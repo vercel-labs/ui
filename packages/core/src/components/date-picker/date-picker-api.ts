@@ -272,8 +272,8 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
       month: ISOMonth,
       { reason = "imperative", event }: DatePickerChangeOptions<DatePickerMonthChangeReason> = {},
     ) => setMonth(month, reason, event),
-    previous: calendar.previous,
-    next: calendar.next,
+    previous: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => calendar.previous(options),
+    next: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => calendar.next(options),
     focus: calendar.focus,
     internal: {
       ...calendar.internal,
