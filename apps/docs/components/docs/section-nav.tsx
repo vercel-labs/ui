@@ -5,21 +5,25 @@ import { menu } from "@/lib/menu"
 import type { Section } from "@/lib/sections"
 import type { Root } from "fumadocs-core/page-tree"
 import { usePathname } from "next/navigation"
-import { useFramework } from "./remember-framework"
+import { useSavedFramework } from "./remember-framework"
 
-// Where a menu link goes and whether it's the current section.
+// Where a menu link goes and whether it's the current section. Before hydration
+// and without JavaScript there's no saved framework to read, so the Guides and
+// Components links keep their framework-less hrefs, which redirects resolve
+// from the cookie.
 function useMenuLink(section?: Section) {
-  const [framework] = useFramework()
+  const saved = useSavedFramework()
   const pathname = usePathname()
   const activeLink = menu.findLast(({ href }) => pathname === href || pathname.startsWith(`${href}/`))
   const current = section && isFramework(section) ? section : undefined
+  const framework = current ?? saved
   const onComponents = !!current && pathname.startsWith(`/docs/${current}/components`)
   return (href: string) => {
     if (href === "/docs/frameworks") {
-      return { href: `/docs/${current ?? framework}`, current: !!current && !onComponents }
+      return { href: framework ? `/docs/${framework}` : href, current: !!current && !onComponents }
     }
     if (href === "/docs/components") {
-      return { href: `/docs/${current ?? framework}/components`, current: onComponents }
+      return { href: framework ? `/docs/${framework}/components` : href, current: onComponents }
     }
     return { href, current: href === activeLink?.href }
   }

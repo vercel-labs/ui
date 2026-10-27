@@ -88,7 +88,9 @@ test("the header's framework picker stays on Docs and Agents pages and changes t
   await expect(page).toHaveURL(/\/docs\/svelte$/)
 })
 
-test("the header's framework picker shows the saved framework before the page hydrates", async ({ page }) => {
+test("the header shows the saved framework and framework-less links before the page hydrates", async ({
+  page,
+}) => {
   await page.context().addCookies([{ name: "framework", value: "vue", url: "http://localhost" }])
   // No scripts but the inline ones, so React never hydrates.
   await page.route(/\.js(\?|$)/, (route) => route.abort())
@@ -98,6 +100,17 @@ test("the header's framework picker shows the saved framework before the page hy
       useInnerText: true,
     })
   }
+  // Guides and Components keep their framework-less hrefs, so the cookie
+  // redirects send this reader to Vue, not the hydration fallback.
+  const sections = page.getByRole("navigation", { name: "Sections" }).first()
+  await expect(sections.getByRole("link", { name: "Guides", exact: true })).toHaveAttribute(
+    "href",
+    "/docs/frameworks",
+  )
+  await expect(sections.getByRole("link", { name: "Components", exact: true })).toHaveAttribute(
+    "href",
+    "/docs/components",
+  )
 })
 
 test("Guides and Components split a framework's docs, each with its own sidebar", async ({ page }) => {
