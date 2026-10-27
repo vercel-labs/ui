@@ -19,6 +19,20 @@ test("Mute toggles its pressed state with a click, Enter and Space", async ({ pa
   await expect(button).toHaveAttribute("aria-pressed", "true")
 })
 
+test("highlighted lines span the code block's full scrollable width", async ({ page }) => {
+  await page.goto("/docs/core/build-a-component")
+  const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
+  await pre.scrollIntoViewIfNeeded()
+  const { clientWidth, scrollWidth, bands } = await pre.evaluate((el) => ({
+    clientWidth: el.clientWidth,
+    scrollWidth: el.scrollWidth,
+    bands: [...el.querySelectorAll(".line.highlighted")].map((line) => line.getBoundingClientRect().width),
+  }))
+  expect(scrollWidth, "the block must overflow for the test to mean anything").toBeGreaterThan(clientWidth)
+  expect(bands.length).toBeGreaterThan(0)
+  for (const width of bands) expect(width).toBeGreaterThanOrEqual(scrollWidth - 2)
+})
+
 test("installation, rendering and the next guide follow the framework docs visited last", async ({
   page,
 }) => {
