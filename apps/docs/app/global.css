@@ -157,6 +157,14 @@ html {
   padding-inline: 1rem;
 }
 
+/* With a number gutter the code has no start padding, so the band starts at
+   the content edge and extends only over the end padding. */
+[data-code-frame] pre:has(.line + .line) .line:is(.highlighted, .diff) {
+  min-width: calc(100% + 1rem);
+  margin-inline: 0;
+  padding-inline: 0 1rem;
+}
+
 [data-code-frame] .line.highlighted {
   background: color-mix(in oklab, var(--foreground) 6%, transparent);
 }
@@ -188,13 +196,43 @@ html {
   counter-reset: line;
 }
 
+/* The numbers pin to the block's start edge while the code scrolls under
+   them. Sticky boxes pin at the scroll container's content edge, so the pre
+   has no inline padding: the gutter carries the start padding, and the code
+   element the end padding. The gutter needs an opaque background to cover the
+   code passing beneath, so each line tint is premixed over the frame's
+   background (--gutter-bg) instead of left translucent. */
+[data-code-frame] pre:has(.line + .line) code {
+  padding-inline-start: 0;
+}
+
 [data-code-frame] pre:has(.line + .line) .line::before {
   counter-increment: line;
   content: counter(line);
+  position: sticky;
+  inset-inline-start: 0;
   display: inline-block;
-  width: 2ch;
-  margin-inline-end: 1.25rem;
+  width: calc(1rem + 2ch + 1.25rem);
+  padding-inline: 1rem 1.25rem;
   text-align: end;
   color: color-mix(in oklab, var(--subtle) 55%, transparent);
   user-select: none;
+  --gutter-bg: var(--background);
+  background: var(--gutter-bg);
+}
+
+.dark [data-code-frame] pre:has(.line + .line) .line::before {
+  --gutter-bg: color-mix(in srgb, var(--foreground) 3%, var(--canvas));
+}
+
+[data-code-frame] pre:has(.line + .line) .line.highlighted::before {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--gutter-bg));
+}
+
+[data-code-frame] pre:has(.line + .line) .line.diff.add::before {
+  background: color-mix(in srgb, var(--color-green-500) 14%, var(--gutter-bg));
+}
+
+[data-code-frame] pre:has(.line + .line) .line.diff.remove::before {
+  background: color-mix(in srgb, var(--color-red-500) 14%, var(--gutter-bg));
 }

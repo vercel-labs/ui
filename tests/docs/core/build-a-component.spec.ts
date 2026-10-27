@@ -33,6 +33,22 @@ test("highlighted lines span the code block's full scrollable width", async ({ p
   for (const width of bands) expect(width).toBeGreaterThanOrEqual(scrollWidth - 2)
 })
 
+test("line numbers stay pinned while the code scrolls", async ({ page }) => {
+  await page.goto("/docs/core/build-a-component")
+  const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
+  await pre.scrollIntoViewIfNeeded()
+  const hits = await pre.evaluate((el) => {
+    el.scrollLeft = 100
+    const rect = el.getBoundingClientRect()
+    return [...el.querySelectorAll(".line")].slice(0, 8).map((line) => {
+      const y = line.getBoundingClientRect().top + 8
+      const top = document.elementsFromPoint(rect.left + 4, y)[0]
+      return top?.classList.contains("line") ? "gutter" : (top?.tagName ?? "none")
+    })
+  })
+  expect(hits).toEqual(Array(8).fill("gutter"))
+})
+
 test("installation, rendering and the next guide follow the framework docs visited last", async ({
   page,
 }) => {
