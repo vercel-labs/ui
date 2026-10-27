@@ -169,7 +169,7 @@ type HoverCardContentState<Payload = unknown> = {
  * @stable
  */
 type HoverCardArrowState = {
-  /** Whether the card is open. */
+  /** Whether the card is open. False as soon as it starts closing, while it still animates out. */
   open: boolean
 }
 

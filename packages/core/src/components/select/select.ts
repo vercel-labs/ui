@@ -400,9 +400,9 @@ type SelectTriggerState = {
   open: boolean
   /** Whether the select is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether the select is read-only. */
+  /** Whether the select keeps its value but refuses changes, from its `readOnly` option. Sets `aria-readonly`. */
   readOnly: boolean
-  /** Whether the select is required. */
+  /** Whether a value must be selected before the form submits, from its `required` option. Sets `aria-required`. */
   required: boolean
   /** Whether nothing is selected, so the placeholder shows. */
   placeholder: boolean
@@ -450,9 +450,9 @@ type SelectContentState = {
 type SelectItemState = {
   /** Whether the item has keyboard focus or is under the pointer. */
   highlighted: boolean
-  /** Whether the item is selected. */
+  /** Whether its value is in the select's value, compared with `isItemEqualToValue` when you pass one. */
   selected: boolean
-  /** Whether the item can't be chosen. */
+  /** Whether the item's own `disabled` prop is set. It can still be highlighted, but not chosen. */
   disabled: boolean
 }
 /**
@@ -463,7 +463,7 @@ type SelectItemState = {
 type SelectInputState = {
   /** Whether the list is open. */
   open: boolean
-  /** Whether the select is disabled. */
+  /** Whether the select is disabled, by itself or by a `<fieldset>`. A read-only select's search field stays enabled. */
   disabled: boolean
 }
 /**
@@ -507,7 +507,7 @@ type SelectSelectAllState = ListSelectAllState
  * @stable
  */
 type SelectItemIndicatorState = {
-  /** Whether the item is selected. */
+  /** Whether its item is selected. While false, the indicator leaves the page unless `keepMounted` is set. */
   selected: boolean
 }
 /**
@@ -516,7 +516,7 @@ type SelectItemIndicatorState = {
  * @stable
  */
 type SelectClearState = {
-  /** Whether the select is disabled. */
+  /** Whether the select is disabled or read-only, so there's nothing it can clear. */
   disabled: boolean
 }
 /**

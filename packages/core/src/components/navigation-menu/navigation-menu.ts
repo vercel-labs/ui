@@ -225,7 +225,7 @@ type NavigationMenuRootState<T extends string = string> = {
   value: T | null
   /** Whether a panel is open. */
   open: boolean
-  /** The orientation. */
+  /** The menu's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: NavigationMenuOrientation
   /** Whether the menu sits inside another one's content. */
   nested: boolean
@@ -238,7 +238,7 @@ type NavigationMenuRootState<T extends string = string> = {
 type NavigationMenuListState = {
   /** Whether a panel is open. */
   open: boolean
-  /** The orientation. */
+  /** The menu's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: NavigationMenuOrientation
 }
 /**
@@ -258,7 +258,7 @@ type NavigationMenuItemState = {
 type NavigationMenuTriggerState = {
   /** Whether this trigger's panel is open. */
   open: boolean
-  /** Whether the trigger is disabled. */
+  /** Set by the trigger's `disabled` prop, which stops it opening its panel. */
   disabled: boolean
 }
 /**
@@ -271,7 +271,7 @@ type NavigationMenuContentState = {
   open: boolean
   /** Which way it moves when another item takes over or gives way, or null when the menu opened or closed as a whole. */
   motion: NavigationMenuMotion | null
-  /** The orientation. */
+  /** The menu's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: NavigationMenuOrientation
 }
 /**
@@ -302,7 +302,7 @@ type NavigationMenuLinkIconState = ItemIconState
 type NavigationMenuViewportState = {
   /** Whether a panel is open. False while it animates out. */
   open: boolean
-  /** The orientation. */
+  /** The menu's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: NavigationMenuOrientation
 }
 /**
@@ -313,7 +313,7 @@ type NavigationMenuViewportState = {
 type NavigationMenuIndicatorState = {
   /** Whether a panel is open. */
   open: boolean
-  /** The orientation. */
+  /** The menu's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: NavigationMenuOrientation
 }
 

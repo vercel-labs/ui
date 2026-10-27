@@ -351,7 +351,7 @@ type AlertDialogShortcutProps = ShortcutProps
 type DialogTriggerState = {
   /** Whether the dialog is open from this trigger. */
   open: boolean
-  /** Whether the trigger is disabled. */
+  /** Set by the trigger's `disabled` prop, which stops it opening the dialog. */
   disabled: boolean
 }
 /**

@@ -191,7 +191,7 @@ type CalendarSelectState = {
   value: number
   /** Every month, or the years from `min` to `max` (10 either side of the year shown without them). */
   options: CalendarSelectOption[]
-  /** Whether the calendar is disabled. */
+  /** Whether the calendar is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
 }
 
@@ -211,7 +211,7 @@ type CalendarStepState = {
  * @stable
  */
 type CalendarGridCell = {
-  /** Its date. */
+  /** Its ISO date, like `"2026-10-27"`. Pass it as the day's `value`. */
   date: ISODate
   /** Whether it belongs to the month before or after. */
   outside: boolean
@@ -224,7 +224,7 @@ type CalendarGridCell = {
  * @stable
  */
 type CalendarGridState = {
-  /** The grid's month. */
+  /** The month it shows: the first month shown, plus its `offset`. */
   month: ISOMonth
   /** The month's name and year, like "October 2026". */
   label: string
@@ -258,7 +258,7 @@ type CalendarDayState = {
   label: string
   /** Whether it's selected. In a range, every date from start to end is. */
   selected: boolean
-  /** Whether it's today. */
+  /** Whether it's the `today` option's date, or else today in `timeZone`, read once the calendar runs in the browser. */
   today: boolean
   /** Whether it belongs to the month before or after its grid's. */
   outside: boolean

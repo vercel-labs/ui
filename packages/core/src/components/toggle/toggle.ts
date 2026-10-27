@@ -32,7 +32,7 @@ type ToggleChangeOptions = ChangeOptions<TogglePressedChangeReason>
  */
 function createToggleController() {
   return createController<{
-    /** Whether it's pressed. */
+    /** Whether it's pressed. Inside a group, it follows the group's value. */
     isPressed: () => boolean
     /** Presses or unpresses it, as a user would. A disabled toggle ignores it. Returns false when canceled. */
     setPressed: (pressed: boolean, options?: ToggleChangeOptions) => boolean
@@ -101,7 +101,7 @@ type ToggleInternalOptions = ToggleOptions & {
  * @stable
  */
 type ToggleState = {
-  /** Whether it's pressed. */
+  /** Whether it's pressed. Inside a group, it follows the group's value. */
   pressed: boolean
   /** Whether it's disabled, by itself or by its group. */
   disabled: boolean

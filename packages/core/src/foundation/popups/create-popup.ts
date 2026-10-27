@@ -52,7 +52,7 @@ type PopupOptions = {
  * @experimental
  */
 type PopupState = {
-  /** Whether it's open. */
+  /** Whether it's open. False as soon as it starts closing, while `mounted` stays true through the exit animation. */
   open: boolean
   /** True while it's in the page, including while it animates out. */
   mounted: boolean

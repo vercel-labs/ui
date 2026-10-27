@@ -291,7 +291,7 @@ type MenuSubTriggerProps = SubTriggerProps
 type MenuTriggerState = {
   /** Whether the menu is open from this trigger. */
   open: boolean
-  /** Whether the trigger is disabled. */
+  /** Whether the trigger's `disabled` prop is set, or the menubar it's in is disabled. */
   disabled: boolean
 }
 /**
@@ -335,7 +335,7 @@ type MenuItemState = {
  * @stable
  */
 type MenuCheckboxItemState = MenuItemState & {
-  /** Whether the item is checked. */
+  /** Whether the item is on: its `checked` prop when you pass one, otherwise `defaultChecked` until a press changes it. */
   checked: boolean
 }
 /**
@@ -362,7 +362,7 @@ type MenuRadioGroupState = {
  * @stable
  */
 type MenuItemIndicatorState = {
-  /** Whether the item is checked. */
+  /** Whether its checkbox item is on, or its radio item is its group's value. While false, the indicator leaves the page unless `keepMounted` is set. */
   checked: boolean
   /** Whether the item can't be chosen. */
   disabled: boolean

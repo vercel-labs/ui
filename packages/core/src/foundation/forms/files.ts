@@ -34,7 +34,7 @@ type FileRejectionReason =
  * @stable
  */
 type FileRejection<F extends FileLike = File> = {
-  /** The file. */
+  /** The file that failed. It never joins the value. */
   file: F
   /**
    * Every reason, in the order they're checked: type, size, your `validate`,

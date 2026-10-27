@@ -330,7 +330,7 @@ type TriggerMenuItemProps<T = string> = {
  * @stable
  */
 type TriggerMenuInputState = {
-  /** Whether the menu is open. */
+  /** Whether the menu is open. It opens on a typed trigger, and closes when nothing matches unless it's loading or renders an empty part. */
   open: boolean
   /** The trigger of the current match, like `"@"`, or null. */
   trigger: string | null
@@ -395,7 +395,7 @@ type TriggerMenuEmptyState = {
  * @stable
  */
 type TriggerMenuStatusState = {
-  /** Whether the menu is open. */
+  /** Whether the menu is open. It opens on a typed trigger, and closes when nothing matches unless it's loading or renders an empty part. */
   open: boolean
   /** Whether items are loading or failed. */
   status: AsyncOptionsStatus

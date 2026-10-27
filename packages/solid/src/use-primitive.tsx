@@ -307,11 +307,11 @@ function slotProps(
 type PrimitiveHandle<P extends Primitive> = {
   /** The primitive it's an instance of. */
   primitive: P
-  /** The primitive instance. */
+  /** What calling the primitive returned, which holds its state, its parts and its api. */
   instance: ReturnType<P>
   /** The instance's state now. Reading it doesn't track; parts read theirs from `usePart`. */
   readonly state: TypesOf<P>["state"]
-  /** The instance's api. */
+  /** The methods its definition declares, like Tabs' `setValue`. */
   api: TypesOf<P>["api"]
   /** Whether a slot's element should exist. Reading it in a tracking scope, like a `Show` condition, tracks it. */
   present: <S extends SlotName<P>>(name: S, props?: () => PropsOf<P, S>) => boolean

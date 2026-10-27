@@ -174,7 +174,7 @@ type ResizablePanelState = {
   orientation: "horizontal" | "vertical"
   /** The panel's size in percent. Reading it renders on every frame of a drag. */
   size: number
-  /** Whether the panel is collapsed. */
+  /** Whether the panel is down at its `collapsedSize`, below its minimum. */
   collapsed: boolean
   /** Whether the panel can collapse. */
   collapsible: boolean

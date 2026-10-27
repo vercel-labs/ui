@@ -91,7 +91,7 @@ type PopupContentProps = PositionProps &
 type PopupTriggerState = {
   /** Whether the popup is open from this trigger. */
   open: boolean
-  /** Whether the trigger is disabled. */
+  /** Set by the trigger's `disabled` prop, which stops it opening the popup. */
   disabled: boolean
 }
 
@@ -115,7 +115,7 @@ type PopupContentState = {
  * @experimental
  */
 type PopupPartState = {
-  /** Whether the popup is open. */
+  /** Whether the popup is open. False as soon as it starts closing, while it still animates out. */
   open: boolean
 }
 

@@ -212,7 +212,7 @@ type ListboxRootState = {
   orientation: "horizontal" | "vertical"
   /** Whether the listbox is disabled, by itself, a Field or a `<fieldset>`. */
   disabled: boolean
-  /** Whether the listbox is read-only. */
+  /** Whether the listbox keeps its value but refuses changes, from its `readOnly` option. A form reset still restores it. */
   readOnly: boolean
   /** Whether a value is required. */
   required: boolean
@@ -227,7 +227,7 @@ type ListboxRootState = {
 type ListboxItemState = {
   /** Whether the item has focus. */
   highlighted: boolean
-  /** Whether the item is selected. */
+  /** Whether its value is in the listbox's value, compared with `isItemEqualToValue` when you pass one. */
   selected: boolean
   /** Whether the item can't be chosen. */
   disabled: boolean
@@ -238,7 +238,7 @@ type ListboxItemState = {
  * @stable
  */
 type ListboxItemIndicatorState = {
-  /** Whether the item is selected. */
+  /** Whether its item is selected. While false, the indicator leaves the page unless `keepMounted` is set. */
   selected: boolean
 }
 /**

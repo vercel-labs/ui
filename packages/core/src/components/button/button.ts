@@ -64,7 +64,7 @@ type ButtonInternalOptions = ButtonOptions & {
  * @stable
  */
 type ButtonState = {
-  /** Whether the button is disabled. */
+  /** Whether the `disabled` option is on. A running press shows in `pending` instead. */
   disabled: boolean
   /** Whether the Promise the last press returned is still running. Presses do nothing meanwhile. */
   pending: boolean

@@ -39,7 +39,7 @@ type TokenInputValueChangeReason =
 type TokenInputValueChangeDetails = ChangeDetails<TokenInputValueChangeReason> & {
   /** The browser's input type for typing, like `"insertText"` or `"deleteContentBackward"`. */
   inputType?: string
-  /** The tokens the change removed. */
+  /** The tokens the old value held and the new one doesn't, matched by id. */
   removed: Token[]
 }
 
@@ -178,7 +178,7 @@ type TokenInputEditorState = {
   empty: boolean
   /** Whether the input is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether the input is read-only. */
+  /** Whether the input is read-only: it stays focusable, but typing, pastes and drops don't change it. */
   readOnly: boolean
 }
 /**
@@ -187,7 +187,7 @@ type TokenInputEditorState = {
  * @stable
  */
 type TokenInputTokenState = {
-  /** The token. */
+  /** The token this part shows, found in the value by the id its host passes. */
   token: Token
   /** Whether the token is in the selection, or selected for removal. */
   selected: boolean
@@ -195,9 +195,9 @@ type TokenInputTokenState = {
   pending: boolean
   /** Whether the token needs the user, like an ambiguous mention. */
   unresolved: boolean
-  /** Whether the input is disabled. */
+  /** Whether the input is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether the input is read-only. */
+  /** Whether the input is read-only, so the token's remove button does nothing. */
   readOnly: boolean
 }
 

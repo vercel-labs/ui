@@ -432,9 +432,9 @@ type ComboboxInputState = {
   open: boolean
   /** Whether the combobox is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether the combobox is read-only. */
+  /** Whether the combobox keeps its value but refuses changes, from its `readOnly` option. */
   readOnly: boolean
-  /** Whether the combobox is required. */
+  /** Whether a value must be selected before the form submits, from its `required` option. */
   required: boolean
 }
 /**
@@ -471,7 +471,7 @@ type ComboboxContentState = {
 type ComboboxItemState = {
   /** Whether the item is highlighted, by the keyboard or the pointer. */
   highlighted: boolean
-  /** Whether the item is selected. */
+  /** Whether its value is in the combobox's value, compared with `isItemEqualToValue` when you pass one. */
   selected: boolean
   /** Whether the item can't be chosen, by itself or because `maxSelected` is reached. */
   disabled: boolean
@@ -495,7 +495,7 @@ type ComboboxItemIconState = ItemIconState
  * @stable
  */
 type ComboboxItemIndicatorState = {
-  /** Whether the item is selected. */
+  /** Whether its item is selected. While false, the indicator leaves the page unless `keepMounted` is set. */
   selected: boolean
 }
 /**
@@ -554,9 +554,9 @@ type ComboboxStatusState = ListStatusState
  * @stable
  */
 type ComboboxChipState = {
-  /** The chip's value. */
+  /** The selected value the chip stands for, from its `value` prop. */
   value: unknown
-  /** The chip's label. */
+  /** The text for the value: from `itemToLabel`, its item's label, or the value itself. */
   label: string
   /** Whether the combobox is disabled or read-only, so the chip can't be removed. */
   disabled: boolean

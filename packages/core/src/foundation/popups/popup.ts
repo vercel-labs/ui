@@ -179,7 +179,7 @@ type PopupController<
   Result = string,
   PayloadReason extends Reason = Reason,
 > = {
-  /** Whether it's open. */
+  /** Whether it's open. False as soon as it starts closing, while it still animates out. */
   isOpen: () => boolean
   /** Opens or closes it. */
   setOpen: (open: boolean, options?: PopupChangeOptions<Reason>) => void

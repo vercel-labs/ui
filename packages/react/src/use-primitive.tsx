@@ -115,11 +115,11 @@ function toReactProps(attrs: Attrs) {
 type PrimitiveHandle<P extends Primitive> = {
   /** The primitive it's an instance of. */
   primitive: P
-  /** The primitive instance. */
+  /** What calling the primitive returned, which holds its state, its parts and its api. */
   instance: ReturnType<P>
   /** The state this render shows. Reading it doesn't subscribe; a part's `render` and class name functions get the state they render. */
   readonly state: TypesOf<P>["state"]
-  /** The instance's api. */
+  /** The methods its definition declares, like Tabs' `setValue`. */
   api: TypesOf<P>["api"]
 }
 

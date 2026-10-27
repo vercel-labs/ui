@@ -232,7 +232,7 @@ type PopoverShortcutProps = ShortcutProps
 type PopoverTriggerState = {
   /** Whether the popover is open from this trigger. */
   open: boolean
-  /** Whether the trigger is disabled. */
+  /** Set by the trigger's `disabled` prop, which stops it opening the popover. */
   disabled: boolean
 }
 /**
@@ -259,7 +259,7 @@ type PopoverContentState<Payload = unknown> = {
  * @stable
  */
 type PopoverArrowState = {
-  /** Whether the popover is open. */
+  /** Whether the popover is open. False as soon as it starts closing, while it still animates out. */
   open: boolean
 }
 /**

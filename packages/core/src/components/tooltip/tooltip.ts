@@ -207,7 +207,7 @@ type TooltipContentState<Payload = unknown> = {
  * @stable
  */
 type TooltipArrowState = {
-  /** Whether the tooltip is open. */
+  /** Whether the tooltip is open. False as soon as it starts closing, while it still animates out. */
   open: boolean
 }
 /**

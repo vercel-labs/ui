@@ -143,7 +143,7 @@ type TabsPanelProps = PanelProps
 type TabsRootState<T extends string = string> = {
   /** The selected tab's value. */
   value: T | null
-  /** The orientation. */
+  /** The tabs' `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: TabsOrientation
   /** Which way the last selection moved. */
   direction: TabsDirection
@@ -154,7 +154,7 @@ type TabsRootState<T extends string = string> = {
  * @stable
  */
 type TabsListState = {
-  /** The orientation. */
+  /** The tabs' `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: TabsOrientation
 }
 /**
@@ -194,7 +194,7 @@ type TabsTabIconState = ItemIconState
  * @stable
  */
 type TabsIndicatorState = {
-  /** The orientation. */
+  /** The tabs' `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: TabsOrientation
   /** Which way the last selection moved. */
   direction: TabsDirection

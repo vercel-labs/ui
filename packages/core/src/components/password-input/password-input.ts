@@ -118,7 +118,7 @@ type PasswordInputState = {
   disabled: boolean
   /** Whether the field is read-only. */
   readOnly: boolean
-  /** Whether a password is required. */
+  /** Whether a form won't submit while the field is empty. */
   required: boolean
 }
 

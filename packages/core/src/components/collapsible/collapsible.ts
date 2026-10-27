@@ -113,7 +113,7 @@ type CollapsibleTriggerProps = {}
 type CollapsibleRootState = {
   /** Whether the panel is open. */
   open: boolean
-  /** Whether the collapsible is disabled. */
+  /** Whether the trigger ignores presses. The controller can still open and close it. */
   disabled: boolean
 }
 /**

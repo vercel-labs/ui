@@ -108,7 +108,7 @@ type CheckboxGroupState = {
   value: string[]
   /** Whether the group is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether the group is required. */
+  /** Whether a form won't submit until at least one of its checkboxes is checked. */
   required: boolean
 }
 

@@ -27,9 +27,9 @@ type FileInputValueChangeReason = "picker" | "drop" | "paste" | "remove-press" |
 type FileInputChange = {
   /** Why it changed. */
   reason: FileInputValueChangeReason
-  /** The files it added. */
+  /** The files that joined the value. Files that failed the checks are in `rejected` instead. */
   added: File[]
-  /** The files it removed. */
+  /** The files that left the value, including the one a new file replaces without `multiple`. */
   removed: File[]
   /** The files that didn't pass the checks, each with its reasons. They never join the value. */
   rejected: FileRejection[]
@@ -180,7 +180,7 @@ type FileInputState = {
   value: readonly File[]
   /** Whether it's disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether it's required. */
+  /** Whether a form won't submit while it holds no files. */
   required: boolean
   /** Whether files are being dragged over one of its drop zones. */
   dragging: boolean
@@ -198,7 +198,7 @@ type FileInputDropzoneState = {
   dragAccept: boolean
   /** Whether a dragged file has a type `accept` rules out, or there are too many. */
   dragReject: boolean
-  /** Whether the file input is disabled. */
+  /** Whether the file input is disabled, by itself or by a `<fieldset>`, so drops and pastes are ignored. */
   disabled: boolean
 }
 
@@ -208,7 +208,7 @@ type FileInputDropzoneState = {
  * @stable
  */
 type FileInputItemState = {
-  /** The file. */
+  /** The file this item shows, from its `file` prop. */
   file: File
   /** Where it is in the value, from 0. */
   index: number
@@ -222,7 +222,7 @@ type FileInputItemState = {
  * @stable
  */
 type FileInputItemRemoveState = {
-  /** Whether the file input is disabled. */
+  /** Whether the file input is disabled, so the button can't remove its file. */
   disabled: boolean
 }
 

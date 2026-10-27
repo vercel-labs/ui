@@ -174,9 +174,9 @@ type NumberInputState = {
   value: number | null
   /** Whether it's disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether it's read-only. */
+  /** Whether it's read-only: it stays focusable and submitted, but typing, steps and scrubs don't change it. */
   readOnly: boolean
-  /** Whether it's required. */
+  /** Whether a form won't submit while it's empty. */
   required: boolean
   /** Whether a scrub is moving the value. */
   scrubbing: boolean

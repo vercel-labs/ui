@@ -286,7 +286,7 @@ type TreeRootState = {
 type TreeItemState = {
   /** Whether it's a branch that's expanded. */
   expanded: boolean
-  /** Whether it's selected. */
+  /** Whether its value is in the tree's value. Separate from `checked`, which its checkbox sets. */
   selected: boolean
   /** Its checkbox: checked, unchecked or `"indeterminate"`. False without `checkable`. */
   checked: TreeCheckedState

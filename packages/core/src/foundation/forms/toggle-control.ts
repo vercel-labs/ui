@@ -73,13 +73,13 @@ function checkedAttribute(attribute: string | null) {
 type CheckboxState = {
   /** Whether it's checked. False while indeterminate. */
   checked: boolean
-  /** Whether it's indeterminate. */
+  /** Whether it's `"indeterminate"`, for a partly checked group. A press makes it checked. */
   indeterminate: boolean
   /** Whether it's disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether it's read-only. */
+  /** Whether it's read-only: it stays focusable and submitted, but presses don't change it. */
   readOnly: boolean
-  /** Whether it's required. */
+  /** Whether a form won't submit until it's checked. Indeterminate doesn't count. */
   required: boolean
 }
 

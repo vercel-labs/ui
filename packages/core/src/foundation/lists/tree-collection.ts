@@ -200,7 +200,7 @@ function treeFromPaths(paths: readonly string[]) {
  * @stable
  */
 type TreeRow = {
-  /** The item. */
+  /** The object from your data this row shows, the same one you passed in, children included. */
   item: TreeItemData
   /** The value of the item it's nested in, or `null` at the top level. */
   parent: string | null

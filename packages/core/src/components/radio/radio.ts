@@ -127,9 +127,9 @@ type RadioGroupState = {
   value: string | null
   /** Whether the group is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
-  /** Whether the group is read-only. */
+  /** Whether the group is read-only: arrow keys still move focus, but nothing changes the checked item. */
   readOnly: boolean
-  /** Whether the group is required. */
+  /** Whether a form won't submit until an item is checked. */
   required: boolean
 }
 /**

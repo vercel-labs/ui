@@ -195,7 +195,7 @@ type AccordionRootState<T extends string = string> = {
  * @stable
  */
 type AccordionItemState = {
-  /** Whether the item is open. */
+  /** Whether the accordion's `value` holds this item's value. */
   open: boolean
   /** Whether the item can't open or close. */
   disabled: boolean

@@ -28,6 +28,10 @@
 //   types, or someone hovering a component in their editor, learns what each
 //   one is for. A Svelte component takes a `<!-- @component -->` comment
 //   instead, which Svelte's tooling shows the same way.
+// - name-only-docs: a field or method's JSDoc in packages/*/src says more
+//   than its name and its type's name, so "Whether the item is selected." on
+//   `ItemState.selected` fails, and so do "The orientation." and "Whether
+//   it's open.". Say what sets it, when it changes or what it holds.
 // - stability: each of those exports says what it promises with exactly one
 //   of `@stable` (follows semver) or `@experimental` (may change in any minor
 //   release), at the end of its JSDoc, or in a Svelte component's
@@ -107,8 +111,7 @@ const publicNameAllowlist = {
   dispatch: "An action that runs a callback and says whether it was canceled.",
   animateIn: "An action that animates an element, and returns what stops it.",
   animateOut: "An action that animates an element, and returns what stops it.",
-  partPresent:
-    "Reads a part in `@ui-sdk/core/testing`, named like `partAttrs` and `partState`.",
+  partPresent: "Reads a part in `@ui-sdk/core/testing`, named like `partAttrs` and `partState`.",
 }
 // The page-wide registries `register*` may name.
 const registries = ["registerShortcut", "registerTools"]
@@ -129,6 +132,8 @@ const svelteComponentDoc = /^<!--\s*@component\b/m
 const svelteComponentComment = /^<!--\s*@component\b[\s\S]*?-->/m
 const svelteStabilityLabel = /^\s*@(stable|experimental)\s*$/gm
 const stabilityLabels = ["stable", "experimental"]
+// Words a doc may add to a name and still say nothing.
+const fillerWords = new Set(["the", "a", "an", "it", "its", "s", "is", "whether", "this", "of"])
 
 const shouldFix = process.argv.includes("--fix")
 const violations = []
@@ -138,6 +143,7 @@ checkPopupSteps()
 checkImportLayers()
 const surface = publicExports(root)
 checkPublicDocs()
+checkNameOnlyDocs()
 checkStability()
 checkInternalStability()
 checkExportsAtEnd()
@@ -432,6 +438,56 @@ function checkPublicDocs() {
       message: `\`${name}\` is public, so give it a \`<!-- @component -->\` comment that says what it's for.`,
     })
   }
+}
+
+function checkNameOnlyDocs() {
+  const isMember = (node) =>
+    ts.isPropertySignature(node) ||
+    ts.isMethodSignature(node) ||
+    ts.isPropertyDeclaration(node) ||
+    ts.isMethodDeclaration(node) ||
+    ts.isGetAccessor(node) ||
+    ts.isPropertyAssignment(node)
+  const isOwner = (node) =>
+    ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node) || ts.isClassDeclaration(node)
+  for (const file of packageSources()) {
+    const text = readFileSync(file, "utf8")
+    for (const { code, lineOffset } of typeScriptBlocks(file, text)) {
+      const source = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true)
+      const visit = (node, owner) => {
+        const name =
+          node.name && (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) && node.name.text
+        if (name && isMember(node) && node.jsDoc?.length) {
+          const doc = node.jsDoc.map((jsDoc) => ts.getTextOfJSDocComment(jsDoc.comment) ?? "").join(" ")
+          const named = new Set([
+            ...docWords(name).filter((word) => word !== "is" && word !== "has"),
+            ...docWords(owner),
+          ])
+          const said = docWords(doc).filter((word) => !fillerWords.has(word))
+          if (said.length && said.every((word) => named.has(word)))
+            violations.push({
+              file: path.relative(root, file),
+              line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1 + lineOffset,
+              rule: "name-only-docs",
+              message: `\`${name}\`'s doc only repeats its name. Say what sets it, when it changes or what it holds.`,
+            })
+        }
+        const next = isOwner(node) ? node.name.text : owner
+        ts.forEachChild(node, (child) => visit(child, next))
+      }
+      visit(source, "")
+    }
+  }
+}
+
+// The words of a name or a doc, so `readOnly` and "read-only" match: lowercase, without plural `s`.
+function docWords(text) {
+  return text
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .map((word) => (word.length > 3 ? word.replace(/s$/, "") : word))
 }
 
 function checkStability() {

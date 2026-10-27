@@ -131,7 +131,7 @@ type ToggleGroupState<T extends string = string> = {
   multiple: boolean
   /** Whether the whole group is disabled. */
   disabled: boolean
-  /** The orientation. */
+  /** The group's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: ToggleGroupOrientation
 }
 

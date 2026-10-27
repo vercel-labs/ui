@@ -31,7 +31,7 @@ function createCheckboxController() {
   return createController<{
     /** Checks it, or unchecks it. An indeterminate checkbox becomes checked. */
     toggle: (details?: Details) => boolean
-    /** Whether it's checked. */
+    /** Whether it's checked: `true`, `false` or `"indeterminate"`. */
     getChecked: () => CheckedState
     /** Sets whether it's checked, as a user would. */
     setChecked: (checked: CheckedState, details?: Details) => boolean

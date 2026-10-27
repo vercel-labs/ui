@@ -120,7 +120,7 @@ type ToolbarGroupProps = GroupProps
  * @stable
  */
 type ToolbarRootState = {
-  /** The orientation. */
+  /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
   /** Whether the whole toolbar is disabled. */
   disabled: boolean
@@ -133,7 +133,7 @@ type ToolbarRootState = {
 type ToolbarButtonState = {
   /** Whether the item is disabled, by itself, its group or the toolbar. */
   disabled: boolean
-  /** The toolbar's orientation. */
+  /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
 }
 /**
@@ -142,7 +142,7 @@ type ToolbarButtonState = {
  * @stable
  */
 type ToolbarLinkState = {
-  /** The toolbar's orientation. */
+  /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
 }
 /**
@@ -159,7 +159,7 @@ type ToolbarInputState = ToolbarButtonState
 type ToolbarGroupState = {
   /** Whether the group is disabled, by itself or the toolbar. */
   disabled: boolean
-  /** The toolbar's orientation. */
+  /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
 }
 /**

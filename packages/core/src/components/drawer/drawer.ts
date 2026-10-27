@@ -235,7 +235,7 @@ type DrawerHandleState = {
  * @stable
  */
 type DrawerOutletState = {
-  /** Whether the drawer is open. */
+  /** Whether the drawer is open. False as soon as it starts closing, while it still animates out. */
   open: boolean
 }
 

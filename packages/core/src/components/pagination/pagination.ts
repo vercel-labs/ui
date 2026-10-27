@@ -114,7 +114,7 @@ type PaginationState = {
  * @stable
  */
 type PaginationLinkState = {
-  /** The link's page. */
+  /** The page it goes to, from its `page` prop. */
   page: number
   /** Whether it's the current page. */
   active: boolean

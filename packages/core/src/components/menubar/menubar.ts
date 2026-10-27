@@ -80,7 +80,7 @@ type MenubarOptions = {
  * @stable
  */
 type MenubarState = {
-  /** The orientation. */
+  /** Which arrow keys move between menus, from the `orientation` option. A vertical menubar opens its menus to the side. */
   orientation: MenubarOrientation
   /** Whether the whole menubar is disabled. */
   disabled: boolean
