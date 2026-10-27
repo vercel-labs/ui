@@ -160,7 +160,9 @@ jobs:
         env:
           BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || (github.event.before != '0000000000000000000000000000000000000000' && github.event.before) || 'origin/main' }}
           ENGINES: ${{ needs.plan.outputs.suite == 'affected-engines' && '--engines' || '' }}
+        # pipefail, so a failing script fails the job instead of planning no shards.
         run: |
+          set -o pipefail
           node scripts/affected-specs.mjs --base "$BASE" $ENGINES --shards | tee "$RUNNER_TEMP/plan.txt"
           count=$(sed -n 's/^shards=//p' "$RUNNER_TEMP/plan.txt")
           echo "base=$(git rev-parse "$BASE")" >> "$GITHUB_OUTPUT"

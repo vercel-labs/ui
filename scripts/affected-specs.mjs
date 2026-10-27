@@ -316,13 +316,15 @@ function commands({ touched, shared }) {
 function shardCount(runs) {
   let seconds = 0
   for (const args of runs) {
+    // Every Chromium project lists about 3 MB, past the default 1 MB buffer.
     const list = spawnSync("npx", ["playwright", "test", "--list", ...args], {
       cwd: path.join(root, "tests"),
       encoding: "utf8",
       env: { ...process.env, CI: "1" },
+      maxBuffer: 64 * 1024 * 1024,
     })
     if (list.status !== 0) {
-      console.error(list.stdout, list.stderr)
+      console.error(list.error ?? "", list.stdout, list.stderr)
       process.exit(1)
     }
     for (const [, project, file] of list.stdout.matchAll(/^\s+\[(.+?)\] › (\S+?):\d+:\d+ › /gm)) {
