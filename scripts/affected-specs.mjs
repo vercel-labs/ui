@@ -6,6 +6,8 @@
 //   pnpm test:pr --base <ref>
 //   pnpm test:pr --workers 3 Passes a worker count to Playwright. Three quarters of the cores by default.
 //   pnpm test:pr --dev       Serves the playground from Vite's dev server instead of a build.
+//   pnpm test:pr --shards    Prints the plan and how many CI runners it needs, as `shards=<n>`.
+//   pnpm test:pr --shard 2/3 Runs the second third of every command, like one of those runners.
 //   pnpm test:sweep          Runs every spec on every project: Chromium and web on
 //                            WebKit and Firefox. It replaces CI's main and nightly tiers.
 //
@@ -46,6 +48,18 @@ const fixtureRoot = path.join(root, "apps/playground/src/fixtures")
 // running each importer's specs on every project would cost more than that.
 const sharedThreshold = 4
 
+// What a test takes on a 2-worker CI runner, in seconds, from the affected
+// runs' durations: the react project's 2,551 tests took 21 to 25 minutes.
+// A leak test, at 10 to 30 seconds, counts as 16, and WebKit and Firefox
+// take about twice as long as Chromium.
+const testSeconds = 0.4
+const leakWeight = 16
+const engineWeight = 2
+// CI splits the plan into runners of about this many minutes of tests, so
+// each Playwright run stays well inside the config's 25-minute globalTimeout.
+const shardMinutes = 10
+const maxShards = 10
+
 const frameworks = ["react", "vue", "web", "solid", "svelte"]
 const engineProjects = ["web-webkit", "web-firefox"]
 const leakFrameworks = ["react", "vue", "web"]
@@ -77,6 +91,8 @@ const { values: flags } = parseArgs({
     all: { type: "boolean", default: false },
     dev: { type: "boolean", default: false },
     workers: { type: "string" },
+    shards: { type: "boolean", default: false },
+    shard: { type: "string" },
   },
 })
 
@@ -296,6 +312,32 @@ function commands({ touched, shared }) {
   return runs
 }
 
+/** The CI runners `runs` need: their listed tests' estimated minutes over `shardMinutes`. */
+function shardCount(runs) {
+  let seconds = 0
+  for (const args of runs) {
+    // Every Chromium project lists about 3 MB, past the default 1 MB buffer.
+    const list = spawnSync("npx", ["playwright", "test", "--list", ...args], {
+      cwd: path.join(root, "tests"),
+      encoding: "utf8",
+      env: { ...process.env, CI: "1" },
+      maxBuffer: 64 * 1024 * 1024,
+    })
+    if (list.status !== 0) {
+      console.error(list.error ?? "", list.stdout, list.stderr)
+      process.exit(1)
+    }
+    for (const [, project, file] of list.stdout.matchAll(/^\s+\[(.+?)\] › (\S+?):\d+:\d+ › /gm)) {
+      const weight =
+        (file === "leaks.spec.ts" ? leakWeight : 1) * (/-(webkit|firefox)$/.test(project) ? engineWeight : 1)
+      seconds += testSeconds * weight
+    }
+  }
+  const minutes = seconds / 60
+  console.log(`Estimated time on one runner: ${Math.max(1, Math.round(minutes))} min.`)
+  return Math.min(maxShards, Math.ceil(minutes / shardMinutes))
+}
+
 // A port of its own, so the gate never reuses another session's playground.
 function freePort() {
   return new Promise((done) => {
@@ -350,7 +392,8 @@ for (const args of runs)
   console.log(
     `  npx playwright test ${args.map((arg) => (/[*|()\\]/.test(arg) ? `'${arg}'` : arg)).join(" ")}`,
   )
-if (flags.dry || runs.length === 0) process.exit(0)
+if (flags.shards) console.log(`shards=${runs.length > 0 ? shardCount(runs) : 0}`)
+if (flags.dry || flags.shards || runs.length === 0) process.exit(0)
 
 const port = process.env.PLAYGROUND_PORT ?? (await freePort())
 const server = flags.dev ? undefined : await servePlayground(port)
@@ -360,7 +403,8 @@ for (const args of runs) {
   // 260 specs from 124 to 93 seconds. CI keeps the config's 2.
   const count = flags.workers ?? (process.env.CI ? undefined : "75%")
   const workers = count ? ["--workers", count] : []
-  const { status } = spawnSync("npx", ["playwright", "test", ...args, ...workers], {
+  const shard = flags.shard ? ["--shard", flags.shard] : []
+  const { status } = spawnSync("npx", ["playwright", "test", ...args, ...workers, ...shard], {
     cwd: path.join(root, "tests"),
     stdio: "inherit",
     env: { ...process.env, PLAYGROUND_PORT: port, ...(server && { PLAYGROUND_SERVED: "1" }) },

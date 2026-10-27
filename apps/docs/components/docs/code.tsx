@@ -23,12 +23,15 @@ function Pre({ className, style, title, icon, ...props }: ComponentProps<"pre"> 
           <CopyButton className="-my-1.5 -me-2 ms-auto" />
         </div>
       )}
+      {/* The inline padding sits on the code element: the pre is the scroll
+          container, and the sticky line numbers pin at its content edge, so
+          padding there would leave a strip of scrolled code uncovered. */}
       <pre
         {...props}
         style={{ ...style, backgroundColor: undefined }}
         className={cn(
           className,
-          "max-h-[32rem] scrollbar-none overflow-auto px-4 py-3.5 font-mono text-[13px] leading-[1.7] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:p-0 [&>code]:text-[1em]",
+          "max-h-[32rem] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[13px] leading-[1.7] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:p-0 [&>code]:px-4 [&>code]:text-[1em]",
         )}
       />
       {!title && <CopyButton className="absolute top-2 end-2 bg-background" />}
