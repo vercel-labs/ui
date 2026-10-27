@@ -12,7 +12,7 @@ function setStyle(el: HTMLElement, name: string, value: string) {
   }
 }
 
-const registered = new Set<string>()
+const registered: Set<string> = new Set()
 
 // Registers custom properties that don't inherit, so one written on every
 // frame restyles only the element it's on, not everything inside it. The
