@@ -8,7 +8,14 @@ import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
-import { calendarApi, calendarSlots, calendarState, calendarSync, isDisabled } from "./calendar-api"
+import {
+  calendarApi,
+  calendarSlots,
+  calendarState,
+  calendarSync,
+  isDisabled,
+  type CalendarModelState,
+} from "./calendar-api"
 
 /**
  * Why a calendar's value wants to change.
@@ -313,7 +320,7 @@ type CalendarDayProps = {
  * `calendar`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @stable
  */
-type CalendarApi = ReturnType<typeof calendarApi>
+type CalendarApi = ReturnType<typeof calendarApi<CalendarOptions, CalendarModelState>>
 
 const calendarPrimitive = /* @__PURE__ */ definePrimitive({
   name: "calendar",

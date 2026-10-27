@@ -301,12 +301,22 @@ function dayState(state: State, props: CalendarDayProps) {
 /**
  * A calendar's behavior, which Date Picker shares. `picked` runs once a
  * press or a key completes a value: a date in single mode, a range's end.
+ * `ValueReason` and `MonthReason` are the reasons its write methods accept,
+ * which Date Picker widens with its own.
  */
-function calendarApi<Options extends Omit<CalendarOptions, "controller" | "onValueChange">, S extends State>(
-  shared: PrimitiveContext<Options, S, string>,
-  hooks: { picked?: (event: Event | undefined) => void } = {},
-) {
-  const context = shared as unknown as PrimitiveContext<CalendarOptions, State, string>
+function calendarApi<
+  Options extends Omit<CalendarOptions, "controller" | "onValueChange">,
+  S extends State,
+  ValueReason extends string = CalendarValueChangeReason,
+  MonthReason extends string = CalendarMonthChangeReason,
+>(shared: PrimitiveContext<Options, S, string>, hooks: { picked?: (event: Event | undefined) => void } = {}) {
+  type ValueChangeReason = ValueReason | CalendarValueChangeReason
+  type MonthChangeReason = MonthReason | CalendarMonthChangeReason
+  const context = shared as unknown as PrimitiveContext<
+    Omit<CalendarOptions, "onValueChange" | "onMonthChange">,
+    State,
+    string
+  >
   const { store, options, element } = context
   const change = createChange(context)
 
@@ -336,24 +346,23 @@ function calendarApi<Options extends Omit<CalendarOptions, "controller" | "onVal
     fallback: (lost) => element("day", lost.key),
   })
 
-  function setMonth(month: ISOMonth, reason: CalendarMonthChangeReason, event?: Event) {
+  function setMonth(month: ISOMonth, reason: MonthChangeReason, event?: Event) {
     if (!isISOMonth(month)) return false
     return change("month", month, { reason, event })
   }
 
-  function setValue(value: CalendarValue, reason: CalendarValueChangeReason, event?: Event) {
+  function setValue(value: CalendarValue, reason: ValueChangeReason, event?: Event) {
     const state = store.get()
     return change("value", normalizeValue(state.mode, value), { reason, event })
   }
 
-  // Turns the months so `date` shows.
-  function reveal(date: ISODate, reason: CalendarMonthChangeReason, event?: Event) {
+  function reveal(date: ISODate, reason: MonthChangeReason, event?: Event) {
     const state = store.get()
     const first = monthToShow(date, state.month, state.months, state.pageBy)
     if (first !== state.month) setMonth(first, reason, event)
   }
 
-  function step(direction: -1 | 1, reason: CalendarMonthChangeReason, event?: Event) {
+  function step(direction: -1 | 1, reason: MonthChangeReason, event?: Event) {
     const target = stepTarget(store.get(), direction)
     return !target.disabled && setMonth(target.month, reason, event)
   }
@@ -383,16 +392,16 @@ function calendarApi<Options extends Omit<CalendarOptions, "controller" | "onVal
     getValue: () => store.get().value,
     setValue: (
       value: CalendarValue,
-      { reason = "imperative", event }: CalendarChangeOptions<CalendarValueChangeReason> = {},
+      { reason = "imperative", event }: CalendarChangeOptions<ValueChangeReason> = {},
     ) => setValue(value, reason, event),
     getMonth: () => store.get().month,
     setMonth: (
       month: ISOMonth,
-      { reason = "imperative", event }: CalendarChangeOptions<CalendarMonthChangeReason> = {},
+      { reason = "imperative", event }: CalendarChangeOptions<MonthChangeReason> = {},
     ) => setMonth(month, reason, event),
-    previous: ({ reason = "imperative", event }: CalendarChangeOptions<CalendarMonthChangeReason> = {}) =>
+    previous: ({ reason = "imperative", event }: CalendarChangeOptions<MonthChangeReason> = {}) =>
       step(-1, reason, event),
-    next: ({ reason = "imperative", event }: CalendarChangeOptions<CalendarMonthChangeReason> = {}) =>
+    next: ({ reason = "imperative", event }: CalendarChangeOptions<MonthChangeReason> = {}) =>
       step(1, reason, event),
     focus(date?: ISODate) {
       if (date === undefined) return roving.focus(store.get().focused ?? undefined)
@@ -489,7 +498,7 @@ const calendarSync = (options: CalendarOptions) => ({
   ...(options.today === undefined ? {} : { today: dateOrNull(options.today) }),
 })
 
-type CalendarApi = ReturnType<typeof calendarApi>
+type CalendarApi = ReturnType<typeof calendarApi<CalendarOptions, State>>
 
 // A native <select> of the months or years, which turns the first month shown.
 function selectSlot<S extends State, A extends Pick<CalendarApi, "internal">>(

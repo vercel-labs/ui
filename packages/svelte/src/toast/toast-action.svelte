@@ -30,7 +30,7 @@ the action has an `href`. A Promise from its handler keeps the toast open and th
   const href = $derived(action?.href)
 </script>
 
-{#snippet fallback()}<Content content={action!.label} />{/snippet}
+{#snippet fallback()}{#if action}<Content content={action.label} />{/if}{/snippet}
 
 {#if action || onAction}
   <Part

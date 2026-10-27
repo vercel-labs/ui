@@ -112,16 +112,17 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
   // A controlled open starts focus from the selected date, in the same pass.
   deriveOpen(context, ["focused"], (open) => (open ? { focused: null } : undefined))
 
-  const calendar = calendarApi(context, {
+  const calendar = calendarApi<
+    DatePickerOptions,
+    State,
+    DatePickerValueChangeReason,
+    DatePickerMonthChangeReason
+  >(context, {
     picked(event) {
       if (store.get().closeOnSelect) control.hide({ reason: "item-press", event })
     },
   })
-  const { setValue, setMonth, reveal } = calendar.internal as unknown as {
-    setValue: (value: DatePickerValue, reason: DatePickerValueChangeReason, event?: Event) => boolean
-    setMonth: (month: ISOMonth, reason: DatePickerMonthChangeReason, event?: Event) => boolean
-    reveal: (date: ISODate, reason: DatePickerMonthChangeReason, event?: Event) => void
-  }
+  const { setValue, setMonth, reveal } = calendar.internal
 
   // The trigger, or without one, the input that holds the start.
   const triggerElement = () => element("trigger") ?? element("input", "start") ?? element("input")
@@ -271,10 +272,8 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
       month: ISOMonth,
       { reason = "imperative", event }: DatePickerChangeOptions<DatePickerMonthChangeReason> = {},
     ) => setMonth(month, reason, event),
-    previous: calendar.previous as (
-      options?: DatePickerChangeOptions<DatePickerMonthChangeReason>,
-    ) => boolean,
-    next: calendar.next as (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => boolean,
+    previous: calendar.previous,
+    next: calendar.next,
     focus: calendar.focus,
     internal: {
       ...calendar.internal,
