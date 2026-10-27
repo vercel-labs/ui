@@ -85,8 +85,8 @@ jobs:
         run: pnpm --filter "./packages/*" test
 
   # Each tier runs a different set of shards, so the matrix is built here.
-  # Pull requests and pushes to main run the specs their changes can affect on
-  # one runner, like `pnpm test:pr` (the affected job), since every push running
+  # Pull requests and pushes to main run the specs their changes can affect,
+  # like `pnpm test:pr` (the affected jobs), since every push running
   # the whole Chromium matrix spent the Actions budget. WebKit and Firefox (web
   # only) run nightly, and on pull requests with the engines label: adding it
   # runs them once, and each push to a labeled pull request adds them to the
@@ -131,16 +131,54 @@ jobs:
 
   # The specs a pull request or a push can affect, from scripts/affected-specs.mjs:
   # the touched components on the frameworks the changes reach, their leak
-  # tests, and a framework's whole project when its shared code changed. Most
-  # changes take a few minutes on one runner.
-  affected:
-    name: Playwright affected specs
+  # tests, and a framework's whole project when its shared code changed. The
+  # script lists the plan's tests and asks for a runner per 10 minutes of them,
+  # so a component change takes one runner and a change to shared code a few.
+  affected-plan:
+    name: Plan affected specs
     needs: plan
     if: startsWith(needs.plan.outputs.suite, 'affected')
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 10
+    outputs:
+      base: ${{ steps.size.outputs.base }}
+      shards: ${{ steps.size.outputs.shards }}
+      count: ${{ steps.size.outputs.count }}
     steps:
       # Full history, so the script finds where the changes left their base.
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+
+      # A pull request against its base branch, a push to main against the
+      # commit main was at before it. A repository's first push has no such
+      # commit (GitHub sends all zeros), so it falls back to origin/main. The
+      # runners get the commit it resolves to, so a push to the base branch
+      # meanwhile can't change their plan.
+      - id: size
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || (github.event.before != '0000000000000000000000000000000000000000' && github.event.before) || 'origin/main' }}
+          ENGINES: ${{ needs.plan.outputs.suite == 'affected-engines' && '--engines' || '' }}
+        run: |
+          node scripts/affected-specs.mjs --base "$BASE" $ENGINES --shards | tee "$RUNNER_TEMP/plan.txt"
+          count=$(sed -n 's/^shards=//p' "$RUNNER_TEMP/plan.txt")
+          echo "base=$(git rev-parse "$BASE")" >> "$GITHUB_OUTPUT"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "shards=[$(seq -s, 1 "$count")]" >> "$GITHUB_OUTPUT"
+
+  affected:
+    name: Playwright affected specs ${{ matrix.shard }}/${{ needs.affected-plan.outputs.count }}
+    needs: [plan, affected-plan]
+    if: needs.affected-plan.outputs.shards != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      # Every shard finishes, so one run lists every failure.
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.affected-plan.outputs.shards) }}
+    steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -148,14 +186,13 @@ jobs:
         with:
           browsers: ${{ needs.plan.outputs.suite == 'affected-engines' && 'chromium webkit firefox' || 'chromium' }}
 
-      # A pull request against its base branch, a push to main against the
-      # commit main was at before it. A repository's first push has no such
-      # commit (GitHub sends all zeros), so it falls back to origin/main.
+      # Each runner takes its share of every Playwright command in the plan.
       - name: Run Playwright
         env:
-          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || (github.event.before != '0000000000000000000000000000000000000000' && github.event.before) || 'origin/main' }}
+          BASE: ${{ needs.affected-plan.outputs.base }}
           ENGINES: ${{ needs.plan.outputs.suite == 'affected-engines' && '--engines' || '' }}
-        run: node scripts/affected-specs.mjs --base "$BASE" $ENGINES
+          SHARD: ${{ matrix.shard }}/${{ needs.affected-plan.outputs.count }}
+        run: node scripts/affected-specs.mjs --base "$BASE" $ENGINES --shard "$SHARD"
 
   e2e:
     name: Playwright ${{ matrix.engine }} ${{ matrix.shard }}/${{ matrix.shards }}

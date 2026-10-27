@@ -63,15 +63,18 @@ A file filter is a regular expression matched against the path, so `specs/menu` 
 
 From `.github/workflows`:
 
-| Tier         | When                                              | Playwright projects                                                                           | Also                                                                                 |
-| ------------ | ------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `pr`         | Pull requests                                     | Chromium `react`, `vue`, `web` (3 shards)                                                     | Typecheck, perf docs, unit tests                                                     |
-| `pr-engines` | Pushes to a pull request with the `engines` label | `pr`, plus `*-webkit` and `*-firefox`                                                         | Typecheck, perf docs, unit tests                                                     |
-| `main`       | Pushes to `main`                                  | Every Chromium project: the 3 frameworks, `*-data`, `*-ssr`, `*-portal`, `*-sheet` (7 shards) | Typecheck, perf docs, unit tests, docs tests                                         |
-| `nightly`    | 03:00 UTC Monday to Saturday, when main changed   | `*-webkit`, `*-firefox`                                                                       |                                                                                      |
-| `full`       | Sundays from `weekly.yml`, and Run workflow       | Everything above, plus `*-edge`                                                               | Typecheck, perf docs, unit tests, docs tests                                         |
+| Tier               | When                                              | Playwright projects                                                                            | Also                                         |
+| ------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `affected`         | Pull requests and pushes to `main`                | The specs the changes can affect, from `pnpm test:pr`, on 1 to 10 runners                      | Typecheck, perf docs, unit tests             |
+| `affected-engines` | Pushes to a pull request with the `engines` label | `affected`, plus `web-webkit` and `web-firefox` for the touched specs                          | Typecheck, perf docs, unit tests             |
+| `engines`          | Adding the `engines` label to a pull request      | `*-webkit`, `*-firefox`                                                                        |                                              |
+| `main`             | Run workflow                                      | Every Chromium project: the 5 frameworks, `*-data`, `*-ssr`, `*-portal`, `*-sheet` (10 shards) | Typecheck, perf docs, unit tests             |
+| `nightly`          | 03:00 UTC Monday to Saturday, when main changed   | `*-webkit`, `*-firefox`                                                                        |                                              |
+| `full`             | Sundays from `weekly.yml`, and Run workflow       | Everything above                                                                               | Typecheck, perf docs, unit tests, docs tests |
 
 Pushes and pull requests that change only Markdown files or `.claude/` skip CI, unless one of them is `tests/perf/README.md`, which `pnpm docs:perf --check` reads.
+
+The affected tiers size themselves. The Plan affected specs job lists the plan's tests with `pnpm test:pr --shards`, estimates their time on one runner and asks for a runner per 10 minutes of it. Each runner then takes its share of every command with `--shard <n>/<count>`. A component change runs on one runner. A change to shared code, which runs a framework's whole project, takes a few. The estimate counts a leak test as 16 tests and a WebKit or Firefox test as 2; retune `testSeconds` in `scripts/affected-specs.mjs` from the runners' durations.
 
 To run a CI shard locally:
 
@@ -285,10 +288,10 @@ pnpm docs:perf --check
 
 Where output lands:
 
-| Output                       | Where                                                            | Kept                                  |
-| ---------------------------- | ---------------------------------------------------------------- | ------------------------------------- |
-| Failed tests' output, traces | `tests/test-results/`                                            | Ignored by git                        |
-| HTML reports                 | `tests/playwright-report/`                                       | Ignored by git                        |
-| CI shard reports             | `tests/blob-report/`                                             | Ignored by git, uploaded as artifacts |
+| Output                       | Where                      | Kept                                  |
+| ---------------------------- | -------------------------- | ------------------------------------- |
+| Failed tests' output, traces | `tests/test-results/`      | Ignored by git                        |
+| HTML reports                 | `tests/playwright-report/` | Ignored by git                        |
+| CI shard reports             | `tests/blob-report/`       | Ignored by git, uploaded as artifacts |
 
 Delete `test-results` and `playwright-report` after a run, since they grow.
