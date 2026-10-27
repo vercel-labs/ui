@@ -133,7 +133,7 @@ function mergeAttrs(result: Record<string, any>, attrs: Attrs) {
 type PrimitiveHandle<P extends Primitive> = {
   /** The primitive it's an instance of. */
   primitive: P
-  /** The core instance `usePrimitive` made, which holds its state, its parts and its api. */
+  /** The core instance `usePrimitive` made, with its `get()`, `part()` and `api`. Read `state` instead of its `get()` in a render, since `get()` tracks nothing. */
   instance: ReturnType<P>
   /** The methods its definition declares, like Tabs' `setValue`. */
   api: TypesOf<P>["api"]

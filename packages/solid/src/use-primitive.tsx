@@ -307,7 +307,7 @@ function slotProps(
 type PrimitiveHandle<P extends Primitive> = {
   /** The primitive it's an instance of. */
   primitive: P
-  /** The core instance `usePrimitive` made, which holds its state, its parts and its api. */
+  /** The core instance `usePrimitive` made, with its `get()`, `part()` and `api`. */
   instance: ReturnType<P>
   /** The instance's state now. Reading it doesn't track; parts read theirs from `usePart`. */
   readonly state: TypesOf<P>["state"]
