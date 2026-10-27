@@ -163,7 +163,7 @@ type TabsListState = {
  * @stable
  */
 type TabsTabState = {
-  /** Whether this tab is selected. */
+  /** Whether this tab's value is the tabs' `value`. */
   selected: boolean
   /** Whether this tab can't be selected. */
   disabled: boolean

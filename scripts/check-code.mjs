@@ -133,7 +133,7 @@ const svelteComponentComment = /^<!--\s*@component\b[\s\S]*?-->/m
 const svelteStabilityLabel = /^\s*@(stable|experimental)\s*$/gm
 const stabilityLabels = ["stable", "experimental"]
 // Words a doc may add to a name and still say nothing.
-const fillerWords = new Set(["the", "a", "an", "it", "its", "s", "is", "whether", "this", "of"])
+const fillerWords = new Set(docWords("the a an it its s is whether this of"))
 
 const shouldFix = process.argv.includes("--fix")
 const violations = []
