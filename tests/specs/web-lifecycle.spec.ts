@@ -240,10 +240,12 @@ test("a popover moved into an iframe closes on Escape there", async ({ page }) =
 
 test("Escape closes the topmost layer of the document it was pressed in", async ({ page }) => {
   await page.evaluate(() => {
+    // Pinned top left: unstyled popover content sits at its static position,
+    // which WebKit and Firefox resolve over the iframe's button.
     const dialog = (name: string) => `
       <ui-dialog modal="false">
         <ui-dialog-trigger><button>Open ${name}</button></ui-dialog-trigger>
-        <ui-dialog-content>
+        <ui-dialog-content style="position: fixed; top: 0; left: 0">
           <ui-dialog-title>${name}</ui-dialog-title>
           <button>In ${name}</button>
         </ui-dialog-content>

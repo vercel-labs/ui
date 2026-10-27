@@ -64,9 +64,8 @@ const test = base.extend<{
     { auto: true },
   ],
   tab: async ({ page, browserName }, use) => {
-    await use(async ({ shift = false } = {}) => {
-      const modifiers = [browserName === "webkit" && "Alt", shift && "Shift"].filter(Boolean)
-      await page.keyboard.press([...modifiers, "Tab"].join("+"))
+    await use(async (options) => {
+      await page.keyboard.press(tabKey(browserName, options))
     })
   },
 })
@@ -270,6 +269,14 @@ async function entered(page: Page) {
   )
 }
 
+// The key press that moves focus to the next control, for a spec that presses
+// it outside the tab fixture. Safari only tabs to buttons with Option held,
+// like its default setting, so WebKit gets Alt+Tab.
+function tabKey(browserName: string, { shift = false }: { shift?: boolean } = {}) {
+  const modifiers = [browserName === "webkit" && "Alt", shift && "Shift"].filter(Boolean)
+  return [...modifiers, "Tab"].join("+")
+}
+
 export {
   allowSolidDiagnostic,
   buttonNamed,
@@ -294,6 +301,7 @@ export {
   recordDialogNamesAtFocus,
   regionNamed,
   shortcutKeys,
+  tabKey,
   tabNamed,
   test,
   triggerNamed,

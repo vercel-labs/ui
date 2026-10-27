@@ -440,6 +440,8 @@ test("a scroll area in another document times its scrollbars with that document'
   await open("scroll-area")
   const used = await page.evaluate(async () => {
     const frame = document.createElement("iframe")
+    // In view: WebKit and Firefox give an iframe below the fold no animation frames.
+    frame.style.cssText = "position: fixed; top: 0; left: 0"
     document.body.append(frame)
     const win = frame.contentWindow!
     let timers = 0
