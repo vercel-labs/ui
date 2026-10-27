@@ -142,39 +142,47 @@ html {
   color: var(--shiki-dark);
 }
 
-/* The code element spans its longest line, so the lines below resolve 100%
-   against the full scrollable width, not the pre's visible width. */
+[data-code-frame] {
+  --code-pad: 1rem;
+  --gutter-bg: var(--background);
+  --line-tint: transparent;
+}
+
+.dark [data-code-frame] {
+  --gutter-bg: color-mix(in srgb, var(--foreground) 3%, var(--canvas));
+}
+
+[data-code-frame] pre {
+  --pad-start: var(--code-pad);
+  padding-inline: 0;
+}
+
 [data-code-frame] pre code {
   display: block;
   width: fit-content;
   min-width: 100%;
+  padding-block: 0;
+  padding-inline: var(--pad-start) var(--code-pad);
 }
 
 [data-code-frame] .line:is(.highlighted, .diff) {
   display: inline-block;
-  min-width: calc(100% + 2rem);
-  margin-inline: -1rem;
-  padding-inline: 1rem;
-}
+  min-width: calc(100% + var(--pad-start) + var(--code-pad));
+  margin-inline: calc(var(--pad-start) * -1);
+  padding-inline: var(--pad-start) var(--code-pad);
+  background: var(--line-tint);
 
-/* With a number gutter the code has no start padding, so the band starts at
-   the content edge and extends only over the end padding. */
-[data-code-frame] pre:has(.line + .line) .line:is(.highlighted, .diff) {
-  min-width: calc(100% + 1rem);
-  margin-inline: 0;
-  padding-inline: 0 1rem;
-}
+  &.highlighted {
+    --line-tint: color-mix(in oklab, var(--foreground) 6%, transparent);
+  }
 
-[data-code-frame] .line.highlighted {
-  background: color-mix(in oklab, var(--foreground) 6%, transparent);
-}
+  &.diff.add {
+    --line-tint: color-mix(in oklab, var(--color-green-500) 14%, transparent);
+  }
 
-[data-code-frame] .line.diff.add {
-  background: color-mix(in oklab, var(--color-green-500) 14%, transparent);
-}
-
-[data-code-frame] .line.diff.remove {
-  background: color-mix(in oklab, var(--color-red-500) 14%, transparent);
+  &.diff.remove {
+    --line-tint: color-mix(in oklab, var(--color-red-500) 14%, transparent);
+  }
 }
 
 [data-code-frame] .highlighted-word {
@@ -192,47 +200,30 @@ html {
   opacity: 1;
 }
 
-[data-code-frame] pre:has(.line + .line) code {
-  counter-reset: line;
-}
+[data-code-frame] pre:has(.line + .line) {
+  --pad-start: 0px;
 
-/* The numbers pin to the block's start edge while the code scrolls under
-   them. Sticky boxes pin at the scroll container's content edge, so the pre
-   has no inline padding: the gutter carries the start padding, and the code
-   element the end padding. The gutter needs an opaque background to cover the
-   code passing beneath, so each line tint is premixed over the frame's
-   background (--gutter-bg) instead of left translucent. */
-[data-code-frame] pre:has(.line + .line) code {
-  padding-inline-start: 0;
-}
+  & code {
+    counter-reset: line;
+  }
 
-[data-code-frame] pre:has(.line + .line) .line::before {
-  counter-increment: line;
-  content: counter(line);
-  position: sticky;
-  inset-inline-start: 0;
-  display: inline-block;
-  width: calc(1rem + 2ch + 1.25rem);
-  padding-inline: 1rem 1.25rem;
-  text-align: end;
-  color: color-mix(in oklab, var(--subtle) 55%, transparent);
-  user-select: none;
-  --gutter-bg: var(--background);
-  background: var(--gutter-bg);
-}
+  & .line::before {
+    --gutter-gap: 1.25rem;
+    counter-increment: line;
+    content: counter(line);
+    position: sticky;
+    inset-inline-start: 0;
+    display: inline-block;
+    box-sizing: border-box;
+    width: calc(var(--code-pad) + 2ch + var(--gutter-gap));
+    padding-inline: var(--code-pad) var(--gutter-gap);
+    text-align: end;
+    color: color-mix(in oklab, var(--subtle) 55%, transparent);
+    user-select: none;
+    background: var(--gutter-bg);
+  }
 
-.dark [data-code-frame] pre:has(.line + .line) .line::before {
-  --gutter-bg: color-mix(in srgb, var(--foreground) 3%, var(--canvas));
-}
-
-[data-code-frame] pre:has(.line + .line) .line.highlighted::before {
-  background: color-mix(in srgb, var(--foreground) 6%, var(--gutter-bg));
-}
-
-[data-code-frame] pre:has(.line + .line) .line.diff.add::before {
-  background: color-mix(in srgb, var(--color-green-500) 14%, var(--gutter-bg));
-}
-
-[data-code-frame] pre:has(.line + .line) .line.diff.remove::before {
-  background: color-mix(in srgb, var(--color-red-500) 14%, var(--gutter-bg));
+  & .line:is(.highlighted, .diff)::before {
+    background: linear-gradient(var(--line-tint), var(--line-tint)), var(--gutter-bg);
+  }
 }
