@@ -487,8 +487,12 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       openerLayer = before && findLayer(before)
       openerTarget = openerLayer ? undefined : lastClosed()
       store.set({ mounted: true } as Partial<State>)
-      if (bound) show()
-      else if (!isBrowser) {
+      // Reopened while animating out, it attaches again: the close already let
+      // go of the inert page and the close watcher, and focus has to move in.
+      if (bound) {
+        hide()
+        show()
+      } else if (!isBrowser) {
         enterPending = false
         complete(true)
       }
