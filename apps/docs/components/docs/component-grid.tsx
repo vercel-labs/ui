@@ -1,4 +1,3 @@
-import { groupByCategory } from "@/lib/component-categories"
 import type { Framework } from "@/lib/frameworks"
 import { source } from "@/lib/source"
 import Link from "next/link"
@@ -15,31 +14,19 @@ function Card({ title, description, href }: { title: string; description?: strin
   )
 }
 
-// Every component page, from its frontmatter, grouped by category.
+// Every component page, from its frontmatter, in alphabetical order.
 function ComponentGrid({ framework }: { framework: Framework }) {
   const pages = source
     .getPages()
     .filter(
       (page) => page.slugs.length === 3 && page.slugs[0] === framework && page.slugs[1] === "components",
     )
-  const groups = groupByCategory(pages, (page) => page.slugs[2])
+    .sort((a, b) => a.data.title.localeCompare(b.data.title))
 
   return (
-    <div className="my-8 flex flex-col gap-10">
-      {groups.map((group) => (
-        <section key={group.label}>
-          <h2 className="mb-4 text-sm font-medium text-foreground">{group.label}</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {group.items.map((page) => (
-              <Card
-                key={page.url}
-                title={page.data.title}
-                description={page.data.description}
-                href={page.url}
-              />
-            ))}
-          </div>
-        </section>
+    <div className="my-8 grid gap-3 sm:grid-cols-2">
+      {pages.map((page) => (
+        <Card key={page.url} title={page.data.title} description={page.data.description} href={page.url} />
       ))}
     </div>
   )

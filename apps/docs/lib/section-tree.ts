@@ -1,8 +1,7 @@
-import { groupByCategory } from "./component-categories"
 import type { Framework } from "./frameworks"
 import type { Section } from "./sections"
 import { source } from "./source"
-import { flattenTree, type Node, type Root } from "fumadocs-core/page-tree"
+import { flattenTree, type Root } from "fumadocs-core/page-tree"
 
 // A section's sidebar: the folder under /docs whose home is /docs/<section>.
 function sectionTree(section: Section) {
@@ -24,19 +23,17 @@ function sectionTree(section: Section) {
 }
 
 // A framework's sidebars: the guides without the components folder, and the
-// components on their own, grouped by category.
+// components on their own, in alphabetical order.
 function frameworkTrees(tree: Root, framework: Framework) {
   const home = `/docs/${framework}/components`
   const folder = tree.children.find((node) => node.type === "folder" && node.index?.url === home)
   if (folder?.type !== "folder" || !folder.index) return { guides: tree, components: undefined }
-  const pages = folder.children.filter((node) => node.type === "page")
-  const children: Node[] = [{ ...folder.index, name: "Overview" }]
-  for (const group of groupByCategory(pages, (page) => page.url.split("/").pop() ?? "")) {
-    children.push({ type: "separator", name: group.label }, ...group.items)
-  }
+  const pages = folder.children
+    .filter((node) => node.type === "page")
+    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
   return {
     guides: { name: tree.name, children: tree.children.filter((node) => node !== folder) },
-    components: { name: "Components", children },
+    components: { name: "Components", children: [{ ...folder.index, name: "Overview" }, ...pages] },
   }
 }
 
