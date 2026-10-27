@@ -291,6 +291,18 @@ test.describe("animation", () => {
   })
 })
 
+test.describe("hidden while closed", () => {
+  test("a class that sets display on the content doesn't show it while closed", async ({ page }) => {
+    await page.addStyleTag({ content: ".tooltip { display: flex }" })
+    await expect(saveTip(page)).toBeHidden()
+    await hover(page, "Save")
+    await expect(saveTip(page)).toBeVisible()
+    await moveAway(page)
+    await page.clock.runFor(200)
+    await expect(saveTip(page)).toBeHidden()
+  })
+})
+
 test.describe("options and dismissal", () => {
   test("Escape closes only a tooltip that keyboard focus opened inside a popover", async ({ page, tab }) => {
     await profile(page).click()
