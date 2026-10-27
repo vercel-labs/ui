@@ -362,7 +362,7 @@ type MenuRadioGroupState = {
  * @stable
  */
 type MenuItemIndicatorState = {
-  /** Whether its checkbox item is on, or its radio item is its group's value. While false, the indicator leaves the page unless `keepMounted` is set. */
+  /** Whether its checkbox item is on, or its radio item is its group's value. While false, the indicator isn't shown unless `keepMounted` is set. */
   checked: boolean
   /** Whether the item can't be chosen. */
   disabled: boolean

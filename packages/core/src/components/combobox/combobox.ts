@@ -495,7 +495,7 @@ type ComboboxItemIconState = ItemIconState
  * @stable
  */
 type ComboboxItemIndicatorState = {
-  /** Whether its item is selected. While false, the indicator leaves the page unless `keepMounted` is set. */
+  /** Whether its item is selected. While false, the indicator isn't shown unless `keepMounted` is set. */
   selected: boolean
 }
 /**

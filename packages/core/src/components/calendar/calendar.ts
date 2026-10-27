@@ -191,7 +191,7 @@ type CalendarSelectState = {
   value: number
   /** Every month, or the years from `min` to `max` (10 either side of the year shown without them). */
   options: CalendarSelectOption[]
-  /** Whether the calendar is disabled, by itself or by a `<fieldset>`. */
+  /** Whether the calendar's `disabled` option is on. Inside a Date Picker, a disabled `<fieldset>` around the picker counts too. */
   disabled: boolean
 }
 
