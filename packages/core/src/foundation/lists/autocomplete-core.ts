@@ -11,7 +11,8 @@ import { fuzzyFilter } from "../text/fuzzy"
 import { createListbox, type ListData, type ListFilter, type Listbox } from "./listbox"
 import { listStep } from "./listbox-keyboard"
 import { keepListing, type Listing } from "./listbox-listing"
-import { hideFilteredItems, positionAttrs, registerItem } from "./listbox-parts"
+import { positionAttrs, registerItem } from "./listbox-parts"
+import { enforceHidden } from "../platform/style"
 import { announceResults, createLoadMore, matchMode, type ListAnnouncement } from "./listbox-search"
 import { idPart } from "../kernel/attrs"
 import type { BaseSlotProps, PrimitiveContext, SlotDefinition } from "../kernel/primitive-types"
@@ -335,7 +336,7 @@ function optionPart<State extends AutocompleteCoreState, Api extends CoreApi>() 
     },
     press: ({ api, key }, event) => api.internal.press(key, event),
     bind(el, { api, key, props }) {
-      hideFilteredItems(el.ownerDocument)
+      enforceHidden(el.ownerDocument)
       const unregister = registerItem(el, { api, key, props })
       return () => {
         unregister()

@@ -103,19 +103,6 @@ function stashContent(
   }
 }
 
-// Items a filter hides get `hidden`, which any class that sets `display`
-// would undo. One rule per document, in the lowest cascade layer but
-// important, so it wins over author classes the way the attribute means.
-function hideFilteredItems(doc: Document) {
-  const id = "ui-sdk-hidden-items"
-  if (doc.getElementById(id)) return
-  const style = doc.createElement("style")
-  style.id = id
-  style.textContent =
-    '@layer ui-sdk { :where([data-slot][hidden]:not([hidden="until-found"])) { display: none !important } }'
-  doc.head.prepend(style)
-}
-
 // Warns when the control has no accessible name once its labels have had
 // time to connect. Not `checkName`, since a combobox role takes no name from
 // its content: only a label, `aria-label` or `aria-labelledby` name it.
@@ -425,7 +412,6 @@ export {
   groupLabelledBy,
   groupLabelPart,
   hiddenInputPart,
-  hideFilteredItems,
   isDisabled,
   isLocked,
   itemIndicatorPart,

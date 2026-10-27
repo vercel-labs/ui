@@ -32,7 +32,6 @@ import {
   formAttrs,
   groupLabelPart,
   hiddenInputPart,
-  hideFilteredItems,
   isDisabled,
   isLocked,
   itemIndicatorPart,
@@ -48,6 +47,7 @@ import {
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { inputState, listContentPart, listId, listPart } from "../../foundation/lists/listbox-popup"
 import { itemIconsFeature, optionIcon, rememberIcon } from "../../foundation/lists/item-icon"
+import { enforceHidden } from "../../foundation/platform/style"
 import { itemTextPart, type ListItemTextProps } from "../../foundation/lists/listbox-search"
 import { selectAllFeature } from "../../foundation/lists/listbox-select-all"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
@@ -329,7 +329,7 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
     },
     press: ({ api, key }, event) => api.internal.choose(key, event),
     bind(el, context) {
-      hideFilteredItems(el.ownerDocument)
+      enforceHidden(el.ownerDocument)
       return bindItem(el, context)
     },
   }),
@@ -526,7 +526,7 @@ const comboboxChips = /* @__PURE__ */ (() => ({
       attrs: (state) => ({ hidden: state.visibleChips === null ? "" : undefined }),
       bind(el, { api, store, props }) {
         // Collapsed chips stay hidden whatever display their class sets.
-        hideFilteredItems(el.ownerDocument)
+        enforceHidden(el.ownerDocument)
         // The chips around it bind after it in some frameworks, so measuring starts a microtask later.
         let unbind = () => {}
         let active = true

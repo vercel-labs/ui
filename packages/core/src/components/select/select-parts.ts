@@ -11,7 +11,6 @@ import {
   formAttrs,
   groupLabelPart,
   hiddenInputPart,
-  hideFilteredItems,
   isDisabled,
   isLocked,
   itemIndicatorPart,
@@ -26,6 +25,7 @@ import {
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { itemIconsFeature, optionIcon, rememberIcon } from "../../foundation/lists/item-icon"
+import { enforceHidden } from "../../foundation/platform/style"
 import { itemTextPart, type ListItemTextProps } from "../../foundation/lists/listbox-search"
 import { selectAllFeature } from "../../foundation/lists/listbox-select-all"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
@@ -367,7 +367,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
     },
     press: ({ api, key }, event) => api.internal.choose(key, event),
     bind(el, context) {
-      hideFilteredItems(el.ownerDocument)
+      enforceHidden(el.ownerDocument)
       return bindItem(el, context)
     },
   }),

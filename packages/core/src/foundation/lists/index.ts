@@ -51,7 +51,6 @@ export {
   groupLabelledBy,
   groupLabelPart,
   hiddenInputPart,
-  hideFilteredItems,
   isDisabled,
   isLocked,
   itemIndicatorPart,

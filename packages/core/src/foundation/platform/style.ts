@@ -32,4 +32,19 @@ function registerUninherited(names: readonly string[]) {
   }
 }
 
-export { registerUninherited, setStyle }
+// A hidden element shows again when a class sets `display`, like a utility
+// some CSS frameworks emit without a `[hidden]` guard. One rule per document,
+// in the lowest cascade layer but important, so it wins over author classes
+// the way the attribute means, and `hidden="until-found"` keeps the browser's
+// searchable hiding.
+function enforceHidden(doc: Document) {
+  const id = "ui-sdk-hidden"
+  if (doc.getElementById(id)) return
+  const style = doc.createElement("style")
+  style.id = id
+  style.textContent =
+    '@layer ui-sdk { :where([data-slot][hidden]:not([hidden="until-found"])) { display: none !important } }'
+  doc.head.prepend(style)
+}
+
+export { enforceHidden, registerUninherited, setStyle }

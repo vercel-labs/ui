@@ -5,12 +5,8 @@ import { contentAnchor, placementOptions } from "../../foundation/popups/popup-f
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
 import { position } from "../../foundation/platform/position"
 import { textFieldAdapter } from "../../foundation/text/caret"
-import {
-  groupLabelledBy,
-  groupLabelPart,
-  hideFilteredItems,
-  stashContent,
-} from "../../foundation/lists/listbox-parts"
+import { groupLabelledBy, groupLabelPart, stashContent } from "../../foundation/lists/listbox-parts"
+import { enforceHidden } from "../../foundation/platform/style"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
@@ -216,7 +212,7 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
     },
     press: ({ api, key }, event) => api.internal.choose(key, event),
     bind(el, { api, key, props }) {
-      hideFilteredItems(el.ownerDocument)
+      enforceHidden(el.ownerDocument)
       const unregister = api.internal.listbox.register(key, el, () => {
         const latest = api.internal.itemProps(key) ?? props
         return {
