@@ -7,8 +7,7 @@ import type { Root } from "fumadocs-core/page-tree"
 import { usePathname } from "next/navigation"
 import { useFramework } from "./remember-framework"
 
-// Where a menu link goes and whether it's the current section. A framework
-// section is split between Guides and Components, told apart by the pathname.
+// Where a menu link goes and whether it's the current section.
 function useMenuLink(section?: Section) {
   const [framework] = useFramework()
   const pathname = usePathname()
@@ -26,7 +25,6 @@ function useMenuLink(section?: Section) {
   }
 }
 
-// The sidebar a page shows: the components tree on a components page, else the guides.
 function useActiveTree(tree?: Root, componentsTree?: Root) {
   const pathname = usePathname()
   if (!componentsTree) return tree

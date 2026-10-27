@@ -112,7 +112,6 @@ test("Guides and Components split a framework's docs, each with its own sidebar"
   await expect(guides).toHaveAttribute("aria-current", "page")
   await expect(components).not.toHaveAttribute("aria-current", "page")
   await expect(components).not.toHaveAttribute("aria-haspopup")
-  // The guides sidebar, without the catalog.
   await expect(docs.getByText("Using Components", { exact: true })).toBeVisible()
   await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toBeVisible()
   await expect(docs.getByRole("link", { name: "Button", exact: true })).toHaveCount(0)
@@ -121,7 +120,6 @@ test("Guides and Components split a framework's docs, each with its own sidebar"
   await expect(page).toHaveURL(/\/docs\/react\/components$/)
   await expect(components).toHaveAttribute("aria-current", "page")
   await expect(guides).not.toHaveAttribute("aria-current", "page")
-  // The catalog sidebar, without the guides.
   await expect(docs.getByRole("link", { name: "Overview", exact: true })).toBeVisible()
   await expect(docs.getByRole("link", { name: "Button", exact: true })).toBeVisible()
   await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toHaveCount(0)

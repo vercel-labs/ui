@@ -15,7 +15,6 @@ export default async function Layout({ children, params }: LayoutProps<"/docs/[s
   if (!isSection(section)) notFound()
   const full = sectionTree(section)
   if (!full) notFound()
-  // A framework splits into two sidebars; the page's path picks one on the client.
   const { guides: tree, components: componentsTree } = isFramework(section)
     ? frameworkTrees(full, section)
     : { guides: full, components: undefined }

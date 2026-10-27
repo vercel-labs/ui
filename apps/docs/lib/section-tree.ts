@@ -22,8 +22,6 @@ function sectionTree(section: Section) {
   return tree
 }
 
-// A framework's sidebars: the guides without the components folder, and the
-// components on their own, in alphabetical order.
 function frameworkTrees(tree: Root, framework: Framework) {
   const home = `/docs/${framework}/components`
   const folder = tree.children.find((node) => node.type === "folder" && node.index?.url === home)
