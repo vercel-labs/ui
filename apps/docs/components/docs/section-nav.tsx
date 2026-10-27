@@ -7,10 +7,7 @@ import type { Root } from "fumadocs-core/page-tree"
 import { usePathname } from "next/navigation"
 import { useSavedFramework } from "./remember-framework"
 
-// Where a menu link goes and whether it's the current section. Before hydration
-// and without JavaScript there's no saved framework to read, so the Guides and
-// Components links keep their framework-less hrefs, which redirects resolve
-// from the cookie.
+// Where a menu link goes and whether it's the current section.
 function useMenuLink(section?: Section) {
   const saved = useSavedFramework()
   const pathname = usePathname()

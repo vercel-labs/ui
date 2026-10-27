@@ -100,8 +100,6 @@ test("the header shows the saved framework and framework-less links before the p
       useInnerText: true,
     })
   }
-  // Guides and Components keep their framework-less hrefs, so the cookie
-  // redirects send this reader to Vue, not the hydration fallback.
   const sections = page.getByRole("navigation", { name: "Sections" }).first()
   await expect(sections.getByRole("link", { name: "Guides", exact: true })).toHaveAttribute(
     "href",
