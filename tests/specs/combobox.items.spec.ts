@@ -66,7 +66,6 @@ test.describe("items that change while open", () => {
       await expectOrder(page, labels(changedItems.reversed))
       await expect(listbox(page)).toBeVisible()
       await expect.poll(() => highlighted(page)).toBe("Australia")
-      // Argentina now comes after Australia.
       await page.keyboard.press("ArrowDown")
       await expect.poll(() => highlighted(page)).toBe("Argentina")
       await page.keyboard.press("ArrowUp")

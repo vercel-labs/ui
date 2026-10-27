@@ -2,8 +2,7 @@
   import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/svelte"
   import { perfSize } from "tests/fixtures/perf.ts"
 
-  // N single-thumb sliders, like a page of settings,
-  // scenario. Each submits a value, so each renders its form input.
+  // N single-thumb sliders, like a page of settings. Each submits a value, so each renders its form input.
   const sliders = Array.from({ length: perfSize(200) }, (_, index) => index)
 </script>
 

@@ -77,12 +77,8 @@ function Tokens({
   // The hosts are elements the editor holds, so they come from the instance, never a preview.
   return input.api.internal
     .hosts()
-    .map(({ token, host }) =>
-      createPortal(
-        <TokenContext.Provider value={token.id!}>{renderToken(token)}</TokenContext.Provider>,
-        host,
-        token.id,
-      ),
+    .map(({ id, token, host }) =>
+      createPortal(<TokenContext.Provider value={id}>{renderToken(token)}</TokenContext.Provider>, host, id),
     )
 }
 

@@ -42,9 +42,11 @@ test("presets: a popover, a modal dialog and a tooltip from the same primitive",
   const dialog = page.getByRole("dialog", { name: "Rename file" })
   await expect(dialog).toBeVisible()
   await expect(dialog).toHaveAttribute("aria-modal", "true")
-  // Focus stays inside while it's open.
   for (let i = 0; i < 3; i++) await page.keyboard.press("Tab")
-  expect(await dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true)
+  expect(
+    await dialog.evaluate((el) => el.contains(document.activeElement)),
+    "focus stays inside while it's open",
+  ).toBe(true)
   await dialog.getByRole("button", { name: "Save" }).click()
   await expect(dialog).toBeHidden()
   const help = page.getByRole("button", { name: "Help" })
@@ -65,21 +67,18 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await expect(status).toHaveText("Opened by trigger-press")
   await page.keyboard.press("Escape")
   await expect(status).toHaveText("Closed by escape-key")
-  // Not modal: a press outside closes it and reaches the button beneath.
   await cart.click()
   await count.click()
-  await expect(status).toHaveText("Closed by outside-press")
-  await expect(count).toHaveText("Likes 1")
-  // Modal: the press only closes it.
+  await expect(status, "not modal: a press outside closes it").toHaveText("Closed by outside-press")
+  await expect(count, "not modal: the press reaches the button beneath").toHaveText("Likes 1")
   await example.getByRole("checkbox", { name: "Modal" }).check()
   await cart.click()
   await expect(count).toHaveAttribute("inert", "")
   const box = (await count.boundingBox())!
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
-  await expect(content).toBeHidden()
-  await expect(count).toHaveText("Likes 1")
+  await expect(content, "modal: the press closes it").toBeHidden()
+  await expect(count, "modal: the press doesn't reach the button beneath").toHaveText("Likes 1")
   await example.getByRole("checkbox", { name: "Modal" }).uncheck()
-  // Not dismissible: Escape asks instead.
   await example.getByRole("checkbox", { name: "Dismissible" }).uncheck()
   await cart.click()
   await page.keyboard.press("Escape")
@@ -88,7 +87,6 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await content.getByRole("button", { name: "Check out" }).click()
   await expect(status).toHaveText("Closed by close-press")
   await example.getByRole("checkbox", { name: "Dismissible" }).check()
-  // Open on hover.
   await example.getByRole("checkbox", { name: "Open on hover" }).check()
   await cart.hover()
   await expect(status).toHaveText("Opened by trigger-hover")

@@ -67,23 +67,23 @@ for (const framework of frameworks) {
 
     const preview = (name: string) => page.locator(`[data-example="accordion/${name}"]`)
 
-    // With one item open at a time, opening one closed the other. With multiple, both stay open.
     await expect(
       preview("basic").getByRole("button", { name: /^What are your shipping options/ }),
+      "with one item open at a time, opening one closed the other",
     ).toHaveAttribute("aria-expanded", "false")
-    await expect(preview("multiple").getByRole("button", { name: /^Notification settings/ })).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    )
+    await expect(
+      preview("multiple").getByRole("button", { name: /^Notification settings/ }),
+      "with multiple, both stay open",
+    ).toHaveAttribute("aria-expanded", "true")
 
-    // The open trigger that can't close says so, and the one before it no longer does.
-    await expect(preview("collapsible").getByRole("button", { name: /^Timeline/ })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    )
-    await expect(preview("collapsible").getByRole("button", { name: /^Overview/ })).not.toHaveAttribute(
-      "aria-disabled",
-    )
+    await expect(
+      preview("collapsible").getByRole("button", { name: /^Timeline/ }),
+      "the open trigger that can't close says so",
+    ).toHaveAttribute("aria-disabled", "true")
+    await expect(
+      preview("collapsible").getByRole("button", { name: /^Overview/ }),
+      "the trigger that closed isn't marked as unable to close",
+    ).not.toHaveAttribute("aria-disabled")
 
     // Find in page reveals a closed panel's text and opens its item.
     const fruit = preview("find-in-page").getByRole("button", { name: /^Which fruit do you stock/ })

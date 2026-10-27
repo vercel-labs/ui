@@ -152,8 +152,7 @@ it. The `token` snippet renders each token's content.
   const sync = (render: Snippet<[Token]> | undefined) => {
     const seen = new Set<string>()
     if (render)
-      for (const { token: current, host } of input.api.internal.hosts()) {
-        const key = current.id!
+      for (const { id: key, token: current, host } of input.api.internal.hosts()) {
         seen.add(key)
         const entry = mounted.get(key)
         if (entry?.host === host) {

@@ -56,7 +56,6 @@ function createToastTimers(expire: (id: string) => void, now = () => Date.now())
     )
   }
 
-  // Runs what should run, and stops the rest.
   function apply() {
     const ids = new Set(shown.map((toast) => toast.id))
     for (const [id, countdown] of countdowns) {

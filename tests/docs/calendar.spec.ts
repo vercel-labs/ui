@@ -58,7 +58,6 @@ const checks: Record<string, Check> = {
     await expectSelected(preview, "Monday, October 12, 2026")
     await expectSelected(preview, "Wednesday, October 14, 2026")
     await expectSelected(preview, "Friday, October 16, 2026")
-    // A new range takes two presses, and its middle days are selected too.
     await day(preview, "Tuesday, October 20, 2026").click()
     await day(preview, "Friday, October 23, 2026").click()
     await expectSelected(preview, "Tuesday, October 20, 2026")
@@ -69,14 +68,18 @@ const checks: Record<string, Check> = {
   "range-limits": async (preview) => {
     await showMonth(preview, "October 2026")
     await expectUnavailable(preview, "Saturday, October 17, 2026")
-    // A press that would make a stay too short starts a new one there.
     await day(preview, "Wednesday, October 14, 2026").click()
     await day(preview, "Thursday, October 15, 2026").click()
-    // The stay may span the booked weekend.
     await day(preview, "Tuesday, October 20, 2026").click()
-    await expectSelected(preview, "Wednesday, October 14, 2026", false)
+    await expect(
+      day(preview, "Wednesday, October 14, 2026"),
+      "a press that would make a stay too short starts a new one there",
+    ).toHaveAttribute("aria-selected", "false")
     await expectSelected(preview, "Thursday, October 15, 2026")
-    await expectSelected(preview, "Sunday, October 18, 2026")
+    await expect(
+      day(preview, "Sunday, October 18, 2026"),
+      "the stay may span the booked weekend",
+    ).toHaveAttribute("aria-selected", "true")
     await expectSelected(preview, "Tuesday, October 20, 2026")
   },
   multiple: async (preview) => {
@@ -85,14 +88,12 @@ const checks: Record<string, Check> = {
     await expect(preview.getByText("3 selected")).toBeVisible()
     await expectSelected(preview, "Tuesday, October 6, 2026")
     await expectSelected(preview, "Tuesday, October 20, 2026")
-    // A second press takes a date out.
     await day(preview, "Tuesday, October 6, 2026").click()
     await expect(preview.getByText("2 selected")).toBeVisible()
     await expectSelected(preview, "Tuesday, October 6, 2026", false)
   },
   unavailable: async (preview) => {
     await showMonth(preview, "October 2026")
-    // A date, a range of dates and the weekends are booked.
     await expectUnavailable(preview, "Thursday, October 8, 2026")
     await expectUnavailable(preview, "Wednesday, October 21, 2026")
     await expectUnavailable(preview, "Saturday, October 17, 2026")
@@ -115,7 +116,6 @@ const checks: Record<string, Check> = {
   "two-months": async (preview) => {
     await expect(preview.getByRole("grid", { name: "October 2026" })).toBeVisible()
     await expect(preview.getByRole("grid", { name: "November 2026" })).toBeVisible()
-    // Next turns both months.
     await step(preview, "Next month").click()
     await expect(preview.getByRole("grid", { name: "December 2026" })).toBeVisible()
     await expect(preview.getByRole("grid", { name: "January 2027" })).toBeVisible()
@@ -133,14 +133,18 @@ const checks: Record<string, Check> = {
   },
   locale: async (preview) => {
     await expect(preview.getByRole("heading")).toHaveText("Oktober 2026")
-    // The week starts on Monday, and headers read their full names.
-    await expect(preview.getByRole("columnheader").first()).toHaveAccessibleName("Montag")
+    await expect(
+      preview.getByRole("columnheader").first(),
+      "the week starts on Monday, and headers read their full names",
+    ).toHaveAccessibleName("Montag")
     await pick(preview, "Freitag, 16. Oktober 2026", "Dienstag, 20. Oktober 2026")
   },
   "custom-day": async (preview) => {
     await expect(day(preview, "Friday, October 16, 2026").getByText("$100")).toBeVisible()
-    // Days of the months around it show no price.
-    await expect(day(preview, "Sunday, September 27, 2026").getByText("$")).toBeHidden()
+    await expect(
+      day(preview, "Sunday, September 27, 2026").getByText("$"),
+      "days of the months around it show no price",
+    ).toBeHidden()
     await pick(preview, "Friday, October 16, 2026", "Tuesday, October 20, 2026")
   },
   "fixed-weeks": async (preview) => {

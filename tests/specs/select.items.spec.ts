@@ -41,10 +41,8 @@ test.describe("items that change while open", () => {
         changedItems.reversed.map((item) => item.label),
       )
       await expect(listbox(page)).toBeVisible()
-      // The highlight and the selection stay on their items.
       await expect(option(page, "Blueberry")).toBeFocused()
       await expect(option(page, "Banana")).toHaveAttribute("aria-selected", "true")
-      // Blueberry now comes before Banana.
       await page.keyboard.press("ArrowDown")
       await expect(option(page, "Banana")).toBeFocused()
       await page.keyboard.press("ArrowUp")

@@ -402,7 +402,6 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
         disabled: isDisabled(state) ? "" : undefined,
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
-      // A press is the button's click.
       press: ({ api, props }, event) => api.internal.removeItem(props.file!, event as MouseEvent | undefined),
     }),
   }),

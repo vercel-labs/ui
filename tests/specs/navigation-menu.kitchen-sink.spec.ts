@@ -195,7 +195,6 @@ async function checkVariant(page: Page, variant: Variant, index: number) {
       )
       .toBe("positioned")
     await expect(page.getByRole("link", { name: "Tutorials" })).toBeVisible()
-    // Escape closes the nested menu first, then the menu around it.
     await page.keyboard.press("Escape")
     await expect(learn, `${label} closes the nested menu`).toHaveAttribute("aria-expanded", "false")
     await expect(trigger, `${label} stays open`).toHaveAttribute("aria-expanded", "true")

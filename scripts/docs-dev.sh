@@ -66,7 +66,7 @@ while true; do
     stale=$(stale_frameworks)
     if [ -n "${stale// /}" ]; then
       echo "[docs-dev] rebuilding the examples for ${stale% }."
-      # shellcheck disable=SC2086
+      # shellcheck disable=SC2086 # $stale is a list of frameworks, one argument each.
       build_examples $stale
     fi
     # The cache and the server, once a minute.
