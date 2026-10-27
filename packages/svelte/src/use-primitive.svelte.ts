@@ -37,7 +37,7 @@ import { trackBindable } from "./bindable.svelte"
  * @stable
  */
 type PrimitiveHandle<P extends Primitive> = {
-  /** What calling the primitive returned, which holds its state, its parts and its api. */
+  /** The core instance `usePrimitive` made, which holds its state, its parts and its api. */
   instance: ReturnType<P>
   /** The methods its definition declares, like Tabs' `setValue`. */
   api: TypesOf<P>["api"]

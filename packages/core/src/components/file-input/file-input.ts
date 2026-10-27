@@ -208,7 +208,7 @@ type FileInputDropzoneState = {
  * @stable
  */
 type FileInputItemState = {
-  /** The file this item shows, from its `file` prop. */
+  /** The file this item shows: the one its `FileInputList` renders it for, or its `file` prop. */
   file: File
   /** Where it is in the value, from 0. */
   index: number

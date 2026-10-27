@@ -187,7 +187,7 @@ type TokenInputEditorState = {
  * @stable
  */
 type TokenInputTokenState = {
-  /** The token this part shows, found in the value by the id its host passes. */
+  /** The token this part shows: the one the token input renders its content for. */
   token: Token
   /** Whether the token is in the selection, or selected for removal. */
   selected: boolean
