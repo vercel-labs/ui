@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test"
+import type { Locator, Page } from "@playwright/test"
 
 // Helpers for behavior every popup shares, like Menu and Popover.
 
@@ -31,4 +31,21 @@ async function composingEscape(page: Page) {
   )
 }
 
-export { addScroller, composingEscape }
+// Puts a custom element before `el` whose open shadow root holds a button
+// named "Shadow", like a design system's button inside a popup.
+async function addShadowButton(el: Locator) {
+  await el.evaluate((el) => {
+    if (!customElements.get("shadow-button"))
+      customElements.define(
+        "shadow-button",
+        class extends HTMLElement {
+          connectedCallback() {
+            if (!this.shadowRoot) this.attachShadow({ mode: "open" }).innerHTML = "<button>Shadow</button>"
+          }
+        },
+      )
+    el.before(document.createElement("shadow-button"))
+  })
+}
+
+export { addScroller, addShadowButton, composingEscape }
