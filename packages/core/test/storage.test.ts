@@ -104,3 +104,27 @@ test("keeps a value in a cookie, encoded, and removes it", () => {
   storage.remove()
   expect(storage.get()).toBeNull()
 })
+
+test("a storage that was full takes writes again once space frees up, and reads while full", () => {
+  const items = new Map([["color-scheme", "dark"]])
+  let full = true
+  const area = {
+    getItem: (key: string) => items.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      if (full) throw new DOMException("Full", "QuotaExceededError")
+      items.set(key, value)
+    },
+    removeItem: (key: string) => items.delete(key),
+  }
+  const real = Object.getOwnPropertyDescriptor(window, "sessionStorage")!
+  Object.defineProperty(window, "sessionStorage", { configurable: true, get: () => area })
+  cleanups.push(() => Object.defineProperty(window, "sessionStorage", real))
+  const storage = createSessionStorage("color-scheme")
+  expect(storage.available()).toBe(false)
+  expect(storage.set("light")).toBe(false)
+  expect(storage.get()).toBe("dark")
+  full = false
+  expect(storage.available()).toBe(true)
+  expect(storage.set("light")).toBe(true)
+  expect(createSessionStorage("color-scheme").get()).toBe("light")
+})

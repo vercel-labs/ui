@@ -261,3 +261,40 @@ test("a cookie starts the choice right away, since the server reads it too", () 
   const colorScheme = createColorScheme({ storage: createCookieStorage("color-scheme-cookie") })
   expect(colorScheme.initialState.value).toBe("light")
 })
+
+test("a choice removed while nothing subscribes goes back to the default on the next subscribe", () => {
+  cleanups.push(() => localStorage.clear())
+  const reasons: string[] = []
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme-removed"),
+    onValueChange: (_value, details) => reasons.push(details.reason),
+  })
+  const stop = colorScheme.subscribe(() => {})
+  colorScheme.set("dark", { reason: "item-press" })
+  stop()
+  localStorage.removeItem("color-scheme-removed")
+  cleanups.push(colorScheme.subscribe(() => {}))
+  expect(colorScheme.get().value).toBe("system")
+  expect(reasons).toEqual(["item-press", "restore"])
+})
+
+test("a choice saved elsewhere while nothing subscribes comes back on the next subscribe", () => {
+  cleanups.push(() => localStorage.clear())
+  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme-elsewhere") })
+  const stop = colorScheme.subscribe(() => {})
+  colorScheme.set("dark")
+  stop()
+  localStorage.setItem("color-scheme-elsewhere", "light")
+  cleanups.push(colorScheme.subscribe(() => {}))
+  expect(colorScheme.get().value).toBe("light")
+})
+
+test("a choice that couldn't be saved survives subscribing again", () => {
+  const storage = createLocalStorage("color-scheme-unsaved")
+  const colorScheme = createColorScheme({ storage: { ...storage, set: () => false } })
+  const stop = colorScheme.subscribe(() => {})
+  colorScheme.set("dark")
+  stop()
+  cleanups.push(colorScheme.subscribe(() => {}))
+  expect(colorScheme.get().value).toBe("dark")
+})

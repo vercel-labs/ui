@@ -78,28 +78,32 @@ const listenersOf = (kind: Kind, id: string) => {
   return listeners
 }
 
-// Whether each localStorage or sessionStorage object takes a write, checked once.
-const writable = new WeakMap<Storage, boolean>()
+// The localStorage and sessionStorage objects that took a write. Only success
+// is remembered: a full storage can take writes again once space frees up.
+const writable = new WeakSet<Storage>()
 
 // The page's localStorage or sessionStorage, or undefined where reading it
-// throws, like in a sandboxed frame, or writing fails, like with storage blocked.
+// throws, like in a sandboxed frame.
 function areaOf(kind: "local" | "session") {
   if (!isBrowser) return
   try {
-    const area = kind === "local" ? window.localStorage : window.sessionStorage
-    if (!writable.has(area)) {
-      const probe = "__ui-sdk-storage__"
-      try {
-        area.setItem(probe, probe)
-        area.removeItem(probe)
-        writable.set(area, true)
-      } catch {
-        writable.set(area, false)
-      }
-    }
-    return writable.get(area) ? area : undefined
+    return kind === "local" ? window.localStorage : window.sessionStorage
   } catch {
     return
+  }
+}
+
+// Whether a write goes through now, unlike in a browser that blocks storage or once it's full.
+function canWrite(area: Storage) {
+  if (writable.has(area)) return true
+  try {
+    const probe = "__ui-sdk-storage__"
+    area.setItem(probe, probe)
+    area.removeItem(probe)
+    writable.add(area)
+    return true
+  } catch {
+    return false
   }
 }
 
@@ -176,7 +180,10 @@ function createAreaStorage(kind: "local" | "session", id: string) {
         throw new Error(`A storage script only sets data-* attributes, not "${attribute}".`)
       return `(${seed})(${[kind, id, attribute, values].map(literal).join(",")})`
     },
-    available: () => Boolean(areaOf(kind)),
+    available: () => {
+      const area = areaOf(kind)
+      return Boolean(area && canWrite(area))
+    },
     read: () => {
       try {
         return areaOf(kind)?.getItem(id) ?? null
@@ -192,7 +199,7 @@ function createAreaStorage(kind: "local" | "session", id: string) {
         else area.setItem(id, value)
         return true
       } catch {
-        // Full, or blocked since the check.
+        // Blocked, or full.
         return false
       }
     },

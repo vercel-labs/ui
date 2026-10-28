@@ -132,6 +132,10 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
     const value = storage?.get() ?? null
     return isValue(value) ? value : undefined
   }
+  // What the storage held when this last read or wrote it, so subscribing
+  // again catches up with whatever changed in between, removals too.
+  // Undefined until the first read.
+  let synced = storage?.readsOnServer ? storage.get() : undefined
   // A storage the server reads too starts the choice on both sides, so hydration matches.
   const defaultValue = (storage?.readsOnServer ? saved() : undefined) ?? options.defaultValue ?? "system"
   const shared = () => sharedOf(options.view ?? (isBrowser ? window : undefined))
@@ -191,9 +195,17 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
       }
       if (storage) {
         // Read back what was saved, now that hydration is done, then hear other tabs.
-        const restored = saved()
-        if (restored) set(restored, { reason: "restore" })
+        const current = storage.get()
+        if (current !== synced) {
+          const first = synced === undefined
+          synced = current
+          // Nothing saved the first time keeps the starting choice. A choice
+          // removed since the last read goes back to the default.
+          if (isValue(current)) set(current, { reason: "restore" })
+          else if (!first) set(options.defaultValue ?? "system", { reason: "restore" })
+        }
         unwatchStorage = storage.subscribe((next) => {
+          synced = next
           set(isValue(next) ? next : (options.defaultValue ?? "system"), { reason: "storage-sync" })
         })
       }
@@ -215,7 +227,7 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
     if (details.canceled) return false
     value = next
     // A value read from storage is already there.
-    if (reason !== "restore" && reason !== "storage-sync") storage?.set(next)
+    if (reason !== "restore" && reason !== "storage-sync" && storage?.set(next)) synced = next
     notify()
     return true
   }
