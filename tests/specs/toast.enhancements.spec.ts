@@ -17,14 +17,18 @@ const show = (page: Page, options: FixtureToast) =>
     (options) => (window as unknown as { showToast: (o: FixtureToast) => string }).showToast(options),
     options,
   )
-const toaster = <T>(page: Page, run: (toaster: any) => T) =>
-  page.evaluate(run as never, undefined as never) as Promise<T>
+type PageToaster = {
+  toaster: ((content: string) => string) & {
+    dismiss: (id?: string) => void
+    update: (id: string, content: string) => boolean
+  }
+}
 
 test.describe("enhancements", { tag: "@enhancement" }, () => {
   test("update() says whether the toast was still there", async ({ page, open }) => {
     await open("toast")
     const updated = await page.evaluate(() => {
-      const toaster = (window as any).toaster
+      const toaster = (window as unknown as PageToaster).toaster
       const id = toaster("Gone")
       toaster.dismiss(id)
       return toaster.update(id, "Back")
@@ -52,7 +56,7 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(region(page)).toHaveCount(0)
     await page.getByRole("button", { name: success.trigger }).click()
     await expect(region(page)).toHaveCount(1)
-    await toaster(page, () => (window as any).toaster.dismiss())
+    await page.evaluate(() => (window as unknown as PageToaster).toaster.dismiss())
     await expect(region(page)).toHaveCount(0)
   })
 

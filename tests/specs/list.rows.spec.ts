@@ -159,11 +159,12 @@ test.describe("loading more", { tag: "@enhancement" }, () => {
     await input(page).focus()
     await page.keyboard.press("ArrowDown")
     await expect(listbox(page).getByRole("option")).toHaveCount(4)
-    // From the first item, ArrowUp wraps to the last.
     await page.keyboard.press("ArrowUp")
     await expect(listbox(page).getByRole("option")).toHaveCount(8)
-    // The highlight stays where it was while the page arrives.
-    await expect(option(page, "Belgium")).toHaveAttribute("data-highlighted", "")
+    await expect(
+      option(page, "Belgium"),
+      "the highlight stays where it was while the page arrives",
+    ).toHaveAttribute("data-highlighted", "")
   })
 
   test("scrolling to the end loads the next page, with a status while it does", async ({ page, open }) => {
@@ -182,7 +183,6 @@ test.describe("loading more", { tag: "@enhancement" }, () => {
     await expect.poll(() => optionTexts(page)).toEqual(["Argentina", "Australia", "Austria", "Brazil"])
     await page.keyboard.press("ArrowUp")
     await expect(listbox(page).getByRole("option")).toHaveCount(7)
-    // From Brazil to the new last item, Germany, which asks for no more.
     for (let step = 0; step < 3; step++) await page.keyboard.press("ArrowDown")
     await expect(option(page, "Germany")).toHaveAttribute("data-highlighted", "")
     await expect(page.getByText("Loading more…")).toBeHidden()

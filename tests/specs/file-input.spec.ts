@@ -68,7 +68,6 @@ test.describe("drops and pastes", () => {
   })
 
   test("the drag state holds while the drag crosses the zone's children", async ({ page }) => {
-    // Record every time the attribute goes away.
     await zone(page).evaluate((el) => {
       const log: string[] = ((window as unknown as { dragLog: string[] }).dragLog = [])
       new MutationObserver(() => log.push(el.hasAttribute("data-dragging") ? "on" : "off")).observe(el, {
@@ -149,8 +148,7 @@ test.describe("drops and pastes", () => {
     await fire(zone(page), "dragenter", data)
     await expect(zone(page)).not.toHaveAttribute("data-dragging")
     await expect(zone(page)).toHaveAttribute("data-disabled", "")
-    // The browser still doesn't open the file.
-    expect(await fire(zone(page), "drop", data)).toBe(true)
+    expect(await fire(zone(page), "drop", data), "the browser still doesn't open the file").toBe(true)
     await expect(lastAction(page)).toHaveText("")
   })
 
@@ -162,8 +160,10 @@ test.describe("drops and pastes", () => {
       const data = await transfer(page, [png])
       expect(await fire(before, "dragover", data)).toBe(true)
       expect(await fire(before, "drop", data)).toBe(true)
-      // Text drops elsewhere keep working.
-      expect(await fire(before, "drop", await transfer(page, [], "hello"))).toBe(false)
+      expect(
+        await fire(before, "drop", await transfer(page, [], "hello")),
+        "text drops elsewhere keep working",
+      ).toBe(false)
       await expect(lastAction(page)).toHaveText("")
     },
   )
@@ -183,8 +183,7 @@ test.describe("drops and pastes", () => {
     const note = page.getByRole("textbox", { name: f.note.label })
     expect(await paste(note, [png])).toBe(true)
     await expect(lastAction(page)).toHaveText("attachments:paste:a.png|")
-    // Text still pastes into it.
-    expect(await paste(note, [], "hello")).toBe(false)
+    expect(await paste(note, [], "hello"), "text still pastes into it").toBe(false)
   })
 
   test("a page-wide zone shows while files are over the window", async ({ page, open }) => {

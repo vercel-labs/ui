@@ -84,7 +84,7 @@ function moveTab(doc: Document, backward: boolean, scope?: Element) {
     const inside = stops.filter((el) => scope.contains(el))
     return (backward ? inside.at(-1) : inside[0])?.focus()
   }
-  const index = stops.indexOf(active!)
+  const index = active ? stops.indexOf(active) : -1
   const next = backward ? (index < 0 ? stops.at(-1) : stops[index - 1]) : stops[index + 1]
   if (next) next.focus()
   else active?.blur()

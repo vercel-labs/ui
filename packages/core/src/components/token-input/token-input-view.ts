@@ -300,7 +300,7 @@ function createTokenView(
     offsetAt: (node: Node, offset: number) => offsetOf(node, offset),
     // Whether a DOM point is inside a token's host.
     inHost: (node: Node | null) => !!hostOf(node),
-    hosts: () => [...hosts.values()].map(({ token, content }) => ({ token, host: content })),
+    hosts: () => [...hosts].map(([id, { token, content }]) => ({ id, token, host: content })),
     hostElement: (id: string) => hosts.get(id)?.host,
     destroy() {
       hosts.clear()

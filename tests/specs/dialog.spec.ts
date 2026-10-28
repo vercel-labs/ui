@@ -421,6 +421,20 @@ test.describe("alert dialog", () => {
 })
 
 test.describe("animation", () => {
+  test("reopened while it animates out, it takes focus and hides the page again", async ({ page, open }) => {
+    await open("dialog", { animate: "" })
+    await openWithKeyboard(page)
+    await page.keyboard.press("Escape")
+    await expect(page.locator(".dialog[data-ending-style]")).toHaveCount(1)
+    await page.keyboard.press("Enter")
+    await expect(field(page)).toBeFocused()
+    await expect
+      .poll(() => outside(page, "After").evaluate((el) => !!el.closest('[inert], [aria-hidden="true"]')), {
+        message: "the page outside is hidden again",
+      })
+      .toBe(true)
+  })
+
   test("the dialog and its backdrop stay mounted while they animate out", async ({ page, open }) => {
     await open("dialog", { animate: "" })
     await trigger(page).click()

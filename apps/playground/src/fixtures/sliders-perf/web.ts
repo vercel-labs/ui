@@ -1,8 +1,7 @@
 import "@ui-sdk/web/slider"
 import { mountWhenAsked, perfSize } from "tests/fixtures/perf.ts"
 
-// N single-thumb sliders, like a page of settings,
-// scenario. Each submits a value.
+// N single-thumb sliders, like a page of settings. Each submits a value.
 function mount(root: HTMLElement) {
   mountWhenAsked(root, (target) => {
     const sliders = Array.from(

@@ -49,7 +49,6 @@ test.describe("items that change while open", () => {
       await expectOrder(page, labels(changedItems.reversed))
       await expect(listbox(page)).toBeVisible()
       await expect.poll(() => highlighted(page)).toBe("Apricot")
-      // Apple now comes after Apricot, and Avocado before it.
       await page.keyboard.press("ArrowDown")
       await expect.poll(() => highlighted(page)).toBe("Apple")
       await page.keyboard.press("ArrowUp")
@@ -102,8 +101,11 @@ test.describe("items that change while open", () => {
       await changeItems(page, "replaced")
       await expectOrder(page, labels(changedItems.replaced))
       await expect(listbox(page)).toBeVisible()
-      // Not left pointing at the removed element.
-      await expect.poll(() => highlighted(page)).toBeNull()
+      await expect
+        .poll(() => highlighted(page), {
+          message: "the highlight isn't left pointing at the removed element",
+        })
+        .toBeNull()
       await expect(input(page)).toBeFocused()
       await page.keyboard.press("ArrowDown")
       await expect.poll(() => highlighted(page)).toBe("Peach")

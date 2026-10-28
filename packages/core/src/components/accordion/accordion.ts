@@ -237,7 +237,6 @@ type AccordionState = {
   items: string[]
 }
 
-// The value after opening or closing one item.
 function nextValue(value: string[], key: string, open: boolean, multiple: boolean) {
   if (!open) return value.filter((item) => item !== key)
   if (value.includes(key)) return value

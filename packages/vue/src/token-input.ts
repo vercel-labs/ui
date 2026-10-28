@@ -116,10 +116,8 @@ const TokenInput = defineComponent({
         slots.token &&
           input.api.internal
             .hosts()
-            .map(({ token, host }) =>
-              h(Teleport, { key: token.id, to: host }, [
-                h(TokenScope, { id: token.id! }, () => slots.token!({ token })),
-              ]),
+            .map(({ id, token, host }) =>
+              h(Teleport, { key: id, to: host }, [h(TokenScope, { id }, () => slots.token!({ token }))]),
             ),
         h(FormInput),
       ]

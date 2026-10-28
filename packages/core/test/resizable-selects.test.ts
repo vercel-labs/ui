@@ -170,8 +170,7 @@ describe("resizable panels and handles select on what they show", () => {
       instance.api.internal.dragBy(5)
       return reads.count / handles.length
     }
-    // Once for the move and once for the handles' values, against once per
-    // handle per handle before.
+    // Once for the move and once for the handles' values, however many handles there are.
     expect(readsPerMove(10)).toBeLessThanOrEqual(2)
     expect(readsPerMove(200)).toBeLessThanOrEqual(2)
   })

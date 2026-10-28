@@ -432,7 +432,6 @@ function calendarApi<
       },
       step: (direction: -1 | 1, event: Event | undefined) =>
         step(direction, direction < 0 ? "previous-press" : "next-press", event),
-      // A month or year select picked `value`.
       select(kind: "month" | "year", value: number, event?: Event) {
         if (Number.isInteger(value)) setMonth(selectedMonth(store.get(), kind, value), "select-change", event)
       },

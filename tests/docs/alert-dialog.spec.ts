@@ -73,14 +73,12 @@ for (const framework of frameworks) {
       await expect(alert).toHaveAccessibleName(parts.title)
       await expect(alert).toHaveAttribute("aria-describedby", /.+/)
 
-      // A press outside keeps it open, and Escape closes it back to the trigger.
       await page.mouse.click(4, 4)
-      await expect(alert).toBeVisible()
+      await expect(alert, "a press outside keeps it open").toBeVisible()
       await page.keyboard.press("Escape")
       await expect(alert, `${name} closes`).toHaveCount(0)
-      await expect(trigger).toBeFocused()
+      await expect(trigger, "escape closes it back to the trigger").toBeFocused()
 
-      // The agreeing answer closes it too.
       await trigger.click()
       await agree.click()
       await expect(alert).toHaveCount(0)
@@ -96,14 +94,12 @@ for (const framework of frameworks) {
     const deletes = list.getByRole("button", { name: "Delete" })
     await expect(deletes).toHaveCount(3)
 
-    // Cancel and Escape answer no.
     await deletes.nth(1).click()
     await expect(alert).toContainText("Delete Globex?")
     await page.keyboard.press("Escape")
     await expect(alert).toHaveCount(0)
-    await expect(list.getByText(/^Globex/)).toHaveCount(1)
+    await expect(list.getByText(/^Globex/), "escape answers no").toHaveCount(1)
 
-    // Delete answers yes, and the row goes.
     await deletes.nth(0).click()
     await expect(alert).toContainText("Delete Acme?")
     await alert.getByRole("button", { name: "Delete" }).click()
@@ -124,28 +120,27 @@ for (const framework of frameworks) {
     const alert = page.getByRole("alertdialog")
     const action = alert.getByRole("button").last()
 
-    // The first try fails: pending meanwhile, nothing else closes it, then the error shows.
     await trigger.click()
     await action.click()
-    await expect(action).toHaveText("Deleting…")
+    await expect(action, "the first try is pending meanwhile").toHaveText("Deleting…")
     await expect(action).toHaveAttribute("aria-busy", "true")
     await page.keyboard.press("Escape")
     await alert.getByRole("button", { name: "Cancel" }).click()
-    await expect(alert).toBeVisible()
+    await expect(alert, "nothing else closes it while pending").toBeVisible()
     await expect(action).toHaveText("Try again")
     await expect(action).not.toHaveAttribute("aria-busy", "true")
     await expect(alert).toBeVisible()
-    await expect(alert.getByRole("alert")).toHaveText("Couldn't delete the project. Try again.")
+    await expect(alert.getByRole("alert"), "the first try fails, then the error shows").toHaveText(
+      "Couldn't delete the project. Try again.",
+    )
 
-    // The error is gone the next time it opens.
     await alert.getByRole("button", { name: "Cancel" }).click()
     await expect(alert).toHaveCount(0)
     await trigger.click()
-    await expect(action).toHaveText("Delete")
+    await expect(action, "the error is gone the next time it opens").toHaveText("Delete")
 
-    // The second try succeeds and closes it with the reason action.
     await action.click()
-    await expect(alert).toHaveCount(0)
+    await expect(alert, "the second try succeeds and closes it").toHaveCount(0)
     await expect(preview).toContainText("Deleted")
     await expect(trigger).toBeFocused()
 

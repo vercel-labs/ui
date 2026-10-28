@@ -193,10 +193,9 @@ test.describe("async actions", { tag: "@enhancement" }, () => {
     await removeAction(page).click()
     await expect(removeAction(page)).toHaveAttribute("data-pending", "")
     await expect(removeAction(page)).toHaveAttribute("aria-busy", "true")
-    // Nothing but the action closes it meanwhile.
     await page.keyboard.press("Escape")
     await remove(page).getByRole("button", { name: f.remove.cancel }).click()
-    await expect(remove(page)).toBeVisible()
+    await expect(remove(page), "nothing but the action closes it meanwhile").toBeVisible()
     await page.evaluate(() => (window as unknown as { __action: { resolve: () => void } }).__action.resolve())
     await expect(remove(page)).toHaveCount(0)
     expect(await changes(page)).toEqual(["delete:true:trigger-press", "delete:false:action"])
@@ -211,9 +210,8 @@ test.describe("async actions", { tag: "@enhancement" }, () => {
     )
     await expect(removeAction(page)).not.toHaveAttribute("data-pending")
     await expect(remove(page)).toBeVisible()
-    // It can be tried again.
     await removeAction(page).click()
-    await expect(removeAction(page)).toHaveAttribute("data-pending", "")
+    await expect(removeAction(page), "it can be tried again").toHaveAttribute("data-pending", "")
   })
 })
 

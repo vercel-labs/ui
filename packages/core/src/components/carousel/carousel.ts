@@ -103,7 +103,6 @@ type CarouselController = ReturnType<typeof createCarouselController>
  */
 type CarouselOrientation = "horizontal" | "vertical"
 
-// Reads a `slides-per-page` attribute: a number of slides, or "auto".
 function slidesPerPageAttribute(attribute: string | null) {
   if (attribute === null) return undefined
   return attribute === "auto" ? "auto" : Number(attribute)

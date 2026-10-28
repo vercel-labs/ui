@@ -109,11 +109,11 @@ function tokens(input: TokenInputContextValue, renderToken: (token: Token) => JS
     },
   )
   return (
-    <For each={hosts()} keyed={(entry) => entry.token.id}>
+    <For each={hosts()} keyed={(entry) => entry.id}>
       {(entry) => {
         // A host keeps its identity for its token's life; the token changes only when it's updated.
         const host = untrack(() => entry().host)
-        const id = untrack(() => entry().token.id!)
+        const id = untrack(() => entry().id)
         const token = createMemo(() => entry().token)
         return (
           <Portal mount={host}>

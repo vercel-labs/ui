@@ -76,26 +76,26 @@ for (const framework of frameworks) {
       await expect(checkbox, `${name} after a press`).toHaveAttribute("aria-checked", to)
     }
 
-    // Selecting every row updates the count.
-    await expect(previews.nth(order.indexOf("table"))).toContainText("4 of 4 selected")
+    await expect(previews.nth(order.indexOf("table")), "selecting every row updates the count").toContainText(
+      "4 of 4 selected",
+    )
 
-    // A controller toggles the checkbox from outside, with its own reason.
     const controlled = previews.nth(order.indexOf("controlled"))
     await controlled.getByRole("button", { name: "Toggle from outside" }).click()
     await expect(
       controlled.getByRole("checkbox", { name: /^Email me about product updates$/ }),
+      "a controller toggles the checkbox from outside",
     ).toHaveAttribute("aria-checked", "false")
-    await expect(controlled).toContainText("imperative")
+    await expect(controlled, "the controller toggles with its own reason").toContainText("imperative")
 
-    // The form submits both checkboxes, then resets to the defaults.
     const form = previews.nth(order.indexOf("form"))
     await form.getByRole("button", { name: "Submit" }).click()
-    await expect(form).toContainText("terms=yes, newsletter=weekly")
+    await expect(form, "the form submits both checkboxes").toContainText("terms=yes, newsletter=weekly")
     await form.getByRole("button", { name: "Reset" }).click()
-    await expect(form.getByRole("checkbox", { name: /^I agree to the terms$/ })).toHaveAttribute(
-      "aria-checked",
-      "false",
-    )
+    await expect(
+      form.getByRole("checkbox", { name: /^I agree to the terms$/ }),
+      "the form resets to the defaults",
+    ).toHaveAttribute("aria-checked", "false")
 
     expect(errors).toEqual([])
   })
@@ -123,42 +123,49 @@ for (const framework of frameworks) {
       await expect(checkbox, `${name} checks`).toBeChecked()
     }
 
-    // The parent checked every topping.
     const parent = previews.nth(order.indexOf("group-parent"))
     for (const topping of ["Cheese", "Mushrooms", "Olives", "Peppers"])
-      await expect(parent.getByRole("checkbox", { name: topping, exact: true })).toBeChecked()
+      await expect(
+        parent.getByRole("checkbox", { name: topping, exact: true }),
+        "the parent checked every topping",
+      ).toBeChecked()
 
-    // A disabled group never changes, and a disabled checkbox keeps its state when the parent toggles.
     const disabled = previews.nth(order.indexOf("group-disabled"))
     const photos = disabled.getByRole("checkbox", { name: "Photos", exact: true })
     await expect(photos).toBeDisabled()
     await photos.click({ force: true })
-    await expect(photos).toBeChecked()
+    await expect(photos, "a disabled group never changes").toBeChecked()
     const selectAll = disabled.getByRole("checkbox", { name: "Select all", exact: true })
     await selectAll.click()
     await selectAll.click()
-    await expect(disabled.getByRole("checkbox", { name: "Desktop", exact: true })).toBeChecked()
+    await expect(
+      disabled.getByRole("checkbox", { name: "Desktop", exact: true }),
+      "a disabled checkbox keeps its state when the parent toggles",
+    ).toBeChecked()
     await expect(disabled.getByRole("checkbox", { name: "Downloads", exact: true })).not.toBeChecked()
 
-    // The controller checks values from outside the group.
     const controlled = previews.nth(order.indexOf("group-controlled"))
     await controlled.getByRole("button", { name: "Select weekdays" }).click()
-    await expect(controlled.getByRole("checkbox", { name: "Fri", exact: true })).toBeChecked()
+    await expect(
+      controlled.getByRole("checkbox", { name: "Fri", exact: true }),
+      "the controller checks values from outside the group",
+    ).toBeChecked()
     await expect(controlled.getByRole("checkbox", { name: "Sat", exact: true })).not.toBeChecked()
     await controlled.getByRole("button", { name: "Clear" }).click()
     await expect(controlled.getByRole("checkbox", { name: "Mon", exact: true })).not.toBeChecked()
 
-    // Reset returns to the default value.
     const form = previews.nth(order.indexOf("group-form"))
     await form.getByRole("button", { name: "Reset" }).click()
     await expect(form.getByRole("checkbox", { name: "Olives", exact: true })).not.toBeChecked()
     await expect(form.getByRole("checkbox", { name: "Cheese", exact: true })).toBeChecked()
 
-    // Saving with nothing checked shows the field's error.
     const field = previews.nth(order.indexOf("group-field"))
     await field.getByRole("checkbox", { name: "SMS", exact: true }).click()
     await field.getByRole("button", { name: "Save" }).click()
-    await expect(field.getByText("Choose at least one way to be notified.")).toBeVisible()
+    await expect(
+      field.getByText("Choose at least one way to be notified."),
+      "saving with nothing checked shows the field's error",
+    ).toBeVisible()
 
     expect(errors).toEqual([])
   })

@@ -101,7 +101,6 @@ test.describe("catching it", { tag: "@enhancement" }, () => {
     const height = page.viewportSize()!.height
     const cdp = await context.newCDPSession(page)
     await drawerTrigger(page).click()
-    // Early on its way up.
     const caught = await drawerDialog(page).evaluate(
       (el, limit) =>
         new Promise<number>((resolve) => {
@@ -214,9 +213,11 @@ test.describe("keyboard", { tag: "@enhancement" }, () => {
         await showKeyboard(page, 300)
         await page.waitForTimeout(400)
       })
-      // In between on the way, and above the keyboard at the end.
-      expect(tops.some((top) => top < before - 30 && top > before - 270)).toBe(true)
-      expect(tops.at(-1)).toBe(before - 300)
+      expect(
+        tops.some((top) => top < before - 30 && top > before - 270),
+        "it passes in between on the way",
+      ).toBe(true)
+      expect(tops.at(-1), "it ends above the keyboard").toBe(before - 300)
       await showKeyboard(page, null)
       await expect.poll(async () => (await sheetRect(page)).top).toBe(before)
     })
