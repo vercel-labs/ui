@@ -85,6 +85,8 @@ A [Switch](./switch) uses the same label and description association as a checkb
 
 A label can wrap a choice and its content. See [Radio](./radio) for selection behavior; the card layout is your own CSS.
 
+A label can also wrap a whole `<ui-field>`, so one card holds a control with its own description. Outside a field, put `as-child` on a `<ui-field-label>` around a native `<label>`, which labels the control inside it.
+
 ### Right to Left
 
 Fields follow the surrounding `dir`. Use logical spacing such as `ps-3` and `text-start` in your styles.

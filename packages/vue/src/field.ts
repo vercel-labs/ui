@@ -3,16 +3,35 @@ import {
   field as fieldPrimitive,
   fieldSet as fieldSetPrimitive,
   type FieldDescriptionState,
+  type FieldErrorState,
   type ValidityKey,
 } from "@ui-sdk/core/field"
-import { defineComponent, inject, provide, useAttrs, useId, type InjectionKey, type PropType } from "vue"
+import {
+  checkFieldOutside,
+  fieldOutsideAttrs,
+  fieldOutsideErrorShown,
+  fieldOutsideState,
+  type FieldOutsideSlot,
+} from "@ui-sdk/core/renderer"
+import {
+  defineComponent,
+  inject,
+  provide,
+  useAttrs,
+  useId,
+  useSlots,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { slotContent } from "./children"
 import { withElement } from "./create-parts"
 import {
   optionalBoolean,
+  renderElement,
   usePart,
   usePrimitive,
   useScope,
+  type PartElement,
   type PrimitiveHandle,
   type PartSlots,
   type StateSlots,
@@ -24,10 +43,25 @@ type FieldSetContext = PrimitiveHandle<typeof fieldSetPrimitive>
 // Field is closer.
 const DescribedKey: InjectionKey<FieldContext | FieldSetContext> = Symbol("field-described")
 
-function useField() {
-  const context = inject(FieldKey)
-  if (!context) throw new Error("Field parts must be used inside <Field>.")
-  return context
+// Checks a part outside a field once it's in the page. Made once, so every
+// render hands Vue the same ref.
+const outsideRefs: Partial<Record<FieldOutsideSlot, (el: unknown) => void>> = {
+  label: (el) => checkFieldOutside(el as Element | null, "label"),
+  control: (el) => checkFieldOutside(el as Element | null, "control"),
+}
+
+// A part outside any Field: a plain element with no field wiring, so a
+// FieldLabel is a native <label> that labels the control it wraps. Call it
+// in setup; it returns the render function.
+function useOutside(slot: FieldOutsideSlot, element: PartElement<FieldErrorState>, shown = () => true) {
+  const attrs = useAttrs()
+  const slots = useSlots()
+  const ref = outsideRefs[slot]
+  return () => {
+    if (!shown()) return null
+    const props = { ...fieldOutsideAttrs(slot), ...attrs, ...(ref && { ref }) }
+    return renderElement(props, slots, fieldOutsideState, element)
+  }
 }
 
 // A part keyed by the `id` attribute it's given, so core keeps that id on its element.
@@ -68,7 +102,8 @@ const Field = withElement(
 )
 
 /**
- * The field's label, which names its control.
+ * The field's label, which names its control. Outside a Field it's a plain
+ * <label>, which labels the control inside it, like a card around a whole Field.
  * @stable
  */
 const FieldLabel = withElement(
@@ -78,7 +113,9 @@ const FieldLabel = withElement(
     inheritAttrs: false,
     slots: Object as PartSlots<typeof fieldPrimitive, "label">,
     setup() {
-      return usePart(useField(), "label", useIdProp(), undefined, "label")
+      const field = inject(FieldKey, null)
+      if (!field) return useOutside("label", { tag: "label" })
+      return usePart(field, "label", useIdProp(), undefined, "label")
     },
   }),
 )
@@ -96,8 +133,8 @@ const FieldDescription = withElement(
     // A field set's description has only the set's state.
     slots: Object as StateSlots<FieldDescriptionState>,
     setup() {
-      const described = inject(DescribedKey)
-      if (!described) throw new Error("FieldDescription must be used inside <Field> or <FieldSet>.")
+      const described = inject(DescribedKey, null)
+      if (!described) return useOutside("description", { tag: "p" })
       // A field set's description slot takes the same props, and its state is the
       // `disabled` that FieldDescriptionState always has.
       return usePart(described as FieldContext, "description", useIdProp(), undefined, "p")
@@ -122,13 +159,16 @@ const FieldError = withElement(
     setup(props, { slots }) {
       const attrs = useAttrs()
       const made = useId()
+      const field = inject(FieldKey, null)
+      const element = {
+        tag: "div",
+        children: (state: FieldErrorState) => slotContent(slots.default, { state }) ?? state.message,
+      }
+      if (!field) return useOutside("error", element, () => fieldOutsideErrorShown({ match: props.match }))
       // Only an error with `match` needs an id of its own. One without takes the
       // field's, which the control points at before the field binds.
       const id = () => (attrs.id as string | undefined) ?? (props.match === undefined ? undefined : made)
-      return usePart(useField(), "error", () => ({ id: id(), match: props.match }), undefined, {
-        tag: "div",
-        children: (state) => slotContent(slots.default, { state }) ?? state.message,
-      })
+      return usePart(field, "error", () => ({ id: id(), match: props.match }), undefined, element)
     },
   }),
 )
@@ -144,7 +184,8 @@ const FieldControl = withElement(
     inheritAttrs: false,
     slots: Object as PartSlots<typeof fieldPrimitive, "control">,
     setup() {
-      const field = useField()
+      const field = inject(FieldKey, null)
+      if (!field) return useOutside("control", { tag: "input" })
       const attrs = useAttrs()
       const control = () => ({
         id: attrs.id as string | undefined,

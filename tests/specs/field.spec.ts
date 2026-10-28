@@ -1,4 +1,6 @@
+import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
+import { fieldChoiceCardFixture as f } from "../fixtures/field"
 import { checkbox, email, errors, fillRequired, radio, save } from "./forms.helpers"
 
 // A field names its control from its label, describes it with its description,
@@ -26,6 +28,42 @@ test.describe("labelling", () => {
   test("clicking the label of a text field focuses it", async ({ page }) => {
     await page.getByText("Email", { exact: true }).click()
     await expect(email(page)).toBeFocused()
+  })
+})
+
+// Choice cards: a FieldLabel outside any Field wraps a whole Field, and labels
+// the control inside it the way a native <label> does.
+test.describe("a label wrapping a field", () => {
+  const card = (page: Page, title: string) => page.getByRole("checkbox", { name: title })
+
+  test("names the control inside it", async ({ page, open }) => {
+    await open("field-choice-card")
+    for (const { title } of f.cards) await expect(card(page, title)).toBeVisible()
+  })
+
+  test("checks its control when clicked anywhere", async ({ page, open }) => {
+    await open("field-choice-card")
+    const [first, second] = f.cards
+    await page.getByText(first.description).click()
+    await expect(card(page, first.title)).toBeChecked()
+    await expect(card(page, second.title)).not.toBeChecked()
+    await page.getByText(first.title).click()
+    await expect(card(page, first.title)).not.toBeChecked()
+  })
+
+  test("keeps the field's description on its control", async ({ page, open }) => {
+    await open("field-choice-card")
+    for (const { title, description } of f.cards)
+      await expect(card(page, title)).toHaveAccessibleDescription(description)
+  })
+
+  test("warns in development only when a label outside a field labels nothing", async ({ page, open }) => {
+    const printed: string[] = []
+    page.on("console", (message) => message.type() === "warning" && printed.push(message.text()))
+    await open("field-choice-card", { alone: "" })
+    await expect(page.getByText(f.alone)).toBeVisible()
+    const unlabeled = () => printed.filter((text) => text.includes("labels nothing"))
+    await expect.poll(() => unlabeled().length).toBe(1)
   })
 })
 

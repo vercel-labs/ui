@@ -1,6 +1,13 @@
 import type { field, fieldSet } from "@ui-sdk/core/field"
+import {
+  checkFieldOutside,
+  fieldOutsideAttrs,
+  fieldOutsideState,
+  type FieldOutsideSlot,
+} from "@ui-sdk/core/renderer"
 import { getContext } from "svelte"
-import { useHandlePart, type PrimitiveHandle, type SlotAttributes } from "../use-primitive.svelte"
+import { createAttachmentKey } from "svelte/attachments"
+import { plainPart, useHandlePart, type PrimitiveHandle, type SlotAttributes } from "../use-primitive.svelte"
 
 type FieldContext = PrimitiveHandle<typeof field> & {
   name: () => string | undefined
@@ -15,11 +22,20 @@ const FieldSetKey = Symbol("field-set")
 // Field is closer.
 const DescribedKey = Symbol("field-described")
 
-function useField() {
-  const context = getContext<FieldContext | undefined>(FieldKey)
-  if (!context) throw new Error("Field parts must be used inside <Field>.")
-  return context
+// The field around a part, or undefined outside any.
+const useField = () => getContext<FieldContext | undefined>(FieldKey)
+
+// Checks a part outside a field once it's in the page. Made once, so Svelte
+// attaches each element once.
+const outsideChecks: Partial<Record<FieldOutsideSlot, SlotAttributes>> = {
+  label: { [createAttachmentKey()]: (el: HTMLElement) => checkFieldOutside(el, "label") },
+  control: { [createAttachmentKey()]: (el: HTMLElement) => checkFieldOutside(el, "control") },
 }
+
+// A part outside any Field: a plain element with no field wiring, so a
+// FieldLabel is a native <label> that labels the control it wraps.
+const outsidePart = (slot: FieldOutsideSlot) =>
+  plainPart(fieldOutsideState, { ...fieldOutsideAttrs(slot), ...outsideChecks[slot] })
 
 /**
  * Controls inside a field take its name and disabled state, and its ids and
@@ -61,6 +77,7 @@ export {
   FieldKey,
   type FieldSetContext,
   FieldSetKey,
+  outsidePart,
   useField,
   useFieldControl,
 }

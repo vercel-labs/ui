@@ -1,7 +1,15 @@
 import { field, fieldGroup, fieldSet } from "@ui-sdk/core/field"
+import { checkFieldOutside, fieldOutsideErrorShown } from "@ui-sdk/core/renderer"
 import { defineParts } from "./define-element"
 
 const owner = "ui-field"
+
+// An error outside any field has no validation behind it, so only a `match`
+// that is present or "true" shows it.
+function errorAlone(el: HTMLElement) {
+  const match = el.getAttribute("match")
+  el.hidden = !fieldOutsideErrorShown({ match: match === "" || match === "true" })
+}
 
 // <ui-field> ties the control inside it to its label and messages. The control
 // can be any form control: a native input, or <ui-checkbox> and the others.
@@ -58,10 +66,17 @@ function defineFieldElements() {
         return instance.subscribe(update)
       },
     },
-    label: { tag: "ui-field-label", display: "block" },
+    // Outside any field, a label is plain. With as-child on a native <label>,
+    // it labels the control inside it, like a card around a whole field.
+    label: { tag: "ui-field-label", display: "block", alone: (el) => checkFieldOutside(el, "label") },
     // Describes the nearest field, or the whole field set when no field is closer.
-    description: { tag: "ui-field-description", owners: ["ui-field-set"], display: "block" },
-    error: { tag: "ui-field-error", display: "block" },
+    description: {
+      tag: "ui-field-description",
+      owners: ["ui-field-set"],
+      display: "block",
+      alone: () => {},
+    },
+    error: { tag: "ui-field-error", display: "block", alone: errorAlone },
   })
   defineParts(fieldSet, {
     // Wraps a native <fieldset> and its <legend>, so `disabled` disables every

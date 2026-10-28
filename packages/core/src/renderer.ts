@@ -22,6 +22,13 @@ export type { GaugeOptions } from "./foundation/gauge/gauge"
 export type { ToastRegionInternalOptions } from "./components/toast/toast-api"
 export { selectItemIcons, selectSelectAll } from "./components/select/select-parts"
 export { toasterInternals, type Toaster } from "./components/toast/toaster"
+export {
+  checkFieldOutside,
+  fieldOutsideAttrs,
+  fieldOutsideErrorShown,
+  type FieldOutsideSlot,
+  fieldOutsideState,
+} from "./components/field/field-outside"
 export { fileKey } from "./components/file-input/file-input-api"
 export { renderStaticHtml } from "./components/token-input/token-input-view"
 export type { AccordionGeneric } from "./components/accordion/accordion-generic"
