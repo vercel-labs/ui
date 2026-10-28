@@ -2,7 +2,7 @@
 
 What the React expert knows. Part 1 is React itself, part 2 is how `@ui-sdk/react` is built, part 3 is the checklist a review walks. Pinned to the versions the repo installs: React 19.2.3 (`packages/react` peer range `react >=19`). When React changes, update this file and the date.
 
-Last checked: 2026-10-26, against `node_modules/react` 19.2.3.
+Last checked: 2026-10-28, against `node_modules/react` 19.2.3.
 
 ## 1. React, as the docs write it
 
@@ -84,7 +84,7 @@ The core holds every behavior. The adapter only renders. Read `packages/react/sr
 
 - **`usePrimitive(primitive, options)`** makes one core instance per component in a `useState` initializer, inside `unwatched()`, without its controller and with id `ui-sdk-${useId()}`. The instance is kept (`keep(instance)` in a layout effect) only once React commits it: only then do the agent and `observe` hear it, its controller attach and its outside work start. So StrictMode's thrown-away initializer and an abandoned transition leave no trace.
 - **Previews.** Render reads `instance.preview(next)`: the state this render's options make before the instance has them. Options reach the instance at commit (`handOver` in a layout effect, `instance.setOptions`). So a transition renders the new value while React keeps showing the old one, like plain state, and render never writes to the store. `readIn` runs slot definitions against the preview; `reading()` marks options that read another instance (a toggle's `group`); `instance.view`'s `around` lets a part read the props of the parts around it as they render.
-- **No `useSyncExternalStore`.** Parts subscribe in effects, and a layout-effect check before paint catches a store change during a transition. Kept on purpose: uSES would force those updates to be synchronous. See decisions.md.
+- **No `useSyncExternalStore` in parts.** Parts subscribe in effects, and a layout-effect check before paint catches a store change during a transition. Kept on purpose: uSES would force those updates to be synchronous. See decisions.md. The one exception is `useFieldControl` (`packages/react/src/field-context.ts`), which reads the field's store through uSES.
 - **Lifecycle.** Unmount waits a microtask, so StrictMode's unmount and remount don't count. Hidden (Activity, Suspense) or gone, the instance `release`s what it holds outside itself and keeps its state. With an element in the page, it's destroyed once that element leaves; without one, once React lets go of the component (`FinalizationRegistry`).
 - **Kept work.** Core makes every instance through `withLifecycle` (`packages/core/src/foundation/kernel/keep.ts`). Work outside the instance starts through `whenKept` during setup; called outside setup, it warns in development and never starts.
 - **Handle.** One stable object for the instance's life (`useMemo` on the instance), so context consumers never re-render for it. `handle.state` reads the preview; `handle.api` reads committed state.

@@ -31,6 +31,12 @@ const checks: Record<string, Check> = {
     await select.selectOption("design")
     await expect(select).toHaveValue("design")
   },
+  "wrapping-label": async (preview) => {
+    const alerts = preview.getByRole("checkbox", { name: /^Usage alerts/ })
+    await preview.getByText("Email the team when usage passes its limit.").click()
+    await expect(alerts).toHaveAttribute("aria-checked", "true")
+    await expect(alerts).toHaveAccessibleDescription("Email the team when usage passes its limit.")
+  },
   validation: async (preview) => {
     // Custom elements keep error parts that aren't shown, hidden.
     await expect(preview.getByText("Enter your email address.")).toBeHidden()

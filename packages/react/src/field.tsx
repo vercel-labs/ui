@@ -40,7 +40,8 @@ const DescribedContext = React.createContext<FieldHandle | FieldSetHandle | null
 // Checks a part outside a field once it's in the page. Made once, so React
 // keeps the same ref and hands the element over once.
 const outsideRefs: Partial<Record<FieldOutsideSlot, (el: Element | null) => void>> = {
-  label: (el) => checkFieldOutside(el, "label"),
+  label: (el) =>
+    checkFieldOutside(el, "label", "Put the control inside it, or point its `htmlFor` at the control."),
   control: (el) => checkFieldOutside(el, "control"),
 }
 

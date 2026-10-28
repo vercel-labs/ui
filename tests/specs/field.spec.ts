@@ -57,13 +57,66 @@ test.describe("a label wrapping a field", () => {
       await expect(card(page, title)).toHaveAccessibleDescription(description)
   })
 
+  test("names a control that renders after it", async ({ page, open }) => {
+    await open("field-choice-card", { later: "" })
+    await expect(card(page, f.later.title)).toBeVisible()
+    await page.getByText(f.later.description).click()
+    await expect(card(page, f.later.title)).toBeChecked()
+  })
+
+  test("keeps the part's data-slot", async ({ page, open }) => {
+    await open("field-choice-card", { alone: "" })
+    const cards = page.locator(".choice-card")
+    await expect(cards).toHaveCount(f.cards.length)
+    for (const label of await cards.all()) await expect(label).toHaveAttribute("data-slot", "field-label")
+    await expect(page.getByText(f.alone)).toHaveAttribute("data-slot", "field-label")
+  })
+
+  // Every label is checked at once, so a false warning about the card whose
+  // control comes later would print before the orphan's.
   test("warns in development only when a label outside a field labels nothing", async ({ page, open }) => {
     const printed: string[] = []
     page.on("console", (message) => message.type() === "warning" && printed.push(message.text()))
-    await open("field-choice-card", { alone: "" })
-    await expect(page.getByText(f.alone)).toBeVisible()
+    await open("field-choice-card", { alone: "", later: "" })
+    await expect(card(page, f.later.title)).toBeVisible()
     const unlabeled = () => printed.filter((text) => text.includes("labels nothing"))
-    await expect.poll(() => unlabeled().length).toBe(1)
+    await expect.poll(() => unlabeled().some((text) => text.includes(f.alone))).toBe(true)
+    expect(unlabeled()).toHaveLength(1)
+  })
+
+  test("a description and an error outside a field keep their data-slot", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web components write it on an element they don't render.")
+    await open("field-choice-card")
+    await page.evaluate(() => {
+      document.querySelector(".fixture")!.insertAdjacentHTML(
+        "beforeend",
+        `<ui-field-description>Plain description</ui-field-description>
+        <ui-field-error match="true">Plain error</ui-field-error>`,
+      )
+    })
+    await expect(page.getByText("Plain description")).toHaveAttribute("data-slot", "field-description")
+    await expect(page.getByText("Plain error")).toHaveAttribute("data-slot", "field-error")
+  })
+
+  test("a hidden error outside a field stays hidden whatever display its class gives", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web components hide an element they don't render.")
+    await open("field-choice-card")
+    await page.evaluate(() => {
+      document.head.insertAdjacentHTML("beforeend", "<style>.shown { display: block }</style>")
+      document
+        .querySelector(".fixture")!
+        .insertAdjacentHTML("beforeend", `<ui-field-error class="shown">Plain error</ui-field-error>`)
+    })
+    await expect(page.getByText("Plain error")).toHaveAttribute("data-slot", "field-error")
+    await expect(page.getByText("Plain error")).toBeHidden()
   })
 
   test("an error outside a field follows its match", async ({ page, open, framework }) => {

@@ -17,7 +17,7 @@ import {
   fieldOutsideState,
   type FieldOutsideSlot,
 } from "@ui-sdk/core/renderer"
-import { createContext, createUniqueId, merge, omit, Show, untrack, useContext } from "solid-js"
+import { createContext, createUniqueId, merge, omit, onSettled, Show, untrack, useContext } from "solid-js"
 import { FieldContext, type FieldContextValue } from "./field-context"
 import { renderStatic, usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "./use-primitive"
 
@@ -29,7 +29,8 @@ const FieldSetContext = createContext<FieldSetHandle | null>(null)
 // Field is closer.
 const DescribedContext = createContext<FieldHandle | FieldSetHandle | null>(null)
 
-// Checks a part outside a field once it's in the page.
+// Checks a part outside a field once its component settles, so a label
+// behind a pending boundary is in the page by then.
 const outsideRefs: Partial<Record<FieldOutsideSlot, (el: Element) => void>> = {
   label: (el) => checkFieldOutside(el, "label"),
   control: (el) => checkFieldOutside(el, "control"),
@@ -38,9 +39,12 @@ const outsideRefs: Partial<Record<FieldOutsideSlot, (el: Element) => void>> = {
 // A part outside any Field: a plain element with no field wiring, so a
 // FieldLabel is a native <label> that labels the control it wraps.
 function outside(slot: FieldOutsideSlot, tag: string, props: Record<string, any>) {
-  const ref = outsideRefs[slot]
+  const check = outsideRefs[slot]
+  let el: Element | undefined
+  if (check) onSettled(() => void (el && check(el)))
+  const ref = (node: Element) => void (el = node)
   const userRef = untrack(() => props.ref)
-  const user = ref ? merge(props, { ref: userRef ? [userRef, ref] : ref }) : props
+  const user = check ? merge(props, { ref: userRef ? [userRef, ref] : ref }) : props
   return renderStatic(tag, () => ({ attrs: fieldOutsideAttrs(slot), state: fieldOutsideState }), user)
 }
 

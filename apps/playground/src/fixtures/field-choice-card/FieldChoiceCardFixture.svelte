@@ -3,7 +3,12 @@
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
   import { fieldChoiceCardFixture as f, fieldChoiceCardOptions } from "tests/fixtures/field.ts"
 
-  const { alone } = fieldChoiceCardOptions()
+  const { alone, later } = fieldChoiceCardOptions()
+  let ready = $state(false)
+  $effect(() => {
+    const timer = setTimeout(() => (ready = true), f.later.delay)
+    return () => clearTimeout(timer)
+  })
 </script>
 
 <div class="fixture">
@@ -19,6 +24,19 @@
       </Field>
     </FieldLabel>
   {/each}
+  {#if later}
+    <FieldLabel class="choice-card">
+      <Field>
+        {#if ready}
+          <Checkbox class="checkbox" name={f.later.name}>
+            <CheckboxIndicator class="checkbox-indicator" />
+          </Checkbox>
+        {/if}
+        <span>{f.later.title}</span>
+        <FieldDescription>{f.later.description}</FieldDescription>
+      </Field>
+    </FieldLabel>
+  {/if}
   {#if alone}
     <FieldLabel>{f.alone}</FieldLabel>
   {/if}

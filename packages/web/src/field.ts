@@ -1,12 +1,38 @@
 import { field, fieldGroup, fieldSet } from "@ui-sdk/core/field"
-import { checkFieldOutside, fieldOutsideErrorShown } from "@ui-sdk/core/renderer"
+import {
+  checkFieldOutside,
+  fieldOutsideAttrs,
+  fieldOutsideErrorShown,
+  type FieldOutsideSlot,
+} from "@ui-sdk/core/renderer"
 import { defineParts } from "./define-element"
 
 const owner = "ui-field"
 
+// A part outside any field is plain, with the same attributes the other
+// adapters write, so styles that select it, and the rule that keeps a hidden
+// part hidden, still match.
+function writeAlone(el: HTMLElement, slot: FieldOutsideSlot) {
+  for (const [name, value] of Object.entries(fieldOutsideAttrs(slot)))
+    if (el.getAttribute(name) !== value) el.setAttribute(name, value)
+}
+
+// A label outside any field names its control only as a native <label>. With
+// as-child, its child may come later, and the label runs this again then.
+function labelAlone(el: HTMLElement, host: HTMLElement) {
+  writeAlone(el, "label")
+  if (el === host && host.hasAttribute("as-child")) return
+  checkFieldOutside(
+    el,
+    "label",
+    "Put `as-child` on the <ui-field-label>, around a native <label> that wraps the control.",
+  )
+}
+
 // An error outside any field has no validation behind it, so only a `match`
 // that is present or "true" shows it.
 function errorAlone(el: HTMLElement, host: HTMLElement) {
+  writeAlone(el, "error")
   const match = host.getAttribute("match")
   el.hidden = !fieldOutsideErrorShown({ match: match === "" || match === "true" })
 }
@@ -68,13 +94,13 @@ function defineFieldElements() {
     },
     // Outside any field, a label is plain. With as-child on a native <label>,
     // it labels the control inside it, like a card around a whole field.
-    label: { tag: "ui-field-label", display: "block", alone: (el) => checkFieldOutside(el, "label") },
+    label: { tag: "ui-field-label", display: "block", alone: labelAlone },
     // Describes the nearest field, or the whole field set when no field is closer.
     description: {
       tag: "ui-field-description",
       owners: ["ui-field-set"],
       display: "block",
-      alone: () => {},
+      alone: (el) => writeAlone(el, "description"),
     },
     error: { tag: "ui-field-error", display: "block", alone: errorAlone },
   })

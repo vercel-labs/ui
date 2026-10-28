@@ -7,13 +7,20 @@ const fieldChoiceCardFixture = {
     { name: "backups", title: "Daily backups", description: "Keep a copy of every database each night." },
     { name: "alerts", title: "Usage alerts", description: "Email the team when usage passes its limit." },
   ],
+  // With `?later`, a card whose checkbox renders `delay` milliseconds after its label.
+  later: {
+    name: "reports",
+    title: "Weekly reports",
+    description: "Send a summary every Monday.",
+    delay: 100,
+  },
   // With `?alone`, a FieldLabel outside any Field that labels nothing.
   alone: "Orphan label",
 }
 
 function fieldChoiceCardOptions() {
   const params = new URLSearchParams(location.search)
-  return { alone: params.has("alone") }
+  return { alone: params.has("alone"), later: params.has("later") }
 }
 
 export { fieldChoiceCardFixture, fieldChoiceCardOptions }
