@@ -43,3 +43,22 @@ test("fields hear each change, and nothing when the message stays the same", () 
   setComponentValidity(el, "")
   expect(heard).toEqual([el, el])
 })
+
+test("clearing while the input is disabled leaves it valid once enabled", () => {
+  const el = input()
+  setComponentValidity(el, "Enter a valid date.")
+  el.disabled = true
+  setComponentValidity(el, "")
+  el.disabled = false
+  expect(el.validity.valid).toBe(true)
+})
+
+test("a message the app had set comes back when the component clears while disabled", () => {
+  const el = input()
+  el.setCustomValidity("Taken by the server.")
+  setComponentValidity(el, "Enter a valid date.")
+  el.disabled = true
+  setComponentValidity(el, "")
+  el.disabled = false
+  expect(el.validationMessage).toBe("Taken by the server.")
+})

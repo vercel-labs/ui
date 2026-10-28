@@ -107,7 +107,8 @@ const heldMessages = new WeakMap<HTMLInputElement, { message: string; app: strin
 // Sets a native control's custom validity from a component's own check, like a
 // date picker's text that isn't a date, and tells fields around it. An empty
 // message gives the control back the message the app had set, unless the app
-// set another one since.
+// set another one since. A control barred from validation, like a disabled
+// one, reports no message, so there it's taken to still hold the component's.
 function setComponentValidity(el: HTMLInputElement, message: string) {
   const held = heldMessages.get(el)
   if ((held?.message ?? "") === message) return
@@ -117,7 +118,7 @@ function setComponentValidity(el: HTMLInputElement, message: string) {
     el.setCustomValidity(message)
   } else {
     heldMessages.delete(el)
-    if (el.validationMessage === held!.message) el.setCustomValidity(held!.app)
+    if (!el.willValidate || el.validationMessage === held!.message) el.setCustomValidity(held!.app)
   }
   validityChanged(el)
 }
