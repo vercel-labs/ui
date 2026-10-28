@@ -160,6 +160,7 @@ const reasonEvents: Record<string, string[]> = {
   "item-removed": [],
   reset: [],
   restore: [],
+  "storage-sync": ["StorageEvent"],
   swipe: ["PointerEvent", "TouchEvent"],
   scroll: ["Event"],
   "focus-in": ["FocusEvent"],

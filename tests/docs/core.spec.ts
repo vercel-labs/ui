@@ -19,6 +19,7 @@ const pages = [
   ["/core/behaviors/trees", "Trees"],
   ["/core/behaviors/motion", "Transitions and Gestures"],
   ["/core/behaviors/popups", "Popups and Layers"],
+  ["/core/behaviors/preferences", "Preferences and Devices"],
   ["/core/behaviors/canvas", "Canvas"],
   ["/core/date", "Dates"],
   ["/core/testing", "Testing"],

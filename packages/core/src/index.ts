@@ -32,6 +32,24 @@ export type {
 export type { Store } from "./foundation/kernel/store"
 export type { ActionDetails } from "./foundation/kernel/action"
 export { isRTL } from "./foundation/platform/env"
+export {
+  colorSchemeOf,
+  createColorScheme,
+  type ColorScheme,
+  type ColorSchemeOptions,
+  type ColorSchemeState,
+  type ColorSchemeStore,
+  type ColorSchemeValue,
+  type SystemColorScheme,
+} from "./foundation/preferences/color-scheme"
+export {
+  createCookieStorage,
+  createLocalStorage,
+  createSessionStorage,
+  type CookieStorageOptions,
+  type StorageScriptOptions,
+  type ValueStorage,
+} from "./foundation/storage/storage"
 export { createTypeahead, isTypeaheadKey, labelOf } from "./foundation/text/typeahead"
 export {
   createSelection,

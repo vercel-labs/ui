@@ -1,0 +1,323 @@
+---
+title: Preferences and Devices
+description: Let people choose light, dark or their system's scheme, keep what they choose between visits, and render it right from the server's first render.
+---
+
+People tell their browser how they like things, such as light or dark colors, and apps often let them choose again, per app or per part of a page. `createColorScheme` holds that choice, reads the browser's preference and works out what shows, so your components can follow along. Storage keeps a choice like that between visits, in localStorage, sessionStorage or a cookie.
+
+Import them from `@ui-sdk/core`.
+
+## Color Scheme
+
+### Three Answers
+
+A color scheme knows three things, and each has its own field:
+
+| Field      | Values                             | Means                                                                                                                  |
+| ---------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `value`    | `"system"`, `"light"` or `"dark"`  | What the app chose. `"system"` follows the browser.                                                                    |
+| `system`   | `"light"`, `"dark"` or `"unknown"` | What the browser prefers. `"unknown"` on the server, before hydration, and in browsers without `prefers-color-scheme`. |
+| `resolved` | `"light"`, `"dark"` or `"unknown"` | What shows: `value`, or `system` when `value` is `"system"`.                                                           |
+
+A dashboard set to Light while the browser prefers dark is `{ value: "light", system: "dark", resolved: "light" }`. On the server, following the system, it's `{ value: "system", system: "unknown", resolved: "unknown" }`: the app knows it follows the system, and nobody knows the answer yet.
+
+### Follow It in a Primitive
+
+Create a color scheme once per scope, like the page or a dark sidebar. Every color scheme on a page shares one browser query, so you can make as many as you like:
+
+```ts
+import { createColorScheme } from "@ui-sdk/core"
+
+const colorScheme = createColorScheme()
+```
+
+Keep its state in your primitive's state, starting at `initialState`, which is what the server renders too:
+
+```ts
+state: () => ({ colorScheme: colorScheme.initialState }),
+```
+
+Then call `follow` from a part's `bind`, with the part's store and the key to keep up to date:
+
+```ts
+root: slot<{}, { colorScheme: ColorSchemeState }>({
+  state: (state) => ({ colorScheme: state.colorScheme }),
+  attrs: (state) => ({ "data-color-scheme": state.colorScheme.value }),
+  bind: (_el, part) => colorScheme.follow(part.store, "colorScheme"),
+}),
+```
+
+The server and the first render in the browser both use `initialState`, so the page hydrates without a mismatch. A microtask later, `follow` catches up with the browser's preference, then keeps up with every change, to the preference or the app's choice. It returns the cleanup `bind` needs, and the page's one listener goes away once nothing follows it.
+
+### Let People Choose
+
+`set` changes the app's choice. Pass the reason and the event, which reach `onValueChange`:
+
+```ts
+press: ({ key }, event) => colorScheme.set(key, { reason: "item-press", event }),
+```
+
+Dark and Light stay put whatever the browser does. Going back to Default (System) shows the browser's preference right away, since the color scheme kept up with it the whole time. In this picker, the choices are a radio group with [roving focus](./focus#roving-focus), so Tab reaches the chosen one and the arrow keys change it with the reason `"list-navigation"`.
+
+<ComponentExample
+  name="behaviors/color-scheme"
+  caption="Pick Dark or Light, then go back to Default (System) and switch your system between light and dark, or emulate prefers-color-scheme in your browser's developer tools."
+/>
+
+`onValueChange` hears each choice before it happens, with its reason and who made it, and `details.cancel()` keeps the current one. `onSystemValueChange` hears the browser's preference change while something subscribes or follows:
+
+```ts
+const colorScheme = createColorScheme({
+  onValueChange: (value, details) => track("color-scheme", value, details.reason),
+  onSystemValueChange: (value) => console.log("The browser now prefers", value),
+})
+```
+
+### Render the Right Scheme First
+
+Render the choice, not what it resolves to. The first render says `data-color-scheme="system"` unless the app chose otherwise, and your stylesheet answers it with its own media query, so the first paint is right before any script runs:
+
+```css
+[data-color-scheme="dark"] {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-color-scheme="system"] {
+    color-scheme: dark;
+  }
+}
+```
+
+A choice someone saved works the same way when it's kept in a cookie, as in [Remember the Choice](#remember-the-choice): the server reads it, so the first render already shows it.
+
+Style everything that depends on the scheme this way, from `data-color-scheme` in CSS, and keep the state for content, like a label that says "Dark". CSS is right from the first paint; content follows the state, which can only change after hydration.
+
+That covers styles. When the markup itself depends on what shows, like a label that says "Dark" or a picture for each scheme, the server needs to know the browser's preference too.
+
+Chromium-based browsers can tell your server with each request, in the `Sec-CH-Prefers-Color-Scheme` header. Ask for it in your responses:
+
+```http
+Accept-CH: Sec-CH-Prefers-Color-Scheme
+Critical-CH: Sec-CH-Prefers-Color-Scheme
+Vary: Sec-CH-Prefers-Color-Scheme
+```
+
+`Critical-CH` asks the browser to send the header with the very first request, and `Vary` keeps caches from mixing the two schemes up. Then read the header with `colorSchemeOf` and pass it as `initial`:
+
+```ts
+import { colorSchemeOf, createColorScheme } from "@ui-sdk/core"
+
+const colorScheme = createColorScheme({
+  initial: colorSchemeOf(request.headers.get("Sec-CH-Prefers-Color-Scheme")),
+})
+```
+
+`colorSchemeOf` returns `"light"`, `"dark"`, or `"unknown"` when the header is missing. Browsers may leave it out, so keep the stylesheet's media query either way.
+
+A color scheme holds the app's choice, so create one per request on the server, never one shared by every request.
+
+### Remember the Choice
+
+Pass a [storage](#storage) as `storage`, and the color scheme saves each choice and reads it back on the next visit:
+
+```ts
+import { createColorScheme, createLocalStorage } from "@ui-sdk/core"
+
+const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme") })
+```
+
+When the saved choice shows depends on who can read it:
+
+- A cookie, from `createCookieStorage`, is read as the color scheme is created, on the server and in the browser alike, so the first render shows the saved choice. On the server, give it the request's `Cookie` header, as in [Read Cookie on the Server](#read-cookie-on-the-server).
+- localStorage and sessionStorage are only in the browser, so the first render shows `defaultValue`. The saved choice comes back once something subscribes or follows, after hydration, and `onValueChange` hears it with the reason `"restore"`. Render `colorScheme.script()` right after the root, as in [Show It Before Hydration](#show-it-before-hydration), and CSS shows the saved choice on the first paint anyway.
+
+Choices made in another tab, or through another storage with the same ID, arrive with the reason `"storage-sync"`. The picker above keeps its choice in localStorage, so pick one and reload the page.
+
+### Outside a Primitive
+
+`get` returns everything the color scheme knows right now, the same object until something changes, and `subscribe` hears every change. Call the function `subscribe` returns to stop:
+
+```ts
+const colorScheme = createColorScheme()
+
+colorScheme.get().resolved
+
+const stop = colorScheme.subscribe((state) => {
+  document.documentElement.dataset.colorScheme = state.value
+})
+```
+
+On the server, `get` returns `initialState` and `subscribe` hears only `set`.
+
+### Inside a Frame
+
+A part in an iframe follows the iframe's window. Pass it as `view`:
+
+```ts
+const colorScheme = createColorScheme({ view: frame.contentWindow! })
+```
+
+## Storage
+
+A storage keeps one value, a string, between visits, under an ID. There are three, and they differ in how long the value lasts and who can read it:
+
+| Storage                | Lasts                       | Reaches   | The server reads it |
+| ---------------------- | --------------------------- | --------- | ------------------- |
+| `createLocalStorage`   | Until it's removed          | Every tab | No                  |
+| `createSessionStorage` | While the tab is open       | That tab  | No                  |
+| `createCookieStorage`  | A year, or `maxAge` seconds | Every tab | Yes                 |
+
+### Keep a Value
+
+Give each storage an ID. It's the localStorage or sessionStorage key, or the cookie's name, so storages with the same kind and ID share one value:
+
+```ts
+import { createLocalStorage } from "@ui-sdk/core"
+
+const note = createLocalStorage("note")
+
+note.set("Buy milk")
+note.get() // "Buy milk"
+note.remove()
+note.get() // null
+```
+
+`get` returns `null` when nothing is kept. `set` and `remove` return whether they wrote.
+
+<ComponentExample
+  name="behaviors/storage"
+  caption="Type a note, then reload the page, or open it in another tab and type there. Switch storages to see what each one keeps."
+/>
+
+### When It's Unavailable
+
+Any storage can be unavailable: on the server, in a sandboxed frame, in a browser that blocks storage, or when it's full. Then `get` returns `null` and `set` returns `false`, and nothing throws, so code that saves something works everywhere. Ask `available` to say so in the interface:
+
+```ts
+if (!note.available()) showHint("Your note won't be saved here.")
+```
+
+### Hear Changes
+
+`subscribe` hears the value change through another storage with the same ID on the page, or in another tab for localStorage, and for cookies in browsers with `cookieStore`. Call the function it returns to stop:
+
+```ts
+const stop = note.subscribe((value) => {
+  render(value ?? "")
+})
+```
+
+A storage doesn't tell its own `subscribe` about the value the page started with, so read `get` first. With React, `useSyncExternalStore(note.subscribe, note.get, () => null)` does both.
+
+### Read Cookie on the Server
+
+A cookie is the one storage the server reads, so a value kept in one can render right from the first render. Pass the request's `Cookie` header as `cookie`:
+
+```ts
+import { createCookieStorage } from "@ui-sdk/core"
+
+const colorSchemeCookie = createCookieStorage("color-scheme", {
+  cookie: request.headers.get("cookie"),
+})
+```
+
+In the browser it reads `document.cookie` instead. `readsOnServer` says whether a storage can do this, so helpers like `createColorScheme` know when to read it.
+
+The cookie lasts a year, on every path, and isn't sent with other sites' requests. Change that with `maxAge`, `path`, `domain`, `sameSite` and `secure`.
+
+### Show It Before Hydration
+
+The server can't read localStorage or sessionStorage, so it renders the value the component starts with. `script` closes that gap for CSS: it returns an inline script to render right after the component's root. As the page loads, before any bundle, it reads the saved value and puts it on the root as a `data-*` attribute:
+
+```tsx
+const script = colorSchemeStorage.script({
+  attribute: "data-color-scheme",
+  values: ["system", "light", "dark"],
+})
+
+<div data-color-scheme={state.colorScheme.value} suppressHydrationWarning>…</div>
+<script dangerouslySetInnerHTML={{ __html: script }} />
+```
+
+Style from the attribute, and the first paint shows the saved value. The component's state catches up after hydration, through `"restore"`, so content that depends on the value, like a label, changes then. The root differs from the server's HTML until it does, so tell your framework to expect it, like React's `suppressHydrationWarning`.
+
+Every script with the same kind and ID reads the storage once, however many components render it, and the scripts are identical, so compression shrinks the repeats to a few bytes.
+
+The saved value comes from the browser, where any script on your site can write it, so `script` only sets attributes that start with `data-`, and only to one of `values`. Anything else leaves the root as the server rendered it. A cookie needs no script, so its `script` returns undefined: the server renders its value.
+
+## API Reference
+
+<TypeTable
+  path="../../packages/core/src/foundation/preferences/color-scheme.ts"
+  name="ColorSchemeOptions"
+  events={false}
+  examples={{
+    defaultValue: "Render the Right Scheme First",
+    initial: "Render the Right Scheme First",
+    onValueChange: "Let People Choose",
+    onSystemValueChange: "Let People Choose",
+    storage: "Remember the Choice",
+    view: "Inside a Frame",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/preferences/color-scheme.ts"
+  name="ColorScheme"
+  events={false}
+  examples={{
+    initialState: "Follow It in a Primitive",
+    get: "Outside a Primitive",
+    set: "Let People Choose",
+    subscribe: "Outside a Primitive",
+    script: "Remember the Choice",
+    follow: "Follow It in a Primitive",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/preferences/color-scheme.ts"
+  name="ColorSchemeState"
+  events={false}
+  examples={{
+    value: "Three Answers",
+    system: "Three Answers",
+    resolved: "Three Answers",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/storage/storage.ts"
+  name="ValueStorage"
+  events={false}
+  examples={{
+    id: "Keep a Value",
+    readsOnServer: "Read Cookie on the Server",
+    script: "Show It Before Hydration",
+    available: "When It's Unavailable",
+    get: "Keep a Value",
+    set: "Keep a Value",
+    remove: "Keep a Value",
+    subscribe: "Hear Changes",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/storage/storage.ts"
+  name="CookieStorageOptions"
+  events={false}
+  examples={{
+    cookie: "Read Cookie on the Server",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/storage/storage.ts"
+  name="StorageScriptOptions"
+  events={false}
+  examples={{
+    attribute: "Show It Before Hydration",
+    values: "Show It Before Hydration",
+  }}
+/>

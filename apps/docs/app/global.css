@@ -36,7 +36,8 @@
   }
 }
 
-:root {
+:root,
+.light {
   --canvas: oklch(0.9848 0 0);
   --subtle: oklch(0.48 0 0);
   --radius: 0.625rem;

@@ -22,6 +22,8 @@ const coreLayers = [
   "lists",
   "motion",
   "popups",
+  "preferences",
+  "storage",
   "canvas",
   "text",
 ]

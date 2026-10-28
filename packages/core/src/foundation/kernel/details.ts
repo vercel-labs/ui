@@ -57,8 +57,10 @@ type ReasonVocabulary = {
   "item-removed": undefined
   /** A form reset. */
   reset: undefined
-  /** The browser restored state, like after going back. */
+  /** The browser restored state, like after going back, or a saved value was read back from storage. */
   restore: undefined
+  /** Another tab, or another storage with the same ID, saved a new value. */
+  "storage-sync": StorageEvent | undefined
   /** A swipe gesture: a finger, mouse or pen dragged it. */
   swipe: PointerEvent | TouchEvent
   /** The user scrolled a carousel some other way: a wheel, a trackpad, a scrollbar, or the browser bringing focus or a find in page into view. */
