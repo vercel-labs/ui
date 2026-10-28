@@ -28,9 +28,12 @@ function useAsyncOptions<Item>(
   const start = () => {
     if (immediate && helper.getState() === initial) helper.reload()
   }
-  // Outside a component, like in a detached effect scope, nothing mounts.
-  if (getCurrentInstance()) onMounted(start)
-  else start()
+  // A component that has already mounted, like one calling a store from its
+  // own `onMounted`, won't mount again, and outside a component nothing mounts:
+  // both start now, in the browser only.
+  const instance = getCurrentInstance()
+  if (instance && !instance.isMounted) onMounted(start)
+  else if (typeof document !== "undefined") start()
   onScopeDispose(() => helper.cancel())
   return { state, setQuery: helper.setQuery, reload: helper.reload, loadMore: helper.loadMore }
 }

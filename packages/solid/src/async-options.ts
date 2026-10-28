@@ -4,7 +4,8 @@ import {
   type AsyncOptionsOptions,
   type AsyncOptionsState,
 } from "@ui-sdk/core/async-options"
-import { createSignal, onCleanup, onSettled } from "solid-js"
+import { isServer } from "@solidjs/web"
+import { createSignal, isHydrating, onCleanup, onSettled } from "solid-js"
 
 /**
  * Options loaded for what the user types, latest first. Pass `items`, `status`
@@ -19,18 +20,22 @@ function useAsyncOptions<Item>(
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
   options?: AsyncOptionsOptions,
 ) {
-  // A component's body runs on the server too, so an `immediate` load starts
-  // once it has rendered. Until then it shows as loading, so nothing says "no match" first.
-  const helper = createAsyncOptions<Item>(load, { ...options, immediate: false })
+  // An `immediate` load starts at once in the browser, so it doesn't wait for a
+  // `<Loading>` boundary to reveal. A component's body runs on the server too,
+  // where it never starts, and while hydrating it waits until hydration settles.
+  // Until then it shows as loading, so nothing says "no match" first.
   const immediate = !!options?.immediate
+  const now = immediate && !isServer && !isHydrating()
+  const helper = createAsyncOptions<Item>(load, { ...options, immediate: now })
   const initial = helper.getState()
   const [state, setState] = createSignal<AsyncOptionsState<Item>>(
     immediate ? { ...initial, status: "loading" } : initial,
   )
   onCleanup(helper.subscribe(() => setState(helper.getState())))
-  onSettled(() => {
-    if (immediate && helper.getState() === initial) helper.reload()
-  })
+  if (immediate && !now)
+    onSettled(() => {
+      if (helper.getState() === initial) helper.reload()
+    })
   // Cancels on unmount, so a load that lands later changes nothing.
   onCleanup(() => helper.cancel())
   return {
