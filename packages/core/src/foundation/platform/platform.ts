@@ -47,6 +47,16 @@ function composedContains(container: Node, node: Node) {
   return composedHops(node).some((hop) => container.contains(hop))
 }
 
+// The nearest element around `node` that matches `selector`, across shadow
+// roots, like an item around a custom element's own label. `closest` stops at them.
+function composedClosest<T extends Element>(node: Node, selector: string) {
+  for (const hop of composedHops(node)) {
+    const found = (hop as Element).closest?.<T>(selector)
+    if (found) return found
+  }
+  return null
+}
+
 // Whether the user asked for less motion. Animations jump instead.
 function prefersReducedMotion() {
   return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -211,6 +221,7 @@ function hasCommandModifier(keys: string) {
 export {
   activeElement,
   ariaKeyshortcuts,
+  composedClosest,
   composedContains,
   composedHops,
   formatShortcut,

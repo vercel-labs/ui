@@ -31,6 +31,7 @@ export { layoutBox, layoutOrigin, layoutSize } from "./layout"
 export {
   activeElement,
   ariaKeyshortcuts,
+  composedClosest,
   composedContains,
   formatShortcut,
   hasCommandModifier,

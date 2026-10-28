@@ -3,7 +3,7 @@
 // its search field, and a press on the trigger that drags or holds to an item
 // and releases to choose it.
 import { isTypeaheadKey } from "../../foundation/text/typeahead"
-import { isApple } from "../../foundation/platform/platform"
+import { composedClosest, composedContains, isApple } from "../../foundation/platform/platform"
 import { type Listbox } from "../../foundation/lists/listbox"
 import { listStep } from "../../foundation/lists/listbox-keyboard"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
@@ -172,14 +172,15 @@ function createSelectKeyboard({
     const start = { x: event.clientX, y: event.clientY, time: performance.now() }
     const off = on(window, "pointerup", (up) => {
       off()
-      const target = up.target as HTMLElement
+      // The window sees only the shadow host around a trigger in a shadow root.
+      const target = up.composedPath()[0] as HTMLElement
       // A release off the trigger sends it no click, so the next click, like Enter, is a new press.
-      if (!trigger.contains(target)) pressClick = false
+      if (!composedContains(trigger, target)) pressClick = false
       if (!opening) return
       const held = performance.now() - start.time >= HOLD_MS
       const moved = Math.hypot(up.clientX - start.x, up.clientY - start.y) > DRAG_PX
-      if ((!held && !moved) || trigger.contains(target)) return
-      const option = target.closest<HTMLElement>('[role="option"]')
+      if ((!held && !moved) || composedContains(trigger, target)) return
+      const option = composedClosest<HTMLElement>(target, '[role="option"]')
       const entry = option && listbox.entries().find((entry) => listbox.element(entry.key) === option)
       if (entry) choose(entry.key, up)
     })

@@ -1,5 +1,5 @@
 import { expect, focusIsWithin, isSheet, lastAction, menuNamed, test, waitForStill } from "../fixtures"
-import { addScroller, composingEscape } from "../fixtures/popup"
+import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
 
 // Behavior follows the WAI-ARIA menu button pattern:
 // https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
@@ -44,6 +44,23 @@ test.describe("trigger", () => {
     await page.getByRole("button", { name: "File" }).focus()
     await page.keyboard.press("ArrowUp")
     await expect(page.getByRole("menuitem", { name: "Delete" })).toBeFocused()
+  })
+
+  test("a click on a trigger in a shadow root opens the menu, and it stays open", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("react"),
+      "React stops hearing events once its tree moves into a shadow root.",
+    )
+    await moveIntoShadowRoot(page.locator(".fixture"))
+    const trigger = page.getByRole("button", { name: "File" })
+    await trigger.click()
+    await expect(menuNamed(page, "File")).toBeVisible()
+    await page.waitForTimeout(100)
+    await expect(menuNamed(page, "File")).toBeVisible()
+    await expect(trigger).toHaveAttribute("aria-expanded", "true")
   })
 })
 

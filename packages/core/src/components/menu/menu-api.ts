@@ -1,6 +1,7 @@
 import { type Layer } from "../../foundation/platform/layers"
 import type { MenubarApi } from "../menubar/menubar"
 import { isRTL } from "../../foundation/platform/env"
+import { composedClosest, composedContains } from "../../foundation/platform/platform"
 import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
 import { menuPreset } from "../../foundation/popups/popup-presets"
 import {
@@ -662,17 +663,18 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     const start = { x: event.clientX, y: event.clientY, time: performance.now() }
     const off = on(window, "pointerup", (up) => {
       off()
-      const target = up.target as HTMLElement
+      // The window sees only the shadow host around a trigger in a shadow root.
+      const target = up.composedPath()[0] as HTMLElement
       // A release off the trigger sends it no click, so the next click, like Enter, is a new press.
-      if (!trigger.contains(target)) pressClick = false
+      if (!composedContains(trigger, target)) pressClick = false
       if (!opening) return
       const held = performance.now() - start.time >= 200
       const moved = Math.hypot(up.clientX - start.x, up.clientY - start.y) > 4
-      if (!held || (!moved && trigger.contains(target))) return
-      const item = target.closest<HTMLElement>(itemSelector)
+      if (!held || (!moved && composedContains(trigger, target))) return
+      const item = composedClosest<HTMLElement>(target, itemSelector)
       const entry = item && findEntry(item)
       if (entry && !entry.entry.disabled() && !entry.entry.openSubmenu) entry.entry.activate(up)
-      else if (!item && !trigger.contains(target) && !root().treeContains(target)) {
+      else if (!item && !composedContains(trigger, target) && !root().treeContains(target)) {
         hide({ reason: "trigger-release", event: up, focus: false })
       }
     })
@@ -703,7 +705,8 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   }
 
   function treeContains(target: Node) {
-    if (popup.element()?.contains(target)) return true
+    const el = popup.element()
+    if (el && composedContains(el, target)) return true
     return [...children].some((child) => child.treeContains(target))
   }
 

@@ -48,4 +48,14 @@ async function addShadowButton(el: Locator) {
   })
 }
 
-export { addScroller, addShadowButton, composingEscape }
+// Moves `el` into the open shadow root of an element that takes its place,
+// like a component rendered inside a design system's custom element.
+async function moveIntoShadowRoot(el: Locator) {
+  await el.evaluate((el) => {
+    const host = document.createElement("div")
+    el.before(host)
+    host.attachShadow({ mode: "open" }).append(el)
+  })
+}
+
+export { addScroller, addShadowButton, composingEscape, moveIntoShadowRoot }
