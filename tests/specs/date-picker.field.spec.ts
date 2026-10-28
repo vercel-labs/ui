@@ -55,3 +55,22 @@ test("a required date left empty shows the field's error, which describes the in
   // Typing renders the input again, which keeps the field's description.
   await expect(input(page)).toHaveAccessibleDescription(`MM/DD/YYYY ${f.description}`)
 })
+
+test("text that isn't a date shows the field's error until it's fixed", async ({ page, open }) => {
+  await open("date-picker-field")
+  await input(page).fill("not a date")
+  await input(page).press("Enter")
+  await page.getByRole("button", { name: "Submit" }).click()
+  const error = page.locator(".field-error")
+  await expect(error).toBeVisible()
+  await expect(page.locator(".field")).toHaveAttribute("data-invalid", "")
+  expect(await input(page).evaluate((el: HTMLInputElement) => el.validity.customError)).toBe(true)
+  await expect(error).toHaveText(await input(page).evaluate((el: HTMLInputElement) => el.validationMessage))
+  await expect(submitted(page)).toHaveText("")
+  await input(page).fill("10/20/2026")
+  await input(page).press("Tab")
+  await expect(error).toBeHidden()
+  await expect(page.locator(".field")).not.toHaveAttribute("data-invalid")
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText(JSON.stringify([[datePickerFixture.name, "2026-10-20"]]))
+})

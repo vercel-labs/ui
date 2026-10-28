@@ -42,6 +42,27 @@ test("text that isn't a date stays as typed and marks the input invalid", async 
   await expect(input(page)).not.toHaveAttribute("aria-invalid")
 })
 
+test("text that isn't a date blocks the form's submit until it's fixed", async ({ page, open }) => {
+  await open("date-picker", { value: "2026-10-16" })
+  await type(page, "not a date")
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText("")
+  expect(await input(page).evaluate((el: HTMLInputElement) => el.validity.customError)).toBe(true)
+  await type(page, "10/18/2026")
+  expect(await input(page).evaluate((el: HTMLInputElement) => el.validity.customError)).toBe(false)
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText(JSON.stringify([[f.name, "2026-10-18"]]))
+})
+
+test("clearing text that isn't a date lets the form submit", async ({ page, open }) => {
+  await open("date-picker", { value: "2026-10-16" })
+  await type(page, "not a date")
+  await type(page, "")
+  expect(await input(page).evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(true)
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText(JSON.stringify([[f.name, ""]]))
+})
+
 test("the format hint describes the input", async ({ page, open }) => {
   await open("date-picker")
   await expect(input(page)).toHaveAccessibleDescription("MM/DD/YYYY")
@@ -201,5 +222,24 @@ test.describe("range", () => {
     await open("date-picker", { mode: "range", value: "2026-10-20,2026-10-23" })
     await type(page, "10/10/2026", "End date")
     await expect(input(page, "End date")).toHaveAttribute("aria-invalid", "true")
+  })
+
+  test("an end that isn't a date blocks the form's submit until it's fixed", async ({ page, open }) => {
+    await open("date-picker", { mode: "range", value: "2026-10-20,2026-10-23" })
+    await type(page, "not a date", "End date")
+    await page.getByRole("button", { name: "Submit" }).click()
+    await expect(submitted(page)).toHaveText("")
+    const endError = () => input(page, "End date").evaluate((el: HTMLInputElement) => el.validity.customError)
+    expect(await endError()).toBe(true)
+    expect(await input(page, "Start date").evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(true)
+    await type(page, "10/25/2026", "End date")
+    expect(await endError()).toBe(false)
+    await page.getByRole("button", { name: "Submit" }).click()
+    await expect(submitted(page)).toHaveText(
+      JSON.stringify([
+        ["start", "2026-10-20"],
+        ["end", "2026-10-25"],
+      ]),
+    )
   })
 })

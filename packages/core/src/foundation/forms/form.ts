@@ -82,6 +82,33 @@ function valueMissingMessage(type: "checkbox" | "radio" | "select" | "file" | "t
   return messages.get(type)!
 }
 
+// Fields that read their controls' validity again when a component changes a
+// control's custom validity, which no event reports.
+const customValidityListeners = new Set<(el: HTMLElement) => void>()
+
+// Sets a native control's custom validity from a component's own check, like a
+// date picker's text that isn't a date, and tells fields around it. An empty
+// message clears it. Returns a function that sets the next message, and writes
+// only when it changes, so a message the app set itself stays until the
+// component's check changes.
+function customValidity(el: HTMLInputElement) {
+  let current = ""
+  return (message: string) => {
+    if (message === current) return
+    current = message
+    el.setCustomValidity(message)
+    customValidityListeners.forEach((listener) => listener(el))
+  }
+}
+
+// Calls `listener` with the control whenever `customValidity` changes one. Returns a cleanup.
+function onCustomValidity(listener: (el: HTMLElement) => void) {
+  customValidityListeners.add(listener)
+  return () => {
+    customValidityListeners.delete(listener)
+  }
+}
+
 const blocksImplicitSubmission = new Set([
   "text",
   "search",
@@ -372,6 +399,7 @@ export {
   bindInternals,
   bindValueInput,
   claimInvalidFocus,
+  customValidity,
   dispatchChange,
   fieldsetDisabled,
   focusWith,
@@ -384,6 +412,7 @@ export {
   labelledBy,
   labelsOf,
   nameFromLabels,
+  onCustomValidity,
   submitImplicitly,
   valueMissingMessage,
   watchFieldsets,

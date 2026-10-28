@@ -68,7 +68,7 @@ Dates are strings such as `"2026-10-16"`, with no time or time zone attached. No
 
 The input parses text when you press Enter or leave the field. It uses the locale’s date order, such as `10/16/2026` in American English or `16.10.2026` in German. It also accepts ISO dates, digits without separators, two-digit years, and month names in the locale or English. Dates without a year use the current year.
 
-The field formats a valid date after it is committed, leaving your typing alone until then. Invalid text stays visible and sets `aria-invalid` and `data-invalid`; the previous value stays unchanged. The hint’s state includes an example date you can show alongside the field.
+The field formats a valid date after it is committed, leaving your typing alone until then. Invalid text stays visible and sets `aria-invalid` and `data-invalid`; the previous value stays unchanged. Until the text is a date again, or empty, the input reports "Enter a valid date." as its validation message, so its form won't submit. The hint’s state includes an example date you can show alongside the field.
 
 <ComponentExample
   name="date-picker/invalid"
@@ -187,14 +187,14 @@ Set `dismissible` to `false` while a choice is incomplete. Escape, an outside pr
 
 ## Forms
 
-`name` submits an ISO date. In range mode, use `startName` and `endName` for separate fields, or `name` to submit both ends under the same name. `required` blocks an empty submission, a form reset restores `defaultValue`, and a disabled `fieldset` disables the picker. Server-rendered hidden inputs submit the initial value before hydration too.
+`name` submits an ISO date. In range mode, use `startName` and `endName` for separate fields, or `name` to submit both ends under the same name. `required` blocks an empty submission, text that isn't a date blocks one too, a form reset restores `defaultValue`, and a disabled `fieldset` disables the picker. Server-rendered hidden inputs submit the initial value before hydration too.
 
 <ComponentExample
   name="date-picker/form"
   caption="Press Submit with an empty field, then enter a date and submit again. A valid date submits as an ISO string."
 />
 
-A [Field](./field) connects the label, description, and errors to the input. Its `name` is used when the picker has none, and a disabled field disables the picker.
+A [Field](./field) connects the label, description, and errors to the input, and shows an error for an empty required date or text that isn't a date. Its `name` is used when the picker has none, and a disabled field disables the picker.
 
 <ComponentExample
   name="date-picker/field"

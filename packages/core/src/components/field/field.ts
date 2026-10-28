@@ -3,6 +3,7 @@ import {
   formInternals,
   invalidFocusClaimed,
   isLabelable,
+  onCustomValidity,
   watchFieldsets,
 } from "../../foundation/forms/form"
 import { afterReset } from "../../foundation/forms/value"
@@ -303,6 +304,14 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
         external = next
         store.set({ revealed: false })
         check()
+      }),
+    )
+
+    // A component's own check, like a date picker's text that isn't a date,
+    // changes its control's custom validity without an event.
+    cleanups.push(
+      onCustomValidity((control) => {
+        if (el.contains(control)) check()
       }),
     )
 

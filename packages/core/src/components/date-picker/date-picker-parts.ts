@@ -5,7 +5,7 @@ import { normalizeValue } from "../calendar/calendar-model"
 import { formatDate } from "../../foundation/date/format"
 import { datePattern } from "../../foundation/date/parse"
 import { type ISODate } from "../../foundation/date/plain-date"
-import { bindInternals, bindValueInput } from "../../foundation/forms/form"
+import { bindInternals, bindValueInput, customValidity } from "../../foundation/forms/form"
 import { openerOf, popupContentAttrs, popupTriggerAttrs } from "../../foundation/popups/popup"
 import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
 import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
@@ -37,6 +37,10 @@ import {
 } from "./date-picker-api"
 
 const indexOf = (props: DatePickerInputProps) => (props.end ? 1 : 0)
+
+// The message the browser and a Field show for an input whose text isn't a
+// date that can be picked. English, like the trigger's label.
+const invalidDateMessage = "Enter a valid date."
 
 function triggerLabel(state: State) {
   const label = state.mode === "range" ? "Choose dates" : "Choose date"
@@ -120,13 +124,21 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
     },
     bind(el, { store, props }) {
       const input = el as HTMLInputElement
+      const setValidity = customValidity(input)
       // The text is written here, so the framework never fights the caret.
       const write = () => {
-        const text = textOf(store.get(), indexOf(props))
+        const state = store.get()
+        const text = textOf(state, indexOf(props))
         if (input.value !== text) input.value = text
+        // Text that isn't a date blocks its form, until it's a date or empty.
+        setValidity(invalidAt(state, indexOf(props)) ? invalidDateMessage : "")
       }
       write()
-      return store.subscribe(write)
+      const unsubscribe = store.subscribe(write)
+      return () => {
+        unsubscribe()
+        setValidity("")
+      }
     },
   }),
 
