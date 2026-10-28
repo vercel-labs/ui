@@ -78,7 +78,9 @@ function onSubmit(event: Event) {
           <NumberInputGroup class="number-input-group">
             <NumberInputDecrement :aria-label="f.quantity.decrement">−</NumberInputDecrement>
             <NumberInputControl class="number-input-control" />
-            <NumberInputIncrement :aria-label="f.quantity.increment">+</NumberInputIncrement>
+            <NumberInputIncrement :aria-label="f.quantity.increment" :disabled="options.disabledIncrement"
+              >+</NumberInputIncrement
+            >
           </NumberInputGroup>
         </NumberInput>
         <FieldDescription>{{ f.quantity.description }}</FieldDescription>

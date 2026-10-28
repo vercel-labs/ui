@@ -39,9 +39,10 @@ const numberInputFixture = {
 // Options a spec can set through the URL:
 // ?quantity=<n> sets where the quantity starts, empty for none, ?required
 // requires the quantity, ?wheel lets the wheel step both, ?disabled and
-// ?readonly apply to both, ?locale=<tag> sets the locale, ?negative lets the
-// amount go below 0, ?cancel=<name> cancels changes to that field,
-// ?controlled controls the quantity.
+// ?readonly apply to both, ?disabled-increment disables only the quantity's
+// increment button, ?locale=<tag> sets the locale, ?negative lets the amount go
+// below 0, ?cancel=<name> cancels changes to that field, ?controlled controls
+// the quantity.
 function numberInputOptions() {
   const params = new URLSearchParams(location.search)
   const quantity = params.get("quantity")
@@ -56,6 +57,7 @@ function numberInputOptions() {
     wheel: params.has("wheel"),
     disabled: params.has("disabled"),
     readOnly: params.has("readonly"),
+    disabledIncrement: params.has("disabled-increment"),
     locale: params.get("locale") ?? "en-US",
     amountMin: params.has("negative") ? undefined : numberInputFixture.amount.min,
     cancel: params.get("cancel"),

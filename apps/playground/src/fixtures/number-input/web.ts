@@ -11,11 +11,11 @@ function markup(options: ReturnType<typeof numberInputOptions>) {
     .join("")
   const quantity = options.quantity === null ? "" : ` default-value="${options.quantity}"`
   const amountMin = options.amountMin === undefined ? "" : ` min="${options.amountMin}"`
-  const group = (item: { decrement: string; increment: string }) => `
+  const group = (item: { decrement: string; increment: string }, incrementDisabled = false) => `
     <ui-number-input-group class="number-input-group">
       <ui-number-input-decrement><button aria-label="${item.decrement}">−</button></ui-number-input-decrement>
       <ui-number-input-control><input class="number-input-control" /></ui-number-input-control>
-      <ui-number-input-increment><button aria-label="${item.increment}">+</button></ui-number-input-increment>
+      <ui-number-input-increment${incrementDisabled ? " disabled" : ""}><button aria-label="${item.increment}">+</button></ui-number-input-increment>
     </ui-number-input-group>`
   return `
     <div class="fixture">
@@ -24,7 +24,7 @@ function markup(options: ReturnType<typeof numberInputOptions>) {
         <ui-field name="${f.quantity.name}">
           <ui-field-label>${f.quantity.label}</ui-field-label>
           <ui-number-input min="${f.quantity.min}" max="${f.quantity.max}"${quantity}${shared}${options.required ? " required" : ""}>
-            ${group(f.quantity)}
+            ${group(f.quantity, options.disabledIncrement)}
           </ui-number-input>
           <ui-field-description>${f.quantity.description}</ui-field-description>
         </ui-field>

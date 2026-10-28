@@ -732,7 +732,13 @@ const components: Record<string, Component> = {
   "number-input": {
     source: "number-input/number-input.ts",
     examples: "number-input",
-    types: ["NumberInputOptions", "NumberInputScrubAreaProps", "NumberInputState", "NumberInputButtonState"],
+    types: [
+      "NumberInputOptions",
+      "NumberInputScrubAreaProps",
+      "NumberInputButtonProps",
+      "NumberInputState",
+      "NumberInputButtonState",
+    ],
   },
   field: {
     source: "field/field.ts",

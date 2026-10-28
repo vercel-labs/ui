@@ -141,6 +141,8 @@ Set `disabled` on the component or its enclosing fieldset to prevent focus, chan
   caption="Try to focus Quantity or use its step buttons. The disabled field stays at 3."
 />
 
+Set `disabled` on one step button's element, like `<ui-number-input-increment disabled>`, to turn off only that direction. The other button still steps.
+
 ### Read Only
 
 Set `read-only` to keep the value focusable and included in form data while preventing edits and steps.
@@ -252,6 +254,13 @@ Every write method takes an optional `{ reason, event }`, fires the change event
 <TypeTable
   path="../../packages/core/src/components/number-input/number-input.ts"
   name="NumberInputScrubAreaProps"
+/>
+
+### NumberInputIncrement and NumberInputDecrement
+
+<TypeTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputButtonProps"
 />
 
 ### State

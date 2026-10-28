@@ -27,6 +27,20 @@ describe("number input", () => {
     expect(attrs(disabled.part("increment", { id: "n" }))["data-at-bound"]).toBeUndefined()
   })
 
+  test("a disabled button is disabled on its own, even in a read-only field", () => {
+    const instance = numberInput({ id: "n", defaultValue: 5 })
+    expect(partState(instance.part("increment", { disabled: true }))).toMatchObject({ disabled: true })
+    expect(attrs(instance.part("increment", { disabled: true }))).toMatchObject({
+      disabled: "",
+      "aria-disabled": "true",
+      "data-disabled": "",
+    })
+    expect(attrs(instance.part("decrement"))["data-disabled"]).toBeUndefined()
+    const readOnly = numberInput({ id: "n", defaultValue: 5, readOnly: true })
+    expect(attrs(readOnly.part("increment")).disabled).toBeUndefined()
+    expect(attrs(readOnly.part("increment", { disabled: true })).disabled).toBe("")
+  })
+
   test("a new format shows the value again", () => {
     const options = { id: "n", defaultValue: 19.99, locale: "en-US" }
     const instance = numberInput(options)

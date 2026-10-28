@@ -8,6 +8,7 @@ export { default as NumberInputScrubAreaCursor } from "./number-input/number-inp
 export { createNumberInputController } from "@ui-sdk/core/number-input"
 export type {
   NumberInputApi,
+  NumberInputButtonProps,
   NumberInputButtonState,
   NumberInputChangeOptions,
   NumberInputController,
