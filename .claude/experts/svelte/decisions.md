@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-No review has run in this repository yet: pass `--base` to `scripts/expert-scope.mjs` until the first review adds a `Last reviewed:` line here.
+Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 
 
 ## Settled
@@ -12,6 +12,7 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 - **Bindable props are controlled whenever defined**; a value passed without `bind:` only sets where the component starts.
 - **Handlers go on the component**, not on the `render` snippet's element: Svelte's delegation runs markup handlers after the built-in one, so they can't cancel it. Not fixable without Svelte's private symbol.
 - **Form component dropped.**
+- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -19,6 +20,7 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 - **Parts hear every change** unless `selects` narrows them.
 - **`menu-trigger-binding.svelte`** calls `use(feature)` inside `$derived.by`. Idempotent, but not idiomatic.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
+- **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
 
 ## Revisit
 

@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-No review has run in this repository yet: pass `--base` to `scripts/expert-scope.mjs` until the first review adds a `Last reviewed:` line here.
+Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 
 
 ## Settled
@@ -15,6 +15,7 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 - **`React.useLayoutEffect` on the server**, no isomorphic shim: React 19 doesn't warn.
 - **React 19 only** (`react >=19`). No `forwardRef`, refs are props.
 - **Form component dropped.** Don't review or suggest Form; users bring react-hook-form or TanStack Form.
+- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -27,6 +28,7 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 - **Controller on two instances**: no dev warning since controllers attach at commit.
 - **Author id in a later Suspense boundary**: an id inside a boundary that hydrates after the parts pointing at it gives a hydration attribute warning. Documented; not fixable while ids are taken at render.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
+- **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration, as Radio was before PR 13.
 
 ## Revisit
 
