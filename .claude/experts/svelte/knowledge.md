@@ -53,6 +53,7 @@ Last checked: 2026-10-28, against `node_modules/svelte` 5.57.2 (exports checked:
 - Component `<script>` runs on the server; `$effect`, `$effect.pre`, `onMount` and attachments don't. `onDestroy` runs on the server after render.
 - Hydration must match: no `typeof window` branches in markup, no locale-dependent text (`Intl` defaults to the machine's locale), `$props.id()` for ids.
 - SvelteKit renders on the server by default and hydrates; a library must not need `ssr = false`.
+- `kit.csp` adds a nonce to `style-src` only for CSS it inlines itself (`inlineStyleThreshold`, 0 by default), and in dev it swaps nonces for `'unsafe-inline'`. `%sveltekit.nonce%` in `app.html` and `mode: "nonce"` both forbid prerendering. SvelteKit, Vite and ui-sdk all read `<meta property="csp-nonce">`.
 
 ### Common mistakes to flag
 

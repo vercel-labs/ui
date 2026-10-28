@@ -58,6 +58,8 @@ Solid 1 habits are the main thing to catch. These changed:
 - On the server, memos compute as they're created and effects don't run; `isServer` tells. Context providers render their children lazily.
 - `hydrate()` claims server elements; while hydrating, refs see server attributes and children before Solid patches them, and Solid skips text writes and never removes server attributes. Anything that reads or writes the DOM belongs after hydration (`onSettled`).
 - `isHydrating()` is exported from `solid-js`. It isn't reactive, and is meant for "render what the server did, switch in `onSettled`".
+- Solid 2 rc.14 `@solidjs/web` has built-in head management (`useHead`) and a `nonce` option (a string or `{ script, style }`) on `renderToString` and `renderToStream`, applied to its hydration script and head styles. `generateHydrationScript` and `HydrationScript` take a string nonce.
+- No released `@solidjs/start` (latest 2.1.0) supports Solid 2; it peers on `solid-js ^1.9`. Don't document SolidStart setups for `@ui-sdk/solid`.
 
 ### Diagnostics
 

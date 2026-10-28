@@ -6,18 +6,21 @@ import { expect, test, waitForStill } from "../fixtures"
 // the page's `<meta property="csp-nonce">`, or come from constructed style
 // sheets, which no policy blocks, when the tag has no nonce. Those are
 // adopted after the page's own styles, so there the page declares
-// `@layer ui-sdk` first to keep it the lowest layer.
+// `@layer ui-sdk` first to keep it the lowest layer. Server markup still
+// carries `style` attributes, like a select's hidden input's, so both
+// policies allow them with `style-src-attr 'unsafe-inline'`, as the styling
+// docs say to, until backlog item P2.39 moves them out of the markup.
 
 const policies = [
   {
     name: "a nonce",
-    policy: "style-src 'self' 'nonce-ui-sdk' 'report-sample'",
+    policy: "style-src 'self' 'nonce-ui-sdk' 'report-sample'; style-src-attr 'unsafe-inline'",
     meta: '<meta property="csp-nonce" nonce="ui-sdk">',
     layers: "",
   },
   {
     name: "no nonce",
-    policy: "style-src 'self' 'report-sample'",
+    policy: "style-src 'self' 'report-sample'; style-src-attr 'unsafe-inline'",
     meta: '<meta property="csp-nonce">',
     layers: "@layer ui-sdk;",
   },
@@ -60,13 +63,6 @@ const backdropColor = (page: Page) =>
 
 for (const { name, policy, meta, layers } of policies) {
   test.describe(`under a policy with ${name} for styles`, () => {
-    test.beforeEach(({ framework }) => {
-      test.skip(
-        framework.endsWith("-ssr"),
-        "Server markup writes style attributes, like a select's hidden input's, which the policy blocks too.",
-      )
-    })
-
     test("a modal dialog locks scrolling, and contains overscroll on iOS", async ({ page, open }) => {
       await serve(page, { policy, meta })
       await page.addInitScript(() =>
