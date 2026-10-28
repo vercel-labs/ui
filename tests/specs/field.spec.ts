@@ -65,6 +65,28 @@ test.describe("a label wrapping a field", () => {
     const unlabeled = () => printed.filter((text) => text.includes("labels nothing"))
     await expect.poll(() => unlabeled().length).toBe(1)
   })
+
+  test("an error outside a field follows its match", async ({ page, open, framework }) => {
+    test.skip(!framework.startsWith("web"), "Web components read match from the element's attribute.")
+    await open("field-choice-card")
+    await page.evaluate(() => {
+      document.querySelector(".fixture")!.insertAdjacentHTML(
+        "beforeend",
+        `<ui-field-error id="plain">Plain error</ui-field-error>
+        <ui-field-error id="child" as-child match="true"><p>Child error</p></ui-field-error>`,
+      )
+    })
+    const plain = page.getByText("Plain error")
+    const child = page.getByText("Child error")
+    await expect(child).toBeVisible()
+    await expect(plain).toBeHidden()
+    await page.evaluate(() => {
+      document.getElementById("plain")!.setAttribute("match", "")
+      document.getElementById("child")!.setAttribute("match", "false")
+    })
+    await expect(plain).toBeVisible()
+    await expect(child).toBeHidden()
+  })
 })
 
 test.describe("errors", () => {

@@ -6,8 +6,8 @@ const owner = "ui-field"
 
 // An error outside any field has no validation behind it, so only a `match`
 // that is present or "true" shows it.
-function errorAlone(el: HTMLElement) {
-  const match = el.getAttribute("match")
+function errorAlone(el: HTMLElement, host: HTMLElement) {
+  const match = host.getAttribute("match")
   el.hidden = !fieldOutsideErrorShown({ match: match === "" || match === "true" })
 }
 

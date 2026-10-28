@@ -1187,9 +1187,10 @@ type SlotConfig = {
   /**
    * @internal Runs on the element the part binds when no owner is around it,
    * in place of the warning that it needs one, for a part that works alone,
-   * like a field label wrapping a whole field.
+   * like a field label wrapping a whole field. It gets the bound element and
+   * the part element, which holds the attributes, and runs again when they change.
    */
-  alone?: (el: HTMLElement) => void
+  alone?: (el: HTMLElement, host: HTMLElement) => void
   /** Callbacks whose event hands listeners `waitUntil()`, from the schema's `"action"` kind. */
   actions?: string[]
 }
@@ -1292,7 +1293,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
       #findOwnerLater() {
         if (!this.isConnected || this.#owner) return
         if (findOwner(this, config.owner)) this.connectedCallback()
-        else if (config.alone) config.alone(boundElement(this, config.target) ?? this)
+        else if (config.alone) config.alone(boundElement(this, config.target) ?? this, this)
         else warn(`<${tagName}> must be inside ${config.owner}.`)
       }
 
@@ -1335,7 +1336,11 @@ function definePartElement(tagName: string, config: SlotConfig) {
           this.connectedCallback()
           return
         }
-        if (!this.#owner || !this.#part) return
+        if (!this.#owner || !this.#part) {
+          if (config.alone && this.isConnected && !findOwner(this, config.owner))
+            config.alone(boundElement(this, config.target) ?? this, this)
+          return
+        }
         const previous = this.#part.props
         this.#part.props = this.#props()
         const next = this.#part.props
