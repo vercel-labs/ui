@@ -1,5 +1,6 @@
 import { dev, emit } from "#dev"
 import { on } from "../kernel/events"
+import { composedContains, composedHops } from "./platform"
 import { pressedScrollbar } from "./scrollbar"
 
 // Every open popup is a layer. Layers nest: a submenu's layer has its menu's
@@ -86,7 +87,7 @@ function bindPersistentLayer(el: Element) {
 
 // Whether a node is inside a persistent layer, like a toast region.
 function inPersistentLayer(target: Node) {
-  for (const el of persistent()) if (el.contains(target)) return true
+  for (const el of persistent()) if (composedContains(el, target)) return true
   return false
 }
 
@@ -162,10 +163,17 @@ function lastEscape() {
   return realm.escapeAt ?? -Infinity
 }
 
+// A press or focus in a shadow root inside a layer, like on a custom
+// element's own button, is inside it, so each layer hears the node and the
+// elements it shows through in outer trees.
+function insideTree(layer: Layer, target: Node, event?: Event) {
+  return insideTreeAt(layer, composedHops(target), event)
+}
+
 // check-code: allow return-type recursive, so TypeScript cannot infer it.
-function insideTree(layer: Layer, target: Node, event?: Event): boolean {
-  if (layer.contains(target, event)) return true
-  return active().some((other) => other.parent === layer && insideTree(other, target, event))
+function insideTreeAt(layer: Layer, hops: Node[], event?: Event): boolean {
+  if (hops.some((hop) => layer.contains(hop, event))) return true
+  return active().some((other) => other.parent === layer && insideTreeAt(other, hops, event))
 }
 
 function listen(doc: Document, win: Window) {
@@ -315,9 +323,10 @@ function layerContains(layer: Layer, target: Node) {
 // inside another popup nests under it, so pressing inside the child never
 // dismisses the parent.
 function findLayer(target: Node) {
+  const hops = composedHops(target)
   return active()
     .reverse()
-    .find((layer) => layer.contains(target))
+    .find((layer) => hops.some((hop) => layer.contains(hop)))
 }
 
 // Where focus would have gone from the popup that closed last, until the

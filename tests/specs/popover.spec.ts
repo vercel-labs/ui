@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test"
 import { dialogNamesAtFocus, expect, isSheet, lastAction, recordDialogNamesAtFocus, test } from "../fixtures"
-import { addScroller, composingEscape } from "../fixtures/popup"
+import { addScroller, addShadowButton, composingEscape } from "../fixtures/popup"
 
 // The trigger is a button that opens a dialog, following the WAI-ARIA dialog
 // pattern for focus inside it: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
@@ -246,6 +246,34 @@ test.describe("dismissal", () => {
     await expect(dialog(page)).toBeVisible()
     await page.mouse.click(scrollbar!.x - 40, scrollbar!.y)
     await expect(dialog(page)).toBeHidden()
+  })
+
+  test("pressing a button in a shadow root inside keeps the popover open", async ({ page }) => {
+    await trigger(page).click()
+    await addShadowButton(page.getByRole("button", { name: "Save" }))
+    await page.getByRole("button", { name: "Shadow" }).click()
+    await page.waitForTimeout(100)
+    await expect(dialog(page)).toBeVisible()
+    await page.mouse.click(5, 5)
+    await expect(dialog(page)).toBeHidden()
+  })
+
+  test("Tab into a button in a shadow root inside keeps the popover open", async ({ page, tab }) => {
+    await openWithKeyboard(page)
+    await addShadowButton(page.getByRole("button", { name: "Save" }))
+    await tab()
+    await expect(page.getByRole("button", { name: "Shadow" })).toBeFocused()
+    await page.waitForTimeout(100)
+    await expect(dialog(page)).toBeVisible()
+  })
+
+  test("Escape on a button in a shadow root inside returns focus to the trigger", async ({ page }) => {
+    await openWithKeyboard(page)
+    await addShadowButton(page.getByRole("button", { name: "Save" }))
+    await page.getByRole("button", { name: "Shadow" }).focus()
+    await page.keyboard.press("Escape")
+    await expect(dialog(page)).toBeHidden()
+    await expect(trigger(page)).toBeFocused()
   })
 
   test("switching windows leaves the popover open", async ({ page, open }) => {

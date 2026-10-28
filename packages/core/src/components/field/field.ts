@@ -178,6 +178,7 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       const checkable =
         role === "checkbox" ||
         role === "switch" ||
+        role === "radio" ||
         (control instanceof HTMLInputElement && (control.type === "checkbox" || control.type === "radio"))
       // A native label clicks a plain button it names, like a FileInputTrigger's.
       const plainButton = control instanceof HTMLButtonElement && !role

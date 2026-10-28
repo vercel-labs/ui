@@ -3,9 +3,10 @@
 // Tabs, Radio Group, Toggle Group, Toolbar, Menubar and Carousel run on it,
 // the same block a component of your own uses.
 import { moveIndex, rovingStop, stepFor } from "./collection"
-import type { PrimitiveContext } from "../kernel/primitive-types"
+import type { Part, PrimitiveContext } from "../kernel/primitive-types"
 import { isRTL } from "../platform/env"
 import { createOrder } from "../kernel/order"
+import { onProps } from "../kernel/part"
 
 /**
  * An item of a roving group, as the group's callbacks see it.
@@ -241,8 +242,19 @@ function createRovingFocus<State extends object, Props = any>(
       }
       el.addEventListener("focus", focused)
       el.addEventListener("blur", blurred)
+      // An item disabled or enabled after it joined, like a radio a field
+      // around it disables, moves the stop off it or lets it take the stop.
+      // An item that joins with its part gets the props of each render; one
+      // that joins with plain data, like a menubar trigger, never hears any.
+      let wasDisabled = isDisabled(part)
+      const unwatch = onProps(part as Part, () => {
+        if (isDisabled(part) === wasDisabled) return
+        wasDisabled = !wasDisabled
+        queue(false)
+      })
       queue(true)
       return () => {
+        unwatch()
         el.removeEventListener("focus", focused)
         el.removeEventListener("blur", blurred)
         // An element removed with focus fires no blur, and focus drops to the body.

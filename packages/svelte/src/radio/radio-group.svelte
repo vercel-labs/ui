@@ -12,10 +12,10 @@ Radios that share one value, with one tab stop and arrow keys between them.
     type RadioGroupValueChangeReason,
   } from "@ui-sdk/core/radio"
   import { setContext } from "svelte"
-  import { useFieldControl } from "../field/context"
+  import { useField, useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
-  import { RadioGroupKey } from "./context"
+  import { GroupFieldKey, RadioGroupKey } from "./context"
 
   type Details = ChangeDetails<RadioGroupValueChangeReason>
 
@@ -58,6 +58,7 @@ Radios that share one value, with one tab stop and arrow keys between them.
   } = $props()
 
   const id = $props.id()
+  setContext(GroupFieldKey, useField())
   const field = useFieldControl()
   const group = usePrimitive(radioGroupPrimitive, () => ({
     id,

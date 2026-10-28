@@ -25,7 +25,13 @@ const zero = () => 0
  * @stable
  */
 function useFieldControl(own?: { id?: string }) {
-  const field = React.useContext(FieldContext)
+  return useJoinField(React.useContext(FieldContext), own)
+}
+
+// `useFieldControl` for one field, or null for none, for a control that joins
+// only some of the fields around it, like a radio, which leaves its group's
+// field to the group and doesn't re-render with it.
+function useJoinField(field: FieldContextValue | null, own?: { id?: string }) {
   const version = field ? () => renderVersion(field.instance) : zero
   React.useSyncExternalStore(field ? field.instance.subscribe : noop, version, version)
   if (!field) return null
@@ -95,4 +101,5 @@ export {
   type FieldContextValue,
   ownDescription,
   useFieldControl,
+  useJoinField,
 }

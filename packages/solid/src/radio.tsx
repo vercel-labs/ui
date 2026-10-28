@@ -5,11 +5,14 @@ import {
   type RadioProps,
   type RadioState,
 } from "@ui-sdk/core/radio"
-import { omit } from "solid-js"
-import { joinField, useFieldControl } from "./field-context"
+import { createContext, omit, useContext } from "solid-js"
+import { FieldContext, type FieldContextValue, joinField, useFieldControl } from "./field-context"
 import { createParts, usePart, type PartProps } from "./use-primitive"
 
 const parts = createParts(radioGroup, { indicator: "span" })
+
+// The field the group joined, so a radio joins only a field of its own.
+const GroupFieldContext = createContext<FieldContextValue | null>(null)
 
 /**
  * Radios that share one value, with one tab stop and arrow keys between them.
@@ -36,13 +39,15 @@ function RadioGroup<T extends string = string>(
   )
   // The group's element joins the field it's in, which also names and disables it.
   return (
-    <parts.Root<T>
-      {...props}
-      disabled={props.disabled || field?.disabled()}
-      name={props.name ?? field?.name()}
-    >
-      {usePart(radioGroup, "group", undefined, joinField(field, rest, "div"), "div")}
-    </parts.Root>
+    <GroupFieldContext value={useContext(FieldContext)}>
+      <parts.Root<T>
+        {...props}
+        disabled={props.disabled || field?.disabled()}
+        name={props.name ?? field?.name()}
+      >
+        {usePart(radioGroup, "group", undefined, joinField(field, rest, "div"), "div")}
+      </parts.Root>
+    </GroupFieldContext>
   )
 }
 
@@ -51,11 +56,14 @@ function RadioGroup<T extends string = string>(
  * @stable
  */
 function Radio(props: Omit<PartProps<"button", RadioState>, "value" | "onSelect"> & RadioProps) {
-  const item = () => ({ value: props.value, disabled: props.disabled })
+  // A radio in a field of its own is that field's control. In the group's field, the group is.
+  const nearest = useContext(FieldContext)
+  const field = nearest && nearest !== useContext(GroupFieldContext) ? useFieldControl() : null
+  const item = () => ({ value: props.value, disabled: props.disabled || field?.disabled() })
   const rest = omit(props, "value", "disabled")
   return (
     <>
-      {usePart(radioGroup, "root", item, rest, "button")}
+      {usePart(radioGroup, "root", item, joinField(field, rest, "button"), "button")}
       {usePart(radioGroup, "input", item, {}, "input")}
     </>
   )

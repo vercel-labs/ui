@@ -26,6 +26,37 @@ function activeElement(doc = document) {
   return active as HTMLElement | null
 }
 
+// The node, then each element it shows through in an outer tree: the slot
+// it's assigned to and the host of its shadow root. An element in an outer
+// tree holds the node when it holds one of these.
+function composedHops(node: Node) {
+  const hops = [node]
+  let at: Node | null | undefined = node
+  while (at) {
+    const next: Node | null | undefined =
+      (at as Element).assignedSlot ?? at.parentNode ?? (at as Partial<ShadowRoot>).host
+    if (next && next !== at.parentNode) hops.push(next)
+    at = next
+  }
+  return hops
+}
+
+// Whether `container` holds `node`, across shadow roots, like a button in the
+// shadow root of a custom element inside a popup. `Node.contains` stops at them.
+function composedContains(container: Node, node: Node) {
+  return composedHops(node).some((hop) => container.contains(hop))
+}
+
+// The nearest element around `node` that matches `selector`, across shadow
+// roots, like an item around a custom element's own label. `closest` stops at them.
+function composedClosest<T extends Element>(node: Node, selector: string) {
+  for (const hop of composedHops(node)) {
+    const found = (hop as Element).closest?.<T>(selector)
+    if (found) return found
+  }
+  return null
+}
+
 // Whether the user asked for less motion. Animations jump instead.
 function prefersReducedMotion() {
   return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -190,6 +221,9 @@ function hasCommandModifier(keys: string) {
 export {
   activeElement,
   ariaKeyshortcuts,
+  composedClosest,
+  composedContains,
+  composedHops,
   formatShortcut,
   hasCommandModifier,
   initialApple,

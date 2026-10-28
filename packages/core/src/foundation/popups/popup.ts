@@ -24,7 +24,7 @@ import { moveFocus, restoreFocus, sourceOf, trackInput } from "../kernel/modalit
 import { isAfter } from "../kernel/order"
 import { isBrowser } from "../platform/env"
 import { writeStyle } from "../platform/style"
-import { activeElement, supportsTopLayer } from "../platform/platform"
+import { activeElement, composedContains, supportsTopLayer } from "../platform/platform"
 import { resolveBehavior, type PopupBehavior, type PopupBehaviorName } from "./popup-behavior"
 import { registerPopupElement } from "./popup-elements"
 import type { Anchor, position, PositionOptions } from "../platform/position"
@@ -520,13 +520,15 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       return
     }
     // Focus on the body belongs to no one, like in Safari, where pressing a
-    // button doesn't focus it. Focus in a popup nested under this one counts as inside.
+    // button doesn't focus it. Focus in a popup nested under this one counts as
+    // inside, and so does focus in a shadow root inside it.
     const active = activeElement()
+    const trigger = options.trigger()
     const hadFocus =
       !active ||
       active === el.ownerDocument.body ||
-      el.contains(active) ||
-      (!!layer && layerContains(layer, active) && !options.trigger()?.contains(active))
+      composedContains(el, active) ||
+      (!!layer && layerContains(layer, active) && !(trigger && composedContains(trigger, active)))
     options.onOpenChange?.(false, closed)
     bound?.config.onClose?.()
     const order = layerCount()
@@ -554,7 +556,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     if (mode === "unless-moved") {
       queueMicrotask(() => {
         const now = activeElement()
-        const moved = !!now && now !== el.ownerDocument.body && !el.contains(now)
+        const moved = !!now && now !== el.ownerDocument.body && !composedContains(el, now)
         if (!moved && !openedSince(order)) returnFocus(el, from)
       })
       return

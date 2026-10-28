@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test"
 import { expect, isSheet, lastAction, test, waitForStill } from "../fixtures"
+import { moveIntoShadowRoot } from "../fixtures/popup"
 
 // A select-only combobox: a button that opens a listbox, following the WAI-ARIA
 // APG pattern https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/
@@ -50,6 +51,22 @@ test.describe("trigger", () => {
     await expect(listbox(page)).toBeVisible()
     await trigger(page).click({ force: true })
     await expect(listbox(page)).toBeHidden()
+  })
+
+  test("a click on a trigger in a shadow root opens the list, and it stays open", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("react"),
+      "React stops hearing events once its tree moves into a shadow root.",
+    )
+    await moveIntoShadowRoot(page.locator(".fixture"))
+    await trigger(page).click()
+    await expect(listbox(page)).toBeVisible()
+    await page.waitForTimeout(100)
+    await expect(listbox(page)).toBeVisible()
+    await expect(trigger(page)).toHaveAttribute("aria-expanded", "true")
   })
 })
 
