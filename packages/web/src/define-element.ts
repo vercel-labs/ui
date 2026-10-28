@@ -311,8 +311,17 @@ const display = new Map<string, PartDisplay>()
 const aligned = new Set<string>()
 // The document's style with the rules, in its own cascade layer, declared
 // first in the document, so it loses to every other style, including
-// utilities that frameworks like Tailwind put in layers.
-const documentStyle = "ui-sdk-web"
+// utilities that frameworks like Tailwind put in layers. Each copy of this
+// package lists only the tags it defined, so each writes its own style,
+// numbered across the copies on the page.
+let styleId: string | undefined
+function documentStyle() {
+  if (styleId) return styleId
+  const copies = globalThis as Record<symbol, number | undefined>
+  const key = Symbol.for("ui-sdk.web-styles@1")
+  copies[key] = (copies[key] ?? 0) + 1
+  return (styleId = `ui-sdk-web-${copies[key]}`)
+}
 // The rules as the document's style has them, empty until a part needs one.
 let css = ""
 // Counts changes to the rules, so a copy of them knows it's behind.
@@ -330,7 +339,7 @@ function setDisplay(selector: string, value?: PartDisplay, align = false) {
   if (!value && !align) return
   if (value) display.set(selector, value)
   css = rules()
-  writeStyle(document, documentStyle, css)
+  writeStyle(document, documentStyle(), css)
   rulesVersion++
 }
 
@@ -385,7 +394,7 @@ function sharedSheet(doc: Document) {
 // Other documents an element moves into, like an iframe's, get the rules too,
 // and any defined since they were copied.
 function copyStyles(doc: Document) {
-  if (doc !== document && css) writeStyle(doc, documentStyle, css)
+  if (doc !== document && css) writeStyle(doc, documentStyle(), css)
 }
 
 type Part = {

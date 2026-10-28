@@ -102,6 +102,29 @@ for (const { name, policy, meta, layers } of policies) {
       expect(await blockedStyles(page)).toEqual([])
     })
 
+    test("a frame on the page takes the page's tag, and its styles apply", async ({ page, open }) => {
+      await serve(page, { policy, meta })
+      await open("dialog")
+      const display = await page.evaluate(async () => {
+        const { loadCoreModule } = window as unknown as {
+          loadCoreModule: (name: string) => Promise<{ enforceHidden: (doc: Document) => void }>
+        }
+        const { enforceHidden } = await loadCoreModule("style")
+        const doc = document.body.appendChild(document.createElement("iframe")).contentDocument!
+        doc.addEventListener("securitypolicyviolation", (event) =>
+          (window as unknown as { blockedStyles: string[] }).blockedStyles.push(`frame: ${event.sample}`),
+        )
+        const part = doc.body.appendChild(doc.createElement("div"))
+        part.dataset.slot = "part"
+        part.hidden = true
+        part.style.display = "block"
+        enforceHidden(doc)
+        return doc.defaultView!.getComputedStyle(part).display
+      })
+      expect(display).toBe("none")
+      expect(await blockedStyles(page)).toEqual([])
+    })
+
     test("the page's own cascade layers win over ui-sdk's styles", async ({ page, open }) => {
       await serve(page, {
         policy,

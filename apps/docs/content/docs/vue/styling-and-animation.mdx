@@ -188,18 +188,36 @@ Put exit styles on `data-ending-style`. `data-closed` describes the state but do
 
 Popups provide `--anchor-width` and `--available-height` for sizing. [Popups](./popups) covers mounting and placement.
 
+## The ui-sdk Layer
+
+A few behaviors need a little CSS, like keeping a closed popup hidden or dimming the page behind a sheet, so ui-sdk adds it to the page in a cascade layer named `ui-sdk`. Declare that layer at the top of your global stylesheet, the one `main.ts` or `nuxt.config.ts` loads, so your own styles win over it wherever the page puts them. With Tailwind, put it above `@import "tailwindcss"`:
+
+```css
+@layer ui-sdk;
+```
+
+A component's `<style>` block loads with the component, too late to come first, so keep the line in the global stylesheet.
+
 ## Content Security Policy
 
-A few behaviors need a little CSS, like keeping a closed popup hidden or dimming the page behind a sheet, so ui-sdk adds it to the page. It goes before your own styles, in a cascade layer named `ui-sdk`, so your styles win.
-
-A Content Security Policy without `'unsafe-inline'` blocks styles added this way. Give ui-sdk your policy's nonce with a meta tag in the page's `<head>`. Vite reads the same tag for the styles it adds:
+A Content Security Policy without `'unsafe-inline'` in `style-src` blocks the CSS ui-sdk adds. Give ui-sdk your policy's nonce with a meta tag in the page's `<head>`:
 
 ```html
 <meta property="csp-nonce" nonce="your-nonce" />
 ```
 
-If your policy has no nonce for styles, add the tag without the `nonce` attribute. ui-sdk then adds its CSS as constructed style sheets, which the browser places after yours, so declare its layer at the top of your stylesheet to keep your styles winning:
+With Vite, set `html.cspNonce` in your Vite config to a placeholder, and Vite writes this tag for you. Your server replaces the placeholder with a new nonce on each request.
 
-```css
-@layer ui-sdk;
+In Nuxt, the nuxt-security module writes the tag only in development. For production, add a Nitro plugin, like `server/plugins/csp-nonce.ts`, that writes it into every page with the module's nonce:
+
+```ts
+export default defineNitroPlugin((nitroApp) => {
+  nitroApp.hooks.hook("render:html", (html, { event }) => {
+    html.head.push(`<meta property="csp-nonce" nonce="${event.context.security.nonce}">`)
+  })
+})
 ```
+
+Pages rendered on the server also carry a few `style` attributes, like the one that hides a select's native input, so the policy needs `style-src-attr 'unsafe-inline'` too.
+
+If your policy has no nonce for styles, add the tag without the `nonce` attribute. ui-sdk then adds its CSS as constructed style sheets, which no policy blocks.

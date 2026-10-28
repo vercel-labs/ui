@@ -42,14 +42,18 @@ const adopted = () =>
   >
 
 // What a document's `<meta property="csp-nonce">` says, read once: its nonce,
-// "" when the tag has none, or null without the tag. Browsers hide a nonce
+// "" when the tag has none, or null without the tag. A same-origin frame,
+// like an about:blank one, has its page's policy but not its tag, so a
+// document without one reads its parents'. Browsers hide a nonce
 // attribute's value once it's parsed, so it's read from the property.
 const nonces = new WeakMap<Document, string | null>()
 
 function pageNonce(doc: Document) {
   if (nonces.has(doc)) return nonces.get(doc)!
-  const meta = doc.head.querySelector<HTMLMetaElement>('meta[property="csp-nonce"]')
-  const nonce = meta && (meta.nonce || meta.getAttribute("nonce") || "")
+  let meta: HTMLMetaElement | null | undefined
+  for (let at: Document | undefined = doc; at && !meta; at = at.defaultView?.frameElement?.ownerDocument)
+    meta = at.head?.querySelector<HTMLMetaElement>('meta[property="csp-nonce"]')
+  const nonce = meta ? meta.nonce || meta.getAttribute("nonce") || "" : null
   nonces.set(doc, nonce)
   return nonce
 }
