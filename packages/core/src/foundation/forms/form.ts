@@ -82,31 +82,44 @@ function valueMissingMessage(type: "checkbox" | "radio" | "select" | "file" | "t
   return messages.get(type)!
 }
 
-// Fields that read their controls' validity again when a component changes a
-// control's custom validity, which no event reports.
-const customValidityListeners = new Set<(el: HTMLElement) => void>()
+// Fields that read their controls' validity again when a component changes it
+// in a way no event reports.
+const validityListeners = new Set<(el: HTMLElement) => void>()
 
-// Sets a native control's custom validity from a component's own check, like a
-// date picker's text that isn't a date, and tells fields around it. An empty
-// message clears it. Returns a function that sets the next message, and writes
-// only when it changes, so a message the app set itself stays until the
-// component's check changes.
-function customValidity(el: HTMLInputElement) {
-  let current = ""
-  return (message: string) => {
-    if (message === current) return
-    current = message
-    el.setCustomValidity(message)
-    customValidityListeners.forEach((listener) => listener(el))
+// Tells fields around a control that its validity changed.
+function validityChanged(el: HTMLElement) {
+  validityListeners.forEach((listener) => listener(el))
+}
+
+// Calls `listener` with the control whenever `validityChanged` reports one. Returns a cleanup.
+function onValidityChange(listener: (el: HTMLElement) => void) {
+  validityListeners.add(listener)
+  return () => {
+    validityListeners.delete(listener)
   }
 }
 
-// Calls `listener` with the control whenever `customValidity` changes one. Returns a cleanup.
-function onCustomValidity(listener: (el: HTMLElement) => void) {
-  customValidityListeners.add(listener)
-  return () => {
-    customValidityListeners.delete(listener)
+// The message a component holds on a control, and the app's own message it
+// replaced. Kept by element, so a part that binds again, like under React's
+// <Activity>, picks up what the element already carries.
+const heldMessages = new WeakMap<HTMLInputElement, { message: string; app: string }>()
+
+// Sets a native control's custom validity from a component's own check, like a
+// date picker's text that isn't a date, and tells fields around it. An empty
+// message gives the control back the message the app had set, unless the app
+// set another one since.
+function setComponentValidity(el: HTMLInputElement, message: string) {
+  const held = heldMessages.get(el)
+  if ((held?.message ?? "") === message) return
+  if (message) {
+    if (held) held.message = message
+    else heldMessages.set(el, { message, app: el.validity.customError ? el.validationMessage : "" })
+    el.setCustomValidity(message)
+  } else {
+    heldMessages.delete(el)
+    if (el.validationMessage === held!.message) el.setCustomValidity(held!.app)
   }
+  validityChanged(el)
 }
 
 const blocksImplicitSubmission = new Set([
@@ -399,7 +412,6 @@ export {
   bindInternals,
   bindValueInput,
   claimInvalidFocus,
-  customValidity,
   dispatchChange,
   fieldsetDisabled,
   focusWith,
@@ -412,8 +424,10 @@ export {
   labelledBy,
   labelsOf,
   nameFromLabels,
-  onCustomValidity,
+  onValidityChange,
+  setComponentValidity,
   submitImplicitly,
+  validityChanged,
   valueMissingMessage,
   watchFieldsets,
 }

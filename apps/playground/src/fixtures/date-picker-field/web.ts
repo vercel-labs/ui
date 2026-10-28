@@ -23,11 +23,15 @@ async function mount(root: HTMLElement) {
           <ui-field-error class="field-error"></ui-field-error>
         </ui-field>
         <button type="submit">Submit</button>
+        <button type="button" class="remove">Remove date picker</button>
       </form>
       <output role="status" aria-label="Submitted"></output>
     </div>`
   const form = root.querySelector("form")!
   const submitted = root.querySelector("output")!
+  root
+    .querySelector(".remove")!
+    .addEventListener("click", () => root.querySelector("ui-date-picker")?.remove())
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     submitted.textContent = JSON.stringify([...new FormData(form)])

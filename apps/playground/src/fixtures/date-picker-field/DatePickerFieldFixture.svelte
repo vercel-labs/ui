@@ -15,6 +15,7 @@
 
   const { required, disabled } = datePickerFieldOptions()
   let submitted = $state("")
+  let shown = $state(true)
 
   function onSubmit(event: SubmitEvent) {
     event.preventDefault()
@@ -27,16 +28,19 @@
   <form onsubmit={onSubmit}>
     <Field class="field" name={datePickerFixture.name} {disabled}>
       <FieldLabel>{f.label}</FieldLabel>
-      <DatePicker class="date-picker" today={datePickerFixture.today} {required}>
-        <DatePickerInput />
-        <DatePickerTrigger />
-        <DatePickerHint class="date-picker-hint" />
-        <DatePickerContent class="date-picker-content" />
-      </DatePicker>
+      {#if shown}
+        <DatePicker class="date-picker" today={datePickerFixture.today} {required}>
+          <DatePickerInput />
+          <DatePickerTrigger />
+          <DatePickerHint class="date-picker-hint" />
+          <DatePickerContent class="date-picker-content" />
+        </DatePicker>
+      {/if}
       <FieldDescription>{f.description}</FieldDescription>
       <FieldError class="field-error" />
     </Field>
     <button type="submit">Submit</button>
+    <button type="button" onclick={() => (shown = false)}>Remove date picker</button>
   </form>
   <output role="status" aria-label="Submitted">{submitted}</output>
 </div>

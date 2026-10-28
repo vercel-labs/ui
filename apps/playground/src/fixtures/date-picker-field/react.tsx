@@ -17,6 +17,7 @@ import {
 function Fixture() {
   const { required, disabled } = datePickerFieldOptions()
   const [submitted, setSubmitted] = React.useState("")
+  const [shown, setShown] = React.useState(true)
   return (
     <div className="fixture">
       <button>Before</button>
@@ -28,16 +29,21 @@ function Fixture() {
       >
         <Field className="field" name={datePickerFixture.name} disabled={disabled}>
           <FieldLabel>{f.label}</FieldLabel>
-          <DatePicker className="date-picker" today={datePickerFixture.today} required={required}>
-            <DatePickerInput />
-            <DatePickerTrigger />
-            <DatePickerHint className="date-picker-hint" />
-            <DatePickerContent className="date-picker-content" />
-          </DatePicker>
+          {shown && (
+            <DatePicker className="date-picker" today={datePickerFixture.today} required={required}>
+              <DatePickerInput />
+              <DatePickerTrigger />
+              <DatePickerHint className="date-picker-hint" />
+              <DatePickerContent className="date-picker-content" />
+            </DatePicker>
+          )}
           <FieldDescription>{f.description}</FieldDescription>
           <FieldError className="field-error" />
         </Field>
         <button type="submit">Submit</button>
+        <button type="button" onClick={() => setShown(false)}>
+          Remove date picker
+        </button>
       </form>
       <output role="status" aria-label="Submitted">
         {submitted}

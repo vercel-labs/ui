@@ -3,7 +3,7 @@ import {
   formInternals,
   invalidFocusClaimed,
   isLabelable,
-  onCustomValidity,
+  onValidityChange,
   watchFieldsets,
 } from "../../foundation/forms/form"
 import { afterReset } from "../../foundation/forms/value"
@@ -138,7 +138,11 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     return false
   }
 
+  // The controls the field last read, so one leaving the page reads them again.
+  let wired: HTMLElement[] = []
+
   function readValidity(controls: HTMLElement[]) {
+    wired = controls
     let next = valid
     for (const el of controls) {
       const { willValidate, validity, message } = validityOf(el)
@@ -308,19 +312,25 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     )
 
     // A component's own check, like a date picker's text that isn't a date,
-    // changes its control's custom validity without an event.
+    // changes its control's validity without an event.
     cleanups.push(
-      onCustomValidity((control) => {
+      onValidityChange((control) => {
         if (el.contains(control)) check()
       }),
     )
 
     // Controls that become required, disabled or enabled, or change their
-    // pattern like an OTP input does, change validity without an event.
+    // pattern like an OTP input does, change validity without an event. So
+    // does a control that leaves, which frameworks may remove before its
+    // component cleans up.
     if (typeof MutationObserver !== "undefined") {
-      const observer = new MutationObserver(check)
+      const observer = new MutationObserver((records) => {
+        const left = wired.some((control) => !el.contains(control))
+        if (left || records.some((record) => record.type === "attributes")) check()
+      })
       observer.observe(el, {
         subtree: true,
+        childList: true,
         attributeFilter: ["required", "aria-required", "disabled", "pattern"],
       })
       cleanups.push(() => observer.disconnect())
