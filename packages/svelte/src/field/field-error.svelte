@@ -6,23 +6,29 @@ browser's message for the current problem.
 -->
 <script lang="ts">
   import type { FieldErrorProps, FieldErrorState } from "@ui-sdk/core/field"
+  import { fieldOutsideErrorShown } from "@ui-sdk/core/renderer"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
-  import { useField } from "./context"
+  import { outsidePart, useField } from "./context"
 
   let { match, children, ...rest }: PartProps<"div", FieldErrorState> & FieldErrorProps = $props()
 
+  const field = useField()
   const made = $props.id()
   // Only an error with `match` needs an id of its own. One without takes the
   // field's, which the control points at before the field binds.
-  const error = useHandlePart(useField(), "error", () => ({
-    id: rest.id ?? (match === undefined ? undefined : made),
-    match,
-  }))
+  const error = field
+    ? useHandlePart(field, "error", () => ({
+        id: rest.id ?? (match === undefined ? undefined : made),
+        match,
+      }))
+    : undefined
+  const shown = $derived(error ? error.present : fieldOutsideErrorShown({ match }))
+  const part = error ?? outsidePart("error")
 </script>
 
 {#snippet message(state: FieldErrorState)}{state.message}{/snippet}
 
-{#if error.present}
-  <Part tag="div" part={error} props={{ ...rest, children: children ?? message }} />
+{#if shown}
+  <Part tag="div" {part} props={{ ...rest, children: children ?? message }} />
 {/if}

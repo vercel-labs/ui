@@ -201,6 +201,7 @@ function NumberInputScrubAreaCursor(props: PartProps<"span", NumberInputState>) 
 export { createNumberInputController } from "@ui-sdk/core/number-input"
 export type {
   NumberInputApi,
+  NumberInputButtonProps,
   NumberInputButtonState,
   NumberInputChangeOptions,
   NumberInputController,

@@ -2,7 +2,7 @@
 
 What the Vue expert knows. Part 1 is Vue itself, part 2 is how `@ui-sdk/vue` is built, part 3 is the checklist a review walks. Pinned to what the repo installs: Vue 3.5.43 (`packages/vue` peer range `vue >=3.5`).
 
-Last checked: 2026-10-26, against `node_modules/vue` 3.5.43.
+Last checked: 2026-10-28, against `node_modules/vue` 3.5.43.
 
 ## 1. Vue, as its docs write it
 
@@ -57,7 +57,7 @@ Last checked: 2026-10-26, against `node_modules/vue` 3.5.43.
 
 ### Provide and inject
 
-- `provide(key, value)` and `inject(key)`, typed with `InjectionKey<T>`. A part used outside its root gets `undefined` from `inject` and should throw a clear error naming the root, not fail later.
+- `provide(key, value)` and `inject(key)`, typed with `InjectionKey<T>`. A part used outside its root gets `undefined` from `inject` and should throw a clear error naming the root, not fail later. Field parts are the exception: outside a Field they render plain elements.
 
 ### Common mistakes to flag
 
@@ -84,6 +84,7 @@ Core holds every behavior; the adapter renders. Read `packages/vue/src/use-primi
 - **Slots.** A part's default slot and its `#render` slot receive its state. `#render` gets the props to bind, the state, and `children`, the part's own content (like a slider thumb's range input). No `as` prop. `children` is one cached functional component per part (`contentOf`), so a focused input inside stays; it takes no props, so Vue skips it when the part renders, and the part hands it the latest content through a `shallowRef` it reads (`test/render-slot-children.test.ts`). `SlotHost` renders a default slot in its own component so it re-renders only when what it reads changes. Every part that shows its own content without children, `SlotHost` included, falls back the way `<slot>` does: `slotContent` (`children.ts`) treats a slot of only comments (a `v-if` left out) or empty fragments as empty. Hand-written parts type their slots (`PartSlots`).
 - **Parts outside their root.** A trigger connected through `controller` (dialog, alert dialog, drawer, popover, menu and context menu, tooltip, hover card, select, file input) renders through `useConnectedPart` (`controller-target.ts`): one component renders the plain element until the root mounts, then the bound part, and binds again in a new effect scope when the controller's root changes. Its controller's root wins over a root of the same kind around it once that root mounts; until then, and on the server, it binds to the one around it (`useControllerTarget`). No key and no inner binding component, so the element, the app's ref and focus stay (`test/outside-trigger.test.ts`). The old part's ref is called with `null` by hand, since Vue never calls a replaced function ref. Parts inside such a trigger, like a select's value, in its default slot or its `#render` slot, find the component through `provideConnected` and `useConnectedHandle` and render through `useConnectedPart` too: the placeholder until the root mounts, then the value (`test/outside-trigger.test.ts`). Dialog, Drawer, Popover and Tooltip shortcuts still find theirs through their own `TriggerKey`. Carousel's controls, the number input's scrub area and the drawer outlet still swap a keyed binding component.
 - **Generics.** Select, Combobox and Listbox are generic over the value with one shape per `multiple`; Slider over a number or a range. A popup's content part is typed by its payload through an alias in the script, `const DayTooltipContent = TooltipContent<Day>`, since a template can't pass a type argument (`withPayload` in `popup.ts`). Every part that renders an element takes that element's attributes and events in its types, `data-*` included, so `strictTemplates` accepts them and still reports the rest: `createParts` types its parts from their tags, and a hand-written part is wrapped in `withElement(tag, defineComponent(...))` (`create-parts.ts`), which gives it one construct signature that a template and `InstanceType` both read. A generic root passes its tag to `RootPropsOf` and `RootInstanceOf`. Strict-template consumer checks in `packages/vue/test/types/` (`attributes.vue` for this) run in `typecheck`.
+- **Field parts outside a Field** render plain elements (`useOutside` in `field.ts`) instead of throwing, so a FieldLabel can wrap a whole Field; FieldLegend still throws.
 - **Provide and inject.** Each primitive's parts share one injection key (`scopeKey`): the nearest instance, and getters for the props of the parts around the one rendering.
 - **Form reset**: form controls render a hidden native input, and core's `associate` (`packages/core/src/foundation/forms/form.ts`) resets them on the form's `reset` event. Shared by every adapter.
 
@@ -97,5 +98,5 @@ Tests that show where the project stands: `packages/vue/test/v-model.test.ts`, `
 4. `<KeepAlive>`, `<Teleport>`, `<Transition>`, `<Suspense>`: deactivated parts let go of global effects; teleported popups work; enter and leave animations against Vue's own transitions.
 5. Fallthrough: `class`, `style` and listener merging, refs combined, the `#render` slot gets everything, and a `#render` slot's `children` that changes with the content (a `v-for` item's text, a thumb's `aria-label`) without remounting.
 6. SSR: nothing touches `window` in setup, nothing outside the instance (a controller, a subscription) starts in setup, same HTML on server and client, `useId` ids, server HTML that uses author-given ids (a tab's `id` in its panel's `aria-labelledby`), locale-independent text.
-7. Provide and inject: a part outside its root prints an error naming the root.
+7. Provide and inject: a part outside its root prints an error naming the root, except Field parts outside a Field, which render plain elements.
 8. Docs and examples teach the idiomatic way: `v-model`, `<script setup>`, no watchers that sync props, `#render` for custom elements.

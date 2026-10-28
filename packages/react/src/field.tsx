@@ -1,3 +1,4 @@
+import type { PropsOf } from "@ui-sdk/core"
 import {
   fieldGroup,
   field as fieldPrimitive,
@@ -10,9 +11,24 @@ import {
   type FieldSetState,
   type FieldState,
 } from "@ui-sdk/core/field"
+import {
+  checkFieldOutside,
+  fieldOutsideAttrs,
+  fieldOutsideErrorShown,
+  fieldOutsideState,
+  type FieldOutsideSlot,
+} from "@ui-sdk/core/renderer"
 import * as React from "react"
 import { FieldContext, ownDescription } from "./field-context"
-import { extendHandle, usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "./use-primitive"
+import {
+  extendHandle,
+  mergeProps,
+  renderElement,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 type FieldHandle = PrimitiveHandle<typeof fieldPrimitive>
 type FieldSetHandle = PrimitiveHandle<typeof fieldSet>
@@ -21,10 +37,37 @@ type FieldSetHandle = PrimitiveHandle<typeof fieldSet>
 // Field is closer.
 const DescribedContext = React.createContext<FieldHandle | FieldSetHandle | null>(null)
 
-function useField() {
-  const context = React.useContext(FieldContext)
-  if (!context) throw new Error("Field parts must be used inside <Field>.")
-  return context
+// Checks a part outside a field once it's in the page. Made once, so React
+// keeps the same ref and hands the element over once.
+const outsideRefs: Partial<Record<FieldOutsideSlot, (el: Element | null) => void>> = {
+  label: (el) =>
+    checkFieldOutside(el, "label", "Put the control inside it, or point its `htmlFor` at the control."),
+  control: (el) => checkFieldOutside(el, "control"),
+}
+
+// A part outside any Field: a plain element with no field wiring, so a
+// FieldLabel is a native <label> that labels the control it wraps.
+function outside(slot: FieldOutsideSlot, tag: string, { render, ...props }: Record<string, any>) {
+  const ref = outsideRefs[slot]
+  return renderElement(tag, mergeProps(fieldOutsideAttrs(slot), props, { ref }), render, fieldOutsideState)
+}
+
+// A part inside its field, as a component of its own, so whether a field is
+// around a part never changes the order of its hooks.
+function InField<S extends FieldOutsideSlot>({
+  field,
+  slot,
+  part,
+  props,
+  tag,
+}: {
+  field: FieldHandle
+  slot: S
+  part: PropsOf<typeof fieldPrimitive, S>
+  props: Record<string, any>
+  tag: "label" | "p" | "div" | "input"
+}) {
+  return usePart(field, slot, part, props, tag)
 }
 
 /**
@@ -46,11 +89,14 @@ function Field({ name, disabled, invalid, debug, ...props }: FieldOptions & Part
 // Field parts take the user's `id`, which names the part, as the slot's too.
 
 /**
- * The field's label, which names its control.
+ * The field's label, which names its control. Outside a Field it's a plain
+ * <label>, which labels the control inside it, like a card around a whole Field.
  * @stable
  */
 function FieldLabel(props: PartProps<"label", FieldState>) {
-  return usePart(useField(), "label", { id: props.id }, props, "label")
+  const field = React.useContext(FieldContext)
+  if (!field) return outside("label", "label", props)
+  return <InField field={field} slot="label" part={{ id: props.id }} props={props} tag="label" />
 }
 
 /**
@@ -60,10 +106,11 @@ function FieldLabel(props: PartProps<"label", FieldState>) {
  */
 function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
   const described = React.useContext(DescribedContext)
-  if (!described) throw new Error("FieldDescription must be used inside <Field> or <FieldSet>.")
+  if (!described) return outside("description", "p", props)
   // A field set's description slot takes the same props, and its state is the
   // `disabled` that FieldDescriptionState always has.
-  return usePart(described as FieldHandle, "description", { id: props.id }, props, "p")
+  const owner = described as FieldHandle
+  return <InField field={owner} slot="description" part={{ id: props.id }} props={props} tag="p" />
 }
 
 /**
@@ -76,11 +123,14 @@ function FieldError({
   children = message,
   ...props
 }: PartProps<"div", FieldErrorState> & FieldErrorProps) {
+  const field = React.useContext(FieldContext)
   const made = React.useId()
+  if (!field)
+    return fieldOutsideErrorShown({ match }) ? outside("error", "div", { ...props, children }) : null
   // Only an error with `match` needs an id of its own. One without takes the
   // field's, which the control points at before the field binds.
   const id = props.id ?? (match === undefined ? undefined : made)
-  return usePart(useField(), "error", { id, match }, { ...props, children }, "div")
+  return <InField field={field} slot="error" part={{ id, match }} props={{ ...props, children }} tag="div" />
 }
 
 const message = (state: FieldErrorState) => state.message
@@ -90,10 +140,12 @@ const message = (state: FieldErrorState) => state.message
  * @stable
  */
 function FieldControl({ name, render, ...rest }: PartProps<"input", FieldState>) {
-  const field = useField()
+  const field = React.useContext(FieldContext)
+  if (!field) return outside("control", "input", { ...rest, name, render })
   const [props, element] = ownDescription(rest, render)
   const control = { id: props.id, describedBy: props["aria-describedby"] }
-  return usePart(field, "control", control, { ...props, render: element, name: name ?? field.name }, "input")
+  const user = { ...props, render: element, name: name ?? field.name }
+  return <InField field={field} slot="control" part={control} props={user} tag="input" />
 }
 
 /**

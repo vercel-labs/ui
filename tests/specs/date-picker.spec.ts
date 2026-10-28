@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
 import { datePickerAction, datePickerFixture as f } from "../fixtures/date-picker"
 import { dateName, day, expectFocused } from "./calendar.helpers"
+import { invalidDate, validity } from "./date-picker.helpers"
 
 // A text input that reads a typed date, and a button that opens a calendar in
 // a dialog, following the WAI-ARIA date picker dialog:
@@ -40,6 +41,58 @@ test("text that isn't a date stays as typed and marks the input invalid", async 
   await expect(input(page)).toHaveAttribute("aria-invalid", "true")
   await type(page, "10/18/2026")
   await expect(input(page)).not.toHaveAttribute("aria-invalid")
+})
+
+test("text that isn't a date blocks the form's submit until it's fixed", async ({ page, open }) => {
+  await open("date-picker", { value: "2026-10-16" })
+  await type(page, "not a date")
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText("")
+  expect(await validity(input(page))).toEqual(invalidDate)
+  await type(page, "10/18/2026")
+  expect(await validity(input(page))).toEqual({ valid: true, message: "" })
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText(JSON.stringify([[f.name, "2026-10-18"]]))
+})
+
+test("clearing text that isn't a date lets the form submit", async ({ page, open }) => {
+  await open("date-picker", { value: "2026-10-16" })
+  await type(page, "not a date")
+  await type(page, "")
+  expect(await validity(input(page))).toEqual({ valid: true, message: "" })
+  await page.getByRole("button", { name: "Submit" }).click()
+  await expect(submitted(page)).toHaveText(JSON.stringify([[f.name, ""]]))
+})
+
+test("a message the app set on the input comes back once the text is a date", async ({ page, open }) => {
+  await open("date-picker", { value: "2026-10-16" })
+  await input(page).evaluate((el: HTMLInputElement) => el.setCustomValidity("Taken by the server."))
+  await type(page, "not a date")
+  expect(await validity(input(page))).toEqual(invalidDate)
+  await type(page, "10/18/2026")
+  expect(await input(page).evaluate((el: HTMLInputElement) => el.validationMessage)).toBe(
+    "Taken by the server.",
+  )
+})
+
+test("the date picker element reports text that isn't a date as its own bad input", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(framework !== "web", "Custom elements only.")
+  await open("date-picker", { value: "2026-10-16" })
+  const picker = page.locator("ui-date-picker")
+  const own = () =>
+    picker.evaluate((el: HTMLElement & { validity: ValidityState; validationMessage: string }) => ({
+      badInput: el.validity.badInput,
+      invalid: el.matches(":invalid"),
+      message: el.validationMessage,
+    }))
+  await type(page, "not a date")
+  expect(await own()).toEqual({ badInput: true, invalid: true, message: "Enter a valid date." })
+  await type(page, "10/18/2026")
+  expect(await own()).toEqual({ badInput: false, invalid: false, message: "" })
 })
 
 test("the format hint describes the input", async ({ page, open }) => {
@@ -201,5 +254,23 @@ test.describe("range", () => {
     await open("date-picker", { mode: "range", value: "2026-10-20,2026-10-23" })
     await type(page, "10/10/2026", "End date")
     await expect(input(page, "End date")).toHaveAttribute("aria-invalid", "true")
+  })
+
+  test("an end that isn't a date blocks the form's submit until it's fixed", async ({ page, open }) => {
+    await open("date-picker", { mode: "range", value: "2026-10-20,2026-10-23" })
+    await type(page, "not a date", "End date")
+    await page.getByRole("button", { name: "Submit" }).click()
+    await expect(submitted(page)).toHaveText("")
+    expect(await validity(input(page, "End date"))).toEqual(invalidDate)
+    await expect(input(page, "Start date")).not.toHaveAttribute("aria-invalid")
+    await type(page, "10/25/2026", "End date")
+    expect(await validity(input(page, "End date"))).toEqual({ valid: true, message: "" })
+    await page.getByRole("button", { name: "Submit" }).click()
+    await expect(submitted(page)).toHaveText(
+      JSON.stringify([
+        ["start", "2026-10-20"],
+        ["end", "2026-10-25"],
+      ]),
+    )
   })
 })

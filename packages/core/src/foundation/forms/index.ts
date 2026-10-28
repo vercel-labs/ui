@@ -28,6 +28,8 @@ export {
   isLabelable,
   labelsOf,
   nameFromLabels,
+  onValidityChange,
+  setComponentValidity,
   submitImplicitly,
   valueMissingMessage,
   watchFieldsets,

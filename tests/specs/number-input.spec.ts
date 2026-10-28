@@ -159,6 +159,79 @@ test.describe("buttons", () => {
     await button(page, "Increase quantity").click()
     await expect.poll(() => status(page, "Committed")).toBe("quantity:2")
   })
+
+  test("a disabled button is marked disabled", async ({ page, open }) => {
+    await open("number-input", { quantity: "5", "disabled-increment": "" })
+    const increment = button(page, "Increase quantity")
+    await expect(increment).toBeDisabled()
+    await expect(increment).toHaveAttribute("aria-disabled", "true")
+    await expect(increment).toHaveAttribute("data-disabled", "")
+    await expect(button(page, "Decrease quantity")).toBeEnabled()
+  })
+
+  test("a disabled button doesn't step when clicked or held, and the other still does", async ({
+    page,
+    open,
+  }) => {
+    await open("number-input", { quantity: "5", "disabled-increment": "" })
+    const increment = button(page, "Increase quantity")
+    await increment.click({ force: true })
+    // Presses that reach the button anyway, like a pointer on a custom element
+    // or a screen reader's click, must not step either.
+    await increment.dispatchEvent("pointerdown", { button: 0, pointerType: "mouse", isPrimary: true })
+    await page.clock.runFor(1000)
+    await increment.dispatchEvent("pointerup", { button: 0, pointerType: "mouse", isPrimary: true })
+    await increment.dispatchEvent("click", { detail: 0 })
+    const box = (await increment.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await page.clock.runFor(1000)
+    await page.mouse.up()
+    await expect(quantity(page)).toHaveValue("5")
+    await expect.poll(() => status(page, "Last action")).toBe("")
+    await button(page, "Decrease quantity").click()
+    await expect(quantity(page)).toHaveValue("4")
+  })
+
+  test("<button disabled> inside a step button element stays disabled past a bound", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web component markup only.")
+    await open("number-input", { quantity: "98", "disabled-increment": "button" })
+    const increment = button(page, "Increase quantity")
+    await expect(increment).toHaveAttribute("aria-disabled", "true")
+    await expect(increment).toHaveAttribute("data-disabled", "")
+    const setValue = (value: number) =>
+      quantity(page).evaluate((el, value) => {
+        ;(el.closest("ui-number-input") as HTMLElement & { value: number }).value = value
+      }, value)
+    await setValue(99)
+    await expect(quantity(page)).toHaveValue("99")
+    await setValue(98)
+    await expect(quantity(page)).toHaveValue("98")
+    await expect(increment).toBeDisabled()
+    await increment.click({ force: true })
+    await increment.dispatchEvent("click", { detail: 0 })
+    await expect(quantity(page)).toHaveValue("98")
+  })
+
+  test("a button disabled while it's held stops repeating", async ({ page, open, framework }) => {
+    await open("number-input", { quantity: "5" })
+    const increment = button(page, "Increase quantity")
+    const box = (await increment.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await expect(quantity(page)).toHaveValue("6")
+    await increment.evaluate(
+      (el, web) => (web ? el.closest("ui-number-input-increment")! : el).setAttribute("disabled", ""),
+      framework.startsWith("web"),
+    )
+    await page.clock.runFor(1000)
+    await page.mouse.up()
+    await expect(quantity(page)).toHaveValue("6")
+  })
 })
 
 test.describe("state and forms", () => {

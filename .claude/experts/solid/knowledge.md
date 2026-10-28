@@ -2,7 +2,7 @@
 
 What the Solid expert knows. Part 1 is Solid 2 itself, part 2 is how `@ui-sdk/solid` is built, part 3 is the checklist a review walks. Pinned to what the repo installs: `solid-js` 2.0.0-rc.14 with `@solidjs/web` and `@solidjs/signals` (peer range `>=2.0.0-rc.14 <3`). Solid 2 isn't final: when an rc changes an API, update this file.
 
-Last checked: 2026-10-26, against `node_modules/solid-js` 2.0.0-rc.14 (exports and `.d.ts` JSDoc read; Solid 2's own docs are thin, so the types are the source).
+Last checked: 2026-10-28, against `node_modules/solid-js` 2.0.0-rc.14 (exports and `.d.ts` JSDoc read; Solid 2's own docs are thin, so the types are the source).
 
 ## 1. Solid 2, as its types and docs write it
 
@@ -37,10 +37,13 @@ Solid 1 habits are the main thing to catch. These changed:
 
 - Every computation has an owner; `onCleanup` runs when the owner reruns or is disposed. Something created outside an owner is never cleaned up (`createRoot` gives one).
 - `onSettled` runs once the flush that created the component has rendered, which is where DOM measurement goes.
+- `onSettled` called with no owner goes on the global queue and still fires.
+- `onCleanup` inside `onSettled` throws `CLEANUP_IN_FORBIDDEN_SCOPE` and halts reactivity.
 
 ### Async and Loading
 
 - Reading a pending async value throws `NotReadyError` up to the nearest `<Loading>`, which shows `fallback` until it's ready. Children stay alive behind the fallback. Once shown, a `<Loading>` shows the fallback again only for its `on` dependencies; other refetches keep content and expose the wait through `isPending()`.
+- Under a pending `<Loading>`, `onSettled` waits for the reveal, and the element is connected by then. Work that shouldn't wait for slow siblings, like starting a request, doesn't belong in it.
 - A frame can be held: a write inside an `action`, or data other readers wait on, lands together with the new page. Code that reads state during a held frame must stay consistent with what's shown.
 
 ### Control flow and rendering
@@ -54,6 +57,7 @@ Solid 1 habits are the main thing to catch. These changed:
 
 - On the server, memos compute as they're created and effects don't run; `isServer` tells. Context providers render their children lazily.
 - `hydrate()` claims server elements; while hydrating, refs see server attributes and children before Solid patches them, and Solid skips text writes and never removes server attributes. Anything that reads or writes the DOM belongs after hydration (`onSettled`).
+- `isHydrating()` is exported from `solid-js`. It isn't reactive, and is meant for "render what the server did, switch in `onSettled`".
 
 ### Diagnostics
 

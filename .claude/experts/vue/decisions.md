@@ -15,7 +15,6 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 
 - **Wide change types**: Tabs' `onValueChange` passes `string | null`, Checkbox's `boolean | "indeterminate"`.
 - **Suspense internals**: the deferral reads `instance.suspense`, which Vue's public types leave out.
-- **`useAsyncOptions` on the server**: an `immediate` load still runs during setup.
 - **`bind` runs in a render**: `useConnectedPart` calls it there, so a bind must not call lifecycle hooks, `provide` or `useId`.
 - **A trigger that switches instances** keeps its old `PartWatch` subscription until it unmounts.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.

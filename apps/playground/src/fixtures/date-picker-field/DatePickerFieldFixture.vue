@@ -16,6 +16,7 @@ import { ref } from "vue"
 
 const { required, disabled } = datePickerFieldOptions()
 const submitted = ref("")
+const shown = ref(true)
 
 function onSubmit(event: Event) {
   submitted.value = JSON.stringify([...new FormData(event.currentTarget as HTMLFormElement)])
@@ -28,7 +29,7 @@ function onSubmit(event: Event) {
     <form @submit.prevent="onSubmit">
       <Field class="field" :name="datePickerFixture.name" :disabled="disabled">
         <FieldLabel>{{ f.label }}</FieldLabel>
-        <DatePicker class="date-picker" :today="datePickerFixture.today" :required="required">
+        <DatePicker v-if="shown" class="date-picker" :today="datePickerFixture.today" :required="required">
           <DatePickerInput />
           <DatePickerTrigger />
           <DatePickerHint class="date-picker-hint" />
@@ -38,6 +39,7 @@ function onSubmit(event: Event) {
         <FieldError class="field-error" />
       </Field>
       <button type="submit">Submit</button>
+      <button type="button" @click="shown = false">Remove date picker</button>
     </form>
     <output role="status" aria-label="Submitted">{{ submitted }}</output>
   </div>

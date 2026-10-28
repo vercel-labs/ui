@@ -1,4 +1,6 @@
+import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
+import { fieldChoiceCardFixture as f } from "../fixtures/field"
 import { checkbox, email, errors, fillRequired, radio, save } from "./forms.helpers"
 
 // A field names its control from its label, describes it with its description,
@@ -26,6 +28,135 @@ test.describe("labelling", () => {
   test("clicking the label of a text field focuses it", async ({ page }) => {
     await page.getByText("Email", { exact: true }).click()
     await expect(email(page)).toBeFocused()
+  })
+})
+
+// Choice cards: a FieldLabel outside any Field wraps a whole Field, and labels
+// the control inside it the way a native <label> does.
+test.describe("a label wrapping a field", () => {
+  const card = (page: Page, title: string) => page.getByRole("checkbox", { name: title })
+
+  test("names the control inside it", async ({ page, open }) => {
+    await open("field-choice-card")
+    for (const { title } of f.cards) await expect(card(page, title)).toBeVisible()
+  })
+
+  test("checks its control when clicked anywhere", async ({ page, open }) => {
+    await open("field-choice-card")
+    const [first, second] = f.cards
+    await page.getByText(first.description).click()
+    await expect(card(page, first.title)).toBeChecked()
+    await expect(card(page, second.title)).not.toBeChecked()
+    await page.getByText(first.title).click()
+    await expect(card(page, first.title)).not.toBeChecked()
+  })
+
+  test("keeps the field's description on its control", async ({ page, open }) => {
+    await open("field-choice-card")
+    for (const { title, description } of f.cards)
+      await expect(card(page, title)).toHaveAccessibleDescription(description)
+  })
+
+  test("names a control that renders after it", async ({ page, open }) => {
+    await open("field-choice-card", { later: "" })
+    await expect(card(page, f.later.title)).toBeVisible()
+    await page.getByText(f.later.description).click()
+    await expect(card(page, f.later.title)).toBeChecked()
+  })
+
+  test("keeps the part's data-slot", async ({ page, open }) => {
+    await open("field-choice-card", { alone: "" })
+    const cards = page.locator(".choice-card")
+    await expect(cards).toHaveCount(f.cards.length)
+    for (const label of await cards.all()) await expect(label).toHaveAttribute("data-slot", "field-label")
+    await expect(page.getByText(f.alone)).toHaveAttribute("data-slot", "field-label")
+  })
+
+  // Every label is checked at once, so a false warning about the card whose
+  // control comes later would print before the orphan's.
+  test("warns in development only when a label outside a field labels nothing", async ({ page, open }) => {
+    const printed: string[] = []
+    page.on("console", (message) => message.type() === "warning" && printed.push(message.text()))
+    await open("field-choice-card", { alone: "", later: "" })
+    await expect(card(page, f.later.title)).toBeVisible()
+    const unlabeled = () => printed.filter((text) => text.includes("labels nothing"))
+    await expect.poll(() => unlabeled().some((text) => text.includes(f.alone))).toBe(true)
+    expect(unlabeled()).toHaveLength(1)
+  })
+
+  test("a description and an error outside a field keep their data-slot", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web components write it on an element they don't render.")
+    await open("field-choice-card")
+    await page.evaluate(() => {
+      document.querySelector(".fixture")!.insertAdjacentHTML(
+        "beforeend",
+        `<ui-field-description>Plain description</ui-field-description>
+        <ui-field-error match="true">Plain error</ui-field-error>`,
+      )
+    })
+    await expect(page.getByText("Plain description")).toHaveAttribute("data-slot", "field-description")
+    await expect(page.getByText("Plain error")).toHaveAttribute("data-slot", "field-error")
+  })
+
+  test("a hidden error outside a field stays hidden whatever display its class gives", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web components hide an element they don't render.")
+    await open("field-choice-card")
+    await page.evaluate(() => {
+      document.head.insertAdjacentHTML("beforeend", "<style>.shown { display: block }</style>")
+      document
+        .querySelector(".fixture")!
+        .insertAdjacentHTML("beforeend", `<ui-field-error class="shown">Plain error</ui-field-error>`)
+    })
+    await expect(page.getByText("Plain error")).toHaveAttribute("data-slot", "field-error")
+    await expect(page.getByText("Plain error")).toBeHidden()
+  })
+
+  test("an error outside a field follows its match", async ({ page, open, framework }) => {
+    test.skip(!framework.startsWith("web"), "Web components read match from the element's attribute.")
+    await open("field-choice-card")
+    await page.evaluate(() => {
+      document.querySelector(".fixture")!.insertAdjacentHTML(
+        "beforeend",
+        `<ui-field-error id="plain">Plain error</ui-field-error>
+        <ui-field-error id="child" as-child match="true"><p>Child error</p></ui-field-error>`,
+      )
+    })
+    const plain = page.getByText("Plain error")
+    const child = page.getByText("Child error")
+    await expect(child).toBeVisible()
+    await expect(plain).toBeHidden()
+    await page.evaluate(() => {
+      document.getElementById("plain")!.setAttribute("match", "")
+      document.getElementById("child")!.setAttribute("match", "false")
+    })
+    await expect(plain).toBeVisible()
+    await expect(child).toBeHidden()
+  })
+
+  test("an error outside a field shows a child that arrives after it", async ({ page, open, framework }) => {
+    test.skip(!framework.startsWith("web"), "Web components bind an as-child element when it arrives.")
+    await open("field-choice-card")
+    await page.evaluate(async () => {
+      const error = document.createElement("ui-field-error")
+      error.id = "late"
+      error.setAttribute("as-child", "")
+      document.querySelector(".fixture")!.append(error)
+      await new Promise((resolve) => setTimeout(resolve, 30))
+      error.innerHTML = "<p>Late error</p>"
+      await new Promise((resolve) => setTimeout(resolve, 30))
+    })
+    const late = page.getByText("Late error")
+    await expect(late).toBeHidden()
+    await page.evaluate(() => document.getElementById("late")!.setAttribute("match", "true"))
+    await expect(late).toBeVisible()
   })
 })
 

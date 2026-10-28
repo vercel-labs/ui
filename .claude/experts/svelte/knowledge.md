@@ -2,7 +2,7 @@
 
 What the Svelte expert knows. Part 1 is Svelte itself, part 2 is how `@ui-sdk/svelte` is built, part 3 is the checklist a review walks. Pinned to what the repo installs: Svelte 5.57.2 (`packages/svelte` peer range `svelte >=5.33`). Anything newer than 5.33 that the adapter uses needs the peer range raised.
 
-Last checked: 2026-10-26, against `node_modules/svelte` 5.57.2 (exports checked: `createContext`, `getAbortSignal`, `fork`, `settled`, `hydratable`, `createRawSnippet`; `svelte/attachments`: `createAttachmentKey`, `fromAction`).
+Last checked: 2026-10-28, against `node_modules/svelte` 5.57.2 (exports checked: `createContext`, `getAbortSignal`, `fork`, `settled`, `hydratable`, `createRawSnippet`; `svelte/attachments`: `createAttachmentKey`, `fromAction`).
 
 ## 1. Svelte, as its docs write it
 
@@ -32,6 +32,7 @@ Last checked: 2026-10-26, against `node_modules/svelte` 5.57.2 (exports checked:
 
 - `{@attach fn}` (5.29) runs `fn(element)` when the element mounts and again when its dependencies change; the returned function cleans up. Attachments can be passed through props and spread (`{...props}` carries them, keyed by `createAttachmentKey()`), which actions can't.
 - `use:action` still works; `fromAction` turns one into an attachment. New code should use attachments.
+- When a block is destroyed, Svelte removes its DOM first and runs effect and attachment cleanups after (`destroy_effect`), so a cleanup can't find its element in the page. During an outro, effects are paused, not destroyed, until it ends.
 
 ### Events
 

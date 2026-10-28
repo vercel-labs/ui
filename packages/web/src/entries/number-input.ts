@@ -5,6 +5,7 @@ defineNumberInputElements()
 
 export type {
   NumberInputApi,
+  NumberInputButtonProps,
   NumberInputButtonState,
   NumberInputChangeOptions,
   NumberInputController,

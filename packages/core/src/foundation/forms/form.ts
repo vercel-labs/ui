@@ -82,6 +82,47 @@ function valueMissingMessage(type: "checkbox" | "radio" | "select" | "file" | "t
   return messages.get(type)!
 }
 
+// Fields that read their controls' validity again when a component changes it
+// in a way no event reports.
+const validityListeners = new Set<(el: HTMLElement) => void>()
+
+// Tells fields around a control that its validity changed.
+function validityChanged(el: HTMLElement) {
+  validityListeners.forEach((listener) => listener(el))
+}
+
+// Calls `listener` with the control whenever `validityChanged` reports one. Returns a cleanup.
+function onValidityChange(listener: (el: HTMLElement) => void) {
+  validityListeners.add(listener)
+  return () => {
+    validityListeners.delete(listener)
+  }
+}
+
+// The message a component holds on a control, and the app's own message it
+// replaced. Kept by element, so a part that binds again, like under React's
+// <Activity>, picks up what the element already carries.
+const heldMessages = new WeakMap<HTMLInputElement, { message: string; app: string }>()
+
+// Sets a native control's custom validity from a component's own check, like a
+// date picker's text that isn't a date, and tells fields around it. An empty
+// message gives the control back the message the app had set, unless the app
+// set another one since. A control barred from validation, like a disabled
+// one, reports no message, so there it's taken to still hold the component's.
+function setComponentValidity(el: HTMLInputElement, message: string) {
+  const held = heldMessages.get(el)
+  if ((held?.message ?? "") === message) return
+  if (message) {
+    if (held) held.message = message
+    else heldMessages.set(el, { message, app: el.validity.customError ? el.validationMessage : "" })
+    el.setCustomValidity(message)
+  } else {
+    heldMessages.delete(el)
+    if (!el.willValidate || el.validationMessage === held!.message) el.setCustomValidity(held!.app)
+  }
+  validityChanged(el)
+}
+
 const blocksImplicitSubmission = new Set([
   "text",
   "search",
@@ -384,7 +425,10 @@ export {
   labelledBy,
   labelsOf,
   nameFromLabels,
+  onValidityChange,
+  setComponentValidity,
   submitImplicitly,
+  validityChanged,
   valueMissingMessage,
   watchFieldsets,
 }

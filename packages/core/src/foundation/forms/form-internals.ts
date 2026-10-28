@@ -2,7 +2,15 @@
 // ElementInternals. Only the web adapter imports this module: it hands each
 // element's internals to the core with `bindElementInternals`, so components
 // in the other adapters, which use a hidden input, never ship it.
-import { claimInvalidFocus, focusWith, labelledBy, labelsOf, type Association, type FormValue } from "./form"
+import {
+  claimInvalidFocus,
+  focusWith,
+  labelledBy,
+  labelsOf,
+  validityChanged,
+  type Association,
+  type FormValue,
+} from "./form"
 
 type FormCallbacks = {
   reset?: () => void
@@ -46,6 +54,9 @@ function bindElementInternals(
     restore: (state: string) => void
     valueMissing: () => boolean
     message: () => string
+    // A problem the component finds itself, like a date picker's text that
+    // isn't a date, with its message and where the browser points it.
+    invalid?: () => { flags: ValidityStateFlags; message: string; anchor?: HTMLElement } | undefined
     // Where the browser points its validation message.
     anchor?: () => HTMLElement | undefined
     // Where focus goes for the element, when it isn't focusable itself, like a group.
@@ -53,6 +64,8 @@ function bindElementInternals(
     subscribe: (listener: () => void) => () => void
   },
 ) {
+  // The component's own problem last reported, so fields hear when it changes.
+  let reported = ""
   const sync = () => {
     const value = options.value()
     if (value instanceof FormData) internals.setFormValue(value, options.state())
@@ -64,10 +77,16 @@ function bindElementInternals(
     } else internals.setFormValue(value, options.state())
     const missing = options.valueMissing()
     const custom = customMessages.get(el)
+    const invalid = options.invalid?.()
     if (custom) internals.setValidity({ customError: true }, custom, options.anchor?.() ?? el)
+    else if (invalid)
+      internals.setValidity(invalid.flags, invalid.message, invalid.anchor ?? options.anchor?.() ?? el)
     else if (missing)
       internals.setValidity({ valueMissing: true }, options.message(), options.anchor?.() ?? el)
     else internals.setValidity({})
+    if ((invalid?.message ?? "") === reported) return
+    reported = invalid?.message ?? ""
+    validityChanged(el)
   }
   sync()
   const unsubscribe = options.subscribe(sync)

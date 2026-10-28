@@ -5,7 +5,7 @@ import { normalizeValue } from "../calendar/calendar-model"
 import { formatDate } from "../../foundation/date/format"
 import { datePattern } from "../../foundation/date/parse"
 import { type ISODate } from "../../foundation/date/plain-date"
-import { bindInternals, bindValueInput } from "../../foundation/forms/form"
+import { bindInternals, bindValueInput, setComponentValidity } from "../../foundation/forms/form"
 import { openerOf, popupContentAttrs, popupTriggerAttrs } from "../../foundation/popups/popup"
 import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
 import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
@@ -37,6 +37,10 @@ import {
 } from "./date-picker-api"
 
 const indexOf = (props: DatePickerInputProps) => (props.end ? 1 : 0)
+
+// The message the browser and a Field show for an input whose text isn't a
+// date that can be picked. English, like the trigger's label.
+const invalidDateMessage = "Enter a valid date."
 
 function triggerLabel(state: State) {
   const label = state.mode === "range" ? "Choose dates" : "Choose date"
@@ -75,6 +79,16 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           restore: api.internal.restore,
           valueMissing: () => false,
           message: () => "",
+          // Text that isn't a date is a bad input, like a native date input's.
+          invalid: () => {
+            const state = store.get()
+            if (!invalidAt(state, 0) && !invalidAt(state, 1)) return undefined
+            return {
+              flags: { badInput: true },
+              message: invalidDateMessage,
+              anchor: api.internal.invalidInput(),
+            }
+          },
           focus: api.internal.focusInput,
           reset: api.internal.reset,
           disabled: api.internal.setFormDisabled,
@@ -118,15 +132,26 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       keydown: (event, { api, props }) => api.internal.inputKeydown(event, indexOf(props)),
       focusout: (event, { api, props }) => api.internal.commit(indexOf(props), event),
     },
-    bind(el, { store, props }) {
+    bind(el, { api, store, props }) {
       const input = el as HTMLInputElement
       // The text is written here, so the framework never fights the caret.
       const write = () => {
-        const text = textOf(store.get(), indexOf(props))
+        const state = store.get()
+        const text = textOf(state, indexOf(props))
         if (input.value !== text) input.value = text
+        // Text that isn't a date blocks its form, until it's a date or empty.
+        // A root that validates reports it instead.
+        if (api.internal.rootValidates()) return
+        setComponentValidity(input, invalidAt(state, indexOf(props)) ? invalidDateMessage : "")
       }
       write()
-      return store.subscribe(write)
+      const unsubscribe = store.subscribe(write)
+      return () => {
+        unsubscribe()
+        // React's hidden <Activity> keeps the input and its text in the page,
+        // so the text still blocks its form.
+        if (!input.isConnected) setComponentValidity(input, "")
+      }
     },
   }),
 

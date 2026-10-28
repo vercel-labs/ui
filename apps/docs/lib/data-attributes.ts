@@ -983,10 +983,10 @@ const components: Record<
     descriptions: {
       "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
       "increment:data-disabled": {
-        text: "Present when the button can't step: the field is disabled or read-only, or the value is at `max`.",
+        text: "Present when the button can't step: it or the field is disabled, the field is read-only, or the value is at `max`.",
       },
       "decrement:data-disabled": {
-        text: "Present when the button can't step: the field is disabled or read-only, or the value is at `min`.",
+        text: "Present when the button can't step: it or the field is disabled, the field is read-only, or the value is at `min`.",
       },
       "data-readonly": { text: "Present when read-only." },
       "data-required": { text: "Present when required." },

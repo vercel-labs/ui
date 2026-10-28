@@ -60,7 +60,9 @@ function Fixture() {
             <NumberInputGroup className="number-input-group">
               <NumberInputDecrement aria-label={f.quantity.decrement}>−</NumberInputDecrement>
               <NumberInputControl className="number-input-control" />
-              <NumberInputIncrement aria-label={f.quantity.increment}>+</NumberInputIncrement>
+              <NumberInputIncrement aria-label={f.quantity.increment} disabled={options.disabledIncrement}>
+                +
+              </NumberInputIncrement>
             </NumberInputGroup>
           </NumberInput>
           <FieldDescription>{f.quantity.description}</FieldDescription>

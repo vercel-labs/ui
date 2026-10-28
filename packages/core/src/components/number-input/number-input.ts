@@ -165,6 +165,15 @@ type NumberInputScrubAreaProps = {
 }
 
 /**
+ * The props the `increment` and `decrement` slots of `numberInput` take.
+ * @stable
+ */
+type NumberInputButtonProps = {
+  /** Turns off this button alone. Pressing, clicking or holding it doesn't step. */
+  disabled?: boolean
+}
+
+/**
  * The state the `root` slot of `numberInput` hands `render` functions and
  * state-based class names.
  * @stable
@@ -187,7 +196,7 @@ type NumberInputState = {
  * @stable
  */
 type NumberInputButtonState = NumberInputState & {
-  /** Whether the button can't step, because the field is disabled or read-only, or the value is at its bound. */
+  /** Whether the button can't step, because it or the field is disabled, the field is read-only, or the value is at its bound. */
   disabled: boolean
   /** Whether the value is at the bound this button steps toward, like the maximum for the increment. */
   atBound: boolean
@@ -214,21 +223,26 @@ function dataAttrs(state: State) {
 
 const controlId = (id: string) => `${id}-control`
 
+// Whether a step button can't step: it's disabled itself, or the field can't step that way.
+function isBlocked(state: State, props: NumberInputButtonProps, direction: number) {
+  return !!props.disabled || !canStep(state, direction)
+}
+
 function button(direction: number) {
   return {
-    state: (state: State) => ({
+    state: (state: State, { props }: { props: NumberInputButtonProps }) => ({
       ...fieldState(state),
-      disabled: !canStep(state, direction),
+      disabled: isBlocked(state, props, direction),
       atBound: atBound(state, direction),
     }),
-    attrs: (state: State, { id }: { id: string }) => {
-      const blocked = !canStep(state, direction)
+    attrs: (state: State, { id, props }: { id: string; props: NumberInputButtonProps }) => {
+      const blocked = isBlocked(state, props, direction)
       return {
         type: "button",
         tabindex: "-1",
         "aria-controls": controlId(id),
         // Read-only buttons stay in the page as they were, but do nothing.
-        disabled: blocked && !state.readOnly ? "" : undefined,
+        disabled: props.disabled || (blocked && !state.readOnly) ? "" : undefined,
         "aria-disabled": blocked ? "true" : undefined,
         ...dataAttrs(state),
         "data-disabled": blocked ? "" : undefined,
@@ -356,19 +370,23 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       },
     }),
 
-    increment: slot<{}, NumberInputButtonState>({
+    increment: slot<NumberInputButtonProps, NumberInputButtonState>({
+      props: { disabled: "boolean" },
       ...button(1),
       on: {
-        pointerdown: (event, { api, el }) => el && api.internal.pressButton(event, el, 1),
-        click: (event, { api }) => api.internal.clickButton(event, 1),
+        pointerdown: (event, { api, el, props }) =>
+          el && !props.disabled && api.internal.pressButton(event, el, 1),
+        click: (event, { api, props }) => !props.disabled && api.internal.clickButton(event, 1),
       },
     }),
 
-    decrement: slot<{}, NumberInputButtonState>({
+    decrement: slot<NumberInputButtonProps, NumberInputButtonState>({
+      props: { disabled: "boolean" },
       ...button(-1),
       on: {
-        pointerdown: (event, { api, el }) => el && api.internal.pressButton(event, el, -1),
-        click: (event, { api }) => api.internal.clickButton(event, -1),
+        pointerdown: (event, { api, el, props }) =>
+          el && !props.disabled && api.internal.pressButton(event, el, -1),
+        click: (event, { api, props }) => !props.disabled && api.internal.clickButton(event, -1),
       },
     }),
 
@@ -439,6 +457,7 @@ const numberInput: NumberInputPrimitive = numberInputPrimitive
 export {
   createNumberInputController,
   numberInput,
+  type NumberInputButtonProps,
   type NumberInputButtonState,
   type NumberInputChangeOptions,
   type NumberInputController,

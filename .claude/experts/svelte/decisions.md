@@ -17,7 +17,6 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 
 - **Other outros**: portaled popups, separate `in:`/`out:` and custom components in `render` weren't probed.
 - **Parts hear every change** unless `selects` narrows them.
-- **`useAsyncOptions` on the server**: an `immediate` load still runs during setup.
 - **`menu-trigger-binding.svelte`** calls `use(feature)` inside `$derived.by`. Idempotent, but not idiomatic.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 

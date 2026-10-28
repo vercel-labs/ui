@@ -1766,8 +1766,8 @@ declare global {
     "ui-navigation-menu-indicator": UiPartElement<typeof navigationMenu, "indicator">
     "ui-number-input-group": UiPartElement<typeof numberInput, "group">
     "ui-number-input-control": UiPartElement<typeof numberInput, "control">
-    "ui-number-input-increment": UiPartElement<typeof numberInput, "increment">
-    "ui-number-input-decrement": UiPartElement<typeof numberInput, "decrement">
+    "ui-number-input-increment": UiPartElement<typeof numberInput, "increment", "disabled">
+    "ui-number-input-decrement": UiPartElement<typeof numberInput, "decrement", "disabled">
     "ui-number-input-scrub-area": UiPartElement<
       typeof numberInput,
       "scrub-area",

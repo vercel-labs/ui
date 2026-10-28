@@ -50,9 +50,9 @@ The second argument sets the starting behavior:
 | ----------- | ------------------------------------------------------- | ------- |
 | `debounce`  | Milliseconds typing must pause before a request starts. | `200`   |
 | `query`     | The starting search text.                               | `""`    |
-| `immediate` | Loads that text before anyone types.                    | `false` |
+| `immediate` | Loads that text as soon as the component mounts.        | `false` |
 
-For initial choices, add `{ immediate: true, debounce: 300 }` after the loader. If you set `query`, use the same starting text for the component's `defaultQuery`.
+For initial choices, add `{ immediate: true, debounce: 300 }` after the loader. Until that first load starts, `status` is already `"loading"`, so the list never flashes an empty state. If you set `query`, use the same starting text for the component's `defaultQuery`.
 
 ## Load More
 

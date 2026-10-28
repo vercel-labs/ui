@@ -17,6 +17,7 @@ import type { CalendarOptions } from "../calendar/calendar"
 import { formatDate } from "../../foundation/date/format"
 import { parseDate } from "../../foundation/date/parse"
 import { isISODate, type ISODate } from "../../foundation/date/plain-date"
+import { formInternals } from "../../foundation/forms/form"
 import { initialApple } from "../../foundation/platform/platform"
 import { deriveOpen } from "../../foundation/popups/popup"
 import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
@@ -26,6 +27,7 @@ import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import type {
   DatePickerChangeOptions,
   DatePickerContentProps,
+  DatePickerInputProps,
   DatePickerMonthChangeReason,
   DatePickerOptions,
   DatePickerValue,
@@ -127,6 +129,13 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
   // The trigger, or without one, the input that holds the start.
   const triggerElement = () => element("trigger") ?? element("input", "start") ?? element("input")
   const inputElement = () => element("input", "start") ?? element("input")
+  // The first input whose text isn't a date, the start before the end.
+  const invalidInput = () => {
+    const state = store.get()
+    return elements<DatePickerInputProps>(context, "input").find(({ props }) =>
+      invalidAt(state, props.end ? 1 : 0),
+    )?.el
+  }
 
   const kit = createPopup(context, {
     preset: datePickerPreset,
@@ -288,7 +297,11 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
       restore,
       submitted: () => submitted(store.get()),
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
-      focusInput: () => inputElement()?.focus(),
+      // The input whose text isn't a date, else the start's.
+      focusInput: () => (invalidInput() ?? inputElement())?.focus(),
+      invalidInput,
+      // A form-associated root, like a custom element's, reports the inputs' problems itself.
+      rootValidates: () => !!formInternals(element("root")),
       contentProps,
       // The popup lines up with the start input, or the trigger without one.
       anchorElement: () => inputElement() ?? element("trigger"),
