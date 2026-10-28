@@ -18,9 +18,22 @@ const fieldChoiceCardFixture = {
   alone: "Orphan label",
 }
 
+// What every field-radios fixture renders: a Field labelled "Size" around a
+// radio group, with each radio in a Field of its own with a label, between
+// two buttons.
+const fieldRadiosFixture = {
+  label: "Size",
+  name: "size",
+  sizes: [
+    { value: "small", label: "Small" },
+    { value: "medium", label: "Medium" },
+    { value: "large", label: "Large" },
+  ],
+}
+
 function fieldChoiceCardOptions() {
   const params = new URLSearchParams(location.search)
   return { alone: params.has("alone"), later: params.has("later") }
 }
 
-export { fieldChoiceCardFixture, fieldChoiceCardOptions }
+export { fieldChoiceCardFixture, fieldChoiceCardOptions, fieldRadiosFixture }

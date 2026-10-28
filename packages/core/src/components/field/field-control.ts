@@ -74,9 +74,11 @@ function validityOf(el: HTMLElement) {
 }
 
 // The element a field wires to its label and messages: a control of this
-// package, or the first native one.
+// package, or the first native one. A radio is the control of a field around
+// it alone. A field around its whole group finds the group first, since it
+// comes first in the page.
 const controlSelector =
-  '[data-slot="slider-root"],input:not([type="hidden"]):not([aria-hidden="true"]),select,textarea,[data-slot="checkbox-group"],[role="checkbox"],[role="switch"],[role="radiogroup"],[role="combobox"],[role="slider"],[role="spinbutton"],[role="textbox"],[role="listbox"],[data-slot="file-input-trigger"]'
+  '[data-slot="slider-root"],input:not([type="hidden"]):not([aria-hidden="true"]),select,textarea,[data-slot="checkbox-group"],[role="checkbox"],[role="switch"],[role="radiogroup"],[role="radio"],[role="combobox"],[role="slider"],[role="spinbutton"],[role="textbox"],[role="listbox"],[data-slot="file-input-trigger"]'
 
 // A slider with several thumbs is a group the label names, ahead of its
 // thumbs. One thumb is the control itself. Checked here rather than with
