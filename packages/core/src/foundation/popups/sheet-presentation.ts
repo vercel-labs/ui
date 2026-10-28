@@ -6,13 +6,11 @@
 // backdrop part. `createPresentation` loads this module when it's needed.
 import type { SnapPoint } from "../motion/snap-points"
 import { on } from "../kernel/events"
-import { setStyle } from "../platform/style"
+import { setStyle, writeStyle } from "../platform/style"
 import type { Layer } from "../platform/layers"
 import type { Popup } from "./popup"
 import type { SheetConfig } from "./presentation"
 import { attachSheet, parentSheet, sheetLayers, type Sheet } from "./sheet"
-
-const styled = new WeakMap<Document, Set<string>>()
 
 // The dim is the viewport's `::backdrop`: black at 0.2, like iOS, unless the
 // content sets `--sheet-backdrop`. It takes presses, so one on the dim is an
@@ -20,14 +18,12 @@ const styled = new WeakMap<Document, Set<string>>()
 // author style wins.
 function styleBackdrop(host: HTMLElement) {
   const slot = host.getAttribute("data-slot")
-  const doc = host.ownerDocument
-  const known = styled.get(doc) ?? new Set()
-  styled.set(doc, known)
-  if (!slot || known.has(slot)) return
-  known.add(slot)
-  const style = doc.createElement("style")
-  style.textContent = `@layer ui-sdk { :where([data-slot="${slot}"])::backdrop { background: var(--sheet-backdrop, rgb(0 0 0 / 0.2)); pointer-events: auto } }`
-  doc.head.prepend(style)
+  if (!slot) return
+  writeStyle(
+    host.ownerDocument,
+    `ui-sdk-sheet-${slot}`,
+    `@layer ui-sdk { :where([data-slot="${slot}"])::backdrop { background: var(--sheet-backdrop, rgb(0 0 0 / 0.2)); pointer-events: auto } }`,
+  )
 }
 
 function isolate(container: Element, keep: (Element | undefined)[]) {

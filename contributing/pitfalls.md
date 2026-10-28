@@ -41,6 +41,7 @@ Things that cost real debugging time. Read them before you write core or adapter
 - **Collections read on every key or hover** keep a cached order with `createOrder()` from `kernel/order.ts`. `elements()` sorts on each call, so don't call it per key.
 - **Typeahead** reads text through `textOf(el)`, which skips `aria-hidden` text such as shortcuts. Space continues a search only while it still matches.
 - **Popup positioning sleeps.** Something that moves an anchor without scroll, resize, DOM changes, input, loads or an animation starting follows within 500 ms, not the next frame.
+- **Page styles go through `writeStyle`** (`platform/style.ts`), never a `<style>` of their own, which a strict Content Security Policy blocks. Adopted sheets come after the document's, so `@layer ui-sdk` in one is declared after the page's layers and beats them: `writeStyle` adopts a sheet only when the page's `csp-nonce` meta tag has no nonce, and otherwise writes a `<style>` first in the head, with the tag's nonce.
 - **Global side effects** (scroll lock, inert) are reference-counted, use idempotent releases, and restore only what they set, property by property. Another library may change the same element while a lock is held.
 - **Kept elements must not hide their own subtree.** `inertOutside` skips targets inside other targets.
 - **A popup animating out is inert, so presses fall through it.** The layer swallows presses on an exiting popup. Specs that close one popup and press the next trigger wait for `[data-ending-style]` to go away.

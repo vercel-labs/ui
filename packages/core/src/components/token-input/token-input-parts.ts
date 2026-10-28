@@ -20,6 +20,7 @@ import { tokensOf, valueLength } from "./token-input-model"
 import type { TokenInputApi, TokenInputState } from "./token-input-api"
 import { createTokenView } from "./token-input-view"
 import { live } from "../../foundation/kernel/live"
+import { writeStyle } from "../../foundation/platform/style"
 
 function editorState(state: TokenInputState) {
   return { empty: valueLength(state.value) === 0, disabled: isDisabled(state), readOnly: state.readOnly }
@@ -46,13 +47,11 @@ const isSelected = (state: TokenInputState, id: string) => !!id && ` ${state.sel
 // The editor keeps white space and new lines as typed. In the lowest cascade
 // layer, so any class wins.
 function editorStyles(doc: Document) {
-  const id = "ui-sdk-token-input"
-  if (doc.getElementById(id)) return
-  const style = doc.createElement("style")
-  style.id = id
-  style.textContent =
-    '@layer ui-sdk { :where([data-slot="token-input-editor"]) { white-space: pre-wrap; overflow-wrap: anywhere } :where([data-slot="token-input-host"]) { user-select: all } }'
-  doc.head.prepend(style)
+  writeStyle(
+    doc,
+    "ui-sdk-token-input",
+    '@layer ui-sdk { :where([data-slot="token-input-editor"]) { white-space: pre-wrap; overflow-wrap: anywhere } :where([data-slot="token-input-host"]) { user-select: all } }',
+  )
 }
 
 const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => ({

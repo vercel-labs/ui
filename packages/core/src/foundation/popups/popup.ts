@@ -23,6 +23,7 @@ import { inertOutside, lockScroll } from "./modal"
 import { moveFocus, restoreFocus, sourceOf, trackInput } from "../kernel/modality"
 import { isAfter } from "../kernel/order"
 import { isBrowser } from "../platform/env"
+import { writeStyle } from "../platform/style"
 import { activeElement, supportsTopLayer } from "../platform/platform"
 import { resolveBehavior, type PopupBehavior, type PopupBehaviorName } from "./popup-behavior"
 import { registerPopupElement } from "./popup-elements"
@@ -327,25 +328,28 @@ function focusedFrom(el: Element) {
   return (el.getRootNode() as Document | ShadowRoot).activeElement
 }
 
+// The selectors each document's reset covers, shared by every copy of ui-sdk
+// on the page, since they write the same style. Made on first use, so a
+// bundle without popups drops it.
+const resetSelectors = () =>
+  ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.popover-reset@1")] ??=
+    new WeakMap()) as WeakMap<Document, Set<string>>
+
 // Undoes the browser's built-in styles for [popover] (centered, fit-content,
 // a border, padding and a canvas background), so a popup that isn't
 // positioned is a plain fixed element any class can style. In its own cascade
 // layer, declared first in the document, so it loses to every author style,
 // including utilities in layers, and still beats the browser's.
 function resetPopoverStyles(doc: Document, selectors: string[]) {
-  const id = "ui-sdk-popover-reset"
-  let style = doc.getElementById(id) as HTMLStyleElement | null
-  if (!style) {
-    style = doc.createElement("style")
-    style.id = id
-    style.dataset.selectors = ""
-    doc.head.prepend(style)
-  }
-  const known = new Set(style.dataset.selectors!.split(",").filter(Boolean))
+  let known = resetSelectors().get(doc)
+  if (!known) resetSelectors().set(doc, (known = new Set()))
   if (selectors.every((selector) => known.has(selector))) return
   selectors.forEach((selector) => known.add(selector))
-  style.dataset.selectors = [...known].join(",")
-  style.textContent = `@layer ui-sdk { :where(${[...known].map((selector) => `${selector}[popover]`).join(", ")}) { inset: auto; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: visible; color: inherit; background: none } }`
+  writeStyle(
+    doc,
+    "ui-sdk-popover-reset",
+    `@layer ui-sdk { :where(${[...known].map((selector) => `${selector}[popover]`).join(", ")}) { inset: auto; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: visible; color: inherit; background: none } }`,
+  )
 }
 
 const prepared = new WeakSet<string[]>()

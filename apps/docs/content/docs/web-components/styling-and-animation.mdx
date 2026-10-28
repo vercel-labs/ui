@@ -179,3 +179,19 @@ Import `@ui-sdk/web/popover`, then style `data-starting-style` for entry and `da
 The popup stays shown until its exit transition or animation finishes, then becomes hidden. Put exit styles on `data-ending-style`; `data-closed` describes state but doesn't wait for an exit.
 
 Popups provide `--anchor-width` and `--available-height` for sizing. Use those and `data-slot` rather than generated IDs. [Popups](./popups) covers placement and containers.
+
+## Content Security Policy
+
+A few behaviors need a little CSS, like keeping a closed popup hidden or dimming the page behind a sheet, so ui-sdk adds it to the page. It goes before your own styles, in a cascade layer named `ui-sdk`, so your styles win.
+
+A Content Security Policy without `'unsafe-inline'` blocks styles added this way. Give ui-sdk your policy's nonce with a meta tag in the page's `<head>`. Vite reads the same tag for the styles it adds:
+
+```html
+<meta property="csp-nonce" nonce="your-nonce" />
+```
+
+If your policy has no nonce for styles, add the tag without the `nonce` attribute. ui-sdk then adds its CSS as constructed style sheets, which the browser places after yours, so declare its layer at the top of your stylesheet to keep your styles winning:
+
+```css
+@layer ui-sdk;
+```

@@ -42,4 +42,4 @@ export {
 export { type Anchor, type PortalProps, position, type PositionOptions, type PositionProps } from "./position"
 export { pressedScrollbar } from "./scrollbar"
 export { physicalSide, type PhysicalSide, type Side } from "./sides"
-export { enforceHidden, registerUninherited, setStyle } from "./style"
+export { enforceHidden, registerUninherited, setStyle, writeStyle } from "./style"

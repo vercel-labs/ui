@@ -9,6 +9,7 @@ import { dev } from "#dev"
 import { checkName } from "#name-check"
 import type { BaseSlotProps, SlotDefinition } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
+import { writeStyle } from "../platform/style"
 
 /** Props of an item's icon part, in every framework. */
 type ItemIconProps = {
@@ -60,13 +61,11 @@ function mark(el: Element, attribute: "data-has-icon" | "data-has-icons") {
 // a class's `transform`, `rotate` and `translate` alone, and only applies to a
 // box, so a mirrored icon is an inline block unless a class says otherwise.
 function addMirrorRule(doc: Document) {
-  const id = "ui-sdk-mirror"
-  if (doc.getElementById(id)) return
-  const style = doc.createElement("style")
-  style.id = id
-  style.textContent =
-    "@layer ui-sdk{:where([data-mirror][aria-hidden]){display:inline-block}:where([data-mirror][aria-hidden]:dir(rtl)){scale:-1 1}}"
-  doc.head.prepend(style)
+  writeStyle(
+    doc,
+    "ui-sdk-mirror",
+    "@layer ui-sdk{:where([data-mirror][aria-hidden]){display:inline-block}:where([data-mirror][aria-hidden]:dir(rtl)){scale:-1 1}}",
+  )
 }
 
 // Marks the icon's item and list, and calls `found` with the item. Frameworks

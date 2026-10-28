@@ -1,7 +1,7 @@
 import { on } from "../kernel/events"
 import { persistentLayers } from "../platform/layers"
 import { isIOS } from "../platform/env"
-import { setStyle } from "../platform/style"
+import { setStyle, writeStyle } from "../platform/style"
 
 // The page-wide side effects of modal layers: the scroll lock and making the
 // rest of the page inert. Several modals, and other libraries, can hold them
@@ -168,12 +168,7 @@ const guardRule =
 function guardTouch(modal: HTMLElement) {
   const doc = modal.ownerDocument
   const view = doc.defaultView ?? window
-  if (!doc.getElementById("ui-sdk-scroll-guard")) {
-    const style = doc.createElement("style")
-    style.id = "ui-sdk-scroll-guard"
-    style.textContent = guardRule
-    doc.head.append(style)
-  }
+  writeStyle(doc, "ui-sdk-scroll-guard", guardRule)
   const marked = !modal.hasAttribute("data-scroll-guard")
   if (marked) modal.setAttribute("data-scroll-guard", "")
 

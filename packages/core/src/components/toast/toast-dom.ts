@@ -3,6 +3,7 @@
 // focused toast closes. Decisions are pure; the region calls them from `bind`.
 import type { SwipeDirection } from "./swipe"
 import { on } from "../../foundation/kernel/events"
+import { writeStyle } from "../../foundation/platform/style"
 
 // Defaults for the region and its list, in the lowest cascade layer with zero
 // specificity, so any class replaces them. Enough for an unstyled
@@ -18,16 +19,10 @@ const defaults = `@layer ui-sdk {
 :where([data-slot="toast-list"]) { margin: 0; padding: 0; list-style: none }
 }`
 
-// Adds the defaults to a document once, right after the popover reset, which
-// they build on.
+// Adds the defaults to a document once. They build on the popover reset, so
+// the region writes it first, and these come after it.
 function addToastStyles(doc: Document) {
-  if (doc.getElementById("ui-sdk-toast-defaults")) return
-  const style = doc.createElement("style")
-  style.id = "ui-sdk-toast-defaults"
-  style.textContent = defaults
-  const reset = doc.getElementById("ui-sdk-popover-reset")
-  if (reset) reset.after(style)
-  else doc.head.prepend(style)
+  writeStyle(doc, "ui-sdk-toast-defaults", defaults)
 }
 
 /**

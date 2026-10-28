@@ -3,6 +3,7 @@
 // and handles of nested groups that meet drag together, one along each axis.
 import { swallowNextClick } from "../../foundation/drag-and-drop/pointer"
 import { pressedScrollbar } from "../../foundation/platform/scrollbar"
+import { writeStyle } from "../../foundation/platform/style"
 
 /** A handle as the page sees it. */
 type HandleTarget = {
@@ -141,9 +142,11 @@ function updateCursor(doc: Document) {
 
 const sheets = new WeakMap<Document, { css: string; set: (css: string) => void }>()
 
-// One style sheet per document. Constructed sheets need no nonce under a
-// strict Content Security Policy; a <style> element is the fallback. Writing
-// a sheet restyles the whole page, so the same text isn't written again.
+// One style sheet per document, adopted after the page's own, so its
+// important rules win. Constructed sheets need no nonce under a strict
+// Content Security Policy; the page's other ui-sdk styles are the fallback.
+// Writing a sheet restyles the whole page, so the same text isn't written
+// again.
 function setPageStyle(doc: Document, css: string) {
   let sheet = sheets.get(doc)
   if (!sheet) {
@@ -163,13 +166,7 @@ function pageSheet(doc: Document) {
     doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet]
     return (css: string) => sheet.replaceSync(css)
   } catch {
-    const style = doc.createElement("style")
-    style.dataset.uiSdkResizable = ""
-    return (css: string) => {
-      style.textContent = css
-      if (css && !style.isConnected) doc.head.append(style)
-      else if (!css) style.remove()
-    }
+    return (css: string) => writeStyle(doc, "ui-sdk-resizable", css)
   }
 }
 
