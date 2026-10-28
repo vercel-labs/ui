@@ -328,28 +328,29 @@ function focusedFrom(el: Element) {
   return (el.getRootNode() as Document | ShadowRoot).activeElement
 }
 
-// The selectors each document's reset covers, shared by every copy of ui-sdk
-// on the page, since they write the same style. Made on first use, so a
-// bundle without popups drops it.
-const resetSelectors = () =>
-  ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.popover-reset@1")] ??=
-    new WeakMap()) as WeakMap<Document, Set<string>>
+// The selectors each document's reset covers and its text, shared by every
+// copy of ui-sdk on the page, since they write the same style. Made on first
+// use, so a bundle without popups drops it.
+const resets = () =>
+  ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.popover-reset@2")] ??=
+    new WeakMap()) as WeakMap<Document, { selectors: Set<string>; css: string }>
 
 // Undoes the browser's built-in styles for [popover] (centered, fit-content,
 // a border, padding and a canvas background), so a popup that isn't
 // positioned is a plain fixed element any class can style. In its own cascade
 // layer, declared first in the document, so it loses to every author style,
-// including utilities in layers, and still beats the browser's.
+// including utilities in layers, and still beats the browser's. Written again
+// with known selectors too, so a page that replaced its adopted sheets gets
+// it back.
 function resetPopoverStyles(doc: Document, selectors: string[]) {
-  let known = resetSelectors().get(doc)
-  if (!known) resetSelectors().set(doc, (known = new Set()))
-  if (selectors.every((selector) => known.has(selector))) return
-  selectors.forEach((selector) => known.add(selector))
-  writeStyle(
-    doc,
-    "ui-sdk-popover-reset",
-    `@layer ui-sdk { :where(${[...known].map((selector) => `${selector}[popover]`).join(", ")}) { inset: auto; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: visible; color: inherit; background: none } }`,
-  )
+  let reset = resets().get(doc)
+  if (!reset) resets().set(doc, (reset = { selectors: new Set(), css: "" }))
+  const known = reset.selectors
+  if (!selectors.every((selector) => known.has(selector))) {
+    selectors.forEach((selector) => known.add(selector))
+    reset.css = `@layer ui-sdk { :where(${[...known].map((selector) => `${selector}[popover]`).join(", ")}) { inset: auto; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: visible; color: inherit; background: none } }`
+  }
+  if (reset.css) writeStyle(doc, "ui-sdk-popover-reset", reset.css)
 }
 
 const prepared = new WeakSet<string[]>()

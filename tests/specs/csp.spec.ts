@@ -135,3 +135,53 @@ for (const { name, policy, meta, layers } of policies) {
     })
   })
 }
+
+test("a page that replaces its adopted sheets gets ui-sdk's styles back at the next bind", async ({
+  page,
+  open,
+}) => {
+  await serve(page, policies[1])
+  await open("dialog")
+  await page.getByRole("button", { name: "Edit profile" }).click()
+  const content = page.getByRole("dialog", { name: "Profile settings" })
+  const slot = await content.getAttribute("data-slot")
+  const rules = await content.evaluate(async (el, slot) => {
+    const { loadCoreModule } = window as unknown as {
+      loadCoreModule: (name: string) => Promise<Record<string, (doc: Document, selectors?: string[]) => void>>
+    }
+    const [{ enforceHidden }, { resetPopoverStyles }] = await Promise.all([
+      loadCoreModule("style"),
+      loadCoreModule("popup"),
+    ])
+    document.adoptedStyleSheets = []
+    enforceHidden(el.ownerDocument)
+    resetPopoverStyles(el.ownerDocument, [`[data-slot="${slot}"]`])
+    return document.adoptedStyleSheets
+      .flatMap((sheet) => Array.from(sheet.cssRules, (rule) => rule.cssText))
+      .join("\n")
+  }, slot)
+  expect(rules).toContain("display: none !important")
+  expect(rules).toContain("inset: auto")
+  expect(await blockedStyles(page)).toEqual([])
+})
+
+test("a page that replaces its adopted sheets gets the web components' defaults back", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(framework !== "web", "Only custom elements take default displays from ui-sdk.")
+  await serve(page, policies[1])
+  await open("popover")
+  const trigger = page.locator("ui-popover-trigger", { has: page.getByRole("button", { name: "Profile" }) })
+  expect(await trigger.evaluate((el) => getComputedStyle(el).display)).toBe("contents")
+  await page.evaluate(() => {
+    document.adoptedStyleSheets = []
+  })
+  await page.getByRole("button", { name: "Profile" }).click()
+  await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeVisible()
+  await page.keyboard.press("Escape")
+  await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeHidden()
+  expect(await trigger.evaluate((el) => getComputedStyle(el).display)).toBe("contents")
+  expect(await blockedStyles(page)).toEqual([])
+})

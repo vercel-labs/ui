@@ -391,10 +391,12 @@ function sharedSheet(doc: Document) {
   return entry.sheet
 }
 
-// Other documents an element moves into, like an iframe's, get the rules too,
-// and any defined since they were copied.
+// The element's document gets the rules, and any defined since they were
+// copied: another document an element moves into, like an iframe's, and this
+// one again after the page replaces its adopted sheets, which take them when
+// the page's csp-nonce tag has no nonce. Unchanged, it's one lookup.
 function copyStyles(doc: Document) {
-  if (doc !== document && css) writeStyle(doc, documentStyle(), css)
+  if (css) writeStyle(doc, documentStyle(), css)
 }
 
 type Part = {

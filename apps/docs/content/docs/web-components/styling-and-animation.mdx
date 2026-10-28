@@ -198,4 +198,4 @@ A Content Security Policy without `'unsafe-inline'` in `style-src` blocks the CS
 
 With Vite, set `html.cspNonce` in your Vite config to a placeholder, and Vite writes this tag for you. Your server replaces the placeholder with a new nonce on each request. Shadow roots need nothing: ui-sdk adopts constructed style sheets there, which no policy blocks.
 
-If your policy has no nonce for styles, add the tag without the `nonce` attribute, and ui-sdk adopts constructed style sheets on the page too.
+If your policy has no nonce for styles, add the tag without the `nonce` attribute, and ui-sdk adopts constructed style sheets on the page too. If your code replaces `document.adoptedStyleSheets`, ui-sdk adds its sheets back as elements update or are added.
