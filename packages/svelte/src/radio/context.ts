@@ -7,6 +7,8 @@ type RadioGroupContext = PrimitiveHandle<typeof radioGroup>
 const RadioGroupKey = Symbol("radio-group")
 // The value of the radio a part is in.
 const RadioKey = Symbol("radio")
+// The field the group joined, so a radio joins only a field of its own.
+const GroupFieldKey = Symbol("radio-group-field")
 
 function useRadioGroup() {
   const context = getContext<RadioGroupContext | undefined>(RadioGroupKey)
@@ -14,4 +16,4 @@ function useRadioGroup() {
   return context
 }
 
-export { type RadioGroupContext, RadioGroupKey, RadioKey, useRadioGroup }
+export { GroupFieldKey, type RadioGroupContext, RadioGroupKey, RadioKey, useRadioGroup }

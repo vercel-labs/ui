@@ -4,9 +4,9 @@ import {
   type RadioGroupController,
   type RadioGroupValueChangeReason,
 } from "@ui-sdk/core/radio"
-import { defineComponent, h, type PropType } from "vue"
+import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
 import { withElement } from "./create-parts"
-import { useFieldControl } from "./field-context"
+import { type FieldContext, FieldKey, useFieldControl } from "./field-context"
 import {
   optionalBoolean,
   orModel,
@@ -16,6 +16,9 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+
+// The field the group joined, so a radio joins only a field of its own.
+const GroupFieldKey: InjectionKey<FieldContext | null> = Symbol("radio-group-field")
 
 /**
  * Radios that share one value, with one tab stop and arrow keys between them.
@@ -46,6 +49,7 @@ const RadioGroup = withElement(
     },
     slots: Object as PartSlots<typeof radioGroupPrimitive, "group">,
     setup(props, { emit }) {
+      provide(GroupFieldKey, inject(FieldKey, null))
       const field = useFieldControl()
       const group = usePrimitive(radioGroupPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
@@ -85,9 +89,12 @@ const Radio = withElement(
     setup(props) {
       const group = useScope(radioGroupPrimitive)?.handle
       if (!group) throw new Error("Radio group parts must be used inside <RadioGroup>.")
-      const item = () => ({ value: props.value, disabled: props.disabled })
+      // A radio in a field of its own is that field's control. In the group's field, the group is.
+      const nearest = inject(FieldKey, null)
+      const field = nearest && nearest !== inject(GroupFieldKey, null) ? useFieldControl() : null
+      const item = () => ({ value: props.value, disabled: props.disabled || field?.disabled() })
       provideProps(radioGroupPrimitive, "root", item)
-      const radio = usePart(group, "root", item, undefined, "button")
+      const radio = usePart(group, "root", item, undefined, { tag: "button", extend: field?.props })
       return () => [radio(), h("input", group.slot("input", item()))]
     },
   }),

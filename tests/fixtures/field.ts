@@ -20,7 +20,8 @@ const fieldChoiceCardFixture = {
 
 // What every field-radios fixture renders: a Field labelled "Size" around a
 // radio group, with each radio in a Field of its own with a label, between
-// two buttons.
+// the buttons Before and After. A last button disables the first radio, or
+// enables it again.
 const fieldRadiosFixture = {
   label: "Size",
   name: "size",
@@ -29,6 +30,13 @@ const fieldRadiosFixture = {
     { value: "medium", label: "Medium" },
     { value: "large", label: "Large" },
   ],
+  disableFirst: "Disable Small",
+}
+
+// With `?disabled-field`, the Field around the first radio is disabled.
+function fieldRadiosOptions() {
+  const params = new URLSearchParams(location.search)
+  return { disabledField: params.has("disabled-field") }
 }
 
 function fieldChoiceCardOptions() {
@@ -36,4 +44,4 @@ function fieldChoiceCardOptions() {
   return { alone: params.has("alone"), later: params.has("later") }
 }
 
-export { fieldChoiceCardFixture, fieldChoiceCardOptions, fieldRadiosFixture }
+export { fieldChoiceCardFixture, fieldChoiceCardOptions, fieldRadiosFixture, fieldRadiosOptions }
