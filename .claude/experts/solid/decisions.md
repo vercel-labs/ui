@@ -16,7 +16,6 @@ No review has run in this repository yet: pass `--base` to `scripts/expert-scope
 ## Known and open (don't report again, check whether fixed)
 
 - **Parts hear every change** (`WASTED_RECOMPUTE`): the fix records which state keys a part reads.
-- **`useAsyncOptions` on the server**: an `immediate` load still runs during setup.
 - **No `solid-ssr` hydration fixture with author ids.**
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 

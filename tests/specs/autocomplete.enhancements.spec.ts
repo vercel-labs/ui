@@ -86,6 +86,16 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("listbox", { name: "Fruit" })).toBeVisible()
   })
 
+  test("an immediate search runs once when the autocomplete mounts", async ({ page, open }) => {
+    await open("autocomplete", { async: "" })
+    await page.getByRole("button", { name: "Show fruits" }).click()
+    await expect(page.getByRole("option", { name: "Grape" })).toBeVisible()
+    const searches = await page.evaluate(
+      () => (window as unknown as { fruitSearches?: { query: string; aborted: boolean }[] }).fruitSearches,
+    )
+    expect(searches).toEqual([{ query: "", aborted: false }])
+  })
+
   test("a newer search aborts the older one, and only its results land", async ({ page, open }) => {
     await open("autocomplete", { async: "" })
     const searches = () =>

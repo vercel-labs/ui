@@ -4,7 +4,7 @@ import {
   type AsyncOptionsOptions,
   type AsyncOptionsState,
 } from "@ui-sdk/core/async-options"
-import { onDestroy } from "svelte"
+import { onDestroy, onMount } from "svelte"
 
 /**
  * Options loaded for what the user types, latest first. Returns the state,
@@ -19,9 +19,16 @@ function useAsyncOptions<Item>(
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
   options?: AsyncOptionsOptions,
 ) {
-  const helper = createAsyncOptions<Item>(load, options)
-  let state = $state.raw<AsyncOptionsState<Item>>(helper.getState())
+  // A component's script runs on the server too, so an `immediate` load
+  // starts once it mounts. Until then it shows as loading, so nothing says "no match" first.
+  const helper = createAsyncOptions<Item>(load, { ...options, immediate: false })
+  const immediate = !!options?.immediate
+  const initial = helper.getState()
+  let state = $state.raw<AsyncOptionsState<Item>>(immediate ? { ...initial, status: "loading" } : initial)
   const unsubscribe = helper.subscribe(() => (state = helper.getState()))
+  onMount(() => {
+    if (immediate && helper.getState() === initial) helper.reload()
+  })
   onDestroy(() => {
     unsubscribe()
     helper.cancel()

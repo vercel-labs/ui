@@ -4,7 +4,7 @@ import {
   type AsyncOptionsOptions,
   type AsyncOptionsState,
 } from "@ui-sdk/core/async-options"
-import { onScopeDispose, shallowRef } from "vue"
+import { getCurrentInstance, onMounted, onScopeDispose, shallowRef } from "vue"
 
 /**
  * Options loaded for what the user types, latest first. Returns reactive state
@@ -18,9 +18,19 @@ function useAsyncOptions<Item>(
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
   options?: AsyncOptionsOptions,
 ) {
-  const helper = createAsyncOptions<Item>(load, options)
-  const state = shallowRef<AsyncOptionsState<Item>>(helper.getState())
+  // Setup runs on the server too, so an `immediate` load starts once the
+  // component mounts. Until then it shows as loading, so nothing says "no match" first.
+  const helper = createAsyncOptions<Item>(load, { ...options, immediate: false })
+  const immediate = !!options?.immediate
+  const initial = helper.getState()
+  const state = shallowRef<AsyncOptionsState<Item>>(immediate ? { ...initial, status: "loading" } : initial)
   onScopeDispose(helper.subscribe(() => (state.value = helper.getState())))
+  const start = () => {
+    if (immediate && helper.getState() === initial) helper.reload()
+  }
+  // Outside a component, like in a detached effect scope, nothing mounts.
+  if (getCurrentInstance()) onMounted(start)
+  else start()
   onScopeDispose(() => helper.cancel())
   return { state, setQuery: helper.setQuery, reload: helper.reload, loadMore: helper.loadMore }
 }
