@@ -192,6 +192,22 @@ test.describe("buttons", () => {
     await button(page, "Decrease quantity").click()
     await expect(quantity(page)).toHaveValue("4")
   })
+
+  test("a button disabled while it's held stops repeating", async ({ page, open, framework }) => {
+    await open("number-input", { quantity: "5" })
+    const increment = button(page, "Increase quantity")
+    const box = (await increment.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await expect(quantity(page)).toHaveValue("6")
+    await increment.evaluate(
+      (el, web) => (web ? el.closest("ui-number-input-increment")! : el).setAttribute("disabled", ""),
+      framework.startsWith("web"),
+    )
+    await page.clock.runFor(1000)
+    await page.mouse.up()
+    await expect(quantity(page)).toHaveValue("6")
+  })
 })
 
 test.describe("state and forms", () => {

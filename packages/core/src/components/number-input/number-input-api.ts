@@ -313,6 +313,8 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
           large: event.shiftKey,
           touch: event.pointerType !== "mouse",
           event,
+          // The button can be disabled while it's held, and stops there.
+          blocked: () => el.hasAttribute("disabled"),
         })
         const blockMenu = (menu: Event) => menu.preventDefault()
         el.ownerDocument.addEventListener("contextmenu", blockMenu)
@@ -329,7 +331,12 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
       // Returns the release, which commits and says whether the press repeated.
       hold(
         direction: number,
-        { large = false, touch = false, event }: { large?: boolean; touch?: boolean; event?: Event } = {},
+        {
+          large = false,
+          touch = false,
+          event,
+          blocked = () => false,
+        }: { large?: boolean; touch?: boolean; event?: Event; blocked?: () => boolean } = {},
       ) {
         const reason = direction > 0 ? "increment-press" : "decrement-press"
         const size = large ? "large" : "step"
@@ -338,14 +345,14 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         // Repeats until the value reaches its bound.
         const startRepeat = () =>
           (stopRepeat = repeatWhileHeld(
-            () => stepBy(direction, size, reason, event) && canStep(store.get(), direction),
+            () => !blocked() && stepBy(direction, size, reason, event) && canStep(store.get(), direction),
           ))
         const timer = touch ? setTimeout(() => ((held = true), startRepeat()), 400) : undefined
         if (!touch) startRepeat()
         return (canceled = false, end?: Event) => {
           clearTimeout(timer)
           stopRepeat()
-          if (touch && !held && !canceled) stepBy(direction, size, reason, end)
+          if (touch && !held && !canceled && !blocked()) stepBy(direction, size, reason, end)
           commit(end)
           return held
         }
