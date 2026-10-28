@@ -193,6 +193,30 @@ test.describe("buttons", () => {
     await expect(quantity(page)).toHaveValue("4")
   })
 
+  test("<button disabled> inside a step button element stays disabled past a bound", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web component markup only.")
+    await open("number-input", { quantity: "98", "disabled-increment": "button" })
+    const increment = button(page, "Increase quantity")
+    await expect(increment).toHaveAttribute("aria-disabled", "true")
+    await expect(increment).toHaveAttribute("data-disabled", "")
+    const setValue = (value: number) =>
+      quantity(page).evaluate((el, value) => {
+        ;(el.closest("ui-number-input") as HTMLElement & { value: number }).value = value
+      }, value)
+    await setValue(99)
+    await expect(quantity(page)).toHaveValue("99")
+    await setValue(98)
+    await expect(quantity(page)).toHaveValue("98")
+    await expect(increment).toBeDisabled()
+    await increment.click({ force: true })
+    await increment.dispatchEvent("click", { detail: 0 })
+    await expect(quantity(page)).toHaveValue("98")
+  })
+
   test("a button disabled while it's held stops repeating", async ({ page, open, framework }) => {
     await open("number-input", { quantity: "5" })
     const increment = button(page, "Increase quantity")

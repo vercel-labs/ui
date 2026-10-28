@@ -11,12 +11,16 @@ function markup(options: ReturnType<typeof numberInputOptions>) {
     .join("")
   const quantity = options.quantity === null ? "" : ` default-value="${options.quantity}"`
   const amountMin = options.amountMin === undefined ? "" : ` min="${options.amountMin}"`
-  const group = (item: { decrement: string; increment: string }, incrementDisabled = false) => `
+  const group = (item: { decrement: string; increment: string }, incrementDisabled = false) => {
+    const onElement = incrementDisabled && !options.disabledIncrementButton ? " disabled" : ""
+    const onButton = incrementDisabled && options.disabledIncrementButton ? " disabled" : ""
+    return `
     <ui-number-input-group class="number-input-group">
       <ui-number-input-decrement><button aria-label="${item.decrement}">−</button></ui-number-input-decrement>
       <ui-number-input-control><input class="number-input-control" /></ui-number-input-control>
-      <ui-number-input-increment${incrementDisabled ? " disabled" : ""}><button aria-label="${item.increment}">+</button></ui-number-input-increment>
+      <ui-number-input-increment${onElement}><button aria-label="${item.increment}"${onButton}>+</button></ui-number-input-increment>
     </ui-number-input-group>`
+  }
   return `
     <div class="fixture">
       <button>Before</button>

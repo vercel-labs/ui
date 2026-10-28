@@ -40,9 +40,10 @@ const numberInputFixture = {
 // ?quantity=<n> sets where the quantity starts, empty for none, ?required
 // requires the quantity, ?wheel lets the wheel step both, ?disabled and
 // ?readonly apply to both, ?disabled-increment disables only the quantity's
-// increment button, ?locale=<tag> sets the locale, ?negative lets the amount go
-// below 0, ?cancel=<name> cancels changes to that field, ?controlled controls
-// the quantity.
+// increment button (web components write `disabled` on its own <button> with
+// ?disabled-increment=button), ?locale=<tag> sets the locale, ?negative lets
+// the amount go below 0, ?cancel=<name> cancels changes to that field,
+// ?controlled controls the quantity.
 function numberInputOptions() {
   const params = new URLSearchParams(location.search)
   const quantity = params.get("quantity")
@@ -58,6 +59,7 @@ function numberInputOptions() {
     disabled: params.has("disabled"),
     readOnly: params.has("readonly"),
     disabledIncrement: params.has("disabled-increment"),
+    disabledIncrementButton: params.get("disabled-increment") === "button",
     locale: params.get("locale") ?? "en-US",
     amountMin: params.has("negative") ? undefined : numberInputFixture.amount.min,
     cancel: params.get("cancel"),
