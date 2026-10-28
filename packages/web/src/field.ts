@@ -30,8 +30,10 @@ function labelAlone(el: HTMLElement, host: HTMLElement) {
 }
 
 // An error outside any field has no validation behind it, so only a `match`
-// that is present or "true" shows it.
+// that is present or "true" shows it. With as-child, its child may come later,
+// and the error runs this again then.
 function errorAlone(el: HTMLElement, host: HTMLElement) {
+  if (el === host && host.hasAttribute("as-child")) return
   writeAlone(el, "error")
   const match = host.getAttribute("match")
   el.hidden = !fieldOutsideErrorShown({ match: match === "" || match === "true" })

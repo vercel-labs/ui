@@ -140,6 +140,24 @@ test.describe("a label wrapping a field", () => {
     await expect(plain).toBeVisible()
     await expect(child).toBeHidden()
   })
+
+  test("an error outside a field shows a child that arrives after it", async ({ page, open, framework }) => {
+    test.skip(!framework.startsWith("web"), "Web components bind an as-child element when it arrives.")
+    await open("field-choice-card")
+    await page.evaluate(async () => {
+      const error = document.createElement("ui-field-error")
+      error.id = "late"
+      error.setAttribute("as-child", "")
+      document.querySelector(".fixture")!.append(error)
+      await new Promise((resolve) => setTimeout(resolve, 30))
+      error.innerHTML = "<p>Late error</p>"
+      await new Promise((resolve) => setTimeout(resolve, 30))
+    })
+    const late = page.getByText("Late error")
+    await expect(late).toBeHidden()
+    await page.evaluate(() => document.getElementById("late")!.setAttribute("match", "true"))
+    await expect(late).toBeVisible()
+  })
 })
 
 test.describe("errors", () => {
