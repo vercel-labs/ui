@@ -18,6 +18,15 @@ function entryOf(tag: string, entries: readonly string[]) {
 }
 
 /**
+ * The folder a loader at `scriptUrl` loads components from: `web@1.2.0/`
+ * beside `web@1.2.0.js`. A query or hash on the script, like `?v=2`, isn't
+ * part of the folder's name.
+ */
+function componentsBase(scriptUrl: string) {
+  return new URL(new URL(scriptUrl).pathname.replace(/\.js$/, "/"), scriptUrl)
+}
+
+/**
  * Imports the entry of every undefined `ui-` element in `root` from `base`,
  * like `web/tabs.js`, then of every one added later.
  */
@@ -44,4 +53,4 @@ function autoload(base: URL, entries: readonly string[], root: Document = docume
   return () => observer.disconnect()
 }
 
-export { autoload, entryOf }
+export { autoload, componentsBase, entryOf }

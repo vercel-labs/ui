@@ -47,8 +47,8 @@ await write(
         load: (id) =>
           id === loader
             ? [
-                `import { autoload } from ${JSON.stringify(path.join(packageDir, "src/autoload.ts"))}`,
-                `autoload(new URL(import.meta.url.replace(/\\.js$/, "/")), ${JSON.stringify(entries)})`,
+                `import { autoload, componentsBase } from ${JSON.stringify(path.join(packageDir, "src/autoload.ts"))}`,
+                `autoload(componentsBase(import.meta.url), ${JSON.stringify(entries)})`,
               ].join("\n")
             : undefined,
       },
