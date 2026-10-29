@@ -275,7 +275,8 @@ Its own element has `display: contents`, so it doesn't change your layout, and i
 
 <ComponentExample
   name="behaviors/skin-tone"
-  caption="Pick a skin tone, then reload the page. The hand by the greeting is in the HTML in every tone, and CSS shows the one that matches data-skin-tone, so it's right before the page hydrates."
+  tall
+  caption="Pick a skin tone, then reload the page. The hand by the greeting is rendered in every tone, and CSS shows the one that matches data-skin-tone. In your app, where Preferences renders on the server, that's right before the page hydrates; these examples render in the browser, where it starts from the saved tone."
 />
 
 This site's theme switch is built the same way, with a color scheme on `<html>`.
@@ -358,7 +359,7 @@ render()
 
 </FrameworkContent>
 
-Until the page hydrates it returns the server's state, so hydration matches, and right after, the saved one. So content like this changes once the page hydrates, unless the value is kept in a cookie. For a first paint that's right everywhere, style by the attribute, as below.
+Until the page hydrates it returns the server's state, so hydration matches, and right after, the saved one. A render in the browser only, like after a client-side navigation, starts from the saved one. So content like this changes once the page hydrates, unless the value is kept in a cookie. For a first paint that's right everywhere, style by the attribute, as below.
 
 ## Style by Preferences
 

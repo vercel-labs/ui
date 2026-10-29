@@ -131,8 +131,21 @@ function createPreference<const Value extends string>(options: PreferenceOptions
   let state = initialState
   const listeners = new Set<(state: { value: Value }) => void>()
 
+  // What a read shows before anything subscribes: the saved value, read once,
+  // so a render in the browser only, which reads `get`, starts with it.
+  // Hydration starts from `initialState` instead, and the value catches up
+  // once something subscribes.
+  let peeked: string | null | undefined
+  let changed = false
+  const shown = () => {
+    if (synced !== undefined || changed || !storage || storage.readsOnServer) return value
+    peeked ??= storage.get()
+    return isValue(peeked) ? peeked : value
+  }
+
   const get = () => {
-    if (state.value !== value) state = { value }
+    const current = shown()
+    if (state.value !== current) state = { value: current }
     return state
   }
 
@@ -143,6 +156,7 @@ function createPreference<const Value extends string>(options: PreferenceOptions
     options.onValueChange?.(next, details)
     if (details.canceled) return false
     value = next
+    changed = true
     // A value read from storage is already there.
     if (reason !== "restore" && reason !== "storage-sync" && storage?.set(next)) synced = next
     const current = get()
@@ -192,7 +206,11 @@ function createPreference<const Value extends string>(options: PreferenceOptions
     storage,
     /** What the server and the first client render show: `defaultValue`, or the value a cookie keeps. */
     initialState,
-    /** The current state. The same object until the value changes. */
+    /**
+     * The current state, the same object until the value changes. In the
+     * browser it's the saved value even before anything subscribes, for a
+     * render in the browser only. Hydrate from `initialState`.
+     */
     get,
     /**
      * Changes the value, through `onValueChange`, which can cancel it, and

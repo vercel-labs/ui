@@ -19,10 +19,13 @@ function ExamplePreview({
   name,
   framework,
   compact = false,
+  tall = false,
 }: {
   name: string
   framework: Framework
   compact?: boolean
+  // Reserves more room, for an example taller than the default box, so the page doesn't move when it mounts.
+  tall?: boolean
 }) {
   const host = React.useRef<HTMLDivElement>(null)
 
@@ -49,7 +52,7 @@ function ExamplePreview({
       data-example={name}
       className={cn(
         "flex flex-col items-center justify-center px-6 text-foreground sm:px-10",
-        compact ? "min-h-32 py-6" : "min-h-56 py-12",
+        compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
       )}
     >
       <div ref={host} className="contents" />

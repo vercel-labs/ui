@@ -72,6 +72,7 @@ test("reads a saved value back once something subscribes, and goes back to the d
     onValueChange: (_value, details) => reasons.push(details.reason),
   })
   expect(skinTone.initialState.value).toBe("default")
+  expect(skinTone.get().value).toBe("medium")
   const stop = skinTone.subscribe(() => {})
   expect(skinTone.get().value).toBe("medium")
   createLocalStorage("skin-tone").remove()
@@ -156,4 +157,18 @@ test("follow keeps a primitive's key in step after a microtask", async () => {
   expect(state.skinTone.value).toBe("default")
   await new Promise<void>((resolve) => queueMicrotask(resolve))
   expect(state.skinTone.value).toBe("dark")
+})
+
+test("a value set before anything subscribes shows, even when saving it failed", () => {
+  localStorage.setItem("skin-tone", "medium")
+  const storage = createLocalStorage("skin-tone")
+  const skinTone = createPreference({
+    values: tones,
+    defaultValue: "default",
+    attribute: "data-skin-tone",
+    storage: { ...storage, set: () => false },
+  })
+  expect(skinTone.get().value).toBe("medium")
+  skinTone.set("dark")
+  expect(skinTone.get().value).toBe("dark")
 })

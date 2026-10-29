@@ -13,6 +13,7 @@ async function ComponentExample({
   hideCode = false,
   hideTabs = false,
   compact = false,
+  tall = false,
 }: {
   name: string
   framework: Framework
@@ -20,11 +21,12 @@ async function ComponentExample({
   hideCode?: boolean
   hideTabs?: boolean
   compact?: boolean
+  tall?: boolean
 }) {
   const sources = await readExampleSources(name, framework)
   if (!sources) return null
 
-  const preview = <ExamplePreview name={name} framework={framework} compact={compact} />
+  const preview = <ExamplePreview name={name} framework={framework} compact={compact} tall={tall} />
   const source = sources.files.map((file) => (
     <CodeBlock key={file.name} title={file.name} code={file.code} lang={file.lang} />
   ))

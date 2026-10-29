@@ -224,9 +224,11 @@ test("reads a saved choice back once something subscribes, with the reason resto
     onValueChange: (_value, details) => reasons.push(details.reason),
   })
   expect(colorScheme.initialState.value).toBe("system")
-  expect(colorScheme.get().value).toBe("system")
+  // A render in the browser only reads it right away, and hydration starts from initialState.
+  const before = colorScheme.get()
+  expect(before.value).toBe("dark")
   cleanups.push(colorScheme.subscribe(() => {}))
-  expect(colorScheme.get().value).toBe("dark")
+  expect(colorScheme.get()).toBe(before)
   expect(reasons).toEqual(["restore"])
 })
 
