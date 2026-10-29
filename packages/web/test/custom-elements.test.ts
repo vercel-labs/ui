@@ -6,6 +6,7 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { afterAll, beforeAll, describe, expect, test } from "vitest"
+import { entryOf } from "../src/autoload"
 
 const root = path.resolve(import.meta.dirname, "..")
 const pkg = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"))
@@ -98,6 +99,19 @@ describe("custom elements manifest", () => {
     expect(tabs.exports.map((definition) => definition.name)).toEqual(
       expect.arrayContaining(["ui-tabs", "ui-tabs-list", "ui-tabs-tab", "ui-tabs-panel"]),
     )
+  })
+
+  // The browser build's `web.js` loads the entry named like a tag the first time it appears.
+  test("the loader finds an entry that defines every tag", () => {
+    const definedBy = new Map<string, Set<string>>()
+    for (const module of manifest.modules) {
+      const entry = path.basename(module.path, ".js")
+      for (const { name } of module.exports)
+        definedBy.set(name, (definedBy.get(name) ?? new Set()).add(entry))
+    }
+    expect(definedBy.size).toBeGreaterThan(100)
+    const unfound = [...definedBy].filter(([tag, defining]) => !defining.has(entryOf(tag, entries) ?? ""))
+    expect(unfound).toEqual([])
   })
 
   test("describes every element, types every attribute, and names events as the DOM fires them", () => {

@@ -30,6 +30,26 @@ import "@ui-sdk/web/dialog"
 
 Load these imports from your app's browser entry. The root entry, `@ui-sdk/web`, exports helpers and types but registers no elements. Each [component page](./components) shows the tags you can use.
 
+## Without a Build Step
+
+A plain HTML page can load the components from ui-sdk.dev, with nothing to install. Add one script, and each component loads the first time its tags appear on the page:
+
+```html
+<script type="module" src="https://ui-sdk.dev/web@0.js"></script>
+
+<ui-toggle><button>Bold</button></ui-toggle>
+```
+
+`@0` follows the newest 0.x release. To keep a page on one release, use its exact version, like `web@0.4.1.js`.
+
+Each component also has its own file, named like its import, if you'd rather list them:
+
+```html
+<script type="module" src="https://ui-sdk.dev/web@0/toggle.js"></script>
+```
+
+To host the files yourself, copy the `browser` folder from the `@ui-sdk/web` package into your site. It holds `web.js` and the `web` folder it loads from, so keep the two side by side. Browsers only run module scripts from a server, so open the page through one, not from a file on disk.
+
 ## Add Your Styles
 
 Components use light DOM and are unstyled. The examples use Tailwind CSS, but you can use your app's CSS too. [Styling and Animation](./styling-and-animation) covers both approaches.

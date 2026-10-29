@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Settings</title>
+    <script type="module" src="{{files}}/web.js"></script>
+  </head>
+  <body>
+    <ui-popover>
+      <ui-popover-trigger><button>Open popover</button></ui-popover-trigger>
+      <ui-popover-content hidden>
+        <ui-popover-title>Dimensions</ui-popover-title>
+        <input aria-label="Width" value="100%" />
+      </ui-popover-content>
+    </ui-popover>
+
+    <ui-tabs default-value="account">
+      <ui-tabs-list aria-label="Settings">
+        <ui-tabs-tab value="account"><button>Account</button></ui-tabs-tab>
+        <ui-tabs-tab value="password"><button>Password</button></ui-tabs-tab>
+      </ui-tabs-list>
+      <ui-tabs-panel value="account">Account settings</ui-tabs-panel>
+      <ui-tabs-panel value="password">Password settings</ui-tabs-panel>
+    </ui-tabs>
+
+    <ui-dialog>
+      <ui-dialog-trigger><button>Edit profile</button></ui-dialog-trigger>
+      <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+      <ui-dialog-content hidden>
+        <ui-dialog-title>Edit profile</ui-dialog-title>
+        <ui-dialog-close><button>Cancel</button></ui-dialog-close>
+      </ui-dialog-content>
+    </ui-dialog>
+  </body>
+</html>

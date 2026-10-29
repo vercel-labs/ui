@@ -15,6 +15,7 @@
     "test:pr": "bash scripts/test-slot.sh node scripts/affected-specs.mjs",
     "test:sweep": "bash scripts/test-slot.sh node scripts/affected-specs.mjs --all",
     "test:docs": "cd tests && playwright test --config docs.config.ts",
+    "test:browser-build": "cd tests && playwright test --config browser-build.config.ts",
     "build": "pnpm -r --filter \"./packages/**\" build",
     "check:packages": "node scripts/check-packages.mjs",
     "release": "pnpm --filter registry release",
@@ -32,6 +33,7 @@
     "eslint-plugin-svelte": "^3.23.1",
     "eslint-plugin-vue": "^10.12.0",
     "prettier": "^3.9.9",
+    "rolldown": "1.2.12",
     "typescript": "catalog:",
     "typescript-eslint": "^8.72.1"
   }

@@ -80,6 +80,7 @@ const exportsAtEndSkips = {
   "examples/": "Docs examples are snippets to copy, each exporting one Example where it's declared.",
   "apps/docs/app/":
     "Next.js reads route config like `dynamic` only from an `export const` where it's declared.",
+  "apps/docs/proxy.ts": "Next.js reads the proxy's `config` only from an `export const` where it's declared.",
 }
 const exportsAtEndCovers = ["examples/experiments/", "examples/scripts/"]
 

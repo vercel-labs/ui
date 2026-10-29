@@ -84,6 +84,23 @@ jobs:
       - name: Unit tests
         run: pnpm --filter "./packages/*" test
 
+  # The web components built for pages without a bundler, loaded from another
+  # origin like the docs site serves them (tests/browser-build.config.ts).
+  browser-build:
+    name: Browser build
+    needs: plan
+    if: contains(fromJSON('["affected", "affected-engines", "main", "full"]'), needs.plan.outputs.suite)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+        with:
+          browsers: chromium
+
+      - name: Run browser build tests
+        run: pnpm test:browser-build
+
   # Each tier runs a different set of shards, so the matrix is built here.
   # Pull requests and pushes to main run the specs their changes can affect,
   # like `pnpm test:pr` (the affected jobs), since every push running

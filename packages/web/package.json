@@ -63,6 +63,7 @@
   ],
   "files": [
     "dist",
+    "browser",
     "docs",
     "custom-elements.json",
     "html-custom-data.json"
@@ -280,7 +281,7 @@
     }
   },
   "scripts": {
-    "build": "node ../../scripts/build/build-package.mjs",
+    "build": "node ../../scripts/build/build-package.mjs && node ../../scripts/build/browser.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "test": "vitest run"
   },

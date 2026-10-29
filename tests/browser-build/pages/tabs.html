@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tabs</title>
+    <script type="module" src="{{files}}/web/tabs.js"></script>
+  </head>
+  <body>
+    <ui-tabs default-value="account">
+      <ui-tabs-list aria-label="Settings">
+        <ui-tabs-tab value="account"><button>Account</button></ui-tabs-tab>
+        <ui-tabs-tab value="password"><button>Password</button></ui-tabs-tab>
+      </ui-tabs-list>
+      <ui-tabs-panel value="account">Account settings</ui-tabs-panel>
+      <ui-tabs-panel value="password">Password settings</ui-tabs-panel>
+    </ui-tabs>
+  </body>
+</html>

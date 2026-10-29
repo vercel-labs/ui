@@ -1,5 +1,6 @@
 import { createMDX } from "fumadocs-mdx/next"
 import path from "node:path"
+import { newestByMajor, releasesIn, webReleaseHeaders } from "./lib/web-releases.mjs"
 
 const withMDX = createMDX()
 
@@ -17,6 +18,15 @@ const config = {
   // with its function.
   outputFileTracingIncludes: {
     "/examples/**": ["../../examples/dist/**/*.js"],
+  },
+  // The newest `@ui-sdk/web` release of each major, like `{"1":"1.3.0"}`, for `proxy.ts`.
+  env: {
+    WEB_RELEASES: JSON.stringify(
+      Object.fromEntries(newestByMajor(releasesIn(path.join(import.meta.dirname, "public")))),
+    ),
+  },
+  async headers() {
+    return webReleaseHeaders()
   },
   async redirects() {
     const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
