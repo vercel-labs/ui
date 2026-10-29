@@ -3,7 +3,7 @@ title: Popups
 description: Place popup content, control dismissal, and choose when it stays mounted.
 ---
 
-Popovers, menus, selects, and dialogs use the browser's top layer. They render in place, above the page, so you don't need a Portal or Positioner part.
+Popovers, menus, selects, and dialogs use the browser's top layer. They render in place, above the page, so you don't need a Portal or Positioner part. Their events bubble through the elements around them like any other child's, so a click handler or a link wrapped around a popup also gets the clicks inside it. Keep popups outside clickable cards and links.
 
 ## Place the Content
 
