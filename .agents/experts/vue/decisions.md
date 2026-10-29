@@ -20,7 +20,7 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **A trigger that switches instances** keeps its old `PartWatch` subscription until it unmounts.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
-- **A Field with no FieldLabel** points its control's `aria-labelledby` at a label id that doesn't exist, in server markup until hydration.
+- **A Field with no FieldLabel or no FieldDescription** points its control's `aria-labelledby` or `aria-describedby` at an id that doesn't exist, in server markup until hydration. Most fields have no description, so the dangling `aria-describedby` is the common one. The server can't know which parts will render, and every adapter's server tests check that a label names and a description describes the control before hydration, wherever it renders.
 
 ## Revisit
 
