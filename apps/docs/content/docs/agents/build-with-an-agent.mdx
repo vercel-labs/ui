@@ -7,7 +7,9 @@ Tell the agent what you're building, which framework you use, and how the compon
 
 ## Give It the Docs
 
-Each package includes Markdown docs that match the version you installed. For a React project, you can start with:
+Each package includes Markdown docs that match the version you installed. Choose your framework in the page header, then start with:
+
+<FrameworkContent value="react">
 
 ```text
 This project uses React and ui-sdk. Read
@@ -17,7 +19,53 @@ For a custom component, read the relevant sections of docs/core.md
 and docs/rendering.md in the same package.
 ```
 
-`llms.txt` covers the framework's APIs. `core.md` covers the behaviors, and `rendering.md` explains how to render a primitive in your framework. For Vue, Svelte, Solid or Web Components, use that framework's package instead. Web Components uses `@ui-sdk/web`.
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```text
+This project uses Vue and ui-sdk. Read
+node_modules/@ui-sdk/vue/docs/llms.txt to see what's available.
+
+For a custom component, read the relevant sections of docs/core.md
+and docs/rendering.md in the same package.
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```text
+This project uses Svelte and ui-sdk. Read
+node_modules/@ui-sdk/svelte/docs/llms.txt to see what's available.
+
+For a custom component, read the relevant sections of docs/core.md
+and docs/rendering.md in the same package.
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```text
+This project uses Solid and ui-sdk. Read
+node_modules/@ui-sdk/solid/docs/llms.txt to see what's available.
+
+For a custom component, read the relevant sections of docs/core.md
+and docs/rendering.md in the same package.
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```text
+This project uses Web Components and ui-sdk. Read
+node_modules/@ui-sdk/web/docs/llms.txt to see what's available.
+
+For a custom component, read the relevant sections of docs/core.md
+and docs/rendering.md in the same package.
+```
+
+</FrameworkContent>
+
+`llms.txt` covers your framework's APIs. `core.md` covers the behaviors, and `rendering.md` explains how to render a primitive in your framework.
 
 The [Core guides](../core/build-a-component) walk through the code. [All Behaviors](../core/behaviors) helps the agent find a building block for each interaction.
 
@@ -35,6 +83,8 @@ It gives the agent a workflow for choosing behaviors, defining a primitive, rend
 
 Give the agent a concrete example of what someone should be able to do. For an emoji picker:
 
+<FrameworkContent value="react">
+
 ```text
 Build an emoji picker in React using ui-sdk.
 
@@ -44,6 +94,60 @@ grid, and Enter selects an emoji. Announce the selection to screen readers.
 
 Use our existing styles.
 ```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```text
+Build an emoji picker in Vue using ui-sdk.
+
+Add a search input and a grid of emoji. Down from the search input
+should move focus to the first result. Arrow keys move through the
+grid, and Enter selects an emoji. Announce the selection to screen readers.
+
+Use our existing styles.
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```text
+Build an emoji picker in Svelte using ui-sdk.
+
+Add a search input and a grid of emoji. Down from the search input
+should move focus to the first result. Arrow keys move through the
+grid, and Enter selects an emoji. Announce the selection to screen readers.
+
+Use our existing styles.
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```text
+Build an emoji picker in Solid using ui-sdk.
+
+Add a search input and a grid of emoji. Down from the search input
+should move focus to the first result. Arrow keys move through the
+grid, and Enter selects an emoji. Announce the selection to screen readers.
+
+Use our existing styles.
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```text
+Build an emoji picker as a web component using ui-sdk.
+
+Add a search input and a grid of emoji. Down from the search input
+should move focus to the first result. Arrow keys move through the
+grid, and Enter selects an emoji. Announce the selection to screen readers.
+
+Use our existing styles.
+```
+
+</FrameworkContent>
 
 Include details that matter to your app, such as whether the picker opens in a popup or whether a parent component owns the selected value. The agent can choose the behaviors from those requirements.
 
