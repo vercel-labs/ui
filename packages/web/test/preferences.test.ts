@@ -75,3 +75,17 @@ test("moved in one go, it keeps following", async () => {
   skinTone.set("medium")
   expect(element.dataset.skinTone).toBe("medium")
 })
+
+test("preferences assigned before the element upgraded still take effect", () => {
+  const { preferences, skinTone } = setup()
+  // A document with no definitions, so the element stays un-upgraded, like one parsed before its script ran.
+  const other = document.implementation.createHTMLDocument()
+  const element = other.createElement("ui-preferences") as HTMLElement & { preferences: typeof preferences }
+  element.preferences = preferences
+  expect(Object.prototype.hasOwnProperty.call(element, "preferences")).toBe(true)
+  document.body.append(document.adoptNode(element))
+  expect(Object.prototype.hasOwnProperty.call(element, "preferences")).toBe(false)
+  expect(element.preferences).toBe(preferences)
+  skinTone.set("medium")
+  expect(element.dataset.skinTone).toBe("medium")
+})

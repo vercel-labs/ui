@@ -150,7 +150,8 @@ function createPreference<const Value extends string>(options: PreferenceOptions
   }
 
   const set = (next: Value, change: { reason?: ChangeReason; event?: Event } = {}) => {
-    if (next === value || !isValue(next)) return false
+    // Compared with what a read shows, which before anything subscribes can be the saved value.
+    if (next === shown() || !isValue(next)) return false
     const reason = change.reason ?? "imperative"
     const details = createDetails({ reason, event: change.event }, changeSource(reason, change.event))
     options.onValueChange?.(next, details)

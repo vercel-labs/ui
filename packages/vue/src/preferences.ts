@@ -36,14 +36,20 @@ const Preferences = defineComponent({
     // The script is in the server's HTML until then. A client-only render
     // drops it right away, and the browser never runs a script Vue inserts.
     const mounted = shallowRef(false)
+    const element = shallowRef<HTMLElement>()
     let stop = () => {}
     const follow = (list: readonly PreferenceLike[]) => {
       stop()
       const read = () => {
         values.value = list.map((preference) => preference.get().value)
+        // Written to its own element too, since a restore that
+        // `onValueChange` canceled leaves the rendered value as it was, and
+        // Vue wouldn't touch the attribute the script set.
         for (const preference of list)
-          if (preference.global)
-            document.documentElement.setAttribute(preference.attribute, preference.get().value)
+          (preference.global ? document.documentElement : element.value)?.setAttribute(
+            preference.attribute,
+            preference.get().value,
+          )
       }
       const stops = list.map((preference) => preference.subscribe(read))
       read()
@@ -76,6 +82,7 @@ const Preferences = defineComponent({
         "div",
         {
           "data-slot": "preferences",
+          ref: element,
           ...attributes.value,
           // The script changes these attributes before hydration, so they may differ from the server's HTML.
           "data-allow-mismatch": "attribute",

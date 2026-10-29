@@ -1,5 +1,6 @@
 import { preferencesScript, type PreferenceLike } from "@ui-sdk/core"
 import * as React from "react"
+import { mergeRefs } from "./render-element"
 
 /**
  * Props of `Preferences`.
@@ -34,8 +35,9 @@ function useStable(preferences: readonly PreferenceLike[]) {
  * `usePreference`, catches up after hydration.
  * @experimental
  */
-function Preferences({ preferences, nonce, children, style, ...props }: PreferencesProps) {
+function Preferences({ preferences, nonce, children, style, ref, ...props }: PreferencesProps) {
   const list = useStable(preferences)
+  const element = React.useRef<HTMLDivElement>(null)
   // True on the server and while hydrating, when the script is in the HTML. A
   // client-only render leaves it out, since the browser never runs a script React inserts.
   const fromServer = React.useSyncExternalStore(
@@ -57,11 +59,16 @@ function Preferences({ preferences, nonce, children, style, ...props }: Preferen
     () => JSON.stringify(list.map((preference) => preference.initialState.value)),
   )
   React.useEffect(() => {
-    // The current values, not the render's: right after hydration, the render
-    // still has the server's, and the script already put the saved ones on <html>.
+    // The current values, not the render's: right after hydration the render
+    // still has the server's, and the script already put the saved ones in
+    // place. Written to its own element too, since a restore that
+    // `onValueChange` canceled leaves the render's value as it was, and React
+    // wouldn't touch the attribute the script set.
     for (const preference of list)
-      if (preference.global)
-        document.documentElement.setAttribute(preference.attribute, preference.get().value)
+      (preference.global ? document.documentElement : element.current)?.setAttribute(
+        preference.attribute,
+        preference.get().value,
+      )
   }, [list, values])
   const shown = JSON.parse(values) as string[]
   const attributes: Record<string, string> = {}
@@ -74,6 +81,8 @@ function Preferences({ preferences, nonce, children, style, ...props }: Preferen
       data-slot="preferences"
       {...attributes}
       {...props}
+      // `mergeRefs` takes refs to any element, and both of these are to this div.
+      ref={mergeRefs(element, ref ?? null) as React.Ref<HTMLDivElement>}
       style={{ display: "contents", ...style }}
       suppressHydrationWarning
     >

@@ -241,6 +241,7 @@
       },
       "./preferences": {
         "types": "./dist/preferences.d.ts",
+        "solid": "./dist/solid/preferences.jsx",
         "default": "./dist/preferences.js"
       },
       "./progress": {

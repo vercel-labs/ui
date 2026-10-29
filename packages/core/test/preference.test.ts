@@ -172,3 +172,17 @@ test("a value set before anything subscribes shows, even when saving it failed",
   skinTone.set("dark")
   expect(skinTone.get().value).toBe("dark")
 })
+
+test("setting the default before anything subscribes goes through when a different value is saved", () => {
+  localStorage.setItem("skin-tone", "dark")
+  const skinTone = createPreference({
+    values: tones,
+    defaultValue: "default",
+    attribute: "data-skin-tone",
+    storage: createLocalStorage("skin-tone"),
+  })
+  expect(skinTone.get().value).toBe("dark")
+  expect(skinTone.set("default")).toBe(true)
+  expect(skinTone.get().value).toBe("default")
+  expect(localStorage.getItem("skin-tone")).toBe("default")
+})

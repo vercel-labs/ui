@@ -98,3 +98,32 @@ test("a client-only render drops the script, and still shows the saved values", 
   colorScheme.set("dark")
   expect(document.documentElement.dataset.colorScheme).toBe("dark")
 })
+
+test("a restore that onValueChange cancels leaves the default on the attributes the script set", async () => {
+  localStorage.setItem("color-scheme", "dark")
+  localStorage.setItem("skin-tone", "medium")
+  const cancel = (_value: string, details: { cancel: () => void }) => details.cancel()
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+    onValueChange: cancel,
+  })
+  const skinTone = createPreference({
+    values: tones,
+    defaultValue: "default",
+    attribute: "data-skin-tone",
+    storage: createLocalStorage("skin-tone"),
+    onValueChange: cancel,
+  })
+  const root = () => h(Preferences, { preferences: [colorScheme, skinTone] })
+  const container = document.body.appendChild(document.createElement("div"))
+  load(container, await renderToString(createSSRApp(root)))
+  const element = container.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  expect(element.dataset.skinTone).toBe("medium")
+  app = createSSRApp(root)
+  app.mount(container)
+  await settle()
+  expect(skinTone.get().value).toBe("default")
+  expect(element.dataset.skinTone).toBe("default")
+  expect(document.documentElement.dataset.colorScheme).toBe("system")
+})

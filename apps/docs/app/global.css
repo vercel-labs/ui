@@ -57,6 +57,11 @@
   color-scheme: light dark;
 }
 
+/* A part set to "system" inside one that forces a scheme follows the browser again. */
+[data-color-scheme="system"] {
+  color-scheme: light dark;
+}
+
 [data-color-scheme="light"],
 .light {
   color-scheme: light;

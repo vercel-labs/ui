@@ -390,7 +390,8 @@ With Tailwind, make it a variant:
 Map the attribute to the CSS `color-scheme` property, and write each color once with `light-dark()`, which picks a side by the element's `color-scheme`:
 
 ```css
-:root {
+:root,
+[data-color-scheme="system"] {
   color-scheme: light dark;
 }
 
@@ -409,7 +410,7 @@ Map the attribute to the CSS `color-scheme` property, and write each color once 
 }
 ```
 
-`"system"`, or no attribute yet, leaves `light dark`, so the browser's preference picks, with no media query. Form controls and scrollbars follow `color-scheme` too.
+`"system"`, or no attribute yet, is `light dark`, so the browser's preference picks, with no media query. Give `"system"` its own rule rather than leaving it to inherit, so a part set to `"system"` inside one that forces a scheme follows the browser again. Form controls and scrollbars follow `color-scheme` too.
 
 Declare the colors on every element that sets a scheme, not just `:root`. A browser works out `light-dark()` in a custom property where it's declared, and the elements inside inherit the color it picked, so a part of the page with its own scheme, like a dark sidebar with its own `data-color-scheme`, needs its own declaration to pick again.
 

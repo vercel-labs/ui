@@ -1,5 +1,5 @@
 import type { PreferenceLike } from "@ui-sdk/core"
-import { claimTag, whenGone } from "./define-element"
+import { claimTag, upgradeProperties, whenGone } from "./define-element"
 import type { UiPreferencesElement } from "./events"
 
 // <ui-preferences> shows preferences on `data-*` attributes, so CSS styles by
@@ -26,6 +26,8 @@ function definePreferencesElements() {
       }
 
       connectedCallback() {
+        // Set before the element was defined, it would hide the setter.
+        upgradeProperties(this, ["preferences"])
         this.style.display ||= "contents"
         // Moved in one go, it keeps following.
         if (!this.#stop) this.#start()
