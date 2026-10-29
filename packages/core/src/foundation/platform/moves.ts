@@ -13,7 +13,12 @@
 // itself: moving the highlight through a menu runs no positioning frames.
 
 const wakers = new Map<() => void, Element | undefined>()
-let unlisten = () => {}
+// What `unlisten` goes back to once the last popup closes. The old one keeps
+// its aborted signal, whose reason is an error whose stack keeps the closed
+// popup, its anchor and the page around them alive. It's made out here, since
+// a function made in the cleanup would share its scope and keep them too.
+const idle = () => {}
+let unlisten = idle
 
 const wakeOutside = (event: Event) =>
   wakers.forEach((popup, wake) => (event.target instanceof Node && popup?.contains(event.target)) || wake())
@@ -63,7 +68,9 @@ function watchMoves(wake: () => void, popup?: Element) {
   return () => {
     sizes?.disconnect()
     wakers.delete(wake)
-    if (!wakers.size) unlisten()
+    if (wakers.size) return
+    unlisten()
+    unlisten = idle
   }
 }
 

@@ -356,8 +356,8 @@ const budgets = {
       "What stays behind after a menu, select, combobox, popover, dialog, tooltip, accordion or collapsible opens and closes 200 times, the arrow keys move through tabs, a toolbar or a tree 200 times, or a slider, a resizable handle or a scroll area's thumb is dragged 200 times (stepped with keys, or scrolled with the wheel so its scrollbar shows and hides), then mounts and unmounts 200 times, against the page after a warmup: listeners on the window and the document, pending animation frames, open layers, detached parts, and heap after garbage collection.",
     why: "A popup adds document listeners, animation frames and a layer while it's open, a panel animates and observes its size, tabs swap panels and measure their indicator, and a slider, a resizable group or a scroll area adds document listeners and frames while it's dragged or scrolled. A page does each thousands of times. Anything it doesn't give back grows with every open, key, drag or mount, until the page slows or runs out of memory.",
     // Listeners, frames, layers and detached parts come back to exactly what
-    // they were. The last popup closed can stay referenced, which the
-    // warmup counts in the starting values.
+    // they were. Nothing keeps the last popup closed once it unmounts, which
+    // a test checks without a warmup.
     listeners: 0,
     frames: 0,
     layers: 0,
