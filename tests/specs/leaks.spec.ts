@@ -222,7 +222,12 @@ test.describe("leaks", () => {
     test(`unmounting ${withArticle(name)} after it opens and closes once leaves none of its parts alive`, async ({
       page,
       open,
+      framework,
     }) => {
+      // Solid's event delegation defines a `currentTarget` getter on each
+      // event, and V8 keeps the first one on the event's shape, with that
+      // event and its target.
+      test.skip(framework.startsWith("solid"), "Solid keeps the first delegated event's target.")
       await open("leaks", { component: name })
       const cdp = await page.context().newCDPSession(page)
       await openAndClose(page, name, 1)
