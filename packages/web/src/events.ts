@@ -1,3 +1,4 @@
+import type { PreferenceLike } from "@ui-sdk/core"
 import type {
   TreeAnnouncement,
   TreeCheckedChangeReason,
@@ -1144,6 +1145,15 @@ interface UiToastRegionElement extends UiElement<{}>, AttributeProperties<typeof
 }
 
 /**
+ * `<ui-preferences>`: the preferences it shows on their attributes.
+ * @experimental
+ */
+interface UiPreferencesElement extends HTMLElement {
+  /** The preferences to show, from `createPreference` or `createColorScheme`. */
+  preferences: readonly PreferenceLike[]
+}
+
+/**
  * `<ui-overlay-host>`: the registry it renders, and how its toast regions look.
  * @stable
  */
@@ -1490,6 +1500,7 @@ declare global {
     "ui-tree": UiTreeElement
     "ui-toast-region": UiToastRegionElement
     "ui-overlay-host": UiOverlayHostElement
+    "ui-preferences": UiPreferencesElement
     "ui-meter": UiMeterElement
     "ui-separator": UiSeparatorElement
     "ui-progress": UiGaugeElement
@@ -2052,6 +2063,7 @@ export {
   type UiPartElement,
   type UiPasswordInputElement,
   type UiPopoverElement,
+  type UiPreferencesElement,
   type UiRadioElement,
   type UiRadioGroupElement,
   type UiResizableElement,

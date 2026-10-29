@@ -40,6 +40,7 @@
     "./pagination": "./src/entries/pagination.ts",
     "./password-input": "./src/entries/password-input.ts",
     "./popover": "./src/entries/popover.ts",
+    "./preferences": "./src/entries/preferences.ts",
     "./progress": "./src/entries/progress.ts",
     "./radio": "./src/entries/radio.ts",
     "./resizable": "./src/entries/resizable.ts",
@@ -211,6 +212,10 @@
       "./popover": {
         "types": "./dist/entries/popover.d.ts",
         "default": "./dist/entries/popover.js"
+      },
+      "./preferences": {
+        "types": "./dist/entries/preferences.d.ts",
+        "default": "./dist/entries/preferences.js"
       },
       "./progress": {
         "types": "./dist/entries/progress.d.ts",

@@ -185,21 +185,100 @@ The saved value comes back the way a color scheme's does: right away from a cook
 
 `Preferences` shows a list of preferences on their attributes. Pass it color schemes and preferences alike, and put it at the top of `<body>`:
 
+<FrameworkContent value="react">
+
 ```tsx
 import { Preferences } from "@ui-sdk/react/preferences"
 
-;<body>
-  <Preferences preferences={[colorScheme, skinTone]}>
-    <App />
+function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <Preferences preferences={[colorScheme, skinTone]}>{children}</Preferences>
+      </body>
+    </html>
+  )
+}
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<script setup lang="ts">
+import { Preferences } from "@ui-sdk/vue/preferences"
+import { colorScheme, skinTone } from "./preferences"
+</script>
+
+<template>
+  <Preferences :preferences="[colorScheme, skinTone]">
+    <RouterView />
   </Preferences>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<script lang="ts">
+  import { Preferences } from "@ui-sdk/svelte/preferences"
+  import { colorScheme, skinTone } from "$lib/preferences"
+
+  let { children } = $props()
+</script>
+
+<Preferences preferences={[colorScheme, skinTone]}>
+  {@render children()}
+</Preferences>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+import { Preferences } from "@ui-sdk/solid/preferences"
+import type { JSX } from "@solidjs/web"
+
+function App(props: { children: JSX.Element }) {
+  return <Preferences preferences={[colorScheme, skinTone]}>{props.children}</Preferences>
+}
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+Custom elements don't render on the server, so put the script in your page yourself, as `<ui-preferences>`'s first child, and give the element its preferences once it's defined:
+
+```html
+<body>
+  <ui-preferences>
+    <script>
+      /* preferencesScript([colorScheme, skinTone]) from @ui-sdk/core, written in by your server */
+    </script>
+    …
+  </ui-preferences>
+  <script type="module">
+    import "@ui-sdk/web/preferences"
+    import { colorScheme, skinTone } from "./preferences.js"
+
+    document.querySelector("ui-preferences").preferences = [colorScheme, skinTone]
+  </script>
 </body>
 ```
 
-On the server it renders one inline script as its first child. As the page loads, before any bundle, the script reads every storage once and puts each saved value, or the default, on its attribute, so the first paint already shows it. After hydration, `Preferences` keeps the attributes in step with every change. A render in the browser only, like after a client-side navigation, leaves the script out, since the values are already known.
+</FrameworkContent>
+
+On the server it renders one inline script as its first child. As the page loads, before any bundle, the script reads every storage once and puts each saved value, or the default, on its attribute, so the first paint already shows it. Once the page hydrates, `Preferences` keeps the attributes in step with every change. A render in the browser only, like after a client-side navigation, leaves the script out, since the values are already known.
 
 Its own element has `display: contents`, so it doesn't change your layout, and it holds the attributes of preferences that aren't global, for the part of the page inside it. Pass `nonce` if your Content Security Policy only allows inline scripts with one.
 
-This site's theme switch is built this way.
+<ComponentExample
+  name="behaviors/skin-tone"
+  caption="Pick a skin tone, then reload the page. The hand by the greeting is in the HTML in every tone, and CSS shows the one that matches data-skin-tone, so it's right before the page hydrates."
+/>
+
+This site's theme switch is built the same way, with a color scheme on `<html>`.
 
 ### On the Whole Page
 
@@ -209,22 +288,77 @@ Pass `global: true`, and the attribute goes on `<html>`, for something the whole
 const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
 ```
 
-The script puts it on `<html>` before the page paints, even from a cookie, since `Preferences` doesn't render `<html>` itself. Tell your framework the attribute is there before hydration, like React's `suppressHydrationWarning` on `<html>`.
+The script puts it on `<html>` before the page paints, even from a cookie, since `Preferences` doesn't render `<html>` itself. If your framework renders `<html>` and checks its attributes while hydrating, tell it the attribute is expected there, like React's `suppressHydrationWarning`.
 
 ### Read One in a Component
 
 `usePreference` returns a preference's state, or a color scheme's:
 
+<FrameworkContent value="react">
+
 ```tsx
 import { usePreference } from "@ui-sdk/react/preferences"
 
-function Wave() {
+function Greeting() {
   const { value } = usePreference(skinTone)
   return <span>{waves[value]}</span>
 }
 ```
 
-While hydrating it returns the server's state, so the page hydrates without a mismatch, and right after, the saved one. So content like this changes once the page hydrates, unless the value is kept in a cookie. For a first paint that's right everywhere, style by the attribute, as below.
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<script setup lang="ts">
+import { usePreference } from "@ui-sdk/vue/preferences"
+
+const tone = usePreference(skinTone)
+</script>
+
+<template>
+  <span>{{ waves[tone.value] }}</span>
+</template>
+```
+
+It returns a computed ref, so the template reads `tone.value` for the state's `value`.
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<script lang="ts">
+  import { usePreference } from "@ui-sdk/svelte/preferences"
+
+  const tone = usePreference(skinTone)
+</script>
+
+<span>{waves[tone.current.value]}</span>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+import { usePreference } from "@ui-sdk/solid/preferences"
+
+function Greeting() {
+  const tone = usePreference(skinTone)
+  return <span>{waves[tone().value]}</span>
+}
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts
+const render = () => (greeting.textContent = waves[skinTone.get().value])
+skinTone.subscribe(render)
+render()
+```
+
+</FrameworkContent>
+
+Until the page hydrates it returns the server's state, so hydration matches, and right after, the saved one. So content like this changes once the page hydrates, unless the value is kept in a cookie. For a first paint that's right everywhere, style by the attribute, as below.
 
 ## Style by Preferences
 

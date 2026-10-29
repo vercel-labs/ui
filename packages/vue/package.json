@@ -40,6 +40,7 @@
     "./password-input": "./src/password-input.ts",
     "./popover": "./src/popover.ts",
     "./primitive": "./src/primitive.ts",
+    "./preferences": "./src/preferences.ts",
     "./progress": "./src/progress.ts",
     "./radio": "./src/radio.ts",
     "./resizable": "./src/resizable.ts",
@@ -210,6 +211,10 @@
       "./primitive": {
         "types": "./dist/primitive.d.ts",
         "default": "./dist/primitive.js"
+      },
+      "./preferences": {
+        "types": "./dist/preferences.d.ts",
+        "default": "./dist/preferences.js"
       },
       "./progress": {
         "types": "./dist/progress.d.ts",
