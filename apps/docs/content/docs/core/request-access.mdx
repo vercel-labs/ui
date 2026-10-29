@@ -20,21 +20,93 @@ The first line points installs of `@ui-sdk` packages at the registry, and the se
 
 ## 3. Install the Packages
 
-Install the packages. For React:
+Choose your framework in the page header, then install its packages:
+
+<FrameworkContent value="react">
 
 ```bash
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```bash
+npm install @ui-sdk/vue @ui-sdk/core
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```bash
+npm install @ui-sdk/svelte @ui-sdk/core
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```bash
+npm install @ui-sdk/solid @ui-sdk/core
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```bash
+npm install @ui-sdk/web @ui-sdk/core
+```
+
+</FrameworkContent>
+
 ## 4. Set Up Your Agent
 
 Copy this prompt into `AGENTS.md` in your project root, then ask your agent to start building:
+
+<FrameworkContent value="react">
 
 ```text
 This app uses ui-sdk. Before using a component, read
 node_modules/@ui-sdk/react/docs/llms.txt. For a component ui-sdk doesn't ship, read docs/core.md
 ("Build a Component", "All Behaviors") and docs/rendering.md in the same folder.
 ```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```text
+This app uses ui-sdk. Before using a component, read
+node_modules/@ui-sdk/vue/docs/llms.txt. For a component ui-sdk doesn't ship, read docs/core.md
+("Build a Component", "All Behaviors") and docs/rendering.md in the same folder.
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```text
+This app uses ui-sdk. Before using a component, read
+node_modules/@ui-sdk/svelte/docs/llms.txt. For a component ui-sdk doesn't ship, read docs/core.md
+("Build a Component", "All Behaviors") and docs/rendering.md in the same folder.
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```text
+This app uses ui-sdk. Before using a component, read
+node_modules/@ui-sdk/solid/docs/llms.txt. For a component ui-sdk doesn't ship, read docs/core.md
+("Build a Component", "All Behaviors") and docs/rendering.md in the same folder.
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```text
+This app uses ui-sdk. Before using a component, read
+node_modules/@ui-sdk/web/docs/llms.txt. For a component ui-sdk doesn't ship, read docs/core.md
+("Build a Component", "All Behaviors") and docs/rendering.md in the same folder.
+```
+
+</FrameworkContent>
 
 ## 5. Send Feedback and Suggestions
 
