@@ -143,11 +143,12 @@ async function pageMarkdown(
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
-      .replace(/<FrameworkContent\s+value="([^"]+)">/g, (_, value: string) => {
+      .replace(/<\/?FrameworkTabs>\n?/g, "")
+      .replace(/<Framework(?:Content|Tab)\s+value="([^"]+)">/g, (_, value: string) => {
         const label = frameworks[value as Framework]?.label ?? value
         return `**${label}**\n`
       })
-      .replace(/<\/FrameworkContent>\n?/g, "")
+      .replace(/<\/Framework(?:Content|Tab)>\n?/g, "")
       .replace(/<Collapsible\b([^>]*)>/g, (_, attrs: string) => {
         const { title } = attributes(attrs)
         return title ? `**${title}**\n` : ""

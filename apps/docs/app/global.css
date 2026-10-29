@@ -165,6 +165,21 @@ html {
   padding-inline: var(--pad-start) var(--code-pad);
 }
 
+[data-code-frame] pre[data-text] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+
+  & code {
+    width: auto;
+  }
+
+  & .line.step {
+    display: inline-block;
+    padding-inline-start: 3ch;
+    text-indent: -3ch;
+  }
+}
+
 [data-code-frame] .line:is(.highlighted, .diff) {
   display: inline-block;
   min-width: calc(100% + var(--pad-start) + var(--code-pad));
@@ -200,7 +215,7 @@ html {
   opacity: 1;
 }
 
-[data-code-frame] pre:has(.line + .line) {
+[data-code-frame] pre:not([data-text]):has(.line + .line) {
   --pad-start: 0px;
 
   & code {

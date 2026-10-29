@@ -10,8 +10,10 @@ const themes = { light: "github-light-default", dark: "github-dark-default" } as
 
 // The `pre` that MDX code fences render, already highlighted by Shiki. A fence
 // with `title="rating.ts"` gets a header with the file's name and icon, and the
-// copy button sits in it.
+// copy button sits in it. A ```text prompt fence gets a header with a labeled
+// copy button.
 function Pre({ className, style, title, icon, ...props }: ComponentProps<"pre"> & { icon?: string }) {
+  const prompt = "data-prompt" in props
   return (
     <div data-code-frame="" className={cn("relative my-5 overflow-hidden", frame)}>
       {title && (
@@ -23,6 +25,15 @@ function Pre({ className, style, title, icon, ...props }: ComponentProps<"pre"> 
           <CopyButton className="-my-1.5 -me-2 ms-auto" />
         </div>
       )}
+      {!title && prompt && (
+        <div
+          data-prompt-bar=""
+          className="flex items-center border-b border-border/60 px-4 py-2 text-[13px] text-subtle"
+        >
+          Prompt
+          <CopyButton label="Copy prompt" className="-my-1 -me-2 ms-auto" />
+        </div>
+      )}
       <pre
         {...props}
         style={{ ...style, backgroundColor: undefined }}
@@ -31,7 +42,7 @@ function Pre({ className, style, title, icon, ...props }: ComponentProps<"pre"> 
           "max-h-[32rem] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[13px] leading-[1.7] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]",
         )}
       />
-      {!title && <CopyButton className="absolute top-2 end-2 bg-background" />}
+      {!title && !prompt && <CopyButton className="absolute top-2 end-2 bg-background" />}
     </div>
   )
 }

@@ -3,11 +3,34 @@ title: Introduction
 description: Use unstyled Vue components with keyboard, focus, and screen reader support built in.
 ---
 
+<Callout>
+
+This section covers using ui-sdk in Vue.
+
+- To browse the components library, see [Components](./components).
+- To build your own with `@ui-sdk/core`, see [Core](/docs/core).
+
+</Callout>
+
 `@ui-sdk/vue` gives you components such as Select, Dialog, and Tabs, built on ui-sdk's behaviors. They handle interactions, focus, and ARIA attributes. You choose their markup and styles.
 
 Import the parts you need, put them together in your app, and style them with your own CSS. The examples use Tailwind CSS.
 
-## Get Started
+## Quick Start
+
+Copy this prompt into your agent:
+
+```text prompt
+Set up ui-sdk in this Vue project. It needs Vue 3.5 or newer.
+
+1. Install @ui-sdk/vue and @ui-sdk/core with the project's package manager.
+2. Add a note to AGENTS.md, creating it if needed: before using ui-sdk, read node_modules/@ui-sdk/vue/docs/llms.txt. To build a new component, read docs/core.md and docs/rendering.md in the same folder.
+3. If you support skills, run: npx skills add vercel-labs/ui --skill ui-sdk-create-component
+```
+
+It installs ui-sdk and points your `AGENTS.md` at the docs that ship with the packages.
+
+## Set It Up Yourself
 
 <Cards>
   <Card title="Installation" href="./installation" description="Install the packages in your Vue app." />
@@ -16,8 +39,4 @@ Import the parts you need, put them together in your app, and style them with yo
 
 ## Explore the Components
 
-Browse [Components](./components) to find what you need. Each page shows the component's parts, examples of what you can do with it, and its API.
-
 The [Using Components guides](./parts-and-composition) cover patterns the components share, such as composing parts, handling state, and styling.
-
-For a component of your own, start with [Build a Component](../core/build-a-component), then [render its parts in Vue](./rendering).

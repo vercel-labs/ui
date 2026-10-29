@@ -6,6 +6,7 @@ import { applyMdxPreset } from "fumadocs-mdx/config"
 import { defineDocs } from "fumadocs-mdx/macro"
 import { highlightLines } from "./highlight-lines"
 import { remarkInstall } from "./remark-install"
+import { textBlocks } from "./text-blocks"
 
 const docs = defineDocs({
   dir: "content/docs",
@@ -16,7 +17,7 @@ const docs = defineDocs({
       rehypeCodeOptions: {
         themes: { light: "github-light-default", dark: "github-dark-default" },
         // Fumadocs' own, for `// [!code highlight]`, `[!code ++]`, `[!code word:x]` and `[!code focus]`.
-        transformers: [...(rehypeCodeDefaultOptions.transformers ?? []), highlightLines],
+        transformers: [...(rehypeCodeDefaultOptions.transformers ?? []), highlightLines, textBlocks],
       },
       remarkPlugins: (plugins) => [remarkInstall, ...plugins],
       remarkNpmOptions: { persist: { id: "package-manager" } },

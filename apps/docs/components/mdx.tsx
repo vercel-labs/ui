@@ -12,7 +12,13 @@ import { card } from "./docs/frame"
 import { Card, ComponentGrid } from "./docs/component-grid"
 import { FrameworkLink } from "./docs/framework-link"
 import { FrameworkContent } from "./docs/framework-content"
-import { CodeBlockTab, CodeBlockTabs, CodeBlockTabsList, CodeBlockTabsTrigger } from "./docs/code-tabs"
+import {
+  CodeBlockTab,
+  CodeBlockTabs,
+  CodeBlockTabsList,
+  CodeBlockTabsTrigger,
+  FrameworkTabs,
+} from "./docs/code-tabs"
 import { SpecList } from "./spec-list"
 import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tables"
 
@@ -92,10 +98,15 @@ function getMDXComponents(
     CodeBlockTabsList,
     CodeBlockTabsTrigger,
     CodeBlockTab,
+    FrameworkTabs,
+    FrameworkTab: CodeBlockTab,
     FrameworkContent,
     Collapsible,
     Callout: ({ children }: { children: ReactNode }) => (
-      <aside role="note" className={cn(card, "my-6 px-4 py-3 [&>p]:my-0")}>
+      <aside
+        role="note"
+        className={cn(card, "my-6 px-4 py-3 [&>p]:my-0 [&>ul]:mt-1.5 [&>ul]:mb-0 [&>ul]:gap-0.5")}
+      >
         {children}
       </aside>
     ),
