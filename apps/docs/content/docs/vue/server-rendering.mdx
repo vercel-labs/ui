@@ -40,6 +40,100 @@ onMounted(() => {
 
 Both initial renders show “Loading language…”. Once mounted, the paragraph shows the browser’s language. Read other browser-only values in the same place, or in an event handler.
 
+## Saved Preferences and Storage
+
+Preferences like a color scheme or an emoji skin tone are saved in the browser, so the server can't render them. [Preferences and Devices](../core/behaviors/preferences) covers the preferences themselves; this is how they fit server rendering.
+
+### Show Them Before Hydration
+
+Render `Preferences` around your app. On the server it renders one inline script as its first child, which puts every saved value on its `data-*` attribute as the page loads, before Vue hydrates, so CSS that selects those attributes is right from the first paint:
+
+```vue title="app.vue"
+<script setup lang="ts">
+import { Preferences } from "@ui-sdk/vue/preferences"
+import Page from "./page.vue"
+import { colorScheme, skinTone } from "./preferences"
+
+const preferences = [colorScheme, skinTone]
+</script>
+
+<template>
+  <Preferences :preferences="preferences">
+    <Page />
+  </Preferences>
+</template>
+```
+
+Its element marks its attributes with `data-allow-mismatch="attribute"`, since the script changes them before hydration. A preference made with `global: true` goes on `<html>` instead. Pass `nonce` if your Content Security Policy only allows inline scripts with one.
+
+Content that reads a preference through `usePreference` renders the default on the server and the saved value once mounted. Style by the attribute instead wherever the first paint has to be right, as [Style by Preferences](../core/behaviors/preferences#style-by-preferences) shows.
+
+### Read a Cookie on the Server
+
+A preference kept in a cookie can render on the server too, content included. Read the request's `Cookie` header on the server, however your server or framework gives you the request, and pass it to your app as a prop, like `createSSRApp(App, { cookie })`. `setup` runs once per request, so create the preference there and share it with `provide`:
+
+```vue title="app.vue"
+<script setup lang="ts">
+import { createCookieStorage, createPreference } from "@ui-sdk/core"
+import { Preferences } from "@ui-sdk/vue/preferences"
+import { provide } from "vue"
+import Page from "./page.vue"
+
+const props = defineProps<{ cookie: string | null }>()
+const skinTone = createPreference({
+  values: ["default", "light", "medium", "dark"],
+  defaultValue: "default",
+  attribute: "data-skin-tone",
+  storage: createCookieStorage("skin-tone", { cookie: props.cookie }),
+})
+provide("skin-tone", skinTone)
+</script>
+
+<template>
+  <Preferences :preferences="[skinTone]">
+    <Page />
+  </Preferences>
+</template>
+```
+
+The server reads the value from `cookie`, and the browser from `document.cookie`, so both render it and hydration matches.
+
+### Render the Storage Script Yourself
+
+`Preferences` is the usual way. For one component that keeps its own value, like a toolbar's density, a storage's `script` returns the same kind of inline script for a single element. Render it right after the element, since it writes to the element right before it. Vue templates leave `<script>` tags out, so render it from a render function:
+
+```ts title="toolbar.ts"
+import { createLocalStorage } from "@ui-sdk/core"
+import { defineComponent, h, onMounted, shallowRef } from "vue"
+
+const density = createLocalStorage("density")
+const script = density.script({ attribute: "data-density", values: ["comfortable", "compact"] })
+
+const Toolbar = defineComponent((_props, { slots }) => {
+  const value = shallowRef("comfortable")
+  // The script is in the server's HTML until then.
+  const mounted = shallowRef(false)
+  onMounted(() => {
+    value.value = density.get() === "compact" ? "compact" : "comfortable"
+    mounted.value = true
+  })
+  return () => [
+    h("div", { "data-density": value.value, "data-allow-mismatch": "attribute" }, slots.default?.()),
+    mounted.value || !script ? null : h("script", { innerHTML: script }),
+  ]
+})
+
+export { Toolbar }
+```
+
+- **Only from the server.** The browser never runs a script Vue inserts, so drop it once mounted.
+- **The element differs until hydration.** The script changes its attribute before Vue hydrates, so mark it with `data-allow-mismatch="attribute"`. Once mounted, render the saved value from state, as above.
+- **Shared by ID.** Every script with the same storage kind and ID reads the storage once, however many elements render it, and the scripts are identical, so compression shrinks the repeats.
+- **Only safe values.** Any script on your site can write the saved value, so `script` only sets attributes that start with `data-`, and only to one of `values`.
+- **Not for cookies.** A cookie storage's `script` returns undefined, since the server reads the cookie and renders the value itself.
+
+To run before the page's content at all, render `preferencesScript([...])` from `@ui-sdk/core` in `<head>` yourself, wherever your server writes it. Only global preferences make sense there, since the others go on the script's parent element.
+
 ## Keep IDs and Values Consistent
 
 Use the same initial component values on the server and client. For example, do not render an open dialog on the server and a closed one for the first client render.

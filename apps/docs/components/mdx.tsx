@@ -70,7 +70,7 @@ function getMDXComponents(
       const url = resolve(href)
       const className =
         "font-normal text-foreground underline decoration-foreground/25 underline-offset-[3px] transition-colors hover:decoration-foreground"
-      if (/^\/docs\/(components|utilities|rendering)\b/.test(url))
+      if (/^\/docs\/(components|utilities|rendering|server-rendering)\b/.test(url))
         return <FrameworkLink href={url} className={className} {...props} />
       return url.startsWith("/") || url.startsWith("#") ? (
         <Link href={url} className={className} {...props} />

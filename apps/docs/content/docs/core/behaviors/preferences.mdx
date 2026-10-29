@@ -279,7 +279,7 @@ Its own element has `display: contents`, so it doesn't change your layout, and i
   caption="Pick a skin tone, then reload the page. The hand by the greeting is rendered in every tone, and CSS shows the one that matches data-skin-tone. In your app, where Preferences renders on the server, that's right before the page hydrates; these examples render in the browser, where it starts from the saved tone."
 />
 
-This site's theme switch is built the same way, with a color scheme on `<html>`.
+This site's theme switch is built the same way, with a color scheme on `<html>`. Your framework's [server rendering guide](/docs/server-rendering#saved-preferences-and-storage) shows where `Preferences` goes in a server-rendered app, and how to read a cookie there.
 
 ### On the Whole Page
 
@@ -549,7 +549,7 @@ const script = colorSchemeStorage.script({
 
 Style from the attribute, and the first paint shows the saved value. The component's state catches up after hydration, through `"restore"`, so content that depends on the value, like a label, changes then. The root differs from the server's HTML until it does, so tell your framework to expect it, like React's `suppressHydrationWarning`.
 
-Every script with the same kind and ID reads the storage once, however many components render it, and the scripts are identical, so compression shrinks the repeats to a few bytes. For preferences, [`Preferences`](#show-them-with-preferences) renders one script for all of them instead.
+Every script with the same kind and ID reads the storage once, however many components render it, and the scripts are identical, so compression shrinks the repeats to a few bytes. For preferences, [`Preferences`](#show-them-with-preferences) renders one script for all of them instead. Your framework's [server rendering guide](/docs/server-rendering#render-the-storage-script-yourself) shows how to render the script there, which differs a little from one framework to the next.
 
 The saved value comes from the browser, where any script on your site can write it, so `script` only sets attributes that start with `data-`, and only to one of `values`. Anything else leaves the root as the server rendered it. A cookie needs no script, so its `script` returns undefined: the server renders its value.
 

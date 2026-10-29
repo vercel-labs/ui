@@ -30,7 +30,7 @@ const config = {
   },
   async redirects() {
     const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
-    const pages = "components|utilities|rendering"
+    const pages = "components|utilities|rendering|server-rendering"
     return [
       {
         source: `/docs/:framework(${frameworks.join("|")})/:folder(hooks|utilities)/observe`,
