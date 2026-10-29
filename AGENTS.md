@@ -40,7 +40,7 @@ Component libraries cover familiar patterns like menus, dialogs and tabs. Real p
 ## Skills
 
 - `.agents/skills/` holds the skills for working on ui-sdk: `ui-sdk-write-code`, `ui-sdk-unslop` and `ui-sdk-expert-review`. [Its README](.agents/skills/README.md) says when to use each. Plain Markdown, usable from any harness: read `SKILL.md` and follow it.
-- `skills/ui-sdk-create-component` ships to people building their own components on `@ui-sdk/core`.
+- `packages/core/skills/ui-sdk-create-component` ships inside `@ui-sdk/core` to people building their own components on it. `skills.sh.json` points `npx skills add vercel-labs/ui` at that folder. The skills in `.agents/skills/` are marked `internal`, so it doesn't offer them.
 
 ## Framework experts
 

@@ -98,7 +98,11 @@ function index(name: string, framework: Framework | undefined) {
 
 The ui-sdk docs for the framework-free core, as Markdown, for the release this package came from. Each framework's package has its own pages, like \`@ui-sdk/react/docs\`.
 
-${llms}${shared}`
+${llms}${shared}
+## Skills
+
+- [ui-sdk-create-component](../skills/ui-sdk-create-component/SKILL.md): builds a component ui-sdk doesn't ship, from the behaviors in this package.
+`
   const list = (folder: string) =>
     frameworkFiles(framework)
       .filter(({ file }) => file.startsWith(`${folder}/`))

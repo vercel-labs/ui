@@ -15,13 +15,12 @@ Everything you need to work on ui-sdk, for people and agents alike. Start with t
 
 ## The repo
 
-- `packages/core`: the behaviors, primitives and kernel, with no framework. `packages/react`, `vue`, `svelte`, `solid` and `web` render them.
+- `packages/core`: the behaviors, primitives and kernel, with no framework, and in `skills/` the skill that ships to people building with ui-sdk (`ui-sdk-create-component`). `packages/react`, `vue`, `svelte`, `solid` and `web` render them.
 - `apps/docs`: the docs site, which also serves the compiled examples.
 - `apps/registry`: the private package registry ([REGISTRY.md](../apps/registry/REGISTRY.md)).
 - `apps/playground`: the fixtures the browser specs open, one folder per component and framework.
 - `examples`: every docs example, in every framework, compiled by Vite into `examples/dist`.
 - `tests`: the Playwright specs, fixtures and perf budgets.
-- `skills`: the skill that ships to people building with ui-sdk (`ui-sdk-create-component`).
 - `.claude`: one expert per framework, and the skill that runs their review.
 - `scripts`: lint, formatting, the test plan, package checks and docs generation.
 

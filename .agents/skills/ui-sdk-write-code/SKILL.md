@@ -1,6 +1,8 @@
 ---
 name: ui-sdk-write-code
 description: Writes and edits ui-sdk code (core, the React, Vue, Svelte, Solid and web component adapters, examples, specs and scripts) the way an expert in that framework would, then checks it with the linters, the framework expert's checklist and a cold read. Use whenever you write or change code in this repo, before you call the change done.
+metadata:
+  internal: true
 ---
 
 # Write ui-sdk code

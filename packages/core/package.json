@@ -76,7 +76,8 @@
   "sideEffects": false,
   "files": [
     "dist",
-    "docs"
+    "docs",
+    "skills"
   ],
   "publishConfig": {
     "main": "./dist/index.js",
