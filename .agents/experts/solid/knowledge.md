@@ -1,8 +1,8 @@
 # Solid expert: knowledge
 
-What the Solid expert knows. Part 1 is Solid 2 itself, part 2 is how `@ui-sdk/solid` is built, part 3 is the checklist a review walks. Pinned to what the repo installs: `solid-js` 2.0.0-rc.14 with `@solidjs/web` and `@solidjs/signals` (peer range `>=2.0.0-rc.14 <3`). Solid 2 isn't final: when an rc changes an API, update this file.
+What the Solid expert knows. Part 1 is Solid 2 itself, part 2 is how `@ui-sdk/solid` is built, part 3 is the checklist a review walks. Pinned to what the repo installs: `solid-js` 2.0.0-rc.19 with `@solidjs/web` and `@solidjs/signals` (peer range `>=2.0.0-rc.19 <3`). Solid 2 isn't final: when an rc changes an API, update this file.
 
-Last checked: 2026-10-28, against `node_modules/solid-js` 2.0.0-rc.14 (exports and `.d.ts` JSDoc read; Solid 2's own docs are thin, so the types are the source).
+Last checked: 2026-10-28, against `node_modules/solid-js` 2.0.0-rc.14 (exports and `.d.ts` JSDoc read; Solid 2's own docs are thin, so the types are the source). Moved to rc.19 on 2026-10-29: the adapter builds, typechecks and passes its suites there, but the table below wasn't read again.
 
 ## 1. Solid 2, as its types and docs write it
 

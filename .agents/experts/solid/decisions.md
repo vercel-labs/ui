@@ -7,7 +7,9 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 
 ## Settled
 
-- **Solid 2 only** (`solid-js >=2.0.0-rc.14`). `ownedWrite` workarounds go when Solid 2 is final.
+- **Solid 2 only** (`solid-js >=2.0.0-rc.19`). `ownedWrite` workarounds go when Solid 2 is final.
+- **rc.19 is the floor** (2026-10-29): before it, `@solidjs/web`'s event delegation defined a `currentTarget` getter on each delegated event and left it there. V8 keeps the first such getter on the shape every event of that type shares, so the first delegated keydown or click kept its event and target alive for the life of the page, and with them the page that target was in. rc.19 deletes the getter after dispatch. `leaks.spec.ts` covers it in the `solid` project.
+- **The playground turns off Solid's Performance panel tracks** (`performanceTracks: false`): on the dev server they keep every scope they saw, with its element.
 - **`render` is the only way to render your own element.** No `as`, no `<Dynamic>` prop.
 - **Solid's dev diagnostics are a gate**: `packages/solid/test/diagnostics.test.tsx` and the playground's checker fail on any code but the allowed ones.
 - **Form component dropped.**

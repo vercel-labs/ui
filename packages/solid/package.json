@@ -364,11 +364,11 @@
   },
   "peerDependencies": {
     "@ui-sdk/core": "workspace:^",
-    "solid-js": ">=2.0.0-rc.14 <3",
-    "@solidjs/web": ">=2.0.0-rc.14 <3"
+    "solid-js": ">=2.0.0-rc.19 <3",
+    "@solidjs/web": ">=2.0.0-rc.19 <3"
   },
   "devDependencies": {
-    "@solidjs/compiler": "2.0.0-rc.14",
+    "@solidjs/compiler": "2.0.0-rc.19",
     "@solidjs/vite-plugin": "catalog:",
     "@solidjs/web": "catalog:",
     "@ui-sdk/core": "workspace:*",

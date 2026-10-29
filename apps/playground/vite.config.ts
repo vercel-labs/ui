@@ -15,7 +15,10 @@ export default defineConfig({
     react({ exclude: solidFiles }),
     vue(),
     svelte(),
-    solid({ include: solidFiles, ssr: true }),
+    // Solid's dev server paints Performance panel tracks by default, which
+    // keep every scope they saw with its element, so the leak specs would
+    // find them alive. Builds never paint them.
+    solid({ include: solidFiles, ssr: true, performanceTracks: false }),
     solidSsr(),
     tailwind(),
     ssrFixtures(),
