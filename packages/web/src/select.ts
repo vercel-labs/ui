@@ -1,6 +1,6 @@
 import { select, type ListData, type SelectApi, type SelectOptions } from "@ui-sdk/core/select"
 import { selectAllKey, selectItemIcons, selectSelectAll } from "@ui-sdk/core/renderer"
-import { autoId, defineParts, wrappedButton, wrappedChild } from "./define-element"
+import { autoId, createParts, wrappedButton, wrappedChild } from "./define-element"
 import { popupKinds, popupState, sheetPortal } from "./popup"
 import {
   adoptDefaultValue,
@@ -45,7 +45,7 @@ const markupLists = new WeakMap<Element, Element | null>()
 // searches it; the items then go in a <ui-select-list>, which renders the
 // data items that match when it has none of its own.
 function defineSelectElements() {
-  defineParts(select, {
+  createParts(select, {
     root: {
       tag: owner,
       defaults: { loop: true, dismissible: true },

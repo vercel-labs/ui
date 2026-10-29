@@ -26,10 +26,9 @@ import { watchWhileKept } from "./watchers"
 
 /**
  * Defines a component's behavior without its markup: its state, an api that
- * changes it, and its parts, called slots. Every adapter renders the result:
- * `createParts` in React, Vue, Solid and Svelte, and `defineParts` for custom
- * elements, which read `options` and each slot's `props` to tell them from an
- * element's own. Each slot's element gets `data-slot="<name>-<slot>"`.
+ * changes it, and its parts, called slots. Every adapter renders the result
+ * with `createParts`, which reads `options` and each slot's `props` to tell
+ * them from an element's own. Each slot's element gets `data-slot="<name>-<slot>"`.
  *
  * @example
  * export const disclosure = definePrimitive({

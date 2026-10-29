@@ -16,7 +16,7 @@ import type { datePicker } from "@ui-sdk/core/date-picker"
 import {
   claimTag,
   definePart,
-  defineParts,
+  createParts,
   findOwner,
   instanceOf,
   ownButton,
@@ -72,7 +72,7 @@ const calendarLiveState = {
 //   <ui-calendar-weeks><template><ui-calendar-day class="day"></ui-calendar-day></template></ui-calendar-weeks>
 // </ui-calendar-grid>
 function defineCalendarElements() {
-  defineParts(calendar, {
+  createParts(calendar, {
     root: {
       tag: "ui-calendar",
       display: "block",

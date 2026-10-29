@@ -57,7 +57,7 @@ test("each framework's rendering guide explains its helpers", async ({ page }) =
   await expect(page.getByText("usePrimitive", { exact: true }).first()).toBeVisible()
   await page.goto("/docs/web-components/rendering")
   await expect(page.getByRole("heading", { name: "Define the Elements" })).toBeVisible()
-  await expect(page.getByText("defineParts", { exact: true }).first()).toBeVisible()
+  await expect(page.getByText("createParts", { exact: true }).first()).toBeVisible()
 })
 
 test("Observe lives in Core Tools and old framework URLs redirect", async ({ page }) => {

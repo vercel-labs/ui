@@ -1,5 +1,5 @@
 import { scrollArea } from "@ui-sdk/core/scroll-area"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 const owner = "ui-scroll-area"
 
@@ -23,7 +23,7 @@ const thumbAxis = (el: HTMLElement) => {
 //
 // The controller's methods are on `api`, like `el.api.scrollToEnd()`.
 function defineScrollAreaElements() {
-  defineParts(scrollArea, {
+  createParts(scrollArea, {
     root: {
       tag: owner,
       display: "block",

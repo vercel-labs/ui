@@ -1,6 +1,6 @@
 import { command, type CommandApi, type CommandData } from "@ui-sdk/core/command"
 import { pageItems } from "@ui-sdk/core/renderer"
-import { defineParts, wrappedChild } from "./define-element"
+import { createParts, wrappedChild } from "./define-element"
 import { copy, isGenerated, itemText, listAttribute, renderData, stashedEmpty, templateOf } from "./list"
 
 // The properties rich values are set through.
@@ -25,7 +25,7 @@ type CommandElement = HTMLElement & {
 //
 // Set `items` and the element renders the list itself.
 function defineCommandElements() {
-  defineParts(command, {
+  createParts(command, {
     root: {
       tag: "ui-command",
       display: "block",

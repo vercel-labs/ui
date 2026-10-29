@@ -2,7 +2,7 @@ import type { PrimitiveInstance } from "@ui-sdk/core"
 import { partState } from "@ui-sdk/core/renderer"
 import { meter } from "@ui-sdk/core/meter"
 import { showDefaultText } from "./default-text"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 const valueText = (_: HTMLElement, instance: PrimitiveInstance) =>
   (partState(instance.part("value")) as { text: string }).text
@@ -18,7 +18,7 @@ const valueText = (_: HTMLElement, instance: PrimitiveInstance) =>
 // An empty <ui-meter-value> shows the formatted value. Set `format` and
 // `getValueLabel` as properties.
 function defineMeterElements() {
-  defineParts(meter, {
+  createParts(meter, {
     root: {
       tag: "ui-meter",
       display: "block",

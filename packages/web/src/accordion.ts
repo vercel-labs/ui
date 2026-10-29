@@ -1,5 +1,5 @@
 import { accordion, type AccordionApi } from "@ui-sdk/core/accordion"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 const heading = ":scope > :is(h1, h2, h3, h4, h5, h6)"
 
@@ -17,7 +17,7 @@ const heading = ":scope > :is(h1, h2, h3, h4, h5, h6)"
 // `default-value` lists open items separated by commas. The live state is the
 // `value` property, an array. Setting it fires `valuechange` like a press.
 function defineAccordionElements() {
-  defineParts(accordion, {
+  createParts(accordion, {
     root: {
       tag: "ui-accordion",
       display: "block",

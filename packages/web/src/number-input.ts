@@ -1,5 +1,5 @@
 import { numberInput, type NumberInputApi } from "@ui-sdk/core/number-input"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 const owner = "ui-number-input"
 
@@ -26,7 +26,7 @@ function stepButtonProps(el: HTMLElement) {
 //
 // Set `format` as a property, like `{ style: "currency", currency: "USD" }`.
 function defineNumberInputElements() {
-  defineParts(numberInput, {
+  createParts(numberInput, {
     root: {
       tag: owner,
       display: "block",

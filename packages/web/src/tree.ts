@@ -1,5 +1,5 @@
 import { tree, type TreeApi, type TreeItemData } from "@ui-sdk/core/tree"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { copy, element, listAttribute, templateOf } from "./list"
 
 const owner = "ui-tree"
@@ -65,7 +65,7 @@ function renderItems(
 // of the parts in a <template> inside it, when it has one. With
 // `selection-mode="multiple"`, `value` lists values separated by commas.
 function defineTreeElements() {
-  defineParts(tree, {
+  createParts(tree, {
     root: {
       tag: owner,
       defaults: { expandOnPress: true, focusableWhenDisabled: true },

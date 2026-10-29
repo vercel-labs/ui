@@ -1,5 +1,5 @@
 import { menubar, type MenubarApi } from "@ui-sdk/core/menubar"
-import { defineParts, instanceOf } from "./define-element"
+import { createParts, instanceOf } from "./define-element"
 
 // <ui-menubar> holds menus, each a <ui-menu> with its trigger and content.
 // Define it before the menus, so they find it as they upgrade. Markup:
@@ -11,7 +11,7 @@ import { defineParts, instanceOf } from "./define-element"
 //   </ui-menu>
 // </ui-menubar>
 function defineMenubarElements() {
-  defineParts(menubar, {
+  createParts(menubar, {
     root: {
       tag: "ui-menubar",
       display: "block",

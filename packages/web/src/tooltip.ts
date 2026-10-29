@@ -1,5 +1,5 @@
 import { tooltip } from "@ui-sdk/core/tooltip"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { popupApi, popupKinds, popupPortal, popupState } from "./popup"
 
 const owner = "ui-tooltip"
@@ -14,7 +14,7 @@ const owner = "ui-tooltip"
 //   </ui-tooltip-content>
 // </ui-tooltip>
 function defineTooltipElements() {
-  defineParts(tooltip, {
+  createParts(tooltip, {
     root: {
       tag: owner,
       defaults: { closeOnPress: true },

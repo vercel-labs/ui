@@ -40,7 +40,7 @@ const searchField = definePrimitive({
 export { searchField }
 ```
 
-Then render it in your framework. React, Vue, Svelte and Solid use `createParts`, and web components use `defineParts`. The parts are the same in all five.
+Then render it in your framework with `createParts`. The parts are the same in all five.
 
 ### React
 
@@ -137,10 +137,10 @@ export { Search }
 Register a custom element for each part:
 
 ```ts
-import { defineParts, wrappedButton, wrappedChild } from "@ui-sdk/web"
+import { createParts, wrappedButton, wrappedChild } from "@ui-sdk/web"
 import { searchField } from "./search-field"
 
-defineParts(searchField, {
+createParts(searchField, {
   root: "search-field",
   input: { tag: "search-field-input", target: wrappedChild("input") },
   clear: { tag: "search-field-clear", target: wrappedButton },

@@ -3,25 +3,7 @@ title: Custom Parts
 description: Choose a binding target and expose the state of a custom element.
 ---
 
-Start with the rating elements from [Rendering Primitives](./rendering). Use `definePart` to register a part separately, or add configuration to `defineParts` when you need a different target or a public API.
-
-## Define a Part Separately
-
-Define the root first, then the parts that belong to it:
-
-```ts
-import { definePart, wrappedButton } from "@ui-sdk/web"
-import { rating } from "./rating"
-
-definePart(rating, "root", "my-rating")
-definePart(rating, "star", {
-  tag: "my-rating-star",
-  target: wrappedButton,
-  display: "contents",
-})
-```
-
-This is an alternative to the `defineParts` call in the rendering guide, using the same markup. A tag is registered once; calling a definition again doesn't replace it.
+Start with the rating elements from [Rendering Primitives](./rendering). Add configuration to `createParts` when you need a different target or a public API.
 
 ## Choose the Target
 
@@ -34,10 +16,10 @@ Bind to the native element that should own focus and keyboard behavior. Put its 
 The rating primitive has a `rate` method. Add it to the root's `api` list to let application code call it:
 
 ```ts title="rating-web.ts"
-import { defineParts, wrappedButton } from "@ui-sdk/web"
+import { createParts, wrappedButton } from "@ui-sdk/web"
 import { rating } from "./rating"
 
-defineParts(rating, {
+createParts(rating, {
   root: { tag: "my-rating", api: ["rate"] },
   star: { tag: "my-rating-star", target: wrappedButton, display: "contents" },
 })
@@ -51,9 +33,9 @@ A `state` mapping exposes a live getter and setter. Both call the primitive's AP
 
 ```ts
 import { toggle } from "@ui-sdk/core/toggle"
-import { defineParts, wrappedButton } from "@ui-sdk/web"
+import { createParts, wrappedButton } from "@ui-sdk/web"
 
-defineParts(toggle, {
+createParts(toggle, {
   root: {
     tag: "my-toggle",
     target: wrappedButton,
@@ -93,9 +75,9 @@ Each attribute gets a property that reflects it. Name the booleans that are on b
 
 ```ts
 import { tabs } from "@ui-sdk/core/tabs"
-import { defineParts, wrappedButton } from "@ui-sdk/web"
+import { createParts, wrappedButton } from "@ui-sdk/web"
 
-defineParts(tabs, {
+createParts(tabs, {
   root: { tag: "my-tabs", defaults: { loop: true } },
   list: "my-tabs-list",
   tab: { tag: "my-tabs-tab", target: wrappedButton },

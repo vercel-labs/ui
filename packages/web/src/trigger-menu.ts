@@ -4,7 +4,7 @@ import {
   type TriggerDefinition,
   type TriggerMenuApi,
 } from "@ui-sdk/core/trigger-menu"
-import { defineParts, findOwner, instanceOf, wrappedChild } from "./define-element"
+import { createParts, findOwner, instanceOf, wrappedChild } from "./define-element"
 import { copy, renderListItems, stashedEmpty, templateOf } from "./list"
 import { popupKinds, popupPortal, popupState } from "./popup"
 
@@ -43,7 +43,7 @@ const automaticText = {
 }
 
 function defineTriggerMenuElements() {
-  defineParts(triggerMenu, {
+  createParts(triggerMenu, {
     root: {
       tag: owner,
       defaults: { autoHighlight: true, loop: true, dismissible: true },

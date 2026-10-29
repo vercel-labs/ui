@@ -1,5 +1,5 @@
 import { hoverCard } from "@ui-sdk/core/hover-card"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { popupApi, popupKinds, popupPortal, popupState } from "./popup"
 
 const owner = "ui-hover-card"
@@ -14,7 +14,7 @@ const owner = "ui-hover-card"
 //   </ui-hover-card-content>
 // </ui-hover-card>
 function defineHoverCardElements() {
-  defineParts(hoverCard, {
+  createParts(hoverCard, {
     root: {
       tag: owner,
       kinds: popupKinds,

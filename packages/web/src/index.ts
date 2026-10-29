@@ -1,13 +1,13 @@
 // Helpers and types, without side effects. Importing a component defines its
 // elements, like `import "@ui-sdk/web/accordion"`.
 export {
-  definePart,
-  defineParts,
+  createParts,
   wrappedButton,
   wrappedChild,
   type AttributeType,
   type Kinds,
   type PartOptions,
+  type Parts,
   type RootOptions,
 } from "./define-element"
 export { createDrawerController, sheetPhysics } from "@ui-sdk/core/drawer"

@@ -1,8 +1,8 @@
 import {
   partElement,
   partElements,
+  type createParts as createPartsType,
   type definePart as definePartType,
-  type defineParts as definePartsType,
 } from "../../../packages/web/src/define-element"
 
 /** One element a web entry defines, as its define call described it. */
@@ -10,7 +10,7 @@ type Definition = {
   kind: "owner" | "part" | "element"
   entry: string
   tagName: string
-  // Its key in `defineParts`' tags, or its slot in `definePart`.
+  // Its key in `createParts`' tags, or its slot in `definePart`.
   key?: string
   // What the manifest reads from a define call's config.
   config: {
@@ -47,9 +47,9 @@ const record = (
   definitions.push({ kind, entry, tagName, key, config, stack: new Error().stack ?? "" })
 }
 
-// The elements `defineParts` and `definePart` describe from the primitive's
+// The elements `createParts` and `definePart` describe from the primitive's
 // schema, each recorded at the call, which the manifest finds by key.
-function defineParts(...[primitive, tags]: Parameters<typeof definePartsType>) {
+function createParts(...[primitive, tags]: Parameters<typeof createPartsType>) {
   for (const element of partElements(primitive, tags))
     record(element.kind, element.tagName, element.config, element.key)
 }
@@ -68,5 +68,5 @@ function claimTag(tagName: string) {
 
 function setDisplay() {}
 
-export { begin, claimTag, definePart, defineParts, type Definition, definitions, setDisplay }
+export { begin, claimTag, createParts, definePart, type Definition, definitions, setDisplay }
 export * from "../../../packages/web/src/define-element"

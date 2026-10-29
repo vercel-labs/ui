@@ -1,5 +1,5 @@
 import { navigationMenu, type NavigationMenuApi } from "@ui-sdk/core/navigation-menu"
-import { autoId, defineParts, findContainer, findOwner, instanceOf } from "./define-element"
+import { autoId, createParts, findContainer, findOwner, instanceOf } from "./define-element"
 
 const owner = "ui-navigation-menu"
 
@@ -53,7 +53,7 @@ const portal = {
 //   <ui-navigation-menu-viewport></ui-navigation-menu-viewport>
 // </ui-navigation-menu>
 function defineNavigationMenuElements() {
-  defineParts(navigationMenu, {
+  createParts(navigationMenu, {
     root: {
       tag: owner,
       defaults: { openOnHover: true, closeOnSelect: true },

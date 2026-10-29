@@ -1,5 +1,5 @@
 import { passwordInput, type PasswordInputController } from "@ui-sdk/core/password-input"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 const owner = "ui-password-input"
 
@@ -12,7 +12,7 @@ const owner = "ui-password-input"
 //   <ui-password-input-toggle><button aria-label="Show password">…</button></ui-password-input-toggle>
 // </ui-password-input>
 function definePasswordInputElements() {
-  defineParts(passwordInput, {
+  createParts(passwordInput, {
     root: {
       tag: owner,
       display: "block",

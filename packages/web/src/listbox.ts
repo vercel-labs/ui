@@ -1,5 +1,5 @@
 import { listbox, type ListData, type ListboxApi, type ListboxOptions } from "@ui-sdk/core/listbox"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { adoptDefaultValue, listAttribute, renderListItems, templateOf, valuesOf } from "./list"
 
 const owner = "ui-listbox"
@@ -24,7 +24,7 @@ const generated = new WeakMap<HTMLElement, HTMLElement[]>()
 //
 // Set `items` to a data list and the element renders its items itself.
 function defineListboxElements() {
-  defineParts(listbox, {
+  createParts(listbox, {
     root: {
       tag: owner,
       defaults: { loop: true },

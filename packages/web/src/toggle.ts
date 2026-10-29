@@ -1,6 +1,6 @@
 import { toggle, toggleGroup, type ToggleApi, type ToggleGroupApi } from "@ui-sdk/core/toggle"
 import type { ToolbarApi } from "@ui-sdk/core/toolbar"
-import { defineParts, instanceOf, wrappedButton } from "./define-element"
+import { createParts, instanceOf, wrappedButton } from "./define-element"
 
 // The toolbar a toggle or a toggle group sits in, read when needed, since it
 // may upgrade later, and whether a toolbar group around it is disabled.
@@ -14,7 +14,7 @@ const toolbarOf = (el: HTMLElement) => () =>
 //
 // <ui-toggle default-pressed><button aria-label="Bookmark">…</button></ui-toggle>
 function defineToggleElements() {
-  defineParts(toggle, {
+  createParts(toggle, {
     root: {
       tag: "ui-toggle",
       target: wrappedButton,
@@ -48,7 +48,7 @@ function defineToggleElements() {
 //   <ui-toggle value="italic"><button>Italic</button></ui-toggle>
 // </ui-toggle-group>
 function defineToggleGroupElements() {
-  defineParts(toggleGroup, {
+  createParts(toggleGroup, {
     root: {
       tag: "ui-toggle-group",
       self: "group",

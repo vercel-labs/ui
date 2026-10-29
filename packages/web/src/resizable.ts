@@ -1,5 +1,5 @@
 import { resizable, type ResizableApi } from "@ui-sdk/core/resizable"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 // <ui-resizable> and its parts. Markup:
 //
@@ -11,7 +11,7 @@ import { defineParts } from "./define-element"
 //
 // Groups nest inside panels. Set `storage` and `controller` as properties.
 function defineResizableElements() {
-  defineParts(resizable, {
+  createParts(resizable, {
     root: {
       tag: "ui-resizable",
       display: "block",

@@ -600,7 +600,7 @@ function formAssociated(Base: typeof HTMLElement) {
   }
 }
 
-// How `defineRootElement` defines an owner element, from what `defineParts` reads.
+// How `defineRootElement` defines an owner element, from what `createParts` reads.
 type OwnerConfig<P extends Primitive> = {
   /**
    * Attributes, by option name in camelCase. Each is read from its kebab-case
@@ -1153,7 +1153,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
   )
 }
 
-// How `definePartElement` defines a part element, from what `defineParts` reads.
+// How `definePartElement` defines a part element, from what `createParts` reads.
 type SlotConfig = {
   /** The owner primitive's slot this element fills. */
   slot: string
@@ -1370,7 +1370,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
 type Kinds = Record<string, PropSpec | null>
 
 /**
- * How `defineParts` and `definePart` define a part's element, beyond its tag.
+ * How `createParts` and `definePart` define a part's element, beyond its tag.
  * @stable
  */
 type PartOptions<P extends Primitive = Primitive> = {
@@ -1389,7 +1389,7 @@ type PartOptions<P extends Primitive = Primitive> = {
 } & Omit<SlotConfig, "slot" | "owner" | "props" | "properties" | "from" | "ids" | "actions">
 
 /**
- * How `defineParts` and `definePart` define the root's element, the one that owns an instance, beyond its tag.
+ * How `createParts` and `definePart` define the root's element, the one that owns an instance, beyond its tag.
  * @stable
  */
 type RootOptions<P extends Primitive> = {
@@ -1520,7 +1520,7 @@ function partElement<P extends Primitive>(
 }
 
 /**
- * The tags `defineParts` takes: `root` for the element that owns an
+ * The tags `createParts` takes: `root` for the element that owns an
  * instance, and each slot it renders by name. A part under another key
  * names its slot, like `{ radio: { tag: "ui-radio", slot: "root" } }`.
  */
@@ -1529,7 +1529,7 @@ type PartTags<P extends Primitive> = { root: string | RootOptions<P> } & {
 }
 
 /**
- * Every element `defineParts` defines, as `partElement` describes each, the
+ * Every element `createParts` defines, as `partElement` describes each, the
  * root first, so its parts know their owner's tag.
  */
 function partElements<P extends Primitive>(primitive: P, tags: PartTags<P>) {
@@ -1548,6 +1548,22 @@ function defineElement<P extends Primitive>(primitive: P, element: ReturnType<ty
   else definePartElement(element.tagName, element.config)
 }
 
+// "tab-icon" is `TabIcon`.
+type Pascal<Name extends string> = Name extends `${infer Head}-${infer Tail}`
+  ? `${Capitalize<Head>}${Pascal<Tail>}`
+  : Capitalize<Name>
+
+const pascal = (name: string) => name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
+
+/**
+ * The element classes `createParts` returns: `Root`, and one per tagged
+ * part, named in Pascal case. Each is `undefined` on the server.
+ * @stable
+ */
+type Parts<Tags> = {
+  [K in keyof Tags & string as Pascal<K>]: CustomElementConstructor | undefined
+}
+
 /**
  * Defines a custom element for each part of a primitive, typed from it.
  * `root` is the element that owns an instance: the primitive's options are
@@ -1558,10 +1574,13 @@ function defineElement<P extends Primitive>(primitive: P, element: ReturnType<ty
  * element that finds the root above it, with the slot's props read the same
  * way. A part that needs more than a tag takes an object, like
  * `{ tag, display, target, render }`, and the root's takes `state`, `api` and
- * `display` too. Does nothing on the server, and once per tag.
+ * `display` too. Defines each tag once, and returns the element classes,
+ * `Root` and one per part named in Pascal case, like `TabIcon` for
+ * `tab-icon`. On the server it defines nothing and the classes are
+ * `undefined`.
  *
  * @example
- * defineParts(tabs, {
+ * createParts(tabs, {
  *   root: { tag: "ui-tabs", display: "block", api: ["select"] },
  *   list: "ui-tabs-list",
  *   // Binds the <button> inside, so it stays a real button.
@@ -1570,21 +1589,26 @@ function defineElement<P extends Primitive>(primitive: P, element: ReturnType<ty
  * })
  * @stable
  */
-function defineParts<P extends Primitive, Tags extends PartTags<P>>(primitive: P, tags: Tags) {
-  for (const element of partElements(primitive, tags)) defineElement(primitive, element)
+function createParts<P extends Primitive, Tags extends PartTags<P>>(primitive: P, tags: Tags) {
+  const parts: Record<string, CustomElementConstructor | undefined> = {}
+  for (const element of partElements(primitive, tags)) {
+    defineElement(primitive, element)
+    parts[pascal(element.key)] =
+      typeof customElements === "undefined" ? undefined : customElements.get(element.tagName)
+  }
+  return parts as Parts<Tags>
 }
 
 /**
  * Defines the custom element for one part of a primitive, written by hand:
  * the root, which owns an instance, or a part that finds the root above it.
  * Its attributes, properties and events come from the primitive's schema, as
- * in `defineParts`. Define the root first. A second root of the same
+ * in `createParts`. Define the root first. A second root of the same
  * primitive, like a submenu's, owns the parts defined after it too.
  *
  * @example
  * definePart(rating, "root", "my-rating")
  * definePart(rating, "star", { tag: "my-rating-star", target: wrappedButton })
- * @stable
  */
 function definePart<P extends Primitive, S extends SlotName<P> | "root">(
   primitive: P,
@@ -1598,8 +1622,8 @@ export {
   type AttributeType,
   autoId,
   claimTag,
+  createParts,
   definePart,
-  defineParts,
   findContainer,
   findOwner,
   inheritedPortal,
@@ -1611,6 +1635,7 @@ export {
   partElement,
   partElements,
   type PartOptions,
+  type Parts,
   type PartTags,
   passPortalOn,
   type RootOptions,

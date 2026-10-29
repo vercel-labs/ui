@@ -1,5 +1,5 @@
 import { pagination, type PaginationRangeItem } from "@ui-sdk/core/pagination"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 import { element } from "./list"
 
 const owner = "ui-pagination"
@@ -20,7 +20,7 @@ const owner = "ui-pagination"
 //
 // Links written out by hand, like a server's, take a `page` attribute.
 function definePaginationElements() {
-  defineParts(pagination, {
+  createParts(pagination, {
     root: {
       tag: owner,
       display: "block",

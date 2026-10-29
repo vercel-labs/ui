@@ -1,5 +1,5 @@
 import { tabs } from "@ui-sdk/core/tabs"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 // <ui-tabs> and its parts. Markup:
 //
@@ -13,7 +13,7 @@ import { defineParts, wrappedButton } from "./define-element"
 //   <ui-tabs-panel value="password">…</ui-tabs-panel>
 // </ui-tabs>
 function defineTabsElements() {
-  defineParts(tabs, {
+  createParts(tabs, {
     root: {
       tag: "ui-tabs",
       display: "block",

@@ -6,7 +6,7 @@ import {
   comboboxSelectAll,
   selectAllKey,
 } from "@ui-sdk/core/renderer"
-import { autoId, defineParts, findOwner, wrappedChild } from "./define-element"
+import { autoId, createParts, findOwner, wrappedChild } from "./define-element"
 import {
   adoptDefaultValue,
   copy,
@@ -51,7 +51,7 @@ const automaticOverflow = new WeakSet<Element>()
 // With `multiple`, an empty <ui-combobox-chips> around the input renders a chip
 // per value, with a remove button. Set `items` and the element renders its list.
 function defineComboboxElements() {
-  defineParts(combobox, {
+  createParts(combobox, {
     root: {
       tag: owner,
       defaults: { loop: true, dismissible: true },

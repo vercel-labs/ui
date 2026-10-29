@@ -1,5 +1,5 @@
 import { carousel, type CarouselApi } from "@ui-sdk/core/carousel"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 // Wrappers have no role, so the tablist still sees its tabs as direct children.
 const wrapper = { display: "contents" as const, target: wrappedButton }
@@ -28,7 +28,7 @@ const wrapper = { display: "contents" as const, target: wrappedButton }
 // page with `for="<carousel id>"`. The play toggle's button has `data-playing`
 // while rotating, so its label can switch with CSS.
 function defineCarouselElements() {
-  defineParts(carousel, {
+  createParts(carousel, {
     root: {
       tag: "ui-carousel",
       display: "block",

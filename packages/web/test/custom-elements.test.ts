@@ -71,7 +71,7 @@ describe("custom elements manifest", () => {
         const source = readFileSync(path.join(root, "src", file), "utf8")
         return [
           ...source.matchAll(/claimTag\("(ui-[\w-]+)"/g),
-          // Tags `defineParts` and `definePart` take, by slot or as `tag`.
+          // Tags `createParts` and `definePart` take, by slot or as `tag`.
           ...source.matchAll(/(?:(?:^\s*"?[\w-]+"?|\btag):|definePart\(\w+, "[\w-]+",)\s*"(ui-[\w-]+)"/gm),
         ]
       })

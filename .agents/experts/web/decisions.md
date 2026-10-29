@@ -11,6 +11,8 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Every attribute option reflects as a property**, by the built-ins' rules: default-off booleans by presence, default-on as `"true"`/`"false"`, text as written, rich data property-only. ("I want it to feel like HTML, not a new API", shadcn 2026-10-24, on main as `bc22dedb`)
 - **Events don't bubble**; listen with `{ capture: true }`. Public events are `composed`.
 - **Form component dropped.**
+- **`createParts`, like every adapter** (shadcn 2026-10-29). It defines an element per part and returns their classes, `Root` and one per part in Pascal case, `undefined` on the server. `definePart` is internal, for the package's own components.
+- **Button parts wrap a written `<button>`** (shadcn 2026-10-29). A custom element can't be a native button and Safari has no customized built-ins, so the package never creates the button for the user.
 - **The instance is private.** An owner element's public surface is `api`, the controller's methods, plus its attribute and live properties. The primitive instance lives in a module-private `WeakMap` that the package's modules read through `instanceOf(el)`, and a custom root's `render(el, instance)` receives it.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
 

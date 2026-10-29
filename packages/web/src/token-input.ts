@@ -5,7 +5,7 @@ import {
   type TokenInputApi,
   type TokenInputValue,
 } from "@ui-sdk/core/token-input"
-import { defineParts, reconfigureInside } from "./define-element"
+import { createParts, reconfigureInside } from "./define-element"
 
 const owner = "ui-token-input"
 
@@ -41,7 +41,7 @@ function tokenOf(el: HTMLElement) {
 }
 
 function defineTokenInputElements() {
-  defineParts(tokenInput, {
+  createParts(tokenInput, {
     root: {
       tag: owner,
       formAssociated: true,

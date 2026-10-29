@@ -14,7 +14,7 @@ The whole Core section of the docs ships with this package as one file, [`docs/c
 | `@ui-sdk/core/<component>`                                                     | One component's primitive, its options, its state and props per slot, its api, its controller and its change reasons, like `@ui-sdk/core/popover`.                 |
 | `@ui-sdk/react/primitive`                                                      | `createParts`, `usePrimitive`, `usePart`, `renderElement`, `mergeProps` and `PartProps`.                                                                           |
 | `@ui-sdk/vue/primitive`, `@ui-sdk/solid/primitive`, `@ui-sdk/svelte/primitive` | The same, for each framework.                                                                                                                                      |
-| `@ui-sdk/web`                                                                  | `defineParts` and `definePart`, which turn a primitive into custom elements.                                                                                       |
+| `@ui-sdk/web`                                                                  | `createParts`, which turns a primitive into custom elements.                                                                                                       |
 
 The modules these entries are built from aren't exports, so they can change in any release. If a component needs something no entry has, that's a gap in the public kit worth reporting.
 

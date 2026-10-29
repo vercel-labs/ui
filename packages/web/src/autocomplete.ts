@@ -1,5 +1,5 @@
 import { autocomplete, type AutocompleteApi, type ListData } from "@ui-sdk/core/autocomplete"
-import { defineParts, wrappedChild } from "./define-element"
+import { createParts, wrappedChild } from "./define-element"
 import { copy, itemText, renderData, stashedEmpty, templateOf } from "./list"
 import { popupKinds, popupState, sheetInputPortal } from "./popup"
 
@@ -30,7 +30,7 @@ const lists = new WeakMap<Element, Element>()
 //
 // Set `items` and the element renders its suggestions.
 function defineAutocompleteElements() {
-  defineParts(autocomplete, {
+  createParts(autocomplete, {
     root: {
       tag: owner,
       defaults: { loop: true, dismissible: true },

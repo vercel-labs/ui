@@ -1,6 +1,6 @@
 import { button } from "@ui-sdk/core/button"
 import { actionOf } from "./action"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 // What the author wrote as the inner button's type, by inner button, read
 // before the core writes its own, so <button type="submit"> stays a submit
@@ -32,7 +32,7 @@ function authoredType(el: HTMLElement) {
 // <ui-button disabled focusable-when-disabled><button>Archive</button></ui-button>
 // <ui-button><a href="/docs">Docs</a></ui-button>
 function defineButtonElements() {
-  defineParts(button, {
+  createParts(button, {
     root: {
       tag: "ui-button",
       target: wrappedButton,

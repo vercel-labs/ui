@@ -132,7 +132,7 @@ test("installation, rendering and the next guide follow the framework docs visit
   await expect(content).toContainText('import { createParts } from "@ui-sdk/vue/primitive"')
   await page.goto("/docs/web-components")
   await page.goto("/docs/core/compose-behaviors")
-  await expect(content).toContainText("defineParts(rating,")
+  await expect(content).toContainText("createParts(rating,")
   await expect(content).toContainText('import { rating } from "./rating"')
   await expect(content).not.toContainText('import { createParts } from "@ui-sdk/vue/primitive"')
   await expect(

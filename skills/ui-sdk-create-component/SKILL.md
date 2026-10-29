@@ -53,7 +53,7 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 
 ### 4. Render it
 
-`createParts(primitive, { root: "div", item: "div" })` from `@ui-sdk/<framework>/primitive` returns `Root` and one part per tagged slot, typed from the primitive (`@ui-sdk/web` has `defineParts`). Write a part by hand with `usePart` only when it renders something of its own, like a list from data, and a root with `usePrimitive`. The adapter only renders: no key handlers, focus moves, ARIA or `data-slot` in it.
+`createParts(primitive, { root: "div", item: "div" })` from `@ui-sdk/<framework>/primitive` returns `Root` and one part per tagged slot, typed from the primitive (`@ui-sdk/web` has `createParts`). Write a part by hand with `usePart` only when it renders something of its own, like a list from data, and a root with `usePrimitive`. The adapter only renders: no key handlers, focus moves, ARIA or `data-slot` in it.
 
 ### 5. Test it
 
@@ -82,7 +82,7 @@ Never bind a slot of yours to an element one of ours already binds. In React our
 
 Each needs its own adapter package at the same version as `@ui-sdk/core`, from the registry in `.npmrc`. Install it if it's missing, and say so. Its `docs/rendering.md` shows how that adapter renders a primitive.
 
-**Web components** have no `primitive` entry. `defineParts` and `definePart` come from `@ui-sdk/web` itself. [references/web-components.md](references/web-components.md) covers what the types don't: component entries define their elements on import, how to find tag names and required inner markup, and how hidden parts differ from React.
+**Web components** have no `primitive` entry. `createParts` comes from `@ui-sdk/web` itself. [references/web-components.md](references/web-components.md) covers what the types don't: component entries define their elements on import, how to find tag names and required inner markup, and how hidden parts differ from React.
 
 ## When you're done
 

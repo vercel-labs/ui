@@ -1,5 +1,5 @@
 import { radioGroup, type RadioGroupApi } from "@ui-sdk/core/radio"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 const owner = "ui-radio-group"
 
@@ -15,7 +15,7 @@ const owner = "ui-radio-group"
 //   </label>
 // </ui-radio-group>
 function defineRadioGroupElements() {
-  defineParts(radioGroup, {
+  createParts(radioGroup, {
     root: {
       tag: owner,
       defaults: { loop: true },

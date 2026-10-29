@@ -1,5 +1,5 @@
 import { popover } from "@ui-sdk/core/popover"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 import { popupApi, popupKinds, popupState, renderPopupTitle, sheetPortal } from "./popup"
 
 const owner = "ui-popover"
@@ -18,7 +18,7 @@ const owner = "ui-popover"
 //   </ui-popover-content>
 // </ui-popover>
 function definePopoverElements() {
-  defineParts(popover, {
+  createParts(popover, {
     root: {
       tag: owner,
       defaults: { dismissible: true },

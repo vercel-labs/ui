@@ -17,7 +17,7 @@ Every piece of code here has a twin that already does it well. Open it before yo
 | A popup                    | `packages/core/src/components/popover/popover.ts` and its adapters, on `createPopup` in `foundation/popups/`                       |
 | A React, Vue or Solid part | The same component's file in `packages/<framework>/src/`, on `createParts`                                                         |
 | A Svelte part              | `packages/svelte/src/tabs/`                                                                                                        |
-| A web component            | `packages/web/src/tabs.ts`, on `defineParts`                                                                                       |
+| A web component            | `packages/web/src/tabs.ts`, on `createParts`                                                                                       |
 | An example                 | The same example in another framework: `examples/<name>/<framework>/`                                                              |
 | A spec                     | `tests/specs/tabs*.spec.ts`                                                                                                        |
 

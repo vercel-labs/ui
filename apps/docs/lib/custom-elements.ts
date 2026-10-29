@@ -187,23 +187,23 @@ async function describeElements() {
     return current
   }
 
-  // The define call's name, like `defineParts`.
+  // The define call's name, like `createParts`.
   const calleeOf = (call: ts.CallExpression) => call.expression.getText()
 
   // What a part's element is defined with, beyond its tag: its entry in
-  // `defineParts(primitive, tags)`, by key, or the options of
+  // `createParts(primitive, tags)`, by key, or the options of
   // `definePart(primitive, slot, options)`.
   function partOptions(call: ts.CallExpression, key: string) {
     const callee = calleeOf(call)
     if (callee === "definePart") return call.arguments[2] && checker.getTypeAtLocation(call.arguments[2])
-    if (callee === "defineParts") return property(checker.getTypeAtLocation(call.arguments[1]), key)?.type
+    if (callee === "createParts") return property(checker.getTypeAtLocation(call.arguments[1]), key)?.type
   }
 
   // The node whose comment describes an element: its entry in
-  // `defineParts`' tags, by key, else its define call's statement.
+  // `createParts`' tags, by key, else its define call's statement.
   function describedNode(call: ts.CallExpression, key: string) {
     const tags = call.arguments[1]
-    if (calleeOf(call) !== "defineParts" || !tags || !ts.isObjectLiteralExpression(tags))
+    if (calleeOf(call) !== "createParts" || !tags || !ts.isObjectLiteralExpression(tags))
       return statementOf(call)
     return tags.properties.find(
       (entry) =>
@@ -291,7 +291,7 @@ async function describeElements() {
   }
 
   // The primitive an owner defines with: its options and slots, and its
-  // type parameters' defaults. It's the first argument of `defineParts` and `definePart`.
+  // type parameters' defaults. It's the first argument of `createParts` and `definePart`.
   function primitiveTypes(call: ts.CallExpression) {
     const primitive = call.arguments[0]
     const signature = checker.getTypeAtLocation(primitive).getCallSignatures()[0]

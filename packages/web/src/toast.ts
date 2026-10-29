@@ -8,7 +8,7 @@ import {
   type Toaster,
 } from "@ui-sdk/core/toast"
 import { actionOf } from "./action"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 import type { UiToastRegionElement } from "./events"
 
 /**
@@ -159,7 +159,7 @@ function render(region: RegionElement, instance: RegionInstance) {
 //   </template>
 // </ui-toast-region>
 function defineToastElements() {
-  defineParts(toastRegion, {
+  createParts(toastRegion, {
     root: {
       tag: "ui-toast-region",
       self: "region",

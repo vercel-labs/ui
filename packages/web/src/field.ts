@@ -5,7 +5,7 @@ import {
   fieldOutsideErrorShown,
   type FieldOutsideSlot,
 } from "@ui-sdk/core/renderer"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 const owner = "ui-field"
 
@@ -72,7 +72,7 @@ function errorAlone(el: HTMLElement, host: HTMLElement) {
 //
 // A legend that isn't a native <legend> is a <ui-field-legend>.
 function defineFieldElements() {
-  defineParts(field, {
+  createParts(field, {
     root: {
       tag: owner,
       display: "block",
@@ -106,7 +106,7 @@ function defineFieldElements() {
     },
     error: { tag: "ui-field-error", display: "block", alone: errorAlone },
   })
-  defineParts(fieldSet, {
+  createParts(fieldSet, {
     // Wraps a native <fieldset> and its <legend>, so `disabled` disables every
     // control inside it the way the browser does.
     root: {
@@ -120,7 +120,7 @@ function defineFieldElements() {
     },
     legend: { tag: "ui-field-legend", display: "block" },
   })
-  defineParts(fieldGroup, {
+  createParts(fieldGroup, {
     root: { tag: "ui-field-group", self: "group", display: "block" },
   })
 }

@@ -5,7 +5,7 @@ What the `@ui-sdk/web` types don't say, learned by probing.
 ## Setup
 
 - Install `@ui-sdk/web` at the same version as `@ui-sdk/core` if it's missing.
-- There's no `primitive` entry. `defineParts`, `definePart`, `wrappedButton` and the element types, like `UiInputElement`, come from `@ui-sdk/web` itself.
+- There's no `primitive` entry. `createParts`, `wrappedButton` and the element types, like `UiInputElement`, come from `@ui-sdk/web` itself.
 - A component entry, like `@ui-sdk/web/input`, defines its elements when imported. Its types are `export {}`. A `define…Elements()` function you may find in another `.d.ts` isn't what the entry exports, and calling it fails.
 
 ## Tag names and markup
@@ -29,10 +29,10 @@ Parts that keep native behavior need the native element inside them. The console
 
 ## Elements of your own
 
-`defineParts` reads attributes and properties from the primitive's `options` schema, so give `definePrimitive` one, like `options: { clearOnEscape: "boolean", input: "value" }`. Every attribute option gets a property that reflects it, like `el.clearOnEscape = true`. Name booleans that start on in the root's `defaults`, like `defaults: { loop: true }`, so the property reads `true` without the attribute. Options the page provides go in the root's `options`:
+`createParts` reads attributes and properties from the primitive's `options` schema, so give `definePrimitive` one, like `options: { clearOnEscape: "boolean", input: "value" }`. Every attribute option gets a property that reflects it, like `el.clearOnEscape = true`. Name booleans that start on in the root's `defaults`, like `defaults: { loop: true }`, so the property reads `true` without the attribute. Options the page provides go in the root's `options`:
 
 ```ts
-defineParts(clearableInput, {
+createParts(clearableInput, {
   root: {
     tag: "ui-clearable-input",
     display: "block",

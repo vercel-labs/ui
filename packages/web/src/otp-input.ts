@@ -1,6 +1,6 @@
 import { otpInput, type OTPInputApi } from "@ui-sdk/core/otp-input"
 import { showDefaultText } from "./default-text"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { forwardAttributes } from "./forward-attributes"
 import { partState } from "@ui-sdk/core/renderer"
 
@@ -38,7 +38,7 @@ const withInput = new WeakSet<HTMLElement>()
 // Empty slots show their character. Write the input yourself, inside a
 // <ui-otp-input-control>, to give it an id for a <label for>.
 function defineOTPInputElements() {
-  defineParts(otpInput, {
+  createParts(otpInput, {
     root: {
       tag: owner,
       display: "block",

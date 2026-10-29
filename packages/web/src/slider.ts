@@ -1,7 +1,7 @@
 import { attrs, partState } from "@ui-sdk/core/renderer"
 import { slider, type SliderApi } from "@ui-sdk/core/slider"
 import { showDefaultText } from "./default-text"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { forwardAttributes } from "./forward-attributes"
 
 const owner = "ui-slider"
@@ -36,7 +36,7 @@ const inputAttributes = ["aria-label", "aria-labelledby", "aria-describedby"]
 // Each thumb adds the range input that takes focus. An empty
 // <ui-slider-value> shows the formatted value. Set `format` as a property.
 function defineSliderElements() {
-  defineParts(slider, {
+  createParts(slider, {
     root: {
       tag: owner,
       display: "block",

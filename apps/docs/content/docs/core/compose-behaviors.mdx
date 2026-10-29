@@ -192,10 +192,10 @@ export { Example }
 Register the parts from your app's browser entry point:
 
 ```ts
-import { defineParts, wrappedButton } from "@ui-sdk/web"
+import { createParts, wrappedButton } from "@ui-sdk/web"
 import { rating } from "./rating"
 
-defineParts(rating, {
+createParts(rating, {
   root: "my-rating",
   star: { tag: "my-rating-star", target: wrappedButton },
 })

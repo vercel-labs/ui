@@ -1,5 +1,5 @@
 import { avatar } from "@ui-sdk/core/avatar"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 // <ui-avatar> holds a native <img>, hidden until it loads, and a fallback
 // shown until then or when it can't. Markup:
@@ -12,7 +12,7 @@ import { defineParts } from "./define-element"
 // The image's own attributes, like `crossorigin` and `referrerpolicy`, apply
 // as written. `loadingstatuschange` fires with each status.
 function defineAvatarElements() {
-  defineParts(avatar, {
+  createParts(avatar, {
     root: {
       tag: "ui-avatar",
       children: { image: (el) => el.querySelector(":scope > img") },

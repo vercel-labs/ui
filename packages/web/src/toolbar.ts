@@ -1,5 +1,5 @@
 import { toolbar } from "@ui-sdk/core/toolbar"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 
 // The control a toolbar item wraps: its own button, link or field, or the one
 // inside a component it wraps, like the button of a <ui-menu-trigger>.
@@ -26,7 +26,7 @@ const wrappedControl = (el: HTMLElement) =>
 //   <ui-toolbar-link><a href="/help">Help</a></ui-toolbar-link>
 // </ui-toolbar>
 function defineToolbarElements() {
-  defineParts(toolbar, {
+  createParts(toolbar, {
     root: { tag: "ui-toolbar", display: "block", defaults: { loop: true }, api: ["focus"] },
     button: {
       tag: "ui-toolbar-button",

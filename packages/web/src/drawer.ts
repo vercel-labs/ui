@@ -1,6 +1,6 @@
 import { drawer, type SnapPoint } from "@ui-sdk/core/drawer"
 import { actionOf } from "./action"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 import {
   closesOnOutsidePress,
   popupApi,
@@ -29,7 +29,7 @@ const portal = { ...popupPortal, slots: ["backdrop", "viewport"] }
 // The content sits in a full-screen <ui-drawer-viewport>, which it adds
 // around itself when the markup has none.
 function defineDrawerElements() {
-  defineParts(drawer, {
+  createParts(drawer, {
     root: {
       tag: "ui-drawer",
       kinds: popupKinds,

@@ -2,7 +2,7 @@ import type { PrimitiveInstance } from "@ui-sdk/core"
 import { datePicker, type DatePickerHintState } from "@ui-sdk/core/date-picker"
 import { partState } from "@ui-sdk/core/renderer"
 import { defineCalendarParts, renderCalendarParts, renderDefaultCalendar } from "./calendar"
-import { defineParts, findOwner, ownButton, parseAttribute } from "./define-element"
+import { createParts, findOwner, ownButton, parseAttribute } from "./define-element"
 import { showDefaultText } from "./default-text"
 import { element } from "./list"
 import { popupKinds, popupState, sheetPortal } from "./popup"
@@ -37,7 +37,7 @@ const owner = "ui-date-picker"
 // Clear and presets wrap a <button>, or make one around what they hold. An
 // empty hint shows the format to type, like "MM/DD/YYYY".
 function defineDatePickerElements() {
-  defineParts(datePicker, {
+  createParts(datePicker, {
     root: {
       tag: owner,
       defaults: { showOutsideDays: true, closeOnSelect: true, dismissible: true },

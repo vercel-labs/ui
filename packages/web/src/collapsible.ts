@@ -1,5 +1,5 @@
 import { collapsible, type CollapsibleApi } from "@ui-sdk/core/collapsible"
-import { defineParts, wrappedButton } from "./define-element"
+import { createParts, wrappedButton } from "./define-element"
 
 // <ui-collapsible> and its parts. Markup:
 //
@@ -11,7 +11,7 @@ import { defineParts, wrappedButton } from "./define-element"
 // The live state is the `open` property. Setting it fires `openchange` like a
 // press, and `openchangecomplete` fires once the panel has finished animating.
 function defineCollapsibleElements() {
-  defineParts(collapsible, {
+  createParts(collapsible, {
     root: {
       tag: "ui-collapsible",
       display: "block",

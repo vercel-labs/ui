@@ -2,7 +2,7 @@ import { dialog } from "@ui-sdk/core/dialog"
 // From its own module, so an app with only alert dialogs doesn't carry Dialog's presentation.
 import { alertDialog } from "@ui-sdk/core/alert-dialog"
 import { actionOf } from "./action"
-import { definePart, defineParts, wrappedButton } from "./define-element"
+import { definePart, createParts, wrappedButton } from "./define-element"
 import {
   closesOnOutsidePress,
   popupApi,
@@ -66,7 +66,7 @@ function defineDialogParts(primitive: typeof dialog | typeof alertDialog, owner:
 //   </ui-dialog-content>
 // </ui-dialog>
 function defineDialogElements() {
-  defineParts(dialog, {
+  createParts(dialog, {
     root: {
       tag: "ui-dialog",
       kinds: popupKinds,
@@ -85,7 +85,7 @@ function defineDialogElements() {
 // <ui-alert-dialog> and its parts, named like the dialog's:
 // <ui-alert-dialog-trigger>, <ui-alert-dialog-content>, <ui-alert-dialog-close value="confirm">.
 function defineAlertDialogElements() {
-  defineParts(alertDialog, {
+  createParts(alertDialog, {
     root: {
       tag: "ui-alert-dialog",
       kinds: popupKinds,

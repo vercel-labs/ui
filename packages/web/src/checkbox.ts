@@ -6,7 +6,7 @@ import {
   type CheckedState,
 } from "@ui-sdk/core/checkbox"
 import { switchPrimitive, type SwitchApi } from "@ui-sdk/core/switch"
-import { defineParts, instanceOf } from "./define-element"
+import { createParts, instanceOf } from "./define-element"
 
 // `default-checked` is where a form reset returns to, and takes
 // "indeterminate" on a checkbox. `checked` sets where it starts too, and
@@ -28,7 +28,7 @@ const toggleApi: ("getChecked" | "setChecked" | "toggle" | "focus")[] = [
 //   Accept the terms
 // </label>
 function defineCheckboxElements() {
-  defineParts(checkbox, {
+  createParts(checkbox, {
     root: {
       tag: "ui-checkbox",
       formAssociated: true,
@@ -62,7 +62,7 @@ function defineCheckboxElements() {
 // `default-value` and `all-values` take comma-separated values. Define the
 // checkbox elements too.
 function defineCheckboxGroupElements() {
-  defineParts(checkboxGroup, {
+  createParts(checkboxGroup, {
     root: {
       tag: "ui-checkbox-group",
       self: "group",
@@ -81,7 +81,7 @@ function defineCheckboxGroupElements() {
 
 // <ui-switch name="wifi" default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch>
 function defineSwitchElements() {
-  defineParts(switchPrimitive, {
+  createParts(switchPrimitive, {
     root: {
       tag: "ui-switch",
       formAssociated: true,

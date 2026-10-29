@@ -196,10 +196,10 @@ export { Example }
 For web components, register a custom element:
 
 ```ts title="components/ui/mute-button.tsx"
-import { defineParts, wrappedButton } from "@ui-sdk/web"
+import { createParts, wrappedButton } from "@ui-sdk/web"
 import { muteButton } from "@/lib/mute-button"
 
-defineParts(muteButton, {
+createParts(muteButton, {
   root: { tag: "mute-button", target: wrappedButton },
 })
 ```

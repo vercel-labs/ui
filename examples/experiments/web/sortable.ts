@@ -1,4 +1,4 @@
-import { defineParts } from "@ui-sdk/web"
+import { createParts } from "@ui-sdk/web"
 import { sortable } from "../sortable"
 
 function arrange(list: HTMLElement, instance: ReturnType<typeof sortable>) {
@@ -15,7 +15,7 @@ function arrange(list: HTMLElement, instance: ReturnType<typeof sortable>) {
   }
 }
 
-defineParts(sortable, {
+createParts(sortable, {
   root: { tag: "ui-sortable", render: (el, instance) => instance.subscribe(() => arrange(el, instance)) },
   item: "ui-sortable-item",
   handle: "ui-sortable-handle",

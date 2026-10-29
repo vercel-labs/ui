@@ -1,6 +1,6 @@
 import { fileInput, formatFileSize, relativePath, type FileInputApi } from "@ui-sdk/core/file-input"
 import { fileKey } from "@ui-sdk/core/renderer"
-import { defineParts } from "./define-element"
+import { createParts } from "./define-element"
 import { element } from "./list"
 
 const owner = "ui-file-input"
@@ -23,7 +23,7 @@ type ItemElement = HTMLElement & { file?: File }
 // there is one. Elements in the item with `data-file="name"`, `"size"`,
 // `"type"` or `"path"` show that about the file.
 function defineFileInputElements() {
-  defineParts(fileInput, {
+  createParts(fileInput, {
     root: {
       tag: owner,
       display: "block",

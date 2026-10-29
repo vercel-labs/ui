@@ -1,5 +1,5 @@
 import { input, inputGroup, textarea, type InputController } from "@ui-sdk/core/input"
-import { defineParts, wrappedChild } from "./define-element"
+import { createParts, wrappedChild } from "./define-element"
 
 const textApi: ("getValue" | "setValue" | "clear" | "focus")[] = ["getValue", "setValue", "clear", "focus"]
 // `value` reads and writes the field like the controller, so a write fires `valuechange`.
@@ -26,7 +26,7 @@ const controlProps = {
 // <ui-input><input name="email" type="email" /></ui-input>
 // <ui-textarea auto-resize><textarea name="bio"></textarea></ui-textarea>
 function defineInputElements() {
-  defineParts(input, {
+  createParts(input, {
     root: {
       tag: "ui-input",
       display: "contents",
@@ -36,7 +36,7 @@ function defineInputElements() {
       api: textApi,
     },
   })
-  defineParts(textarea, {
+  createParts(textarea, {
     root: {
       tag: "ui-textarea",
       display: "contents",
@@ -58,7 +58,7 @@ function defineInputElements() {
 //   <ui-input-clear><button aria-label="Clear">×</button></ui-input-clear>
 // </ui-input-group>
 function defineInputGroupElements() {
-  defineParts(inputGroup, {
+  createParts(inputGroup, {
     root: { tag: "ui-input-group", self: "group", display: "block" },
     clear: {
       tag: "ui-input-clear",
