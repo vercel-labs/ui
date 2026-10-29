@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { afterAll, beforeEach, expect, test, vi } from "vitest"
 import { readExampleSources } from "./example-sources"
@@ -94,4 +94,17 @@ test("framework llms output reads imports without treating subfolders as source 
   expect(markdown).toContain("### Button")
   expect(markdown).toContain("Import from `@ui-sdk/react/button`.")
   expect(markdown).not.toContain("Example notes")
+})
+
+test("lean Markdown keeps the first example's classes and drops the rest", async () => {
+  writeFiles({
+    "basic.tsx": source,
+    "outline.tsx":
+      'export const Example = () => (\n  <button\n    className="rounded-lg border"\n    type="button"\n  >\n    Save\n  </button>\n)',
+  })
+  const file = writePage()
+  writeFileSync(file, `${readFileSync(file, "utf8")}\n<ComponentExample name="button/outline" />\n`)
+  const markdown = await pageMarkdown(file, "react", () => null, { lean: true })
+  expect(markdown).toContain(source)
+  expect(markdown).toContain('export const Example = () => (\n  <button type="button">\n    Save')
 })

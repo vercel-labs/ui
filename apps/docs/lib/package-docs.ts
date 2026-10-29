@@ -146,8 +146,11 @@ async function writePackageDocs(names = Object.keys(packageFrameworks)) {
       ? await frameworkLlms(framework, linksFrom("llms.txt", framework))
       : await sectionMarkdown("core", (slugs, hash) => linksFrom("llms.txt", framework)({ slugs, hash }))
     if (framework)
+      // Component and utility pages are in folders; guides keep every example styled.
       for (const { page, file } of frameworkFiles(framework))
-        files[file] = await pageMarkdown(page.file, framework, linksFrom(file, framework))
+        files[file] = await pageMarkdown(page.file, framework, linksFrom(file, framework), {
+          lean: file.includes("/"),
+        })
     for (const [file, text] of Object.entries(files)) {
       await mkdir(path.dirname(path.join(dir, file)), { recursive: true })
       await writeFile(path.join(dir, file), text)
