@@ -60,10 +60,13 @@ type StorageScriptOptions = {
 
 type Kind = "local" | "session" | "cookie"
 
-// What every script runs: read the storage once per kind and ID, then put a
-// value it allows on the element right before the script. ES5, since it runs
-// before any bundle and any polyfill.
-const seed = `function(k,i,a,v){try{var c=window.__uiSdkStorage||(window.__uiSdkStorage={}),n=k+":"+i,s;if(n in c)s=c[n];else{try{s=(k==="local"?localStorage:sessionStorage).getItem(i)}catch(e){s=null}c[n]=s}var t=document.currentScript,r=t&&t.previousElementSibling;if(r&&s!==null&&v.indexOf(s)>-1)r.setAttribute(a,s)}catch(e){}}`
+// What every script reads with: the value saved under an ID, read once per
+// kind and ID however many scripts ask, and cached on the window. ES5, since
+// it runs before any bundle and any polyfill.
+const readSaved = `function(k,i){var c=window.__uiSdkStorage||(window.__uiSdkStorage={}),n=k+":"+i;if(!(n in c)){var s=null;try{if(k==="cookie"){var m=("; "+document.cookie).split("; "+encodeURIComponent(i)+"=");if(m.length>1)s=decodeURIComponent(m.pop().split(";")[0])}else s=(k==="local"?localStorage:sessionStorage).getItem(i)}catch(e){}c[n]=s}return c[n]}`
+
+// Puts a value it allows on the element right before the script.
+const seed = `function(k,i,a,v){try{var s=(${readSaved})(k,i),t=document.currentScript,r=t&&t.previousElementSibling;if(r&&s!==null&&v.indexOf(s)>-1)r.setAttribute(a,s)}catch(e){}}`
 
 // JSON, with `<` escaped so a value can't close the script element.
 const literal = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c")
@@ -128,6 +131,7 @@ function createStorage(
 ) {
   checkId(id)
   const listeners = listenersOf(kind, id)
+  const storageKind = kind
 
   const save = (value: string | null) => {
     if (!area.write(value)) return false
@@ -138,6 +142,8 @@ function createStorage(
   return {
     /** The ID the value is kept under: the localStorage or sessionStorage key, or the cookie's name. */
     id,
+    /** Where the value is kept: `"local"`, `"session"` or `"cookie"`. */
+    kind: storageKind,
     /** Whether the server reads the value too, so it renders right from the first render. True for cookies. */
     readsOnServer: area.readsOnServer,
     /**
@@ -318,6 +324,8 @@ function createCookieStorage(id: string, options: CookieStorageOptions = {}) {
 type ValueStorage = ReturnType<typeof createLocalStorage>
 
 export {
+  literal,
+  readSaved,
   type CookieStorageOptions,
   type StorageScriptOptions,
   type ValueStorage,

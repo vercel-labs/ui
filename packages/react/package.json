@@ -38,6 +38,7 @@
     "./password-input": "./src/password-input.tsx",
     "./popover": "./src/popover.tsx",
     "./primitive": "./src/primitive.ts",
+    "./preferences": "./src/preferences.tsx",
     "./progress": "./src/progress.tsx",
     "./radio": "./src/radio.tsx",
     "./resizable": "./src/resizable.tsx",
@@ -199,6 +200,10 @@
       "./primitive": {
         "types": "./dist/primitive.d.ts",
         "default": "./dist/primitive.js"
+      },
+      "./preferences": {
+        "types": "./dist/preferences.d.ts",
+        "default": "./dist/preferences.js"
       },
       "./progress": {
         "types": "./dist/progress.d.ts",

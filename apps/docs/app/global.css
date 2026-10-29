@@ -2,7 +2,17 @@
 @source "../../../examples";
 @source not "../../../examples/dist";
 
-@custom-variant dark (&:where(.dark, .dark *));
+/* Matches where the dark side shows: a dark choice, or the system's dark preference. */
+@custom-variant dark {
+  &:where(.dark, .dark *, [data-color-scheme="dark"], [data-color-scheme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-color-scheme="system"], [data-color-scheme="system"] *) {
+      @slot;
+    }
+  }
+}
 
 /* The site's width and side padding, shared by the header and the footer. */
 @utility container {
@@ -36,52 +46,57 @@
   }
 }
 
-:root,
-.light {
-  --canvas: oklch(0.9848 0 0);
-  --subtle: oklch(0.48 0 0);
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+/*
+ * One set of colors for both schemes: `light-dark()` picks a side by the
+ * element's `color-scheme`. `Preferences` puts the reader's choice on
+ * <html> as `data-color-scheme` before the first paint, and "system", or
+ * no attribute yet, follows the browser. `.light` and `.dark` force one
+ * side for a part of the page, like an example's preview.
+ */
+:root {
+  color-scheme: light dark;
 }
 
+[data-color-scheme="light"],
+.light {
+  color-scheme: light;
+}
+
+[data-color-scheme="dark"],
 .dark {
-  --canvas: oklch(0.175 0 0);
-  --subtle: oklch(0.72 0 0);
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  color-scheme: dark;
+}
+
+/*
+ * Declared again on everything that sets a scheme, since a browser works out
+ * `light-dark()` in a custom property where it's declared, and the elements
+ * inside inherit the color it picked.
+ */
+:root,
+.light,
+.dark,
+[data-color-scheme] {
+  --canvas: light-dark(oklch(0.9848 0 0), oklch(0.175 0 0));
+  --subtle: light-dark(oklch(0.48 0 0), oklch(0.72 0 0));
+  --radius: 0.625rem;
+  --background: light-dark(oklch(1 0 0), oklch(0.145 0 0));
+  --foreground: light-dark(oklch(0.145 0 0), oklch(0.985 0 0));
+  --card: light-dark(oklch(1 0 0), oklch(0.205 0 0));
+  --card-foreground: light-dark(oklch(0.145 0 0), oklch(0.985 0 0));
+  --popover: light-dark(oklch(1 0 0), oklch(0.205 0 0));
+  --popover-foreground: light-dark(oklch(0.145 0 0), oklch(0.985 0 0));
+  --primary: light-dark(oklch(0.205 0 0), oklch(0.922 0 0));
+  --primary-foreground: light-dark(oklch(0.985 0 0), oklch(0.205 0 0));
+  --secondary: light-dark(oklch(0.97 0 0), oklch(0.269 0 0));
+  --secondary-foreground: light-dark(oklch(0.205 0 0), oklch(0.985 0 0));
+  --muted: light-dark(oklch(0.97 0 0), oklch(0.269 0 0));
+  --muted-foreground: light-dark(oklch(0.556 0 0), oklch(0.708 0 0));
+  --accent: light-dark(oklch(0.97 0 0), oklch(0.269 0 0));
+  --accent-foreground: light-dark(oklch(0.205 0 0), oklch(0.985 0 0));
+  --destructive: light-dark(oklch(0.577 0.245 27.325), oklch(0.704 0.191 22.216));
+  --border: light-dark(oklch(0.922 0 0), oklch(1 0 0 / 10%));
+  --input: light-dark(oklch(0.922 0 0), oklch(1 0 0 / 15%));
+  --ring: light-dark(oklch(0.708 0 0), oklch(0.556 0 0));
 }
 
 @theme inline {
@@ -135,22 +150,13 @@ html {
 
 .shiki,
 .shiki span {
-  color: var(--shiki-light);
-}
-
-.dark .shiki,
-.dark .shiki span {
-  color: var(--shiki-dark);
+  color: light-dark(var(--shiki-light), var(--shiki-dark));
 }
 
 [data-code-frame] {
   --code-pad: 1rem;
-  --gutter-bg: var(--background);
+  --gutter-bg: light-dark(var(--background), color-mix(in srgb, var(--foreground) 3%, var(--canvas)));
   --line-tint: transparent;
-}
-
-.dark [data-code-frame] {
-  --gutter-bg: color-mix(in srgb, var(--foreground) 3%, var(--canvas));
 }
 
 [data-code-frame] pre {

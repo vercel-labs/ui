@@ -2,7 +2,6 @@
 // The inline script a component renders after its root, run the way the
 // browser's parser would: once per script element, with it as currentScript.
 import { afterEach, expect, test } from "vitest"
-import { createColorScheme } from "../src/foundation/preferences/color-scheme"
 import {
   createCookieStorage,
   createLocalStorage,
@@ -111,12 +110,4 @@ test("a cookie needs no script, since the server renders its value", () => {
   expect(
     createCookieStorage("color-scheme").script({ attribute: "data-color-scheme", values }),
   ).toBeUndefined()
-})
-
-test("a color scheme's script shows its saved choice on data-color-scheme", () => {
-  localStorage.setItem("color-scheme", "dark")
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme") })
-  const [root] = load(`<div data-color-scheme="system"></div><script>${colorScheme.script()}</script>`)
-  expect(root.dataset.colorScheme).toBe("dark")
-  expect(createColorScheme().script()).toBeUndefined()
 })

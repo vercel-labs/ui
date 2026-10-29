@@ -4,6 +4,7 @@ import { FrameworkPicker } from "./framework-picker"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
 import { HeaderMenu } from "./header-menu"
+import { ThemeToggle } from "./theme-toggle"
 
 // The header on large screens. Pages outside the docs, like the homepage, have no section.
 function Header({ section, urls = [] }: { section?: Section; urls?: string[] }) {
@@ -52,6 +53,7 @@ function Header({ section, urls = [] }: { section?: Section; urls?: string[] }) 
             shortcut
             className="flex h-8 w-56 items-center gap-2.5 whitespace-nowrap rounded-2xl bg-foreground/[0.045] px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 xl:w-60"
           />
+          <ThemeToggle />
         </div>
       </div>
     </header>

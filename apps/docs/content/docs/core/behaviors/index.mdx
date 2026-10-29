@@ -131,13 +131,15 @@ Import these helpers from `@ui-sdk/core/gesture`.
 
 ## Preferences and Devices
 
-| Helper                                                           | What It Does                                                             |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [`createColorScheme`](./preferences#follow-it-in-a-primitive)    | Holds a choice of light, dark or the system's scheme, and what it shows. |
-| [`colorSchemeOf`](./preferences#render-the-right-scheme-first)   | Reads the color scheme a browser sends with a request.                   |
-| [`createLocalStorage`](./preferences#keep-a-value)               | Keeps a value in localStorage, for every tab, until it's removed.        |
-| [`createSessionStorage`](./preferences#keep-a-value)             | Keeps a value in sessionStorage, for the tab, while it's open.           |
-| [`createCookieStorage`](./preferences#read-cookie-on-the-server) | Keeps a value in a cookie, which the server reads too.                   |
+| Helper                                                           | What It Does                                                                              |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| [`createColorScheme`](./preferences#follow-it-in-a-primitive)    | Holds a choice of light, dark or the system's scheme, and what it shows.                  |
+| [`colorSchemeOf`](./preferences#render-the-right-scheme-first)   | Reads the color scheme a browser sends with a request.                                    |
+| [`createPreference`](./preferences#define-a-preference)          | Holds a choice from a list, like a skin tone, and shows it on a `data-*` attribute.       |
+| [`preferencesScript`](./preferences#show-them-with-preferences)  | The inline script that puts saved preferences on their attributes before the first paint. |
+| [`createLocalStorage`](./preferences#keep-a-value)               | Keeps a value in localStorage, for every tab, until it's removed.                         |
+| [`createSessionStorage`](./preferences#keep-a-value)             | Keeps a value in sessionStorage, for the tab, while it's open.                            |
+| [`createCookieStorage`](./preferences#read-cookie-on-the-server) | Keeps a value in a cookie, which the server reads too.                                    |
 
 ## Canvas
 

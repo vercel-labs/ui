@@ -1,19 +1,8 @@
-const themeKey = "theme"
+import { createColorScheme, createLocalStorage } from "@ui-sdk/core"
 
-// Runs in <head> before the page paints. Kept free of imports so it can be inlined.
-const themeScript = `(() => {
-  try {
-    const theme = localStorage.getItem("${themeKey}") ?? "system"
-    const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches)
-    document.documentElement.classList.toggle("dark", dark)
-    document.documentElement.style.colorScheme = dark ? "dark" : "light"
-  } catch {}
-})()`
+// The site's color scheme, shown on <html> as `data-color-scheme`, which the
+// stylesheet's colors follow. It's kept under "theme", the key the site used
+// before, so readers keep what they chose.
+const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
 
-function applyTheme(theme: string) {
-  const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches)
-  document.documentElement.classList.toggle("dark", dark)
-  document.documentElement.style.colorScheme = dark ? "dark" : "light"
-}
-
-export { applyTheme, themeKey, themeScript }
+export { colorScheme }

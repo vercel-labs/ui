@@ -8,10 +8,10 @@
 // `Sec-CH-Prefers-Color-Scheme` hint says, through `initial`. A stylesheet
 // answers `"system"` with its own `prefers-color-scheme` query, so the first
 // paint is right before any script runs.
-import { createDetails, type ChangeDetails, type ChangeReason } from "../kernel/details"
-import { changeSource } from "../kernel/input-source"
+import type { ChangeDetails, ChangeReason } from "../kernel/details"
 import { isBrowser } from "../platform/env"
 import type { ValueStorage } from "../storage/storage"
+import { createPreference, followIn } from "./preference"
 
 /**
  * A color scheme the app can choose: `"light"`, `"dark"`, or `"system"`,
@@ -70,6 +70,12 @@ type ColorSchemeOptions = {
    * subscribes or follows, after hydration, with the reason `"restore"`.
    */
   storage?: ValueStorage
+  /**
+   * Whether `Preferences` puts `data-color-scheme` on `<html>`, for a page
+   * that styles by it everywhere. Otherwise it goes on the `Preferences` element.
+   * @defaultValue false
+   */
+  global?: boolean
   /** The window to read, like an iframe's. Defaults to the page's window. */
   view?: Window
 }
@@ -114,32 +120,27 @@ function sharedOf(view: Window | undefined) {
   return shared
 }
 
-const isValue = (value: string | null): value is ColorSchemeValue =>
-  value === "system" || value === "light" || value === "dark"
-
 const resolve = (value: ColorSchemeValue, system: SystemColorScheme) => (value === "system" ? system : value)
 
 /**
  * The app's color scheme: a choice of `"system"`, `"light"` or `"dark"`, the
  * browser's preference, and what shows. Create one per scope, like the page
- * or a dark sidebar. They share one query per window.
+ * or a dark sidebar. They share one query per window. It's a preference on
+ * `data-color-scheme`, so pass it to `Preferences` with any others.
  * @experimental
  */
 function createColorScheme(options: ColorSchemeOptions = {}) {
   const initial = options.initial ?? "unknown"
-  const { storage } = options
-  const saved = () => {
-    const value = storage?.get() ?? null
-    return isValue(value) ? value : undefined
-  }
-  // What the storage held when this last read or wrote it, so subscribing
-  // again catches up with whatever changed in between, removals too.
-  // Undefined until the first read.
-  let synced = storage?.readsOnServer ? storage.get() : undefined
-  // A storage the server reads too starts the choice on both sides, so hydration matches.
-  const defaultValue = (storage?.readsOnServer ? saved() : undefined) ?? options.defaultValue ?? "system"
+  // The choice, kept in the storage and shown on `data-color-scheme`.
+  const choice = createPreference({
+    values: ["system", "light", "dark"],
+    defaultValue: options.defaultValue ?? "system",
+    attribute: "data-color-scheme",
+    global: options.global,
+    storage: options.storage,
+    onValueChange: options.onValueChange,
+  })
   const shared = () => sharedOf(options.view ?? (isBrowser ? window : undefined))
-  let value = defaultValue
   const listeners = new Set<(state: ColorSchemeState) => void>()
 
   const systemNow = () => {
@@ -156,11 +157,12 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
     const next: ColorSchemeState = { value, system, resolved: resolve(value, system) }
     return next
   }
-  const initialState = snapshot(defaultValue, initial)
+  const initialState = snapshot(choice.initialState.value, initial)
   // The same object until something changes, so frameworks can compare snapshots.
   let state = initialState
 
   const get = () => {
+    const value = choice.get().value
     const system = systemNow()
     if (state.value !== value || state.system !== system) state = snapshot(value, system)
     return state
@@ -180,7 +182,7 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
     notify()
   }
 
-  let unwatchStorage: (() => void) | undefined
+  let unwatchChoice: (() => void) | undefined
 
   const subscribe = (listener: (state: ColorSchemeState) => void) => {
     // A wrapper per subscription, so the same listener subscribed twice stops once per call.
@@ -193,46 +195,29 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
         if (current.listeners.size === 0) current.query.addEventListener("change", current.notify)
         current.listeners.add(onSystem)
       }
-      if (storage) {
-        // Read back what was saved, now that hydration is done, then hear other tabs.
-        const current = storage.get()
-        if (current !== synced) {
-          const first = synced === undefined
-          synced = current
-          // Nothing saved the first time keeps the starting choice. A choice
-          // removed since the last read goes back to the default.
-          if (isValue(current)) set(current, { reason: "restore" })
-          else if (!first) set(options.defaultValue ?? "system", { reason: "restore" })
-        }
-        unwatchStorage = storage.subscribe((next) => {
-          synced = next
-          set(isValue(next) ? next : (options.defaultValue ?? "system"), { reason: "storage-sync" })
-        })
-      }
+      // The choice's first subscriber reads back what was saved, after hydration.
+      unwatchChoice = choice.subscribe(notify)
     }
     return () => {
       if (!listeners.delete(entry) || listeners.size > 0) return
-      unwatchStorage?.()
-      unwatchStorage = undefined
+      unwatchChoice?.()
+      unwatchChoice = undefined
       if (!current?.listeners.delete(onSystem)) return
       if (current.listeners.size === 0) current.query.removeEventListener("change", current.notify)
     }
   }
 
-  const set = (next: ColorSchemeValue, change: { reason?: ChangeReason; event?: Event } = {}) => {
-    if (next === value) return false
-    const reason = change.reason ?? "imperative"
-    const details = createDetails({ reason, event: change.event }, changeSource(reason, change.event))
-    options.onValueChange?.(next, details)
-    if (details.canceled) return false
-    value = next
-    // A value read from storage is already there.
-    if (reason !== "restore" && reason !== "storage-sync" && storage?.set(next)) synced = next
-    notify()
-    return true
-  }
-
   return {
+    /** The attribute `Preferences` shows the choice on. */
+    attribute: choice.attribute,
+    /** Whether `Preferences` puts `data-color-scheme` on `<html>`. */
+    global: choice.global,
+    /** The choices: `"system"`, `"light"` and `"dark"`. */
+    values: choice.values,
+    /** The choice when nothing allowed is saved. */
+    defaultValue: choice.defaultValue,
+    /** Where the choice is kept between visits. */
+    storage: choice.storage,
     /** What the server and the first client render show: `defaultValue`, with `initial` as the browser's preference. */
     initialState,
     /** What the color scheme knows now. The same object until something changes. */
@@ -241,41 +226,17 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
      * Changes the app's scheme, through `onValueChange`, which can cancel it.
      * The reason defaults to `"imperative"`. Returns whether it changed.
      */
-    set,
+    set: choice.set,
     /** Hears every change, to the app's scheme or the browser's preference. Returns the function that stops it. */
     subscribe,
-    /**
-     * The inline script to render right after the root that shows
-     * `data-color-scheme`, which puts the saved choice there before
-     * hydration, so CSS shows it on the first paint. Undefined without a
-     * `storage`, or with a cookie, since the server renders its value.
-     */
-    script: () => storage?.script({ attribute: "data-color-scheme", values: ["system", "light", "dark"] }),
     /**
      * Keeps `key` in a store set to the color scheme's state. Call it from a
      * part's `bind`: the state starts at `initialState`, catches up a
      * microtask later, once hydration is done, and follows every change after
      * that. Returns the cleanup for `bind`.
      */
-    follow<Key extends string>(store: ColorSchemeStore<Key>, key: Key) {
-      const write = (next: ColorSchemeState) => {
-        // A cast, since TypeScript can't tell that a computed key makes the mapped type.
-        if (store.get()[key] !== next) store.set({ [key]: next } as { [K in Key]: ColorSchemeState })
-      }
-      let stopped = false
-      let unsubscribe: (() => void) | undefined
-      // A microtask later, like the platform's shortcut names, so every part
-      // a framework hydrates in this pass renders what the server did first.
-      queueMicrotask(() => {
-        if (stopped) return
-        unsubscribe = subscribe(write)
-        write(get())
-      })
-      return () => {
-        stopped = true
-        unsubscribe?.()
-      }
-    },
+    follow: <Key extends string>(store: ColorSchemeStore<Key>, key: Key) =>
+      followIn({ get, subscribe }, store, key),
   }
 }
 

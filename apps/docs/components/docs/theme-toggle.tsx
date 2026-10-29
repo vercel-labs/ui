@@ -1,7 +1,9 @@
 "use client"
 
 import { Toggle, ToggleGroup } from "@/components/ui/toggle-group"
-import { applyTheme, themeKey } from "@/lib/theme"
+import { colorScheme } from "@/lib/theme"
+import type { ColorSchemeValue } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/react/preferences"
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react"
 import * as React from "react"
 
@@ -9,36 +11,32 @@ const themes = [
   { value: "system", label: "System", icon: MonitorIcon },
   { value: "light", label: "Light", icon: SunIcon },
   { value: "dark", label: "Dark", icon: MoonIcon },
-]
+] as const
+
+const noSubscribe = () => () => {}
 
 function ThemeToggle() {
-  // The stored theme is only known in the browser, so the first render shows none pressed.
-  const [theme, setTheme] = React.useState<string[]>([])
-
-  React.useEffect(() => {
-    setTheme([localStorage.getItem(themeKey) ?? "system"])
-  }, [])
-
-  // Follows the system while it's the choice.
-  React.useEffect(() => {
-    if (theme[0] !== "system") return
-    const query = matchMedia("(prefers-color-scheme: dark)")
-    const update = () => applyTheme("system")
-    query.addEventListener("change", update)
-    return () => query.removeEventListener("change", update)
-  }, [theme])
+  const { value } = usePreference(colorScheme)
+  // The saved choice is only known after hydration, so the server's render
+  // shows none pressed rather than the wrong one. The page's colors are right
+  // before that, from `data-color-scheme`.
+  const hydrated = React.useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  )
 
   return (
     <ToggleGroup
       aria-label="Theme"
-      value={theme}
-      onValueChange={(next) => {
+      value={hydrated ? [value] : []}
+      onValueChange={(next, details) => {
         // A pressed toggle stays pressed: there's always a theme.
         if (!next.length) return
-        const value = next[next.length - 1]
-        setTheme([value])
-        localStorage.setItem(themeKey, value)
-        applyTheme(value)
+        colorScheme.set(next[next.length - 1] as ColorSchemeValue, {
+          reason: "item-press",
+          event: details.event,
+        })
       }}
     >
       {themes.map(({ value, label, icon: Icon }) => (

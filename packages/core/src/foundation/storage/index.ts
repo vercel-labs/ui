@@ -2,6 +2,8 @@
 // import from another folder against this list. Nothing imports this file, so bundles
 // don't pay for it.
 export {
+  literal,
+  readSaved,
   createCookieStorage,
   createLocalStorage,
   createSessionStorage,

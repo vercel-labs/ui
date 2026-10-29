@@ -66,9 +66,7 @@ test("a highlighted gutter matches its band, and the block keeps its end padding
   for (const theme of ["light", "dark"] as const) {
     await page.evaluate((next) => {
       localStorage.setItem("theme", next)
-      const dark = next === "dark"
-      document.documentElement.classList.toggle("dark", dark)
-      document.documentElement.style.colorScheme = dark ? "dark" : "light"
+      document.documentElement.dataset.colorScheme = next
     }, theme)
     const gap = await pre.evaluate((el) => {
       const lines = [...el.querySelectorAll<HTMLElement>(".line.highlighted")]

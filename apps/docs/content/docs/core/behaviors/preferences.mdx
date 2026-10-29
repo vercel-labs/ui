@@ -1,9 +1,9 @@
 ---
 title: Preferences and Devices
-description: Let people choose light, dark or their system's scheme, keep what they choose between visits, and render it right from the server's first render.
+description: Let people choose a color scheme, an emoji skin tone or any other preference, keep it between visits, and style by it from the first paint.
 ---
 
-People tell their browser how they like things, such as light or dark colors, and apps often let them choose again, per app or per part of a page. `createColorScheme` holds that choice, reads the browser's preference and works out what shows, so your components can follow along. Storage keeps a choice like that between visits, in localStorage, sessionStorage or a cookie.
+People tell their browser how they like things, such as light or dark colors, and apps let them choose more: an emoji skin tone, a density, a time format. `createColorScheme` holds a color scheme, reads the browser's preference and works out what shows. `createPreference` holds any other choice from a list. `Preferences` shows them all on `data-*` attributes before the first paint, so your CSS styles by them, and storage keeps them between visits, in localStorage, sessionStorage or a cookie.
 
 Import them from `@ui-sdk/core`.
 
@@ -89,6 +89,8 @@ Render the choice, not what it resolves to. The first render says `data-color-sc
 }
 ```
 
+[Style by Preferences](#style-by-preferences) shows the whole stylesheet, with one set of colors for both schemes.
+
 A choice someone saved works the same way when it's kept in a cookie, as in [Remember the Choice](#remember-the-choice): the server reads it, so the first render already shows it.
 
 Style everything that depends on the scheme this way, from `data-color-scheme` in CSS, and keep the state for content, like a label that says "Dark". CSS is right from the first paint; content follows the state, which can only change after hydration.
@@ -115,7 +117,7 @@ const colorScheme = createColorScheme({
 
 `colorSchemeOf` returns `"light"`, `"dark"`, or `"unknown"` when the header is missing. Browsers may leave it out, so keep the stylesheet's media query either way.
 
-A color scheme holds the app's choice, so create one per request on the server, never one shared by every request.
+A color scheme made from a request, like one given its client hint or its cookie, belongs to that request, so create it per request, never once for the whole server.
 
 ### Remember the Choice
 
@@ -130,7 +132,7 @@ const colorScheme = createColorScheme({ storage: createLocalStorage("color-schem
 When the saved choice shows depends on who can read it:
 
 - A cookie, from `createCookieStorage`, is read as the color scheme is created, on the server and in the browser alike, so the first render shows the saved choice. On the server, give it the request's `Cookie` header, as in [Read Cookie on the Server](#read-cookie-on-the-server).
-- localStorage and sessionStorage are only in the browser, so the first render shows `defaultValue`. The saved choice comes back once something subscribes or follows, after hydration, and `onValueChange` hears it with the reason `"restore"`. Render `colorScheme.script()` right after the root, as in [Show It Before Hydration](#show-it-before-hydration), and CSS shows the saved choice on the first paint anyway.
+- localStorage and sessionStorage are only in the browser, so the first render shows `defaultValue`. The saved choice comes back once something subscribes or follows, after hydration, and `onValueChange` hears it with the reason `"restore"`. Pass the color scheme to [`Preferences`](#show-them-with-preferences), and CSS shows the saved choice on the first paint anyway.
 
 Choices made in another tab, or through another storage with the same ID, arrive with the reason `"storage-sync"`. The picker above keeps its choice in localStorage, so pick one and reload the page.
 
@@ -157,6 +159,175 @@ A part in an iframe follows the iframe's window. Pass it as `view`:
 ```ts
 const colorScheme = createColorScheme({ view: frame.contentWindow! })
 ```
+
+## Preferences
+
+### Define a Preference
+
+A preference is one value people choose from a list, shown on a `data-*` attribute and kept in a storage. Give it its values, the default, the attribute, and a [storage](#storage):
+
+```ts
+import { createLocalStorage, createPreference } from "@ui-sdk/core"
+
+const skinTone = createPreference({
+  values: ["default", "light", "medium-light", "medium", "medium-dark", "dark"],
+  defaultValue: "default",
+  attribute: "data-skin-tone",
+  storage: createLocalStorage("skin-tone"),
+})
+```
+
+It works like a color scheme's choice. `get` returns its state, like `{ value: "dark" }`, the same object until it changes. `set` changes it through `onValueChange`, which hears the reason and can cancel it, and saves it. `subscribe` hears every change, and `follow` keeps a primitive's state in step from a part's `bind`. A value that isn't in `values` is refused, and a saved one is ignored, so a stale or tampered value never shows.
+
+The saved value comes back the way a color scheme's does: right away from a cookie, which the server reads too, and after hydration, with the reason `"restore"`, from localStorage or sessionStorage.
+
+### Show Them with Preferences
+
+`Preferences` shows a list of preferences on their attributes. Pass it color schemes and preferences alike, and put it at the top of `<body>`:
+
+```tsx
+import { Preferences } from "@ui-sdk/react/preferences"
+
+;<body>
+  <Preferences preferences={[colorScheme, skinTone]}>
+    <App />
+  </Preferences>
+</body>
+```
+
+On the server it renders one inline script as its first child. As the page loads, before any bundle, the script reads every storage once and puts each saved value, or the default, on its attribute, so the first paint already shows it. After hydration, `Preferences` keeps the attributes in step with every change. A render in the browser only, like after a client-side navigation, leaves the script out, since the values are already known.
+
+Its own element has `display: contents`, so it doesn't change your layout, and it holds the attributes of preferences that aren't global, for the part of the page inside it. Pass `nonce` if your Content Security Policy only allows inline scripts with one.
+
+This site's theme switch is built this way.
+
+### On the Whole Page
+
+Pass `global: true`, and the attribute goes on `<html>`, for something the whole page styles by, like a color scheme or a density:
+
+```ts
+const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
+```
+
+The script puts it on `<html>` before the page paints, even from a cookie, since `Preferences` doesn't render `<html>` itself. Tell your framework the attribute is there before hydration, like React's `suppressHydrationWarning` on `<html>`.
+
+### Read One in a Component
+
+`usePreference` returns a preference's state, or a color scheme's:
+
+```tsx
+import { usePreference } from "@ui-sdk/react/preferences"
+
+function Wave() {
+  const { value } = usePreference(skinTone)
+  return <span>{waves[value]}</span>
+}
+```
+
+While hydrating it returns the server's state, so the page hydrates without a mismatch, and right after, the saved one. So content like this changes once the page hydrates, unless the value is kept in a cookie. For a first paint that's right everywhere, style by the attribute, as below.
+
+## Style by Preferences
+
+The attribute is there before the first paint; the state is only there after hydration. So anything that should look right from the first paint is CSS that selects the attribute, and content follows the state.
+
+### Select the Attribute
+
+Select a global preference from `<html>`, and any other from inside the `Preferences` element:
+
+```css
+[data-density="compact"] .row {
+  padding-block: 0.25rem;
+}
+```
+
+With Tailwind, make it a variant:
+
+```css
+@custom-variant compact (&:where([data-density="compact"], [data-density="compact"] *));
+```
+
+```html
+<li class="py-2 compact:py-1">…</li>
+```
+
+### Color Scheme with light-dark()
+
+Map the attribute to the CSS `color-scheme` property, and write each color once with `light-dark()`, which picks a side by the element's `color-scheme`:
+
+```css
+:root {
+  color-scheme: light dark;
+}
+
+[data-color-scheme="light"] {
+  color-scheme: light;
+}
+
+[data-color-scheme="dark"] {
+  color-scheme: dark;
+}
+
+:root,
+[data-color-scheme] {
+  --background: light-dark(oklch(1 0 0), oklch(0.145 0 0));
+  --foreground: light-dark(oklch(0.145 0 0), oklch(0.985 0 0));
+}
+```
+
+`"system"`, or no attribute yet, leaves `light dark`, so the browser's preference picks, with no media query. Form controls and scrollbars follow `color-scheme` too.
+
+Declare the colors on every element that sets a scheme, not just `:root`. A browser works out `light-dark()` in a custom property where it's declared, and the elements inside inherit the color it picked, so a part of the page with its own scheme, like a dark sidebar with its own `data-color-scheme`, needs its own declaration to pick again.
+
+Tailwind's `dark:` variant needs the browser's preference for `"system"`, so give it both cases:
+
+```css
+@custom-variant dark {
+  &:where([data-color-scheme="dark"], [data-color-scheme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where([data-color-scheme="system"], [data-color-scheme="system"] *) {
+      @slot;
+    }
+  }
+}
+```
+
+### Content That Depends on One
+
+Content can't wait for hydration either, so when there are only a few versions of it, render every one and let CSS show the one that matches. A skin tone picker's hands, or a label that says "Dark":
+
+```tsx
+<span className="wave">
+  {skinTone.values.map((tone) => (
+    <span key={tone} data-tone={tone}>
+      {waves[tone]}
+    </span>
+  ))}
+</span>
+```
+
+```css
+.wave [data-tone] {
+  display: none;
+}
+
+[data-skin-tone="default"] .wave [data-tone="default"],
+[data-skin-tone="dark"] .wave [data-tone="dark"] {
+  display: inline;
+}
+```
+
+`display: none` keeps the hidden versions from screen readers too. For a picture, switch `background-image` by the attribute the same way.
+
+Content that's everywhere, like every emoji in a thread, or text a preference formats, like dates in a time format, is too much to render in every version. Keep that preference in a cookie, which the server reads, so it renders the right content to begin with.
+
+| What depends on it                         | Do this                      | First paint                  |
+| ------------------------------------------ | ---------------------------- | ---------------------------- |
+| Colors, spacing, fonts, showing and hiding | CSS by the attribute         | Right, with any storage      |
+| A few versions of some content             | Render each, CSS shows one   | Right, with any storage      |
+| Content everywhere, or formatted text      | A cookie, read on the server | Right                        |
+| Content, with localStorage                 | `usePreference`              | The default, until hydration |
 
 ## Storage
 
@@ -242,7 +413,7 @@ const script = colorSchemeStorage.script({
 
 Style from the attribute, and the first paint shows the saved value. The component's state catches up after hydration, through `"restore"`, so content that depends on the value, like a label, changes then. The root differs from the server's HTML until it does, so tell your framework to expect it, like React's `suppressHydrationWarning`.
 
-Every script with the same kind and ID reads the storage once, however many components render it, and the scripts are identical, so compression shrinks the repeats to a few bytes.
+Every script with the same kind and ID reads the storage once, however many components render it, and the scripts are identical, so compression shrinks the repeats to a few bytes. For preferences, [`Preferences`](#show-them-with-preferences) renders one script for all of them instead.
 
 The saved value comes from the browser, where any script on your site can write it, so `script` only sets attributes that start with `data-`, and only to one of `values`. Anything else leaves the root as the server rendered it. A cookie needs no script, so its `script` returns undefined: the server renders its value.
 
@@ -258,6 +429,7 @@ The saved value comes from the browser, where any script on your site can write 
     onValueChange: "Let People Choose",
     onSystemValueChange: "Let People Choose",
     storage: "Remember the Choice",
+    global: "On the Whole Page",
     view: "Inside a Frame",
   }}
 />
@@ -271,7 +443,6 @@ The saved value comes from the browser, where any script on your site can write 
     get: "Outside a Primitive",
     set: "Let People Choose",
     subscribe: "Outside a Primitive",
-    script: "Remember the Choice",
     follow: "Follow It in a Primitive",
   }}
 />
@@ -284,6 +455,43 @@ The saved value comes from the browser, where any script on your site can write 
     value: "Three Answers",
     system: "Three Answers",
     resolved: "Three Answers",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/preferences/preference.ts"
+  name="PreferenceOptions"
+  events={false}
+  examples={{
+    values: "Define a Preference",
+    defaultValue: "Define a Preference",
+    attribute: "Define a Preference",
+    global: "On the Whole Page",
+    storage: "Define a Preference",
+    onValueChange: "Define a Preference",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/preferences/preference.ts"
+  name="Preference"
+  events={false}
+  examples={{
+    get: "Define a Preference",
+    set: "Define a Preference",
+    subscribe: "Define a Preference",
+    follow: "Define a Preference",
+    global: "On the Whole Page",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/react/src/preferences.tsx"
+  name="PreferencesProps"
+  events={false}
+  examples={{
+    preferences: "Show Them with Preferences",
+    nonce: "Show Them with Preferences",
   }}
 />
 

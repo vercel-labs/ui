@@ -11,3 +11,11 @@ export {
   type ColorSchemeValue,
   type SystemColorScheme,
 } from "./color-scheme"
+export {
+  createPreference,
+  preferencesScript,
+  type Preference,
+  type PreferenceLike,
+  type PreferenceOptions,
+  type PreferenceStore,
+} from "./preference"
