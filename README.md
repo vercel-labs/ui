@@ -9,124 +9,151 @@ A library of UI behaviors for building interfaces: keyboard navigation, focus, s
 
 ## Example
 
-ui-sdk comes with ready-made components like Popover, Menu and Select for every framework. When you need one that isn't there, you build it from the same behaviors.
+Every component in ui-sdk is built from behaviors, and you can build your own the same way. Let's make a search field with a button that clears it.
 
-Let's build a ranking list. You can drag an item to a new place, or use the keyboard: Space picks it up, the arrows move it, Space drops it and Escape puts it back. Screen readers hear each step.
-
-It takes two behaviors. `createRovingFocus` moves focus with the arrow keys, and `createReorder` handles the dragging, the keyboard moves and the announcements. Define the list once in `ranking.ts`:
+The clear button disappears when you press it, which would drop focus to the page. `createFocusRecovery` sends focus back to the input. Define the field once in `search-field.ts`:
 
 ```ts
-import {
-  createChange,
-  createReorder,
-  createRovingFocus,
-  definePrimitive,
-  type ReorderDraft,
-} from "@ui-sdk/core"
+import { createFocusRecovery, definePrimitive } from "@ui-sdk/core"
 
-const ranking = definePrimitive({
-  name: "ranking",
-  options: { defaultValue: "list" },
-  state: (options: { defaultValue: string[] }) => ({
-    value: options.defaultValue,
-    focused: null as string | null,
-    moving: null as ReorderDraft | null,
+const searchField = definePrimitive({
+  name: "search-field",
+  state: () => ({ value: "" }),
+  api: (context) => ({
+    set: (value: string) => context.store.set({ value }),
+    recovery: createFocusRecovery({ fallback: () => context.element("input") }),
   }),
-  api: (context) => {
-    const change = createChange(context)
-    return {
-      roving: createRovingFocus(context, { slot: "item", key: "focused" }),
-      reorder: createReorder(context, {
-        slot: "item",
-        key: "value",
-        draft: "moving",
-        set: (value, details) => change("value", value, details),
-      }),
-    }
-  },
   slots: (slot) => ({
-    root: slot<{}, { order: string[] }>({
-      state: (state, { api }) => ({ order: api.reorder.order(state) }),
-      attrs: () => ({ role: "listbox", "aria-roledescription": "sortable list" }),
+    input: slot({
+      attrs: (state) => ({ value: state.value }),
+      on: { input: (event, { api }) => api.set((event.target as HTMLInputElement).value) },
     }),
-    item: slot<{ value: string }>({
-      props: { value: "string" },
-      attrs: (state, part) => ({
-        role: "option",
-        "aria-roledescription": "sortable item",
-        "aria-selected": String(state.moving?.key === part.key),
-        "data-grabbed": state.moving?.key === part.key ? "" : undefined,
-        tabindex: part.api.roving.tabIndex(state, part),
-        style: "touch-action: none",
-      }),
-      on: {
-        keydown: (event, { el, api, key }) =>
-          api.reorder.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
-      },
-      bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.reorder.bind(el, part)]
-        return () => cleanups.forEach((cleanup) => cleanup())
-      },
+    clear: slot({
+      present: (state) => state.value !== "",
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.set(""),
+      bind: (el, part) => part.api.recovery.bind(el, part),
     }),
   }),
 })
 
-export { ranking }
+export { searchField }
 ```
 
-Then use `createParts` to turn it into components. In React:
+Then render it in your framework. React, Vue, Svelte and Solid use `createParts`, and web components use `defineParts`. The parts are the same in all five.
+
+### React
 
 ```tsx
 import { createParts } from "@ui-sdk/react/primitive"
-import { ranking } from "./ranking"
+import { searchField } from "./search-field"
 
-const { Root, Item } = createParts(ranking, { root: "div", item: "div" })
+const parts = createParts(searchField, { input: "input", clear: "button" })
 
-function Seasons() {
+const SearchField = parts.Root
+const SearchFieldInput = parts.Input
+const SearchFieldClear = parts.Clear
+
+function Search() {
   return (
-    <Root aria-label="Favorite seasons" defaultValue={["Spring", "Summer", "Autumn", "Winter"]}>
-      {({ order }) =>
-        order.map((season) => (
-          <Item key={season} value={season}>
-            {season}
-          </Item>
-        ))
-      }
-    </Root>
+    <SearchField>
+      <SearchFieldInput placeholder="Search" />
+      <SearchFieldClear>Clear</SearchFieldClear>
+    </SearchField>
   )
 }
 
-export { Seasons }
+export { Search }
 ```
 
-And in Vue, it's the same call with the same parts:
+### Vue
 
 ```vue
 <script setup lang="ts">
 import { createParts } from "@ui-sdk/vue/primitive"
-import { ranking } from "./ranking"
+import { searchField } from "./search-field"
 
-const { Root, Item } = createParts(ranking, { root: "div", item: "div" })
+const parts = createParts(searchField, { input: "input", clear: "button" })
+
+const SearchField = parts.Root
+const SearchFieldInput = parts.Input
+const SearchFieldClear = parts.Clear
 </script>
 
 <template>
-  <Root
-    v-slot="{ state }"
-    aria-label="Favorite seasons"
-    :default-value="['Spring', 'Summer', 'Autumn', 'Winter']"
-  >
-    <Item v-for="season in state.order" :key="season" :value="season">{{ season }}</Item>
-  </Root>
+  <SearchField>
+    <SearchFieldInput placeholder="Search" />
+    <SearchFieldClear>Clear</SearchFieldClear>
+  </SearchField>
 </template>
 ```
 
-The styles are yours. While you drag an item, it gets `data-grabbed` and the `--drag-x` and `--drag-y` variables, so one rule keeps it under the pointer:
+### Svelte
 
-```css
-[data-grabbed] {
-  translate: var(--drag-x, 0) var(--drag-y, 0);
+```svelte
+<script lang="ts">
+  import { createParts } from "@ui-sdk/svelte/primitive"
+  import { searchField } from "./search-field"
+
+  const parts = createParts(searchField, { input: "input", clear: "button" })
+
+  const SearchField = parts.Root
+  const SearchFieldInput = parts.Input
+  const SearchFieldClear = parts.Clear
+</script>
+
+<SearchField>
+  <SearchFieldInput placeholder="Search" />
+  <SearchFieldClear>Clear</SearchFieldClear>
+</SearchField>
+```
+
+### Solid
+
+```tsx
+import { createParts } from "@ui-sdk/solid/primitive"
+import { searchField } from "./search-field"
+
+const parts = createParts(searchField, { input: "input", clear: "button" })
+
+const SearchField = parts.Root
+const SearchFieldInput = parts.Input
+const SearchFieldClear = parts.Clear
+
+function Search() {
+  return (
+    <SearchField>
+      <SearchFieldInput placeholder="Search" />
+      <SearchFieldClear>Clear</SearchFieldClear>
+    </SearchField>
+  )
 }
+
+export { Search }
+```
+
+### Web Components
+
+Register a custom element for each part:
+
+```ts
+import { defineParts, wrappedButton, wrappedChild } from "@ui-sdk/web"
+import { searchField } from "./search-field"
+
+defineParts(searchField, {
+  root: "search-field",
+  input: { tag: "search-field-input", target: wrappedChild("input") },
+  clear: { tag: "search-field-clear", target: wrappedButton },
+})
+```
+
+Then use them in your HTML:
+
+```html
+<search-field>
+  <search-field-input><input placeholder="Search" /></search-field-input>
+  <search-field-clear><button>Clear</button></search-field-clear>
+</search-field>
 ```
 
 ## Contributing
