@@ -25,7 +25,7 @@ import {
 } from "tests/fixtures/autocomplete.ts"
 import { onItemsChange } from "tests/fixtures/items.ts"
 import { serializeForm } from "tests/fixtures/select.ts"
-import { computed, h, onBeforeUnmount, ref, shallowRef, type FunctionalComponent } from "vue"
+import { computed, h, onBeforeUnmount, onMounted, ref, shallowRef, type FunctionalComponent } from "vue"
 
 const props = defineProps<{ data?: boolean }>()
 // ?late is React only.
@@ -44,7 +44,10 @@ const action = ref("")
 const submitted = ref("")
 const remote = useAsyncOptions(searchFruits, { immediate: async })
 const list = shallowRef<{ value: string; label: string; keywords?: string[]; disabled?: boolean }[]>(f.items)
-onBeforeUnmount(onItemsChange(changedItems, (next) => (list.value = next)))
+// Items a spec swaps in. Only in the browser: the server has no document.
+let stopItemChanges = () => {}
+onMounted(() => (stopItemChanges = onItemsChange(changedItems, (next) => (list.value = next))))
+onBeforeUnmount(() => stopItemChanges())
 const items = computed(() =>
   async
     ? remote.state.value.items

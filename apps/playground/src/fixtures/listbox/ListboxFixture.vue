@@ -19,7 +19,7 @@ import {
   longToppings,
 } from "tests/fixtures/listbox.ts"
 import { serializeForm } from "tests/fixtures/select.ts"
-import { computed, onBeforeUnmount, ref, shallowRef } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from "vue"
 
 const props = defineProps<{ data?: boolean }>()
 const controller = createListboxController<string, boolean>()
@@ -29,7 +29,10 @@ const reason = ref("")
 const submitted = ref("")
 const value = ref<unknown>(defaultValue ?? (options.multiple ? [] : null))
 const list = shallowRef(f.items)
-onBeforeUnmount(onItemsChange(changedToppings, (next) => (list.value = next)))
+// Items a spec swaps in. Only in the browser: the server has no document.
+let stopItemChanges = () => {}
+onMounted(() => (stopItemChanges = onItemsChange(changedToppings, (next) => (list.value = next))))
+onBeforeUnmount(() => stopItemChanges())
 const items = computed(() => (long ? longToppings() : grouped ? listboxData(true) : list.value))
 // What both the data listbox and the composed one take.
 const shared = computed(() => ({

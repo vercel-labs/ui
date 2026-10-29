@@ -27,7 +27,16 @@ import {
   selectOptions,
   serializeForm,
 } from "tests/fixtures/select.ts"
-import { computed, defineComponent, h, onBeforeUnmount, ref, shallowRef, type FunctionalComponent } from "vue"
+import {
+  computed,
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  shallowRef,
+  type FunctionalComponent,
+} from "vue"
 
 const props = defineProps<{ data?: boolean }>()
 const controller = createSelectController<string, boolean>()
@@ -42,7 +51,10 @@ const fromData = props.data || long || recent || wrapped
 const action = ref("")
 const submitted = ref("")
 const list = shallowRef<{ value: string; label: string; disabled?: boolean }[]>(f.items)
-onBeforeUnmount(onItemsChange(changedItems, (next) => (list.value = next)))
+// Items a spec swaps in. Only in the browser: the server has no document.
+let stopItemChanges = () => {}
+onMounted(() => (stopItemChanges = onItemsChange(changedItems, (next) => (list.value = next))))
+onBeforeUnmount(() => stopItemChanges())
 const items = computed(() =>
   long
     ? longItems()

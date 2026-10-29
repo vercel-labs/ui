@@ -2,8 +2,8 @@ import type { Plugin } from "vite"
 
 // Answers `/__ssr?fixture=<name>&framework=solid&…` with the fixture's server
 // HTML, for the `solid-ssr` fixtures: Solid's server output is a separate
-// compile, so a fixture can't render itself to a string in the browser the
-// way the Vue ones do. The dev server renders through its own SSR module
+// compile, so a fixture can't render itself to a string in the browser. The
+// dev server renders through its own SSR module
 // graph. `vite preview` has no module runner, so it starts a dev server in
 // middleware mode just to answer this path.
 function solidSsr(): Plugin {

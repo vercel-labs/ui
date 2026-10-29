@@ -19,10 +19,11 @@ import {
   exposeDrawerFixture,
   recordDrawer,
 } from "tests/fixtures/drawer.ts"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 
 const controller = createDrawerController()
-exposeDrawerFixture(controller)
+// The specs' hooks live on the window, which the server doesn't have.
+onMounted(() => exposeDrawerFixture(controller))
 
 const options = drawerOptions()
 const parts = drawerParts()

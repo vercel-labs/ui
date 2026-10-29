@@ -26,12 +26,13 @@ import {
   dialogOptions,
   dialogParts,
 } from "tests/fixtures/dialog.ts"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import { exposeDialogFixture, recordOpenChange } from "./shared"
 
 const controller = createDialogController()
 const confirm = createConfirm()
-exposeDialogFixture(controller, confirm)
+// The specs' hooks live on the window, which the server doesn't have.
+onMounted(() => exposeDialogFixture(controller, confirm))
 
 const options = dialogOptions()
 const alertOptions = alertDialogOptions()
