@@ -126,6 +126,20 @@ describe("autocomplete headless", () => {
     expect(keys(instance)).toEqual(["Blueberry"])
   })
 
+  test("a value that onValueChange puts in place of the typed one is what filters", () => {
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      onValueChange: (value) => {
+        if (value === "ap") instance.api.setValue("ban")
+      },
+    })
+    type(instance, "ap")
+    expect(instance.api.getValue()).toBe("ban")
+    expect(instance.get().query).toBe("ban")
+    expect(keys(instance)).toEqual(["Banana"])
+  })
+
   test("items that drop the highlighted suggestion clear the highlight in the same change", () => {
     const instance = autocomplete({ id: "a", items: fruits, defaultOpen: true })
     instance.api.internal.onInputKeyDown(key("ArrowDown"))

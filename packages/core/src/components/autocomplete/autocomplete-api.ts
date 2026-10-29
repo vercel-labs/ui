@@ -214,7 +214,8 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     requested = value
     core.cause(reason, event)
     if (value === state.value || change("value", value, { reason, event })) {
-      store.set({ query })
+      // A value that `onValueChange` set in its place stored its own query.
+      if (requested === value) store.set({ query })
       return true
     }
     // Canceled: the field shows the value it had.
