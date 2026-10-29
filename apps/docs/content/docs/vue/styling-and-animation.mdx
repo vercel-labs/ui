@@ -220,4 +220,4 @@ export default defineNitroPlugin((nitroApp) => {
 
 Pages rendered on the server also carry a few `style` attributes, like the one that hides a select's native input, so the policy needs `style-src-attr 'unsafe-inline'` too.
 
-If your policy has no nonce for styles, add the tag without the `nonce` attribute. ui-sdk then adds its CSS as constructed style sheets, which no policy blocks. If your code replaces `document.adoptedStyleSheets`, ui-sdk adds its sheets back the next time a component mounts.
+If your policy has no nonce for styles, add the tag without the `nonce` attribute. ui-sdk then adds its CSS as constructed style sheets, which no policy blocks. In Nuxt, `useHead` leaves out a meta tag without `content`, so give it one. ui-sdk doesn't read it: `useHead({ meta: [{ property: "csp-nonce", content: "none" }] })`. If your code replaces `document.adoptedStyleSheets`, ui-sdk adds its sheets back the next time a component mounts.
