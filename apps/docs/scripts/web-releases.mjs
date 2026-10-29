@@ -1,37 +1,46 @@
-// Copies the browser build of every published `@ui-sdk/web` release into
-// `public/`, so the site serves each one at its own URL for pages without a
-// bundler:
+// Copies the browser build of `@ui-sdk/web` into `public/`, so the site
+// serves each version at its own URL for pages without a bundler:
 //
 //   /web@1.2.0.js         The loader, which defines components as their tags appear.
 //   /web@1.2.0/tabs.js    One component, with its shared chunks beside it.
 //
-// A deploy only has the files of the commit it builds, so every release comes
-// back from the registry each time, and a page pinned to an old version keeps
-// working. `next.config.mjs` adds the headers and points `/web@1.js` at the
-// newest 1.x. A release without a `browser/` folder, from before it existed,
-// is skipped, and so is everything when the package isn't published yet.
+// A deploy only has the files of the commit it builds, so every published
+// release comes back from the registry each time, and a page pinned to an old
+// version keeps working. A release without a `browser/` folder, from before it
+// existed, is skipped. The commit's own source is built too, as a prerelease
+// named after the commit, like `0.4.1-g1dc2c96`, so a deploy works before
+// anything is published. `next.config.mjs` adds the headers and points
+// `/web@1.js` at the newest 1.x, which is a release once there is one.
 //
 //   node scripts/web-releases.mjs   Runs before `next build`.
 //
 // WEB_RELEASES_REGISTRY  The registry to read, npm's by default.
 // WEB_RELEASES_TOKEN     A token for a private registry.
 import { execFileSync } from "node:child_process"
-import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
 const registry = (process.env.WEB_RELEASES_REGISTRY ?? "https://registry.npmjs.org").replace(/\/$/, "")
 const token = process.env.WEB_RELEASES_TOKEN
 const publicDir = path.join(import.meta.dirname, "../public")
+const packageDir = path.join(import.meta.dirname, "../../../packages/web")
 const headers = token ? { authorization: `Bearer ${token}` } : {}
 
 const response = await fetch(`${registry}/@ui-sdk%2fweb`, { headers })
-if (response.status === 404) {
-  console.log(`@ui-sdk/web isn't published on ${registry}, so the site serves no releases.`)
-  process.exit(0)
+if (!response.ok && response.status !== 404) {
+  throw new Error(`${registry} answered ${response.status} for @ui-sdk/web.`)
 }
-if (!response.ok) throw new Error(`${registry} answered ${response.status} for @ui-sdk/web.`)
-const { versions } = await response.json()
+const { versions } = response.ok ? await response.json() : { versions: {} }
 
 const work = mkdtempSync(path.join(tmpdir(), "ui-sdk-web-releases-"))
 let copied = 0
@@ -47,7 +56,23 @@ try {
 } finally {
   rmSync(work, { recursive: true, force: true })
 }
-console.log(`Copied ${copied} @ui-sdk/web releases into public/.`)
+console.log(`Copied ${copied} @ui-sdk/web releases from ${registry} into public/.`)
+
+const commit = (
+  process.env.VERCEL_GIT_COMMIT_SHA ?? execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" })
+).slice(0, 7)
+const { version } = JSON.parse(readFileSync(path.join(packageDir, "package.json"), "utf8"))
+const source = `${version}-g${commit}`
+// An earlier commit's build, from a local run, would compete for `/web@0.js`.
+for (const file of readdirSync(publicDir)) {
+  if (/^web@\d+\.\d+\.\d+-g[0-9a-f]{7}(\.js)?$/.test(file)) {
+    rmSync(path.join(publicDir, file), { recursive: true })
+  }
+}
+execFileSync("node", ["../../scripts/build/browser.mjs"], { cwd: packageDir, stdio: "inherit" })
+cpSync(path.join(packageDir, "browser/web.js"), path.join(publicDir, `web@${source}.js`))
+cpSync(path.join(packageDir, "browser/web"), path.join(publicDir, `web@${source}`), { recursive: true })
+console.log(`Built @ui-sdk/web ${source} from source into public/.`)
 
 // Unpacks a release's `browser/` folder, or returns nothing when it has none.
 async function download(version, tarball) {
