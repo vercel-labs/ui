@@ -1,37 +1,17 @@
 "use client"
 
-import { frameworkIds, type Framework } from "@/lib/frameworks"
-import { frameworkCookie } from "@/lib/sections"
+import type { Framework } from "@/lib/frameworks"
+import { framework as preference } from "@/lib/preferences"
+import { usePreference } from "@ui-sdk/react/preferences"
 import * as React from "react"
 
-const listeners = new Set<() => void>()
-
-function subscribe(listener: () => void) {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
-}
-
 function setFramework(framework: Framework) {
-  if (!frameworkIds.includes(framework)) {
-    return
-  }
-  document.cookie = `${frameworkCookie}=${framework}; path=/; max-age=31536000; samesite=lax`
-  document.documentElement.dataset.framework = framework
-  listeners.forEach((listener) => listener())
-}
-
-/** The reader's saved framework choice, if they've made one. */
-function readSavedFramework() {
-  if (typeof document === "undefined") {
-    return undefined
-  }
-  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${frameworkCookie}=([^;]+)`))
-  return frameworkIds.find((framework) => framework === match?.[1])
+  preference.set(framework)
 }
 
 /** The saved framework choice, or undefined before the reader has made one. */
 function useSavedFramework() {
-  return React.useSyncExternalStore(subscribe, readSavedFramework, () => undefined)
+  return usePreference(preference).value || undefined
 }
 
 /** The shared framework preference, else React, persisted for links and server redirects. */
