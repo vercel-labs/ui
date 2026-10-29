@@ -1,5 +1,10 @@
 # UI SDK
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./assets/behaviors-dark.svg">
+  <img alt="An environment selector split into three behaviors: createPopup, createListbox and createTypeahead." src="./assets/behaviors-light.svg">
+</picture>
+
 A library of UI behaviors for building interfaces: keyboard navigation, focus, selection, dismissal, popups, drag and drop and the ARIA they need, in `@ui-sdk/core`, with adapters for React, Vue, web components, Solid and Svelte.
 
 ## Contributing
