@@ -6,6 +6,9 @@ The source of truth is Rhea's stylesheet in shadcn/ui (`apps/v4/registry/styles/
 
 ## Rules
 
+- **Demo styling.** Import directly from ui-sdk and style the parts inline with Tailwind using the neutral Rhea theme. CSS Modules examples belong in framework styling guides.
+- **Button demos use secondary styling.** Apply the secondary colors to the button recipe below. Keep the normal cursor; don't add `cursor-pointer`.
+- **Stable layout.** Keep controls in place when state changes or search results disappear. Reserve space for changing output where needed.
 - **Inline every class.** Write classes on the element. No `const trigger = "..."`, no class helpers above the component, no `styles` objects, no shared style files. A class that repeats on ten items repeats ten times. A `className` that depends on state is an inline arrow: `className={(state) => (state.nested ? "..." : "...")}`. A value that varies per item in a data array (an avatar color) is data and may stay in the array.
 - **shadcn/ui tokens, not palette colors.** `bg-primary`, `text-muted-foreground`, `bg-input/50`, `ring-ring/30`, `bg-popover`, `text-destructive`. The docs define the neutral theme and shadcn's radius scale in `apps/docs/app/global.css`, so examples paste into any shadcn/ui project. Write `dark:` only where Rhea does (`dark:bg-transparent`, `dark:ring-foreground/10`, `dark:hover:bg-input/30`). The available tokens: `background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent` (each with `-foreground`), `destructive`, `border`, `input`, `ring`.
 - **Write the border color.** shadcn projects set `border-border` in a base layer; the docs don't. Every `border`, `border-b` or `divide-*` gets an explicit color: `border-border`, `border-input`.
@@ -26,15 +29,15 @@ Focus ring, on every focusable control:
 Invalid, on fields:
 `data-invalid:border-destructive data-invalid:ring-3 data-invalid:ring-destructive/20 dark:data-invalid:border-destructive/50 dark:data-invalid:ring-destructive/40`
 
-**Button, default:**
+**Button, primary base recipe** (use the secondary colors below for button demos):
 `inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-primary bg-clip-padding px-3 text-sm font-medium whitespace-nowrap text-primary-foreground outline-none select-none transition-[color,background-color,box-shadow] hover:bg-primary/80 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:not-aria-[haspopup]:translate-y-px data-disabled:pointer-events-none data-disabled:opacity-50`
 
 **Button, outline** (most triggers). The `data-open:*` classes apply only when the button is a popup trigger; drop them on a plain button:
 `inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-border bg-background bg-clip-padding px-3 text-sm font-medium whitespace-nowrap outline-none select-none transition-[color,background-color,box-shadow] hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:not-aria-[haspopup]:translate-y-px data-open:bg-muted data-open:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50 dark:bg-transparent dark:hover:bg-input/30`
 
-**Button, secondary:** `bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]` in place of the default colors.
+**Button, secondary:** `bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]` in place of the primary colors.
 **Button, ghost:** the outline recipe with `border-transparent bg-transparent` and `hover:bg-muted data-open:bg-muted dark:hover:bg-muted/50`.
-**Button, destructive:** replace the default colors and the focus ring colors, don't add to them, so `ring-ring/30` and `ring-destructive/20` never sit on one element: `bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40`.
+**Button, destructive:** replace the primary colors and the focus ring colors, don't add to them, so `ring-ring/30` and `ring-destructive/20` never sit on one element: `bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40`.
 **Sizes:** `xs` is `h-6 gap-1 px-2.5 text-xs`, `sm` is `h-7 gap-1 px-3`, `lg` is `h-9 px-4`, icon buttons are `size-8 px-0` (`size-7`, `size-6`, `size-9`) and drop the `gap`, `px` and text classes.
 **Pill shape.** `rounded-2xl` on an `h-8` control is already a pill, so an example that teaches radius has to show something else (square, `rounded-md`), or drop what it no longer teaches.
 **Link-style button inside a sentence:** `inline h-auto p-0 font-medium text-primary underline-offset-4 hover:underline` with the focus ring.

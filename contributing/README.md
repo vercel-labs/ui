@@ -9,6 +9,7 @@ Everything you need to work on ui-sdk, for people and agents alike. Start with t
 | [code.md](code.md)                       | How code is written, structured and reviewed                                                        |
 | [pitfalls.md](pitfalls.md)               | What cost real debugging time, by framework, browser and tool                                       |
 | [docs-site.md](docs-site.md)             | How the docs site, examples and agent Markdown are built, and how docs are written                  |
+| [docs-writing.md](docs-writing.md)       | The website's writing style, with current pages as references                                       |
 | [examples.md](examples.md)               | How the docs examples are styled                                                                    |
 | [../tests/README.md](../tests/README.md) | Every kind of test, where it runs and the exact command                                             |
 | [../BACKLOG.md](../BACKLOG.md)           | Open work: bugs, follow-ups and ideas                                                               |

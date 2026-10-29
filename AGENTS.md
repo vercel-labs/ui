@@ -34,12 +34,12 @@ Component libraries cover familiar patterns like menus, dialogs and tabs. Real p
 - **Commits** are conventional, with a lowercase subject.
 - **Code** follows [contributing/code.md](contributing/code.md): comments end with a period, no return type annotations, inline types, named exports listed at the end of each file. `pnpm lint` and `pnpm format` check what they can; `pnpm format:write` fixes formatting.
 - **Examples** have no comments, and follow [contributing/examples.md](contributing/examples.md).
-- **Docs** are written from a new user's point of view, like talking to a friend: one new term at a time, what things do rather than what they aren't and no notes for agents in prose pages. Everything documented gets a small live example. See [contributing/docs-site.md](contributing/docs-site.md).
+- **Docs.** When writing or reviewing website docs, use [ui-sdk-write-docs](.agents/skills/ui-sdk-write-docs/SKILL.md). [Writing Website Docs](contributing/docs-writing.md) records the current style; [the docs-site guide](contributing/docs-site.md) covers the implementation.
 - **Tests.** Every server command sets its own port. Run tests through `scripts/test-slot.sh`. Check exit codes, not grep output. Run the specs for what you touched (`pnpm test:pr`), and rerun only what failed.
 
 ## Skills
 
-- `.agents/skills/` holds the skills for working on ui-sdk: `ui-sdk-write-code`, `ui-sdk-unslop` and `ui-sdk-expert-review`. [Its README](.agents/skills/README.md) says when to use each. Plain Markdown, usable from any harness: read `SKILL.md` and follow it.
+- `.agents/skills/` holds the skills for working on ui-sdk: `ui-sdk-write-code`, `ui-sdk-write-docs`, `ui-sdk-unslop` and `ui-sdk-expert-review`. [Its README](.agents/skills/README.md) says when to use each. Plain Markdown, usable from any harness: read `SKILL.md` and follow it.
 - `packages/core/skills/ui-sdk-create-component` ships inside `@ui-sdk/core` to people building their own components on it. `skills.sh.json` points `npx skills add vercel-labs/ui` at that folder. The skills in `.agents/skills/` are marked `internal`, so it doesn't offer them.
 
 ## Framework experts
