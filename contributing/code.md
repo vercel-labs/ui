@@ -5,11 +5,11 @@ Write code a highly skilled team would be glad to read, review and extend. Reada
 ## Style
 
 - No semicolons. Double quotes. Prettier formats everything: `pnpm format` checks, `pnpm format:write` fixes.
-- Comments are full sentences ending in a period.
+- Comments are rare, at most three lines, and full sentences ending in a period. `pnpm lint` checks the length (`comment-length`).
 - Never annotate function return types; let them infer.
 - Prefer inline types.
 - Named exports, listed once at the end of the file.
-- `pnpm lint` (`scripts/check-code.mjs`) checks the rules a script can. Every new convention lands with its lint rule.
+- `pnpm lint` (`scripts/check-code.mjs` and `scripts/check-comments.mjs`) checks the rules a script can. Every new convention lands with its lint rule.
 
 ## Structure
 
@@ -30,7 +30,7 @@ Write code a highly skilled team would be glad to read, review and extend. Reada
 - **Names say what a thing is or does,** in full words: `highlightedItem`, not `hi`. Booleans read as questions: `isOpen`, `hasValue`.
 - **Short functions with one level of abstraction.** Return early instead of nesting. Name complex conditions with a well-named `const` or a small function.
 - **Prefer plain data and functions** over classes and inheritance. Closures over hidden module state.
-- **Comments explain why** (a browser bug, an APG rule, a trade-off), never what the next line does. Link the spec or the test that pins the behavior. Examples have no comments: their docs page explains them.
+- **Most code needs no comment.** A name and a type say what a thing is. Write one only when a reader would get the code wrong without it: a browser bug, an APG rule, a trade-off. Never describe what the next line does, what a value holds, where it's stored or how the pieces connect: the code shows that. An explanation that needs more than three lines belongs in the docs page, a test title or `contributing/`. Examples have no comments: their docs page explains them (`example-comments`).
 
 ## Types
 
@@ -64,5 +64,6 @@ Read your whole diff as a strict reviewer would, and fix what you find:
 - Is anything duplicated that exists elsewhere?
 - Is any file now too long?
 - Any dead code, debug output, stray `any` or unexplained casts?
+- Would the code read as well without each comment you added? Then delete it.
 - Any hot-path allocation or layout thrash?
 - Would a new teammate understand each module from its first screen?

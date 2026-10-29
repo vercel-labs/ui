@@ -32,7 +32,9 @@ Component libraries cover familiar patterns like menus, dialogs and tabs. Real p
 - **One shape everywhere.** Every component follows the same composable shape, with the same contract in every framework. A part changes its element through `render`, never an `as` prop.
 - **Discuss first** before changing a public API's name or shape, adding a component or a dependency, or changing a principle.
 - **Commits** are conventional, with a lowercase subject.
-- **Code** follows [contributing/code.md](contributing/code.md): comments end with a period, no return type annotations, inline types, named exports listed at the end of each file. `pnpm lint` and `pnpm format` check what they can; `pnpm format:write` fixes formatting.
+- **Code** follows [contributing/code.md](contributing/code.md): no return type annotations, inline types, named exports listed at the end of each file. `pnpm lint` and `pnpm format` check what they can; `pnpm format:write` fixes formatting.
+- **Comments are rare.** Write none unless a reader would get the code wrong without it: a browser bug, an APG rule, a trade-off. Three lines at most, ending in a period. Never say what the code does, what a value is or how the pieces connect. `pnpm lint` checks the length.
+- **Finish with unslop.** Write code with [ui-sdk-write-code](.agents/skills/ui-sdk-write-code/SKILL.md), and run [ui-sdk-unslop](.agents/skills/ui-sdk-unslop/SKILL.md) on your diff before you commit.
 - **Examples** have no comments, and follow [contributing/examples.md](contributing/examples.md).
 - **Docs.** When writing or reviewing website docs, use [ui-sdk-write-docs](.agents/skills/ui-sdk-write-docs/SKILL.md). [Writing Website Docs](contributing/docs-writing.md) records the current style; [the docs-site guide](contributing/docs-site.md) covers the implementation.
 - **Tests.** Every server command sets its own port. Run tests through `scripts/test-slot.sh`. Check exit codes, not grep output. Run the specs for what you touched (`pnpm test:pr`), and rerun only what failed.

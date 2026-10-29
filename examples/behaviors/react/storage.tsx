@@ -29,7 +29,6 @@ const noServerValue = () => null
 function Example() {
   const [picked, setPicked] = React.useState(0)
   const { storage, lasts } = storages[picked]
-  // Re-reads the note whenever a storage with the same ID, here or in another tab, writes it.
   const note = React.useSyncExternalStore(storage.subscribe, storage.get, noServerValue)
   const [available, setAvailable] = React.useState(true)
   React.useEffect(() => setAvailable(storage.available()), [storage])

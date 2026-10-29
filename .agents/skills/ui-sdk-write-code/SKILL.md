@@ -25,6 +25,8 @@ Every piece of code here has a twin that already does it well. Open it before yo
 
 If two twins disagree, the shape is wrong in one of them. Say so instead of picking one.
 
+Copy a twin's shape, not its comments. Older files carry more comments than the rules below allow.
+
 ## 2. Load the framework
 
 Read the expert's knowledge file for every framework you touch: `.agents/experts/<framework>/knowledge.md`, part 1 and "Common mistakes to flag", and its `decisions.md`. It's pinned to the versions this repo installs, so trust it over memory. Write in the current idiom of that version:
@@ -42,7 +44,7 @@ The rules in `contributing/code.md` hold everywhere. The ones that make code loo
 - **One shape.** `<Name>` root, `<Name><Part>` per slot, `render` to change the element, never `as`. Same names and the same props in every framework.
 - **Names in full words** that say what a thing is. Booleans read as questions.
 - **Exports listed once at the end.** Inline types. No return type annotations.
-- **No comment that restates the code.** A comment says why: a browser bug, an APG rule, a trade-off. Examples have none.
+- **No comment by default.** Write one only when a reader would get the code wrong without it: a browser bug, an APG rule, a trade-off. One to three lines. Never a comment per declaration, and never one that explains the design or the data flow. Examples have none.
 - **No defensive code for cases that can't happen.** Types already rule them out.
 - **No helper for one caller,** and no wrapper that only renames.
 - **Behavior lives in core.** An adapter that grows a listener, a focus call or an `aria-*` attribute is in the wrong layer.
@@ -72,4 +74,6 @@ Read the whole diff as the framework's expert would, using the "Review checklist
 - Does any function do two things, or any file hold two ideas?
 - Any allocation on a hot path, or a layout read after a write?
 
-Finish with the `ui-sdk-unslop` pass on your diff. Before merging a change to an adapter, core, the specs, examples or framework docs, run `ui-sdk-expert-review`.
+## 6. Unslop
+
+Run `ui-sdk-unslop` on your diff. The change isn't done until it has. Before merging a change to an adapter, core, the specs, examples or framework docs, run `ui-sdk-expert-review`.

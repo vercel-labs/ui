@@ -9,7 +9,6 @@
     createConfirm,
     type ConfirmOptions,
   } from "@ui-sdk/svelte/alert-dialog"
-  // The alert dialog's content is the dialog's, so its snippet takes a dialog's state.
   import type { DialogContentState } from "@ui-sdk/svelte/dialog"
   import { OverlayHost, createOverlays } from "@ui-sdk/svelte/overlays"
   import { Toast, ToastDescription, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"

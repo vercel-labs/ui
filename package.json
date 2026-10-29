@@ -7,7 +7,7 @@
     "dev": "bash scripts/docs-dev.sh",
     "playground": "pnpm --filter playground dev",
     "typecheck": "node scripts/check-type-imports.mjs && pnpm -r --parallel typecheck",
-    "lint": "node scripts/check-code.mjs",
+    "lint": "node scripts/check-code.mjs && node scripts/check-comments.mjs",
     "lint:idioms": "eslint packages examples apps/playground/src",
     "format": "node scripts/format-changed.mjs --check",
     "format:write": "node scripts/format-changed.mjs --write",
