@@ -1,0 +1,172 @@
+---
+title: Preferences
+description: Apply user preferences to data attributes so your styles can follow them.
+---
+
+`<ui-preferences>` puts your preferences on `data-*` attributes and keeps them up to date. Use it around a part of your app, or apply a preference to the whole page.
+
+<ComponentExample
+  name="preferences/basic"
+  caption="Press Compact layout to change the spacing, then reload the page. Your choice is saved."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/web @ui-sdk/core
+```
+
+Import the component once to register its element:
+
+```ts
+import "@ui-sdk/web/preferences"
+```
+
+The demo uses the [shared example theme](../styling-and-animation#example-theme).
+
+## Usage
+
+Define the preference you want to apply. Here, `density` controls the space between rows:
+
+```ts title="preferences.ts"
+import { createPreference } from "@ui-sdk/core"
+
+const density = createPreference({
+  values: ["comfortable", "compact"],
+  defaultValue: "comfortable",
+  attribute: "data-density",
+})
+
+export { density }
+```
+
+Wrap the content in `<ui-preferences>`, then style it using the preference's attribute:
+
+```html title="file-list.html"
+<ui-preferences>
+  <ul>
+    <li class="py-3 [[data-density=compact]_&]:py-1">Project notes</li>
+    <li class="py-3 [[data-density=compact]_&]:py-1">Meeting notes</li>
+  </ul>
+</ui-preferences>
+<script type="module" src="./file-list.ts"></script>
+```
+
+Set the element's `preferences` property to your list:
+
+```ts title="file-list.ts"
+import "@ui-sdk/web/preferences"
+import { density } from "./preferences"
+
+const preferences = document.querySelector("ui-preferences")!
+preferences.preferences = [density]
+```
+
+The element starts with `data-density="comfortable"`. Calling `density.set("compact")` updates it, and the rows use the compact spacing.
+
+## Save the Value
+
+Add `storage` to save the choice between visits:
+
+```ts title="preferences.ts"
+import { createLocalStorage, createPreference } from "@ui-sdk/core"
+
+const density = createPreference({
+  values: ["comfortable", "compact"],
+  defaultValue: "comfortable",
+  attribute: "data-density",
+  storage: createLocalStorage("ui-sdk-preferences-density"),
+})
+
+export { density }
+```
+
+The preference now saves changes in local storage and restores the saved value when the page reloads. You can also [use session storage or cookies with `createPreference`](../../core/behaviors/preferences#remember-the-choice).
+
+## Read the Value
+
+Use `get()` and `subscribe()` when the value affects your content. This function keeps a label current and returns its cleanup:
+
+```ts title="density-label.ts"
+import { density } from "./preferences"
+
+function bindDensityLabel(element: HTMLElement) {
+  const update = () => {
+    element.textContent = `Density: ${density.get().value}`
+  }
+
+  const stop = density.subscribe(update)
+  update()
+  return stop
+}
+
+export { bindDensityLabel }
+```
+
+Call `bindDensityLabel(element)` when the label mounts, and call the returned function when it is removed. Pass the same preference instance wherever you need its value. Subscriptions also work outside `<ui-preferences>`.
+
+## Apply to the Whole Page
+
+Set `global: true` when defining the preference:
+
+```ts
+const density = createPreference({
+  values: ["comfortable", "compact"],
+  defaultValue: "comfortable",
+  attribute: "data-density",
+  global: true,
+  storage: createLocalStorage("ui-sdk-preferences-density"),
+})
+```
+
+Keep assigning it to `<ui-preferences>`. Its attribute now goes on `<html>`, so styles throughout the page can use it. A global preference needs only one connected `<ui-preferences>` element to apply it.
+
+## Multiple Preferences
+
+Assign more than one preference in the list. For example, you can apply `density` alongside a [color scheme](../../core/behaviors/preferences#choose-a-color-scheme):
+
+```ts
+import { createColorScheme } from "@ui-sdk/core"
+
+const colorScheme = createColorScheme()
+
+preferences.preferences = [density, colorScheme]
+```
+
+Each preference uses its own attribute and `global` option. Wrappers that share a preference instance follow the same value. For independent choices, use separate preference instances and different storage keys.
+
+## Server Rendering
+
+To apply saved values before the page paints, write `preferencesScript([...])` into your server-rendered HTML as the element's first child:
+
+```ts title="server.ts"
+import { preferencesScript } from "@ui-sdk/core"
+import { density } from "./preferences"
+
+const page = `<ui-preferences>
+  <script>${preferencesScript([density])}</script>
+  <main>…</main>
+</ui-preferences>`
+```
+
+The script applies the saved attributes as the browser parses the page. Your client module then assigns the same preferences to the element, as in [Usage](#usage), to keep them current.
+
+Follow the [server rendering setup](../server-rendering#show-them-before-the-scripts-load) for the complete page and client module, including how to keep cookie-backed preferences separate for each request.
+
+If your Content Security Policy requires a nonce, put the nonce from your response on the `<script>` you write into the HTML.
+
+## API Reference
+
+### ui-preferences
+
+Set `preferences` as a JavaScript property. It accepts preferences created with `createPreference` or `createColorScheme`.
+
+<TypeTable
+  path="../../packages/web/src/events.ts"
+  name="PreferencesElementOptions"
+  type="Pick<UiPreferencesElement, 'preferences'>"
+  events={false}
+  examples={{
+    preferences: "Usage",
+  }}
+/>
