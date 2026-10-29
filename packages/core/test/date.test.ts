@@ -214,9 +214,14 @@ describe("names and labels", () => {
     expect(formatDate("2026-10-16", "th-TH", { year: "numeric", numberingSystem: "latn" })).toContain("2569")
   })
 
-  test("ranges read as one phrase", () => {
-    // Intl puts thin spaces around the dash.
-    expect(formatDateRange("2026-10-16", "2026-10-20", "en-US").replace(/\s/g, " ")).toBe("Oct 16 – 20, 2026")
+  test("ranges read as one phrase, with the same spaces on every ICU", () => {
+    expect(formatDateRange("2026-10-16", "2026-10-20", "en-US")).toBe("Oct 16 – 20, 2026")
+    expect(formatDateRange("2026-10-01", "2026-11-01", "en-US", { month: "long", year: "numeric" })).toBe(
+      "October – November 2026",
+    )
+    expect(formatDateRange("2026-10-01", "2026-11-01", "ru-RU", { month: "long", year: "numeric" })).toBe(
+      "октябрь 2026 г. – ноябрь 2026 г.",
+    )
   })
 
   test("month names stand alone, as a heading or a select shows them", () => {

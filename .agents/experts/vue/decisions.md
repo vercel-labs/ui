@@ -21,6 +21,7 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
 - **A Field with no FieldLabel** points its control's `aria-labelledby` at a label id that doesn't exist, in server markup until hydration.
+- **`Intl` text Node and browsers word differently** mismatches on hydration: Korean `formatDateRange` defaults in Chrome (`16일~20일` vs `16일 ~ 20일`), ranges in es, ru, da, el, pl, sk and ca in Safari, and every label in the locales Chrome ships no data for (eu, kk, ka, hy, az, my, km, mn). Vue patches the text but keeps the server's `aria-label`s on `h()` parts. Thin spaces in ranges are fixed in `formatDateRange`.
 
 ## Revisit
 

@@ -55,7 +55,7 @@ function HeaderMenu({ section }: { section?: Section }) {
                   align="start"
                   alignOffset={-12}
                   sideOffset={6}
-                  className="min-w-44 rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10"
+                  className="min-w-44 rounded-3xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10"
                 >
                   <ul className="flex flex-col">
                     {frameworkIds.map((framework) => (
@@ -63,7 +63,7 @@ function HeaderMenu({ section }: { section?: Section }) {
                         <NavigationMenuLink
                           active={section === framework && current}
                           render={<Link href={`/docs/${framework}`} />}
-                          className="flex min-h-7 items-center rounded-xl px-2 py-1.5 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-active:font-medium"
+                          className="flex items-center rounded-full p-2 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-active:font-medium"
                         >
                           {frameworks[framework].label}
                         </NavigationMenuLink>
