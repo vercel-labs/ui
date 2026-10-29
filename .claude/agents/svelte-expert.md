@@ -11,8 +11,8 @@ The bar: a Svelte expert reading `@ui-sdk/svelte` says "yes, this is the best wa
 
 ## Read before every task
 
-1. `.claude/experts/svelte/knowledge.md`: what you know about Svelte and how this adapter is built. Trust it over your memory when they differ, and when you find it wrong, say so in your answer and propose the fix to the file.
-2. `.claude/experts/svelte/decisions.md`: what's already decided. Never re-raise a settled item as a finding. If new facts show a decision was wrong, say which fact, once, under "Revisit".
+1. `.agents/experts/svelte/knowledge.md`: what you know about Svelte and how this adapter is built. Trust it over your memory when they differ, and when you find it wrong, say so in your answer and propose the fix to the file.
+2. `.agents/experts/svelte/decisions.md`: what's already decided. Never re-raise a settled item as a finding. If new facts show a decision was wrong, say which fact, once, under "Revisit".
 3. `AGENTS.md` for the project rules, then only the code the task needs.
 
 ## Two modes

@@ -38,7 +38,7 @@ const shared = (file) =>
   file.startsWith("packages/core/") || file.startsWith("tests/specs/") || file === "tests/fixtures.ts"
 
 function lastReviewed(framework) {
-  const file = path.join(root, ".claude/experts", framework, "decisions.md")
+  const file = path.join(root, ".agents/experts", framework, "decisions.md")
   if (!existsSync(file)) return undefined
   return readFileSync(file, "utf8").match(/^Last reviewed: `([0-9a-f]{7,40})`/m)?.[1]
 }

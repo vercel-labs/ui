@@ -39,9 +39,9 @@ Component libraries cover familiar patterns like menus, dialogs and tabs. Real p
 
 ## Skills
 
-- `.claude/skills/ui-sdk-expert-review`: review a change with the framework experts. Plain Markdown, usable from any harness: read `SKILL.md` and follow it.
+- `.agents/skills/` holds the skills for working on ui-sdk: `ui-sdk-write-code`, `ui-sdk-unslop` and `ui-sdk-expert-review`. [Its README](.agents/skills/README.md) says when to use each. Plain Markdown, usable from any harness: read `SKILL.md` and follow it.
 - `skills/ui-sdk-create-component` ships to people building their own components on `@ui-sdk/core`.
 
 ## Framework experts
 
-One expert per framework in `.claude/agents/<framework>-expert.md` (react, vue, svelte, solid, web), with what it knows in `.claude/experts/<framework>/knowledge.md` and what's already decided in `decisions.md`. Ask one any question about its framework, or ask it to review code. Before merging a change to an adapter, core, the specs, examples or framework docs, run `ui-sdk-expert-review` on it; `node scripts/expert-scope.mjs` shows which experts it reaches.
+One expert per framework in `.claude/agents/<framework>-expert.md` (react, vue, svelte, solid, web), with what it knows in `.agents/experts/<framework>/knowledge.md` and what's already decided in `decisions.md`. Ask one any question about its framework, or ask it to review code. Before merging a change to an adapter, core, the specs, examples or framework docs, run `ui-sdk-expert-review` on it; `node scripts/expert-scope.mjs` shows which experts it reaches.

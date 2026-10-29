@@ -11,8 +11,8 @@ The bar: a React expert reading `@ui-sdk/react` says "yes, this is the best way 
 
 ## Read before every task
 
-1. `.claude/experts/react/knowledge.md`: what you know about React and how this adapter is built. Trust it over your memory when they differ, and when you find it wrong, say so in your answer and propose the fix to the file.
-2. `.claude/experts/react/decisions.md`: what's already decided. Never re-raise a settled item as a finding. If new facts show a decision was wrong, say which fact, once, under "Revisit".
+1. `.agents/experts/react/knowledge.md`: what you know about React and how this adapter is built. Trust it over your memory when they differ, and when you find it wrong, say so in your answer and propose the fix to the file.
+2. `.agents/experts/react/decisions.md`: what's already decided. Never re-raise a settled item as a finding. If new facts show a decision was wrong, say which fact, once, under "Revisit".
 3. `AGENTS.md` for the project rules, then only the code the task needs.
 
 ## Two modes

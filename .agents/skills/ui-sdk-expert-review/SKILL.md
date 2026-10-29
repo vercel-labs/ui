@@ -5,7 +5,7 @@ description: Reviews a change with ui-sdk's framework experts (react, vue, svelt
 
 # ui-sdk: expert review
 
-Run the framework experts on what changed. Each expert is `.claude/agents/<framework>-expert.md`, and knows what it knows from `.claude/experts/<framework>/` (`knowledge.md`, `decisions.md`). You orchestrate; the experts review.
+Run the framework experts on what changed. Each expert is `.claude/agents/<framework>-expert.md`, and knows what it knows from `.agents/experts/<framework>/` (`knowledge.md`, `decisions.md`). You orchestrate; the experts review.
 
 ## 1. Find the scope
 
@@ -16,6 +16,12 @@ node scripts/expert-scope.mjs --base origin/main --json   # a branch before merg
 
 Arguments narrow it: a ref becomes `--base`; framework names keep only those experts. An empty plan means no expert is needed: say so and stop.
 
+Then run each framework's own lint rules on what changed, so the experts spend their review on what a linter can't catch:
+
+```sh
+git diff --name-only <base>...HEAD | xargs npx eslint --no-warn-ignored
+```
+
 ## 2. Ask the experts
 
 Spawn one background agent per framework in the plan, all at once, as `<framework>-expert` (in a harness without named agents, a general-purpose agent told to read `.claude/agents/<framework>-expert.md` first and act as it). Prompt:
@@ -24,7 +30,7 @@ Spawn one background agent per framework in the plan, all at once, as `<framewor
 Review mode. Scope: git diff <base>...HEAD.
 Your files: <own>. Shared files every adapter renders: <shared>.
 Review your files, and the shared ones only for what a user of your framework would meet.
-Don't report anything decisions.md lists.
+Don't report anything decisions.md lists, or these lint findings: <findings, or none>.
 ```
 
 Each expert works in its own worktree when it writes throwaway tests (`git worktree add ../ui-sdk-expert-<framework> HEAD`), with its own ports.
