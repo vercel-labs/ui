@@ -1,16 +1,16 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs"
 import path from "node:path"
-import { callbackIn, frameworks, type Framework } from "./frameworks"
+import { frameworks, type Framework } from "./frameworks"
 import { pageMarkdown, type LinkTarget, type PageLinks } from "./page-markdown"
-import { docPages, frameworkGuides } from "./pages"
+import { docPages, frameworkGuides, type DocPage } from "./pages"
 import { repoRoot } from "./repo-root"
 import { utilitiesFolder } from "./sections"
 
 // A framework's docs as one Markdown file for an agent's context, served at
 // /docs/<framework>/llms.txt and shipped as each package's docs/llms.txt:
-// the framework guides whole, every component's anatomy, props,
-// state and styling hooks in a few words each, the utilities, and how to
-// render a primitive. Examples and test lists stay on the pages it links to.
+// the framework guides whole, an index of the components that links each
+// page, and the utilities. It stays small enough to read in one go, and an
+// agent reads only the pages of the components it uses.
 
 /** Each framework's package name, after `@ui-sdk/`. */
 const packageNames: Record<Framework, string> = {
@@ -20,82 +20,6 @@ const packageNames: Record<Framework, string> = {
   solid: "solid",
   "web-components": "web",
 }
-
-// Sections of a component page the file keeps.
-const kept = ["Usage", "Anatomy", "Styling", "API Reference"]
-
-// Props that mean the same on every component that takes them, which each
-// framework's guides describe once. Entries list them by name.
-const sharedProps = [
-  "disabled",
-  "readOnly",
-  "required",
-  "name",
-  "form",
-  "debug",
-  "controller",
-  "container",
-  "keepMounted",
-  "side",
-  "align",
-  "sideOffset",
-  "alignOffset",
-  "collisionPadding",
-  "arrowPadding",
-  "dismissible",
-  "onDismissAttempt",
-  "onOpenChangeComplete",
-  "loop",
-  "orientation",
-]
-
-// A list's rows for shared props, folded into one row of names at its end.
-function foldShared(text: string, framework: Framework) {
-  const shared = new Set(sharedProps.map((name) => callbackIn(name, framework)))
-  const out: string[] = []
-  let folded: string[] = []
-  const flush = () => {
-    if (folded.length) out.push(`- Shared: ${folded.map((name) => `\`${name}\``).join(", ")}.`)
-    folded = []
-  }
-  for (const line of text.split("\n")) {
-    const name = line.match(/^- `([^`]+?)\??(?: event)?`/)?.[1]
-    if (name && shared.has(name)) folded.push(name)
-    else {
-      if (!line.startsWith("- ")) flush()
-      out.push(line)
-    }
-  }
-  flush()
-  return out.join("\n")
-}
-
-// A Styling section's attributes and variables, without its prose.
-const stylingHooks = (section: string) => {
-  const lines = section.split("\n")
-  const attributes = lines.filter((line) => line.startsWith("- `[data-slot="))
-  const variables = lines.find((line) => line.startsWith("`--"))
-  return [
-    "## Styling",
-    "",
-    ...attributes,
-    ...(variables ? ["", `CSS variables: ${variables}`] : []),
-    "",
-    "",
-  ].join("\n")
-}
-
-// The reference in fewer lines: each part's state on one line, a
-// controller's methods by name, and tables without their padding.
-const tighten = (section: string) =>
-  section
-    .replace(/^What render functions.*\n\n/m, "")
-    .replace(/^`(\w+)`:\n\n(`.*)\n/gm, "- `$1`: $2")
-    .replace(/((?:^- `\w+\([^`]*\)`.*\n)+)/gm, (methods: string) => {
-      const names = [...methods.matchAll(/^- (`\w+\([^`]*\)`)/gm)].map((match) => match[1])
-      return `Methods: ${names.join(", ")}.\n`
-    })
-    .replace(/^\|.*\|$/gm, (row) => row.replace(/ {2,}/g, " ").replace(/-{3,}/g, "---"))
 
 // Headings one level deeper for each of `levels`, outside fenced code.
 const demote = (text: string, levels: number) =>
@@ -121,32 +45,18 @@ function importsOf(component: string, framework: Framework) {
   return [...count.keys()].sort((a, b) => (a === own ? -1 : b === own ? 1 : count.get(b)! - count.get(a)!))
 }
 
-// A component's entry in the file: what it is, where it's imported from, and
-// the page's anatomy, styling hooks and reference, compact.
-async function componentEntry(file: string, slug: string, framework: Framework, link: PageLinks) {
-  const markdown = await pageMarkdown(file, framework, link, { compact: true })
-  const [head, ...sections] = markdown.split(/^(?=## )/m)
-  const description = head.replace(/^# .*\n+/, "").trim()
-  const imports = importsOf(slug, framework)
-  const from =
-    framework === "web-components"
-      ? imports.length && `Defined by \`import "${imports[0]}"\`.`
-      : imports.length && `Import from \`${imports[0]}\`.`
-  const page = link({ slugs: [framework, "components", slug] })
-  const body = sections
-    .filter((section) => kept.includes(section.match(/^## (.*)/)![1]))
-    .map((section) =>
-      section.startsWith("## Styling") ? stylingHooks(section) : tighten(foldShared(section, framework)),
-    )
-    .join("")
-  return [
-    `### ${readPageTitle(file)}`,
-    [description, from, page && `[Full page](${page}).`].filter(Boolean).join(" "),
-    demote(body, 2).trim(),
-  ].join("\n\n")
+// A component's line in the index: what it does, where it's imported from,
+// and its page.
+function componentLine(page: DocPage, framework: Framework, to: (target: LinkTarget) => string) {
+  const slug = page.slugs[2]
+  const [entry] = importsOf(slug, framework)
+  const from = entry
+    ? framework === "web-components"
+      ? ` Defined by \`import "${entry}"\`.`
+      : ` Import from \`${entry}\`.`
+    : ""
+  return `- [${page.title}](${to({ slugs: [framework, "components", slug] })}): ${page.description ?? ""}${from}`
 }
-
-const readPageTitle = (file: string) => readFileSync(file, "utf8").match(/^title: (.*)$/m)![1]
 
 /**
  * `framework`'s llms.txt. Links go through `link`, like the site's pages or
@@ -167,9 +77,6 @@ async function frameworkLlms(framework: Framework, link: PageLinks) {
   const utilities = docPages(`${framework}/${utilitiesFolder(framework)}`).filter(
     (entry) => entry.slugs.length === 3,
   )
-  const entries = await Promise.all(
-    components.map((entry) => componentEntry(entry.file, entry.slugs[2], framework, link)),
-  )
   const utilityPages = await Promise.all(
     utilities.map(
       async (entry) =>
@@ -181,7 +88,7 @@ async function frameworkLlms(framework: Framework, link: PageLinks) {
 
 > ${name} renders ui-sdk's framework-free TypeScript core in ${label}. How an interface behaves lives in the core; ${name} turns each primitive into parts. No styles, no dependencies, no providers, no portals.
 
-This file is the context an agent needs to build with ${name}: how ${label} renders a primitive, the conventions every part shares, then every component's parts, props, state and styling hooks in a few words each. Each component links to its full page, with examples and every prop's whole description. It's generated from the docs, for this release.
+This file is the context an agent needs to build with ${name}: how ${label} renders a primitive and the conventions every part shares, then every component with a link to its page. Read the pages of the components you use. It's generated from the docs, for this release.
 
 - [Core](${to({ slugs: ["core"] })}): build a component, compose behaviors, and explore the foundations, from defining a primitive to working with state, the browser and text.
 - [Agents](${to({ slugs: ["agents"] })}): letting an agent operate a page, and WebMCP.
@@ -190,7 +97,9 @@ ${guides.join("\n\n")}
 
 ## Components
 
-${entries.join("\n\n")}
+Each page has the component's anatomy, examples, styling hooks and every prop.
+
+${components.map((page) => componentLine(page, framework, to)).join("\n")}
 
 ## ${framework === "react" ? "Hooks" : "Utilities"}
 

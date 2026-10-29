@@ -86,7 +86,7 @@ function index(name: string, framework: Framework | undefined) {
   const core = docPage(["core"])!
   const agents = docPage(["agents"])!
   const llms = framework
-    ? `Start with [llms.txt](./llms.txt): how the components fit together, then every component's parts, props, state and styling hooks, in one file for an agent's context. Each page below has the rest.\n\n`
+    ? `Start with [llms.txt](./llms.txt): how the components fit together, then an index of every component, in one file for an agent's context. Each page below has the rest.\n\n`
     : `[llms.txt](./llms.txt) is the Core docs, the same as core.md, under the name agents look for.\n\n`
   const shared = `## Core and Agents
 

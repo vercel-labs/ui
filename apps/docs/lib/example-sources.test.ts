@@ -91,7 +91,7 @@ test("framework llms output reads imports without treating subfolders as source 
   writePage()
   mkdirSync(path.join(repoRoot, "apps/docs/content/docs/react/hooks"), { recursive: true })
   const markdown = await frameworkLlms("react", ({ slugs }) => `/docs/${slugs.join("/")}`)
-  expect(markdown).toContain("### Button")
+  expect(markdown).toContain("- [Button](/docs/react/components/button):")
   expect(markdown).toContain("Import from `@ui-sdk/react/button`.")
   expect(markdown).not.toContain("Example notes")
 })
