@@ -3,8 +3,9 @@
 // Prettier would rewrite, so formatting the whole repository would bury every
 // diff. Prettier skips files .prettierignore lists and types it can't parse.
 // Markdown is skipped too: Prettier realigns whole tables, so one edited row
-// would rewrite hundreds.
+// would rewrite hundreds. Symlinks are skipped because Prettier refuses them.
 import { execFileSync, spawnSync } from "node:child_process"
+import { lstatSync } from "node:fs"
 import path from "node:path"
 
 const root = path.resolve(import.meta.dirname, "..")
@@ -22,7 +23,7 @@ const files = [
     ...git("diff", "--name-only", "-z", "--diff-filter=d", base),
     ...git("ls-files", "--others", "--exclude-standard", "-z"),
   ]),
-].filter((file) => !file.endsWith(".md"))
+].filter((file) => !file.endsWith(".md") && !lstatSync(path.join(root, file)).isSymbolicLink())
 if (!files.length) process.exit(0)
 
 const prettier = path.join(root, "node_modules/.bin/prettier")
