@@ -2,7 +2,7 @@
 
 What the custom elements expert knows. Part 1 is the platform, part 2 is how `@ui-sdk/web` is built, part 3 is the checklist a review walks. No framework version to pin: the bar is the HTML and DOM standards as Chromium, WebKit and Firefox ship them. Browser specs run on Chromium in the cloud; WebKit and Firefox are skipped for now (shadcn, 2026-10-25), so say when a claim was only checked on Chromium.
 
-Last checked: 2026-10-28, against `packages/web/src/define-element.ts`.
+Last checked: 2026-10-29, against `packages/web/src/define-element.ts` and `packages/web/src/autoload.ts`.
 
 ## 1. The platform, as the standards write it
 
@@ -78,6 +78,8 @@ Core holds every behavior; the adapter defines elements. Read `packages/web/src/
 - **Moves.** `disconnectedCallback` waits until the task's moves settle (`whenGone`), so a popup moving to a portal stays bound. Gone, it saves its form state, destroys the instance, and put back later, starts again from its defaults and restores state quietly. No `connectedMoveCallback` yet.
 - **Forms.** `formAssociated(Base)` adds `static formAssociated`, `attachInternals()`, the native members (`form`, `labels`, `name`, `validity`, `validationMessage`, `willValidate`, `checkValidity`, `reportValidity`, `setCustomValidity`) and the form callbacks, all handed to core. `disabled` and `required` count whenever present, like native controls.
 - **Types.** Element interfaces with `AttributeProperties<typeof primitive, Own>` for root tags, and every part tag in `HTMLElementTagNameMap` as `UiPartElement<typeof primitive, slot, attributes, properties, events>` (its slot props as properties, like `ui-tabs-tab`'s `disabled` or a trigger's `payload`, and its events from the slot's callbacks, `PartEvents`, unless the element fires others, like a close's `action`, or its owner fires them, like a trigger menu item's `select`). `custom-elements.json` lists elements, attributes with defaults (from core's `@defaultValue`) and events, reading parts from their define calls and part events from their types. A test checks each part's property list against its define call, and `part-events.test.ts` presses every part with typed events and checks it fires exactly those.
+
+- **Without a bundler.** `scripts/build/browser.mjs` builds `packages/web/browser/` with Rolldown: `web/<entry>.js` per side-effect entry, shared code in `web/chunks/`, and `web.js`, the loader (`src/autoload.ts`). The loader finds the folder beside its own URL (`componentsBase`), maps a tag to the longest entry named like it (`entryOf`: `ui-tabs-panel` to `tabs`, `ui-overlay-host` to `overlays`), and imports each entry once, for tags in the document and in open shadow roots it sees, then for ones added later. The files export nothing. The docs site serves them at `/web@<version>.js` and `/web@<version>/`, and `apps/docs/proxy.ts` redirects `/web@<major>` to the newest. Specs: `pnpm test:browser-build` (`tests/browser-build/`, pages on one origin, files on another).
 
 Tests that show where the project stands: `packages/web/test/reconnect.test.ts`, `tests/specs/web-lifecycle.spec.ts`, the manifest test. Browser specs: `--project web` (plus `web-webkit` and `web-firefox` when engines run).
 
