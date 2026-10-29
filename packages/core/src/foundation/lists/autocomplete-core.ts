@@ -290,9 +290,14 @@ function fieldPart<State extends AutocompleteCoreState, Api extends CoreApi>() {
     },
     bind(el, { api, store }) {
       // The DOM property, since an input's value attribute stops applying once someone types.
+      // Only new text is written: typing stores the query before the text, and
+      // a write in between would put the old text back with the caret at the end.
       const input = el as HTMLInputElement
+      let shown: string | undefined
       const write = () => {
         const value = text(api, store.get())
+        if (value === shown) return
+        shown = value
         if (input.value !== value) input.value = value
       }
       write()
