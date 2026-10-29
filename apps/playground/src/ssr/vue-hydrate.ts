@@ -12,7 +12,7 @@ function fixtureProps(fixture: Component, search: string) {
 
 // Vue's warnings pass vnodes along with the message, and `String` throws on
 // objects without a prototype.
-function describe(args: unknown[]) {
+function message(args: unknown[]) {
   return args
     .map((arg) =>
       typeof arg === "string" || arg instanceof Error ? String(arg) : Object.prototype.toString.call(arg),
@@ -41,11 +41,11 @@ async function hydrateFixture(root: HTMLElement, fixture: Component) {
     const warn = console.warn
     const error = console.error
     console.warn = (...args: unknown[]) => {
-      errors.push(describe(args))
+      errors.push(message(args))
       warn(...args)
     }
     console.error = (...args: unknown[]) => {
-      errors.push(describe(args))
+      errors.push(message(args))
       error(...args)
     }
     createSSRApp(fixture, fixtureProps(fixture, location.search)).mount(root)

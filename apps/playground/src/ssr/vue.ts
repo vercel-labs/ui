@@ -16,35 +16,32 @@ const fixtures = import.meta.glob("../fixtures/*/vue-ssr.ts") as Record<
 // until React registers, and the server needs the same no-op.
 Object.assign(globalThis, { $RefreshSig$: () => (type: unknown) => type })
 
-// Vue renders asynchronously, so renders run one at a time to keep each
-// request's stand-in for `location` its own.
-let queue: Promise<unknown> = Promise.resolve()
-
-function renderFixture(fixture: string, url: string) {
-  const render = queue.then(async () => {
-    const load = fixtures[`../fixtures/${fixture}/vue-ssr.ts`]
-    if (!load) throw new Error(`No Vue fixture for ${fixture}.`)
-    const { Fixture } = await load()
-    const location = new URL(url)
-    const realm = globalThis as { location?: unknown }
-    realm.location = location
-    // Without an error handler, Vue's development build throws out of a
-    // `setup` that fails and leaves that component as the current instance,
-    // and every later render in the process loses its parts' content. Nuxt
-    // always sets one, so the fixture reports the error once it's rendered.
-    const app = createSSRApp(Fixture, fixtureProps(Fixture, location.search))
-    let failure: unknown
-    app.config.errorHandler = (error) => void (failure ??= error)
-    try {
-      const html = await renderToString(app)
-      if (failure) throw failure
-      return html
-    } finally {
-      delete realm.location
-    }
-  })
-  queue = render.catch(() => {})
-  return render
+async function renderFixture(fixture: string, url: string) {
+  const load = fixtures[`../fixtures/${fixture}/vue-ssr.ts`]
+  if (!load) throw new Error(`No Vue fixture for ${fixture}.`)
+  const { Fixture } = await load()
+  const location = new URL(url)
+  // Without an error handler, Vue's development build throws out of a
+  // `setup` that fails and leaves that component as the current instance,
+  // and every later render in the process loses its parts' content. Nuxt
+  // always sets one, so the fixture reports the error once it's rendered.
+  const app = createSSRApp(Fixture, fixtureProps(Fixture, location.search))
+  let failure: unknown
+  app.config.errorHandler = (error) => void (failure ??= error)
+  // Requests overlap, and Vue runs every fixture's setup and render before
+  // `renderToString` first awaits, since none has an async setup, so the
+  // stand-in is in place for exactly one render at a time.
+  const realm = globalThis as { location?: unknown }
+  realm.location = location
+  let rendering: Promise<string>
+  try {
+    rendering = renderToString(app)
+  } finally {
+    delete realm.location
+  }
+  const html = await rendering
+  if (failure) throw failure
+  return html
 }
 
 export { renderFixture }
