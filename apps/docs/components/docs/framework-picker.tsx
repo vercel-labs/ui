@@ -9,8 +9,8 @@ import { setFramework, useSavedFramework } from "./remember-framework"
 
 const items = frameworkIds.map((value) => ({ value, label: frameworks[value].label }))
 
-// Each label shows when <html data-framework> names its framework, and the
-// placeholder while it's empty. Tailwind needs the classes written out.
+// Each label shows when <html data-framework> names its framework. Tailwind needs the
+// classes written out.
 const shownFor = {
   react: "[html[data-framework=react]_&]:inline",
   vue: "[html[data-framework=vue]_&]:inline",

@@ -10,8 +10,7 @@ import { CopyButton } from "./copy-button"
 import { frame } from "./frame"
 import { useFramework } from "./remember-framework"
 
-// The package-manager tabs that remark-npm renders, which all show the
-// reader's package manager.
+// The package-manager tabs remark-npm renders.
 function CodeBlockTabs({ className, children }: { className?: string; children: React.ReactNode }) {
   const { value } = usePreference(packageManager)
   return (

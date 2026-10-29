@@ -6,9 +6,7 @@ import type { ReactNode } from "react"
 
 const preferences = [colorScheme, framework, packageManager]
 
-// Puts the reader's color scheme, framework and package manager on <html>
-// before the first paint, from the script `Preferences` renders first, and
-// keeps them there.
+// Puts the saved preferences on <html> before the first paint.
 function SitePreferences({ children }: { children: ReactNode }) {
   return <Preferences preferences={preferences}>{children}</Preferences>
 }
