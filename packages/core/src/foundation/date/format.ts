@@ -61,7 +61,9 @@ function formatDateRange(
   locale?: string,
   options: Intl.DateTimeFormatOptions = mediumDate,
 ) {
-  return dateFormatter(locale, options).formatRange(utc(start), utc(end))
+  // Browsers write plain spaces where Node's ICU writes thin ones, so a label
+  // rendered on the server wouldn't match the one the browser hydrates.
+  return dateFormatter(locale, options).formatRange(utc(start), utc(end)).replace(thinSpaces, " ")
 }
 
 /**
@@ -132,5 +134,6 @@ const longDate: Intl.DateTimeFormatOptions = {
   day: "numeric",
 }
 const mediumDate: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" }
+const thinSpaces = /[\u2009\u202F]/g
 
 export { dateFormatter, formatDate, formatDateRange, formatDateToParts, monthNames, todayDate, weekdayNames }
