@@ -108,3 +108,15 @@ test("lean Markdown keeps the first example's classes and drops the rest", async
   expect(markdown).toContain(source)
   expect(markdown).toContain('export const Example = () => (\n  <button type="button">\n    Save')
 })
+
+test("lean Markdown keeps a class list the code selects", async () => {
+  writeFiles({
+    "basic.tsx": source,
+    "grid.tsx":
+      'const grid = document.querySelector(".grid")\nexport const Example = () => <div className="grid gap-2" />',
+  })
+  const file = writePage()
+  writeFileSync(file, `${readFileSync(file, "utf8")}\n<ComponentExample name="button/grid" />\n`)
+  const markdown = await pageMarkdown(file, "react", () => null, { lean: true })
+  expect(markdown).toContain('<div className="grid gap-2" />')
+})

@@ -99,11 +99,14 @@ async function replaceAsync(text: string, pattern: RegExp, replace: (...match: s
   return text.replace(pattern, () => values[index++])
 }
 
-// Example code without its static class lists. A tag whose other attributes
-// now fit on one line is joined back onto it.
+// Example code without its static class lists, except ones holding a class
+// the code selects, like `.grid`. A tag whose other attributes now fit on one
+// line is joined back onto it.
 const unstyled = (code: string) =>
   code
-    .replace(/\s+(?:class|className)="[^"]*"/g, "")
+    .replace(/\s+(?:class|className)="([^"]*)"/g, (list, names: string) =>
+      names.split(/\s+/).some((name) => name && code.includes(`.${name}`)) ? list : "",
+    )
     .replace(/^( *)<([\w.:-]+)((?:\n +[^\n<>]+)*)\n *(\/?>)$/gm, (tag, indent, name, attrs, end) => {
       const line = `${indent}<${[name, ...attrs.split("\n").map((attr: string) => attr.trim())].filter(Boolean).join(" ")}${end === "/>" ? " />" : ">"}`
       return line.length <= 110 ? line : tag
@@ -149,6 +152,10 @@ async function pageMarkdown(
       slugs = [framework, slugs[0] === "utilities" ? utilitiesFolder(framework) : slugs[0], ...slugs.slice(1)]
     return link({ slugs, hash })
   }
+
+  // With `lean`, only the page's first example keeps its class lists.
+  const [, firstExample = ""] = tag("ComponentExample").exec(body) ?? []
+  const styledExample = lean ? attributes(firstExample).name : undefined
 
   let text = body
   text = await outsideCode(text, async (prose) => {
@@ -229,12 +236,11 @@ async function pageMarkdown(
       })
       return tables.map((table) => rows(table.rows)).join("\n\n")
     })
-    let examples = 0
     out = await replaceAsync(out, tag("ComponentExample"), async (_, attrs: string) => {
       // Core guides show their shared primitives and framework bindings inline.
       const { name, caption } = attributes(attrs)
       if (compact || !framework) return caption ?? ""
-      const styled = !lean || examples++ === 0
+      const styled = !lean || name === styledExample
       const sources = await readExampleSources(name, framework)
       if (!sources) return caption ?? ""
       const blocks = (files: { name: string; lang: string; code: string }[]) =>
