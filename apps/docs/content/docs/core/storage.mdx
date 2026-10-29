@@ -3,9 +3,9 @@ title: Storage
 description: Keep a value between visits, follow changes, and read cookies on the server.
 ---
 
-`createLocalStorage`, `createSessionStorage`, and `createCookieStorage` keep a string under an ID. They share the same methods for reading, writing, removing, and subscribing to a value.
+Use the storage helpers to save a value and read it back later. They support localStorage, sessionStorage, and cookies, and let you listen for changes.
 
-Import them from `@ui-sdk/core`. To save a color scheme or another choice from a list, pass a storage to [Preferences](./behaviors/preferences).
+For a user preference, such as a theme or sidebar state, pass a storage to [`createPreference`](./behaviors/preferences#remember-the-choice).
 
 ## Choose a Storage
 
@@ -21,7 +21,7 @@ A note you want to keep between visits can use localStorage. A temporary draft c
 
 ## Keep a Value
 
-The ID is the localStorage or sessionStorage key, or the cookie's name. Storages with the same kind and ID share a value:
+These helpers store strings under a name, which becomes the localStorage or sessionStorage key, or the cookie's name:
 
 ```ts
 import { createLocalStorage } from "@ui-sdk/core"
@@ -34,7 +34,7 @@ note.remove()
 note.get()
 ```
 
-The first `get()` returns `"Buy milk"`; after `remove()`, it returns `null`. `set` and `remove` return whether the write succeeded.
+The first `get()` returns `"Buy milk"`. After `remove()`, it returns `null`.
 
 <ComponentExample
   name="behaviors/storage"
@@ -43,9 +43,9 @@ The first `get()` returns `"Buy milk"`; after `remove()`, it returns `null`. `se
 
 ## When Storage Is Unavailable
 
-A browser can block storage, and a write can fail when storage is full. A failed read returns `null`; a failed write returns `false`.
+A browser can block storage or run out of space. If a read fails, `get()` returns `null`. For localStorage and sessionStorage, `set` and `remove` return `true` when the write succeeds, or `false` when it fails.
 
-Use `available()` to show whether saving is available, and check the write's result when you need to know whether a particular value was saved:
+Use `available()` for an initial check. A later write can still fail, so check its return value too:
 
 ```ts
 if (!note.available()) {
@@ -57,9 +57,13 @@ if (!note.set("Buy milk")) {
 }
 ```
 
-A full storage may still let you read or remove an existing value. On the server, localStorage and sessionStorage return `null` from `get()` and `false` from writes. Cookies can be read there when you supply the request's header.
+A full storage may still let you read or remove an existing value.
 
-## Hear Changes
+For cookies, `true` means no error was reported. It doesn't confirm that the cookie was saved or removed.
+
+On the server, localStorage and sessionStorage are unavailable. To read a saved value there, [use a cookie](#read-a-cookie-on-the-server).
+
+## Follow Changes
 
 Read the starting value with `get`, then subscribe to changes. `subscribe` doesn't call your listener with the initial value:
 
@@ -96,9 +100,11 @@ function readDensity(request: Request) {
 }
 ```
 
-In the browser, the same storage reads `document.cookie` instead. `readsOnServer` is `true` for cookies, so helpers such as `createPreference` know they can use the saved value in their initial state. Create storage that holds a request's header per request.
+Create the storage inside your request handler, as above, so each visitor's cookie stays separate. In the browser, it reads `document.cookie`.
 
-By default, cookies last one year, use path `/` and `SameSite=Lax`, and use `Secure` on HTTPS pages. Change these with `maxAge`, `path`, `domain`, `sameSite`, and `secure`. Writing a cookie through this helper needs a browser; it doesn't set a server response header.
+On the server, `available()` returns `true` when you supply a `Cookie` header, but `set` and `remove` return `false`. The helper reads the request's cookies; it doesn't set response headers. Its `readsOnServer` flag lets helpers such as `createPreference` use the saved value in their initial state.
+
+By default, cookies last one year, use path `/` and `SameSite=Lax`, and use `Secure` on HTTPS pages. You can change these with `maxAge`, `path`, `domain`, `sameSite`, and `secure`.
 
 ## Show a Value Before Hydration
 
@@ -118,11 +124,11 @@ Render the element with its default attribute, such as `data-density="comfortabl
 
 Only values listed in `values` are written. Missing or invalid saved values leave the attribute as the server rendered it. Attribute names must start with `data-`.
 
-This changes the attribute, not your component's state. Read the storage when the component mounts and subscribe to keep its state current. If hydration checks the attribute, tell your framework to expect the script's change. The [server rendering guide](/docs/server-rendering#render-the-storage-script-yourself) shows the markup for your framework.
+The script updates the attribute. Read the storage when the component mounts and subscribe to keep its state current. When you [render the script in your framework](/docs/server-rendering#render-the-storage-script-yourself), account for the attribute changing before hydration.
 
 Scripts with the same storage kind and ID share one initial read. A cookie storage's `script` returns `undefined`, because the server can render the cookie's value itself.
 
-For a list of preferences, [Preferences](./behaviors/preferences#apply-preferences) renders one script and keeps their attributes up to date for you.
+For user preferences, [apply them with `Preferences`](./behaviors/preferences#apply-preferences) to render one script and keep their attributes up to date.
 
 ## API Reference
 
@@ -139,7 +145,7 @@ For a list of preferences, [Preferences](./behaviors/preferences#apply-preferenc
     get: "Keep a Value",
     set: "Keep a Value",
     remove: "Keep a Value",
-    subscribe: "Hear Changes",
+    subscribe: "Follow Changes",
   }}
 />
 

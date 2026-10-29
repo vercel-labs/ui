@@ -152,13 +152,24 @@ function createStorage(
      * first paint. Undefined for a cookie, since the server renders its value.
      */
     script: (options: StorageScriptOptions) => area.script?.(options),
-    /** Whether the value can be read and written here. False on the server, except a cookie given the request's header. */
+    /**
+     * Whether storage appears available. A later write can still fail.
+     * On the server, a cookie with a request header is available for reading only.
+     */
     available: area.available,
     /** The value kept under the ID, or null when nothing is, or the storage is unavailable. */
     get: area.read,
-    /** Keeps a value under the ID. Returns whether it was written. */
+    /**
+     * Saves a value under the ID. Returns false when writing is unavailable or
+     * the browser reports a write failure. For cookies, true means the assignment
+     * didn't throw; it doesn't confirm the cookie was saved.
+     */
     set: (value: string) => save(value),
-    /** Removes the value. Returns whether it was removed. */
+    /**
+     * Removes the value. Returns false when writing is unavailable or the
+     * browser reports a write failure. For cookies, true means the assignment
+     * didn't throw; it doesn't confirm the cookie was removed.
+     */
     remove: () => save(null),
     /**
      * Hears the value change, through another storage with the same ID on the

@@ -3,7 +3,7 @@ title: Preferences
 description: Define choices such as skin tone or density, save them, and keep components in sync.
 ---
 
-Use `createPreference` to share a setting across your app. It keeps components in sync when the setting changes and can save the choice between visits.
+Use `createPreference` to share a user preference across your app. It keeps components in sync when the preference changes and can save it between visits.
 
 You can use it for a theme, like light or dark mode (see [`createColorScheme`](#choose-a-color-scheme)), or other user preferences like a preferred package manager or whether the sidebar is open.
 
@@ -77,7 +77,7 @@ const skinTone = createPreference({
 export { skinTone }
 ```
 
-Saved values outside the allowed list are ignored. This demo uses localStorage:
+This demo uses localStorage:
 
 <ComponentExample
   name="behaviors/skin-tone"
@@ -91,9 +91,135 @@ Saved values outside the allowed list are ignored. This demo uses localStorage:
 | `createSessionStorage` | A choice that lasts while the tab is open.                    |
 | `createCookieStorage`  | A choice the server needs to read to render content.          |
 
-Restoring a value reports the reason `"restore"`. Changes received from another storage instance or tab report `"storage-sync"`. Which tabs can share a value depends on the storage.
+When subscribing restores a different saved value, `onValueChange` receives the reason `"restore"`. Changes received from another storage instance or tab report `"storage-sync"`. Which tabs can share a value depends on the storage.
 
-If you render on the server, [apply saved preferences before the page paints](#server-rendering) so styles use the saved choice from the start.
+If you render on the server, [apply saved preferences before the page paints](#show-a-preference-before-hydration) so styles use the saved choice from the start.
+
+### When Nothing Is Saved
+
+If there's no saved value, the preference starts with `defaultValue`. A saved value outside the allowed `values` uses that default too. For the skin-tone example, that's `"default"`.
+
+### When Saving Is Unavailable
+
+A browser can block storage or run out of space. The preference still changes and updates its subscribers, but the new choice may be lost on reload.
+
+`skinTone.set(...)` returns whether the preference changed. If your interface needs to tell someone whether saving is available, [check the storage](../storage#when-storage-is-unavailable).
+
+### Remember a Sidebar's State
+
+Here's another example. Use `createPreference` to remember whether a sidebar is open or closed. Define `sidebarPreference` in its own file:
+
+```ts title="sidebar-preference.ts"
+import { createLocalStorage, createPreference } from "@ui-sdk/core"
+
+const sidebarPreference = createPreference({
+  values: ["open", "closed"],
+  defaultValue: "open",
+  attribute: "data-sidebar",
+  storage: createLocalStorage("sidebar-state"),
+})
+
+export { sidebarPreference }
+```
+
+Then read it in your sidebar component:
+
+<FrameworkContent value="react">
+
+```tsx title="sidebar.tsx"
+import { usePreference } from "@ui-sdk/react/preferences"
+import { sidebarPreference } from "./sidebar-preference"
+
+function Sidebar() {
+  const { value } = usePreference(sidebarPreference)
+
+  return <aside hidden={value === "closed"}>Sidebar content</aside>
+}
+
+export { Sidebar }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue title="sidebar.vue"
+<script setup lang="ts">
+import { usePreference } from "@ui-sdk/vue/preferences"
+import { sidebarPreference } from "./sidebar-preference"
+
+const sidebar = usePreference(sidebarPreference)
+</script>
+
+<template>
+  <aside :hidden="sidebar.value === 'closed'">Sidebar content</aside>
+</template>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte title="sidebar.svelte"
+<script lang="ts">
+  import { usePreference } from "@ui-sdk/svelte/preferences"
+  import { sidebarPreference } from "./sidebar-preference"
+
+  const sidebar = usePreference(sidebarPreference)
+</script>
+
+<aside hidden={sidebar.current.value === "closed"}>Sidebar content</aside>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx title="sidebar.tsx"
+import { usePreference } from "@ui-sdk/solid/preferences"
+import { sidebarPreference } from "./sidebar-preference"
+
+function Sidebar() {
+  const sidebar = usePreference(sidebarPreference)
+
+  return <aside hidden={sidebar().value === "closed"}>Sidebar content</aside>
+}
+
+export { Sidebar }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts title="sidebar.ts"
+import { sidebarPreference } from "./sidebar-preference"
+
+class AppSidebar extends HTMLElement {
+  #stop?: () => void
+
+  connectedCallback() {
+    const update = () => {
+      this.hidden = sidebarPreference.get().value === "closed"
+    }
+
+    this.#stop = sidebarPreference.subscribe(update)
+    update()
+  }
+
+  disconnectedCallback() {
+    this.#stop?.()
+  }
+}
+
+customElements.define("app-sidebar", AppSidebar)
+```
+
+```html
+<app-sidebar>
+  <aside>Sidebar content</aside>
+</app-sidebar>
+```
+
+</FrameworkContent>
+
+Call `sidebarPreference.set("closed")` from your toggle to close the sidebar, or `sidebarPreference.set("open")` to open it. The component updates when the preference changes, and the choice is saved for the next visit.
 
 ## Apply Preferences
 
@@ -481,9 +607,7 @@ The container supplies the accessible name. CSS shows one hand and hides the oth
 
 ## Server Rendering
 
-On the server, `Preferences` renders an inline script before its content. The script reads saved choices and sets their attributes before the page paints. CSS can use those attributes immediately.
-
-State from `usePreference` or `follow` starts at `initialState` so hydration matches. It then picks up the saved value and the browser's color scheme. Cookies can supply the saved value on the server too:
+The server can read cookies, but localStorage and sessionStorage are only available in the browser. Choose how to render based on what the preference changes:
 
 | What Depends on the Preference                | How to Render It                           |
 | --------------------------------------------- | ------------------------------------------ |
@@ -492,9 +616,40 @@ State from `usePreference` or `follow` starts at `initialState` so hydration mat
 | Formatted text or content throughout the page | Read a cookie on the server.               |
 | Content that can update after hydration       | Read the state with `usePreference`.       |
 
-The [server rendering guide](/docs/server-rendering#saved-preferences-and-storage) shows where to put `Preferences` in your framework, how to read cookies, and how to handle the attributes during hydration. Pass `nonce` when your Content Security Policy requires one for inline scripts.
+### Show a Preference Before Hydration
 
-For HTML you render yourself, `preferencesScript([colorScheme, skinTone])` generates the script. Place it inside the element that holds the preferences. The framework guide includes this setup for Web Components.
+For a preference saved in localStorage or sessionStorage, pass it to `Preferences`. It renders an inline script that applies the saved choice before the page paints:
+
+1. The server renders using `defaultValue`.
+2. The script reads the saved choice and sets the preference's data attribute. CSS can use it immediately.
+3. After hydration, `usePreference` and `follow` pick up the saved value.
+
+For example, if someone saved `"medium"`, CSS sees `data-skin-tone="medium"` on the first paint. A label rendered from `usePreference` still starts with `"default"` and updates after hydration.
+
+When your framework checks those attributes during hydration, [account for the script's changes](/docs/server-rendering#saved-preferences-and-storage). Pass `nonce` to `Preferences` if your Content Security Policy requires one for inline scripts.
+
+For HTML you render yourself, `preferencesScript([skinTone])` generates the script. Place it inside the element that holds the preferences. For a single storage value, you can [render the storage's script](../storage#show-a-value-before-hydration) instead.
+
+### Read a Cookie on the Server
+
+Use a cookie when the server needs the saved choice to render content, such as an install command for someone's preferred package manager. Inside your request handler, pass the `Cookie` header to the storage:
+
+```ts
+import { createCookieStorage, createPreference } from "@ui-sdk/core"
+
+const packageManager = createPreference({
+  values: ["npm", "pnpm", "yarn", "bun"],
+  defaultValue: "npm",
+  attribute: "data-package-manager",
+  storage: createCookieStorage("package-manager", {
+    cookie: request.headers.get("cookie"),
+  }),
+})
+```
+
+If the cookie contains `"pnpm"`, `packageManager.initialState.value` and `packageManager.get().value` both start at `"pnpm"`. A missing or invalid cookie uses `"npm"`.
+
+In the browser, the storage reads `document.cookie`. [Create and share the preference for each request](/docs/server-rendering#read-a-cookie-on-the-server) so visitors don't share state. Components can then use the saved choice from their first render.
 
 ### Browser Preferences on the Server
 
