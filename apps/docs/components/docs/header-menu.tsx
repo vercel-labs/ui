@@ -12,7 +12,7 @@ import {
 import { frameworkIds, frameworks } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
 import type { Section } from "@/lib/sections"
-import { ChevronDownIcon } from "lucide-react"
+import { ArrowUpRightIcon, ChevronDownIcon } from "lucide-react"
 import Link from "next/link"
 import { useMenuLink } from "./section-nav"
 
@@ -26,6 +26,19 @@ function HeaderMenu({ section }: { section?: Section }) {
     <NavigationMenu aria-label="Sections">
       <NavigationMenuList className="flex items-center gap-6">
         {menu.map((item) => {
+          if (item.href.startsWith("http")) {
+            return (
+              <NavigationMenuItem key={item.href}>
+                <NavigationMenuLink
+                  render={<a href={item.href} target="_blank" rel="noreferrer" />}
+                  className={cn("gap-1", itemClassName)}
+                >
+                  {item.title}
+                  <ArrowUpRightIcon className="size-3.5" />
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            )
+          }
           const { href, current } = link(item.href)
           if (item.href === "/docs/frameworks") {
             return (
@@ -40,6 +53,7 @@ function HeaderMenu({ section }: { section?: Section }) {
                 <NavigationMenuContent
                   side="bottom"
                   align="start"
+                  alignOffset={-12}
                   sideOffset={6}
                   className="min-w-44 rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10"
                 >

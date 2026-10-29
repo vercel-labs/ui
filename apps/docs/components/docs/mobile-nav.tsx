@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/r
 import { menu } from "@/lib/menu"
 import type { Section } from "@/lib/sections"
 import type * as PageTree from "fumadocs-core/page-tree"
+import { ArrowUpRightIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
@@ -127,6 +128,21 @@ function MobileMenu({
       <nav aria-label="Sections">
         <MenuGroup label="Menu">
           {menu.map((item) => {
+            if (item.href.startsWith("http")) {
+              return (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-fit items-center gap-1 rounded-md text-2xl font-medium tracking-tight text-foreground/70 outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
+                  >
+                    {item.title}
+                    <ArrowUpRightIcon className="size-5" />
+                  </a>
+                </li>
+              )
+            }
             const { href, current } = link(item.href)
             return (
               <MenuLink key={item.href} href={href} current={current} onNavigate={onNavigate}>
