@@ -100,16 +100,19 @@ The Done button still closes it. Cancellation also works when you control the va
 
 ## Share State Across Components
 
-When several components need the same state, create it once in a parent and hand it down through context. `createContext` gives you a typed pair of functions:
+When several components need the same state, create it once in a parent and hand it down through context. A pair of small functions keeps the context key in one place:
 
 ```ts title="editor.svelte.ts"
-import { createContext } from "svelte"
+import { getContext, setContext } from "svelte"
 
 export class Editor {
   bold = $state(false)
 }
 
-export const [getEditor, setEditor] = createContext<Editor>()
+const key = Symbol("editor")
+
+export const setEditor = (editor: Editor) => setContext(key, editor)
+export const getEditor = () => getContext<Editor>(key)
 ```
 
 Create the state in a component near the top of your app. In SvelteKit, the root layout works well:

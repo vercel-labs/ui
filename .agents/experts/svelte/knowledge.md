@@ -63,7 +63,7 @@ Last checked: 2026-10-28, against `node_modules/svelte` 5.57.2 (exports checked:
 - DOM access during component init.
 - Actions where an attachment would pass through props.
 - `on:` directives, `createEventDispatcher`, `<slot>`, `$:`: Svelte 4 idioms in runes code.
-- App state exported as a module-level `$state` (`export const app = $state(...)` in a `.svelte.ts` file). The server shares a module across requests, so every visitor reads and writes the same object. Create it in a component and share it with `createContext`.
+- App state exported as a module-level `$state` (`export const app = $state(...)` in a `.svelte.ts` file). The server shares a module across requests, so every visitor reads and writes the same object. Create it in a component and share it through context (`setContext` and `getContext`, which work on every Svelte version the docs support; `createContext` needs 5.40).
 
 ## 2. How `@ui-sdk/svelte` is built
 
