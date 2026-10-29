@@ -9,61 +9,95 @@ A library of UI behaviors for building interfaces: keyboard navigation, focus, s
 
 ## Example
 
-Let's build a popover. `createPopup` gives it everything a popover needs: it opens from a button, sits next to it, closes on Escape or a click outside, and moves focus in and back.
+ui-sdk comes with ready-made components like Popover, Menu and Select for every framework. When you need one that isn't there, you build it from the same behaviors.
 
-Define it once in `invite.ts`:
+Let's build a ranking list. You can drag an item to a new place, or use the keyboard: Space picks it up, the arrows move it, Space drops it and Escape puts it back. Screen readers hear each step.
+
+It takes two behaviors. `createRovingFocus` moves focus with the arrow keys, and `createReorder` handles the dragging, the keyboard moves and the announcements. Define the list once in `ranking.ts`:
 
 ```ts
 import {
-  createPopup,
+  createChange,
+  createReorder,
+  createRovingFocus,
   definePrimitive,
-  popupClose,
-  popupContent,
-  popupState,
-  popupTrigger,
+  type ReorderDraft,
 } from "@ui-sdk/core"
-import { popoverPreset } from "@ui-sdk/core/popover"
 
-const invite = definePrimitive({
-  name: "invite",
-  options: { defaultOpen: "boolean" },
-  state: (options: { defaultOpen?: boolean }) => popupState(options),
-  api: (context) => createPopup(context, { preset: popoverPreset }),
+const ranking = definePrimitive({
+  name: "ranking",
+  options: { defaultValue: "list" },
+  state: (options: { defaultValue: string[] }) => ({
+    value: options.defaultValue,
+    focused: null as string | null,
+    moving: null as ReorderDraft | null,
+  }),
+  api: (context) => {
+    const change = createChange(context)
+    return {
+      roving: createRovingFocus(context, { slot: "item", key: "focused" }),
+      reorder: createReorder(context, {
+        slot: "item",
+        key: "value",
+        draft: "moving",
+        set: (value, details) => change("value", value, details),
+      }),
+    }
+  },
   slots: (slot) => ({
-    trigger: popupTrigger(slot),
-    content: popupContent(slot),
-    close: popupClose(slot),
+    root: slot<{}, { order: string[] }>({
+      state: (state, { api }) => ({ order: api.reorder.order(state) }),
+      attrs: () => ({ role: "listbox", "aria-roledescription": "sortable list" }),
+    }),
+    item: slot<{ value: string }>({
+      props: { value: "string" },
+      attrs: (state, part) => ({
+        role: "option",
+        "aria-roledescription": "sortable item",
+        "aria-selected": String(state.moving?.key === part.key),
+        "data-grabbed": state.moving?.key === part.key ? "" : undefined,
+        tabindex: part.api.roving.tabIndex(state, part),
+        style: "touch-action: none",
+      }),
+      on: {
+        keydown: (event, { el, api, key }) =>
+          api.reorder.keydown(event, key) || api.roving.keydown(event, el!),
+        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
+      },
+      bind: (el, part) => {
+        const cleanups = [part.api.roving.bind(el, part), part.api.reorder.bind(el, part)]
+        return () => cleanups.forEach((cleanup) => cleanup())
+      },
+    }),
   }),
 })
 
-export { invite }
+export { ranking }
 ```
 
 Then use `createParts` to turn it into components. In React:
 
 ```tsx
 import { createParts } from "@ui-sdk/react/primitive"
-import { invite } from "./invite"
+import { ranking } from "./ranking"
 
-const { Root, Trigger, Content, Close } = createParts(invite, {
-  trigger: "button",
-  content: "div",
-  close: "button",
-})
+const { Root, Item } = createParts(ranking, { root: "div", item: "div" })
 
-function InvitePopover() {
+function Seasons() {
   return (
-    <Root>
-      <Trigger>Invite</Trigger>
-      <Content>
-        <p>Anyone with the link can join.</p>
-        <Close>Done</Close>
-      </Content>
+    <Root aria-label="Favorite seasons" defaultValue={["Spring", "Summer", "Autumn", "Winter"]}>
+      {({ order }) =>
+        order.map((season) => (
+          <Item key={season} value={season}>
+            {season}
+          </Item>
+        ))
+      }
     </Root>
   )
 }
 
-export { InvitePopover }
+export { Seasons }
 ```
 
 And in Vue, it's the same call with the same parts:
@@ -71,27 +105,29 @@ And in Vue, it's the same call with the same parts:
 ```vue
 <script setup lang="ts">
 import { createParts } from "@ui-sdk/vue/primitive"
-import { invite } from "./invite"
+import { ranking } from "./ranking"
 
-const { Root, Trigger, Content, Close } = createParts(invite, {
-  trigger: "button",
-  content: "div",
-  close: "button",
-})
+const { Root, Item } = createParts(ranking, { root: "div", item: "div" })
 </script>
 
 <template>
-  <Root>
-    <Trigger>Invite</Trigger>
-    <Content>
-      <p>Anyone with the link can join.</p>
-      <Close>Done</Close>
-    </Content>
+  <Root
+    v-slot="{ state }"
+    aria-label="Favorite seasons"
+    :default-value="['Spring', 'Summer', 'Autumn', 'Winter']"
+  >
+    <Item v-for="season in state.order" :key="season" :value="season">{{ season }}</Item>
   </Root>
 </template>
 ```
 
-The behavior lives in `invite.ts`, so both popovers open, close and move focus the same way. Style them with your own classes, using the data attributes each part sets, like `data-open`.
+The styles are yours. While you drag an item, it gets `data-grabbed` and the `--drag-x` and `--drag-y` variables, so one rule keeps it under the pointer:
+
+```css
+[data-grabbed] {
+  translate: var(--drag-x, 0) var(--drag-y, 0);
+}
+```
 
 ## Contributing
 
