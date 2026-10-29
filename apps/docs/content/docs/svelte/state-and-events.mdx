@@ -98,6 +98,49 @@ For example, keep a popover open when someone clicks outside it:
 
 The Done button still closes it. Cancellation also works when you control the value. Add `debug` to a root to log changes while you work.
 
+## Share State Across Components
+
+When several components need the same state, create it once in a parent and hand it down through context. `createContext` gives you a typed pair of functions:
+
+```ts title="editor.svelte.ts"
+import { createContext } from "svelte"
+
+export class Editor {
+  bold = $state(false)
+}
+
+export const [getEditor, setEditor] = createContext<Editor>()
+```
+
+Create the state in a component near the top of your app. In SvelteKit, the root layout works well:
+
+```svelte title="+layout.svelte"
+<script lang="ts">
+  import { Editor, setEditor } from "$lib/editor.svelte"
+
+  let { children } = $props()
+
+  setEditor(new Editor())
+</script>
+
+{@render children()}
+```
+
+Any component inside it can read and bind the same state:
+
+```svelte
+<script lang="ts">
+  import { Toggle } from "@ui-sdk/svelte/toggle"
+  import { getEditor } from "$lib/editor.svelte"
+
+  const editor = getEditor()
+</script>
+
+<Toggle bind:pressed={editor.bold}>Bold</Toggle>
+```
+
+Each render of the layout creates its own `Editor`, so on the server every request starts with a fresh copy. A `$state` exported from a module lives as long as the server does, so every visitor would read and change the same copy. Keep shared state in context, and use module state only for values that are the same for everyone.
+
 ## Empty and Multiple Values
 
 Select, Tabs, and Radio Group report `null` when nothing is selected. A multiple Select or Combobox uses an array. Accordion and Toggle Group always use arrays.

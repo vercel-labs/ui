@@ -46,4 +46,8 @@ Pass an explicit `id` when something outside the component needs to refer to a p
 
 Use classes or data attributes for styling, rather than generated IDs.
 
+## Give Each Request Its Own State
+
+The server runs your modules once and reuses them for every request. Create app state inside a component and share it through context, so each visitor gets their own copy. [State and Events](./state-and-events#share-state-across-components) shows how.
+
 Popups render in place, so your server layout doesn't need a portal root. [Popups](./popups) covers containers; [Forms](./forms) covers submission and validation.
