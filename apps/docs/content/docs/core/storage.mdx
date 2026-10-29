@@ -1,0 +1,168 @@
+---
+title: Storage
+description: Keep a value between visits, follow changes, and read cookies on the server.
+---
+
+`createLocalStorage`, `createSessionStorage`, and `createCookieStorage` keep a string under an ID. They share the same methods for reading, writing, removing, and subscribing to a value.
+
+Import them from `@ui-sdk/core`. To save a color scheme or another choice from a list, pass a storage to [Preferences](./behaviors/preferences).
+
+## Choose a Storage
+
+Choose by how long the value should last and whether the server needs to read it:
+
+| Storage                | Lasts                         | Shared With             | Server Reads It |
+| ---------------------- | ----------------------------- | ----------------------- | --------------- |
+| `createLocalStorage`   | Until removed                 | Other tabs on the site  | No              |
+| `createSessionStorage` | While the tab is open         | This tab                | No              |
+| `createCookieStorage`  | One year, or `maxAge` seconds | Requests and other tabs | Yes             |
+
+A note you want to keep between visits can use localStorage. A temporary draft can use sessionStorage. A preference that changes server-rendered content can use a cookie.
+
+## Keep a Value
+
+The ID is the localStorage or sessionStorage key, or the cookie's name. Storages with the same kind and ID share a value:
+
+```ts
+import { createLocalStorage } from "@ui-sdk/core"
+
+const note = createLocalStorage("note")
+
+note.set("Buy milk")
+note.get()
+note.remove()
+note.get()
+```
+
+The first `get()` returns `"Buy milk"`; after `remove()`, it returns `null`. `set` and `remove` return whether the write succeeded.
+
+<ComponentExample
+  name="behaviors/storage"
+  caption="Type a note and reload. Switch storage types, or open another tab, to see which values carry over."
+/>
+
+## When Storage Is Unavailable
+
+A browser can block storage, and a write can fail when storage is full. A failed read returns `null`; a failed write returns `false`.
+
+Use `available()` to show whether saving is available, and check the write's result when you need to know whether a particular value was saved:
+
+```ts
+if (!note.available()) {
+  console.log("Saving is unavailable here.")
+}
+
+if (!note.set("Buy milk")) {
+  console.log("The note wasn't saved.")
+}
+```
+
+A full storage may still let you read or remove an existing value. On the server, localStorage and sessionStorage return `null` from `get()` and `false` from writes. Cookies can be read there when you supply the request's header.
+
+## Hear Changes
+
+Read the starting value with `get`, then subscribe to changes. `subscribe` doesn't call your listener with the initial value:
+
+```ts
+function logNote(value: string | null) {
+  console.log(value ?? "")
+}
+
+logNote(note.get())
+const stop = note.subscribe(logNote)
+```
+
+Writes through a storage with the same kind and ID notify listeners on the page, including writes through `note` itself. LocalStorage also follows changes in other tabs. Cookies follow other tabs in browsers that support `cookieStore`.
+
+Call the returned function when you no longer need the subscription, such as when the component unmounts:
+
+```ts
+stop()
+```
+
+## Read a Cookie on the Server
+
+Pass the request's `Cookie` header to read a saved value during server rendering:
+
+```ts
+import { createCookieStorage } from "@ui-sdk/core"
+
+function readDensity(request: Request) {
+  const density = createCookieStorage("density", {
+    cookie: request.headers.get("cookie"),
+  })
+
+  return density.get()
+}
+```
+
+In the browser, the same storage reads `document.cookie` instead. `readsOnServer` is `true` for cookies, so helpers such as `createPreference` know they can use the saved value in their initial state. Create storage that holds a request's header per request.
+
+By default, cookies last one year, use path `/` and `SameSite=Lax`, and use `Secure` on HTTPS pages. Change these with `maxAge`, `path`, `domain`, `sameSite`, and `secure`. Writing a cookie through this helper needs a browser; it doesn't set a server response header.
+
+## Show a Value Before Hydration
+
+The server can't read localStorage or sessionStorage. For styles that depend on a saved value, `script` generates JavaScript that puts it on a `data-*` attribute before hydration:
+
+```ts
+import { createLocalStorage } from "@ui-sdk/core"
+
+const densityStorage = createLocalStorage("density")
+const script = densityStorage.script({
+  attribute: "data-density",
+  values: ["comfortable", "compact"],
+})
+```
+
+Render the element with its default attribute, such as `data-density="comfortable"`. Render `script` as inline JavaScript immediately after that element. It reads the saved value and updates the preceding element's attribute while the page loads.
+
+Only values listed in `values` are written. Missing or invalid saved values leave the attribute as the server rendered it. Attribute names must start with `data-`.
+
+This changes the attribute, not your component's state. Read the storage when the component mounts and subscribe to keep its state current. If hydration checks the attribute, tell your framework to expect the script's change. The [server rendering guide](/docs/server-rendering#render-the-storage-script-yourself) shows the markup for your framework.
+
+Scripts with the same storage kind and ID share one initial read. A cookie storage's `script` returns `undefined`, because the server can render the cookie's value itself.
+
+For a list of preferences, [Preferences](./behaviors/preferences#apply-preferences) renders one script and keeps their attributes up to date for you.
+
+## API Reference
+
+<TypeTable
+  path="../../packages/core/src/foundation/storage/storage.ts"
+  name="ValueStorage"
+  events={false}
+  examples={{
+    id: "Keep a Value",
+    kind: "Choose a Storage",
+    readsOnServer: "Read a Cookie on the Server",
+    script: "Show a Value Before Hydration",
+    available: "When Storage Is Unavailable",
+    get: "Keep a Value",
+    set: "Keep a Value",
+    remove: "Keep a Value",
+    subscribe: "Hear Changes",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/storage/storage.ts"
+  name="CookieStorageOptions"
+  events={false}
+  examples={{
+    cookie: "Read a Cookie on the Server",
+    maxAge: "Read a Cookie on the Server",
+    path: "Read a Cookie on the Server",
+    domain: "Read a Cookie on the Server",
+    sameSite: "Read a Cookie on the Server",
+    secure: "Read a Cookie on the Server",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/storage/storage.ts"
+  name="StorageScriptOptions"
+  events={false}
+  examples={{
+    attribute: "Show a Value Before Hydration",
+    values: "Show a Value Before Hydration",
+  }}
+/>

@@ -42,7 +42,7 @@ Run this after the markup exists. `whenDefined` waits for the tag's registration
 
 ## Saved Preferences and Storage
 
-Preferences like a color scheme or an emoji skin tone are saved in the browser, so your server can't render them. [Preferences and Devices](../core/behaviors/preferences) covers the preferences themselves; this is how they fit server-rendered HTML.
+Preferences like a color scheme or an emoji skin tone are saved in the browser, so your server can't render them. [Preferences](../core/behaviors/preferences) covers the preferences themselves; this is how they fit server-rendered HTML.
 
 ### Show Them Before the Scripts Load
 
@@ -87,7 +87,7 @@ const page = `<ui-preferences data-skin-tone="${skinTone.get().value}">…</ui-p
 
 In the browser the same storage reads `document.cookie`.
 
-### Write the Storage Script Yourself
+### Render the Storage Script Yourself
 
 For one element that keeps its own value, like a toolbar's density, a storage's `script` returns the same kind of inline script for a single element. Write it right after the element, since it sets the element right before it:
 
