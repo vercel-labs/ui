@@ -170,6 +170,8 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         "data-disabled": disabled ? "" : undefined,
       }
     },
+    // Settling that there's no label drops the reference without rendering the trigger again.
+    direct: direct(["aria-labelledby"]),
     on: {
       keydown: (event, { api, el }) => api.internal.onTriggerKeyDown(event, el),
       pointerdown(event, { api, el, props, store }) {
