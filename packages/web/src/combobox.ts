@@ -213,7 +213,7 @@ const renderedChips = new WeakMap<Element, { value: unknown; labels: string }>()
 // One chip per value, with a remove button named after it, until the page
 // renders chips of its own. The page's chips go in before the state commits,
 // from the change event, so the element's never show beside them.
-function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false } = {}) {
+function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false, settled = false } = {}) {
   const chips = el.querySelector("ui-combobox-chips")
   if (!chips) return
   // The page's chips can sit in a wrapper of their own; the element's are children.
@@ -232,10 +232,14 @@ function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false } = 
   const last = renderedChips.get(chips)
   const joined = labels.join("\n")
   if (!force && last && last.value === value && last.labels === joined) return
-  renderedChips.set(chips, { value, labels: joined })
   const keys = selection.keys()
   const kept = new Set(keys)
   const existing = new Map(children.map((chip) => [chip.getAttribute("value"), chip]))
+  // A page that sets `value` quietly, like lit, renders its own chips after.
+  // New chips wait a microtask for them.
+  if (!settled && keys.some((key) => !existing.has(key)))
+    return void queueMicrotask(() => renderChips(el, api, { force, settled: true }))
+  renderedChips.set(chips, { value, labels: joined })
   // Chips that stay keep their element, so focus on one survives a neighbour's removal.
   for (const [key, chip] of existing) if (!kept.has(key ?? "")) chip.remove()
   // Chips go before the overflow part, if there is one, and the input.
