@@ -42,6 +42,7 @@ import { type ItemIcons } from "../../foundation/lists/item-icon"
 import { createValueSelection, listOf } from "../../foundation/lists/listbox-value"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
+import { deriveFromOptions } from "../../foundation/kernel/derive"
 
 // The create option's key in the highlight. Never a real item's.
 const CREATE = "\u0000create"
@@ -188,6 +189,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   deriveOpen(context, ["highlighted", "focusInList"], (open) =>
     open ? undefined : { highlighted: null, focusInList: false },
   )
+  // Items that load after the value, like from a request, put its label in
+  // place of the raw value the input showed, in the same pass.
+  deriveFromOptions(context, ["query"], (synced, state, next) => {
+    if (synced.items === state.items || state.dirty || next.multiple || next.query !== undefined) return
+    const first = listOf("value" in synced ? synced.value : state.value)[0]
+    if (first === undefined || state.query !== itemKey(first, next.itemToValue)) return
+    return { query: initialQuery(next, first) }
+  })
   const change = createChange(context)
   let mountsQueued = false
   let openedBy: PopupOpener = "imperative"
