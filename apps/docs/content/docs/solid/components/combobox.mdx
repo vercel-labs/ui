@@ -74,7 +74,7 @@ A disabled combobox cannot be focused or changed and submits nothing. A read-onl
 
 ### Auto Highlight
 
-Add `autoHighlight` to highlight the first match while typing, so Enter can choose it immediately.
+Add `autoHighlight` to highlight the first match while typing, so Enter can choose it immediately. With `autoHighlight="always"`, opening the list also highlights the selected item, or the first, so the arrow keys move from there. A highlight it placed follows the list as items arrive, and one the user moved stays while its item is there.
 
 <ComponentExample
   name="combobox/auto-highlight"
