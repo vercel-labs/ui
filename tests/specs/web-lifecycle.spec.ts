@@ -294,6 +294,40 @@ test("reconnecting keeps a checkbox's reset default", async ({ page }) => {
   })
 })
 
+test("a checkbox and a radio group put back on the page fire no input or change events", async ({ page }) => {
+  await page.evaluate(() => {
+    document.querySelector("#stage")!.innerHTML = `
+      <form>
+        <label><ui-checkbox name="terms"></ui-checkbox> Terms</label>
+        <ui-radio-group name="plan" aria-label="Plan">
+          <label><ui-radio value="free"></ui-radio> Free</label>
+          <label><ui-radio value="pro"></ui-radio> Pro</label>
+        </ui-radio-group>
+        <label><input type="checkbox" name="native" /> Native</label>
+      </form>`
+  })
+  await page.getByRole("checkbox", { name: "Terms" }).click()
+  await page.getByRole("radio", { name: "Pro" }).click()
+  await page.getByRole("checkbox", { name: "Native" }).click()
+  const heard = await page.evaluate(async () => {
+    const tick = () => new Promise((done) => setTimeout(done))
+    const stage = document.querySelector("#stage")!
+    const form = stage.querySelector("form")!
+    const heard: string[] = []
+    for (const type of ["input", "change"])
+      form.addEventListener(type, (event) => heard.push(`${type} ${(event.target as Element).localName}`))
+    await tick()
+    form.remove()
+    await tick()
+    stage.append(form)
+    await tick()
+    return heard
+  })
+  expect(heard).toEqual([])
+  await expect(page.getByRole("checkbox", { name: "Terms" })).toBeChecked()
+  await expect(page.getByRole("radio", { name: "Pro" })).toBeChecked()
+})
+
 // Writes `markup` into the stage, when given, then sets properties on the
 // element there. Names in `files` become a `value` of files.
 async function set(page: Page, properties: Record<string, unknown>, markup?: string) {
