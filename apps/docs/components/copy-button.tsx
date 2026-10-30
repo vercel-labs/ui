@@ -5,8 +5,6 @@ import { cn } from "cn"
 import { CheckIcon, CopyIcon } from "lucide-react"
 import * as React from "react"
 
-// Copies the code of the frame it sits in, or of the open tab in a
-// `data-copy-scope`. With a label, it shows the label instead of a tooltip.
 function CopyButton({ label, className }: { label?: string; className?: string }) {
   const [copied, setCopied] = React.useState(false)
   const timeout = React.useRef<ReturnType<typeof setTimeout>>(undefined)

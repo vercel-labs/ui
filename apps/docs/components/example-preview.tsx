@@ -6,15 +6,9 @@ import { cn } from "cn"
 
 type Mount = (module: unknown, host: HTMLElement) => () => void
 
-// Imports a compiled example from examples/dist, which app/examples serves.
-// The docs' bundler never sees them: compiling every example in every
-// framework made the first page take two minutes and its cache 4 GB.
+// Imports a compiled example from examples/dist, which app/examples serves. This is a workaround to avoid bundling the examples in the docs app.
 const load = (url: string) => import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url)
 
-// Renders an example live in the page, not in an iframe, so overlays,
-// focus and scrolling behave as they do in a real app. Each framework's
-// build comes with a `mount` that mounts its examples, with their own copy of
-// the framework.
 function ExamplePreview({
   name,
   framework,
@@ -24,7 +18,6 @@ function ExamplePreview({
   name: string
   framework: Framework
   compact?: boolean
-  // Reserves more room, for an example taller than the default box, so the page doesn't move when it mounts.
   tall?: boolean
 }) {
   const host = React.useRef<HTMLDivElement>(null)

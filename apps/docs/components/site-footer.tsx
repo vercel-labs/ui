@@ -1,4 +1,3 @@
-import { Credit } from "./footer"
 import { VercelLogo } from "./logo"
 import { ThemeToggle } from "./theme-toggle"
 
@@ -13,7 +12,18 @@ function SiteFooter() {
         >
           <VercelLogo className="h-4 w-auto" />
         </a>
-        <Credit />
+        <p className="text-[13px] text-subtle">
+          The{" "}
+          <a
+            href="https://github.com/vercel-labs/ui"
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground underline decoration-foreground/25 underline-offset-[3px] transition-colors hover:decoration-foreground"
+          >
+            source code
+          </a>{" "}
+          is available on GitHub.
+        </p>
       </div>
       <ThemeToggle />
     </footer>

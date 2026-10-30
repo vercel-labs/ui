@@ -1,14 +1,18 @@
-// Rendering only the rows a scroller shows, for lists and grids of thousands:
-// a data table, a log, a chat history, a file list. Rows can be any height;
-// each is measured once it renders and the rest are estimated. Framework-free:
-// it reads the scroller and calls `subscribe` listeners, and an adapter
-// renders `items()` however it renders.
+// Renders only the rows a scroller shows, measuring each as it renders and
+// estimating the rest. Framework-free: an adapter renders `items()`. With
+// `findable`, rows it doesn't render stay findable through hidden stand-ins.
+import type { FindableHost, FindableRows, FindableSlot } from "./findable-rows"
+
+let loading: Promise<typeof import("./findable-rows")> | undefined
+const load = () => (loading ??= import("./findable-rows"))
 
 /**
- * One row to render: where it starts along the scroller, in pixels, and its size.
+ * One row to render: where it starts along the scroller, in pixels, and its
+ * size. `found` marks the row find in page matched last, until the next
+ * match, until it scrolls away, or until someone presses or types in the list.
  * @experimental
  */
-type VirtualItem = { index: number; key: string; start: number; size: number }
+type VirtualItem = { index: number; key: string; start: number; size: number; found?: true }
 
 /**
  * Where `scrollToIndex` puts a row. `auto` scrolls only as far as it takes to show it.
@@ -52,6 +56,12 @@ type VirtualizerOptions = {
   onEnd?: () => void
   /** How close to the end `onEnd` runs, in rows. @defaultValue 10 */
   endThreshold?: number
+  /**
+   * The text the browser's find in page should find in a row, like its
+   * title, so it finds rows that aren't rendered too. Keep it what the row
+   * shows. Return a list of pieces to give each its own `findableText`.
+   */
+  findable?: (index: number) => string | readonly string[]
 }
 
 /**
@@ -86,6 +96,15 @@ function createVirtualizer(options: VirtualizerOptions) {
   // Each measured element and the row it shows now, which changes when the list sorts.
   const measured = new Map<Element, number>()
   let resizes: ResizeObserver | undefined
+
+  const elements = new Map<number, HTMLElement>()
+  const slots = new Map<number, (FindableSlot | undefined)[]>()
+  let tokens = 0
+  let foundIndex = -1
+  let find: FindableRows | undefined
+  // The contiguous rows in view and the overscan, apart from `keep`.
+  let windowFrom = -1
+  let windowTo = -1
 
   const margin = () => options.scrollMargin ?? 0
   const sizeOf = (index: number) => sizes.get(keyOf(index)) ?? options.estimate(index)
@@ -125,7 +144,9 @@ function createVirtualizer(options: VirtualizerOptions) {
       let to = from
       const end = offset - margin() + viewport
       while (to < count - 1 && starts[to] + sizeOf(to) < end) to++
-      for (let i = Math.max(0, from - overscan); i <= Math.min(count - 1, to + overscan); i++) indexes.add(i)
+      windowFrom = Math.max(0, from - overscan)
+      windowTo = Math.min(count - 1, to + overscan)
+      for (let i = windowFrom; i <= windowTo; i++) indexes.add(i)
       for (const index of options.keep?.() ?? []) if (index >= 0 && index < count) indexes.add(index)
       if (options.onEnd && to >= count - 1 - (options.endThreshold ?? 10) && endedAt !== count) {
         endedAt = count
@@ -134,7 +155,13 @@ function createVirtualizer(options: VirtualizerOptions) {
     }
     const next = [...indexes]
       .sort((a, b) => a - b)
-      .map((index) => ({ index, key: keyOf(index), start: starts[index], size: sizeOf(index) }))
+      .map((index) => ({
+        index,
+        key: keyOf(index),
+        start: starts[index],
+        size: sizeOf(index),
+        ...(index === foundIndex && { found: true as const }),
+      }))
     const same =
       next.length === snapshot.length &&
       next.every(
@@ -142,7 +169,8 @@ function createVirtualizer(options: VirtualizerOptions) {
           item.key === snapshot[i].key &&
           item.start === snapshot[i].start &&
           item.size === snapshot[i].size &&
-          item.index === snapshot[i].index,
+          item.index === snapshot[i].index &&
+          item.found === snapshot[i].found,
       )
     if (same) return false
     snapshot = next
@@ -150,7 +178,69 @@ function createVirtualizer(options: VirtualizerOptions) {
   }
 
   function update() {
+    if (!compute()) return
+    if (foundIndex !== -1 && !snapshot.some((item) => item.index === foundIndex)) foundIndex = -1
+    releaseSlots()
+    find?.sync()
+    for (const listener of [...listeners]) listener()
+  }
+
+  function setFound(index: number) {
+    if (foundIndex === index) return
+    foundIndex = index
     if (compute()) for (const listener of [...listeners]) listener()
+  }
+
+  const piecesOf = (index: number) => {
+    const text = options.findable?.(index) ?? ""
+    return typeof text === "string" ? [text] : [...text]
+  }
+
+  // Slots hold the stand-ins' own text once they load, and plain text until then.
+  function adopt(index: number) {
+    if (find) return find.adopt(index)
+    const own = slots.get(index)
+    if (!own || index >= options.count()) return
+    const plain = piecesOf(index)
+    own.forEach((slot, part) => {
+      if (slot && slot.el.textContent !== plain[part]) slot.el.textContent = plain[part] ?? ""
+    })
+  }
+
+  // Rows that left `items()` give their text back, also where a framework
+  // calls a ref with null instead of running its cleanup.
+  function releaseSlots() {
+    if (!slots.size) return
+    const shown = new Set(snapshot.map((item) => item.index))
+    for (const [index, own] of slots) {
+      if (shown.has(index)) continue
+      slots.delete(index)
+      own.forEach((slot, part) => slot && find?.restore(index, part, slot.el))
+    }
+  }
+
+  const host: FindableHost = {
+    count: () => options.count(),
+    pieces: piecesOf,
+    horizontal: () => !!options.horizontal,
+    scroller: () => scroller,
+    items: () => snapshot,
+    range: () => [windowFrom, windowTo],
+    elements,
+    slots,
+    place(index) {
+      layout()
+      return { start: starts[index] + margin() - offset, size: sizeOf(index) }
+    },
+    reveal(index) {
+      foundIndex = index
+      api.scrollToIndex(index, { align: "center", behavior: "instant" })
+      // Already there, so the scroll didn't render it as found.
+      if (!snapshot.some((item) => item.found)) {
+        foundIndex = -1
+        setFound(index)
+      }
+    },
   }
 
   function record(el: HTMLElement) {
@@ -197,9 +287,34 @@ function createVirtualizer(options: VirtualizerOptions) {
       listeners.add(listener)
       return () => void listeners.delete(listener)
     },
-    /** Reads the scroller on every scroll and resize, until the returned function runs. */
-    connect(el: HTMLElement) {
+    /**
+     * Reads the scroller on every scroll and resize, until the returned
+     * function runs. With `findable`, also adds the layers that keep rows
+     * that aren't rendered findable.
+     */
+    connect(
+      el: HTMLElement,
+      connectOptions: {
+        /** Keeps rows that aren't rendered findable, through layers at the start and end of `el`. Needs the `findable` option. */
+        findable?: boolean
+      } = {},
+    ) {
       scroller = el
+      let connected = true
+      if (connectOptions.findable && options.findable)
+        void load().then(({ attachFindable }) => {
+          if (!connected || find) return
+          find = attachFindable(host, el)
+          for (const index of slots.keys()) adopt(index)
+        })
+      // Pressing or typing in the list ends the found row.
+      const done = () => {
+        if (foundIndex === -1) return
+        find?.release()
+        setFound(-1)
+      }
+      el.addEventListener("pointerdown", done)
+      el.addEventListener("keydown", done)
       const onScroll = () => {
         read()
         update()
@@ -211,7 +326,12 @@ function createVirtualizer(options: VirtualizerOptions) {
       onScroll()
       return () => {
         el.removeEventListener("scroll", onScroll)
+        el.removeEventListener("pointerdown", done)
+        el.removeEventListener("keydown", done)
         box?.disconnect()
+        connected = false
+        find?.detach()
+        find = undefined
         if (scroller === el) scroller = undefined
       }
     },
@@ -222,7 +342,11 @@ function createVirtualizer(options: VirtualizerOptions) {
     measure(index: number, el: HTMLElement | null) {
       if (!el) return () => {}
       const first = !measured.has(el)
+      // A reused element that shows another row now.
+      const before = measured.get(el)
+      if (before !== undefined && before !== index && elements.get(before) === el) elements.delete(before)
       measured.set(el, index)
+      elements.set(index, el)
       if (first) {
         const view = el.ownerDocument.defaultView
         if (!resizes && view?.ResizeObserver)
@@ -233,7 +357,9 @@ function createVirtualizer(options: VirtualizerOptions) {
       }
       record(el)
       return () => {
+        const shown = measured.get(el)
         measured.delete(el)
+        if (shown !== undefined && elements.get(shown) === el) elements.delete(shown)
         resizes?.unobserve(el)
       }
     },
@@ -259,11 +385,37 @@ function createVirtualizer(options: VirtualizerOptions) {
       read()
       update()
     },
-    /** Reads the list again, like after its rows change without a scroll. */
+    /** Reads the list again, like after its rows change without a scroll. Find in page sees the new text. */
     refresh() {
       dirty = true
       read()
       update()
+      if (find) find.refresh()
+      else for (const index of slots.keys()) adopt(index)
+    },
+    /**
+     * Renders a piece of a row's `findable` text into `el`, from the row's
+     * ref, until the returned function runs. Render `el` empty: it holds the
+     * very text find in page searches, so the browser highlights the match in
+     * the row itself. `part` picks the piece when `findable` returns several.
+     */
+    findableText(index: number, el: HTMLElement | null, part = 0) {
+      if (!el) return () => {}
+      const own = slots.get(index) ?? []
+      const token = ++tokens
+      own[part] = { el, token }
+      slots.set(index, own)
+      adopt(index)
+      return () => {
+        // A ref that runs again with the same element in the same render keeps its text.
+        queueMicrotask(() => {
+          const list = slots.get(index)
+          if (list?.[part]?.token !== token) return
+          list[part] = undefined
+          if (!list.some(Boolean)) slots.delete(index)
+          find?.restore(index, part, el)
+        })
+      }
     },
     /** Forgets every measured size, like after a change that resizes every row. */
     reset() {

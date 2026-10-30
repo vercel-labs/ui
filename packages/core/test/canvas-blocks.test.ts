@@ -181,6 +181,184 @@ describe("createViewport", () => {
   })
 })
 
+describe("createViewport bindFindable", () => {
+  // jsdom keeps no scroll position: store what's set, like a browser that can scroll this far.
+  const scrollable = (el: HTMLElement) => {
+    const at = { left: 0, top: 0 }
+    Object.defineProperties(el, {
+      scrollLeft: { get: () => at.left, set: (value: number) => (at.left = value), configurable: true },
+      scrollTop: { get: () => at.top, set: (value: number) => (at.top = value), configurable: true },
+    })
+    return el
+  }
+  const scrollTo = (el: HTMLElement, left: number, top: number) => {
+    el.scrollLeft = left
+    el.scrollTop = top
+    el.dispatchEvent(new Event("scroll"))
+  }
+  const state = (instance: ReturnType<typeof mountCanvas>["instance"]) =>
+    ({ viewport: instance.api.viewport.get(), connecting: null }) as CanvasState
+
+  test("rests the surface far from its origin, with the world offset to match, until it's unbound", () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    const unbind = instance.api.viewport.bindFindable(surface)
+    const spacer = surface.lastElementChild as HTMLElement
+    expect(spacer.getAttribute("aria-hidden")).toBe("true")
+    expect(spacer.style).toMatchObject({ position: "absolute", visibility: "hidden" })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(100000px,100000px) scale(1)",
+    )
+    unbind()
+    expect(spacer.isConnected).toBe(false)
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(0px,0px) scale(1)")
+  })
+
+  test("a scroll the browser makes, like to a find in page match, becomes a pan, and the surface goes back to rest", () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    instance.api.viewport.setViewport({ x: 10, y: 20, zoom: 2 })
+    // Toward something to the right and above the view.
+    scrollTo(surface, 100300, 99880)
+    const panned = instance.api.viewport.get()
+    expect(panned).toEqual({ x: -290, y: 140, zoom: 2 })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    // Its own reset is no pan.
+    surface.dispatchEvent(new Event("scroll"))
+    expect(instance.api.viewport.get()).toBe(panned)
+  })
+
+  test("reports a pan as find-in-page, or as focus-in when focus moved into the pane", async () => {
+    const seen: string[] = []
+    const board = definePrimitive({
+      name: "board",
+      state: (): { viewport: Viewport } => ({ viewport: { x: 0, y: 0, zoom: 1 } }),
+      live: ["viewport"],
+      api: (context) => ({
+        viewport: createViewport<{ viewport: Viewport }>(context, {
+          key: "viewport",
+          surface: () => context.element("root"),
+          set: (value, details) => {
+            seen.push(details.reason)
+            context.store.set({ viewport: value })
+            return true
+          },
+        }),
+      }),
+      slots: (slot) => ({ root: slot({}) }),
+    })
+    const instance = board({ id: "b" })
+    const surface = scrollable(document.createElement("div"))
+    document.body.append(surface)
+    cleanups.push(bind(instance.part("root", {}), surface), () => instance.destroy())
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    scrollTo(surface, 99500, 100000)
+    expect(seen).toEqual(["find-in-page"])
+    expect(instance.api.viewport.get()).toEqual({ x: 500, y: 0, zoom: 1 })
+    const node = document.createElement("button")
+    surface.append(node)
+    node.focus()
+    scrollTo(surface, 100200, 100000)
+    expect(seen).toEqual(["find-in-page", "focus-in"])
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    scrollTo(surface, 100000, 100300)
+    expect(seen).toEqual(["find-in-page", "focus-in", "find-in-page"])
+  })
+
+  test("a pane bound while hidden rests once it shows, and a lost rest doesn't pan", () => {
+    // Like a pane in a closed tab: no box, so it can't scroll until it shows.
+    let shown = false
+    const at = { left: 0, top: 0 }
+    let resized: (() => void) | undefined
+    const original = window.ResizeObserver
+    window.ResizeObserver = class {
+      constructor(callback: () => void) {
+        resized = callback
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    } as unknown as typeof ResizeObserver
+    cleanups.push(() => (window.ResizeObserver = original))
+    const { instance, surface } = mountCanvas()
+    Object.defineProperties(surface, {
+      scrollLeft: {
+        get: () => at.left,
+        set: (value: number) => shown && (at.left = value),
+        configurable: true,
+      },
+      scrollTop: { get: () => at.top, set: (value: number) => shown && (at.top = value), configurable: true },
+    })
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    // While it can't scroll, the world isn't offset, so nothing is lost if it shows without a resize.
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(0px,0px)")
+    shown = true
+    resized!()
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(100000px,100000px)")
+    // Hidden and shown again, the browser forgot the scroll; a scroll event then finds it at the origin.
+    at.left = 0
+    at.top = 0
+    surface.dispatchEvent(new Event("scroll"))
+    expect(instance.api.viewport.get()).toEqual({ x: 0, y: 0, zoom: 1 })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+  })
+
+  test("right to left, the pane rests on the negative side, and the world follows", () => {
+    const { instance, surface } = mountCanvas()
+    const at = { left: 0, top: 0 }
+    // Right to left, scrollLeft runs from 0 down; a positive one clamps to 0.
+    Object.defineProperties(surface, {
+      scrollLeft: {
+        get: () => at.left,
+        set: (value: number) => (at.left = Math.min(0, value)),
+        configurable: true,
+      },
+      scrollTop: { get: () => at.top, set: (value: number) => (at.top = value), configurable: true },
+    })
+    const computed = window.getComputedStyle
+    vi.spyOn(window, "getComputedStyle").mockImplementation((el, pseudo) =>
+      el === surface ? ({ direction: "rtl" } as CSSStyleDeclaration) : computed(el, pseudo),
+    )
+    cleanups.push(() => vi.restoreAllMocks())
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([-100000, 100000])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(-100000px,100000px)")
+    // Toward something to the left: further negative.
+    scrollTo(surface, -100250, 100000)
+    expect(instance.api.viewport.get()).toEqual({ x: 250, y: 0, zoom: 1 })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([-100000, 100000])
+  })
+
+  test("unbinding before the next frame leaves the pane unbound", async () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    const unbind = instance.api.viewport.bindFindable(surface)
+    scrollTo(surface, 100300, 100000)
+    unbind()
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(surface.querySelector('[aria-hidden="true"]')).toBeNull()
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(-300px,0px)")
+  })
+
+  test("a scroll clamped because the spacer went missing puts it back without panning", () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    // Like a framework replacing the surface's children.
+    surface.replaceChildren()
+    scrollTo(surface, 0, 0)
+    expect(instance.api.viewport.get()).toEqual({ x: 0, y: 0, zoom: 1 })
+    expect(surface.lastElementChild?.getAttribute("aria-hidden")).toBe("true")
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+  })
+})
+
 describe("createConnect", () => {
   const ports: Record<string, [number, number]> = {
     "a.out": [100, 50],

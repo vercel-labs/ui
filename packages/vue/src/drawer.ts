@@ -48,6 +48,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 type OpenDetails = ChangeDetails<DrawerOpenChangeReason> & { returnValue?: string }
 type DrawerContext = PrimitiveHandle<typeof drawerPrimitive>
@@ -71,67 +72,69 @@ const snapPointProp = { type: [Number, String] as PropType<SnapPoint | null>, de
  * A dialog presented as a sheet that slides in from an edge. Put its trigger, backdrop and content inside.
  * @stable
  */
-const Drawer = defineComponent({
-  name: "Drawer",
-  props: {
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
-    closeOnOutsidePress: optionalBoolean,
-    controller: Object as PropType<DrawerController<any, any>>,
-    dismissible: optionalBoolean,
-    persistentElements: [Array, Function] as PropType<(Element | string)[] | (() => Element[])>,
-    pendingAnnouncement: String,
-    debug: optionalBoolean,
-    container: containerProp,
-    snapPoints: Array as PropType<SnapPoint[]>,
-    snapPoint: snapPointProp,
-    defaultSnapPoint: { type: [Number, String] as PropType<SnapPoint>, default: undefined },
-    side: String as PropType<DrawerSide>,
-    modalAbove: { type: [Number, String] as PropType<SnapPoint>, default: undefined },
-    driver: String as PropType<DrawerDriver>,
-    expandOnScroll: optionalBoolean,
-    physics: Object as PropType<Partial<SheetPhysics>>,
-    themeColor: optionalBoolean,
-    preventEdgeSwipe: optionalBoolean,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    payloadChange: (_payload: unknown, _details: ChangeDetails<DrawerPayloadChangeReason>) => true,
-    dismissAttempt: (_details: DrawerDismissAttemptDetails) => true,
-    "update:snapPoint": (_snapPoint: SnapPoint) => true,
-    snapPointChange: (_snapPoint: SnapPoint, _details: ChangeDetails<DrawerSnapPointChangeReason>) => true,
-  },
-  setup(props, { slots, emit }) {
-    provide(ContainerKey, () => props.container)
-    const drawer = usePrimitive(drawerPrimitive, () => ({
-      ...(props as Record<string, any>),
-      open: orModel(props.open, props.modelValue),
-      container: undefined,
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onPayloadChange: (payload: unknown, details: ChangeDetails<DrawerPayloadChangeReason>) =>
-        emit("payloadChange", payload, details),
-      onDismissAttempt: (details: DrawerDismissAttemptDetails) => emit("dismissAttempt", details),
-      onSnapPointChange: (snapPoint: SnapPoint, details: ChangeDetails<DrawerSnapPointChangeReason>) => {
-        emit("snapPointChange", snapPoint, details)
-        if (!details.canceled) emit("update:snapPoint", snapPoint)
-      },
-    }))
-    useControllerEntry(() => props.controller, drawer)
-    return () => slots.default?.()
-  },
-})
+const Drawer = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Drawer",
+    props: {
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
+      closeOnOutsidePress: optionalBoolean,
+      controller: Object as PropType<DrawerController<any, any>>,
+      dismissible: optionalBoolean,
+      persistentElements: [Array, Function] as PropType<(Element | string)[] | (() => Element[])>,
+      pendingAnnouncement: String,
+      debug: optionalBoolean,
+      container: containerProp,
+      snapPoints: Array as PropType<SnapPoint[]>,
+      snapPoint: snapPointProp,
+      defaultSnapPoint: { type: [Number, String] as PropType<SnapPoint>, default: undefined },
+      side: String as PropType<DrawerSide>,
+      modalAbove: { type: [Number, String] as PropType<SnapPoint>, default: undefined },
+      driver: String as PropType<DrawerDriver>,
+      expandOnScroll: optionalBoolean,
+      physics: Object as PropType<Partial<SheetPhysics>>,
+      themeColor: optionalBoolean,
+      preventEdgeSwipe: optionalBoolean,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      payloadChange: (_payload: unknown, _details: ChangeDetails<DrawerPayloadChangeReason>) => true,
+      dismissAttempt: (_details: DrawerDismissAttemptDetails) => true,
+      "update:snapPoint": (_snapPoint: SnapPoint) => true,
+      snapPointChange: (_snapPoint: SnapPoint, _details: ChangeDetails<DrawerSnapPointChangeReason>) => true,
+    },
+    setup(props, { slots, emit }) {
+      provide(ContainerKey, () => props.container)
+      const drawer = usePrimitive(drawerPrimitive, () => ({
+        ...(props as Record<string, any>),
+        open: orModel(props.open, props.modelValue),
+        container: undefined,
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onPayloadChange: (payload: unknown, details: ChangeDetails<DrawerPayloadChangeReason>) =>
+          emit("payloadChange", payload, details),
+        onDismissAttempt: (details: DrawerDismissAttemptDetails) => emit("dismissAttempt", details),
+        onSnapPointChange: (snapPoint: SnapPoint, details: ChangeDetails<DrawerSnapPointChangeReason>) => {
+          emit("snapPointChange", snapPoint, details)
+          if (!details.canceled) emit("update:snapPoint", snapPoint)
+        },
+      }))
+      useControllerEntry(() => props.controller, drawer)
+      return () => slots.default?.()
+    },
+  }),
+)
 
 /**
  * The button that opens the drawer. A trigger outside the drawer, like one per table row, connects through
