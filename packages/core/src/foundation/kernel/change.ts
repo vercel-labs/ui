@@ -1,4 +1,12 @@
-import { checkEvent, checkPrevented, dev, emit, expectControlled, forgetControlled } from "#dev"
+import {
+  checkEvent,
+  checkPrevented,
+  dev,
+  emit,
+  expectControlled,
+  forgetControlled,
+  heardControlled,
+} from "#dev"
 import { createDetails, resolveSource, withSource, type ChangeSource } from "./details"
 import { callbackName } from "./option-names"
 import type { PrimitiveContext, PrimitiveOptions, ReasonFor } from "./primitive-types"
@@ -27,7 +35,8 @@ function changeFrom<Options, State extends object>(
   const asked = new Map<string, number>()
 
   // A controlled key's next options report the source of the change that asked for them.
-  context.onOptions((_options, synced) => {
+  context.onOptions((next, synced) => {
+    if (dev) heardControlled(requested, next as object)
     if (!synced) return
     let source: ChangeSource | undefined
     for (const [key, entry] of requested) {
