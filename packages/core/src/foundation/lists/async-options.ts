@@ -85,6 +85,7 @@ function createAsyncOptions<Item>(
 
   function cancel() {
     clearTimeout(timer)
+    timer = undefined
     controller?.abort()
     controller = undefined
   }

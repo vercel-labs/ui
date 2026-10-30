@@ -133,7 +133,7 @@ const Combobox = /* @__PURE__ */ renderless(
       itemToValue: Function as PropType<(value: any) => string>,
       itemToLabel: Function as PropType<(value: any) => string>,
       isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
-      autoHighlight: optionalBoolean,
+      autoHighlight: { type: [Boolean, String] as PropType<boolean | "always">, default: undefined },
       keepQuery: optionalBoolean,
       allowCustomValue: optionalBoolean,
       status: String as PropType<AsyncOptionsStatus>,

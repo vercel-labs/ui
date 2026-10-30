@@ -172,7 +172,7 @@ function toggleControl<Checked extends CheckedState, Owner extends ToggleOwner =
     if (isDisabled(state) || state.readOnly) return false
     const owner = group?.owner()
     const done = group && owner ? group.write(owner, checked, details) : change("checked", checked, details)
-    if (done) dispatchChange(formElement())
+    if (done && reason !== "restore") dispatchChange(formElement())
     return done
   }
 
