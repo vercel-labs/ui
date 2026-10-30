@@ -55,12 +55,15 @@ function direct(names: readonly string[]) {
         const values = attrs(part)
         for (const name of names) {
           const value = values[name]
-          const current = el.getAttribute(name)
-          // An author's name or hint, rendered in place of the part's, stays.
-          if (authorOwned.has(name) && current !== null && current !== last[name] && current !== value)
+          if (value === undefined) {
+            if (last[name] !== undefined && el.getAttribute(name) === last[name]) el.removeAttribute(name)
             continue
-          if (value !== undefined) current !== value && el.setAttribute(name, value)
-          else if (last[name] !== undefined && el.getAttribute(name) === last[name]) el.removeAttribute(name)
+          }
+          const current = el.getAttribute(name)
+          if (current === value) continue
+          // An author's name or hint, rendered in place of the part's, stays.
+          if (authorOwned.has(name) && current !== null && current !== last[name]) continue
+          el.setAttribute(name, value)
         }
         last = values
       })
