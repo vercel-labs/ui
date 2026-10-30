@@ -2,6 +2,7 @@
 import { createController, definePrimitive, selects } from "@ui-sdk/core"
 import { observe, type ObservedChange } from "@ui-sdk/core/observe"
 import * as React from "react"
+import { flushSync } from "react-dom"
 import { createRoot, type Root } from "react-dom/client"
 import { renderToString } from "react-dom/server"
 import { afterEach, expect, test, vi } from "vitest"
@@ -540,4 +541,57 @@ test("a part subscribes again when the prop it selects on changes", async () => 
   await React.act(async () => root!.render(<Choice target="after" />))
   await React.act(async () => view.querySelector("button")!.click())
   expect(view.querySelector("span")!.textContent).toBe("true")
+})
+
+test("a dialog whose content takes an inline ref leaves Escape to the popover opened inside it", async () => {
+  function Settings() {
+    const [open, setOpen] = React.useState(false)
+    return (
+      <Dialog defaultOpen>
+        <DialogContent ref={(el) => void el}>
+          <DialogTitle>Settings</DialogTitle>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger>Filters</PopoverTrigger>
+            <PopoverContent>Filter list</PopoverContent>
+          </Popover>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+  const view = await render(<Settings />)
+  await React.act(async () => view.querySelector<HTMLElement>('[aria-haspopup="dialog"]')!.click())
+  await React.act(() => wait(5))
+  await React.act(async () => {
+    document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+  })
+  await React.act(() => wait(5))
+  expect(view.textContent).not.toContain("Filter list")
+  expect(view.querySelector('[role="dialog"]')?.hasAttribute("data-open")).toBe(true)
+})
+
+test("unmounting an open dialog lets the page go in the same commit", async () => {
+  let hide = () => {}
+  function App() {
+    const [shown, setShown] = React.useState(true)
+    hide = () => setShown(false)
+    return (
+      <>
+        <input aria-label="Outside" />
+        {shown && (
+          <Dialog defaultOpen>
+            <DialogContent>
+              <DialogTitle>Settings</DialogTitle>
+            </DialogContent>
+          </Dialog>
+        )}
+      </>
+    )
+  }
+  const view = await render(<App />)
+  const inert = (el: HTMLElement | null): boolean => !!el && (el.inert || inert(el.parentElement))
+  const outside = view.querySelector("input")!
+  await React.act(() => wait(5))
+  expect(inert(outside)).toBe(true)
+  React.act(() => flushSync(hide))
+  expect(inert(outside)).toBe(false)
 })

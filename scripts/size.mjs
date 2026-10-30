@@ -97,7 +97,10 @@ const adapters = [
 // context module, so no other entry bundles it.
 const fieldModule = /^packages\/core\/src\/components\/field\/[^/]+\.ts$/
 // Adapters with no size rows whose entries still get that check.
-const checkedOnly = [{ name: "web", options: {} }]
+const checkedOnly = [
+  { name: "solid", options: { external: ["solid-js", "solid-js/*", "@solidjs/*"] } },
+  { name: "web", options: {} },
+]
 
 // Optional parts ship only once a page renders them (`Feature` in core's
 // `primitive-types.ts`): a page with a component's basic parts bundles none of
@@ -108,6 +111,8 @@ const minimalPages = {
     parts: ["Switch", "SwitchThumb"],
     without: ["motion/presence", "checkbox/checkbox", "checkbox/checkbox-group"],
   },
+  checkbox: { parts: ["Checkbox", "CheckboxIndicator"], without: ["checkbox/checkbox-group"] },
+  toggle: { parts: ["Toggle"], without: ["toggle/toggle-group"] },
   select: {
     parts: ["Select", "SelectTrigger", "SelectValue", "SelectContent", "SelectItem"],
     without: ["lists/listbox-select-all", "lists/item-icon"],
@@ -118,7 +123,7 @@ const minimalPages = {
     without: ["lists/listbox-select-all", "lists/item-icon", "combobox/combobox-chips"],
   },
 }
-const minimalChecked = ["react", "vue", "svelte"]
+const minimalChecked = ["react", "vue", "svelte", "solid"]
 
 // Core modules an entry must never bundle, by entry. A switch has no indicator
 // to animate and no live attributes. Svelte's adapter writes styles through

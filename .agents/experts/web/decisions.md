@@ -39,6 +39,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
 - **A trigger slotted into a closed shadow root's scroller** waits for the slow check: `assignedSlot` is `null` there, so positioning can't find that root.
 - **`el.autoHighlight` reads `undefined` without the attribute**, not `false`, since its schema parses `"always"` and the boolean fallback no longer applies (PR 88).
 - **A popup mounted open and bound again later**, like by a late menubar's `rebind()`, still has `opener` `"initial"` and would take whatever has focus then as its opener (suspected, PR 87).
+- **An owner whose `id` is set or changed after it connects** isn't found by `for` parts, and renaming it away leaves them bound. A native label's `for` and `popovertarget` resolve at use time.
 
 ## Revisit
 

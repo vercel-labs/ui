@@ -31,6 +31,7 @@ type DatePattern = {
 const directionMarks = /[‎‏؜]/g
 
 const fieldLetters = { year: "Y", month: "M", day: "D" }
+const numericDate: Intl.DateTimeFormatOptions = { year: "numeric", month: "2-digit", day: "2-digit" }
 
 const patterns = new Map<string, DatePattern>()
 
@@ -47,9 +48,7 @@ function datePattern(locale?: string) {
 
 function readPattern(locale: string | undefined) {
   const year = new Date().getFullYear()
-  const parts = dateFormatter(locale, { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(
-    Date.UTC(year, 11, 31),
-  )
+  const parts = dateFormatter(locale, numericDate).formatToParts(Date.UTC(year, 11, 31))
   const names = fieldNames(locale)
   const fields: DateField[] = []
   let separator = ""
@@ -89,9 +88,9 @@ function fieldNames(locale: string | undefined) {
  * It reads the locale's order with any separator ("16.10.2026", "16/10/26",
  * "16 10 2026"), digits alone ("16102026"), month names ("16 Oct 2026",
  * "October 16"), the locale's own digits, and ISO dates. A missing year is
- * `referenceDate`'s, today's by default. A two-digit year lands in the hundred
- * years that end 20 years after the reference year: "26" is 2026 and "70" is
- * 1970 in 2026.
+ * `referenceDate`'s, today's by default. Years read in the locale's calendar,
+ * like Buddhist years in Thai. A two-digit year lands in the hundred years that
+ * end 20 years after the reference year: "26" is 2026 and "70" is 1970 in 2026.
  * @stable
  */
 function parseDate(text: string, locale?: string, options: { referenceDate?: ISODate } = {}) {
@@ -135,8 +134,29 @@ function parseDate(text: string, locale?: string, options: { referenceDate?: ISO
     order.forEach((field, index) => (values[field] = numbers[index]))
   } else return undefined
 
-  const year = values.year === undefined ? referenceYear : fullYear(values.year, referenceYear)
+  const offset = yearOffset(locale)
+  const year =
+    values.year === undefined ? referenceYear : fullYear(values.year, referenceYear + offset) - offset
   return isoDate(year, Number(values.month), Number(values.day))
+}
+
+const yearOffsets = new Map<string, number>()
+
+// How far the years a locale writes are from Gregorian years, like 543 for
+// the Buddhist years of Thai. Japanese years restart with each era, so they read as Gregorian.
+function yearOffset(locale: string | undefined) {
+  const key = locale ?? ""
+  let offset = yearOffsets.get(key)
+  if (offset === undefined) yearOffsets.set(key, (offset = readYearOffset(locale)))
+  return offset
+}
+
+function readYearOffset(locale: string | undefined) {
+  const formatter = dateFormatter(locale, numericDate)
+  const parts = formatter.formatToParts(Date.UTC(2026, 11, 31))
+  const year = Number(toLatinDigits(parts.find((part) => part.type === "year")?.value ?? "", locale))
+  if (!year || formatter.resolvedOptions().calendar === "japanese") return 0
+  return year - 2026
 }
 
 function fullYear(text: string, referenceYear: number) {

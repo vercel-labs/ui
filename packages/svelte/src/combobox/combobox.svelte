@@ -133,8 +133,8 @@ list are its parts.
     itemToLabel?: (value: T) => string
     /** Whether an item's value is the selected value, for object values that aren't the same object. */
     isItemEqualToValue?: (itemValue: T, value: T) => boolean
-    /** Whether the first matching item is highlighted while typing, so Enter chooses it. */
-    autoHighlight?: boolean
+    /** Whether the first matching item is highlighted while typing, so Enter chooses it. `"always"` also highlights the selected item, or the first, when the list opens. */
+    autoHighlight?: boolean | "always"
     /** With `multiple`, whether the input keeps its text after an item is chosen. */
     keepQuery?: boolean
     /** Whether text that matches no item becomes the value, when Enter is pressed with nothing highlighted, or, without `multiple`, when the list closes. */

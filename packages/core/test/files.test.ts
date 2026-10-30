@@ -176,3 +176,9 @@ test("formats file sizes in the locale", () => {
   expect(formatFileSize(25_000_000, "en-US")).toBe("25 MB")
   expect(formatFileSize(1536, "de-DE")).toBe("1,5 kB")
 })
+
+test("a size that rounds up to 1000 of a unit reads as the next unit", () => {
+  expect(formatFileSize(999_999, "en-US")).toBe("1 MB")
+  expect(formatFileSize(999_600_000, "en-US")).toBe("1 GB")
+  expect(formatFileSize(999_400, "en-US")).toBe("999 kB")
+})
