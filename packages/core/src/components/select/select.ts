@@ -146,9 +146,9 @@ type SelectController<T = string, Multiple extends boolean | undefined = false> 
  * `multiple` picks the shape of the value, and `Multiple` true requires it.
  * @stable
  */
-// A union on `multiple`, so TypeScript infers `T` through it and types
-// `onValueChange` from `multiple`. The multiple side comes first, so a list in
-// a variable infers `T` as its items, not as the list.
+// A union on `multiple`, so TypeScript infers `T` through it. The multiple side
+// comes first, so a list in a variable infers `T` as its items. A value that is
+// itself a list takes `items` or the type: `<Select<number[]>>`.
 type SelectOptions<T = string, Multiple extends boolean | undefined = false> = SelectSharedOptions<T> &
   (SelectMultipleOptions<T, Multiple> | SelectSingleOptions<T, Multiple> | SelectEitherOptions<T, Multiple>)
 

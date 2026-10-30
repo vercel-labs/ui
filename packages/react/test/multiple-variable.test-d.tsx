@@ -9,3 +9,11 @@ declare const setLabels: (labels: string[]) => void
 ;<Combobox multiple value={labels} onValueChange={(value) => setLabels(value)} />
 ;<Select multiple value={labels} onValueChange={(value) => setLabels(value)} />
 ;<Listbox multiple value={labels} onValueChange={(value) => setLabels(value)} />
+
+declare const range: number[]
+declare const setRange: (range: number[] | null) => void
+declare const rangeItems: { value: number[]; label: string }[]
+
+// A value that is itself a list takes its items or its type.
+;<Select items={rangeItems} value={range} onValueChange={(value) => setRange(value)} />
+;<Select<number[]> value={range} onValueChange={(value) => setRange(value)} />

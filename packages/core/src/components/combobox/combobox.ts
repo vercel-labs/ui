@@ -155,9 +155,9 @@ type ComboboxController<T = string, Multiple extends boolean | undefined = false
  * `multiple` picks the shape of the value, and `Multiple` true requires it.
  * @stable
  */
-// A union on `multiple`, so TypeScript infers `T` through it and types
-// `onValueChange` from `multiple`. The multiple side comes first, so a list in
-// a variable infers `T` as its items, not as the list.
+// A union on `multiple`, so TypeScript infers `T` through it. The multiple side
+// comes first, so a list in a variable infers `T` as its items. A value that is
+// itself a list takes `items` or the type: `<Combobox<number[]>>`.
 type ComboboxOptions<T = string, Multiple extends boolean | undefined = false> = ComboboxSharedOptions<T> &
   (
     | ComboboxMultipleOptions<T, Multiple>
