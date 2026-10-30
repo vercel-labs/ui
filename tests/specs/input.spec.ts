@@ -115,14 +115,20 @@ test.describe("input group", { tag: "@enhancement" }, () => {
   })
 })
 
-test("<ui-input>'s value property writes the field and reports it", async ({ page, framework }) => {
+test("<ui-input>'s value property writes the field quietly, and its api reports", async ({
+  page,
+  framework,
+}) => {
   test.skip(framework !== "web", "Web component markup only.")
-  await page.locator("ui-input#website").evaluate((el: HTMLElement & { value: string }) => {
+  const input = page.locator("ui-input#website")
+  await input.evaluate((el: HTMLElement & { value: string }) => {
     el.value = "example.com"
   })
   await expect(textbox(page, "Website")).toHaveValue("example.com")
-  await expect(status(page, "Last action")).toHaveText("website:example.com:imperative")
-  expect(
-    await page.locator("ui-input#website").evaluate((el: HTMLElement & { value: string }) => el.value),
-  ).toBe("example.com")
+  expect(await input.evaluate((el: HTMLElement & { value: string }) => el.value)).toBe("example.com")
+  await expect(status(page, "Last action")).toHaveText("")
+  await input.evaluate((el: HTMLElement & { api: { setValue: (value: string) => void } }) =>
+    el.api.setValue("example.org"),
+  )
+  await expect(status(page, "Last action")).toHaveText("website:example.org:imperative")
 })

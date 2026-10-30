@@ -110,16 +110,22 @@ test("a removal a controlled owner ignores keeps the item and its focus", async 
   await expect(item(page, "a.png")).toBeFocused()
 })
 
-test("the value property sets the files on web components", async ({ page, framework }) => {
+test("the value property sets the files quietly on web components, and the api reports", async ({
+  page,
+  framework,
+}) => {
   test.skip(!framework.startsWith("web"), "Only web components have the value property.")
-  await page
-    .locator("ui-file-input")
-    .first()
-    .evaluate((el: HTMLElement & { value: File[] }) => {
-      el.value = [new File(["x"], "set.png", { type: "image/png" })]
-    })
+  const input = page.locator("ui-file-input").first()
+  const before = await lastAction(page).textContent()
+  await input.evaluate((el: HTMLElement & { value: File[] }) => {
+    el.value = [new File(["x"], "set.png", { type: "image/png" })]
+  })
   await expect(item(page, "set.png")).toHaveCount(1)
-  await expect(lastAction(page)).toHaveText("attachments:imperative:set.png|")
+  await expect(lastAction(page)).toHaveText(before ?? "")
+  await input.evaluate((el: HTMLElement & { api: { setValue: (files: File[]) => void } }) =>
+    el.api.setValue([new File(["y"], "api.png", { type: "image/png" })]),
+  )
+  await expect(lastAction(page)).toHaveText("attachments:imperative:api.png,-set.png|")
 })
 
 test("the remove buttons are out of the tab order", async ({ page }) => {

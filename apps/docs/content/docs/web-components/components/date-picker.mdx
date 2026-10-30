@@ -235,18 +235,18 @@ no hidden input.
 
 Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiDatePickerElement` for typed listeners.
 
-| Member                     | On               | Description                                                    |
-| -------------------------- | ---------------- | -------------------------------------------------------------- |
-| `value` property           | `ui-date-picker` | The selected value. Setting it selects and fires `valuechange` |
-| `open` property            | `ui-date-picker` | Whether the popup is open. Setting it opens or closes it       |
-| `month` property           | `ui-date-picker` | The calendar's first month. Setting it turns there             |
-| `api` property             | `ui-date-picker` | The [controller](#controller)                                  |
-| `controller` property      | `ui-date-picker` | A controller from `createDatePickerController()`               |
-| `valuechange` event        | `ui-date-picker` | `detail: { value, reason, event, source }`                     |
-| `openchange` event         | `ui-date-picker` | `detail: { value: open, reason, event, source }`               |
-| `openchangecomplete` event | `ui-date-picker` | `detail: { value: open }`, once any animation finished         |
-| `monthchange` event        | `ui-date-picker` | `detail: { value: month, reason, event, source }`              |
-| `dismissattempt` event     | `ui-date-picker` | `detail: { reason, event }`, when a dismissal was refused      |
+| Member                     | On               | Description                                               |
+| -------------------------- | ---------------- | --------------------------------------------------------- |
+| `value` property           | `ui-date-picker` | The selected value. Setting it selects it                 |
+| `open` property            | `ui-date-picker` | Whether the popup is open. Setting it opens or closes it  |
+| `month` property           | `ui-date-picker` | The calendar's first month. Setting it turns there        |
+| `api` property             | `ui-date-picker` | The [controller](#controller)                             |
+| `controller` property      | `ui-date-picker` | A controller from `createDatePickerController()`          |
+| `valuechange` event        | `ui-date-picker` | `detail: { value, reason, event, source }`                |
+| `openchange` event         | `ui-date-picker` | `detail: { value: open, reason, event, source }`          |
+| `openchangecomplete` event | `ui-date-picker` | `detail: { value: open }`, once any animation finished    |
+| `monthchange` event        | `ui-date-picker` | `detail: { value: month, reason, event, source }`         |
+| `dismissattempt` event     | `ui-date-picker` | `detail: { reason, event }`, when a dismissal was refused |
 
 ### Reasons
 

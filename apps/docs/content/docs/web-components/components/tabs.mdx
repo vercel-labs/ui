@@ -158,7 +158,7 @@ Use `data-activation-direction` to choose a slide direction. Put both panels in 
 
 ### Controlled
 
-Read and set the element’s `value` property, or call its `api.select(value)` method. Setting the property or attribute fires `valuechange`. [State and Events](../state-and-events) covers the shared pattern. Call `event.preventDefault()` on `valuechange` to reject a change.
+Read and set the element’s `value` property, or call its `api.select(value)` method. Setting the property or attribute fires no event; the `api` and the person choosing a tab do. [State and Events](../state-and-events) covers the shared pattern. Call `event.preventDefault()` on `valuechange` to reject a change.
 
 `valuechange` receives the new value and a [reason](#reasons), such as `item-press`, `list-navigation`, or `imperative`. It does not run for the initial selection. Use the element’s `api` to select a tab from another control.
 
@@ -249,11 +249,11 @@ is false. Callbacks are DOM events.
 
 Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` keeps the current tab.
 
-| Member                      | On        | Description                                                            |
-| --------------------------- | --------- | ---------------------------------------------------------------------- |
-| `value` property, attribute | `ui-tabs` | The selected tab. Setting either selects a tab and fires `valuechange` |
-| `api` property              | `ui-tabs` | The [controller](#controller)                                          |
-| `valuechange` event         | `ui-tabs` | `detail: { value, reason, event, source }`                             |
+| Member                      | On        | Description                                    |
+| --------------------------- | --------- | ---------------------------------------------- |
+| `value` property, attribute | `ui-tabs` | The selected tab. Setting either selects a tab |
+| `api` property              | `ui-tabs` | The [controller](#controller)                  |
+| `valuechange` event         | `ui-tabs` | `detail: { value, reason, event, source }`     |
 
 ### Reasons
 

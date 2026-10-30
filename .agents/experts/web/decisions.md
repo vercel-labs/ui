@@ -13,6 +13,7 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Form component dropped.**
 - **`createParts`, like every adapter** (shadcn 2026-10-29). It defines an element per part and returns their classes, `Root` and one per part in Pascal case, `undefined` on the server. `definePart` is internal, for the package's own components.
 - **Button parts wrap a written `<button>`** (shadcn 2026-10-29). A custom element can't be a native button and Safari has no customized built-ins, so the package never creates the button for the user.
+- **State set from script fires no events** (shadcn 2026-10-30). A live property or state attribute commits quietly, like a native input's `value`, so a page that renders state back never hears its own write. The `api`, people and agents still fire events.
 - **The instance is private.** An owner element's public surface is `api`, the controller's methods, plus its attribute and live properties. The primitive instance lives in a module-private `WeakMap` that the package's modules read through `instanceOf(el)`, and a custom root's `render(el, instance)` receives it.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
 
@@ -22,7 +23,6 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **`<ui-otp-input>`'s `input-mode`** can't reflect: every element has `inputMode`.
 - **Text options read `undefined`**, not the default, without the attribute.
 - **No element interface** for drawer, slider, field, number input and progress.
-- **Live properties fire change events** when set from script, unlike native controls.
 - **Typed JSX** for React, Vue and Svelte consumers.
 - **Focus inside shadow roots**: a popover in a closed root dismisses on inside presses and Escape drops focus to `body`; a modal popup's Tab loop skips slotted content (both probed 2026-10-28 in Chromium).
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.

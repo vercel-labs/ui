@@ -32,6 +32,8 @@ console.log(toggle.pressed)
 
 Other elements expose `open`, `checked`, or `value`. These are live properties, not React-style controlled props. Changing an attribute such as `pressed` also updates state.
 
+Setting a property or attribute fires no event, like setting a native input's `value`. So a page that renders the state back into the element never hears its own write. Changes from the person using it, from the element's `api`, or from an agent fire events.
+
 ## Change an Option from Script
 
 Options have properties too. On the same toggle, changing `disabled` also updates its attribute:

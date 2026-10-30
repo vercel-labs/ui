@@ -207,8 +207,8 @@ function upgradeProperties(el: HTMLElement, names: Iterable<string>) {
   }
 }
 
-// Elements restoring their state, whose changes fire no events, like a
-// native control's state restored by the browser.
+// Elements whose changes fire no events right now: state restored by the
+// browser, or set from script, like a native control's.
 const quiet = new WeakSet<HTMLElement>()
 
 // Whether a callback's only argument is a details object, like
@@ -746,7 +746,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
               return this.#instance ? get(this.#instance.api) : undefined
             },
             set(this: Owner, value: unknown) {
-              if (this.#instance && !this.#gone) set(this.#instance.api, value)
+              if (this.#instance && !this.#gone) this.#quietly(() => set(this.#instance!.api, value))
               else this.#state[name] = value
             },
           })
@@ -788,7 +788,21 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         if (!(key in state) || value === previous) return
         const type = schema[key]
         const cleared = type === "boolean" ? false : type === "list" ? [] : null
-        state[key].set(this.#instance!.api, value === null ? cleared : parseAttribute(type, value))
+        this.#quietly(() =>
+          state[key].set(this.#instance!.api, value === null ? cleared : parseAttribute(type, value)),
+        )
+      }
+
+      // State set from script commits without events, like a native input's
+      // `value`, so a page that renders the state back never hears its own write.
+      #quietly(write: () => void) {
+        if (quiet.has(this)) return write()
+        quiet.add(this)
+        try {
+          write()
+        } finally {
+          quiet.delete(this)
+        }
       }
 
       connectedCallback() {
