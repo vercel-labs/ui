@@ -7,7 +7,7 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 
 ## Settled
 
-- **Solid 2 only** (`solid-js >=2.0.0-rc.14`). `ownedWrite` workarounds go when Solid 2 is final.
+- **Solid 2 only** (`solid-js >=2.0.0-rc.14`). `ownedWrite` workarounds for signals written while children render go when Solid 2 is final. Signals fed by core's listeners keep it for good, since core writes synchronously during a disposal whatever Solid does.
 - **`render` is the only way to render your own element.** No `as`, no `<Dynamic>` prop.
 - **Solid's dev diagnostics are a gate**: `packages/solid/test/diagnostics.test.tsx` and the playground's checker fail on any code but the allowed ones.
 - **Form component dropped.**

@@ -87,7 +87,7 @@ Core holds every behavior; the adapter renders. Read `packages/solid/src/use-pri
 - **Children functions.** A children function that takes state runs in the element's tracked children scope, so a read in its body rebuilds the subtree when that value changes. Read state in JSX or through an accessor instead.
 - **Payloads.** Content parts are generic (`DialogContent<Payload>`), so a popup's payload reads without a cast. Nothing ties that type to the controller's.
 - **Context.** Each primitive's parts share one context (`scopeOf`); `providePrimitive` provides the handle. `provided()` renders a provider's children in document order on the server, so a toolbar's tab stop goes to the first item.
-- **`ownedWrite`** marks signals written while children render (a combobox's "has its own content"). Goes when Solid 2 is final.
+- **`ownedWrite`** marks signals written while children render (a combobox's "has its own content"), which goes when Solid 2 is final. It also marks every signal fed by a core subscription (`createTracked`, the menu's `appleSignal`, token input hosts, async options, overlays, controller targets), since a part's unbind fires those listeners inside a disposing computation. That one stays.
 - **Form reset**: form controls render a hidden native input, and core's `associate` (`packages/core/src/foundation/forms/form.ts`) resets them on the form's `reset` event. Shared by every adapter.
 - **Packages.** `@ui-sdk/core` is a peer dependency.
 
