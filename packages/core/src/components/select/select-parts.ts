@@ -149,7 +149,11 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
   }),
 
   trigger: slot<SelectTriggerProps, SelectTriggerState>({
-    props: { disabled: "boolean", named: "boolean" },
+    props: {
+      disabled: "boolean",
+      // Internal: passed by renderers. Select has no `field` slot, so no element attribute either.
+      named: { kind: "boolean", from: "field" },
+    },
     state: (state, { props }) => triggerState(state, props),
     attrs: (state, { id, props }) => {
       const { disabled, placeholder } = triggerState(state, props)
