@@ -405,6 +405,18 @@ describe("agent", () => {
     expect(nested.get().value).toBe("src/index.ts")
   })
 
+  test("a component whose elements are all hidden, like one in a closed dialog, isn't on the page", async () => {
+    const agent = createAgent()
+    const shown = mountCheckbox({ id: "status-shown" }, "Status")
+    mountCheckbox({ id: "status-closed" }, "Status")
+    const closed = document.body.appendChild(document.createElement("div"))
+    closed.hidden = true
+    closed.append(document.body.querySelectorAll("label")[1])
+    expect(agent.snapshot().filter((component) => component.label === "Status")).toHaveLength(1)
+    await agent.act({ steps: [{ ref: "Status", action: "setChecked", args: [true] }] })
+    expect(shown.get().checked).toBe(true)
+  })
+
   test("a press waits for the button's action, and a failed action fails the step", async () => {
     const agent = createAgent()
     let fail = false

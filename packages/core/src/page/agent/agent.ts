@@ -207,6 +207,10 @@ function renderedItems(parts: Bound[]) {
     })
 }
 
+// Whether an element shows, as far as the browser can tell. Without
+// `checkVisibility`, a `hidden` ancestor hides it.
+const isShown = (el: HTMLElement) => el.checkVisibility?.() ?? !el.closest("[hidden]")
+
 // Buttons and menu items inside the component's elements, like a dialog's
 // Cancel and Delete or a menu's Remove, visible, not inert and not inside
 // `data-agent-hidden`.
@@ -359,7 +363,13 @@ function createAgent(
       const parts = bound(instance)
       if (parts.length) remember(entry, parts)
       // Some show only now and then, like a field while it has errors: its control carries its label.
-      if (parts.length && !entry.offLimits && (entry.agent?.shown?.(instance.get()) ?? true))
+      // One whose every element is hidden, like a field in a closed dialog, isn't on the page yet.
+      if (
+        parts.length &&
+        !entry.offLimits &&
+        (entry.agent?.shown?.(instance.get()) ?? true) &&
+        parts.some((part) => isShown(part.el))
+      )
         found.push({ entry, instance, parts })
     }
     return found
