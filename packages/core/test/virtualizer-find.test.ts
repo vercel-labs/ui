@@ -350,6 +350,36 @@ describe("bindFindable slots", () => {
     }
   })
 
+  test("rows that scroll away give their text back even when the framework never runs the cleanup", () => {
+    const rows = createVirtualizer({ count: () => 1000, estimate: () => 20, overscan: 2, findable: pieces })
+    const el = scroller(100, () => rows.size())
+    cleanups.push(rows.connect(el, { findable: true }))
+    // Like Vue: the ref runs again on every update, and with null on unmount; what it returns is dropped.
+    const bound = new Map<number, HTMLElement[]>()
+    const draw = () => {
+      for (const item of rows.items())
+        if (!bound.has(item.index)) {
+          const own = [document.createElement("span"), document.createElement("span")]
+          own.forEach((slot, part) => rows.bindFindable(item.index, slot, part))
+          bound.set(item.index, own)
+        }
+      for (const [index, own] of bound)
+        if (rows.items().some((item) => item.index === index))
+          own.forEach((slot, part) => rows.bindFindable(index, slot, part))
+    }
+    draw()
+    cleanups.push(rows.subscribe(draw))
+    expect(bound.get(1)![0].textContent).toBe("Row 1")
+    el.scrollTop = 8000
+    el.dispatchEvent(new Event("scroll"))
+    expect(standIns(el).find((node) => node.textContent?.startsWith("Row 1 "))?.textContent).toBe(
+      "Row 1 plain",
+    )
+    el.scrollTop = 0
+    el.dispatchEvent(new Event("scroll"))
+    expect(bound.get(1)![0].textContent).toBe("Row 1")
+  })
+
   test("without the layers, slots show plain text", () => {
     const { shown } = slottedList({ findable: false })
     expect(shown.get(2)!.slots.map((slot) => slot.textContent)).toEqual(["Row 2", "plain"])

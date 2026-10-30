@@ -132,10 +132,47 @@ Keep `findable` the text the row shows, so a row is found the same rendered or n
 
 Then render that text through `bindFindable`, one empty element per piece, from its ref:
 
+<FrameworkContent value="react">
+
 ```tsx
 <span ref={(el) => virtual.bindFindable(item.index, el, 0)} />
 <span ref={(el) => virtual.bindFindable(item.index, el, 1)} />
 ```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<span :ref="(el) => virtual.bindFindable(item.index, el as HTMLElement | null, 0)" />
+<span :ref="(el) => virtual.bindFindable(item.index, el as HTMLElement | null, 1)" />
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<span {@attach (el) => virtual.bindFindable(item.index, el, 0)}></span>
+<span {@attach (el) => virtual.bindFindable(item.index, el, 1)}></span>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+<span ref={(el) => virtual.bindFindable(item.index, el, 0)} />
+<span ref={(el) => virtual.bindFindable(item.index, el, 1)} />
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts
+const off = [virtual.bindFindable(index, id, 0), virtual.bindFindable(index, customer, 1)]
+```
+
+</FrameworkContent>
+
+A row that leaves `items()` gives its text back on its own, so frameworks that call a ref with `null` instead of running what it returned work the same.
 
 The element holds the very text find in page searches, so the browser highlights the match in the row itself, in the row's own styles, and counts it once. `part`, the last argument, picks the piece when `findable` returns several.
 

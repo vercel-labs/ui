@@ -213,6 +213,7 @@ function createVirtualizer(options: VirtualizerOptions) {
 
   function update() {
     if (!compute()) return
+    releaseSlots()
     syncStandIns()
     for (const listener of [...listeners]) listener()
   }
@@ -249,6 +250,20 @@ function createVirtualizer(options: VirtualizerOptions) {
       const node = pieces[part]
       if (slot && node && node.parentNode !== slot.el) slot.el.replaceChildren(node)
     })
+  }
+
+  // Rows that left `items()` give their text back, also where a framework
+  // calls a ref with null instead of running its cleanup.
+  function releaseSlots() {
+    if (!slots.size) return
+    const shown = new Set(snapshot.map((item) => item.index))
+    for (const [index, own] of slots) {
+      if (shown.has(index)) continue
+      slots.delete(index)
+      own.forEach((slot, part) => {
+        if (slot && texts[index]?.[part]?.parentNode === slot.el) restore(index, part)
+      })
+    }
   }
 
   // A piece goes back to its stand-in, where it sits before the space after it.
