@@ -7,6 +7,7 @@ import { accordion } from "../src/components/accordion/accordion"
 import { createAgent, registerTools, type AgentComponent } from "../src/page/agent/agent"
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
+import { datePicker } from "../src/components/date-picker/date-picker"
 import { input } from "../src/components/input/input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
@@ -403,6 +404,22 @@ describe("agent", () => {
     // A label inside a collapsed branch names its node.
     await agent.act({ steps: [{ ref: "Files", action: "setValue", args: ["index.ts"] }] })
     expect(nested.get().value).toBe("src/index.ts")
+  })
+
+  test("a date picker is named by its input's label, not by the month its calendar shows", () => {
+    const agent = createAgent()
+    const instance = datePicker({ id: "due", defaultMonth: "2026-11" })
+    const label = document.body.appendChild(document.createElement("label"))
+    label.textContent = "Due date"
+    const input = label.appendChild(document.createElement("input"))
+    const heading = document.body.appendChild(document.createElement("h2"))
+    heading.textContent = "November 2026"
+    cleanups.push(bind(instance.part("input"), input), bind(instance.part("heading"), heading), () =>
+      instance.destroy(),
+    )
+    expect(agent.snapshot().find((component) => component.component === "date-picker")?.label).toBe(
+      "Due date",
+    )
   })
 
   test("a press waits for the button's action, and a failed action fails the step", async () => {
