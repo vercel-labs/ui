@@ -27,6 +27,7 @@ import {
   usePrimitive,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("trigger-menu-container")
 
@@ -53,63 +54,65 @@ const parts = createParts(triggerMenuPrimitive, {
  * it uses that editor; otherwise render a TriggerMenuInput, or pass `editor`.
  * @stable
  */
-const TriggerMenu = defineComponent({
-  name: "TriggerMenu",
-  props: {
-    triggers: { type: Array as PropType<TriggerDefinition<any>[]>, required: true },
-    editor: Object as PropType<TextEditorAdapter>,
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    status: String as PropType<AsyncOptionsStatus>,
-    autoHighlight: optionalBoolean,
-    loop: optionalBoolean,
-    shortcut: String,
-    controller: Object as PropType<TriggerMenuController>,
-    dismissible: optionalBoolean,
-    debug: optionalBoolean,
-    container: containerProp,
-    // An action handler: a function prop beside the emit, so a returned Promise inserts a pending token.
-    onSelect: Function as PropType<SelectHandler>,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    dismissAttempt: (_details: DismissAttemptDetails<TriggerMenuDismissReason>) => true,
-    queryChange: (_query: string, _details: QueryDetails) => true,
-  },
-  setup(props, { slots, emit }) {
-    const inherited = inject(EditorKey, () => undefined)
-    provide(ContainerKey, () => props.container)
-    const menu = usePrimitive(triggerMenuPrimitive, () => ({
-      ...props,
-      open: orModel(props.open, props.modelValue),
-      container: undefined,
-      editor: props.editor ?? inherited(),
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onDismissAttempt: (details: DismissAttemptDetails<TriggerMenuDismissReason>) =>
-        emit("dismissAttempt", details),
-      onQueryChange: (query: string, details: QueryDetails) => emit("queryChange", query, details),
-    }))
-    useControllerEntry(() => props.controller, menu)
-    const placed = usePlacedContent()
-    return () => {
-      const children = slots.default?.() ?? []
-      // A data menu renders its list, unless the app placed a TriggerMenuContent:
-      // in the markup, or inside a component of its own.
-      const own = placed() || hasChild(children, TriggerMenuContent)
-      return [children, !own && h(NotPlaced, () => h(TriggerMenuContent))]
-    }
-  },
-})
+const TriggerMenu = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "TriggerMenu",
+    props: {
+      triggers: { type: Array as PropType<TriggerDefinition<any>[]>, required: true },
+      editor: Object as PropType<TextEditorAdapter>,
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      status: String as PropType<AsyncOptionsStatus>,
+      autoHighlight: optionalBoolean,
+      loop: optionalBoolean,
+      shortcut: String,
+      controller: Object as PropType<TriggerMenuController>,
+      dismissible: optionalBoolean,
+      debug: optionalBoolean,
+      container: containerProp,
+      // An action handler: a function prop beside the emit, so a returned Promise inserts a pending token.
+      onSelect: Function as PropType<SelectHandler>,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<TriggerMenuDismissReason>) => true,
+      queryChange: (_query: string, _details: QueryDetails) => true,
+    },
+    setup(props, { slots, emit }) {
+      const inherited = inject(EditorKey, () => undefined)
+      provide(ContainerKey, () => props.container)
+      const menu = usePrimitive(triggerMenuPrimitive, () => ({
+        ...props,
+        open: orModel(props.open, props.modelValue),
+        container: undefined,
+        editor: props.editor ?? inherited(),
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onDismissAttempt: (details: DismissAttemptDetails<TriggerMenuDismissReason>) =>
+          emit("dismissAttempt", details),
+        onQueryChange: (query: string, details: QueryDetails) => emit("queryChange", query, details),
+      }))
+      useControllerEntry(() => props.controller, menu)
+      const placed = usePlacedContent()
+      return () => {
+        const children = slots.default?.() ?? []
+        // A data menu renders its list, unless the app placed a TriggerMenuContent:
+        // in the markup, or inside a component of its own.
+        const own = placed() || hasChild(children, TriggerMenuContent)
+        return [children, !own && h(NotPlaced, () => h(TriggerMenuContent))]
+      }
+    },
+  }),
+)
 
 /**
  * The text field the menu suggests into: a `<textarea>`, or an `<input>` from the `render` slot.
