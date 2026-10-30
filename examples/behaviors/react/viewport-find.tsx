@@ -34,7 +34,14 @@ const map = definePrimitive({
     }),
     pane: slot({
       attrs: () => ({
-        style: css({ position: "absolute", inset: "0", overflow: "hidden", "pointer-events": "none" }),
+        style: css({
+          position: "absolute",
+          inset: "0",
+          overflow: "scroll",
+          "scrollbar-width": "none",
+          "touch-action": "none",
+          "pointer-events": "none",
+        }),
       }),
       bind: (el, { api }) => api.viewport.bindFindable(el),
     }),

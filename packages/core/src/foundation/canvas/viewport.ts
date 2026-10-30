@@ -332,9 +332,10 @@ function createViewport<State extends object>(
     /**
      * Turns the browser's scrolls inside `el` into pans, until the returned
      * function runs, so find in page, focus and links to an id bring what
-     * they found into view. `el` is a pane with `overflow: hidden` that fills
-     * the surface and holds only the world: it rests scrolled far from its
-     * origin, with the world offset to match.
+     * they found into view. `el` is a pane that fills the surface and holds
+     * only the world, with `overflow: scroll`, since find in page skips what a
+     * user can't scroll: it rests scrolled far from its origin, with the world
+     * offset to match.
      */
     bindFindable(el: HTMLElement) {
       const spacer = el.ownerDocument.createElement("div")
