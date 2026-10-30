@@ -69,7 +69,7 @@ test("a component's own file defines it without web.js", async ({ page }) => {
   expect(entries).toEqual(["tabs"])
 })
 
-test("form controls get their values back after going back, with no input or change events, like native ones", async ({
+test("form controls get their values back after going back, with no events, like native ones", async ({
   page,
 }) => {
   await page.goto("/form.html")
@@ -81,7 +81,7 @@ test("form controls get their values back after going back, with no input or cha
   await page.addInitScript(() => {
     const heard: string[] = []
     Object.assign(window, { heard })
-    for (const type of ["input", "change"])
+    for (const type of ["input", "change", "checkedchange", "valuechange"])
       document.addEventListener(
         type,
         (event) => heard.push(`${type} ${(event.target as Element).localName}`),

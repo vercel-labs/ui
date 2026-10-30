@@ -602,9 +602,16 @@ function formAssociated(Base: typeof HTMLElement) {
       formCallback(this, "disabled", disabled)
     }
     formStateRestoreCallback(state: unknown, mode: string) {
+      const restore = () => {
+        quiet.add(this)
+        try {
+          return formCallback(this, "restore", state, mode)
+        } finally {
+          quiet.delete(this)
+        }
+      }
       // The browser restores state as the element upgrades, before its parts bind.
-      if (!formCallback(this, "restore", state, mode))
-        queueMicrotask(() => formCallback(this, "restore", state, mode))
+      if (!restore()) queueMicrotask(restore)
     }
   }
 }
