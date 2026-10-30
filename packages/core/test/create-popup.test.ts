@@ -376,6 +376,39 @@ describe("our popups on the kit", () => {
     expect(document.activeElement?.textContent).toBe("Ada")
   })
 
+  test("Popover opened by its open option after the trigger that opened it last is gone returns focus to its other trigger", async () => {
+    let options = { id: "p", open: false, onOpenChange: (open: boolean) => hand(open) }
+    const instance = popover(options)
+    const hand = (open: boolean) => {
+      options = { ...options, open }
+      instance.setOptions(options)
+    }
+    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace] = [button("Ada"), button("Grace")]
+    const content = document.createElement("div")
+    const inside = content.appendChild(button("Copy link"))
+    document.body.append(ada, grace, content)
+    const unbind = [
+      bind(instance.part("content"), content),
+      bind(instance.part("trigger", { id: "ada" }), ada),
+      bind(instance.part("trigger", { id: "grace" }), grace),
+    ]
+    grace.click()
+    await frame()
+    inside.focus()
+    grace.remove()
+    hand(false)
+    await frame()
+    hand(true)
+    await frame()
+    inside.focus()
+    hand(false)
+    await frame()
+    expect(document.activeElement).toBe(ada)
+    for (const cleanup of unbind) cleanup()
+    instance.destroy()
+  })
+
   test("Hover Card opens on keyboard focus and Escape closes it", async () => {
     const view = mount(
       hoverCard,
