@@ -295,7 +295,7 @@ const MenuItem = withElement(
  */
 const MenuCheckboxItem = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "MenuCheckboxItem",
     inheritAttrs: false,
     props: {
@@ -339,7 +339,7 @@ const MenuCheckboxItem = /* @__PURE__ */ withElement(
  */
 const MenuRadioGroup = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "MenuRadioGroup",
     inheritAttrs: false,
     props: {
@@ -386,7 +386,7 @@ const MenuRadioGroup = /* @__PURE__ */ withElement(
  */
 const MenuRadioItem = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "MenuRadioItem",
     inheritAttrs: false,
     props: {
@@ -415,7 +415,7 @@ const MenuRadioItem = /* @__PURE__ */ withElement(
  */
 const MenuItemIndicator = /* @__PURE__ */ withElement(
   "span",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "MenuItemIndicator",
     inheritAttrs: false,
     props: { keepMounted: optionalBoolean },

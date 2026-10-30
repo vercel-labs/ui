@@ -282,7 +282,8 @@ function slotProps(
     if (key === "style" && key in untrack(attrs) && user.style != null)
       return mergeStyles(user.style, attrs().style as Record<string, string>)
     if (key in untrack(attrs)) return attrs()[key]
-    return skipped.has(key) ? undefined : user[key]
+    if (skipped.has(key)) return undefined
+    return key in user || key === "children" ? user[key] : attrs()[key]
   }
   const proxy: Record<string, any> = new Proxy({} as Record<string, any>, {
     get: (_, key) => (typeof key === "string" ? get(key) : key === $PROXY ? proxy : undefined),

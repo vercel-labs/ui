@@ -294,6 +294,7 @@ type MenuNode = {
     highlight: (key: string | null, options?: { focus?: boolean; scroll?: boolean }) => void
     childOpenChanged: (childId: string, open: boolean) => void
     hoverItem: (el: HTMLElement, event: PointerEvent) => void
+    cancelHoverOpen: () => void
     layer: () => Layer | undefined
     barArrow: (by: 1 | -1, event: KeyboardEvent) => boolean
   }
@@ -611,6 +612,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
             options().delay ?? 100,
           )
       },
+      cancelHoverOpen: () => clearTimeout(hoverTimer),
       popup,
       presentation,
       layer: () => popup.layer(),

@@ -7,10 +7,21 @@ import {
   type ToggleOptions,
   type ToggleState,
 } from "@ui-sdk/core/toggle"
+import * as React from "react"
 import { useToolbarScope } from "./toolbar-context"
-import { createParts, reading, useNearest, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  reading,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 const parts = createParts(toggle, { root: "button", icon: "span" })
+
+// The group's own context, so a toggle can join a group without bundling it.
+const ToggleGroupContext = React.createContext<PrimitiveHandle<typeof toggleGroup> | null>(null)
 
 /**
  * A button that stays pressed. Inside a ToggleGroup, the group decides whether it's pressed.
@@ -20,7 +31,7 @@ function Toggle(
   props: ToggleOptions &
     Omit<PartProps<"button", ToggleState>, "value" | "defaultValue" | "type" | "onChange" | "onSelect">,
 ) {
-  const group = useNearest(toggleGroup)
+  const group = React.useContext(ToggleGroupContext)
   const toolbar = useToolbarScope()
   return (
     <parts.Root {...props} group={group ? reading(group, () => group.api) : undefined} toolbar={toolbar} />
@@ -68,7 +79,11 @@ function ToggleGroup<T extends string = string>({
     toolbar,
   })
   // The state holds only values of type `T`, which the primitive types as strings.
-  return usePart(group, "group", {}, props as PartProps<"div", ToggleGroupState>, "div")
+  return (
+    <ToggleGroupContext value={group}>
+      {usePart(group, "group", {}, props as PartProps<"div", ToggleGroupState>, "div")}
+    </ToggleGroupContext>
+  )
 }
 
 export { createToggleController, createToggleGroupController } from "@ui-sdk/core/toggle"

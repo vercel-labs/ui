@@ -40,4 +40,20 @@ describe("combobox headless", () => {
     expect(instance.api.getValue()).toBe("astro")
     expect(instance.api.getQuery()).toBe("Astro")
   })
+
+  test("a value set before its items load shows their label once they arrive", () => {
+    const instance = combobox({ id: "c", items: [], value: "astro" })
+    instance.setOptions({ id: "c", items: frameworks, value: "astro" })
+    expect(instance.api.getQuery()).toBe("Astro")
+  })
+
+  test("a multiple combobox keeps its text when new items arrive", () => {
+    const options = { id: "c", items: frameworks, multiple: true, keepQuery: true }
+    const instance = combobox(options)
+    instance.api.setQuery("astro")
+    instance.api.internal.choose("astro")
+    expect(instance.api.getValue()).toEqual(["astro"])
+    instance.setOptions({ ...options, items: [...frameworks] })
+    expect(instance.api.getQuery()).toBe("astro")
+  })
 })

@@ -91,7 +91,7 @@ test.describe("tree", () => {
   })
 
   test("a group copies the template's group", async ({ page }) => {
-    await expect(page.getByRole("group")).toHaveClass(/\bdocs-group\b/)
+    await expect(page.getByRole("tree").getByRole("group")).toHaveClass(/\bdocs-group\b/)
   })
 
   test("a link item's label is a link with the label's classes", async ({ page }) => {
