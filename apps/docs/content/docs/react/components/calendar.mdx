@@ -96,7 +96,7 @@ A range cannot include an unavailable date unless `allowUnavailable` is set. Tha
 
 ### Range in Progress
 
-The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `onAnchorChange` and `onFocusedChange` report them as they change, to show the range being picked outside the calendar.
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `onAnchorChange` and `onFocusedChange` report them as they change, to show the range being picked outside the calendar. `focused` is reported once a day takes focus.
 
 <ComponentExample
   name="calendar/range-progress"
@@ -276,7 +276,7 @@ Callbacks get the new value first, then the details.
 | ----------------- | ---------- | ------------------------------------------------------------------- |
 | `onValueChange`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)       |
 | `onMonthChange`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons) |
-| `onFocusedChange` | `Calendar` | `(date)`: the date with the Tab stop                                |
+| `onFocusedChange` | `Calendar` | `(date)`: the day that took focus                                   |
 | `onAnchorChange`  | `Calendar` | `(date)`: a range's start, or `null` once it ends                   |
 
 ### Reasons

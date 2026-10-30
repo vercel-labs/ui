@@ -88,7 +88,7 @@ A range cannot include an unavailable date unless `allow-unavailable` is set. Th
 
 ### Range in Progress
 
-The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `anchorchange` and `focusedchange` events report them as they change, to show the range being picked outside the calendar.
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `anchorchange` and `focusedchange` events report them as they change, to show the range being picked outside the calendar. `focused` is reported once a day takes focus.
 
 <ComponentExample
   name="calendar/range-progress"
@@ -264,7 +264,7 @@ numbers are numbers. `value`, `default-value` and `unavailable` take comma-separ
 
 ### Events
 
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCalendarElement` for typed listeners.
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change, except on `anchorchange` and `focusedchange`, which only report. Type the element as `UiCalendarElement` for typed listeners.
 
 | Member                | On            | Description                                                  |
 | --------------------- | ------------- | ------------------------------------------------------------ |
@@ -274,7 +274,7 @@ Events fire on their own element and don't bubble, with the new value in `event.
 | `controller` property | `ui-calendar` | A controller from `createCalendarController()`               |
 | `valuechange` event   | `ui-calendar` | `detail: { value, reason, event, source }`                   |
 | `monthchange` event   | `ui-calendar` | `detail: { value: month, reason, event, source }`            |
-| `focusedchange` event | `ui-calendar` | `detail: { value }`: the date with the Tab stop              |
+| `focusedchange` event | `ui-calendar` | `detail: { value }`: the day that took focus                 |
 | `anchorchange` event  | `ui-calendar` | `detail: { value }`: a range's start, or `null` once it ends |
 
 ### Reasons

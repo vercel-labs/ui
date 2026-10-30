@@ -98,7 +98,7 @@ A range cannot include an unavailable date unless `allow-unavailable` is set. Th
 
 ### Range in Progress
 
-The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `@anchor-change` and `@focused-change` report them as they change, to show the range being picked outside the calendar.
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `@anchor-change` and `@focused-change` report them as they change, to show the range being picked outside the calendar. `focused` is reported once a day takes focus.
 
 <ComponentExample
   name="calendar/range-progress"
@@ -280,7 +280,7 @@ Events get the new value first, then the details. `v-model` only updates when th
 | `v-model:month`   | `Calendar` | The first month shown                                               |
 | `@value-change`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)       |
 | `@month-change`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons) |
-| `@focused-change` | `Calendar` | `(date)`: the date with the Tab stop                                |
+| `@focused-change` | `Calendar` | `(date)`: the day that took focus                                   |
 | `@anchor-change`  | `Calendar` | `(date)`: a range's start, or `null` once it ends                   |
 
 ### Reasons

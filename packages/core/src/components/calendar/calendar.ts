@@ -113,7 +113,7 @@ type CalendarOptions = {
    * @defaultValue false
    */
   deselectable?: boolean
-  /** Runs when the date with the tab stop changes, as keys and presses move it. */
+  /** Runs when another day takes focus, as keys and presses move it. */
   onFocusedChange?: (date: ISODate | null) => void
   /** Runs when a range's start is picked and while its end isn't, with `null` once the range ends or Escape drops it. */
   onAnchorChange?: (anchor: ISODate | null) => void
