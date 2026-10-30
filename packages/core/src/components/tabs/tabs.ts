@@ -2,7 +2,7 @@ import { type Direction, orientationOf, scrollToShow } from "../../foundation/fo
 import { directionBetween } from "./tabs-direction"
 import type { TabsGeneric } from "./tabs-generic"
 import { bindFindable, hiddenAttrs } from "../../foundation/disclosure/disclosure"
-import { opensElsewhere } from "../../foundation/platform/button"
+import { buttonElement, opensElsewhere, type ButtonElement } from "../../foundation/platform/button"
 import { layoutBox } from "../../foundation/platform/layout"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
@@ -213,6 +213,9 @@ type TabsState = {
   stop: string | null
   // Panels in the page. Tabs point aria-controls only at these.
   panels: string[]
+  // What each tab is rendered as when it isn't a button, like a link. Known
+  // once it binds, so servers render buttons.
+  elements: Record<string, ButtonElement>
 }
 
 const indicatorVariables = ["left", "right", "top", "bottom", "width", "height"] as const
@@ -367,6 +370,11 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
           store.set({ panels: [...panels], exiting: exiting.filter((value) => value !== key) })
         }
       },
+      setElement(key: string, el: HTMLElement) {
+        const element = buttonElement(el)
+        const { elements } = store.get()
+        if ((elements[key] ?? "button") !== element) store.set({ elements: { ...elements, [key]: element } })
+      },
       finishExit(key: string) {
         store.set({ exiting: store.get().exiting.filter((value) => value !== key) })
       },
@@ -436,6 +444,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
     exiting: [],
     stop: null,
     panels: [],
+    elements: {},
   }),
   live: ["panels"],
   sync: (options) => ({
@@ -481,6 +490,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         stop: ({ key }) => [key, null],
         exiting: [],
         panels: ({ key }) => [key],
+        elements: ({ key }) => [key],
       }),
       state: (state, { key, props }) => ({ selected: state.value === key, disabled: !!props.disabled }),
       attrs: (state, { id, key, props, api }) => {
@@ -488,7 +498,8 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         return {
           id: `${id}-tab-${idPart(key)}`,
           role: "tab",
-          type: "button",
+          // On a link, `type` names the linked file's kind, so only a button gets one.
+          type: (state.elements[key] ?? "button") === "button" ? "button" : undefined,
           tabindex: api.internal.roving.tabIndex(state, { key, props }),
           "aria-selected": String(selected),
           "aria-disabled": props.disabled ? "true" : undefined,
@@ -513,7 +524,10 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         if (el && document.activeElement !== el) el.focus({ preventScroll: true })
         api.select(key, api.internal.pressDetails(event))
       },
-      bind: (el, part) => part.api.internal.roving.bind(el, part),
+      bind(el, part) {
+        part.api.internal.setElement(part.key, el)
+        return part.api.internal.roving.bind(el, part)
+      },
     }),
 
     "tab-icon": slot(
@@ -572,7 +586,13 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       props: { value: "string", keepMounted: "boolean", hiddenUntilFound: "boolean" },
       // Panels never read the tab stop, which moves with every arrow key, or
       // which panels are in the page, and only ask whether they're exiting.
-      selects: selects({ value: ({ key }) => [key], stop: [], exiting: ({ key }) => [key], panels: [] }),
+      selects: selects({
+        value: ({ key }) => [key],
+        stop: [],
+        exiting: ({ key }) => [key],
+        panels: [],
+        elements: [],
+      }),
       present: (state, { key, props }) =>
         !!props.keepMounted || findable(state, props) || state.value === key || state.exiting.includes(key),
       state: (state, { key }) => ({ selected: state.value === key }),
