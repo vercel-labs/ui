@@ -268,6 +268,43 @@ describe("createViewport bindFindable", () => {
     expect(seen).toEqual(["find-in-page", "focus-in", "find-in-page"])
   })
 
+  test("a pane bound while hidden rests once it shows, and a lost rest doesn't pan", () => {
+    // Like a pane in a closed tab: no box, so it can't scroll until it shows.
+    let shown = false
+    const at = { left: 0, top: 0 }
+    let resized: (() => void) | undefined
+    const original = window.ResizeObserver
+    window.ResizeObserver = class {
+      constructor(callback: () => void) {
+        resized = callback
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    } as unknown as typeof ResizeObserver
+    cleanups.push(() => (window.ResizeObserver = original))
+    const { instance, surface } = mountCanvas()
+    Object.defineProperties(surface, {
+      scrollLeft: {
+        get: () => at.left,
+        set: (value: number) => shown && (at.left = value),
+        configurable: true,
+      },
+      scrollTop: { get: () => at.top, set: (value: number) => shown && (at.top = value), configurable: true },
+    })
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    shown = true
+    resized!()
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    // Hidden and shown again, the browser forgot the scroll; a scroll event then finds it at the origin.
+    at.left = 0
+    at.top = 0
+    surface.dispatchEvent(new Event("scroll"))
+    expect(instance.api.viewport.get()).toEqual({ x: 0, y: 0, zoom: 1 })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+  })
+
   test("a scroll clamped because the spacer went missing puts it back without panning", () => {
     const { instance, surface } = mountCanvas()
     scrollable(surface)

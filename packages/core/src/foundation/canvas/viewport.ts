@@ -361,8 +361,9 @@ function createViewport<State extends object>(
         requestAnimationFrame(() => (focusing = false))
       }
       const onScroll = (event: Event) => {
-        // Without the spacer, like after a framework replaced the children, the scroll was clamped, not asked for.
-        if (!spacer.isConnected) return settle()
+        // Without the spacer, like after a framework replaced the children, or
+        // back at the origin, like after the pane was hidden, the rest was lost.
+        if (!spacer.isConnected || (!el.scrollLeft && !el.scrollTop)) return settle()
         const dx = el.scrollLeft - rest
         const dy = el.scrollTop - rest
         if (!dx && !dy) return
@@ -374,7 +375,12 @@ function createViewport<State extends object>(
       restyle()
       el.addEventListener("scroll", onScroll)
       el.addEventListener("focusin", onFocusIn)
+      // A hidden pane, like in a closed tab or dialog, can't scroll: it rests once it shows, before it paints.
+      const view = el.ownerDocument.defaultView
+      const sized = view?.ResizeObserver ? new view.ResizeObserver(settle) : undefined
+      sized?.observe(el)
       return () => {
+        sized?.disconnect()
         el.removeEventListener("scroll", onScroll)
         el.removeEventListener("focusin", onFocusIn)
         spacer.remove()
