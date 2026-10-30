@@ -658,12 +658,15 @@ function activateItem(api: MenuApi, props: ItemProps, event?: Event, selection =
 }
 
 // A router can call `preventDefault()` on a link's click before the item's
-// handler, which then skips it. This listener still selects and closes the
-// menu; `onSelect` gets an event of its own to keep it open.
+// handler, which then skips it. Once the click has reached the window, after
+// React's handlers too, this still selects; `onSelect` gets its own event.
 function linkClick(api: MenuApi, props: () => ItemProps, el: HTMLElement, event: Event) {
-  if (!event.defaultPrevented || taken.has(event) || !el.matches("a[href]") || opensElsewhere(event, el))
-    return
-  activateItem(api, props(), event, selectEvent())
+  if (!el.matches("a[href]") || opensElsewhere(event, el)) return
+  const done = (last: Event) => {
+    if (last === event && event.defaultPrevented && !taken.has(event))
+      activateItem(api, props(), event, selectEvent())
+  }
+  el.ownerDocument.defaultView?.addEventListener("click", done, { once: true })
 }
 
 function toggleCheckbox(api: MenuApi, props: CheckboxProps, event?: Event) {
