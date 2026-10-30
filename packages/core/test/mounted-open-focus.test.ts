@@ -13,7 +13,11 @@ test("Escape returns focus to what had it when the dialog mounted open", async (
   const opener = document.body.appendChild(document.createElement("button"))
   opener.textContent = "Open"
   opener.focus()
-  const view = mount(dialog, { defaultOpen: true }, `<content><title>Profile</title><close>Close</close></content>`)
+  const view = mount(
+    dialog,
+    { defaultOpen: true },
+    `<content><title>Profile</title><close>Close</close></content>`,
+  )
   await settle()
   expect(view.part("content")!.contains(document.activeElement)).toBe(true)
   await view.keys("Escape")
@@ -24,7 +28,11 @@ test("Escape returns focus to what had it when the dialog mounted open", async (
 })
 
 test("focus on the page body when it mounted gives it nowhere to return to", async () => {
-  const view = mount(dialog, { defaultOpen: true }, `<content><title>Profile</title><close>Close</close></content>`)
+  const view = mount(
+    dialog,
+    { defaultOpen: true },
+    `<content><title>Profile</title><close>Close</close></content>`,
+  )
   await settle()
   await view.keys("Escape")
   await settle()
