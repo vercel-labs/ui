@@ -56,7 +56,17 @@ The viewport holds the open panel and follows its size and position. The sizing 
 
 Render your router's link for client-side navigation. `active` marks the link for the current page with `aria-current="page"` and `data-active`.
 
-Render the router's link with the `render` slot, like a `RouterLink` with `v-bind="props"`.
+Render the router's link with the `render` slot. With Vue Router, use `RouterLink`'s `custom` form and bind the part's props to your own `<a>`, then its `navigate` after them, so the menu's `aria-current` is the one the link gets.
+
+```vue
+<NavigationMenuLink :active="route.path === '/docs'">
+  <template #render="{ props }">
+    <RouterLink to="/docs" custom v-slot="{ href, navigate }">
+      <a v-bind="props" :href="href" @click="navigate">Introduction</a>
+    </RouterLink>
+  </template>
+</NavigationMenuLink>
+```
 
 <ComponentExample
   name="navigation-menu/link-component"

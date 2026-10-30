@@ -1,0 +1,29 @@
+{
+  "name": "tracker-solid",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port ${TRACKER_PORT:-5603}",
+    "build": "vite build",
+    "preview": "vite preview --port ${TRACKER_PORT:-5603}",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@solidjs/router": "2.0.0-next.38",
+    "@solidjs/web": "catalog:",
+    "@ui-sdk/core": "workspace:*",
+    "@ui-sdk/solid": "workspace:*",
+    "cn": "0.5.0",
+    "lucide": "1.54.0",
+    "solid-js": "catalog:",
+    "tracker-data": "workspace:*"
+  },
+  "devDependencies": {
+    "@solidjs/vite-plugin": "catalog:",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "tracker-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port ${TRACKER_PORT:-5604}",
+    "build": "vite build",
+    "preview": "vite preview --port ${TRACKER_PORT:-5604}",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ui-sdk/core": "workspace:*",
+    "@ui-sdk/web": "workspace:*",
+    "cn": "0.5.0",
+    "lit-html": "3.3.3",
+    "lucide": "1.54.0",
+    "tracker-data": "workspace:*"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

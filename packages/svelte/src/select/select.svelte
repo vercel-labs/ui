@@ -3,7 +3,7 @@
 Picks one value, or several with `multiple`, from a list in a popup.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T = string, Multiple extends boolean | undefined = false">
   import type { ChangeDetails, DismissAttemptDetails } from "@ui-sdk/core"
   import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
   import {
@@ -31,6 +31,39 @@ Picks one value, or several with `multiple`, from a list in a popup.
   type ValueDetails = ChangeDetails<SelectValueChangeReason>
   type OpenDetails = ChangeDetails<SelectOpenChangeReason>
   type QueryDetails = ChangeDetails<SelectQueryChangeReason>
+  // The value's shape follows `multiple`. The multiple side comes first, so a
+  // list in a variable infers `T` as its items.
+  type SelectValueProps<T, Multiple> =
+    | ({
+        /** Whether several items can be selected. The value is then a list. */
+        multiple: Multiple
+        /** The selected values. Bind it with `bind:value` to control the select. */
+        value?: T[]
+        /** The values selected at first, when uncontrolled. A form reset returns to them. */
+        defaultValue?: T[]
+        /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
+        onValueChange?: (value: T[], details: ValueDetails) => void
+      } & ([Multiple] extends [true] ? unknown : never))
+    | ({
+        /** Whether several items can be selected. */
+        multiple?: Multiple
+        /** The selected value. Bind it with `bind:value` to control the select. `null` selects nothing. */
+        value?: T | null
+        /** The value selected at first, when uncontrolled. A form reset returns to it. */
+        defaultValue?: T | null
+        /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
+        onValueChange?: (value: NoInfer<T> | null, details: ValueDetails) => void
+      } & ([Multiple] extends [false | undefined] ? unknown : never))
+    | ({
+        /** Whether several items can be selected. */
+        multiple?: Multiple
+        /** The selected value, or values with `multiple`. Bind it with `bind:value` to control the select. */
+        value?: T | T[] | null
+        /** The value or values selected at first, when uncontrolled. A form reset returns to it. */
+        defaultValue?: T | T[] | null
+        /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
+        onValueChange?: (value: NoInfer<T> | NoInfer<T>[] | null, details: ValueDetails) => void
+      } & (boolean extends Multiple ? unknown : never))
 
   let {
     value = $bindable(),
@@ -71,26 +104,20 @@ Picks one value, or several with `multiple`, from a list in a popup.
     onDismissAttempt,
     children,
   }: {
-    /** The selected value. Bind it with `bind:value` to control the select. `null` selects nothing, and with `multiple` it's a list. */
-    value?: unknown
-    /** The value selected at first, when uncontrolled. A form reset returns to it. */
-    defaultValue?: unknown
     /** Whether the list is open. Bind it with `bind:open` to control it. */
     open?: boolean
     /** Whether the list starts open, when uncontrolled. */
     defaultOpen?: boolean
-    /** Whether several items can be selected. */
-    multiple?: boolean
     /** The items as data. Renders them for you. */
-    items?: ListData<any>
+    items?: ListData<T>
     /** What the list shows while the search is empty, like recent choices. */
-    emptyItems?: ListData<any>
+    emptyItems?: ListData<T>
     /** The search text. Bind it with `bind:query` to control it. */
     query?: string
     /** The search text at first, when uncontrolled. */
     defaultQuery?: string
     /** How the search matches items. */
-    filter?: ListFilter<any>
+    filter?: ListFilter<T>
     /** Whether items are loading, for async options. */
     status?: AsyncOptionsStatus
     /** What screen readers hear when the results change. */
@@ -98,11 +125,11 @@ Picks one value, or several with `multiple`, from a list in a popup.
     /** What the trigger shows while nothing is selected. */
     placeholder?: string
     /** The string an item's value submits as and is identified by, for object values. */
-    itemToValue?: (value: any) => string
+    itemToValue?: (value: T) => string
     /** The label of a value whose item isn't rendered. */
-    itemToLabel?: (value: any) => string
+    itemToLabel?: (value: T) => string
     /** Whether an item's value is the selected value, for object values that aren't the same object. */
-    isItemEqualToValue?: (itemValue: any, value: any) => boolean
+    isItemEqualToValue?: (itemValue: T, value: T) => boolean
     /** Whether arrow keys wrap from the last item to the first. */
     loop?: boolean
     /** Whether the page behind the list is inert, or only shielded from the pointer. */
@@ -129,14 +156,12 @@ Picks one value, or several with `multiple`, from a list in a popup.
     debug?: boolean
     /** Renders the list into this element instead of in place. */
     container?: PopupContainer
-    /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
-    onValueChange?: (value: any, details: ValueDetails) => void
     /** Runs when the list wants to open or close. `details.cancel()` stops it. */
     onOpenChange?: (open: boolean, details: OpenDetails) => void
     /** Runs once the list has finished opening or closing, after any animation. */
     onOpenChangeComplete?: (open: boolean) => void
     /** Runs when the highlight moves to another item. */
-    onHighlight?: (value: any, details: ListHighlightDetails) => void
+    onHighlight?: (value: T | null, details: ListHighlightDetails) => void
     /** Runs when the search text wants to change. `details.cancel()` stops it. */
     onQueryChange?: (query: string, details: QueryDetails) => void
     /** Runs when the list is scrolled near its end, for async options. */
@@ -144,7 +169,7 @@ Picks one value, or several with `multiple`, from a list in a popup.
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
     onDismissAttempt?: (details: DismissAttemptDetails<SelectDismissReason>) => void
     children?: Snippet
-  } = $props()
+  } & SelectValueProps<T, Multiple> = $props()
 
   const id = $props.id()
   const field = useFieldControl()
@@ -187,8 +212,8 @@ Picks one value, or several with `multiple`, from a list in a popup.
     debug,
     onValueChange: (next: unknown, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      onValueChange?.(next as never, details)
+      if (!details.canceled) value = next as never
     },
     onOpenChange: (next: boolean, details: OpenDetails) => {
       onOpenChange?.(next, details)

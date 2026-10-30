@@ -332,8 +332,9 @@ const pending = new WeakMap<object, Map<string, { timer: ReturnType<typeof setTi
 
 /**
  * Warns when a controlled change was requested and the option it controls
- * still has the old value a moment later, like a controlled `open` the owner
- * never updates in `onOpenChange`.
+ * still has the old value a second later, like a controlled `open` the owner
+ * never updates in `onOpenChange`. A second leaves time for a navigation or
+ * a save that passes the value back once it's done.
  */
 function expectControlled(
   instance: object,
@@ -355,10 +356,10 @@ function expectControlled(
         : `for \`${info.key}\` ${JSON.stringify(info.value)}`
     const callback = callbackName(info.key, "Change")
     warn(
-      `asked ${asked} (\`${info.reason}\`, \`${info.source}\`), and \`${info.key}\` stayed ${JSON.stringify(before)}. Update it in \`${callback}\`, or call \`details.cancel()\` there to refuse.`,
+      `asked ${asked} (\`${info.reason}\`, \`${info.source}\`), and \`${info.key}\` stayed ${JSON.stringify(before)}. Update it in \`${callback}\`, right away even when a save or navigation follows, or call \`details.cancel()\` there to refuse.`,
       info,
     )
-  }, 200)
+  }, 1000)
   waiting.set(info.key, { timer, before })
 }
 

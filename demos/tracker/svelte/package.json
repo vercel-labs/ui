@@ -1,0 +1,36 @@
+{
+  "name": "tracker-svelte",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port ${TRACKER_PORT:-5601}",
+    "build": "vite build",
+    "build:review": "NODE_ENV=development TRACKER_REVIEW=1 vite build",
+    "preview": "vite preview --port ${TRACKER_PORT:-5601}",
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings"
+  },
+  "imports": {
+    "#lib/*": "./src/lib/*",
+    "#ui/*": "./src/lib/components/ui/*/index.ts"
+  },
+  "dependencies": {
+    "@lucide/svelte": "1.54.0",
+    "@ui-sdk/core": "workspace:*",
+    "@ui-sdk/svelte": "workspace:*",
+    "cn": "0.5.0",
+    "tracker-data": "workspace:*"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^6.0.0",
+    "@sveltejs/adapter-vercel": "^7.0.2",
+    "@sveltejs/kit": "^3.1.0",
+    "@sveltejs/vite-plugin-svelte": "catalog:",
+    "@tailwindcss/vite": "^4.3.3",
+    "svelte": "catalog:",
+    "svelte-check": "catalog:",
+    "tailwindcss": "^4.3.3",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}
