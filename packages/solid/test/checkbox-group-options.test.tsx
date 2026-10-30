@@ -47,3 +47,31 @@ test("grouped checkboxes show the group's value after the page of rows changes",
     "false",
   ])
 })
+
+test("a checkbox group disabled and named after mount disables and names its checkboxes", async () => {
+  const [disabled, setDisabled] = createSignal(false)
+  const [name, setName] = createSignal<string>()
+  dispose = render(
+    () => (
+      <form>
+        <CheckboxGroup aria-label="Toppings" disabled={disabled()} name={name()}>
+          <Checkbox value="cheese" aria-label="Cheese" />
+        </CheckboxGroup>
+      </form>
+    ),
+    document.body,
+  )
+  flush()
+  await new Promise((resolve) => setTimeout(resolve))
+  setDisabled(true)
+  setName("toppings")
+  flush()
+  await new Promise((resolve) => setTimeout(resolve))
+  const checkbox = document.querySelector('[role="checkbox"]')!
+  const input = document.querySelector<HTMLInputElement>('[data-slot="checkbox-input"]')!
+  expect([checkbox.getAttribute("aria-disabled"), input.disabled, input.name]).toEqual([
+    "true",
+    true,
+    "toppings",
+  ])
+})
