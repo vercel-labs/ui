@@ -179,6 +179,7 @@ export {
   type VirtualAlign,
   type VirtualItem,
   type Virtualizer,
+  type VirtualizerConnectOptions,
   type VirtualizerOptions,
 } from "./foundation/lists/virtualizer"
 export {
