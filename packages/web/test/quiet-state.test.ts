@@ -3,6 +3,7 @@
 // without events, like a native input's `value`. The `api` and people still fire them.
 import { beforeAll, expect, test } from "vitest"
 import type { UiToggleGroupElement } from "../src/events"
+import { defineAccordionElements } from "../src/accordion"
 import { defineToggleGroupElements } from "../src/toggle"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
@@ -47,4 +48,21 @@ test("the api and presses still fire events", async () => {
   group.api.setValue(["board"])
   group.querySelector<HTMLButtonElement>('ui-toggle[value="list"] button')!.click()
   expect(heard).toEqual([["board"], ["list"]])
+})
+
+test("setting an accordion's value fires no openchange on its items", async () => {
+  defineAccordionElements()
+  document.body.innerHTML = `<ui-accordion><ui-accordion-item value="a"><ui-accordion-header><h3><ui-accordion-trigger><button>A</button></ui-accordion-trigger></h3></ui-accordion-header><ui-accordion-panel>A</ui-accordion-panel></ui-accordion-item></ui-accordion>`
+  await wait()
+  const root = document.body.firstElementChild as HTMLElement & { value: string[] }
+  const item = root.firstElementChild!
+  const heard: string[] = []
+  item.addEventListener("openchange", (event) => {
+    heard.push("item")
+    event.preventDefault()
+  })
+  root.addEventListener("valuechange", () => heard.push("root"))
+  root.value = ["a"]
+  expect(root.value).toEqual(["a"])
+  expect(heard).toEqual([])
 })
