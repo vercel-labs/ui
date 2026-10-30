@@ -23,7 +23,7 @@ import {
   valueInputPart,
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
-import { flagWhileBound } from "../../foundation/kernel/bound-keys"
+import { flagWhileBound, settleFlag } from "../../foundation/kernel/bound-keys"
 import { itemIconsFeature, optionIcon, rememberIcon } from "../../foundation/lists/item-icon"
 import { enforceHidden } from "../../foundation/platform/style"
 import { itemTextPart, type ListItemTextProps } from "../../foundation/lists/listbox-search"
@@ -149,7 +149,11 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
   }),
 
   trigger: slot<SelectTriggerProps, SelectTriggerState>({
-    props: { disabled: "boolean" },
+    props: {
+      disabled: "boolean",
+      // Internal: passed by renderers. Select has no `field` slot, so no element attribute either.
+      named: { kind: "boolean", from: "field" },
+    },
     state: (state, { props }) => triggerState(state, props),
     attrs: (state, { id, props }) => {
       const { disabled, placeholder } = triggerState(state, props)
@@ -160,7 +164,9 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         "aria-haspopup": "listbox",
         "aria-expanded": String(state.open),
         "aria-controls": state.mounted ? `${id}-${state.listed ? "list" : "content"}` : undefined,
-        "aria-labelledby": state.labeled ? `${id}-label` : undefined,
+        // Until a SelectLabel is known to be missing, it names the trigger, unless something else does.
+        "aria-labelledby":
+          state.labeled || (state.labeled === null && !props.named) ? `${id}-label` : undefined,
         "aria-readonly": state.readOnly ? "true" : undefined,
         "aria-required": state.required ? "true" : undefined,
         disabled: disabled ? "" : undefined,
@@ -170,6 +176,8 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         "data-disabled": disabled ? "" : undefined,
       }
     },
+    // Settling that there's no label drops the reference without rendering the trigger again.
+    direct: direct(["aria-labelledby"]),
     on: {
       keydown: (event, { api, el }) => api.internal.onTriggerKeyDown(event, el),
       pointerdown(event, { api, el, props, store }) {
@@ -187,6 +195,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       else api.internal.show({ event, reason: "trigger-press" })
     },
     bind(el, { api, id, store }) {
+      settleFlag(store, "labeled")
       // A value whose label or icon only its item knows: render the list
       // hidden so the item registers, once the parts that render now have.
       if (!store.get().items && !api.internal.options().itemToLabel)
@@ -198,7 +207,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
           el,
           "The trigger has no accessible name. Add a SelectLabel, a Field label or an aria-label.",
           { component: "select", id },
-          () => store.get().labeled,
+          () => !!store.get().labeled,
         )
     },
   }),

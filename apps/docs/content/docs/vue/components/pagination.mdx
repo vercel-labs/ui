@@ -99,7 +99,17 @@ Render your router's link to page on the client. The pagination's click handler 
 Here the page comes from the URL, like your router's search params, so the pagination is
 [controlled](#controlled) by the route.
 
-Render the router's link with the `render` slot, like a `RouterLink` with `v-bind="props"`. It receives the part's props, `href` included.
+Render the router's link with the `render` slot. With Vue Router, use `RouterLink`'s `custom` form and bind the part's props to your own `<a>`, then its `navigate` after them. The pagination's click handler then runs first, and the link only marks the current page.
+
+```vue
+<PaginationLink :page="item">
+  <template #render="{ props, children }">
+    <RouterLink :to="props.href" custom v-slot="{ href, navigate }">
+      <a v-bind="props" :href="href" @click="navigate"><component :is="children" /></a>
+    </RouterLink>
+  </template>
+</PaginationLink>
+```
 
 <ComponentExample
   name="pagination/router"

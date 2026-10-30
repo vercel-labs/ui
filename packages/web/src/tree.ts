@@ -122,6 +122,8 @@ function defineTreeElements() {
       ],
       // Runs again whenever `items` or `paths` is set.
       render(el, { api }) {
+        const focused = el.ownerDocument.activeElement?.closest("ui-tree-item")
+        const keep = focused && el.contains(focused) ? focused.getAttribute("value") : null
         generated.get(el)?.forEach((child) => child.remove())
         generated.delete(el)
         // Items of its own, like rows a virtualized list renders, win over the data.
@@ -131,6 +133,8 @@ function defineTreeElements() {
         const fresh = renderItems(items, el.hasAttribute("checkable"), templateOf(el))
         generated.set(el, fresh)
         el.append(...fresh)
+        // Focus stays on the item that had it, now a new element.
+        if (keep !== null) api.focus(keep)
       },
     },
     // An item's parent is the item around it, and a group inside it makes it a branch.
