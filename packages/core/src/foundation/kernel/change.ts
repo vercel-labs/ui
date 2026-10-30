@@ -26,7 +26,8 @@ function changeFrom<Options, State extends object>(
   // a clamp, stands over the change that called it.
   const asked = new Map<string, number>()
   // The value each key is changing to while its callback runs. Asking for that
-  // same value from inside, like a view that renders it back, is the same change.
+  // same value from inside, like a view that renders it back, is the same
+  // change: it does nothing itself, so the outer change commits or cancels it.
   const changing = new Map<string, unknown>()
 
   // A controlled key's next options report the source of the change that asked for them.
@@ -52,7 +53,7 @@ function changeFrom<Options, State extends object>(
       [extra: string]: unknown
     },
   ) => {
-    if (changing.has(key) && sameValue(changing.get(key), value)) return true
+    if (changing.has(key) && sameValue(changing.get(key), value)) return false
     const ask = (asked.get(key) ?? 0) + 1
     asked.set(key, ask)
     const previous = store.get()[key]
