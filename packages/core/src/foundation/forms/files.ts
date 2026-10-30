@@ -188,7 +188,7 @@ const sizeUnits = ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte"] as co
 function formatFileSize(bytes: number, locale?: string) {
   let value = bytes
   let unit = 0
-  while (value >= 1000 && unit < sizeUnits.length - 1) {
+  while (Math.round(value) >= 1000 && unit < sizeUnits.length - 1) {
     value /= 1000
     unit++
   }
