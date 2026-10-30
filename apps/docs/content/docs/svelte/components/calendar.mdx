@@ -153,7 +153,7 @@ They update the first displayed month with the `select-change` reason. Their sta
 
 `locale` controls month names, weekday headers, and full date labels. Without it, Calendar uses the surrounding page’s `lang`, then the browser’s language. The first weekday follows the locale unless `weekStartsOn` overrides it. `weekdayFormat` accepts `"narrow"`, `"short"`, or `"long"`.
 
-Previous and Next have English accessible labels by default; replace their `aria-label` when translating them. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
+Previous and Next are named "Previous month" and "Next month". Pass `aria-label` to name them in another language. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
 
 <ComponentExample
   name="calendar/locale"

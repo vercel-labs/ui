@@ -132,6 +132,30 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
   )
 }
 
+// What names an element or hints how to type in it, which no behavior reads,
+// so the author's own value replaces the part's. Not `aria-describedby`, which
+// a field combines with the control's own.
+const authorOwned = new Set([
+  "aria-label",
+  "aria-labelledby",
+  "aria-description",
+  "title",
+  "autocomplete",
+  "autocapitalize",
+  "autocorrect",
+  "spellcheck",
+  "inputmode",
+])
+
+/** The part's attributes without the ones the author gives, for `given(name)` to say which. */
+function yieldToAuthor(attrs: Attrs, given: (name: string) => boolean) {
+  let result: Attrs | undefined
+  for (const name in attrs)
+    if (attrs[name] !== undefined && authorOwned.has(name) && given(name))
+      (result ??= { ...attrs })[name] = undefined
+  return result ?? attrs
+}
+
 /**
  * What `render` functions and state-based class names receive.
  * @stable
@@ -505,6 +529,7 @@ function composing(event: Event) {
 export {
   aliasReferences,
   attrs,
+  authorOwned,
   bind,
   commit,
   conditional,
@@ -528,4 +553,5 @@ export {
   takeOwnId,
   touched,
   view,
+  yieldToAuthor,
 }

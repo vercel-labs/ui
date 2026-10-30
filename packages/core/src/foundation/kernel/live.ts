@@ -1,6 +1,6 @@
 // Attributes core writes to a bound element itself, so a change to them
 // re-renders nothing: a slot's `live` attributes, and its `direct` ones.
-import { attrs, liveAttrs, subscribe } from "./part"
+import { attrs, authorOwned, liveAttrs, subscribe } from "./part"
 import type { Attrs, Part } from "./primitive-types"
 
 /**
@@ -70,8 +70,9 @@ const applied = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
 
 /**
  * Writes attributes and removes the ones a previous call wrote but this one
- * doesn't. Attributes it never wrote, like an author's own, stay, and so does
- * an id it didn't write. `channel` keeps render and live attributes, and two
+ * doesn't. Attributes it never wrote, like an author's own, stay, and so do
+ * an id and an author's name, description or typing hints it didn't write,
+ * like a translated `aria-label`. `channel` keeps render and live attributes, and two
  * components sharing one element (a tooltip on a popover's trigger), from
  * removing each other's.
  */
@@ -88,6 +89,13 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
   const id = written.has("id") || previous.has("id") ? el.getAttribute("id") : null
   const keeps = keepsId(id, channels, channel)
   if (keeps) written.delete("id")
+  for (const name of written.keys())
+    if (
+      authorOwned.has(name) &&
+      el.hasAttribute(name) &&
+      !Object.values(channels).some((wrote) => wrote.has(name))
+    )
+      written.delete(name)
   for (const name of previous.keys()) {
     if (written.has(name) || (name === "id" && keeps)) continue
     if (name.startsWith("style:")) el.style.removeProperty(name.slice(6))

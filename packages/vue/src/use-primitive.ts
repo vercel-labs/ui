@@ -24,6 +24,7 @@ import {
   subscribe,
   takeOwnId,
   unwatched,
+  yieldToAuthor,
 } from "@ui-sdk/core/renderer"
 import {
   computed,
@@ -109,15 +110,13 @@ function listenerProp(type: string) {
   return prop
 }
 
-// A part's attributes merged into the user's in one pass, as
-// `mergeProps(user, part)` would: the part's win, and classes and styles
-// combine. Attributes left undefined are absent, so they never replace a
-// value merged in, like a field's attributes on its control. An `id` the user
-// gives wins, and the parts rendered after it point at it, and every part once
-// the element binds.
+// A part's attributes merged into the user's in one pass, as `mergeProps(user, part)` would,
+// but for an `id` and what `yieldToAuthor` leaves to the user. Undefined attributes are
+// absent, so they never replace a value merged in, like a field's on its control.
 function mergeAttrs(result: Record<string, any>, attrs: Attrs) {
-  for (const key in attrs) {
-    const value = attrs[key]
+  const own = yieldToAuthor(attrs, (name) => result[name] != null)
+  for (const key in own) {
+    const value = own[key]
     if (value === undefined || (key === "id" && result.id != null)) continue
     if (key === "style")
       result.style = result.style ? normalizeStyle([result.style, styleObject(value)]) : styleObject(value)

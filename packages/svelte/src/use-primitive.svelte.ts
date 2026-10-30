@@ -26,6 +26,7 @@ import {
   subscribe,
   takeOwnId,
   touched,
+  yieldToAuthor,
 } from "@ui-sdk/core/renderer"
 import { onDestroy, untrack, type Snippet } from "svelte"
 import { createAttachmentKey, type Attachment } from "svelte/attachments"
@@ -426,11 +427,11 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       // Attachments merged in, like a control's own under a field's.
       for (const key of Object.getOwnPropertySymbols(attributes))
         result[key] = (attributes as SlotAttributes)[key]
-      // Attributes left undefined are absent, so they never replace a value
-      // merged in, like a field's attributes on its control. An `id` the user
-      // gives wins, and the parts rendered after it point at it, and every part
-      // once the element binds.
-      for (const [key, value] of Object.entries(rendered.attrs))
+      // Attributes left undefined are absent, so they never replace a value merged
+      // in, like a field's on its control. An `id` the user gives, and what
+      // `yieldToAuthor` leaves to the user, stay the user's.
+      const own = yieldToAuthor(rendered.attrs, (key) => attributes[key] != null)
+      for (const [key, value] of Object.entries(own))
         if (value !== undefined && !(key === "id" && attributes.id != null)) result[key] = value
       if ("style" in rendered.attrs)
         result.style = styleFor(mergeStyles(attributes.style, rendered.attrs.style))
