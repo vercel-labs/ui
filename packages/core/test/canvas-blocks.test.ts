@@ -205,7 +205,7 @@ describe("createViewport bindFindable", () => {
     const unbind = instance.api.viewport.bindFindable(surface)
     const spacer = surface.lastElementChild as HTMLElement
     expect(spacer.getAttribute("aria-hidden")).toBe("true")
-    expect(spacer.style).toMatchObject({ position: "absolute", left: "200000px", top: "200000px" })
+    expect(spacer.style).toMatchObject({ position: "absolute", visibility: "hidden" })
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
     expect(instance.api.viewport.style(state(instance))).toContain(
       "transform:translate(100000px,100000px) scale(1)",
@@ -294,15 +294,44 @@ describe("createViewport bindFindable", () => {
     })
     cleanups.push(instance.api.viewport.bindFindable(surface))
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    // While it can't scroll, the world isn't offset, so nothing is lost if it shows without a resize.
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(0px,0px)")
     shown = true
     resized!()
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(100000px,100000px)")
     // Hidden and shown again, the browser forgot the scroll; a scroll event then finds it at the origin.
     at.left = 0
     at.top = 0
     surface.dispatchEvent(new Event("scroll"))
     expect(instance.api.viewport.get()).toEqual({ x: 0, y: 0, zoom: 1 })
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+  })
+
+  test("right to left, the pane rests on the negative side, and the world follows", () => {
+    const { instance, surface } = mountCanvas()
+    const at = { left: 0, top: 0 }
+    // Right to left, scrollLeft runs from 0 down; a positive one clamps to 0.
+    Object.defineProperties(surface, {
+      scrollLeft: {
+        get: () => at.left,
+        set: (value: number) => (at.left = Math.min(0, value)),
+        configurable: true,
+      },
+      scrollTop: { get: () => at.top, set: (value: number) => (at.top = value), configurable: true },
+    })
+    const computed = window.getComputedStyle
+    vi.spyOn(window, "getComputedStyle").mockImplementation((el, pseudo) =>
+      el === surface ? ({ direction: "rtl" } as CSSStyleDeclaration) : computed(el, pseudo),
+    )
+    cleanups.push(() => vi.restoreAllMocks())
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([-100000, 100000])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(-100000px,100000px)")
+    // Toward something to the left: further negative.
+    scrollTo(surface, -100250, 100000)
+    expect(instance.api.viewport.get()).toEqual({ x: 250, y: 0, zoom: 1 })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([-100000, 100000])
   })
 
   test("a scroll clamped because the spacer went missing puts it back without panning", () => {

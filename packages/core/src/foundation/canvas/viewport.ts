@@ -91,8 +91,9 @@ function createViewport<State extends object>(
   let gesture: { center: { x: number; y: number }; distance: number; view: Viewport } | null = null
   let stop: (() => void) | undefined
   context.onDestroy(() => stop?.())
-  // The surface `bindFindable` keeps at rest, whose world `style` moves with it.
+  // The pane `bindFindable` keeps at rest, and where it rests, which the world's `style` offsets by.
   let findable: HTMLElement | undefined
+  let rested = { x: 0, y: 0 }
   const restyle = () => store.set({ [options.key]: { ...api.get() } } as Partial<State>)
 
   const api = {
@@ -326,8 +327,8 @@ function createViewport<State extends object>(
     /** The world element's `style`: one transform for every item, so panning lays nothing out. */
     style(state: State) {
       const { x, y, zoom } = (state[options.key] ?? { x: 0, y: 0, zoom: 1 }) as Viewport
-      const at = findable ? rest : 0
-      return `transform:translate(${x + at}px,${y + at}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
+      const at = findable ? rested : { x: 0, y: 0 }
+      return `transform:translate(${x + at.x}px,${y + at.y}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
     },
     /**
      * Turns the browser's scrolls inside `el` into pans, until the returned
@@ -340,19 +341,27 @@ function createViewport<State extends object>(
     bindFindable(el: HTMLElement) {
       const spacer = el.ownerDocument.createElement("div")
       spacer.setAttribute("aria-hidden", "true")
+      // On the pane's end side, which right to left puts on the left, so there's room to scroll toward.
       Object.assign(spacer.style, {
         position: "absolute",
-        left: `${rest * 2}px`,
-        top: `${rest * 2}px`,
+        insetInlineStart: `${rest * 2}px`,
+        insetBlockStart: `${rest * 2}px`,
         width: "1px",
         height: "1px",
         visibility: "hidden",
         pointerEvents: "none",
       })
+      // The world moves by where the pane really rests, which is nowhere while
+      // it can't scroll, like hidden in a closed tab, and negative right to left.
       const settle = () => {
         if (!spacer.isConnected) el.append(spacer)
-        el.scrollLeft = rest
+        const rtl = el.ownerDocument.defaultView?.getComputedStyle(el).direction === "rtl"
+        el.scrollLeft = rtl ? -rest : rest
         el.scrollTop = rest
+        const at = { x: el.scrollLeft, y: el.scrollTop }
+        if (at.x === rested.x && at.y === rested.y) return
+        rested = at
+        restyle()
       }
       // Focus scrolls as it moves, and the scroll arrives before the next frame.
       let focusing = false
@@ -364,15 +373,17 @@ function createViewport<State extends object>(
         // Without the spacer, like after a framework replaced the children, or
         // back at the origin, like after the pane was hidden, the rest was lost.
         if (!spacer.isConnected || (!el.scrollLeft && !el.scrollTop)) return settle()
-        const dx = el.scrollLeft - rest
-        const dy = el.scrollTop - rest
+        const dx = el.scrollLeft - rested.x
+        const dy = el.scrollTop - rested.y
         if (!dx && !dy) return
         settle()
         api.panBy(-dx, -dy, { reason: focusing ? "focus-in" : "find-in-page", event })
+        // Chrome ignores the reset during a find in page scroll; the rest takes it, and goes back once the scroll is done.
+        requestAnimationFrame(settle)
       }
       findable = el
+      rested = { x: 0, y: 0 }
       settle()
-      restyle()
       el.addEventListener("scroll", onScroll)
       el.addEventListener("focusin", onFocusIn)
       // A hidden pane, like in a closed tab or dialog, can't scroll: it rests once it shows, before it paints.
@@ -386,6 +397,7 @@ function createViewport<State extends object>(
         spacer.remove()
         if (findable !== el) return
         findable = undefined
+        rested = { x: 0, y: 0 }
         el.scrollLeft = 0
         el.scrollTop = 0
         restyle()
