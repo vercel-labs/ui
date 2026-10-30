@@ -146,10 +146,11 @@ type SelectController<T = string, Multiple extends boolean | undefined = false> 
  * `multiple` picks the shape of the value, and `Multiple` true requires it.
  * @stable
  */
-// A union on `multiple`, not a conditional type, so TypeScript infers `T`
-// through it and types `onValueChange` from whether `multiple` is set.
+// A union on `multiple`, so TypeScript infers `T` through it. The multiple side
+// comes first, so a list in a variable infers `T` as its items. A value that is
+// itself a list takes `items` or the type: `<Select<number[]>>`.
 type SelectOptions<T = string, Multiple extends boolean | undefined = false> = SelectSharedOptions<T> &
-  (SelectSingleOptions<T, Multiple> | SelectMultipleOptions<T, Multiple> | SelectEitherOptions<T, Multiple>)
+  (SelectMultipleOptions<T, Multiple> | SelectSingleOptions<T, Multiple> | SelectEitherOptions<T, Multiple>)
 
 /** The value options of a select that selects one item. `Multiple` true or `boolean` rules them out. */
 type SelectSingleOptions<T, Multiple> = {
@@ -293,6 +294,8 @@ type SelectTriggerProps = {
    * @defaultValue false
    */
   disabled?: boolean
+  /** @internal Whether a Field or its own `aria-labelledby` names the trigger. Set by each framework. */
+  named?: boolean
 }
 
 /**

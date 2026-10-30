@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `86c8795` (2026-10-29, the browser build and `web.js` loader in PR 25).
+Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
 
 ## Settled
 
@@ -17,6 +17,8 @@ Last reviewed: `86c8795` (2026-10-29, the browser build and `web.js` loader in P
 - **`web.js` loads by tag, from the folder beside it**, and imports each component once. A failed download isn't tried again: the browser keeps a failed module for its URL, so only a new URL could retry it, and that would load a second copy of shared code. (PR 25, 2026-10-29)
 - **The docs site serves each deploy's own build** as `<version>-g<commit>` until releases are published, so `/web@0.js` works before anything is on npm (shadcn 2026-10-29: no npm release yet). An exact version from a commit build lasts until the next deploy.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
+- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -32,6 +34,9 @@ Last reviewed: `86c8795` (2026-10-29, the browser build and `web.js` loader in P
 - **A closed shadow root, or one attached after its host was scanned**, is invisible to `web.js`. Load the component's own file there.
 - **Listed component files can mix releases** across a release boundary: each `web@0/<entry>.js` follows its own redirect. `web.js` doesn't, since it imports from one release.
 - **A `disabled` on the `<button>` inside a Number Input step part** is read once per button; toggling it on the same button later does nothing.
+- **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
+- **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
+- **A trigger slotted into a closed shadow root's scroller** waits for the slow check: `assignedSlot` is `null` there, so positioning can't find that root.
 
 ## Revisit
 

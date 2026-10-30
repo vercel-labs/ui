@@ -1,0 +1,6 @@
+export { default as SelectContent } from "./select-content.vue"
+export { default as SelectItem } from "./select-item.vue"
+export { default as SelectItemIcon } from "./select-item-icon.vue"
+export { default as SelectLabel } from "./select-label.vue"
+export { default as SelectTrigger } from "./select-trigger.vue"
+export { Select } from "@ui-sdk/vue/select"

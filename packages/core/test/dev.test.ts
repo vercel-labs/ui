@@ -132,11 +132,22 @@ describe("devtools hook", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     const instance = popover({ id: "p3", open: false })
     instance.api.open()
-    vi.advanceTimersByTime(500)
+    vi.advanceTimersByTime(1500)
     expect(warn).toHaveBeenCalledTimes(1)
     expect(String(warn.mock.calls[0][0])).toContain(
       "popover#p3: asked to open (`imperative`, `programmatic`)",
     )
+  })
+
+  test("a controlled value passed back after a slow navigation doesn't warn", () => {
+    vi.useFakeTimers()
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const instance = popover({ id: "p5", open: false })
+    instance.api.open()
+    vi.advanceTimersByTime(600)
+    instance.setOptions({ id: "p5", open: true })
+    vi.advanceTimersByTime(1500)
+    expect(warn).not.toHaveBeenCalled()
   })
 
   test("a controlled value passed back doesn't warn", () => {
@@ -145,7 +156,7 @@ describe("devtools hook", () => {
     const instance = popover({ id: "p4", open: false })
     instance.api.open()
     instance.setOptions({ id: "p4", open: true })
-    vi.advanceTimersByTime(500)
+    vi.advanceTimersByTime(1500)
     expect(warn).not.toHaveBeenCalled()
   })
 

@@ -5,7 +5,7 @@ const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-scroll-area class="group h-72 w-56 rounded-2xl border border-border">
-      <ui-scroll-area-viewport aria-label="Releases" class="size-full rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none">
+      <ui-scroll-area-viewport role="region" aria-label="Releases" class="size-full rounded-[inherit] outline-none transition-[color,box-shadow] focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none">
         <ui-scroll-area-content class="p-4 pb-10 text-sm">
           ${tags.map((tag) => `<p class="py-1.5">${tag}</p>`).join("")}
         </ui-scroll-area-content>

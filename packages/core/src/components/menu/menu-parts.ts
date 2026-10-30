@@ -1,6 +1,7 @@
 import { dev, warn } from "#dev"
 import { checkName } from "#name-check"
 import { keyWhileBound } from "../../foundation/kernel/bound-keys"
+import { opensElsewhere } from "../../foundation/platform/button"
 import { isRTL } from "../../foundation/platform/env"
 import { ariaKeyshortcuts } from "../../foundation/platform/platform"
 import { popupContentAttrs, popupTriggerAttrs } from "../../foundation/popups/popup"
@@ -10,7 +11,7 @@ import { animateIn } from "../../foundation/motion/presence"
 import { labelOf } from "../../foundation/text/typeahead"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { checkedAttrs, openAttrs } from "../../foundation/kernel/attrs"
-import { selectEvent } from "../../foundation/kernel/events"
+import { on, selectEvent } from "../../foundation/kernel/events"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { adoptPlatform } from "../../foundation/shortcuts/shortcut-slot"
 import { shortcuts as shortcutManager } from "../../foundation/shortcuts/shortcuts"
@@ -356,13 +357,18 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     bind(el, { api, key, props, id }) {
       if (dev && !props.label && !labelOf(el).trim())
         warn("An item has no text. Pass a label so typeahead can find it.", { component: "menu", id })
-      return api.internal.register(el, {
-        key,
-        kind: "item",
-        label: () => ((api.itemProps("item", key) ?? props) as ItemProps).label ?? labelOf(el),
-        disabled: () => el.getAttribute("aria-disabled") === "true",
-        activate: (event) => activateItem(api, api.itemProps("item", key) ?? props, event),
-      })
+      const current = () => (api.itemProps("item", key) ?? props) as ItemProps
+      const cleanups = [
+        on(el, "click", (event) => linkClick(api, current, el, event)),
+        api.internal.register(el, {
+          key,
+          kind: "item",
+          label: () => current().label ?? labelOf(el),
+          disabled: () => el.getAttribute("aria-disabled") === "true",
+          activate: (event) => activateItem(api, current(), event),
+        }),
+      ]
+      return () => cleanups.forEach((cleanup) => cleanup())
     },
   }),
 
@@ -635,9 +641,12 @@ function firstItemOffset(el: HTMLElement) {
   return (parseFloat(style.paddingTop) || 0) + (parseFloat(style.borderTopWidth) || 0)
 }
 
-function activateItem(api: MenuApi, props: ItemProps, event?: Event) {
+// Clicks an item already took, so its link listener leaves them alone.
+const taken = new WeakSet<Event>()
+
+function activateItem(api: MenuApi, props: ItemProps, event?: Event, selection = event ?? selectEvent()) {
   if (props.disabled) return
-  const selection = event ?? selectEvent()
+  if (event) taken.add(event)
   props.onSelect?.(selection)
   // Keeps the menu open, whether the item was clicked, pressed or chosen with a key.
   if (selection.defaultPrevented) return
@@ -646,6 +655,18 @@ function activateItem(api: MenuApi, props: ItemProps, event?: Event) {
     return
   }
   api.action(props.value, event)
+}
+
+// A router can call `preventDefault()` on a link's click before the item's
+// handler, which then skips it. Once the click has reached the window, after
+// React's handlers too, this still selects; `onSelect` gets its own event.
+function linkClick(api: MenuApi, props: () => ItemProps, el: HTMLElement, event: Event) {
+  if (!el.matches("a[href]") || opensElsewhere(event, el)) return
+  const done = (last: Event) => {
+    if (last === event && event.defaultPrevented && !taken.has(event))
+      activateItem(api, props(), event, selectEvent())
+  }
+  el.ownerDocument.defaultView?.addEventListener("click", done, { once: true })
 }
 
 function toggleCheckbox(api: MenuApi, props: CheckboxProps, event?: Event) {
