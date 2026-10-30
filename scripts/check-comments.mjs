@@ -49,8 +49,11 @@ function checkCommentLength() {
 }
 
 function checkExampleComments() {
-  const files = git("ls-files", "-z", "examples").split("\0")
-  for (const file of files.filter((file) => exampleCode.test(file) && sourceFile.test(file))) {
+  const files = git("ls-files", "-z", "--cached", "--others", "--exclude-standard", "examples").split("\0")
+  const examples = files.filter(
+    (file) => exampleCode.test(file) && sourceFile.test(file) && existsSync(path.join(root, file)),
+  )
+  for (const file of examples) {
     for (const comment of commentsOf(file)) {
       violations.push({
         file,
