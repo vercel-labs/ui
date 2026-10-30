@@ -55,9 +55,8 @@ function direct(names: readonly string[]) {
         const values = attrs(part)
         for (const name of names) {
           const value = values[name]
-          const current = el.getAttribute(name)
-          if (value === undefined) current === (last[name] ?? null) && el.removeAttribute(name)
-          else if (current !== value) el.setAttribute(name, value)
+          if (value !== undefined) el.getAttribute(name) !== value && el.setAttribute(name, value)
+          else if (last[name] !== undefined && el.getAttribute(name) === last[name]) el.removeAttribute(name)
         }
         last = values
       })
