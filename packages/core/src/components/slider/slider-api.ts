@@ -14,6 +14,7 @@ import {
 import { localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { sameValue } from "../../foundation/kernel/store"
+import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { SliderChangeOptions, SliderOptions, SliderValueChangeReason } from "./slider"
 import {
   fractionAlong,
@@ -326,6 +327,14 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
       },
     },
   }
+
+  // New bounds clamp an uncontrolled value, without a change event, like a native range.
+  deriveFromOptions(context, ["value"], (synced, state, arriving) => {
+    const { min, max } = bounds(arriving)
+    if (arriving.value !== undefined || !(min <= max)) return
+    const value = normalized(state.value, arriving)
+    if (!sameValue(value, state.value)) return { value }
+  })
 
   // Each thumb's value by index follows the value, before any part hears it changed.
   let valueShown = store.get().value

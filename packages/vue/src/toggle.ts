@@ -8,12 +8,22 @@ import {
   type ToggleGroupValueChangeReason,
   type TogglePressedChangeReason,
 } from "@ui-sdk/core/toggle"
-import { defineComponent, type PropType } from "vue"
+import { defineComponent, inject, provide, type InjectionKey, type PropType } from "vue"
 import { useToolbarScope } from "./toolbar-context"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, orModel, usePart, usePrimitive, useScope, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 const parts = createParts(togglePrimitive, { icon: "span" })
+
+// The group's own key, so a toggle can join a group without bundling it.
+const ToggleGroupKey: InjectionKey<PrimitiveHandle<typeof toggleGroupPrimitive>> = Symbol("toggle-group")
 
 /**
  * A button that stays pressed. Inside a ToggleGroup, the group decides whether it's pressed.
@@ -41,7 +51,7 @@ const Toggle = withElement(
     },
     slots: Object as PartSlots<typeof togglePrimitive, "root">,
     setup(props, { emit }) {
-      const group = useScope(toggleGroupPrimitive)?.handle
+      const group = inject(ToggleGroupKey, null)
       const toolbar = useToolbarScope()
       const toggle = usePrimitive(togglePrimitive, () => ({
         pressed: orModel(props.pressed, props.modelValue),
@@ -77,9 +87,9 @@ const ToggleIcon = parts.Icon
  * Toggles that share one value, with one tab stop and arrow keys between them.
  * @stable
  */
-const ToggleGroup = withElement(
+const ToggleGroup = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ToggleGroup",
     inheritAttrs: false,
     props: {
@@ -121,6 +131,7 @@ const ToggleGroup = withElement(
           emit("update:modelValue", value)
         },
       }))
+      provide(ToggleGroupKey, group)
       return usePart(group, "group", undefined, undefined, "div")
     },
   }),

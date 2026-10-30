@@ -23,6 +23,14 @@ let unlisten = idle
 const wakeOutside = (event: Event) =>
   wakers.forEach((popup, wake) => (event.target instanceof Node && popup?.contains(event.target)) || wake())
 
+const wakeOnChanges = (records: MutationRecord[]) =>
+  wakers.forEach(
+    (popup, wake) =>
+      records.some(
+        (record) => record.attributeName != "aria-activedescendant" && !popup?.contains(record.target),
+      ) && wake(),
+  )
+
 function listen() {
   const listening = new AbortController()
   // The capture phase, so events that don't bubble count too: element
@@ -40,18 +48,67 @@ function listen() {
   ] as const
   for (const [target, types] of targets)
     for (const type of types) target?.addEventListener(type, wakeOutside, options)
-  const changes = new MutationObserver((records) =>
-    wakers.forEach(
-      (popup, wake) =>
-        records.some(
-          (record) => record.attributeName != "aria-activedescendant" && !popup?.contains(record.target),
-        ) && wake(),
-    ),
-  )
+  const changes = new MutationObserver(wakeOnChanges)
   changes.observe(document, { subtree: true, childList: true, attributes: true, characterData: true })
   return () => {
     listening.abort()
     changes.disconnect()
+  }
+}
+
+// Scrolls, loads, animations and changes inside a shadow root never reach the
+// document's listeners, so each root an anchor renders in gets its own.
+const roots = new Map<Node, { count: number; stop: () => void }>()
+
+function listenIn(root: Node) {
+  const listening = new AbortController()
+  const options = { capture: true, passive: true, signal: listening.signal }
+  for (const type of ["scroll", "load", "transitionstart", "animationstart"])
+    root.addEventListener(type, wakeOutside, options)
+  const changes = new MutationObserver(wakeOnChanges)
+  changes.observe(root, { subtree: true, childList: true, attributes: true, characterData: true })
+  return () => {
+    listening.abort()
+    changes.disconnect()
+  }
+}
+
+/**
+ * The shadow roots `node` renders in, walking up through the slots it's
+ * assigned to: a light DOM node slotted into a scroller inside a shadow root
+ * moves with that scroller, though its own root is the document.
+ */
+function shadowRootsAround(node: Node) {
+  const found: Node[] = []
+  for (let at: Node | null = node; at;) {
+    // A shadow root is the only fragment with a host. Checked by shape, since
+    // `instanceof ShadowRoot` fails for nodes from another window.
+    if (at.nodeType === 11 && "host" in at) {
+      found.push(at)
+      at = (at as ShadowRoot).host
+    } else at = (at as Element).assignedSlot ?? at.parentNode
+  }
+  return found
+}
+
+/**
+ * Wakes every open popup on what moves inside `shadowRoots`, until the
+ * returned cleanup runs.
+ */
+function watchShadowRoots(shadowRoots: Node[]) {
+  const watched = [...shadowRoots]
+  for (const root of watched) {
+    const entry = roots.get(root) ?? { count: 0, stop: listenIn(root) }
+    entry.count++
+    roots.set(root, entry)
+  }
+  return () => {
+    for (const root of watched.splice(0)) {
+      const entry = roots.get(root)!
+      if (--entry.count) continue
+      entry.stop()
+      roots.delete(root)
+    }
   }
 }
 
@@ -74,4 +131,4 @@ function watchMoves(wake: () => void, popup?: Element) {
   }
 }
 
-export { watchMoves }
+export { shadowRootsAround, watchMoves, watchShadowRoots }

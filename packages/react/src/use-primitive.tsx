@@ -422,6 +422,27 @@ function carried(primitive: Primitive, instance: PrimitiveInstance, options: Rec
   return defaults
 }
 
+const heldRefs = new WeakMap<Part, (el: HTMLElement | null) => void>()
+
+// React detaches and attaches an element again when its ref changes, like an
+// inline callback ref the app passes, so a part lets go of its element a
+// microtask later, unless it attached again by then.
+function heldRef(part: Part) {
+  let held = heldRefs.get(part)
+  if (held) return held
+  const bindTo = ref(part, host)
+  let releasing = false
+  held = (el) => {
+    releasing = !el
+    if (el) return bindTo(el)
+    queueMicrotask(() => {
+      if (releasing) bindTo(null)
+    })
+  }
+  heldRefs.set(part, held)
+  return held
+}
+
 // The slot's attributes win over the user's props, but for an `id` and what
 // `yieldToAuthor` leaves to the user. The user's handlers run first and can
 // call preventDefault() to skip the built-in behavior.
@@ -443,7 +464,7 @@ function elementProps(part: Part, props: unknown, user: Record<string, any>, sta
   )
   return mergeProps(handlers, user, toReactProps(own), {
     id: user.id,
-    ref: ref(part, host),
+    ref: heldRef(part),
   })
 }
 
@@ -730,6 +751,8 @@ function usePart<P extends Primitive, S extends SlotName<P>, T extends Tag = "di
   const state = usePartState(owner, slot as never, slotProps as never, provided.shown)
   // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
   const part = owner.instance.part(slot, slotProps, true)
+  // Removed with its component, a part lets go in this commit, not a microtask later.
+  React.useLayoutEffect(() => () => ref(part, host)(null), [part])
   // An id on a `render` element wins its merge, so the part takes that one as
   // it renders. A render function's can't be read until it runs.
   const renderId = React.isValidElement<{ id?: string }>(render) ? render.props.id : undefined

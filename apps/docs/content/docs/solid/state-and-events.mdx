@@ -47,6 +47,8 @@ export { Example }
 
 Clicking Bold changes both the button and the output. If the callback does not update the signal, the toggle keeps its current value.
 
+To keep a value in the URL, set the signal in the callback, then navigate. A value that changes only when the navigation finishes leaves the component showing the old one until then, and logs a warning in development.
+
 Other components use `open` and `onOpenChange`, or `value` and `onValueChange`. Keep signal and prop reads reactive; read them in JSX or a getter rather than saving their current value in a variable.
 
 ## Respond to a Change

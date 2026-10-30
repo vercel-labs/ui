@@ -85,29 +85,39 @@ function useAuthor() {
 
 function Thread({ comments }: { comments: Comment[] }) {
   const [, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
   return (
-    <ul aria-label="Comments here" className="flex max-h-64 flex-col overflow-auto border-b border-border">
-      {comments.map((comment) => (
-        <li key={comment.id} className="group flex gap-2 px-3 py-2.5">
-          <Avatar name={comment.author} />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 text-[11px]">
-              <span className="font-medium">{comment.author}</span>
-              <span className="text-muted-foreground">{ago(comment.createdAt)}</span>
-              <button
-                type="button"
-                aria-label="Delete comment"
-                onClick={() => startTransition(() => removeComment(comment.id))}
-                className="ms-auto flex size-5 items-center justify-center rounded text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100"
-              >
-                <Trash2 aria-hidden="true" className="size-3" />
-              </button>
+    <>
+      {error && (
+        <p role="alert" className="px-3 pt-2 text-[11px] text-red-600">
+          {error}
+        </p>
+      )}
+      <ul aria-label="Comments here" className="flex max-h-64 flex-col overflow-auto border-b border-border">
+        {comments.map((comment) => (
+          <li key={comment.id} className="group flex gap-2 px-3 py-2.5">
+            <Avatar name={comment.author} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 text-[11px]">
+                <span className="font-medium">{comment.author}</span>
+                <span className="text-muted-foreground">{ago(comment.createdAt)}</span>
+                <button
+                  type="button"
+                  aria-label="Delete comment"
+                  onClick={() =>
+                    startTransition(async () => setError((await removeComment(comment.id)).error))
+                  }
+                  className="ms-auto flex size-5 items-center justify-center rounded text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100"
+                >
+                  <Trash2 aria-hidden="true" className="size-3" />
+                </button>
+              </div>
+              <p className="text-[13px] whitespace-pre-wrap">{comment.body}</p>
             </div>
-            <p className="text-[13px] whitespace-pre-wrap">{comment.body}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </>
   )
 }
 
@@ -126,6 +136,7 @@ function CommentCard({
 }) {
   const [body, setBody] = useState("")
   const [pending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
   const { author, asking, setAsking, change } = useAuthor()
   const authorInput = useRef<HTMLInputElement>(null)
   const thread = spot ? comments.filter((comment) => sameRange(comment, spot)) : []
@@ -139,7 +150,7 @@ function CommentCard({
     }
     const path = new URLSearchParams(window.location.search).get("path") ?? "/"
     startTransition(async () => {
-      await addComment({
+      const result = await addComment({
         framework,
         file: spot.file,
         line: spot.line,
@@ -149,6 +160,8 @@ function CommentCard({
         author,
         body,
       })
+      setError(result.error)
+      if (result.error) return
       setBody("")
       setAsking(false)
     })
@@ -239,6 +252,11 @@ function CommentCard({
               {thread.length > 0 ? "Reply" : "Comment"}
             </button>
           </div>
+          {error && (
+            <p role="alert" className="text-[11px] text-red-600">
+              {error}
+            </p>
+          )}
         </form>
       </PopoverContent>
     </Popover>

@@ -337,6 +337,18 @@ test.describe("submenu with a pointer", () => {
     await page.mouse.move(open.x + 12, open.y + open.height / 2, { steps: 8 })
     await expect(menuNamed(page, "Share")).toBeHidden()
   })
+
+  test("leaving the menu from the submenu trigger before it opens keeps the submenu closed", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const menu = (await menuNamed(page, "File").boundingBox())!
+    await page.mouse.move(share.x + 12, share.y + share.height / 2)
+    await page.mouse.move(menu.x - 40, share.y + share.height / 2, { steps: 2 })
+    await page.waitForTimeout(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+  })
 })
 
 test.describe("positioning", () => {

@@ -26,11 +26,12 @@ const DescribedKey = Symbol("field-described")
 const useField = () => getContext<FieldContext | undefined>(FieldKey)
 
 // Checks a part outside a field once it's in the page. Made once, so Svelte
-// attaches each element once.
-const outsideChecks: Partial<Record<FieldOutsideSlot, SlotAttributes>> = {
+// attaches each element once, and in a pure call, so a control that only
+// imports useFieldControl doesn't bundle the checks.
+const outsideChecks: Partial<Record<FieldOutsideSlot, SlotAttributes>> = /* @__PURE__ */ (() => ({
   label: { [createAttachmentKey()]: (el: HTMLElement) => checkFieldOutside(el, "label") },
   control: { [createAttachmentKey()]: (el: HTMLElement) => checkFieldOutside(el, "control") },
-}
+}))()
 
 // A part outside any Field: a plain element with no field wiring, so a
 // FieldLabel is a native <label> that labels the control it wraps.

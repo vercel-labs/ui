@@ -252,10 +252,10 @@ type ComboboxSharedOptions<T> = PortalProps & {
   /** Whether an item's value is the selected value, for object values that aren't the same object. */
   isItemEqualToValue?: (itemValue: T, value: T) => boolean
   /**
-   * Whether the first matching item is highlighted while typing, so Enter chooses it.
+   * Whether the first matching item is highlighted while typing, so Enter chooses it. `"always"` also highlights the selected item, or the first, when the list opens, so arrows move from there.
    * @defaultValue false
    */
-  autoHighlight?: boolean
+  autoHighlight?: boolean | "always"
   /**
    * With `multiple`, whether the input keeps its text after an item is chosen.
    * @defaultValue false
@@ -616,7 +616,8 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
     itemToValue: "value",
     itemToLabel: "value",
     isItemEqualToValue: "value",
-    autoHighlight: "boolean",
+    autoHighlight: (attribute: string | null) =>
+      attribute === null ? undefined : attribute === "always" ? "always" : attribute !== "false",
     keepQuery: "boolean",
     allowCustomValue: "boolean",
     status: "string",

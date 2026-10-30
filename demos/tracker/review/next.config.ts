@@ -22,6 +22,18 @@ const config: NextConfig = {
       "../../../packages/*/src/**/*",
     ],
   },
+  // A visit to the domain root opens the review app; the preview iframe still gets the tracker.
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/review",
+        basePath: false,
+        permanent: false,
+        has: [{ type: "header", key: "sec-fetch-dest", value: "document" }],
+      },
+    ]
+  },
   async rewrites() {
     const available = availableFrameworks()
     return {
