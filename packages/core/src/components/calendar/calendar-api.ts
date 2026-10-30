@@ -327,8 +327,11 @@ function calendarApi<
     // Unavailable dates stay focusable, as the date picker pattern asks; they just can't be picked.
     disabled: (day) => blockedDate(store.get(), day.key),
     // Days of the months around a grid show it, but focus moves through each grid's own.
+    // A focused day that becomes disabled keeps focus until the arrow keys move it.
     focusable: (day) =>
-      !isDisabled(store.get()) && !isOutside(store.get(), day.props) && !disabledDate(store.get(), day.key),
+      !isDisabled(store.get()) &&
+      !isOutside(store.get(), day.props) &&
+      (!disabledDate(store.get(), day.key) || day.key === store.get().focused),
     preferred: (day) => day.key === preferredDate(store.get()),
     claims: (state, day) => !isOutside(state, day.props) && day.key === preferredDate(state),
     move: (event, { from, rtl }) => {

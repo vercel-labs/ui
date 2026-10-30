@@ -455,6 +455,22 @@ describe("calendar", () => {
     expect(instance.api.getValue()).toBe("2026-10-16")
   })
 
+  test("arrow keys still move from a focused day that disabledDates disables", async () => {
+    const { day, press, focused, instance } = mount({ defaultValue: "2026-10-16" })
+    await tick()
+    day("2026-10-16").focus()
+    instance.setOptions({
+      id: "c",
+      today: "2026-10-16",
+      defaultValue: "2026-10-16",
+      disabledDates: ["2026-10-16"],
+    })
+    await tick()
+    press("ArrowRight")
+    await tick()
+    expect(focused()).toBe("2026-10-17")
+  })
+
   test("disabled dates take no tab stop, can't be picked, and arrow keys pass over them", async () => {
     const { day, press, focused, stops, instance } = mount({
       defaultValue: "2026-10-16",
