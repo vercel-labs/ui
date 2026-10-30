@@ -62,3 +62,25 @@ test("items appended while open leave a highlight the user moved", async () => {
   await settle()
   expect(combo.state.highlighted).toBe("Blueberry")
 })
+
+test("results that keep the first match's item still move the highlight to the new first match", async () => {
+  const combo = view({ items: ["Apple", "Apricot"], autoHighlight: true })
+  await combo.type("ap")
+  await settle()
+  expect(combo.state.highlighted).toBe("Apple")
+  combo.api.internal.store.set({ items: ["Apex", "Apple"] })
+  await settle()
+  expect(combo.state.highlighted).toBe("Apex")
+})
+
+test("a highlight the user moved back to the first match stays as results arrive", async () => {
+  const combo = view({ items: ["Banana", "Blueberry"], autoHighlight: true })
+  await combo.type("b")
+  await settle()
+  await combo.keys("ArrowDown")
+  await combo.keys("ArrowUp")
+  expect(combo.state.highlighted).toBe("Banana")
+  combo.api.internal.store.set({ items: ["Bacon", "Banana", "Blueberry"] })
+  await settle()
+  expect(combo.state.highlighted).toBe("Banana")
+})

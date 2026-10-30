@@ -195,8 +195,9 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   let committing = false
   // The highlight to place once the list has mounted, after an arrow key opened it.
   let pendingHighlight: "first" | "last" | null = null
-  // The highlight `autoHighlight` placed last.
+  // The highlight `autoHighlight` placed last, until anything else moves it.
   let placed: string | null = null
+  let settling = false
 
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
   const inputElement = () => element("input")
@@ -403,9 +404,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     const kept = current !== null && listbox.entries().some((entry) => entry.key === current)
     const target = autoTarget()
     const follows = target !== undefined && (fresh || !kept || current === placed)
-    if (follows) placed = target
     const next = follows ? target : kept ? current : null
-    if (next !== current) listbox.highlight(next)
+    settling = true
+    try {
+      if (next !== current) listbox.highlight(next)
+    } finally {
+      settling = false
+    }
+    if (follows) placed = target
   }
 
   function choose(key: string, event?: Event) {
@@ -620,6 +626,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
         pendingHighlight = null
         if (!store.get().focusInList) {
           if (options().autoHighlight === "always") settleHighlight(false)
+          else if (target === "first" && options().autoHighlight && filterQuery()) settleHighlight()
           else if (target) listbox.move(target)
           // In a sheet the input moved into its header, and loses focus on
           // the way if the sheet showed later. It takes focus back here.
@@ -675,6 +682,13 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     const label = selection.labelOf(first)
     if (query === toKey(first) && label !== query) store.set({ query: label })
   }
+
+  let highlighted = store.get().highlighted
+  store.subscribe(() => {
+    if (store.get().highlighted === highlighted) return
+    highlighted = store.get().highlighted
+    if (!settling) placed = null
+  })
 
   let listed = { items: store.get().items, mounts: store.get().mounts }
   store.subscribe(() => {
