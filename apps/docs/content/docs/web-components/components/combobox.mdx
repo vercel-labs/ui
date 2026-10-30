@@ -319,6 +319,8 @@ The selection, text, and popup have separate values:
 
 Read or write the element’s properties and listen for these events. Call `preventDefault()` on a change event to reject it. Choosing an item writes its label into the input; closing without choosing restores that label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
 
+Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, call `preventDefault()` on that `openchange`.
+
 ### Controller
 
 Use the element’s `api`. It can read or set the value and query, open or close the list, and focus the input. `open()` resolves when the list closes with its reason and source, including `unmount`; pass an abort signal to close it on cancellation. [Controllers](../controllers) covers lifetime and setup.
