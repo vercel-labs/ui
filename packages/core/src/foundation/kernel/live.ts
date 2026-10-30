@@ -104,7 +104,7 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
     if (!authorOwned.has(name)) continue
     const current = el.getAttribute(name)
     read.set(name, current)
-    if (current === null || current === written.get(name)) continue
+    if (current === null || current === written.get(name) || copied(name, current)) continue
     if (!Object.values(channels).some((wrote) => wrote.get(name) === current)) authors.add(name)
   }
   for (const name of authors) written.delete(name)
@@ -127,6 +127,10 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
   channels[channel] = written
   applied.set(el, channels)
 }
+
+// A label reference only to ids ui-sdk made, like one a copied component carries, isn't the author's.
+const copied = (name: string, value: string) =>
+  name === "aria-labelledby" && value.split(/\s+/).every((id) => id.startsWith("ui-sdk-"))
 
 // An id a channel didn't write stays: an author's, a script's, or another
 // component's on the same element. The exception is an id ui-sdk made (every

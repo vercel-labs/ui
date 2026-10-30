@@ -258,3 +258,10 @@ test("a trigger menu points its editor at an option's author id", async () => {
   instance.destroy()
   document.body.replaceChildren()
 })
+
+test("writing attributes replaces a label reference to an id ui-sdk made, like one a copied element carries", () => {
+  const copy = element()
+  copy.setAttribute("aria-labelledby", "ui-sdk-tabs-1-tab-a")
+  applyAttrs(copy, { "aria-labelledby": "ui-sdk-tabs-4-tab-a" })
+  expect(copy.getAttribute("aria-labelledby")).toBe("ui-sdk-tabs-4-tab-a")
+})
