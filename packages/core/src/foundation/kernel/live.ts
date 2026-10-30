@@ -47,15 +47,21 @@ function direct(names: readonly string[]) {
   return {
     names,
     /** Keeps the attributes current on `el` on every change the part hears. Returns the cleanup. */
-    attach: (part: Part, el: HTMLElement) =>
-      subscribe(part, () => {
+    attach: (part: Part, el: HTMLElement) => {
+      // What the part last had, so dropping a value removes only that, not
+      // one the framework merged in, like a Field's label on a trigger.
+      let last = attrs(part)
+      return subscribe(part, () => {
         const values = attrs(part)
         for (const name of names) {
           const value = values[name]
-          if (value === undefined) el.removeAttribute(name)
-          else if (el.getAttribute(name) !== value) el.setAttribute(name, value)
+          const current = el.getAttribute(name)
+          if (value === undefined) current === (last[name] ?? null) && el.removeAttribute(name)
+          else if (current !== value) el.setAttribute(name, value)
         }
-      }),
+        last = values
+      })
+    },
   }
 }
 

@@ -35,7 +35,7 @@
     controls: (key) => owner.controls(key),
   })
   const field = useFieldControl()
-  const trigger = useHandlePart(() => owner, "trigger", () => ({ disabled }))
+  const trigger = useHandlePart(() => owner, "trigger", () => ({ disabled, field: !!field }))
   const control = field?.control(
     () => rest.id as string | undefined,
     () => rest["aria-describedby"],

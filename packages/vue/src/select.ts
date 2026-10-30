@@ -223,7 +223,7 @@ const SelectTrigger = withElement(
       return useConnectedPart(
         connected,
         (select) =>
-          usePart(select, "trigger", () => ({ disabled: props.disabled }), undefined, {
+          usePart(select, "trigger", () => ({ disabled: props.disabled, field: !!field }), undefined, {
             tag: "button",
             // Its content, or without any, the value.
             children: (state) => slotContent(slots.default, { state }) ?? h(SelectValue),

@@ -293,6 +293,8 @@ type SelectTriggerProps = {
    * @defaultValue false
    */
   disabled?: boolean
+  /** @internal Whether a Field names the trigger. Set by each framework. */
+  field?: boolean
 }
 
 /**
