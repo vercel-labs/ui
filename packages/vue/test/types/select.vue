@@ -15,6 +15,7 @@ const fruit = ref<Fruit | null>(null)
 const ids = ref<string[]>([])
 const picked = (next: Fruit | null) => next?.id
 const count = ref(0)
+const several = ref(false)
 </script>
 
 <template>
@@ -26,6 +27,10 @@ const count = ref(0)
   <Select v-model="count" :items="['apple', 'pear']" />
   <!-- @vue-expect-error A multiple select's value is a list. -->
   <Select v-model="name" multiple :items="['apple', 'pear']" />
+  <!-- @vue-expect-error A multiple select's value is a list. -->
+  <Select multiple :value="name" />
+  <Select :multiple="several" :value="name" />
+  <Select :multiple="several" :value="ids" />
   <Select>
     <SelectValue v-slot="{ state }">{{ state.placeholder }}</SelectValue>
     <SelectItem :value="apple">Apple</SelectItem>

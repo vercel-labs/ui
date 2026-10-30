@@ -45,9 +45,9 @@ type ListboxComponent = {
   new <T = string>(
     props: RootPropsOf<ListboxProps<T, true>, "div">,
   ): RootInstanceOf<ListboxProps<T, true>, ListboxRootState, "div">
-  new <T = string>(
-    props: RootPropsOf<ListboxProps<T, boolean>, "div">,
-  ): RootInstanceOf<ListboxProps<T, boolean>, ListboxRootState, "div">
+  new <T = string, Multiple extends boolean = boolean>(
+    props: RootPropsOf<ListboxProps<T, Multiple>, "div">,
+  ): RootInstanceOf<ListboxProps<T, Multiple>, ListboxRootState, "div">
 } & RenderableWith<ListboxProps<any, boolean | undefined>, ListboxRootState, "div">
 
 /**
