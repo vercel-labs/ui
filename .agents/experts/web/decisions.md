@@ -15,6 +15,8 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Button parts wrap a written `<button>`** (shadcn 2026-10-29). A custom element can't be a native button and Safari has no customized built-ins, so the package never creates the button for the user.
 - **The instance is private.** An owner element's public surface is `api`, the controller's methods, plus its attribute and live properties. The primitive instance lives in a module-private `WeakMap` that the package's modules read through `instanceOf(el)`, and a custom root's `render(el, instance)` receives it.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
+- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -28,6 +30,9 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **Clicking a `<ui-field-label>`** checks its checkbox or radio but doesn't focus it.
 - **A `disabled` on the `<button>` inside a Number Input step part** is read once per button; toggling it on the same button later does nothing.
+- **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
+- **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
+- **A trigger slotted into a closed shadow root's scroller** waits for the slow check: `assignedSlot` is `null` there, so positioning can't find that root.
 
 ## Revisit
 
