@@ -58,6 +58,11 @@ catalogs:
       specifier: ^3.3.12
       version: 3.3.12
 
+patchedDependencies:
+  '@solidjs/web@2.0.0-rc.14':
+    hash: bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8
+    path: patches/@solidjs__web@2.0.0-rc.14.patch
+
 importers:
 
   .:
@@ -164,7 +169,7 @@ importers:
         version: 0.33.0
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-rc.14(solid-js@2.0.0-rc.14)
+        version: 2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)
       '@ui-sdk/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -207,7 +212,7 @@ importers:
     devDependencies:
       '@solidjs/vite-plugin':
         specifier: 'catalog:'
-        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
         version: 7.3.1(svelte@5.57.2(@typescript-eslint/types@8.72.1))(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
@@ -383,10 +388,10 @@ importers:
     dependencies:
       '@solidjs/router':
         specifier: 2.0.0-next.38
-        version: 2.0.0-next.38(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)
+        version: 2.0.0-next.38(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-rc.14(solid-js@2.0.0-rc.14)
+        version: 2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)
       '@ui-sdk/core':
         specifier: workspace:*
         version: link:../../../packages/core
@@ -408,7 +413,7 @@ importers:
     devDependencies:
       '@solidjs/vite-plugin':
         specifier: 'catalog:'
-        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
@@ -552,7 +557,7 @@ importers:
         version: 1.54.0(vue@3.5.43(typescript@5.9.3))
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-rc.14(solid-js@2.0.0-rc.14)
+        version: 2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)
       '@ui-sdk/core':
         specifier: workspace:*
         version: link:../packages/core
@@ -595,7 +600,7 @@ importers:
     devDependencies:
       '@solidjs/vite-plugin':
         specifier: 'catalog:'
-        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
       '@sveltejs/vite-plugin-svelte':
         specifier: 'catalog:'
         version: 7.3.1(svelte@5.57.2(@typescript-eslint/types@8.72.1))(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
@@ -664,10 +669,10 @@ importers:
         version: 2.0.0-rc.14
       '@solidjs/vite-plugin':
         specifier: 'catalog:'
-        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+        version: 3.0.0-next.35(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
       '@solidjs/web':
         specifier: 'catalog:'
-        version: 2.0.0-rc.14(solid-js@2.0.0-rc.14)
+        version: 2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)
       '@ui-sdk/core':
         specifier: workspace:*
         version: link:../core
@@ -7992,20 +7997,20 @@ snapshots:
       '@solidjs/compiler-wasm32-wasi': 2.0.0-rc.14
       '@solidjs/compiler-win32-x64-msvc': 2.0.0-rc.14
 
-  '@solidjs/router@2.0.0-next.38(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)':
+  '@solidjs/router@2.0.0-next.38(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)':
     dependencies:
-      '@solidjs/web': 2.0.0-rc.14(solid-js@2.0.0-rc.14)
+      '@solidjs/web': 2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)
       solid-js: 2.0.0-rc.14
 
   '@solidjs/signals@2.0.0-rc.14': {}
 
-  '@solidjs/vite-plugin@3.0.0-next.35(@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))':
+  '@solidjs/vite-plugin@3.0.0-next.35(@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14))(solid-js@2.0.0-rc.14)(vite@8.3.3(@types/node@26.6.4)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@babel/core': 7.29.7
       '@solidjs/babel-plugin': 2.0.0-rc.14(@babel/core@7.29.7)
       '@solidjs/compiler': 2.0.0-rc.14
-      '@solidjs/web': 2.0.0-rc.14(solid-js@2.0.0-rc.14)
+      '@solidjs/web': 2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)
       '@types/babel__core': 7.20.5
       merge-anything: 5.1.7
       solid-js: 2.0.0-rc.14
@@ -8015,7 +8020,7 @@ snapshots:
       - '@tsrx/core'
       - supports-color
 
-  '@solidjs/web@2.0.0-rc.14(solid-js@2.0.0-rc.14)':
+  '@solidjs/web@2.0.0-rc.14(patch_hash=bb9d9f68caa99f2240d2b84402b5628498c3eb86af575d34fda2838c0a1ebef8)(solid-js@2.0.0-rc.14)':
     dependencies:
       seroval: 1.6.9
       seroval-plugins: 1.6.9(seroval@1.6.9)

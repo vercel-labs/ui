@@ -222,15 +222,7 @@ test.describe("leaks", () => {
     test(`unmounting ${withArticle(name)} after it opens and closes once leaves none of its parts alive`, async ({
       page,
       open,
-      framework,
     }) => {
-      // Solid's event delegation gives each event its own `currentTarget`
-      // getter. V8 keeps one of them on the shape every event of that type
-      // shares, with its event and target, so a Solid page keeps the target
-      // of one keydown, click or focus. Earlier events in the other leak
-      // tests' warmups keep elements that are still on the page. See
-      // BACKLOG.md.
-      test.skip(framework.startsWith("solid"), "Solid's event delegation keeps one event's target alive.")
       await open("leaks", { component: name })
       const cdp = await page.context().newCDPSession(page)
       await openAndClose(page, name, 1)
