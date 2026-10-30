@@ -312,6 +312,23 @@ describe("our popups on the kit", () => {
     expect(view.part("trigger")!.getAttribute("aria-keyshortcuts")).toBeTruthy()
   })
 
+  test("Popover closing after the trigger that opened it is gone moves focus past it, not to its other trigger", async () => {
+    const view = mount(
+      popover,
+      {},
+      `<div><trigger id="ada">Ada</trigger><trigger id="grace">Grace</trigger><button>After</button><content><button>Copy link</button></content></div>`,
+    )
+    mounts.push(view)
+    const grace = view.part("trigger", "grace")!
+    grace.focus()
+    await view.keys("Enter")
+    expect(view.state.open).toBe(true)
+    grace.remove()
+    await view.keys("Escape")
+    expect(view.state.open).toBe(false)
+    expect(document.activeElement?.textContent).toBe("After")
+  })
+
   test("Hover Card opens on keyboard focus and Escape closes it", async () => {
     const view = mount(
       hoverCard,

@@ -271,6 +271,11 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     const key = store.get().trigger
     return (key !== null && element(triggerSlot, key)) || element(triggerSlot)
   }
+  // Only the trigger that opened it, so focus never returns to another one once that one is gone.
+  const openedFrom = () => {
+    const key = store.get().trigger
+    return rules?.trigger || key === null ? triggerElement() : element(triggerSlot, key)
+  }
 
   const core: PopupCore = {
     label: context.label,
@@ -328,7 +333,7 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     position: preset.placement?.position,
     owner: { component: context.label, id: context.id },
     store,
-    trigger: triggerElement,
+    trigger: openedFrom,
     contains: (target, event) =>
       rules?.contains
         ? rules.contains(target, event)
