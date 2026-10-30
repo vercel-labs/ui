@@ -181,6 +181,98 @@ describe("createViewport", () => {
   })
 })
 
+describe("createViewport bindFindable", () => {
+  // jsdom keeps no scroll position: store what's set, like a browser that can scroll this far.
+  const scrollable = (el: HTMLElement) => {
+    const at = { left: 0, top: 0 }
+    Object.defineProperties(el, {
+      scrollLeft: { get: () => at.left, set: (value: number) => (at.left = value), configurable: true },
+      scrollTop: { get: () => at.top, set: (value: number) => (at.top = value), configurable: true },
+    })
+    return el
+  }
+  const scrollTo = (el: HTMLElement, left: number, top: number) => {
+    el.scrollLeft = left
+    el.scrollTop = top
+    el.dispatchEvent(new Event("scroll"))
+  }
+  const state = (instance: ReturnType<typeof mountCanvas>["instance"]) =>
+    ({ viewport: instance.api.viewport.get(), connecting: null }) as CanvasState
+
+  test("rests the surface far from its origin, with the world offset to match, until it's unbound", () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    const unbind = instance.api.viewport.bindFindable(surface)
+    const spacer = surface.lastElementChild as HTMLElement
+    expect(spacer.getAttribute("aria-hidden")).toBe("true")
+    expect(spacer.style).toMatchObject({ position: "absolute", left: "200000px", top: "200000px" })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(100000px,100000px) scale(1)",
+    )
+    unbind()
+    expect(spacer.isConnected).toBe(false)
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(0px,0px) scale(1)")
+  })
+
+  test("a scroll the browser makes, like to a find in page match, becomes a pan, and the surface goes back to rest", () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    instance.api.viewport.setViewport({ x: 10, y: 20, zoom: 2 })
+    // Toward something to the right and above the view.
+    scrollTo(surface, 100300, 99880)
+    const panned = instance.api.viewport.get()
+    expect(panned).toEqual({ x: -290, y: 140, zoom: 2 })
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+    // Its own reset is no pan.
+    surface.dispatchEvent(new Event("scroll"))
+    expect(instance.api.viewport.get()).toBe(panned)
+  })
+
+  test("reports the pan as scroll-into-view", () => {
+    const seen: string[] = []
+    const board = definePrimitive({
+      name: "board",
+      state: (): { viewport: Viewport } => ({ viewport: { x: 0, y: 0, zoom: 1 } }),
+      live: ["viewport"],
+      api: (context) => ({
+        viewport: createViewport<{ viewport: Viewport }>(context, {
+          key: "viewport",
+          surface: () => context.element("root"),
+          set: (value, details) => {
+            seen.push(details.reason)
+            context.store.set({ viewport: value })
+            return true
+          },
+        }),
+      }),
+      slots: (slot) => ({ root: slot({}) }),
+    })
+    const instance = board({ id: "b" })
+    const surface = scrollable(document.createElement("div"))
+    document.body.append(surface)
+    cleanups.push(bind(instance.part("root", {}), surface), () => instance.destroy())
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    scrollTo(surface, 99500, 100000)
+    expect(seen).toEqual(["scroll-into-view"])
+    expect(instance.api.viewport.get()).toEqual({ x: 500, y: 0, zoom: 1 })
+  })
+
+  test("a scroll clamped because the spacer went missing puts it back without panning", () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    cleanups.push(instance.api.viewport.bindFindable(surface))
+    // Like a framework replacing the surface's children.
+    surface.replaceChildren()
+    scrollTo(surface, 0, 0)
+    expect(instance.api.viewport.get()).toEqual({ x: 0, y: 0, zoom: 1 })
+    expect(surface.lastElementChild?.getAttribute("aria-hidden")).toBe("true")
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
+  })
+})
+
 describe("createConnect", () => {
   const ports: Record<string, [number, number]> = {
     "a.out": [100, 50],

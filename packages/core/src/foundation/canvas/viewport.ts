@@ -23,7 +23,7 @@ type CanvasRect = { left: number; top: number; right: number; bottom: number }
  * Why the viewport moved.
  * @experimental
  */
-type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "imperative"
+type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "scroll-into-view" | "imperative"
 
 /**
  * How `createViewport` keeps the viewport.
@@ -43,6 +43,10 @@ type ViewportOptions<State extends object> = {
   /** What screen readers hear after a zoom key. Defaults to English, like "Zoom 150%". */
   message?: (zoom: number) => string
 }
+
+// How far a findable surface rests from its scroll origin, so the browser can
+// scroll it toward anything on the canvas, whichever way it lies.
+const rest = 100_000
 
 const wheelUnit = (event: WheelEvent, surface: HTMLElement) =>
   event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? surface.clientHeight : 1
@@ -64,7 +68,8 @@ const wheelUnit = (event: WheelEvent, surface: HTMLElement) =>
  * ```
  *
  * `toCanvas` and `toScreen` convert points, `fit` shows a box, `reveal`
- * scrolls the least to bring one into view, which a focused item calls.
+ * scrolls the least to bring one into view, which a focused item calls, and
+ * `bindFindable` pans to whatever the browser scrolls to, like a find in page match.
  * @experimental
  */
 function createViewport<State extends object>(
@@ -86,6 +91,9 @@ function createViewport<State extends object>(
   let gesture: { center: { x: number; y: number }; distance: number; view: Viewport } | null = null
   let stop: (() => void) | undefined
   context.onDestroy(() => stop?.())
+  // The surface `bindFindable` keeps at rest, whose world `style` moves with it.
+  let findable: HTMLElement | undefined
+  const restyle = () => store.set({ [options.key]: { ...api.get() } } as Partial<State>)
 
   const api = {
     /** The viewport now. */
@@ -318,7 +326,55 @@ function createViewport<State extends object>(
     /** The world element's `style`: one transform for every item, so panning lays nothing out. */
     style(state: State) {
       const { x, y, zoom } = (state[options.key] ?? { x: 0, y: 0, zoom: 1 }) as Viewport
-      return `transform:translate(${x}px,${y}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
+      const at = findable ? rest : 0
+      return `transform:translate(${x + at}px,${y + at}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
+    },
+    /**
+     * Turns the browser's scrolls inside `el` into pans, until the returned
+     * function runs, so find in page, focus and links to an id bring what
+     * they found into view. `el` is a pane with `overflow: hidden` that fills
+     * the surface and holds only the world: it rests scrolled far from its
+     * origin, with the world offset to match.
+     */
+    bindFindable(el: HTMLElement) {
+      const spacer = el.ownerDocument.createElement("div")
+      spacer.setAttribute("aria-hidden", "true")
+      Object.assign(spacer.style, {
+        position: "absolute",
+        left: `${rest * 2}px`,
+        top: `${rest * 2}px`,
+        width: "1px",
+        height: "1px",
+        visibility: "hidden",
+        pointerEvents: "none",
+      })
+      const settle = () => {
+        if (!spacer.isConnected) el.append(spacer)
+        el.scrollLeft = rest
+        el.scrollTop = rest
+      }
+      const onScroll = (event: Event) => {
+        // Without the spacer, like after a framework replaced the children, the scroll was clamped, not asked for.
+        if (!spacer.isConnected) return settle()
+        const dx = el.scrollLeft - rest
+        const dy = el.scrollTop - rest
+        if (!dx && !dy) return
+        settle()
+        api.panBy(-dx, -dy, { reason: "scroll-into-view", event })
+      }
+      findable = el
+      settle()
+      restyle()
+      el.addEventListener("scroll", onScroll)
+      return () => {
+        el.removeEventListener("scroll", onScroll)
+        spacer.remove()
+        if (findable !== el) return
+        findable = undefined
+        el.scrollLeft = 0
+        el.scrollTop = 0
+        restyle()
+      }
     },
   }
   return api

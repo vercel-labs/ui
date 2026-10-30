@@ -84,7 +84,7 @@ sight: slot({
 }),
 ```
 
-Use `overflow: clip` on the frame so native focus scrolling doesn't compete with the viewport. The `message` option customizes what a zoom key announces:
+Use `overflow: clip` on the frame so native focus scrolling doesn't compete with the viewport, or let the viewport take those scrolls with [`bindFindable`](#find-in-page). The `message` option customizes what a zoom key announces:
 
 ```ts
 message: (zoom) => `Map at ${Math.round(zoom * 100)} percent`,
@@ -93,6 +93,32 @@ message: (zoom) => `Map at ${Math.round(zoom * 100)} percent`,
 <ComponentExample
   name="behaviors/viewport-fit"
   caption="Press Fit to see every sight. Try the zoom and pan buttons, then Tab through the sights: the map brings each focused sight into view."
+/>
+
+### Find in Page
+
+Find in page (⌘F, or Ctrl+F) finds text anywhere on the canvas, but it reveals a match by scrolling, and the viewport pans instead. Put the world in a pane that fills the frame, and bind the pane with `bindFindable`:
+
+```ts
+pane: slot({
+  attrs: () => ({ style: css({ position: "absolute", inset: "0", overflow: "hidden", "pointer-events": "none" }) }),
+  bind: (el, { api }) => api.viewport.bindFindable(el),
+}),
+world: slot({
+  attrs: () => ({ style: css({ position: "absolute", left: "0", top: "0", "pointer-events": "auto" }) }),
+  live: live((state, { api }) => ({ style: api.viewport.style(state) })),
+}),
+```
+
+Keep the frame's `overflow: clip`, and keep controls like a reset button in the frame, outside the pane. The pane passes presses and the wheel on empty space through to the frame, so its handlers work as before.
+
+Every scroll the browser makes in the frame becomes a pan with the reason `scroll-into-view`, so the match comes into view the way the browser would show it, with its own highlight and count. The same goes for anything else that scrolls to an element: Tab to a node out of view, `scrollIntoView`, or a link to its id.
+
+The pane rests scrolled far from its origin, with an empty element to make room, so the browser can scroll toward a node whichever side of the view it's on. The world's `style` moves to match while it's bound; anything else in the pane would scroll away, which is why it holds only the world. A smooth `scrollIntoView` pans by its first step only; to animate a pan, call `reveal`.
+
+<ComponentExample
+  name="behaviors/viewport-find"
+  caption="Press ⌘F or Ctrl+F and search for lighthouse. Each one is off the map in a different direction; press Enter to go from one to the next, and the map pans to each."
 />
 
 ### Screen and Canvas Points
@@ -111,7 +137,7 @@ By default, the behavior writes its state key directly. To let a component contr
 set: (value, details) => change("viewport", value, details),
 ```
 
-Changes report a reason: `wheel`, `drag`, `pinch`, `zoom-key`, `focus-in`, or `imperative`.
+Changes report a reason: `wheel`, `drag`, `pinch`, `zoom-key`, `focus-in`, `scroll-into-view`, or `imperative`.
 
 <ComponentExample
   name="behaviors/viewport-points"
