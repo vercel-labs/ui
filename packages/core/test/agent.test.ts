@@ -422,6 +422,23 @@ describe("agent", () => {
     )
   })
 
+  test("a select keeps its trigger's name when its popup's search field mounts", () => {
+    const agent = createAgent()
+    const instance = select({ id: "fruit", items: ["Apple", "Pear"] })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.textContent = "Fruit"
+    const content = document.body.appendChild(document.createElement("div"))
+    const search = content.appendChild(document.createElement("input"))
+    search.setAttribute("aria-label", "Search fruit")
+    cleanups.push(
+      bind(instance.part("trigger"), trigger),
+      bind(instance.part("content"), content),
+      bind(instance.part("input"), search),
+      () => instance.destroy(),
+    )
+    expect(agent.snapshot().find((component) => component.component === "select")?.label).toBe("Fruit")
+  })
+
   test("a press waits for the button's action, and a failed action fails the step", async () => {
     const agent = createAgent()
     let fail = false
