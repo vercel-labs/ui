@@ -120,7 +120,16 @@ type DatePickerController = ReturnType<typeof createDatePickerController>
  */
 type DatePickerOptions = Omit<
   CalendarOptions,
-  "mode" | "value" | "defaultValue" | "onValueChange" | "onMonthChange" | "controller"
+  | "mode"
+  | "value"
+  | "defaultValue"
+  | "onValueChange"
+  | "onMonthChange"
+  | "controller"
+  | "disabledDates"
+  | "deselectable"
+  | "onFocusedChange"
+  | "onAnchorChange"
 > &
   PortalProps & {
     /**

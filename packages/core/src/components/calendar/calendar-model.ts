@@ -120,15 +120,21 @@ function isAllowedRange(start: ISODate, end: ISODate, rules: RangeRules) {
   return true
 }
 
+/** The range from `anchor` to `date`, whichever comes first, or null when the rules don't allow it. */
+function rangeTo(anchor: ISODate, date: ISODate, rules: RangeRules) {
+  const range = (date < anchor ? [date, anchor] : [anchor, date]) as [ISODate, ISODate]
+  return isAllowedRange(range[0], range[1], rules) ? range : null
+}
+
 /**
  * What a press on `date` does to a range: with no start yet, it starts one.
- * With a start, a later or equal date ends it, if the rules allow; an earlier
- * one, or one the rules don't allow, starts over from `date`.
+ * With a start, any date ends it, the earlier of the two starting it, if the
+ * rules allow; one they don't allow keeps the start.
  */
 function pressRange(anchor: ISODate | null, date: ISODate, rules: RangeRules) {
-  if (anchor === null || date < anchor || !isAllowedRange(anchor, date, rules))
-    return { anchor: date, value: undefined }
-  return { anchor: null, value: [anchor, date] as [ISODate, ISODate] }
+  if (anchor === null) return { anchor: date, value: undefined }
+  const value = rangeTo(anchor, date, rules)
+  return value ? { anchor: null, value } : { anchor, value: undefined }
 }
 
 /** Where a key moves focus from `from`, before clamping, or undefined for a key the grid doesn't use. */
@@ -158,14 +164,37 @@ function dateForKey(
   }
 }
 
-/** A key's move, kept within `min` and `max`. Undefined when the key isn't the grid's. */
+/**
+ * A key's move, kept within `min` and `max`. Undefined when the key isn't the
+ * grid's. A date `skips` names is passed over: arrows and pages go on the way
+ * they went, Home and End come back toward `from`, which stays when nothing does.
+ */
 function moveDate(
   event: { key: string; shiftKey?: boolean },
   from: ISODate,
-  options: { rtl: boolean; weekStartsOn: number; min?: ISODate | null; max?: ISODate | null },
+  options: {
+    rtl: boolean
+    weekStartsOn: number
+    min?: ISODate | null
+    max?: ISODate | null
+    skips?: (date: ISODate) => boolean
+  },
 ) {
   const to = dateForKey(event, from, options)
-  return to === undefined ? undefined : clampDate(to, options.min, options.max)
+  if (to === undefined) return undefined
+  let date = clampDate(to, options.min, options.max)
+  if (!options.skips?.(date)) return date
+  const vertical = event.key === "ArrowUp" || event.key === "ArrowDown"
+  const back = event.key === "Home" || event.key === "End"
+  const step = (to < from !== back ? -1 : 1) * (vertical ? 7 : 1)
+  // Ten years of dates, so a matcher that names every date can't loop forever.
+  for (let count = 0; count < 3660; count++) {
+    date = addDays(date, step)
+    const outside = (!!options.min && date < options.min) || (!!options.max && date > options.max)
+    if (outside || date === from) return from
+    if (!options.skips(date)) return date
+  }
+  return from
 }
 
 /**
@@ -249,6 +278,7 @@ export {
   moveDate,
   normalizeValue,
   pressRange,
+  rangeTo,
   type RangeRules,
   selectedDates,
   visibleRange,

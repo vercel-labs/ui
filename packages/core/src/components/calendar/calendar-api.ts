@@ -3,7 +3,6 @@
 import {
   addMonthsTo,
   gridWeeks,
-  isAllowedRange,
   isISOMonth,
   matchesDate,
   monthOf,
@@ -11,6 +10,7 @@ import {
   moveDate,
   normalizeValue,
   pressRange,
+  rangeTo,
   selectedDates,
   visibleRange,
   type CalendarMode,
@@ -66,8 +66,10 @@ type CalendarModelState = {
   min: ISODate | null
   max: ISODate | null
   unavailable: DateMatchers | null
+  disabledDates: DateMatchers | null
   disabled: boolean
   readOnly: boolean
+  deselectable: boolean
   months: number
   pageBy: "month" | "page"
   locale: string | null
@@ -91,8 +93,10 @@ const calendarSettings = (options: CalendarOptions) => ({
   min: dateOrNull(options.min),
   max: dateOrNull(options.max),
   unavailable: options.unavailable ?? null,
+  disabledDates: options.disabledDates ?? null,
   disabled: !!options.disabled,
   readOnly: !!options.readOnly,
+  deselectable: !!options.deselectable,
   months: Math.max(1, Math.floor(options.months ?? 1) || 1),
   pageBy: options.pageBy ?? "month",
   locale: options.locale ?? null,
@@ -107,10 +111,12 @@ const calendarSettings = (options: CalendarOptions) => ({
 
 const weekStartOf = (state: State) => state.weekStartsOn ?? firstDayOfWeek(localeOf(state))
 const unavailableDate = (state: State, date: ISODate) => matchesDate(date, state.unavailable)
+const disabledDate = (state: State, date: ISODate) => matchesDate(date, state.disabledDates)
 const outOfBounds = (state: State, date: ISODate) =>
   (state.min !== null && date < state.min) || (state.max !== null && date > state.max)
 // A date that can't be picked. The calendar being disabled is checked apart.
-const blockedDate = (state: State, date: ISODate) => outOfBounds(state, date) || unavailableDate(state, date)
+const blockedDate = (state: State, date: ISODate) =>
+  outOfBounds(state, date) || unavailableDate(state, date) || disabledDate(state, date)
 const sameDates = (a: CalendarValue, b: CalendarValue) => String(a) === String(b)
 const gridMonth = (state: State, offset: number | undefined) => addMonthsTo(state.month, offset ?? 0)
 const isOutside = (state: State, props: CalendarDayProps) =>
@@ -120,7 +126,7 @@ const rangeRules = (state: State) => ({
   minDays: state.minDays,
   maxDays: state.maxDays,
   allowUnavailable: state.allowUnavailable,
-  isUnavailable: (date: ISODate) => unavailableDate(state, date),
+  isUnavailable: (date: ISODate) => unavailableDate(state, date) || disabledDate(state, date),
 })
 
 // The month a calendar opens on: the selection's, else today's, within `min` and `max`.
@@ -137,13 +143,8 @@ function initialMonth(options: CalendarOptions, value: CalendarValue) {
 function shownRange(state: State) {
   if (state.mode !== "range") return null
   if (state.anchor !== null) {
-    const end =
-      state.hover !== null &&
-      state.hover >= state.anchor &&
-      isAllowedRange(state.anchor, state.hover, rangeRules(state))
-        ? state.hover
-        : state.anchor
-    return [state.anchor, end] as const
+    const preview = state.hover === null ? null : rangeTo(state.anchor, state.hover, rangeRules(state))
+    return preview ?? ([state.anchor, state.anchor] as const)
   }
   return state.value as [ISODate, ISODate] | null
 }
@@ -326,7 +327,8 @@ function calendarApi<
     // Unavailable dates stay focusable, as the date picker pattern asks; they just can't be picked.
     disabled: (day) => blockedDate(store.get(), day.key),
     // Days of the months around a grid show it, but focus moves through each grid's own.
-    focusable: (day) => !isDisabled(store.get()) && !isOutside(store.get(), day.props),
+    focusable: (day) =>
+      !isDisabled(store.get()) && !isOutside(store.get(), day.props) && !disabledDate(store.get(), day.key),
     preferred: (day) => day.key === preferredDate(store.get()),
     claims: (state, day) => !isOutside(state, day.props) && day.key === preferredDate(state),
     move: (event, { from, rtl }) => {
@@ -337,6 +339,7 @@ function calendarApi<
         weekStartsOn: weekStartOf(state),
         min: state.min,
         max: state.max,
+        skips: state.disabledDates ? (date) => disabledDate(state, date) : undefined,
       })
     },
   })
@@ -345,6 +348,21 @@ function calendarApi<
   const recovery = createFocusRecovery<CalendarDayProps>({
     fallback: (lost) => element("day", lost.key),
   })
+
+  let { focused, anchor } = store.get()
+  context.onDestroy(
+    store.subscribe(() => {
+      const state = store.get()
+      if (state.focused !== focused) {
+        focused = state.focused
+        options().onFocusedChange?.(focused)
+      }
+      if (state.anchor !== anchor) {
+        anchor = state.anchor
+        options().onAnchorChange?.(anchor)
+      }
+    }),
+  )
 
   function setMonth(month: ISOMonth, reason: MonthChangeReason, event?: Event) {
     if (!isISOMonth(month)) return false
@@ -379,13 +397,14 @@ function calendarApi<
       )
     } else if (state.mode === "range") {
       const pressed = pressRange(state.anchor, date, rangeRules(state))
-      store.set({ anchor: pressed.anchor, hover: pressed.anchor })
+      store.set({ anchor: pressed.anchor, hover: pressed.anchor === null ? null : date })
       if (
         pressed.value &&
         (setValue(pressed.value, "item-press", event) || sameDates(store.get().value, pressed.value))
       )
         hooks.picked?.(event)
-    } else if (setValue(date, "item-press", event) || store.get().value === date) hooks.picked?.(event)
+    } else if (state.deselectable && state.value === date) setValue(null, "item-press", event)
+    else if (setValue(date, "item-press", event) || store.get().value === date) hooks.picked?.(event)
   }
 
   const api = {
@@ -617,7 +636,10 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
         const range = shownRange(state)
         return {
           role: "gridcell",
-          tabindex: isDisabled(state) || day.outside ? undefined : api.internal.roving.tabIndex(state, part),
+          tabindex:
+            isDisabled(state) || day.outside || disabledDate(state, props.value)
+              ? undefined
+              : api.internal.roving.tabIndex(state, part),
           "aria-label": formatDate(props.value, localeOf(state)),
           "aria-selected": day.outside ? undefined : String(day.selected),
           "aria-disabled": day.disabled ? "true" : undefined,

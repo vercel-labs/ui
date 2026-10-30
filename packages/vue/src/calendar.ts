@@ -11,6 +11,7 @@ import {
   type DateMatchers,
   type ISOMonth,
 } from "@ui-sdk/core/calendar"
+import type { ISODate } from "@ui-sdk/core/date"
 import { defineComponent, Fragment, h, inject, provide, type PropType, type SlotsType, type VNode } from "vue"
 import { CalendarKey, GridKey } from "./calendar-context"
 import { slotContent } from "./children"
@@ -51,8 +52,10 @@ const Calendar = withElement(
       min: String,
       max: String,
       unavailable: null as unknown as PropType<DateMatchers>,
+      disabledDates: null as unknown as PropType<DateMatchers>,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
+      deselectable: optionalBoolean,
       months: Number,
       pageBy: String as PropType<"month" | "page">,
       locale: String,
@@ -74,6 +77,8 @@ const Calendar = withElement(
       valueChange: (_value: CalendarValue, _details: ChangeDetails<CalendarValueChangeReason>) => true,
       "update:month": (_month: ISOMonth) => true,
       monthChange: (_month: ISOMonth, _details: ChangeDetails<CalendarMonthChangeReason>) => true,
+      focusedChange: (_date: ISODate | null) => true,
+      anchorChange: (_anchor: ISODate | null) => true,
     },
     slots: Object as PartSlots<typeof calendarPrimitive, "root">,
     setup(props, { slots, emit }) {
@@ -86,8 +91,12 @@ const Calendar = withElement(
         min: props.min,
         max: props.max,
         unavailable: props.unavailable,
+        disabledDates: props.disabledDates,
         disabled: props.disabled,
         readOnly: props.readOnly,
+        deselectable: props.deselectable,
+        onFocusedChange: (date: ISODate | null) => emit("focusedChange", date),
+        onAnchorChange: (anchor: ISODate | null) => emit("anchorChange", anchor),
         months: props.months,
         pageBy: props.pageBy,
         locale: props.locale,

@@ -157,6 +157,22 @@ describe("the calendar model", () => {
     expect(moveDate({ key: "a" }, "2026-10-28", options)).toBeUndefined()
   })
 
+  test("keys pass over skipped dates, and Home and End come back toward where they started", () => {
+    const options = {
+      rtl: false,
+      weekStartsOn: 0,
+      skips: (date: string) => ["0", "6"].includes(date.slice(-1)),
+    }
+    expect(moveDate({ key: "ArrowRight" }, "2026-10-15", options)).toBe("2026-10-17")
+    expect(moveDate({ key: "ArrowUp" }, "2026-10-17", options)).toBe("2026-10-03")
+    expect(moveDate({ key: "Home" }, "2026-09-09", options)).toBe("2026-09-07")
+    expect(moveDate({ key: "End" }, "2026-10-07", options)).toBe("2026-10-09")
+    expect(moveDate({ key: "End" }, "2026-10-21", { ...options, skips: () => true })).toBe("2026-10-21")
+    expect(moveDate({ key: "ArrowRight" }, "2026-10-29", { ...options, max: "2026-10-30" })).toBe(
+      "2026-10-29",
+    )
+  })
+
   test("the months turn only as far as a date needs", () => {
     expect(monthToShow("2026-11-01", "2026-10", 1, "month")).toBe("2026-11")
     expect(monthToShow("2026-11-01", "2026-10", 2, "month")).toBe("2026-10")
@@ -165,7 +181,7 @@ describe("the calendar model", () => {
     expect(monthToShow("2026-09-30", "2026-10", 2, "page")).toBe("2026-08")
   })
 
-  test("a range starts, ends, and starts over on an earlier date or one the rules refuse", () => {
+  test("a range starts, ends on either side of its start, and keeps its start through an end the rules refuse", () => {
     const rules = {
       allowUnavailable: false,
       isUnavailable: (date: string) => date === "2026-10-20",
@@ -176,9 +192,12 @@ describe("the calendar model", () => {
       anchor: null,
       value: ["2026-10-16", "2026-10-18"],
     })
-    expect(pressRange("2026-10-16", "2026-10-14", rules).anchor).toBe("2026-10-14")
-    expect(pressRange("2026-10-16", "2026-10-16", rules).anchor).toBe("2026-10-16")
-    expect(pressRange("2026-10-16", "2026-10-22", rules).anchor).toBe("2026-10-22")
+    expect(pressRange("2026-10-16", "2026-10-14", rules)).toEqual({
+      anchor: null,
+      value: ["2026-10-14", "2026-10-16"],
+    })
+    expect(pressRange("2026-10-16", "2026-10-16", rules)).toEqual({ anchor: "2026-10-16", value: undefined })
+    expect(pressRange("2026-10-16", "2026-10-22", rules)).toEqual({ anchor: "2026-10-16", value: undefined })
     expect(pressRange("2026-10-16", "2026-10-22", { ...rules, allowUnavailable: true }).value).toEqual([
       "2026-10-16",
       "2026-10-22",
@@ -380,18 +399,87 @@ describe("calendar", () => {
     expect(instance.get()).toMatchObject({ anchor: null, value: ["2026-10-16", "2026-10-19"] })
   })
 
-  test("a range keeps to minDays, maxDays and unavailable dates", () => {
+  test("a range keeps to minDays, maxDays and unavailable dates, keeping its start through an end they refuse", () => {
     const { day, instance } = mount({ mode: "range", minDays: 3, maxDays: 5, unavailable: "2026-10-21" })
     day("2026-10-16").click()
     day("2026-10-17").click()
-    expect(instance.get()).toMatchObject({ anchor: "2026-10-17", value: null })
+    expect(instance.get()).toMatchObject({ anchor: "2026-10-16", value: null })
     day("2026-10-23").click()
-    expect(instance.get()).toMatchObject({ anchor: "2026-10-23" })
-    day("2026-10-25").click()
-    expect(instance.api.getValue()).toEqual(["2026-10-23", "2026-10-25"])
+    expect(instance.get()).toMatchObject({ anchor: "2026-10-16", value: null })
     day("2026-10-18").click()
-    day("2026-10-22").click()
-    expect(instance.get()).toMatchObject({ anchor: "2026-10-22" })
+    expect(instance.api.getValue()).toEqual(["2026-10-16", "2026-10-18"])
+    day("2026-10-19").click()
+    day("2026-10-23").click()
+    expect(instance.get()).toMatchObject({ anchor: "2026-10-19", value: ["2026-10-16", "2026-10-18"] })
+  })
+
+  test("a range ends before its start, which then becomes its end, and previews that way", async () => {
+    const { day, instance } = mount({ mode: "range" })
+    await tick()
+    day("2026-10-20").click()
+    day("2026-10-17").dispatchEvent(new PointerEvent("pointerenter"))
+    await tick()
+    expect(day("2026-10-17").hasAttribute("data-range-start")).toBe(true)
+    expect(day("2026-10-18").hasAttribute("data-range-middle")).toBe(true)
+    expect(day("2026-10-20").hasAttribute("data-range-end")).toBe(true)
+    day("2026-10-17").click()
+    expect(instance.api.getValue()).toEqual(["2026-10-17", "2026-10-20"])
+  })
+
+  test("the root state and its events follow the tab stop and a range's start", async () => {
+    const onFocusedChange = vi.fn()
+    const onAnchorChange = vi.fn()
+    const { day, press, instance } = mount({ mode: "range", onFocusedChange, onAnchorChange })
+    await tick()
+    expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-16")
+    day("2026-10-16").focus()
+    press("ArrowRight")
+    expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-17")
+    press("Enter")
+    expect(onAnchorChange).toHaveBeenLastCalledWith("2026-10-17")
+    expect(partState(instance.part("root", {}))).toMatchObject({
+      focused: "2026-10-17",
+      anchor: "2026-10-17",
+    })
+    press("Escape")
+    expect(onAnchorChange).toHaveBeenLastCalledWith(null)
+  })
+
+  test("deselectable clears the selected date when it's pressed again", () => {
+    const onValueChange = vi.fn()
+    const { day, instance } = mount({ defaultValue: "2026-10-16", deselectable: true, onValueChange })
+    day("2026-10-16").click()
+    expect(instance.api.getValue()).toBeNull()
+    expect(onValueChange).toHaveBeenLastCalledWith(null, expect.objectContaining({ reason: "item-press" }))
+    day("2026-10-16").click()
+    expect(instance.api.getValue()).toBe("2026-10-16")
+  })
+
+  test("disabled dates take no tab stop, can't be picked, and arrow keys pass over them", async () => {
+    const { day, press, focused, stops, instance } = mount({
+      defaultValue: "2026-10-16",
+      disabledDates: [{ weekday: [0, 6] }, "2026-10-14"],
+    })
+    await tick()
+    expect(day("2026-10-17").hasAttribute("tabindex")).toBe(false)
+    expect(day("2026-10-17").getAttribute("aria-disabled")).toBe("true")
+    day("2026-10-17").click()
+    expect(instance.api.getValue()).toBe("2026-10-16")
+    day("2026-10-16").focus()
+    press("ArrowRight")
+    await tick()
+    expect(focused()).toBe("2026-10-19")
+    press("ArrowLeft")
+    await tick()
+    expect(focused()).toBe("2026-10-16")
+    press("ArrowLeft")
+    press("ArrowLeft")
+    await tick()
+    expect(focused()).toBe("2026-10-13")
+    press("ArrowDown")
+    press("ArrowDown")
+    await tick()
+    expect(stops()).toEqual(["2026-10-27"])
   })
 
   test("unavailable dates are focusable but can't be picked", async () => {

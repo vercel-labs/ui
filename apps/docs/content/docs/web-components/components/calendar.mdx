@@ -68,7 +68,7 @@ A value with the wrong shape for its mode is treated as no selection.
 
 ### Range
 
-`mode="range"` chooses a start and then an end. Moving the pointer or focus previews the range; the value changes once both ends are chosen. Choosing a date before the start begins a new range there. Escape cancels an unfinished range.
+`mode="range"` chooses a start and then an end. Moving the pointer or focus previews the range; the value changes once both ends are chosen. A date before the start ends it too, and becomes the start. Escape cancels an unfinished range.
 
 <ComponentExample
   name="calendar/range"
@@ -77,13 +77,22 @@ A value with the wrong shape for its mode is treated as no selection.
 
 ### Range Limits
 
-`min-days` and `max-days` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit starts a new range at that date instead.
+`min-days` and `max-days` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen.
 
 A range cannot include an unavailable date unless `allow-unavailable` is set. That allows unavailable dates between the ends; they still cannot be chosen as an endpoint.
 
 <ComponentExample
   name="calendar/range-limits"
   caption="In October 2026, choose October 15 then October 20. This example accepts 3–8 days and allows the range to span the unavailable weekend."
+/>
+
+### Range in Progress
+
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `anchorchange` and `focusedchange` events report them as they change, to show the range being picked outside the calendar.
+
+<ComponentExample
+  name="calendar/range-progress"
+  caption="Choose a start date, then move with the arrow keys. The line below follows the start and the focused date until Enter picks the end."
 />
 
 ### Multiple
@@ -104,6 +113,17 @@ Unavailable dates cannot be selected, but stay focusable so keyboard and screen 
 <ComponentExample
   name="calendar/unavailable"
   caption="Try an unavailable date, then choose an available one. Unavailable days remain focusable so their state can be heard."
+/>
+
+### Disabled Dates
+
+`disabledDates` takes the same matchers as a property, or a list of dates as the `disabled-dates` attribute, for dates that cannot be focused either. Arrow keys pass over them and they never hold the Tab stop, so use it for dates nobody needs to hear about, like weekends in a calendar of business days.
+
+`deselectable` lets a second press on the selected date clear it.
+
+<ComponentExample
+  name="calendar/disabled-dates"
+  caption="Choose Friday, October 16, then press Right Arrow. Focus passes over the weekend. Choose the selected date again to clear it."
 />
 
 ### Min and Max
@@ -246,14 +266,16 @@ numbers are numbers. `value`, `default-value` and `unavailable` take comma-separ
 
 Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCalendarElement` for typed listeners.
 
-| Member                | On            | Description                                       |
-| --------------------- | ------------- | ------------------------------------------------- |
-| `value` property      | `ui-calendar` | The selected value. Setting it selects it         |
-| `month` property      | `ui-calendar` | The first month shown. Setting it turns there     |
-| `api` property        | `ui-calendar` | The [controller](#controller)                     |
-| `controller` property | `ui-calendar` | A controller from `createCalendarController()`    |
-| `valuechange` event   | `ui-calendar` | `detail: { value, reason, event, source }`        |
-| `monthchange` event   | `ui-calendar` | `detail: { value: month, reason, event, source }` |
+| Member                | On            | Description                                                  |
+| --------------------- | ------------- | ------------------------------------------------------------ |
+| `value` property      | `ui-calendar` | The selected value. Setting it selects it                    |
+| `month` property      | `ui-calendar` | The first month shown. Setting it turns there                |
+| `api` property        | `ui-calendar` | The [controller](#controller)                                |
+| `controller` property | `ui-calendar` | A controller from `createCalendarController()`               |
+| `valuechange` event   | `ui-calendar` | `detail: { value, reason, event, source }`                   |
+| `monthchange` event   | `ui-calendar` | `detail: { value: month, reason, event, source }`            |
+| `focusedchange` event | `ui-calendar` | `detail: { value }`: the date with the Tab stop              |
+| `anchorchange` event  | `ui-calendar` | `detail: { value }`: a range's start, or `null` once it ends |
 
 ### Reasons
 

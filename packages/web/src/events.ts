@@ -890,6 +890,8 @@ interface UiPaginationElement
 type CalendarEvents = {
   valuechange: UiChangeEvent<CalendarValue, CalendarValueChangeReason>
   monthchange: UiChangeEvent<ISOMonth, CalendarMonthChangeReason>
+  focusedchange: CustomEvent<{ value: string | null }>
+  anchorchange: CustomEvent<{ value: string | null }>
 }
 /**
  * `<ui-calendar>`: `value` and `month`, the controller's methods on `api`, and typed events.
@@ -898,13 +900,18 @@ type CalendarEvents = {
 interface UiCalendarElement
   extends
     UiElement<CalendarEvents>,
-    AttributeProperties<typeof calendar, "api" | "controller" | "month" | "unavailable" | "value"> {
+    AttributeProperties<
+      typeof calendar,
+      "api" | "controller" | "disabledDates" | "month" | "unavailable" | "value"
+    > {
   value: CalendarValue
   month: ISOMonth
   api: CalendarController
   controller?: CalendarController
   /** Dates that can't be picked, as any matcher, like `{ weekday: [0, 6] }`. The attribute takes a list of dates. */
   unavailable?: DateMatchers
+  /** Dates that can't be picked or focused, as any matcher. The attribute takes a list of dates. */
+  disabledDates?: DateMatchers
 }
 
 /**

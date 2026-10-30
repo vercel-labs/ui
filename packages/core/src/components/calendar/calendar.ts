@@ -102,10 +102,21 @@ type CalendarOptions = {
    * them.
    */
   unavailable?: DateMatchers
+  /** Dates that can't be picked or focused, written like `unavailable`. Arrow keys pass over them, and they never hold the tab stop. */
+  disabledDates?: DateMatchers
   /** Whether nothing can be picked or focused. */
   disabled?: boolean
   /** Whether dates can be focused but not picked. */
   readOnly?: boolean
+  /**
+   * Whether pressing the selected date again clears it, in `"single"` mode.
+   * @defaultValue false
+   */
+  deselectable?: boolean
+  /** Runs when the date with the tab stop changes, as keys and presses move it. */
+  onFocusedChange?: (date: ISODate | null) => void
+  /** Runs when a range's start is picked and while its end isn't, with `null` once the range ends or Escape drops it. */
+  onAnchorChange?: (anchor: ISODate | null) => void
   /**
    * How many months show side by side, each in its own grid.
    * @defaultValue 1
@@ -164,6 +175,10 @@ type CalendarState = {
   disabled: boolean
   /** Whether dates can be focused but not picked. */
   readOnly: boolean
+  /** The date with the tab stop, `null` until days render in the browser. */
+  focused: ISODate | null
+  /** A range's start while its end is being picked, else `null`. */
+  anchor: ISODate | null
 }
 
 /**
@@ -269,7 +284,7 @@ type CalendarDayState = {
   today: boolean
   /** Whether it belongs to the month before or after its grid's. */
   outside: boolean
-  /** Whether it can't be picked: outside `min` and `max`, unavailable, or the calendar is disabled. */
+  /** Whether it can't be picked: outside `min` and `max`, unavailable, named by `disabledDates`, or the calendar is disabled. */
   disabled: boolean
   /** Whether `unavailable` names it. */
   unavailable: boolean
@@ -335,8 +350,12 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
     min: "string",
     max: "string",
     unavailable: "list",
+    disabledDates: "list",
     disabled: "boolean",
     readOnly: "boolean",
+    deselectable: "boolean",
+    onFocusedChange: "callback",
+    onAnchorChange: "callback",
     months: "number",
     pageBy: "string",
     locale: "string",
@@ -363,6 +382,8 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
         mode: state.mode,
         disabled: isDisabled(state),
         readOnly: state.readOnly,
+        focused: state.focused,
+        anchor: state.anchor,
       }),
       attrs: (state) => ({
         "data-mode": state.mode,

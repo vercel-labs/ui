@@ -77,8 +77,8 @@ function defineCalendarElements() {
       tag: "ui-calendar",
       display: "block",
       defaults: { showOutsideDays: true },
-      // `unavailable` as a property takes any matcher, like `{ weekday: [0, 6] }`.
-      properties: ["unavailable"],
+      // `unavailable` and `disabledDates` as properties take any matcher, like `{ weekday: [0, 6] }`.
+      properties: ["unavailable", "disabledDates"],
       state: calendarLiveState,
       api: ["getValue", "setValue", "getMonth", "setMonth", "previous", "next", "focus"],
       render(el, instance) {
