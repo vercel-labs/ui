@@ -23,7 +23,7 @@ type CanvasRect = { left: number; top: number; right: number; bottom: number }
  * Why the viewport moved.
  * @experimental
  */
-type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "scroll-into-view" | "imperative"
+type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "find-in-page" | "imperative"
 
 /**
  * How `createViewport` keeps the viewport.
@@ -354,6 +354,12 @@ function createViewport<State extends object>(
         el.scrollLeft = rest
         el.scrollTop = rest
       }
+      // Focus scrolls as it moves, and the scroll arrives before the next frame.
+      let focusing = false
+      const onFocusIn = () => {
+        focusing = true
+        requestAnimationFrame(() => (focusing = false))
+      }
       const onScroll = (event: Event) => {
         // Without the spacer, like after a framework replaced the children, the scroll was clamped, not asked for.
         if (!spacer.isConnected) return settle()
@@ -361,14 +367,16 @@ function createViewport<State extends object>(
         const dy = el.scrollTop - rest
         if (!dx && !dy) return
         settle()
-        api.panBy(-dx, -dy, { reason: "scroll-into-view", event })
+        api.panBy(-dx, -dy, { reason: focusing ? "focus-in" : "find-in-page", event })
       }
       findable = el
       settle()
       restyle()
       el.addEventListener("scroll", onScroll)
+      el.addEventListener("focusin", onFocusIn)
       return () => {
         el.removeEventListener("scroll", onScroll)
+        el.removeEventListener("focusin", onFocusIn)
         spacer.remove()
         if (findable !== el) return
         findable = undefined

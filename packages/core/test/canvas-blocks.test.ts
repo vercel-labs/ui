@@ -231,7 +231,7 @@ describe("createViewport bindFindable", () => {
     expect(instance.api.viewport.get()).toBe(panned)
   })
 
-  test("reports the pan as scroll-into-view", () => {
+  test("reports a pan as find-in-page, or as focus-in when focus moved into the pane", async () => {
     const seen: string[] = []
     const board = definePrimitive({
       name: "board",
@@ -256,8 +256,16 @@ describe("createViewport bindFindable", () => {
     cleanups.push(bind(instance.part("root", {}), surface), () => instance.destroy())
     cleanups.push(instance.api.viewport.bindFindable(surface))
     scrollTo(surface, 99500, 100000)
-    expect(seen).toEqual(["scroll-into-view"])
+    expect(seen).toEqual(["find-in-page"])
     expect(instance.api.viewport.get()).toEqual({ x: 500, y: 0, zoom: 1 })
+    const node = document.createElement("button")
+    surface.append(node)
+    node.focus()
+    scrollTo(surface, 100200, 100000)
+    expect(seen).toEqual(["find-in-page", "focus-in"])
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    scrollTo(surface, 100000, 100300)
+    expect(seen).toEqual(["find-in-page", "focus-in", "find-in-page"])
   })
 
   test("a scroll clamped because the spacer went missing puts it back without panning", () => {
