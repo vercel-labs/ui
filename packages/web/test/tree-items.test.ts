@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
-// A page that renders on every change, like lit-html, sets `items` again
-// each time. The same items render nothing again, and new ones keep focus
-// on the item that had it.
+// A page that renders on every change sets `items` again each time. The same
+// items render nothing new, and new ones keep focus on the item that had it.
 import { beforeAll, expect, test } from "vitest"
 import { defineTreeElements } from "../src/tree"
 
