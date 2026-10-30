@@ -70,7 +70,7 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
           </nav>
         )}
       </article>
-      <PageToc toc={page.data.toc} />
+      <PageToc toc={page.data.toc} url={page.url} />
     </>
   )
 }
