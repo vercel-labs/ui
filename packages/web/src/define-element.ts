@@ -209,13 +209,16 @@ function upgradeProperties(el: HTMLElement, names: Iterable<string>) {
 
 // Elements whose changes fire no events right now: state restored by the
 // browser, or set from script, like a native control's.
-const quiet = new WeakSet<HTMLElement>()
+const quiet = new Set<HTMLElement>()
 
 // Whether `el` fires nothing right now. A part is quiet while its owner is,
-// so setting an accordion's value moves its items without their events.
+// so setting an accordion's value moves its items without their events, and
+// an element while one inside it is, like a group whose checkbox restores.
 function quietNow(el: HTMLElement) {
   const owner = partOwners.get(el)
-  return quiet.has(el) || (!!owner && quiet.has(owner))
+  if (quiet.has(el) || (!!owner && quiet.has(owner))) return true
+  for (const inside of quiet) if (el.contains(inside)) return true
+  return false
 }
 
 // Whether a callback's only argument is a details object, like

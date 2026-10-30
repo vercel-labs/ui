@@ -76,6 +76,7 @@ test("form controls get their values back after going back, with no events, like
   await page.getByRole("textbox", { name: "Note" }).fill("Leave at the door")
   await page.getByRole("checkbox", { name: "Gift wrap" }).click()
   await page.getByRole("radio", { name: "Express" }).click()
+  await page.getByRole("checkbox", { name: "Olives" }).click()
   await page.getByRole("combobox", { name: "Size" }).click()
   await page.getByRole("option", { name: "Large" }).click()
   await page.addInitScript(() => {
@@ -93,10 +94,11 @@ test("form controls get their values back after going back, with no events, like
   await expect(page.getByRole("textbox", { name: "Note" })).toHaveValue("Leave at the door")
   await expect(page.getByRole("checkbox", { name: "Gift wrap" })).toBeChecked()
   await expect(page.getByRole("radio", { name: "Express" })).toBeChecked()
+  await expect(page.getByRole("checkbox", { name: "Olives" })).toBeChecked()
   await expect(page.getByRole("combobox", { name: "Size" })).toHaveText("Large")
   expect(
     await page.evaluate(() => Object.fromEntries(new FormData(document.querySelector("form")!))),
-  ).toEqual({ note: "Leave at the door", gift: "on", shipping: "express", size: "large" })
+  ).toEqual({ note: "Leave at the door", gift: "on", shipping: "express", toppings: "olives", size: "large" })
   const heard = await page.evaluate(
     () => new Promise((done) => setTimeout(() => done((window as unknown as { heard: string[] }).heard))),
   )
