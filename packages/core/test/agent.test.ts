@@ -16,6 +16,7 @@ import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { select } from "../src/components/select/select"
 import { separator } from "../src/components/separator/separator"
 import { slider } from "../src/components/slider/slider"
+import { tabs } from "../src/components/tabs/tabs"
 import { tree } from "../src/components/tree/tree"
 
 let cleanups: (() => void)[] = []
@@ -437,6 +438,44 @@ describe("agent", () => {
       () => instance.destroy(),
     )
     expect(agent.snapshot().find((component) => component.component === "select")?.label).toBe("Fruit")
+  })
+
+  test("item labels read as text: spaces collapsed, and without a nested item's text", () => {
+    const agent = createAgent()
+    const views = tabs({ id: "views" })
+    const list = document.body.appendChild(document.createElement("div"))
+    list.setAttribute("aria-label", "Views")
+    cleanups.push(bind(views.part("root"), list), () => views.destroy())
+    for (const [value, count] of [
+      ["active", 12],
+      ["activity", 2],
+    ] as const) {
+      const tab = list.appendChild(document.createElement("button"))
+      tab.innerHTML = `\n  ${value}\n  <span>${count}</span>\n`
+      cleanups.push(bind(views.part("tab", { value }), tab))
+    }
+    const files = tree({ id: "files" })
+    const root = document.body.appendChild(document.createElement("ul"))
+    root.setAttribute("aria-label", "Files")
+    cleanups.push(bind(files.part("root"), root), () => files.destroy())
+    const branch = root.appendChild(document.createElement("li"))
+    branch.append("src")
+    const group = branch.appendChild(document.createElement("ul"))
+    const leaf = group.appendChild(document.createElement("li"))
+    leaf.textContent = "index.ts"
+    cleanups.push(
+      bind(files.part("item", { value: "src" }), branch),
+      bind(files.part("item", { value: "src/index.ts" }), leaf),
+    )
+    const screen = agent.snapshot()
+    expect(screen.find((component) => component.label === "Views")?.items).toEqual([
+      { value: "active", label: "active 12" },
+      { value: "activity", label: "activity 2" },
+    ])
+    expect(screen.find((component) => component.label === "Files")?.items).toEqual([
+      { value: "src", label: "src" },
+      { value: "src/index.ts", label: "index.ts" },
+    ])
   })
 
   test("a press waits for the button's action, and a failed action fails the step", async () => {

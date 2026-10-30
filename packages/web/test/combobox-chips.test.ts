@@ -81,3 +81,15 @@ test("the page's own chips inside a wrapper stay as the page rendered them", asy
   await wait()
   expect(chips()).toEqual(["#bug", "#docs"])
 })
+
+test("the page's own chips stay alone when the page renders them after setting the value", async () => {
+  const { combobox, chips } = await mount()
+  const part = combobox.querySelector("ui-combobox-chips")!
+  ;(combobox as unknown as { value: string[] }).value = ["bug"]
+  const chip = document.createElement("ui-combobox-chip")
+  chip.setAttribute("value", "bug")
+  chip.textContent = "#bug"
+  part.prepend(chip)
+  await wait()
+  expect(chips()).toEqual(["#bug"])
+})

@@ -152,8 +152,15 @@ function TriggerPart({
   ...props
 }: Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps) {
   // Without content, the trigger shows the value.
-  const element = { ...props, children, render: controlRender(useFieldControl(props), "button", render) }
-  return usePart(selectPrimitive, "trigger", { disabled }, element, "button")
+  const field = useFieldControl(props)
+  const element = { ...props, children, render: controlRender(field, "button", render) }
+  return usePart(
+    selectPrimitive,
+    "trigger",
+    { disabled, named: !!field || props["aria-labelledby"] != null },
+    element,
+    "button",
+  )
 }
 
 const unselected: SelectValueState = { value: null, label: "", labels: [], placeholder: true }
