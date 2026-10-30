@@ -11,7 +11,7 @@
 
 {#each items as item (item.key)}
   <div data-index={item.index}>
-    <span {@attach (span) => virtual.bindFindable(item.index, span, 0)}></span>
-    <span {@attach (span) => virtual.bindFindable(item.index, span, 1)}></span>
+    <span {@attach (span) => virtual.findableText(item.index, span, 0)}></span>
+    <span {@attach (span) => virtual.findableText(item.index, span, 1)}></span>
   </div>
 {/each}

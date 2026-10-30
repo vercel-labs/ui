@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 // A findable virtual list rendered by Vue, binding its text with function refs.
 import { createVirtualizer } from "@ui-sdk/core"
-import { afterEach, beforeAll, expect, test } from "vitest"
+import { afterEach, beforeAll, expect, test, vi } from "vitest"
 import { createApp, defineComponent, h, nextTick, onUnmounted, shallowRef, type App } from "vue"
 
 beforeAll(() => {
+  Element.prototype.scrollIntoView ??= () => {}
   Object.defineProperty(HTMLElement.prototype, "onbeforematch", {
     value: null,
     writable: true,
@@ -71,9 +72,9 @@ function setup() {
       return () =>
         items.value.map((item) =>
           h("div", { key: item.key, "data-index": item.index }, [
-            h("span", { ref: (span) => virtual.bindFindable(item.index, span as HTMLElement | null, 0) }),
+            h("span", { ref: (span) => virtual.findableText(item.index, span as HTMLElement | null, 0) }),
             " ",
-            h("span", { ref: (span) => virtual.bindFindable(item.index, span as HTMLElement | null, 1) }),
+            h("span", { ref: (span) => virtual.findableText(item.index, span as HTMLElement | null, 1) }),
           ]),
         )
     },
@@ -85,6 +86,8 @@ function setup() {
 
 test("rows bind their text, a match renders its row before the next frame, and rows that leave give their text back", async () => {
   const { el, settle } = setup()
+  await vi.dynamicImportSettled()
+  await settle()
   expect([...row(el, 1)!.querySelectorAll("span")].map((span) => span.textContent)).toEqual([
     "Row 1",
     "plain",
@@ -99,7 +102,7 @@ test("rows bind their text, a match renders its row before the next frame, and r
     (node) => node.textContent === "Row 500 needle",
   )!
   const text = match.firstChild
-  match.dispatchEvent(new Event("beforematch"))
+  match.dispatchEvent(new Event("beforematch", { bubbles: true }))
   await settle()
   expect(row(el, 500)).not.toBeNull()
   await frame()

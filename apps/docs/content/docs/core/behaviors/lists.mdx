@@ -130,44 +130,45 @@ virtual.connect(scroller, { findable: true })
 
 Keep `findable` the text the row shows, so a row is found the same rendered or not. Pass only the text worth finding, like a title rather than a timestamp.
 
-Then render that text through `bindFindable`, one empty element per piece, from its ref:
+Then render that text through `findableText`, one empty element per piece, from its ref:
 
 <FrameworkContent value="react">
 
 ```tsx
-<span ref={(el) => virtual.bindFindable(item.index, el, 0)} />
-<span ref={(el) => virtual.bindFindable(item.index, el, 1)} />
+<span ref={(el) => virtual.findableText(item.index, el, 0)} />
+<span ref={(el) => virtual.findableText(item.index, el, 1)} />
 ```
 
 </FrameworkContent>
 <FrameworkContent value="vue">
 
 ```vue
-<span :ref="(el) => virtual.bindFindable(item.index, el as HTMLElement | null, 0)" />
-<span :ref="(el) => virtual.bindFindable(item.index, el as HTMLElement | null, 1)" />
+<span :ref="(el) => virtual.findableText(item.index, el as HTMLElement | null, 0)" />
+<span :ref="(el) => virtual.findableText(item.index, el as HTMLElement | null, 1)" />
 ```
 
 </FrameworkContent>
 <FrameworkContent value="svelte">
 
 ```svelte
-<span {@attach (el) => virtual.bindFindable(item.index, el, 0)}></span>
-<span {@attach (el) => virtual.bindFindable(item.index, el, 1)}></span>
+<span {@attach (el) => virtual.findableText(item.index, el, 0)}></span>
+<span {@attach (el) => virtual.findableText(item.index, el, 1)}></span>
 ```
 
 </FrameworkContent>
 <FrameworkContent value="solid">
 
 ```tsx
-<span ref={(el) => virtual.bindFindable(item.index, el, 0)} />
-<span ref={(el) => virtual.bindFindable(item.index, el, 1)} />
+<span ref={(el) => virtual.findableText(item.index, el, 0)} />
+<span ref={(el) => virtual.findableText(item.index, el, 1)} />
 ```
 
 </FrameworkContent>
 <FrameworkContent value="web-components">
 
 ```ts
-const off = [virtual.bindFindable(index, id, 0), virtual.bindFindable(index, customer, 1)]
+const [idText, customerText] = row.querySelectorAll("span")
+const off = [virtual.findableText(index, idText, 0), virtual.findableText(index, customerText, 1)]
 ```
 
 </FrameworkContent>
@@ -184,18 +185,7 @@ The element holds the very text find in page searches, so the browser highlights
 
 ### The Row It Found
 
-`onFind` runs when find in page matched a row that wasn't rendered, as the list scrolls to it, with `reason: "find-in-page"`:
-
-```ts
-const virtual = createVirtualizer({
-  count,
-  estimate,
-  findable: (index) => rows[index].title,
-  onFind: (index) => console.log(`Found ${rows[index].title}`),
-})
-```
-
-The row is `found` in `items()` until the next match, until it scrolls away, or until someone presses or types in the list. `virtual.found()` returns its index. A row that renders its text without `bindFindable` still scrolls into view, but the browser's highlight can't show on it, so mark it yourself:
+The row find in page matched is `found` in `items()` until the next match, until it scrolls away, or until someone presses or types in the list. A row that renders its text without `findableText` still scrolls into view, but the browser's highlight can't show on it, so mark it yourself:
 
 ```tsx
 <div data-found={item.found ? "" : undefined} className="data-found:bg-muted">
@@ -207,14 +197,14 @@ The findable layers are two elements that take no space, one at the start of the
 
 1. **Order:** find in page steps through matches in page order, so the stand-ins of the rows above the ones in view sit in the first layer, and the rest in the last. Rendered rows have no stand-in in the page, so their text is found once, where it shows.
 2. **A match** fires the stand-in's `beforematch` before the browser scrolls to it. The list scrolls to the row first and renders it, with the stand-in lying clear over the row, so the browser's own scroll has nothing to do.
-3. **On the next frame,** the matched text moves into the row's `bindFindable` elements, so the browser's highlight shows there and the find bar's Enter continues with the rows after it. A row without them takes the clear stand-in instead, and the find bar counts it twice until it scrolls away.
+3. **On the next frame,** the matched text moves into the row's `findableText` elements, so the browser's highlight shows there and the find bar's Enter continues with the rows after it. A row without them takes the clear stand-in instead, and the find bar counts it twice until it scrolls away.
 4. **Groups of stand-ins** are hidden until found too, so the browser skips style and layout for all of them until one matches.
 
-The layers cost two DOM nodes per row, the stand-in and its text, but almost no layout: the browser lays out only the groups. Call `virtual.refresh()` after the rows change, so the stand-ins hold the new text.
+Each row costs a stand-in and a text node per piece, with a space between pieces: two DOM nodes for a single string, four for two pieces. They cost almost no layout, since the browser lays out only the groups. Call `virtual.refresh()` after the rows change: it updates only the text that changed, in place, and rebuilds the stand-ins only when the count changes.
 
-To put the layers in another element around the rows, like the box they sit in, call `virtual.mountFindable(box)` instead of passing `findable` to `connect`. It returns a cleanup.
+The stand-ins' code loads the first time a list connects with `findable`, so lists without it don't download it.
 
-Browsers without `hidden="until-found"` don't get the layers, and find in page sees only the rows on screen, as without `findable`; `supportsHiddenUntilFound()` tells you. Closed tabs, accordions, collapsibles, trees and navigation menus are findable the same way, through their `hiddenUntilFound` option or [`bindFindable`](./motion#find-in-page-on-its-own), and a list inside a closed panel opens the panel first.
+Browsers without `hidden="until-found"` don't get the layers, and find in page sees only the rows on screen, as without `findable`; `supportsHiddenUntilFound()` tells you. Closed tabs, accordions, collapsibles, trees and navigation menus are findable the same way, through their `hiddenUntilFound` option or [`findableText`](./motion#find-in-page-on-its-own), and a list inside a closed panel opens the panel first.
 
 ### Options
 
@@ -233,15 +223,7 @@ Browsers without `hidden="until-found"` don't get the layers, and find in page s
     onEnd: "Jumping and Loading More",
     endThreshold: "Jumping and Loading More",
     findable: "Find in Page",
-    onFind: "The Row It Found",
   }}
-/>
-
-<TypeTable
-  path="../../packages/core/src/foundation/lists/virtualizer.ts"
-  name="VirtualizerConnectOptions"
-  events={false}
-  examples={{ findable: "Find in Page" }}
 />
 
 ## Logs That Follow Their End

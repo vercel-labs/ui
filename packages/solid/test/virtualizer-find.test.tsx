@@ -3,9 +3,10 @@
 import { createVirtualizer } from "@ui-sdk/core"
 import { render } from "@solidjs/web"
 import { createSignal, flush, For, onCleanup } from "solid-js"
-import { afterEach, beforeAll, expect, test } from "vitest"
+import { afterEach, beforeAll, expect, test, vi } from "vitest"
 
 beforeAll(() => {
+  Element.prototype.scrollIntoView ??= () => {}
   Object.defineProperty(HTMLElement.prototype, "onbeforematch", {
     value: null,
     writable: true,
@@ -72,8 +73,8 @@ function setup() {
       <For each={items()}>
         {(item) => (
           <div data-index={item.index}>
-            <span ref={(span) => virtual.bindFindable(item.index, span, 0)} />{" "}
-            <span ref={(span) => virtual.bindFindable(item.index, span, 1)} />
+            <span ref={(span) => virtual.findableText(item.index, span, 0)} />{" "}
+            <span ref={(span) => virtual.findableText(item.index, span, 1)} />
           </div>
         )}
       </For>
@@ -92,6 +93,8 @@ function setup() {
 
 test("rows bind their text, a match renders its row before the next frame, and rows that leave give their text back", async () => {
   const { el, settle } = setup()
+  await vi.dynamicImportSettled()
+  await settle()
   expect([...row(el, 1)!.querySelectorAll("span")].map((span) => span.textContent)).toEqual([
     "Row 1",
     "plain",
@@ -106,7 +109,7 @@ test("rows bind their text, a match renders its row before the next frame, and r
     (node) => node.textContent === "Row 500 needle",
   )!
   const text = match.firstChild
-  match.dispatchEvent(new Event("beforematch"))
+  match.dispatchEvent(new Event("beforematch", { bubbles: true }))
   await settle()
   expect(row(el, 500)).not.toBeNull()
   await frame()

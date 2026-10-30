@@ -44,10 +44,10 @@ function Example() {
               style={{ transform: `translateY(${item.start}px)` }}
             >
               <span
-                ref={(el) => virtual.bindFindable(item.index, el, 0)}
+                ref={(el) => virtual.findableText(item.index, el, 0)}
                 className="font-mono text-xs tabular-nums"
               />{" "}
-              <span ref={(el) => virtual.bindFindable(item.index, el, 1)} className="text-muted-foreground" />
+              <span ref={(el) => virtual.findableText(item.index, el, 1)} className="text-muted-foreground" />
             </div>
           ))}
         </div>
