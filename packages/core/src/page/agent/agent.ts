@@ -190,22 +190,39 @@ function valueFor(entry: Entry, action: string, value: unknown) {
   return parsed == null || Number.isNaN(parsed) ? refuse() : parsed
 }
 
+// An element's text as it reads, with its spaces collapsed, and without the
+// text of the elements in `skip`, like a tree branch's child items.
+function textOf(el: Element, skip: Element[] = []) {
+  let text = ""
+  const walk = (node: Node) => {
+    for (const child of node.childNodes)
+      if (child.nodeType === Node.TEXT_NODE) text += child.textContent
+      else if (child instanceof Element && !skip.includes(child)) walk(child)
+  }
+  walk(el)
+  return text.replace(/\s+/g, " ").trim()
+}
+
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
 function renderedItems(parts: Bound[]) {
-  return parts
-    .filter(
-      (part) =>
-        part.key &&
-        (part.slot === "item" ||
-          part.slot === "tab" ||
-          (part.slot === "root" && part.el.getAttribute("role") === "radio")),
-    )
-    .map((part) => {
-      const el = parts.find((other) => other.slot === "trigger" && other.key === part.key)?.el ?? part.el
-      return { value: part.key, label: el.textContent?.trim() || accessibleName(el) }
-    })
+  const items = parts.filter(
+    (part) =>
+      part.key &&
+      (part.slot === "item" ||
+        part.slot === "tab" ||
+        (part.slot === "root" && part.el.getAttribute("role") === "radio")),
+  )
+  const nested = items.map((part) => part.el)
+  return items.map((part) => {
+    const el = parts.find((other) => other.slot === "trigger" && other.key === part.key)?.el ?? part.el
+    return { value: part.key, label: textOf(el, nested) || accessibleName(el) }
+  })
 }
+
+// Whether an element shows, as far as the browser can tell. Without
+// `checkVisibility`, a `hidden` ancestor hides it.
+const isShown = (el: HTMLElement) => el.checkVisibility?.() ?? !el.closest("[hidden]")
 
 // Buttons and menu items inside the component's elements, like a dialog's
 // Cancel and Delete or a menu's Remove, visible, not inert and not inside
@@ -269,6 +286,9 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   const row = rowOf(parts)
   if (row) out.row = row
   for (const key of stateKeys(entry, state)) if (key in state) out[key] = redact(entry, state[key] ?? null)
+  // A reading nothing sets, like a progress bar's 2 of `max` 4.
+  if (!("value" in out) && "value" in state && typeof api.setValue !== "function")
+    out.value = redact(entry, state.value ?? null)
   // The rest only when they say something, like `required: true`. A secret
   // field's search text and errors can repeat its value.
   for (const key of shown) {
@@ -293,12 +313,12 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   }
   const text = parts
     .filter((part) => /title|description|error/.test(part.slot))
-    .map((part) => (entry.secret && /error/.test(part.slot) ? "[redacted]" : part.el.textContent?.trim()))
+    .map((part) => (entry.secret && /error/.test(part.slot) ? "[redacted]" : textOf(part.el)))
     .filter(Boolean)
   if (text.length) out.text = text as string[]
   const confirm = confirmOf(parts.filter((part) => !part.key).map((part) => part.el))
   if (confirm) out.confirm = confirm
-  const buttons = state.open === true ? buttonsOf(parts).map((el) => el.textContent?.trim() ?? "") : []
+  const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
   if (buttons.length) out.buttons = buttons
   const disabled =
     state.disabled === true || state.readOnly === true || ownButton(parts)?.matches(":disabled")
@@ -359,7 +379,13 @@ function createAgent(
       const parts = bound(instance)
       if (parts.length) remember(entry, parts)
       // Some show only now and then, like a field while it has errors: its control carries its label.
-      if (parts.length && !entry.offLimits && (entry.agent?.shown?.(instance.get()) ?? true))
+      // One whose every element is hidden, like a field in a closed dialog, isn't on the page yet.
+      if (
+        parts.length &&
+        !entry.offLimits &&
+        (entry.agent?.shown?.(instance.get()) ?? true) &&
+        parts.some((part) => isShown(part.el))
+      )
         found.push({ entry, instance, parts })
     }
     return found
@@ -578,8 +604,8 @@ function createAgent(
       // way are refused, not guessed.
       const needle = fold(text)
       const words = wordsOf(text)
-      const exact = buttons.filter((el) => fold(el.textContent?.trim() ?? "") === needle)
-      const near = buttons.filter((el) => words.trim() && wordsOf(el.textContent ?? "").includes(words))
+      const exact = buttons.filter((el) => fold(textOf(el)) === needle)
+      const near = buttons.filter((el) => words.trim() && wordsOf(textOf(el)).includes(words))
       const matches = exact.length ? exact : near
       if (matches.length > 1)
         throw new Error(
@@ -602,10 +628,10 @@ function createAgent(
     const { buttons, button } = found
     if (!button)
       throw new Error(
-        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => el.textContent?.trim()).join(", ") || "none"}.`,
+        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
       )
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
-    const pressed = `Pressed "${button.textContent?.trim() || accessibleName(button)}"`
+    const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
     const close = () => asAgent(() => api.setOpen?.(false))
     return { click: () => button.click(), button, pressed, opened, close }
   }
@@ -615,7 +641,7 @@ function createAgent(
   // open it without a step `allow` decided on, so it says press opens it.
   function pressable(instance: PrimitiveInstance) {
     const texts = buttonsOf(bound(instance))
-      .map((el) => el.textContent?.trim())
+      .map((el) => textOf(el))
       .filter(Boolean)
     if (texts.length) return ` press takes a button's text: ${texts.join(", ")}.`
     const opens = typeof (instance.api as { setOpen?: unknown }).setOpen === "function"
@@ -810,11 +836,7 @@ function createAgent(
     // way around it, like choosing a marked menu item by its value.
     try {
       if (press)
-        await ask(
-          args,
-          [press.button],
-          `press "${press.button.textContent?.trim() || accessibleName(press.button)}"`,
-        )
+        await ask(args, [press.button], `press "${textOf(press.button) || accessibleName(press.button)}"`)
       else await ask(args, targetsOf(args[0]), "make this change")
     } catch (refused) {
       // A popup the press opened to find its button closes again, as it was.

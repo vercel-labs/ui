@@ -22,6 +22,9 @@ function Checkbox(props: Omit<CheckboxOptions, "group"> & ButtonControlProps<Che
   // Inside a group, the group is the field's control.
   const field = useFieldControl()
   const fieldControl = group ? null : field
+  // Made once. A new function on each options run hands the options over again
+  // in the group's own update, and the parent checkbox then shows stale state.
+  const groupApi = group ? () => group.api : undefined
   const handle = usePrimitive(checkbox, () => ({
     checked: props.checked,
     defaultChecked: props.defaultChecked,
@@ -33,7 +36,7 @@ function Checkbox(props: Omit<CheckboxOptions, "group"> & ButtonControlProps<Che
     value: props.value,
     form: props.form,
     parent: props.parent,
-    group: group ? () => group.api : undefined,
+    group: groupApi,
     controller: props.controller,
     debug: props.debug,
   }))

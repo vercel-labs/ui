@@ -489,6 +489,10 @@ const comboboxChips = /* @__PURE__ */ (() => ({
       attrs: (state, { props, api }) => ({
         // Collapsed into the overflow part, past the chips that fit.
         hidden: collapsed(state, api, props.value) ? "" : undefined,
+        // A group named by its value's label alone, around its remove button.
+        // Delete or Backspace removes it.
+        role: "group",
+        "aria-label": api.internal.selection.labelOf(props.value) || undefined,
         tabindex: "-1",
         "aria-disabled": isDisabled(state) ? "true" : undefined,
         "aria-readonly": state.readOnly ? "true" : undefined,

@@ -763,6 +763,8 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
               return this.#properties[name]
             },
             set(this: Owner, value: unknown) {
+              // A page that renders on every change, like lit-html, sets the same value again each time.
+              if (Object.is(this.#properties[name], value)) return
               this.#properties[name] = value
               if (!this.#connected) return
               this.#configure()

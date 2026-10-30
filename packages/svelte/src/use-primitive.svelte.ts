@@ -317,7 +317,11 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       on(el, type as keyof HTMLElementEventMap, (event) => {
         const own = user[`on${type}`]
         if (typeof own === "function") own(event)
-        if (!event.defaultPrevented) handler!(event)
+        if (event.defaultPrevented) return
+        // Chrome fires `focusout` as Svelte removes a focused element, inside
+        // the effect removing it, where a write throws. The core hears it after.
+        if ($effect.tracking()) queueMicrotask(() => el.isConnected && handler!(event))
+        else handler!(event)
       }),
     )
     return () => {
