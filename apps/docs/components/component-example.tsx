@@ -2,9 +2,9 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
 import { readExampleSources } from "@/lib/example-sources"
-import { CodeBlock } from "./docs/code"
-import { frame } from "./docs/frame"
+import { CodeBlock } from "./code"
 import { ExamplePreview } from "./example-preview"
+import { Frame } from "./frame"
 
 async function ComponentExample({
   name,
@@ -37,27 +37,29 @@ async function ComponentExample({
   return (
     <figure className="my-8">
       {hideCode || hideTabs ? (
-        <div className={cn("flex flex-col overflow-hidden", frame)}>
+        <Frame className="flex flex-col overflow-hidden">
           {preview}
           {!hideCode && <div className={cn("border-t border-border/60", flat)}>{source}</div>}
-        </div>
+        </Frame>
       ) : (
-        <Tabs defaultValue="preview" className={cn("flex flex-col", frame)}>
-          <TabsList aria-label="Example" className="border-b border-border/60 px-4 py-2.5">
-            <TabsTab value="preview">Preview</TabsTab>
-            <TabsTab value="code">Code</TabsTab>
-          </TabsList>
-          <TabsPanel
-            value="preview"
-            keepMounted
-            className="rounded-b-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-          >
-            {preview}
-          </TabsPanel>
-          <TabsPanel value="code" className={cn("outline-none", flat)}>
-            {source}
-          </TabsPanel>
-        </Tabs>
+        <Frame>
+          <Tabs defaultValue="preview" className="flex flex-col">
+            <TabsList aria-label="Example" className="border-b border-border/60 px-4 py-2.5">
+              <TabsTab value="preview">Preview</TabsTab>
+              <TabsTab value="code">Code</TabsTab>
+            </TabsList>
+            <TabsPanel
+              value="preview"
+              keepMounted
+              className="rounded-b-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+            >
+              {preview}
+            </TabsPanel>
+            <TabsPanel value="code" className={cn("outline-none", flat)}>
+              {source}
+            </TabsPanel>
+          </Tabs>
+        </Frame>
       )}
       {caption && (
         <figcaption className="mt-3 px-1 text-sm leading-relaxed text-balance text-muted-foreground">

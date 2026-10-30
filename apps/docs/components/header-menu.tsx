@@ -11,15 +11,16 @@ import {
 } from "@ui-sdk/react/navigation-menu"
 import { frameworkIds, frameworks } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
-import type { Section } from "@/lib/sections"
 import { ArrowUpRightIcon, ChevronDownIcon } from "lucide-react"
 import Link from "next/link"
 import { useMenuLink } from "./section-nav"
+import { useSection } from "./site-preferences"
 
 const itemClassName =
   "inline-flex items-center rounded-md py-1.5 text-sm text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-active:text-foreground"
 
-function HeaderMenu({ section }: { section?: Section }) {
+function HeaderMenu() {
+  const section = useSection()
   const link = useMenuLink(section)
 
   return (

@@ -2,7 +2,6 @@
 @source "../../../examples";
 @source not "../../../examples/dist";
 
-/* Matches where the dark side shows: a dark choice, or the system's dark preference. */
 @custom-variant dark {
   &:where(.dark, .dark *, [data-color-scheme="dark"], [data-color-scheme="dark"] *) {
     @slot;
@@ -14,7 +13,6 @@
   }
 }
 
-/* The site's width and side padding, shared by the header and the footer. */
 @utility container {
   margin-inline: auto;
   width: 100%;
@@ -45,19 +43,11 @@
     opacity: 0;
   }
 }
-
-/*
- * One set of colors for both schemes: `light-dark()` picks a side by the
- * element's `color-scheme`. `Preferences` puts the reader's choice on
- * <html> as `data-color-scheme` before the first paint, and "system", or
- * no attribute yet, follows the browser. `.light` and `.dark` force one
- * side for a part of the page, like an example's preview.
- */
+  
 :root {
   color-scheme: light dark;
 }
 
-/* A part set to "system" inside one that forces a scheme follows the browser again. */
 [data-color-scheme="system"] {
   color-scheme: light dark;
 }
@@ -72,11 +62,6 @@
   color-scheme: dark;
 }
 
-/*
- * Declared again on everything that sets a scheme, since a browser works out
- * `light-dark()` in a custom property where it's declared, and the elements
- * inside inherit the color it picked.
- */
 :root,
 .light,
 .dark,

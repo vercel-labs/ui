@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/command"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { isFramework } from "@/lib/frameworks"
+import { useFramework } from "@/lib/preferences"
 import type { Section } from "@/lib/sections"
-import { useFramework } from "./remember-framework"
 import { createDialogController, DialogShortcut } from "@ui-sdk/react/dialog"
 import { useDocsSearch } from "fumadocs-core/search/client"
 import { FileTextIcon, HashIcon, SearchIcon, TextIcon } from "lucide-react"
@@ -44,19 +44,16 @@ const searchDialog = createDialogController()
 function SearchTrigger({
   label = "Search",
   shortcut,
-  anchor,
   className,
 }: {
   label?: string
   shortcut?: boolean
-  anchor?: boolean
   className?: string
 }) {
   return (
     <DialogTrigger
       controller={searchDialog}
       shortcut={shortcut ? "mod+k" : undefined}
-      data-search-anchor={anchor ? "" : undefined}
       className={
         className ??
         "flex h-8 w-full items-center gap-2 rounded-2xl px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
@@ -69,31 +66,10 @@ function SearchTrigger({
   )
 }
 
-function measureAnchor() {
-  const trigger = document.querySelector<HTMLElement>("[data-search-anchor]")
-  const rect = trigger?.getBoundingClientRect()
-  if (!rect?.width) return undefined
-  return {
-    top: rect.top - (48 - rect.height) / 2,
-    left: rect.left,
-    width: rect.width,
-    maxWidth: "none",
-    translate: "none",
-  } satisfies React.CSSProperties
-}
-
 function Search({ section, pages }: { section?: Section; pages: { name: string; url: string }[] }) {
   const [open, setOpen] = React.useState(false)
   const [preferredFramework] = useFramework()
-  const [anchor, setAnchor] = React.useState<React.CSSProperties>()
   const router = useRouter()
-
-  React.useEffect(() => {
-    if (!open) return
-    const update = () => setAnchor(measureAnchor())
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
-  }, [open])
 
   const { search, setSearch, query } = useDocsSearch({ type: "fetch", api: "/api/search", delayMs: 100 })
   const framework = section && isFramework(section) ? section : preferredFramework
@@ -114,12 +90,11 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
       controller={searchDialog}
       open={open}
       onOpenChange={(next) => {
-        if (next) setAnchor(measureAnchor())
         setOpen(next)
         if (!next) setSearch("")
       }}
     >
-      <DialogContent instant style={anchor}>
+      <DialogContent instant className="max-w-[37rem]">
         <DialogTitle className="sr-only">Search the docs</DialogTitle>
         <Command
           filter={false}

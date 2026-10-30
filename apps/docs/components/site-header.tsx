@@ -1,13 +1,10 @@
-import type { Section } from "@/lib/sections"
 import Link from "next/link"
-import { FrameworkPicker } from "./framework-picker"
+import { FrameworkPicker } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
 import { HeaderMenu } from "./header-menu"
-import { ThemeToggle } from "./theme-toggle"
 
-// The header on large screens. Pages outside the docs, like the homepage, have no section.
-function Header({ section, urls = [] }: { section?: Section; urls?: string[] }) {
+function SiteHeader({ urls }: { urls: string[] }) {
   return (
     <header className="sticky top-0 z-10 hidden bg-canvas/85 backdrop-blur-md lg:block">
       <aside aria-label="Private preview" className="bg-muted">
@@ -43,21 +40,19 @@ function Header({ section, urls = [] }: { section?: Section; urls?: string[] }) 
           <span aria-hidden className="text-lg font-light text-foreground/20">
             /
           </span>
-          <FrameworkPicker section={section} urls={urls} />
+          <FrameworkPicker urls={urls} />
         </div>
-        {/* Where you are on the left, where you can go on the right. */}
         <div className="ms-auto flex items-center gap-8">
-          <HeaderMenu section={section} />
+          <HeaderMenu />
           <SearchTrigger
             label="Search the docs"
             shortcut
             className="flex h-8 w-56 items-center gap-2.5 whitespace-nowrap rounded-2xl bg-foreground/[0.045] px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 xl:w-60"
           />
-          <ThemeToggle />
         </div>
       </div>
     </header>
   )
 }
 
-export { Header }
+export { SiteHeader }

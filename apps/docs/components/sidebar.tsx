@@ -20,7 +20,7 @@ function Sidebar({
   const active = useActiveTree(tree, componentsTree) ?? tree
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pt-6 ps-10 pe-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pt-6 pe-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <nav aria-label="Docs">
           <Nodes nodes={active.children} tocs={tocs} />
         </nav>
@@ -29,7 +29,6 @@ function Sidebar({
   )
 }
 
-// A group's heading: smaller and heavier than the links under it.
 const groupLabel = "mb-2 text-xs font-medium text-foreground"
 
 function Nodes({ nodes, tocs }: { nodes: PageTree.Node[]; tocs: Record<string, TableOfContents> }) {
@@ -58,7 +57,6 @@ function Nodes({ nodes, tocs }: { nodes: PageTree.Node[]; tocs: Record<string, T
   )
 }
 
-// A group of pages under a label. The label links to the folder's index page, if it has one.
 function Folder({ folder, tocs }: { folder: PageTree.Folder; tocs: Record<string, TableOfContents> }) {
   const pathname = usePathname()
   return (
@@ -85,7 +83,6 @@ function Folder({ folder, tocs }: { folder: PageTree.Folder; tocs: Record<string
 function PageLink({ page, toc }: { page: PageTree.Item; toc?: TableOfContents }) {
   const pathname = usePathname()
   const active = page.url === pathname
-  // Sections only. Subsections would push the rest of the nav out of view.
   const items = toc?.filter((item) => item.depth <= 2) ?? []
 
   return (
@@ -100,7 +97,6 @@ function PageLink({ page, toc }: { page: PageTree.Item; toc?: TableOfContents })
       >
         {page.name}
       </Link>
-      {/* Wide screens list the headings on the right instead. */}
       {active && items.length > 1 && (
         <div className="xl:hidden">
           <AnchorProvider toc={items} single>
@@ -112,10 +108,8 @@ function PageLink({ page, toc }: { page: PageTree.Item; toc?: TableOfContents })
   )
 }
 
-// The headings of the page you're on, nested under its link.
 function Toc({ items }: { items: TableOfContents }) {
   const active = useActiveAnchor()
-  // One heading isn't worth a list.
   if (items.length < 2) return null
 
   return (

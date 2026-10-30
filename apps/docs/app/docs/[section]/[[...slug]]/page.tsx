@@ -1,8 +1,6 @@
-import { PageToc } from "@/components/docs/page-toc"
+import { PageToc } from "@/components/page-toc"
 import { getMDXComponents } from "@/components/mdx"
-import { cn } from "cn"
 import { isFramework } from "@/lib/frameworks"
-import { contentColumn } from "@/lib/layout"
 import { isSection, sectionLabel } from "@/lib/sections"
 import { source } from "@/lib/source"
 import { findNeighbour } from "fumadocs-core/page-tree"
@@ -18,14 +16,11 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
   if (!page) notFound()
 
   const MDX = page.data.body
-  // Previous and next follow the same page order as the sidebar.
   const neighbours = findNeighbour(source.getPageTree(), page.url)
   const inSection = (url?: string) => url === `/docs/${section}` || url?.startsWith(`/docs/${section}/`)
   const previous = inSection(neighbours.previous?.url) ? neighbours.previous : undefined
   const next = inSection(neighbours.next?.url) ? neighbours.next : undefined
 
-  // Links in the content are relative to their file, like ./components/menu.
-  // The source finds pages by file, so the link is tried as a page and as a folder's index.
   const resolve = (href: string) => {
     if (!href.startsWith("./") && !href.startsWith("../")) return href
     const [file, hash] = href.split("#", 2)
@@ -37,8 +32,8 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
   }
 
   return (
-    <div className="flex">
-      <article className={cn(contentColumn, "pt-8 pb-24")}>
+    <>
+      <article className="mx-auto w-full xl:max-w-[42rem] px-4 pt-8 pb-24 sm:px-8 lg:px-10 xl:ms-0">
         <header className="mb-10">
           <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
             {page.data.title}
@@ -76,7 +71,7 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
         )}
       </article>
       <PageToc toc={page.data.toc} />
-    </div>
+    </>
   )
 }
 
@@ -92,7 +87,6 @@ export async function generateMetadata(props: PageProps<"/docs/[section]/[[...sl
 
   const title = isFramework(section) ? `${page.data.title} for ${sectionLabel(section)}` : page.data.title
   const description = page.data.description
-  // Drawn by app/og/docs/[...slug]/route.tsx.
   const image = `/og${page.url}/image.png`
   return {
     title,
