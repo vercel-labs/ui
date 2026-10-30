@@ -16,6 +16,7 @@ const ids = ref<string[]>([])
 const picked = (next: Fruit | null) => next?.id
 const count = ref(0)
 const several = ref(false)
+const maybe = ref<boolean | undefined>(undefined)
 </script>
 
 <template>
@@ -33,6 +34,8 @@ const several = ref(false)
   <Select :value="ids" />
   <Select :multiple="several" :value="name" />
   <Select :multiple="several" :value="ids" />
+  <Select :multiple="maybe" :value="name" />
+  <Select :multiple="maybe" :value="ids" />
   <Select>
     <SelectValue v-slot="{ state }">{{ state.placeholder }}</SelectValue>
     <SelectItem :value="apple">Apple</SelectItem>

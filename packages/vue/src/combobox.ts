@@ -105,7 +105,7 @@ type ComboboxProps<T, Multiple extends boolean | undefined> = ComboboxOptions<T,
 type ComboboxComponent = {
   new <T = string>(props: RootPropsOf<ComboboxProps<T, false>>): RootInstanceOf<ComboboxProps<T, false>>
   new <T = string>(props: RootPropsOf<ComboboxProps<T, true>>): RootInstanceOf<ComboboxProps<T, true>>
-  new <T = string, Multiple extends boolean = boolean>(
+  new <T = string, Multiple extends boolean | undefined = boolean>(
     props: RootPropsOf<ComboboxProps<T, Multiple> & { multiple: Multiple }>,
   ): RootInstanceOf<ComboboxProps<T, Multiple>>
 } & RenderableWith<ComboboxProps<any, boolean | undefined>>
