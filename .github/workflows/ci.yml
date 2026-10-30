@@ -80,6 +80,9 @@ jobs:
       - name: Perf docs
         run: pnpm docs:perf --check
 
+      - name: Bundle size
+        run: pnpm size
+
       # Only packages/*: a recursive `test` would also start Playwright in tests/.
       - name: Unit tests
         run: pnpm --filter "./packages/*" test

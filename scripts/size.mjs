@@ -1,28 +1,6 @@
-// Checks what each React and Svelte entry costs an app against `size-budget.json`.
-//
-//   pnpm size            Fails when an entry grows more than 3% past its budget.
-//   pnpm size --update   Writes today's sizes as the new budgets.
-//
-// Each entry is bundled from source the way an app's production build bundles
-// it: minified, with the framework external and core included, and with `#dev`
-// resolved without the `development` condition. Sizes are gzip bytes.
-// Code an entry loads with `import()`, like the sheet a popup presents as on
-// phones, goes into chunks of its own, as app bundlers split it. An entry's
-// size is what a page loads up front: its chunk and the chunks it imports
-// statically, glue included. What `import()` loads later is its own
-// "(lazy)" row, with its own budget, so it can't grow unseen either.
-//
-// Svelte rows compile `.svelte` components and `.svelte.ts` runes modules as
-// `@sveltejs/vite-plugin-svelte` does in a production build, so they count the
-// compiled adapter, not its source. They also count the Svelte runtime the
-// entry needs beyond a bare app (`adapters` below says why).
-//
-// The "(perf pages)" rows bundle every part the perf pages use in one entry
-// (`perfPages` below), so code the components share counts once, as in an app.
-//
-// It also fails when an entry other than Field and Form bundles Field or Form
-// code, in React, Svelte, Vue and web components alike, and when an entry
-// bundles a core module `absent` below rules out for it.
+// Checks what each React, Svelte and Vue entry costs an app against
+// `size-budget.json`, and the code no entry may ship. tests/README.md
+// ("Bundle size") says how each row is measured.
 import { build, transform } from "esbuild"
 import { readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { readFile } from "node:fs/promises"
@@ -95,16 +73,31 @@ const adapters = [
       `mount(App, { target: document.body })`,
     ].join("\n"),
   },
+  {
+    name: "vue",
+    // Vite's defaults for Vue's compile-time flags in a production build.
+    options: {
+      external: ["vue"],
+      define: {
+        __VUE_OPTIONS_API__: "true",
+        __VUE_PROD_DEVTOOLS__: "false",
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
+      },
+    },
+    // Vue's runtime tree-shakes like Svelte's, so an entry counts the parts
+    // of it a bare app doesn't use, like `Teleport`.
+    app: [
+      `import { createApp, h } from "vue"`,
+      `createApp({ render: () => h("button", "App") }).mount(document.body)`,
+    ].join("\n"),
+  },
 ]
 
 // Field ships only with a Field: a control joins a field through a small
 // context module, so no other entry bundles it.
 const fieldModule = /^packages\/core\/src\/components\/field\/[^/]+\.ts$/
 // Adapters with no size rows whose entries still get that check.
-const checkedOnly = [
-  { name: "vue", options: { external: ["vue"] } },
-  { name: "web", options: {} },
-]
+const checkedOnly = [{ name: "web", options: {} }]
 
 // Optional parts ship only once a page renders them (`Feature` in core's
 // `primitive-types.ts`): a page with a component's basic parts bundles none of
@@ -267,21 +260,29 @@ function gzip(code) {
 // chunk it imports statically, and the code it loads later with `import()`.
 // An entry is a `file`, or a `source` written here.
 async function bundleForProduction(entry, options) {
-  const result = await build({
+  const shared = {
     entryPoints: { entry: entry.file ?? "size:entry" },
     bundle: true,
     minify: true,
     format: "esm",
-    splitting: true,
     outdir: "out",
     platform: "browser",
     target: "es2022",
     ...options,
     plugins: [...(options.plugins ?? []), ...(entry.source === undefined ? [] : [sourceEntry(entry.source)])],
-    define: { "process.env.NODE_ENV": '"production"' },
+    define: { ...options.define, "process.env.NODE_ENV": '"production"' },
     write: false,
     metafile: true,
     logLevel: "error",
+  }
+  // Vite drops an `import()` in code it shakes out. esbuild still splits it,
+  // which moves shared code into a chunk the entry imports, so a build without
+  // splitting first finds what ships and the rest stays out.
+  const whole = await build(shared)
+  const result = await build({
+    ...shared,
+    splitting: true,
+    plugins: [unshippedImports(keptModules(Object.values(whole.metafile.outputs))), ...shared.plugins],
   })
   const outputs = result.metafile.outputs
   // The chunks a page loads up front, then the ones it can load later. esbuild
@@ -302,18 +303,44 @@ async function bundleForProduction(entry, options) {
   const text = (output) => result.outputFiles.find((file) => file.path.endsWith(output)).text
   const join = (list) => list.map(text).join("\n")
   const all = Object.keys(outputs).filter((output) => output.endsWith(".js") && loadable.has(output))
-  // The source files with code in the output, relative to the root.
-  const modules = new Set(
-    all.flatMap((output) =>
-      Object.entries(outputs[output].inputs)
+  return {
+    code: join(all.filter((output) => upfront.has(output))),
+    lazy: join(all.filter((output) => !upfront.has(output))),
+    modules: keptModules(all.map((output) => outputs[output])),
+  }
+}
+
+// The source files with code in these outputs, relative to the root.
+function keptModules(outputs) {
+  return new Set(
+    outputs.flatMap((output) =>
+      Object.entries(output.inputs)
         .filter(([, input]) => input.bytesInOutput)
         .map(([file]) => file),
     ),
   )
+}
+
+// Leaves out each `import()` of a module that isn't in `kept`.
+function unshippedImports(kept) {
   return {
-    code: join(all.filter((output) => upfront.has(output))),
-    lazy: join(all.filter((output) => !upfront.has(output))),
-    modules,
+    name: "unshipped-imports",
+    setup(build) {
+      build.onResolve(
+        { filter: /.*/ },
+        async ({ path: specifier, kind, importer, resolveDir, pluginData }) => {
+          if (kind !== "dynamic-import" || pluginData === unshippedImports) return
+          const resolved = await build.resolve(specifier, {
+            kind,
+            importer,
+            resolveDir,
+            pluginData: unshippedImports,
+          })
+          if (resolved.errors.length || resolved.namespace !== "file") return
+          if (!kept.has(path.relative(root, resolved.path))) return { path: specifier, external: true }
+        },
+      )
+    },
   }
 }
 

@@ -441,7 +441,7 @@ const SelectItemText = withElement(
  */
 const SelectSelectAll = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "SelectSelectAll",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof selectPrimitive, "select-all">,
