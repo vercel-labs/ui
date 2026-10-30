@@ -154,6 +154,26 @@ describe("navigation over data", () => {
     expect(listbox.search("b", "banana")?.key).toBe("blueberry")
   })
 
+  test("typeahead from a disabled item finds the next match after it", () => {
+    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const listbox = createListbox({
+      store,
+      focus: "virtual",
+      items: () => [
+        { value: "apple", label: "Apple" },
+        { value: "avocado", label: "Avocado", disabled: true },
+        { value: "banana", label: "Banana" },
+        { value: "apricot", label: "Apricot" },
+      ],
+      toKey: (value) => itemKey(value),
+      filter: () => "contains",
+      query: () => "",
+      loop: () => true,
+      active: () => true,
+    })
+    expect(listbox.search("a", "avocado")?.key).toBe("apricot")
+  })
+
   test("moves only through items that match the query", () => {
     const { store, listbox } = make(true, "berry")
     listbox.move("first")

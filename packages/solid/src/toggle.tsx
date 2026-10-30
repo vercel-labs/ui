@@ -1,17 +1,27 @@
 import {
   toggle,
   toggleGroup as toggleGroupPrimitive,
+  type ToggleGroupController,
   type ToggleGroupOptions,
   type ToggleGroupState,
   type ToggleOptions,
   type ToggleState,
 } from "@ui-sdk/core/toggle"
-import { omit } from "solid-js"
+import { createContext, omit, useContext } from "solid-js"
 import { useToolbarScope } from "./toolbar-context"
-import { createParts, useNearest, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  provided,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 const parts = createParts(toggle, { icon: "span" })
-const groupParts = createParts(toggleGroupPrimitive, {})
+
+// The group's own context, so a toggle can join a group without bundling it.
+const ToggleGroupContext = createContext<PrimitiveHandle<typeof toggleGroupPrimitive> | null>(null)
 
 /**
  * A button that stays pressed. Inside a ToggleGroup, the group decides whether it's pressed.
@@ -21,7 +31,7 @@ function Toggle(
   props: ToggleOptions &
     Omit<PartProps<"button", ToggleState>, "value" | "defaultValue" | "type" | "onChange" | "onSelect">,
 ) {
-  const group = useNearest(toggleGroupPrimitive)
+  const group = useContext(ToggleGroupContext)
   const toolbar = useToolbarScope()
   const handle = usePrimitive(toggle, () => ({
     pressed: props.pressed,
@@ -66,6 +76,19 @@ function ToggleGroup<T extends string = string>(
     Omit<PartProps<"div", ToggleGroupState<T>>, "defaultValue" | "onChange" | "onSelect">,
 ) {
   const toolbar = useToolbarScope()
+  const group = usePrimitive(toggleGroupPrimitive, () => ({
+    value: props.value,
+    defaultValue: props.defaultValue,
+    onValueChange: props.onValueChange as ToggleGroupOptions["onValueChange"],
+    multiple: props.multiple,
+    deselectable: props.deselectable,
+    disabled: props.disabled,
+    orientation: props.orientation,
+    loop: props.loop,
+    controller: props.controller as ToggleGroupController | undefined,
+    debug: props.debug,
+    toolbar: toolbar?.(),
+  }))
   const rest = omit(
     props,
     "value",
@@ -79,10 +102,8 @@ function ToggleGroup<T extends string = string>(
     "controller",
     "debug",
   )
-  return (
-    <groupParts.Root<T> {...props} toolbar={toolbar?.()}>
-      {usePart(toggleGroupPrimitive, "group", undefined, rest, "div")}
-    </groupParts.Root>
+  return provided(
+    <ToggleGroupContext value={group}>{usePart(group, "group", undefined, rest, "div")}</ToggleGroupContext>,
   )
 }
 

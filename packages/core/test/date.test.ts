@@ -312,6 +312,17 @@ describe("typing a date", () => {
     expect(parseDate("2026년 10월 16일", "ko")).toBe("2026-10-16")
   })
 
+  test("reads years in the calendar the locale writes them in", () => {
+    const shown = formatDate("2026-10-16", "th-TH", { year: "numeric", month: "2-digit", day: "2-digit" })
+    expect(parseDate(shown, "th-TH")).toBe("2026-10-16")
+    expect(parseDate("16/10/2569", "th-TH")).toBe("2026-10-16")
+    expect(parseDate("16/10/69", "th-TH", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
+    expect(parseDate("16/10", "th-TH", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
+    expect(parseDate("10/16/2569", "en-US-u-ca-buddhist")).toBe("2026-10-16")
+    expect(parseDate("115/10/16", "zh-TW-u-ca-roc")).toBe("2026-10-16")
+    expect(parseDate("2026/10/16", "ja-JP-u-ca-japanese")).toBe("2026-10-16")
+  })
+
   test("reads the locale's own digits", () => {
     expect(parseDate("١٦/١٠/٢٠٢٦", "ar-EG")).toBe("2026-10-16")
   })

@@ -8,6 +8,7 @@ import {
   decimalsOf,
   displayOptions,
   formatNumber,
+  maxOnGrid,
   numberFormatter,
   snapToStep,
   stepValue,
@@ -96,14 +97,14 @@ function inputMode(state: State) {
   return decimal ? "decimal" : "numeric"
 }
 
-function canStep(state: State, direction: number) {
-  return !isLocked(state) && !atBound(state, direction)
+function canStep(state: State, direction: number, step = state.step) {
+  return !isLocked(state) && !atBound(state, direction, step)
 }
 
 // Whether the value is at the bound a step in this direction moves toward.
-function atBound(state: State, direction: number) {
+function atBound(state: State, direction: number, step = state.step) {
   if (state.value === null) return false
-  return direction > 0 ? state.value >= state.max : state.value <= state.min
+  return direction > 0 ? state.value >= maxOnGrid({ ...rangeOf(state), step }) : state.value <= state.min
 }
 
 // Which step a gesture moves by: Shift picks the large one, and Alt the small one.
@@ -180,7 +181,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
   // own grid, so a fine change isn't rounded away by `step`.
   function stepBy(steps: number, size: StepSize, reason: NumberInputValueChangeReason, event?: Event) {
     const state = store.get()
-    if (!canStep(state, steps)) return false
+    if (!canStep(state, steps, size === "small" ? state.smallStep : state.step)) return false
     const range = rangeOf(state)
     const from = current()
     const next =
@@ -281,7 +282,8 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         }
         if (event.altKey) return
         // Home and End go to a bound only when there is one. Otherwise they move the caret.
-        const bound = event.key === "Home" ? state.min : event.key === "End" ? state.max : undefined
+        const bound =
+          event.key === "Home" ? state.min : event.key === "End" ? maxOnGrid(rangeOf(state)) : undefined
         if (bound === undefined || !Number.isFinite(bound) || isLocked(state)) return
         event.preventDefault()
         setValue(bound, "step-key", event)
