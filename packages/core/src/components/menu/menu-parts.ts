@@ -657,10 +657,9 @@ function activateItem(api: MenuApi, props: ItemProps, event?: Event, selection =
   api.action(props.value, event)
 }
 
-// Routers call `preventDefault()` on a link's click to navigate on the
-// client, sometimes before the item's handler, which then skips the click. A
-// listener on the element hears it either way, so a link item still selects
-// and closes the menu. `onSelect` gets an event of its own to keep it open.
+// A router can call `preventDefault()` on a link's click before the item's
+// handler, which then skips it. This listener still selects and closes the
+// menu; `onSelect` gets an event of its own to keep it open.
 function linkClick(api: MenuApi, props: () => ItemProps, el: HTMLElement, event: Event) {
   if (!event.defaultPrevented || taken.has(event) || !el.matches("a[href]") || opensElsewhere(event, el))
     return

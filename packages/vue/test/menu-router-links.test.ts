@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
-// A router's link calls `preventDefault()` on its click before the item's
-// handler hears it, to navigate on the client. The item still selects and
-// closes the menu.
+// A router's link calls `preventDefault()` before the item's handler hears the
+// click. The item still selects and closes the menu.
 import { afterEach, expect, test } from "vitest"
 import { createApp, h, mergeProps, nextTick, type App } from "vue"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "../src/menu"
