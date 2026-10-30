@@ -6,6 +6,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { linkPreview, type LinkPreviewOptions } from "../../../examples/experiments/link-preview"
 import type { ChangeDetails } from "../src/foundation/kernel/details"
+import { bind } from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { createPopup, popupState } from "../src/foundation/popups/create-popup"
 import { tooltipPreset } from "../src/foundation/popups/popup-hover-presets"
@@ -22,6 +23,8 @@ afterEach(() => {
   mounts.splice(0).forEach((mounted) => mounted.unmount())
   document.body.replaceChildren()
 })
+
+const frame = () => new Promise((done) => requestAnimationFrame(() => setTimeout(done)))
 
 const page = (title: string) =>
   JSON.stringify({ title, description: `About ${title}.`, image: `/${title}.png` })
@@ -327,6 +330,50 @@ describe("our popups on the kit", () => {
     await view.keys("Escape")
     expect(view.state.open).toBe(false)
     expect(document.activeElement?.textContent).toBe("After")
+  })
+
+  test("Popover whose only trigger renders again while open returns focus to the new one", async () => {
+    const instance = popover({ id: "p" })
+    const first = Object.assign(document.createElement("button"), { textContent: "Open" })
+    const content = document.createElement("div")
+    const inside = content.appendChild(
+      Object.assign(document.createElement("button"), { textContent: "Inside" }),
+    )
+    document.body.append(first, content)
+    const unbindContent = bind(instance.part("content"), content)
+    const unbindFirst = bind(instance.part("trigger", { id: "t1" }), first)
+    first.click()
+    await frame()
+    inside.focus()
+    unbindFirst()
+    const second = Object.assign(document.createElement("button"), { textContent: "Close" })
+    first.replaceWith(second)
+    const unbindSecond = bind(instance.part("trigger", { id: "t2" }), second)
+    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    await frame()
+    expect(instance.get().open).toBe(false)
+    expect(document.activeElement).toBe(second)
+    unbindSecond()
+    unbindContent()
+    instance.destroy()
+  })
+
+  test("Popover opened from code after the trigger that opened it last is gone returns focus to its other trigger", async () => {
+    const view = mount(
+      popover,
+      {},
+      `<div><trigger id="ada">Ada</trigger><trigger id="grace">Grace</trigger><button>After</button><content><button>Copy link</button></content></div>`,
+    )
+    mounts.push(view)
+    await view.click(view.part("trigger", "grace")!)
+    view.part("trigger", "grace")!.remove()
+    await view.keys("Escape")
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    view.api.open()
+    await view.settle()
+    await view.keys("Escape")
+    expect(view.state.open).toBe(false)
+    expect(document.activeElement?.textContent).toBe("Ada")
   })
 
   test("Hover Card opens on keyboard focus and Escape closes it", async () => {

@@ -168,8 +168,14 @@ function bindPopupContent(el: HTMLElement, internal: PopupInternal, key?: string
 }
 
 // The first trigger is the one focus returns to until another opens the popup.
-function bindTrigger<State extends PopupState>(store: Store<State>, key: string) {
-  if (store.get().trigger === null) store.set({ trigger: key } as Partial<State>)
+// A trigger that binds once the one that opened it is gone takes its place, like the same button re-rendered.
+function bindTrigger<State extends PopupState>(
+  store: Store<State>,
+  key: string,
+  bound: (key: string) => boolean,
+) {
+  const { trigger } = store.get()
+  if (trigger === null || !bound(trigger)) store.set({ trigger: key } as Partial<State>)
   return () => {
     if (store.get().trigger === key && !store.get().open) store.set({ trigger: null } as Partial<State>)
   }
@@ -207,7 +213,7 @@ function popupTrigger<State extends PopupState, Api extends PopupApi>(slot: Slot
     press: ({ api, key, props }, event) => api.internal.press?.press(key, props, event),
     bind(el, { api, key, id, store }) {
       if (dev) checkName(el, "The trigger", { component: api.internal.label, id })
-      return bindTrigger(store, key)
+      return bindTrigger(store, key, (trigger) => !!api.internal.element(api.internal.triggerSlot, trigger))
     },
   })
 }
