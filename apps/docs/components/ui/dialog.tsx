@@ -7,7 +7,6 @@ import type { ComponentProps } from "react"
 const backdrop =
   "fixed inset-0 bg-black/20 transition-opacity duration-150 supports-backdrop-filter:backdrop-blur-[2px] data-starting-style:opacity-0 data-ending-style:opacity-0 dark:bg-black/50"
 
-
 function DialogContent({
   instant,
   className,
