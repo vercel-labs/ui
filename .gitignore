@@ -31,3 +31,5 @@ packages/web/html-custom-data.json
 packages/web/browser/
 # The @ui-sdk/web releases apps/docs/scripts/web-releases.mjs copies in before a build.
 apps/docs/public/web@*
+# Git worktrees agents work in, inside the workspace.
+.claude/worktrees/
