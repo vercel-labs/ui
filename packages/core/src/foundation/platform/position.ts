@@ -512,13 +512,9 @@ const angle = (value: string) => {
   return (number * Math.PI) / 180
 }
 
-// Where a popup's box would be on screen without its own `translate`,
-// `rotate`, `scale` and `transform`, like an entrance animation's, which move
-// what getBoundingClientRect reports. Each corner goes through them around
-// the transform origin, and the box around the corners is what's on screen.
-// Whatever else scales it is `zoom` on an ancestor or a scaled containing
-// block, which scale its offsets too, and is returned as `scale`. A box under
-// a pixel off isn't scaled: offsets round, so it may be the size they gave.
+// Where a popup's box would be on screen without its own transforms, like an
+// entrance animation's: each corner goes through them around the transform
+// origin. The scale left over is an ancestor's `zoom` or a scaled containing block.
 function untransformed(
   rect: { x: number; y: number; width: number; height: number },
   size: { width: number; height: number },
@@ -560,6 +556,7 @@ function untransformed(
   const ys = corners.map(([, y]) => y)
   const left = Math.min(...xs)
   const top = Math.min(...ys)
+  // Offsets round, so a box under a pixel off may be the size they gave.
   const rest = (shown: number, whole: number) =>
     whole > 0.01 && Math.abs(shown - whole) >= 1 ? shown / whole : 1
   const scale = { x: rest(rect.width, Math.max(...xs) - left), y: rest(rect.height, Math.max(...ys) - top) }

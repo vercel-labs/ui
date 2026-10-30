@@ -1,10 +1,8 @@
 import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
 
-// Where `position` places a popup in layouts that move or scale it, checked
-// in a real browser against the core module itself. It doesn't depend on the
-// framework, so it runs once per browser: in React on Chromium, and in the
-// one framework each other engine runs.
+// The core module itself, in layouts that move or scale a popup. It doesn't
+// depend on the framework, so it runs once per engine: React on Chromium, web elsewhere.
 test.beforeEach(async ({ framework, open, browserName }) => {
   test.skip(browserName === "chromium" && framework !== "react", "Framework independent.")
   await open("popover")
