@@ -31,3 +31,10 @@ export type {
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"
 export type { TreeEvents, UiTreeElement } from "../events"
+export {
+  createTreeController,
+  toggleTreeChecked,
+  treeCheckedStates,
+  treeFromPaths,
+  visibleTreeRows,
+} from "@ui-sdk/core/tree"

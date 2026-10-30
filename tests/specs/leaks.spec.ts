@@ -224,10 +224,13 @@ test.describe("leaks", () => {
       open,
       framework,
     }) => {
-      // Solid's event delegation defines a `currentTarget` getter on each
-      // event, and V8 keeps the first one on the event's shape, with that
-      // event and its target.
-      test.skip(framework.startsWith("solid"), "Solid keeps the first delegated event's target.")
+      // Solid's event delegation gives each event its own `currentTarget`
+      // getter. V8 keeps one of them on the shape every event of that type
+      // shares, with its event and target, so a Solid page keeps the target
+      // of one keydown, click or focus. Earlier events in the other leak
+      // tests' warmups keep elements that are still on the page. See
+      // BACKLOG.md.
+      test.skip(framework.startsWith("solid"), "Solid's event delegation keeps one event's target alive.")
       await open("leaks", { component: name })
       const cdp = await page.context().newCDPSession(page)
       await openAndClose(page, name, 1)

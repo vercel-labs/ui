@@ -23,3 +23,4 @@ export type {
   ConfirmOptions,
 } from "@ui-sdk/core/alert-dialog"
 export type { AlertDialogEvents, UiAlertDialogElement } from "../events"
+export { confirm, createAlertDialogController, createConfirm } from "@ui-sdk/core/alert-dialog"

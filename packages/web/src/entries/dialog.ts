@@ -45,3 +45,4 @@ export type {
   DialogTriggerState,
 } from "@ui-sdk/core/dialog"
 export type { DialogEvents, UiDialogElement } from "../events"
+export { createDialogController } from "@ui-sdk/core/dialog"

@@ -24,6 +24,8 @@ function expectControlled(
 
 function forgetControlled(_instance: object) {}
 
+function heardControlled(_instance: object, _options: object) {}
+
 function measured(read: () => void) {
   read()
 }
@@ -53,6 +55,7 @@ export {
   expectControlled,
   exposeShortcuts,
   forgetControlled,
+  heardControlled,
   isMeasuring,
   measured,
   warn,

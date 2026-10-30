@@ -232,13 +232,13 @@ Props are attributes in kebab case, like `default-value` (open values separated 
 
 Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the details beside it. Calling `preventDefault()` on `valuechange` or `openchange` cancels the change.
 
-| Member                     | On                  | Description                                                                            |
-| -------------------------- | ------------------- | -------------------------------------------------------------------------------------- |
-| `value` property           | `ui-accordion`      | The open items, as an array. Setting it, or the `value` attribute, fires `valuechange` |
-| `api` property             | `ui-accordion`      | The [controller](#controller)                                                          |
-| `valuechange` event        | `ui-accordion`      | `detail: { value, reason, event, source }`                                             |
-| `openchange` event         | `ui-accordion-item` | `detail: { value: open, reason, event, source }`, before `valuechange`                 |
-| `openchangecomplete` event | `ui-accordion-item` | `detail: { value: open }`, after the panel's animation                                 |
+| Member                     | On                  | Description                                                                   |
+| -------------------------- | ------------------- | ----------------------------------------------------------------------------- |
+| `value` property           | `ui-accordion`      | The open items, as an array. Setting it, or the `value` attribute, opens them |
+| `api` property             | `ui-accordion`      | The [controller](#controller)                                                 |
+| `valuechange` event        | `ui-accordion`      | `detail: { value, reason, event, source }`                                    |
+| `openchange` event         | `ui-accordion-item` | `detail: { value: open, reason, event, source }`, before `valuechange`        |
+| `openchangecomplete` event | `ui-accordion-item` | `detail: { value: open }`, after the panel's animation                        |
 
 ### Reasons
 

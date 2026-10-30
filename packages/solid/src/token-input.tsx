@@ -99,7 +99,10 @@ function TokenInput(props: TokenInputProps) {
 // read after mount, from an effect: the server has none, and reading them
 // while hydrating would render content the server never did.
 function tokens(input: TokenInputContextValue, renderToken: (token: Token) => JSX.Element) {
-  const [hosts, setHosts] = createSignal<ReturnType<typeof input.api.internal.hosts>>([])
+  // Written from core's listeners, which can fire inside a disposal.
+  const [hosts, setHosts] = createSignal<ReturnType<typeof input.api.internal.hosts>>([], {
+    ownedWrite: true,
+  })
   createEffect(
     () => 0,
     () => {

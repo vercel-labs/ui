@@ -29,3 +29,4 @@ export type {
   NavigationMenuViewportState,
 } from "@ui-sdk/core/navigation-menu"
 export type { NavigationMenuEvents, UiNavigationMenuElement } from "../events"
+export { createNavigationMenuController } from "@ui-sdk/core/navigation-menu"

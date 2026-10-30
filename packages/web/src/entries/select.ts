@@ -44,3 +44,4 @@ export type {
   SelectValueState,
 } from "@ui-sdk/core/select"
 export type { SelectEvents, UiSelectElement } from "../events"
+export { createSelectController } from "@ui-sdk/core/select"

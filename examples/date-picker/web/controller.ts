@@ -1,5 +1,4 @@
-import { createDatePickerController } from "@ui-sdk/web"
-import "@ui-sdk/web/date-picker"
+import { createDatePickerController } from "@ui-sdk/web/date-picker"
 import { Calendar, ChevronLeft, ChevronRight, createElement } from "lucide"
 
 export function mount(root: HTMLElement) {

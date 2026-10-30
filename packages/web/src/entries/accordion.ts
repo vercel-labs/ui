@@ -21,3 +21,4 @@ export type {
   AccordionValueChangeReason,
 } from "@ui-sdk/core/accordion"
 export type { AccordionEvents, UiAccordionElement } from "../events"
+export { createAccordionController } from "@ui-sdk/core/accordion"

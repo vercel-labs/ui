@@ -262,15 +262,15 @@ numbers are numbers. `controller` is a property. `page` and `playing` are live p
 
 Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCarouselElement` for typed listeners.
 
-| Member                     | On            | Description                                                    |
-| -------------------------- | ------------- | -------------------------------------------------------------- |
-| `page` property            | `ui-carousel` | The current page. Setting it goes there and fires `pagechange` |
-| `playing` property         | `ui-carousel` | Whether it rotates. Setting it fires `playingchange`           |
-| `api` property             | `ui-carousel` | The [controller](#controller)                                  |
-| `controller` property      | `ui-carousel` | A controller from `createCarouselController()`                 |
-| `pagechange` event         | `ui-carousel` | `detail: { value: page, reason, event, source }`               |
-| `pagechangecomplete` event | `ui-carousel` | `detail: { value: page }`, once the slides come to rest        |
-| `playingchange` event      | `ui-carousel` | `detail: { value: playing, reason, event, source }`            |
+| Member                     | On            | Description                                             |
+| -------------------------- | ------------- | ------------------------------------------------------- |
+| `page` property            | `ui-carousel` | The current page. Setting it goes there                 |
+| `playing` property         | `ui-carousel` | Whether it rotates                                      |
+| `api` property             | `ui-carousel` | The [controller](#controller)                           |
+| `controller` property      | `ui-carousel` | A controller from `createCarouselController()`          |
+| `pagechange` event         | `ui-carousel` | `detail: { value: page, reason, event, source }`        |
+| `pagechangecomplete` event | `ui-carousel` | `detail: { value: page }`, once the slides come to rest |
+| `playingchange` event      | `ui-carousel` | `detail: { value: playing, reason, event, source }`     |
 
 ### Reasons
 
