@@ -216,12 +216,14 @@ const renderedChips = new WeakMap<Element, { value: unknown; labels: string }>()
 function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false } = {}) {
   const chips = el.querySelector("ui-combobox-chips")
   if (!chips) return
-  const children = Array.from(chips.querySelectorAll<HTMLElement>(":scope > ui-combobox-chip"))
-  if (children.some((chip) => !renderedChip.has(chip))) {
-    for (const chip of children) if (renderedChip.has(chip)) chip.remove()
+  // The page's chips can sit in a wrapper of their own; the element's are children.
+  const all = Array.from(chips.querySelectorAll<HTMLElement>("ui-combobox-chip"))
+  if (all.some((chip) => !renderedChip.has(chip))) {
+    for (const chip of all) if (renderedChip.has(chip)) chip.remove()
     renderedChips.delete(chips)
     return
   }
+  const children = all.filter((chip) => chip.parentElement === chips)
   const value = api.getValue()
   const { selection } = api.internal
   const values = selection.values()

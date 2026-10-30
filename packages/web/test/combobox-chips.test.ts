@@ -58,3 +58,26 @@ test("the page's own chips stay as the page rendered them, though its list start
   combobox.api.setValue(["bug", "docs"])
   expect(chips()).toEqual(["#docs", "#bug"])
 })
+
+test("the page's own chips inside a wrapper stay as the page rendered them", async () => {
+  const { combobox, chips } = await mount()
+  const part = combobox.querySelector("ui-combobox-chips")!
+  const wrapper = document.createElement("div")
+  part.prepend(wrapper)
+  combobox.addEventListener("valuechange", (event) => {
+    wrapper.replaceChildren(
+      ...(event.detail.value as string[]).map((value) => {
+        const chip = document.createElement("ui-combobox-chip")
+        chip.setAttribute("value", value)
+        chip.textContent = `#${value}`
+        return chip
+      }),
+    )
+  })
+  combobox.api.setValue(["bug"])
+  await wait()
+  expect(chips()).toEqual(["#bug"])
+  combobox.api.setValue(["bug", "docs"])
+  await wait()
+  expect(chips()).toEqual(["#bug", "#docs"])
+})
