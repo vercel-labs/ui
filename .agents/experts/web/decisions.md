@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `86c8795` (2026-10-29, the browser build and `web.js` loader in PR 25).
+Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
 
 ## Settled
 

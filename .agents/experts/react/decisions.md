@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
+Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
 
 
 ## Settled
