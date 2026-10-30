@@ -234,7 +234,8 @@ function createVirtualizer(options: VirtualizerOptions) {
   // page matches and highlights the row's text and counts it once.
   function adopt(index: number) {
     const own = slots.get(index)
-    if (!own) return
+    // A row past the end, like one just filtered out, is about to unmount.
+    if (!own || index >= options.count()) return
     const pieces = texts[index]
     // Without the layer, like where find in page can't reach hidden text, slots hold plain text.
     if (!pieces) {
@@ -489,6 +490,8 @@ function createVirtualizer(options: VirtualizerOptions) {
         layers = undefined
         standIns = []
         homes = []
+        texts = []
+        spaces = []
         split = undefined
         kept = new Set()
       }
@@ -629,6 +632,7 @@ function createVirtualizer(options: VirtualizerOptions) {
       read()
       update()
       if (layers) buildStandIns()
+      else for (const index of slots.keys()) adopt(index)
     },
     /**
      * Puts the findable layers at the start and end of `parent`, an element

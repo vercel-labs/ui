@@ -278,6 +278,78 @@ describe("bindFindable slots", () => {
     expect(slots[0].firstChild).toBe(node)
   })
 
+  // Rows from data that can change, rendered through slots like a framework would.
+  function dataList(connect = { findable: true }) {
+    let data = Array.from({ length: 1000 }, (_, index) => ({ id: `Row ${index}`, word: "plain" }))
+    const rows = createVirtualizer({
+      count: () => data.length,
+      estimate: () => 20,
+      overscan: 2,
+      findable: (index) => [data[index].id, data[index].word],
+    })
+    const el = scroller(100, () => rows.size())
+    cleanups.push(rows.connect(el, connect))
+    const slots = new Map<number, HTMLElement[]>()
+    const offs = new Map<number, (() => void)[]>()
+    const draw = () => {
+      const want = new Set(rows.items().map((item) => item.index))
+      for (const [index, off] of offs)
+        if (!want.has(index)) {
+          off.forEach((cleanup) => cleanup())
+          offs.delete(index)
+          slots.delete(index)
+        }
+      for (const index of want)
+        if (!slots.has(index)) {
+          const own = [document.createElement("span"), document.createElement("span")]
+          slots.set(index, own)
+          offs.set(
+            index,
+            own.map((slot, part) => rows.bindFindable(index, slot, part)),
+          )
+        }
+    }
+    draw()
+    return { rows, el, slots, draw, set: (next: typeof data) => (data = next) }
+  }
+
+  test("refresh shows the rows' new text in their slots, with or without the layers", async () => {
+    for (const connect of [{ findable: true }, { findable: false }]) {
+      const { rows, slots, set } = dataList(connect)
+      set(Array.from({ length: 1000 }, (_, index) => ({ id: `Item ${index}`, word: "changed" })))
+      rows.refresh()
+      expect(
+        slots.get(1)!.map((slot) => slot.textContent),
+        JSON.stringify(connect),
+      ).toEqual(["Item 1", "changed"])
+      cleanups.forEach((cleanup) => cleanup())
+      cleanups = []
+    }
+  })
+
+  test("after the layers unmount, refresh shows the new text too", () => {
+    const { rows, el, slots, set } = dataList({ findable: false })
+    const unmount = rows.mountFindable(el)
+    unmount()
+    set(Array.from({ length: 1000 }, (_, index) => ({ id: `Item ${index}`, word: "changed" })))
+    rows.refresh()
+    expect(slots.get(1)!.map((slot) => slot.textContent)).toEqual(["Item 1", "changed"])
+  })
+
+  test("filtering bound rows out and refreshing doesn't read past the end", async () => {
+    for (const connect of [{ findable: true }, { findable: false }]) {
+      const { rows, slots, draw, set } = dataList(connect)
+      set([{ id: "Only", word: "left" }])
+      expect(() => rows.refresh(), JSON.stringify(connect)).not.toThrow()
+      draw()
+      await microtask()
+      expect([...slots.keys()]).toEqual([0])
+      expect(slots.get(0)!.map((slot) => slot.textContent)).toEqual(["Only", "left"])
+      cleanups.forEach((cleanup) => cleanup())
+      cleanups = []
+    }
+  })
+
   test("without the layers, slots show plain text", () => {
     const { shown } = slottedList({ findable: false })
     expect(shown.get(2)!.slots.map((slot) => slot.textContent)).toEqual(["Row 2", "plain"])
