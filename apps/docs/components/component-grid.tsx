@@ -14,7 +14,6 @@ function Card({ title, description, href }: { title: string; description?: strin
   )
 }
 
-// Every component page, from its frontmatter, in alphabetical order.
 function ComponentGrid({ framework }: { framework: Framework }) {
   const pages = source
     .getPages()

@@ -1,5 +1,6 @@
 import { createColorScheme, createCookieStorage, createLocalStorage, createPreference } from "@ui-sdk/core"
-import { frameworkIds } from "./frameworks"
+import { usePreference } from "@ui-sdk/react/preferences"
+import { type Framework, frameworkIds } from "./frameworks"
 
 // "theme" is the key the site used before, so readers keep their choice.
 const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
@@ -22,4 +23,19 @@ const packageManager = createPreference({
   storage: createLocalStorage("tabs:package-manager"),
 })
 
-export { colorScheme, framework, packageManager }
+function setFramework(next: Framework) {
+  framework.set(next)
+}
+
+/** The saved framework choice, or undefined before the reader has made one. */
+function useSavedFramework() {
+  return usePreference(framework).value || undefined
+}
+
+/** The shared framework preference, else React, persisted for links and server redirects. */
+function useFramework() {
+  const current = useSavedFramework() ?? "react"
+  return [current, setFramework] as const
+}
+
+export { colorScheme, framework, packageManager, setFramework, useFramework, useSavedFramework }

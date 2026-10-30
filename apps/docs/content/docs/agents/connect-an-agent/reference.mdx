@@ -55,9 +55,12 @@ Each entry describes one registered component with bound elements, or a remember
 | `disabled`                                                                     | `true` when the bridge considers the component unavailable. Its `actions` are then empty.                       |
 | `offPage`                                                                      | `true` for a remembered component that left the page. Its `actions` are empty.                                  |
 | `confirm`                                                                      | The text of a `data-agent-confirm` mark. A step on it needs the person.                                         |
+| `source`                                                                       | Where the app writes it, such as `"components/header.tsx:24"`. Development builds only; see below.              |
 | `actions`                                                                      | Action names available to request, such as `setValue`, `setChecked`, or `press`.                                |
 
 A password, card, or one-time-code field's value, or one inside `data-agent-secret`, shows as `"[redacted]"` once it's filled, here, in `act`'s values and changes, and in `subscribe`. Password Input and OTP Input stay redacted while their text is shown.
+
+In development, `source` comes from a `data-review-loc="file:line"` attribute on the component's element or the nearest element around it, or from Svelte's own element locations. Add the attribute at build time to let an agent go from a component to the code that renders it. Production builds leave `source` out.
 
 Remembered entries keep their last exposed state. The bridge retains up to 50 of them; password, card, one-time-code, and `data-agent-secret` fields aren't kept after they leave. An off-page entry can't be acted on until its component is available again.
 

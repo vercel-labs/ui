@@ -4,17 +4,15 @@ import { cn } from "cn"
 import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-core/toc"
 import { CircleArrowUp } from "lucide-react"
 
-// The page's headings, on the right of wide screens. The one you're reading is marked.
 function PageToc({ toc }: { toc: TableOfContents }) {
   const items = toc.filter((item) => item.depth <= 3)
-  // One heading isn't worth a list.
   if (items.length < 2) return null
 
   return (
     <AnchorProvider toc={items} single>
       <nav
         aria-label="On this page"
-        className="sticky top-16 ms-auto hidden max-h-[calc(100dvh-4rem)] w-56 shrink-0 overflow-y-auto overscroll-contain pt-16 pe-10 pb-8 [scrollbar-width:none] xl:block [&::-webkit-scrollbar]:hidden"
+        className="sticky top-14 ms-auto hidden max-h-[calc(100dvh-4rem)] w-64 shrink-0 overflow-y-auto overscroll-contain pt-8 pb-8 [scrollbar-width:none] xl:block [&::-webkit-scrollbar]:hidden"
       >
         <div className="mb-2 text-xs font-medium text-foreground">On this page</div>
         <Items items={items} />

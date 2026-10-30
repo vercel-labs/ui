@@ -1,4 +1,7 @@
-import { SitePreferences } from "@/components/docs/site-preferences"
+import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
+import { SitePreferences } from "@/components/site-preferences"
+import { source } from "@/lib/source"
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
@@ -21,10 +24,16 @@ export const metadata: Metadata = {
 }
 
 export default function Layout({ children }: LayoutProps<"/">) {
+  const urls = source.getPages().map((page) => page.url)
+
   return (
     <html lang="en" className={geist.variable} suppressHydrationWarning>
-      <body className="min-h-dvh bg-canvas font-sans text-foreground">
-        <SitePreferences>{children}</SitePreferences>
+      <body className="flex min-h-dvh flex-col bg-canvas font-sans text-foreground">
+        <SitePreferences>
+          <SiteHeader urls={urls} />
+          {children}
+          <SiteFooter />
+        </SitePreferences>
         <Analytics />
       </body>
     </html>

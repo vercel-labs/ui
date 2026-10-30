@@ -2,15 +2,41 @@
 
 import { cn } from "cn"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { frameworkIds, frameworks, isFramework } from "@/lib/frameworks"
-import { frameworkHref, type Section } from "@/lib/sections"
+import { type Framework, frameworkIds, frameworks, isFramework } from "@/lib/frameworks"
+import {
+  colorScheme,
+  framework as frameworkPreference,
+  packageManager,
+  setFramework,
+  useFramework,
+  useSavedFramework,
+} from "@/lib/preferences"
+import { frameworkHref, isSection, utilitiesFolder } from "@/lib/sections"
+import { Preferences } from "@ui-sdk/react/preferences"
+import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { setFramework, useSavedFramework } from "./remember-framework"
+import * as React from "react"
+
+const preferences = [colorScheme, frameworkPreference, packageManager]
+
+/** The section of the page being read, from its path. */
+function useSection() {
+  const segment = usePathname().split("/")[2] ?? ""
+  return isSection(segment) ? segment : undefined
+}
+
+function SitePreferences({ children }: { children: React.ReactNode }) {
+  const section = useSection()
+
+  React.useEffect(() => {
+    if (section && isFramework(section)) setFramework(section)
+  }, [section])
+
+  return <Preferences preferences={preferences}>{children}</Preferences>
+}
 
 const items = frameworkIds.map((value) => ({ value, label: frameworks[value].label }))
 
-// Each label shows when <html data-framework> names its framework. Tailwind needs the
-// classes written out.
 const shownFor = {
   react: "[html[data-framework=react]_&]:inline",
   vue: "[html[data-framework=vue]_&]:inline",
@@ -34,7 +60,8 @@ function SavedLabel() {
   )
 }
 
-function FrameworkPicker({ section, urls }: { section?: Section; urls: string[] }) {
+function FrameworkPicker({ urls }: { urls: string[] }) {
+  const section = useSection()
   const pathname = usePathname()
   const router = useRouter()
   const saved = useSavedFramework()
@@ -69,4 +96,20 @@ function FrameworkPicker({ section, urls }: { section?: Section; urls: string[] 
   )
 }
 
-export { FrameworkPicker }
+function FrameworkLink({ href, ...props }: React.ComponentProps<typeof Link> & { href: string }) {
+  const [framework] = useFramework()
+  const [resolved, setResolved] = React.useState(href)
+  React.useEffect(() => {
+    const [, , folder, ...rest] = href.split("/")
+    const target = folder === "utilities" ? utilitiesFolder(framework) : folder
+    setResolved(["", "docs", framework, target, ...rest].join("/"))
+  }, [framework, href])
+  return <Link href={resolved} {...props} />
+}
+
+function FrameworkContent({ value, children }: { value: Framework; children: React.ReactNode }) {
+  const [framework] = useFramework()
+  return framework === value ? children : null
+}
+
+export { FrameworkContent, FrameworkLink, FrameworkPicker, SitePreferences, useSection }

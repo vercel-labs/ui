@@ -6,19 +6,18 @@ import type { ComponentProps, ReactNode } from "react"
 import { ComponentExample } from "./component-example"
 import { CoreEntries, CoreExports } from "./core-reference"
 import { CssVariables, DataAttributes } from "./data-attributes"
-import { Pre } from "./docs/code"
-import { Collapsible } from "./docs/collapsible"
-import { card } from "./docs/frame"
-import { Card, ComponentGrid } from "./docs/component-grid"
-import { FrameworkLink } from "./docs/framework-link"
-import { FrameworkContent } from "./docs/framework-content"
+import { Pre } from "./code"
+import { Collapsible } from "./collapsible"
+import { Card, ComponentGrid } from "./component-grid"
+import { Frame } from "./frame"
+import { FrameworkContent, FrameworkLink } from "./site-preferences"
 import {
   CodeBlockTab,
   CodeBlockTabs,
   CodeBlockTabsList,
   CodeBlockTabsTrigger,
   FrameworkTabs,
-} from "./docs/code-tabs"
+} from "./code-tabs"
 import { SpecList } from "./spec-list"
 import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tables"
 
@@ -103,12 +102,13 @@ function getMDXComponents(
     FrameworkContent,
     Collapsible,
     Callout: ({ children }: { children: ReactNode }) => (
-      <aside
+      <Frame
+        variant="flat"
         role="note"
-        className={cn(card, "my-6 px-4 py-3 [&>p]:my-0 [&>ul]:mt-1.5 [&>ul]:mb-0 [&>ul]:gap-0.5")}
+        className="my-6 overflow-hidden px-4 py-3 [&>p]:my-0 [&>ul]:mt-1.5 [&>ul]:mb-0 [&>ul]:gap-0.5"
       >
         {children}
-      </aside>
+      </Frame>
     ),
     blockquote: (props) => (
       <blockquote
@@ -118,12 +118,12 @@ function getMDXComponents(
     ),
     hr: () => <hr className="my-10 border-border/70" />,
     table: (props) => (
-      <div className={cn(card, "my-6 overflow-x-auto")}>
+      <Frame variant="flat" className="my-6 overflow-x-auto">
         <table
           className="w-full border-collapse text-start text-sm [&_tr:last-child>td]:border-0"
           {...props}
         />
-      </div>
+      </Frame>
     ),
     th: (props) => (
       <th

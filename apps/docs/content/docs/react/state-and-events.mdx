@@ -49,6 +49,8 @@ export { Example }
 
 Other components use pairs such as `open` and `onOpenChange`, or `value` and `onValueChange`. The component requests the next value; your callback updates the state you pass back. If you keep passing `false`, the toggle stays off.
 
+To keep a value in the URL, still update your state in the callback, then navigate. A value that changes only when the navigation finishes leaves the component showing the old one until then, and logs a warning in development.
+
 ## Understand a Change
 
 The first callback argument is the requested value. The second, `details`, tells you where the request came from and lets you cancel it:

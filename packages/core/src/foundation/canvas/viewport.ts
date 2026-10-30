@@ -23,7 +23,7 @@ type CanvasRect = { left: number; top: number; right: number; bottom: number }
  * Why the viewport moved.
  * @experimental
  */
-type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "imperative"
+type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "find-in-page" | "imperative"
 
 /**
  * How `createViewport` keeps the viewport.
@@ -43,6 +43,10 @@ type ViewportOptions<State extends object> = {
   /** What screen readers hear after a zoom key. Defaults to English, like "Zoom 150%". */
   message?: (zoom: number) => string
 }
+
+// How far a findable surface rests from its scroll origin, so the browser can
+// scroll it toward anything on the canvas, whichever way it lies.
+const rest = 100_000
 
 const wheelUnit = (event: WheelEvent, surface: HTMLElement) =>
   event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? surface.clientHeight : 1
@@ -64,7 +68,8 @@ const wheelUnit = (event: WheelEvent, surface: HTMLElement) =>
  * ```
  *
  * `toCanvas` and `toScreen` convert points, `fit` shows a box, `reveal`
- * scrolls the least to bring one into view, which a focused item calls.
+ * scrolls the least to bring one into view, which a focused item calls, and
+ * `bindFindable` pans to whatever the browser scrolls to, like a find in page match.
  * @experimental
  */
 function createViewport<State extends object>(
@@ -86,6 +91,10 @@ function createViewport<State extends object>(
   let gesture: { center: { x: number; y: number }; distance: number; view: Viewport } | null = null
   let stop: (() => void) | undefined
   context.onDestroy(() => stop?.())
+  // The pane `bindFindable` keeps at rest, and where it rests, which the world's `style` offsets by.
+  let findable: HTMLElement | undefined
+  let rested = { x: 0, y: 0 }
+  const restyle = () => store.set({ [options.key]: { ...api.get() } } as Partial<State>)
 
   const api = {
     /** The viewport now. */
@@ -318,7 +327,87 @@ function createViewport<State extends object>(
     /** The world element's `style`: one transform for every item, so panning lays nothing out. */
     style(state: State) {
       const { x, y, zoom } = (state[options.key] ?? { x: 0, y: 0, zoom: 1 }) as Viewport
-      return `transform:translate(${x}px,${y}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
+      const at = findable ? rested : { x: 0, y: 0 }
+      return `transform:translate(${x + at.x}px,${y + at.y}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
+    },
+    /**
+     * Turns the browser's scrolls inside `el` into pans, until the returned
+     * function runs, so find in page, focus and links to an id bring what
+     * they found into view. `el` is a pane that fills the surface and holds
+     * only the world, with `overflow: scroll`, since find in page skips what a
+     * user can't scroll: it rests scrolled far from its origin, with the world
+     * offset to match.
+     */
+    bindFindable(el: HTMLElement) {
+      const spacer = el.ownerDocument.createElement("div")
+      spacer.setAttribute("aria-hidden", "true")
+      // On the pane's end side, which right to left puts on the left, so there's room to scroll toward.
+      Object.assign(spacer.style, {
+        position: "absolute",
+        insetInlineStart: `${rest * 2}px`,
+        insetBlockStart: `${rest * 2}px`,
+        width: "1px",
+        height: "1px",
+        visibility: "hidden",
+        pointerEvents: "none",
+      })
+      // The world moves by where the pane really rests, which is nowhere while
+      // it can't scroll, like hidden in a closed tab, and negative right to left.
+      let bound = true
+      let frame = 0
+      const settle = () => {
+        if (!bound) return
+        if (!spacer.isConnected) el.append(spacer)
+        const rtl = el.ownerDocument.defaultView?.getComputedStyle(el).direction === "rtl"
+        el.scrollLeft = rtl ? -rest : rest
+        el.scrollTop = rest
+        const at = { x: el.scrollLeft, y: el.scrollTop }
+        if (at.x === rested.x && at.y === rested.y) return
+        rested = at
+        restyle()
+      }
+      // Focus scrolls as it moves, and the scroll arrives before the next frame.
+      let focusing = false
+      const onFocusIn = () => {
+        focusing = true
+        requestAnimationFrame(() => (focusing = false))
+      }
+      const onScroll = (event: Event) => {
+        // Without the spacer, like after a framework replaced the children, or
+        // back at the origin, like after the pane was hidden, the rest was lost.
+        if (!spacer.isConnected || (!el.scrollLeft && !el.scrollTop)) return settle()
+        const dx = el.scrollLeft - rested.x
+        const dy = el.scrollTop - rested.y
+        if (!dx && !dy) return
+        settle()
+        api.panBy(-dx, -dy, { reason: focusing ? "focus-in" : "find-in-page", event })
+        // Chrome ignores the reset during a find in page scroll; the rest takes it, and goes back once the scroll is done.
+        cancelAnimationFrame(frame)
+        frame = requestAnimationFrame(settle)
+      }
+      findable = el
+      rested = { x: 0, y: 0 }
+      settle()
+      el.addEventListener("scroll", onScroll)
+      el.addEventListener("focusin", onFocusIn)
+      // A hidden pane, like in a closed tab or dialog, can't scroll: it rests once it shows, before it paints.
+      const view = el.ownerDocument.defaultView
+      const sized = view?.ResizeObserver ? new view.ResizeObserver(settle) : undefined
+      sized?.observe(el)
+      return () => {
+        bound = false
+        cancelAnimationFrame(frame)
+        sized?.disconnect()
+        el.removeEventListener("scroll", onScroll)
+        el.removeEventListener("focusin", onFocusIn)
+        spacer.remove()
+        if (findable !== el) return
+        findable = undefined
+        rested = { x: 0, y: 0 }
+        el.scrollLeft = 0
+        el.scrollTop = 0
+        restyle()
+      }
     },
   }
   return api

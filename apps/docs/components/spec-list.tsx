@@ -1,5 +1,5 @@
 import { listOf, sentence, specGroups } from "@/lib/spec-groups"
-import { card } from "./docs/frame"
+import { Frame } from "./frame"
 
 // Behavior written as the tests that prove it, with the frameworks they run
 // in. A test that runs in fewer than the rest says which.
@@ -8,7 +8,7 @@ async function SpecList({ spec, only }: { spec: string; only?: string[] }) {
   return (
     <div className="my-6 flex flex-col gap-4 text-sm">
       {groups.map((group) => (
-        <div key={group.title} className={card}>
+        <Frame variant="flat" key={group.title} className="overflow-hidden">
           {group.title && (
             <div className="border-b border-border/70 px-4 py-2.5 font-medium text-foreground">
               {sentence(group.title)}
@@ -29,7 +29,7 @@ async function SpecList({ spec, only }: { spec: string; only?: string[] }) {
               </li>
             ))}
           </ul>
-        </div>
+        </Frame>
       ))}
       {frameworks.length > 0 && <p className="text-subtle">Runs in {listOf(frameworks)}.</p>}
     </div>

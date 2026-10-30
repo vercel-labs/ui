@@ -41,6 +41,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 // Where root popups render. Set on <Menu> or <MenuContent>.
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("menu-container")
@@ -65,76 +66,80 @@ const parts = createParts(menuPrimitive, { shortcut: "span", separator: "div" })
  * A list of actions and options, opened from a button or a right-click. Put its trigger and content inside.
  * @stable
  */
-const Menu = defineComponent({
-  name: "Menu",
-  props: {
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    items: Array as PropType<MenuData>,
-    shortcuts: optionalBoolean,
-    loop: optionalBoolean,
-    delay: Number,
-    presentation: String as PropType<"auto" | "popover" | "sheet">,
-    modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
-    controller: Object as PropType<MenuController<any>>,
-    dismissible: optionalBoolean,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    dismissAttempt: (_details: DismissAttemptDetails<MenuDismissReason>) => true,
-    payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
-    action: (_value: string, _details: { event?: Event }) => true,
-    checkedChange: (_checked: boolean, _details: MenuCheckedChangeDetails) => true,
-    valueChange: (_value: string, _details: MenuValueChangeDetails) => true,
-  },
-  setup(props, { slots, emit }) {
-    provide(ContainerKey, () => props.container)
-    const menubar = inject(MenubarKey, null)
-    // A menu inside this one's content is no item of the menubar.
-    provide(MenubarKey, null)
-    const menu = usePrimitive(menuPrimitive, () => ({
-      ...props,
-      open: orModel(props.open, props.modelValue),
-      container: undefined,
-      menubar: menubar ? () => menubar.api : undefined,
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onDismissAttempt: (details: DismissAttemptDetails<MenuDismissReason>) =>
-        emit("dismissAttempt", details),
-      onPayloadChange: (payload: unknown, details: PayloadDetails) => emit("payloadChange", payload, details),
-      onAction: (value: string, details: { event?: Event }) => emit("action", value, details),
-      onCheckedChange: (checked: boolean, details: MenuCheckedChangeDetails) =>
-        emit("checkedChange", checked, details),
-      onValueChange: (value: string, details: MenuValueChangeDetails) => emit("valueChange", value, details),
-    }))
-    useControllerEntry(() => props.controller, menu)
-    const placed = usePlacedContent()
-    return () => {
-      const children = slots.default?.() ?? []
-      // A data menu renders its content, unless the app placed a MenuContent:
-      // in the markup, or inside a component of its own.
-      const own = !props.items || placed() || hasChild(children, MenuContent)
-      return [
-        children,
-        props.items &&
-          !own &&
-          h(NotPlaced, () => h(MenuContent, null, () => h(MenuItems, { items: props.items! }))),
-      ]
-    }
-  },
-})
+const Menu = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Menu",
+    props: {
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      items: Array as PropType<MenuData>,
+      shortcuts: optionalBoolean,
+      loop: optionalBoolean,
+      delay: Number,
+      presentation: String as PropType<"auto" | "popover" | "sheet">,
+      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      controller: Object as PropType<MenuController<any>>,
+      dismissible: optionalBoolean,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<MenuDismissReason>) => true,
+      payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
+      action: (_value: string, _details: { event?: Event }) => true,
+      checkedChange: (_checked: boolean, _details: MenuCheckedChangeDetails) => true,
+      valueChange: (_value: string, _details: MenuValueChangeDetails) => true,
+    },
+    setup(props, { slots, emit }) {
+      provide(ContainerKey, () => props.container)
+      const menubar = inject(MenubarKey, null)
+      // A menu inside this one's content is no item of the menubar.
+      provide(MenubarKey, null)
+      const menu = usePrimitive(menuPrimitive, () => ({
+        ...props,
+        open: orModel(props.open, props.modelValue),
+        container: undefined,
+        menubar: menubar ? () => menubar.api : undefined,
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onDismissAttempt: (details: DismissAttemptDetails<MenuDismissReason>) =>
+          emit("dismissAttempt", details),
+        onPayloadChange: (payload: unknown, details: PayloadDetails) =>
+          emit("payloadChange", payload, details),
+        onAction: (value: string, details: { event?: Event }) => emit("action", value, details),
+        onCheckedChange: (checked: boolean, details: MenuCheckedChangeDetails) =>
+          emit("checkedChange", checked, details),
+        onValueChange: (value: string, details: MenuValueChangeDetails) =>
+          emit("valueChange", value, details),
+      }))
+      useControllerEntry(() => props.controller, menu)
+      const placed = usePlacedContent()
+      return () => {
+        const children = slots.default?.() ?? []
+        // A data menu renders its content, unless the app placed a MenuContent:
+        // in the markup, or inside a component of its own.
+        const own = !props.items || placed() || hasChild(children, MenuContent)
+        return [
+          children,
+          props.items &&
+            !own &&
+            h(NotPlaced, () => h(MenuContent, null, () => h(MenuItems, { items: props.items! }))),
+        ]
+      }
+    },
+  }),
+)
 
 // A trigger, inside the menu or anywhere a controller connects it.
 function triggerPart<S extends "trigger" | "context-trigger", Tag extends string>(
@@ -482,42 +487,44 @@ const MenuSeparator = parts.Separator
  * A submenu. Put its `MenuSubTrigger` and `MenuSubContent` inside, in a menu's content.
  * @stable
  */
-const MenuSub = defineComponent({
-  name: "MenuSub",
-  props: {
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    delay: Number,
-    loop: optionalBoolean,
-    controller: Object as PropType<MenuController<any>>,
-    debug: optionalBoolean,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-  },
-  setup(props, { slots, emit }) {
-    const parent = useMenu()
-    // Its parts inside use this instance, the nearest.
-    usePrimitive(menuPrimitive, () => ({
-      ...props,
-      open: orModel(props.open, props.modelValue),
-      parent: parent.api,
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-    }))
-    return () => slots.default?.()
-  },
-})
+const MenuSub = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "MenuSub",
+    props: {
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      delay: Number,
+      loop: optionalBoolean,
+      controller: Object as PropType<MenuController<any>>,
+      debug: optionalBoolean,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+    },
+    setup(props, { slots, emit }) {
+      const parent = useMenu()
+      // Its parts inside use this instance, the nearest.
+      usePrimitive(menuPrimitive, () => ({
+        ...props,
+        open: orModel(props.open, props.modelValue),
+        parent: parent.api,
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+      }))
+      return () => slots.default?.()
+    },
+  }),
+)
 
 /**
  * The item that opens its submenu.
@@ -547,76 +554,78 @@ const MenuSubContent = MenuContent
  * of your own, and available for custom layouts.
  * @stable
  */
-const MenuItems = defineComponent({
-  name: "MenuItems",
-  props: {
-    items: { type: Array as PropType<MenuData>, required: true },
-  },
-  setup(props) {
-    // check-code: allow return-type recursive, so TypeScript cannot infer it.
-    const render = (items: MenuData): VNode[] =>
-      items.map((entry, index) => {
-        const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
-        switch (item.type) {
-          case undefined:
-          case "item":
-            return h(
-              MenuItem,
-              {
-                key: item.value,
-                value: item.value,
-                disabled: item.disabled,
-                shortcut: item.shortcut,
-                closeOnSelect: item.closeOnSelect,
-                destructive: item.destructive,
-              },
-              () => item.label,
-            )
-          case "separator":
-            return h(MenuSeparator, { key: `separator-${index}` })
-          case "group":
-            return h(MenuGroup, { key: `group-${index}` }, () => [
-              item.label && h(MenuGroupLabel, null, () => item.label),
-              ...render(item.items),
-            ])
-          case "checkbox":
-            return h(
-              MenuCheckboxItem,
-              {
-                key: item.value,
-                value: item.value,
-                disabled: item.disabled,
-                checked: item.checked,
-                defaultChecked: item.defaultChecked,
-                closeOnSelect: item.closeOnSelect,
-              },
-              () => item.label,
-            )
-          case "radio-group":
-            return h(
-              MenuRadioGroup,
-              { key: item.name, name: item.name, value: item.value, defaultValue: item.defaultValue },
-              () => [
+const MenuItems = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "MenuItems",
+    props: {
+      items: { type: Array as PropType<MenuData>, required: true },
+    },
+    setup(props) {
+      // check-code: allow return-type recursive, so TypeScript cannot infer it.
+      const render = (items: MenuData): VNode[] =>
+        items.map((entry, index) => {
+          const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+          switch (item.type) {
+            case undefined:
+            case "item":
+              return h(
+                MenuItem,
+                {
+                  key: item.value,
+                  value: item.value,
+                  disabled: item.disabled,
+                  shortcut: item.shortcut,
+                  closeOnSelect: item.closeOnSelect,
+                  destructive: item.destructive,
+                },
+                () => item.label,
+              )
+            case "separator":
+              return h(MenuSeparator, { key: `separator-${index}` })
+            case "group":
+              return h(MenuGroup, { key: `group-${index}` }, () => [
                 item.label && h(MenuGroupLabel, null, () => item.label),
-                ...item.items.map((radio) =>
-                  h(
-                    MenuRadioItem,
-                    { key: radio.value, value: radio.value, disabled: radio.disabled },
-                    () => radio.label,
+                ...render(item.items),
+              ])
+            case "checkbox":
+              return h(
+                MenuCheckboxItem,
+                {
+                  key: item.value,
+                  value: item.value,
+                  disabled: item.disabled,
+                  checked: item.checked,
+                  defaultChecked: item.defaultChecked,
+                  closeOnSelect: item.closeOnSelect,
+                },
+                () => item.label,
+              )
+            case "radio-group":
+              return h(
+                MenuRadioGroup,
+                { key: item.name, name: item.name, value: item.value, defaultValue: item.defaultValue },
+                () => [
+                  item.label && h(MenuGroupLabel, null, () => item.label),
+                  ...item.items.map((radio) =>
+                    h(
+                      MenuRadioItem,
+                      { key: radio.value, value: radio.value, disabled: radio.disabled },
+                      () => radio.label,
+                    ),
                   ),
-                ),
-              ],
-            )
-          case "submenu":
-            return h(MenuSub, { key: `submenu-${index}` }, () => [
-              h(MenuSubTrigger, { disabled: item.disabled }, () => item.label),
-              h(MenuSubContent, null, () => render(item.items)),
-            ])
-        }
-      })
-    return () => render(props.items)
-  },
-})
+                ],
+              )
+            case "submenu":
+              return h(MenuSub, { key: `submenu-${index}` }, () => [
+                h(MenuSubTrigger, { disabled: item.disabled }, () => item.label),
+                h(MenuSubContent, null, () => render(item.items)),
+              ])
+          }
+        })
+      return () => render(props.items)
+    },
+  }),
+)
 
 export { createMenuController } from "@ui-sdk/core/menu"
 export type {

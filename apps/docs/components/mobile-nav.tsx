@@ -9,7 +9,7 @@ import { ArrowUpRightIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
-import { FrameworkPicker } from "./framework-picker"
+import { FrameworkPicker } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
 import { useActiveTree, useMenuLink } from "./section-nav"
@@ -37,7 +37,7 @@ function MobileNav({
   return (
     <header
       data-mobile-header
-      className="container sticky top-0 z-10 flex h-14 items-center gap-2 bg-canvas/85 backdrop-blur-md lg:hidden"
+      className="container sticky top-0 z-10 flex h-14 items-center gap-4 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
       <a
         href="https://vercel.com"
@@ -61,7 +61,7 @@ function MobileNav({
       <span aria-hidden className="ms-0.5 text-lg font-light text-foreground/20">
         /
       </span>
-      <FrameworkPicker section={section} urls={urls} />
+      <FrameworkPicker urls={urls} />
       <div className="ms-auto flex items-center gap-1">
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger className="flex size-8 items-center justify-center rounded-2xl bg-foreground/[0.045] text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
