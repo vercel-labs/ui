@@ -478,6 +478,22 @@ describe("calendar", () => {
     expect(day("2026-10-16").hasAttribute("tabindex")).toBe(false)
   })
 
+  test("a disabled date takes focus neither from a press on another month's day nor from focus()", async () => {
+    const { day, focused, instance } = mount({
+      defaultValue: "2026-10-16",
+      disabledDates: ["2026-10-14", "2026-09-29"],
+    })
+    await tick()
+    day("2026-10-16").focus()
+    instance.api.focus("2026-10-14")
+    await tick()
+    expect(focused()).toBe("2026-10-16")
+    document.querySelector<HTMLElement>('[data-value="2026-09-29"][data-outside]')!.click()
+    await tick()
+    expect(focused()).toBe("2026-10-16")
+    expect(instance.api.getMonth()).toBe("2026-10")
+  })
+
   test("disabled dates take no tab stop, can't be picked, and arrow keys pass over them", async () => {
     const { day, press, focused, stops, instance } = mount({
       defaultValue: "2026-10-16",

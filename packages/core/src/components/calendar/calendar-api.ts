@@ -435,6 +435,7 @@ function calendarApi<
       if (!isISODate(date)) return
       const state = store.get()
       const target = clampDate(date, state.min, state.max)
+      if (disabledDate(state, target)) return
       reveal(target, "imperative")
       roving.focus(target)
     },
@@ -453,7 +454,7 @@ function calendarApi<
         if (el && !isOutside(state, props) && el.ownerDocument.activeElement !== el)
           el.focus({ preventScroll: true })
         pick(props.value, event)
-        if (isOutside(store.get(), props)) {
+        if (isOutside(store.get(), props) && !disabledDate(store.get(), props.value)) {
           reveal(props.value, "item-press", event)
           roving.focus(props.value)
         }
