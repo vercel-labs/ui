@@ -352,14 +352,19 @@ function calendarApi<
     fallback: (lost) => element("day", lost.key),
   })
 
-  let { focused, anchor } = store.get()
+  // Reported as focus lands on a day, so a stop the calendar settles on
+  // itself, on load or after a script turns the month, reports nothing.
+  let focused: ISODate | null = null
+  function focusLanded(date: ISODate) {
+    if (date === focused) return
+    focused = date
+    options().onFocusedChange?.(date)
+  }
+
+  let { anchor } = store.get()
   context.onDestroy(
     store.subscribe(() => {
       const state = store.get()
-      if (state.focused !== focused) {
-        focused = state.focused
-        options().onFocusedChange?.(focused)
-      }
       if (state.anchor !== anchor) {
         anchor = state.anchor
         options().onAnchorChange?.(anchor)
@@ -436,6 +441,7 @@ function calendarApi<
     internal: {
       roving,
       recovery,
+      focusLanded,
       setValue,
       setMonth,
       reveal,
@@ -639,8 +645,11 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
         const range = shownRange(state)
         return {
           role: "gridcell",
+          // A browser blurs an element whose tabindex goes, so the focused day keeps it.
           tabindex:
-            isDisabled(state) || day.outside || disabledDate(state, props.value)
+            isDisabled(state) ||
+            day.outside ||
+            (disabledDate(state, props.value) && props.value !== state.focused)
               ? undefined
               : api.internal.roving.tabIndex(state, part),
           "aria-label": formatDate(props.value, localeOf(state)),
@@ -665,7 +674,13 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
         pointerenter: (_event, { api, props }) => api.internal.hover(props.value),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.internal.roving.bind(el, part), part.api.internal.recovery.bind(el, part)]
+        const landed = () => part.api.internal.focusLanded(part.props.value)
+        el.addEventListener("focus", landed)
+        const cleanups = [
+          part.api.internal.roving.bind(el, part),
+          part.api.internal.recovery.bind(el, part),
+          () => el.removeEventListener("focus", landed),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),

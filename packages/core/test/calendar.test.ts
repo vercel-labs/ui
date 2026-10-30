@@ -431,8 +431,13 @@ describe("calendar", () => {
     const onAnchorChange = vi.fn()
     const { day, press, instance } = mount({ mode: "range", onFocusedChange, onAnchorChange })
     await tick()
-    expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-16")
+    instance.api.setMonth("2026-12")
+    await tick()
+    instance.api.setMonth("2026-10")
+    await tick()
+    expect(onFocusedChange).not.toHaveBeenCalled()
     day("2026-10-16").focus()
+    expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-16")
     press("ArrowRight")
     expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-17")
     press("Enter")
@@ -466,9 +471,11 @@ describe("calendar", () => {
       disabledDates: ["2026-10-16"],
     })
     await tick()
+    expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
     press("ArrowRight")
     await tick()
     expect(focused()).toBe("2026-10-17")
+    expect(day("2026-10-16").hasAttribute("tabindex")).toBe(false)
   })
 
   test("disabled dates take no tab stop, can't be picked, and arrow keys pass over them", async () => {
