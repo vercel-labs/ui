@@ -27,6 +27,15 @@ describe("number input", () => {
     expect(attrs(disabled.part("increment", { id: "n" }))["data-at-bound"]).toBeUndefined()
   })
 
+  test("End and the increment button stop at the highest value on the step grid", () => {
+    const instance = numberInput({ id: "n", defaultValue: 3, min: 0, max: 10, step: 3 })
+    instance.api.internal.keydown({ key: "End", preventDefault() {} } as KeyboardEvent)
+    expect(instance.get().value).toBe(9)
+    expect(partState(instance.part("increment"))).toMatchObject({ disabled: true, atBound: true })
+    instance.api.internal.keydown({ key: "ArrowUp", altKey: true, preventDefault() {} } as KeyboardEvent)
+    expect(instance.get().value).toBe(9.3)
+  })
+
   test("a disabled button is disabled on its own, even in a read-only field", () => {
     const instance = numberInput({ id: "n", defaultValue: 5 })
     expect(partState(instance.part("increment", { disabled: true }))).toMatchObject({ disabled: true })
