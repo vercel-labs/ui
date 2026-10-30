@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
 
 ## Settled
 
@@ -37,6 +37,8 @@ Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/positi
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
 - **A trigger slotted into a closed shadow root's scroller** waits for the slow check: `assignedSlot` is `null` there, so positioning can't find that root.
+- **`el.autoHighlight` reads `undefined` without the attribute**, not `false`, since its schema parses `"always"` and the boolean fallback no longer applies (PR 88).
+- **A popup mounted open and bound again later**, like by a late menubar's `rebind()`, still has `opener` `"initial"` and would take whatever has focus then as its opener (suspected, PR 87).
 
 ## Revisit
 

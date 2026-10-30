@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `33a038a` (2026-10-30, the bundle size check and the Field leak fix in PR 84).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
 
 
 ## Settled
@@ -25,6 +25,7 @@ Last reviewed: `33a038a` (2026-10-30, the bundle size check and the Field leak f
 - **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
+- **A Combobox with `bind:value` records a relay on `query`** when the user types and presses Enter, from setting the input's text inside the handover (on main since `d9c0141`). No playground fixture binds a Combobox's value.
 
 ## Revisit
 

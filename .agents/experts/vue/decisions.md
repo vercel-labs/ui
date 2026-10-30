@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/vue`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
 
 
 ## Settled
