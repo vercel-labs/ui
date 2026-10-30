@@ -174,6 +174,20 @@ describe("untransformed box", () => {
     }
   })
 
+  test("a box tilted around x or y is squashed by its own turn, not scaled around it", () => {
+    // 100 by 50 at 10,20, tilted 60 degrees around its top edge, shows half as tall.
+    for (const rotate of ["x 60deg", "1 0 0 60deg"]) {
+      const box = untransformed(
+        { x: 10, y: 20, width: 100, height: 25 },
+        { width: 100, height: 50 },
+        style("0px 0px", "none", "none", "none", rotate),
+      )
+      expect(box.x).toBeCloseTo(10)
+      expect(box.y).toBeCloseTo(20)
+      expect(box.scale).toEqual({ x: 1, y: 1 })
+    }
+  })
+
   test("a box sliding in moves back by its translate, in pixels or percent of its size", () => {
     expect(
       untransformed(

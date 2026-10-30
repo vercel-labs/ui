@@ -527,11 +527,21 @@ function untransformed(
   const moves = style.translate && style.translate !== "none" ? style.translate.split(" ") : []
   const moveX = length(moves[0], size.width)
   const moveY = length(moves[1], size.height)
-  // Only a turn around the z axis, the one on screen, keeps a box flat.
+  // A turn around any axis shows on screen as its rotation matrix's top left
+  // corner: a tilt around x or y squashes the box rather than turning it.
   const turn = style.rotate && style.rotate !== "none" ? style.rotate.split(" ") : []
-  const flat = turn.length === 1 || turn[0] === "z" || turn.slice(0, 3).join(" ") === "0 0 1"
-  const radians = flat ? angle(turn[turn.length - 1]) : 0
+  const named = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] }[turn[0]]
+  const [kx, ky, kz] = named ?? (turn.length === 4 ? turn.slice(0, 3).map(parseFloat) : [0, 0, 1])
+  const axis = Math.hypot(kx, ky, kz) || 1
+  const [ux, uy, uz] = [kx / axis, ky / axis, kz / axis]
+  const radians = turn.length ? angle(turn[turn.length - 1]) : 0
   const [cos, sin] = [Math.cos(radians), Math.sin(radians)]
+  const r = [
+    cos + (1 - cos) * ux * ux,
+    (1 - cos) * ux * uy - sin * uz,
+    (1 - cos) * ux * uy + sin * uz,
+    cos + (1 - cos) * uy * uy,
+  ]
   const [scaleX = 1, scaleY = scaleX] =
     style.scale && style.scale !== "none" ? style.scale.split(" ").map(parseFloat) : []
   const matrix = /^matrix(3d)?\((.*)\)$/.exec(style.transform ?? "")
@@ -544,7 +554,7 @@ function untransformed(
   const corner = (x: number, y: number) => {
     const tx = scaleX * (a * (x - originX) + c * (y - originY) + e)
     const ty = scaleY * (b * (x - originX) + d * (y - originY) + f)
-    return [originX + moveX + cos * tx - sin * ty, originY + moveY + sin * tx + cos * ty]
+    return [originX + moveX + r[0] * tx + r[1] * ty, originY + moveY + r[2] * tx + r[3] * ty]
   }
   const corners = [
     corner(0, 0),

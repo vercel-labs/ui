@@ -156,7 +156,7 @@ test("a popup follows a scroll in the shadow root its anchor is slotted into", a
 })
 
 test("a turned popup lines up with its anchor as it would unturned", async ({ page }) => {
-  for (const turn of ["rotate: 3deg", "transform: rotate(-4deg) scale(0.96)"]) {
+  for (const turn of ["rotate: 3deg", "rotate: x 40deg", "transform: rotate(-4deg) scale(0.96)"]) {
     await place(
       page,
       anchor("position: fixed; left: 300px; top: 300px") +
