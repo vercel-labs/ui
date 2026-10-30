@@ -189,6 +189,32 @@ describe("input otp", () => {
     expect(onValueChange).toHaveBeenCalledWith("12", expect.objectContaining({ reason: "imperative", event }))
   })
 
+  test("a code echoed back from onValueChange completes once, and a cancel after it still holds", () => {
+    const onComplete = vi.fn()
+    const otp = otpInput({
+      id: "o",
+      maxLength: 4,
+      onComplete,
+      onValueChange: (value) => {
+        otp.api.setValue(value)
+      },
+    })
+    otp.api.setValue("1234")
+    expect(onComplete).toHaveBeenCalledTimes(1)
+    const canceling = otpInput({
+      id: "c",
+      maxLength: 4,
+      onComplete,
+      onValueChange: (value, details) => {
+        canceling.api.setValue(value)
+        details.cancel()
+      },
+    })
+    canceling.api.setValue("5678")
+    expect(canceling.api.getValue()).toBe("")
+    expect(onComplete).toHaveBeenCalledTimes(1)
+  })
+
   test("a canceled change keeps the code", () => {
     const otp = otpInput({ id: "o", defaultValue: "12", onValueChange: (_, details) => details.cancel() })
     otp.api.clear()

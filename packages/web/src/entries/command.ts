@@ -37,3 +37,4 @@ export type {
   SearchFilter,
 } from "@ui-sdk/core/command"
 export type { CommandEvents, UiCommandElement } from "../events"
+export { createCommandController } from "@ui-sdk/core/command"

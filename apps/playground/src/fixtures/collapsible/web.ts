@@ -1,7 +1,8 @@
+import { createCollapsibleController } from "@ui-sdk/core/collapsible"
 import { collapsibleFixture as fixture } from "tests/fixtures/collapsible.ts"
 import { collapsibleOptions } from "tests/fixtures/page.ts"
 
-type CollapsibleElement = HTMLElement & { open?: boolean }
+type CollapsibleElement = HTMLElement & { open?: boolean; controller?: unknown }
 
 async function mount(root: HTMLElement) {
   const { cancel, defaultOpen, disabled, keepMounted, hiddenUntilFound } = collapsibleOptions()
@@ -28,8 +29,10 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/collapsible")
   const collapsible = root.querySelector<CollapsibleElement>("ui-collapsible")!
   const output = (name: string) => root.querySelector(`output[aria-label="${name}"]`)!
-  root.querySelector("[data-close]")!.addEventListener("click", () => (collapsible.open = false))
-  root.querySelector("[data-toggle]")!.addEventListener("click", () => (collapsible.open = !collapsible.open))
+  const controller = createCollapsibleController()
+  collapsible.controller = controller
+  root.querySelector("[data-close]")!.addEventListener("click", () => controller.close())
+  root.querySelector("[data-toggle]")!.addEventListener("click", () => controller.toggle())
   collapsible.addEventListener("openchange", (event) => {
     const detail = (event as CustomEvent<{ value: boolean; reason: string; source: string }>).detail
     if (cancel === (detail.value ? "open" : "close")) return event.preventDefault()

@@ -254,11 +254,11 @@ test.describe("web component attributes", () => {
     expect(result).toEqual({ open: false, gap: 12 })
   })
 
-  test("the value attribute on tabs is live and fires valuechange", async ({ page, open }) => {
+  test("the value attribute on tabs is live and fires no valuechange", async ({ page, open }) => {
     await open("alignment")
     await page.locator("ui-tabs").evaluate((el) => el.setAttribute("value", "golf"))
     await expect(page.getByRole("tab", { name: "Golf" })).toHaveAttribute("aria-selected", "true")
-    await expect(output(page, "Tab changes")).toHaveText("1")
+    await expect(output(page, "Tab changes")).toHaveText("0")
     expect(await page.locator("ui-tabs").evaluate((el) => (el as unknown as { value: string }).value)).toBe(
       "golf",
     )

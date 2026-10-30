@@ -1,7 +1,7 @@
 // A trigger given a controller connects to that controller's component, even
 // inside another component of the same kind, once that one mounts.
 import { render } from "@solidjs/web"
-import { flush, type Component } from "solid-js"
+import { createSignal, flush, For, type Component } from "solid-js"
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { createDialogController, Dialog, DialogContent, DialogTrigger } from "../src/dialog"
 import { createDrawerController, Drawer, DrawerTrigger } from "../src/drawer"
@@ -192,4 +192,20 @@ test("a trigger inside its own popover, given that popover's controller, keeps i
   await settle()
   expect(view.querySelector("button")).toBe(trigger)
   expect(document.activeElement).toBe(trigger)
+})
+
+test("removing a row whose trigger names a menu's controller leaves the menu working", async () => {
+  const menu = createMenuController()
+  const [rows, setRows] = createSignal(["a", "b"])
+  const view = mount(() => (
+    <>
+      <For each={rows()}>{(row) => <MenuTrigger controller={menu}>{row}</MenuTrigger>}</For>
+      <Menu controller={menu} />
+    </>
+  ))
+  await settle()
+  setRows(["b"])
+  expect(() => flush()).not.toThrow()
+  await settle()
+  expect([...view.querySelectorAll("button")].map((button) => button.textContent)).toEqual(["b"])
 })

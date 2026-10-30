@@ -26,3 +26,4 @@ export type {
   FileRules,
 } from "@ui-sdk/core/file-input"
 export type { FileInputEvents, UiFileInputElement } from "../events"
+export { createFileInputController, formatFileSize, relativePath } from "@ui-sdk/core/file-input"

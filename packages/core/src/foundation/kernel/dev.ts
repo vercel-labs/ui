@@ -326,8 +326,9 @@ function checkControlled(from: { component: string; id: string }, keys: string[]
 }
 
 // What a stuck controlled change looks like: the component asked for a new
-// value, and the owner never passed it back.
-const pending = new WeakMap<object, Map<string, ReturnType<typeof setTimeout>>>()
+// value, and the owner never passed it back. Each key waits with the value it
+// had when asked.
+const pending = new WeakMap<object, Map<string, { timer: ReturnType<typeof setTimeout>; before: unknown }>>()
 
 /**
  * Warns when a controlled change was requested and the option it controls
@@ -339,33 +340,47 @@ function expectControlled(
   info: { component: string; id: string; key: string; value: unknown; reason: string; source: string },
   current: () => unknown,
 ) {
-  let timers = pending.get(instance)
-  if (!timers) pending.set(instance, (timers = new Map()))
-  clearTimeout(timers.get(info.key))
+  let waiting = pending.get(instance)
+  if (!waiting) pending.set(instance, (waiting = new Map()))
+  clearTimeout(waiting.get(info.key)?.timer)
   const before = current()
-  timers.set(
-    info.key,
-    setTimeout(() => {
-      timers.delete(info.key)
-      if (!Object.is(current(), before) || Object.is(before, info.value)) return
-      const asked =
-        info.key === "open"
-          ? info.value
-            ? "to open"
-            : "to close"
-          : `for \`${info.key}\` ${JSON.stringify(info.value)}`
-      const callback = callbackName(info.key, "Change")
-      warn(
-        `asked ${asked} (\`${info.reason}\`, \`${info.source}\`), and \`${info.key}\` stayed ${JSON.stringify(before)}. Update it in \`${callback}\`, or call \`details.cancel()\` there to refuse.`,
-        info,
-      )
-    }, 200),
-  )
+  const timer = setTimeout(() => {
+    waiting.delete(info.key)
+    if (!Object.is(current(), before) || Object.is(before, info.value)) return
+    const asked =
+      info.key === "open"
+        ? info.value
+          ? "to open"
+          : "to close"
+        : `for \`${info.key}\` ${JSON.stringify(info.value)}`
+    const callback = callbackName(info.key, "Change")
+    warn(
+      `asked ${asked} (\`${info.reason}\`, \`${info.source}\`), and \`${info.key}\` stayed ${JSON.stringify(before)}. Update it in \`${callback}\`, or call \`details.cancel()\` there to refuse.`,
+      info,
+    )
+  }, 200)
+  waiting.set(info.key, { timer, before })
+}
+
+/**
+ * Stops waiting for each controlled value the owner passed something else
+ * for, so one that opens and closes again before the check, like a palette
+ * closed by its own command, doesn't warn.
+ */
+function heardControlled(instance: object, options: object) {
+  const waiting = pending.get(instance)
+  if (!waiting) return
+  const values = options as Record<string, unknown>
+  for (const [key, { timer, before }] of waiting)
+    if (!Object.is(values[key], before)) {
+      clearTimeout(timer)
+      waiting.delete(key)
+    }
 }
 
 /** Stops waiting for a controlled value, like when the instance leaves the page. */
 function forgetControlled(instance: object) {
-  pending.get(instance)?.forEach((timer) => clearTimeout(timer))
+  pending.get(instance)?.forEach(({ timer }) => clearTimeout(timer))
   pending.delete(instance)
 }
 
@@ -417,6 +432,7 @@ export {
   expectControlled,
   exposeShortcuts,
   forgetControlled,
+  heardControlled,
   isMeasuring,
   measured,
   warn,

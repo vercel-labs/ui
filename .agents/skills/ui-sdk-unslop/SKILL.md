@@ -20,6 +20,24 @@ Each pattern, with what replaces it.
 if (event.key === "Escape") close()
 ```
 
+**A comment on every declaration.** Most constants, fields and functions need none: the name and the type say what they are. Delete each one that doesn't stop a reader from getting the code wrong.
+
+**A comment that explains the design.** What a value holds, where it's kept, which attribute it lands on, who reads it. The code says that. Keep the one fact it can't show, in a line, or delete the comment.
+
+```ts
+// Before
+// The site's color scheme, shown on <html> as `data-color-scheme`, which the
+// stylesheet's colors follow. It's kept under "theme", the key the site used
+// before, so readers keep what they chose.
+const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
+
+// After
+// "theme" is the key the site used before, so readers keep their choice.
+const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
+```
+
+**A comment longer than three lines.** Cut it to the reason. An explanation that needs more goes in the docs page, a test title or `contributing/`. `pnpm lint` flags it (`comment-length`).
+
 **A comment that narrates history or the task.** "Now we", "Updated to", "Fixed the bug where", "As requested". Delete it. Git holds the history.
 
 **A section banner.** `// ---- Helpers ----`, `// State`. Delete it. Split the file if it needs signposts.
@@ -44,7 +62,7 @@ if (event.key === "Escape") close()
 
 ## What stays
 
-- A comment that says why: a browser bug and the browser, an APG rule, a trade-off, a link to the spec or test that pins the behavior.
+- A comment that says why, in three lines at most: a browser bug and the browser, an APG rule, a trade-off, a link to the spec or test that pins the behavior.
 - The word "primitive", and parentheses that hold code names, like "the trigger (`MenuTrigger`)".
 - JSDoc on every public field and export. Make it say more; don't delete it.
 
@@ -53,5 +71,6 @@ if (event.key === "Escape") close()
 1. List what you'll change, by file, before touching anything.
 2. Make the changes.
 3. Run `pnpm lint`, `pnpm format`, `pnpm typecheck` and the unit tests for the packages you touched. Check exit codes.
-4. Read the diff once more. Revert any change that doesn't make the code easier to read.
-5. If one pattern showed up in three or more files, propose a lint rule for it in `scripts/check-code.mjs`.
+4. Delete each comment left in the diff and reread the code. If it still reads right, leave it deleted.
+5. Read the diff once more. Revert any change that doesn't make the code easier to read.
+6. If one pattern showed up in three or more files, propose a lint rule for it in `scripts/check-code.mjs` or `scripts/check-comments.mjs`.

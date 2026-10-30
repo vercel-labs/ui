@@ -38,3 +38,4 @@ export type {
   ISOMonth,
 } from "@ui-sdk/core/date-picker"
 export type { DatePickerEvents, UiDatePickerElement } from "../events"
+export { createDatePickerController } from "@ui-sdk/core/date-picker"

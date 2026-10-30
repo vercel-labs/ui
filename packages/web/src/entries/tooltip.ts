@@ -19,3 +19,4 @@ export type {
   TooltipTriggerState,
 } from "@ui-sdk/core/tooltip"
 export type { TooltipEvents, UiTooltipElement } from "../events"
+export { createTooltipController } from "@ui-sdk/core/tooltip"

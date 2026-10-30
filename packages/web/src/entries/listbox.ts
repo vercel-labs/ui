@@ -25,3 +25,4 @@ export type {
   ListboxValueChangeReason,
 } from "@ui-sdk/core/listbox"
 export type { ListboxEvents, UiListboxElement } from "../events"
+export { createListboxController } from "@ui-sdk/core/listbox"

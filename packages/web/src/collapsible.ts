@@ -8,8 +8,9 @@ import { createParts, wrappedButton } from "./define-element"
 //   <ui-collapsible-panel>…</ui-collapsible-panel>
 // </ui-collapsible>
 //
-// The live state is the `open` property. Setting it fires `openchange` like a
-// press, and `openchangecomplete` fires once the panel has finished animating.
+// The live state is the `open` property. Setting it commits without events,
+// like a native input's `value`. A press or `api.toggle()` fires `openchange`,
+// and `openchangecomplete` once the panel has finished animating.
 function defineCollapsibleElements() {
   createParts(collapsible, {
     root: {

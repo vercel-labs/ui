@@ -50,6 +50,18 @@ test("web.js defines components added after the page loads", async ({ page }) =>
   expect(entries).toContain("toggle")
 })
 
+test("web.js defines components inside shadow roots", async ({ page }) => {
+  await page.goto("/shadow.html")
+  await expect(page.getByRole("switch", { name: "Notifications" })).toHaveAttribute("aria-checked", "false")
+  await page.evaluate(() => {
+    const host = document.createElement("toolbar-card")
+    const shadowRoot = host.attachShadow({ mode: "open" })
+    document.body.append(host)
+    setTimeout(() => (shadowRoot.innerHTML = "<ui-toggle><button>Bold</button></ui-toggle>"))
+  })
+  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-pressed", "false")
+})
+
 test("a component's own file defines it without web.js", async ({ page }) => {
   const entries = fetchedEntries(page)
   await page.goto("/tabs.html")

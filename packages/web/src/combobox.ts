@@ -27,8 +27,8 @@ type ComboboxElement = HTMLElement &
   Pick<ComboboxOptions<unknown>, "items" | "filter" | "itemToValue" | "itemToLabel" | "isItemEqualToValue">
 
 const generated = new WeakMap<HTMLElement, HTMLElement>()
-// Chips parts that had no chips of their own, so the element renders one per value.
-const automaticChips = new WeakSet<Element>()
+// The chips the element rendered, so it can tell them from chips the page renders.
+const renderedChip = new WeakSet<Element>()
 // Create parts without content of their own, so the core writes the offer into them.
 const automaticCreate = new WeakSet<Element>()
 // Overflow parts without content of their own, so the core writes the count into them.
@@ -158,9 +158,6 @@ function defineComboboxElements() {
       tag: "ui-combobox-chips",
       feature: comboboxChips,
       display: "block",
-      render(el) {
-        if (!el.querySelector("ui-combobox-chip")) automaticChips.add(el)
-      },
     },
     chip: { tag: "ui-combobox-chip", feature: comboboxChips, display: "block" },
     // "+2 more" once chips don't fit on the chips' line. Rendering it turns collapsing on.
@@ -213,10 +210,20 @@ function created(el: HTMLElement, query: string) {
 // both alone, like the highlight moving, skip it.
 const renderedChips = new WeakMap<Element, { value: unknown; labels: string }>()
 
-// One chip per value, with a remove button named after it, in empty chips parts.
+// One chip per value, with a remove button named after it, until the page
+// renders chips of its own. The page's chips go in before the state commits,
+// from the change event, so the element's never show beside them.
 function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false } = {}) {
   const chips = el.querySelector("ui-combobox-chips")
-  if (!chips || !automaticChips.has(chips)) return
+  if (!chips) return
+  // The page's chips can sit in a wrapper of their own; the element's are children.
+  const all = Array.from(chips.querySelectorAll<HTMLElement>("ui-combobox-chip"))
+  if (all.some((chip) => !renderedChip.has(chip))) {
+    for (const chip of all) if (renderedChip.has(chip)) chip.remove()
+    renderedChips.delete(chips)
+    return
+  }
+  const children = all.filter((chip) => chip.parentElement === chips)
   const value = api.getValue()
   const { selection } = api.internal
   const values = selection.values()
@@ -228,12 +235,7 @@ function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false } = 
   renderedChips.set(chips, { value, labels: joined })
   const keys = selection.keys()
   const kept = new Set(keys)
-  const existing = new Map(
-    Array.from(chips.querySelectorAll<HTMLElement>(":scope > ui-combobox-chip")).map((chip) => [
-      chip.getAttribute("value"),
-      chip,
-    ]),
-  )
+  const existing = new Map(children.map((chip) => [chip.getAttribute("value"), chip]))
   // Chips that stay keep their element, so focus on one survives a neighbour's removal.
   for (const [key, chip] of existing) if (!kept.has(key ?? "")) chip.remove()
   // Chips go before the overflow part, if there is one, and the input.
@@ -244,6 +246,7 @@ function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false } = 
     if (!chip) {
       // A copy of the template's chip, with its remove button, or a new one.
       chip = copy(templateOf(el), "ui-combobox-chip")
+      renderedChip.add(chip)
       chip.setAttribute("value", key)
       if (!chip.querySelector(":scope > ui-combobox-chip-remove")) {
         const remove = element("ui-combobox-chip-remove")

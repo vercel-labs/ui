@@ -38,3 +38,4 @@ export type {
   SearchFilter,
 } from "@ui-sdk/core/autocomplete"
 export type { AutocompleteEvents, UiAutocompleteElement } from "../events"
+export { createAutocompleteController } from "@ui-sdk/core/autocomplete"

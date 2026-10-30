@@ -17,3 +17,4 @@ export type {
   PaginationStepState,
 } from "@ui-sdk/core/pagination"
 export type { PaginationEvents, UiPaginationElement } from "../events"
+export { createPaginationController, paginationRange } from "@ui-sdk/core/pagination"

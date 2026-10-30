@@ -164,14 +164,15 @@ const deliveries = new WeakMap<
 >()
 
 // Reads a part from its instance, tracking what it reads of the props'
-// delivery, and nothing the read itself touches: state reads the props, which
-// every part would otherwise track. A read its slot doesn't define, like the
-// attributes of a part without `attrs`, reads no state and tracks nothing.
+// delivery. The read itself tracks too, so a callback core calls for the part,
+// like a `getHref` that reads a signal, renders it again when that signal
+// changes. A read its slot doesn't define, like the attributes of a part
+// without `attrs`, reads no state and tracks none of the delivery.
 function readPart<T>(instance: object, part: Part, defines: "present" | "attrs" | "state", read: () => T) {
   const delivery = deliveries.get(instance)
   const slot = delivery?.slots?.[part.slot]
   if (!slot || slot[defines]) delivery?.track(part)
-  return untrack(read)
+  return read()
 }
 
 // Records with the same values, so a memo that builds a new but equal one

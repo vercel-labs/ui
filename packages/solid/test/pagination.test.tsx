@@ -72,3 +72,23 @@ test("the links that stay in the range keep their elements as the page changes",
   expect(linkFor(root, 10)?.getAttribute("aria-current")).toBe("page")
   expect(linkFor(root, 20)).toBe(lastLink)
 })
+
+test("a getHref that reads a signal moves the links when the signal changes", () => {
+  const [filter, setFilter] = createSignal("open")
+  const root = mount(() => (
+    <Pagination
+      aria-label="Pages"
+      page={1}
+      pageCount={3}
+      getHref={(page) => `/?status=${filter()}&page=${page}`}
+    >
+      <PaginationList>{(state) => range(state.items)}</PaginationList>
+    </Pagination>
+  ))
+  const hrefOf = (page: number) =>
+    [...root.querySelectorAll("a")].find((link) => link.textContent === String(page))?.getAttribute("href")
+  expect(hrefOf(2)).toBe("/?status=open&page=2")
+  setFilter("done")
+  flush()
+  expect(hrefOf(2)).toBe("/?status=done&page=2")
+})

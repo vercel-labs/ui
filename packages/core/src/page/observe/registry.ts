@@ -179,8 +179,17 @@ function bound(instance: PrimitiveInstance) {
 
 function componentLabel(parts: Bound[]) {
   const keyless = (slot: string) => parts.find((part) => part.slot === slot && !part.key)?.el
+  // Not when the slot has many keys: an accordion's first trigger names its
+  // item, not the accordion. A dialog's one trigger does name it, and so does
+  // a label the web adapter keys by its element.
+  const first = (slot: string) => {
+    const found = parts.filter((part) => part.slot === slot)
+    return new Set(found.map((part) => part.key)).size === 1
+      ? found[0].el
+      : found.find((part) => !part.key)?.el
+  }
   const text = (el: Element | undefined) => el?.textContent?.trim().slice(0, 80) || undefined
-  const label = text(keyless("label"))
+  const label = text(first("label"))
   if (label) return label
   // A group's own element names it before its items do.
   const group = keyless("group") ?? keyless("root")
@@ -191,14 +200,6 @@ function componentLabel(parts: Bound[]) {
   const button =
     root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button") ? root : undefined
   const named = (el: Element | undefined) => (el && accessibleName(el)) || text(el)
-  // Not when the slot has many keys: an accordion's first trigger names its
-  // item, not the accordion. A dialog's one trigger does name it.
-  const first = (slot: string) => {
-    const found = parts.filter((part) => part.slot === slot)
-    return new Set(found.map((part) => part.key)).size === 1
-      ? found[0].el
-      : found.find((part) => !part.key)?.el
-  }
   const shown = named(first("title")) ?? named(first("heading")) ?? named(first("trigger")) ?? named(button)
   if (shown) return shown
   // Then any part's own name, keyless first, so an accordion isn't named by

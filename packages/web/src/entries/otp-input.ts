@@ -17,3 +17,4 @@ export type {
   OtpInputPrimitive,
 } from "@ui-sdk/core/otp-input"
 export type { OTPInputEvents, UiOTPInputElement } from "../events"
+export { createOTPInputController } from "@ui-sdk/core/otp-input"

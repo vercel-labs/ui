@@ -17,3 +17,4 @@ export type {
   CollapsibleTriggerState,
 } from "@ui-sdk/core/collapsible"
 export type { CollapsibleEvents, UiCollapsibleElement } from "../events"
+export { createCollapsibleController } from "@ui-sdk/core/collapsible"

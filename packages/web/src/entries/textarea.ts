@@ -19,3 +19,4 @@ export type {
   TextareaState,
 } from "@ui-sdk/core/input"
 export type { InputEvents, UiInputElement } from "../events"
+export { createInputController } from "@ui-sdk/core/input"

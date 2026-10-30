@@ -67,7 +67,7 @@ Set the element’s `open` property to open or close it from your app. Listen fo
 
 ### Confirm
 
-Use `createConfirm<Payload>()` to ask a question from an event handler and await the answer. Create it once, then pass its `controller` to your alert dialog. Import `createConfirm` from `@ui-sdk/core/alert-dialog` and assign `confirm.controller` to the root element’s `controller` property. The `payloadchange` event provides the current question in `event.detail.value`.
+Use `createConfirm<Payload>()` to ask a question from an event handler and await the answer. Create it once, then pass its `controller` to your alert dialog. Import `createConfirm` from `@ui-sdk/web/alert-dialog` and assign `confirm.controller` to the root element’s `controller` property. The `payloadchange` event provides the current question in `event.detail.value`.
 
 `await confirm({ name })` resolves `true` when the Close part with `value="confirm"` closes the dialog. Cancel, Escape, and other answers resolve `false`. This lets several rows share one dialog:
 
@@ -125,7 +125,7 @@ Alert Dialog shares [Dialog's](./dialog) options, except `modal`, `closeOnOutsid
 
 ### Controller
 
-Use `createAlertDialogController<Payload, Result>()` from `@ui-sdk/core/alert-dialog` for direct control. The root element’s `api` property has the same methods. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
+Use `createAlertDialogController<Payload, Result>()` from `@ui-sdk/web/alert-dialog` for direct control. The root element’s `api` property has the same methods. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
 
 <ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
 

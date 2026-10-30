@@ -150,7 +150,12 @@ const withState = (children: unknown, state: unknown) =>
 // first client render agree, and the platform's glyphs follow a moment later.
 // Item state doesn't carry it, so the root menu listens once for every item.
 function appleSignal(menu: MenuContextValue) {
-  const [apple, setApple] = createSignal(untrack(() => menu.state.apple))
+  // Written from core's listeners, which can fire inside a disposal, like a
+  // `For` removing a row whose trigger names this menu's controller.
+  const [apple, setApple] = createSignal(
+    untrack(() => menu.state.apple),
+    { ownedWrite: true },
+  )
   createEffect(
     () => 0,
     () => {

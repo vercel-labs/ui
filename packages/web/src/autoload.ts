@@ -28,14 +28,28 @@ function componentsBase(scriptUrl: string) {
 
 /**
  * Imports the entry of every undefined `ui-` element in `root` from `base`,
- * like `web/tabs.js`, then of every one added later.
+ * like `web/tabs.js`, then of every one added later, inside open shadow roots
+ * too.
  */
 function autoload(base: URL, entries: readonly string[], root: Document = document) {
   const requested = new Set<string>()
+  const shadowRoots = new WeakSet<ShadowRoot>()
+
+  const observer = new MutationObserver((records) => {
+    for (const record of records) for (const node of record.addedNodes) load(node)
+  })
 
   const load = (node: Node) => {
     if (!(node instanceof Element)) return
-    for (const element of [node, ...node.querySelectorAll(":not(:defined)")]) {
+    for (const element of [node, ...node.querySelectorAll("*")]) {
+      // A shadow root that exists now, like one a component renders into, is
+      // watched for what it gets later.
+      const shadowRoot = element.shadowRoot
+      if (shadowRoot && !shadowRoots.has(shadowRoot)) {
+        shadowRoots.add(shadowRoot)
+        observer.observe(shadowRoot, { childList: true, subtree: true })
+        for (const child of shadowRoot.children) load(child)
+      }
       const tag = element.localName
       if (!tag.startsWith("ui-") || customElements.get(tag)) continue
       const entry = entryOf(tag, entries)
@@ -46,9 +60,6 @@ function autoload(base: URL, entries: readonly string[], root: Document = docume
   }
 
   load(root.documentElement)
-  const observer = new MutationObserver((records) => {
-    for (const record of records) for (const node of record.addedNodes) load(node)
-  })
   observer.observe(root.documentElement, { childList: true, subtree: true })
   return () => observer.disconnect()
 }

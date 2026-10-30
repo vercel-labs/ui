@@ -63,7 +63,7 @@ function HeaderMenu({ section }: { section?: Section }) {
                         <NavigationMenuLink
                           active={section === framework && current}
                           render={<Link href={`/docs/${framework}`} />}
-                          className="flex items-center rounded-full p-2 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-active:font-medium"
+                          className="flex items-center rounded-full px-3 py-2 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-active:font-medium"
                         >
                           {frameworks[framework].label}
                         </NavigationMenuLink>

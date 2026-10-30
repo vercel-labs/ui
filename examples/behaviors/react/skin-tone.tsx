@@ -21,7 +21,6 @@ const skinTone = createPreference({
   storage: createLocalStorage("ui-sdk-skin-tone"),
 })
 
-// Shows a version only where `data-skin-tone` matches it. Written out, so Tailwind finds every class.
 const shown: Record<Tone, string> = {
   default: "[[data-skin-tone=default]_&]:inline",
   light: "[[data-skin-tone=light]_&]:inline",
@@ -31,8 +30,6 @@ const shown: Record<Tone, string> = {
   dark: "[[data-skin-tone=dark]_&]:inline",
 }
 
-// Every tone is in the HTML, and CSS shows the one that matches, so the hand
-// is right before the page hydrates.
 function Wave() {
   return (
     <span role="img" aria-label="Waving hand" className="text-3xl leading-none">

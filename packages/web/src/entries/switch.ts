@@ -13,3 +13,4 @@ export type {
   SwitchThumbState,
 } from "@ui-sdk/core/switch"
 export type { SwitchEvents, UiSwitchElement } from "../events"
+export { createSwitchController } from "@ui-sdk/core/switch"

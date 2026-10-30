@@ -10,7 +10,7 @@ import { createParts, instanceOf } from "./define-element"
 
 // `default-checked` is where a form reset returns to, and takes
 // "indeterminate" on a checkbox. `checked` sets where it starts too, and
-// changing it later changes it like a press.
+// changing it later commits without events, like a native checkbox's.
 const toggleApi: ("getChecked" | "setChecked" | "toggle" | "focus")[] = [
   "getChecked",
   "setChecked",

@@ -148,6 +148,18 @@ describe("devtools hook", () => {
     vi.advanceTimersByTime(500)
     expect(warn).not.toHaveBeenCalled()
   })
+
+  test("a controlled value passed back and changed again before the check doesn't warn", () => {
+    vi.useFakeTimers()
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const instance = popover({ id: "p5", open: false })
+    instance.api.open()
+    instance.setOptions({ id: "p5", open: true })
+    vi.advanceTimersByTime(50)
+    instance.setOptions({ id: "p5", open: false })
+    vi.advanceTimersByTime(500)
+    expect(warn).not.toHaveBeenCalled()
+  })
 })
 
 describe("missing slots", () => {
