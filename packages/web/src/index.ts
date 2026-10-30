@@ -35,7 +35,7 @@ export type {
 } from "@ui-sdk/core/drawer"
 export { createOverlays, overlays, type OverlayHostToastOptions } from "./overlays"
 export { createToaster, toast, type ToastContent } from "./toast"
-export { confirm, createConfirm } from "@ui-sdk/core/dialog"
+export { confirm, createConfirm, createDialogController } from "@ui-sdk/core/dialog"
 export type {
   AlertDialogBackdropState,
   AlertDialogCloseActionDetails,
@@ -123,10 +123,42 @@ export type {
   ResizableStorage,
 } from "@ui-sdk/core/resizable"
 export { createFileInputController, formatFileSize, relativePath } from "@ui-sdk/core/file-input"
-export { paginationRange, type PaginationRangeItem } from "@ui-sdk/core/pagination"
+export {
+  createPaginationController,
+  paginationRange,
+  type PaginationRangeItem,
+} from "@ui-sdk/core/pagination"
 export { createCarouselController } from "@ui-sdk/core/carousel"
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export { createDatePickerController } from "@ui-sdk/core/date-picker"
+// Every component's controller, like in the other frameworks' packages.
+export { createAccordionController } from "@ui-sdk/core/accordion"
+export { createAlertDialogController } from "@ui-sdk/core/alert-dialog"
+export { createAutocompleteController } from "@ui-sdk/core/autocomplete"
+export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
+export { createCollapsibleController } from "@ui-sdk/core/collapsible"
+export { createComboboxController } from "@ui-sdk/core/combobox"
+export { createCommandController } from "@ui-sdk/core/command"
+export { createHoverCardController } from "@ui-sdk/core/hover-card"
+export { createInputController } from "@ui-sdk/core/input"
+export { createListboxController } from "@ui-sdk/core/listbox"
+export { createMenubarController } from "@ui-sdk/core/menubar"
+export { createNavigationMenuController } from "@ui-sdk/core/navigation-menu"
+export { createNumberInputController } from "@ui-sdk/core/number-input"
+export { createOTPInputController } from "@ui-sdk/core/otp-input"
+export { createPasswordInputController } from "@ui-sdk/core/password-input"
+export { createPopoverController } from "@ui-sdk/core/popover"
+export { createRadioGroupController } from "@ui-sdk/core/radio"
+export { createScrollAreaController } from "@ui-sdk/core/scroll-area"
+export { createSelectController } from "@ui-sdk/core/select"
+export { createSliderController } from "@ui-sdk/core/slider"
+export { createSwitchController } from "@ui-sdk/core/switch"
+export { createTabsController } from "@ui-sdk/core/tabs"
+export { createToggleController, createToggleGroupController } from "@ui-sdk/core/toggle"
+export { createTokenInputController } from "@ui-sdk/core/token-input"
+export { createToolbarController } from "@ui-sdk/core/toolbar"
+export { createTooltipController } from "@ui-sdk/core/tooltip"
+export { createTreeController } from "@ui-sdk/core/tree"
 // Text matching the way the search components match, for your own filters and highlights.
 export { fuzzyScore, matchRanges, matchSegments } from "@ui-sdk/core/text-match"
 export type { MatchRange, MatchSegment } from "@ui-sdk/core/text-match"

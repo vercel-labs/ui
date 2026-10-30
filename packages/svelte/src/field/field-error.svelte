@@ -14,12 +14,12 @@ browser's message for the current problem.
   let { match, children, ...rest }: PartProps<"div", FieldErrorState> & FieldErrorProps = $props()
 
   const field = useField()
-  const made = $props.id()
+  const uid = $props.id()
   // Only an error with `match` needs an id of its own. One without takes the
   // field's, which the control points at before the field binds.
   const error = field
     ? useHandlePart(field, "error", () => ({
-        id: rest.id ?? (match === undefined ? undefined : made),
+        id: rest.id ?? (match === undefined ? undefined : `ui-sdk-${uid}`),
         match,
       }))
     : undefined

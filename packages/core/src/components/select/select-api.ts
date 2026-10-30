@@ -40,7 +40,8 @@ type SelectState = PopupState & {
   prepared: boolean
   // A List part holds the items, so the content isn't the listbox itself.
   listed: boolean
-  labeled: boolean
+  // A SelectLabel is bound. Null until the trigger binds, so the server's HTML names the trigger after it.
+  labeled: boolean | null
   multiple: boolean
   disabled: boolean
   readOnly: boolean
@@ -100,7 +101,7 @@ function initialSelectState(options: SelectOptions<any, any>): SelectState {
     trigger: null,
     prepared: false,
     listed: false,
-    labeled: false,
+    labeled: null,
     multiple: !!options.multiple,
     disabled: !!options.disabled,
     readOnly: !!options.readOnly,

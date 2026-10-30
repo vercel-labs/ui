@@ -5,7 +5,7 @@ The combobox renders no element of its own: the input, the chips and the
 list are its parts.
 @stable
 -->
-<script lang="ts">
+<script lang="ts" generics="T = string, Multiple extends boolean | undefined = false">
   import type { ChangeDetails, DismissAttemptDetails } from "@ui-sdk/core"
   import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
   import {
@@ -33,6 +33,39 @@ list are its parts.
 
   type ValueDetails = ChangeDetails<ComboboxValueChangeReason>
   type QueryDetails = ChangeDetails<ComboboxQueryChangeReason>
+  // The value's shape follows `multiple`. The multiple side comes first, so a
+  // list in a variable infers `T` as its items.
+  type ComboboxValueProps<T, Multiple> =
+    | ({
+        /** Whether several items can be selected. The value is then a list, the list stays open as items toggle, and the input empties after each choice. */
+        multiple: Multiple
+        /** The selected values. Bind it with `bind:value` to control the combobox. */
+        value?: T[]
+        /** The values selected at first, when uncontrolled. A form reset returns to them. */
+        defaultValue?: T[]
+        /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
+        onValueChange?: (value: T[], details: ValueDetails) => void
+      } & ([Multiple] extends [true] ? unknown : never))
+    | ({
+        /** Whether several items can be selected. */
+        multiple?: Multiple
+        /** The selected value. Bind it with `bind:value` to control the combobox. `null` selects nothing. */
+        value?: T | null
+        /** The value selected at first, when uncontrolled. A form reset returns to it. */
+        defaultValue?: T | null
+        /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
+        onValueChange?: (value: NoInfer<T> | null, details: ValueDetails) => void
+      } & ([Multiple] extends [false | undefined] ? unknown : never))
+    | ({
+        /** Whether several items can be selected. */
+        multiple?: Multiple
+        /** The selected value, or values with `multiple`. Bind it with `bind:value` to control the combobox. */
+        value?: T | T[] | null
+        /** The value or values selected at first, when uncontrolled. A form reset returns to it. */
+        defaultValue?: T | T[] | null
+        /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
+        onValueChange?: (value: NoInfer<T> | NoInfer<T>[] | null, details: ValueDetails) => void
+      } & (boolean extends Multiple ? unknown : never))
   type OpenDetails = ChangeDetails<ComboboxOpenChangeReason>
 
   let {
@@ -76,10 +109,6 @@ list are its parts.
     onDismissAttempt,
     children,
   }: {
-    /** The selected value. Bind it with `bind:value` to control the combobox. `null` selects nothing, and with `multiple` it's a list. */
-    value?: unknown
-    /** The value selected at first, when uncontrolled. A form reset returns to it. */
-    defaultValue?: unknown
     /** The input's text, which filters the list. Bind it with `bind:query` to control it. Choosing an item sets it to the item's label, or empties it with `multiple`. */
     query?: string
     /** The input's text at first, when uncontrolled. Defaults to the selected item's label. */
@@ -88,24 +117,22 @@ list are its parts.
     open?: boolean
     /** Whether the list starts open, when uncontrolled. */
     defaultOpen?: boolean
-    /** Whether several items can be selected. The value is then a list, the list stays open as items toggle, and the input empties after each choice. */
-    multiple?: boolean
     /** With `multiple`, how many items can be selected. Once reached, the other items are disabled. */
     maxSelected?: number
     /** The items as data. Renders the list for you, and filters it without rendering every item. */
-    items?: ListData<any>
+    items?: ListData<T>
     /** Items shown instead of `items` while the input is empty, like recent choices. Needs `items`. */
-    emptyItems?: ListData<any>
+    emptyItems?: ListData<T>
     /** How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, or `false` to keep every item, for results a server already filtered. */
-    filter?: ListFilter<any>
+    filter?: ListFilter<T>
     /** What screen readers hear after typing pauses, when no `ComboboxStatus` is rendered, and when a chip is removed. Return null for nothing. */
     announcement?: (change: ListAnnouncement) => string | null | undefined
     /** The string an item's value submits as and is identified by, for object values. */
-    itemToValue?: (value: any) => string
+    itemToValue?: (value: T) => string
     /** The text a value shows, for values whose item isn't rendered, like async results. */
-    itemToLabel?: (value: any) => string
+    itemToLabel?: (value: T) => string
     /** Whether an item's value is the selected value, for object values that aren't the same object. */
-    isItemEqualToValue?: (itemValue: any, value: any) => boolean
+    isItemEqualToValue?: (itemValue: T, value: T) => boolean
     /** Whether the first matching item is highlighted while typing, so Enter chooses it. */
     autoHighlight?: boolean
     /** With `multiple`, whether the input keeps its text after an item is chosen. */
@@ -138,8 +165,6 @@ list are its parts.
     debug?: boolean
     /** Renders the list into this element instead of in place. */
     container?: PopupContainer
-    /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
-    onValueChange?: (value: any, details: ValueDetails) => void
     /** Runs when the input's text wants to change: typing, choosing an item, or closing with text that wasn't chosen. `details.cancel()` stops it. */
     onQueryChange?: (query: string, details: QueryDetails) => void
     /** Runs when the list wants to open or close. `details.cancel()` stops it. */
@@ -147,13 +172,13 @@ list are its parts.
     /** Runs once the list has finished opening or closing, after any animation. */
     onOpenChangeComplete?: (open: boolean) => void
     /** Runs when the highlight moves, with the item's index among the visible items. */
-    onHighlight?: (value: any, details: ListHighlightDetails) => void
+    onHighlight?: (value: T | null, details: ListHighlightDetails) => void
     /** Runs when the highlight or scrolling reaches the last item, so the next page can load. */
     onLoadMore?: () => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
     onDismissAttempt?: (details: DismissAttemptDetails<ComboboxDismissReason>) => void
     children?: Snippet
-  } = $props()
+  } & ComboboxValueProps<T, Multiple> = $props()
 
   const id = $props.id()
   const field = useFieldControl()
@@ -198,8 +223,8 @@ list are its parts.
     debug,
     onValueChange: (next: unknown, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
-      onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      onValueChange?.(next as never, details)
+      if (!details.canceled) value = next as never
     },
     onQueryChange: (next: string, details: QueryDetails) => {
       onQueryChange?.(next, details)

@@ -26,7 +26,7 @@ Put the content inside a viewport, then add a scrollbar for each axis you want t
 </script>
 
 <ScrollArea>
-  <ScrollAreaViewport aria-label="Release notes">
+  <ScrollAreaViewport role="region" aria-label="Release notes">
     <ScrollAreaContent>Content to scroll</ScrollAreaContent>
   </ScrollAreaViewport>
   <ScrollAreaScrollbar orientation="vertical">
@@ -147,7 +147,7 @@ With `"scroll"` and `"hover"`, `scrollHideDelay` keeps a scrollbar for a while a
 
 ### Keyboard and Screen Readers
 
-The viewport scrolls natively, so arrow keys, Page Up and Down, Home, End and Space work once focus is inside it. A viewport that scrolls and holds nothing focusable is a tab stop itself, so keyboard users can reach it; one with links or fields inside isn't, since Tab reaches them and they scroll it. Scrollbars and the corner are hidden from screen readers, which scroll the viewport themselves. Name the viewport with `aria-label` when it's a region worth finding, or give a chat `role="log"`.
+The viewport scrolls natively, so arrow keys, Page Up and Down, Home, End and Space work once focus is inside it. A viewport that scrolls and holds nothing focusable is a tab stop itself, so keyboard users can reach it; one with links or fields inside isn't, since Tab reaches them and they scroll it. Scrollbars and the corner are hidden from screen readers, which scroll the viewport themselves. Make the viewport a landmark with `role="region"` and an `aria-label` when it's worth finding, or give a chat `role="log"`.
 
 ### Controller
 
