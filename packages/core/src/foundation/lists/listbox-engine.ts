@@ -487,13 +487,13 @@ function createListboxEngine(
 
   // The next enabled item whose label starts with what the user typed, after `from`.
   function search(char: string, from: string | null) {
-    const enabled = entries().filter((entry) => !entry.pinned && !disabled(entry))
+    const list = entries().filter((entry) => !entry.pinned)
     const found = typeahead(
       char,
-      enabled.map((entry) => entry.label),
-      enabled.findIndex((entry) => entry.key === from),
+      list.map((entry) => (disabled(entry) ? "" : entry.label)),
+      list.findIndex((entry) => entry.key === from),
     )
-    return found === -1 ? undefined : enabled[found]
+    return found === -1 ? undefined : list[found]
   }
 
   // Whether focus fell to the page, like when its item left or moved.

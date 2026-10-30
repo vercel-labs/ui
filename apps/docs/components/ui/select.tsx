@@ -15,7 +15,6 @@ import type { ComponentProps, ReactNode } from "react"
 const triggers = {
   default:
     "flex h-8 w-full items-center justify-between gap-1.5 rounded-2xl border border-transparent bg-foreground/5 px-3 text-sm hover:bg-foreground/[0.07] focus-visible:border-ring",
-  // Reads as text until hovered, for a switcher inline with other text.
   ghost:
     "-mx-1.5 inline-flex h-7 items-center gap-1 rounded-lg px-1.5 text-sm hover:bg-foreground/5 data-open:bg-foreground/5",
 }

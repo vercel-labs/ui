@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
+Last reviewed: `afb7ffa` (2026-10-30, the group contexts for Checkbox and Toggle in PR 85).
 
 
 ## Settled
@@ -16,6 +16,9 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **React 19 only** (`react >=19`). No `forwardRef`, refs are props.
 - **Form component dropped.** Don't review or suggest Form; users bring react-hook-form or TanStack Form.
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
+- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
+- **A package `Checkbox` or `Toggle` joins only a package `CheckboxGroup` or `ToggleGroup`**, through the group's own context. A group root built with `createParts` or `usePart` doesn't reach it. This matches Svelte and keeps the group out of a standalone control's bundle.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -29,6 +32,8 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Author id in a later Suspense boundary**: an id inside a boundary that hydrates after the parts pointing at it gives a hydration attribute warning. Documented; not fixable while ids are taken at render.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration, as Radio was before PR 13.
+- **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
+- **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
 
 ## Revisit
 

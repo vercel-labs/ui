@@ -28,6 +28,11 @@ const config = {
   async headers() {
     return webReleaseHeaders()
   },
+  // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
+  // Agents' own `.md` files are the whole section, and they win.
+  async rewrites() {
+    return [{ source: "/docs/:path*.md", destination: "/md/:path*" }]
+  },
   async redirects() {
     const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
     const pages = "components|utilities|rendering|server-rendering"

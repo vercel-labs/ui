@@ -3,7 +3,7 @@ import { openBehaviors } from "./helpers"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "lists")
-  await expect(page.locator("[data-example]")).toHaveCount(8)
+  await expect(page.locator("[data-example]")).toHaveCount(9)
   expect(errors).toEqual([])
 })
 
@@ -20,6 +20,33 @@ test("virtualizer: only the rows in view are in the page, and scrolling renders 
   await expect(list.getByText("Entry 5001", { exact: true })).toBeVisible()
   await expect(list.getByText("Entry 1", { exact: true })).toHaveCount(0)
   expect(await list.getByRole("listitem").count()).toBeLessThan(30)
+})
+
+test("virtualizer find in page: a match on a row that isn't rendered scrolls to it, and the row holds the matched text", async ({
+  page,
+}) => {
+  await openBehaviors(page, "lists")
+  const list = page.getByRole("list", { name: "Invoices" })
+  await expect(list.locator("[data-findable-layer]")).toHaveCount(2)
+  // Every row's number in page order, as find in page walks the text.
+  const ids = () =>
+    list.evaluate((el) => {
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+      const found: number[] = []
+      while (walker.nextNode()) {
+        const match = /^INV-(\d+)$/.exec(walker.currentNode.textContent ?? "")
+        if (match) found.push(Number(match[1]))
+      }
+      return found
+    })
+  const all = Array.from({ length: 10000 }, (_, index) => index + 1)
+  expect(await ids()).toEqual(all)
+  // A text fragment goes through the same match and reveal as the find bar, once the example has mounted.
+  await page.goto(`${page.url().split("#")[0]}#:~:text=INV%2D08888`)
+  const row = list.getByRole("listitem").filter({ hasText: "INV-08888" })
+  await expect(row).toBeInViewport()
+  await expect(row.locator("span").first()).toHaveText("INV-08888")
+  await expect.poll(ids).toEqual(all)
 })
 
 test("stick to bottom: follows new lines, lets go on scroll up, and jumps back", async ({ page }) => {

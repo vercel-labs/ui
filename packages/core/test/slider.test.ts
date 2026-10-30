@@ -124,6 +124,19 @@ describe("slider", () => {
     expect(onValueChange.mock.calls[0][1].reason).toBe("imperative")
   })
 
+  test("keeps an uncontrolled value inside its range when the bounds change", () => {
+    const single = kept(slider({ id: "s", name: "volume", defaultValue: 80 }))
+    single.setOptions({ id: "s", name: "volume", defaultValue: 80, max: 50 })
+    expect(single.get().value).toBe(50)
+    expect(attrs(single.part("input")).value).toBe("50")
+    expect(attrs(single.part("thumb-input", { id: "0", index: 0 }))["aria-valuetext"]).toBe("50")
+    const range = kept(slider({ id: "r", defaultValue: [20, 80] }))
+    range.setOptions({ id: "r", defaultValue: [20, 80], min: 30, max: 60 })
+    expect(range.get().value).toEqual([30, 60])
+    range.setOptions({ id: "r", defaultValue: [20, 80], min: 30, max: Number.NaN })
+    expect(range.get().value).toEqual([30, 60])
+  })
+
   test("keeps a single value a number", () => {
     const onValueChange = vi.fn()
     const instance = slider({ id: "s", defaultValue: 5, onValueChange })

@@ -6,6 +6,8 @@ import type { UiToggleGroupElement } from "../src/events"
 import { defineAccordionElements } from "../src/accordion"
 import { defineToggleGroupElements } from "../src/toggle"
 
+;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => defineToggleGroupElements())

@@ -634,6 +634,12 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const cleanups: (() => void)[] = []
     const trigger = options.trigger()
     const host = config.host?.() ?? el
+    // Mounted open, like a dialog an overlay manager opens, focus returns to
+    // what had it as the popup mounted, since no open recorded it.
+    if (opener === "initial" && !before) {
+      const active = activeElement()
+      if (active && active !== active.ownerDocument.body && !composedContains(el, active)) before = active
+    }
     el.removeAttribute("hidden")
     host.removeAttribute("hidden")
     // The backdrop goes into the top layer first, so it sits just below the popup.

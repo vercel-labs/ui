@@ -19,6 +19,7 @@ import {
 } from "./popup"
 import { createParts, withElement } from "./create-parts"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { renderless } from "./renderless"
 
 type OpenDetails = ChangeDetails<HoverCardOpenChangeReason>
 type PayloadDetails = ChangeDetails<HoverCardPayloadChangeReason>
@@ -32,46 +33,49 @@ const parts = createParts(hoverCardPrimitive, { arrow: "div" })
  * A preview of what a link points to, shown when the pointer rests on the link or keyboard focus stays on it.
  * @stable
  */
-const HoverCard = defineComponent({
-  name: "HoverCard",
-  props: {
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    delay: Number,
-    closeDelay: Number,
-    disabled: optionalBoolean,
-    controller: Object as PropType<HoverCardController<any>>,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
-  },
-  setup(props, { slots, emit }) {
-    provide(ContainerKey, () => props.container)
-    const hoverCard = usePrimitive(hoverCardPrimitive, () => ({
-      ...props,
-      open: orModel(props.open, props.modelValue),
-      container: undefined,
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onPayloadChange: (payload: unknown, details: PayloadDetails) => emit("payloadChange", payload, details),
-    }))
-    useControllerEntry(() => props.controller, hoverCard)
-    return () => slots.default?.()
-  },
-})
+const HoverCard = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "HoverCard",
+    props: {
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      delay: Number,
+      closeDelay: Number,
+      disabled: optionalBoolean,
+      controller: Object as PropType<HoverCardController<any>>,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
+    },
+    setup(props, { slots, emit }) {
+      provide(ContainerKey, () => props.container)
+      const hoverCard = usePrimitive(hoverCardPrimitive, () => ({
+        ...props,
+        open: orModel(props.open, props.modelValue),
+        container: undefined,
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onPayloadChange: (payload: unknown, details: PayloadDetails) =>
+          emit("payloadChange", payload, details),
+      }))
+      useControllerEntry(() => props.controller, hoverCard)
+      return () => slots.default?.()
+    },
+  }),
+)
 
 /**
  * A link by default: pressing it follows the link, and hover or focus opens the card.

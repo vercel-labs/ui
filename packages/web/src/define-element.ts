@@ -479,6 +479,13 @@ const partOwners = new WeakMap<Element, OwnerElement>()
 // Each part element's part, so a part inside it can take its props.
 const slotParts = new WeakMap<Element, Part>()
 
+// A part its owner let go of when it left the page registers again once the owner is back.
+const registered = new WeakSet<Part>()
+
+// Looks for the part element's owner again, for an owner that connects after
+// a part whose `for` names it, like a native label's control.
+const findOwnerAgain = new WeakMap<Element, () => void>()
+
 // The props of the nearest part of `slot` around `el` that has the same owner,
 // so a part of another component in between, with a slot of the same name, is skipped.
 function propsAround(el: Element, slot: string, owner?: OwnerElement) {
@@ -893,6 +900,10 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           this.#childObserver.observe(this, { childList: true })
         }
         this.#render()
+        if (this.id) {
+          const root = this.getRootNode() as ParentNode
+          for (const el of root.querySelectorAll(`[for="${CSS.escape(this.id)}"]`)) findOwnerAgain.get(el)?.()
+        }
         // Once its parts bind, which reports to the form again, silently.
         if (restore !== undefined)
           queueMicrotask(() => {
@@ -989,6 +1000,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // microtask later in DOM order, so a trigger binds before an open popup.
       register(part: Part) {
         this.#parts.add(part)
+        registered.add(part)
         if (!this.#pending.size) queueMicrotask(() => this.#flush())
         this.#pending.add(part)
       }
@@ -1045,6 +1057,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         part.disconnect = undefined
         this.#restore(part)
         this.#parts.delete(part)
+        registered.delete(part)
         this.#pending.delete(part)
       }
 
@@ -1241,6 +1254,13 @@ function definePartElement(tagName: string, config: SlotConfig) {
       #part?: Part
       #properties: Record<string, unknown> = {}
 
+      constructor() {
+        super()
+        findOwnerAgain.set(this, () => {
+          if (this.isConnected) this.connectedCallback()
+        })
+      }
+
       static {
         for (const name of config.properties ?? [])
           Object.defineProperty(PartElement.prototype, name, {
@@ -1289,7 +1309,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
             .then(() => this.isConnected && this.connectedCallback())
           return
         }
-        if (owner === this.#owner) return
+        if (owner === this.#owner && this.#part && registered.has(this.#part)) return
         if (this.#owner && this.#part) this.#owner.unregister(this.#part)
 
         const el = boundElement(this, config.target)
@@ -1325,7 +1345,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
         if (!this.isConnected || this.#owner) return
         if (findOwner(this, config.owner)) this.connectedCallback()
         else if (config.alone) config.alone(boundElement(this, config.target) ?? this, this)
-        else warn(`<${tagName}> must be inside ${config.owner}.`)
+        else if (!this.hasAttribute("for")) warn(`<${tagName}> must be inside ${config.owner}.`)
       }
 
       // The element the part binds came, left or was replaced: the part lets go

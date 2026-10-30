@@ -22,6 +22,7 @@ import {
   usePrimitive,
   useScope,
 } from "./use-primitive"
+import { warnAttributes } from "./renderless"
 
 // A parser function reads an attribute, which only custom elements have.
 const kindOf = (spec: PropSpec) =>
@@ -380,7 +381,7 @@ function createParts<P extends Primitive, const Tags extends { [S in SlotName<P>
       ...(model ? { modelValue: null } : {}),
     } as Record<string, null>,
     emits: [...emitsOf(rootEvents), ...(model ? ["update:modelValue"] : [])],
-    setup(props, { slots, emit }) {
+    setup(props, { slots, emit, attrs }) {
       // `v-model` without an argument binds the main value, as `v-model:<key>` would.
       const callbacks = emitters(rootEvents, (event, ...args) => {
         emit(event, ...args)
@@ -393,7 +394,10 @@ function createParts<P extends Primitive, const Tags extends { [S in SlotName<P>
         return current as OptionsOf<P>
       })
       // Whether there's a root tag never changes.
-      if (!tagOf.root) return () => slots.default?.()
+      if (!tagOf.root) {
+        warnAttributes(name, attrs)
+        return () => slots.default?.()
+      }
       return usePart(
         handle,
         "root",

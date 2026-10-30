@@ -40,6 +40,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 type OpenDetails = ChangeDetails<TooltipOpenChangeReason>
 type PayloadDetails = ChangeDetails<TooltipPayloadChangeReason>
@@ -58,50 +59,53 @@ const parts = createParts(tooltipPrimitive, { arrow: "div" })
  * A short label or hint that appears when the pointer rests on its trigger or keyboard focus reaches it.
  * @stable
  */
-const Tooltip = defineComponent({
-  name: "Tooltip",
-  props: {
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    delay: Number,
-    closeDelay: Number,
-    disabled: optionalBoolean,
-    toggleable: optionalBoolean,
-    closeOnPress: optionalBoolean,
-    type: String as PropType<"label" | "description">,
-    shortcut: String,
-    controller: Object as PropType<TooltipController<any>>,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
-  },
-  setup(props, { slots, emit }) {
-    provide(ContainerKey, () => props.container)
-    const tooltip = usePrimitive(tooltipPrimitive, () => ({
-      ...copyProps(props),
-      open: orModel(props.open, props.modelValue),
-      container: undefined,
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onPayloadChange: (payload: unknown, details: PayloadDetails) => emit("payloadChange", payload, details),
-    }))
-    useControllerEntry(() => props.controller, tooltip)
-    return () => slots.default?.()
-  },
-})
+const Tooltip = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Tooltip",
+    props: {
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      delay: Number,
+      closeDelay: Number,
+      disabled: optionalBoolean,
+      toggleable: optionalBoolean,
+      closeOnPress: optionalBoolean,
+      type: String as PropType<"label" | "description">,
+      shortcut: String,
+      controller: Object as PropType<TooltipController<any>>,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
+    },
+    setup(props, { slots, emit }) {
+      provide(ContainerKey, () => props.container)
+      const tooltip = usePrimitive(tooltipPrimitive, () => ({
+        ...copyProps(props),
+        open: orModel(props.open, props.modelValue),
+        container: undefined,
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onPayloadChange: (payload: unknown, details: PayloadDetails) =>
+          emit("payloadChange", payload, details),
+      }))
+      useControllerEntry(() => props.controller, tooltip)
+      return () => slots.default?.()
+    },
+  }),
+)
 
 /**
  * The element the tooltip names or describes, usually a button.

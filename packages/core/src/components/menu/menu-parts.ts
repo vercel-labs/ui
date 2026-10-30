@@ -125,9 +125,11 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         api.menubar()?.internal.hover(id, event)
       },
       pointerleave(event, { api }) {
+        if (event.pointerType === "touch") return
         const submenu = api.popupElement()
-        if (api.isOpen() && submenu && event.pointerType !== "touch")
+        if (api.isOpen() && submenu)
           api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, submenu)
+        else api.parentMenu()?.internal.cancelHoverOpen()
       },
     },
     press({ api, key, props, el, store }, event) {
