@@ -194,7 +194,7 @@ function triggerPart(
     },
   })
   const field = useFieldControl(props)
-  const own = () => ({ ...trigger(), field: !!field })
+  const own = () => ({ ...trigger(), named: !!field || props["aria-labelledby"] != null })
   return (
     <SelectContext value={select}>
       {usePart(select, "trigger", own, joinField(field, user, "button"), "button")}

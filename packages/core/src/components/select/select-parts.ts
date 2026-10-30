@@ -149,7 +149,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
   }),
 
   trigger: slot<SelectTriggerProps, SelectTriggerState>({
-    props: { disabled: "boolean", field: "boolean" },
+    props: { disabled: "boolean", named: "boolean" },
     state: (state, { props }) => triggerState(state, props),
     attrs: (state, { id, props }) => {
       const { disabled, placeholder } = triggerState(state, props)
@@ -160,9 +160,9 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         "aria-haspopup": "listbox",
         "aria-expanded": String(state.open),
         "aria-controls": state.mounted ? `${id}-${state.listed ? "list" : "content"}` : undefined,
-        // Until a SelectLabel is known to be missing, it names the trigger, unless a Field does.
+        // Until a SelectLabel is known to be missing, it names the trigger, unless something else does.
         "aria-labelledby":
-          state.labeled || (state.labeled === null && !props.field) ? `${id}-label` : undefined,
+          state.labeled || (state.labeled === null && !props.named) ? `${id}-label` : undefined,
         "aria-readonly": state.readOnly ? "true" : undefined,
         "aria-required": state.required ? "true" : undefined,
         disabled: disabled ? "" : undefined,

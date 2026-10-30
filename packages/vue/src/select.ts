@@ -223,12 +223,18 @@ const SelectTrigger = withElement(
       return useConnectedPart(
         connected,
         (select) =>
-          usePart(select, "trigger", () => ({ disabled: props.disabled, field: !!field }), undefined, {
-            tag: "button",
-            // Its content, or without any, the value.
-            children: (state) => slotContent(slots.default, { state }) ?? h(SelectValue),
-            extend: field?.props,
-          }),
+          usePart(
+            select,
+            "trigger",
+            () => ({ disabled: props.disabled, named: !!field || attrs["aria-labelledby"] != null }),
+            undefined,
+            {
+              tag: "button",
+              // Its content, or without any, the value.
+              children: (state) => slotContent(slots.default, { state }) ?? h(SelectValue),
+              extend: field?.props,
+            },
+          ),
         // Until its select mounts, a trigger outside it is a plain button.
         () => {
           const state = {

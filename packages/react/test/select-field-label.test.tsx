@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
+import { renderToString } from "react-dom/server"
 import { afterEach, expect, test } from "vitest"
 import { Field, FieldLabel } from "../src/field"
 import { Select, SelectTrigger, SelectValue } from "../src/select"
@@ -34,4 +35,23 @@ test("a select in a Field keeps the Field's label as its name", async () => {
   const trigger = container.querySelector<HTMLElement>('[role="combobox"]')!
   const label = container.querySelector('[data-slot="field-label"]')!
   expect(trigger.getAttribute("aria-labelledby")?.split(" ")).toContain(label.id)
+})
+
+test("a trigger named by its own aria-labelledby keeps it, on the server too", async () => {
+  const app = (
+    <>
+      <span id="fruit">Fruit</span>
+      <Select items={["Apple", "Pear"]}>
+        <SelectTrigger aria-labelledby="fruit">
+          <SelectValue />
+        </SelectTrigger>
+      </Select>
+    </>
+  )
+  expect(renderToString(app)).toContain('aria-labelledby="fruit"')
+  const container = document.body.appendChild(document.createElement("div"))
+  root = createRoot(container)
+  await React.act(async () => root!.render(app))
+  await React.act(async () => new Promise((resolve) => setTimeout(resolve, 10)))
+  expect(container.querySelector('[role="combobox"]')!.getAttribute("aria-labelledby")).toBe("fruit")
 })

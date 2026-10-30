@@ -293,8 +293,8 @@ type SelectTriggerProps = {
    * @defaultValue false
    */
   disabled?: boolean
-  /** @internal Whether a Field names the trigger. Set by each framework. */
-  field?: boolean
+  /** @internal Whether a Field or its own `aria-labelledby` names the trigger. Set by each framework. */
+  named?: boolean
 }
 
 /**
