@@ -96,7 +96,7 @@ Use `keywords` for text that should match without appearing in the label, such a
 
 ### Filter
 
-`filter` accepts `"contains"` (the default), `"startsWith"`, `"fuzzy"`, a function of the item and query, or `false` for results already filtered by a server.
+`filter` accepts `"contains"` (the default), `"startsWith"`, a function of the item and query, or `false` for results already filtered by a server. A function can return a score instead of `true` or `false`, and items you pass as `items` then sort by it, best first. `fuzzyScore` from `@ui-sdk/core/text-match` scores an exact match above a prefix, and a prefix above a match inside the label.
 
 <ComponentExample
   name="combobox/filter"
