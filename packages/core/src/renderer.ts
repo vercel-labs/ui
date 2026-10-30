@@ -47,6 +47,7 @@ export type { TriggerMenuGeneric } from "./components/trigger-menu/trigger-menu-
 export type { RovingScope } from "./foundation/focus/roving-scope"
 export { attachFormInternals } from "./foundation/forms/form"
 export { bindElementInternals, formCallback } from "./foundation/forms/form-internals"
+export { writeFromScript } from "./foundation/forms/value"
 export { canceledAction } from "./foundation/kernel/action"
 export { createListSnapshots } from "./foundation/kernel/controlled-lists"
 export { on } from "./foundation/kernel/events"

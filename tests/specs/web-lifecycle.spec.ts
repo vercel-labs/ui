@@ -294,6 +294,84 @@ test("reconnecting keeps a checkbox's reset default", async ({ page }) => {
   })
 })
 
+test("state set from script fires no input or change events, like a native control's, and the api still does", async ({
+  page,
+}) => {
+  const result = await page.evaluate(async () => {
+    const tick = () => new Promise((done) => setTimeout(done))
+    const form = document.createElement("form")
+    form.innerHTML = `
+      <ui-checkbox name="terms" aria-label="Terms"></ui-checkbox>
+      <ui-select name="fruit" aria-label="Fruit">
+        <ui-select-trigger><button></button></ui-select-trigger>
+        <ui-select-content>
+          <ui-select-item value="apple">Apple</ui-select-item>
+          <ui-select-item value="banana">Banana</ui-select-item>
+        </ui-select-content>
+      </ui-select>
+      <ui-input><input name="note" aria-label="Note" /></ui-input>
+      <input type="checkbox" name="native" />`
+    document.querySelector("#stage")!.append(form)
+    await tick()
+    const checkbox = form.querySelector("ui-checkbox") as HTMLElement & {
+      checked: boolean
+      api: { toggle: () => void }
+    }
+    const select = form.querySelector("ui-select") as HTMLElement & { value: string }
+    const note = form.querySelector("ui-input") as HTMLElement & { value: string }
+    const heard: string[] = []
+    for (const type of ["input", "change"])
+      form.addEventListener(type, (event) => heard.push(`${type} ${(event.target as Element).localName}`))
+    checkbox.checked = true
+    select.value = "banana"
+    select.setAttribute("value", "apple")
+    note.value = "Leave at the door"
+    form.querySelector<HTMLInputElement>("input[type=checkbox]")!.checked = true
+    await tick()
+    const quiet = [...heard]
+    const data = [...new FormData(form)]
+    checkbox.api.toggle()
+    await tick()
+    return { quiet, data, api: heard.slice(quiet.length) }
+  })
+  expect(result).toEqual({
+    quiet: [],
+    data: [
+      ["terms", "on"],
+      ["fruit", "apple"],
+      ["note", "Leave at the door"],
+      ["native", "on"],
+    ],
+    api: ["input ui-checkbox", "change ui-checkbox"],
+  })
+})
+
+test("an api call made while another element's state is set from script still fires input and change", async ({
+  page,
+}) => {
+  const heard = await page.evaluate(async () => {
+    const tick = () => new Promise((done) => setTimeout(done))
+    const form = document.createElement("form")
+    form.innerHTML = `
+      <ui-checkbox-group name="toppings" aria-label="Toppings">
+        <ui-checkbox value="cheese" aria-label="Cheese"></ui-checkbox>
+      </ui-checkbox-group>
+      <ui-switch name="wifi" aria-label="Wi-Fi"></ui-switch>`
+    document.querySelector("#stage")!.append(form)
+    await tick()
+    const item = form.querySelector("ui-checkbox") as HTMLElement & { checked: boolean }
+    const toggle = form.querySelector("ui-switch") as HTMLElement & { api: { toggle: () => void } }
+    form.querySelector("ui-checkbox-group")!.addEventListener("valuechange", () => toggle.api.toggle())
+    const heard: string[] = []
+    for (const type of ["checkedchange", "input", "change"])
+      toggle.addEventListener(type, () => heard.push(type))
+    item.checked = true
+    await tick()
+    return heard
+  })
+  expect(heard).toEqual(["checkedchange", "input", "change"])
+})
+
 // Writes `markup` into the stage, when given, then sets properties on the
 // element there. Names in `files` become a `value` of files.
 async function set(page: Page, properties: Record<string, unknown>, markup?: string) {

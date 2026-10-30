@@ -26,6 +26,25 @@ function afterReset(event: Event, run: () => void) {
   })
 }
 
+// State set from script, like a custom element's `value` property, fires no
+// `input` or `change`, like a native control's.
+const scriptWrites = new Set<Element>()
+
+function writeFromScript(el: Element, write: () => void) {
+  if (scriptWrites.has(el)) return write()
+  scriptWrites.add(el)
+  try {
+    write()
+  } finally {
+    scriptWrites.delete(el)
+  }
+}
+
+function writingFromScript(el: Element) {
+  for (let node: Element | null = el; node; node = node.parentElement) if (scriptWrites.has(node)) return true
+  return false
+}
+
 /**
  * Writes a text control's value. From code by default, and only when it
  * differs: watchers hear a write, a framework's value tracker follows, and no
@@ -35,7 +54,7 @@ function afterReset(event: Event, run: () => void) {
  * hear it.
  */
 function writeValue(el: TextControl, value: string, options?: { asUser?: boolean }) {
-  if (options?.asUser) {
+  if (options?.asUser && !writingFromScript(el)) {
     prototypeValue(el).set!.call(el, value)
     el.dispatchEvent(new Event("input", { bubbles: true, composed: true }))
   } else if (el.value !== value) el.value = value
@@ -103,4 +122,12 @@ function release(el: TextControl) {
   restores.delete(el)
 }
 
-export { afterReset, type TextControl, type ValueSource, watchValue, writeValue }
+export {
+  afterReset,
+  type TextControl,
+  type ValueSource,
+  watchValue,
+  writeFromScript,
+  writeValue,
+  writingFromScript,
+}

@@ -10,7 +10,7 @@
 //   validity through it.
 import { documentOrder } from "../kernel/order"
 import { trusted } from "../kernel/trusted"
-import { afterReset, writeValue } from "./value"
+import { afterReset, writeValue, writingFromScript } from "./value"
 import type { bindElementInternals } from "./form-internals"
 
 type InternalsBinder = typeof bindElementInternals
@@ -167,7 +167,7 @@ function dispatchChange(
   el: HTMLElement | undefined,
   types: readonly ("input" | "change")[] = ["input", "change"],
 ) {
-  if (!el) return
+  if (!el || writingFromScript(el)) return
   // Controlled components render the new value first.
   queueMicrotask(() => {
     if (!el.isConnected) return

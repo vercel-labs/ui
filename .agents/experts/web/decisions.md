@@ -37,6 +37,7 @@ Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/positi
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
 - **A trigger slotted into a closed shadow root's scroller** waits for the slow check: `assignedSlot` is `null` there, so positioning can't find that root.
+- **A checkbox group fires `valuechange`** when one of its items' state is set from script.
 
 ## Revisit
 
