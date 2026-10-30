@@ -19,6 +19,29 @@ test("a calendar's Previous keeps the label written on its button, and Next gets
   expect(previous.getAttribute("aria-label")).toBe("Mois précédent")
 })
 
+test("a label written on a part's button after it upgrades stays", async () => {
+  defineCalendarElements()
+  document.body.innerHTML = `<ui-calendar month="2026-10"><ui-calendar-previous><button>‹</button></ui-calendar-previous><ui-calendar-next><button>›</button></ui-calendar-next><ui-calendar-grid></ui-calendar-grid></ui-calendar>`
+  await wait()
+  const [previous, next] = document.querySelectorAll("button")
+  previous.setAttribute("aria-label", "Mois précédent")
+  next.click()
+  await wait()
+  expect(previous.getAttribute("aria-label")).toBe("Mois précédent")
+})
+
+test("a copied calendar's grid label follows its month", async () => {
+  defineCalendarElements()
+  document.body.innerHTML = `<ui-calendar month="2026-10"><ui-calendar-next><button>›</button></ui-calendar-next><ui-calendar-grid></ui-calendar-grid></ui-calendar>`
+  await wait()
+  const copy = document.querySelector("ui-calendar")!.cloneNode(true) as HTMLElement
+  document.body.replaceChildren(copy)
+  await wait()
+  copy.querySelector("button")!.click()
+  await wait()
+  expect(copy.querySelector('[role="grid"]')!.getAttribute("aria-label")).toBe("November 2026")
+})
+
 test("a combobox input keeps the autocomplete written on it, and its role", async () => {
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}

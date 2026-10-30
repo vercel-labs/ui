@@ -96,15 +96,20 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
   const id = written.has("id") || previous.has("id") ? el.getAttribute("id") : null
   const keeps = keepsId(id, channels, channel)
   if (keeps) written.delete("id")
-  for (const name of written.keys())
-    if (
-      authorOwned.has(name) &&
-      el.hasAttribute(name) &&
-      !Object.values(channels).some((wrote) => wrote.has(name))
-    )
-      written.delete(name)
+  // A value no channel wrote, and not the part's own, like a copied
+  // component's, is the author's, even when set after the part wrote its own.
+  const authors = new Set<string>()
+  const read = new Map<string, string | null>()
+  for (const name of new Set([...written.keys(), ...previous.keys()])) {
+    if (!authorOwned.has(name)) continue
+    const current = el.getAttribute(name)
+    read.set(name, current)
+    if (current === null || current === written.get(name)) continue
+    if (!Object.values(channels).some((wrote) => wrote.get(name) === current)) authors.add(name)
+  }
+  for (const name of authors) written.delete(name)
   for (const name of previous.keys()) {
-    if (written.has(name) || (name === "id" && keeps)) continue
+    if (written.has(name) || authors.has(name) || (name === "id" && keeps)) continue
     if (name.startsWith("style:")) el.style.removeProperty(name.slice(6))
     else el.removeAttribute(name)
   }
@@ -116,7 +121,8 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
     // and setting it before anyone types replaces the text with the caret at
     // the start, so the property goes first, as every framework writes it.
     if (name === "value" && isTextField(el) && el.value !== value) el.value = value
-    if ((name === "id" ? id : el.getAttribute(name)) !== value) el.setAttribute(name, value)
+    const current = name === "id" ? id : read.has(name) ? read.get(name) : el.getAttribute(name)
+    if (current !== value) el.setAttribute(name, value)
   }
   channels[channel] = written
   applied.set(el, channels)
