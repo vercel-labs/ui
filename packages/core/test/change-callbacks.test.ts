@@ -40,6 +40,20 @@ test("a change back to the value the state holds, from inside on<Key>Change, sta
   expect(instance.get().value).toBe(10)
 })
 
+test("asking for the same value from inside on<Key>Change, like a view rendering it back, is the same change", () => {
+  const seen: number[] = []
+  const instance = counter({
+    id: "echoed",
+    onValueChange: (value) => {
+      seen.push(value)
+      instance.api.set(value)
+    },
+  })
+  instance.api.set(5)
+  expect(seen).toEqual([5])
+  expect(instance.get().value).toBe(5)
+})
+
 test("a change inside on<Key>Change to another key leaves the outer change in place", () => {
   const pair = definePrimitive({
     name: "pair",

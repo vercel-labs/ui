@@ -25,6 +25,9 @@ function changeFrom<Options, State extends object>(
   // Changes asked of each key, so one asked from inside `on<Key>Change`, like
   // a clamp, stands over the change that called it.
   const asked = new Map<string, number>()
+  // The value each key is changing to while its callback runs. Asking for that
+  // same value from inside, like a view that renders it back, is the same change.
+  const changing = new Map<string, unknown>()
 
   // A controlled key's next options report the source of the change that asked for them.
   context.onOptions((_options, synced) => {
@@ -49,6 +52,7 @@ function changeFrom<Options, State extends object>(
       [extra: string]: unknown
     },
   ) => {
+    if (changing.has(key) && sameValue(changing.get(key), value)) return true
     const ask = (asked.get(key) ?? 0) + 1
     asked.set(key, ask)
     const previous = store.get()[key]
@@ -59,19 +63,27 @@ function changeFrom<Options, State extends object>(
     debug(context, key, value, reason, callbackDetails.source)
     const current = options() as Record<string, unknown>
     const isControlled = current[key] !== undefined
-    withSource(callbackDetails.source, () => {
-      const name = callbackName(key, "Change")
-      const callback = current[name]
-      if (typeof callback === "function") {
-        const prevented = dev && !!event?.defaultPrevented
-        callback(value, callbackDetails)
-        if (dev)
-          checkPrevented(name, prevented, callbackDetails, { component: context.label, id: context.id })
-      }
-      const askedInside = asked.get(key) !== ask
-      if (!callbackDetails.canceled && !isControlled && !askedInside)
-        store.set({ [key]: value } as unknown as Partial<State>)
-    })
+    const outer = changing.has(key)
+    const outerValue = changing.get(key)
+    changing.set(key, value)
+    try {
+      withSource(callbackDetails.source, () => {
+        const name = callbackName(key, "Change")
+        const callback = current[name]
+        if (typeof callback === "function") {
+          const prevented = dev && !!event?.defaultPrevented
+          callback(value, callbackDetails)
+          if (dev)
+            checkPrevented(name, prevented, callbackDetails, { component: context.label, id: context.id })
+        }
+        const askedInside = asked.get(key) !== ask
+        if (!callbackDetails.canceled && !isControlled && !askedInside)
+          store.set({ [key]: value } as unknown as Partial<State>)
+      })
+    } finally {
+      if (outer) changing.set(key, outerValue)
+      else changing.delete(key)
+    }
     if (dev)
       emit({
         type: "change",
