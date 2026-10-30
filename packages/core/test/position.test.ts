@@ -143,6 +143,34 @@ describe("untransformed box", () => {
     expect(box).toEqual({ x: 150, y: 90, scale: { x: 1.5, y: 1.5 } })
   })
 
+  test("a box of an exact size is scaled by any visible difference", () => {
+    // `zoom: 1.05` shows a 15px tall box 15.75px tall, under the pixel offsets round by.
+    const exact = { width: true, height: true }
+    const box = untransformed(
+      { x: 10, y: 20, width: 210, height: 15.75 },
+      { width: 200, height: 15, exact },
+      style("0px 0px"),
+    )
+    expect(box.scale.x).toBeCloseTo(1.05)
+    expect(box.scale.y).toBeCloseTo(1.05)
+  })
+
+  test("a box tilted toward the viewer is projected, not scaled", () => {
+    // perspective(600px) rotateX(-20deg) around its top edge, as getComputedStyle gives it.
+    const transform =
+      "matrix3d(1, 0, 0, 0, 0, 0.939693, -0.34202, 0.00057, 0, 0.34202, 0.939693, -0.001566, 0, 0, 0, 1)"
+    const [cos, sin] = [Math.cos((-20 * Math.PI) / 180), Math.sin((-20 * Math.PI) / 180)]
+    const depth = 1 + (-sin / 600) * 120
+    const box = untransformed(
+      { x: 300, y: 334, width: 200, height: (120 * cos) / depth },
+      { width: 200, height: 120, exact: { width: true, height: true } },
+      style("100px 0px", "none", "none", transform),
+    )
+    expect(box.x).toBeCloseTo(300)
+    expect(box.y).toBeCloseTo(334)
+    expect(box.scale).toEqual({ x: 1, y: 1 })
+  })
+
   test("a box with a fractional size isn't scaled", () => {
     // offsetHeight rounds 41.6 up to 42.
     const box = untransformed(
@@ -218,6 +246,7 @@ describe("exact size", () => {
     expect(exactSize(computed({ width: "200px", height: "17.4px" }), { width: 200, height: 17 })).toEqual({
       width: 200,
       height: 17.4,
+      exact: { width: true, height: true },
     })
     const padded = computed({
       width: "180px",
@@ -239,6 +268,7 @@ describe("exact size", () => {
     expect(exactSize(computed({ width: "auto" }), { width: 120, height: 30 })).toEqual({
       width: 120,
       height: 30,
+      exact: { width: false, height: false },
     })
   })
 })

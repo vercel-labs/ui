@@ -58,21 +58,18 @@ type PortalProps = {
 }
 
 // The box an element renders, or nothing when it renders none. One with
-// `display: contents` has no box of its own, so it's the box around its children's.
-// check-code: allow return-type recursive, so TypeScript cannot infer it.
-function renderedRect(el: Element): Rect | undefined {
-  if (el.getClientRects().length) {
-    const { x, y, width, height } = el.getBoundingClientRect()
-    return { x, y, width, height }
+// `display: contents` has no box of its own, so it's the box around what it
+// renders, text included.
+function renderedRect(el: Element) {
+  let rendered: Element | Range = el
+  if (!el.getClientRects().length) {
+    if (getComputedStyle(el).display !== "contents") return undefined
+    rendered = el.ownerDocument.createRange()
+    rendered.selectNodeContents(el)
+    if (!rendered.getClientRects().length) return undefined
   }
-  if (getComputedStyle(el).display !== "contents") return undefined
-  const boxes = Array.from(el.children, renderedRect).filter((box) => box !== undefined)
-  if (!boxes.length) return undefined
-  const x = Math.min(...boxes.map((box) => box.x))
-  const y = Math.min(...boxes.map((box) => box.y))
-  const right = Math.max(...boxes.map((box) => box.x + box.width))
-  const bottom = Math.max(...boxes.map((box) => box.y + box.height))
-  return { x, y, width: right - x, height: bottom - y }
+  const { x, y, width, height } = rendered.getBoundingClientRect()
+  return { x, y, width, height }
 }
 
 function anchorRect(anchor: Anchor | Rect) {
@@ -317,10 +314,12 @@ function position(
   // loop completed with undelivered notifications" for every such change.
 
   let unwatched = false
+  let stopped = false
   let watchedRoots: Node[] = []
   let unwatchRoots = () => {}
 
   function update() {
+    if (stopped) return false
     const options = read()
     const resolved = resolve(options)
     const arrowPadding = Number(options.arrowPadding ?? 6)
@@ -466,6 +465,7 @@ function position(
     unwatch()
     unwatchRoots()
     watchedRoots = []
+    stopped = true
   }
   // Places the popup again now, as its first placement, without animating:
   // for a popup whose size only just became known, like a navigation menu's
@@ -498,10 +498,8 @@ function exactSize(
         px(`border-${end}-width`)
   const width = parseFloat(style.width) + edges("left", "right")
   const height = parseFloat(style.height) + edges("top", "bottom")
-  return {
-    width: Math.abs(width - offsets.width) < 1 ? width : offsets.width,
-    height: Math.abs(height - offsets.height) < 1 ? height : offsets.height,
-  }
+  const exact = { width: Math.abs(width - offsets.width) < 1, height: Math.abs(height - offsets.height) < 1 }
+  return { width: exact.width ? width : offsets.width, height: exact.height ? height : offsets.height, exact }
 }
 
 const angle = (value: string) => {
@@ -517,7 +515,7 @@ const angle = (value: string) => {
 // origin. The scale left over is an ancestor's `zoom` or a scaled containing block.
 function untransformed(
   rect: { x: number; y: number; width: number; height: number },
-  size: { width: number; height: number },
+  size: { width: number; height: number; exact?: { width: boolean; height: boolean } },
   style: { transformOrigin: string; translate: string; rotate?: string; scale?: string; transform?: string },
 ) {
   const [originX = 0, originY = 0] = style.transformOrigin.split(" ").map((part) => parseFloat(part) || 0)
@@ -546,14 +544,17 @@ function untransformed(
     style.scale && style.scale !== "none" ? style.scale.split(" ").map(parseFloat) : []
   const matrix = /^matrix(3d)?\((.*)\)$/.exec(style.transform ?? "")
   const m = matrix?.[2].split(",").map(parseFloat) ?? []
-  const [a, b, c, d, e, f] = !matrix
-    ? [1, 0, 0, 1, 0, 0]
+  // A `perspective()` puts depth in the last row, which divides each corner.
+  const [a, b, c, d, e, f, p, q, w] = !matrix
+    ? [1, 0, 0, 1, 0, 0, 0, 0, 1]
     : matrix[1]
-      ? [m[0], m[1], m[4], m[5], m[12], m[13]]
-      : m
+      ? [m[0], m[1], m[4], m[5], m[12], m[13], m[3], m[7], m[15]]
+      : [...m, 0, 0, 1]
   const corner = (x: number, y: number) => {
-    const tx = scaleX * (a * (x - originX) + c * (y - originY) + e)
-    const ty = scaleY * (b * (x - originX) + d * (y - originY) + f)
+    const [dx, dy] = [x - originX, y - originY]
+    const depth = p * dx + q * dy + w || 1
+    const tx = (scaleX * (a * dx + c * dy + e)) / depth
+    const ty = (scaleY * (b * dx + d * dy + f)) / depth
     return [originX + moveX + r[0] * tx + r[1] * ty, originY + moveY + r[2] * tx + r[3] * ty]
   }
   const corners = [
@@ -567,9 +568,13 @@ function untransformed(
   const left = Math.min(...xs)
   const top = Math.min(...ys)
   // Offsets round, so a box under a pixel off may be the size they gave.
-  const rest = (shown: number, whole: number) =>
-    whole > 0.01 && Math.abs(shown - whole) >= 1 ? shown / whole : 1
-  const scale = { x: rest(rect.width, Math.max(...xs) - left), y: rest(rect.height, Math.max(...ys) - top) }
+  // Sizes from styles are exact, so any visible difference is a scale.
+  const rest = (shown: number, whole: number, exact = false) =>
+    whole > 0.01 && Math.abs(shown - whole) >= (exact ? 0.05 : 1) ? shown / whole : 1
+  const scale = {
+    x: rest(rect.width, Math.max(...xs) - left, size.exact?.width),
+    y: rest(rect.height, Math.max(...ys) - top, size.exact?.height),
+  }
   return { x: rect.x - scale.x * left, y: rect.y - scale.y * top, scale }
 }
 

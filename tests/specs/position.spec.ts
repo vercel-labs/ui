@@ -32,7 +32,8 @@ async function place(page: Page, html: string, shadow = false, hostShadow?: stri
         }>
       }
       const { position } = await loadCoreModule("position")
-      position(root.querySelector("#probe-anchor")!, popup, { side: "bottom", align: "start" })
+      const stop = position(root.querySelector("#probe-anchor")!, popup, { side: "bottom", align: "start" })
+      Object.assign(window, { stopProbe: stop })
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
     },
     { html, shadow, hostShadow },
@@ -156,7 +157,13 @@ test("a popup follows a scroll in the shadow root its anchor is slotted into", a
 })
 
 test("a turned popup lines up with its anchor as it would unturned", async ({ page }) => {
-  for (const turn of ["rotate: 3deg", "rotate: x 40deg", "transform: rotate(-4deg) scale(0.96)"]) {
+  for (const turn of [
+    "rotate: 3deg",
+    "rotate: x 40deg",
+    "transform: rotate(-4deg) scale(0.96)",
+    "transform: perspective(600px) rotateX(-20deg); transform-origin: top",
+    "transform: perspective(400px) rotateY(15deg)",
+  ]) {
     await place(
       page,
       anchor("position: fixed; left: 300px; top: 300px") +
@@ -167,7 +174,10 @@ test("a turned popup lines up with its anchor as it would unturned", async ({ pa
       .evaluate((el) => ({ left: el.style.left, top: el.style.top }))
     expect(parseFloat(left)).toBeCloseTo(300)
     expect(parseFloat(top)).toBeCloseTo(334)
-    await page.evaluate(() => document.getElementById("probe-stage")!.remove())
+    await page.evaluate(() => {
+      ;(window as unknown as { stopProbe: () => void }).stopProbe()
+      document.getElementById("probe-stage")!.remove()
+    })
   }
 })
 
@@ -177,6 +187,30 @@ test("a popup of a fractional height lines up with its anchor under CSS zoom", a
     `<div style="zoom: 1.5">${anchor("margin: 300px 100px")}<div id="probe-popup" popover="manual" style="width: 200px; height: 17.4px; padding: 0; border: 0; margin: 0"></div></div>`,
   )
   expectBelow(placed, 6)
+})
+
+test("a small popup lines up with its anchor under a slight CSS zoom", async ({ page }) => {
+  const placed = await place(
+    page,
+    `<div style="zoom: 1.05">${anchor("margin: 300px 100px")}<div id="probe-popup" popover="manual" style="width: 200px; height: 15px; padding: 0; border: 0; margin: 0"></div></div>`,
+  )
+  expectBelow(placed, 4.2)
+})
+
+test("a popup lines up with an anchor that renders only its text", async ({ page }) => {
+  await place(
+    page,
+    `<div style="position: fixed; left: 300px; top: 300px"><span id="probe-anchor" style="display: contents">Open menu</span></div>${popup}`,
+  )
+  const text = await page.evaluate(() => {
+    const range = document.createRange()
+    range.selectNodeContents(document.getElementById("probe-anchor")!)
+    const { x, bottom } = range.getBoundingClientRect()
+    return { x, bottom }
+  })
+  const box = (await page.locator("#probe-popup").boundingBox())!
+  expect(Math.abs(box.x - text.x)).toBeLessThan(1)
+  expect(Math.abs(box.y - (text.bottom + 4))).toBeLessThan(1)
 })
 
 test("a popup follows an anchor that renders only its children", async ({ page }) => {

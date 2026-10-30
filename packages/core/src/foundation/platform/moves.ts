@@ -56,9 +56,8 @@ function listen() {
   }
 }
 
-// Shadow roots an anchor sits in, with how many popups watch each. Scrolls,
-// loads, animations and changes inside one never reach the document's
-// listeners, so each root gets its own while a popup is anchored in it.
+// Scrolls, loads, animations and changes inside a shadow root never reach the
+// document's listeners, so each root an anchor renders in gets its own.
 const roots = new Map<Node, { count: number; stop: () => void }>()
 
 function listenIn(root: Node) {
@@ -83,7 +82,7 @@ function shadowRootsAround(node: Node) {
   const found: Node[] = []
   for (let at: Node | null = node; at;) {
     // A shadow root is the only fragment with a host. Checked by shape, since
-    // a link's `host` is its URL's.
+    // `instanceof ShadowRoot` fails for nodes from another window.
     if (at.nodeType === 11 && "host" in at) {
       found.push(at)
       at = (at as ShadowRoot).host
