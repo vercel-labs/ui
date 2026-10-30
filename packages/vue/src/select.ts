@@ -59,6 +59,7 @@ import {
   type PartSlots,
 } from "./use-primitive"
 import { FormInputs } from "./form-inputs"
+import { renderless } from "./renderless"
 
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("select-container")
 
@@ -88,100 +89,102 @@ const anyValue = { type: null as unknown as PropType<unknown> }
  * Picks one value, or several with `multiple`, from a list in a popup.
  * @stable
  */
-const Select = defineComponent({
-  name: "Select",
-  props: {
-    value: anyValue,
-    modelValue: anyValue,
-    defaultValue: anyValue,
-    open: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    multiple: optionalBoolean,
-    items: Array as PropType<ListData<any>>,
-    emptyItems: Array as PropType<ListData<any>>,
-    query: { type: String, default: undefined },
-    defaultQuery: String,
-    filter: { type: [String, Boolean, Function] as PropType<ListFilter<any>>, default: undefined },
-    status: String as PropType<AsyncOptionsStatus>,
-    announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
-    placeholder: String,
-    itemToValue: Function as PropType<(value: any) => string>,
-    itemToLabel: Function as PropType<(value: any) => string>,
-    isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
-    loop: optionalBoolean,
-    modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
-    presentation: String as PropType<"auto" | "popover" | "sheet">,
-    disabled: optionalBoolean,
-    readOnly: optionalBoolean,
-    required: optionalBoolean,
-    name: String,
-    form: String,
-    autoComplete: String,
-    controller: Object as PropType<SelectController<any, any>>,
-    dismissible: optionalBoolean,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:value": (_value: unknown) => true,
-    "update:modelValue": (_value: unknown) => true,
-    valueChange: (_value: unknown, _details: ValueDetails) => true,
-    "update:open": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    dismissAttempt: (_details: DismissAttemptDetails<SelectDismissReason>) => true,
-    highlight: (_value: unknown, _details: ListHighlightDetails) => true,
-    "update:query": (_query: string) => true,
-    queryChange: (_query: string, _details: QueryDetails) => true,
-    loadMore: () => true,
-  },
-  setup(props, { slots, emit }) {
-    const field = useFieldControl()
-    provide(ContainerKey, () => props.container)
-    const select = usePrimitive(selectPrimitive, () => ({
-      ...props,
-      value: orModel(props.value, props.modelValue),
-      container: undefined,
-      name: props.name ?? field?.name(),
-      disabled: props.disabled || field?.disabled(),
-      onValueChange: (value: unknown, details: ValueDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("valueChange", value, details)
-        if (details.canceled) return
-        emit("update:value", value)
-        emit("update:modelValue", value)
-      },
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        emit("openChange", open, details)
-        if (!details.canceled) emit("update:open", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onDismissAttempt: (details: DismissAttemptDetails<SelectDismissReason>) =>
-        emit("dismissAttempt", details),
-      onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
-      onQueryChange: (query: string, details: QueryDetails) => {
-        emit("queryChange", query, details)
-        if (!details.canceled) emit("update:query", query)
-      },
-      onLoadMore: () => emit("loadMore"),
-    }))
-    useControllerEntry(() => props.controller, select)
-    const placed = usePlacedContent()
-    return () => {
-      const children = slots.default?.() ?? []
-      learnLabels(select.api.internal, children, itemDecorations)
-      // A data select renders its list, unless the app placed a SelectContent:
-      // in the markup, or inside a component of its own.
-      // Only a data one asks, so a composed one never renders again when its content mounts.
-      const own = !props.items || placed() || hasChild(children, SelectContent)
-      return [
-        children,
-        props.items && !own && h(NotPlaced, () => h(SelectContent)),
-        h(FormInputs, { handle: select }),
-      ]
-    }
-  },
-}) as unknown as SelectComponent
+const Select = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Select",
+    props: {
+      value: anyValue,
+      modelValue: anyValue,
+      defaultValue: anyValue,
+      open: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      multiple: optionalBoolean,
+      items: Array as PropType<ListData<any>>,
+      emptyItems: Array as PropType<ListData<any>>,
+      query: { type: String, default: undefined },
+      defaultQuery: String,
+      filter: { type: [String, Boolean, Function] as PropType<ListFilter<any>>, default: undefined },
+      status: String as PropType<AsyncOptionsStatus>,
+      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
+      placeholder: String,
+      itemToValue: Function as PropType<(value: any) => string>,
+      itemToLabel: Function as PropType<(value: any) => string>,
+      isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
+      loop: optionalBoolean,
+      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      presentation: String as PropType<"auto" | "popover" | "sheet">,
+      disabled: optionalBoolean,
+      readOnly: optionalBoolean,
+      required: optionalBoolean,
+      name: String,
+      form: String,
+      autoComplete: String,
+      controller: Object as PropType<SelectController<any, any>>,
+      dismissible: optionalBoolean,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:value": (_value: unknown) => true,
+      "update:modelValue": (_value: unknown) => true,
+      valueChange: (_value: unknown, _details: ValueDetails) => true,
+      "update:open": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<SelectDismissReason>) => true,
+      highlight: (_value: unknown, _details: ListHighlightDetails) => true,
+      "update:query": (_query: string) => true,
+      queryChange: (_query: string, _details: QueryDetails) => true,
+      loadMore: () => true,
+    },
+    setup(props, { slots, emit }) {
+      const field = useFieldControl()
+      provide(ContainerKey, () => props.container)
+      const select = usePrimitive(selectPrimitive, () => ({
+        ...props,
+        value: orModel(props.value, props.modelValue),
+        container: undefined,
+        name: props.name ?? field?.name(),
+        disabled: props.disabled || field?.disabled(),
+        onValueChange: (value: unknown, details: ValueDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("valueChange", value, details)
+          if (details.canceled) return
+          emit("update:value", value)
+          emit("update:modelValue", value)
+        },
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          emit("openChange", open, details)
+          if (!details.canceled) emit("update:open", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onDismissAttempt: (details: DismissAttemptDetails<SelectDismissReason>) =>
+          emit("dismissAttempt", details),
+        onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
+        onQueryChange: (query: string, details: QueryDetails) => {
+          emit("queryChange", query, details)
+          if (!details.canceled) emit("update:query", query)
+        },
+        onLoadMore: () => emit("loadMore"),
+      }))
+      useControllerEntry(() => props.controller, select)
+      const placed = usePlacedContent()
+      return () => {
+        const children = slots.default?.() ?? []
+        learnLabels(select.api.internal, children, itemDecorations)
+        // A data select renders its list, unless the app placed a SelectContent:
+        // in the markup, or inside a component of its own.
+        // Only a data one asks, so a composed one never renders again when its content mounts.
+        const own = !props.items || placed() || hasChild(children, SelectContent)
+        return [
+          children,
+          props.items && !own && h(NotPlaced, () => h(SelectContent)),
+          h(FormInputs, { handle: select }),
+        ]
+      }
+    },
+  }),
+) as unknown as SelectComponent
 
 // Generic over the value, like React's `Select<T>`: `v-model`, `@value-change`
 // and the items share `T`. One shape per `multiple`, so the value is a list
@@ -440,7 +443,7 @@ const SelectItemText = withElement(
  */
 const SelectSelectAll = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "SelectSelectAll",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof selectPrimitive, "select-all">,

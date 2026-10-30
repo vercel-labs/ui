@@ -1,7 +1,7 @@
 import { coreEntries, exportsByLayer, layerTitle, type CoreExport } from "@/lib/core-exports"
-import { card } from "./docs/frame"
-import { FrameworkLink } from "./docs/framework-link"
+import { FrameworkLink } from "./site-preferences"
 import { Rows } from "./type-tables"
+import { Frame } from "./frame"
 
 /**
  * Every export of `@ui-sdk/core` from one layer folder, with its JSDoc.
@@ -39,7 +39,7 @@ function ExportRows({ label, entries }: { label: string; entries: CoreExport[] }
 /** Every entry of `@ui-sdk/core` but `internal`, linked to the page that documents it. */
 function CoreEntries() {
   return (
-    <div className={`${card} my-6 overflow-x-auto`}>
+    <Frame variant="flat" className="my-6 overflow-x-auto">
       <table className="w-full border-collapse text-start text-sm [&_tr:last-child>td]:border-0">
         <thead>
           <tr>
@@ -77,7 +77,7 @@ function CoreEntries() {
           ))}
         </tbody>
       </table>
-    </div>
+    </Frame>
   )
 }
 

@@ -43,6 +43,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 type OpenDetails = ChangeDetails<PopoverOpenChangeReason>
 type PayloadDetails = ChangeDetails<PopoverPayloadChangeReason>
@@ -69,52 +70,55 @@ const parts = createParts(popoverPrimitive, {
  * Rich content in a floating panel, opened from a button. Put its trigger and content inside.
  * @stable
  */
-const Popover = defineComponent({
-  name: "Popover",
-  props: {
-    open: optionalBoolean,
-    modelValue: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
-    openOnHover: optionalBoolean,
-    delay: Number,
-    closeDelay: Number,
-    presentation: String as PropType<"auto" | "popover" | "sheet">,
-    controller: Object as PropType<PopoverController<any>>,
-    dismissible: optionalBoolean,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:open": (_open: boolean) => true,
-    "update:modelValue": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    dismissAttempt: (_details: DismissAttemptDetails<PopoverDismissReason>) => true,
-    payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
-  },
-  setup(props, { slots, emit }) {
-    provide(ContainerKey, () => props.container)
-    const popover = usePrimitive(popoverPrimitive, () => ({
-      ...props,
-      open: orModel(props.open, props.modelValue),
-      container: undefined,
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("openChange", open, details)
-        if (details.canceled) return
-        emit("update:open", open)
-        emit("update:modelValue", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onDismissAttempt: (details: DismissAttemptDetails<PopoverDismissReason>) =>
-        emit("dismissAttempt", details),
-      onPayloadChange: (payload: unknown, details: PayloadDetails) => emit("payloadChange", payload, details),
-    }))
-    useControllerEntry(() => props.controller, popover)
-    return () => slots.default?.()
-  },
-})
+const Popover = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Popover",
+    props: {
+      open: optionalBoolean,
+      modelValue: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
+      openOnHover: optionalBoolean,
+      delay: Number,
+      closeDelay: Number,
+      presentation: String as PropType<"auto" | "popover" | "sheet">,
+      controller: Object as PropType<PopoverController<any>>,
+      dismissible: optionalBoolean,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:open": (_open: boolean) => true,
+      "update:modelValue": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<PopoverDismissReason>) => true,
+      payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
+    },
+    setup(props, { slots, emit }) {
+      provide(ContainerKey, () => props.container)
+      const popover = usePrimitive(popoverPrimitive, () => ({
+        ...props,
+        open: orModel(props.open, props.modelValue),
+        container: undefined,
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("openChange", open, details)
+          if (details.canceled) return
+          emit("update:open", open)
+          emit("update:modelValue", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onDismissAttempt: (details: DismissAttemptDetails<PopoverDismissReason>) =>
+          emit("dismissAttempt", details),
+        onPayloadChange: (payload: unknown, details: PayloadDetails) =>
+          emit("payloadChange", payload, details),
+      }))
+      useControllerEntry(() => props.controller, popover)
+      return () => slots.default?.()
+    },
+  }),
+)
 
 /**
  * The button that opens the popover. A trigger outside the popover connects through `controller`.

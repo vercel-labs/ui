@@ -1,7 +1,6 @@
-import { cn } from "cn"
 import { cssVariableRows, dataAttributeTables } from "@/lib/data-attributes"
 import type { Framework } from "@/lib/frameworks"
-import { card } from "./docs/frame"
+import { Frame } from "./frame"
 
 async function DataAttributes({
   framework,
@@ -15,7 +14,7 @@ async function DataAttributes({
   return (
     <div className="my-6 flex flex-col gap-4 text-sm">
       {styled.map((part) => (
-        <div key={part.slot} className={card}>
+        <Frame variant="flat" key={part.slot} className="overflow-hidden">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-border/70 px-4 py-2.5">
             {part.name && <span className="font-medium">{part.name}</span>}
             <code className="font-mono text-xs text-subtle">[data-slot="{part.dataSlot}"]</code>
@@ -44,7 +43,7 @@ async function DataAttributes({
               </div>
             ))}
           </dl>
-        </div>
+        </Frame>
       ))}
       {plain.length > 0 && (
         <p className="text-[15px] leading-[1.65] text-foreground/75">
@@ -70,16 +69,18 @@ async function DataAttributes({
 async function CssVariables({ component = "menu" }: { component?: string }) {
   const rows = await cssVariableRows(component)
   return (
-    <dl className={cn(card, "my-6 divide-y divide-border/60 text-sm")}>
-      {rows.map(({ name, text }) => (
-        <div key={name} className="grid gap-1 px-4 py-2.5 sm:grid-cols-[11rem_1fr] sm:gap-4">
-          <dt>
-            <code className="font-mono text-[13px] text-foreground">{name}</code>
-          </dt>
-          <dd className="text-foreground/75">{text}</dd>
-        </div>
-      ))}
-    </dl>
+    <Frame variant="flat" className="my-6 overflow-hidden">
+      <dl className="divide-y divide-border/60 text-sm">
+        {rows.map(({ name, text }) => (
+          <div key={name} className="grid gap-1 px-4 py-2.5 sm:grid-cols-[11rem_1fr] sm:gap-4">
+            <dt>
+              <code className="font-mono text-[13px] text-foreground">{name}</code>
+            </dt>
+            <dd className="text-foreground/75">{text}</dd>
+          </div>
+        ))}
+      </dl>
+    </Frame>
   )
 }
 

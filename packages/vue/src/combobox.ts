@@ -72,6 +72,7 @@ import {
   type PartSlots,
 } from "./use-primitive"
 import { FormInputs } from "./form-inputs"
+import { renderless } from "./renderless"
 
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("combobox-container")
 
@@ -114,103 +115,105 @@ type ComboboxComponent = {
  * A text input that filters a list as you type, to select one item, or several with `multiple`.
  * @stable
  */
-const Combobox = defineComponent({
-  name: "Combobox",
-  props: {
-    value: anyValue,
-    modelValue: anyValue,
-    defaultValue: anyValue,
-    query: { type: String, default: undefined },
-    defaultQuery: { type: String, default: undefined },
-    open: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    multiple: optionalBoolean,
-    maxSelected: Number,
-    items: Array as PropType<ListData<any>>,
-    emptyItems: Array as PropType<ListData<any>>,
-    filter: { type: [String, Boolean, Function] as PropType<ListFilter<any>>, default: undefined },
-    announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
-    itemToValue: Function as PropType<(value: any) => string>,
-    itemToLabel: Function as PropType<(value: any) => string>,
-    isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
-    autoHighlight: optionalBoolean,
-    keepQuery: optionalBoolean,
-    allowCustomValue: optionalBoolean,
-    status: String as PropType<AsyncOptionsStatus>,
-    loop: optionalBoolean,
-    modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
-    presentation: String as PropType<"auto" | "popover" | "sheet">,
-    disabled: optionalBoolean,
-    readOnly: optionalBoolean,
-    required: optionalBoolean,
-    name: String,
-    form: String,
-    controller: Object as PropType<ComboboxController<any, any>>,
-    dismissible: optionalBoolean,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:value": (_value: unknown) => true,
-    "update:modelValue": (_value: unknown) => true,
-    valueChange: (_value: unknown, _details: ValueDetails) => true,
-    "update:query": (_query: string) => true,
-    queryChange: (_query: string, _details: QueryDetails) => true,
-    "update:open": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    dismissAttempt: (_details: DismissAttemptDetails<ComboboxDismissReason>) => true,
-    highlight: (_value: unknown, _details: ListHighlightDetails) => true,
-    loadMore: () => true,
-  },
-  setup(props, { slots, emit }) {
-    const field = useFieldControl()
-    provide(ContainerKey, () => props.container)
-    const combobox = usePrimitive(comboboxPrimitive, () => ({
-      ...props,
-      value: orModel(props.value, props.modelValue),
-      container: undefined,
-      name: props.name ?? field?.name(),
-      disabled: props.disabled || field?.disabled(),
-      onValueChange: (value: unknown, details: ValueDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("valueChange", value, details)
-        if (details.canceled) return
-        emit("update:value", value)
-        emit("update:modelValue", value)
-      },
-      onQueryChange: (query: string, details: QueryDetails) => {
-        emit("queryChange", query, details)
-        if (!details.canceled) emit("update:query", query)
-      },
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        emit("openChange", open, details)
-        if (!details.canceled) emit("update:open", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onDismissAttempt: (details: DismissAttemptDetails<ComboboxDismissReason>) =>
-        emit("dismissAttempt", details),
-      onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
-      onLoadMore: () => emit("loadMore"),
-    }))
-    useControllerEntry(() => props.controller, combobox)
-    provideSheetHeader()
-    const placed = usePlacedContent()
-    return () => {
-      const children = slots.default?.() ?? []
-      learnLabels(combobox.api.internal, children, itemDecorations)
-      // A data combobox renders its list, unless the app placed a ComboboxContent:
-      // in the markup, or inside a component of its own.
-      // Only a data one asks, so a composed one never renders again when its content mounts.
-      const own = !props.items || placed() || hasChild(children, ComboboxContent)
-      return [
-        children,
-        props.items && !own && h(NotPlaced, () => h(ComboboxContent)),
-        h(FormInputs, { handle: combobox }),
-      ]
-    }
-  },
-}) as unknown as ComboboxComponent
+const Combobox = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Combobox",
+    props: {
+      value: anyValue,
+      modelValue: anyValue,
+      defaultValue: anyValue,
+      query: { type: String, default: undefined },
+      defaultQuery: { type: String, default: undefined },
+      open: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      multiple: optionalBoolean,
+      maxSelected: Number,
+      items: Array as PropType<ListData<any>>,
+      emptyItems: Array as PropType<ListData<any>>,
+      filter: { type: [String, Boolean, Function] as PropType<ListFilter<any>>, default: undefined },
+      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
+      itemToValue: Function as PropType<(value: any) => string>,
+      itemToLabel: Function as PropType<(value: any) => string>,
+      isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
+      autoHighlight: { type: [Boolean, String] as PropType<boolean | "always">, default: undefined },
+      keepQuery: optionalBoolean,
+      allowCustomValue: optionalBoolean,
+      status: String as PropType<AsyncOptionsStatus>,
+      loop: optionalBoolean,
+      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      presentation: String as PropType<"auto" | "popover" | "sheet">,
+      disabled: optionalBoolean,
+      readOnly: optionalBoolean,
+      required: optionalBoolean,
+      name: String,
+      form: String,
+      controller: Object as PropType<ComboboxController<any, any>>,
+      dismissible: optionalBoolean,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:value": (_value: unknown) => true,
+      "update:modelValue": (_value: unknown) => true,
+      valueChange: (_value: unknown, _details: ValueDetails) => true,
+      "update:query": (_query: string) => true,
+      queryChange: (_query: string, _details: QueryDetails) => true,
+      "update:open": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<ComboboxDismissReason>) => true,
+      highlight: (_value: unknown, _details: ListHighlightDetails) => true,
+      loadMore: () => true,
+    },
+    setup(props, { slots, emit }) {
+      const field = useFieldControl()
+      provide(ContainerKey, () => props.container)
+      const combobox = usePrimitive(comboboxPrimitive, () => ({
+        ...props,
+        value: orModel(props.value, props.modelValue),
+        container: undefined,
+        name: props.name ?? field?.name(),
+        disabled: props.disabled || field?.disabled(),
+        onValueChange: (value: unknown, details: ValueDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("valueChange", value, details)
+          if (details.canceled) return
+          emit("update:value", value)
+          emit("update:modelValue", value)
+        },
+        onQueryChange: (query: string, details: QueryDetails) => {
+          emit("queryChange", query, details)
+          if (!details.canceled) emit("update:query", query)
+        },
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          emit("openChange", open, details)
+          if (!details.canceled) emit("update:open", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onDismissAttempt: (details: DismissAttemptDetails<ComboboxDismissReason>) =>
+          emit("dismissAttempt", details),
+        onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
+        onLoadMore: () => emit("loadMore"),
+      }))
+      useControllerEntry(() => props.controller, combobox)
+      provideSheetHeader()
+      const placed = usePlacedContent()
+      return () => {
+        const children = slots.default?.() ?? []
+        learnLabels(combobox.api.internal, children, itemDecorations)
+        // A data combobox renders its list, unless the app placed a ComboboxContent:
+        // in the markup, or inside a component of its own.
+        // Only a data one asks, so a composed one never renders again when its content mounts.
+        const own = !props.items || placed() || hasChild(children, ComboboxContent)
+        return [
+          children,
+          props.items && !own && h(NotPlaced, () => h(ComboboxContent)),
+          h(FormInputs, { handle: combobox }),
+        ]
+      }
+    },
+  }),
+) as unknown as ComboboxComponent
 
 /**
  * A visible label for the input.
@@ -224,7 +227,7 @@ const ComboboxLabel = parts.Label
  */
 const ComboboxChips = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChips",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chips">,
@@ -242,7 +245,7 @@ const ComboboxChips = /* @__PURE__ */ withElement(
  */
 const ComboboxChipsOverflow = /* @__PURE__ */ withElement(
   "span",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChipsOverflow",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chips-overflow">,
@@ -409,7 +412,7 @@ const ComboboxItemText = withElement(
  */
 const ComboboxSelectAll = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxSelectAll",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "select-all">,
@@ -532,24 +535,26 @@ type ValueState = StateOf<typeof comboboxPrimitive, "value">
  * The selected value, for rendering chips or a summary. The default slot gets its state. Renders no element.
  * @stable
  */
-const ComboboxValue = defineComponent({
-  name: "ComboboxValue",
-  props: { max: Number, moreLabel: Function as PropType<(count: number) => string> },
-  slots: Object as SlotsType<{
-    /** Renders the value from the part's state, and the value itself as `value`. */
-    default?: (scope: { state: ValueState; value: ValueState["value"] }) => VNode[]
-  }>,
-  setup(props, { slots }) {
-    // Only its state: the part renders no element.
-    const { state } = usePart(comboboxPrimitive, "value", () => ({
-      max: props.max,
-      moreLabel: props.moreLabel,
-    }))
-    // Nothing selected renders nothing, not an empty text: the server leaves
-    // that out, and hydration would match the next node against it.
-    return () => slotContent(slots.default, { state, value: state.value }) ?? (state.label || null)
-  },
-})
+const ComboboxValue = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "ComboboxValue",
+    props: { max: Number, moreLabel: Function as PropType<(count: number) => string> },
+    slots: Object as SlotsType<{
+      /** Renders the value from the part's state, and the value itself as `value`. */
+      default?: (scope: { state: ValueState; value: ValueState["value"] }) => VNode[]
+    }>,
+    setup(props, { slots }) {
+      // Only its state: the part renders no element.
+      const { state } = usePart(comboboxPrimitive, "value", () => ({
+        max: props.max,
+        moreLabel: props.moreLabel,
+      }))
+      // Nothing selected renders nothing, not an empty text: the server leaves
+      // that out, and hydration would match the next node against it.
+      return () => slotContent(slots.default, { state, value: state.value }) ?? (state.label || null)
+    },
+  }),
+)
 
 /**
  * One selected value. Without children, it shows the value's label.
@@ -583,7 +588,7 @@ const ComboboxChip = /* @__PURE__ */ (() =>
  */
 const ComboboxChipRemove = /* @__PURE__ */ withElement(
   "button",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChipRemove",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chip-remove">,

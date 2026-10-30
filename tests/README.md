@@ -37,26 +37,26 @@ A file filter is a regular expression matched against the path, so `specs/menu` 
 | [One-off specs](#one-off-specs)       | `<name>.<topic>.spec.ts`, like `combobox.virtual.spec.ts`         | Like behavior, without the sheet projects                                            | `pr`        |
 | [Unit tests](#unit-tests)             | `packages/*/test/*.test.ts(x)`                                    | Node, vitest                                                                         | `pr`        |
 | [Docs tests](#docs-tests)             | `tests/docs/*.spec.ts`                                            | Chromium, against the docs site                                                      | `main`      |
-| [Bundle size](#bundle-size)           | `scripts/size.mjs`, `size-budget.json`                            | Node                                                                                 | never in CI |
+| [Bundle size](#bundle-size)           | `scripts/size.mjs`, `size-budget.json`                            | Node                                                                                 | `pr`        |
 | [Perf docs](#perf-docs)               | `scripts/perf-docs.mjs`                                           | Node                                                                                 | `pr`        |
 
 ## Projects
 
 `tests/playwright.config.ts` defines every project. Each Playwright spec runs once per project that includes it. A project sets the framework, the browser and, for some, URL options every test gets (`fixtureOptions`).
 
-| Projects                                                            | Browser                         | Fixture                                                                         | Runs                                                                                |
-| ------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `react`, `vue`, `web`                                               | Chromium                        | `<fixture>/react.tsx`, `vue.ts`, `web.ts`: the component built from parts       | Every spec, except `specsThatSkip`                                                  |
-| `react-data`, `vue-data`, `web-data`                                | Chromium                        | `<fixture>/<framework>-data.*`: the same component built from a data definition | Specs whose fixtures have a `-data` file                                            |
-| `react-ssr`, `vue-ssr`                                              | Chromium                        | `<fixture>/<framework>-ssr.*`: rendered to a string, then hydrated              | Specs whose fixtures have an `-ssr` file                                            |
-| `react-portal`, `vue-portal`, `web-portal`                          | Chromium                        | Like `react`, with `?container=portal-root`                                     | Every spec of the components in `portalSpecs`, except kitchen sinks and count gates |
-| `react-sheet`, `vue-sheet`, `web-sheet`                             | Chromium                        | Like `react`, with `?presentation=sheet`                                        | The base spec of each component in `sheetSpecs`                                     |
-| `<framework>-webkit`, `-firefox`, `-edge` for `react`, `vue`, `web` | WebKit, Firefox, Microsoft Edge | Like `react`                                                                    | Like `react`, `vue` and `web`                                                       |
+| Projects                                   | Browser         | Fixture                                                                         | Runs                                                                                |
+| ------------------------------------------ | --------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `react`, `vue`, `web`                      | Chromium        | `<fixture>/react.tsx`, `vue.ts`, `web.ts`: the component built from parts       | Every spec, except `specsThatSkip`                                                  |
+| `react-data`, `vue-data`, `web-data`       | Chromium        | `<fixture>/<framework>-data.*`: the same component built from a data definition | Specs whose fixtures have a `-data` file                                            |
+| `react-ssr`, `vue-ssr`                     | Chromium        | `<fixture>/<framework>-ssr.*`: rendered to a string, then hydrated              | Specs whose fixtures have an `-ssr` file                                            |
+| `react-portal` | Chromium        | Like `react`, with `?container=portal-root`                                     | Every spec of the components in `portalSpecs`, except kitchen sinks and count gates |
+| `*-sheet`, one per framework    | Chromium        | Like the framework's project, with `?presentation=sheet`                                        | The base spec of each component in `sheetSpecs`                                     |
+| `web-webkit`, `web-firefox`                | WebKit, Firefox | Like `web`                                                                      | Like `web`, except the leak specs, which read the heap through CDP                  |
 
 - **`specsThatSkip`** (`tests/fixture-files.ts`) leaves out of a project every spec file whose fixtures don't exist for its framework. It reads the fixtures a spec opens from its `open("<fixture>")` calls and looks for `apps/playground/src/fixtures/<fixture>/<framework>.ts(x)`. Kitchen sinks are left out of every project but the composition ones. CI shards split by test count, so a file that would only skip would still take a shard's share.
 - **`portalSpecs`**: alignment, autocomplete, combobox, command, dialog, drawer, hover-card, list, menu, menubar, navigation-menu, popover, popup, presentation, select, toast, token-input, tooltip and trigger-menu. The pattern is `**/<name>.*spec.ts`, so it matches every kind of spec for those names. Add a component when it gains a popup.
 - **`sheetSpecs`**: autocomplete, combobox, dialog, menu, popover and select, as `**/<name>.spec.ts`. Specs that measure placement against a trigger skip there, through `isSheet(fixtureOptions)` in `tests/fixtures.ts`.
-- **Engines.** `BROWSERS=webkit,firefox` keeps only those engines' projects. `BROWSERS=chromium` drops all three. The `edge` projects need Microsoft Edge installed, since they use Playwright's `msedge` channel.
+- **Engines.** WebKit and Firefox run web only: behavior lives in core and differs by engine, not framework. Edge is Chromium's engine, so it has no project. `BROWSERS=webkit,firefox` keeps only those engines' projects. `BROWSERS=chromium` drops both.
 - **Missing fixtures.** A test whose fixture doesn't exist for its framework skips with "No `<fixture>` fixture for `<framework>`." `open()` knows from the files before it loads the page.
 
 ## CI tiers
@@ -262,7 +262,9 @@ cd tests && DOCS_PORT=5410 ../scripts/test-slot.sh npx playwright test --config 
 
 ## Bundle size
 
-`pnpm size` (`scripts/size.mjs`) bundles every React entry the way an app's production build would: minified, React external, core included, and `#dev` resolved without the `development` condition. It compares each entry's gzip size with `size-budget.json`, and fails when one grows more than 3% past its budget, or when production code contains strings only development code has. Code an entry loads with `import()` gets its own `(lazy)` row and budget. CI doesn't run it yet: `pnpm size --update` writes the first budgets. Run it before merging a change to shipped code.
+`pnpm size` (`scripts/size.mjs`) bundles every React, Svelte and Vue entry from source the way an app's production build would: minified, core included, and `#dev` resolved without the `development` condition. React stays external. Svelte and Vue rows count the part of their runtime the entry adds to a bare app, and Svelte rows compile components as `@sveltejs/vite-plugin-svelte` does. A row is what a page loads up front: the entry's chunk and the chunks it imports statically. Code it loads with `import()`, like the sheet, gets its own `(lazy)` row and budget. An `import()` in code the build shakes out counts for nothing, as in Vite. The `(perf pages)` rows bundle every part the perf pages use in one entry, so shared code counts once, as in an app.
+
+It compares each row's gzip size with `size-budget.json` and fails when one grows more than 3% past its budget. It also fails, in every framework including web components, when production code contains strings only development code has, when an entry other than Field bundles Field code, and when an entry bundles a module it should never need, like a page with a component's basic parts bundling code for a part it doesn't render (`absent` and `minimalPages` in the script). The CI check job runs it. After a change that shrinks or grows an entry on purpose, `pnpm size --update` writes the new budgets.
 
 ```bash
 pnpm size            # Check.

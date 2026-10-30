@@ -37,6 +37,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 // The page parts sit on: `null` for the first page. Not provided outside any page.
 const PageKey: InjectionKey<string | null> = Symbol("command-page")
@@ -281,15 +282,17 @@ const CommandShortcut = withElement(
  * Commands shown while this page is on top. Without `value`, it's the first page. Renders no element.
  * @stable
  */
-const CommandPage = defineComponent({
-  name: "CommandPage",
-  props: { value: String },
-  setup(props, { slots }) {
-    const command = useCommand()
-    provide(PageKey, props.value ?? null)
-    return () => (command.present("page", { value: props.value }) ? slots.default?.() : null)
-  },
-})
+const CommandPage = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "CommandPage",
+    props: { value: String },
+    setup(props, { slots }) {
+      const command = useCommand()
+      provide(PageKey, props.value ?? null)
+      return () => (command.present("page", { value: props.value }) ? slots.default?.() : null)
+    },
+  }),
+)
 
 /**
  * An icon inside a command. Screen readers, typeahead and filtering
@@ -345,40 +348,42 @@ const CommandStatus = parts.Status
  * Renders data commands. Used by data command lists, and available for custom layouts.
  * @stable
  */
-const CommandItems = defineComponent({
-  name: "CommandItems",
-  props: {
-    items: { type: Array as PropType<CommandData>, required: true },
-  },
-  setup(props) {
-    provide(DataKey, true)
-    // check-code: allow return-type recursive, so TypeScript cannot infer it.
-    const render = (items: CommandData): VNode[] =>
-      items.map((entry, index) => {
-        if (typeof entry === "string") return h(CommandItem, { key: entry, value: entry }, () => entry)
-        if ("type" in entry && entry.type === "separator")
-          return h(CommandSeparator, { key: `separator-${index}` })
-        if ("type" in entry && entry.type === "group")
-          return h(CommandGroup, { key: `group-${entry.label ?? index}` }, () => [
-            entry.label && h(CommandGroupLabel, null, () => entry.label),
-            ...render(entry.items),
-          ])
-        return h(
-          CommandItem,
-          {
-            key: entry.value,
-            value: entry.value,
-            label: entry.label,
-            keywords: entry.keywords,
-            disabled: entry.disabled,
-            shortcut: entry.shortcut,
-          },
-          () => entry.label,
-        )
-      })
-    return () => h(Fragment, render(props.items))
-  },
-})
+const CommandItems = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "CommandItems",
+    props: {
+      items: { type: Array as PropType<CommandData>, required: true },
+    },
+    setup(props) {
+      provide(DataKey, true)
+      // check-code: allow return-type recursive, so TypeScript cannot infer it.
+      const render = (items: CommandData): VNode[] =>
+        items.map((entry, index) => {
+          if (typeof entry === "string") return h(CommandItem, { key: entry, value: entry }, () => entry)
+          if ("type" in entry && entry.type === "separator")
+            return h(CommandSeparator, { key: `separator-${index}` })
+          if ("type" in entry && entry.type === "group")
+            return h(CommandGroup, { key: `group-${entry.label ?? index}` }, () => [
+              entry.label && h(CommandGroupLabel, null, () => entry.label),
+              ...render(entry.items),
+            ])
+          return h(
+            CommandItem,
+            {
+              key: entry.value,
+              value: entry.value,
+              label: entry.label,
+              keywords: entry.keywords,
+              disabled: entry.disabled,
+              shortcut: entry.shortcut,
+            },
+            () => entry.label,
+          )
+        })
+      return () => h(Fragment, render(props.items))
+    },
+  }),
+)
 
 export { createCommandController } from "@ui-sdk/core/command"
 export type {

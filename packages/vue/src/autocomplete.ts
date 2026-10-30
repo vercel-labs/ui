@@ -38,6 +38,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("autocomplete-container")
 
@@ -63,88 +64,91 @@ const parts = createParts(autocompletePrimitive, {
  * A text field that suggests as you type. The text is the value. Renders no element of its own.
  * @stable
  */
-const Autocomplete = defineComponent({
-  name: "Autocomplete",
-  props: {
-    value: { type: String, default: undefined },
-    modelValue: { type: String, default: undefined },
-    defaultValue: { type: String, default: undefined },
-    open: optionalBoolean,
-    defaultOpen: optionalBoolean,
-    items: Array as PropType<ListData<string>>,
-    emptyItems: Array as PropType<ListData<string>>,
-    announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
-    filter: { type: [String, Boolean, Function] as PropType<SearchFilter<string>>, default: undefined },
-    inlineComplete: optionalBoolean,
-    autoHighlight: optionalBoolean,
-    openOnFocus: optionalBoolean,
-    submitOnSelect: optionalBoolean,
-    status: String as PropType<AsyncOptionsStatus>,
-    loop: optionalBoolean,
-    modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
-    presentation: String as PropType<"auto" | "popover" | "sheet">,
-    disabled: optionalBoolean,
-    readOnly: optionalBoolean,
-    required: optionalBoolean,
-    name: String,
-    form: String,
-    controller: Object as PropType<AutocompleteController>,
-    dismissible: optionalBoolean,
-    debug: optionalBoolean,
-    container: containerProp,
-  },
-  emits: {
-    "update:value": (_value: string) => true,
-    "update:modelValue": (_value: string) => true,
-    valueChange: (_value: string, _details: ValueDetails) => true,
-    "update:open": (_open: boolean) => true,
-    openChange: (_open: boolean, _details: OpenDetails) => true,
-    openChangeComplete: (_open: boolean) => true,
-    dismissAttempt: (_details: DismissAttemptDetails<AutocompleteDismissReason>) => true,
-    submit: (_value: string, _details: AutocompleteSubmitDetails) => true,
-    highlight: (_value: string | null, _details: ListHighlightDetails) => true,
-    loadMore: () => true,
-  },
-  setup(props, { slots, emit }) {
-    const field = useFieldControl()
-    provide(ContainerKey, () => props.container)
-    const autocomplete = usePrimitive(autocompletePrimitive, () => ({
-      ...props,
-      value: orModel(props.value, props.modelValue),
-      container: undefined,
-      name: props.name ?? field?.name(),
-      disabled: props.disabled || field?.disabled(),
-      onValueChange: (value: string, details: ValueDetails) => {
-        // The change event runs first, so canceling it also keeps v-model as it was.
-        emit("valueChange", value, details)
-        if (details.canceled) return
-        emit("update:value", value)
-        emit("update:modelValue", value)
-      },
-      onOpenChange: (open: boolean, details: OpenDetails) => {
-        emit("openChange", open, details)
-        if (!details.canceled) emit("update:open", open)
-      },
-      onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onDismissAttempt: (details: DismissAttemptDetails<AutocompleteDismissReason>) =>
-        emit("dismissAttempt", details),
-      onSubmit: (value: string, details: AutocompleteSubmitDetails) => emit("submit", value, details),
-      onHighlight: (value: string | null, details: ListHighlightDetails) => emit("highlight", value, details),
-      onLoadMore: () => emit("loadMore"),
-    }))
-    useControllerEntry(() => props.controller, autocomplete)
-    provideSheetHeader()
-    const placed = usePlacedContent()
-    return () => {
-      const children = slots.default?.() ?? []
-      // A data autocomplete renders its list, unless the app placed an
-      // AutocompleteContent: in the markup, or inside a component of its own.
-      // Only a data one asks, so a composed one never renders again when its content mounts.
-      const own = !props.items || placed() || hasChild(children, AutocompleteContent)
-      return [children, props.items && !own && h(NotPlaced, () => h(AutocompleteContent))]
-    }
-  },
-})
+const Autocomplete = /* @__PURE__ */ renderless(
+  defineComponent({
+    name: "Autocomplete",
+    props: {
+      value: { type: String, default: undefined },
+      modelValue: { type: String, default: undefined },
+      defaultValue: { type: String, default: undefined },
+      open: optionalBoolean,
+      defaultOpen: optionalBoolean,
+      items: Array as PropType<ListData<string>>,
+      emptyItems: Array as PropType<ListData<string>>,
+      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
+      filter: { type: [String, Boolean, Function] as PropType<SearchFilter<string>>, default: undefined },
+      inlineComplete: optionalBoolean,
+      autoHighlight: optionalBoolean,
+      openOnFocus: optionalBoolean,
+      submitOnSelect: optionalBoolean,
+      status: String as PropType<AsyncOptionsStatus>,
+      loop: optionalBoolean,
+      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      presentation: String as PropType<"auto" | "popover" | "sheet">,
+      disabled: optionalBoolean,
+      readOnly: optionalBoolean,
+      required: optionalBoolean,
+      name: String,
+      form: String,
+      controller: Object as PropType<AutocompleteController>,
+      dismissible: optionalBoolean,
+      debug: optionalBoolean,
+      container: containerProp,
+    },
+    emits: {
+      "update:value": (_value: string) => true,
+      "update:modelValue": (_value: string) => true,
+      valueChange: (_value: string, _details: ValueDetails) => true,
+      "update:open": (_open: boolean) => true,
+      openChange: (_open: boolean, _details: OpenDetails) => true,
+      openChangeComplete: (_open: boolean) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<AutocompleteDismissReason>) => true,
+      submit: (_value: string, _details: AutocompleteSubmitDetails) => true,
+      highlight: (_value: string | null, _details: ListHighlightDetails) => true,
+      loadMore: () => true,
+    },
+    setup(props, { slots, emit }) {
+      const field = useFieldControl()
+      provide(ContainerKey, () => props.container)
+      const autocomplete = usePrimitive(autocompletePrimitive, () => ({
+        ...props,
+        value: orModel(props.value, props.modelValue),
+        container: undefined,
+        name: props.name ?? field?.name(),
+        disabled: props.disabled || field?.disabled(),
+        onValueChange: (value: string, details: ValueDetails) => {
+          // The change event runs first, so canceling it also keeps v-model as it was.
+          emit("valueChange", value, details)
+          if (details.canceled) return
+          emit("update:value", value)
+          emit("update:modelValue", value)
+        },
+        onOpenChange: (open: boolean, details: OpenDetails) => {
+          emit("openChange", open, details)
+          if (!details.canceled) emit("update:open", open)
+        },
+        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onDismissAttempt: (details: DismissAttemptDetails<AutocompleteDismissReason>) =>
+          emit("dismissAttempt", details),
+        onSubmit: (value: string, details: AutocompleteSubmitDetails) => emit("submit", value, details),
+        onHighlight: (value: string | null, details: ListHighlightDetails) =>
+          emit("highlight", value, details),
+        onLoadMore: () => emit("loadMore"),
+      }))
+      useControllerEntry(() => props.controller, autocomplete)
+      provideSheetHeader()
+      const placed = usePlacedContent()
+      return () => {
+        const children = slots.default?.() ?? []
+        // A data autocomplete renders its list, unless the app placed an
+        // AutocompleteContent: in the markup, or inside a component of its own.
+        // Only a data one asks, so a composed one never renders again when its content mounts.
+        const own = !props.items || placed() || hasChild(children, AutocompleteContent)
+        return [children, props.items && !own && h(NotPlaced, () => h(AutocompleteContent))]
+      }
+    },
+  }),
+)
 
 /**
  * A visible label for the field.

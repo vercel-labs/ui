@@ -1,9 +1,7 @@
 import { BehaviorDrawing } from "@/components/behavior-drawing"
-import { Header } from "@/components/docs/header"
-import { Logo } from "@/components/docs/logo"
-import { MobileNav } from "@/components/docs/mobile-nav"
-import { Search } from "@/components/docs/search"
-import { SiteFooter } from "@/components/docs/site-footer"
+import { Logo } from "@/components/logo"
+import { MobileNav } from "@/components/mobile-nav"
+import { Search } from "@/components/search"
 import { sectionPages, sectionTree } from "@/lib/section-tree"
 import Link from "next/link"
 
@@ -12,8 +10,7 @@ export default function HomePage() {
   const pages = core ? sectionPages(core) : []
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Header />
+    <div className="flex flex-1 flex-col">
       <MobileNav />
       <Search pages={pages} />
       <main className="container flex flex-1 flex-col items-center justify-center">
@@ -69,7 +66,6 @@ export default function HomePage() {
           </div>
         </div>
       </main>
-      <SiteFooter />
     </div>
   )
 }
