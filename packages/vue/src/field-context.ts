@@ -33,10 +33,15 @@ function useFieldControl(own?: Record<string, unknown>) {
       const merged = field.slot(
         "control",
         { id, describedBy: props["aria-describedby"] },
-        { ...props, id: undefined },
+        { ...props, id: undefined, "aria-labelledby": undefined },
       )
-      // The control stays its own part for styling.
-      return { ...merged, "data-slot": props["data-slot"] }
+      // The field's label names the control over the control's own, like a
+      // ComboboxLabel's. The control stays its own part for styling.
+      return {
+        ...merged,
+        "aria-labelledby": merged["aria-labelledby"] ?? props["aria-labelledby"],
+        "data-slot": props["data-slot"],
+      }
     },
   }
 }

@@ -62,11 +62,16 @@ function useFieldControl() {
         id: id() ?? undefined,
         describedBy: describedBy?.() ?? undefined,
       }))
+      // The field's label names the control over the control's own, like a ComboboxLabel's.
       // check-code: allow return-type the spread drops SlotAttributes' index signatures, so callers would lose its attachments.
-      return (props: SlotAttributes): SlotAttributes => ({
-        ...part.slot({ ...props, id: undefined }),
-        "data-slot": props["data-slot"],
-      })
+      return (props: SlotAttributes): SlotAttributes => {
+        const merged = part.slot({ ...props, id: undefined, "aria-labelledby": undefined })
+        return {
+          ...merged,
+          "aria-labelledby": merged["aria-labelledby"] ?? props["aria-labelledby"],
+          "data-slot": props["data-slot"],
+        }
+      }
     },
   }
 }

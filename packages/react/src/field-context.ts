@@ -41,16 +41,21 @@ function useJoinField(field: FieldContextValue | null, own?: { id?: string }) {
     // Merges the field's attributes for its control into the control's props,
     // keeping the control's own description ahead of the field's. The field
     // decides the id.
-    props: (props: Record<string, any>) => ({
-      ...slotIn(
+    props: (props: Record<string, any>) => {
+      const merged = slotIn(
         field,
         "control",
         { id: (own ?? props).id, describedBy: props["aria-describedby"] },
-        { ...props, id: undefined },
-      ),
-      // The control stays its own part for styling.
-      "data-slot": props["data-slot"],
-    }),
+        { ...props, id: undefined, "aria-labelledby": undefined },
+      )
+      // The field's label names the control over the control's own, like a
+      // ComboboxLabel's. The control stays its own part for styling.
+      return {
+        ...merged,
+        "aria-labelledby": merged["aria-labelledby"] ?? props["aria-labelledby"],
+        "data-slot": props["data-slot"],
+      }
+    },
   }
 }
 

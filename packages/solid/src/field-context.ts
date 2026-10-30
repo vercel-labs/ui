@@ -36,10 +36,14 @@ function useFieldControl(own?: { id?: unknown }) {
           id: untrack(() => (own ?? props).id) as string | undefined,
           describedBy: props["aria-describedby"],
         }),
-        omit(props, "id"),
+        omit(props, "id", "aria-labelledby"),
       )
-      // The control stays its own part for styling.
+      // The field's label names the control over the control's own, like a
+      // ComboboxLabel's. The control stays its own part for styling.
       return merge(merged, {
+        get "aria-labelledby"() {
+          return merged["aria-labelledby"] ?? props["aria-labelledby"]
+        },
         get "data-slot"() {
           return props["data-slot"]
         },

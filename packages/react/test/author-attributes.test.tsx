@@ -2,6 +2,8 @@
 import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, expect, test } from "vitest"
+import { Combobox, ComboboxInput, ComboboxLabel } from "../src/combobox"
+import { Field, FieldLabel } from "../src/field"
 import { Select, SelectLabel, SelectTrigger, SelectValue } from "../src/select"
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true })
@@ -38,4 +40,18 @@ test("a trigger keeps the label it's given after the select's own label mounts",
   )
   await React.act(async () => new Promise((resolve) => setTimeout(resolve, 20)))
   expect(view.querySelector("button")!.getAttribute("aria-labelledby")).toBe("mine")
+})
+
+test("a field's label names a combobox input over the combobox's own label", async () => {
+  const view = await render(
+    <Field>
+      <FieldLabel>Fruit</FieldLabel>
+      <Combobox>
+        <ComboboxLabel>Pick one</ComboboxLabel>
+        <ComboboxInput />
+      </Combobox>
+    </Field>,
+  )
+  const label = view.querySelector('[data-slot="field-label"]')!
+  expect(view.querySelector("input")!.getAttribute("aria-labelledby")).toBe(label.id)
 })
