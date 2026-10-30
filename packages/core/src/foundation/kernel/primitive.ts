@@ -289,6 +289,11 @@ function definePrimitive<
         let synced: Partial<State> | undefined
         const read = (state = heldState(store), before?: Options) => {
           if (before) return syncFrom({ ...before, id }, state)
+          // Once the instance is destroyed, what it reads, like a checkbox
+          // group counting its checkboxes after they left, keeps what the
+          // framework last delivered: the framework's values may have gone
+          // with the component, like a Svelte `$derived` of its effects.
+          if (destroyed) return synced
           const options = current()
           if (last?.options !== options || last.state !== state) {
             last = { options, state }

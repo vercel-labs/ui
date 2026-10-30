@@ -10,7 +10,7 @@
 
 ## Layout
 
-- `apps/docs/content/docs/` has one folder per section: `core` and `agents`, which are framework-free, and `react`, `vue`, `svelte`, `solid` and `web-components`, one full copy of the docs per framework.
+- `apps/docs/content/docs/` has one folder per section: `core` and `agents`, which are shared across frameworks, and `react`, `vue`, `svelte`, `solid` and `web-components`, one full copy of the docs per framework.
 - A framework's docs have no `<Framework only>` blocks. A page differs per framework in its own copy, so an edit that holds for every framework is made in each copy. A component a framework doesn't have gets no page there.
 - Core and Agents link to a framework's pages without naming one, like `/docs/components/field`, which redirects to the framework the reader last read (a cookie its pages set), else React. The sidebar's section switcher keeps the page between frameworks.
 - Each section's order is its `meta.json`.
@@ -20,6 +20,7 @@
 - One page per framework: `apps/docs/content/docs/<framework>/components/<name>.mdx`. Write React's first, then copy it to each framework and rewrite only what differs: installation, anatomy, code, callback names (`@open-change` in Vue, the `openchange` event on web components) and framework notes.
 - Examples render with `<ComponentExample name="<name>/<example>" />`.
 - The API reference comes from the code: `<TypeTable path="../../packages/core/src/components/<name>/<name>.ts" name="..." />`, `<StateTable>`, `<ReasonTable>` and `<ControllerTable>` (same `path` and `name` props, read from the exported types), `<DataAttributes component="<name>" />`, `<CssVariables>` and `<SpecList spec="<name>" />`, which lists behavior from spec titles.
+- `TypeTable` example links use heading text in the `examples` map. When renaming a heading, update these maps and incoming fragment links too.
 - Add the component to `tests/docs/props.spec.ts`, which checks that every exported prop and state field appears in at least one React example.
 
 ## Examples
@@ -42,9 +43,9 @@
 
 ## Core and Agents
 
-- `/docs/core` is written for agents and people building components from core. It shows no framework's code; each framework's Rendering page renders the primitives in that framework.
+- `/docs/core` explains building components from core. Shared pages can use `FrameworkContent` for framework-specific snippets, as Preferences does. Each framework's Rendering page covers rendering primitives in that framework.
 - Core's Reference is generated from `packages/core/src/index.ts` (`apps/docs/lib/core-exports.ts`), so a new export appears with its JSDoc.
-- The walkthrough's code blocks are extracted from the Core pages and the framework's rendering page, and run by `packages/react/test/docs-walkthrough.test.tsx` and `packages/web/test/docs-walkthrough.test.ts`. Edit the pages and the tests together.
+- The walkthrough's code blocks are extracted from Compose Behaviors and the framework's Rendering page, and run by `packages/react/test/docs-walkthrough.test.tsx` and `packages/web/test/docs-walkthrough.test.ts`. Edit the pages and the tests together.
 - A new public block gets its own page under `core/`, an entry in its section's `meta.json`, and a mention on the Behaviors overview.
 
 ## Markdown for agents
@@ -56,10 +57,4 @@
 
 ## Writing
 
-- Write from a new user's point of view, like you're explaining it to a friend.
-- Introduce one new term at a time.
-- Say what things do, not what they aren't.
-- No notes addressed to agents in prose pages; agents read the same pages people do.
-- Don't call ui-sdk headless or a component library: it's the behaviors underneath one.
-- Everything documented gets a small live example.
-- Examples have no comments: the page around them explains them.
+Follow [Writing Website Docs](docs-writing.md) for prose, page scope, examples, and captions. Agents writing or reviewing these pages use [ui-sdk-write-docs](../.agents/skills/ui-sdk-write-docs/SKILL.md).

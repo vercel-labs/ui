@@ -26,3 +26,4 @@ export type {
   SnapPoint,
 } from "@ui-sdk/core/drawer"
 export type { DrawerEvents, UiDrawerElement } from "../events"
+export { createDrawerController, sheetPhysics } from "@ui-sdk/core/drawer"

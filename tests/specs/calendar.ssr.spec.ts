@@ -20,6 +20,13 @@ test("a calendar hydrates without mismatches, with one tab stop", async ({ page,
   expect(await hydrationErrors(page)).toEqual([])
 })
 
+// The heading names the range, which the server's ICU spaces differently than the browser's.
+test("a calendar showing two months hydrates without mismatches", async ({ page, open }) => {
+  await open("calendar", { months: "2" })
+  await page.waitForLoadState("networkidle")
+  expect(await hydrationErrors(page)).toEqual([])
+})
+
 test("a calendar in another language hydrates and then reads the page's language", async ({ page, open }) => {
   await open("calendar", { lang: "de-DE" })
   await expect(heading(page)).toHaveText("Oktober 2026")

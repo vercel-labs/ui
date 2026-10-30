@@ -13,3 +13,4 @@ export type {
   MenubarState,
 } from "@ui-sdk/core/menubar"
 export type { UiMenubarElement } from "../events"
+export { createMenubarController } from "@ui-sdk/core/menubar"

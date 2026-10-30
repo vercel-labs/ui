@@ -1,5 +1,4 @@
-import { createFileInputController } from "@ui-sdk/core/file-input"
-import "@ui-sdk/web/file-input"
+import { createFileInputController } from "@ui-sdk/web/file-input"
 import { createElement, File as FileIcon, X } from "lucide"
 
 export function mount(root: HTMLElement) {

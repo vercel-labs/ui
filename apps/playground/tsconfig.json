@@ -1,17 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": [
-    "src",
-    "vite.config.ts"
-  ],
-  "exclude": [
-    "src/fixtures/*/solid*.tsx",
-    "src/ssr/*.ts",
-    "solid-ssr.ts"
-  ],
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["src/fixtures/*/solid*.tsx", "src/ssr/solid.ts", "src/ssr/hydrate.ts", "solid-ssr.ts"],
   "compilerOptions": {
-    "types": [
-      "vite/client"
-    ]
+    "types": ["vite/client"]
   }
 }

@@ -39,3 +39,21 @@ test("every kitchen sink variant opens", async ({ page, framework }) => {
 
   expect(errors).toEqual([])
 })
+
+// A controlled value comes back through props after core has stored the new query.
+test("typing in the middle of a controlled value keeps the caret where it was", async ({
+  page,
+  framework,
+}) => {
+  test.skip(!["react", "vue", "web"].includes(framework), "Composition frameworks only.")
+  await page.goto(`/?fixture=autocomplete-kitchen-sink&framework=${framework}`)
+  await page.locator("body[data-mounted]").waitFor({ state: "attached" })
+  const input = page.locator('[data-variant="controlled-value"] [data-slot="autocomplete-input"]')
+  await input.scrollIntoViewIfNeeded()
+  await input.click()
+  await page.keyboard.type("aple")
+  await input.evaluate((el: HTMLInputElement) => el.setSelectionRange(1, 1))
+  await page.keyboard.type("p")
+  await expect(input).toHaveValue("apple")
+  await expect.poll(() => input.evaluate((el: HTMLInputElement) => el.selectionStart)).toBe(2)
+})

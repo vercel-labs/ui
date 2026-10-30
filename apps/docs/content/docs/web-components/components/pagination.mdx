@@ -164,7 +164,7 @@ A page past the end, like after the count shrinks, reads as the last page.
 ### Paging from Anywhere
 
 The element's `api` property is its [controller](#controller): it pages the pagination from anywhere. Or
-create one with `createPaginationController()` from `@ui-sdk/core/pagination` and set the `controller`
+create one with `createPaginationController()` from `@ui-sdk/web/pagination` and set the `controller`
 property.
 
 <ComponentExample
@@ -223,13 +223,13 @@ numbers. `getHref` and `controller` are properties. `page` is a live property. C
 
 Events fire on their own element and don't bubble, with the new page in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiPaginationElement` for typed listeners.
 
-| Member                | On              | Description                                                    |
-| --------------------- | --------------- | -------------------------------------------------------------- |
-| `page` property       | `ui-pagination` | The current page. Setting it goes there and fires `pagechange` |
-| `api` property        | `ui-pagination` | The [controller](#controller)                                  |
-| `getHref` property    | `ui-pagination` | A page's URL. With it, wrap links instead of buttons           |
-| `controller` property | `ui-pagination` | A controller from `createPaginationController()`               |
-| `pagechange` event    | `ui-pagination` | `detail: { value: page, reason, event, source }`               |
+| Member                | On              | Description                                          |
+| --------------------- | --------------- | ---------------------------------------------------- |
+| `page` property       | `ui-pagination` | The current page. Setting it goes there              |
+| `api` property        | `ui-pagination` | The [controller](#controller)                        |
+| `getHref` property    | `ui-pagination` | A page's URL. With it, wrap links instead of buttons |
+| `controller` property | `ui-pagination` | A controller from `createPaginationController()`     |
+| `pagechange` event    | `ui-pagination` | `detail: { value: page, reason, event, source }`     |
 
 ### Reasons
 

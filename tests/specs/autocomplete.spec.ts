@@ -39,6 +39,14 @@ test.describe("field", () => {
     await expect(page.getByText("No fruits found")).toBeVisible()
     await expect(input(page)).toHaveValue("kiwi")
   })
+
+  test("typing in the middle of the text keeps the caret where it was", async ({ page }) => {
+    await input(page).fill("aple")
+    await input(page).evaluate((el: HTMLInputElement) => el.setSelectionRange(1, 1))
+    await page.keyboard.type("p")
+    await expect(input(page)).toHaveValue("apple")
+    await expect.poll(() => input(page).evaluate((el: HTMLInputElement) => el.selectionStart)).toBe(2)
+  })
 })
 
 test.describe("choosing", () => {

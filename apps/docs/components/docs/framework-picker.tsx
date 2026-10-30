@@ -22,7 +22,9 @@ const shownFor = {
 function SavedLabel() {
   return (
     <>
-      <span className="text-muted-foreground [html[data-framework]_&]:hidden">Framework</span>
+      <span className="text-muted-foreground [html[data-framework]:not([data-framework=''])_&]:hidden">
+        Framework
+      </span>
       {items.map(({ value, label }) => (
         <span key={value} className={cn("hidden", shownFor[value])}>
           {label}

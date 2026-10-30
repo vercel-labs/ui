@@ -41,21 +41,7 @@ function frameworkHref(href: string, framework: Framework, urls: string[]) {
 // /docs/components/field, and go to the one the reader last read.
 const frameworkPages = ["components", "utilities", "rendering"]
 
-/** The cookie that remembers which framework's docs the reader was on. */
-const frameworkCookie = "framework"
-
-// Runs in <head> before the page paints, like the theme's. It copies the saved framework onto
-// <html data-framework>, so labels that show it are right before React hydrates.
-const frameworkScript = `(() => {
-  try {
-    const saved = document.cookie.match(/(?:^|;\\s*)${frameworkCookie}=([^;]+)/)?.[1]
-    if (${JSON.stringify(frameworkIds)}.includes(saved)) document.documentElement.dataset.framework = saved
-  } catch {}
-})()`
-
 export {
-  frameworkCookie,
-  frameworkScript,
   frameworkHref,
   frameworkPages,
   isSection,

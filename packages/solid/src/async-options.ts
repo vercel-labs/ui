@@ -28,8 +28,10 @@ function useAsyncOptions<Item>(
   const now = immediate && !isServer && !isHydrating()
   const helper = createAsyncOptions<Item>(load, { ...options, immediate: now })
   const initial = helper.getState()
+  // Written from the helper's listeners, which can fire inside a disposal.
   const [state, setState] = createSignal<AsyncOptionsState<Item>>(
     immediate ? { ...initial, status: "loading" } : initial,
+    { ownedWrite: true },
   )
   onCleanup(helper.subscribe(() => setState(helper.getState())))
   if (immediate && !now)

@@ -15,7 +15,8 @@ const heading = ":scope > :is(h1, h2, h3, h4, h5, h6)"
 // </ui-accordion>
 //
 // `default-value` lists open items separated by commas. The live state is the
-// `value` property, an array. Setting it fires `valuechange` like a press.
+// `value` property, an array. Setting it commits without events, like a
+// native input's `value`, and `api.setValue()` fires them like a press.
 function defineAccordionElements() {
   createParts(accordion, {
     root: {

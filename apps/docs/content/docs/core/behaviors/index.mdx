@@ -129,17 +129,22 @@ Import these helpers from `@ui-sdk/core/gesture`.
 
 [Popup presets](./popups#pick-its-behavior) choose the interaction for a popover, dialog, tooltip, or hover card. [Popup controllers](./popups#open-from-code) open existing popup components from code and wait for a result. Import each from its component entrypoint, such as `@ui-sdk/core/popover`.
 
-## Preferences and Devices
+## Preferences
 
-| Helper                                                           | What It Does                                                                              |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [`createColorScheme`](./preferences#follow-it-in-a-primitive)    | Holds a choice of light, dark or the system's scheme, and what it shows.                  |
-| [`colorSchemeOf`](./preferences#render-the-right-scheme-first)   | Reads the color scheme a browser sends with a request.                                    |
-| [`createPreference`](./preferences#define-a-preference)          | Holds a choice from a list, like a skin tone, and shows it on a `data-*` attribute.       |
-| [`preferencesScript`](./preferences#show-them-with-preferences)  | The inline script that puts saved preferences on their attributes before the first paint. |
-| [`createLocalStorage`](./preferences#keep-a-value)               | Keeps a value in localStorage, for every tab, until it's removed.                         |
-| [`createSessionStorage`](./preferences#keep-a-value)             | Keeps a value in sessionStorage, for the tab, while it's open.                            |
-| [`createCookieStorage`](./preferences#read-cookie-on-the-server) | Keeps a value in a cookie, which the server reads too.                                    |
+| Helper                                                             | What It Does                                                                      |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| [`createPreference`](./preferences#create-a-preference)            | Holds a choice from a list, notifies subscribers, and can save it between visits. |
+| [`createColorScheme`](./preferences#choose-a-color-scheme)         | Builds on a preference to choose light, dark, or the browser's scheme.            |
+| [`colorSchemeOf`](./preferences#browser-preferences-on-the-server) | Reads the color scheme a browser sends with a request.                            |
+| [`preferencesScript`](./preferences#server-rendering)              | Puts saved preferences on their attributes before the first paint.                |
+
+### Storage
+
+| Helper                                                          | What It Does                                                      |
+| --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [`createLocalStorage`](../storage#keep-a-value)                 | Keeps a value in localStorage, for every tab, until it's removed. |
+| [`createSessionStorage`](../storage#keep-a-value)               | Keeps a value in sessionStorage, for the tab, while it's open.    |
+| [`createCookieStorage`](../storage#read-a-cookie-on-the-server) | Keeps a value in a cookie, which the server reads too.            |
 
 ## Canvas
 

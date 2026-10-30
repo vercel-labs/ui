@@ -29,3 +29,4 @@ export type {
   UiCheckboxElement,
   UiCheckboxGroupElement,
 } from "../events"
+export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"

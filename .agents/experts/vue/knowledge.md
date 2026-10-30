@@ -54,6 +54,7 @@ Last checked: 2026-10-28, against `node_modules/vue` 3.5.43.
 - Hydration must produce the same HTML. Mismatches come from `typeof window` in render, locale-dependent text (`Intl` defaults to the machine's locale), `Date.now()`, random ids. `data-allow-mismatch` (3.5) silences one known mismatch; it's not a fix.
 - Lazy hydration (3.5): `defineAsyncComponent({ loader, hydrate: hydrateOnVisible() })`.
 - In Nuxt, `<ClientOnly>` is the escape hatch; a library shouldn't need it.
+- With no `app.config.errorHandler`, the development build throws out of a `setup` that fails and never resets the current instance, so every later server render in the process reads that component from `inject` and `getCurrentInstance()`, and parts render empty. Production builds and Nuxt, which always sets a handler, don't leak. A server renderer of our own sets one.
 
 ### Provide and inject
 

@@ -39,3 +39,4 @@ export type {
   MenuValueChangeReason,
 } from "@ui-sdk/core/menu"
 export type { MenuEvents, UiMenuElement, UiMenuSubElement } from "../events"
+export { createMenuController } from "@ui-sdk/core/menu"

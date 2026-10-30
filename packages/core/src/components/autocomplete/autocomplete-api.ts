@@ -213,11 +213,12 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     if ((isDisabled(state) || state.readOnly) && reason !== "reset") return false
     requested = value
     core.cause(reason, event)
-    store.set({ query })
-    if (value === state.value) return true
-    if (change("value", value, { reason, event })) return true
+    if (value === state.value || change("value", value, { reason, event })) {
+      // A value that `onValueChange` set in its place stored its own query.
+      if (requested === value) store.set({ query })
+      return true
+    }
     // Canceled: the field shows the value it had.
-    store.set({ query: state.query })
     const input = inputElement()
     if (input && input.value !== state.value) input.value = state.value
     return false

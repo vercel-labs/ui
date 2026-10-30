@@ -15,13 +15,14 @@ import {
   createMenubarController,
 } from "@ui-sdk/vue"
 import { menubarFixture as f, menubarOptions } from "tests/fixtures/menubar.ts"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 
 const action = ref("")
 const options = menubarOptions()
 const run = (value: string) => (action.value = value)
 const controller = createMenubarController()
-;(window as unknown as { __menubar: typeof controller }).__menubar = controller
+// Specs drive the menubar through its controller. Only in the browser: the server has no window.
+onMounted(() => Object.assign(window, { __menubar: controller }))
 </script>
 
 <template>

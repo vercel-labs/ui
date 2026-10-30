@@ -23,3 +23,4 @@ export type {
   TabsValueChangeReason,
 } from "@ui-sdk/core/tabs"
 export type { TabsEvents, UiTabsElement } from "../events"
+export { createTabsController } from "@ui-sdk/core/tabs"

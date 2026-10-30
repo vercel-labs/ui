@@ -16,3 +16,4 @@ export type {
   ScrollAreaType,
 } from "@ui-sdk/core/scroll-area"
 export type { UiScrollAreaElement } from "../events"
+export { createScrollAreaController } from "@ui-sdk/core/scroll-area"

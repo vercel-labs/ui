@@ -1,7 +1,7 @@
 "use client"
 
 import { Toggle, ToggleGroup } from "@/components/ui/toggle-group"
-import { colorScheme } from "@/lib/theme"
+import { colorScheme } from "@/lib/preferences"
 import type { ColorSchemeValue } from "@ui-sdk/core"
 import { usePreference } from "@ui-sdk/react/preferences"
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react"

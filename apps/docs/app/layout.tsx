@@ -1,4 +1,3 @@
-import { frameworkScript } from "@/lib/sections"
 import { SitePreferences } from "@/components/docs/site-preferences"
 import type { Metadata } from "next"
 import { Geist } from "next/font/google"
@@ -24,9 +23,6 @@ export const metadata: Metadata = {
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={geist.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: frameworkScript }} />
-      </head>
       <body className="min-h-dvh bg-canvas font-sans text-foreground">
         <SitePreferences>{children}</SitePreferences>
         <Analytics />

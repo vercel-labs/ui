@@ -1,13 +1,14 @@
 "use client"
 
-import { colorScheme } from "@/lib/theme"
+import { colorScheme, framework, packageManager } from "@/lib/preferences"
 import { Preferences } from "@ui-sdk/react/preferences"
 import type { ReactNode } from "react"
 
-// Puts the reader's color scheme on <html> before the first paint, from the
-// script `Preferences` renders first, and keeps it there.
+const preferences = [colorScheme, framework, packageManager]
+
+// Puts the saved preferences on <html> before the first paint.
 function SitePreferences({ children }: { children: ReactNode }) {
-  return <Preferences preferences={[colorScheme]}>{children}</Preferences>
+  return <Preferences preferences={preferences}>{children}</Preferences>
 }
 
 export { SitePreferences }

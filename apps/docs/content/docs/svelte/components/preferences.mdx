@@ -1,0 +1,144 @@
+---
+title: Preferences
+description: Apply user preferences to data attributes so your styles can follow them.
+---
+
+`Preferences` puts your preferences on `data-*` attributes and keeps them up to date. Use it around a part of your app, or apply a preference to the whole page.
+
+<ComponentExample
+  name="preferences/basic"
+  caption="Press Compact layout to change the spacing, then reload the page. Your choice is saved."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/svelte @ui-sdk/core
+```
+
+The demo uses the [shared example theme](../styling-and-animation#example-theme).
+
+## Usage
+
+Define the preference you want to apply. Here, `density` controls the space between rows:
+
+```ts title="preferences.ts"
+import { createPreference } from "@ui-sdk/core"
+
+const density = createPreference({
+  values: ["comfortable", "compact"],
+  defaultValue: "comfortable",
+  attribute: "data-density",
+})
+
+export { density }
+```
+
+Pass it to `Preferences`, then style the content using its attribute:
+
+```svelte title="file-list.svelte"
+<script lang="ts">
+  import { Preferences } from "@ui-sdk/svelte/preferences"
+  import { density } from "./preferences"
+</script>
+
+<Preferences preferences={[density]}>
+  <ul>
+    <li class="py-3 [[data-density=compact]_&]:py-1">Project notes</li>
+    <li class="py-3 [[data-density=compact]_&]:py-1">Meeting notes</li>
+  </ul>
+</Preferences>
+```
+
+`Preferences` starts with `data-density="comfortable"`. Calling `density.set("compact")` updates it, and the rows use the compact spacing.
+
+## Save the Value
+
+Add `storage` to save the choice between visits:
+
+```ts title="preferences.ts"
+import { createLocalStorage, createPreference } from "@ui-sdk/core"
+
+const density = createPreference({
+  values: ["comfortable", "compact"],
+  defaultValue: "comfortable",
+  attribute: "data-density",
+  storage: createLocalStorage("ui-sdk-preferences-density"),
+})
+
+export { density }
+```
+
+The preference now saves changes in local storage and restores the saved value when the page reloads. You can also [use session storage or cookies with `createPreference`](../../core/behaviors/preferences#remember-the-choice).
+
+## Read the Value
+
+Use `usePreference` when the value affects what your component renders:
+
+```svelte title="density-label.svelte"
+<script lang="ts">
+  import { usePreference } from "@ui-sdk/svelte/preferences"
+  import { density } from "./preferences"
+
+  const state = usePreference(density)
+</script>
+
+<span>Density: {state.current.value}</span>
+```
+
+Pass the same preference instance wherever you need its value. `usePreference` also works outside a `Preferences` component.
+
+## Apply to the Whole Page
+
+Set `global: true` when defining the preference:
+
+```ts
+const density = createPreference({
+  values: ["comfortable", "compact"],
+  defaultValue: "comfortable",
+  attribute: "data-density",
+  storage: createLocalStorage("ui-sdk-preferences-density"),
+  global: true,
+})
+```
+
+Keep passing it to `Preferences`. Its attribute now goes on `<html>`, so styles throughout the page can use it. A global preference needs only one mounted `Preferences` component to apply it.
+
+## Multiple Preferences
+
+Pass more than one preference in the list. For example, you can apply `density` alongside a [color scheme](../../core/behaviors/preferences#choose-a-color-scheme):
+
+```svelte
+<Preferences preferences={[density, colorScheme]}>
+  <App />
+</Preferences>
+```
+
+Each preference uses its own attribute and `global` option. Wrappers that share a preference instance follow the same value. For independent choices, use separate preference instances and different storage keys.
+
+## Server Rendering
+
+On the server, `Preferences` includes a script that applies saved values before the page paints. CSS can use those attributes immediately. `usePreference` starts with the server's value and updates after hydration.
+
+Follow the [server rendering setup](../server-rendering#saved-preferences-and-storage) to place `Preferences` in your app and keep cookie-backed preferences separate for each request.
+
+If your Content Security Policy requires a nonce, pass the nonce from your response:
+
+```svelte
+<Preferences preferences={[density]} {nonce}>
+  <App />
+</Preferences>
+```
+
+## API Reference
+
+### Preferences
+
+| Prop          | Type                        | Description                                                                                             |
+| ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `preferences` | `readonly PreferenceLike[]` | The preferences to apply, from `createPreference` or `createColorScheme`. See [Usage](#usage).          |
+| `nonce?`      | `string`                    | The nonce your Content Security Policy gives inline scripts. See [Server Rendering](#server-rendering). |
+
+### usePreference
+
+`usePreference(preference)` returns an object whose `.current` getter tracks the preference's state. For a preference created with `createPreference`, read `state.current.value`. For a color scheme, `.current` also includes `system` and `resolved`. Keep reading `.current` where you render it so Svelte follows changes.

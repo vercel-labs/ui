@@ -868,11 +868,12 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 - `detached`: 0.
 - `heapKB`: 1,024.
 
-**Notes:** Listeners, frames, layers and detached parts come back to exactly what they were. The last popup closed can stay referenced, which the warmup counts in the starting values. After the warmup, 200 opens and 400 mounts grow the development heap by 120 to 600 KB, from compiled code and the test's own handles. One leaked popup per open is about 25 KB, 5 MB in all.
+**Notes:** Listeners, frames, layers and detached parts come back to exactly what they were. Nothing keeps the last popup closed once it unmounts, which a test checks without a warmup. After the warmup, 200 opens and 400 mounts grow the development heap by 120 to 600 KB, from compiled code and the test's own handles. One leaked popup per open is about 25 KB, 5 MB in all.
 
 **Tests:**
 
 - `leaks.spec.ts` › opening and closing <withArticle(name)> 200 times, then mounting and unmounting it 200 times, leaves nothing behind
+- `leaks.spec.ts` › unmounting <withArticle(name)> after it opens and closes once leaves none of its parts alive
 - `leaks.spec.ts` › dragging a slider 200 times, then mounting and unmounting it 200 times, leaves nothing behind
 - `leaks.spec.ts` › moving through <name> with the arrow keys 200 times, then mounting and unmounting it 200 times, leaves nothing behind
 - `leaks.spec.ts` › resizing a resizable group 200 times, then mounting and unmounting it 200 times, leaves nothing behind
@@ -904,6 +905,7 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 
 - `leaks.spec.ts` › opening and closing <withArticle(name)> 200 times, then mounting and unmounting it 200 times, leaves nothing behind
 - `leaks.spec.ts` › unmounting <withArticle(name)> while it's open 50 times leaves nothing behind
+- `leaks.spec.ts` › unmounting <withArticle(name)> after it opens and closes once leaves none of its parts alive
 - `leaks.spec.ts` › dragging a slider 200 times, then mounting and unmounting it 200 times, leaves nothing behind
 - `leaks.spec.ts` › unmounting a slider in the middle of a drag 50 times leaves nothing behind
 - `leaks.spec.ts` › moving through <name> with the arrow keys 200 times, then mounting and unmounting it 200 times, leaves nothing behind

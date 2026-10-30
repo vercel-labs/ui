@@ -7,7 +7,7 @@ metadata:
 
 # ui-sdk: expert review
 
-Run the framework experts on what changed. Each expert is `.claude/agents/<framework>-expert.md`, and knows what it knows from `.agents/experts/<framework>/` (`knowledge.md`, `decisions.md`). You orchestrate; the experts review.
+Run the framework experts on what changed. Each expert lives in `.agents/experts/<framework>/`: who it is in `expert.md`, what it knows in `knowledge.md` and what's decided in `decisions.md`. You orchestrate; the experts review.
 
 ## 1. Find the scope
 
@@ -26,7 +26,7 @@ git diff --name-only <base>...HEAD | xargs npx eslint --no-warn-ignored
 
 ## 2. Ask the experts
 
-Spawn one background agent per framework in the plan, all at once, as `<framework>-expert` (in a harness without named agents, a general-purpose agent told to read `.claude/agents/<framework>-expert.md` first and act as it). Prompt:
+Spawn one background agent per framework in the plan, all at once, as `<framework>-expert` (in a harness without named agents, a general-purpose agent told to read `.agents/experts/<framework>/expert.md` first and act as it). Prompt:
 
 ```
 Review mode. Scope: git diff <base>...HEAD.

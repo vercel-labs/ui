@@ -4,7 +4,7 @@ import { countGates, kitchenSinks, leakSpecs, specsThatSkip } from "./fixture-fi
 // Each session can run its own playground with PLAYGROUND_PORT, so parallel work never shares a server.
 const port = process.env.PLAYGROUND_PORT ?? "5300"
 
-// *-ssr fixtures render to a string, then hydrate it.
+// *-ssr fixtures render to a string, then hydrate it. Vue, Svelte and Solid render theirs in Node.
 const frameworks = [
   "react",
   "vue",

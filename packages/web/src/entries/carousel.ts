@@ -29,3 +29,4 @@ export type {
   CarouselViewportState,
 } from "@ui-sdk/core/carousel"
 export type { CarouselEvents, UiCarouselElement } from "../events"
+export { createCarouselController } from "@ui-sdk/core/carousel"

@@ -1,15 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
-  "include": [
-    "src/fixtures/*/solid*.tsx",
-    "src/ssr/*.ts",
-    "solid-ssr.ts"
-  ],
+  "include": ["src/fixtures/*/solid*.tsx", "src/ssr/solid.ts", "src/ssr/hydrate.ts", "solid-ssr.ts"],
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "@solidjs/web",
-    "types": [
-      "vite/client"
-    ]
+    "types": ["vite/client"]
   }
 }

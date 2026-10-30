@@ -33,7 +33,7 @@ import {
 } from "tests/fixtures/combobox.ts"
 import { onItemsChange } from "tests/fixtures/items.ts"
 import { longItems, serializeForm } from "tests/fixtures/select.ts"
-import { computed, onBeforeUnmount, ref, shallowRef } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from "vue"
 
 const props = defineProps<{ data?: boolean }>()
 const {
@@ -62,7 +62,10 @@ const created = ref<{ value: string; label: string }[]>([])
 const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, { immediate: async || pages })
 const remoteMode = async || pages
 const list = shallowRef<{ value: string; label: string; keywords?: string[]; disabled?: boolean }[]>(f.items)
-onBeforeUnmount(onItemsChange(changedItems, (next) => (list.value = next)))
+// Items a spec swaps in. Only in the browser: the server has no document.
+let stopItemChanges = () => {}
+onMounted(() => (stopItemChanges = onItemsChange(changedItems, (next) => (list.value = next))))
+onBeforeUnmount(() => stopItemChanges())
 const all = computed(() => [...list.value, ...created.value])
 const labels = computed(() => new Map([...f.items, ...all.value].map((item) => [item.value, item.label])))
 const items = computed(() =>

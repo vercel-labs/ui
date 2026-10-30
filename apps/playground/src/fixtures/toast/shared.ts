@@ -27,9 +27,12 @@ function createFixtureToasts<Content>(record: (action: string) => void) {
       : undefined,
   })
 
-  ;(window as unknown as { showToast: (options: FixtureToast) => string }).showToast = (options) =>
-    toast(fromFixture(options))
-  ;(window as unknown as { toaster: typeof toast }).toaster = toast
+  // The specs' hooks live on the window, which the server doesn't have.
+  if (typeof window !== "undefined")
+    Object.assign(window, {
+      showToast: (options: FixtureToast) => toast(fromFixture(options)),
+      toaster: toast,
+    })
 
   const { basic, success, error, promise } = toastFixture
   return {
