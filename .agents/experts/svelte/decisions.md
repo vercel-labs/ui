@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
+Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
 
 
 ## Settled
@@ -13,6 +13,8 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **Handlers go on the component**, not on the `render` snippet's element: Svelte's delegation runs markup handlers after the built-in one, so they can't cancel it. Not fixable without Svelte's private symbol.
 - **Form component dropped.**
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
+- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -21,6 +23,8 @@ Last reviewed: `8bde473` (2026-10-28, the P1 fixes in PRs 11 to 17).
 - **`menu-trigger-binding.svelte`** calls `use(feature)` inside `$derived.by`. Idempotent, but not idiomatic.
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration.
+- **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
+- **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
 
 ## Revisit
 

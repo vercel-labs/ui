@@ -14,7 +14,7 @@ async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const [{ roots, files }, source, comments] = await Promise.all([
     listFiles(framework),
     readSource(framework, file),
-    store.read(),
+    store?.read() ?? [],
   ])
 
   return (

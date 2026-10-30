@@ -3,19 +3,14 @@ import { getHighlighter } from "fumadocs-core/highlight"
 import type { ComponentProps } from "react"
 import type { BundledLanguage } from "shiki"
 import { CopyButton } from "./copy-button"
-import { frame } from "./frame"
+import { Frame } from "./frame"
 
-// The same themes as the MDX code fences, in lib/source.ts.
 const themes = { light: "github-light-default", dark: "github-dark-default" } as const
 
-// The `pre` that MDX code fences render, already highlighted by Shiki. A fence
-// with `title="rating.ts"` gets a header with the file's name and icon, and the
-// copy button sits in it. A ```text prompt fence gets a header with a labeled
-// copy button.
 function Pre({ className, style, title, icon, ...props }: ComponentProps<"pre"> & { icon?: string }) {
   const prompt = "data-prompt" in props
   return (
-    <div data-code-frame="" className={cn("relative my-5 overflow-hidden", frame)}>
+    <Frame data-code-frame="" className="relative my-5 overflow-hidden">
       {title && (
         <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2.5 font-mono text-xs text-muted-foreground">
           {icon && (
@@ -43,14 +38,10 @@ function Pre({ className, style, title, icon, ...props }: ComponentProps<"pre"> 
         )}
       />
       {!title && !prompt && <CopyButton className="absolute top-2 end-2 bg-background" />}
-    </div>
+    </Frame>
   )
 }
 
-// Highlighted code, by language and source, so a page renders it once.
-// Shiki's HTML renders as one element: its tokens as JSX were thousands per
-// page, each of which React tracks in development, and 30 examples took a
-// page 6 s to render.
 const highlighted = new Map<
   string,
   Promise<{ html: string; className: string; style: Record<string, string> }>
@@ -66,7 +57,6 @@ async function toHtml(code: string, lang: BundledLanguage) {
     defaultColor: false,
     transformers: [
       {
-        // The `pre` is the frame's own, so only its class and colors are kept.
         pre(node) {
           className = String(node.properties.class ?? "")
           style = Object.fromEntries(
@@ -82,7 +72,6 @@ async function toHtml(code: string, lang: BundledLanguage) {
   return { html: html.slice(html.indexOf(">") + 1, html.lastIndexOf("</pre>")), className, style }
 }
 
-// Highlights code on the server, for code that isn't in MDX.
 async function CodeBlock({
   code,
   lang,
@@ -99,7 +88,6 @@ async function CodeBlock({
   if (!result) {
     result = toHtml(code, lang)
     highlighted.set(key, result)
-    // The most recent few hundred blocks, enough for a few pages in every framework.
     if (highlighted.size > 500) highlighted.delete(highlighted.keys().next().value!)
     result.catch(() => highlighted.delete(key))
   }

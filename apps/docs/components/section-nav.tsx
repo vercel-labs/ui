@@ -2,12 +2,11 @@
 
 import { isFramework } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
+import { useSavedFramework } from "@/lib/preferences"
 import type { Section } from "@/lib/sections"
 import type { Root } from "fumadocs-core/page-tree"
 import { usePathname } from "next/navigation"
-import { useSavedFramework } from "./remember-framework"
 
-// Where a menu link goes and whether it's the current section.
 function useMenuLink(section?: Section) {
   const saved = useSavedFramework()
   const pathname = usePathname()

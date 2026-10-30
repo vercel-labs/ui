@@ -88,7 +88,10 @@ const blobStore: Store = {
   },
 }
 
-const store = process.env.BLOB_READ_WRITE_TOKEN ? blobStore : fileStore
+// A connected store sets one or the other. Vercel's file system is read-only, so
+// there comments need the store.
+const blobConnected = Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID)
+const store = blobConnected ? blobStore : process.env.VERCEL ? null : fileStore
 
 export { store }
 export type { Comment }

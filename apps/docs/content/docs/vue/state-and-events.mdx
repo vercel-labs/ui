@@ -45,6 +45,8 @@ The main value depends on the component: `checked` for Checkbox, `open` for Popo
 
 If you pass `:pressed` without `v-model`, update that value yourself in `@pressed-change`. A value the parent never updates stays fixed.
 
+To keep a value in the URL, update your ref through `v-model` or the event, then call `router.push`. A value that changes only when the navigation finishes leaves the component showing the old one until then, and logs a warning in development.
+
 ## Respond to a Change
 
 Events such as `@pressed-change` receive the requested value and `details`. They run before `v-model` updates.

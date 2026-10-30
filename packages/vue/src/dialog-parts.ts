@@ -45,6 +45,7 @@ import {
   type PrimitiveHandle,
   type PartSlots,
 } from "./use-primitive"
+import { renderless } from "./renderless"
 
 type OpenDetails = ChangeDetails<DialogOpenChangeReason> & { returnValue?: string }
 type PayloadDetails = ChangeDetails<DialogPayloadChangeReason>
@@ -115,23 +116,27 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
     useControllerEntry(() => props.controller, dialog)
     return () => slots.default?.()
   }
-  const AlertRoot = defineComponent({
-    name,
-    props: sharedProps,
-    emits,
-    setup: (props, context) => setup(props, context),
-  })
-  const Root = defineComponent({
-    name,
-    props: {
-      ...sharedProps,
-      modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
-      closeOnOutsidePress: optionalBoolean,
-      presentation: String as PropType<"auto" | "dialog" | "sheet">,
-    },
-    emits,
-    setup: (props, context) => setup(props, context),
-  })
+  const AlertRoot = renderless(
+    defineComponent({
+      name,
+      props: sharedProps,
+      emits,
+      setup: (props, context) => setup(props, context),
+    }),
+  )
+  const Root = renderless(
+    defineComponent({
+      name,
+      props: {
+        ...sharedProps,
+        modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
+        closeOnOutsidePress: optionalBoolean,
+        presentation: String as PropType<"auto" | "dialog" | "sheet">,
+      },
+      emits,
+      setup: (props, context) => setup(props, context),
+    }),
+  )
 
   const Trigger = withElement(
     "button",

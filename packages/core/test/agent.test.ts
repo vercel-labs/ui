@@ -1344,3 +1344,43 @@ describe("a primitive's agent key", () => {
     expect(agent.snapshot().map((component) => component.component)).not.toContain("separator")
   })
 })
+
+describe("agent source", () => {
+  test("names where the app writes a component, from the nearest stamped element", () => {
+    const agent = createAgent()
+    const wrapper = document.createElement("div")
+    wrapper.setAttribute("data-review-loc", "components/settings.tsx:12")
+    document.body.append(wrapper)
+    const instance = checkbox({ id: "notify" })
+    const el = document.createElement("button")
+    el.setAttribute("aria-label", "Notify me")
+    wrapper.append(el)
+    const unbind = bind(instance.part("root"), el)
+    cleanups.push(() => {
+      unbind()
+      instance.destroy()
+    })
+    expect(agent.snapshot()[0]).toMatchObject({ label: "Notify me", source: "components/settings.tsx:12" })
+  })
+
+  test("reads Svelte's element locations", () => {
+    const agent = createAgent()
+    const instance = checkbox({ id: "notify" })
+    const el = document.createElement("button")
+    el.setAttribute("aria-label", "Notify me")
+    Object.assign(el, { __svelte_meta: { loc: { file: "src/lib/settings.svelte", line: 7 } } })
+    document.body.append(el)
+    const unbind = bind(instance.part("root"), el)
+    cleanups.push(() => {
+      unbind()
+      instance.destroy()
+    })
+    expect(agent.snapshot()[0].source).toBe("src/lib/settings.svelte:7")
+  })
+
+  test("leaves it out when nothing says where", () => {
+    const agent = createAgent()
+    mountCheckbox({ id: "terms" })
+    expect(agent.snapshot()[0]).not.toHaveProperty("source")
+  })
+})
