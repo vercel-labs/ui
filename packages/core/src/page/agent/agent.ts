@@ -271,7 +271,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   for (const key of stateKeys(entry, state)) if (key in state) out[key] = redact(entry, state[key] ?? null)
   // A reading nothing sets, like a progress bar's 2 of `max` 4.
   if (!("value" in out) && "value" in state && typeof api.setValue !== "function")
-    out.value = state.value ?? null
+    out.value = redact(entry, state.value ?? null)
   // The rest only when they say something, like `required: true`. A secret
   // field's search text and errors can repeat its value.
   for (const key of shown) {

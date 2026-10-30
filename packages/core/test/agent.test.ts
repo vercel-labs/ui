@@ -418,6 +418,23 @@ describe("agent", () => {
     })
   })
 
+  test("a reading inside data-agent-secret is redacted", () => {
+    const agent = createAgent()
+    const instance = progress({ id: "score", value: 3, max: 4 })
+    const region = document.body.appendChild(document.createElement("div"))
+    region.setAttribute("data-agent-secret", "")
+    const el = region.appendChild(document.createElement("div"))
+    el.setAttribute("aria-label", "Credit score")
+    cleanups.push(
+      bind(instance.part("root"), el),
+      () => instance.destroy(),
+      () => region.remove(),
+    )
+    expect(agent.snapshot().find((component) => component.label === "Credit score")).toMatchObject({
+      value: "[redacted]",
+    })
+  })
+
   test("a press waits for the button's action, and a failed action fails the step", async () => {
     const agent = createAgent()
     let fail = false
