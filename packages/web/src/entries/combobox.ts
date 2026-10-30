@@ -48,3 +48,4 @@ export type {
   MatchSegment,
 } from "@ui-sdk/core/combobox"
 export type { ComboboxEvents, UiComboboxElement } from "../events"
+export { createComboboxController } from "@ui-sdk/core/combobox"

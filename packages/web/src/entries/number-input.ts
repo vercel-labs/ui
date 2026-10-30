@@ -16,3 +16,4 @@ export type {
   NumberInputValueChangeReason,
 } from "@ui-sdk/core/number-input"
 export type { NumberInputEvents, UiNumberInputElement } from "../events"
+export { createNumberInputController } from "@ui-sdk/core/number-input"

@@ -30,3 +30,4 @@ export type {
   ISOMonth,
 } from "@ui-sdk/core/calendar"
 export type { CalendarEvents, UiCalendarElement } from "../events"
+export { createCalendarController } from "@ui-sdk/core/calendar"

@@ -20,3 +20,4 @@ export type {
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
 export type { UiToolbarElement } from "../events"
+export { createToolbarController } from "@ui-sdk/core/toolbar"

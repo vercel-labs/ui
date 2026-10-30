@@ -12,3 +12,4 @@ export type {
   PasswordInputVisibleChangeReason,
 } from "@ui-sdk/core/password-input"
 export type { PasswordInputEvents, UiPasswordInputElement } from "../events"
+export { createPasswordInputController } from "@ui-sdk/core/password-input"

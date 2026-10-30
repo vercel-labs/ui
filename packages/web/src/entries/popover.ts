@@ -22,3 +22,4 @@ export type {
   PopoverTriggerState,
 } from "@ui-sdk/core/popover"
 export type { PopoverEvents, UiPopoverElement } from "../events"
+export { createPopoverController } from "@ui-sdk/core/popover"

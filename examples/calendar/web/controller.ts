@@ -1,5 +1,4 @@
-import { createCalendarController } from "@ui-sdk/web"
-import "@ui-sdk/web/calendar"
+import { createCalendarController } from "@ui-sdk/web/calendar"
 import { ChevronLeft, ChevronRight, createElement } from "lucide"
 
 function mount(root: HTMLElement) {

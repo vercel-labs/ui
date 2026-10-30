@@ -21,3 +21,4 @@ export type {
   ResizableStorage,
 } from "@ui-sdk/core/resizable"
 export type { ResizableEvents, UiResizableElement } from "../events"
+export { createResizableController, resizableStorageKey } from "@ui-sdk/core/resizable"

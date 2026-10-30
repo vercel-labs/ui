@@ -17,3 +17,4 @@ export type {
   HoverCardTriggerState,
 } from "@ui-sdk/core/hover-card"
 export type { HoverCardEvents, UiHoverCardElement } from "../events"
+export { createHoverCardController } from "@ui-sdk/core/hover-card"

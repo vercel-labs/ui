@@ -17,3 +17,4 @@ export type {
   RadioState,
 } from "@ui-sdk/core/radio"
 export type { RadioGroupEvents, UiRadioElement, UiRadioGroupElement } from "../events"
+export { createRadioGroupController } from "@ui-sdk/core/radio"
