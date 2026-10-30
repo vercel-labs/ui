@@ -678,10 +678,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
 
   let listed = { items: store.get().items, mounts: store.get().mounts }
   store.subscribe(() => {
-    const { items, mounts, open } = store.get()
+    const { items, mounts } = store.get()
     if (items === listed.items && mounts === listed.mounts) return
     listed = { items, mounts }
-    if (open) settleHighlight(false)
+    // After the options that brought the items are handed over, so the
+    // highlight isn't written beside them.
+    queueMicrotask(() => {
+      if (store.get().open) settleHighlight(false)
+    })
   })
 
   // A value set from outside, like a controller or a controlled prop, shows
