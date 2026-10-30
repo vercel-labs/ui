@@ -10,6 +10,7 @@ import { checkbox } from "../src/components/checkbox/checkbox"
 import { input } from "../src/components/input/input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
+import { progress } from "../src/components/progress/progress"
 import { bind } from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { select } from "../src/components/select/select"
@@ -403,6 +404,18 @@ describe("agent", () => {
     // A label inside a collapsed branch names its node.
     await agent.act({ steps: [{ ref: "Files", action: "setValue", args: ["index.ts"] }] })
     expect(nested.get().value).toBe("src/index.ts")
+  })
+
+  test("a reading, like a progress bar's value, is in the snapshot", () => {
+    const agent = createAgent()
+    const instance = progress({ id: "upload", value: 2, max: 4 })
+    const el = document.body.appendChild(document.createElement("div"))
+    el.setAttribute("aria-label", "Upload")
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    expect(agent.snapshot().find((component) => component.label === "Upload")).toMatchObject({
+      value: 2,
+      max: 4,
+    })
   })
 
   test("a press waits for the button's action, and a failed action fails the step", async () => {
