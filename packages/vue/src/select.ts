@@ -193,7 +193,7 @@ type SelectComponent = {
   new <T = string>(props: RootPropsOf<SelectProps<T, false>>): RootInstanceOf<SelectProps<T, false>>
   new <T = string>(props: RootPropsOf<SelectProps<T, true>>): RootInstanceOf<SelectProps<T, true>>
   new <T = string, Multiple extends boolean = boolean>(
-    props: RootPropsOf<SelectProps<T, Multiple>>,
+    props: RootPropsOf<SelectProps<T, Multiple> & { multiple: Multiple }>,
   ): RootInstanceOf<SelectProps<T, Multiple>>
 } & RenderableWith<SelectProps<any, boolean | undefined>>
 

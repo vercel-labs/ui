@@ -29,6 +29,8 @@ const several = ref(false)
   <Select v-model="name" multiple :items="['apple', 'pear']" />
   <!-- @vue-expect-error A multiple select's value is a list. -->
   <Select multiple :value="name" />
+  <!-- @vue-expect-error Only a multiple select's value is a list. -->
+  <Select :value="ids" />
   <Select :multiple="several" :value="name" />
   <Select :multiple="several" :value="ids" />
   <Select>
