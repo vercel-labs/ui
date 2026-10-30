@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - apps/*
+  - demos/*/*
   - tests
   - examples
 allowBuilds:
