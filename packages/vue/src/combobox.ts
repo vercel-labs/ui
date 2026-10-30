@@ -222,7 +222,7 @@ const ComboboxLabel = parts.Label
  */
 const ComboboxChips = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChips",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chips">,
@@ -240,7 +240,7 @@ const ComboboxChips = /* @__PURE__ */ withElement(
  */
 const ComboboxChipsOverflow = /* @__PURE__ */ withElement(
   "span",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChipsOverflow",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chips-overflow">,
@@ -407,7 +407,7 @@ const ComboboxItemText = withElement(
  */
 const ComboboxSelectAll = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxSelectAll",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "select-all">,
@@ -581,7 +581,7 @@ const ComboboxChip = /* @__PURE__ */ (() =>
  */
 const ComboboxChipRemove = /* @__PURE__ */ withElement(
   "button",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChipRemove",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chip-remove">,

@@ -1,28 +1,6 @@
-// Checks what each React and Svelte entry costs an app against `size-budget.json`.
-//
-//   pnpm size            Fails when an entry grows more than 3% past its budget.
-//   pnpm size --update   Writes today's sizes as the new budgets.
-//
-// Each entry is bundled from source the way an app's production build bundles
-// it: minified, with the framework external and core included, and with `#dev`
-// resolved without the `development` condition. Sizes are gzip bytes.
-// Code an entry loads with `import()`, like the sheet a popup presents as on
-// phones, goes into chunks of its own, as app bundlers split it. An entry's
-// size is what a page loads up front: its chunk and the chunks it imports
-// statically, glue included. What `import()` loads later is its own
-// "(lazy)" row, with its own budget, so it can't grow unseen either.
-//
-// Svelte rows compile `.svelte` components and `.svelte.ts` runes modules as
-// `@sveltejs/vite-plugin-svelte` does in a production build, so they count the
-// compiled adapter, not its source. They also count the Svelte runtime the
-// entry needs beyond a bare app (`adapters` below says why).
-//
-// The "(perf pages)" rows bundle every part the perf pages use in one entry
-// (`perfPages` below), so code the components share counts once, as in an app.
-//
-// It also fails when an entry other than Field and Form bundles Field or Form
-// code, in React, Svelte, Vue and web components alike, and when an entry
-// bundles a core module `absent` below rules out for it.
+// Checks what each React, Svelte and Vue entry costs an app against
+// `size-budget.json`, and the code no entry may ship. tests/README.md
+// ("Bundle size") says how each row is measured.
 import { build, transform } from "esbuild"
 import { readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { readFile } from "node:fs/promises"
@@ -95,16 +73,31 @@ const adapters = [
       `mount(App, { target: document.body })`,
     ].join("\n"),
   },
+  {
+    name: "vue",
+    // Vite's defaults for Vue's compile-time flags in a production build.
+    options: {
+      external: ["vue"],
+      define: {
+        __VUE_OPTIONS_API__: "true",
+        __VUE_PROD_DEVTOOLS__: "false",
+        __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: "false",
+      },
+    },
+    // Vue's runtime tree-shakes like Svelte's, so an entry counts the parts
+    // of it a bare app doesn't use, like `Teleport`.
+    app: [
+      `import { createApp, h } from "vue"`,
+      `createApp({ render: () => h("button", "App") }).mount(document.body)`,
+    ].join("\n"),
+  },
 ]
 
 // Field ships only with a Field: a control joins a field through a small
 // context module, so no other entry bundles it.
 const fieldModule = /^packages\/core\/src\/components\/field\/[^/]+\.ts$/
 // Adapters with no size rows whose entries still get that check.
-const checkedOnly = [
-  { name: "vue", options: { external: ["vue"] } },
-  { name: "web", options: {} },
-]
+const checkedOnly = [{ name: "web", options: {} }]
 
 // Optional parts ship only once a page renders them (`Feature` in core's
 // `primitive-types.ts`): a page with a component's basic parts bundles none of
@@ -278,7 +271,7 @@ async function bundleForProduction(entry, options) {
     target: "es2022",
     ...options,
     plugins: [...(options.plugins ?? []), ...(entry.source === undefined ? [] : [sourceEntry(entry.source)])],
-    define: { "process.env.NODE_ENV": '"production"' },
+    define: { ...options.define, "process.env.NODE_ENV": '"production"' },
     write: false,
     metafile: true,
     logLevel: "error",

@@ -37,7 +37,7 @@ A file filter is a regular expression matched against the path, so `specs/menu` 
 | [One-off specs](#one-off-specs)       | `<name>.<topic>.spec.ts`, like `combobox.virtual.spec.ts`         | Like behavior, without the sheet projects                                            | `pr`        |
 | [Unit tests](#unit-tests)             | `packages/*/test/*.test.ts(x)`                                    | Node, vitest                                                                         | `pr`        |
 | [Docs tests](#docs-tests)             | `tests/docs/*.spec.ts`                                            | Chromium, against the docs site                                                      | `main`      |
-| [Bundle size](#bundle-size)           | `scripts/size.mjs`, `size-budget.json`                            | Node                                                                                 | never in CI |
+| [Bundle size](#bundle-size)           | `scripts/size.mjs`, `size-budget.json`                            | Node                                                                                 | `pr`        |
 | [Perf docs](#perf-docs)               | `scripts/perf-docs.mjs`                                           | Node                                                                                 | `pr`        |
 
 ## Projects
@@ -262,7 +262,9 @@ cd tests && DOCS_PORT=5410 ../scripts/test-slot.sh npx playwright test --config 
 
 ## Bundle size
 
-`pnpm size` (`scripts/size.mjs`) bundles every React entry the way an app's production build would: minified, React external, core included, and `#dev` resolved without the `development` condition. It compares each entry's gzip size with `size-budget.json`, and fails when one grows more than 3% past its budget, or when production code contains strings only development code has. Code an entry loads with `import()` gets its own `(lazy)` row and budget. CI doesn't run it yet: `pnpm size --update` writes the first budgets. Run it before merging a change to shipped code.
+`pnpm size` (`scripts/size.mjs`) bundles every React, Svelte and Vue entry from source the way an app's production build would: minified, core included, and `#dev` resolved without the `development` condition. React stays external. Svelte and Vue rows count the part of their runtime the entry adds to a bare app, and Svelte rows compile components as `@sveltejs/vite-plugin-svelte` does. A row is what a page loads up front: the entry's chunk and the chunks it imports statically. Code it loads with `import()`, like the sheet, gets its own `(lazy)` row and budget. The `(perf pages)` rows bundle every part the perf pages use in one entry, so shared code counts once, as in an app.
+
+It compares each row's gzip size with `size-budget.json` and fails when one grows more than 3% past its budget. It also fails, in every framework including web components, when production code contains strings only development code has, when an entry other than Field bundles Field code, and when an entry bundles a module it should never need, like a page with a component's basic parts bundling code for a part it doesn't render (`absent` and `minimalPages` in the script). The CI check job runs it. After a change that shrinks or grows an entry on purpose, `pnpm size --update` writes the new budgets.
 
 ```bash
 pnpm size            # Check.
