@@ -61,7 +61,6 @@ function SearchTrigger({
     >
       <SearchIcon className="size-4 shrink-0" />
       <span>{label}</span>
-      {shortcut && <DialogShortcut className="ms-auto font-sans text-xs tracking-widest text-subtle" />}
     </DialogTrigger>
   )
 }
@@ -72,6 +71,7 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
   const router = useRouter()
 
   const { search, setSearch, query } = useDocsSearch({ type: "fetch", api: "/api/search", delayMs: 100 })
+  const searching = search !== "" && (query.isLoading || query.data === "empty")
   const framework = section && isFramework(section) ? section : preferredFramework
   const results =
     query.data && query.data !== "empty"
@@ -107,11 +107,15 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
           }}
           className="flex min-h-0 flex-1 flex-col"
         >
-          <CommandInput aria-label="Search the docs" placeholder="Search the docs" />
+          <CommandInput aria-label="Search the docs" placeholder="Search the docs" loading={searching} />
           <CommandEmpty>
-            {search && !query.isLoading && query.data === "empty" ? `Nothing found for “${search}”.` : null}
+            {searching
+              ? "Searching…"
+              : query.error
+                ? "Search isn’t available right now."
+                : search && `Nothing found for “${search}”.`}
           </CommandEmpty>
-          <CommandList aria-busy={query.isLoading || undefined}>
+          <CommandList aria-busy={searching || undefined}>
             {search ? (
               results.map((result) => {
                 const Icon = icons[result.type]

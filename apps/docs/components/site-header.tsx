@@ -42,12 +42,12 @@ function SiteHeader({ urls }: { urls: string[] }) {
           </span>
           <FrameworkPicker urls={urls} />
         </div>
-        <div className="ms-auto flex items-center gap-8">
+        <div className="ms-auto flex items-center gap-4">
           <HeaderMenu />
           <SearchTrigger
             label="Search the docs"
             shortcut
-            className="flex h-8 w-56 items-center gap-2.5 whitespace-nowrap rounded-2xl bg-foreground/[0.045] px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 xl:w-60"
+            className="flex h-8 w-48 items-center gap-2.5 whitespace-nowrap rounded-2xl bg-foreground/[0.045] px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
           />
         </div>
       </div>
