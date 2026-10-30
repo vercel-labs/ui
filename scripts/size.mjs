@@ -260,12 +260,11 @@ function gzip(code) {
 // chunk it imports statically, and the code it loads later with `import()`.
 // An entry is a `file`, or a `source` written here.
 async function bundleForProduction(entry, options) {
-  const result = await build({
+  const shared = {
     entryPoints: { entry: entry.file ?? "size:entry" },
     bundle: true,
     minify: true,
     format: "esm",
-    splitting: true,
     outdir: "out",
     platform: "browser",
     target: "es2022",
@@ -275,6 +274,15 @@ async function bundleForProduction(entry, options) {
     write: false,
     metafile: true,
     logLevel: "error",
+  }
+  // Vite drops an `import()` in code it shakes out. esbuild still splits it,
+  // which moves shared code into a chunk the entry imports, so a build without
+  // splitting first finds what ships and the rest stays out.
+  const whole = await build(shared)
+  const result = await build({
+    ...shared,
+    splitting: true,
+    plugins: [unshippedImports(keptModules(Object.values(whole.metafile.outputs))), ...shared.plugins],
   })
   const outputs = result.metafile.outputs
   // The chunks a page loads up front, then the ones it can load later. esbuild
@@ -295,18 +303,44 @@ async function bundleForProduction(entry, options) {
   const text = (output) => result.outputFiles.find((file) => file.path.endsWith(output)).text
   const join = (list) => list.map(text).join("\n")
   const all = Object.keys(outputs).filter((output) => output.endsWith(".js") && loadable.has(output))
-  // The source files with code in the output, relative to the root.
-  const modules = new Set(
-    all.flatMap((output) =>
-      Object.entries(outputs[output].inputs)
+  return {
+    code: join(all.filter((output) => upfront.has(output))),
+    lazy: join(all.filter((output) => !upfront.has(output))),
+    modules: keptModules(all.map((output) => outputs[output])),
+  }
+}
+
+// The source files with code in these outputs, relative to the root.
+function keptModules(outputs) {
+  return new Set(
+    outputs.flatMap((output) =>
+      Object.entries(output.inputs)
         .filter(([, input]) => input.bytesInOutput)
         .map(([file]) => file),
     ),
   )
+}
+
+// Leaves out each `import()` of a module that isn't in `kept`.
+function unshippedImports(kept) {
   return {
-    code: join(all.filter((output) => upfront.has(output))),
-    lazy: join(all.filter((output) => !upfront.has(output))),
-    modules,
+    name: "unshipped-imports",
+    setup(build) {
+      build.onResolve(
+        { filter: /.*/ },
+        async ({ path: specifier, kind, importer, resolveDir, pluginData }) => {
+          if (kind !== "dynamic-import" || pluginData === unshippedImports) return
+          const resolved = await build.resolve(specifier, {
+            kind,
+            importer,
+            resolveDir,
+            pluginData: unshippedImports,
+          })
+          if (resolved.errors.length || resolved.namespace !== "file") return
+          if (!kept.has(path.relative(root, resolved.path))) return { path: specifier, external: true }
+        },
+      )
+    },
   }
 }
 
