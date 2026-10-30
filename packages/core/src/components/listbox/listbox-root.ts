@@ -67,12 +67,13 @@ type ListboxController<T = string, Multiple extends boolean | undefined = false>
  * `multiple` picks the shape of the value, and `Multiple` true requires it.
  * @stable
  */
-// A union on `multiple`, not a conditional type, so TypeScript infers `T`
-// through it and types `onValueChange` from whether `multiple` is set.
+// A union on `multiple`, so TypeScript infers `T` through it and types
+// `onValueChange` from `multiple`. The multiple side comes first, so a list in
+// a variable infers `T` as its items, not as the list.
 type ListboxOptions<T = string, Multiple extends boolean | undefined = false> = ListboxSharedOptions<T> &
   (
-    | ListboxSingleOptions<T, Multiple>
     | ListboxMultipleOptions<T, Multiple>
+    | ListboxSingleOptions<T, Multiple>
     | ListboxEitherOptions<T, Multiple>
   )
 
