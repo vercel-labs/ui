@@ -188,7 +188,8 @@ function componentLabel(parts: Bound[]) {
       ? found[0].el
       : found.find((part) => !part.key)?.el
   }
-  const text = (el: Element | undefined) => el?.textContent?.trim().slice(0, 80) || undefined
+  const text = (el: Element | undefined) =>
+    el?.textContent?.replace(/\s+/g, " ").trim().slice(0, 80) || undefined
   const label = text(first("label"))
   if (label) return label
   // A group's own element names it before its items do.
