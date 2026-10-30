@@ -71,7 +71,7 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
   const router = useRouter()
 
   const { search, setSearch, query } = useDocsSearch({ type: "fetch", api: "/api/search", delayMs: 100 })
-  const searching = search !== "" && (query.isLoading || query.data === "empty")
+  const searching = search !== "" && (query.isLoading || (query.data === "empty" && !query.error))
   const framework = section && isFramework(section) ? section : preferredFramework
   const results =
     query.data && query.data !== "empty"
