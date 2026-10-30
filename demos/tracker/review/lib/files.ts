@@ -44,7 +44,8 @@ function resolveFile(framework: Framework, file: string) {
   const base = path.join(repo, root.dir)
   const full = path.resolve(base, rest.join("/"))
   if (!full.startsWith(base + path.sep)) return null
-  if (full.split(path.sep).some((segment) => skipped.has(segment))) return null
+  const segments = path.relative(base, full).split(path.sep)
+  if (segments.some((segment) => skipped.has(segment) || segment.startsWith("."))) return null
   return { full, repoPath: path.relative(repo, full) }
 }
 

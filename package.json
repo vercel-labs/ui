@@ -7,7 +7,7 @@
     "dev": "bash scripts/docs-dev.sh",
     "playground": "pnpm --filter playground dev",
     "review": "node demos/tracker/review/scripts/dev.mjs",
-    "typecheck": "node scripts/check-type-imports.mjs && pnpm -r --parallel typecheck",
+    "typecheck": "node scripts/check-type-imports.mjs && pnpm -r --workspace-concurrency=4 --no-sort typecheck",
     "lint": "node scripts/check-code.mjs && node scripts/check-comments.mjs",
     "lint:idioms": "eslint packages examples apps/playground/src",
     "format": "node scripts/format-changed.mjs --check",

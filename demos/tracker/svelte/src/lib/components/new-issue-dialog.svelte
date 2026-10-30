@@ -41,7 +41,7 @@
       if (result.type === "success" && result.data?.id) {
         tracker.newIssue.close()
         toast.success(`${result.data.id} created`)
-        await goto(`/?issue=${result.data.id}`)
+        await goto(`/?issue=${result.data.id}`, { invalidateAll: true })
         return
       }
       if (result.type === "failure") error = String(result.data?.error ?? "Couldn't create the issue.")

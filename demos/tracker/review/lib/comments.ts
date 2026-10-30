@@ -38,14 +38,19 @@ async function writeFileComments(comments: Comment[]) {
   await rename(temporary, file)
 }
 
+// Saves and removes run one at a time, so two at once can't drop a comment.
+let writes = Promise.resolve()
+
+function queueWrite(change: (comments: Comment[]) => Comment[]) {
+  const next = writes.then(async () => writeFileComments(change(await readFileComments())))
+  writes = next.catch(() => {})
+  return next
+}
+
 const fileStore: Store = {
   read: readFileComments,
-  async save(comment) {
-    await writeFileComments([...(await readFileComments()), comment])
-  },
-  async remove(id) {
-    await writeFileComments((await readFileComments()).filter((comment) => comment.id !== id))
-  },
+  save: (comment) => queueWrite((comments) => [...comments, comment]),
+  remove: (id) => queueWrite((comments) => comments.filter((comment) => comment.id !== id)),
 }
 
 // One blob per comment, so two people saving at once never overwrite each other.
