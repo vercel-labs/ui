@@ -334,6 +334,18 @@ describe("createViewport bindFindable", () => {
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([-100000, 100000])
   })
 
+  test("unbinding before the next frame leaves the pane unbound", async () => {
+    const { instance, surface } = mountCanvas()
+    scrollable(surface)
+    const unbind = instance.api.viewport.bindFindable(surface)
+    scrollTo(surface, 100300, 100000)
+    unbind()
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(surface.querySelector('[aria-hidden="true"]')).toBeNull()
+    expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
+    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(-300px,0px)")
+  })
+
   test("a scroll clamped because the spacer went missing puts it back without panning", () => {
     const { instance, surface } = mountCanvas()
     scrollable(surface)

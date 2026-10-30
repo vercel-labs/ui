@@ -353,7 +353,10 @@ function createViewport<State extends object>(
       })
       // The world moves by where the pane really rests, which is nowhere while
       // it can't scroll, like hidden in a closed tab, and negative right to left.
+      let bound = true
+      let frame = 0
       const settle = () => {
+        if (!bound) return
         if (!spacer.isConnected) el.append(spacer)
         const rtl = el.ownerDocument.defaultView?.getComputedStyle(el).direction === "rtl"
         el.scrollLeft = rtl ? -rest : rest
@@ -379,7 +382,8 @@ function createViewport<State extends object>(
         settle()
         api.panBy(-dx, -dy, { reason: focusing ? "focus-in" : "find-in-page", event })
         // Chrome ignores the reset during a find in page scroll; the rest takes it, and goes back once the scroll is done.
-        requestAnimationFrame(settle)
+        cancelAnimationFrame(frame)
+        frame = requestAnimationFrame(settle)
       }
       findable = el
       rested = { x: 0, y: 0 }
@@ -391,6 +395,8 @@ function createViewport<State extends object>(
       const sized = view?.ResizeObserver ? new view.ResizeObserver(settle) : undefined
       sized?.observe(el)
       return () => {
+        bound = false
+        cancelAnimationFrame(frame)
         sized?.disconnect()
         el.removeEventListener("scroll", onScroll)
         el.removeEventListener("focusin", onFocusIn)
