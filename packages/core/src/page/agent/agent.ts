@@ -56,6 +56,11 @@ type AgentComponent = {
   confirm?: string
   /** True for a component that left the page, like a closed tab's field, with the state it had. */
   offPage?: boolean
+  /**
+   * Where the app writes it, like `"components/header.tsx:24"`. Development builds
+   * only, from a `data-review-loc` attribute on it or an element around it, or Svelte's own locations.
+   */
+  source?: string
   /** The api methods it takes now. None while it's disabled or read-only. */
   actions: string[]
 }
@@ -277,6 +282,19 @@ const described = (entry: Entry) =>
 const redact = (entry: Entry, value: unknown) =>
   entry.secret && value !== "" && value != null ? "[redacted]" : value
 
+type SvelteElement = Element & { __svelte_meta?: { loc?: { file: string; line: number } } }
+
+function sourceOf(parts: Bound[]) {
+  for (const { el } of parts) {
+    for (let node: SvelteElement | null = el; node; node = node.parentElement) {
+      const stamped = node.getAttribute("data-review-loc")
+      if (stamped) return stamped
+      const loc = node.__svelte_meta?.loc
+      if (loc) return `${loc.file}:${loc.line}`
+    }
+  }
+}
+
 function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   const state = instance.get() as Record<string, unknown>
   const api = instance.api as Record<string, unknown>
@@ -285,6 +303,8 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (label) out.label = label
   const row = rowOf(parts)
   if (row) out.row = row
+  const source = dev ? sourceOf(parts) : undefined
+  if (source) out.source = source
   for (const key of stateKeys(entry, state)) if (key in state) out[key] = redact(entry, state[key] ?? null)
   // A reading nothing sets, like a progress bar's 2 of `max` 4.
   if (!("value" in out) && "value" in state && typeof api.setValue !== "function")
