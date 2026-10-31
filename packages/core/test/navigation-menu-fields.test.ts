@@ -68,6 +68,26 @@ test('arrow keys on a contenteditable="False" tab stop inside a panel still move
   expect(document.activeElement).toBe(panel.querySelector('a[href="#b"]'))
 })
 
+test("every panel key on a checkbox or button input does what it does on a link", () => {
+  for (const key of ["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Home", "End"]) {
+    const handled = (markup: string, selector: string) => {
+      const panel = mountPanel(`<a href="#a">A</a>${markup}<a href="#b">B</a>`)
+      panel.querySelector<HTMLElement>(selector)!.focus()
+      const event = new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+      document.activeElement!.dispatchEvent(event)
+      panel.remove()
+      return event.defaultPrevented
+    }
+    const onLink = handled('<a href="#c">C</a>', 'a[href="#c"]')
+    for (const type of ["checkbox", "submit", "button"])
+      expect([key, type, handled(`<input type="${type}" aria-label="Pick">`, "input")]).toEqual([
+        key,
+        type,
+        onLink,
+      ])
+  }
+})
+
 test("arrow keys on a checkbox or button input inside a panel still move to the next link", () => {
   for (const type of ["checkbox", "submit", "button"]) {
     const panel = mountPanel(`<a href="#a">A</a><input type="${type}" aria-label="Pick"><a href="#b">B</a>`)

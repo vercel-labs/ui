@@ -8,9 +8,10 @@ import { nextTabbable, tabbables } from "../../foundation/focus/tabbable"
 import { ownsEvent } from "../../foundation/popups/popup-elements"
 import { isModified, listKey, panelKey, stepIndex } from "./navigation-menu-keyboard"
 
-// Fields in a panel, like a search box, keep the keys that move their caret or value.
+// Fields in a panel, like a search box, keep the keys that move their caret or
+// value. The browser decides what's editable, since contenteditable inherits.
 const fields =
-  'input:not([type="checkbox"], [type="button"], [type="submit"], [type="reset"], [type="image"]), textarea, select, [contenteditable]:not([contenteditable="false" i])'
+  'input:not([type="checkbox"], [type="button"], [type="submit"], [type="reset"], [type="image"]), textarea, select'
 
 function createFocus(config: {
   orientation: () => "horizontal" | "vertical"
@@ -79,7 +80,8 @@ function createFocus(config: {
       // Keys from a nested menu's panel are its own.
       // A field in a shadow root retargets the event to its host, so the path's first element is the field.
       const origin = target.shadowRoot ? event.composedPath()[0] : target
-      const inField = origin instanceof Element ? origin.matches(fields) : target.matches(fields)
+      const field = origin instanceof HTMLElement ? origin : target
+      const inField = field.isContentEditable || field.matches(fields)
       if (isModified(event) || !ownsEvent(panel, event) || inField) return
       const step = panelKey(event.key, isRTL(panel))
       if (step === undefined) return
