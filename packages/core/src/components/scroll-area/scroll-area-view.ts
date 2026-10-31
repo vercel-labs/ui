@@ -134,8 +134,6 @@ function createScrollView(store: Store<ScrollAreaModel>) {
   const track = { x: 0, y: 0 }
   const thickness = { x: 0, y: 0 }
   let rtl = false
-  // scrollLeft's sign disagrees with the direction, and the style said it's a rubber band, not a turn.
-  let overscrolled = false
 
   // The last measurement, reused between frames so scrolling allocates nothing.
   const metrics: Record<Axis, AxisMetrics> = {
@@ -164,14 +162,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     metrics.y.scroll = el.scrollHeight
     // Right to left, scrollLeft runs from 0 down to minus the maximum. A turned
     // page resizes nothing but flips the sign, which Safari's rubber band does too,
-    // so the style decides once per stretch.
+    // so a sign that disagrees asks the style.
     const left = el.scrollLeft
-    if (left !== 0 && left < 0 !== rtl) {
-      if (!overscrolled) {
-        rtl = isRTL(el)
-        overscrolled = left < 0 !== rtl
-      }
-    } else overscrolled = false
+    if (left !== 0 && left < 0 !== rtl) rtl = isRTL(el)
     metrics.x.position = rtl ? -left : left
     metrics.x.client = el.clientWidth
     metrics.x.scroll = el.scrollWidth

@@ -93,6 +93,32 @@ test("a rubber band past the start of a left to right area keeps the thumb at th
     .toBeLessThan(2)
 })
 
+test("the thumb follows the page when it turns right to left right after a rubber band", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  const track = await trackBox(page, gallery.label, "horizontal")
+  await viewport(page, gallery.label).evaluate((el) => {
+    Object.defineProperty(el, "scrollLeft", { configurable: true, get: () => -50 })
+    el.dispatchEvent(new Event("scroll"))
+  })
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+  // The stretch ends and the page turns before the next frame measures.
+  await viewport(page, gallery.label).evaluate((el) => {
+    delete (el as { scrollLeft?: number }).scrollLeft
+    el.dispatchEvent(new Event("scroll"))
+    document.documentElement.dir = "rtl"
+    el.scrollLeft = -1e6
+  })
+  const turned = await trackBox(page, gallery.label, "horizontal")
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - turned.x))
+    .toBeLessThan(2)
+})
+
 test("scrollToEnd on a horizontal area follows the page when it turns right to left after mount", async ({
   page,
   open,
