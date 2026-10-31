@@ -117,7 +117,7 @@ test("the thumb follows scrolling when the area's own container turns right to l
 }) => {
   await open("scroll-area")
   await trackBox(page, gallery.label, "horizontal")
-  await area(page, gallery.label).evaluate((el) => (el.dir = "rtl"))
+  await area(page, gallery.label).evaluate((el) => el.setAttribute("dir", "rtl"))
   await setScroll(viewport(page, gallery.label), { left: -1e6 })
   const track = await trackBox(page, gallery.label, "horizontal")
   await expect
