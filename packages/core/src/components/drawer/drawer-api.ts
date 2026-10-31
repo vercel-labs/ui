@@ -150,12 +150,16 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     if (next.open) return opened(next, arriving)
     if (!next.mounted && forgetsSnap(next, arriving)) return { snapPoint: null }
   })
-  // An uncontrolled snap point the new snap points leave out moves to their first.
+  // An uncontrolled snap point the new snap points leave out moves to the
+  // default, or to their first when they leave that out too.
   deriveFromOptions(context, ["snapPoint"], (synced, state, arriving: DrawerOptions) => {
     const point = synced.snapPoint ?? state.snapPoint
     if (arriving.snapPoint !== undefined || point === null) return
-    if (!(arriving.snapPoints ?? ["content"]).some((entry) => sameValue(entry, point)))
-      return { snapPoint: defaultSnap(arriving) }
+    const points = arriving.snapPoints ?? ["content"]
+    const kept = (entry: SnapPoint) => points.some((other) => sameValue(other, entry))
+    if (kept(point)) return
+    const fallback = defaultSnap(arriving)
+    return { snapPoint: kept(fallback) ? fallback : points[0] }
   })
   // The modal setting in effect: none while the page behind is usable.
   deriveState(context, ["modal"], ({ interactive, modalSetting }) => ({

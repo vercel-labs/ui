@@ -209,14 +209,14 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
     }
   })
 
-  // Turned on, the highlight goes to the best match if nothing has it.
-  // Turned off, it stays where it is.
+  // Turned on, the highlight goes to the best match if nothing has it, once
+  // the options are handed over. Turned off, it stays where it is.
   let autoMode = config.autoHighlight()
   context.onOptions(() => {
     const mode = config.autoHighlight()
     if (mode === autoMode) return
     autoMode = mode
-    settle(false, { reason: "imperative" })
+    queueMicrotask(() => settle(false, { reason: "imperative" }))
   })
 
   announceResults({
