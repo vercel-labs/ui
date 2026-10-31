@@ -417,7 +417,6 @@ function createAgent(
   } = {},
 ) {
   install()
-  const opened = new WeakMap<PrimitiveInstance, Set<string>>()
   const scan = () => {
     const found: { entry: Entry; instance: PrimitiveInstance; parts: Bound[] }[] = []
     // A copy, since `remember` can move an entry to the ref it had.
@@ -850,13 +849,17 @@ function createAgent(
         if (Number.isNaN(number)) throw new Error(`${entry.component} ${entry.ref} takes a number.`)
         args = [Array.isArray(state.value) ? [number] : number, ...args.slice(1)]
       }
+      // The disabled items this step saw while it opened the list, if it did.
+      let whileOpen: Set<string> | undefined
+      const seeOpen = (found: Set<string>) => (whileOpen = found)
+      const askToOpen = () => ask(args, targetsOf(args[0]), "make this change")
       // A value by its item's label, like "Germany (Frankfurt)" or an accordion's "Email", so the agent needn't look up the value first.
       const label = typeof args[0] === "string" && fold(args[0])
       if (label) {
         const data = dataOf(entry, instance)
         const items =
           action === "setValue"
-            ? await listItems(entry, instance, () => ask(args, targetsOf(args[0]), "make this change"))
+            ? await listItems(entry, instance, askToOpen, seeOpen)
             : data?.length
               ? data
               : renderedItems(bound(instance))
@@ -881,15 +884,18 @@ function createAgent(
       }
       if (/^set[A-Z]/.test(action)) args = [valueFor(entry, action, args[0]), ...args.slice(1)]
       // The api takes a disabled item, which a person can't choose. One already chosen stays, and
-      // an autocomplete's value is text, which a person can still type.
-      if (entry.component !== "autocomplete" && ["setValue", "select", "open", "toggle"].includes(action)) {
+      // an autocomplete's value is text, which a person can still type. Opening names no item.
+      if (
+        entry.component !== "autocomplete" &&
+        args[0] !== undefined &&
+        ["setValue", "select", "open", "toggle"].includes(action)
+      ) {
         const value = (instance.get() as { value?: unknown }).value
         const key = keyFor(instance)
         const held = (Array.isArray(value) ? value : [value]).map(key)
-        const disabled = disabledItems(entry, instance)
-        // Options that render only while the list is open count as they were when listItems opened it.
-        opened.get(instance)?.forEach((key) => disabled.add(key))
-        opened.delete(instance)
+        // Options that render only while the list is open are read by opening it, now.
+        if (!whileOpen) await listItems(entry, instance, askToOpen, seeOpen)
+        const disabled = whileOpen ?? disabledItems(entry, instance)
         const blocked = (Array.isArray(args[0]) ? args[0] : [args[0]])
           .map(key)
           .find((item) => disabled.has(item) && !held.includes(item))
@@ -962,7 +968,12 @@ function createAgent(
 
   // A list's items: from its data, from the page, or, for a step that
   // `beforeOpen` lets, by opening it for a moment.
-  async function listItems(entry: Entry, instance: PrimitiveInstance, beforeOpen?: () => Promise<void>) {
+  async function listItems(
+    entry: Entry,
+    instance: PrimitiveInstance,
+    beforeOpen?: () => Promise<void>,
+    whileOpen?: (disabled: Set<string>) => void,
+  ) {
     const state = instance.get() as Record<string, unknown>
     const api = instance.api as { setOpen?: (open: boolean) => void }
     let items = dataOf(entry, instance) ?? renderedItems(bound(instance))
@@ -971,7 +982,7 @@ function createAgent(
       asAgent(() => api.setOpen!(true))
       for (let tries = 0; tries < 60 && !(items = renderedItems(bound(instance))).length; tries++)
         await frames()
-      if (items.length) opened.set(instance, disabledItems(entry, instance))
+      if (items.length) whileOpen?.(disabledItems(entry, instance))
       asAgent(() => api.setOpen!(false))
       await frames()
     }

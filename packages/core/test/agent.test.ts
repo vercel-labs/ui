@@ -362,6 +362,76 @@ describe("agent", () => {
     expect(instance.get().value).toBeNull()
   })
 
+  function mountRegionWhileOpen(options: { multiple?: boolean } = {}) {
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbindItems: (() => void)[] = []
+    const disabled = { fra: true }
+    const instance: ReturnType<typeof select> = select({
+      id: "region",
+      ...options,
+      onOpenChange: (open) => {
+        unbindItems.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        if (!open) return
+        for (const [value, label] of [
+          ["fra", "Frankfurt"],
+          ["tyo", "Tokyo"],
+        ] as const) {
+          const item = content.appendChild(document.createElement("div"))
+          item.textContent = label
+          unbindItems.push(
+            bind(instance.part("item", { value, disabled: value === "fra" && disabled.fra }), item),
+          )
+        }
+      },
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Region")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => {
+      unbindItems.forEach((unbind) => unbind())
+      instance.destroy()
+    })
+    return { instance, disabled }
+  }
+
+  test("setValue refuses a list of values holding a disabled option that renders only while open", async () => {
+    const agent = createAgent()
+    const { instance } = mountRegionWhileOpen({ multiple: true })
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: [["fra"]] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toEqual([])
+  })
+
+  test("an item enabled after a failed step can be chosen, since disabled items are read anew each step", async () => {
+    const agent = createAgent()
+    const { instance, disabled } = mountRegionWhileOpen()
+    expect((await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Nowhere"] }] })).ok).toBe(
+      false,
+    )
+    disabled.fra = false
+    instance.api.setOpen(true)
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Frankfurt"] }] })
+    expect(outcome.error).toBeUndefined()
+    expect(instance.get().value).toBe("fra")
+  })
+
+  test("opening a select names no item, so a disabled empty placeholder doesn't stop it", async () => {
+    const agent = createAgent()
+    const instance = mountRegion([
+      { value: "", label: "Choose a region", disabled: true },
+      { value: "tyo", label: "Tokyo" },
+    ])
+    expect((await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Tokyo"] }] })).ok).toBe(
+      true,
+    )
+    for (const action of ["open", "toggle"]) {
+      if (typeof (instance.api as Record<string, unknown>)[action] !== "function") continue
+      const outcome = await agent.act({ steps: [{ ref: "Region", action }] })
+      expect([action, outcome.error]).toEqual([action, undefined])
+      instance.api.setOpen(false)
+    }
+  })
+
   test("setValue takes text that matches a disabled suggestion in an autocomplete, as a person can type it", async () => {
     const agent = createAgent()
     const instance = autocomplete({
