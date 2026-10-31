@@ -3,6 +3,7 @@
 // on tracks, ranges of cells, boxes resized by their edges, and rows swiped
 // aside to their actions. Through the public entry only.
 import { afterEach, describe, expect, test, vi } from "vitest"
+import { setAnnouncer } from "../src/foundation/platform/announce"
 import {
   cellsToText,
   createCellRange,
@@ -238,6 +239,25 @@ describe("createSpans", () => {
     document.dispatchEvent(pointer("pointercancel", 50, 905))
     expect(set).not.toHaveBeenCalled()
     expect(instance.get().events).toEqual([])
+  })
+
+  test("a press on a span the browser takes over says nothing and changes nothing", () => {
+    const instance = calendar({ id: "c", events: [standup] })
+    const heard: string[] = []
+    setAnnouncer((text) => heard.push(text))
+    cleanups.push(
+      () => instance.destroy(),
+      () => setAnnouncer(undefined),
+    )
+    const { spans, set } = instance.api
+    const day = box(0, 0, 100, 1440)
+    cleanups.push(spans.bindTrack(day, "mon"))
+    cleanups.push(spans.bindSpan(box(0, 540, 100, 30, day), "a"))
+    spans.spanPointerdown(pointer("pointerdown", 50, 550), "a")
+    document.dispatchEvent(pointer("pointercancel", 50, 550))
+    expect(heard).toEqual([])
+    expect(set).not.toHaveBeenCalled()
+    expect(instance.get().draft).toBeNull()
   })
 
   test("spanStyle places a span along its track and in its lane", () => {

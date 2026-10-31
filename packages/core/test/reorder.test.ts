@@ -645,6 +645,18 @@ describe("bindDrag", () => {
     expect(onEnd).toHaveBeenCalledWith(expect.anything(), false)
   })
 
+  test("a press canceled before the threshold ends once, as canceled", () => {
+    const el = document.createElement("div")
+    document.body.append(el)
+    const onEnd = vi.fn()
+    const down = pointer("pointerdown", { target: el }) as PointerEvent
+    bindDrag(el, down, { threshold: 3, onMove: () => {}, onEnd })
+    pointer("pointercancel")
+    pointer("pointerup")
+    expect(onEnd).toHaveBeenCalledTimes(1)
+    expect(onEnd).toHaveBeenCalledWith(expect.anything(), true)
+  })
+
   test("onStart returning false stops following the pointer", async () => {
     const el = document.createElement("div")
     document.body.append(el)
