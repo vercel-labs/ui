@@ -142,6 +142,7 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
     if (event.key !== "Escape") return
     event.preventDefault()
     event.stopPropagation()
+    if (dragged) swallowNextClick(el.ownerDocument, true)
     end(pending.event, true)
   }
 
@@ -208,6 +209,8 @@ function swallowNextClick(doc: Document, untilRelease = false) {
   const forget = () => {
     doc.removeEventListener("click", swallow, true)
     doc.removeEventListener("pointerdown", forget, true)
+    doc.removeEventListener("pointerup", stop, true)
+    doc.removeEventListener("pointercancel", stop, true)
   }
   const stop = () => view.setTimeout(forget)
   doc.addEventListener("click", swallow, { capture: true, once: true })
