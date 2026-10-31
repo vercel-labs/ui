@@ -678,6 +678,35 @@ describe("createSwipeActions", () => {
     expect(instance.get().swiping).toBeNull()
   })
 
+  test("a second finger outside an open row leaves the first finger's swipe of it where it is", async () => {
+    const { instance, swipe: actions, row } = mount()
+    const other = box(0, 60, 400, 60)
+    cleanups.push(actions.bindRow(other, "b"))
+    const touch = (type: string, x: number, pointerId: number) => {
+      time += 50
+      const event = new PointerEvent(type, {
+        clientX: x,
+        clientY: 30,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+      Object.defineProperty(event, "timeStamp", { value: time })
+      return event
+    }
+    actions.show("a", "end")
+    actions.pointerdown(touch("pointerdown", 100, 1), "a", row)
+    document.dispatchEvent(touch("pointermove", 120, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const offset = actions.offset(instance.get(), "a")
+    other.dispatchEvent(touch("pointerdown", 300, 2))
+    expect(actions.offset(instance.get(), "a")).toBe(offset)
+    expect(instance.get().open).toEqual({ key: "a", side: "end" })
+  })
+
   test("a long swipe runs the first action, and only then", () => {
     const row = mount()
     const { instance } = row

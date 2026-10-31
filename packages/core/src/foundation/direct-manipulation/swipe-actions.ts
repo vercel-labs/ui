@@ -119,14 +119,14 @@ function createSwipeActions<State extends object>(
     offOutside?.()
     offOutside = undefined
     if (!next) return
-    // A press anywhere but the open row closes it.
+    // A press anywhere but the open row closes it, unless it's a second finger while one swipes.
     const doc = rows.get(next.key)?.ownerDocument
     if (doc)
       offOutside = on(
         doc,
         "pointerdown",
         (event) => {
-          if (!rows.get(next.key)?.contains(event.target as Node)) api.close()
+          if (event.isPrimary && !rows.get(next.key)?.contains(event.target as Node)) api.close()
         },
         { capture: true },
       )
