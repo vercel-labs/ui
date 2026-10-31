@@ -659,3 +659,30 @@ describe("bindDrag", () => {
     expect(onEnd).not.toHaveBeenCalled()
   })
 })
+
+describe("createReorder after a missed release", () => {
+  test("a new pen press ends the drag that missed its release and picks up the pressed item", async () => {
+    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"] })
+    stackRects(list)
+    await tick()
+    const pen = (type: string, init: { x: number; y: number; id: number; target?: EventTarget }) => {
+      const event = new MouseEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        clientX: init.x,
+        clientY: init.y,
+        buttons: 1,
+      })
+      Object.assign(event, { pointerId: init.id, isPrimary: true, pointerType: "pen" })
+      ;(init.target ?? document).dispatchEvent(event)
+    }
+    pen("pointerdown", { target: els.get("a"), x: 10, y: 20, id: 1 })
+    pen("pointermove", { x: 10, y: 105, id: 1 })
+    await frame()
+    expect(instance.get().moving).toMatchObject({ key: "a" })
+    pen("pointerdown", { target: els.get("b"), x: 10, y: 20, id: 2 })
+    pen("pointermove", { x: 10, y: 105, id: 2 })
+    await frame()
+    expect(instance.get().moving).toMatchObject({ key: "b" })
+  })
+})

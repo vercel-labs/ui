@@ -224,7 +224,7 @@ function createTransfer<State extends object>(
 
   function pointerdown(event: PointerEvent, key: string) {
     const start = items.get(key)
-    if (!start || draft() || !drags.accepts(event)) return
+    if (!start || !drags.accepts(event) || draft()) return
     let pointer = { x: event.clientX, y: event.clientY }
     let dragging = false
     // Whether the item had focus, which the new element in another list takes over.

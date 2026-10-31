@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { numberInput } from "../src/components/number-input/number-input"
+import { slider } from "../src/components/slider/slider"
 import { createDragSession } from "../src/foundation/drag-and-drop/pointer"
 import { mount } from "../src/testing/mount"
 
@@ -95,6 +96,60 @@ test("a held stepper stops stepping once its number input leaves the page", () =
     input.unmount()
     vi.advanceTimersByTime(2000)
     expect(input.state.value).toBe(1)
+  } finally {
+    vi.useRealTimers()
+  }
+})
+
+const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+
+function mountSlider(options: object) {
+  const mounted = mount(
+    slider,
+    { defaultValue: 0, ...options },
+    `<root><control><track></track></control></root>`,
+  )
+  mounted.part("track")!.getBoundingClientRect = () => new DOMRect(0, 0, 100, 10)
+  return mounted
+}
+
+test("a slider that leaves the page mid-drag commits nothing", async () => {
+  const onValueCommit = vi.fn()
+  const mounted = mountSlider({ onValueCommit })
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  document.dispatchEvent(press("pointermove", { clientX: 60, clientY: 5 }))
+  await frame()
+  expect(mounted.state.value).toBe(60)
+  mounted.unmount()
+  expect(onValueCommit).not.toHaveBeenCalled()
+})
+
+test("a new press on a slider ends a drag that missed its release, and takes over", async () => {
+  const onValueCommit = vi.fn()
+  const mounted = mountSlider({ onValueCommit })
+  destroy.push(mounted.unmount)
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  expect(mounted.state.value).toBe(10)
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 }))
+  expect(mounted.state.value).toBe(80)
+  expect(onValueCommit).toHaveBeenCalledTimes(1)
+  document.dispatchEvent(press("pointerup", { pointerId: 2, clientX: 80, clientY: 5 }))
+  expect(onValueCommit).toHaveBeenCalledTimes(2)
+})
+
+test("a held stepper commits nothing when its number input leaves the page", () => {
+  vi.useFakeTimers()
+  try {
+    const onValueCommit = vi.fn()
+    const input = mount(
+      numberInput,
+      { defaultValue: 0, onValueCommit },
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+    )
+    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    expect(input.state.value).toBe(1)
+    input.unmount()
+    expect(onValueCommit).not.toHaveBeenCalled()
   } finally {
     vi.useRealTimers()
   }

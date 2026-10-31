@@ -341,7 +341,7 @@ function createReorder<State extends object, Props = any>(
 
   function pointerdown(event: PointerEvent, key: string) {
     const el = element(key)
-    if (!el || draft() || !drags.accepts(event)) return
+    if (!el || !drags.accepts(event) || draft()) return
     const start = { x: event.clientX, y: event.clientY, left: el.offsetLeft, top: el.offsetTop }
     let drag: { track: (x: number, y: number) => void; stop: () => void } | undefined
     // The drop reports the move that placed the item: a pointerup's zero

@@ -26,6 +26,20 @@ const lifecycles = new WeakMap<object, Lifecycle>()
 let making: Lifecycle | undefined
 // Whether `unwatched` is running, so the instances it makes wait for `keep()`.
 let deferring = false
+// Whether an instance's `onDestroy` callbacks are running. What they cut
+// short, like a drag, wasn't ended by the person, so it commits nothing.
+let destroying = 0
+
+function whileDestroying(run: () => void) {
+  destroying++
+  try {
+    run()
+  } finally {
+    destroying--
+  }
+}
+
+const isDestroying = () => destroying > 0
 
 /**
  * Makes an instance with a lifecycle of its own, kept at once in a browser,
@@ -107,4 +121,4 @@ function discard(instance: object) {
   lifecycles.delete(instance)
 }
 
-export { discard, keep, release, unwatched, whenKept, withLifecycle }
+export { discard, isDestroying, keep, release, unwatched, whenKept, whileDestroying, withLifecycle }

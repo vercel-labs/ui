@@ -308,7 +308,7 @@ function createTreeReorder<State extends object>(
 
   function pointerdown(event: PointerEvent, key: string) {
     const el = elements.get(key)
-    if (!el || draft() || !drags.accepts(event)) return
+    if (!el || !drags.accepts(event) || draft()) return
     const start = { x: event.clientX, y: event.clientY }
     let point = start
     let startDepth = 0
