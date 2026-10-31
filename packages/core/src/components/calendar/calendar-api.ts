@@ -3,7 +3,6 @@
 import {
   addMonthsTo,
   gridWeeks,
-  isAllowedRange,
   isISOMonth,
   matchesDate,
   monthOf,
@@ -11,6 +10,7 @@ import {
   moveDate,
   normalizeValue,
   pressRange,
+  rangeTo,
   selectedDates,
   visibleRange,
   type CalendarMode,
@@ -33,12 +33,14 @@ import { createFocusRecovery } from "../../foundation/focus/focus-recovery"
 import { isDisabled } from "../../foundation/forms/form"
 import { bindPageLocale, localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext, SlotFactory } from "../../foundation/kernel/primitive-types"
-import { createChange } from "../../foundation/kernel/input-source"
+import { createChange, dispatch } from "../../foundation/kernel/input-source"
 import { selects } from "../../foundation/kernel/selects"
 import type {
+  CalendarAnchorChangeReason,
   CalendarChangeOptions,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridProps,
   CalendarGridState,
   CalendarHeadingState,
@@ -68,6 +70,7 @@ type CalendarModelState = {
   unavailable: DateMatchers | null
   disabled: boolean
   readOnly: boolean
+  deselectable: boolean
   months: number
   pageBy: "month" | "page"
   locale: string | null
@@ -93,6 +96,7 @@ const calendarSettings = (options: CalendarOptions) => ({
   unavailable: options.unavailable ?? null,
   disabled: !!options.disabled,
   readOnly: !!options.readOnly,
+  deselectable: !!options.deselectable,
   months: Math.max(1, Math.floor(options.months ?? 1) || 1),
   pageBy: options.pageBy ?? "month",
   locale: options.locale ?? null,
@@ -137,13 +141,8 @@ function initialMonth(options: CalendarOptions, value: CalendarValue) {
 function shownRange(state: State) {
   if (state.mode !== "range") return null
   if (state.anchor !== null) {
-    const end =
-      state.hover !== null &&
-      state.hover >= state.anchor &&
-      isAllowedRange(state.anchor, state.hover, rangeRules(state))
-        ? state.hover
-        : state.anchor
-    return [state.anchor, end] as const
+    const preview = state.hover === null ? null : rangeTo(state.anchor, state.hover, rangeRules(state))
+    return preview ?? ([state.anchor, state.anchor] as const)
   }
   return state.value as [ISODate, ISODate] | null
 }
@@ -332,12 +331,13 @@ function calendarApi<
     move: (event, { from, rtl }) => {
       if (event.ctrlKey || event.metaKey) return
       const state = store.get()
-      return moveDate(event, from.key, {
+      const to = moveDate(event, from.key, {
         rtl,
         weekStartsOn: weekStartOf(state),
         min: state.min,
         max: state.max,
       })
+      return to === undefined || moveFocus(to, "list-navigation", event) ? to : from.key
     },
   })
   // A day of next month that took focus before its month showed leaves the
@@ -345,6 +345,51 @@ function calendarApi<
   const recovery = createFocusRecovery<CalendarDayProps>({
     fallback: (lost) => element("day", lost.key),
   })
+
+  // A move to `approved` was asked before focus went, so landing there asks nothing.
+  let approved: ISODate | null = null
+  let pointer: PointerEvent | undefined
+  function moveFocus(date: ISODate, reason: CalendarFocusedChangeReason, event?: Event) {
+    if (date === store.get().focused) return true
+    if (dispatch(context, "onFocusedChange", date, { reason, event })) return false
+    approved = date
+    return true
+  }
+
+  // Focus a pointer or a script put on a day, past `moveFocus`. A stop the
+  // calendar settles on itself, on load or as the months turn, asks nothing.
+  function focusLanded(date: ISODate, event: FocusEvent) {
+    const from = store.get().focused
+    const press = pointer
+    pointer = undefined
+    if (date === approved) approved = null
+    else if (
+      date !== from &&
+      from !== null &&
+      dispatch(
+        context,
+        "onFocusedChange",
+        date,
+        press ? { reason: "item-press", event: press } : { reason: "focus-in", event },
+      )
+    ) {
+      // Before the roving focus hears it, which would move the stop here.
+      event.stopImmediatePropagation()
+      roving.focus(from)
+    }
+  }
+
+  function setAnchor(
+    anchor: ISODate | null,
+    hover: ISODate | null,
+    reason: CalendarAnchorChangeReason,
+    event?: Event,
+  ) {
+    if (anchor !== store.get().anchor && dispatch(context, "onAnchorChange", anchor, { reason, event }))
+      return false
+    store.set({ anchor, hover })
+    return true
+  }
 
   function setMonth(month: ISOMonth, reason: MonthChangeReason, event?: Event) {
     if (!isISOMonth(month)) return false
@@ -379,13 +424,14 @@ function calendarApi<
       )
     } else if (state.mode === "range") {
       const pressed = pressRange(state.anchor, date, rangeRules(state))
-      store.set({ anchor: pressed.anchor, hover: pressed.anchor })
+      if (!setAnchor(pressed.anchor, pressed.anchor === null ? null : date, "item-press", event)) return
       if (
         pressed.value &&
         (setValue(pressed.value, "item-press", event) || sameDates(store.get().value, pressed.value))
       )
         hooks.picked?.(event)
-    } else if (setValue(date, "item-press", event) || store.get().value === date) hooks.picked?.(event)
+    } else if (state.deselectable && state.value === date) setValue(null, "item-press", event)
+    else if (setValue(date, "item-press", event) || store.get().value === date) hooks.picked?.(event)
   }
 
   const api = {
@@ -408,12 +454,14 @@ function calendarApi<
       if (!isISODate(date)) return
       const state = store.get()
       const target = clampDate(date, state.min, state.max)
+      if (!moveFocus(target, "imperative")) return
       reveal(target, "imperative")
       roving.focus(target)
     },
     internal: {
       roving,
       recovery,
+      focusLanded,
       setValue,
       setMonth,
       reveal,
@@ -424,8 +472,9 @@ function calendarApi<
         // Safari doesn't focus a cell on click, so arrow keys would go nowhere.
         if (el && !isOutside(state, props) && el.ownerDocument.activeElement !== el)
           el.focus({ preventScroll: true })
+        pointer = undefined
         pick(props.value, event)
-        if (isOutside(store.get(), props)) {
+        if (isOutside(store.get(), props) && moveFocus(props.value, "item-press", event)) {
           reveal(props.value, "item-press", event)
           roving.focus(props.value)
         }
@@ -449,15 +498,17 @@ function calendarApi<
           return
         }
         // Escape drops the start of a range being picked, before it closes anything.
-        if (event.key === "Escape" && state.anchor !== null) {
+        if (event.key === "Escape" && state.anchor !== null && setAnchor(null, null, "escape-key", event)) {
           event.preventDefault()
-          store.set({ anchor: null, hover: null })
           return
         }
         const moved = roving.keydown(event, el)
         if (!moved || moved.key === moved.from) return
         reveal(moved.key, "list-navigation", event)
         if (store.get().anchor !== null) store.set({ hover: moved.key })
+      },
+      pointerdown(event: PointerEvent) {
+        pointer = event
       },
       hover(date: ISODate) {
         if (store.get().anchor !== null) store.set({ hover: date })
@@ -637,10 +688,18 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
       press: ({ api, props, el }, event) => api.internal.press(props, event, el),
       on: {
         keydown: (event, { api, el, props }) => api.internal.keydown(event, el!, props),
+        pointerdown: (event, { api }) => api.internal.pointerdown(event),
         pointerenter: (_event, { api, props }) => api.internal.hover(props.value),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.internal.roving.bind(el, part), part.api.internal.recovery.bind(el, part)]
+        const landed = (event: FocusEvent) => part.api.internal.focusLanded(part.props.value, event)
+        // Ahead of the roving focus, which moves the stop to where focus lands.
+        el.addEventListener("focus", landed)
+        const cleanups = [
+          part.api.internal.roving.bind(el, part),
+          part.api.internal.recovery.bind(el, part),
+          () => el.removeEventListener("focus", landed),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),

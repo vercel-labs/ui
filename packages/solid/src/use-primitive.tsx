@@ -25,6 +25,7 @@ import {
   takeOwnId,
   touched,
   writes,
+  yieldToAuthor,
   type PrimitiveGeneric,
 } from "@ui-sdk/core/renderer"
 import { dynamic, isServer, type JSX, type ValidComponent } from "@solidjs/web"
@@ -478,7 +479,8 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
           tracked.attrsTick()
           const part = instance.part(name, props())
           takeOwnId(part, user.id)
-          return toSolidProps(readPart(instance, part, "attrs", () => partAttrs(part, part.props)))
+          const own = readPart(instance, part, "attrs", () => partAttrs(part, part.props))
+          return toSolidProps(yieldToAuthor(own, (name) => user[name] != null))
         },
         { lazy: isServer, equals: sameRecord, name: `${name} attrs` },
       )

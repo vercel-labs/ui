@@ -4,9 +4,13 @@
 import { beforeAll, expect, test } from "vitest"
 import type { UiToggleGroupElement } from "../src/events"
 import { defineAccordionElements } from "../src/accordion"
+import { defineCheckboxElements, defineCheckboxGroupElements } from "../src/checkbox"
 import { defineToggleGroupElements } from "../src/toggle"
 
 ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+// jsdom has no form values, which a checkbox sets.
+ElementInternals.prototype.setFormValue ??= () => {}
+ElementInternals.prototype.setValidity ??= () => {}
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -66,5 +70,24 @@ test("setting an accordion's value fires no openchange on its items", async () =
   root.addEventListener("valuechange", () => heard.push("root"))
   root.value = ["a"]
   expect(root.value).toEqual(["a"])
+  expect(heard).toEqual([])
+})
+
+test("checking a grouped checkbox from script fires no valuechange on its group", async () => {
+  defineCheckboxElements()
+  defineCheckboxGroupElements()
+  document.body.innerHTML = `<ui-checkbox-group aria-label="Toppings"><ui-checkbox value="cheese"></ui-checkbox><ui-checkbox value="olives"></ui-checkbox></ui-checkbox-group>`
+  await wait()
+  const group = document.body.firstElementChild as HTMLElement & { value: string[] }
+  const olives = group.lastElementChild as HTMLElement & { checked: boolean }
+  const heard: string[] = []
+  for (const type of ["input", "change", "checkedchange", "valuechange"])
+    group.addEventListener(
+      type,
+      (event) => heard.push(`${type} ${(event.target as Element).localName}`),
+      true,
+    )
+  olives.checked = true
+  expect(group.value).toEqual(["olives"])
   expect(heard).toEqual([])
 })

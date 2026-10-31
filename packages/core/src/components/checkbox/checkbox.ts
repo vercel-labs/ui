@@ -172,11 +172,16 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
       joinGroup(el: HTMLElement) {
         const owner = group()
         if (!owner) return () => {}
-        const follow = () =>
+        const follow = () => {
+          const { name, disabled, form } = fromGroup(options())!
           store.set({
             checked: isParent() ? owner.parentChecked() : owner.checked(store.get().value),
             controls: isParent() ? owner.childIds() || undefined : undefined,
+            name,
+            disabled,
+            form,
           })
+        }
         const unsubscribe = owner.subscribe(follow)
         follow()
         const leave = isParent()

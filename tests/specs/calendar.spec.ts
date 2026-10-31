@@ -201,15 +201,15 @@ test("in range mode, keys preview the end and Escape drops the start", async ({ 
   await expect(status(page)).toHaveText(calendarAction("value", ["2026-10-14", "2026-10-21"], "item-press"))
 })
 
-test("a range keeps to its fewest and most days", async ({ page, open }) => {
+test("a range keeps to its fewest and most days, and keeps its start", async ({ page, open }) => {
   await open("calendar", { mode: "range", minDays: "3", maxDays: "5" })
   await day(page, "2026-10-12").click()
   await day(page, "2026-10-13").click()
   await expect(status(page)).toHaveText("")
   await day(page, "2026-10-19").click()
   await expect(status(page)).toHaveText("")
-  await day(page, "2026-10-21").click()
-  await expect(status(page)).toHaveText(calendarAction("value", ["2026-10-19", "2026-10-21"], "item-press"))
+  await day(page, "2026-10-15").click()
+  await expect(status(page)).toHaveText(calendarAction("value", ["2026-10-12", "2026-10-15"], "item-press"))
 })
 
 test("two months show side by side, and focus moves between them without turning", async ({ page, open }) => {

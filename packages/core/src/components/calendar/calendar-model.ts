@@ -120,15 +120,21 @@ function isAllowedRange(start: ISODate, end: ISODate, rules: RangeRules) {
   return true
 }
 
+/** The range from `anchor` to `date`, whichever comes first, or null when the rules don't allow it. */
+function rangeTo(anchor: ISODate, date: ISODate, rules: RangeRules) {
+  const range = (date < anchor ? [date, anchor] : [anchor, date]) as [ISODate, ISODate]
+  return isAllowedRange(range[0], range[1], rules) ? range : null
+}
+
 /**
  * What a press on `date` does to a range: with no start yet, it starts one.
- * With a start, a later or equal date ends it, if the rules allow; an earlier
- * one, or one the rules don't allow, starts over from `date`.
+ * With a start, any date ends it, the earlier of the two starting it, if the
+ * rules allow; one they don't allow keeps the start.
  */
 function pressRange(anchor: ISODate | null, date: ISODate, rules: RangeRules) {
-  if (anchor === null || date < anchor || !isAllowedRange(anchor, date, rules))
-    return { anchor: date, value: undefined }
-  return { anchor: null, value: [anchor, date] as [ISODate, ISODate] }
+  if (anchor === null) return { anchor: date, value: undefined }
+  const value = rangeTo(anchor, date, rules)
+  return value ? { anchor: null, value } : { anchor, value: undefined }
 }
 
 /** Where a key moves focus from `from`, before clamping, or undefined for a key the grid doesn't use. */
@@ -249,6 +255,7 @@ export {
   moveDate,
   normalizeValue,
   pressRange,
+  rangeTo,
   type RangeRules,
   selectedDates,
   visibleRange,

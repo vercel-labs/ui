@@ -123,7 +123,7 @@ list are its parts.
     items?: ListData<T>
     /** Items shown instead of `items` while the input is empty, like recent choices. Needs `items`. */
     emptyItems?: ListData<T>
-    /** How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, or `false` to keep every item, for results a server already filtered. */
+    /** How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, whose numeric result also sorts data items, or `false` to keep every item, for results a server already filtered. */
     filter?: ListFilter<T>
     /** What screen readers hear after typing pauses, when no `ComboboxStatus` is rendered, and when a chip is removed. Return null for nothing. */
     announcement?: (change: ListAnnouncement) => string | null | undefined

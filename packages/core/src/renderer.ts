@@ -68,7 +68,9 @@ export {
   selectedKeys,
   subscribe,
   takeOwnId,
+  madeLabel,
   touched,
+  yieldToAuthor,
 } from "./foundation/kernel/part"
 export { keep, release, unwatched } from "./foundation/kernel/keep"
 export { renderVersion, schemaOf } from "./foundation/kernel/primitive"

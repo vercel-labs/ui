@@ -71,13 +71,16 @@ import type {
 } from "@ui-sdk/core/slider"
 import type { PaginationController, PaginationPageChangeReason } from "@ui-sdk/core/pagination"
 import type {
+  CalendarAnchorChangeReason,
   CalendarController,
+  CalendarFocusedChangeReason,
   CalendarMonthChangeReason,
   CalendarValue,
   CalendarValueChangeReason,
   DateMatchers,
   ISOMonth,
 } from "@ui-sdk/core/calendar"
+import type { ISODate } from "@ui-sdk/core/date"
 import type {
   DatePickerController,
   DatePickerDismissReason,
@@ -890,6 +893,8 @@ interface UiPaginationElement
 type CalendarEvents = {
   valuechange: UiChangeEvent<CalendarValue, CalendarValueChangeReason>
   monthchange: UiChangeEvent<ISOMonth, CalendarMonthChangeReason>
+  focusedchange: UiChangeEvent<ISODate, CalendarFocusedChangeReason>
+  anchorchange: UiChangeEvent<ISODate | null, CalendarAnchorChangeReason>
 }
 /**
  * `<ui-calendar>`: `value` and `month`, the controller's methods on `api`, and typed events.

@@ -57,7 +57,7 @@ Use it in place of the generated star in [Render the Rating](./rendering#render-
 
 ## Merge Props
 
-`Part` merges your props with the slot's. Slot attributes win, your event handlers run first, and attachments combine. Put canceling handlers in the props passed to `Part`. Calling `preventDefault()` there skips the built-in behavior; a handler on an element inside a `render` snippet runs too late to cancel it.
+`Part` merges your props with the slot's. Slot attributes win, your event handlers run first, and attachments combine. An `id`, or a name or typing hint you pass, like `aria-label` or `autocomplete`, replaces the slot's. Put canceling handlers in the props passed to `Part`. Calling `preventDefault()` there skips the built-in behavior; a handler on an element inside a `render` snippet runs too late to cancel it.
 
 For custom markup, `part.slot(props)` supplies the attributes and attachment. Read `part.state` in markup so Svelte tracks changes, and wrap the element in `{#if part.present}` to follow the slot's presence.
 

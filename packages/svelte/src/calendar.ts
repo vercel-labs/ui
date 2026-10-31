@@ -11,11 +11,13 @@ export { default as CalendarWeeks } from "./calendar/calendar-weeks.svelte"
 export { default as CalendarYearSelect } from "./calendar/calendar-year-select.svelte"
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,

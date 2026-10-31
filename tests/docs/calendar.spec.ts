@@ -73,14 +73,29 @@ const checks: Record<string, Check> = {
     await day(preview, "Tuesday, October 20, 2026").click()
     await expect(
       day(preview, "Wednesday, October 14, 2026"),
-      "a press that would make a stay too short starts a new one there",
-    ).toHaveAttribute("aria-selected", "false")
+      "a press that would make a stay too short keeps its start",
+    ).toHaveAttribute("aria-selected", "true")
     await expectSelected(preview, "Thursday, October 15, 2026")
     await expect(
       day(preview, "Sunday, October 18, 2026"),
       "the stay may span the booked weekend",
     ).toHaveAttribute("aria-selected", "true")
     await expectSelected(preview, "Tuesday, October 20, 2026")
+  },
+  "range-progress": async (preview) => {
+    await showMonth(preview, "October 2026")
+    await day(preview, "Monday, October 12, 2026").click()
+    await expect(
+      preview.getByText("Started on 2026-10-12, focus on 2026-10-12", { exact: true }),
+    ).toBeVisible()
+    await preview.page().keyboard.press("ArrowRight")
+    await expect(
+      preview.getByText("Started on 2026-10-12, focus on 2026-10-13", { exact: true }),
+    ).toBeVisible()
+    await preview.page().keyboard.press("Enter")
+    await expect(preview.getByText("Focus on 2026-10-13", { exact: true })).toBeVisible()
+    await expectSelected(preview, "Monday, October 12, 2026")
+    await expectSelected(preview, "Tuesday, October 13, 2026")
   },
   multiple: async (preview) => {
     await expect(preview.getByText("2 selected")).toBeVisible()

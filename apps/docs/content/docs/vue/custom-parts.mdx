@@ -72,7 +72,7 @@ Use it in place of the generated star in [Render the Rating](./rendering#render-
 
 ## Merge Props
 
-`usePart` merges the component's attrs with the slot's. Slot attributes win, classes and styles combine, and your listeners run first. Call `preventDefault()` in a listener to skip the built-in handler.
+`usePart` merges the component's attrs with the slot's. Slot attributes win, classes and styles combine, and your listeners run first. An `id`, or a name or typing hint you pass, like `aria-label` or `autocomplete`, replaces the slot's. Call `preventDefault()` in a listener to skip the built-in handler.
 
 The last argument can be a tag, or an object with `tag`, `children`, and `extend`. Use `extend` for extra props after the slot's props, such as attributes supplied by a Field. Keep the slot's roles, IDs, and ARIA state intact.
 

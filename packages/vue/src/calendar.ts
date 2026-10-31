@@ -1,7 +1,9 @@
 import type { ChangeDetails } from "@ui-sdk/core"
 import {
   calendar as calendarPrimitive,
+  type CalendarAnchorChangeReason,
   type CalendarController,
+  type CalendarFocusedChangeReason,
   type CalendarGridCell,
   type CalendarMode,
   type CalendarMonthChangeReason,
@@ -11,6 +13,7 @@ import {
   type DateMatchers,
   type ISOMonth,
 } from "@ui-sdk/core/calendar"
+import type { ISODate } from "@ui-sdk/core/date"
 import { defineComponent, Fragment, h, inject, provide, type PropType, type SlotsType, type VNode } from "vue"
 import { CalendarKey, GridKey } from "./calendar-context"
 import { slotContent } from "./children"
@@ -53,6 +56,7 @@ const Calendar = withElement(
       unavailable: null as unknown as PropType<DateMatchers>,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
+      deselectable: optionalBoolean,
       months: Number,
       pageBy: String as PropType<"month" | "page">,
       locale: String,
@@ -74,6 +78,8 @@ const Calendar = withElement(
       valueChange: (_value: CalendarValue, _details: ChangeDetails<CalendarValueChangeReason>) => true,
       "update:month": (_month: ISOMonth) => true,
       monthChange: (_month: ISOMonth, _details: ChangeDetails<CalendarMonthChangeReason>) => true,
+      focusedChange: (_date: ISODate, _details: ChangeDetails<CalendarFocusedChangeReason>) => true,
+      anchorChange: (_anchor: ISODate | null, _details: ChangeDetails<CalendarAnchorChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof calendarPrimitive, "root">,
     setup(props, { slots, emit }) {
@@ -88,6 +94,11 @@ const Calendar = withElement(
         unavailable: props.unavailable,
         disabled: props.disabled,
         readOnly: props.readOnly,
+        deselectable: props.deselectable,
+        onFocusedChange: (date: ISODate, details: ChangeDetails<CalendarFocusedChangeReason>) =>
+          emit("focusedChange", date, details),
+        onAnchorChange: (anchor: ISODate | null, details: ChangeDetails<CalendarAnchorChangeReason>) =>
+          emit("anchorChange", anchor, details),
         months: props.months,
         pageBy: props.pageBy,
         locale: props.locale,
@@ -370,11 +381,13 @@ const CalendarDay = withElement(
 
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,

@@ -1,6 +1,7 @@
 import type { FieldApi, FieldErrorProps } from "./field"
 import type { Validity } from "./field-control"
 import { formInternals } from "../../foundation/forms/form"
+import { madeLabel } from "../../foundation/kernel/part"
 import type { Store } from "../../foundation/kernel/store"
 
 // What a field's parts render: their public state, their data attributes, and
@@ -113,7 +114,7 @@ function controlAttrs(
 function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldStore>) {
   let current: HTMLElement | undefined
   // Only attributes the field wrote are its to remove. The rest are the control's own.
-  let written = new Set<string>()
+  let written = new Map<string, string>()
   // The ids the field last added to the control's description. The others are
   // the control's own, like a date picker's format hint, which its component
   // may write again at any time.
@@ -135,14 +136,23 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     )
     const { descriptions, errors } = references(state, api)
     added = new Set([...descriptions, ...errors])
-    const next = new Set<string>()
+    const next = new Map<string, string>()
     for (const [name, value] of Object.entries(attrs)) {
       if (value === undefined) {
         if (written.has(name)) control.removeAttribute(name)
         continue
       }
-      next.add(name)
-      if (control.getAttribute(name) !== value) control.setAttribute(name, value)
+      const current = control.getAttribute(name)
+      // The author's own label reference names the control over the field's label.
+      if (
+        name === "aria-labelledby" &&
+        current !== null &&
+        current !== written.get(name) &&
+        !madeLabel(current)
+      )
+        continue
+      next.set(name, value)
+      if (current !== value) control.setAttribute(name, value)
     }
     written = next
     // The field's name goes to a control that has none, so it submits: the

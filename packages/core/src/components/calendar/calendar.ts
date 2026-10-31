@@ -31,6 +31,18 @@ type CalendarMonthChangeReason =
   "previous-press" | "next-press" | "list-navigation" | "item-press" | "select-change" | "imperative"
 
 /**
+ * Why focus wants to move to another day.
+ * @stable
+ */
+type CalendarFocusedChangeReason = "list-navigation" | "item-press" | "focus-in" | "imperative"
+
+/**
+ * Why a range's start wants to change.
+ * @stable
+ */
+type CalendarAnchorChangeReason = "item-press" | "escape-key"
+
+/**
  * Options for every write method on a controller.
  * @stable
  */
@@ -107,6 +119,15 @@ type CalendarOptions = {
   /** Whether dates can be focused but not picked. */
   readOnly?: boolean
   /**
+   * Whether pressing the selected date again clears it, in `"single"` mode.
+   * @defaultValue false
+   */
+  deselectable?: boolean
+  /** Runs before keys, a press or `focus()` move focus to another day. Canceling keeps focus where it was. */
+  onFocusedChange?: (date: ISODate, details: ChangeDetails<CalendarFocusedChangeReason>) => void
+  /** Runs before a press starts a range, or ends it or Escape drops it, with `null`. Canceling keeps the start as it was. */
+  onAnchorChange?: (anchor: ISODate | null, details: ChangeDetails<CalendarAnchorChangeReason>) => void
+  /**
    * How many months show side by side, each in its own grid.
    * @defaultValue 1
    */
@@ -164,6 +185,10 @@ type CalendarState = {
   disabled: boolean
   /** Whether dates can be focused but not picked. */
   readOnly: boolean
+  /** The date with the tab stop, `null` until days render in the browser. */
+  focused: ISODate | null
+  /** A range's start while its end is being picked, else `null`. */
+  anchor: ISODate | null
 }
 
 /**
@@ -337,6 +362,9 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
     unavailable: "list",
     disabled: "boolean",
     readOnly: "boolean",
+    deselectable: "boolean",
+    onFocusedChange: "callback",
+    onAnchorChange: "callback",
     months: "number",
     pageBy: "string",
     locale: "string",
@@ -363,6 +391,8 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
         mode: state.mode,
         disabled: isDisabled(state),
         readOnly: state.readOnly,
+        focused: state.focused,
+        anchor: state.anchor,
       }),
       attrs: (state) => ({
         "data-mode": state.mode,
@@ -394,11 +424,13 @@ const calendar: CalendarPrimitive = calendarPrimitive
 
 export {
   calendar,
+  type CalendarAnchorChangeReason,
   type CalendarApi,
   type CalendarChangeOptions,
   type CalendarController,
   type CalendarDayProps,
   type CalendarDayState,
+  type CalendarFocusedChangeReason,
   type CalendarGridCell,
   type CalendarGridProps,
   type CalendarGridState,

@@ -402,6 +402,8 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     owner?: { component: string; id: string }
     // Looked up live, so a trigger that re-rendered as a new element still works.
     trigger: () => HTMLElement | undefined
+    // Where focus returns on close, when that isn't always `trigger`.
+    returnTrigger?: () => HTMLElement | undefined
     // Asks the component to close. `focus` says whether focus should return.
     close: (
       reason: PopupCloseReason,
@@ -454,6 +456,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let openerLayer: Layer | undefined
   let openerTarget: HTMLElement | undefined
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
+  const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
   let remodal: (() => void) | undefined
   let observer: ((open: boolean) => PopupClose<Reason> | undefined) | undefined
@@ -574,11 +577,13 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const fallback = setTimeout(settle, 1000)
   })
 
+  // A popup opened from this one returns here after this one closed, so it
+  // falls back like `returnFocus`.
   function returnTarget() {
-    return firstUsable([options.trigger, () => before], usable)
+    return firstUsable([returnTrigger, () => before, () => neighbour(shown?.el), options.trigger], usable)
   }
 
-  function neighbour(el: HTMLElement) {
+  function neighbour(el: HTMLElement | undefined) {
     const index = path.findIndex((step, i) => !step.node.isConnected && path[i + 1]?.node.isConnected)
     if (index === -1) return
     const { next, previous } = path[index]
@@ -592,7 +597,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
         ? (candidate: Node) => isAfter(previous, candidate) && !previous.contains(candidate)
         : (candidate: Node) => from(parent, candidate)
     for (const { node } of path.slice(index + 1)) {
-      const list = tabbables(node as Element).filter((candidate) => !el.contains(candidate))
+      const list = tabbables(node as Element).filter((candidate) => !el?.contains(candidate))
       const prior = inPlace(previous)
         ? list.filter((candidate) => !from(previous, candidate) || previous.contains(candidate)).pop()
         : undefined
@@ -605,8 +610,8 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") return
     const chain = openedImperatively
-      ? [() => before, from, options.trigger, () => neighbour(el)]
-      : [options.trigger, () => before, from, () => neighbour(el)]
+      ? [() => before, from, returnTrigger, () => neighbour(el), options.trigger]
+      : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
     if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
     // Focusing can fail, on a hidden or inert element. Then the next one gets a turn.
     firstUsable(chain, (target) => {
@@ -689,10 +694,12 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
         el.getBoundingClientRect(),
       )
     // Element neighbours, since a framework's anchor comments beside the
-    // trigger, like Svelte's, leave with it.
-    path = []
+    // trigger, like Svelte's, leave with it. Content that binds again after
+    // that trigger is gone keeps the way to where it was.
+    const returnsTo = returnTrigger()
+    if (returnsTo || !trigger) path = []
     for (
-      let node: Element | null = trigger ?? null;
+      let node: Element | null = returnsTo ?? null;
       node && node !== el.ownerDocument.body;
       node = node.parentElement
     )

@@ -27,7 +27,7 @@ export { on, selectEvent } from "./events"
 export { createHistory, type HistoryOptions } from "./history"
 export { css } from "./inline-style"
 export { keep, release, unwatched, whenKept } from "./keep"
-export { changeSource, createChange, createCommit, inputSource } from "./input-source"
+export { changeSource, createChange, createCommit, dispatch, inputSource } from "./input-source"
 export { applyAttrs, direct, live } from "./live"
 export {
   isFocusFromKeyboard,
@@ -39,7 +39,7 @@ export {
   trackModality,
 } from "./modality"
 export { createOrder, documentOrder, inDocumentOrder, isAfter } from "./order"
-export { aliasReferences, attrs, bind, held, onProps, partState, present, subscribe } from "./part"
+export { aliasReferences, attrs, bind, held, madeLabel, onProps, partState, present, subscribe } from "./part"
 export { definePrimitive, schemaOf } from "./primitive"
 export type {
   AgentSurface,

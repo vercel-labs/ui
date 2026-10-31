@@ -241,7 +241,7 @@ type ComboboxSharedOptions<T> = PortalProps & {
   /** Items shown instead of `items` while the input is empty, like recent choices or suggestions. Groups work, like `{ type: "group", label: "Recent", items }`. Needs `items`. */
   emptyItems?: ListData<T>
   /**
-   * How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, or `false` to keep every item, for results a server already filtered.
+   * How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, whose numeric result also sorts data items, or `false` to keep every item, for results a server already filtered.
    * @defaultValue "contains"
    */
   filter?: ListFilter<T>

@@ -27,6 +27,7 @@ import {
   subscribe,
   takeOwnId,
   unwatched,
+  yieldToAuthor,
   type PrimitiveGeneric,
 } from "@ui-sdk/core/renderer"
 import * as React from "react"
@@ -442,11 +443,9 @@ function heldRef(part: Part) {
   return held
 }
 
-// Props for a slot's element, merged with the user's props. Later props win,
-// so the slot's attributes beat the user's, except an `id` the user gives,
-// which the parts rendered after it point at, and every part once the element
-// binds. The user's handlers run first and can call preventDefault() to skip
-// the built-in behavior.
+// The slot's attributes win over the user's props, but for an `id` and what
+// `yieldToAuthor` leaves to the user. The user's handlers run first and can
+// call preventDefault() to skip the built-in behavior.
 function elementProps(part: Part, props: unknown, user: Record<string, any>, state: object) {
   takeOwnId(part, user.id)
   const handlers: Record<string, (event: React.SyntheticEvent) => void> = {}
@@ -459,7 +458,11 @@ function elementProps(part: Part, props: unknown, user: Record<string, any>, sta
       if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) event.preventDefault()
     }
   }
-  return mergeProps(handlers, user, toReactProps(attrs(part, props as never, state)), {
+  const own = yieldToAuthor(
+    attrs(part, props as never, state),
+    (name) => user[propNames[name] ?? name] != null,
+  )
+  return mergeProps(handlers, user, toReactProps(own), {
     id: user.id,
     ref: heldRef(part),
   })

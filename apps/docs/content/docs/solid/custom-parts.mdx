@@ -54,7 +54,7 @@ Use it in place of the generated star in [Render the Rating](./rendering#render-
 
 ## Merge Props
 
-`usePart` merges your props with the slot's. Slot attributes win, styles and refs combine, and your event handlers run first. Call `preventDefault()` in your handler to skip the built-in behavior.
+`usePart` merges your props with the slot's. Slot attributes win, styles and refs combine, and your event handlers run first. An `id`, or a name or typing hint you pass, like `aria-label` or `autocomplete`, replaces the slot's. Call `preventDefault()` in your handler to skip the built-in behavior.
 
 A `render` function receives the merged props and the part's state. Spread those props onto your element. Use `merge` and `omit` from `solid-js` when adding or removing props so their values stay reactive.
 
