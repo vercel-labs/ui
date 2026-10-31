@@ -346,8 +346,10 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
     state.disabled === true ||
     state.formDisabled === true ||
     state.readOnly === true ||
-    // A native root, like a Button's or an Input's, is disabled by a fieldset around it too.
-    rootOf(parts)?.matches(":disabled")
+    // A disabled fieldset disables a native root, like a Button's, and the fields a component holds,
+    // like a DatePicker's input. A button part alone, like a stepper at its max, leaves it usable.
+    rootOf(parts)?.matches(":disabled") ||
+    parts.some((part) => !part.key && part.el.matches("input:disabled, textarea:disabled, select:disabled"))
   if (disabled) out.disabled = true
   else {
     out.actions = actionsOf(entry, api)

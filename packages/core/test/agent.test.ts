@@ -9,6 +9,7 @@ import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { datePicker } from "../src/components/date-picker/date-picker"
 import { input, textarea } from "../src/components/input/input"
+import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
 import { progress } from "../src/components/progress/progress"
@@ -174,6 +175,37 @@ describe("agent", () => {
     const outcome = await agent.act({ steps: [{ ref: "Note", action: "setValue", args: ["Changed"] }] })
     expect(outcome.error?.message).toContain("takes no setValue now")
     expect(instance.get().value).not.toBe("Changed")
+  })
+
+  test("a date picker whose input a disabled fieldset disables takes no actions", async () => {
+    const agent = createAgent()
+    const instance = datePicker({ id: "due", defaultMonth: "2026-11" })
+    const fieldset = document.body.appendChild(document.createElement("fieldset"))
+    fieldset.disabled = true
+    const input = fieldset.appendChild(document.createElement("input"))
+    input.setAttribute("aria-label", "Due")
+    cleanups.push(bind(instance.part("input"), input), () => instance.destroy())
+    await Promise.resolve()
+    const component = agent.snapshot().find((found) => found.component === "date-picker")
+    expect(component).toMatchObject({ label: "Due", disabled: true, actions: [] })
+    const outcome = await agent.act({ steps: [{ ref: "Due", action: "setValue", args: ["2030-01-02"] }] })
+    expect(outcome.error?.message).toContain("takes no setValue now")
+  })
+
+  test("a number input at its max still takes actions, though its increment button is disabled", async () => {
+    const agent = createAgent()
+    const instance = numberInput({ id: "seats", defaultValue: 10, max: 10 })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Seats")
+    const increment = document.body.appendChild(document.createElement("button"))
+    cleanups.push(bind(instance.part("control"), field), bind(instance.part("increment"), increment), () =>
+      instance.destroy(),
+    )
+    await Promise.resolve()
+    increment.disabled = true
+    const component = agent.snapshot().find((found) => found.label === "Seats")
+    expect(component?.disabled).toBeUndefined()
+    expect(component?.actions).toContain("setValue")
   })
 
   test("a component that leaves the page stays in the snapshot as off the page, with the state it had", async () => {
