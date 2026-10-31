@@ -26,7 +26,7 @@ afterEach(() => {
 })
 
 function mountCase(component: ComponentCase, markup: string, options: object) {
-  const mounted = mount(component.primitive, { ...component.options, ...options } as never, markup)
+  const mounted = mount(component.primitive, { ...component.options, ...options }, markup)
   unmount = mounted.unmount
   return mounted
 }

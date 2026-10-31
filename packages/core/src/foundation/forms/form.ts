@@ -222,6 +222,10 @@ function associate(input: HTMLInputElement, options: Association & { focus: () =
   return () => cleanups.forEach((cleanup) => cleanup())
 }
 
+// What a watched element checks again once it moves, for a renderer that
+// keeps its binding through a move, like a custom element.
+const moves = new WeakMap<Element, () => void>()
+
 // Reports whether ancestor fieldsets disable `el`, now and whenever that
 // changes. Vue binds before the element is in its parents, so fieldsets are
 // found a microtask later. Returns a cleanup.
@@ -241,21 +245,27 @@ function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
     disabled = fieldsetDisabled(el)
     onChange(disabled)
     if (typeof MutationObserver === "undefined") return
-    observer = new MutationObserver(() => {
+    const check = () => {
       observe(observer!)
       if (fieldsetDisabled(el) === disabled) return
       disabled = !disabled
       onChange(disabled)
-    })
+    }
+    observer = new MutationObserver(check)
     observe(observer)
+    moves.set(el, check)
   }
   if (el.isConnected) watch()
   else queueMicrotask(watch)
   return () => {
     active = false
     observer?.disconnect()
+    moves.delete(el)
   }
 }
+
+// Tells what watches `el` that it moved, which no mutation of the fieldsets shows.
+const elementMoved = (el: Element) => moves.get(el)?.()
 
 // A control's own `disabled` (or its field's), or a disabled fieldset around it
 // as `watchFieldsets` reports.
@@ -429,6 +439,7 @@ export {
   bindValueInput,
   claimInvalidFocus,
   dispatchChange,
+  elementMoved,
   fieldsetDisabled,
   focusWith,
   formInternals,

@@ -153,7 +153,7 @@ type State = {
 
 type Item = { key: string; el: HTMLElement; disabled: () => boolean }
 
-const isGroupDisabled = (state: State) => state.disabled || state.formDisabled
+const isGroupDisabled = (state: State) => state.disabled || state.formDisabled || state.scopeDisabled
 
 /** The value after pressing or unpressing one toggle, in document order. */
 function nextValue(
@@ -263,7 +263,7 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
       press,
       // A disabled toolbar disables the groups in it. Read from state, which
       // follows the toolbar the props pass now, before they're handed over.
-      disabled: () => isGroupDisabled(store.get()) || store.get().scopeDisabled,
+      disabled: () => isGroupDisabled(store.get()),
       orientation: () => store.get().orientation,
       subscribe: store.subscribe,
       scope,
