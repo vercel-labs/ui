@@ -294,7 +294,8 @@ type MenuNode = {
     highlight: (key: string | null, options?: { focus?: boolean; scroll?: boolean }) => void
     childOpenChanged: (childId: string, open: boolean) => void
     hoverItem: (el: HTMLElement, event: PointerEvent) => void
-    cancelHoverOpen: (event: PointerEvent) => void
+    cancelHoverOpen: () => void
+    trackPointer: (event: PointerEvent) => void
     layer: () => Layer | undefined
     barArrow: (by: 1 | -1, event: KeyboardEvent) => boolean
   }
@@ -612,10 +613,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
             options().delay ?? 100,
           )
       },
-      cancelHoverOpen(event: PointerEvent) {
-        clearTimeout(hoverTimer)
-        // Where the pointer left from, so coming back to the trigger counts as a move.
-        lastPointer = { x: event.clientX, y: event.clientY }
+      cancelHoverOpen: () => clearTimeout(hoverTimer),
+      trackPointer(event: PointerEvent) {
+        if (event.pointerType !== "touch") lastPointer = { x: event.clientX, y: event.clientY }
       },
       popup,
       presentation,

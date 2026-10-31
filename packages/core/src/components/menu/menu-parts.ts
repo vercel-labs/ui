@@ -129,7 +129,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         const submenu = api.popupElement()
         if (api.isOpen() && submenu)
           api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, submenu)
-        else api.parentMenu()?.internal.cancelHoverOpen(event)
+        else api.parentMenu()?.internal.cancelHoverOpen()
       },
     },
     press({ api, key, props, el, store }, event) {
@@ -276,6 +276,8 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         const entry = api.internal.entryOf(event.target as HTMLElement)
         if (entry && store.get().highlighted !== entry.key) store.set({ highlighted: entry.key })
       },
+      // Moves over separators and gaps count, so coming back to the same item reads as a move.
+      pointermove: (event, { api }) => api.internal.trackPointer(event),
       pointerenter(event, { api }) {
         api.parentMenu()?.internal.safeArea.stop()
       },

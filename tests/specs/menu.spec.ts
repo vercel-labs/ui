@@ -370,7 +370,9 @@ test.describe("submenu with a pointer", () => {
     await expect(menuNamed(page, "Share")).toBeHidden()
   })
 
-  test("returning to the submenu trigger from a separator opens it", async ({ page }) => {
+  test("returning to the submenu trigger from a separator opens it", async ({ page, open }) => {
+    await page.clock.install()
+    await open("menu")
     await page.getByRole("button", { name: "File" }).click()
     const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
     const separator = (await menuNamed(page, "File").getByRole("separator").last().boundingBox())!
@@ -378,8 +380,28 @@ test.describe("submenu with a pointer", () => {
     const y = share.y + share.height / 2
     await page.mouse.move(x, y)
     await page.mouse.move(x, separator.y + separator.height / 2)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
     await page.mouse.move(x, y)
+    await page.clock.runFor(300)
     await expect(menuNamed(page, "Share")).toBeVisible()
+  })
+
+  test("moving from a submenu trigger straight to another item highlights that item", async ({
+    page,
+    open,
+  }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    const box = (await remove.boundingBox())!
+    await page.mouse.move(share.x + 12, share.y + share.height / 2)
+    await page.mouse.move(box.x + 12, box.y + box.height / 2)
+    await expect(remove).toBeFocused()
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
   })
 
   test("a pointermove without movement on an open submenu trigger keeps focus in the submenu", async ({
