@@ -206,7 +206,7 @@ function createSwipeActions<State extends object>(
      * and vertical scrolls keep working.
      */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (event.button !== 0 || options.disabled?.(key)) return
+      if (event.button !== 0 || !event.isPrimary || options.disabled?.(key)) return
       const shown = open()
       // A press inside the open actions is a click on one.
       if (shown?.key === key && actions.get(actionsId(key, shown.side))?.contains(event.target as Node))
