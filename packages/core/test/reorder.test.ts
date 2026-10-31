@@ -685,6 +685,42 @@ describe("bindDrag", () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  test("a release that sends no click after Escape, like a finger lifting, leaves the next click alone", async () => {
+    const el = document.createElement("a")
+    el.href = "#card"
+    document.body.append(el)
+    const onClick = vi.fn()
+    el.addEventListener("click", onClick)
+    const down = pointer("pointerdown", { target: el }) as PointerEvent
+    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove: () => {}, onEnd: () => {} })
+    pointer("pointermove", { x: 20 })
+    await frame()
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    pointer("pointerup", { target: el })
+    await tick()
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+
+  test("Escape ends the drag for good", async () => {
+    const el = document.createElement("div")
+    document.body.append(el)
+    const onMove = vi.fn()
+    const onEnd = vi.fn()
+    const down = pointer("pointerdown", { target: el }) as PointerEvent
+    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove, onEnd })
+    pointer("pointermove", { x: 20 })
+    await frame()
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    const moves = onMove.mock.calls.length
+    pointer("pointermove", { x: 60 })
+    await frame()
+    pointer("pointerup", { x: 60 })
+    expect(onMove).toHaveBeenCalledTimes(moves)
+    expect(onEnd).toHaveBeenCalledOnce()
+    expect(onEnd).toHaveBeenCalledWith(expect.anything(), true)
+  })
+
   test("onStart returning false stops following the pointer", async () => {
     const el = document.createElement("div")
     document.body.append(el)
