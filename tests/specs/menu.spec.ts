@@ -361,6 +361,22 @@ test.describe("submenu with a pointer", () => {
     await page.mouse.move(x, y)
     await expect(menuNamed(page, "Share")).toBeVisible()
   })
+
+  test("a pointermove without movement on an open submenu trigger keeps focus in the submenu", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const x = share.x + 12
+    const y = share.y + share.height / 2
+    await page.mouse.move(x, y)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await page.keyboard.press("ArrowRight")
+    const email = page.getByRole("menuitem", { name: "Email" })
+    await expect(email).toBeFocused()
+    await page.mouse.move(x, y)
+    await expect(email).toBeFocused()
+  })
 })
 
 test.describe("positioning", () => {

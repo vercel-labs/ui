@@ -594,7 +594,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         // WebKit fires pointermove without movement when content scrolls under the pointer.
         const moved = !lastPointer || lastPointer.x !== event.clientX || lastPointer.y !== event.clientY
         lastPointer = { x: event.clientX, y: event.clientY }
-        if (!moved && store.get().highlighted !== null && !entry.openSubmenu) return
+        if (!moved && store.get().highlighted !== null) return
         const child = openChild()
         const point = { x: event.clientX, y: event.clientY }
         if (child && child.triggerElement() !== el) {
@@ -612,7 +612,11 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
             options().delay ?? 100,
           )
       },
-      cancelHoverOpen: () => clearTimeout(hoverTimer),
+      cancelHoverOpen() {
+        clearTimeout(hoverTimer)
+        // Coming back to the same spot after leaving counts as a move.
+        lastPointer = undefined
+      },
       popup,
       presentation,
       layer: () => popup.layer(),
