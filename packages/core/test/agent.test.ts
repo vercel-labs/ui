@@ -311,6 +311,26 @@ describe("agent", () => {
     expect(instance.get().value).toEqual({ id: "tyo" })
   })
 
+  test("setValue keys object values the way the select does, so other fields can't pass a disabled item", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "city",
+      items: [
+        { value: { id: 2, name: "B" }, label: "B", disabled: true },
+        { value: { id: 1, name: "A" }, label: "A" },
+      ],
+      itemToValue: (value: { id: number }) => String(value.id),
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "City")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "City", action: "setValue", args: [{ id: 2, name: "x" }] }],
+    })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toBeNull()
+  })
+
   test("setValue refuses a disabled option that renders only while its select is open", async () => {
     const agent = createAgent()
     const content = document.body.appendChild(document.createElement("div"))

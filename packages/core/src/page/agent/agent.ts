@@ -120,12 +120,15 @@ const frames = () =>
     else requestAnimationFrame(() => requestAnimationFrame(resolve))
   })
 
-// An item's value as a key: an object by its contents, since every object reads "[object Object]".
+// An item's value as a key: the component's own, like a list's `itemToValue`, else an object by its
+// contents, since every object reads "[object Object]".
 const keyOf = (value: unknown) =>
   value !== null && typeof value === "object" ? JSON.stringify(value) : String(value)
+const keyFor = (instance: PrimitiveInstance) =>
+  (instance.api as { internal?: { keyOf?: (value: unknown) => string } }).internal?.keyOf ?? keyOf
 
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
-function fromData(items: unknown, disabled?: Set<string>) {
+function fromData(items: unknown, disabled?: Set<string>, key = keyOf) {
   if (!Array.isArray(items)) return
   const out: { value: string; label: string }[] = []
   const add = (item: unknown) => {
@@ -142,7 +145,7 @@ function fromData(items: unknown, disabled?: Set<string>) {
       if (entry.type === "group") entry.items?.forEach(add)
       else if (entry.type !== "separator") {
         out.push({ value: String(entry.value), label: entry.label ?? "" })
-        if (entry.disabled === true) disabled?.add(keyOf(entry.value))
+        if (entry.disabled === true) disabled?.add(key(entry.value))
         // A tree's branches, whose rows aren't rendered while they're closed.
         entry.children?.forEach(add)
       }
@@ -157,6 +160,7 @@ function dataOf(entry: Entry, instance: PrimitiveInstance, disabled?: Set<string
   return fromData(
     entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items,
     disabled,
+    keyFor(instance),
   )
 }
 
@@ -173,7 +177,7 @@ function disabledItems(entry: Entry, instance: PrimitiveInstance) {
         part.el.matches(":disabled") ||
         part.el.getAttribute("aria-disabled") === "true")
     )
-      disabled.add(keyOf((part.props as { value?: unknown } | undefined)?.value ?? part.key))
+      disabled.add(keyFor(instance)((part.props as { value?: unknown } | undefined)?.value ?? part.key))
   return disabled
 }
 
@@ -880,13 +884,14 @@ function createAgent(
       // an autocomplete's value is text, which a person can still type.
       if (entry.component !== "autocomplete" && ["setValue", "select", "open", "toggle"].includes(action)) {
         const value = (instance.get() as { value?: unknown }).value
-        const held = (Array.isArray(value) ? value : [value]).map(keyOf)
+        const key = keyFor(instance)
+        const held = (Array.isArray(value) ? value : [value]).map(key)
         const disabled = disabledItems(entry, instance)
         // Options that render only while the list is open count as they were when listItems opened it.
         opened.get(instance)?.forEach((key) => disabled.add(key))
         opened.delete(instance)
         const blocked = (Array.isArray(args[0]) ? args[0] : [args[0]])
-          .map(keyOf)
+          .map(key)
           .find((item) => disabled.has(item) && !held.includes(item))
         if (blocked !== undefined) {
           const items = dataOf(entry, instance) ?? renderedItems(bound(instance))
