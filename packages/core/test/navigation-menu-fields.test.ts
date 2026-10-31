@@ -40,6 +40,24 @@ test("keys in a text field inside a panel move its caret, not focus", () => {
   }
 })
 
+test("keys in a text field inside a focusable shadow host move its caret, not focus", () => {
+  const panel = mountPanel('<a href="#a">A</a><x-field tabindex="0"></x-field><a href="#b">B</a>')
+  const host = panel.querySelector("x-field")!
+  const input = host
+    .attachShadow({ mode: "open", delegatesFocus: true })
+    .appendChild(document.createElement("input"))
+  input.focus()
+  const event = new KeyboardEvent("keydown", {
+    key: "ArrowLeft",
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+  })
+  input.dispatchEvent(event)
+  expect(event.defaultPrevented).toBe(false)
+  expect(host.shadowRoot!.activeElement).toBe(input)
+})
+
 test("arrow keys on a checkbox or button input inside a panel still move to the next link", () => {
   for (const type of ["checkbox", "submit", "button"]) {
     const panel = mountPanel(`<a href="#a">A</a><input type="${type}" aria-label="Pick"><a href="#b">B</a>`)

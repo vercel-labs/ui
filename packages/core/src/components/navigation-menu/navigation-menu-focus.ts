@@ -77,7 +77,10 @@ function createFocus(config: {
     panelKeydown(event: KeyboardEvent, panel: HTMLElement) {
       const target = event.target as HTMLElement
       // Keys from a nested menu's panel are its own.
-      if (isModified(event) || !ownsEvent(panel, event) || target.matches(fields)) return
+      // A field in a shadow root retargets the event to its host, so the path's first element is the field.
+      const origin = target.shadowRoot ? event.composedPath()[0] : target
+      const inField = origin instanceof Element ? origin.matches(fields) : target.matches(fields)
+      if (isModified(event) || !ownsEvent(panel, event) || inField) return
       const step = panelKey(event.key, isRTL(panel))
       if (step === undefined) return
       const links = tabbables(panel)
