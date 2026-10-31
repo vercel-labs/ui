@@ -9,7 +9,6 @@ test.beforeEach(async ({ open }) => {
   await open("menu")
 })
 
-// Caps the menu's height so its content scrolls, starting `fromEnd` pixels above the bottom.
 async function clip(menu: Locator, fromEnd: number) {
   await menu.evaluate(async (el, offset) => {
     el.style.maxHeight = "160px"
@@ -19,12 +18,14 @@ async function clip(menu: Locator, fromEnd: number) {
   }, fromEnd)
 }
 
-// Scrolls the menu's content so the middle of `item` sits at `y`, as a wheel would under a resting pointer.
 async function scrollUnder(menu: Locator, item: Locator, y: number) {
   const box = (await item.boundingBox())!
-  await menu.evaluate((el, by) => {
-    el.scrollTop += by
-  }, box.y + box.height / 2 - y)
+  await menu.evaluate(
+    (el, by) => {
+      el.scrollTop += by
+    },
+    box.y + box.height / 2 - y,
+  )
 }
 
 test.describe("trigger", () => {
@@ -421,7 +422,10 @@ test.describe("submenu with a pointer", () => {
     await expect(remove).toBeFocused()
   })
 
-  test("a closed submenu trigger that scrolls under a resting pointer stays closed", async ({ page, open }) => {
+  test("a closed submenu trigger that scrolls under a resting pointer stays closed", async ({
+    page,
+    open,
+  }) => {
     await page.clock.install()
     await open("menu")
     await page.getByRole("button", { name: "File" }).click()
