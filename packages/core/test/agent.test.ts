@@ -8,7 +8,7 @@ import { createAgent, registerTools, type AgentComponent } from "../src/page/age
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { datePicker } from "../src/components/date-picker/date-picker"
-import { input } from "../src/components/input/input"
+import { input, textarea } from "../src/components/input/input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
 import { progress } from "../src/components/progress/progress"
@@ -153,6 +153,27 @@ describe("agent", () => {
     expect(component).toMatchObject({ label: "Visibility", disabled: true, actions: [] })
     const outcome = await agent.act({ steps: [{ ref: "Visibility", action: "setValue", args: ["Public"] }] })
     expect(outcome.error?.message).toContain("takes no setValue now")
+  })
+
+  test.each([
+    ["input", input],
+    ["textarea", textarea],
+  ] as const)("a %s inside a disabled fieldset takes no actions", async (tag, make) => {
+    const agent = createAgent()
+    const instance = make({ id: "note" })
+    const fieldset = document.createElement("fieldset")
+    fieldset.disabled = true
+    const el = document.createElement(tag)
+    el.setAttribute("aria-label", "Note")
+    fieldset.append(el)
+    document.body.append(fieldset)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    await Promise.resolve()
+    const [component] = agent.snapshot()
+    expect(component).toMatchObject({ label: "Note", disabled: true, actions: [] })
+    const outcome = await agent.act({ steps: [{ ref: "Note", action: "setValue", args: ["Changed"] }] })
+    expect(outcome.error?.message).toContain("takes no setValue now")
+    expect(instance.get().value).not.toBe("Changed")
   })
 
   test("a component that leaves the page stays in the snapshot as off the page, with the state it had", async () => {

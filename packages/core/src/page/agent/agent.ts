@@ -240,9 +240,11 @@ function buttonsOf(parts: Bound[]) {
   return [...found]
 }
 
+const rootOf = (parts: Bound[]) => parts.find((part) => part.slot === "root" && !part.key)?.el
+
 // The button a component is, like a Button's root, which `press` presses with no text.
 function ownButton(parts: Bound[]) {
-  const root = parts.find((part) => part.slot === "root" && !part.key)?.el
+  const root = rootOf(parts)
   if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
 }
 
@@ -344,7 +346,8 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
     state.disabled === true ||
     state.formDisabled === true ||
     state.readOnly === true ||
-    ownButton(parts)?.matches(":disabled")
+    // A native root, like a Button's or an Input's, is disabled by a fieldset around it too.
+    rootOf(parts)?.matches(":disabled")
   if (disabled) out.disabled = true
   else {
     out.actions = actionsOf(entry, api)
