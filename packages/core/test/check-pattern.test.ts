@@ -369,6 +369,34 @@ test("a hand-made listbox passes when its styles hide an option, which arrows sk
   await checkPattern(root, "listbox")
 })
 
+test("a hand-made listbox passes when a stylesheet hides the group around options, which arrows skip", async () => {
+  const root = render(`
+    <div>
+    <style>.closed { display: none }</style>
+    <div role="listbox" aria-label="Fruit">
+      <div role="option" aria-selected="true" tabindex="0">Apple</div>
+      <div class="closed"><div role="option" aria-selected="false" tabindex="-1">Apricot</div></div>
+      <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+    </div>
+    </div>`)
+  rove(root, "[role=listbox] > [role=option]", { onMove: selectOnly("[role=option]") })
+  await checkPattern(root, "listbox")
+})
+
+test("a hand-made toolbar passes when a stylesheet hides a control, which arrows skip", async () => {
+  const root = render(`
+    <div>
+    <style>.closed { display: none }</style>
+    <div role="toolbar" aria-label="Format">
+      <button tabindex="0">Bold</button>
+      <span class="closed"><button tabindex="-1">Italic</button></span>
+      <button tabindex="-1">Underline</button>
+    </div>
+    </div>`)
+  rove(root, "[role=toolbar] > button", { next: "ArrowRight", previous: "ArrowLeft" })
+  await checkPattern(root, "toolbar")
+})
+
 describe("broken markup fails", () => {
   test("a tree branch whose group its styles hide, without aria-expanded", async () => {
     const root = render(`

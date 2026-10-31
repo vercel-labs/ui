@@ -58,10 +58,11 @@ const checkedOf = (el: Element) =>
 const isDisabled = (el: Element) =>
   el.getAttribute("aria-disabled") === "true" || (el as HTMLButtonElement).disabled === true
 
-function isTabStop(el: Element) {
+function isTabStop(el: Element, known: Map<Element, boolean>) {
   if (!el.matches(focusable) || isGone(el)) return false
   if ((el as HTMLElement).tabIndex < 0 || (el as HTMLButtonElement).disabled) return false
   if (el instanceof HTMLInputElement && el.type === "hidden") return false
+  if (isUndisplayed(el, known)) return false
   // Native radios that share a name are one stop: the checked one, else the first.
   if (el instanceof HTMLInputElement && el.type === "radio" && el.name) {
     const group = [...el.ownerDocument.querySelectorAll<HTMLInputElement>("input[type=radio]")].filter(
@@ -74,16 +75,19 @@ function isTabStop(el: Element) {
 
 /** The elements in `scope`, itself included, that Tab stops at. */
 function tabStops(scope: Element) {
-  return [scope, ...scope.querySelectorAll(focusable)].filter(isTabStop)
+  const known = new Map<Element, boolean>()
+  return [scope, ...scope.querySelectorAll(focusable)].filter((el) => isTabStop(el, known))
 }
 
 /** The elements in `scope` that can take focus, by Tab or by script, like roving items. */
 function focusables(scope: Element) {
+  const known = new Map<Element, boolean>()
   return [...scope.querySelectorAll(focusable)].filter(
     (el) =>
       !isGone(el) &&
       !(el as HTMLButtonElement).disabled &&
-      !(el instanceof HTMLInputElement && el.type === "hidden"),
+      !(el instanceof HTMLInputElement && el.type === "hidden") &&
+      !isUndisplayed(el, known),
   )
 }
 
