@@ -51,6 +51,12 @@ test.describe("right to left", () => {
     await expectShown(page, 2)
   })
 
+  test("dragging first follows the page when it turns left to right after mount", async ({ page }) => {
+    await page.evaluate(() => (document.documentElement.dir = "ltr"))
+    await drag(page, 0, -200)
+    await expectShown(page, 1)
+  })
+
   test("a carousel with three slides to a view pages from the right @enhancement", async ({ page, open }) => {
     await open("carousel", { dir: "rtl", "per-view": "3" })
     await expect(page.getByRole("tab")).toHaveCount(3)
@@ -81,6 +87,13 @@ test("a controlled page follows the page when it turns right to left after mount
   await page.evaluate(() => (document.documentElement.dir = "rtl"))
   await page.getByRole("button", { name: "Show page 3 by prop" }).click()
   await expectShown(page, 2)
+})
+
+test("dragging first follows the page when it turns right to left after mount", async ({ page, open }) => {
+  await open("carousel")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await drag(page, 0, 200)
+  await expectShown(page, 1)
 })
 
 test("Next in a looping carousel follows the page when it turns right to left after mount", async ({
