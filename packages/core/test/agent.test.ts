@@ -1121,6 +1121,24 @@ describe("agent act", () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  test("a press on a button disabled while its confirmation is pending fails, and closes the popup", async () => {
+    let answer: ((allowed: boolean) => void) | undefined
+    const agent = createAgent({
+      allow: (step) => !step.confirm || new Promise<boolean>((resolve) => (answer = resolve)),
+    })
+    const { instance, onClick } = await mountActions({ confirm: "Removes Tom from the team" })
+    const outcome = agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    await vi.waitFor(() => expect(answer).toBeDefined())
+    const remove = [...document.querySelectorAll("button")].find((el) => el.textContent === "Remove")!
+    remove.disabled = true
+    answer!(true)
+    const result = await outcome
+    expect(result).toMatchObject({ ok: false, error: { message: expect.stringContaining('"Remove"') } })
+    expect(result.error?.message).toContain("disabled")
+    expect(instance.get().open).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   test("a press allow refuses doesn't open the popup", async () => {
     const allow = vi.fn(() => false)
     const agent = createAgent({ allow })

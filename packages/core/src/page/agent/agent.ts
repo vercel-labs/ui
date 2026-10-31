@@ -650,14 +650,16 @@ function createAgent(
       throw new Error(
         `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
       )
-    if (button.matches(":disabled") || button.getAttribute("aria-disabled") === "true") {
+    const refuseDisabled = () => {
+      if (!button.matches(":disabled") && button.getAttribute("aria-disabled") !== "true") return
       if (opened) asAgent(() => api.setOpen!(false))
       throw new Error(`"${textOf(button) || accessibleName(button)}" in ${entry.ref} is disabled now.`)
     }
+    refuseDisabled()
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
     const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
     const close = () => asAgent(() => api.setOpen?.(false))
-    return { click: () => button.click(), button, pressed, opened, close }
+    return { click: () => button.click(), button, pressed, opened, close, refuseDisabled }
   }
 
   // The buttons a press can name, like a row menu's Make admin and Remove,
@@ -867,6 +869,8 @@ function createAgent(
       if (press?.opened) press.close()
       throw refused
     }
+    // The button can turn disabled while the person decides.
+    press?.refuseDisabled()
     if (guard && !guard()) {
       throw new Error(`The restoration of ${entry.ref} was superseded by a newer change.`)
     }
