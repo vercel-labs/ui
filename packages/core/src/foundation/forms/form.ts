@@ -230,29 +230,24 @@ const moves = new WeakMap<Element, () => void>()
 // changes. Vue binds before the element is in its parents, so fieldsets are
 // found a microtask later. Returns a cleanup.
 function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
-  let disabled = false
+  let disabled: boolean | undefined
   let observer: MutationObserver | undefined
   let active = true
   // A move out of a fieldset removes `el`, or a node between it and the
   // fieldset, from its parent, so those parents are watched too.
-  const observe = (observer: MutationObserver) => {
-    observer.disconnect()
-    for (let node = el.parentElement; node?.closest("fieldset"); node = node.parentElement)
-      observer.observe(node, { childList: true, attributeFilter: ["disabled"] })
+  const check = () => {
+    if (observer) {
+      observer.disconnect()
+      for (let node = el.parentElement; node?.closest("fieldset"); node = node.parentElement)
+        observer.observe(node, { childList: true, attributeFilter: ["disabled"] })
+    }
+    const now = fieldsetDisabled(el)
+    if (now !== disabled) onChange((disabled = now))
   }
   const watch = () => {
     if (!active) return
-    disabled = fieldsetDisabled(el)
-    onChange(disabled)
-    if (typeof MutationObserver === "undefined") return
-    const check = () => {
-      observe(observer!)
-      if (fieldsetDisabled(el) === disabled) return
-      disabled = !disabled
-      onChange(disabled)
-    }
-    observer = new MutationObserver(check)
-    observe(observer)
+    if (typeof MutationObserver !== "undefined") observer = new MutationObserver(check)
+    check()
     moves.set(el, check)
   }
   if (el.isConnected) watch()
