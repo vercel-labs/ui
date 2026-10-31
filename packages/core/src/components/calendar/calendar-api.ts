@@ -525,6 +525,12 @@ function calendarApi<
         pointer = event
         refused = null
       },
+      // A press on another month's day past min or max changes nothing, so the
+      // focused day keeps focus. That cell has no tabindex, and the page would blur it.
+      mousedown(event: MouseEvent, props: CalendarDayProps) {
+        const state = store.get()
+        if (isOutside(state, props) && outOfBounds(state, props.value)) event.preventDefault()
+      },
       hover(date: ISODate) {
         if (store.get().anchor !== null) store.set({ hover: date })
       },
@@ -704,6 +710,7 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
       on: {
         keydown: (event, { api, el, props }) => api.internal.keydown(event, el!, props),
         pointerdown: (event, { api }) => api.internal.pointerdown(event),
+        mousedown: (event, { api, props }) => api.internal.mousedown(event, props),
         pointerenter: (_event, { api, props }) => api.internal.hover(props.value),
       },
       bind: (el, part) => {

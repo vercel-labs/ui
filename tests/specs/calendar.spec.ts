@@ -243,6 +243,22 @@ test("pressing another month's day before min keeps the month shown", async ({ p
   await expect(status(page)).toHaveText("")
 })
 
+test("pressing another month's day before min leaves focus on the day that had it", async ({
+  page,
+  open,
+}) => {
+  await open("calendar", { min: "2026-10-01" })
+  await day(page, "2026-10-16").focus()
+  await page
+    .locator('[data-slot="calendar-day"][data-outside]', { hasText: /^28$/ })
+    .first()
+    .click({ force: true })
+  await expect(heading(page)).toHaveText("October 2026")
+  await expectFocused(page, "2026-10-16")
+  await page.keyboard.press("ArrowRight")
+  await expectFocused(page, "2026-10-17")
+})
+
 test("a controlled calendar shows what the app passes", async ({ page, open }) => {
   await open("calendar", { controlled: "", value: "2026-10-31" })
   await day(page, "2026-10-31").focus()
