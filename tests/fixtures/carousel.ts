@@ -32,7 +32,8 @@ const carouselFixture = {
 // slides to a view, ?slides-per-page=2|auto groups them, ?align=center,
 // ?loop, ?orientation=vertical, ?playing starts rotating with ?interval=<ms>,
 // ?default-page=3, ?cancel=<page> cancels changes to that page, ?no-drag turns
-// dragging off, ?skip-snaps and ?drag-free.
+// dragging off, ?skip-snaps and ?drag-free. ?controlled holds the page in the
+// fixture's state, where "Show page 3 by prop" sets it (React and Vue).
 function carouselOptions() {
   const params = new URLSearchParams(location.search)
   const perPage = params.get("slides-per-page")
@@ -46,6 +47,7 @@ function carouselOptions() {
     cancel: cancel === null ? null : Number(cancel),
     // Whether the page renders the play toggle: with rotation, or ?play-toggle without it.
     playToggle: params.has("playing") || params.has("play-toggle"),
+    controlled: params.has("controlled"),
     options: {
       ...(perPage && { slidesPerPage: perPage === "auto" ? ("auto" as const) : Number(perPage) }),
       ...(align && { align: align as "start" | "center" | "end" }),

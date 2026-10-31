@@ -71,6 +71,18 @@ test("Next and dragging follow the page when it turns right to left after mount"
   await expectShown(page, 2)
 })
 
+test("a controlled page follows the page when it turns right to left after mount", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(!["react", "vue"].includes(framework), "Only the React and Vue fixtures control the page.")
+  await open("carousel", { controlled: "" })
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await page.getByRole("button", { name: "Show page 3 by prop" }).click()
+  await expectShown(page, 2)
+})
+
 test("Next in a looping carousel follows the page when it turns right to left after mount", async ({
   page,
   open,

@@ -15,15 +15,17 @@ import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
 import { ref } from "vue"
 
 const controller = createCarouselController()
-const { perView, cancel, playToggle, options } = carouselOptions()
+const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+const page = ref(1)
 
 const action = ref("")
 const reason = ref("")
 const rested = ref("")
 
-function onPageChange(page: number, details: { reason: string; cancel: () => void }) {
-  if (page === cancel) return details.cancel()
-  action.value = String(page)
+function onPageChange(next: number, details: { reason: string; cancel: () => void }) {
+  if (next === cancel) return details.cancel()
+  if (controlled) page.value = next
+  action.value = String(next)
   reason.value = details.reason
 }
 </script>
@@ -35,7 +37,7 @@ function onPageChange(page: number, details: { reason: string; cancel: () => voi
       class="carousel"
       :aria-label="carouselFixture.label"
       :style="{ '--per-view': perView }"
-      v-bind="options"
+      v-bind="controlled ? { ...options, page } : options"
       :controller="controller"
       @page-change="onPageChange"
       @page-change-complete="(page: number) => (rested = String(page))"
@@ -76,6 +78,7 @@ function onPageChange(page: number, details: { reason: string; cancel: () => voi
     <output aria-label="Last reason">{{ reason }}</output>
     <output aria-label="Rested on">{{ rested }}</output>
     <button @click="controller.setPage(4)">Show page 4</button>
+    <button v-if="controlled" @click="page = 3">Show page 3 by prop</button>
     <CarouselNext :controller="controller">Next from outside</CarouselNext>
   </div>
 </template>

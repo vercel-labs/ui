@@ -434,6 +434,7 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     if (state.interval !== before.interval) writeInterval()
     if (state.page !== before.page) {
       autoplay.restart()
+      followDirection()
       followPage()
     }
     if (state.slidesPerPage !== before.slidesPerPage || state.align !== before.align) queueMeasure()
