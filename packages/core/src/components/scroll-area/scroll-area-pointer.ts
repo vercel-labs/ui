@@ -42,8 +42,11 @@ function createScrollbarInput(host: ScrollbarHost) {
   // The part whose drag or press is held, so a part leaving the page
   // mid-gesture ends its own instead of listening on the document until the pointer lifts.
   let holder: HTMLElement | undefined
+  // Ended where it is: only Escape puts the content back.
   const endPress = (el: HTMLElement) => {
-    if (holder === el) drags.cancel()
+    if (holder !== el) return
+    holder = undefined
+    drags.cancel()
   }
 
   // A scrollbar sits beside the viewport, not inside it, so a wheel over it
@@ -104,8 +107,8 @@ function createScrollbarInput(host: ScrollbarHost) {
         host.scrollTo(axis, draggedPosition(start, delta, host.metrics[axis], host.track[axis]))
       },
       onEnd: (_end, canceled) => {
+        if (canceled && holder === el) host.scrollTo(axis, start)
         holder = undefined
-        if (canceled) host.scrollTo(axis, start)
         restoreSnap()
         host.setDragging(null)
       },

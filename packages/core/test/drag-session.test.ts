@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { numberInput } from "../src/components/number-input/number-input"
 import { slider } from "../src/components/slider/slider"
+import { createScrollbarInput, type ScrollbarHost } from "../src/components/scroll-area/scroll-area-pointer"
 import { createArea, definePrimitive } from "../src/index"
 import { createDragSession } from "../src/foundation/drag-and-drop/pointer"
 import { mount } from "../src/testing/mount"
@@ -206,13 +207,67 @@ test("a held stepper that leaves the page stops for good, and its release commit
     input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
     vi.advanceTimersByTime(1000)
     const held = input.state.value
+    const removed = vi.spyOn(document, "removeEventListener")
     input.unmount()
+    expect(vi.getTimerCount()).toBe(0)
+    expect(removed.mock.calls.map(([type]) => type)).toContain("contextmenu")
+    removed.mockRestore()
     document.dispatchEvent(press("pointerup", { pointerType: "mouse" }))
     vi.advanceTimersByTime(2000)
     expect(input.state.value).toBe(held)
     expect(onValueCommit).not.toHaveBeenCalled()
-    expect(vi.getTimerCount()).toBe(0)
   } finally {
     vi.useRealTimers()
   }
+})
+
+test("a touch press while a mouse drags a slider leaves the drag to the mouse", () => {
+  const mounted = mountSlider({})
+  destroy.push(mounted.unmount)
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { pointerType: "mouse", clientX: 10, clientY: 5 }))
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 }))
+  expect(mounted.state.value).toBe(10)
+})
+
+function scrollbar() {
+  const viewport = document.body.appendChild(document.createElement("div"))
+  const thumb = document.body.appendChild(document.createElement("div"))
+  const metrics = {
+    x: { position: 0, client: 100, scroll: 100 },
+    y: { position: 100, client: 100, scroll: 1000 },
+  }
+  const host: ScrollbarHost = {
+    viewport: () => viewport,
+    metrics,
+    track: { x: 0, y: 100 },
+    rtl: () => false,
+    measure() {},
+    scrollTo: (axis, position) => void (metrics[axis].position = position),
+    release() {},
+    stopEasing() {},
+    setDragging() {},
+  }
+  const unbind = createScrollbarInput(host).bindThumb(thumb, "y")
+  thumb.dispatchEvent(press("pointerdown", { pointerType: "mouse", clientY: 10 }))
+  document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientY: 50 }))
+  return { metrics, unbind }
+}
+
+test("a scrollbar thumb that leaves the page mid-drag leaves the content where the drag took it", async () => {
+  const { metrics, unbind } = scrollbar()
+  await frame()
+  const dragged = metrics.y.position
+  expect(dragged).toBeGreaterThan(100)
+  unbind()
+  expect(metrics.y.position).toBe(dragged)
+})
+
+test("Escape mid-drag still puts a scrollbar's content back where the drag began", async () => {
+  const { metrics, unbind } = scrollbar()
+  destroy.push(unbind)
+  await frame()
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+  expect(metrics.y.position).toBe(100)
 })
