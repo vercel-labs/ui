@@ -41,7 +41,7 @@ type ReasonVocabulary = {
   "escape-key": KeyboardEvent
   /** Focus left the layer, or Tab moved it out. */
   "focus-out": FocusEvent | KeyboardEvent
-  /** Keyboard focus moved into the component, which stops a rotating carousel, as the carousel pattern asks, or onto a canvas item, which brought it into view. */
+  /** Keyboard focus moved into the component, which stops a rotating carousel, as the carousel pattern asks, or onto a canvas item, which brought it into view, or onto a calendar's day another way, like a screen reader's. */
   "focus-in": FocusEvent
   /** The window lost focus. */
   "window-blur": FocusEvent

@@ -27,7 +27,7 @@ export { on, selectEvent } from "./events"
 export { createHistory, type HistoryOptions } from "./history"
 export { css } from "./inline-style"
 export { keep, release, unwatched, whenKept } from "./keep"
-export { changeSource, createChange, createCommit, inputSource } from "./input-source"
+export { changeSource, createChange, createCommit, dispatch, inputSource } from "./input-source"
 export { applyAttrs, direct, live } from "./live"
 export {
   isFocusFromKeyboard,

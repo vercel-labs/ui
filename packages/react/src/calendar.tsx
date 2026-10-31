@@ -42,7 +42,6 @@ function Calendar({
   min,
   max,
   unavailable,
-  disabledDates,
   disabled,
   readOnly,
   deselectable,
@@ -76,7 +75,6 @@ function Calendar({
     min,
     max,
     unavailable,
-    disabledDates,
     disabled,
     readOnly,
     deselectable,
@@ -325,11 +323,13 @@ function CalendarDay({
 
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,

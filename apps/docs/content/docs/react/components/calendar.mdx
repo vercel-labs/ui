@@ -96,7 +96,7 @@ A range cannot include an unavailable date unless `allowUnavailable` is set. Tha
 
 ### Range in Progress
 
-The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `onAnchorChange` and `onFocusedChange` report them as they change, to show the range being picked outside the calendar. `focused` is reported once a day takes focus.
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `onAnchorChange` and `onFocusedChange` report them before they change, to show the range being picked outside the calendar, and canceling either keeps things as they were. A day that takes focus because the months turned reports nothing.
 
 <ComponentExample
   name="calendar/range-progress"
@@ -123,16 +123,9 @@ Unavailable dates cannot be selected, but stay focusable so keyboard and screen 
   caption="Try an unavailable date, then choose an available one. Unavailable days remain focusable so their state can be heard."
 />
 
-### Disabled Dates
+### Deselect
 
-`disabledDates` takes the same matchers for dates that cannot be focused either. Arrow keys pass over them and they never hold the Tab stop, so use it for dates nobody needs to hear about, like weekends in a calendar of business days.
-
-`deselectable` lets a second press on the selected date clear it.
-
-<ComponentExample
-  name="calendar/disabled-dates"
-  caption="Choose Friday, October 16, then press Right Arrow. Focus passes over the weekend. Choose the selected date again to clear it."
-/>
+`deselectable` lets a second press on the selected date clear it, in single mode.
 
 ### Min and Max
 
@@ -272,12 +265,12 @@ Props and callbacks are the same as below, as React props.
 
 Callbacks get the new value first, then the details.
 
-| Prop              | On         | Receives                                                            |
-| ----------------- | ---------- | ------------------------------------------------------------------- |
-| `onValueChange`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)       |
-| `onMonthChange`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons) |
-| `onFocusedChange` | `Calendar` | `(date)`: the day that took focus                                   |
-| `onAnchorChange`  | `Calendar` | `(date)`: a range's start, or `null` once it ends                   |
+| Prop              | On         | Receives                                                                               |
+| ----------------- | ---------- | -------------------------------------------------------------------------------------- |
+| `onValueChange`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)                          |
+| `onMonthChange`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons)                    |
+| `onFocusedChange` | `Calendar` | `(date, details)`: the day focus moves to, and the [reason](#reasons)                  |
+| `onAnchorChange`  | `Calendar` | `(date, details)`: a range's start, or `null` once it ends, and the [reason](#reasons) |
 
 ### Reasons
 
@@ -293,6 +286,20 @@ And why the month changed:
 <ReasonTable
   path="../../packages/core/src/components/calendar/calendar.ts"
   name="CalendarMonthChangeReason"
+/>
+
+Why focus moves to another day:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarFocusedChangeReason"
+/>
+
+And why a range's start changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarAnchorChangeReason"
 />
 
 ### Controller

@@ -164,37 +164,14 @@ function dateForKey(
   }
 }
 
-/**
- * A key's move, kept within `min` and `max`. Undefined when the key isn't the
- * grid's. A date `skips` names is passed over: arrows and pages go on the way
- * they went, Home and End come back toward `from`, which stays when nothing does.
- */
+/** A key's move, kept within `min` and `max`. Undefined when the key isn't the grid's. */
 function moveDate(
   event: { key: string; shiftKey?: boolean },
   from: ISODate,
-  options: {
-    rtl: boolean
-    weekStartsOn: number
-    min?: ISODate | null
-    max?: ISODate | null
-    skips?: (date: ISODate) => boolean
-  },
+  options: { rtl: boolean; weekStartsOn: number; min?: ISODate | null; max?: ISODate | null },
 ) {
   const to = dateForKey(event, from, options)
-  if (to === undefined) return undefined
-  let date = clampDate(to, options.min, options.max)
-  if (!options.skips?.(date)) return date
-  const vertical = event.key === "ArrowUp" || event.key === "ArrowDown"
-  const back = event.key === "Home" || event.key === "End"
-  const step = (to < from !== back ? -1 : 1) * (vertical ? 7 : 1)
-  // Ten years of dates, so a matcher that names every date can't loop forever.
-  for (let count = 0; count < 3660; count++) {
-    date = addDays(date, step)
-    const outside = (!!options.min && date < options.min) || (!!options.max && date > options.max)
-    if (outside || date === from) return from
-    if (!options.skips(date)) return date
-  }
-  return from
+  return to === undefined ? undefined : clampDate(to, options.min, options.max)
 }
 
 /**

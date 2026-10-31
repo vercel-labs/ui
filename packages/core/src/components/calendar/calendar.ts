@@ -31,6 +31,18 @@ type CalendarMonthChangeReason =
   "previous-press" | "next-press" | "list-navigation" | "item-press" | "select-change" | "imperative"
 
 /**
+ * Why focus wants to move to another day.
+ * @stable
+ */
+type CalendarFocusedChangeReason = "list-navigation" | "item-press" | "focus-in" | "imperative"
+
+/**
+ * Why a range's start wants to change.
+ * @stable
+ */
+type CalendarAnchorChangeReason = "item-press" | "escape-key"
+
+/**
  * Options for every write method on a controller.
  * @stable
  */
@@ -102,8 +114,6 @@ type CalendarOptions = {
    * them.
    */
   unavailable?: DateMatchers
-  /** Dates that can't be picked or focused, written like `unavailable`. Arrow keys pass over them, and they never hold the tab stop. */
-  disabledDates?: DateMatchers
   /** Whether nothing can be picked or focused. */
   disabled?: boolean
   /** Whether dates can be focused but not picked. */
@@ -113,10 +123,10 @@ type CalendarOptions = {
    * @defaultValue false
    */
   deselectable?: boolean
-  /** Runs when another day takes focus, as keys and presses move it. */
-  onFocusedChange?: (date: ISODate | null) => void
-  /** Runs when a range's start is picked and while its end isn't, with `null` once the range ends or Escape drops it. */
-  onAnchorChange?: (anchor: ISODate | null) => void
+  /** Runs before keys, a press or `focus()` move focus to another day. Canceling keeps focus where it was. */
+  onFocusedChange?: (date: ISODate, details: ChangeDetails<CalendarFocusedChangeReason>) => void
+  /** Runs before a press starts a range, or ends it or Escape drops it, with `null`. Canceling keeps the start as it was. */
+  onAnchorChange?: (anchor: ISODate | null, details: ChangeDetails<CalendarAnchorChangeReason>) => void
   /**
    * How many months show side by side, each in its own grid.
    * @defaultValue 1
@@ -284,7 +294,7 @@ type CalendarDayState = {
   today: boolean
   /** Whether it belongs to the month before or after its grid's. */
   outside: boolean
-  /** Whether it can't be picked: outside `min` and `max`, unavailable, named by `disabledDates`, or the calendar is disabled. */
+  /** Whether it can't be picked: outside `min` and `max`, unavailable, or the calendar is disabled. */
   disabled: boolean
   /** Whether `unavailable` names it. */
   unavailable: boolean
@@ -350,7 +360,6 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
     min: "string",
     max: "string",
     unavailable: "list",
-    disabledDates: "list",
     disabled: "boolean",
     readOnly: "boolean",
     deselectable: "boolean",
@@ -415,11 +424,13 @@ const calendar: CalendarPrimitive = calendarPrimitive
 
 export {
   calendar,
+  type CalendarAnchorChangeReason,
   type CalendarApi,
   type CalendarChangeOptions,
   type CalendarController,
   type CalendarDayProps,
   type CalendarDayState,
+  type CalendarFocusedChangeReason,
   type CalendarGridCell,
   type CalendarGridProps,
   type CalendarGridState,

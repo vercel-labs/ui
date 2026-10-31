@@ -63,7 +63,6 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
     min: props.min,
     max: props.max,
     unavailable: props.unavailable,
-    disabledDates: props.disabledDates,
     disabled: props.disabled,
     readOnly: props.readOnly,
     deselectable: props.deselectable,
@@ -96,7 +95,6 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
     "min",
     "max",
     "unavailable",
-    "disabledDates",
     "disabled",
     "readOnly",
     "deselectable",
@@ -335,11 +333,13 @@ function CalendarDay(props: PartProps<"td", CalendarDayState> & { value: string 
 
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,

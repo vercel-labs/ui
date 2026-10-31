@@ -118,16 +118,6 @@ const checks: Record<string, Check> = {
     await expectSelected(preview, "Thursday, October 8, 2026", false)
     await expectSelected(preview, "Friday, October 9, 2026")
   },
-  "disabled-dates": async (preview) => {
-    await expectUnavailable(preview, "Saturday, October 17, 2026")
-    await expect(day(preview, "Saturday, October 17, 2026")).not.toHaveAttribute("tabindex")
-    await day(preview, "Friday, October 16, 2026").click()
-    await expectSelected(preview, "Friday, October 16, 2026")
-    await preview.page().keyboard.press("ArrowRight")
-    await expect(day(preview, "Monday, October 19, 2026"), "arrow keys pass over the weekend").toBeFocused()
-    await day(preview, "Friday, October 16, 2026").click()
-    await expectSelected(preview, "Friday, October 16, 2026", false)
-  },
   "min-max": async (preview) => {
     await expect(step(preview, "Previous month")).toBeDisabled()
     await expectUnavailable(preview, "Sunday, October 4, 2026")

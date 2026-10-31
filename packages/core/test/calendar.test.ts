@@ -157,22 +157,6 @@ describe("the calendar model", () => {
     expect(moveDate({ key: "a" }, "2026-10-28", options)).toBeUndefined()
   })
 
-  test("keys pass over skipped dates, and Home and End come back toward where they started", () => {
-    const options = {
-      rtl: false,
-      weekStartsOn: 0,
-      skips: (date: string) => ["0", "6"].includes(date.slice(-1)),
-    }
-    expect(moveDate({ key: "ArrowRight" }, "2026-10-15", options)).toBe("2026-10-17")
-    expect(moveDate({ key: "ArrowUp" }, "2026-10-17", options)).toBe("2026-10-03")
-    expect(moveDate({ key: "Home" }, "2026-09-09", options)).toBe("2026-09-07")
-    expect(moveDate({ key: "End" }, "2026-10-07", options)).toBe("2026-10-09")
-    expect(moveDate({ key: "End" }, "2026-10-21", { ...options, skips: () => true })).toBe("2026-10-21")
-    expect(moveDate({ key: "ArrowRight" }, "2026-10-29", { ...options, max: "2026-10-30" })).toBe(
-      "2026-10-29",
-    )
-  })
-
   test("the months turn only as far as a date needs", () => {
     expect(monthToShow("2026-11-01", "2026-10", 1, "month")).toBe("2026-11")
     expect(monthToShow("2026-11-01", "2026-10", 2, "month")).toBe("2026-10")
@@ -437,17 +421,66 @@ describe("calendar", () => {
     await tick()
     expect(onFocusedChange).not.toHaveBeenCalled()
     day("2026-10-16").focus()
-    expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-16")
+    expect(onFocusedChange).not.toHaveBeenCalled()
+    day("2026-10-15").focus()
+    expect(onFocusedChange).toHaveBeenLastCalledWith(
+      "2026-10-15",
+      expect.objectContaining({ reason: "focus-in" }),
+    )
     press("ArrowRight")
-    expect(onFocusedChange).toHaveBeenLastCalledWith("2026-10-17")
+    expect(onFocusedChange).toHaveBeenLastCalledWith(
+      "2026-10-16",
+      expect.objectContaining({ reason: "list-navigation" }),
+    )
+    instance.api.focus("2026-10-20")
+    expect(onFocusedChange).toHaveBeenLastCalledWith(
+      "2026-10-20",
+      expect.objectContaining({ reason: "imperative" }),
+    )
     press("Enter")
-    expect(onAnchorChange).toHaveBeenLastCalledWith("2026-10-17")
+    expect(onAnchorChange).toHaveBeenLastCalledWith(
+      "2026-10-20",
+      expect.objectContaining({ reason: "item-press" }),
+    )
     expect(partState(instance.part("root", {}))).toMatchObject({
-      focused: "2026-10-17",
-      anchor: "2026-10-17",
+      focused: "2026-10-20",
+      anchor: "2026-10-20",
     })
     press("Escape")
-    expect(onAnchorChange).toHaveBeenLastCalledWith(null)
+    expect(onAnchorChange).toHaveBeenLastCalledWith(null, expect.objectContaining({ reason: "escape-key" }))
+    expect(onFocusedChange).toHaveBeenCalledTimes(3)
+  })
+
+  test("canceling a focus change keeps focus on the day it was on", async () => {
+    const { day, press, focused, instance } = mount({
+      onFocusedChange: (date, details) => {
+        if (date !== "2026-10-16") details.cancel()
+      },
+    })
+    await tick()
+    day("2026-10-16").focus()
+    press("ArrowRight")
+    instance.api.focus("2026-11-20")
+    day("2026-10-12").focus()
+    await tick()
+    expect(focused()).toBe("2026-10-16")
+    expect(instance.api.getMonth()).toBe("2026-10")
+    expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
+  })
+
+  test("canceling an anchor change keeps a range's start as it was", async () => {
+    let cancel = false
+    const { day, instance } = mount({
+      mode: "range",
+      onAnchorChange: (_anchor, details) => {
+        if (cancel) details.cancel()
+      },
+    })
+    day("2026-10-16").click()
+    cancel = true
+    day("2026-10-20").click()
+    expect(instance.api.getValue()).toBeNull()
+    expect(partState(instance.part("root", {}))).toMatchObject({ anchor: "2026-10-16" })
   })
 
   test("deselectable clears the selected date when it's pressed again", () => {
@@ -458,67 +491,6 @@ describe("calendar", () => {
     expect(onValueChange).toHaveBeenLastCalledWith(null, expect.objectContaining({ reason: "item-press" }))
     day("2026-10-16").click()
     expect(instance.api.getValue()).toBe("2026-10-16")
-  })
-
-  test("arrow keys still move from a focused day that disabledDates disables", async () => {
-    const { day, press, focused, instance } = mount({ defaultValue: "2026-10-16" })
-    await tick()
-    day("2026-10-16").focus()
-    instance.setOptions({
-      id: "c",
-      today: "2026-10-16",
-      defaultValue: "2026-10-16",
-      disabledDates: ["2026-10-16"],
-    })
-    await tick()
-    expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
-    press("ArrowRight")
-    await tick()
-    expect(focused()).toBe("2026-10-17")
-    expect(day("2026-10-16").hasAttribute("tabindex")).toBe(false)
-  })
-
-  test("a disabled date takes focus neither from a press on another month's day nor from focus()", async () => {
-    const { day, focused, instance } = mount({
-      defaultValue: "2026-10-16",
-      disabledDates: ["2026-10-14", "2026-09-29"],
-    })
-    await tick()
-    day("2026-10-16").focus()
-    instance.api.focus("2026-10-14")
-    await tick()
-    expect(focused()).toBe("2026-10-16")
-    document.querySelector<HTMLElement>('[data-value="2026-09-29"][data-outside]')!.click()
-    await tick()
-    expect(focused()).toBe("2026-10-16")
-    expect(instance.api.getMonth()).toBe("2026-10")
-  })
-
-  test("disabled dates take no tab stop, can't be picked, and arrow keys pass over them", async () => {
-    const { day, press, focused, stops, instance } = mount({
-      defaultValue: "2026-10-16",
-      disabledDates: [{ weekday: [0, 6] }, "2026-10-14"],
-    })
-    await tick()
-    expect(day("2026-10-17").hasAttribute("tabindex")).toBe(false)
-    expect(day("2026-10-17").getAttribute("aria-disabled")).toBe("true")
-    day("2026-10-17").click()
-    expect(instance.api.getValue()).toBe("2026-10-16")
-    day("2026-10-16").focus()
-    press("ArrowRight")
-    await tick()
-    expect(focused()).toBe("2026-10-19")
-    press("ArrowLeft")
-    await tick()
-    expect(focused()).toBe("2026-10-16")
-    press("ArrowLeft")
-    press("ArrowLeft")
-    await tick()
-    expect(focused()).toBe("2026-10-13")
-    press("ArrowDown")
-    press("ArrowDown")
-    await tick()
-    expect(stops()).toEqual(["2026-10-27"])
   })
 
   test("unavailable dates are focusable but can't be picked", async () => {

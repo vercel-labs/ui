@@ -33,12 +33,14 @@ import { createFocusRecovery } from "../../foundation/focus/focus-recovery"
 import { isDisabled } from "../../foundation/forms/form"
 import { bindPageLocale, localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext, SlotFactory } from "../../foundation/kernel/primitive-types"
-import { createChange } from "../../foundation/kernel/input-source"
+import { createChange, dispatch } from "../../foundation/kernel/input-source"
 import { selects } from "../../foundation/kernel/selects"
 import type {
+  CalendarAnchorChangeReason,
   CalendarChangeOptions,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridProps,
   CalendarGridState,
   CalendarHeadingState,
@@ -66,7 +68,6 @@ type CalendarModelState = {
   min: ISODate | null
   max: ISODate | null
   unavailable: DateMatchers | null
-  disabledDates: DateMatchers | null
   disabled: boolean
   readOnly: boolean
   deselectable: boolean
@@ -93,7 +94,6 @@ const calendarSettings = (options: CalendarOptions) => ({
   min: dateOrNull(options.min),
   max: dateOrNull(options.max),
   unavailable: options.unavailable ?? null,
-  disabledDates: options.disabledDates ?? null,
   disabled: !!options.disabled,
   readOnly: !!options.readOnly,
   deselectable: !!options.deselectable,
@@ -111,12 +111,10 @@ const calendarSettings = (options: CalendarOptions) => ({
 
 const weekStartOf = (state: State) => state.weekStartsOn ?? firstDayOfWeek(localeOf(state))
 const unavailableDate = (state: State, date: ISODate) => matchesDate(date, state.unavailable)
-const disabledDate = (state: State, date: ISODate) => matchesDate(date, state.disabledDates)
 const outOfBounds = (state: State, date: ISODate) =>
   (state.min !== null && date < state.min) || (state.max !== null && date > state.max)
 // A date that can't be picked. The calendar being disabled is checked apart.
-const blockedDate = (state: State, date: ISODate) =>
-  outOfBounds(state, date) || unavailableDate(state, date) || disabledDate(state, date)
+const blockedDate = (state: State, date: ISODate) => outOfBounds(state, date) || unavailableDate(state, date)
 const sameDates = (a: CalendarValue, b: CalendarValue) => String(a) === String(b)
 const gridMonth = (state: State, offset: number | undefined) => addMonthsTo(state.month, offset ?? 0)
 const isOutside = (state: State, props: CalendarDayProps) =>
@@ -126,7 +124,7 @@ const rangeRules = (state: State) => ({
   minDays: state.minDays,
   maxDays: state.maxDays,
   allowUnavailable: state.allowUnavailable,
-  isUnavailable: (date: ISODate) => unavailableDate(state, date) || disabledDate(state, date),
+  isUnavailable: (date: ISODate) => unavailableDate(state, date),
 })
 
 // The month a calendar opens on: the selection's, else today's, within `min` and `max`.
@@ -327,23 +325,19 @@ function calendarApi<
     // Unavailable dates stay focusable, as the date picker pattern asks; they just can't be picked.
     disabled: (day) => blockedDate(store.get(), day.key),
     // Days of the months around a grid show it, but focus moves through each grid's own.
-    // A focused day that becomes disabled keeps focus until the arrow keys move it.
-    focusable: (day) =>
-      !isDisabled(store.get()) &&
-      !isOutside(store.get(), day.props) &&
-      (!disabledDate(store.get(), day.key) || day.key === store.get().focused),
+    focusable: (day) => !isDisabled(store.get()) && !isOutside(store.get(), day.props),
     preferred: (day) => day.key === preferredDate(store.get()),
     claims: (state, day) => !isOutside(state, day.props) && day.key === preferredDate(state),
     move: (event, { from, rtl }) => {
       if (event.ctrlKey || event.metaKey) return
       const state = store.get()
-      return moveDate(event, from.key, {
+      const to = moveDate(event, from.key, {
         rtl,
         weekStartsOn: weekStartOf(state),
         min: state.min,
         max: state.max,
-        skips: state.disabledDates ? (date) => disabledDate(state, date) : undefined,
       })
+      return to === undefined || moveFocus(to, "list-navigation", event) ? to : from.key
     },
   })
   // A day of next month that took focus before its month showed leaves the
@@ -352,25 +346,50 @@ function calendarApi<
     fallback: (lost) => element("day", lost.key),
   })
 
-  // Reported as focus lands on a day, so a stop the calendar settles on
-  // itself, on load or after a script turns the month, reports nothing.
-  let focused: ISODate | null = null
-  function focusLanded(date: ISODate) {
-    if (date === focused) return
-    focused = date
-    options().onFocusedChange?.(date)
+  // A move to `approved` was asked before focus went, so landing there asks nothing.
+  let approved: ISODate | null = null
+  let pointer: PointerEvent | undefined
+  function moveFocus(date: ISODate, reason: CalendarFocusedChangeReason, event?: Event) {
+    if (date === store.get().focused) return true
+    if (dispatch(context, "onFocusedChange", date, { reason, event })) return false
+    approved = date
+    return true
   }
 
-  let { anchor } = store.get()
-  context.onDestroy(
-    store.subscribe(() => {
-      const state = store.get()
-      if (state.anchor !== anchor) {
-        anchor = state.anchor
-        options().onAnchorChange?.(anchor)
-      }
-    }),
-  )
+  // Focus a pointer or a script put on a day, past `moveFocus`. A stop the
+  // calendar settles on itself, on load or as the months turn, asks nothing.
+  function focusLanded(date: ISODate, event: FocusEvent) {
+    const from = store.get().focused
+    const press = pointer
+    pointer = undefined
+    if (date === approved) approved = null
+    else if (
+      date !== from &&
+      from !== null &&
+      dispatch(
+        context,
+        "onFocusedChange",
+        date,
+        press ? { reason: "item-press", event: press } : { reason: "focus-in", event },
+      )
+    ) {
+      // Before the roving focus hears it, which would move the stop here.
+      event.stopImmediatePropagation()
+      roving.focus(from)
+    }
+  }
+
+  function setAnchor(
+    anchor: ISODate | null,
+    hover: ISODate | null,
+    reason: CalendarAnchorChangeReason,
+    event?: Event,
+  ) {
+    if (anchor !== store.get().anchor && dispatch(context, "onAnchorChange", anchor, { reason, event }))
+      return false
+    store.set({ anchor, hover })
+    return true
+  }
 
   function setMonth(month: ISOMonth, reason: MonthChangeReason, event?: Event) {
     if (!isISOMonth(month)) return false
@@ -405,7 +424,7 @@ function calendarApi<
       )
     } else if (state.mode === "range") {
       const pressed = pressRange(state.anchor, date, rangeRules(state))
-      store.set({ anchor: pressed.anchor, hover: pressed.anchor === null ? null : date })
+      if (!setAnchor(pressed.anchor, pressed.anchor === null ? null : date, "item-press", event)) return
       if (
         pressed.value &&
         (setValue(pressed.value, "item-press", event) || sameDates(store.get().value, pressed.value))
@@ -435,7 +454,7 @@ function calendarApi<
       if (!isISODate(date)) return
       const state = store.get()
       const target = clampDate(date, state.min, state.max)
-      if (disabledDate(state, target)) return
+      if (!moveFocus(target, "imperative")) return
       reveal(target, "imperative")
       roving.focus(target)
     },
@@ -453,8 +472,9 @@ function calendarApi<
         // Safari doesn't focus a cell on click, so arrow keys would go nowhere.
         if (el && !isOutside(state, props) && el.ownerDocument.activeElement !== el)
           el.focus({ preventScroll: true })
+        pointer = undefined
         pick(props.value, event)
-        if (isOutside(store.get(), props) && !disabledDate(store.get(), props.value)) {
+        if (isOutside(store.get(), props) && moveFocus(props.value, "item-press", event)) {
           reveal(props.value, "item-press", event)
           roving.focus(props.value)
         }
@@ -478,15 +498,17 @@ function calendarApi<
           return
         }
         // Escape drops the start of a range being picked, before it closes anything.
-        if (event.key === "Escape" && state.anchor !== null) {
+        if (event.key === "Escape" && state.anchor !== null && setAnchor(null, null, "escape-key", event)) {
           event.preventDefault()
-          store.set({ anchor: null, hover: null })
           return
         }
         const moved = roving.keydown(event, el)
         if (!moved || moved.key === moved.from) return
         reveal(moved.key, "list-navigation", event)
         if (store.get().anchor !== null) store.set({ hover: moved.key })
+      },
+      pointerdown(event: PointerEvent) {
+        pointer = event
       },
       hover(date: ISODate) {
         if (store.get().anchor !== null) store.set({ hover: date })
@@ -646,13 +668,7 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
         const range = shownRange(state)
         return {
           role: "gridcell",
-          // A browser blurs an element whose tabindex goes, so the focused day keeps it.
-          tabindex:
-            isDisabled(state) ||
-            day.outside ||
-            (disabledDate(state, props.value) && props.value !== state.focused)
-              ? undefined
-              : api.internal.roving.tabIndex(state, part),
+          tabindex: isDisabled(state) || day.outside ? undefined : api.internal.roving.tabIndex(state, part),
           "aria-label": formatDate(props.value, localeOf(state)),
           "aria-selected": day.outside ? undefined : String(day.selected),
           "aria-disabled": day.disabled ? "true" : undefined,
@@ -672,10 +688,12 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
       press: ({ api, props, el }, event) => api.internal.press(props, event, el),
       on: {
         keydown: (event, { api, el, props }) => api.internal.keydown(event, el!, props),
+        pointerdown: (event, { api }) => api.internal.pointerdown(event),
         pointerenter: (_event, { api, props }) => api.internal.hover(props.value),
       },
       bind: (el, part) => {
-        const landed = () => part.api.internal.focusLanded(part.props.value)
+        const landed = (event: FocusEvent) => part.api.internal.focusLanded(part.props.value, event)
+        // Ahead of the roving focus, which moves the stop to where focus lands.
         el.addEventListener("focus", landed)
         const cleanups = [
           part.api.internal.roving.bind(el, part),

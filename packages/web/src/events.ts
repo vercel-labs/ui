@@ -71,13 +71,16 @@ import type {
 } from "@ui-sdk/core/slider"
 import type { PaginationController, PaginationPageChangeReason } from "@ui-sdk/core/pagination"
 import type {
+  CalendarAnchorChangeReason,
   CalendarController,
+  CalendarFocusedChangeReason,
   CalendarMonthChangeReason,
   CalendarValue,
   CalendarValueChangeReason,
   DateMatchers,
   ISOMonth,
 } from "@ui-sdk/core/calendar"
+import type { ISODate } from "@ui-sdk/core/date"
 import type {
   DatePickerController,
   DatePickerDismissReason,
@@ -890,8 +893,8 @@ interface UiPaginationElement
 type CalendarEvents = {
   valuechange: UiChangeEvent<CalendarValue, CalendarValueChangeReason>
   monthchange: UiChangeEvent<ISOMonth, CalendarMonthChangeReason>
-  focusedchange: CustomEvent<{ value: string | null }>
-  anchorchange: CustomEvent<{ value: string | null }>
+  focusedchange: UiChangeEvent<ISODate, CalendarFocusedChangeReason>
+  anchorchange: UiChangeEvent<ISODate | null, CalendarAnchorChangeReason>
 }
 /**
  * `<ui-calendar>`: `value` and `month`, the controller's methods on `api`, and typed events.
@@ -900,18 +903,13 @@ type CalendarEvents = {
 interface UiCalendarElement
   extends
     UiElement<CalendarEvents>,
-    AttributeProperties<
-      typeof calendar,
-      "api" | "controller" | "disabledDates" | "month" | "unavailable" | "value"
-    > {
+    AttributeProperties<typeof calendar, "api" | "controller" | "month" | "unavailable" | "value"> {
   value: CalendarValue
   month: ISOMonth
   api: CalendarController
   controller?: CalendarController
   /** Dates that can't be picked, as any matcher, like `{ weekday: [0, 6] }`. The attribute takes a list of dates. */
   unavailable?: DateMatchers
-  /** Dates that can't be picked or focused, as any matcher. The attribute takes a list of dates. */
-  disabledDates?: DateMatchers
 }
 
 /**

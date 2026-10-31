@@ -126,7 +126,6 @@ type DatePickerOptions = Omit<
   | "onValueChange"
   | "onMonthChange"
   | "controller"
-  | "disabledDates"
   | "deselectable"
   | "onFocusedChange"
   | "onAnchorChange"
