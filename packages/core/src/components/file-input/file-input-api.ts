@@ -6,6 +6,7 @@ import { announce } from "../../foundation/platform/announce"
 import { isRTL } from "../../foundation/platform/env"
 import { moveIndex, radioStep } from "../../foundation/focus/collection"
 import { parseAccept, validateFiles, type FileLike, type FileRejection } from "../../foundation/forms/files"
+import { writingFromScript } from "../../foundation/forms/value"
 import {
   associate,
   bindInternals,
@@ -148,6 +149,7 @@ function fileInputApi(
   let echoing = false
   function echoChange() {
     const el = formElement()
+    if (el && writingFromScript(el)) return
     queueMicrotask(() => {
       if (!el?.isConnected) return
       echoing = true

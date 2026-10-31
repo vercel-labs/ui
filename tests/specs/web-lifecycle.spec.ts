@@ -344,6 +344,7 @@ test("state set from script fires no input or change events, like a native contr
         </ui-select-content>
       </ui-select>
       <ui-input><input name="note" aria-label="Note" /></ui-input>
+      <ui-file-input></ui-file-input>
       <input type="checkbox" name="native" />`
     document.querySelector("#stage")!.append(form)
     await tick()
@@ -353,6 +354,7 @@ test("state set from script fires no input or change events, like a native contr
     }
     const select = form.querySelector("ui-select") as HTMLElement & { value: string }
     const note = form.querySelector("ui-input") as HTMLElement & { value: string }
+    const upload = form.querySelector("ui-file-input") as HTMLElement & { value: File[] }
     const heard: string[] = []
     for (const type of ["input", "change"])
       form.addEventListener(type, (event) => heard.push(`${type} ${(event.target as Element).localName}`))
@@ -360,6 +362,7 @@ test("state set from script fires no input or change events, like a native contr
     select.value = "banana"
     select.setAttribute("value", "apple")
     note.value = "Leave at the door"
+    upload.value = [new File(["Receipt"], "receipt.pdf")]
     form.querySelector<HTMLInputElement>("input[type=checkbox]")!.checked = true
     await tick()
     const quiet = [...heard]

@@ -60,4 +60,4 @@ export {
   toggleState,
   type ToggleState,
 } from "./toggle-control"
-export { afterReset, type TextControl, watchValue, writeValue } from "./value"
+export { afterReset, type TextControl, watchValue, writeValue, writingFromScript } from "./value"
