@@ -496,6 +496,28 @@ describe("bindDragPreview", () => {
     preview.remove()
     expect(copy.isConnected).toBe(false)
   })
+
+  test("leaves a checked radio in the element checked, and shows it checked in the copy", () => {
+    const el = rectBox(10, 20, 100, 40)
+    el.innerHTML = '<input type="radio" name="default" value="a" checked> Card A'
+    const other = rectBox(10, 60, 100, 40)
+    other.innerHTML = '<input type="radio" name="default" value="b"> Card B'
+    const radio = el.querySelector("input")!
+    const preview = bindDragPreview(el, { x: 15, y: 25 })
+    expect(preview.el.querySelector("input")!.checked).toBe(true)
+    expect(radio.checked).toBe(true)
+    preview.remove()
+    expect(radio.checked).toBe(true)
+  })
+
+  test("keeps other names in the copy, like an icon's", () => {
+    const el = rectBox(10, 20, 100, 40)
+    el.innerHTML = '<ui-icon name="grip"></ui-icon><input name="title" value="Card A">'
+    const preview = bindDragPreview(el, { x: 15, y: 25 })
+    expect(preview.el.querySelector("ui-icon")!.getAttribute("name")).toBe("grip")
+    expect(preview.el.querySelector("input")!.getAttribute("name")).toBe("title")
+    preview.remove()
+  })
 })
 
 describe("createArea", () => {
