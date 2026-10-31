@@ -58,6 +58,16 @@ test("keys in a text field inside a focusable shadow host move its caret, not fo
   expect(host.shadowRoot!.activeElement).toBe(input)
 })
 
+test('arrow keys on a contenteditable="False" tab stop inside a panel still move to the next link', () => {
+  const panel = mountPanel(
+    '<a href="#a">A</a><span tabindex="0" contenteditable="False">Note</span><a href="#b">B</a>',
+  )
+  panel.querySelector("span")!.focus()
+  const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true })
+  document.activeElement!.dispatchEvent(event)
+  expect(document.activeElement).toBe(panel.querySelector('a[href="#b"]'))
+})
+
 test("arrow keys on a checkbox or button input inside a panel still move to the next link", () => {
   for (const type of ["checkbox", "submit", "button"]) {
     const panel = mountPanel(`<a href="#a">A</a><input type="${type}" aria-label="Pick"><a href="#b">B</a>`)

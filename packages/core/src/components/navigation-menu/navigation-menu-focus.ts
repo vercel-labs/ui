@@ -10,7 +10,7 @@ import { isModified, listKey, panelKey, stepIndex } from "./navigation-menu-keyb
 
 // Fields in a panel, like a search box, keep the keys that move their caret or value.
 const fields =
-  'input:not([type="checkbox"], [type="button"], [type="submit"], [type="reset"], [type="image"]), textarea, select, [contenteditable]:not([contenteditable="false"])'
+  'input:not([type="checkbox"], [type="button"], [type="submit"], [type="reset"], [type="image"]), textarea, select, [contenteditable]:not([contenteditable="false" i])'
 
 function createFocus(config: {
   orientation: () => "horizontal" | "vertical"
