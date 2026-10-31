@@ -8,6 +8,10 @@ import { nextTabbable, tabbables } from "../../foundation/focus/tabbable"
 import { ownsEvent } from "../../foundation/popups/popup-elements"
 import { isModified, listKey, panelKey, stepIndex } from "./navigation-menu-keyboard"
 
+// Fields in a panel, like a search box, keep the keys that move their caret or value.
+const fields =
+  'input:not([type="checkbox"], [type="button"], [type="submit"], [type="reset"], [type="image"]), textarea, select, [contenteditable]:not([contenteditable="false"])'
+
 function createFocus(config: {
   orientation: () => "horizontal" | "vertical"
   value: () => string | null
@@ -73,7 +77,7 @@ function createFocus(config: {
     panelKeydown(event: KeyboardEvent, panel: HTMLElement) {
       const target = event.target as HTMLElement
       // Keys from a nested menu's panel are its own.
-      if (isModified(event) || !ownsEvent(panel, event)) return
+      if (isModified(event) || !ownsEvent(panel, event) || target.matches(fields)) return
       const step = panelKey(event.key, isRTL(panel))
       if (step === undefined) return
       const links = tabbables(panel)

@@ -1,0 +1,52 @@
+// @vitest-environment jsdom
+import { afterEach, expect, test, vi } from "vitest"
+import { createFocus } from "../src/components/navigation-menu/navigation-menu-focus"
+
+afterEach(() => {
+  vi.restoreAllMocks()
+  document.body.replaceChildren()
+})
+
+function mountPanel(html: string) {
+  vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([{}] as unknown as DOMRectList)
+  const panel = document.createElement("div")
+  panel.setAttribute("data-slot", "navigation-menu-content")
+  panel.innerHTML = html
+  document.body.append(panel)
+  const focus = createFocus({
+    orientation: () => "horizontal",
+    value: () => "a",
+    list: () => undefined,
+    triggers: () => [],
+    links: () => [],
+    trigger: () => undefined,
+    content: () => panel,
+    panel: () => panel,
+    open: () => {},
+  })
+  panel.addEventListener("keydown", (event) => focus.panelKeydown(event, panel))
+  return panel
+}
+
+test("keys in a text field inside a panel move its caret, not focus", () => {
+  const panel = mountPanel('<a href="#a">A</a><input aria-label="Search" value="docs"><a href="#b">B</a>')
+  const input = panel.querySelector("input")!
+  input.focus()
+  for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
+    const event = new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+    input.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+    expect(document.activeElement).toBe(input)
+  }
+})
+
+test("arrow keys on a checkbox or button input inside a panel still move to the next link", () => {
+  for (const type of ["checkbox", "submit", "button"]) {
+    const panel = mountPanel(`<a href="#a">A</a><input type="${type}" aria-label="Pick"><a href="#b">B</a>`)
+    panel.querySelector("input")!.focus()
+    const event = new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true })
+    document.activeElement!.dispatchEvent(event)
+    expect(document.activeElement).toBe(panel.querySelector('a[href="#b"]'))
+    panel.remove()
+  }
+})
