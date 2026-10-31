@@ -1,3 +1,4 @@
+import type { Locator } from "@playwright/test"
 import { expect, focusIsWithin, isSheet, lastAction, menuNamed, test, waitForStill } from "../fixtures"
 import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
 
@@ -7,6 +8,24 @@ import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/po
 test.beforeEach(async ({ open }) => {
   await open("menu")
 })
+
+// Caps the menu's height so its content scrolls, starting `fromEnd` pixels above the bottom.
+async function clip(menu: Locator, fromEnd: number) {
+  await menu.evaluate(async (el, offset) => {
+    el.style.maxHeight = "160px"
+    el.style.overflowY = "auto"
+    await new Promise(requestAnimationFrame)
+    el.scrollTop = el.scrollHeight - el.clientHeight - offset
+  }, fromEnd)
+}
+
+// Scrolls the menu's content so the middle of `item` sits at `y`, as a wheel would under a resting pointer.
+async function scrollUnder(menu: Locator, item: Locator, y: number) {
+  const box = (await item.boundingBox())!
+  await menu.evaluate((el, by) => {
+    el.scrollTop += by
+  }, box.y + box.height / 2 - y)
+}
 
 test.describe("trigger", () => {
   test("advertises its menu and reflects the open state", async ({ page }) => {
@@ -383,11 +402,7 @@ test.describe("submenu with a pointer", () => {
   }) => {
     await page.getByRole("button", { name: "File" }).click()
     const menu = menuNamed(page, "File")
-    await menu.evaluate((el) => {
-      el.style.maxHeight = "160px"
-      el.style.overflowY = "auto"
-      el.scrollTop = el.scrollHeight
-    })
+    await clip(menu, 0)
     const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
     const x = share.x + 12
     const y = share.y + share.height / 2
@@ -401,20 +416,29 @@ test.describe("submenu with a pointer", () => {
     const remove = page.getByRole("menuitem", { name: "Delete" })
     await expect(remove).toBeFocused()
 
-    const under = await menu.evaluate(
-      (el, [px, py]) => {
-        while (el.scrollTop > 0) {
-          el.scrollTop -= 4
-          const item = document.elementFromPoint(px, py)?.closest("[role^='menuitem']")
-          if (item && !item.textContent?.includes("Share")) return item.textContent
-        }
-        return null
-      },
-      [x, y],
-    )
-    expect(under).not.toBeNull()
+    await scrollUnder(menu, page.getByRole("menuitemradio", { name: "Size" }), y)
     await page.mouse.move(x, y)
     await expect(remove).toBeFocused()
+  })
+
+  test("a closed submenu trigger that scrolls under a resting pointer stays closed", async ({ page, open }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const menu = menuNamed(page, "File")
+    await clip(menu, 60)
+    const size = page.getByRole("menuitemradio", { name: "Size" })
+    const box = (await size.boundingBox())!
+    const x = box.x + 12
+    const y = box.y + box.height / 2
+    await page.mouse.move(x, y)
+    await expect(size).toBeFocused()
+
+    await scrollUnder(menu, page.getByRole("menuitem", { name: "Share" }), y)
+    await page.mouse.move(x, y)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await expect(size).toBeFocused()
   })
 })
 
