@@ -358,6 +358,33 @@ describe("our popups on the kit", () => {
     instance.destroy()
   })
 
+  test("Popover that mounts open and whose only trigger renders again returns focus to the new one", async () => {
+    for (const options of [{ defaultOpen: true }, { open: true }]) {
+      const instance = popover({ id: "p", ...options })
+      const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+      const [first, after] = [button("Open"), button("After")]
+      const content = document.createElement("div")
+      const inside = content.appendChild(button("Inside"))
+      document.body.append(first, after, content)
+      const unbindContent = bind(instance.part("content"), content)
+      const unbindFirst = bind(instance.part("trigger", { id: "t1" }), first)
+      await frame()
+      inside.focus()
+      unbindFirst()
+      const second = button("Close")
+      first.replaceWith(second)
+      const unbindSecond = bind(instance.part("trigger", { id: "t2" }), second)
+      instance.api.close()
+      if ("open" in options) instance.setOptions({ id: "p", open: false })
+      await frame()
+      expect(document.activeElement).toBe(second)
+      unbindSecond()
+      unbindContent()
+      instance.destroy()
+      document.body.replaceChildren()
+    }
+  })
+
   test("Popover whose triggers all bind again while open keeps the one that opened it", async () => {
     const instance = popover({ id: "p" })
     const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })

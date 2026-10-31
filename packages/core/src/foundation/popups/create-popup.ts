@@ -275,11 +275,13 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
   // An open after that trigger was already gone, from code or the `open` option, falls back like
   // `triggerElement`, and so does a popup's only trigger, like the same button rendered again.
   let goneAtOpen: string | null = null
-  let onlyTrigger = false
+  // A popup that mounts open has no triggers yet when it opens, so it counts them as it closes.
+  let onlyTrigger: boolean | undefined
   const openedFrom = () => {
     const key = store.get().trigger
     if (rules?.trigger || key === null || key === goneAtOpen) return triggerElement()
-    return element(triggerSlot, key) ?? (onlyTrigger ? element(triggerSlot) : undefined)
+    const only = onlyTrigger ?? elements(context, triggerSlot).length <= 1
+    return element(triggerSlot, key) ?? (only ? element(triggerSlot) : undefined)
   }
   // Before the layer's own listener, which reads `openedFrom` as the popup shows.
   let wasOpen = store.get().open
