@@ -330,6 +330,39 @@ describe("selection", () => {
     expect(instance.api.getValue()).toBe(before)
   })
 
+  test('with `activation: "automatic"`, the child of a loading branch is selected inside a shadow root too', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    const remote = els.get("remote")!
+    const host = document.body.appendChild(document.createElement("div"))
+    cleanups.push(() => host.remove())
+    host.attachShadow({ mode: "open" }).append(remote.parentElement!)
+    await tick()
+    remote.focus()
+    const right = () =>
+      remote.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }),
+      )
+    right()
+    right()
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    remote.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(instance.api.getValue()).toBe("child")
+  })
+
   test('`selectionMode: "none"` writes no aria-selected and selects nothing', () => {
     const { instance, els } = render({ selectionMode: "none" })
     els.get("README.md")!.click()

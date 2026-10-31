@@ -496,7 +496,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     if (child) {
       // Selects only while focus still waits on the branch, not once the user moved on or left.
       const from = itemElement(parent)
-      const stayed = !!from && from.ownerDocument.activeElement === from
+      // A shadow root's own activeElement, since the document's is its host.
+      const stayed = !!from && (from.getRootNode() as Document | ShadowRoot).activeElement === from
       stepInto = null
       child.el.focus()
       if (stayed) follow(child.key, stepIntoEvent)
