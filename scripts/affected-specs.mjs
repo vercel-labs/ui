@@ -299,7 +299,9 @@ function commands({ touched, shared }) {
     const reach = key.split(",")
     const projects = reach.flatMap(chromiumProjects).filter((project) => !whole.includes(project))
     if (flags.engines && reach.includes("web")) projects.push(...engineProjects)
-    if (projects.length > 0) runs.push([`specs/(${group.sort().join("|")})\\.`, ...projectArgs(projects)])
+    // A spec can run on none of them, like web-lifecycle's while the web project runs whole.
+    if (projects.length > 0)
+      runs.push([`specs/(${group.sort().join("|")})\\.`, ...projectArgs(projects), "--pass-with-no-tests"])
   }
   const reached = new Set([...touched.values(), ...shared.values()].flatMap((reach) => [...reach]))
   const leaks = leakFrameworks.filter((framework) => reached.has(framework) && !whole.includes(framework))
