@@ -9,7 +9,8 @@ import { kindOf } from "../src/testing/schema"
 import { cases, type Case } from "./after-mount.cases"
 
 // jsdom has no ResizeObserver or IntersectionObserver. Nothing here changes
-// size or scrolls, so a size is reported once, as a browser reports the first.
+// size or scrolls, so each element's size is reported once, as a browser reports the first.
+const reported = new WeakSet<Element>()
 class Unobserved {
   observe() {}
   unobserve() {}
@@ -27,7 +28,8 @@ class Sized {
   observe(target: Element) {
     this.#watched.add(target)
     requestAnimationFrame(() => {
-      if (!this.#watched.has(target)) return
+      if (!this.#watched.has(target) || reported.has(target)) return
+      reported.add(target)
       const contentRect = target.getBoundingClientRect()
       const size = [{ inlineSize: contentRect.width, blockSize: contentRect.height }]
       this.#report([{ target, contentRect, borderBoxSize: size, contentBoxSize: size }], this)
