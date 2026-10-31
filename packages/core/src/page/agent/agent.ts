@@ -242,9 +242,11 @@ function buttonsOf(parts: Bound[]) {
   return [...found]
 }
 
+const rootOf = (parts: Bound[]) => parts.find((part) => part.slot === "root" && !part.key)?.el
+
 // The button a component is, like a Button's root, which `press` presses with no text.
 function ownButton(parts: Bound[]) {
-  const root = parts.find((part) => part.slot === "root" && !part.key)?.el
+  const root = rootOf(parts)
   if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
 }
 
@@ -255,7 +257,14 @@ function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
   const root = parts.find((part) => /^(root|group|set)$/.test(part.slot) && !part.key)
   if (root && (partState(root) as { disabled?: unknown }).disabled === true) return true
   const button = ownButton(parts)
-  return !!button && isDisabledElement(button)
+  if (button && isDisabledElement(button)) return true
+  // A disabled fieldset disables a native root, like a Button's, and every field a component holds,
+  // like a DatePicker's inputs. One disabled radio, or a stepper button at its max, leaves it usable.
+  const fields = parts.filter((part) => part.el.matches("input, textarea, select"))
+  return (
+    !!rootOf(parts)?.matches(":disabled") ||
+    (fields.length > 0 && fields.every((part) => part.el.matches(":disabled")))
+  )
 }
 
 // Whether a state value changed, by content for a list's values.
@@ -660,10 +669,16 @@ function createAgent(
       throw new Error(
         `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
       )
+    const refuseDisabled = () => {
+      if (!button.matches(":disabled") && button.getAttribute("aria-disabled") !== "true") return
+      if (opened) asAgent(() => api.setOpen!(false))
+      throw new Error(`"${textOf(button) || accessibleName(button)}" in ${entry.ref} is disabled now.`)
+    }
+    refuseDisabled()
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
     const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
     const close = () => asAgent(() => api.setOpen?.(false))
-    return { click: () => button.click(), button, pressed, opened, close }
+    return { click: () => button.click(), button, pressed, opened, close, refuseDisabled }
   }
 
   // The buttons a press can name, like a row menu's Make admin and Remove,
@@ -873,6 +888,8 @@ function createAgent(
       if (press?.opened) press.close()
       throw refused
     }
+    // The button can turn disabled while the person decides.
+    press?.refuseDisabled()
     if (guard && !guard()) {
       throw new Error(`The restoration of ${entry.ref} was superseded by a newer change.`)
     }

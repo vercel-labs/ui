@@ -46,6 +46,7 @@ function carouselOptions() {
     cancel: cancel === null ? null : Number(cancel),
     // Whether the page renders the play toggle: with rotation, or ?play-toggle without it.
     playToggle: params.has("playing") || params.has("play-toggle"),
+    controlled: params.has("controlled"),
     options: {
       ...(perPage && { slidesPerPage: perPage === "auto" ? ("auto" as const) : Number(perPage) }),
       ...(align && { align: align as "start" | "center" | "end" }),

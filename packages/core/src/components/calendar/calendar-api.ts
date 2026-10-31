@@ -349,6 +349,8 @@ function calendarApi<
   // A move to `approved` was asked before focus went, so landing there asks nothing.
   let approved: ISODate | null = null
   let pointer: PointerEvent | undefined
+  // A day a press couldn't focus, which its click then leaves unfocused.
+  let refused: ISODate | null = null
   function moveFocus(date: ISODate, reason: CalendarFocusedChangeReason, event?: Event) {
     if (date === store.get().focused) return true
     if (dispatch(context, "onFocusedChange", date, { reason, event })) return false
@@ -375,6 +377,7 @@ function calendarApi<
     ) {
       // Before the roving focus hears it, which would move the stop here.
       event.stopImmediatePropagation()
+      if (press) refused = date
       roving.focus(from)
     }
   }
@@ -470,9 +473,16 @@ function calendarApi<
         const state = store.get()
         if (isDisabled(state)) return
         // Safari doesn't focus a cell on click, so arrow keys would go nowhere.
-        if (el && !isOutside(state, props) && el.ownerDocument.activeElement !== el)
+        if (
+          el &&
+          !isOutside(state, props) &&
+          el.ownerDocument.activeElement !== el &&
+          // Only the refused press's own click counts clicks; a script's click() on that day still focuses it.
+          (refused !== props.value || !(event as MouseEvent | undefined)?.detail)
+        )
           el.focus({ preventScroll: true })
         pointer = undefined
+        refused = null
         pick(props.value, event)
         if (isOutside(store.get(), props) && moveFocus(props.value, "item-press", event)) {
           reveal(props.value, "item-press", event)
@@ -509,6 +519,7 @@ function calendarApi<
       },
       pointerdown(event: PointerEvent) {
         pointer = event
+        refused = null
       },
       hover(date: ISODate) {
         if (store.get().anchor !== null) store.set({ hover: date })
