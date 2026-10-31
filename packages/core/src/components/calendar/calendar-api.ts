@@ -377,22 +377,9 @@ function calendarApi<
     ) {
       // Before the roving focus hears it, which would move the stop here.
       event.stopImmediatePropagation()
-      if (press) refuse(date, event.target as Element)
+      if (press) refused = date
       roving.focus(from)
     }
-  }
-
-  // A press released off its day never clicks it, so no later click skips that day's focus.
-  function refuse(date: ISODate, day: Element) {
-    refused = date
-    const doc = day.ownerDocument
-    const release = (event: Event) => {
-      doc.removeEventListener("pointerup", release, true)
-      doc.removeEventListener("pointercancel", release, true)
-      if (event.type === "pointercancel" || !day.contains(event.target as Node)) refused = null
-    }
-    doc.addEventListener("pointerup", release, true)
-    doc.addEventListener("pointercancel", release, true)
   }
 
   function setAnchor(
@@ -490,7 +477,8 @@ function calendarApi<
           el &&
           !isOutside(state, props) &&
           el.ownerDocument.activeElement !== el &&
-          refused !== props.value
+          // Only the refused press's own click counts clicks; a script's click() on that day still focuses it.
+          (refused !== props.value || !(event as MouseEvent | undefined)?.detail)
         )
           el.focus({ preventScroll: true })
         pointer = undefined

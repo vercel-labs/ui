@@ -475,7 +475,8 @@ describe("calendar", () => {
     day("2026-10-16").focus()
     day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
     day("2026-10-20").focus()
-    day("2026-10-20").click()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    day("2026-10-20").dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
     expect(focused()).toBe("2026-10-16")
     expect(onFocusedChange).toHaveBeenCalledOnce()
     expect(onFocusedChange).toHaveBeenCalledWith(
@@ -496,6 +497,23 @@ describe("calendar", () => {
     day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
     day("2026-10-20").focus()
     day("2026-10-16").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    cancel = false
+    day("2026-10-20").click()
+    expect(focused()).toBe("2026-10-20")
+  })
+
+  test("a refused press that never clicks, like a right-button one, doesn't keep a later click from focusing its day", async () => {
+    let cancel = true
+    const { day, focused } = mount({
+      onFocusedChange: (_date, details) => {
+        if (cancel) details.cancel()
+      },
+    })
+    await tick()
+    day("2026-10-16").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 2 }))
+    day("2026-10-20").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true, button: 2 }))
     cancel = false
     day("2026-10-20").click()
     expect(focused()).toBe("2026-10-20")
