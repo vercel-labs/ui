@@ -19,14 +19,19 @@ class Unobserved {
   }
 }
 class Sized {
-  #report: (entries: { target: Element }[], observer: unknown) => void
+  #report: (entries: object[], observer: unknown) => void
   #watched = new Set<Element>()
-  constructor(report: (entries: { target: Element }[], observer: unknown) => void) {
+  constructor(report: (entries: object[], observer: unknown) => void) {
     this.#report = report
   }
   observe(target: Element) {
     this.#watched.add(target)
-    requestAnimationFrame(() => this.#watched.has(target) && this.#report([{ target }], this))
+    requestAnimationFrame(() => {
+      if (!this.#watched.has(target)) return
+      const contentRect = target.getBoundingClientRect()
+      const size = [{ inlineSize: contentRect.width, blockSize: contentRect.height }]
+      this.#report([{ target, contentRect, borderBoxSize: size, contentBoxSize: size }], this)
+    })
   }
   unobserve(target: Element) {
     this.#watched.delete(target)
