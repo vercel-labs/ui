@@ -8,7 +8,7 @@ import type { PrimitiveContext } from "../kernel/primitive-types"
 import { css } from "../kernel/inline-style"
 import { announce } from "../platform/announce"
 import { clamp } from "../text/number"
-import { dragThreshold, bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
 
 /**
  * Where a box sits and how big it is, in the units your boxes use, usually CSS pixels.
@@ -147,8 +147,7 @@ function createResize<State extends object>(
   const { store } = context
   const boxes = () => options.boxes(store.get())
   const setDraft = (draft: ResizeDraft | null) => store.set({ [options.draft]: draft } as Partial<State>)
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   // The box a handle makes when its edges move by `dx` and `dy` from `from`,
   // within the size limits, the bounds and the ratio.
@@ -273,16 +272,11 @@ function createResize<State extends object>(
     /** Starts a drag of a handle, or of the box with `move`, once the pointer moves past `dragThreshold`. */
     pointerdown(event: PointerEvent, key: string, handle: ResizeHandle, el: HTMLElement) {
       const from = boxes()[key]
-      if (event.button !== 0 || !from || options.disabled?.(key) || fromHandle(event, handle)) return
+      if (!from || options.disabled?.(key) || fromHandle(event, handle) || !drags.accepts(event)) return
       // Offsets count from the press, so the edge keeps up with the pointer past the threshold.
       const startX = event.clientX
       const startY = event.clientY
-      const end = () => {
-        stop?.()
-        stop = undefined
-      }
-      stop?.()
-      const stopTracking = bindDrag(el, event, {
+      drags.start(el, event, {
         threshold: dragThreshold,
         cancelOnEscape: true,
         onStart: () => {
@@ -295,7 +289,6 @@ function createResize<State extends object>(
         },
         onEnd: (endEvent, canceled) => {
           const draft = store.get()[options.draft] as ResizeDraft | null
-          end()
           setDraft(null)
           if (draft && !canceled)
             api.resizeTo(
@@ -306,7 +299,6 @@ function createResize<State extends object>(
             )
         },
       })
-      stop = stopTracking
     },
     /** The handle being dragged on a box, if any. */
     dragging(state: State, key: string) {

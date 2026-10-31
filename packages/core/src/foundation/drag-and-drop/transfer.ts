@@ -10,7 +10,7 @@ import { createAutoScroll, type AutoScrollOptions } from "./auto-scroll"
 import { bindDragPreview, type DragPreview } from "./drag-preview"
 import { createDraftMove } from "./draft-move"
 import { isRTL } from "../platform/env"
-import { dragThreshold, bindDrag } from "./pointer"
+import { createDragSession, dragThreshold } from "./pointer"
 import { labelOf } from "../text/typeahead"
 import { dropIndex } from "./reorder"
 
@@ -220,13 +220,11 @@ function createTransfer<State extends object>(
     return best?.list
   }
 
-  let stopDrag: (() => void) | undefined
-  context.onDestroy(() => stopDrag?.())
+  const drags = createDragSession(context.onDestroy)
 
   function pointerdown(event: PointerEvent, key: string) {
     const start = items.get(key)
-    if (!start || event.button !== 0 || !event.isPrimary || event.defaultPrevented || draft()) return
-    stopDrag?.()
+    if (!start || draft() || !drags.accepts(event)) return
     let pointer = { x: event.clientX, y: event.clientY }
     let dragging = false
     // Whether the item had focus, which the new element in another list takes over.
@@ -248,7 +246,7 @@ function createTransfer<State extends object>(
       options.createAutoScroll === false
         ? undefined
         : createAutoScroll({ ...options.createAutoScroll, ignore: () => items.get(key), onScroll: track })
-    const stopTracking = bindDrag(start, event, {
+    drags.start(start, event, {
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
@@ -270,7 +268,10 @@ function createTransfer<State extends object>(
       },
       onEnd: (endEvent, canceled) => {
         const dragged = dragging
-        end()
+        scroller?.stop()
+        preview?.remove()
+        preview = undefined
+        dragging = false
         if (!dragged) return
         if (canceled) cancel()
         else drop("drag", lastMove ?? endEvent)
@@ -278,15 +279,6 @@ function createTransfer<State extends object>(
         if (focused) focusLater(key)
       },
     })
-    const end = () => {
-      stopTracking()
-      scroller?.stop()
-      preview?.remove()
-      preview = undefined
-      dragging = false
-      stopDrag = undefined
-    }
-    stopDrag = end
   }
 
   const transfer = {

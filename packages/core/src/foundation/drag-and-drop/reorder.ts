@@ -13,7 +13,7 @@ import { bindDragPreview, type DragPreview } from "./drag-preview"
 import { createDraftMove } from "./draft-move"
 import { isRTL } from "../platform/env"
 import { createOrder } from "../kernel/order"
-import { dragThreshold, bindDrag } from "./pointer"
+import { createDragSession, dragThreshold } from "./pointer"
 import { labelOf } from "../text/typeahead"
 import { isSameKeys } from "../selection/listbox-range"
 
@@ -267,8 +267,7 @@ function createReorder<State extends object, Props = any>(
   }
 
   // The pointer drag in progress, which the instance ends if it's destroyed mid-drag.
-  let stopDrag: (() => void) | undefined
-  context.onDestroy(() => stopDrag?.())
+  const drags = createDragSession(context.onDestroy)
 
   // Puts a dragged item where the pointer is, and keeps its element under the
   // pointer while the list moves it. Layout offsets ignore transforms, so the
@@ -342,21 +341,17 @@ function createReorder<State extends object, Props = any>(
 
   function pointerdown(event: PointerEvent, key: string) {
     const el = element(key)
-    if (!el || event.button !== 0 || !event.isPrimary || event.defaultPrevented || draft()) return
-    stopDrag?.()
+    if (!el || draft() || !drags.accepts(event)) return
     const start = { x: event.clientX, y: event.clientY, left: el.offsetLeft, top: el.offsetTop }
     let drag: { track: (x: number, y: number) => void; stop: () => void } | undefined
     // The drop reports the move that placed the item: a pointerup's zero
     // pressure reads as a screen reader's pointer to `details.source`.
     let lastMove: PointerEvent | undefined
-    const stopTracking = bindDrag(el, event, {
+    drags.start(el, event, {
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
-        if (!grab(key, true)) {
-          stopDrag = undefined
-          return false
-        }
+        if (!grab(key, true)) return false
         drag = options.preview ? float(key, el, start) : follow(key, start)
       },
       onMove: ({ x, y, event: moveEvent }) => {
@@ -365,20 +360,13 @@ function createReorder<State extends object, Props = any>(
         drag?.track(x, y)
       },
       onEnd: (endEvent, canceled) => {
-        const dragged = !!drag
-        end()
-        if (!dragged) return
+        if (!drag) return
+        drag.stop()
+        drag = undefined
         if (canceled) cancel()
         else drop("drag", lastMove ?? endEvent)
       },
     })
-    const end = () => {
-      stopTracking()
-      drag?.stop()
-      drag = undefined
-      stopDrag = undefined
-    }
-    stopDrag = end
   }
 
   const reorder = {

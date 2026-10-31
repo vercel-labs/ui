@@ -13,7 +13,7 @@ import { createAutoScroll, type AutoScrollOptions } from "../drag-and-drop/auto-
 import { isRTL } from "../platform/env"
 import { keepFocus } from "../focus/keep-focus"
 import { documentOrder } from "../kernel/order"
-import { dragThreshold, bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
 
 /**
  * A range on a track, from `start` to `end` in the track's own units, like minutes from midnight.
@@ -296,8 +296,7 @@ function createSpans<State extends object, S extends Span = Span>(
     return true
   }
 
-  let stopDrag: (() => void) | undefined
-  context.onDestroy(() => stopDrag?.())
+  const drags = createDragSession(context.onDestroy)
 
   // Follows a pointer that pressed `el`, building the draft from `next` on each move.
   function drag(
@@ -308,7 +307,6 @@ function createSpans<State extends object, S extends Span = Span>(
     next: (x: number, y: number) => S | undefined,
     click?: () => void,
   ) {
-    stopDrag?.()
     const before = value()
     let dragging = false
     let last: PointerEvent | undefined
@@ -325,7 +323,7 @@ function createSpans<State extends object, S extends Span = Span>(
       options.createAutoScroll === false
         ? undefined
         : createAutoScroll({ ...options.createAutoScroll, ignore: () => elements.get(id), onScroll: update })
-    const stopTracking = bindDrag(el, event, {
+    drags.start(el, event, {
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
@@ -342,8 +340,9 @@ function createSpans<State extends object, S extends Span = Span>(
       },
       onEnd: (endEvent, canceled) => {
         const dragged = dragging
-        end()
-        if (!dragged) return click?.()
+        scroller?.stop()
+        dragging = false
+        if (!dragged) return canceled ? undefined : click?.()
         const current = draft()
         if (canceled && action !== "draw") {
           const span = before.find((other) => other.id === id)
@@ -358,13 +357,6 @@ function createSpans<State extends object, S extends Span = Span>(
           })
       },
     })
-    const end = () => {
-      stopTracking()
-      scroller?.stop()
-      dragging = false
-      stopDrag = undefined
-    }
-    stopDrag = end
   }
 
   const spans = {
@@ -434,14 +426,7 @@ function createSpans<State extends object, S extends Span = Span>(
     trackPointerdown(event: PointerEvent, track: string) {
       const el = tracks.get(track)
       const target = event.target as Element | null
-      if (
-        !el ||
-        !options.create ||
-        event.button !== 0 ||
-        !event.isPrimary ||
-        target?.closest("[data-span-id]")
-      )
-        return
+      if (!el || !options.create || target?.closest("[data-span-id]") || !drags.accepts(event)) return
       const at = snap(valueAt(track, event.clientX, event.clientY), Math.floor)
       const base = options.create({ id: "", track, start: at, end: at + step() })
       if (!base) return
@@ -474,7 +459,7 @@ function createSpans<State extends object, S extends Span = Span>(
     spanPointerdown(event: PointerEvent, id: string) {
       const el = elements.get(id)
       const span = value().find((other) => other.id === id)
-      if (!el || !span || event.button !== 0 || !event.isPrimary || options.disabled?.(span)) return
+      if (!el || !span || options.disabled?.(span) || !drags.accepts(event)) return
       const edge = (event.target as Element | null)?.closest<HTMLElement>("[data-span-edge]")?.dataset
         .spanEdge
       const grabbed = valueAt(span.track, event.clientX, event.clientY) - span.start
@@ -573,7 +558,7 @@ function createSpans<State extends object, S extends Span = Span>(
     },
     /** Ends a pointer drag and puts its span back. */
     cancel() {
-      stopDrag?.()
+      drags.cancel()
       setDraft(null)
     },
   }
