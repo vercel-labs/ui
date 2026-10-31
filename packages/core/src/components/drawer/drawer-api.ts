@@ -52,6 +52,17 @@ function interactiveByOrder(options: DrawerOptions, point: SnapPoint | null) {
   return above >= 0 && index >= 0 && index <= above
 }
 
+// What a sheet reads only as it attaches: `"auto"` picks its driver from the rest.
+const shapeOf = (options: DrawerOptions) =>
+  [
+    options.side ?? "bottom",
+    options.driver ?? "auto",
+    !!options.preventEdgeSwipe,
+    options.driver === undefined || options.driver === "auto"
+      ? [options.modalAbove === undefined, options.expandOnScroll !== false]
+      : [],
+  ].join()
+
 /**
  * The snap point a handle moves to. `"cycle"` goes to the next larger one and
  * wraps to the smallest, like iOS's grabber; `"expand"` and `"collapse"` step
@@ -139,6 +150,13 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     if (next.open) return opened(next, arriving)
     if (!next.mounted && forgetsSnap(next, arriving)) return { snapPoint: null }
   })
+  // An uncontrolled snap point the new snap points leave out moves to their first.
+  deriveFromOptions(context, ["snapPoint"], (synced, state, arriving: DrawerOptions) => {
+    const point = synced.snapPoint ?? state.snapPoint
+    if (arriving.snapPoint !== undefined || point === null) return
+    if (!(arriving.snapPoints ?? ["content"]).some((entry) => sameValue(entry, point)))
+      return { snapPoint: defaultSnap(arriving) }
+  })
   // The modal setting in effect: none while the page behind is usable.
   deriveState(context, ["modal"], ({ interactive, modalSetting }) => ({
     modal: interactive ? false : modalSetting,
@@ -219,7 +237,9 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   }
 
   // Called from the content's `bind`, between the sheet and the popup layer.
+  let attached: Parameters<typeof attach> | undefined
   function attach(el: HTMLElement, host: HTMLElement, backdrop: () => HTMLElement | undefined) {
+    attached = [el, host, backdrop]
     // One sheet per drawer: a content bound again replaces the last one.
     sheet?.destroy()
     sheet = attachSheet(el, {
@@ -254,7 +274,26 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   function detach() {
     sheet?.destroy()
     sheet = undefined
+    attached = undefined
   }
+
+  // A sheet picks its driver, side and touch guard as it attaches, so a change
+  // to them attaches it again where it rests. New snap points it measures again.
+  let shape = shapeOf(options())
+  let points = String(options().snapPoints)
+  context.onOptions((next) => {
+    const nextShape = shapeOf(next)
+    const nextPoints = String(next.snapPoints)
+    const reshaped = nextShape !== shape
+    const moved = nextPoints !== points
+    shape = nextShape
+    points = nextPoints
+    if (!sheet || !attached) return
+    if (reshaped) {
+      attach(...attached)
+      if (store.get().open) sheet?.open(false)
+    } else if (moved) sheet.refresh()
+  })
 
   // The handle: a press goes to the next larger snap point, wrapping, like iOS's grabber.
   function stepHandle(

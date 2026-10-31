@@ -264,6 +264,15 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     }
     return patch
   }
+  // A tree that starts or stops selecting several keeps what was chosen, in
+  // its new shape, unless the value is controlled.
+  deriveFromOptions(context, ["value", "selected"], (synced, state, next) => {
+    const several = synced.selectionMode === "multiple"
+    if (synced.selectionMode === undefined || several === (state.selectionMode === "multiple")) return
+    if (next.value !== undefined) return
+    const value = several ? toKeys(state.value) : (toKeys(state.value)[0] ?? null)
+    return { value, selected: toKeys(value) }
+  })
   // What options deliver brings its follow-up state in the same pass.
   deriveFromOptions(context, ["selected", "checks", "exiting"], (synced, state) =>
     followUp(state, { ...state, ...synced }),

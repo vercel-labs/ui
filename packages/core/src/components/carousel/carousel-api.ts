@@ -7,7 +7,7 @@ import { dev } from "#dev"
 import { checkName } from "#name-check"
 import { clamp } from "../../foundation/text/number"
 import { createAutoplay } from "./carousel-autoplay"
-import { labelSlide, readCarouselLayout, writeSnapAreas } from "./carousel-dom"
+import { clearSnapAreas, labelSlide, readCarouselLayout, writeSnapAreas } from "./carousel-dom"
 import { carouselIndicators } from "./carousel-indicators"
 import { carouselKeys } from "./carousel-keyboard"
 import {
@@ -206,6 +206,7 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
       motion.moveTo(visual.indexOf(index), { animate })
   }
 
+  let snapAreas = false
   // Reads the slides' layout from the DOM.
   function measure() {
     measureQueued = false
@@ -222,7 +223,13 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     applyLayout({ ...readCarouselLayout(viewport, slides, axis()), first })
     // Slides that didn't rotate, or a track too short to, lay out in their own order.
     if (first && !loop.isActive()) return measure()
-    if (store.get().slidesPerPage !== 1) writeSnapAreas(slides, layout, axis().vertical)
+    if (store.get().slidesPerPage !== 1) {
+      writeSnapAreas(slides, layout, axis().vertical)
+      snapAreas = true
+    } else if (snapAreas) {
+      clearSnapAreas(slides)
+      snapAreas = false
+    }
     loop.recenter()
   }
 

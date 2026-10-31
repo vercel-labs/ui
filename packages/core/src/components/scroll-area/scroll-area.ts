@@ -1,7 +1,8 @@
 import { css } from "../../foundation/kernel/inline-style"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import { onProps } from "../../foundation/kernel/part"
+import type { Named, Part, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
 import { mainAxis, type ScrollAreaType } from "./scroll-area-model"
 import {
   createScrollView,
@@ -140,7 +141,25 @@ type ScrollAreaScrollToEndState = {
 type State = ScrollAreaModel
 
 const axisOf = (orientation: ScrollAreaScrollbarProps["orientation"]) =>
-  orientation === "horizontal" ? "x" : "y"
+  orientation === "horizontal" ? ("x" as const) : ("y" as const)
+
+function alongAxis(
+  part: Part<any, any, { orientation?: ScrollAreaScrollbarProps["orientation"] }>,
+  bindAxis: (axis: "x" | "y") => () => void,
+) {
+  let axis = axisOf(part.props.orientation)
+  let unbind = bindAxis(axis)
+  const unwatch = onProps(part, () => {
+    if (axisOf(part.props.orientation) === axis) return
+    unbind()
+    axis = axisOf(part.props.orientation)
+    unbind = bindAxis(axis)
+  })
+  return () => {
+    unwatch()
+    unbind()
+  }
+}
 
 const atStart = (state: State) => (mainAxis(state) === "x" ? state.atXStart : state.atYStart)
 const atEnd = (state: State) => (mainAxis(state) === "x" ? state.atXEnd : state.atYEnd)
@@ -231,7 +250,8 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
   api: (context) => {
     const { store, onDestroy } = context
     const view = createScrollView(store)
-    // stickToEnd turned on later sticks at once, as it does from the start.
+    // stickToEnd turned on later sticks at once, as it does from the start, and
+    // turned off stops.
     let { stickToEnd, type, scrollHideDelay } = store.get()
     onDestroy(
       store.subscribe(() => {
@@ -242,7 +262,7 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
           state.scrollHideDelay === scrollHideDelay
         )
           return
-        if (state.stickToEnd && !stickToEnd) store.set({ sticking: true })
+        if (state.stickToEnd !== stickToEnd) store.set({ sticking: state.stickToEnd })
         ;({ stickToEnd, type, scrollHideDelay } = state)
         view.refresh()
       }),
@@ -345,7 +365,7 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
           style: visible ? undefined : "pointer-events:none",
         }
       }),
-      bind: (el, { api, props }) => api.internal.bindScrollbar(el, axisOf(props.orientation)),
+      bind: (el, part) => alongAxis(part, (axis) => part.api.internal.bindScrollbar(el, axis)),
     }),
 
     // Sized and moved by CSS variables its scrollbar writes once per frame.
@@ -378,7 +398,7 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
       live: live((state, { props }) => ({
         "data-dragging": flag(state.dragging === axisOf(props.orientation)),
       })),
-      bind: (el, { api, props }) => api.internal.bindThumb(el, axisOf(props.orientation)),
+      bind: (el, part) => alongAxis(part, (axis) => part.api.internal.bindThumb(el, axis)),
     }),
 
     // Where the two scrollbars meet. Only there while both show.
