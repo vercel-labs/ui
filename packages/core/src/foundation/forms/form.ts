@@ -229,18 +229,25 @@ function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
   let disabled = false
   let observer: MutationObserver | undefined
   let active = true
+  // A move out of a fieldset removes `el`, or a node between it and the
+  // fieldset, from its parent, so those parents are watched too.
+  const observe = (observer: MutationObserver) => {
+    observer.disconnect()
+    for (let node = el.parentElement; node?.closest("fieldset"); node = node.parentElement)
+      observer.observe(node, { childList: true, attributeFilter: ["disabled"] })
+  }
   const watch = () => {
     if (!active) return
     disabled = fieldsetDisabled(el)
     onChange(disabled)
     if (typeof MutationObserver === "undefined") return
     observer = new MutationObserver(() => {
+      observe(observer!)
       if (fieldsetDisabled(el) === disabled) return
       disabled = !disabled
       onChange(disabled)
     })
-    for (let node = el.parentElement; node; node = node.parentElement)
-      if (node instanceof HTMLFieldSetElement) observer.observe(node, { attributeFilter: ["disabled"] })
+    observe(observer)
   }
   if (el.isConnected) watch()
   else queueMicrotask(watch)
