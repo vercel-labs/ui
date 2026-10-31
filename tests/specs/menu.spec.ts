@@ -349,6 +349,18 @@ test.describe("submenu with a pointer", () => {
     await page.waitForTimeout(300)
     await expect(menuNamed(page, "Share")).toBeHidden()
   })
+
+  test("returning to the submenu trigger from a separator opens it", async ({ page }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const separator = (await menuNamed(page, "File").getByRole("separator").last().boundingBox())!
+    const x = share.x + 12
+    const y = share.y + share.height / 2
+    await page.mouse.move(x, y)
+    await page.mouse.move(x, separator.y + separator.height / 2)
+    await page.mouse.move(x, y)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+  })
 })
 
 test.describe("positioning", () => {

@@ -594,7 +594,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         // WebKit fires pointermove without movement when content scrolls under the pointer.
         const moved = !lastPointer || lastPointer.x !== event.clientX || lastPointer.y !== event.clientY
         lastPointer = { x: event.clientX, y: event.clientY }
-        if (!moved && store.get().highlighted !== null) return
+        if (!moved && store.get().highlighted !== null && !entry.openSubmenu) return
         const child = openChild()
         const point = { x: event.clientX, y: event.clientY }
         if (child && child.triggerElement() !== el) {
