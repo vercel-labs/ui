@@ -78,7 +78,7 @@ A value with the wrong shape for its mode is treated as no selection.
 
 ### Range
 
-`mode="range"` chooses a start and then an end. Moving the pointer or focus previews the range; the value changes once both ends are chosen. Choosing a date before the start begins a new range there. Escape cancels an unfinished range.
+`mode="range"` chooses a start and then an end. Moving the pointer or focus previews the range; the value changes once both ends are chosen. A date before the start ends it too, and becomes the start. Escape cancels an unfinished range.
 
 <ComponentExample
   name="calendar/range"
@@ -87,13 +87,22 @@ A value with the wrong shape for its mode is treated as no selection.
 
 ### Range Limits
 
-`min-days` and `max-days` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit starts a new range at that date instead.
+`min-days` and `max-days` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen.
 
 A range cannot include an unavailable date unless `allow-unavailable` is set. That allows unavailable dates between the ends; they still cannot be chosen as an endpoint.
 
 <ComponentExample
   name="calendar/range-limits"
   caption="In October 2026, choose October 15 then October 20. This example accepts 3–8 days and allows the range to span the unavailable weekend."
+/>
+
+### Range in Progress
+
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `@anchor-change` and `@focused-change` report them before they change, to show the range being picked outside the calendar, and canceling either keeps things as they were. A day that takes focus because the months turned reports nothing.
+
+<ComponentExample
+  name="calendar/range-progress"
+  caption="Choose a start date, then move with the arrow keys. The line below follows the start and the focused date until Enter picks the end."
 />
 
 ### Multiple
@@ -115,6 +124,10 @@ Unavailable dates cannot be selected, but stay focusable so keyboard and screen 
   name="calendar/unavailable"
   caption="Try an unavailable date, then choose an available one. Unavailable days remain focusable so their state can be heard."
 />
+
+### Deselect
+
+`deselectable` lets a second press on the selected date clear it, in single mode.
 
 ### Min and Max
 
@@ -151,7 +164,7 @@ They update the first displayed month with the `select-change` reason. Their sta
 
 `locale` controls month names, weekday headers, and full date labels. Without it, Calendar uses the surrounding page’s `lang`, then the browser’s language. The first weekday follows the locale unless `week-starts-on` overrides it. `weekday-format` accepts `"narrow"`, `"short"`, or `"long"`.
 
-Previous and Next have English accessible labels by default; replace their `aria-label` when translating them. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
+Previous and Next are named "Previous month" and "Next month". Pass `aria-label` to name them in another language. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
 
 <ComponentExample
   name="calendar/locale"
@@ -254,12 +267,14 @@ Props are the same as below, and callbacks are events.
 
 Events get the new value first, then the details. `v-model` only updates when the event wasn't canceled.
 
-| Binding         | On         | Receives                                                            |
-| --------------- | ---------- | ------------------------------------------------------------------- |
-| `v-model:value` | `Calendar` | The selected value                                                  |
-| `v-model:month` | `Calendar` | The first month shown                                               |
-| `@value-change` | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)       |
-| `@month-change` | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons) |
+| Binding           | On         | Receives                                                                               |
+| ----------------- | ---------- | -------------------------------------------------------------------------------------- |
+| `v-model:value`   | `Calendar` | The selected value                                                                     |
+| `v-model:month`   | `Calendar` | The first month shown                                                                  |
+| `@value-change`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)                          |
+| `@month-change`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons)                    |
+| `@focused-change` | `Calendar` | `(date, details)`: the day focus moves to, and the [reason](#reasons)                  |
+| `@anchor-change`  | `Calendar` | `(date, details)`: a range's start, or `null` once it ends, and the [reason](#reasons) |
 
 ### Reasons
 
@@ -275,6 +290,20 @@ And why the month changed:
 <ReasonTable
   path="../../packages/core/src/components/calendar/calendar.ts"
   name="CalendarMonthChangeReason"
+/>
+
+Why focus moves to another day:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarFocusedChangeReason"
+/>
+
+And why a range's start changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarAnchorChangeReason"
 />
 
 ### Controller

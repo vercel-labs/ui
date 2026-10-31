@@ -268,7 +268,8 @@ function withEvents<T extends object>(
         const event = new CustomEvent(key.slice(2).toLowerCase(), {
           detail,
           bubbles: false,
-          cancelable: true,
+          // Only a change with details or an event to cancel is cancelable.
+          cancelable: typeof cancel === "function" || typeof (value as Event)?.preventDefault === "function",
           composed: true,
         })
         const proceed = el.dispatchEvent(event)

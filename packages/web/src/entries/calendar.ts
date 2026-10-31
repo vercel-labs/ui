@@ -4,11 +4,13 @@ import { defineCalendarElements } from "../calendar"
 defineCalendarElements()
 
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,

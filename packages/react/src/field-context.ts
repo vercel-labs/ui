@@ -1,5 +1,5 @@
 import type { field } from "@ui-sdk/core/field"
-import { renderVersion } from "@ui-sdk/core/renderer"
+import { madeLabel, renderVersion } from "@ui-sdk/core/renderer"
 import * as React from "react"
 import { renderElement, slotIn, type PartProps, type PrimitiveHandle, type RenderProp } from "./use-primitive"
 
@@ -41,16 +41,23 @@ function useJoinField(field: FieldContextValue | null, own?: { id?: string }) {
     // Merges the field's attributes for its control into the control's props,
     // keeping the control's own description ahead of the field's. The field
     // decides the id.
-    props: (props: Record<string, any>) => ({
-      ...slotIn(
+    props: (props: Record<string, any>) => {
+      const label = props["aria-labelledby"]
+      const merged = slotIn(
         field,
         "control",
         { id: (own ?? props).id, describedBy: props["aria-describedby"] },
-        { ...props, id: undefined },
-      ),
-      // The control stays its own part for styling.
-      "data-slot": props["data-slot"],
-    }),
+        { ...props, id: undefined, "aria-labelledby": madeLabel(label) ? undefined : label },
+      )
+      // The field's label names the control over the control's own, like a
+      // ComboboxLabel's, but not over the author's. The control stays its own
+      // part for styling.
+      return {
+        ...merged,
+        "aria-labelledby": merged["aria-labelledby"] ?? label,
+        "data-slot": props["data-slot"],
+      }
+    },
   }
 }
 

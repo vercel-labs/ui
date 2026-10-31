@@ -1,6 +1,6 @@
 // Attributes core writes to a bound element itself, so a change to them
 // re-renders nothing: a slot's `live` attributes, and its `direct` ones.
-import { attrs, liveAttrs, subscribe } from "./part"
+import { attrs, authorOwned, liveAttrs, madeLabel, subscribe } from "./part"
 import type { Attrs, Part } from "./primitive-types"
 
 /**
@@ -55,8 +55,15 @@ function direct(names: readonly string[]) {
         const values = attrs(part)
         for (const name of names) {
           const value = values[name]
-          if (value !== undefined) el.getAttribute(name) !== value && el.setAttribute(name, value)
-          else if (last[name] !== undefined && el.getAttribute(name) === last[name]) el.removeAttribute(name)
+          if (value === undefined) {
+            if (last[name] !== undefined && el.getAttribute(name) === last[name]) el.removeAttribute(name)
+            continue
+          }
+          const current = el.getAttribute(name)
+          if (current === value) continue
+          // An author's name or hint, rendered in place of the part's, stays.
+          if (authorOwned.has(name) && current !== null && current !== last[name]) continue
+          el.setAttribute(name, value)
         }
         last = values
       })
@@ -70,8 +77,9 @@ const applied = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
 
 /**
  * Writes attributes and removes the ones a previous call wrote but this one
- * doesn't. Attributes it never wrote, like an author's own, stay, and so does
- * an id it didn't write. `channel` keeps render and live attributes, and two
+ * doesn't. Attributes it never wrote, like an author's own, stay, and so do
+ * an id and an author's name, description or typing hints it didn't write,
+ * like a translated `aria-label`. `channel` keeps render and live attributes, and two
  * components sharing one element (a tooltip on a popover's trigger), from
  * removing each other's.
  */
@@ -88,8 +96,25 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
   const id = written.has("id") || previous.has("id") ? el.getAttribute("id") : null
   const keeps = keepsId(id, channels, channel)
   if (keeps) written.delete("id")
+  // A value no channel wrote, and not the part's own, like a copied
+  // component's, is the author's, even when set after the part wrote its own.
+  const authors = new Set<string>()
+  const read = new Map<string, string | null>()
+  for (const name of new Set([...written.keys(), ...previous.keys()])) {
+    if (!authorOwned.has(name)) continue
+    const current = el.getAttribute(name)
+    read.set(name, current)
+    if (
+      current === null ||
+      current === written.get(name) ||
+      (name === "aria-labelledby" && madeLabel(current))
+    )
+      continue
+    if (!Object.values(channels).some((wrote) => wrote.get(name) === current)) authors.add(name)
+  }
+  for (const name of authors) written.delete(name)
   for (const name of previous.keys()) {
-    if (written.has(name) || (name === "id" && keeps)) continue
+    if (written.has(name) || authors.has(name) || (name === "id" && keeps)) continue
     if (name.startsWith("style:")) el.style.removeProperty(name.slice(6))
     else el.removeAttribute(name)
   }
@@ -101,7 +126,8 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
     // and setting it before anyone types replaces the text with the caret at
     // the start, so the property goes first, as every framework writes it.
     if (name === "value" && isTextField(el) && el.value !== value) el.value = value
-    if ((name === "id" ? id : el.getAttribute(name)) !== value) el.setAttribute(name, value)
+    const current = name === "id" ? id : read.has(name) ? read.get(name) : el.getAttribute(name)
+    if (current !== value) el.setAttribute(name, value)
   }
   channels[channel] = written
   applied.set(el, channels)

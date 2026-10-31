@@ -65,6 +65,9 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
     unavailable: props.unavailable,
     disabled: props.disabled,
     readOnly: props.readOnly,
+    deselectable: props.deselectable,
+    onFocusedChange: props.onFocusedChange,
+    onAnchorChange: props.onAnchorChange,
     months: props.months,
     pageBy: props.pageBy,
     locale: props.locale,
@@ -94,6 +97,9 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
     "unavailable",
     "disabled",
     "readOnly",
+    "deselectable",
+    "onFocusedChange",
+    "onAnchorChange",
     "months",
     "pageBy",
     "locale",
@@ -327,11 +333,13 @@ function CalendarDay(props: PartProps<"td", CalendarDayState> & { value: string 
 
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,

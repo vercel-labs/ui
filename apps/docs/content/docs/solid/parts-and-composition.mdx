@@ -59,7 +59,7 @@ export { Example }
 
 `render` receives the part's props and state, and returns your element, like `render={(props, state) => <a {...props} href="/settings">Settings</a>}`. A component works too. Forward the supplied props to keep the part's behavior connected.
 
-Your event handler runs first, written as a function or as Solid's bound form, `[handler, data]`. Calling `event.preventDefault()` skips the built-in handler. Keep the supplied roles, IDs, and ARIA state when rendering your own element.
+Your event handler runs first, written as a function or as Solid's bound form, `[handler, data]`. Calling `event.preventDefault()` skips the built-in handler. Keep the supplied roles, IDs, and ARIA state when rendering your own element. A name or typing hint you pass replaces the part's own: `aria-label`, `aria-labelledby`, `aria-description`, `title`, `autocomplete`, `autocapitalize`, `autocorrect`, `inputmode` and `spellcheck`. Roles, `tabindex`, references like `aria-controls` and `aria-describedby`, state attributes and `data-slot` stay the part's, since its behavior reads them.
 
 ## Read the State
 

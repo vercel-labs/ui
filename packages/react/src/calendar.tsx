@@ -44,6 +44,9 @@ function Calendar({
   unavailable,
   disabled,
   readOnly,
+  deselectable,
+  onFocusedChange,
+  onAnchorChange,
   months,
   pageBy,
   locale,
@@ -74,6 +77,9 @@ function Calendar({
     unavailable,
     disabled,
     readOnly,
+    deselectable,
+    onFocusedChange,
+    onAnchorChange,
     months,
     pageBy,
     locale,
@@ -317,11 +323,13 @@ function CalendarDay({
 
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export type {
+  CalendarAnchorChangeReason,
   CalendarApi,
   CalendarChangeOptions,
   CalendarController,
   CalendarDayProps,
   CalendarDayState,
+  CalendarFocusedChangeReason,
   CalendarGridCell,
   CalendarGridProps,
   CalendarGridState,
