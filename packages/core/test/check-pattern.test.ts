@@ -357,6 +357,18 @@ test("a hand-made menubar passes", async () => {
   await checkPattern(root, "menubar")
 })
 
+test("a hand-made listbox passes when its styles hide an option, which arrows skip", async () => {
+  // Names that start alike, so typeahead has no single target and stays out of it.
+  const root = render(`
+    <div role="listbox" aria-label="Fruit">
+      <div role="option" aria-selected="true" tabindex="0">Apple</div>
+      <div role="option" aria-selected="false" tabindex="-1" style="display: none">Apricot</div>
+      <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+    </div>`)
+  rove(root, "[role=option]:not([style])", { onMove: selectOnly("[role=option]") })
+  await checkPattern(root, "listbox")
+})
+
 describe("broken markup fails", () => {
   test("a dialog that keeps Tab inside without aria-modal", async () => {
     const root = render(`<div>

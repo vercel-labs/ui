@@ -21,9 +21,25 @@ const isGone = (el: Element) => !el.isConnected || !!el.closest("[hidden], [iner
 // Rendered but hidden from screen readers, or unreachable: focus must never land here.
 const isUnreachable = (el: Element) => !!el.closest('[aria-hidden="true"], [inert]')
 
+/** Whether `display: none` on `el` or an element around it hides it, like a closed branch its styles hide. */
+// check-code: allow return-type recursive, so TypeScript cannot infer it.
+function isUndisplayed(el: Element | null, known = new Map<Element, boolean>()): boolean {
+  if (!el) return false
+  let hidden = known.get(el)
+  if (hidden === undefined)
+    known.set(
+      el,
+      (hidden = getComputedStyle(el).display === "none" || isUndisplayed(el.parentElement, known)),
+    )
+  return hidden
+}
+
 /** Every element in `scope` with one of `roles`, in page order, leaving out what isn't rendered. */
 function withRole(scope: Element, roles: string[]) {
-  return [...scope.querySelectorAll("*")].filter((el) => roles.includes(roleOf(el)) && !isGone(el))
+  const known = new Map<Element, boolean>()
+  return [...scope.querySelectorAll("*")].filter(
+    (el) => roles.includes(roleOf(el)) && !isGone(el) && !isUndisplayed(el, known),
+  )
 }
 
 /** Whether an attribute is "true" or "false", as a boolean state must be. */
@@ -120,6 +136,7 @@ export {
   isDisabled,
   isGone,
   isRtl,
+  isUndisplayed,
   isUnreachable,
   roleOf,
   tabStops,
