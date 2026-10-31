@@ -317,7 +317,7 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
           inert: collapsed && sameSize(size, 0) ? "" : undefined,
         }
       }),
-      bind: (_, { api }) => api.internal.bindPanel(),
+      bind: (_, part) => part.api.internal.bindPanel(part),
     }),
 
     // The window splitter: a focusable separator whose value is the size of

@@ -265,6 +265,12 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
     const state = store.get()
     const idsChanged = ids.length !== state.ids.length || ids.some((id, index) => id !== state.ids[index])
     if (!idsChanged && sameConstraints(constraints, state.constraints)) return
+    // New bounds on the same panels move them like new space does, with the `resize` reason.
+    if (!idsChanged && !drag) {
+      store.set({ constraints })
+      request(fitLayout(current(), constraints), "resize")
+      return
+    }
     const layout = idsChanged ? startLayout(ids, constraints) : fitLayout(state.layout, constraints)
     requested = undefined
     store.set({ ids, constraints, layout })

@@ -3,7 +3,8 @@
 import { isAfter } from "../../foundation/kernel/order"
 import { bindDrag } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
-import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import { onProps } from "../../foundation/kernel/part"
 import type { ResizableOptions } from "./resizable"
 import type { State } from "./resizable-api"
 import { refreshCursor, registerHandle, releaseHandle, type HandleTarget } from "./resizable-handles"
@@ -24,6 +25,8 @@ type Group = {
   endDrag: (event?: PointerEvent) => void
   handleValue: (key: string) => { now: number; min: number; max: number } | null
 }
+
+const sizeProps = ["defaultSize", "minSize", "maxSize", "collapsible", "collapsedSize"] as const
 
 function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>, group: () => Group) {
   const { store, element } = context
@@ -48,9 +51,9 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
     return panels
   }
 
-  // Panels whose props changed since they bound, like a new `minSize`. Read
-  // before every interaction, since props change without binding again. The
-  // panels are in the order the last reconcile found, so nothing is sorted.
+  // Panels' current props, like a new `minSize`, read again before every
+  // interaction. The panels are in the order the last reconcile found, so
+  // nothing is sorted.
   function refresh() {
     if (!element("panel")) return
     const { ids } = store.get()
@@ -146,9 +149,20 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         view.cancelAnimationFrame(frame)
       }
     },
-    bindPanel() {
+    bindPanel(part: Part) {
       schedule()
-      return schedule
+      // New size props, like a larger `minSize`, apply as the panel renders them.
+      let sizes = part.props as PanelSizes
+      const unwatch = onProps(part, () => {
+        const next = part.props as PanelSizes
+        if (sizeProps.every((name) => next[name] === sizes[name])) return
+        sizes = next
+        schedule()
+      })
+      return () => {
+        unwatch()
+        schedule()
+      }
     },
     bindHandle(el: HTMLElement, key: string) {
       schedule()
