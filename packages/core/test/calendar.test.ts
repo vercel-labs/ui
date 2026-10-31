@@ -468,6 +468,16 @@ describe("calendar", () => {
     expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
   })
 
+  test("pressing another month's day before min keeps the month and focus where they were", async () => {
+    const { container, day, focused, instance } = mount({ min: "2026-10-01" })
+    await tick()
+    day("2026-10-16").focus()
+    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    await tick()
+    expect(instance.api.getMonth()).toBe("2026-10")
+    expect(focused()).toBe("2026-10-16")
+  })
+
   test("canceling an anchor change keeps a range's start as it was", async () => {
     let cancel = false
     const { day, instance } = mount({

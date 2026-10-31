@@ -474,7 +474,11 @@ function calendarApi<
           el.focus({ preventScroll: true })
         pointer = undefined
         pick(props.value, event)
-        if (isOutside(store.get(), props) && moveFocus(props.value, "item-press", event)) {
+        if (
+          isOutside(store.get(), props) &&
+          !outOfBounds(state, props.value) &&
+          moveFocus(props.value, "item-press", event)
+        ) {
           reveal(props.value, "item-press", event)
           roving.focus(props.value)
         }

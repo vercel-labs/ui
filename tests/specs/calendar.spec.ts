@@ -234,6 +234,15 @@ test("pressing a day of the next month selects it and shows its month", async ({
   expect(await selected(page)).toEqual([dateName("2026-10-01")])
 })
 
+test("pressing another month's day before min keeps the month shown", async ({ page, open }) => {
+  await open("calendar", { min: "2026-10-01" })
+  const before = page.locator('[data-slot="calendar-day"][data-outside]', { hasText: /^28$/ }).first()
+  await expect(before).toHaveAttribute("aria-disabled", "true")
+  await before.click({ force: true })
+  await expect(heading(page)).toHaveText("October 2026")
+  await expect(status(page)).toHaveText("")
+})
+
 test("a controlled calendar shows what the app passes", async ({ page, open }) => {
   await open("calendar", { controlled: "", value: "2026-10-31" })
   await day(page, "2026-10-31").focus()
