@@ -510,6 +510,33 @@ describe("bindDragPreview", () => {
     expect(radio.checked).toBe(true)
   })
 
+  test("takes the copy out of named details groups, its own root and any inside, and keeps them open", () => {
+    const el = document.createElement("details")
+    el.setAttribute("name", "faq")
+    el.open = true
+    el.innerHTML = '<summary>Card A</summary><details name="more" open><summary>More</summary></details>'
+    el.getBoundingClientRect = () => new DOMRect(10, 20, 100, 40)
+    document.body.append(el)
+    const preview = bindDragPreview(el, { x: 15, y: 25 })
+    const copies = [preview.el, ...preview.el.querySelectorAll("details")] as HTMLDetailsElement[]
+    expect(copies.map((copy) => [copy.getAttribute("name"), copy.open])).toEqual([
+      [null, true],
+      [null, true],
+    ])
+    expect([el.open, el.querySelector("details")!.open]).toEqual([true, true])
+    preview.remove()
+    el.remove()
+  })
+
+  test("takes a radio inside a label out of its group in the copy only", () => {
+    const el = rectBox(10, 20, 100, 40)
+    el.innerHTML = '<label><input type="radio" name="default" value="a" checked> Card A</label>'
+    const preview = bindDragPreview(el, { x: 15, y: 25 })
+    expect(preview.el.querySelector("input")!.hasAttribute("name")).toBe(false)
+    expect(el.querySelector("input")!.getAttribute("name")).toBe("default")
+    preview.remove()
+  })
+
   test("keeps other names in the copy, like an icon's", () => {
     const el = rectBox(10, 20, 100, 40)
     el.innerHTML = '<ui-icon name="grip"></ui-icon><input name="title" value="Card A">'
