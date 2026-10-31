@@ -30,7 +30,7 @@ const customMessages = new WeakMap<HTMLElement, string>()
 // formStateRestoreCallback and setCustomValidity here.
 function formCallback(el: HTMLElement, type: "reset"): void
 function formCallback(el: HTMLElement, type: "disabled", disabled: boolean): void
-function formCallback(el: HTMLElement, type: "restore", state: unknown, mode: string): void
+function formCallback(el: HTMLElement, type: "restore", state: unknown, mode: string): boolean
 function formCallback(el: HTMLElement, type: "customValidity", message: string): boolean
 function formCallback(el: HTMLElement, type: keyof FormCallbacks, ...args: unknown[]) {
   if (type === "customValidity") customMessages.set(el, args[0] as string)

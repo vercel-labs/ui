@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Order</title>
+    <script type="module" src="{{files}}/web.js"></script>
+    <style>
+      ui-checkbox,
+      ui-radio {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 1px solid;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <label><input name="note" /> Note</label>
+      <label><ui-checkbox name="gift"></ui-checkbox> Gift wrap</label>
+      <ui-radio-group name="shipping" aria-label="Shipping">
+        <label><ui-radio value="standard"></ui-radio> Standard</label>
+        <label><ui-radio value="express"></ui-radio> Express</label>
+      </ui-radio-group>
+      <ui-checkbox-group name="toppings" aria-label="Toppings">
+        <label><ui-checkbox value="cheese"></ui-checkbox> Cheese</label>
+        <label><ui-checkbox value="olives"></ui-checkbox> Olives</label>
+      </ui-checkbox-group>
+      <ui-select name="size">
+        <ui-select-trigger><button aria-label="Size"></button></ui-select-trigger>
+        <ui-select-content hidden>
+          <ui-select-item value="small">Small</ui-select-item>
+          <ui-select-item value="large">Large</ui-select-item>
+        </ui-select-content>
+      </ui-select>
+    </form>
+  </body>
+</html>

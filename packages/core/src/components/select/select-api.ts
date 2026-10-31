@@ -189,6 +189,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
     showEmpty: () => store.get().searchable && store.get().mounted && !store.get().query.trim(),
     toKey,
     filter: () => (store.get().searchable ? (options().filter ?? "contains") : undefined),
+    rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
     active: () => store.get().open,

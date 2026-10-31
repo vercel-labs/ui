@@ -520,3 +520,42 @@ test('disabled="false" disables and required="false" requires, like on native co
   })
   expect(result).toEqual({ ariaDisabled: "true", matches: true, value: null, valid: false })
 })
+
+test("a checkbox group disabled at the start and enabled later enables its checkboxes", async ({ page }) => {
+  const result = await page.evaluate(async () => {
+    const form = document.createElement("form")
+    form.innerHTML = `
+      <ui-checkbox-group name="toppings" aria-label="Toppings" disabled>
+        <ui-checkbox value="cheese" aria-label="Cheese" disabled="disabled"></ui-checkbox>
+        <ui-checkbox value="olives" aria-label="Olives"></ui-checkbox>
+      </ui-checkbox-group>`
+    document.querySelector("#stage")!.append(form)
+    const tick = () => new Promise((done) => setTimeout(done))
+    const boxes = [...form.querySelectorAll("ui-checkbox")]
+    const disabled = () => boxes.map((box) => [box.getAttribute("aria-disabled"), box.matches(":disabled")])
+    await tick()
+    const start = disabled()
+    form.querySelector("ui-checkbox-group")!.removeAttribute("disabled")
+    await tick()
+    const enabled = disabled()
+    boxes[0].removeAttribute("disabled")
+    await tick()
+    return { start, enabled, author: disabled() }
+  })
+  expect(result).toEqual({
+    start: [
+      ["true", true],
+      ["true", true],
+    ],
+    enabled: [
+      ["true", true],
+      [null, false],
+    ],
+    author: [
+      [null, false],
+      [null, false],
+    ],
+  })
+  await page.getByRole("checkbox", { name: "Olives" }).click()
+  await expect(page.getByRole("checkbox", { name: "Olives" })).toBeChecked()
+})

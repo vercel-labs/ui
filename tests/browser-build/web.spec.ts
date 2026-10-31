@@ -69,6 +69,42 @@ test("a component's own file defines it without web.js", async ({ page }) => {
   expect(entries).toEqual(["tabs"])
 })
 
+test("form controls get their values back after going back, with no events, like native ones", async ({
+  page,
+}) => {
+  await page.goto("/form.html")
+  await page.getByRole("textbox", { name: "Note" }).fill("Leave at the door")
+  await page.getByRole("checkbox", { name: "Gift wrap" }).click()
+  await page.getByRole("radio", { name: "Express" }).click()
+  await page.getByRole("checkbox", { name: "Olives" }).click()
+  await page.getByRole("combobox", { name: "Size" }).click()
+  await page.getByRole("option", { name: "Large" }).click()
+  await page.addInitScript(() => {
+    const heard: string[] = []
+    Object.assign(window, { heard })
+    for (const type of ["input", "change", "checkedchange", "valuechange"])
+      document.addEventListener(
+        type,
+        (event) => heard.push(`${type} ${(event.target as Element).localName}`),
+        true,
+      )
+  })
+  await page.goto("/tabs.html")
+  await page.goBack()
+  await expect(page.getByRole("textbox", { name: "Note" })).toHaveValue("Leave at the door")
+  await expect(page.getByRole("checkbox", { name: "Gift wrap" })).toBeChecked()
+  await expect(page.getByRole("radio", { name: "Express" })).toBeChecked()
+  await expect(page.getByRole("checkbox", { name: "Olives" })).toBeChecked()
+  await expect(page.getByRole("combobox", { name: "Size" })).toHaveText("Large")
+  expect(
+    await page.evaluate(() => Object.fromEntries(new FormData(document.querySelector("form")!))),
+  ).toEqual({ note: "Leave at the door", gift: "on", shipping: "express", toppings: "olives", size: "large" })
+  const heard = await page.evaluate(
+    () => new Promise((done) => setTimeout(() => done((window as unknown as { heard: string[] }).heard))),
+  )
+  expect(heard).toEqual([])
+})
+
 test("closed popups stay hidden before the scripts run", async ({ page }) => {
   await page.route(/\.js$/, (route) => route.abort())
   await page.goto("/settings.html")
