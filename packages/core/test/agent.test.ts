@@ -135,6 +135,26 @@ describe("agent", () => {
     expect(outcome.error?.message).toContain("takes no setChecked now")
   })
 
+  test("a component inside a disabled fieldset takes no actions", async () => {
+    const agent = createAgent()
+    const instance = select({ id: "visibility", items: ["Private", "Public"] })
+    const fieldset = document.createElement("fieldset")
+    fieldset.disabled = true
+    const trigger = document.createElement("button")
+    trigger.setAttribute("aria-label", "Visibility")
+    const input = document.createElement("input")
+    fieldset.append(trigger, input)
+    document.body.append(fieldset)
+    cleanups.push(bind(instance.part("trigger"), trigger), bind(instance.part("form-input"), input), () =>
+      instance.destroy(),
+    )
+    await Promise.resolve()
+    const [component] = agent.snapshot()
+    expect(component).toMatchObject({ label: "Visibility", disabled: true, actions: [] })
+    const outcome = await agent.act({ steps: [{ ref: "Visibility", action: "setValue", args: ["Public"] }] })
+    expect(outcome.error?.message).toContain("takes no setValue now")
+  })
+
   test("a component that leaves the page stays in the snapshot as off the page, with the state it had", async () => {
     const agent = createAgent()
     mountCheckbox({ id: "terms", defaultChecked: true }, "Send a weekly digest")

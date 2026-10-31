@@ -341,7 +341,10 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
   if (buttons.length) out.buttons = buttons
   const disabled =
-    state.disabled === true || state.readOnly === true || ownButton(parts)?.matches(":disabled")
+    state.disabled === true ||
+    state.formDisabled === true ||
+    state.readOnly === true ||
+    ownButton(parts)?.matches(":disabled")
   if (disabled) out.disabled = true
   else {
     out.actions = actionsOf(entry, api)
