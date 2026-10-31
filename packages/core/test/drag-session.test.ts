@@ -181,3 +181,38 @@ test("an area that leaves the page mid-drag commits nothing", async () => {
   instance.destroy()
   expect(onCommit).not.toHaveBeenCalled()
 })
+
+test("a second finger on a slider mid-drag leaves the value to the first", async () => {
+  const mounted = mountSlider({})
+  destroy.push(mounted.unmount)
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { pointerId: 2, isPrimary: false, clientX: 80, clientY: 5 }))
+  document.dispatchEvent(press("pointermove", { pointerId: 2, isPrimary: false, clientX: 90, clientY: 5 }))
+  await frame()
+  expect(mounted.state.value).toBe(10)
+})
+
+test("a held stepper that leaves the page stops for good, and its release commits nothing", () => {
+  vi.useFakeTimers()
+  try {
+    const onValueCommit = vi.fn()
+    const input = mount(
+      numberInput,
+      { defaultValue: 0, onValueCommit },
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+    )
+    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    vi.advanceTimersByTime(1000)
+    const held = input.state.value
+    input.unmount()
+    document.dispatchEvent(press("pointerup", { pointerType: "mouse" }))
+    vi.advanceTimersByTime(2000)
+    expect(input.state.value).toBe(held)
+    expect(onValueCommit).not.toHaveBeenCalled()
+    expect(vi.getTimerCount()).toBe(0)
+  } finally {
+    vi.useRealTimers()
+  }
+})

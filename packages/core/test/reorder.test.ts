@@ -661,8 +661,9 @@ describe("bindDrag", () => {
 })
 
 describe("createReorder after a missed release", () => {
-  test("a new pen press ends the drag that missed its release and picks up the pressed item", async () => {
-    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"] })
+  test("a new pen press ends the drag that missed its release, without committing it, and picks up the pressed item", async () => {
+    const onValueChange = vi.fn()
+    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
     stackRects(list)
     await tick()
     const pen = (type: string, init: { x: number; y: number; id: number; target?: EventTarget }) => {
@@ -684,5 +685,7 @@ describe("createReorder after a missed release", () => {
     pen("pointermove", { x: 10, y: 105, id: 2 })
     await frame()
     expect(instance.get().moving).toMatchObject({ key: "b" })
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(instance.get().value).toEqual(["a", "b", "c", "d"])
   })
 })
