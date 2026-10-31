@@ -386,6 +386,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
 
   // A branch whose children are loading because a key asked to step into it.
   let stepInto: string | null = null
+  let stepIntoEvent: KeyboardEvent | undefined
 
   function load(key: string, why: Why<TreeExpandedChangeReason>) {
     const running = loads.get(key)
@@ -493,9 +494,12 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     const parent = stepInto
     const child = roving.items().find((item) => parentOf(item.key) === parent)
     if (child) {
+      // Only the key press that's still where focus is selects, not one the user has moved on from.
+      const stayed = store.get().active === parent
       stepInto = null
       child.el.focus()
-      follow(child.key)
+      if (stayed) follow(child.key, stepIntoEvent)
+      stepIntoEvent = undefined
     }
   }
 
@@ -583,8 +587,10 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
         if (!disabled) expandDeep(key, nav)
       } else if (!expanded) {
         if (disabled) return
-        if (loads.has(key)) stepInto = key
-        else setOpen(key, true, nav)
+        if (loads.has(key)) {
+          stepInto = key
+          stepIntoEvent = event
+        } else setOpen(key, true, nav)
       } else {
         const child = roving.items().find((item) => parentOf(item.key) === key)
         const first = child?.key ?? fromData()?.tree.children(key)[0]
