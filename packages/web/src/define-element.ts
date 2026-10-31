@@ -25,6 +25,7 @@ import {
   schemaOf,
   selectedKeys,
   subscribe,
+  validityChanged,
   warn,
   writeFromScript,
   writeStyle,
@@ -839,6 +840,8 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         } finally {
           if (!nested) quiet.delete(this)
         }
+        // Fields read validity again on `input` and `change`, which this write doesn't fire.
+        if (!nested) validityChanged(this)
       }
 
       connectedCallback() {

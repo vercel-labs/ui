@@ -232,6 +232,21 @@ test.describe("errors", () => {
     await expect(errors(page)).toHaveCount(0)
   })
 
+  test("update as state set from script changes the value once shown", async ({ page, open, framework }) => {
+    test.skip(!framework.startsWith("web"), "Web components take state set on their properties.")
+    await open("forms")
+    await save(page)
+    await expect(page.getByText("Accept the terms to continue.")).toBeVisible()
+    await expect(page.getByRole("radiogroup", { name: "Plan" })).toHaveAttribute("aria-invalid", "true")
+    await page.evaluate(() => {
+      Object.assign(document.querySelector("#terms")!, { checked: true })
+      Object.assign(document.querySelector("ui-radio-group[name=plan]")!, { value: "pro" })
+    })
+    await expect(page.getByText("Accept the terms to continue.")).toBeHidden()
+    await expect(checkbox(page, "Accept the terms")).not.toHaveAttribute("aria-invalid", "true")
+    await expect(page.getByRole("radiogroup", { name: "Plan" })).not.toHaveAttribute("aria-invalid", "true")
+  })
+
   test(
     "a field marked invalid shows its error right away",
     { tag: "@enhancement" },
