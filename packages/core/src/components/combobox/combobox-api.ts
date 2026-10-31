@@ -244,6 +244,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     showEmpty: () => !store.get().query.trim(),
     toKey,
     filter: () => options().filter ?? "contains",
+    rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
     active: () => store.get().open,
