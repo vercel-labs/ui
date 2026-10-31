@@ -121,7 +121,7 @@ const frames = () =>
   })
 
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
-function fromData(items: unknown) {
+function fromData(items: unknown, disabled?: Set<string>) {
   if (!Array.isArray(items)) return
   const out: { value: string; label: string }[] = []
   const add = (item: unknown) => {
@@ -133,10 +133,12 @@ function fromData(items: unknown) {
         children?: unknown[]
         value?: unknown
         label?: string
+        disabled?: boolean
       }
       if (entry.type === "group") entry.items?.forEach(add)
       else if (entry.type !== "separator") {
         out.push({ value: String(entry.value), label: entry.label ?? "" })
+        if (entry.disabled === true) disabled?.add(String(entry.value))
         // A tree's branches, whose rows aren't rendered while they're closed.
         entry.children?.forEach(add)
       }
@@ -147,8 +149,28 @@ function fromData(items: unknown) {
 }
 
 // A component's items as data, from its state's `items` unless its `agent` key says where they are.
-function dataOf(entry: Entry, instance: PrimitiveInstance) {
-  return fromData(entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items)
+function dataOf(entry: Entry, instance: PrimitiveInstance, disabled?: Set<string>) {
+  return fromData(
+    entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items,
+    disabled,
+  )
+}
+
+// The values of the items a person can't choose, like a disabled option, from the list's data and its elements.
+function disabledItems(entry: Entry, instance: PrimitiveInstance) {
+  const disabled = new Set<string>()
+  dataOf(entry, instance, disabled)
+  const parts = bound(instance)
+  const items = new Set(renderedItems(parts).map((item) => item.value))
+  for (const part of parts)
+    if (
+      items.has(part.key) &&
+      ((part.props as { disabled?: unknown } | undefined)?.disabled === true ||
+        part.el.matches(":disabled") ||
+        part.el.getAttribute("aria-disabled") === "true")
+    )
+      disabled.add(part.key)
+  return disabled
 }
 
 // The api methods an agent may call: the ones its `agent` key lists, else the ones named like a change.
@@ -849,6 +871,21 @@ function createAgent(
         }
       }
       if (/^set[A-Z]/.test(action)) args = [valueFor(entry, action, args[0]), ...args.slice(1)]
+      // The api takes a disabled item, which a person can't choose. One already chosen stays, and
+      // an autocomplete's value is text, which a person can still type.
+      if (entry.component !== "autocomplete" && ["setValue", "select", "open", "toggle"].includes(action)) {
+        const value = (instance.get() as { value?: unknown }).value
+        const held = (Array.isArray(value) ? value : [value]).map(String)
+        const disabled = disabledItems(entry, instance)
+        const blocked = (Array.isArray(args[0]) ? args[0] : [args[0]])
+          .map(String)
+          .find((item) => disabled.has(item) && !held.includes(item))
+        if (blocked !== undefined) {
+          const items = dataOf(entry, instance) ?? renderedItems(bound(instance))
+          const label = items.find((item) => item.value === blocked)?.label || blocked
+          throw new Error(`"${label}" in ${entry.label ?? entry.component} (${entry.ref}) is disabled now.`)
+        }
+      }
       run = () => fn(...args)
     }
     // A press asks the button it clicks, and any other step the component's

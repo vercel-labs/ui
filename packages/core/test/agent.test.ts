@@ -4,6 +4,7 @@
 // for an adapter.
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { accordion } from "../src/components/accordion/accordion"
+import { autocomplete } from "../src/components/autocomplete/autocomplete"
 import { createAgent, registerTools, type AgentComponent } from "../src/page/agent/agent"
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
@@ -241,7 +242,10 @@ describe("agent", () => {
     expect(() => registerTools(agent, { allow: () => true })()).not.toThrow()
   })
 
-  function mountRegion(items: { value: string; label: string }[], onValueChange = vi.fn()) {
+  function mountRegion(
+    items: { value: string; label: string; disabled?: boolean }[],
+    onValueChange = vi.fn(),
+  ) {
     const instance = select({ id: "region", items, onValueChange })
     const el = document.createElement("button")
     el.setAttribute("aria-label", "Region")
@@ -265,6 +269,41 @@ describe("agent", () => {
       /^No item "Tokyo" in Region \(c\d+\)\. Its items: Frankfurt, Singapore\.$/,
     )
     expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  test("setValue refuses a disabled item, by its label or its value, as a person can't choose it", async () => {
+    const agent = createAgent()
+    const onValueChange = vi.fn()
+    mountRegion(
+      [
+        { value: "fra", label: "Frankfurt", disabled: true },
+        { value: "sin", label: "Singapore" },
+      ],
+      onValueChange,
+    )
+    for (const args of [["Frankfurt"], ["fra"]]) {
+      const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args }] })
+      expect(outcome.error?.message).toMatch(/^"Frankfurt" in Region \(c\d+\) is disabled now\.$/)
+    }
+    expect(onValueChange).not.toHaveBeenCalled()
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Singapore"] }] })
+    expect(outcome.ok).toBe(true)
+  })
+
+  test("setValue takes text that matches a disabled suggestion in an autocomplete, as a person can type it", async () => {
+    const agent = createAgent()
+    const instance = autocomplete({
+      id: "city",
+      items: ["Berlin", { value: "Cherry", label: "Cherry", disabled: true }],
+    })
+    const el = document.createElement("input")
+    el.setAttribute("aria-label", "City")
+    document.body.append(el)
+    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    await Promise.resolve()
+    const outcome = await agent.act({ steps: [{ ref: "City", action: "setValue", args: ["Cherry"] }] })
+    expect(outcome.error).toBeUndefined()
+    expect(instance.get().value).toBe("Cherry")
   })
 
   test("setValue takes an item's label ignoring accents and case", async () => {
