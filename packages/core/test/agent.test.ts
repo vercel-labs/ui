@@ -1072,7 +1072,7 @@ describe("agent act", () => {
 
   // A row's actions popover whose Remove button renders once it opens, the
   // way an adapter renders its content, and every open change it hears.
-  async function mountActions({ confirm }: { confirm?: string } = {}) {
+  async function mountActions({ confirm, disabled }: { confirm?: string; disabled?: boolean } = {}) {
     const { popover } = await import("../src/components/popover/popover")
     const onClick = vi.fn()
     const changes: [boolean, string][] = []
@@ -1085,6 +1085,7 @@ describe("agent act", () => {
         const remove = document.createElement("button")
         remove.textContent = "Remove"
         if (confirm) remove.setAttribute("data-agent-confirm", confirm)
+        remove.disabled = !!disabled
         remove.addEventListener("click", onClick)
         content.append(remove)
       },
@@ -1108,6 +1109,16 @@ describe("agent act", () => {
       steps: [{ result: expect.stringMatching(/^Pressed "Remove", after opening c\d+\.$/) }],
     })
     expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  test("a press on a disabled button fails, and closes the popup it opened", async () => {
+    const agent = createAgent()
+    const { instance, onClick } = await mountActions({ disabled: true })
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    expect(outcome).toMatchObject({ ok: false, error: { message: expect.stringContaining('"Remove"') } })
+    expect(outcome.error?.message).toContain("disabled")
+    expect(instance.get().open).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
   })
 
   test("a press allow refuses doesn't open the popup", async () => {

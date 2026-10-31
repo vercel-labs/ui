@@ -650,6 +650,10 @@ function createAgent(
       throw new Error(
         `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
       )
+    if (button.matches(":disabled") || button.getAttribute("aria-disabled") === "true") {
+      if (opened) asAgent(() => api.setOpen!(false))
+      throw new Error(`"${textOf(button) || accessibleName(button)}" in ${entry.ref} is disabled now.`)
+    }
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
     const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
     const close = () => asAgent(() => api.setOpen?.(false))
