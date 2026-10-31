@@ -142,7 +142,7 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
     if (event.key !== "Escape") return
     event.preventDefault()
     event.stopPropagation()
-    if (dragged) swallowNextClick(el.ownerDocument, true)
+    if (dragged) swallowNextClick(el.ownerDocument, true, pointerId)
     end(pending.event, true)
   }
 
@@ -200,24 +200,30 @@ function requestLock(el: HTMLElement) {
 // it ends on, like a link. Call it in the release's task, or on the press with
 // `untilRelease`. It stops after the release's task, or at the next press, so
 // a later click goes through.
-function swallowNextClick(doc: Document, untilRelease = false) {
+function swallowNextClick(doc: Document, untilRelease = false, pointerId?: number) {
   const view = doc.defaultView ?? window
+  // With `pointerId`, another pointer's press, release or click, like a second finger's, leaves it armed.
+  const ours = (event: Event) =>
+    pointerId === undefined || !("pointerId" in event) || event.pointerId === pointerId
   const swallow = (event: Event) => {
+    if (!ours(event)) return
     event.preventDefault()
     event.stopPropagation()
+    doc.removeEventListener("click", swallow, true)
   }
   const forget = () => {
     doc.removeEventListener("click", swallow, true)
-    doc.removeEventListener("pointerdown", forget, true)
-    doc.removeEventListener("pointerup", stop, true)
-    doc.removeEventListener("pointercancel", stop, true)
+    doc.removeEventListener("pointerdown", press, true)
+    doc.removeEventListener("pointerup", release, true)
+    doc.removeEventListener("pointercancel", release, true)
   }
-  const stop = () => view.setTimeout(forget)
-  doc.addEventListener("click", swallow, { capture: true, once: true })
-  doc.addEventListener("pointerdown", forget, { capture: true, once: true })
-  if (!untilRelease) return stop()
-  doc.addEventListener("pointerup", stop, { capture: true, once: true })
-  doc.addEventListener("pointercancel", stop, { capture: true, once: true })
+  const press = (event: Event) => ours(event) && forget()
+  const release = (event: Event) => ours(event) && view.setTimeout(forget)
+  doc.addEventListener("click", swallow, true)
+  doc.addEventListener("pointerdown", press, true)
+  if (!untilRelease) return view.setTimeout(forget)
+  doc.addEventListener("pointerup", release, true)
+  doc.addEventListener("pointercancel", release, true)
 }
 
 /**

@@ -666,6 +666,25 @@ describe("bindDrag", () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  test("another pointer's release doesn't disarm the click guard of a drag canceled with Escape", async () => {
+    const el = document.createElement("a")
+    el.href = "#card"
+    document.body.append(el)
+    const onClick = vi.fn()
+    el.addEventListener("click", onClick)
+    const down = pointer("pointerdown", { target: el }) as PointerEvent
+    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove: () => {}, onEnd: () => {} })
+    pointer("pointermove", { x: 20 })
+    await frame()
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    pointer("pointerdown", { id: 2 })
+    pointer("pointerup", { id: 2 })
+    await tick()
+    pointer("pointerup", { target: el })
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
   test("onStart returning false stops following the pointer", async () => {
     const el = document.createElement("div")
     document.body.append(el)
