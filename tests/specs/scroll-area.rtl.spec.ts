@@ -77,6 +77,22 @@ test("dragging the thumb follows the page when it turns right to left after moun
   await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(-10)
 })
 
+test("a rubber band past the start of a left to right area keeps the thumb at the start", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  const track = await trackBox(page, gallery.label, "horizontal")
+  // Safari reads a negative scrollLeft while it stretches past the start, which Chromium can't scroll to.
+  await viewport(page, gallery.label).evaluate((el) => {
+    Object.defineProperty(el, "scrollLeft", { configurable: true, get: () => -50 })
+    el.dispatchEvent(new Event("scroll"))
+  })
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+})
+
 test("the thumb follows scrolling when the page turns right to left after mount", async ({ page, open }) => {
   await open("scroll-area")
   await trackBox(page, gallery.label, "horizontal")
