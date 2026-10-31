@@ -239,6 +239,14 @@ describe("createSpans", () => {
     document.dispatchEvent(pointer("pointercancel", 50, 905))
     expect(set).not.toHaveBeenCalled()
     expect(instance.get().events).toEqual([])
+    // A tap on the still-empty track then makes one span of the default size.
+    spans.trackPointerdown(
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
+      "mon",
+    )
+    document.dispatchEvent(pointer("pointerup", 50, 905))
+    expect(set).toHaveBeenCalledTimes(1)
+    expect(instance.get().events).toHaveLength(1)
   })
 
   test("a press on a span the browser takes over says nothing and changes nothing", () => {
