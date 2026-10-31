@@ -272,11 +272,14 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     return (key !== null && element(triggerSlot, key)) || element(triggerSlot)
   }
   // Only the trigger that opened it, so focus never returns to another one once that one is gone.
-  // An open after that trigger was already gone, from code or the `open` option, falls back like `triggerElement`.
+  // An open after that trigger was already gone, from code or the `open` option, falls back like
+  // `triggerElement`, and so does a popup's only trigger, like the same button rendered again.
   let goneAtOpen: string | null = null
+  let onlyTrigger = false
   const openedFrom = () => {
     const key = store.get().trigger
-    return rules?.trigger || key === null || key === goneAtOpen ? triggerElement() : element(triggerSlot, key)
+    if (rules?.trigger || key === null || key === goneAtOpen) return triggerElement()
+    return element(triggerSlot, key) ?? (onlyTrigger ? element(triggerSlot) : undefined)
   }
   // Before the layer's own listener, which reads `openedFrom` as the popup shows.
   let wasOpen = store.get().open
@@ -284,7 +287,9 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     const { open, trigger } = store.get()
     if (open === wasOpen) return
     wasOpen = open
-    if (open) goneAtOpen = trigger !== null && !element(triggerSlot, trigger) ? trigger : null
+    if (!open) return
+    goneAtOpen = trigger !== null && !element(triggerSlot, trigger) ? trigger : null
+    onlyTrigger = elements(context, triggerSlot).length <= 1
   })
 
   const core: PopupCore = {
