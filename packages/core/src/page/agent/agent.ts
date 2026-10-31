@@ -342,14 +342,15 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (confirm) out.confirm = confirm
   const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
   if (buttons.length) out.buttons = buttons
+  const fields = parts.filter((part) => part.el.matches("input, textarea, select"))
   const disabled =
     state.disabled === true ||
     state.formDisabled === true ||
     state.readOnly === true ||
-    // A disabled fieldset disables a native root, like a Button's, and the fields a component holds,
-    // like a DatePicker's input. A button part alone, like a stepper at its max, leaves it usable.
+    // A disabled fieldset disables a native root, like a Button's, and every field a component holds,
+    // like a DatePicker's inputs. One disabled radio, or a stepper button at its max, leaves it usable.
     rootOf(parts)?.matches(":disabled") ||
-    parts.some((part) => !part.key && part.el.matches("input:disabled, textarea:disabled, select:disabled"))
+    (fields.length > 0 && fields.every((part) => part.el.matches(":disabled")))
   if (disabled) out.disabled = true
   else {
     out.actions = actionsOf(entry, api)

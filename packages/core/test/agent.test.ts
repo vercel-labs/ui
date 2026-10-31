@@ -192,6 +192,19 @@ describe("agent", () => {
     expect(outcome.error?.message).toContain("takes no setValue now")
   })
 
+  test("a date picker whose keyed input a disabled fieldset disables takes no actions, as adapters bind it", async () => {
+    const agent = createAgent()
+    const instance = datePicker({ id: "start-date", defaultMonth: "2026-11" })
+    const fieldset = document.body.appendChild(document.createElement("fieldset"))
+    fieldset.disabled = true
+    const input = fieldset.appendChild(document.createElement("input"))
+    input.setAttribute("aria-label", "Start")
+    cleanups.push(bind(instance.part("input", { id: "start", end: false }), input), () => instance.destroy())
+    await Promise.resolve()
+    const component = agent.snapshot().find((found) => found.component === "date-picker")
+    expect(component).toMatchObject({ label: "Start", disabled: true, actions: [] })
+  })
+
   test("a number input at its max still takes actions, though its increment button is disabled", async () => {
     const agent = createAgent()
     const instance = numberInput({ id: "seats", defaultValue: 10, max: 10 })
