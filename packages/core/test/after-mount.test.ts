@@ -63,6 +63,12 @@ Element.prototype.animate ??= function () {
   return animation as never
 }
 
+// jsdom spaces frames 16ms apart. Nothing here measures time, so each frame
+// runs as its own task as soon as the queue reaches it, in the same order.
+globalThis.requestAnimationFrame = (callback) =>
+  setTimeout(() => callback(performance.now()), 0) as unknown as number
+globalThis.cancelAnimationFrame = (handle) => clearTimeout(handle)
+
 const mounts: { unmount: () => void }[] = []
 afterEach(() => mounts.splice(0).forEach((mounted) => mounted.unmount()))
 
