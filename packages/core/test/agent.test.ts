@@ -290,6 +290,58 @@ describe("agent", () => {
     expect(outcome.ok).toBe(true)
   })
 
+  test("setValue compares object values by their contents, not as text", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "city",
+      items: [
+        { value: { id: "fra" }, label: "Frankfurt", disabled: true },
+        { value: { id: "tyo" }, label: "Tokyo" },
+      ],
+      itemToValue: (value: { id: string }) => value.id,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "City")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const enabled = await agent.act({ steps: [{ ref: "City", action: "setValue", args: [{ id: "tyo" }] }] })
+    expect(enabled.ok).toBe(true)
+    expect(instance.get().value).toEqual({ id: "tyo" })
+    const refused = await agent.act({ steps: [{ ref: "City", action: "setValue", args: [{ id: "fra" }] }] })
+    expect(refused.ok).toBe(false)
+    expect(instance.get().value).toEqual({ id: "tyo" })
+  })
+
+  test("setValue refuses a disabled option that renders only while its select is open", async () => {
+    const agent = createAgent()
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbindItems: (() => void)[] = []
+    const instance: ReturnType<typeof select> = select({
+      id: "region",
+      onOpenChange: (open) => {
+        unbindItems.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        if (!open) return
+        for (const [value, label, disabled] of [
+          ["fra", "Frankfurt", true],
+          ["tyo", "Tokyo", false],
+        ] as const) {
+          const item = content.appendChild(document.createElement("div"))
+          item.textContent = label
+          unbindItems.push(bind(instance.part("item", { value, disabled }), item))
+        }
+      },
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Region")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => {
+      unbindItems.forEach((unbind) => unbind())
+      instance.destroy()
+    })
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Frankfurt"] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toBeNull()
+  })
+
   test("setValue takes text that matches a disabled suggestion in an autocomplete, as a person can type it", async () => {
     const agent = createAgent()
     const instance = autocomplete({
