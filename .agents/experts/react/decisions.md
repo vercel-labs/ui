@@ -34,7 +34,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
 - **A Checkbox in its own Field inside a CheckboxGroup** is unnamed in server markup until hydration, as Radio was before PR 13.
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
-- **Calendar `focused` and `anchor` only report**: `onFocusedChange` and `onAnchorChange` have no controlled prop and no details argument, unlike React Aria's `focusedValue` (PR 90).
 - **An author value equal to the part's own counts as the part's** on a `direct` attribute: a `SelectTrigger` given the select's own label id loses it when `SelectLabel` unmounts (PR 86). Harmless, since the id dangles then anyway.
 
 ## Revisit
