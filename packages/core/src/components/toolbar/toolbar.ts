@@ -1,3 +1,4 @@
+import { watchFormDisabled } from "../../foundation/forms/form"
 import {
   buttonAttrs,
   buttonElement,
@@ -122,7 +123,7 @@ type ToolbarGroupProps = GroupProps
 type ToolbarRootState = {
   /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
-  /** Whether the whole toolbar is disabled. */
+  /** Whether the whole toolbar is disabled, by its `disabled` option or a disabled fieldset around it. */
   disabled: boolean
 }
 /**
@@ -175,6 +176,8 @@ type ToolbarSeparatorState = {
 type State = {
   orientation: ToolbarOrientation
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   // The item that holds the tab stop. Null until items bind.
   stop: string | null
   // Buttons rendered as something else, like a link, by key. Known once they bind.
@@ -182,8 +185,9 @@ type State = {
 }
 
 const across = (orientation: ToolbarOrientation) => (orientation === "horizontal" ? "vertical" : "horizontal")
+const isToolbarDisabled = (state: State) => state.disabled || state.formDisabled
 const isDisabled = (state: State, props: ItemProps) =>
-  !!(props.disabled || props.groupDisabled || state.disabled)
+  !!(props.disabled || props.groupDisabled || isToolbarDisabled(state))
 const isFocusable = (state: State, props: ItemProps) =>
   !isDisabled(state, props) || (props.focusableWhenDisabled ?? true)
 
@@ -231,7 +235,7 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
     stop: () => store.get().stop,
     follow: (key, listener) => followStop(store, key, listener),
     orientation,
-    disabled: () => store.get().disabled,
+    disabled: () => isToolbarDisabled(store.get()),
   }
   // What toggles inside a disabled group see. The scope is all they know of
   // the toolbar, so the group's disabled reaches them as the toolbar's.
@@ -332,21 +336,27 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     disabled: "boolean",
     controller: "value",
   },
-  state: (options: ToolbarOptions): State => ({ ...fromOptions(options), stop: null, elements: {} }),
+  state: (options: ToolbarOptions): State => ({
+    ...fromOptions(options),
+    formDisabled: false,
+    stop: null,
+    elements: {},
+  }),
   sync: fromOptions,
   api: toolbarApi,
   slots: (slot) => ({
     root: slot<{}, ToolbarRootState>({
-      state: (state) => ({ orientation: state.orientation, disabled: state.disabled }),
+      state: (state) => ({ orientation: state.orientation, disabled: isToolbarDisabled(state) }),
       attrs: (state) => ({
         role: "toolbar",
         "aria-orientation": state.orientation,
         "data-orientation": state.orientation,
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isToolbarDisabled(state) ? "" : undefined,
       }),
       on: {
         keydown: (event, { api }) => api.internal.keydown(event),
       },
+      bind: (el, { store }) => watchFormDisabled(el, store),
     }),
 
     button: slot<ItemProps, ToolbarButtonState>({
@@ -423,12 +433,12 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     group: slot<GroupProps, ToolbarGroupState>({
       props: { id: "id", disabled: "boolean" },
       state: (state, { props }) => ({
-        disabled: !!(props.disabled || state.disabled),
+        disabled: !!props.disabled || isToolbarDisabled(state),
         orientation: state.orientation,
       }),
       attrs: (state, { props }) => ({
         role: "group",
-        "data-disabled": props.disabled || state.disabled ? "" : undefined,
+        "data-disabled": props.disabled || isToolbarDisabled(state) ? "" : undefined,
         "data-orientation": state.orientation,
       }),
     }),

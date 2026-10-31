@@ -2,6 +2,7 @@
 // move by day and week across months, as the WAI-ARIA date picker dialog
 // asks. It selects one date, any number, or a range, as ISO strings, with no
 // date library: `@ui-sdk/core/date` does the arithmetic and `Intl` the names.
+import { watchFormDisabled } from "../../foundation/forms/form"
 import type { CalendarMode, CalendarValue, DateMatchers, ISOMonth } from "./calendar-model"
 import type { ISODate } from "../../foundation/date/plain-date"
 import { createController } from "../../foundation/kernel/controller"
@@ -399,7 +400,10 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
         "data-disabled": isDisabled(state) ? "" : undefined,
         "data-readonly": state.readOnly ? "" : undefined,
       }),
-      bind: (el, { api }) => api.internal.bindRoot(el),
+      bind(el, { api, store }) {
+        const cleanups = [watchFormDisabled(el, store), api.internal.bindRoot(el)]
+        return () => cleanups.forEach((cleanup) => cleanup?.())
+      },
     }),
 
     ...calendarSlots(slot),

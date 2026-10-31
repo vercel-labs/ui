@@ -34,6 +34,8 @@ import { createChange, createCommit } from "../../foundation/kernel/input-source
 type State = {
   orientation: "horizontal" | "vertical"
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   step: number
   largeStep: number
   // Each panel's size in percent, in panel order. Live: drags write it every
@@ -145,7 +147,7 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
   const refresh = dom.refresh
 
   const current = () => requested ?? store.get().layout
-  const isDisabled = () => store.get().disabled
+  const isDisabled = () => store.get().disabled || store.get().formDisabled
   const handleDisabled = (key: string) => isDisabled() || !!context.props("handle", key)?.disabled
   // Which handles are disabled on their own, by index. Moves from the others
   // stop at them, so the panels past one keep their sizes.

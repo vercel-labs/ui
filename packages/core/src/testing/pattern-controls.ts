@@ -1,18 +1,9 @@
 // The patterns built from single controls: disclosure, accordion, switch,
 // checkbox and slider. Each checks every control in the root, then presses
 // its keys and presses them again to put the state back.
-import {
-  accessibleName,
-  checkedOf,
-  hasBoolean,
-  ids,
-  isDisabled,
-  isGone,
-  isRtl,
-  roleOf,
-  withRole,
-} from "./aria"
+import { accessibleName, checkedOf, hasBoolean, ids, isGone, isRtl, roleOf, withRole } from "./aria"
 import { orientationOf, requireName, type PatternContext } from "./pattern-context"
+import { isDisabledElement } from "../foundation/forms/form"
 
 // Every element in the root, itself included, with one of `roles`.
 const controls = (context: PatternContext, roles: string[]) =>
@@ -61,7 +52,7 @@ async function disclosure(context: PatternContext) {
         `has aria-expanded "${button.getAttribute("aria-expanded")}"; it's "true" or "false" (APG disclosure).`,
       )
   }
-  const button = buttons.find((el) => !isDisabled(el))
+  const button = buttons.find((el) => !isDisabledElement(el))
   if (!button) return
   const expanded = () => button.getAttribute("aria-expanded") ?? ""
   for (const key of ["Enter", "Space"])
@@ -103,8 +94,8 @@ async function accordion(context: PatternContext) {
   }
   // A collapsed header, whose Enter can always expand it.
   const button =
-    buttons.find((el) => el.getAttribute("aria-expanded") === "false" && !isDisabled(el)) ??
-    buttons.find((el) => !isDisabled(el))
+    buttons.find((el) => el.getAttribute("aria-expanded") === "false" && !isDisabledElement(el)) ??
+    buttons.find((el) => !isDisabledElement(el))
   if (!button) return
   for (const key of ["Enter", "Space"]) await checkAccordionKey(context, buttons, button, key)
 }
@@ -118,7 +109,7 @@ async function checkAccordionKey(context: PatternContext, buttons: Element[], bu
   if (button.getAttribute("aria-expanded") === before[buttons.indexOf(button)])
     context.problem(button, `${key} should toggle its panel, aria-expanded (APG accordion).`)
   for (const [index, el] of buttons.entries()) {
-    if (el.getAttribute("aria-expanded") === before[index] || isDisabled(el)) continue
+    if (el.getAttribute("aria-expanded") === before[index] || isDisabledElement(el)) continue
     await context.focus(el)
     await context.press("Enter")
   }
@@ -136,7 +127,7 @@ async function switchPattern(context: PatternContext) {
     if (!["true", "false"].includes(checkedOf(control)))
       context.problem(control, `has no aria-checked; a switch is on, "true", or off, "false" (APG switch).`)
   }
-  for (const control of switches.filter((el) => !isDisabled(el)))
+  for (const control of switches.filter((el) => !isDisabledElement(el)))
     await checkToggles(context, control, "Space", () => checkedOf(control), {
       name: "aria-checked",
       source: "switch",
@@ -156,7 +147,7 @@ async function checkbox(context: PatternContext) {
       context.problem(box, `has no aria-checked; a checkbox is "true", "false" or "mixed" (APG checkbox).`)
   }
   // A mixed checkbox comes back to mixed in up to three presses.
-  for (const box of boxes.filter((el) => !isDisabled(el)))
+  for (const box of boxes.filter((el) => !isDisabledElement(el)))
     await checkToggles(context, box, "Space", () => checkedOf(box), {
       name: "aria-checked",
       source: "checkbox",
@@ -184,7 +175,7 @@ async function slider(context: PatternContext) {
       context.problem(thumb, "has no aria-valuenow, the value a screen reader reads (APG slider).")
     orientationOf(context, thumb)
   }
-  for (const thumb of sliders.filter((el) => !isDisabled(el))) await checkSliderKeys(context, thumb)
+  for (const thumb of sliders.filter((el) => !isDisabledElement(el))) await checkSliderKeys(context, thumb)
 }
 
 async function checkSliderKeys(context: PatternContext, thumb: Element) {

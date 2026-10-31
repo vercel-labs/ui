@@ -5,7 +5,9 @@
 // each change it makes with the source `"agent"`. The marks an app writes on
 // its elements decide what an agent may do alone (`./marks`).
 import { dev, warn } from "#dev"
+import { isDisabledElement } from "../../foundation/forms/form"
 import { withSource } from "../../foundation/kernel/details"
+import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
 import { accessibleName } from "../../foundation/text/accessible-name"
 import { foldText } from "../../foundation/text/match"
@@ -246,6 +248,16 @@ function ownButton(parts: Bound[]) {
   if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
 }
 
+// The root part's state counts a group around the component, like a toggle's
+// in a disabled toggle group.
+function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
+  if (state.disabled === true || state.formDisabled === true || state.readOnly === true) return true
+  const root = parts.find((part) => /^(root|group|set)$/.test(part.slot) && !part.key)
+  if (root && (partState(root) as { disabled?: unknown }).disabled === true) return true
+  const button = ownButton(parts)
+  return !!button && isDisabledElement(button)
+}
+
 // Whether a state value changed, by content for a list's values.
 const differs = (was: unknown, now: unknown) =>
   !Object.is(was, now) && JSON.stringify(was) !== JSON.stringify(now)
@@ -340,9 +352,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (confirm) out.confirm = confirm
   const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
   if (buttons.length) out.buttons = buttons
-  const disabled =
-    state.disabled === true || state.readOnly === true || ownButton(parts)?.matches(":disabled")
-  if (disabled) out.disabled = true
+  if (isComponentDisabled(state, parts)) out.disabled = true
   else {
     out.actions = actionsOf(entry, api)
     // A popup that isn't a list, like a menu or a dialog, opens itself to press one of its buttons.

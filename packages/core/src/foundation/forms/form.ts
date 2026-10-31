@@ -255,6 +255,14 @@ function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
 const isDisabled = (state: { disabled: boolean; formDisabled: boolean }) =>
   state.disabled || state.formDisabled
 
+const watchFormDisabled = (el: Element, store: { set: (patch: { formDisabled: boolean }) => void }) =>
+  watchFieldsets(el, (formDisabled) => store.set({ formDisabled }))
+
+// Whether a person can't use `el`: natively disabled, by itself or a fieldset,
+// or marked `aria-disabled`.
+const isDisabledElement = (el: Element) =>
+  el.matches(":disabled") || el.getAttribute("aria-disabled") === "true"
+
 // Keeps a hidden input's checkedness in step with the control and reports
 // what happens to its form.
 function bindHiddenInput(
@@ -421,6 +429,7 @@ export {
   hiddenInputStyle,
   invalidFocusClaimed,
   isDisabled,
+  isDisabledElement,
   isLabelable,
   labelledBy,
   labelsOf,
@@ -431,4 +440,5 @@ export {
   validityChanged,
   valueMissingMessage,
   watchFieldsets,
+  watchFormDisabled,
 }

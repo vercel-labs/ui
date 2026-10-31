@@ -7,7 +7,6 @@ import {
   focusables,
   hasBoolean,
   ids,
-  isDisabled,
   isRtl,
   isUnreachable,
   roleOf,
@@ -34,6 +33,7 @@ import {
   requireName,
   type PatternContext,
 } from "./pattern-context"
+import { isDisabledElement } from "../foundation/forms/form"
 
 const isSelected = (el: Element) =>
   el.getAttribute("aria-selected") === "true" || el.getAttribute("aria-checked") === "true"
@@ -82,7 +82,7 @@ async function listbox(context: PatternContext) {
     previous: [arrows.previous],
     homeEnd: true,
   })
-  const readOnly = box.getAttribute("aria-readonly") === "true" || isDisabled(box)
+  const readOnly = box.getAttribute("aria-readonly") === "true" || isDisabledElement(box)
   if (!readOnly) await checkSpaceSelects(context, composite, arrows, multiple)
   await checkTypeahead(context, composite, arrows)
   await returnTo(context, composite, start, arrows)
@@ -98,11 +98,11 @@ async function checkSpaceSelects(
 ) {
   const before = composite.items().filter(isSelected)
   let option = currentItem(context, composite)
-  if (option && (isSelected(option) || isDisabled(option))) {
+  if (option && (isSelected(option) || isDisabledElement(option))) {
     await context.press(arrows.next)
     option = currentItem(context, composite)
   }
-  if (!option || isSelected(option) || isDisabled(option)) return
+  if (!option || isSelected(option) || isDisabledElement(option)) return
   await context.press("Space")
   if (!isSelected(option)) {
     context.problem(option, `Space should select the focused option (APG listbox).`)
@@ -142,7 +142,7 @@ async function tabs(context: PatternContext) {
   const arrows = arrowsFor(orientationOf(context, list), isRtl(list))
   checkTabStop(context, composite)
   const stop = tabStops(list)[0]
-  if (stop && selected[0] && !isDisabled(selected[0]) && stop !== selected[0])
+  if (stop && selected[0] && !isDisabledElement(selected[0]) && stop !== selected[0])
     context.problem(stop, `takes Tab, but the active tab, ${describe(selected[0])}, should (APG tabs).`)
   if (all.length < 2) return
   const start = await enter(context, composite)
@@ -155,7 +155,7 @@ async function tabs(context: PatternContext) {
   // Automatic tabs activate a tab when it takes focus; manual ones on Enter or Space.
   for (const key of ["Enter", "Space"]) {
     const tab = await expectStep(context, composite, arrows.next, true, true)
-    if (isSelected(tab) || isDisabled(tab)) continue
+    if (isSelected(tab) || isDisabledElement(tab)) continue
     await context.press(key)
     if (!isSelected(tab)) context.problem(tab, `${key} should activate the focused tab (APG tabs).`)
     checkPanels(context, composite.items())
@@ -210,7 +210,7 @@ async function radioGroup(context: PatternContext) {
   }
   checkTabStop(context, composite)
   const stop = tabStops(group)[0]
-  if (stop && checked[0] && !isDisabled(checked[0]) && stop !== checked[0])
+  if (stop && checked[0] && !isDisabledElement(checked[0]) && stop !== checked[0])
     context.problem(
       stop,
       `takes Tab, but the checked radio, ${describe(checked[0])}, should (APG radio group).`,
@@ -218,7 +218,7 @@ async function radioGroup(context: PatternContext) {
   if (radios.length < 2) return
   const start = await enter(context, composite)
   // Space checks a focused radio that isn't checked, which can't be undone.
-  if (start && !isChecked(start) && !isDisabled(start)) {
+  if (start && !isChecked(start) && !isDisabledElement(start)) {
     await context.press("Space")
     if (!isChecked(start)) context.problem(start, "Space should check the focused radio (APG radio group).")
   }
@@ -231,7 +231,7 @@ async function radioGroup(context: PatternContext) {
     wraps: true,
     homeEnd: false,
     onMove: (key, radio) => {
-      if (!isChecked(radio) && !isDisabled(radio))
+      if (!isChecked(radio) && !isDisabledElement(radio))
         context.problem(radio, `${key} should check the radio it moves to (APG radio group).`)
     },
   })
@@ -300,7 +300,9 @@ async function menubar(context: PatternContext) {
     wraps: true,
     homeEnd: true,
   })
-  const opener = composite.items().find((item) => item.hasAttribute("aria-haspopup") && !isDisabled(item))
+  const opener = composite
+    .items()
+    .find((item) => item.hasAttribute("aria-haspopup") && !isDisabledElement(item))
   if (opener) {
     await returnTo(context, composite, opener, arrows)
     await checkSubmenu(context, opener)
@@ -375,7 +377,9 @@ async function tree(context: PatternContext) {
 // them. Leaves the branch as it was.
 async function checkBranch(context: PatternContext, composite: Composite, rtl: boolean) {
   const [open, close] = rtl ? ["ArrowLeft", "ArrowRight"] : ["ArrowRight", "ArrowLeft"]
-  const branch = composite.items().find((item) => item.hasAttribute("aria-expanded") && !isDisabled(item))
+  const branch = composite
+    .items()
+    .find((item) => item.hasAttribute("aria-expanded") && !isDisabledElement(item))
   if (!branch) return
   await returnTo(context, composite, branch, { next: "ArrowDown", previous: "ArrowUp" })
   if (currentItem(context, composite) !== branch) return
