@@ -354,8 +354,10 @@ function createScrollView(store: Store<ScrollAreaModel>) {
 
   function scrollToEdge(edge: "start" | "end", { behavior = "smooth" }: ScrollAreaScrollOptions = {}) {
     if (!viewport) return
-    measure()
     const axis = mainAxis(store.get())
+    // At scrollLeft 0 the sign can't show a turned page, so a horizontal call reads the direction.
+    if (axis === "x") rtl = isRTL(viewport)
+    measure()
     const smooth = behavior === "smooth" && !prefersReducedMotion()
     stopEasing()
     if (edge === "end" && axis === "y" && store.get().stickToEnd) setFlag("sticking", true)

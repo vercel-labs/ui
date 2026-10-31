@@ -93,6 +93,24 @@ test("a rubber band past the start of a left to right area keeps the thumb at th
     .toBeLessThan(2)
 })
 
+test("scrollToEnd on a horizontal area follows the page when it turns right to left after mount", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(framework !== "web", "The element's api is the controller.")
+  await open("scroll-area")
+  await viewport(page, gallery.label).evaluate((el) => (el.style.height = `${el.scrollHeight}px`))
+  await expect(area(page, gallery.label)).not.toHaveAttribute("data-overflow-y")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await area(page, gallery.label).evaluate((el) =>
+    (el as HTMLElement & { api: { scrollToEnd: (options: object) => void } }).api.scrollToEnd({
+      behavior: "instant",
+    }),
+  )
+  await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(-100)
+})
+
 test("the thumb follows scrolling when the page turns right to left after mount", async ({ page, open }) => {
   await open("scroll-area")
   await trackBox(page, gallery.label, "horizontal")
