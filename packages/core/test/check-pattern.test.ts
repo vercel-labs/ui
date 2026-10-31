@@ -370,6 +370,16 @@ test("a hand-made listbox passes when its styles hide an option, which arrows sk
 })
 
 describe("broken markup fails", () => {
+  test("a tree branch whose group its styles hide, without aria-expanded", async () => {
+    const root = render(`
+      <div role="tree" aria-label="Files">
+        <div role="treeitem" tabindex="0">src
+          <div role="group" style="display: none"><div role="treeitem" tabindex="-1">index.ts</div></div>
+        </div>
+      </div>`)
+    await expect(checkPattern(root, "tree")).rejects.toThrow(/has child items but no aria-expanded/)
+  })
+
   test("a dialog that keeps Tab inside without aria-modal", async () => {
     const root = render(`<div>
       <button id="opener" aria-haspopup="dialog" aria-expanded="true" aria-controls="box">Open</button>

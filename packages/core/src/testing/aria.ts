@@ -34,11 +34,14 @@ function isUndisplayed(el: Element | null, known = new Map<Element, boolean>()):
   return hidden
 }
 
-/** Every element in `scope` with one of `roles`, in page order, leaving out what isn't rendered. */
-function withRole(scope: Element, roles: string[]) {
+/**
+ * Every element in `scope` with one of `roles`, in page order, leaving out what isn't rendered. With
+ * `displayed` false it keeps what styles hide, like a collapsed tree branch's group, for structure checks.
+ */
+function withRole(scope: Element, roles: string[], { displayed = true } = {}) {
   const known = new Map<Element, boolean>()
   return [...scope.querySelectorAll("*")].filter(
-    (el) => roles.includes(roleOf(el)) && !isGone(el) && !isUndisplayed(el, known),
+    (el) => roles.includes(roleOf(el)) && !isGone(el) && (!displayed || !isUndisplayed(el, known)),
   )
 }
 
