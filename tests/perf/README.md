@@ -15,7 +15,7 @@ How ui-sdk measures the work an interaction costs, and the catalog of every budg
 
 Where the count gates run in CI: pull requests run them on Chromium in the `react`, `vue` and `web` projects. The portal projects leave them out (`countGates` in `tests/fixture-files.ts`), since a portal doesn't change the work. The nightly run adds WebKit and Firefox, and the weekly run adds Edge. Restyle counts read a Chromium trace, so the engines skip them. The leak specs run in Chromium and Edge only. Unit tests that read a budget run in the check job on every pull request.
 
-Bundle size has its own check, `pnpm size`, which compares every React entry with `size-budget.json`. See [tests/README.md](../README.md#bundle-size).
+Bundle size has its own check, `pnpm size`, which compares every adapter entry with `size-budget.json`. See [tests/README.md](../README.md#bundle-size).
 
 ## Running the count gates
 

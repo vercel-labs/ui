@@ -1,4 +1,4 @@
-// Checks what each React, Svelte and Vue entry costs an app against
+// Checks what each adapter entry costs an app against
 // `size-budget.json`, and the code no entry may ship. tests/README.md
 // ("Bundle size") says how each row is measured.
 import { build, transform } from "esbuild"
@@ -8,6 +8,7 @@ import path from "node:path"
 import { parseArgs } from "node:util"
 import { gzipSync } from "node:zlib"
 import { compile, compileModule } from "svelte/compiler"
+import { transform as compileSolid } from "@solidjs/compiler"
 
 const root = path.resolve(import.meta.dirname, "..")
 // Core modules are named from their folder, like "motion/presence" or "checkbox/checkbox".
@@ -91,17 +92,27 @@ const adapters = [
       `createApp({ render: () => h("button", "App") }).mount(document.body)`,
     ].join("\n"),
   },
+  {
+    name: "solid",
+    options: {
+      external: ["solid-js", "solid-js/*", "@solidjs/*"],
+      conditions: ["module", "production"],
+      plugins: [solidFiles()],
+    },
+    app: `import "size:app.tsx"`,
+  },
+  {
+    name: "web",
+    // Importing an entry defines its elements, so a page imports whole
+    // entries. Behaviors with no elements, like `gesture`, come from core.
+    options: {},
+    defines: true,
+  },
 ]
 
 // Field ships only with a Field: a control joins a field through a small
 // context module, so no other entry bundles it.
 const fieldModule = /^packages\/core\/src\/components\/field\/[^/]+\.ts$/
-// Adapters with no size rows whose entries still get that check.
-const checkedOnly = [
-  { name: "solid", options: { external: ["solid-js", "solid-js/*", "@solidjs/*"] } },
-  { name: "web", options: {} },
-]
-
 // Optional parts ship only once a page renders them (`Feature` in core's
 // `primitive-types.ts`): a page with a component's basic parts bundles none of
 // these modules' code. A switch shares its control with Checkbox, but not the
@@ -142,7 +153,8 @@ for (const adapter of adapters) {
   const bareApp = adapter.app
     ? gzip((await bundleForProduction({ source: adapter.app }, withRuntime(adapter))).code)
     : 0
-  for (const entry of [...adapterEntries(adapter.name), perfPagesEntry(adapter.name)]) {
+  const entries = adapter.defines ? entriesOf(adapter.name) : adapterEntries(adapter.name)
+  for (const entry of [...entries, perfPagesEntry(adapter)]) {
     // With the framework external, the code is the entry's alone, so the leak
     // check reads it: the Svelte runtime keeps its warnings in production.
     const own = await bundleForProduction(entry, adapter.options)
@@ -159,13 +171,7 @@ for (const adapter of adapters) {
     strays.push(...fieldIn(entry, own.modules), ...absentIn(entry, own.modules))
   }
 }
-for (const adapter of checkedOnly)
-  for (const entry of entriesOf(adapter.name)) {
-    const { modules } = await bundleForProduction(entry, adapter.options)
-    strays.push(...fieldIn(entry, modules), ...absentIn(entry, modules))
-  }
-
-for (const adapter of [...adapters, ...checkedOnly].filter(({ name }) => minimalChecked.includes(name)))
+for (const adapter of adapters.filter(({ name }) => minimalChecked.includes(name)))
   for (const [key, page] of Object.entries(minimalPages)) {
     const entry = minimalPageEntry(adapter.name, key, page.parts)
     const { modules } = await bundleForProduction(entry, adapter.options)
@@ -229,13 +235,13 @@ function absentIn(entry, modules) {
 }
 
 // One entry that imports every part the perf pages use, from the adapter's subpaths.
-function perfPagesEntry(adapter) {
-  const adapterExports = readManifest(`packages/${adapter}`).exports
+function perfPagesEntry({ name, defines }) {
+  const adapterExports = readManifest(`packages/${name}`).exports
   const imports = Object.entries(perfPages).map(([key, names]) => {
-    const file = path.join(root, `packages/${adapter}`, adapterExports[`./${key}`])
-    return `export { ${names.join(", ")} } from ${JSON.stringify(file)}`
+    const file = JSON.stringify(path.join(root, `packages/${name}`, adapterExports[`./${key}`]))
+    return defines ? `import ${file}` : `export { ${names.join(", ")} } from ${file}`
   })
-  return { name: `@ui-sdk/${adapter} (perf pages)`, source: imports.join("\n") }
+  return { name: `@ui-sdk/${name} (perf pages)`, source: imports.join("\n") }
 }
 
 // One entry that imports a component's basic parts, from the adapter's subpath.
@@ -396,6 +402,30 @@ function svelteFiles() {
       build.onLoad({ filter: /\.svelte\.(js|ts)$/, namespace: "file" }, ({ path: file }) =>
         load(file, runesModule),
       )
+    },
+  }
+}
+
+// Compiles `.tsx` components for the client the way `@solidjs/vite-plugin`
+// does in a production build, then strips their types. It also serves
+// `size:app.tsx`, the one component of a bare app.
+function solidFiles() {
+  const options = { generate: "dom", hydratable: false, dev: false }
+  const app = `import { render } from "@solidjs/web"
+render(() => <button onClick={() => {}}>App</button>, document.body)`
+  return {
+    name: "solid",
+    setup(build) {
+      build.onResolve({ filter: /^size:app\.tsx$/ }, ({ path }) => ({ path, namespace: "size-app" }))
+      build.onLoad({ filter: /.*/, namespace: "size-app" }, () => ({
+        contents: compileSolid(app, { ...options, filename: "app.tsx" }).code,
+        resolveDir: root,
+        loader: "ts",
+      }))
+      build.onLoad({ filter: /\.tsx$/, namespace: "file" }, async ({ path: file }) => ({
+        contents: compileSolid(await readFile(file, "utf8"), { ...options, filename: file }).code,
+        loader: "ts",
+      }))
     },
   }
 }
