@@ -121,13 +121,18 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   // Watches the viewport and every slide while the viewport is bound.
   let resizeObserver: ResizeObserver | undefined
   // Direction comes from computed style, so it's read when measuring and on
-  // keys, never on each frame of a spring.
+  // input, never on each frame of a spring. Turning it resizes nothing, so
+  // input that finds it turned measures again.
   let isRtl = false
   // What moves the viewport while it's bound, and what a looping track rotates under.
   let motion: CarouselMotion | undefined
   // Which way a step heads, 1 or -1, for the loop to rotate toward it.
   let heading: 1 | -1 | undefined
   const readDirection = () => (isRtl = isRTL(element("viewport") ?? element("root")))
+  const followDirection = () => {
+    if (measured && isRtl !== isRTL(element("viewport") ?? element("root"))) measure()
+    return isRtl
+  }
   const axis = () => ({ vertical: store.get().orientation === "vertical", rtl: isRtl })
   const loop = createCarouselLoop({
     slides: () => elements(context, "item"),
@@ -168,6 +173,7 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   // Changes the page for a reason. A change the user made stops rotation.
   // `by` is the step that led here, which a loop moves along.
   function go(page: number, reason: CarouselPageChangeReason, event?: Event, by?: 1 | -1) {
+    followDirection()
     const count = pageCount()
     const target = count === null ? Math.max(1, page) : Math.min(Math.max(1, page), count)
     if (userReasons.has(reason) && store.get().playing)
@@ -300,6 +306,8 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   }
 
   function onScrollRest(position: number, cause: { touch: boolean; event?: Event }) {
+    const wasRtl = isRtl
+    if (followDirection() !== wasRtl && motion) position = motion.position()
     updateInView()
     const index = nearestPage(layout, position)
     if (index === -1) return
@@ -345,6 +353,7 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
       if (motion === viewportMotion) motion = undefined
       loop.reset(elements(context, "item"))
     })
+    cleanups.push(on(viewport, "pointerdown", followDirection, { capture: true }))
     // A finger down pauses rotation; the swipe it makes stops it.
     cleanups.push(
       on(viewport, "touchstart", () => autoplay.setPaused("touch", true), { passive: true }),
@@ -432,7 +441,7 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   })
 
   const indicators = carouselIndicators(context, go)
-  const onViewportKeyDown = carouselKeys(context, go, readDirection)
+  const onViewportKeyDown = carouselKeys(context, go, followDirection)
 
   const api = {
     getPage: () => store.get().page,
