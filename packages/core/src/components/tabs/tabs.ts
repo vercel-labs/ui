@@ -554,7 +554,13 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update)
         const observe = () => {
           const list = api.internal.listElement()
-          const targets = [list, ...Array.from(list?.querySelectorAll('[role="tab"]') ?? [])]
+          const targets = new Set([list, ...Array.from(list?.querySelectorAll('[role="tab"]') ?? [])])
+          // The watched set holds what it watches, so tabs that left leave it, or closed tabs stay alive.
+          for (const target of observed)
+            if (!targets.has(target)) {
+              observed.delete(target)
+              observer?.unobserve(target)
+            }
           for (const target of targets) {
             if (!target || observed.has(target)) continue
             observed.add(target)
