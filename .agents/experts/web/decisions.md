@@ -38,7 +38,6 @@ Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/positi
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
 - **A trigger slotted into a closed shadow root's scroller** waits for the slow check: `assignedSlot` is `null` there, so positioning can't find that root.
 - **An owner whose `id` is set or changed after it connects** isn't found by `for` parts, and renaming it away leaves them bound. A native label's `for` and `popovertarget` resolve at use time.
-- **A checkbox group fires `valuechange`** when one of its items' state is set from script.
 
 ## Revisit
 
