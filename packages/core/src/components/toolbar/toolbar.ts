@@ -19,7 +19,8 @@ import { fieldKeeps, placeCaret } from "./toolbar-fields"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type { Named, Part, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import { onProps } from "../../foundation/kernel/part"
 import { selects } from "../../foundation/kernel/selects"
 
 /**
@@ -242,11 +243,17 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
   // Joins an item. A disabled one keeps focus and moves between items, but
   // presses and keys never reach it or a component rendered through it, like
   // a menu trigger. Capturing them on the item stops them before any handler.
-  function join(slot: string, key: string, el: HTMLElement, keeps?: (event: KeyboardEvent) => boolean) {
+  function join(part: Part, el: HTMLElement, keeps?: (event: KeyboardEvent) => boolean) {
+    const { slot, key } = part
     const disabled = () => isDisabled(store.get(), itemProps(slot, key))
-    const leave = roving.bind(el, {
-      key,
-      props: { disabled, focusable: () => isFocusable(store.get(), itemProps(slot, key)) },
+    const focusable = () => isFocusable(store.get(), itemProps(slot, key))
+    const leave = roving.bind(el, { key, props: { disabled, focusable } })
+    // A prop that disables the item, its own or its group's, can move the stop.
+    let rules = [disabled(), focusable()]
+    const unwatch = onProps(part, () => {
+      if (rules[0] === disabled() && rules[1] === focusable()) return
+      rules = [disabled(), focusable()]
+      scope.queueCheck()
     })
     if (keeps) fields.set(el, keeps)
     const refuse = (event: Event) => {
@@ -267,6 +274,7 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
     const types = ["click", "pointerdown", "keydown"] as const
     for (const type of types) el.addEventListener(type, refuse, true)
     return () => {
+      unwatch()
       leave()
       if (fields.get(el) === keeps) fields.delete(el)
       for (const type of types) el.removeEventListener(type, refuse, true)
@@ -377,9 +385,9 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         keydown: (event, { el }) => buttonKeydown(event, el!),
         keyup: (event, { el }) => buttonKeyup(event, el!),
       },
-      bind(el, { api, key }) {
-        api.internal.setElement(key, el)
-        return api.internal.join("button", key, el)
+      bind(el, part) {
+        part.api.internal.setElement(part.key, el)
+        return part.api.internal.join(part, el)
       },
     }),
 
@@ -391,7 +399,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         tabindex: api.internal.isStop(key, true) ? "0" : "-1",
         "data-orientation": state.orientation,
       }),
-      bind: (el, { api, key }) => api.internal.join("link", key, el),
+      bind: (el, part) => part.api.internal.join(part, el),
     }),
 
     // A text field. Arrows move its caret, and leave it only from the end they point at.
@@ -417,7 +425,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
           ...item.data,
         }
       },
-      bind: (el, { api, key }) => api.internal.join("input", key, el, (event) => fieldKeeps(event, el)),
+      bind: (el, part) => part.api.internal.join(part, el, (event) => fieldKeeps(event, el)),
     }),
 
     group: slot<GroupProps, ToolbarGroupState>({
