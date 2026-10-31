@@ -123,7 +123,7 @@ list are its parts.
     items?: ListData<T>
     /** Items shown instead of `items` while the input is empty, like recent choices. Needs `items`. */
     emptyItems?: ListData<T>
-    /** How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, or `false` to keep every item, for results a server already filtered. */
+    /** How typing narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, whose numeric result also sorts data items, or `false` to keep every item, for results a server already filtered. */
     filter?: ListFilter<T>
     /** What screen readers hear after typing pauses, when no `ComboboxStatus` is rendered, and when a chip is removed. Return null for nothing. */
     announcement?: (change: ListAnnouncement) => string | null | undefined
@@ -133,8 +133,8 @@ list are its parts.
     itemToLabel?: (value: T) => string
     /** Whether an item's value is the selected value, for object values that aren't the same object. */
     isItemEqualToValue?: (itemValue: T, value: T) => boolean
-    /** Whether the first matching item is highlighted while typing, so Enter chooses it. */
-    autoHighlight?: boolean
+    /** Whether the first matching item is highlighted while typing, so Enter chooses it. `"always"` also highlights the selected item, or the first, when the list opens. */
+    autoHighlight?: boolean | "always"
     /** With `multiple`, whether the input keeps its text after an item is chosen. */
     keepQuery?: boolean
     /** Whether text that matches no item becomes the value, when Enter is pressed with nothing highlighted, or, without `multiple`, when the list closes. */

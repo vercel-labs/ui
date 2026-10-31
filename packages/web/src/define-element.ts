@@ -210,13 +210,16 @@ function upgradeProperties(el: HTMLElement, names: Iterable<string>) {
 
 // Elements whose changes fire no events right now: state restored by the
 // browser, or set from script, like a native control's.
-const quiet = new WeakSet<HTMLElement>()
+const quiet = new Set<HTMLElement>()
 
 // Whether `el` fires nothing right now. A part is quiet while its owner is,
-// so setting an accordion's value moves its items without their events.
+// so setting an accordion's value moves its items without their events, and
+// an element while one inside it is, like a group whose checkbox restores.
 function quietNow(el: HTMLElement) {
   const owner = partOwners.get(el)
-  return quiet.has(el) || (!!owner && quiet.has(owner))
+  if (quiet.has(el) || (!!owner && quiet.has(owner))) return true
+  for (const inside of quiet) if (el.contains(inside)) return true
+  return false
 }
 
 // Whether a callback's only argument is a details object, like
@@ -479,6 +482,13 @@ const partOwners = new WeakMap<Element, OwnerElement>()
 // Each part element's part, so a part inside it can take its props.
 const slotParts = new WeakMap<Element, Part>()
 
+// A part its owner let go of when it left the page registers again once the owner is back.
+const registered = new WeakSet<Part>()
+
+// Looks for the part element's owner again, for an owner that connects after
+// a part whose `for` names it, like a native label's control.
+const findOwnerAgain = new WeakMap<Element, () => void>()
+
 // The props of the nearest part of `slot` around `el` that has the same owner,
 // so a part of another component in between, with a slot of the same name, is skipped.
 function propsAround(el: Element, slot: string, owner?: OwnerElement) {
@@ -603,7 +613,16 @@ function formAssociated(Base: typeof HTMLElement) {
       formCallback(this, "disabled", disabled)
     }
     formStateRestoreCallback(state: unknown, mode: string) {
-      formCallback(this, "restore", state, mode)
+      const restore = () => {
+        quiet.add(this)
+        try {
+          return formCallback(this, "restore", state, mode)
+        } finally {
+          quiet.delete(this)
+        }
+      }
+      // The browser restores state as the element upgrades, before its parts bind.
+      if (!restore()) queueMicrotask(restore)
     }
   }
 }
@@ -709,8 +728,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
   const state = config.state ?? {}
   // Options from attributes and properties. A state attribute, like `open`,
   // sets where the state starts, unless its `default-` attribute does.
-  const optionsOf = (el: HTMLElement, properties: Record<string, unknown>) => {
+  const optionsOf = (el: HTMLElement, properties: Record<string, unknown>, rendered: Set<string>) => {
     const options = readAttributes(el, schema)
+    for (const name of rendered) delete options[name]
     for (const [name, value] of Object.entries(properties)) if (value !== undefined) options[name] = value
     for (const name of Object.keys(state)) {
       if (!(name in options)) continue
@@ -736,6 +756,10 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       #parts = new Set<Part>()
       #pending = new Set<Part>()
       #connected = false
+      #rendering = false
+      #rendered = new Set<string>()
+      #applying = new Set<Part>()
+      #stale = new Set<Part>()
       // Left the page and destroyed its instance, which a reconnect replaces.
       #gone = false
       #properties: Record<string, unknown> = {}
@@ -781,7 +805,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         this.#instance?.setOptions(
           withEvents(
             this,
-            { ...optionsOf(this, this.#properties), ...defaults, id: this.#instance.id },
+            { ...optionsOf(this, this.#properties, this.#rendered), ...defaults, id: this.#instance.id },
             config.silent,
             config.actions,
           ),
@@ -789,12 +813,14 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       }
 
       attributeChangedCallback(name: string, previous: string | null, value: string | null) {
+        const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
+        if (!this.#rendering || value === null) this.#rendered.delete(key)
+        else if (previous === null) this.#rendered.add(key)
         if (!this.#connected) return
         this.#configure()
         reconfigureInside(this)
         // A state attribute changed after the start, like `value` set from the
         // URL. Removing it clears the state, like removing `open` from <details>.
-        const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
         if (!(key in state) || value === previous) return
         const type = schema[key]
         const cleared = type === "boolean" ? false : type === "list" ? [] : null
@@ -851,7 +877,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
             withEvents(
               this,
               {
-                ...optionsOf(this, this.#properties),
+                ...optionsOf(this, this.#properties, this.#rendered),
                 ...last,
                 id: this.id || `ui-sdk-${tagName.replace(/^ui-/, "")}-${++count}`,
               },
@@ -864,7 +890,10 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         // A form reset returns to the defaults the attributes give, not to
         // where properties set before connecting started it, like a native input.
         if (config.formAssociated && Object.keys(starts).length) {
-          const base = instance.startState(optionsOf(this, this.#properties)) as Record<string, unknown>
+          const base = instance.startState(optionsOf(this, this.#properties, this.#rendered)) as Record<
+            string,
+            unknown
+          >
           this.#configure(
             Object.fromEntries(Object.keys(starts).map((name) => [defaultOf(name), base[name]])),
           )
@@ -893,6 +922,10 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           this.#childObserver.observe(this, { childList: true })
         }
         this.#render()
+        if (this.id) {
+          const root = this.getRootNode() as ParentNode
+          for (const el of root.querySelectorAll(`[for="${CSS.escape(this.id)}"]`)) findOwnerAgain.get(el)?.()
+        }
         // Once its parts bind, which reports to the form again, silently.
         if (restore !== undefined)
           queueMicrotask(() => {
@@ -989,6 +1022,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // microtask later in DOM order, so a trigger binds before an open popup.
       register(part: Part) {
         this.#parts.add(part)
+        registered.add(part)
         if (!this.#pending.size) queueMicrotask(() => this.#flush())
         this.#pending.add(part)
       }
@@ -1045,6 +1079,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         part.disconnect = undefined
         this.#restore(part)
         this.#parts.delete(part)
+        registered.delete(part)
         this.#pending.delete(part)
       }
 
@@ -1083,10 +1118,12 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       }
 
       #sync(part: Part) {
+        // A write can change state as it lands, like the `disabled` a form-associated
+        // element hears it lost, so the part syncs again after it, never in the middle.
+        if (this.#applying.has(part)) return void this.#stale.add(part)
         adoptStyles(part.el)
         const instance = this.#instance!
         const record = instance.part(part.slot, part.props)
-        const channel = this.#channel
         // A part stays in the page while it isn't present, like a closed popup's content.
         part.disconnect ??= connect(record, part.el)
         part.shown = isPresent(record)
@@ -1102,13 +1139,13 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           const attrs = partAttrs(record)
           if (attrs.hidden === undefined && (conditional(record) || "hidden" in attrs))
             part.el.removeAttribute("hidden")
-          applyAttrs(part.el, attrs, channel)
+          this.#apply(part, attrs)
           if (!part.unbind) this.#bind(part, record)
         } else {
           // A part that was shown gets its final attributes first, so it never keeps
           // stale state like data-open. Parts never shown stay untouched.
           if (part.unbind) {
-            applyAttrs(part.el, partAttrs(record), channel)
+            this.#apply(part, partAttrs(record))
             this.#unbind(part)
           }
           if (!part.el.hasAttribute("hidden")) part.el.setAttribute("hidden", "")
@@ -1159,6 +1196,21 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         part.el.replaceWith(part.placeholder)
         target.appendChild(part.el)
         portals.set(part.el, target)
+      }
+
+      // An attribute the owner writes on itself is state, not an option, like a
+      // grouped checkbox's `disabled` from its group, so it never disables it for good.
+      #apply(part: Part, attrs: Record<string, string | undefined>) {
+        const rendering = this.#rendering
+        this.#rendering = part.el === this
+        this.#applying.add(part)
+        try {
+          applyAttrs(part.el, attrs, this.#channel)
+        } finally {
+          this.#rendering = rendering
+          this.#applying.delete(part)
+        }
+        if (this.#stale.delete(part)) this.#sync(part)
       }
 
       // What the owner writes on its parts' elements. By host, not instance, so
@@ -1241,6 +1293,13 @@ function definePartElement(tagName: string, config: SlotConfig) {
       #part?: Part
       #properties: Record<string, unknown> = {}
 
+      constructor() {
+        super()
+        findOwnerAgain.set(this, () => {
+          if (this.isConnected) this.connectedCallback()
+        })
+      }
+
       static {
         for (const name of config.properties ?? [])
           Object.defineProperty(PartElement.prototype, name, {
@@ -1289,7 +1348,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
             .then(() => this.isConnected && this.connectedCallback())
           return
         }
-        if (owner === this.#owner) return
+        if (owner === this.#owner && this.#part && registered.has(this.#part)) return
         if (this.#owner && this.#part) this.#owner.unregister(this.#part)
 
         const el = boundElement(this, config.target)
@@ -1325,7 +1384,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
         if (!this.isConnected || this.#owner) return
         if (findOwner(this, config.owner)) this.connectedCallback()
         else if (config.alone) config.alone(boundElement(this, config.target) ?? this, this)
-        else warn(`<${tagName}> must be inside ${config.owner}.`)
+        else if (!this.hasAttribute("for")) warn(`<${tagName}> must be inside ${config.owner}.`)
       }
 
       // The element the part binds came, left or was replaced: the part lets go

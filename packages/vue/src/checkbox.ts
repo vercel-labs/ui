@@ -8,13 +8,24 @@ import {
   type CheckedState,
 } from "@ui-sdk/core/checkbox"
 import type { ChangeDetails } from "@ui-sdk/core"
-import { defineComponent, h, type PropType } from "vue"
+import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
 import { useFieldControl } from "./field-context"
 import { toggleProps } from "./toggle-props"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, orModel, usePart, usePrimitive, useScope, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 const parts = createParts(checkboxPrimitive, { indicator: "span" })
+
+// The group's own key, so a checkbox can join a group without bundling it.
+const CheckboxGroupKey: InjectionKey<PrimitiveHandle<typeof checkboxGroupPrimitive>> =
+  Symbol("checkbox-group")
 
 /**
  * The control and the hidden native input that takes part in the form.
@@ -40,7 +51,7 @@ const Checkbox = withElement(
     },
     slots: Object as PartSlots<typeof checkboxPrimitive, "root">,
     setup(props, { emit }) {
-      const group = useScope(checkboxGroupPrimitive)?.handle
+      const group = inject(CheckboxGroupKey, null)
       // Inside a group, the group is the field's control.
       const field = group ? null : useFieldControl()
       const checkbox = usePrimitive(checkboxPrimitive, () => ({
@@ -81,9 +92,9 @@ const CheckboxIndicator = parts.Indicator
  * each checkbox, sits in a field.
  * @stable
  */
-const CheckboxGroup = withElement(
+const CheckboxGroup = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "CheckboxGroup",
     inheritAttrs: false,
     props: {
@@ -124,6 +135,7 @@ const CheckboxGroup = withElement(
           emit("update:modelValue", value)
         },
       }))
+      provide(CheckboxGroupKey, group)
       const root = usePart(group, "group", undefined, undefined, { tag: "div", extend: field?.props })
       return () => [root(), h("input", group.slot("group-input"))]
     },

@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: `e7cd3ca` (2026-10-30, the popup positioning fixes on `fix/position-engine`).
+Last reviewed: `33a038a` (2026-10-30, the bundle size check and the Field leak fix in PR 84).
 
 
 ## Settled

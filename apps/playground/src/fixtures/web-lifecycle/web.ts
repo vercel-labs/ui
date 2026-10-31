@@ -8,6 +8,7 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/popover")
   await import("@ui-sdk/web/dialog")
   await import("@ui-sdk/web/checkbox")
+  await import("@ui-sdk/web/radio")
   await import("@ui-sdk/web/switch")
   await import("@ui-sdk/web/input")
   await import("@ui-sdk/web/combobox")

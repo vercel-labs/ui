@@ -244,7 +244,7 @@ function radioGroupApi(context: PrimitiveContext<RadioGroupOptions, RadioGroupSt
       if (isDisabled(state) || state.readOnly) return false
       if (value !== null && (props("root", value) as ItemProps | undefined)?.disabled) return false
       const done = change("value", value, details)
-      if (done) dispatchChange(formElement())
+      if (done && reason !== "restore") dispatchChange(formElement())
       return done
     },
     // Moves focus to the item that holds the tab stop, the checked one if it is enabled.

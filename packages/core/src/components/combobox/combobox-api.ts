@@ -42,6 +42,7 @@ import { type ItemIcons } from "../../foundation/lists/item-icon"
 import { createValueSelection, listOf } from "../../foundation/lists/listbox-value"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
+import { deriveFromOptions } from "../../foundation/kernel/derive"
 
 // The create option's key in the highlight. Never a real item's.
 const CREATE = "\u0000create"
@@ -188,6 +189,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   deriveOpen(context, ["highlighted", "focusInList"], (open) =>
     open ? undefined : { highlighted: null, focusInList: false },
   )
+  // Items that load after the value, like from a request, put its label in
+  // place of the raw value the input showed, in the same pass.
+  deriveFromOptions(context, ["query"], (synced, state, next) => {
+    if (synced.items === state.items || state.dirty || next.multiple || next.query !== undefined) return
+    const first = listOf("value" in synced ? synced.value : state.value)[0]
+    if (first === undefined || state.query !== itemKey(first, next.itemToValue)) return
+    return { query: initialQuery(next, first) }
+  })
   const change = createChange(context)
   let mountsQueued = false
   let openedBy: PopupOpener = "imperative"
@@ -195,6 +204,9 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   let committing = false
   // The highlight to place once the list has mounted, after an arrow key opened it.
   let pendingHighlight: "first" | "last" | null = null
+  // The highlight `autoHighlight` placed last, until anything else moves it.
+  let placed: string | null = null
+  let settling = false
 
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
   const inputElement = () => element("input")
@@ -232,6 +244,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     showEmpty: () => !store.get().query.trim(),
     toKey,
     filter: () => options().filter ?? "contains",
+    rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
     active: () => store.get().open,
@@ -279,7 +292,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       contains: (target) => ownsElement(target),
       onOpenChange(open, closed) {
         if (open) return
-        pendingHighlight = null
+        pendingHighlight = placed = null
         store.set({ highlighted: null, focusInList: false })
         if (closed) revertQuery(closed.reason as ComboboxOpenChangeReason)
       },
@@ -381,17 +394,34 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     return done
   }
 
-  // After the highlight's item leaves the list, like while filtering, nothing or the first is highlighted.
-  function settleHighlight() {
-    const list = listbox.entries()
+  // What `autoHighlight` highlights: the first match while there's text, an
+  // item over a create option, and with "always" the selected item or the
+  // first without text. Undefined when it highlights nothing of its own.
+  function autoTarget() {
+    const mode = options().autoHighlight
+    const list = listbox.entries().filter((entry) => !isSelectAll(entry.key))
+    const items = list.filter((entry) => !entry.pinned)
+    if (filterQuery()) return mode ? ((items[0] ?? list[0])?.key ?? null) : undefined
+    if (mode !== "always") return undefined
+    return (items.find((entry) => selection.isSelected(entry.key, entry.value)) ?? items[0])?.key ?? null
+  }
+
+  // After the text or the list changed. A highlight the user moved stays while
+  // its item is there, like through more items loading at the end, and one
+  // `autoHighlight` placed follows the list, like async results arriving.
+  function settleHighlight(fresh = true) {
     const current = store.get().highlighted
-    if (options().autoHighlight && store.get().query) {
-      // An item before a select-all option, which typing doesn't look for.
-      const first = list.find((entry) => !isSelectAll(entry.key))
-      if (first && current !== first.key) listbox.highlight(first.key)
-      return
+    const kept = current !== null && listbox.entries().some((entry) => entry.key === current)
+    const target = autoTarget()
+    const follows = target !== undefined && (fresh || !kept || current === placed)
+    const next = follows ? target : kept ? current : null
+    settling = true
+    try {
+      if (next !== current) listbox.highlight(next)
+    } finally {
+      settling = false
     }
-    if (current !== null && !list.some((entry) => entry.key === current)) listbox.highlight(null)
+    if (follows) placed = target
   }
 
   function choose(key: string, event?: Event) {
@@ -605,7 +635,9 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
         const target = pendingHighlight
         pendingHighlight = null
         if (!store.get().focusInList) {
-          if (target) listbox.move(target)
+          if (options().autoHighlight === "always") settleHighlight(false)
+          else if (target === "first" && options().autoHighlight && filterQuery()) settleHighlight()
+          else if (target) listbox.move(target)
           // In a sheet the input moved into its header, and loses focus on
           // the way if the sheet showed later. It takes focus back here.
           return store.get().presentation === "sheet" ? inputElement() : undefined
@@ -660,6 +692,25 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     const label = selection.labelOf(first)
     if (query === toKey(first) && label !== query) store.set({ query: label })
   }
+
+  let highlighted = store.get().highlighted
+  store.subscribe(() => {
+    if (store.get().highlighted === highlighted) return
+    highlighted = store.get().highlighted
+    if (!settling) placed = null
+  })
+
+  let listed = { items: store.get().items, mounts: store.get().mounts }
+  store.subscribe(() => {
+    const { items, mounts } = store.get()
+    if (items === listed.items && mounts === listed.mounts) return
+    listed = { items, mounts }
+    // After the options that brought the items are handed over, so the
+    // highlight isn't written beside them.
+    queueMicrotask(() => {
+      if (store.get().open) settleHighlight(false)
+    })
+  })
 
   // A value set from outside, like a controller or a controlled prop, shows
   // its label in a single combobox's input, unless the user is typing.

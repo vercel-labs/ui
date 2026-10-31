@@ -106,7 +106,9 @@ type ComboboxProps<T, Multiple extends boolean | undefined> = ComboboxOptions<T,
 type ComboboxComponent = {
   new <T = string>(props: RootPropsOf<ComboboxProps<T, false>>): RootInstanceOf<ComboboxProps<T, false>>
   new <T = string>(props: RootPropsOf<ComboboxProps<T, true>>): RootInstanceOf<ComboboxProps<T, true>>
-  new <T = string>(props: RootPropsOf<ComboboxProps<T, boolean>>): RootInstanceOf<ComboboxProps<T, boolean>>
+  new <T = string, Multiple extends boolean | undefined = boolean>(
+    props: RootPropsOf<ComboboxProps<T, Multiple> & { multiple: Multiple }>,
+  ): RootInstanceOf<ComboboxProps<T, Multiple>>
 } & RenderableWith<ComboboxProps<any, boolean | undefined>>
 
 /**
@@ -133,7 +135,7 @@ const Combobox = /* @__PURE__ */ renderless(
       itemToValue: Function as PropType<(value: any) => string>,
       itemToLabel: Function as PropType<(value: any) => string>,
       isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
-      autoHighlight: optionalBoolean,
+      autoHighlight: { type: [Boolean, String] as PropType<boolean | "always">, default: undefined },
       keepQuery: optionalBoolean,
       allowCustomValue: optionalBoolean,
       status: String as PropType<AsyncOptionsStatus>,
@@ -225,7 +227,7 @@ const ComboboxLabel = parts.Label
  */
 const ComboboxChips = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChips",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chips">,
@@ -243,7 +245,7 @@ const ComboboxChips = /* @__PURE__ */ withElement(
  */
 const ComboboxChipsOverflow = /* @__PURE__ */ withElement(
   "span",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChipsOverflow",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chips-overflow">,
@@ -410,7 +412,7 @@ const ComboboxItemText = withElement(
  */
 const ComboboxSelectAll = /* @__PURE__ */ withElement(
   "div",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxSelectAll",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "select-all">,
@@ -586,7 +588,7 @@ const ComboboxChip = /* @__PURE__ */ (() =>
  */
 const ComboboxChipRemove = /* @__PURE__ */ withElement(
   "button",
-  defineComponent({
+  /* @__PURE__ */ defineComponent({
     name: "ComboboxChipRemove",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof comboboxPrimitive, "chip-remove">,

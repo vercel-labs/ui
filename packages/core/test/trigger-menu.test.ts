@@ -190,4 +190,24 @@ describe("loading", () => {
     expect(signals.a.aborted).toBe(true)
     expect(visible()).toEqual(["alpha"])
   })
+
+  test("closing before a load starts still lets the next open load", async () => {
+    const queries: string[] = []
+    const { editor, instance, visible } = setup([
+      {
+        char: "#",
+        items: async (query) => {
+          queries.push(query)
+          return [{ value: "alpha", label: "alpha" }]
+        },
+      },
+    ])
+    editor.type("#")
+    editor.backspace()
+    editor.type("#")
+    await vi.advanceTimersByTimeAsync(200)
+    expect(queries).toEqual([""])
+    expect(visible()).toEqual(["alpha"])
+    expect(instance.get()).toMatchObject({ open: true, loading: "idle" })
+  })
 })

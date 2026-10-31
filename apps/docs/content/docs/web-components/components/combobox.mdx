@@ -71,7 +71,7 @@ A disabled combobox cannot be focused or changed and submits nothing. A read-onl
 
 ### Auto Highlight
 
-Add `auto-highlight` to highlight the first match while typing, so Enter can choose it immediately.
+Add `auto-highlight` to highlight the first match while typing, so Enter can choose it immediately. With `auto-highlight="always"`, opening the list also highlights the selected item, or the first, so the arrow keys move from there. A highlight it placed follows the list as items arrive, and one the user moved stays while its item is there.
 
 <ComponentExample
   name="combobox/auto-highlight"
@@ -98,7 +98,7 @@ Use `keywords` for text that should match without appearing in the label, such a
 
 ### Filter
 
-`filter` accepts `"contains"` (the default), `"startsWith"`, `"fuzzy"`, a function of the item and query, or `false` for results already filtered by a server. Assign a custom function to the `filter` property.
+`filter` accepts `"contains"` (the default), `"startsWith"`, a function of the item and query, or `false` for results already filtered by a server. A function can return a score instead of `true` or `false`, and items you pass as `items` then sort by it, best first. `fuzzyScore` from `@ui-sdk/core/text-match` scores an exact match above a prefix, and a prefix above a match inside the label. Assign a custom function to the `filter` property.
 
 <ComponentExample
   name="combobox/filter"
@@ -318,6 +318,8 @@ The selection, text, and popup have separate values:
 | `open`  | `openchange`        | Whether the popup is open.                     |
 
 Read or write the element’s properties and listen for these events. Call `preventDefault()` on a change event to reject it. Choosing an item writes its label into the input; closing without choosing restores that label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
+
+Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, call `preventDefault()` on that `openchange`.
 
 ### Controller
 
