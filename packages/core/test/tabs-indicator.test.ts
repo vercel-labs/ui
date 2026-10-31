@@ -44,5 +44,10 @@ test("the indicator stops watching tabs that left the page", async () => {
   unbind.get("c")!()
   await tick()
   expect(observed.has(els.get("c")!)).toBe(false)
-  for (const value of ["a", "b"]) unbind.get(value)!()
+  // Back on the page, it's watched again, which a set still holding it would skip.
+  list.append(els.get("c")!)
+  unbind.set("c", bind(instance.part("tab", { value: "c" }), els.get("c")!)!)
+  await tick()
+  expect(observed.has(els.get("c")!)).toBe(true)
+  for (const value of ["a", "b", "c"]) unbind.get(value)!()
 })
