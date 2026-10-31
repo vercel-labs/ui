@@ -397,7 +397,38 @@ test("a hand-made toolbar passes when a stylesheet hides a control, which arrows
   await checkPattern(root, "toolbar")
 })
 
+test("a native radio group passes when styles hide its first radio, which Tab skips", async () => {
+  const root = render(`
+    <div role="radiogroup" aria-label="Size">
+      <label style="display: none"><input type="radio" name="size" value="s">Small</label>
+      <label><input type="radio" name="size" value="m">Medium</label>
+    </div>`)
+  await expect(checkPattern(root, "radio-group")).resolves.toBeUndefined()
+})
+
+test("a hand-made listbox passes when the slot it renders an option in is hidden", async () => {
+  const root = render(`<div role="listbox" aria-label="Fruit">
+    <div role="option" aria-selected="true" tabindex="0">Apple</div>
+    <div role="option" aria-selected="false" tabindex="-1" slot="closed">Apricot</div>
+    <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+  </div>`)
+  root.attachShadow({ mode: "open" }).innerHTML =
+    `<slot></slot><slot name="closed" style="display: none"></slot>`
+  rove(root, "[role=option]:not([slot])", { onMove: selectOnly("[role=option]") })
+  await checkPattern(root, "listbox")
+})
+
 describe("broken markup fails", () => {
+  test("a listbox whose arrows don't move past an option its styles hide", async () => {
+    const root = render(`
+      <div role="listbox" aria-label="Fruit">
+        <div role="option" aria-selected="true" tabindex="0">Apple</div>
+        <div role="option" aria-selected="false" tabindex="-1" style="display: none">Apricot</div>
+        <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+      </div>`)
+    await expect(checkPattern(root, "listbox")).rejects.toThrow(/ArrowDown/)
+  })
+
   test("a tree branch whose group its styles hide, without aria-expanded", async () => {
     const root = render(`
       <div role="tree" aria-label="Files">

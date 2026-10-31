@@ -21,6 +21,10 @@ const isGone = (el: Element) => !el.isConnected || !!el.closest("[hidden], [iner
 // Rendered but hidden from screen readers, or unreachable: focus must never land here.
 const isUnreachable = (el: Element) => !!el.closest('[aria-hidden="true"], [inert]')
 
+// The parent the page renders an element in: the slot it's assigned to, or a shadow root's host.
+const renderedParent = (el: Element) =>
+  el.assignedSlot ?? el.parentElement ?? ((el.parentNode as ShadowRoot | null)?.host || null)
+
 /** Whether `display: none` on `el` or an element around it hides it, like a closed branch its styles hide. */
 // check-code: allow return-type recursive, so TypeScript cannot infer it.
 function isUndisplayed(el: Element | null, known = new Map<Element, boolean>()): boolean {
@@ -29,7 +33,7 @@ function isUndisplayed(el: Element | null, known = new Map<Element, boolean>()):
   if (hidden === undefined)
     known.set(
       el,
-      (hidden = getComputedStyle(el).display === "none" || isUndisplayed(el.parentElement, known)),
+      (hidden = getComputedStyle(el).display === "none" || isUndisplayed(renderedParent(el), known)),
     )
   return hidden
 }
@@ -66,7 +70,7 @@ function isTabStop(el: Element, known: Map<Element, boolean>) {
   // Native radios that share a name are one stop: the checked one, else the first.
   if (el instanceof HTMLInputElement && el.type === "radio" && el.name) {
     const group = [...el.ownerDocument.querySelectorAll<HTMLInputElement>("input[type=radio]")].filter(
-      (radio) => radio.name === el.name && radio.form === el.form,
+      (radio) => radio.name === el.name && radio.form === el.form && !isUndisplayed(radio, known),
     )
     return el === (group.find((radio) => radio.checked) ?? group[0])
   }
