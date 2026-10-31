@@ -76,7 +76,7 @@ test("a controlled page follows the page when it turns right to left after mount
   open,
   framework,
 }) => {
-  test.skip(!["react", "vue"].includes(framework), "Only the React and Vue fixtures control the page.")
+  test.skip(framework === "web", "The web components fixture doesn't control the page.")
   await open("carousel", { controlled: "" })
   await page.evaluate(() => (document.documentElement.dir = "rtl"))
   await page.getByRole("button", { name: "Show page 3 by prop" }).click()

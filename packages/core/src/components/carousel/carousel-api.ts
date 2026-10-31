@@ -129,8 +129,9 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   // Which way a step heads, 1 or -1, for the loop to rotate toward it.
   let heading: 1 | -1 | undefined
   const readDirection = () => (isRtl = isRTL(element("viewport") ?? element("root")))
+  const turned = () => measured && isRtl !== isRTL(element("viewport") ?? element("root"))
   const followDirection = () => {
-    if (measured && isRtl !== isRTL(element("viewport") ?? element("root"))) measure()
+    if (turned()) measure()
     return isRtl
   }
   const axis = () => ({ vertical: store.get().orientation === "vertical", rtl: isRtl })
@@ -434,8 +435,9 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     if (state.interval !== before.interval) writeInterval()
     if (state.page !== before.page) {
       autoplay.restart()
-      followDirection()
-      followPage()
+      // A controlled page can arrive while an adapter hands over props, so a turn measures later, which follows the page.
+      if (turned()) queueMeasure()
+      else followPage()
     }
     if (state.slidesPerPage !== before.slidesPerPage || state.align !== before.align) queueMeasure()
     if (state.orientation !== before.orientation || state.loop !== before.loop) queueMeasure()
