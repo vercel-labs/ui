@@ -468,6 +468,22 @@ describe("calendar", () => {
     expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
   })
 
+  test("a press whose focus change is canceled asks once, as a press", async () => {
+    const onFocusedChange = vi.fn((_date: string, details: { cancel: () => void }) => details.cancel())
+    const { day, focused } = mount({ onFocusedChange })
+    await tick()
+    day("2026-10-16").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").focus()
+    day("2026-10-20").click()
+    expect(focused()).toBe("2026-10-16")
+    expect(onFocusedChange).toHaveBeenCalledOnce()
+    expect(onFocusedChange).toHaveBeenCalledWith(
+      "2026-10-20",
+      expect.objectContaining({ reason: "item-press" }),
+    )
+  })
+
   test("canceling an anchor change keeps a range's start as it was", async () => {
     let cancel = false
     const { day, instance } = mount({
