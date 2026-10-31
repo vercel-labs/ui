@@ -7,6 +7,7 @@
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { isRTL } from "../platform/env"
 import { createDragSession } from "../drag-and-drop/pointer"
+import { isDestroying } from "../kernel/keep"
 
 /**
  * A point in an area, in its own units.
@@ -136,8 +137,9 @@ function createArea<State extends object>(
         onMove: (sample) => {
           if (set(at(el, sample.x, sample.y), { reason: "drag", event: sample.event })) reason = "drag"
         },
+        // A teardown cut the drag short, so nobody ended it to commit.
         onEnd: (end) => {
-          options.onCommit?.(value(), { reason, event: end })
+          if (!isDestroying()) options.onCommit?.(value(), { reason, event: end })
         },
       })
     },

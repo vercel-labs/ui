@@ -2,6 +2,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { numberInput } from "../src/components/number-input/number-input"
 import { slider } from "../src/components/slider/slider"
+import { createArea, definePrimitive } from "../src/index"
 import { createDragSession } from "../src/foundation/drag-and-drop/pointer"
 import { mount } from "../src/testing/mount"
 
@@ -153,4 +154,30 @@ test("a held stepper commits nothing when its number input leaves the page", () 
   } finally {
     vi.useRealTimers()
   }
+})
+
+test("an area that leaves the page mid-drag commits nothing", async () => {
+  const onCommit = vi.fn()
+  const board = definePrimitive({
+    name: "board",
+    options: {},
+    state: (_options: {}) => ({ value: { x: 0, y: 0 } }),
+    api: (context) => ({
+      area: createArea(context, {
+        value: (state) => state.value,
+        set: (value) => (context.store.set({ value }), true),
+        onCommit,
+      }),
+    }),
+    slots: (slot) => ({ root: slot({}) }),
+  })
+  const instance = board({ id: "b" })
+  const el = document.body.appendChild(document.createElement("div"))
+  el.getBoundingClientRect = () => new DOMRect(0, 0, 100, 100)
+  instance.api.area.pointerdown(press("pointerdown", { clientX: 10, clientY: 10, cancelable: true }), el)
+  document.dispatchEvent(press("pointermove", { clientX: 60, clientY: 60 }))
+  await frame()
+  expect(instance.get().value.x).toBeCloseTo(0.6)
+  instance.destroy()
+  expect(onCommit).not.toHaveBeenCalled()
 })
