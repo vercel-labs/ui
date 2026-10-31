@@ -480,6 +480,13 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     deepQueued.push(key)
   }
 
+  // With one item selectable, automatic activation selects wherever a key moves focus.
+  function follow(key: string, event?: KeyboardEvent) {
+    const { selectionMode, activation } = store.get()
+    if (selectionMode === "single" && activation === "automatic")
+      selection.choose(key, { reason: "list-navigation", event })
+  }
+
   // Focus waiting for a loading branch's first child, which takes it once it's in the page.
   function focusLandedChild() {
     if (stepInto === null || loads.has(stepInto)) return
@@ -488,6 +495,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     if (child) {
       stepInto = null
       child.el.focus()
+      follow(child.key)
     }
   }
 
@@ -558,8 +566,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
       const why = { reason: "list-navigation" as const, event }
       if (state.selectionMode === "multiple" && event.shiftKey && (!homeOrEnd || mod))
         selection.extend(target, { ...why, from: key })
-      else if (state.selectionMode === "single" && state.activation === "automatic" && !event.shiftKey)
-        selection.choose(target, why)
+      else if (!event.shiftKey) follow(target, event)
       return
     }
     if (wanted !== undefined) return
@@ -580,11 +587,12 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
         else setOpen(key, true, nav)
       } else {
         const child = roving.items().find((item) => parentOf(item.key) === key)
+        const first = child?.key ?? fromData()?.tree.children(key)[0]
         if (child) {
           child.el.focus()
           options().onItemFocus?.(child.key, { index: visibleKeys().indexOf(child.key) })
-        } else if (fromData()?.tree.children(key)[0] !== undefined)
-          roving.focus(fromData()!.tree.children(key)[0])
+        } else if (first !== undefined) roving.focus(first)
+        if (first !== undefined) follow(first, event)
       }
     } else if (event.key === backward && !mod) {
       if (branch && event.altKey && !disabled) collapseDeep(key, nav)
@@ -595,6 +603,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
         if (itemElement(parent)) itemElement(parent)!.focus()
         else roving.focus(parent)
         options().onItemFocus?.(parent, { index: visibleKeys().indexOf(parent) })
+        follow(parent, event)
       }
     } else if (event.key === "*") {
       const parent = parentOf(key)
@@ -625,6 +634,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
       if (itemElement(to)) itemElement(to)!.focus()
       else roving.focus(to)
       options().onItemFocus?.(to, { index: found })
+      follow(to, event)
     } else return
     event.preventDefault()
   }

@@ -203,6 +203,47 @@ describe("selection", () => {
     expect(instance.api.getValue()).toBe("docs")
   })
 
+  test('with `activation: "automatic"`, Right into a branch, Left out of it and typing select too', async () => {
+    const { instance, els, key, focused } = render({ activation: "automatic", defaultExpanded: ["src"] })
+    await tick()
+    els.get("src")!.focus()
+    key("ArrowRight")
+    expect(focused()).toBe("index.ts")
+    expect(instance.api.getValue()).toBe("index.ts")
+    key("ArrowLeft")
+    expect(focused()).toBe("src")
+    expect(instance.api.getValue()).toBe("src")
+    key("R", { shiftKey: true })
+    expect(focused()).toBe("README.md")
+    expect(instance.api.getValue()).toBe("README.md")
+  })
+
+  test('with `activation: "automatic"`, Right into a branch whose children are loading selects the first once it shows', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els, key, focused } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(focused()).toBe("child")
+    expect(instance.api.getValue()).toBe("child")
+  })
+
   test('`selectionMode: "none"` writes no aria-selected and selects nothing', () => {
     const { instance, els } = render({ selectionMode: "none" })
     els.get("README.md")!.click()
