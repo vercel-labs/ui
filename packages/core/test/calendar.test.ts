@@ -478,6 +478,96 @@ describe("calendar", () => {
     expect(focused()).toBe("2026-10-16")
   })
 
+  test("a press whose focus change is canceled asks once, as a press", async () => {
+    const onFocusedChange = vi.fn((_date: string, details: { cancel: () => void }) => details.cancel())
+    const { day, focused } = mount({ onFocusedChange })
+    await tick()
+    day("2026-10-16").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    day("2026-10-20").dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
+    expect(focused()).toBe("2026-10-16")
+    expect(onFocusedChange).toHaveBeenCalledOnce()
+    expect(onFocusedChange).toHaveBeenCalledWith(
+      "2026-10-20",
+      expect.objectContaining({ reason: "item-press" }),
+    )
+  })
+
+  // Safari focuses nothing on mousedown, so the click's own focus call is what moves focus.
+  const safariPress = (el: HTMLElement) => {
+    el.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    el.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    el.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
+  }
+
+  test("a Safari press focuses the day it clicks", async () => {
+    const onFocusedChange = vi.fn()
+    const { day, focused } = mount({ onFocusedChange })
+    await tick()
+    day("2026-10-16").focus()
+    safariPress(day("2026-10-20"))
+    expect(focused()).toBe("2026-10-20")
+    expect(onFocusedChange).toHaveBeenCalledWith(
+      "2026-10-20",
+      expect.objectContaining({ reason: "item-press" }),
+    )
+  })
+
+  test("a Safari press on a day a refused press left focuses it once focus is allowed", async () => {
+    let cancel = true
+    const { day, focused } = mount({
+      onFocusedChange: (_date, details) => {
+        if (cancel) details.cancel()
+      },
+    })
+    await tick()
+    day("2026-10-16").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    day("2026-10-20").dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
+    expect(focused()).toBe("2026-10-16")
+    cancel = false
+    safariPress(day("2026-10-20"))
+    expect(focused()).toBe("2026-10-20")
+  })
+
+  test("a refused press released off its day doesn't keep a later click from focusing it", async () => {
+    let cancel = true
+    const { day, focused } = mount({
+      onFocusedChange: (_date, details) => {
+        if (cancel) details.cancel()
+      },
+    })
+    await tick()
+    day("2026-10-16").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").focus()
+    day("2026-10-16").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    cancel = false
+    day("2026-10-20").click()
+    expect(focused()).toBe("2026-10-20")
+  })
+
+  test("a refused press that never clicks, like a right-button one, doesn't keep a later click from focusing its day", async () => {
+    let cancel = true
+    const { day, focused } = mount({
+      onFocusedChange: (_date, details) => {
+        if (cancel) details.cancel()
+      },
+    })
+    await tick()
+    day("2026-10-16").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 2 }))
+    day("2026-10-20").focus()
+    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true, button: 2 }))
+    cancel = false
+    day("2026-10-20").click()
+    expect(focused()).toBe("2026-10-20")
+  })
+
   test("canceling an anchor change keeps a range's start as it was", async () => {
     let cancel = false
     const { day, instance } = mount({

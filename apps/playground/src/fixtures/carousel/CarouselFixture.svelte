@@ -14,15 +14,17 @@
   import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
 
   const controller = createCarouselController()
-  const { perView, cancel, playToggle, options } = carouselOptions()
+  const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+  let page = $state(1)
 
   let action = $state("")
   let reason = $state("")
   let rested = $state("")
 
-  function onPageChange(page: number, details: { reason: string; cancel: () => void }) {
-    if (page === cancel) return details.cancel()
-    action = String(page)
+  function onPageChange(next: number, details: { reason: string; cancel: () => void }) {
+    if (next === cancel) return details.cancel()
+    if (controlled) page = next
+    action = String(next)
     reason = details.reason
   }
 </script>
@@ -34,6 +36,7 @@
     aria-label={carouselFixture.label}
     style="--per-view: {perView}"
     {...options}
+    {...controlled ? { page } : {}}
     {controller}
     {onPageChange}
     onPageChangeComplete={(page) => (rested = String(page))}
@@ -75,5 +78,8 @@
   <output aria-label="Last reason">{reason}</output>
   <output aria-label="Rested on">{rested}</output>
   <button onclick={() => controller.setPage(4)}>Show page 4</button>
+  {#if controlled}
+    <button onclick={() => (page = 3)}>Show page 3 by prop</button>
+  {/if}
   <CarouselNext {controller}>Next from outside</CarouselNext>
 </div>
