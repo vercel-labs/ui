@@ -160,8 +160,11 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     metrics.y.position = el.scrollTop
     metrics.y.client = el.clientHeight
     metrics.y.scroll = el.scrollHeight
-    // Right to left, scrollLeft runs from 0 down to minus the maximum.
-    metrics.x.position = rtl ? -el.scrollLeft : el.scrollLeft
+    // Right to left, scrollLeft runs from 0 down to minus the maximum. A page
+    // that turns its direction resizes nothing, but the sign shows it.
+    const left = el.scrollLeft
+    if (left !== 0) rtl = left < 0
+    metrics.x.position = rtl ? -left : left
     metrics.x.client = el.clientWidth
     metrics.x.scroll = el.scrollWidth
   }
@@ -492,6 +495,10 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     track,
     rtl: () => rtl,
     measure,
+    // At the start, scrollLeft has no sign to show a turned direction.
+    readDirection: () => {
+      rtl = isRTL(viewport!)
+    },
     scrollTo,
     release,
     stopEasing,

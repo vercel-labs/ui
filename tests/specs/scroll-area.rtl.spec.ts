@@ -64,3 +64,26 @@ test("pressing the track left of the thumb scrolls toward the inline end", async
   await page.mouse.click(track.x + 4, track.y + track.height / 2)
   await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(0)
 })
+
+test("dragging the thumb follows the page when it turns right to left after mount", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  await trackBox(page, gallery.label, "horizontal")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await dragBy(page, thumb(page, gallery.label, "horizontal"), -40, 0)
+  await page.mouse.up()
+  await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(-10)
+})
+
+test("the thumb follows scrolling when the page turns right to left after mount", async ({ page, open }) => {
+  await open("scroll-area")
+  await trackBox(page, gallery.label, "horizontal")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await setScroll(viewport(page, gallery.label), { left: -1e6 })
+  const track = await trackBox(page, gallery.label, "horizontal")
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+})
