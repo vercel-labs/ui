@@ -225,6 +225,21 @@ describe("createSpans", () => {
     expect(instance.get().events[1]).toMatchObject({ start: 900, end: 960 })
   })
 
+  test("a press the browser takes over for a scroll makes no span", () => {
+    const instance = calendar({ id: "c", events: [] })
+    cleanups.push(() => instance.destroy())
+    const { spans, set } = instance.api
+    const day = box(0, 0, 100, 1440)
+    cleanups.push(spans.bindTrack(day, "mon"))
+    spans.trackPointerdown(
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
+      "mon",
+    )
+    document.dispatchEvent(pointer("pointercancel", 50, 905))
+    expect(set).not.toHaveBeenCalled()
+    expect(instance.get().events).toEqual([])
+  })
+
   test("spanStyle places a span along its track and in its lane", () => {
     const instance = calendar({ id: "c", events: [standup] })
     cleanups.push(() => instance.destroy())
