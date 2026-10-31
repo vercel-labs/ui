@@ -377,6 +377,45 @@ test.describe("submenu with a pointer", () => {
     await page.mouse.move(x, y)
     await expect(email).toBeFocused()
   })
+
+  test("content scrolling under a resting pointer after it leaves a closed submenu trigger keeps focus", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const menu = menuNamed(page, "File")
+    await menu.evaluate((el) => {
+      el.style.maxHeight = "160px"
+      el.style.overflowY = "auto"
+      el.scrollTop = el.scrollHeight
+    })
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const x = share.x + 12
+    const y = share.y + share.height / 2
+    await page.mouse.move(x, y)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await page.keyboard.press("ArrowRight")
+    await expect(page.getByRole("menuitem", { name: "Email" })).toBeFocused()
+    await page.keyboard.press("ArrowLeft")
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await page.keyboard.press("ArrowDown")
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    await expect(remove).toBeFocused()
+
+    const under = await menu.evaluate(
+      (el, [px, py]) => {
+        while (el.scrollTop > 0) {
+          el.scrollTop -= 4
+          const item = document.elementFromPoint(px, py)?.closest("[role^='menuitem']")
+          if (item && !item.textContent?.includes("Share")) return item.textContent
+        }
+        return null
+      },
+      [x, y],
+    )
+    expect(under).not.toBeNull()
+    await page.mouse.move(x, y)
+    await expect(remove).toBeFocused()
+  })
 })
 
 test.describe("positioning", () => {

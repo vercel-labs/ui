@@ -129,7 +129,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         const submenu = api.popupElement()
         if (api.isOpen() && submenu)
           api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, submenu)
-        else api.parentMenu()?.internal.cancelHoverOpen()
+        else api.parentMenu()?.internal.cancelHoverOpen(event)
       },
     },
     press({ api, key, props, el, store }, event) {
