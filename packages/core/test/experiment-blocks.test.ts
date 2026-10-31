@@ -190,6 +190,26 @@ describe("spatialMove and createMove", () => {
     expect(onPositionsChange).toHaveBeenCalledTimes(1)
   })
 
+  test("a second finger landing before the first has moved past the threshold leaves the card to the first finger", async () => {
+    const { instance, els } = setup()
+    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+      new PointerEvent(type, {
+        clientX,
+        clientY,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+      })
+    instance.api.move.pointerdown(touch("pointerdown", 10, 10, 1), "a", els.a)
+    instance.api.move.pointerdown(touch("pointerdown", 210, 10, 2), "b", els.b)
+    document.dispatchEvent(touch("pointermove", 40, 10, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(instance.get().moving).toEqual({ keys: ["a"], dx: 30, dy: 0 })
+    document.dispatchEvent(touch("pointerup", 40, 10, 1))
+  })
+
   test("style gives dragged items their offset", () => {
     const { instance } = setup()
     const state = { ...instance.get(), moving: { keys: ["a"], dx: 4, dy: 6 } } as never
