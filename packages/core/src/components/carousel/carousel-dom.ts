@@ -76,10 +76,13 @@ function writeSnapAreas(slides: readonly Slide[], pages: readonly CarouselPage[]
 
 const snapMargins = ["scroll-margin-block-start", "scroll-margin-inline-start"] as const
 
-// Back to one slide a page, each slide snaps by the rule written on the server.
-function clearSnapAreas(slides: readonly Slide[]) {
-  for (const { el } of slides)
-    for (const property of ["scroll-snap-align", ...snapMargins]) el.style.removeProperty(property)
+// Back to one slide a page, each slide snaps by `align` again. The style
+// attribute already says so, and a renderer doesn't write it twice.
+function clearSnapAreas(slides: readonly Slide[], align: string) {
+  for (const { el } of slides) {
+    el.style.setProperty("scroll-snap-align", align)
+    for (const property of snapMargins) el.style.removeProperty(property)
+  }
 }
 
 // The "1 of 5" labels the carousel wrote, so binding again knows them from an author's.

@@ -227,7 +227,7 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
       writeSnapAreas(slides, layout, axis().vertical)
       snapAreas = true
     } else if (snapAreas) {
-      clearSnapAreas(slides)
+      clearSnapAreas(slides, store.get().align)
       snapAreas = false
     }
     loop.recenter()
