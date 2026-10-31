@@ -258,8 +258,9 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
   }
 
   // Panels joined, left or changed their sizes. Not a change: nobody moved anything.
-  function setPanels(ids: string[], panelSizes: PanelSizes[]) {
+  function setPanels(ids: string[], panelSizes: PanelSizes[], measured = space) {
     sizes = panelSizes
+    if (measured > 0) space = measured
     const rem = remSize()
     const constraints = panelSizes.map((panel) => constraintsOf(panel, space, rem))
     const state = store.get()

@@ -77,3 +77,42 @@ test("bounds that change on two panels in one render ask a controlled owner once
   expect(onLayoutChange).toHaveBeenCalledTimes(1)
   expect(onLayoutChange).toHaveBeenCalledWith([50, 50], expect.objectContaining({ reason: "resize" }))
 })
+
+test("a group that shrinks as a panel's pixel minimum changes fits the new minimum to the new size", async () => {
+  let width = 1000
+  const instance = resizable({ id: "g" })
+  const root = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("root", {}), root)!)
+  const panel = () => {
+    const el = root.appendChild(document.createElement("div"))
+    el.getBoundingClientRect = () => new DOMRect(0, 0, width / 2, 10)
+    return el
+  }
+  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 40, minSize: "300px" }), panel())!)
+  cleanups.push(bind(instance.part("handle", { id: "h" }), root.appendChild(document.createElement("div")))!)
+  cleanups.push(bind(instance.part("panel", { id: "b" }), panel())!)
+  await Promise.resolve()
+  expect(instance.api.getLayout()).toEqual([40, 60])
+  width = 500
+  instance.part("panel", { id: "a", defaultSize: 40, minSize: "100px" })
+  await Promise.resolve()
+  expect(instance.api.getLayout()).toEqual([40, 60])
+  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe("20")
+})
+
+test("a collapsed panel whose collapsedSize changes while mounted takes the new size", async () => {
+  const instance = resizable({ id: "g" })
+  const root = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("root", {}), root)!)
+  const element = () => root.appendChild(document.createElement("div"))
+  const a = { id: "a", defaultSize: 40, minSize: 20, collapsible: true, collapsedSize: 0 }
+  cleanups.push(bind(instance.part("panel", a), element())!)
+  cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
+  cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
+  await Promise.resolve()
+  instance.api.collapse("a")
+  expect(instance.api.getLayout()).toEqual([0, 100])
+  instance.part("panel", { ...a, collapsedSize: 10 })
+  await Promise.resolve()
+  expect(instance.api.getLayout()).toEqual([10, 90])
+})
