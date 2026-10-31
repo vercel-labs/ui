@@ -577,11 +577,13 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const fallback = setTimeout(settle, 1000)
   })
 
+  // A popup opened from this one returns here after this one closed, so it
+  // falls back like `returnFocus`.
   function returnTarget() {
-    return firstUsable([returnTrigger, () => before], usable)
+    return firstUsable([returnTrigger, () => before, () => neighbour(shown?.el), options.trigger], usable)
   }
 
-  function neighbour(el: HTMLElement) {
+  function neighbour(el: HTMLElement | undefined) {
     const index = path.findIndex((step, i) => !step.node.isConnected && path[i + 1]?.node.isConnected)
     if (index === -1) return
     const { next, previous } = path[index]
@@ -595,7 +597,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
         ? (candidate: Node) => isAfter(previous, candidate) && !previous.contains(candidate)
         : (candidate: Node) => from(parent, candidate)
     for (const { node } of path.slice(index + 1)) {
-      const list = tabbables(node as Element).filter((candidate) => !el.contains(candidate))
+      const list = tabbables(node as Element).filter((candidate) => !el?.contains(candidate))
       const prior = inPlace(previous)
         ? list.filter((candidate) => !from(previous, candidate) || previous.contains(candidate)).pop()
         : undefined

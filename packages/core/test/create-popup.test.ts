@@ -12,6 +12,7 @@ import { createPopup, popupState } from "../src/foundation/popups/create-popup"
 import { tooltipPreset } from "../src/foundation/popups/popup-hover-presets"
 import { popoverPreset } from "../src/foundation/popups/popup-presets"
 import { popupSlots } from "../src/foundation/popups/popup-slots"
+import { dialog } from "../src/components/dialog/dialog"
 import { hoverCard } from "../src/components/hover-card/hover-card"
 import { popover } from "../src/components/popover/popover"
 import { tooltip } from "../src/components/tooltip/tooltip"
@@ -494,6 +495,43 @@ describe("our popups on the kit", () => {
     expect(document.activeElement).toBe(ada)
     for (const cleanup of unbind) cleanup()
     instance.destroy()
+  })
+
+  test("Dialog opened from a popover whose trigger is then removed returns focus past that trigger", async () => {
+    const menu = popover({ id: "p" })
+    const confirm = dialog({ id: "d" })
+    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after] = [button("Ada"), button("Grace"), button("After")]
+    const content = document.createElement("div")
+    const remove = content.appendChild(button("Delete"))
+    const dialogContent = document.createElement("div")
+    const yes = dialogContent.appendChild(button("Confirm"))
+    const row = document.body.appendChild(document.createElement("div"))
+    row.append(ada, grace, after)
+    document.body.append(content, dialogContent)
+    const unbind = [
+      bind(menu.part("content"), content),
+      bind(menu.part("trigger", { id: "ada" }), ada),
+      bind(menu.part("trigger", { id: "grace" }), grace),
+      bind(confirm.part("content"), dialogContent),
+    ]
+    grace.focus()
+    grace.click()
+    await frame()
+    remove.focus()
+    confirm.api.open()
+    await frame()
+    menu.api.close()
+    await frame()
+    grace.remove()
+    yes.focus()
+    yes.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    await frame()
+    expect(confirm.get().open).toBe(false)
+    expect(document.activeElement).toBe(after)
+    for (const cleanup of unbind) cleanup()
+    confirm.destroy()
+    menu.destroy()
   })
 
   test("Popover opened from code after the trigger that opened it last is gone returns focus to its other trigger", async () => {
