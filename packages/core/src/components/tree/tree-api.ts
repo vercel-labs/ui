@@ -494,8 +494,9 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     const parent = stepInto
     const child = roving.items().find((item) => parentOf(item.key) === parent)
     if (child) {
-      // Only the key press that's still where focus is selects, not one the user has moved on from.
-      const stayed = store.get().active === parent
+      // Selects only while focus still waits on the branch, not once the user moved on or left.
+      const from = itemElement(parent)
+      const stayed = !!from && from.ownerDocument.activeElement === from
       stepInto = null
       child.el.focus()
       if (stayed) follow(child.key, stepIntoEvent)
