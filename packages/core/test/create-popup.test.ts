@@ -439,6 +439,63 @@ describe("our popups on the kit", () => {
     instance.destroy()
   })
 
+  test("Popover whose content binds again after the trigger that opened it is gone moves focus past it", async () => {
+    const instance = popover({ id: "p" })
+    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after] = [button("Ada"), button("Grace"), button("After")]
+    const content = document.createElement("div")
+    const inside = content.appendChild(button("Copy link"))
+    const row = document.body.appendChild(document.createElement("div"))
+    row.append(ada, grace, after)
+    document.body.append(content)
+    let unbindContent = bind(instance.part("content"), content)
+    const unbind = [
+      bind(instance.part("trigger", { id: "ada" }), ada),
+      bind(instance.part("trigger", { id: "grace" }), grace),
+    ]
+    grace.focus()
+    grace.click()
+    await frame()
+    grace.remove()
+    unbindContent()
+    unbindContent = bind(instance.part("content"), content)
+    await frame()
+    inside.focus()
+    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    await frame()
+    expect(instance.get().open).toBe(false)
+    expect(document.activeElement).toBe(after)
+    for (const cleanup of [unbindContent, ...unbind]) cleanup()
+    instance.destroy()
+  })
+
+  test("Popover closing from its other trigger after the one that opened it is gone leaves focus there", async () => {
+    const instance = popover({ id: "p" })
+    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after] = [button("Ada"), button("Grace"), button("After")]
+    const content = document.createElement("div")
+    content.append(button("Copy link"))
+    const row = document.body.appendChild(document.createElement("div"))
+    row.append(ada, grace, after)
+    document.body.append(content)
+    const unbind = [
+      bind(instance.part("content"), content),
+      bind(instance.part("trigger", { id: "ada" }), ada),
+      bind(instance.part("trigger", { id: "grace" }), grace),
+    ]
+    grace.focus()
+    grace.click()
+    await frame()
+    grace.remove()
+    ada.focus()
+    ada.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    await frame()
+    expect(instance.get().open).toBe(false)
+    expect(document.activeElement).toBe(ada)
+    for (const cleanup of unbind) cleanup()
+    instance.destroy()
+  })
+
   test("Popover opened from code after the trigger that opened it last is gone returns focus to its other trigger", async () => {
     const view = mount(
       popover,

@@ -350,7 +350,8 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     position: preset.placement?.position,
     owner: { component: context.label, id: context.id },
     store,
-    trigger: openedFrom,
+    trigger: triggerElement,
+    returnTrigger: openedFrom,
     contains: (target, event) =>
       rules?.contains
         ? rules.contains(target, event)
