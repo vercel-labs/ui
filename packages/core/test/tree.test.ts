@@ -363,6 +363,34 @@ describe("selection", () => {
     expect(instance.api.getValue()).toBe("child")
   })
 
+  test('with `activation: "automatic"`, collapsing a loading branch forgets the key press that stepped into it', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    const before = instance.api.getValue()
+    instance.api.collapse("remote")
+    instance.api.expand("remote")
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(instance.api.getValue()).toBe(before)
+  })
+
   test('`selectionMode: "none"` writes no aria-selected and selects nothing', () => {
     const { instance, els } = render({ selectionMode: "none" })
     els.get("README.md")!.click()

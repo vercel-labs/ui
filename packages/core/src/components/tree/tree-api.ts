@@ -437,6 +437,11 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
       deep.delete(key)
       loads.get(key)?.abort()
       loads.delete(key)
+      // A step into a branch ends with it, so a later expand doesn't take focus or selection.
+      if (stepInto === key) {
+        stepInto = null
+        stepIntoEvent = undefined
+      }
     }
     if (expanded.includes(key) === opening && !loads.has(key)) return false
     if (opening && needsLoad(key)) return load(key, why)
