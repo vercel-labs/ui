@@ -39,7 +39,7 @@ export {
   trackModality,
 } from "./modality"
 export { createOrder, documentOrder, inDocumentOrder, isAfter } from "./order"
-export { aliasReferences, attrs, bind, held, onProps, partState, present, subscribe } from "./part"
+export { aliasReferences, attrs, bind, held, madeLabel, onProps, partState, present, subscribe } from "./part"
 export { definePrimitive, schemaOf } from "./primitive"
 export type {
   AgentSurface,

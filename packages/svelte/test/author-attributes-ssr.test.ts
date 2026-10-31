@@ -23,3 +23,7 @@ test("a combobox input takes the autocomplete and label passed to it, and keeps 
   expect(attribute(html, "<input", "aria-label")).toBe("Work email")
   expect(attribute(html, "<input", "role")).toBe("combobox")
 })
+
+test("a combobox input inside a labelled field keeps the label reference passed to it", () => {
+  expect(attribute(markup("field"), "<input", "aria-labelledby")).toBe("mine")
+})

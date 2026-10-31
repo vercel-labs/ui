@@ -1,4 +1,5 @@
 import type { field } from "@ui-sdk/core/field"
+import { madeLabel } from "@ui-sdk/core/renderer"
 import { inject, type InjectionKey } from "vue"
 import type { PrimitiveHandle } from "./use-primitive"
 
@@ -30,16 +31,18 @@ function useFieldControl(own?: Record<string, unknown>) {
     // decides the id.
     props: (props: Record<string, any>) => {
       const id = (own ?? props).id as string | undefined
+      const label = props["aria-labelledby"]
       const merged = field.slot(
         "control",
         { id, describedBy: props["aria-describedby"] },
-        { ...props, id: undefined, "aria-labelledby": undefined },
+        { ...props, id: undefined, "aria-labelledby": madeLabel(label) ? undefined : label },
       )
       // The field's label names the control over the control's own, like a
-      // ComboboxLabel's. The control stays its own part for styling.
+      // ComboboxLabel's, but not over the author's. The control stays its own
+      // part for styling.
       return {
         ...merged,
-        "aria-labelledby": merged["aria-labelledby"] ?? props["aria-labelledby"],
+        "aria-labelledby": merged["aria-labelledby"] ?? label,
         "data-slot": props["data-slot"],
       }
     },

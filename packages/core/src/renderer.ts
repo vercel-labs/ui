@@ -68,6 +68,7 @@ export {
   selectedKeys,
   subscribe,
   takeOwnId,
+  madeLabel,
   touched,
   yieldToAuthor,
 } from "./foundation/kernel/part"

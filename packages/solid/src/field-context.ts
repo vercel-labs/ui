@@ -1,4 +1,5 @@
 import type { field } from "@ui-sdk/core/field"
+import { madeLabel } from "@ui-sdk/core/renderer"
 import { dynamic, type JSX } from "@solidjs/web"
 import { createComponent, createContext, merge, omit, untrack, useContext } from "solid-js"
 import type { PartProps, PrimitiveHandle } from "./use-primitive"
@@ -36,10 +37,15 @@ function useFieldControl(own?: { id?: unknown }) {
           id: untrack(() => (own ?? props).id) as string | undefined,
           describedBy: props["aria-describedby"],
         }),
-        omit(props, "id", "aria-labelledby"),
+        merge(omit(props, "id", "aria-labelledby"), {
+          get "aria-labelledby"() {
+            return madeLabel(props["aria-labelledby"]) ? undefined : props["aria-labelledby"]
+          },
+        }),
       )
       // The field's label names the control over the control's own, like a
-      // ComboboxLabel's. The control stays its own part for styling.
+      // ComboboxLabel's, but not over the author's. The control stays its own
+      // part for styling.
       return merge(merged, {
         get "aria-labelledby"() {
           return merged["aria-labelledby"] ?? props["aria-labelledby"]

@@ -156,6 +156,10 @@ function yieldToAuthor(attrs: Attrs, given: (name: string) => boolean) {
   return result ?? attrs
 }
 
+/** Whether a label reference points only at ids ui-sdk made, like a component's own label or a copied element's, rather than the author's. */
+const madeLabel = (value: unknown) =>
+  typeof value === "string" && value.split(/\s+/).every((id) => id.startsWith("ui-sdk-"))
+
 /**
  * What `render` functions and state-based class names receive.
  * @stable
@@ -539,6 +543,7 @@ export {
   handlers,
   held,
   liveAttrs,
+  madeLabel,
   onProps,
   type PartOwner,
   provisional,

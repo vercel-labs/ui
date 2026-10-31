@@ -4,6 +4,7 @@ import {
   fieldOutsideAttrs,
   fieldOutsideState,
   type FieldOutsideSlot,
+  madeLabel,
 } from "@ui-sdk/core/renderer"
 import { getContext } from "svelte"
 import { createAttachmentKey } from "svelte/attachments"
@@ -63,13 +64,18 @@ function useFieldControl() {
         id: id() ?? undefined,
         describedBy: describedBy?.() ?? undefined,
       }))
-      // The field's label names the control over the control's own, like a ComboboxLabel's.
+      // The field's label names the control over the control's own, like a ComboboxLabel's, but not over the author's.
       // check-code: allow return-type the spread drops SlotAttributes' index signatures, so callers would lose its attachments.
       return (props: SlotAttributes): SlotAttributes => {
-        const merged = part.slot({ ...props, id: undefined, "aria-labelledby": undefined })
+        const label = props["aria-labelledby"]
+        const merged = part.slot({
+          ...props,
+          id: undefined,
+          "aria-labelledby": madeLabel(label) ? undefined : label,
+        })
         return {
           ...merged,
-          "aria-labelledby": merged["aria-labelledby"] ?? props["aria-labelledby"],
+          "aria-labelledby": merged["aria-labelledby"] ?? label,
           "data-slot": props["data-slot"],
         }
       }

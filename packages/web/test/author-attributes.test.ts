@@ -4,6 +4,7 @@
 import { expect, test } from "vitest"
 import { defineCalendarElements } from "../src/calendar"
 import { defineComboboxElements } from "../src/combobox"
+import { defineFieldElements } from "../src/field"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
@@ -51,4 +52,14 @@ test("a combobox input keeps the autocomplete written on it, and its role", asyn
   const input = document.querySelector("input")!
   expect(input.getAttribute("autocomplete")).toBe("email")
   expect(input.getAttribute("role")).toBe("combobox")
+})
+
+test("a combobox input inside a labelled field keeps the label reference written on it", async () => {
+  ElementInternals.prototype.setFormValue ??= () => {}
+  ElementInternals.prototype.setValidity ??= () => {}
+  defineFieldElements()
+  defineComboboxElements()
+  document.body.innerHTML = `<ui-field><ui-field-label>Fruit</ui-field-label><ui-combobox><ui-combobox-label>Pick one</ui-combobox-label><ui-combobox-input><input aria-labelledby="mine"></ui-combobox-input></ui-combobox></ui-field>`
+  await wait()
+  expect(document.querySelector("input")!.getAttribute("aria-labelledby")).toBe("mine")
 })

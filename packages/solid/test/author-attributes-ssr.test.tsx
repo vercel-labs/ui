@@ -4,6 +4,7 @@ import { renderToString } from "@solidjs/web"
 import { expect, test } from "vitest"
 import { Calendar, CalendarNext, CalendarPrevious } from "../src/calendar"
 import { Combobox, ComboboxInput, ComboboxLabel } from "../src/combobox"
+import { Field, FieldLabel } from "../src/field"
 
 function attribute(html: string, opening: string, name: string) {
   const tag = html.match(new RegExp(`${opening}[^>]*>`))?.[0] ?? ""
@@ -31,4 +32,17 @@ test("a combobox input takes the autocomplete and label passed to it, and keeps 
   expect(attribute(html, "<input", "autocomplete")).toBe("email")
   expect(attribute(html, "<input", "aria-label")).toBe("Work email")
   expect(attribute(html, "<input", "role")).toBe("combobox")
+})
+
+test("a combobox input inside a labelled field keeps the label reference passed to it", () => {
+  const html = renderToString(() => (
+    <Field>
+      <FieldLabel>Fruit</FieldLabel>
+      <Combobox>
+        <ComboboxLabel>Pick one</ComboboxLabel>
+        <ComboboxInput aria-labelledby="mine" />
+      </Combobox>
+    </Field>
+  ))
+  expect(attribute(html, "<input", "aria-labelledby")).toBe("mine")
 })
