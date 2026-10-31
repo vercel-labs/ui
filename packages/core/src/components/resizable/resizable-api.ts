@@ -269,6 +269,8 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
     if (!idsChanged && !drag) {
       store.set({ constraints })
       request(fitLayout(current(), constraints), "resize")
+      // No interaction completes this one, so a controlled owner that ignores it leaves nothing asked.
+      requested = undefined
       return
     }
     const layout = idsChanged ? startLayout(ids, constraints) : fitLayout(state.layout, constraints)
