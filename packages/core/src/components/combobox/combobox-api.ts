@@ -388,7 +388,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     { reason = "imperative", event }: { reason?: ComboboxValueChangeReason; event?: Event } = {},
   ) {
     const state = store.get()
-    if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    // The browser restores a disabled or read-only control too, as a native one.
+    if (reason !== "restore" && (isDisabled(state) || (state.readOnly && reason !== "reset"))) return false
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done

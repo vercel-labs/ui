@@ -167,8 +167,9 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
   const api = {
     id,
     getValue: () => store.get().value,
+    // The browser restores a disabled group too, as a native one.
     setValue: (value: string[], { reason = "imperative", event }: Details = {}) =>
-      !disabled() && setValue(value, { reason, event }),
+      (reason === "restore" || !disabled()) && setValue(value, { reason, event }),
     focus: () => firstEnabled()?.focus(),
     name: () => store.get().name,
     form: () => store.get().form,

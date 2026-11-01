@@ -213,6 +213,30 @@ function upgradeProperties(el: HTMLElement, names: Iterable<string>) {
 // browser, or set from script, like a native control's.
 const quiet = new Set<HTMLElement>()
 
+// Restores state the browser handed over, quietly. Returns whether the element took it.
+function restoreQuietly(el: HTMLElement, state: unknown, mode: string) {
+  quiet.add(el)
+  try {
+    return formCallback(el, "restore", state, mode)
+  } finally {
+    quiet.delete(el)
+  }
+}
+
+// A restore that waits for the parts to bind, by element. Anything newer that
+// sets the state first wins: script, a state attribute, a reset or another restore.
+const pendingRestores = new WeakMap<HTMLElement, object>()
+
+function restoreOnceBound(el: HTMLElement, state: unknown, mode: string) {
+  const token = {}
+  pendingRestores.set(el, token)
+  queueMicrotask(() => {
+    if (pendingRestores.get(el) !== token) return
+    pendingRestores.delete(el)
+    restoreQuietly(el, state, mode)
+  })
+}
+
 // Whether `el` fires nothing right now. A part is quiet while its owner is,
 // so setting an accordion's value moves its items without their events, and
 // an element while one inside it is, like a group whose checkbox restores.
@@ -609,22 +633,16 @@ function formAssociated(Base: typeof HTMLElement) {
         this.#internals.setValidity(message ? { customError: true } : {}, message)
     }
     formResetCallback() {
+      pendingRestores.delete(this)
       formCallback(this, "reset")
     }
     formDisabledCallback(disabled: boolean) {
       formCallback(this, "disabled", disabled)
     }
     formStateRestoreCallback(state: unknown, mode: string) {
-      const restore = () => {
-        quiet.add(this)
-        try {
-          return formCallback(this, "restore", state, mode)
-        } finally {
-          quiet.delete(this)
-        }
-      }
+      pendingRestores.delete(this)
       // The browser restores state as the element upgrades, before its parts bind.
-      if (!restore()) queueMicrotask(restore)
+      if (!restoreQuietly(this, state, mode)) restoreOnceBound(this, state, mode)
     }
   }
 }
@@ -780,6 +798,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
               return this.#instance ? get(this.#instance.api) : undefined
             },
             set(this: Owner, value: unknown) {
+              pendingRestores.delete(this)
               if (this.#instance && !this.#gone) this.#quietly(() => set(this.#instance!.api, value))
               else this.#state[name] = value
             },
@@ -816,6 +835,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
 
       attributeChangedCallback(name: string, previous: string | null, value: string | null) {
         const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
+        if (key in state && value !== previous && !this.#rendering) pendingRestores.delete(this)
         if (!this.#rendering || value === null) this.#rendered.delete(key)
         else if (previous === null) this.#rendered.add(key)
         if (!this.#connected) return
@@ -931,15 +951,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           for (const el of root.querySelectorAll(`[for="${CSS.escape(this.id)}"]`)) findOwnerAgain.get(el)?.()
         }
         // Once its parts bind, which reports to the form again, silently.
-        if (restore !== undefined)
-          queueMicrotask(() => {
-            quiet.add(this)
-            try {
-              formCallback(this, "restore", restore, "restore")
-            } finally {
-              quiet.delete(this)
-            }
-          })
+        if (restore !== undefined) restoreOnceBound(this, restore, "restore")
       }
 
       #renderCleanup?: () => void

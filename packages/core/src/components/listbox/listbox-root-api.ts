@@ -173,7 +173,8 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
 
   function setValue(value: unknown, { reason, event }: Change) {
     const state = store.get()
-    if (isDisabled(state) || (state.readOnly && reason !== "reset" && reason !== "restore")) return false
+    // The browser restores a disabled or read-only control too, as a native one.
+    if (reason !== "restore" && (isDisabled(state) || (state.readOnly && reason !== "reset"))) return false
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done

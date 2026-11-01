@@ -241,8 +241,11 @@ function radioGroupApi(context: PrimitiveContext<RadioGroupOptions, RadioGroupSt
     setValue(value: string | null, { reason = "imperative", event }: Details = {}) {
       const details = { reason, event }
       const state = store.get()
-      if (isDisabled(state) || state.readOnly) return false
-      if (value !== null && (props("root", value) as ItemProps | undefined)?.disabled) return false
+      // The browser restores a disabled or read-only control too, as a native one.
+      if (reason !== "restore") {
+        if (isDisabled(state) || state.readOnly) return false
+        if (value !== null && (props("root", value) as ItemProps | undefined)?.disabled) return false
+      }
       const done = change("value", value, details)
       if (done && reason !== "restore") dispatchChange(formElement())
       return done

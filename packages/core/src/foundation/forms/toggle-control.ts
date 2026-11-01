@@ -169,7 +169,8 @@ function toggleControl<Checked extends CheckedState, Owner extends ToggleOwner =
   function setState(checked: CheckedState, { reason = "imperative", event }: Details = {}) {
     const details = { reason, event }
     const state = store.get()
-    if (isDisabled(state) || state.readOnly) return false
+    // The browser restores a disabled or read-only control too, as a native one.
+    if (reason !== "restore" && (isDisabled(state) || state.readOnly)) return false
     const owner = group?.owner()
     const done = group && owner ? group.write(owner, checked, details) : change("checked", checked, details)
     if (done && reason !== "restore") dispatchChange(formElement())
