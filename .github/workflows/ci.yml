@@ -37,13 +37,14 @@ permissions:
 
 jobs:
   # The nightly and engines tiers test a commit main or the pull request's own
-  # run already checked.
+  # run already checked. The checks run as three jobs side by side, so the
+  # slowest of them, not their sum, is what a pull request waits on.
   check:
-    name: Typecheck and unit tests
+    name: Lint and typecheck
     needs: plan
     if: contains(fromJSON('["affected", "affected-engines", "main", "full"]'), needs.plan.outputs.suite)
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       # Full history, so `pnpm format` finds where the branch left origin/main.
       # On main that's HEAD itself, so it checks nothing.
@@ -60,12 +61,36 @@ jobs:
       - name: Format
         run: pnpm format
 
+      - name: Typecheck
+        run: pnpm typecheck
+
+  unit:
+    name: Unit tests
+    needs: plan
+    if: contains(fromJSON('["affected", "affected-engines", "main", "full"]'), needs.plan.outputs.suite)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      # Only packages/*: a recursive `test` would also start Playwright in tests/.
+      - name: Unit tests
+        run: pnpm --filter "./packages/*" test
+
+  packages:
+    name: Build and size
+    needs: plan
+    if: contains(fromJSON('["affected", "affected-engines", "main", "full"]'), needs.plan.outputs.suite)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
       # The docs load the compiled examples in examples/dist.
       - name: Build examples
         run: pnpm --filter examples build
-
-      - name: Typecheck
-        run: pnpm typecheck
 
       # The packed packages installed in a scratch app, every entry typechecked
       # strictly against the emitted declarations, from scripts/check-packages.mjs.
@@ -82,10 +107,6 @@ jobs:
 
       - name: Bundle size
         run: pnpm size
-
-      # Only packages/*: a recursive `test` would also start Playwright in tests/.
-      - name: Unit tests
-        run: pnpm --filter "./packages/*" test
 
   # The web components built for pages without a bundler, loaded from another
   # origin like the docs site serves them (tests/browser-build.config.ts).
@@ -152,7 +173,7 @@ jobs:
   # The specs a pull request or a push can affect, from scripts/affected-specs.mjs:
   # the touched components on the frameworks the changes reach, their leak
   # tests, and a framework's whole project when its shared code changed. The
-  # script lists the plan's tests and asks for a runner per 10 minutes of them,
+  # script lists the plan's tests and asks for a runner per 6 minutes of them,
   # so a component change takes one runner and a change to shared code a few.
   affected-plan:
     name: Plan affected specs

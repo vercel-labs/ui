@@ -20,7 +20,8 @@ function Fixture() {
   const [action, setAction] = React.useState("")
   const [reason, setReason] = React.useState("")
   const [rested, setRested] = React.useState("")
-  const { perView, cancel, playToggle, options } = carouselOptions()
+  const { perView, cancel, playToggle, controlled, options } = carouselOptions()
+  const [page, setPage] = React.useState(1)
   return (
     <div className="fixture">
       <button>Before</button>
@@ -30,8 +31,10 @@ function Fixture() {
         style={{ "--per-view": perView } as React.CSSProperties}
         controller={controller}
         {...options}
+        {...(controlled && { page })}
         onPageChange={(page, details) => {
           if (page === cancel) return details.cancel()
+          if (controlled) setPage(page)
           setAction(String(page))
           setReason(details.reason)
         }}
@@ -81,6 +84,7 @@ function Fixture() {
       <output aria-label="Last reason">{reason}</output>
       <output aria-label="Rested on">{rested}</output>
       <button onClick={() => controller.setPage(4)}>Show page 4</button>
+      {controlled && <button onClick={() => setPage(3)}>Show page 3 by prop</button>}
       <CarouselNext controller={controller}>Next from outside</CarouselNext>
     </div>
   )

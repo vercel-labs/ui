@@ -295,6 +295,7 @@ type MenuNode = {
     childOpenChanged: (childId: string, open: boolean) => void
     hoverItem: (el: HTMLElement, event: PointerEvent) => void
     cancelHoverOpen: () => void
+    trackPointer: (event: PointerEvent) => void
     layer: () => Layer | undefined
     barArrow: (by: 1 | -1, event: KeyboardEvent) => boolean
   }
@@ -313,7 +314,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   const safeArea = createSafeArea()
   let pendingFocus: Focus = "none"
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
-  let lastPointer: { x: number; y: number } | undefined
+  // NaN until the pointer first moves, so the first move always counts.
+  let pointerX = NaN
+  let pointerY = NaN
   // The menubar a root menu sits in. Submenus belong to their root's. The
   // adapter passes it once, as the menu is made, so it's read here and never
   // while parts render, whose attributes read state alone.
@@ -592,8 +595,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         const entry = entryOf(el)
         if (!entry) return
         // WebKit fires pointermove without movement when content scrolls under the pointer.
-        const moved = !lastPointer || lastPointer.x !== event.clientX || lastPointer.y !== event.clientY
-        lastPointer = { x: event.clientX, y: event.clientY }
+        const moved = pointerX !== event.clientX || pointerY !== event.clientY
+        pointerX = event.clientX
+        pointerY = event.clientY
         if (!moved && store.get().highlighted !== null) return
         const child = openChild()
         const point = { x: event.clientX, y: event.clientY }
@@ -613,6 +617,11 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
           )
       },
       cancelHoverOpen: () => clearTimeout(hoverTimer),
+      trackPointer(event: PointerEvent) {
+        if (event.pointerType === "touch") return
+        pointerX = event.clientX
+        pointerY = event.clientY
+      },
       popup,
       presentation,
       layer: () => popup.layer(),

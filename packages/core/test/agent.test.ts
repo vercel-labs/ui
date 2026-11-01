@@ -9,7 +9,8 @@ import { createAgent, registerTools, type AgentComponent } from "../src/page/age
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { datePicker } from "../src/components/date-picker/date-picker"
-import { input } from "../src/components/input/input"
+import { input, textarea } from "../src/components/input/input"
+import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
 import { progress } from "../src/components/progress/progress"
@@ -134,6 +135,91 @@ describe("agent", () => {
     expect(component).toMatchObject({ disabled: true, actions: [] })
     const outcome = await agent.act({ steps: [{ ref: component.ref, action: "setChecked", args: [true] }] })
     expect(outcome.error?.message).toContain("takes no setChecked now")
+  })
+
+  test("a component inside a disabled fieldset takes no actions", async () => {
+    const agent = createAgent()
+    const instance = select({ id: "visibility", items: ["Private", "Public"] })
+    const fieldset = document.createElement("fieldset")
+    fieldset.disabled = true
+    const trigger = document.createElement("button")
+    trigger.setAttribute("aria-label", "Visibility")
+    const input = document.createElement("input")
+    fieldset.append(trigger, input)
+    document.body.append(fieldset)
+    cleanups.push(bind(instance.part("trigger"), trigger), bind(instance.part("form-input"), input), () =>
+      instance.destroy(),
+    )
+    await Promise.resolve()
+    const [component] = agent.snapshot()
+    expect(component).toMatchObject({ label: "Visibility", disabled: true, actions: [] })
+    const outcome = await agent.act({ steps: [{ ref: "Visibility", action: "setValue", args: ["Public"] }] })
+    expect(outcome.error?.message).toContain("takes no setValue now")
+  })
+
+  test.each([
+    ["input", input],
+    ["textarea", textarea],
+  ] as const)("a %s inside a disabled fieldset takes no actions", async (tag, make) => {
+    const agent = createAgent()
+    const instance = make({ id: "note" })
+    const fieldset = document.createElement("fieldset")
+    fieldset.disabled = true
+    const el = document.createElement(tag)
+    el.setAttribute("aria-label", "Note")
+    fieldset.append(el)
+    document.body.append(fieldset)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    await Promise.resolve()
+    const [component] = agent.snapshot()
+    expect(component).toMatchObject({ label: "Note", disabled: true, actions: [] })
+    const outcome = await agent.act({ steps: [{ ref: "Note", action: "setValue", args: ["Changed"] }] })
+    expect(outcome.error?.message).toContain("takes no setValue now")
+    expect(instance.get().value).not.toBe("Changed")
+  })
+
+  test("a date picker whose input a disabled fieldset disables takes no actions", async () => {
+    const agent = createAgent()
+    const instance = datePicker({ id: "due", defaultMonth: "2026-11" })
+    const fieldset = document.body.appendChild(document.createElement("fieldset"))
+    fieldset.disabled = true
+    const input = fieldset.appendChild(document.createElement("input"))
+    input.setAttribute("aria-label", "Due")
+    cleanups.push(bind(instance.part("input"), input), () => instance.destroy())
+    await Promise.resolve()
+    const component = agent.snapshot().find((found) => found.component === "date-picker")
+    expect(component).toMatchObject({ label: "Due", disabled: true, actions: [] })
+    const outcome = await agent.act({ steps: [{ ref: "Due", action: "setValue", args: ["2030-01-02"] }] })
+    expect(outcome.error?.message).toContain("takes no setValue now")
+  })
+
+  test("a date picker whose keyed input a disabled fieldset disables takes no actions, as adapters bind it", async () => {
+    const agent = createAgent()
+    const instance = datePicker({ id: "start-date", defaultMonth: "2026-11" })
+    const fieldset = document.body.appendChild(document.createElement("fieldset"))
+    fieldset.disabled = true
+    const input = fieldset.appendChild(document.createElement("input"))
+    input.setAttribute("aria-label", "Start")
+    cleanups.push(bind(instance.part("input", { id: "start", end: false }), input), () => instance.destroy())
+    await Promise.resolve()
+    const component = agent.snapshot().find((found) => found.component === "date-picker")
+    expect(component).toMatchObject({ label: "Start", disabled: true, actions: [] })
+  })
+
+  test("a number input at its max still takes actions, though its increment button is disabled", async () => {
+    const agent = createAgent()
+    const instance = numberInput({ id: "seats", defaultValue: 10, max: 10 })
+    const field = document.body.appendChild(document.createElement("input"))
+    field.setAttribute("aria-label", "Seats")
+    const increment = document.body.appendChild(document.createElement("button"))
+    cleanups.push(bind(instance.part("control"), field), bind(instance.part("increment"), increment), () =>
+      instance.destroy(),
+    )
+    await Promise.resolve()
+    increment.disabled = true
+    const component = agent.snapshot().find((found) => found.label === "Seats")
+    expect(component?.disabled).toBeUndefined()
+    expect(component?.actions).toContain("setValue")
   })
 
   test("a component that leaves the page stays in the snapshot as off the page, with the state it had", async () => {
@@ -1253,7 +1339,12 @@ describe("agent act", () => {
 
   // A row's actions popover whose Remove button renders once it opens, the
   // way an adapter renders its content, and every open change it hears.
-  async function mountActions({ confirm }: { confirm?: string } = {}) {
+  async function mountActions({
+    confirm,
+    disabled,
+    ariaDisabled,
+    inDisabledFieldset,
+  }: { confirm?: string; disabled?: boolean; ariaDisabled?: boolean; inDisabledFieldset?: boolean } = {}) {
     const { popover } = await import("../src/components/popover/popover")
     const onClick = vi.fn()
     const changes: [boolean, string][] = []
@@ -1266,8 +1357,14 @@ describe("agent act", () => {
         const remove = document.createElement("button")
         remove.textContent = "Remove"
         if (confirm) remove.setAttribute("data-agent-confirm", confirm)
+        remove.disabled = !!disabled
+        if (ariaDisabled) remove.setAttribute("aria-disabled", "true")
         remove.addEventListener("click", onClick)
-        content.append(remove)
+        if (inDisabledFieldset) {
+          const fieldset = content.appendChild(document.createElement("fieldset"))
+          fieldset.disabled = true
+          fieldset.append(remove)
+        } else content.append(remove)
       },
     })
     const trigger = document.createElement("button")
@@ -1289,6 +1386,63 @@ describe("agent act", () => {
       steps: [{ result: expect.stringMatching(/^Pressed "Remove", after opening c\d+\.$/) }],
     })
     expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  test("a press on a disabled button fails, and closes the popup it opened", async () => {
+    const agent = createAgent()
+    const { instance, onClick } = await mountActions({ disabled: true })
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    expect(outcome).toMatchObject({ ok: false, error: { message: expect.stringContaining('"Remove"') } })
+    expect(outcome.error?.message).toContain("disabled")
+    expect(instance.get().open).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a press on an aria-disabled button fails, and closes the popup it opened", async () => {
+    const agent = createAgent()
+    const { instance, onClick } = await mountActions({ ariaDisabled: true })
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    expect(outcome).toMatchObject({ ok: false, error: { message: expect.stringContaining('"Remove"') } })
+    expect(outcome.error?.message).toContain("disabled")
+    expect(instance.get().open).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a press on a disabled button in a popup the person opened fails, and leaves it open", async () => {
+    const agent = createAgent()
+    const { instance, onClick } = await mountActions({ disabled: true })
+    ;(instance.api as unknown as { setOpen: (open: boolean) => void }).setOpen(true)
+    await vi.waitFor(() => expect(instance.get().open).toBe(true))
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().open).toBe(true)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a press on a button a disabled fieldset disables fails", async () => {
+    const agent = createAgent()
+    const { onClick } = await mountActions({ inDisabledFieldset: true })
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    expect(outcome).toMatchObject({ ok: false, error: { message: expect.stringContaining("disabled") } })
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a press on a button disabled while its confirmation is pending fails, and closes the popup", async () => {
+    let answer: ((allowed: boolean) => void) | undefined
+    const agent = createAgent({
+      allow: (step) => !step.confirm || new Promise<boolean>((resolve) => (answer = resolve)),
+    })
+    const { instance, onClick } = await mountActions({ confirm: "Removes Tom from the team" })
+    const outcome = agent.act({ steps: [{ ref: "Tom Becker", action: "press", args: ["Remove"] }] })
+    await vi.waitFor(() => expect(answer).toBeDefined())
+    const remove = [...document.querySelectorAll("button")].find((el) => el.textContent === "Remove")!
+    remove.disabled = true
+    answer!(true)
+    const result = await outcome
+    expect(result).toMatchObject({ ok: false, error: { message: expect.stringContaining('"Remove"') } })
+    expect(result.error?.message).toContain("disabled")
+    expect(instance.get().open).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
   })
 
   test("a press allow refuses doesn't open the popup", async () => {

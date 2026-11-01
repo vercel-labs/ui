@@ -55,10 +55,11 @@ const sharedThreshold = 4
 const testSeconds = 0.4
 const leakWeight = 16
 const engineWeight = 2
-// CI splits the plan into runners of about this many minutes of tests, so
-// each Playwright run stays well inside the config's 25-minute globalTimeout.
-const shardMinutes = 10
-const maxShards = 10
+// CI splits the plan into runners of about this many minutes of tests, so a
+// pull request's specs finish in about that long, well inside the config's
+// 25-minute globalTimeout.
+const shardMinutes = 6
+const maxShards = 12
 
 const frameworks = ["react", "vue", "web", "solid", "svelte"]
 const engineProjects = ["web-webkit", "web-firefox"]
