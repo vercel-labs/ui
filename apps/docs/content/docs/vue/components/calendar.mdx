@@ -87,7 +87,7 @@ A value with the wrong shape for its mode is treated as no selection.
 
 ### Range Limits
 
-`min-days` and `max-days` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen.
+`min-days` and `max-days` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen. Until then, the dates that would break it are disabled.
 
 A range cannot include an unavailable date unless `allow-unavailable` is set. That allows unavailable dates between the ends; they still cannot be chosen as an endpoint.
 

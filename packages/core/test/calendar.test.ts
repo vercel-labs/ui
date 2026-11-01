@@ -397,6 +397,19 @@ describe("calendar", () => {
     expect(instance.get()).toMatchObject({ anchor: "2026-10-19", value: ["2026-10-16", "2026-10-18"] })
   })
 
+  test("while a range is picked, the days that can't end it read as disabled", async () => {
+    const { day } = mount({ mode: "range", minDays: 3, maxDays: 5, unavailable: "2026-10-21" })
+    await tick()
+    day("2026-10-16").click()
+    await tick()
+    const disabled = (date: string) => day(date).getAttribute("aria-disabled") === "true"
+    expect(["2026-10-16", "2026-10-18", "2026-10-20"].some(disabled)).toBe(false)
+    expect(["2026-10-15", "2026-10-17", "2026-10-22"].every(disabled)).toBe(true)
+    day("2026-10-18").click()
+    await tick()
+    expect(disabled("2026-10-17")).toBe(false)
+  })
+
   test("a range ends before its start, which then becomes its end, and previews that way", async () => {
     const { day, instance } = mount({ mode: "range" })
     await tick()
