@@ -16,35 +16,20 @@ export function Example() {
   const [value, setValue] = React.useState("")
   const score = strength(value)
   return (
-    <Field name="new-password" className="flex w-full max-w-sm flex-col gap-2">
-      <FieldLabel className="text-sm leading-none font-medium data-disabled:opacity-50">
-        New password
-      </FieldLabel>
-      <PasswordInput
-        value={value}
-        onValueChange={(next) => setValue(next)}
-        autoComplete="new-password"
-        className="flex h-8 w-full min-w-0 items-center gap-2 rounded-2xl border border-transparent bg-input/50 ps-2.5 pe-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 data-disabled:opacity-50"
-      >
-        <PasswordInputControl className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm" />
-        <PasswordInputToggle
-          aria-label="Show password"
-          className="inline-flex size-6 shrink-0 items-center justify-center rounded-xl text-muted-foreground outline-none transition-[color,background-color,box-shadow] hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 aria-pressed:text-foreground data-disabled:pointer-events-none dark:hover:bg-muted/50"
-        >
-          {(state) => (state.visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />)}
+    <Field name="new-password">
+      <FieldLabel>New password</FieldLabel>
+      <PasswordInput value={value} onValueChange={(next) => setValue(next)} autoComplete="new-password">
+        <PasswordInputControl />
+        <PasswordInputToggle aria-label="Show password">
+          {(state) => (state.visible ? <EyeOff /> : <Eye />)}
         </PasswordInputToggle>
       </PasswordInput>
-      <div aria-hidden="true" className="flex gap-1">
+      <div data-slot="strength" aria-hidden="true">
         {[1, 2, 3, 4].map((level) => (
-          <div
-            key={level}
-            className={
-              score >= level ? "h-1 flex-1 rounded-full bg-primary" : "h-1 flex-1 rounded-full bg-muted"
-            }
-          />
+          <div key={level} data-on={score >= level || undefined} />
         ))}
       </div>
-      <output className="text-sm text-muted-foreground">
+      <output data-slot="output">
         {value
           ? `Strength: ${["Weak", "Weak", "Fair", "Good", "Strong"][score]} (${value.length} characters)`
           : "Type a password to rate it."}

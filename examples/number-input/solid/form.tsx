@@ -13,10 +13,10 @@ export function Example() {
   const form = createUniqueId()
 
   return (
-    <div class="flex flex-col gap-4">
+    <div data-slot="stack">
       <form
+        data-slot="stack"
         id={form}
-        class="flex flex-col gap-4"
         onSubmit={(event) => {
           event.preventDefault()
           const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
@@ -24,16 +24,11 @@ export function Example() {
         }}
         onReset={() => setSubmitted("")}
       >
-        <Field class="flex min-w-0 flex-col gap-2 text-foreground">
-          <FieldLabel class="text-sm leading-none font-medium text-foreground data-disabled:opacity-50">
-            Quantity
-          </FieldLabel>
+        <Field>
+          <FieldLabel>Quantity</FieldLabel>
           <NumberInput name="quantity" defaultValue={2} min={1}>
-            <NumberInputGroup class="flex h-8 w-40 items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 px-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none">
-              <NumberInputDecrement
-                aria-label="Decrease"
-                class="inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none select-none data-disabled:pointer-events-none data-disabled:opacity-50"
-              >
+            <NumberInputGroup>
+              <NumberInputDecrement aria-label="Decrease">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -42,16 +37,12 @@ export function Example() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   aria-hidden="true"
-                  class="size-4 shrink-0"
                 >
                   <path d="M5 12h14" />
                 </svg>
               </NumberInputDecrement>
-              <NumberInputControl class="h-full w-full min-w-0 border-0 bg-transparent px-1 py-0 text-center text-base text-foreground tabular-nums outline-none data-disabled:opacity-50 md:text-sm" />
-              <NumberInputIncrement
-                aria-label="Increase"
-                class="inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none select-none data-disabled:pointer-events-none data-disabled:opacity-50"
-              >
+              <NumberInputControl />
+              <NumberInputIncrement aria-label="Increase">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -60,7 +51,6 @@ export function Example() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   aria-hidden="true"
-                  class="size-4 shrink-0"
                 >
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
@@ -69,10 +59,8 @@ export function Example() {
             </NumberInputGroup>
           </NumberInput>
         </Field>
-        <Field class="flex min-w-0 flex-col gap-2 text-foreground">
-          <FieldLabel class="text-sm leading-none font-medium text-foreground data-disabled:opacity-50">
-            Tip
-          </FieldLabel>
+        <Field>
+          <FieldLabel>Tip</FieldLabel>
           <NumberInput
             name="tip"
             defaultValue={1234.5}
@@ -80,11 +68,8 @@ export function Example() {
             step={0.01}
             format={{ style: "currency", currency: "USD" }}
           >
-            <NumberInputGroup class="flex h-8 w-40 items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 px-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none">
-              <NumberInputDecrement
-                aria-label="Decrease"
-                class="inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none select-none data-disabled:pointer-events-none data-disabled:opacity-50"
-              >
+            <NumberInputGroup>
+              <NumberInputDecrement aria-label="Decrease">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -93,16 +78,12 @@ export function Example() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   aria-hidden="true"
-                  class="size-4 shrink-0"
                 >
                   <path d="M5 12h14" />
                 </svg>
               </NumberInputDecrement>
-              <NumberInputControl class="h-full w-full min-w-0 border-0 bg-transparent px-1 py-0 text-center text-base text-foreground tabular-nums outline-none data-disabled:opacity-50 md:text-sm" />
-              <NumberInputIncrement
-                aria-label="Increase"
-                class="inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none select-none data-disabled:pointer-events-none data-disabled:opacity-50"
-              >
+              <NumberInputControl />
+              <NumberInputIncrement aria-label="Increase">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -111,7 +92,6 @@ export function Example() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   aria-hidden="true"
-                  class="size-4 shrink-0"
                 >
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
@@ -120,31 +100,16 @@ export function Example() {
             </NumberInputGroup>
           </NumberInput>
         </Field>
-        <div class="flex flex-wrap gap-2">
-          <button
-            type="submit"
-            class="inline-flex h-8 w-fit shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-secondary bg-clip-padding px-3 text-sm font-medium whitespace-nowrap text-secondary-foreground transition-all outline-none select-none hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:enabled:translate-y-px motion-reduce:transition-none"
-          >
-            Save
-          </button>
-          <button
-            type="reset"
-            class="inline-flex h-8 w-fit shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-secondary bg-clip-padding px-3 text-sm font-medium whitespace-nowrap text-secondary-foreground transition-all outline-none select-none hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:enabled:translate-y-px motion-reduce:transition-none"
-          >
-            Reset
-          </button>
+        <div data-slot="row">
+          <button type="submit">Save</button>
+          <button type="reset">Reset</button>
         </div>
       </form>
-      <Field class="flex flex-col gap-2 border-t border-border pt-4">
-        <FieldLabel class="text-sm leading-none font-medium text-foreground data-disabled:opacity-50">
-          Gift cards
-        </FieldLabel>
+      <Field>
+        <FieldLabel>Gift cards</FieldLabel>
         <NumberInput name="gift-cards" form={form} defaultValue={0} min={0}>
-          <NumberInputGroup class="flex h-8 w-40 items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 px-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none">
-            <NumberInputDecrement
-              aria-label="Decrease"
-              class="inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none select-none data-disabled:pointer-events-none data-disabled:opacity-50"
-            >
+          <NumberInputGroup>
+            <NumberInputDecrement aria-label="Decrease">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -153,16 +118,12 @@ export function Example() {
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 aria-hidden="true"
-                class="size-4 shrink-0"
               >
                 <path d="M5 12h14" />
               </svg>
             </NumberInputDecrement>
-            <NumberInputControl class="h-full w-full min-w-0 border-0 bg-transparent px-1 py-0 text-center text-base text-foreground tabular-nums outline-none data-disabled:opacity-50 md:text-sm" />
-            <NumberInputIncrement
-              aria-label="Increase"
-              class="inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none select-none data-disabled:pointer-events-none data-disabled:opacity-50"
-            >
+            <NumberInputControl />
+            <NumberInputIncrement aria-label="Increase">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -171,7 +132,6 @@ export function Example() {
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 aria-hidden="true"
-                class="size-4 shrink-0"
               >
                 <path d="M5 12h14" />
                 <path d="M12 5v14" />
@@ -180,9 +140,7 @@ export function Example() {
           </NumberInputGroup>
         </NumberInput>
       </Field>
-      <output class="min-h-5 text-sm text-muted-foreground">
-        {submitted() ? `Submitted: ${submitted()}` : ""}
-      </output>
+      <output data-slot="output">{submitted() ? `Submitted: ${submitted()}` : ""}</output>
     </div>
   )
 }

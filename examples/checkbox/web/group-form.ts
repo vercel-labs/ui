@@ -10,11 +10,10 @@ const toppings = [
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div class="flex w-full max-w-xs flex-col gap-3">
-      <h3 id="form-toppings" class="m-0 text-sm font-medium text-foreground">Toppings</h3>
-      <p class="m-0 -mt-2 text-sm text-muted-foreground">Choose at least one.</p>
+    <div data-slot="stack">
+      <h3 id="form-toppings">Toppings</h3>
+      <p data-slot="hint">Choose at least one.</p>
       <ui-checkbox-group
-        class="flex flex-col gap-3"
         aria-labelledby="form-toppings"
         name="toppings"
         form="toppings-form"
@@ -24,10 +23,10 @@ function mount(root: HTMLElement) {
         ${toppings
           .map(
             (topping) => `
-              <label class="flex w-fit items-center gap-3 text-sm">
-                <ui-checkbox class="relative flex size-4 shrink-0 cursor-default appearance-none items-center justify-center rounded-[5px] border border-transparent bg-input/90 p-0 text-primary-foreground outline-none transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2 aria-invalid:border-foreground aria-invalid:ring-3 aria-invalid:ring-foreground/20 aria-invalid:aria-checked:border-primary focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:border-primary data-checked:bg-primary data-indeterminate:border-primary data-indeterminate:bg-primary data-disabled:opacity-50 motion-reduce:transition-none" value="${topping.value}">
-                  <ui-checkbox-indicator class="grid place-content-center">
-                    ${createElement(Check, { class: "size-3.5", "aria-hidden": "true" }).outerHTML}
+              <label data-slot="label">
+                <ui-checkbox value="${topping.value}">
+                  <ui-checkbox-indicator>
+                    ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
                   </ui-checkbox-indicator>
                 </ui-checkbox>
                 ${topping.label}
@@ -36,15 +35,15 @@ function mount(root: HTMLElement) {
           )
           .join("")}
       </ui-checkbox-group>
-      <form id="toppings-form" class="mt-2 flex gap-2">
-        <button class="inline-flex h-8 shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-primary px-3 text-sm font-medium whitespace-nowrap text-primary-foreground outline-none select-none transition-colors hover:bg-primary/80 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30" type="submit">
+      <form data-slot="row" id="toppings-form">
+        <button type="submit">
           Submit
         </button>
-        <button class="inline-flex h-8 shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-border bg-background px-3 text-sm font-medium whitespace-nowrap text-foreground outline-none select-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30" type="reset">
+        <button type="reset">
           Reset
         </button>
       </form>
-      <output class="block min-h-5 text-sm text-muted-foreground"></output>
+      <output data-slot="output"></output>
     </div>
   `
   const form = root.querySelector("form")!

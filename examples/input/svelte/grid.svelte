@@ -3,29 +3,17 @@
   import { Input } from "@ui-sdk/svelte/input"
 </script>
 
-<div class="grid w-full max-w-sm grid-cols-2 gap-4">
-  <Field name="first-name" class="flex flex-col gap-2">
-    <FieldLabel
-      class="text-sm leading-none font-medium data-disabled:opacity-50 data-invalid:text-destructive"
-    >
+<div data-slot="grid">
+  <Field name="first-name">
+    <FieldLabel>
       First name
     </FieldLabel>
-    <Input
-      autocomplete="given-name"
-      placeholder="Ada"
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base outline-none transition-[color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 md:text-sm data-invalid:border-destructive data-invalid:ring-3 data-invalid:ring-destructive/20 dark:data-invalid:border-destructive/50 dark:data-invalid:ring-destructive/40"
-    />
+    <Input autocomplete="given-name" placeholder="Ada" />
   </Field>
-  <Field name="last-name" class="flex flex-col gap-2">
-    <FieldLabel
-      class="text-sm leading-none font-medium data-disabled:opacity-50 data-invalid:text-destructive"
-    >
+  <Field name="last-name">
+    <FieldLabel>
       Last name
     </FieldLabel>
-    <Input
-      autocomplete="family-name"
-      placeholder="Lovelace"
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base outline-none transition-[color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 md:text-sm data-invalid:border-destructive data-invalid:ring-3 data-invalid:ring-destructive/20 dark:data-invalid:border-destructive/50 dark:data-invalid:ring-destructive/40"
-    />
+    <Input autocomplete="family-name" placeholder="Lovelace" />
   </Field>
 </div>

@@ -2,9 +2,8 @@ import { createUniqueId } from "solid-js"
 import { Radio, RadioGroup } from "@ui-sdk/solid/radio"
 import { For, Show } from "solid-js"
 
-const icon = (markup: string) => (props: { class?: string }) => (
+const icon = (markup: string) => () => (
   <svg
-    class={props.class}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -34,26 +33,19 @@ const options = [
 function Example() {
   const id = createUniqueId()
   return (
-    <RadioGroup class="grid w-full max-w-sm gap-2" aria-label="Notify me about" defaultValue="mentions">
+    <RadioGroup aria-label="Notify me about" defaultValue="mentions">
       <For each={options}>
         {(option) => (
           <Radio
             value={option.value}
             aria-labelledby={`${id}-notify-${option.value}-label`}
             aria-describedby={`${id}-notify-${option.value}-description`}
-            class={(state) =>
-              state.checked
-                ? "flex w-full items-center gap-3 rounded-2xl border border-border px-4 py-3 text-start text-sm cursor-default outline-none transition-[color,background-color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 bg-input/30 motion-reduce:transition-none"
-                : "flex w-full items-center gap-3 rounded-2xl border border-border px-4 py-3 text-start text-sm cursor-default outline-none transition-[color,background-color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 hover:bg-input/40 motion-reduce:transition-none"
-            }
             render={(props, state) => (
               <button {...props}>
-                <option.icon class="size-4 shrink-0 text-muted-foreground" />
-                <span class="flex flex-1 flex-col">
-                  <span class="font-medium" id={`${id}-notify-${option.value}-label`}>
-                    {props.children}
-                  </span>
-                  <span class="text-muted-foreground" id={`${id}-notify-${option.value}-description`}>
+                <option.icon />
+                <span data-slot="stack">
+                  <span id={`${id}-notify-${option.value}-label`}>{props.children}</span>
+                  <span data-slot="hint" id={`${id}-notify-${option.value}-description`}>
                     {option.description}
                   </span>
                 </span>
@@ -66,7 +58,6 @@ function Example() {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     aria-hidden="true"
-                    class="size-4 shrink-0"
                   >
                     <path d="M20 6 9 17l-5-5" />
                   </svg>

@@ -13,25 +13,25 @@ const rules = [
 
 export function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-field class="flex w-full max-w-sm flex-col gap-2 text-foreground">
-      <ui-field-label class="text-sm leading-none font-medium text-foreground data-disabled:opacity-50">Create a password</ui-field-label>
-      <ui-password-input name="new-password" class="flex h-8 w-full min-w-0 items-center gap-2 rounded-2xl border border-transparent bg-input/50 ps-2.5 pe-1 text-sm text-muted-foreground transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 data-disabled:opacity-50 motion-reduce:transition-none">
-        <input autocomplete="new-password" class="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-base text-foreground outline-none placeholder:text-muted-foreground md:text-sm" />
+    <ui-field>
+      <ui-field-label>Create a password</ui-field-label>
+      <ui-password-input name="new-password">
+        <input autocomplete="new-password" />
         <ui-password-input-toggle>
-          <button aria-label="Show password" class="group inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none aria-pressed:text-foreground data-disabled:pointer-events-none">
-            ${createElement(Eye, { class: "size-4 group-aria-pressed:hidden", "aria-hidden": "true" }).outerHTML}
-            ${createElement(EyeOff, { class: "hidden size-4 group-aria-pressed:block", "aria-hidden": "true" }).outerHTML}
+          <button aria-label="Show password">
+            ${createElement(Eye, { "aria-hidden": "true" }).outerHTML}
+            ${createElement(EyeOff, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-password-input-toggle>
       </ui-password-input>
-      <ul aria-label="Password requirements" class="flex flex-col gap-1 text-sm">
+      <ul data-slot="stack" aria-label="Password requirements">
         ${rules
           .map(
             (rule) => `
-              <li class="group flex items-center gap-2 text-muted-foreground data-met:text-foreground">
-                ${createElement(X, { class: "size-4 group-data-met:hidden", "aria-hidden": "true" }).outerHTML}
-                ${createElement(Check, { class: "hidden size-4 group-data-met:block", "aria-hidden": "true" }).outerHTML}
-                <span data-rule-status class="sr-only">To do:</span>
+              <li data-slot="row">
+                ${createElement(X, { "aria-hidden": "true" }).outerHTML}
+                ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
+                <span data-slot="visually-hidden" data-rule-status>To do:</span>
                 ${rule.label}
               </li>
             `,

@@ -9,19 +9,14 @@ const plans = [
 
 export function Example() {
   return (
-    <Field className="flex w-full max-w-sm flex-col gap-3">
-      <FieldLabel className="text-sm leading-snug font-medium">Subscription plan</FieldLabel>
-      <FieldDescription className="text-sm text-muted-foreground">
-        Yearly and lifetime plans offer significant savings.
-      </FieldDescription>
-      <RadioGroup className="flex flex-col gap-3" name="plan" defaultValue="monthly">
+    <Field>
+      <FieldLabel>Subscription plan</FieldLabel>
+      <FieldDescription>Yearly and lifetime plans offer significant savings.</FieldDescription>
+      <RadioGroup name="plan" defaultValue="monthly">
         {plans.map((plan) => (
-          <label key={plan.value} className="flex w-fit items-center gap-3 text-sm">
-            <Radio
-              className="flex size-4 shrink-0 items-center justify-center rounded-full border border-transparent bg-input/90 outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:border-primary data-checked:bg-primary data-disabled:opacity-50"
-              value={plan.value}
-            >
-              <RadioIndicator className="size-2 rounded-full bg-primary-foreground" />
+          <label data-slot="label" key={plan.value}>
+            <Radio value={plan.value}>
+              <RadioIndicator />
             </Radio>
             {plan.label}
           </label>

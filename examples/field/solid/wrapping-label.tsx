@@ -9,16 +9,13 @@ const options = [
 
 export function Example() {
   return (
-    <div class="flex w-full max-w-md flex-col gap-3">
+    <div data-slot="stack">
       <For each={options}>
         {(option) => (
-          <FieldLabel class="cursor-pointer rounded-2xl border border-border p-4 transition-colors hover:bg-input/40 has-data-checked:bg-input/30">
-            <Field class="flex flex-row items-start gap-3">
-              <Checkbox
-                class="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[5px] border border-transparent bg-input/90 outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground data-disabled:opacity-50"
-                name={option.name}
-              >
-                <CheckboxIndicator class="grid place-content-center">
+          <FieldLabel data-variant="card">
+            <Field>
+              <Checkbox name={option.name}>
+                <CheckboxIndicator>
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -27,17 +24,14 @@ export function Example() {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     aria-hidden="true"
-                    class="size-3.5"
                   >
                     <path d="M20 6 9 17l-5-5" />
                   </svg>
                 </CheckboxIndicator>
               </Checkbox>
-              <span class="flex flex-col gap-1">
-                <span class="text-sm leading-snug font-medium">{option.title}</span>
-                <FieldDescription class="text-sm text-muted-foreground">
-                  {option.description}
-                </FieldDescription>
+              <span data-slot="stack">
+                <span>{option.title}</span>
+                <FieldDescription>{option.description}</FieldDescription>
               </span>
             </Field>
           </FieldLabel>

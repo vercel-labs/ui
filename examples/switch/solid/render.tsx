@@ -2,14 +2,9 @@ import { Switch, SwitchThumb } from "@ui-sdk/solid/switch"
 
 export function Example() {
   return (
-    <label class="flex items-center gap-2 text-sm font-medium">
-      <Switch
-        class={(state) =>
-          `inline-flex h-5 w-8 shrink-0 items-center rounded-full border-2 outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 ${state.checked ? "border-primary bg-primary" : "border-transparent bg-input/90"}`
-        }
-      >
+    <label data-slot="label">
+      <Switch>
         <SwitchThumb
-          class="flex size-4 items-center justify-center rounded-full bg-background text-foreground shadow-sm transition-transform data-checked:translate-x-[calc(100%-4px)] rtl:data-checked:-translate-x-[calc(100%-4px)] dark:bg-foreground dark:text-background dark:data-checked:bg-primary-foreground dark:data-checked:text-foreground"
           render={(props, state) => (
             <span {...props}>
               {state.checked ? (
@@ -21,7 +16,6 @@ export function Example() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   aria-hidden="true"
-                  class="size-3"
                 >
                   <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
                 </svg>
@@ -34,7 +28,6 @@ export function Example() {
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   aria-hidden="true"
-                  class="size-3"
                 >
                   <circle cx="12" cy="12" r="4" />
                   <path d="M12 2v2" />

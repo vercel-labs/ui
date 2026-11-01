@@ -15,13 +15,10 @@ function Example() {
   const [submitted, setSubmitted] = React.useState<string | null>(null)
 
   return (
-    <div className="flex w-full max-w-xs flex-col gap-3">
-      <h3 id="form-toppings" className="m-0 text-sm font-medium text-foreground">
-        Toppings
-      </h3>
-      <p className="m-0 -mt-2 text-sm text-muted-foreground">Choose at least one.</p>
+    <div data-slot="stack">
+      <h3 id="form-toppings">Toppings</h3>
+      <p data-slot="hint">Choose at least one.</p>
       <CheckboxGroup
-        className="flex flex-col gap-3"
         aria-labelledby="form-toppings"
         name="toppings"
         form="toppings-form"
@@ -29,13 +26,10 @@ function Example() {
         required
       >
         {toppings.map((topping) => (
-          <label key={topping.value} className="flex w-fit items-center gap-3 text-sm">
-            <Checkbox
-              className="relative flex size-4 shrink-0 cursor-default appearance-none items-center justify-center rounded-[5px] border border-transparent bg-input/90 p-0 text-primary-foreground outline-none transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2 aria-invalid:border-foreground aria-invalid:ring-3 aria-invalid:ring-foreground/20 aria-invalid:aria-checked:border-primary focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:border-primary data-checked:bg-primary data-indeterminate:border-primary data-indeterminate:bg-primary data-disabled:opacity-50 motion-reduce:transition-none"
-              value={topping.value}
-            >
-              <CheckboxIndicator className="grid place-content-center">
-                <Check aria-hidden="true" className="size-3.5" />
+          <label data-slot="label" key={topping.value}>
+            <Checkbox value={topping.value}>
+              <CheckboxIndicator>
+                <Check aria-hidden="true" />
               </CheckboxIndicator>
             </Checkbox>
             {topping.label}
@@ -43,30 +37,18 @@ function Example() {
         ))}
       </CheckboxGroup>
       <form
+        data-slot="row"
         id="toppings-form"
-        className="mt-2 flex gap-2"
         onSubmit={(event) => {
           event.preventDefault()
           setSubmitted(new FormData(event.currentTarget).getAll("toppings").join(", "))
         }}
         onReset={() => setSubmitted(null)}
       >
-        <button
-          className="inline-flex h-8 shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-primary px-3 text-sm font-medium whitespace-nowrap text-primary-foreground outline-none select-none transition-colors hover:bg-primary/80 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-          type="submit"
-        >
-          Submit
-        </button>
-        <button
-          className="inline-flex h-8 shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-border bg-background px-3 text-sm font-medium whitespace-nowrap text-foreground outline-none select-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-          type="reset"
-        >
-          Reset
-        </button>
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
       </form>
-      <output className="block min-h-5 text-sm text-muted-foreground">
-        {submitted !== null ? `toppings: ${submitted}` : ""}
-      </output>
+      <output data-slot="output">{submitted !== null ? `toppings: ${submitted}` : ""}</output>
     </div>
   )
 }

@@ -4,18 +4,18 @@ import { createElement, Eye, EyeOff } from "lucide"
 
 export function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-field class="flex w-full max-w-sm flex-col gap-2 text-foreground">
-      <ui-field-label class="text-sm leading-none font-medium text-foreground data-disabled:opacity-50">Recovery key</ui-field-label>
-      <ui-password-input name="recovery-key" read-only default-value="7Hq2-vX9p-Lm4c" class="flex h-8 w-full min-w-0 items-center gap-2 rounded-2xl border border-transparent bg-input/50 ps-2.5 pe-1 text-sm text-muted-foreground transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 data-disabled:opacity-50 motion-reduce:transition-none data-readonly:border-border data-readonly:bg-transparent">
-        <input autocomplete="off" class="h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-base text-foreground outline-none placeholder:text-muted-foreground md:text-sm" />
+    <ui-field>
+      <ui-field-label>Recovery key</ui-field-label>
+      <ui-password-input name="recovery-key" read-only default-value="7Hq2-vX9p-Lm4c">
+        <input autocomplete="off" />
         <ui-password-input-toggle>
-          <button aria-label="Show password" class="group inline-flex size-6 shrink-0 cursor-default items-center justify-center rounded-xl border-0 bg-transparent p-0 text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none aria-pressed:text-foreground data-disabled:pointer-events-none">
-            ${createElement(Eye, { class: "size-4 group-aria-pressed:hidden", "aria-hidden": "true" }).outerHTML}
-            ${createElement(EyeOff, { class: "hidden size-4 group-aria-pressed:block", "aria-hidden": "true" }).outerHTML}
+          <button aria-label="Show password">
+            ${createElement(Eye, { "aria-hidden": "true" }).outerHTML}
+            ${createElement(EyeOff, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-password-input-toggle>
       </ui-password-input>
-      <ui-field-description class="min-h-5 text-sm text-muted-foreground">Keep it somewhere safe. You can show it, but not change it.</ui-field-description>
+      <ui-field-description>Keep it somewhere safe. You can show it, but not change it.</ui-field-description>
     </ui-field>
   `
 }

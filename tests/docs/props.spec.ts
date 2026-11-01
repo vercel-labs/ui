@@ -856,6 +856,12 @@ function uses(code: string, name: string) {
   ).test(code)
 }
 
+// The examples show a part's state through its data attribute, which the docs
+// stylesheet selects, so a state field the stylesheet styles counts as shown.
+const stylesheet = readFileSync(path.join(repo, "apps/docs/app/examples.css"), "utf8")
+const styled = (name: string) =>
+  stylesheet.includes(`[data-${name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`)
+
 // The Solid examples are ports of React's, so they show the same props. They're
 // checked once every folder a component counts has them.
 const hasSolidExamples = (component: Component) =>
@@ -872,10 +878,12 @@ for (const [name, component] of Object.entries(components)) {
       // Types that resolve to nothing would pass everything. Separator has two names.
       expect(names.size).toBeGreaterThan(1)
       // Solid spells native attributes as HTML does: `readonly` for `readOnly`.
-      const used = (prop: string) =>
-        uses(code, prop) || (framework === "solid" && uses(code, prop.toLowerCase()))
+      const used = (prop: string, typeName: string) =>
+        uses(code, prop) ||
+        (framework === "solid" && uses(code, prop.toLowerCase())) ||
+        (typeName.endsWith("State") && styled(prop))
       const missing = [...names]
-        .filter(([prop]) => !allowed[prop] && !used(prop))
+        .filter(([prop, typeName]) => !allowed[prop] && !used(prop, typeName))
         .map(([prop, typeName]) => `${typeName}.${prop}`)
       expect(missing, "props with no example").toEqual([])
       // Keep the allow list honest: a name it lists must still exist.

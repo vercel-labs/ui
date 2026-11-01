@@ -21,124 +21,83 @@
   }
 </script>
 
-<form class="flex w-full max-w-md min-w-0 flex-col gap-6 text-foreground" onsubmit={submit} onreset={() => (submitted = "")}>
-  <Field class="flex min-w-0 flex-col gap-3 text-foreground">
-    <FieldLabel class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">Name</FieldLabel>
-    <FieldControl
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base text-foreground transition-[color,box-shadow] duration-200 outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-foreground/50 data-invalid:ring-3 data-invalid:ring-foreground/10 motion-reduce:transition-none md:text-sm data-disabled:opacity-50"
-      name="name"
-      required
-      autocomplete="name"
-      placeholder="Ada Lovelace"
-    />
-    <div class="min-h-10">
-      <FieldError class="m-0 text-sm text-foreground" match="valueMissing">Enter your name.</FieldError>
+<form data-slot="stack" onsubmit={submit} onreset={() => (submitted = "")}>
+  <Field>
+    <FieldLabel>Name</FieldLabel>
+    <FieldControl name="name" required autocomplete="name" placeholder="Ada Lovelace" />
+    <div>
+      <FieldError match="valueMissing">Enter your name.</FieldError>
     </div>
   </Field>
-  <Field class="flex min-w-0 flex-col gap-3 text-foreground" name="email">
-    <FieldLabel class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">Email</FieldLabel>
-    <FieldControl
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base text-foreground transition-[color,box-shadow] duration-200 outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-foreground/50 data-invalid:ring-3 data-invalid:ring-foreground/10 motion-reduce:transition-none md:text-sm data-disabled:opacity-50"
-      type="email"
-      required
-      autocomplete="email"
-      placeholder="m@example.com"
-    />
-    <div class="min-h-10">
-      <FieldError class="m-0 text-sm text-foreground" />
+  <Field name="email">
+    <FieldLabel>Email</FieldLabel>
+    <FieldControl type="email" required autocomplete="email" placeholder="m@example.com" />
+    <div>
+      <FieldError />
     </div>
   </Field>
-  <Field class="flex min-w-0 flex-col gap-3 text-foreground" name="password">
-    <FieldLabel class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">Password</FieldLabel>
-    <FieldControl
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base text-foreground transition-[color,box-shadow] duration-200 outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 data-invalid:border-foreground/50 data-invalid:ring-3 data-invalid:ring-foreground/10 motion-reduce:transition-none md:text-sm data-disabled:opacity-50"
-      type="password"
-      required
-      minlength={8}
-      pattern=".*[0-9].*"
-      autocomplete="new-password"
-    />
-    <FieldDescription class="m-0 text-sm text-muted-foreground">At least 8 characters, with a number.</FieldDescription>
-    <div class="min-h-10">
-      <FieldError class="m-0 text-sm text-foreground" match="valueMissing">Enter a password.</FieldError>
-      <FieldError class="m-0 text-sm text-foreground" match="tooShort">Use at least 8 characters.</FieldError>
-      <FieldError class="m-0 text-sm text-foreground" match="patternMismatch">Include at least one number.</FieldError>
+  <Field name="password">
+    <FieldLabel>Password</FieldLabel>
+    <FieldControl type="password" required minlength={8} pattern=".*[0-9].*" autocomplete="new-password" />
+    <FieldDescription>At least 8 characters, with a number.</FieldDescription>
+    <div>
+      <FieldError match="valueMissing">Enter a password.</FieldError>
+      <FieldError match="tooShort">Use at least 8 characters.</FieldError>
+      <FieldError match="patternMismatch">Include at least one number.</FieldError>
     </div>
   </Field>
-  <Field class="flex min-w-0 flex-col gap-3 text-foreground">
-    <FieldLabel class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">Plan</FieldLabel>
-    <RadioGroup class="grid grid-cols-1 gap-4 sm:grid-cols-2" name="plan" required>
+  <Field>
+    <FieldLabel>Plan</FieldLabel>
+    <RadioGroup name="plan" required>
       {#each planOptions as plan (plan.value)}
-        <label
-          class="flex cursor-default items-start gap-3 rounded-2xl border border-border p-3 text-sm hover:bg-input/40 has-data-checked:bg-input/30"
-        >
-          <Radio
-            class="relative flex size-4 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent bg-input/90 outline-none transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:bg-primary data-checked:text-primary-foreground data-disabled:cursor-default data-disabled:opacity-50 motion-reduce:transition-none"
-            value={plan.value}
-          >
-            <RadioIndicator class="size-2 rounded-full bg-primary-foreground" />
+        <label data-slot="card">
+          <Radio value={plan.value}>
+            <RadioIndicator />
           </Radio>
-          <span class="flex min-w-0 flex-col gap-1">
-            <span class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">{plan.title}</span>
-            <span class="m-0 text-sm text-muted-foreground">{plan.description}</span>
+          <span data-slot="stack">
+            <span>{plan.title}</span>
+            <span data-slot="hint">{plan.description}</span>
           </span>
         </label>
       {/each}
     </RadioGroup>
-    <div class="min-h-10">
-      <FieldError class="m-0 text-sm text-foreground" match="valueMissing">Choose a plan.</FieldError>
+    <div>
+      <FieldError match="valueMissing">Choose a plan.</FieldError>
     </div>
   </Field>
-  <Field class="flex flex-row items-center justify-between gap-4">
-    <div class="flex min-w-0 flex-col gap-1.5">
-      <FieldLabel class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">Send me updates</FieldLabel>
-      <FieldDescription class="m-0 text-sm text-muted-foreground">Product news, about once a month.</FieldDescription>
+  <Field>
+    <div data-slot="stack">
+      <FieldLabel>Send me updates</FieldLabel>
+      <FieldDescription>Product news, about once a month.</FieldDescription>
     </div>
-    <Switch
-      class="relative inline-flex h-5 w-8 shrink-0 cursor-default appearance-none items-center rounded-2xl border-2 border-transparent bg-input/90 p-0 outline-none transition-colors after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 aria-invalid:border-foreground aria-invalid:ring-3 aria-invalid:ring-foreground/20 data-checked:border-primary data-checked:bg-primary data-disabled:opacity-50 motion-reduce:transition-none"
-      name="updates"
-      defaultChecked
-    >
-      <SwitchThumb
-        class="pointer-events-none block size-4 shrink-0 rounded-2xl bg-background shadow-sm transition-transform data-checked:translate-x-[calc(100%-4px)] rtl:data-checked:-translate-x-[calc(100%-4px)] motion-reduce:transition-none"
-      />
+    <Switch name="updates" defaultChecked>
+      <SwitchThumb />
     </Switch>
   </Field>
-  <Field class="flex min-w-0 flex-col gap-3 text-foreground">
-    <div class="flex items-center gap-3">
-      <Checkbox
-        class="relative flex size-4 shrink-0 cursor-default appearance-none items-center justify-center rounded-[5px] border border-transparent bg-input/90 p-0 text-primary-foreground outline-none transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2 aria-invalid:border-foreground aria-invalid:ring-3 aria-invalid:ring-foreground/20 aria-invalid:aria-checked:border-primary focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:border-primary data-checked:bg-primary data-indeterminate:border-primary data-indeterminate:bg-primary data-disabled:opacity-50 motion-reduce:transition-none"
-        name="terms"
-        required
-      >
-        <CheckboxIndicator class="grid place-content-center">
-          <Check aria-hidden="true" class="size-3.5 shrink-0" />
+  <Field>
+    <div data-slot="row">
+      <Checkbox name="terms" required>
+        <CheckboxIndicator>
+          <Check aria-hidden="true" />
         </CheckboxIndicator>
       </Checkbox>
-      <FieldLabel class="text-sm leading-snug font-medium text-foreground data-disabled:opacity-50">
+      <FieldLabel>
         I accept the terms of service
       </FieldLabel>
     </div>
-    <div class="min-h-10">
-      <FieldError class="m-0 text-sm text-foreground" match="valueMissing">Accept the terms to continue.</FieldError>
+    <div>
+      <FieldError match="valueMissing">Accept the terms to continue.</FieldError>
     </div>
   </Field>
-  <div class="flex flex-wrap gap-2">
-    <button
-      type="submit"
-      class="inline-flex h-8 w-fit shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-secondary bg-clip-padding px-3 text-sm font-medium whitespace-nowrap text-secondary-foreground transition-all outline-none select-none hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:enabled:translate-y-px motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-50"
-    >
+  <div data-slot="row">
+    <button type="submit">
       Submit
     </button>
-    <button
-      type="reset"
-      class="inline-flex h-8 w-fit shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-secondary bg-clip-padding px-3 text-sm font-medium whitespace-nowrap text-secondary-foreground transition-all outline-none select-none hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:enabled:translate-y-px motion-reduce:transition-none disabled:pointer-events-none disabled:opacity-50"
-    >
+    <button type="reset">
       Reset
     </button>
   </div>
-  <output
+  <output data-slot="output"
     aria-label="Submitted"
-    class="block h-36 overflow-y-auto rounded-2xl bg-muted p-3 font-mono text-xs whitespace-pre-wrap"
   >{submitted}</output>
 </form>

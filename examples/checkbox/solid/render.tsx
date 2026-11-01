@@ -10,21 +10,16 @@ const topics = [
 
 export function Example() {
   return (
-    <div class="flex w-full max-w-sm flex-col gap-5">
+    <div data-slot="stack">
       <fieldset>
-        <legend class="mb-3 text-sm font-medium">Topics you follow</legend>
-        <div class="flex flex-wrap gap-2">
+        <legend>Topics you follow</legend>
+        <div data-slot="row">
           <For each={topics}>
             {(topic) => (
               <Checkbox
                 name="topics"
                 value={topic.value}
                 defaultChecked={topic.checked}
-                class={(state) =>
-                  state.checked
-                    ? "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-primary bg-clip-padding ps-2.5 pe-3 text-sm font-medium whitespace-nowrap text-primary-foreground outline-none select-none transition-[color,background-color,box-shadow] hover:bg-primary/80 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-                    : "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-border bg-background bg-clip-padding ps-2.5 pe-3 text-sm font-medium whitespace-nowrap outline-none select-none transition-[color,background-color,box-shadow] hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 dark:bg-transparent dark:hover:bg-input/30"
-                }
                 render={(props, state) => (
                   <button {...props}>
                     {state.checked ? (
@@ -36,7 +31,6 @@ export function Example() {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         aria-hidden="true"
-                        class="size-3.5"
                       >
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
@@ -49,7 +43,6 @@ export function Example() {
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         aria-hidden="true"
-                        class="size-3.5"
                       >
                         <path d="M5 12h14" />
                         <path d="M12 5v14" />
@@ -63,12 +56,9 @@ export function Example() {
           </For>
         </div>
       </fieldset>
-      <label class="flex items-center gap-3 text-sm font-medium">
-        <Checkbox
-          class="flex size-4 shrink-0 items-center justify-center rounded-[5px] border border-transparent bg-input/90 outline-none transition-shadow focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground data-disabled:opacity-50"
-          render={(props) => <span {...props} />}
-        >
-          <CheckboxIndicator class="grid place-content-center">
+      <label data-slot="label">
+        <Checkbox render={(props) => <span {...props} />}>
+          <CheckboxIndicator>
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -77,7 +67,6 @@ export function Example() {
               stroke-linecap="round"
               stroke-linejoin="round"
               aria-hidden="true"
-              class="size-3.5"
             >
               <path d="M20 6 9 17l-5-5" />
             </svg>

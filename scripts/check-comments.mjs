@@ -17,7 +17,8 @@ const commentLengthSkips = {
 }
 
 const root = path.resolve(import.meta.dirname, "..")
-const git = (...args) => execFileSync("git", args, { cwd: root, encoding: "utf8" })
+const git = (...args) =>
+  execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 })
 const base = process.argv[2] ?? git("merge-base", "HEAD", "origin/main").trim()
 const violations = []
 

@@ -3,23 +3,19 @@
   import { Input } from "@ui-sdk/svelte/input"
 </script>
 
-<FieldSet dir="rtl" class="flex w-full max-w-sm flex-col gap-6">
-  <FieldLegend class="mb-3 text-base font-medium data-disabled:opacity-50">العنوان</FieldLegend>
-  <FieldDescription class="-mt-1.5 text-sm text-muted-foreground">نحتاج عنوانك لتوصيل طلبك.</FieldDescription>
-  <Field name="street" class="flex flex-col gap-3">
-    <FieldLabel class="text-sm leading-snug font-medium data-disabled:opacity-50 data-invalid:text-destructive">
+<FieldSet dir="rtl">
+  <FieldLegend>العنوان</FieldLegend>
+  <FieldDescription>نحتاج عنوانك لتوصيل طلبك.</FieldDescription>
+  <Field name="street">
+    <FieldLabel>
       الشارع
     </FieldLabel>
-    <Input
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base outline-none transition-[color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 data-invalid:border-destructive data-invalid:ring-3 data-invalid:ring-destructive/20 md:text-sm dark:data-invalid:border-destructive/50 dark:data-invalid:ring-destructive/40"
-    />
+    <Input />
   </Field>
-  <Field name="city" class="flex flex-col gap-3">
-    <FieldLabel class="text-sm leading-snug font-medium data-disabled:opacity-50 data-invalid:text-destructive">
+  <Field name="city">
+    <FieldLabel>
       المدينة
     </FieldLabel>
-    <Input
-      class="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base outline-none transition-[color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 data-invalid:border-destructive data-invalid:ring-3 data-invalid:ring-destructive/20 md:text-sm dark:data-invalid:border-destructive/50 dark:data-invalid:ring-destructive/40"
-    />
+    <Input />
   </Field>
 </FieldSet>
