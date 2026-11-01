@@ -419,6 +419,15 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
   deriveFromOptions(context, ["modal"], (synced, state, arriving) =>
     modalOf(arriving as PopupOptions, { ...state, ...synced }),
   )
+  // Whatever changes `modal` while the popup shows, its option, a sheet's
+  // snap point or the primitive's own state, applies to the page at once.
+  let modalShown = store.get().modal
+  store.subscribe(() => {
+    const { modal } = store.get()
+    if (modal === modalShown) return
+    modalShown = modal
+    popup.updateModal()
+  })
 
   // Typed as there when the preset names it, which TypeScript can't tell from the calls.
   const features = { dismissal, presentation, press, group, hover, focus, triggerName, rules } as {
