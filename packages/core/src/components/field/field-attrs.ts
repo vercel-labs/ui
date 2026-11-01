@@ -9,6 +9,8 @@ import type { Store } from "../../foundation/kernel/store"
 
 type FieldStore = {
   disabled: boolean
+  // The `name` you pass, which a found control without its own submits under.
+  name: string | undefined
   // The `invalid` you pass. Undefined leaves it to the browser's validation.
   external: boolean | undefined
   focused: boolean
@@ -119,6 +121,9 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
   // the control's own, like a date picker's format hint, which its component
   // may write again at any time.
   let added = new Set<string>()
+  // The element the field named and the name it gave, which follows the
+  // field's own. Another element with that name chose it itself.
+  let gave: { el: Element; name: string | undefined } | undefined
   const write = () => {
     const control = current
     if (!control || control.isConnected === false || api.internal.hasControlPart()) return
@@ -159,12 +164,23 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     // form-associated element around the control when there is one, like a
     // number input around its text input. A control that doesn't submit, like
     // a radio group's container, gets none.
-    const name = api.internal.name()
+    const name = state.name
     const named = submitterOf(control, root)
-    if (name && named && !named.getAttribute("name")) named.setAttribute("name", name)
+    const own = named?.getAttribute("name")
+    if (!named || (own != null && (gave?.el !== named || own !== gave.name))) return
+    if (name) named.setAttribute("name", name)
+    else if (own != null) named.removeAttribute("name")
+    gave = { el: named, name }
   }
-  // The control's component rewriting its own description drops the field's, so the field adds them back.
-  const described = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(write)
+  // The control's component rewriting its own description drops the field's, so
+  // the field adds them back. A new id is the one its labels point at.
+  const described =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver((records) => {
+          if (current && records.some((record) => record.attributeName === "id")) api.internal.adopt(current)
+          write()
+        })
   const find = () => {
     // Vue binds the root before a control part inside it, which then wires
     // itself. Writing here too would name its inner input, which submits twice.
@@ -176,7 +192,7 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     if (!next.id) next.id = `${api.id}-control`
     api.internal.adopt(next)
     described?.disconnect()
-    described?.observe(next, { attributeFilter: ["aria-describedby"] })
+    described?.observe(next, { attributeFilter: ["aria-describedby", "id"] })
     write()
   }
   queueMicrotask(find)

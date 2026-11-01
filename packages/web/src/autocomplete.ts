@@ -99,7 +99,11 @@ function submitted(el: HTMLElement, value: string, event?: Event) {
 function renderSuggestions(el: AutocompleteElement, api: AutocompleteApi) {
   if (!el.items) return
   const template = templateOf(el)
-  let list = lists.get(el) ?? el.querySelector(":scope > ui-autocomplete-content ui-autocomplete-list")
+  let list =
+    lists.get(el) ??
+    [...el.querySelectorAll("ui-autocomplete-content ui-autocomplete-list")].find(
+      (found) => found.closest("ui-autocomplete") === el,
+    )
   if (!list) {
     const created = copy(template, "ui-autocomplete-content", false)
     list = copy(template, "ui-autocomplete-list", false)

@@ -140,6 +140,11 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
     render(el) {
       if (!el.firstElementChild) el.append(element("ui-calendar-weekdays"), element("ui-calendar-weeks"))
     },
+    changed(el) {
+      for (const child of el.children)
+        if (child.localName === "ui-calendar-weekdays" || child.localName === "ui-calendar-weeks")
+          scheduleRefresh(child as HTMLElement)
+    },
   })
   // The weekdays are a row group, like a <thead>, around the header row
   // that fills the slot.
