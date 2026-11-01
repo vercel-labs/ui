@@ -19,7 +19,8 @@ function isTabbable(el: Element): el is HTMLElement {
   if (!(el instanceof HTMLElement) || el.tabIndex < 0) return false
   if (el.matches(":disabled") || el.closest("[inert]")) return false
   // Only one radio button per group takes Tab: the checked one, or the first.
-  // Radios outside a form group with those of their name in the same document or shadow root.
+  // Without a form, a radio's group is the same-named radios outside a form in
+  // its document or shadow root. A checked radio that can't take focus leaves the rest reachable.
   if (el instanceof HTMLInputElement && el.type === "radio" && el.name && !el.checked) {
     const group = el.form
       ? Array.from(el.form.elements)
@@ -29,7 +30,8 @@ function isTabbable(el: Element): el is HTMLElement {
       radio.type === "radio" &&
       radio.name === el.name &&
       radio.form === el.form &&
-      radio.checked
+      radio.checked &&
+      isTabbable(radio)
     if (group.some(checked)) return false
   }
   if (typeof el.checkVisibility === "function") return el.checkVisibility({ visibilityProperty: true })

@@ -101,6 +101,22 @@ test.describe("focus", () => {
     await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
   })
 
+  test("Tab reaches radios whose group's checked radio is behind the dialog", async ({ page, tab }) => {
+    await outside(page, "After").evaluate((el) =>
+      el.insertAdjacentHTML("afterend", `<input type="radio" name="speed" aria-label="Page speed" checked>`),
+    )
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<label><input type="radio" name="speed"> Standard</label><label><input type="radio" name="speed"> Express</label>`,
+      ),
+    )
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
+  })
+
   test("Escape closes the dialog and returns focus to the trigger", async ({ page }) => {
     await openWithKeyboard(page)
     await page.keyboard.press("Escape")
