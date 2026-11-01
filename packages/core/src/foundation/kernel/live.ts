@@ -74,6 +74,7 @@ function direct(names: readonly string[]) {
 type Direct = ReturnType<typeof direct>
 
 const applied = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
+const found = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
 
 /**
  * Writes attributes and removes the ones a previous call wrote but this one
@@ -84,6 +85,29 @@ const applied = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
  * removing each other's.
  */
 function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
+  writeAttrs(el, attrs, channel, false)
+}
+
+/**
+ * Lets go of an element, like a part leaving its owner: removes what `channel`
+ * added, and puts back what it found there, like an author's `disabled`, even
+ * where it wrote the same value.
+ */
+function releaseAttrs(el: HTMLElement, channel: string) {
+  writeAttrs(el, {}, channel, true)
+}
+
+/**
+ * Marks an attribute the author just wrote as theirs, even with the value a
+ * channel wrote, like `disabled` set again on a checkbox its group disabled,
+ * so letting go of the element keeps it.
+ */
+function markAuthored(el: HTMLElement, name: string) {
+  for (const written of Object.values(applied.get(el) ?? {})) written.delete(name)
+  for (const values of Object.values(found.get(el) ?? {})) values.delete(name)
+}
+
+function writeAttrs(el: HTMLElement, attrs: Attrs, channel: string, release: boolean) {
   const channels = applied.get(el) ?? {}
   const previous = channels[channel] ?? new Map()
   const written = new Map<string, string>()
@@ -115,7 +139,11 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
   for (const name of authors) written.delete(name)
   for (const name of previous.keys()) {
     if (written.has(name) || authors.has(name) || (name === "id" && keeps)) continue
-    if (name.startsWith("style:")) el.style.removeProperty(name.slice(6))
+    const original = release ? found.get(el)?.[channel]?.get(name) : undefined
+    if (original !== undefined) {
+      const current = el.getAttribute(name)
+      if (current === previous.get(name) && current !== original) el.setAttribute(name, original)
+    } else if (name.startsWith("style:")) el.style.removeProperty(name.slice(6))
     else el.removeAttribute(name)
   }
   for (const [property, value] of styles)
@@ -127,10 +155,20 @@ function applyAttrs(el: HTMLElement, attrs: Attrs, channel = "render") {
     // the start, so the property goes first, as every framework writes it.
     if (name === "value" && isTextField(el) && el.value !== value) el.value = value
     const current = name === "id" ? id : read.has(name) ? read.get(name) : el.getAttribute(name)
+    if (current != null && !previous.has(name)) keepFound(el, channel, name, current)
     if (current !== value) el.setAttribute(name, value)
   }
   channels[channel] = written
   applied.set(el, channels)
+  if (release) delete found.get(el)?.[channel]
+}
+
+// A copied component's ids, and references to them, never come back.
+function keepFound(el: HTMLElement, channel: string, name: string, value: string) {
+  if (name === "id" || madeLabel(value)) return
+  let channels = found.get(el)
+  if (!channels) found.set(el, (channels = {}))
+  ;(channels[channel] ??= new Map()).set(name, value)
 }
 
 // An id a channel didn't write stays: an author's, a script's, or another
@@ -158,4 +196,4 @@ function styleDeclarations(css: string) {
   return declarations
 }
 
-export { applyAttrs, direct, type Direct, live, type Live }
+export { applyAttrs, direct, type Direct, live, type Live, markAuthored, releaseAttrs }

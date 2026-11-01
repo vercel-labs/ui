@@ -18,9 +18,11 @@ import {
   type Feature,
   formCallback,
   inDocumentOrder,
+  markAuthored,
   portalTarget,
   present as isPresent,
   type PrimitiveSchema,
+  releaseAttrs,
   renderVersion,
   schemaOf,
   selectedKeys,
@@ -816,6 +818,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
 
       attributeChangedCallback(name: string, previous: string | null, value: string | null) {
         const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
+        if (!this.#rendering) markAuthored(this, name)
         if (!this.#rendering || value === null) this.#rendered.delete(key)
         else if (previous === null) this.#rendered.add(key)
         if (!this.#connected) return
@@ -1077,8 +1080,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         part.observer?.disconnect()
         part.observer = undefined
         this.#unbind(part)
-        // An element the part lets go of, like a button moved out of a tab, keeps nothing the owner wrote.
-        applyAttrs(part.el, {}, this.#channel)
+        // An element the part lets go of, like a button moved out of a tab, keeps
+        // nothing the owner wrote, and gets back what the owner wrote over.
+        releaseAttrs(part.el, this.#channel)
         part.disconnect?.()
         part.disconnect = undefined
         this.#restore(part)

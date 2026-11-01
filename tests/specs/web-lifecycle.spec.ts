@@ -614,3 +614,124 @@ test("a checkbox group disabled at the start and enabled later enables its check
   await page.getByRole("checkbox", { name: "Olives" }).click()
   await expect(page.getByRole("checkbox", { name: "Olives" })).toBeChecked()
 })
+
+for (const disabledBy of ["its attribute", "its property", "a fieldset"] as const)
+  for (const author of [
+    'disabled=""',
+    'disabled="disabled"',
+    'disabled="" while its group is disabled',
+  ] as const)
+    for (const removed of ["checkbox", "group", "form"] as const)
+      test(`a checkbox its author gives ${author} stays disabled when its group, disabled by ${disabledBy}, is enabled after the ${removed} is put back`, async ({
+        page,
+      }) => {
+        const result = await page.evaluate(
+          async ({ disabledBy, author, removed }) => {
+            const authored =
+              author === 'disabled="disabled"' ? author : author === 'disabled=""' ? "disabled" : ""
+            const form = document.createElement("form")
+            form.innerHTML = `
+              <fieldset>
+                <ui-checkbox-group name="toppings" aria-label="Toppings">
+                  <ui-checkbox value="cheese" aria-label="Cheese" ${authored}></ui-checkbox>
+                </ui-checkbox-group>
+              </fieldset>`
+            document.querySelector("#stage")!.append(form)
+            const tick = () => new Promise((done) => setTimeout(done))
+            const fieldset = form.querySelector("fieldset")!
+            const group = form.querySelector("ui-checkbox-group") as HTMLElement & { disabled: boolean }
+            const box = form.querySelector("ui-checkbox") as HTMLElement & { disabled: boolean }
+            const setDisabled = (disabled: boolean) => {
+              if (disabledBy === "a fieldset") fieldset.disabled = disabled
+              else if (disabledBy === "its property") group.disabled = disabled
+              else group.toggleAttribute("disabled", disabled)
+            }
+            await tick()
+            setDisabled(true)
+            await tick()
+            if (author === 'disabled="" while its group is disabled') {
+              if (disabledBy === "its property") box.disabled = true
+              else box.setAttribute("disabled", "")
+              await tick()
+            }
+            const target = { checkbox: box, group, form }[removed]
+            const parent = target.parentNode!
+            target.remove()
+            await tick()
+            parent.append(target)
+            await tick()
+            setDisabled(false)
+            await tick()
+            return [box.getAttribute("aria-disabled"), box.hasAttribute("disabled"), box.matches(":disabled")]
+          },
+          { disabledBy, author, removed },
+        )
+        expect(result).toEqual(["true", true, true])
+      })
+
+for (const removed of ["checkbox", "group"] as const)
+  test(`a checkbox disabled by its author stays disabled when the fieldset that disabled its group while its ${removed} was off the page enables it again`, async ({
+    page,
+  }) => {
+    const result = await page.evaluate(async (removed) => {
+      document.querySelector("#stage")!.innerHTML = `
+        <form>
+          <fieldset>
+            <ui-checkbox-group name="toppings" aria-label="Toppings">
+              <ui-checkbox value="cheese" aria-label="Cheese" disabled></ui-checkbox>
+            </ui-checkbox-group>
+          </fieldset>
+        </form>`
+      const tick = () => new Promise((done) => setTimeout(done))
+      const fieldset = document.querySelector("fieldset")!
+      const box = document.querySelector("ui-checkbox")!
+      const target = removed === "checkbox" ? box : document.querySelector("ui-checkbox-group")!
+      const parent = target.parentNode!
+      await tick()
+      target.remove()
+      await tick()
+      fieldset.disabled = true
+      parent.append(target)
+      await tick()
+      fieldset.disabled = false
+      await tick()
+      return [box.getAttribute("aria-disabled"), box.hasAttribute("disabled"), box.matches(":disabled")]
+    }, removed)
+    expect(result).toEqual(["true", true, true])
+  })
+
+test("a checkbox taken off the page keeps the disabled, role and aria-disabled written on it", async ({
+  page,
+}) => {
+  const result = await page.evaluate(async () => {
+    const stage = document.querySelector("#stage")!
+    stage.innerHTML = `<ui-checkbox aria-label="Terms" disabled role="checkbox" aria-disabled="true"></ui-checkbox>`
+    const tick = () => new Promise((done) => setTimeout(done))
+    const box = stage.querySelector("ui-checkbox")!
+    await tick()
+    box.remove()
+    await tick()
+    return [box.getAttribute("disabled"), box.getAttribute("role"), box.getAttribute("aria-disabled")]
+  })
+  expect(result).toEqual(["", "checkbox", "true"])
+})
+
+for (const tag of ["ui-checkbox", "ui-switch"])
+  test(`a ${tag} disabled by its author is still disabled when it's put back on the page`, async ({
+    page,
+  }) => {
+    const result = await page.evaluate(async (tag) => {
+      const form = document.createElement("form")
+      form.innerHTML = `<${tag} name="terms" aria-label="Terms" disabled></${tag}>`
+      document.querySelector("#stage")!.append(form)
+      const tick = () => new Promise((done) => setTimeout(done))
+      const box = form.querySelector(tag)!
+      await tick()
+      box.remove()
+      await tick()
+      form.append(box)
+      await tick()
+      return [box.getAttribute("disabled"), box.getAttribute("aria-disabled"), box.matches(":disabled")]
+    }, tag)
+    expect(result).toEqual(["", "true", true])
+  })
