@@ -132,7 +132,7 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
       .split(/\s+/)
       .filter((id) => id && !added.has(id))
       .join(" ")
-    // The control keeps its own id, which `find` gave it if it had none.
+    // The control keeps its own id, which `adopt` gave it if it had none.
     const { id: _id, ...attrs } = controlAttrs(
       state,
       api,
@@ -172,13 +172,18 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     else if (own != null) named.removeAttribute("name")
     gave = { el: named, name }
   }
+  // Labels point at the control's id, or one the field gives it when it has none.
+  const adopt = (control: HTMLElement) => {
+    if (!control.id) control.id = `${api.id}-control`
+    api.internal.adopt(control)
+  }
   // The control's component rewriting its own description drops the field's, so
-  // the field adds them back. A new id is the one its labels point at.
+  // the field adds them back.
   const described =
     typeof MutationObserver === "undefined"
       ? undefined
       : new MutationObserver((records) => {
-          if (current && records.some((record) => record.attributeName === "id")) api.internal.adopt(current)
+          if (current && records.some((record) => record.attributeName === "id")) adopt(current)
           write()
         })
   const find = () => {
@@ -189,8 +194,7 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     if (next === current || next === undefined) return
     current = next
     added = new Set()
-    if (!next.id) next.id = `${api.id}-control`
-    api.internal.adopt(next)
+    adopt(next)
     described?.disconnect()
     described?.observe(next, { attributeFilter: ["aria-describedby", "id"] })
     write()
