@@ -12,7 +12,7 @@ import {
   baseOptions,
   changesOf,
   idle,
-  markupOf,
+  pageOf,
   tabStopProblem,
   title,
   withAttribute,
@@ -127,13 +127,13 @@ for (const entry of cases)
           change.kind === "option" ? { ...base, [change.key]: value } : base
 
         const fresh = await render(entry, markupAt(change.to), optionsAt(change.to))
-        const expected = markupOf(fresh, entry.history, reactIds)
+        const expected = pageOf(fresh, entry.history, reactIds)
         const freshProblem = tabStopProblem({ root: fresh })
         await unmount()
 
         const changed = await render(entry, markupAt(change.from), optionsAt(change.from))
         await render(entry, markupAt(change.to), optionsAt(change.to))
-        expect(markupOf(changed, entry.history, reactIds)).toEqual(expected)
+        expect(pageOf(changed, entry.history, reactIds)).toEqual(expected)
         if (entry.history?.includes("stop") && !freshProblem)
           expect(tabStopProblem({ root: changed })).toBeUndefined()
       })
