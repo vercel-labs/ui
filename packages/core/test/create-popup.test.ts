@@ -18,6 +18,7 @@ import { popover } from "../src/components/popover/popover"
 import { tooltip } from "../src/components/tooltip/tooltip"
 import type { Modal } from "../src/foundation/popups/popup"
 import { checkPattern, checkServer, mount } from "../src/testing"
+import { rerenderOf } from "../src/testing/mount"
 
 const mounts: { unmount: () => void }[] = []
 afterEach(() => {
@@ -172,6 +173,21 @@ const share = definePrimitive({
   slots: (slot) => popupSlots(slot),
 })
 
+// The same popover with no `sync`, as a primitive that hands no state from its options.
+const unsyncedShare = definePrimitive({
+  name: "unsynced-share",
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+    modal: "value",
+    openOnHover: "boolean",
+  },
+  state: (options: ShareOptions) => popupState(options),
+  api: (context) => createPopup(context, { preset: popoverPreset }),
+  slots: (slot) => popupSlots(slot),
+})
+
 const shareMarkup = `<div>
   <trigger>Share</trigger>
   <content><title>Share</title><button>Copy link</button><close>Close</close></content>
@@ -195,6 +211,15 @@ describe("a popover on the popover preset", () => {
     await view.click(view.part("trigger")!)
     expect(view.part("content")!.getAttribute("aria-modal")).toBe("true")
     await checkPattern(view.root, "dialog")
+  })
+
+  test("one with no sync follows a modal option that changes while it's open", async () => {
+    const view = mount(unsyncedShare, { defaultOpen: true, modal: true }, shareMarkup)
+    mounts.push(view)
+    expect(view.part("content")!.getAttribute("aria-modal")).toBe("true")
+    rerenderOf(view).setOptions({ modal: false })
+    expect(view.state.modal).toBe(false)
+    expect(view.part("content")!.hasAttribute("aria-modal")).toBe(false)
   })
 
   test("a non-modal one passes the dialog pattern without aria-modal", async () => {
