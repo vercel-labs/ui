@@ -9,6 +9,7 @@ import { createAgent, registerTools, type AgentComponent } from "../src/page/age
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { datePicker } from "../src/components/date-picker/date-picker"
+import { dialog } from "../src/components/dialog/dialog"
 import { input, textarea } from "../src/components/input/input"
 import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
@@ -516,6 +517,39 @@ describe("agent", () => {
       expect([action, outcome.error]).toEqual([action, undefined])
       instance.api.setOpen(false)
     }
+  })
+
+  test("opening a dialog with a payload opens it once, since a payload names no item", async () => {
+    const agent = createAgent()
+    const onOpenChange = vi.fn()
+    const instance = dialog({ id: "settings", onOpenChange })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.textContent = "Settings"
+    cleanups.push(bind(instance.part("trigger"), trigger), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Settings", action: "open", args: [{ payload: { id: 1 } }] }],
+    })
+    expect(outcome.error).toBeUndefined()
+    expect(onOpenChange.mock.calls.map(([open]) => open)).toEqual([true])
+  })
+
+  test("setValue refuses a disabled object-valued option named by its label", async () => {
+    const agent = createAgent()
+    const instance = select({ id: "region", itemToValue: (value: { id: string }) => value.id })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Region")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => instance.destroy())
+    for (const [id, label, disabled] of [
+      ["fra", "Frankfurt", true],
+      ["tyo", "Tokyo", false],
+    ] as const) {
+      const item = document.body.appendChild(document.createElement("div"))
+      item.textContent = label
+      cleanups.push(bind(instance.part("item", { value: { id }, disabled }), item))
+    }
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Frankfurt"] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toBeNull()
   })
 
   test("setValue takes text that matches a disabled suggestion in an autocomplete, as a person can type it", async () => {

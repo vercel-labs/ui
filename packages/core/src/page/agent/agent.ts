@@ -868,6 +868,8 @@ function createAgent(
       let whileOpen: Set<string> | undefined
       const seeOpen = (found: Set<string>) => (whileOpen = found)
       const askToOpen = () => ask(args, targetsOf(args[0]), "make this change")
+      // Whether a label already named the item, so its key isn't keyed again.
+      let named = false
       // A value by its item's label, like "Germany (Frankfurt)" or an accordion's "Email", so the agent needn't look up the value first.
       const label = typeof args[0] === "string" && fold(args[0])
       if (label) {
@@ -887,8 +889,10 @@ function createAgent(
             )
           // A closed list refuses text that names none of its items, but a
           // select's search text isn't an item. The first 20 keep the error short.
-          if (found.length === 1) args = [found[0].value, ...args.slice(1)]
-          else if (items.length && entry.agent?.closed && action !== "setQuery")
+          if (found.length === 1) {
+            args = [found[0].value, ...args.slice(1)]
+            named = true
+          } else if (items.length && entry.agent?.closed && action !== "setQuery")
             throw new Error(
               `No item "${args[0]}" in ${name}. Its items: ${items
                 .slice(0, 20)
@@ -908,12 +912,14 @@ function createAgent(
         const value = (instance.get() as { value?: unknown }).value
         const key = keyFor(instance)
         const held = (Array.isArray(value) ? value : [value]).map(key)
-        // Options that render only while the list is open are read by opening it, now.
-        if (!whileOpen) await listItems(entry, instance, askToOpen, seeOpen)
+        // Options that render only while the list is open are read by opening it, now. Only
+        // a choice opens it: a popup's open() takes a payload, not an item.
+        if (!whileOpen && (action === "setValue" || action === "select"))
+          await listItems(entry, instance, askToOpen, seeOpen)
         const disabled = whileOpen ?? disabledItems(entry, instance)
-        const blocked = (Array.isArray(args[0]) ? args[0] : [args[0]])
-          .map(key)
-          .find((item) => disabled.has(item) && !held.includes(item))
+        const blocked = (
+          named ? [args[0] as string] : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
+        ).find((item) => disabled.has(item) && !held.includes(item))
         if (blocked !== undefined) {
           const items = dataOf(entry, instance) ?? renderedItems(bound(instance))
           const label = items.find((item) => item.value === blocked)?.label || blocked
