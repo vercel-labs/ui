@@ -51,8 +51,11 @@ function useBindings() {
   // to another component in one update, like a command whose group is keyed
   // by its index. Vue mounts the new one before it unmounts the old one.
   const refs = new WeakMap<object, WeakMap<PartRef, (el: unknown) => void>>()
+  // Vue never calls a ref it swapped out with null, so a part keyed anew on
+  // the same element, like a label given another id, lets go of the old one.
+  const held = new WeakMap<HTMLElement, Map<string, PartRef>>()
   const outside = {}
-  return (ref: PartRef) => {
+  return (ref: PartRef, slot: string) => {
     const owner = getCurrentInstance() ?? outside
     let own = refs.get(owner)
     if (!own) refs.set(owner, (own = new WeakMap()))
@@ -74,6 +77,14 @@ function useBindings() {
         if (bound.get(ref) !== last) return
         bound.delete(ref)
         return ref(null)
+      }
+      let slots = held.get(el)
+      if (!slots) held.set(el, (slots = new Map()))
+      const previous = slots.get(slot)
+      slots.set(slot, ref)
+      if (previous && previous !== ref && bound.get(previous) === el) {
+        bound.delete(previous)
+        if (!isReleased) previous(null)
       }
       mine = el
       bound.set(ref, el)

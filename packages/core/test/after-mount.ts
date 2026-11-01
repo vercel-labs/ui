@@ -2,7 +2,8 @@
 // to try, the changes a case makes, and markup made comparable.
 import { schemaOf } from "../src/foundation/kernel/primitive"
 import type { Primitive } from "../src/foundation/kernel/primitive-types"
-import { kindOf } from "../src/testing/schema"
+import { parseMarkup, type MarkupNode } from "../src/testing/markup"
+import { kindOf, slotProps } from "../src/testing/schema"
 import type { Case } from "./after-mount.cases"
 
 // jsdom has no ResizeObserver or IntersectionObserver. Nothing here changes
@@ -267,4 +268,84 @@ async function idle() {
   for (let frame = 0; frame < 6; frame++) await new Promise((resolve) => requestAnimationFrame(resolve))
 }
 
-export { baseOptions, changesOf, type Change, idle, markupOf, pageOf, tabStopProblem, title, withAttribute }
+const pascal = (name: string) => name.replace(/(^|[-\s])(\w)/g, (_, __, char: string) => char.toUpperCase())
+
+// Parts an adapter names its own way, and those it renders itself, inside or
+// around the parts a person writes, whose markup children stay.
+const named: Record<string, string> = {
+  "Radio:group": "RadioGroup",
+  "Radio:root": "Radio",
+  "Tree:label": "TreeItemLabel",
+  "Toast:root": "ToastRegion",
+}
+const rendered = new Set([
+  "Checkbox:input",
+  "Checkbox:group-input",
+  "Combobox:form-input",
+  "DatePicker:hidden-input",
+  "Drawer:viewport",
+  "FileInput:input",
+  "NumberInput:hidden-input",
+  "OTPInput:control",
+  "Select:form-input",
+  "Slider:thumb-input",
+  "Toast:list",
+  "TokenInput:form-input",
+])
+
+/** A case's markup as an adapter's parts: an export name, or an element's tag, with props and children. */
+type Built = string | { part?: string; tag?: string; props: Record<string, unknown>; children: Built[] }
+
+// The markup as the adapter's own parts, by export name. The outermost part
+// takes the options, as it holds the instance; markup with none gets a root around it.
+function partsOf(
+  entry: Case,
+  markup: string,
+  options: Record<string, unknown>,
+  has: (name: string) => boolean,
+) {
+  const primitive = entry.primitive as Primitive
+  const schema = schemaOf(primitive)
+  const name = pascal(primitive.name ?? "").replace(/^Otp/, "OTP")
+  const part = (slot: string) => {
+    // A date picker's calendar parts are Calendar's.
+    const found = [
+      named[`${name}:${slot}`] ?? (slot === "root" ? name : name + pascal(slot)),
+      `Calendar${pascal(slot)}`,
+    ]
+    const exported = found.find(has)
+    if (!exported) throw new Error(`The adapter has no part for ${name} ${slot}.`)
+    return exported
+  }
+  const isSlot = (node: MarkupNode | string) =>
+    typeof node !== "string" && (node.tag === "root" || node.tag in schema.slots)
+  function build(node: MarkupNode | string, outermost = false): Built {
+    if (typeof node === "string") return node
+    const children: Built[] = node.children.map((child) => build(child))
+    if (!isSlot(node)) return { tag: node.tag, props: Object.fromEntries(node.attributes), children }
+    if (rendered.has(`${name}:${node.tag}`)) return { props: {}, children }
+    const { props, extra } = slotProps(schema.slots[node.tag] ?? {}, node.attributes, {}, () => "")
+    for (const prop in props) if (props[prop] === undefined || props[prop] === "") delete props[prop]
+    for (const [attribute, value] of extra) if (attribute !== "as") props[attribute] = value
+    if (outermost) Object.assign(props, options)
+    return { part: part(node.tag), props, children }
+  }
+  const nodes = parseMarkup(markup)
+  const owned = nodes.some(isSlot)
+  const built = nodes.map((node) => build(node, owned))
+  return owned ? built : [{ part: part("root"), props: options, children: built }]
+}
+
+export {
+  baseOptions,
+  type Built,
+  changesOf,
+  type Change,
+  idle,
+  markupOf,
+  pageOf,
+  partsOf,
+  tabStopProblem,
+  title,
+  withAttribute,
+}
