@@ -75,7 +75,6 @@ for (const entry of cases)
         expect(pageOf(container!, entry.history, svelteIds)).toEqual(expected)
         if (entry.history?.includes("stop") && !freshProblem)
           expect(tabStopProblem({ root: changed })).toBeUndefined()
-        const known = callbackRelays[`${entry.name} > ${title(change)}`]
-        if (known) expect(relayedKeys()).toEqual(known)
+        expect(relayedKeys()).toEqual(callbackRelays[`${entry.name} > ${title(change)}`] ?? [])
       })
   })
