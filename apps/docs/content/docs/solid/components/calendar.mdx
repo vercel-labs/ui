@@ -79,7 +79,7 @@ A value with the wrong shape for its mode is treated as no selection.
 
 ### Range Limits
 
-`minDays` and `maxDays` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen. Until then, the dates that would break it are disabled.
+`minDays` and `maxDays` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen. Until then, the dates that can't end the range are disabled.
 
 A range cannot include an unavailable date unless `allowUnavailable` is set. That allows unavailable dates between the ends; they still cannot be chosen as an endpoint.
 
@@ -243,7 +243,7 @@ The grid has one Tab stop: the selected date when visible, otherwise today, othe
 
 ## Styling
 
-Use `data-selected`, `data-today`, `data-outside`, and `data-unavailable` to style dates. A range also exposes its start, middle, end, and unfinished preview. Navigation buttons get `data-disabled` when they reach the bounds.
+Use `data-selected`, `data-today`, `data-outside`, `data-unavailable`, and `data-disabled` to style dates. A range also exposes its start, middle, end, and unfinished preview. Navigation buttons also get `data-disabled` when they reach the bounds.
 
 <DataAttributes component="calendar" />
 

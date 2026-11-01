@@ -64,7 +64,7 @@ function Example() {
           {(cell) => (
             <CalendarDay
               value={cell.date}
-              class="size-8 cursor-default rounded-2xl p-0 text-center align-middle text-sm leading-5 outline-none select-none focus-visible:relative focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring/30 data-range-start:bg-primary data-range-start:text-primary-foreground data-range-end:bg-primary data-range-end:text-primary-foreground data-range-middle:rounded-none data-range-middle:bg-muted not-data-selected:hover:bg-muted not-data-selected:data-unavailable:text-muted-foreground not-data-selected:data-unavailable:line-through"
+              class="size-8 cursor-default rounded-2xl p-0 text-center align-middle text-sm leading-5 outline-none select-none focus-visible:relative focus-visible:z-10 focus-visible:ring-3 focus-visible:ring-ring/30 data-range-start:bg-primary data-range-start:text-primary-foreground data-range-end:bg-primary data-range-end:text-primary-foreground data-range-middle:rounded-none data-range-middle:bg-muted not-data-selected:hover:bg-muted not-data-selected:data-unavailable:text-muted-foreground not-data-selected:data-unavailable:line-through data-disabled:text-muted-foreground data-disabled:opacity-50"
             />
           )}
         </CalendarWeeks>
