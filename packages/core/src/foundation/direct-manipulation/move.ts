@@ -178,7 +178,7 @@ function createMove<State extends object>(
     },
     /** Starts a drag once the pointer moves past `dragThreshold`, so a click stays a click. Escape puts the items back. */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (options.disabled?.(key) || !drags.accepts(event)) return
+      if (!drags.accepts(event) || options.disabled?.(key)) return
       // Offsets count from the press, so the item keeps up with the pointer past the threshold.
       const startX = event.clientX
       const startY = event.clientY

@@ -253,7 +253,7 @@ function scrollbar() {
   const unbind = createScrollbarInput(host).bindThumb(thumb, "y")
   thumb.dispatchEvent(press("pointerdown", { pointerType: "mouse", clientY: 10 }))
   document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientY: 50 }))
-  return { metrics, unbind }
+  return { metrics, unbind, thumb }
 }
 
 test("a scrollbar thumb that leaves the page mid-drag leaves the content where the drag took it", async () => {
@@ -271,4 +271,60 @@ test("Escape mid-drag still puts a scrollbar's content back where the drag began
   await frame()
   document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
   expect(metrics.y.position).toBe(100)
+})
+
+test("a new press on a scrollbar's thumb after a missed release leaves the content where the drag took it", async () => {
+  const { metrics, unbind, thumb } = scrollbar()
+  destroy.push(unbind)
+  await frame()
+  const dragged = metrics.y.position
+  thumb.dispatchEvent(press("pointerdown", { pointerType: "mouse", pointerId: 2, clientY: 50 }))
+  expect(metrics.y.position).toBe(dragged)
+})
+
+test("a scrollbar drag the browser cancels leaves the content where the drag took it", async () => {
+  const { metrics, unbind } = scrollbar()
+  destroy.push(unbind)
+  await frame()
+  const dragged = metrics.y.position
+  document.dispatchEvent(press("pointercancel", { pointerType: "mouse" }))
+  expect(metrics.y.position).toBe(dragged)
+})
+
+test("a slider drag the browser cancels still commits where it got to", async () => {
+  const onValueCommit = vi.fn()
+  const mounted = mountSlider({ onValueCommit })
+  destroy.push(mounted.unmount)
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  document.dispatchEvent(press("pointermove", { clientX: 40, clientY: 5 }))
+  await frame()
+  document.dispatchEvent(press("pointercancel", { clientX: 40, clientY: 5 }))
+  expect(onValueCommit).toHaveBeenCalledTimes(1)
+  expect(onValueCommit.mock.calls[0][0]).toBe(40)
+})
+
+test("a new press on a slider that the old drag's commit disabled, like through a fieldset, changes nothing", () => {
+  const mounted = mountSlider({ onValueCommit: () => mounted.api.internal.setFormDisabled(true) })
+  destroy.push(mounted.unmount)
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 }))
+  expect(mounted.state.value).toBe(10)
+})
+
+test("a new press on a stepper that the old hold's commit disabled steps nothing", () => {
+  vi.useFakeTimers()
+  try {
+    const input = mount(
+      numberInput,
+      { defaultValue: 0, onValueCommit: () => input.api.internal.setFormDisabled(true) },
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+    )
+    destroy.push(input.unmount)
+    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    expect(input.state.value).toBe(1)
+    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse", pointerId: 2 }))
+    expect(input.state.value).toBe(1)
+  } finally {
+    vi.useRealTimers()
+  }
 })

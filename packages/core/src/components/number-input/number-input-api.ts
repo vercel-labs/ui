@@ -313,7 +313,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
       // Steps once now, then repeats while held. A tap with a finger steps on
       // release instead, so a scroll that starts on a button doesn't step.
       pressButton(event: PointerEvent, el: HTMLElement, direction: number) {
-        if (!canStep(store.get(), direction) || !drags.accepts(event)) return
+        if (!drags.accepts(event) || !canStep(store.get(), direction)) return
         // Keeps focus where it is, so a phone's keyboard stays as it was.
         event.preventDefault()
         if (event.pointerType === "mouse") input()?.focus({ preventScroll: true })
@@ -377,7 +377,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         commit(event)
       },
       scrub(event: PointerEvent, el: HTMLElement, props: Omit<NumberInputScrubAreaProps, "controller">) {
-        if (isLocked(store.get()) || !drags.accepts(event)) return
+        if (!drags.accepts(event) || isLocked(store.get())) return
         // No focus moves and no text is selected while dragging. Focus waits
         // for a press that turns out to be a click.
         event.preventDefault()

@@ -272,7 +272,7 @@ function createResize<State extends object>(
     /** Starts a drag of a handle, or of the box with `move`, once the pointer moves past `dragThreshold`. */
     pointerdown(event: PointerEvent, key: string, handle: ResizeHandle, el: HTMLElement) {
       const from = boxes()[key]
-      if (!from || options.disabled?.(key) || fromHandle(event, handle) || !drags.accepts(event)) return
+      if (!from || !drags.accepts(event) || options.disabled?.(key) || fromHandle(event, handle)) return
       // Offsets count from the press, so the edge keeps up with the pointer past the threshold.
       const startX = event.clientX
       const startY = event.clientY

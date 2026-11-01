@@ -125,7 +125,7 @@ function createArea<State extends object>(
     set: (next: AreaValue) => set(next, { reason: "imperative" }),
     /** Jumps the thumb under the pointer and follows it until it lifts. Call from the surface's `pointerdown`. */
     pointerdown(event: PointerEvent, el: HTMLElement) {
-      if (options.disabled?.() || !drags.accepts(event)) return
+      if (!drags.accepts(event) || options.disabled?.()) return
       event.preventDefault()
       set(at(el, event.clientX, event.clientY), { reason: "track-press", event })
       // Focus goes to the thumb, so the keyboard picks up where the pointer left off.

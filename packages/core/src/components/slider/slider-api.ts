@@ -201,7 +201,7 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     internal: {
       // A press on the web: the track's box is read once, so moves never read layout.
       press(event: PointerEvent, control: HTMLElement) {
-        if (isDisabled(store.get()) || !drags.accepts(event) || gesture) return
+        if (!drags.accepts(event) || isDisabled(store.get()) || gesture) return
         const rect = (element("track") ?? control).getBoundingClientRect()
         const rtl = isRTL(control)
         const vertical = store.get().orientation === "vertical"

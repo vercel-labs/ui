@@ -426,7 +426,7 @@ function createSpans<State extends object, S extends Span = Span>(
     trackPointerdown(event: PointerEvent, track: string) {
       const el = tracks.get(track)
       const target = event.target as Element | null
-      if (!el || !options.create || target?.closest("[data-span-id]") || !drags.accepts(event)) return
+      if (!el || !drags.accepts(event) || !options.create || target?.closest("[data-span-id]")) return
       const at = snap(valueAt(track, event.clientX, event.clientY), Math.floor)
       const base = options.create({ id: "", track, start: at, end: at + step() })
       if (!base) return
@@ -459,7 +459,7 @@ function createSpans<State extends object, S extends Span = Span>(
     spanPointerdown(event: PointerEvent, id: string) {
       const el = elements.get(id)
       const span = value().find((other) => other.id === id)
-      if (!el || !span || options.disabled?.(span) || !drags.accepts(event)) return
+      if (!el || !span || !drags.accepts(event) || options.disabled?.(span)) return
       const edge = (event.target as Element | null)?.closest<HTMLElement>("[data-span-edge]")?.dataset
         .spanEdge
       const grabbed = valueAt(span.track, event.clientX, event.clientY) - span.start

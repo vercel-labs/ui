@@ -186,7 +186,10 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
   let running: { pointerType: string; cancel: () => void } | undefined
   onDestroy?.(() => running?.cancel())
   return {
-    /** Whether a press can start a drag now. Check it before setting anything up for one. */
+    /**
+     * Whether a press can start a drag now. Check it first, before the
+     * component's own guards: ending a stale drag can change what they read.
+     */
     accepts(event: PointerEvent) {
       if (event.button !== 0 || isSecondary(event) || event.defaultPrevented) return false
       // A new primary press of the same kind means the running drag missed its release.
