@@ -8,7 +8,7 @@ import {
   type Built,
   changesOf,
   idle,
-  markupOf,
+  pageOf,
   partsOf,
   tabStopProblem,
   title,
@@ -81,13 +81,13 @@ for (const entry of cases)
           change.kind === "option" ? { ...base, [change.key]: value } : base
 
         const fresh = await render(entry, markupAt(change.to), optionsAt(change.to))
-        const expected = markupOf(fresh, entry.history, vueIds)
+        const expected = pageOf(fresh, entry.history, vueIds)
         const freshProblem = tabStopProblem({ root: fresh })
         unmount()
 
         const changed = await render(entry, markupAt(change.from), optionsAt(change.from))
         await render(entry, markupAt(change.to), optionsAt(change.to))
-        expect(markupOf(changed, entry.history, vueIds)).toEqual(expected)
+        expect(pageOf(changed, entry.history, vueIds)).toEqual(expected)
         if (entry.history?.includes("stop") && !freshProblem)
           expect(tabStopProblem({ root: changed })).toBeUndefined()
       })
