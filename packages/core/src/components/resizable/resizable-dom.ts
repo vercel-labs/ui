@@ -56,7 +56,7 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
     const { ids } = store.get()
     group().setPanels(
       ids,
-      ids.map((id) => (context.props("panel", id) ?? {}) as PanelSizes),
+      ids.map((id) => context.props<PanelSizes>("panel", id) ?? {}),
     )
   }
 

@@ -284,7 +284,7 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
         const outlet = {
           el,
           get keyframes() {
-            return (context.props("outlet", key) as DrawerOutletProps | undefined)?.keyframes
+            return context.props<DrawerOutletProps>("outlet", key)?.keyframes
           },
         }
         outlets = [...outlets, outlet]

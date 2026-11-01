@@ -22,6 +22,7 @@ import { on } from "../../foundation/kernel/events"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
+import type { NavigationMenuContentProps, NavigationMenuLinkProps } from "./navigation-menu"
 
 type Orientation = "horizontal" | "vertical"
 
@@ -340,7 +341,9 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // client, which would skip a handler the framework attaches. A listener on
   // the element hears the click either way, so the menu closes on route changes.
   function bindLink(el: HTMLElement, key: string) {
-    return on(el, "click", (event) => linkPress(event, context.props("link", key)?.closeOnSelect))
+    return on(el, "click", (event) =>
+      linkPress(event, context.props<NavigationMenuLinkProps>("link", key)?.closeOnSelect),
+    )
   }
 
   // The viewport takes the open content's size.
@@ -387,7 +390,10 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   function bindViewport(el: HTMLElement) {
     resetPopoverStyles(el.ownerDocument, popupSelectors)
     // Custom elements key a part without a value by a generated id, so it's found by element.
-    const props = () => elements(context, "viewport")[0]?.props ?? context.props("viewport") ?? {}
+    const props = () =>
+      elements<PlacementProps>(context, "viewport")[0]?.props ??
+      context.props<PlacementProps>("viewport") ??
+      {}
     const { anchor, position } = placement(el, props, null)
     const viewport = surfaces.get(null)!
     viewportPopup = { el, config: { anchor, position, initialFocus: () => undefined } }
@@ -427,7 +433,11 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       queueMicrotask(() => {
         if (cancelled || store.get().viewport) return
         resetPopoverStyles(el.ownerDocument, popupSelectors)
-        const { anchor, position } = placement(el, () => context.props("content", key) ?? {}, key)
+        const { anchor, position } = placement(
+          el,
+          () => context.props<PlacementProps>("content", key) ?? {},
+          key,
+        )
         unbind = surfaces.get(key)!.bind(el, { anchor, position, initialFocus: () => undefined })
       })
       cleanups.push(() => {
@@ -438,7 +448,8 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     if (props.hiddenUntilFound) {
       const findable = bindFindable(el, {
         shown: () => isShown(store.get(), key),
-        findable: () => !!(context.props("content", key) ?? props).hiddenUntilFound,
+        findable: () =>
+          !!(context.props<NavigationMenuContentProps>("content", key) ?? props).hiddenUntilFound,
         reveal: (event) => open(key, { reason: "find-in-page", event }),
       })
       cleanups.push(findable, store.subscribe(findable.check))

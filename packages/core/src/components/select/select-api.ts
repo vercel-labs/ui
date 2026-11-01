@@ -469,7 +469,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       serialized: selection.keys,
       arrowElement: () => element("arrow"),
       // The props an item last rendered with, read live by its registration.
-      itemProps: (key: string) => context.props("item", key) as SelectItemMeta | undefined,
+      itemProps: (key: string) => context.props<SelectItemMeta>("item", key),
       contentProps: (key?: string) => kit.internal.contentProps(key) as SelectContentProps,
       // Web components read `default-value` as keys when items come later. Once
       // they arrive, a value that still names them takes their values, with no

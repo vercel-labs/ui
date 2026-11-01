@@ -84,7 +84,7 @@ const desktop = /* @__PURE__ */ definePrimitive({
         return { left: 0, top: 0, right: width, bottom: height }
       },
       disabled: (id) => store.get().maximized.includes(id),
-      label: (id) => context.props("window", id)?.title as string | undefined,
+      label: (id) => context.props<{ title: string }>("window", id)?.title,
     })
     const toggle = (list: string[], id: string, on: boolean) =>
       on ? (list.includes(id) ? list : [...list, id]) : list.filter((other) => other !== id)

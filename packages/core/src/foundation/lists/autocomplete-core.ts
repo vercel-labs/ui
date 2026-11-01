@@ -139,7 +139,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
   })
   keepListing(store, listbox)
 
-  const itemProps = (key: string) => context.props("item", key) as AutocompleteCoreItem | undefined
+  const itemProps = (key: string) => context.props<AutocompleteCoreItem>("item", key)
 
   // Where the highlight belongs after the list changed. New text highlights
   // its best match; otherwise the same item stays while it's still there,
