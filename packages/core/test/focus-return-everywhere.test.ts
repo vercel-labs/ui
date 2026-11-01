@@ -9,46 +9,70 @@ import { drawer } from "../src/components/drawer/drawer"
 import { menu } from "../src/components/menu/menu"
 import { popover } from "../src/components/popover/popover"
 import { select } from "../src/components/select/select"
-import type { Primitive } from "../src/foundation/kernel/primitive-types"
 import { mount } from "../src/testing/mount"
 
-type PopupCase = { name: string; primitive: Primitive; trigger: string; content: string; viewport?: boolean }
+type Opening = { defaultOpen?: boolean }
+// What these tests use of a mounted popup, whichever it is.
+type View = Pick<
+  ReturnType<typeof mount<typeof dialog>>,
+  "root" | "keys" | "click" | "settle" | "unmount"
+> & {
+  api: { setOpen: (open: boolean) => void }
+  state: { open: boolean }
+  part: (slot: "trigger") => HTMLElement | undefined
+}
+type PopupCase = { name: string; trigger: string; mount: (options: Opening) => View }
 
-const popups: PopupCase[] = [
-  { name: "popover", primitive: popover, trigger: "Share", content: `<button>Copy link</button>` },
-  {
-    name: "dialog",
-    primitive: dialog,
-    trigger: "Rename",
-    content: `<title>Rename</title><button>Save</button><close>Cancel</close>`,
-  },
-  {
-    name: "alert dialog",
-    primitive: alertDialog,
-    trigger: "Delete",
-    content: `<title>Delete?</title><close>Cancel</close>`,
-  },
-  {
-    name: "drawer",
-    primitive: drawer,
-    trigger: "Filters",
-    content: `<title>Filters</title><close>Done</close>`,
-    viewport: true,
-  },
-  { name: "menu", primitive: menu, trigger: "Actions", content: `<item value="copy">Copy</item>` },
-  {
-    name: "select",
-    primitive: select,
-    trigger: "Fruit",
-    content: `<list><item value="apple">Apple</item></list>`,
-  },
-  { name: "date picker", primitive: datePicker, trigger: "Pick a date", content: `<grid></grid>` },
-]
-
-const markup = ({ trigger, content, viewport }: PopupCase) => {
+const markup = (trigger: string, content: string, viewport = false) => {
   const popup = `<content>${content}</content>`
   return `<div><button>Before</button><trigger>${trigger}</trigger>${viewport ? `<viewport>${popup}</viewport>` : popup}<button>After</button></div>`
 }
+
+const popups: PopupCase[] = [
+  {
+    name: "popover",
+    trigger: "Share",
+    mount: (options) => mount(popover, options, markup("Share", `<button>Copy link</button>`)),
+  },
+  {
+    name: "dialog",
+    trigger: "Rename",
+    mount: (options) =>
+      mount(
+        dialog,
+        options,
+        markup("Rename", `<title>Rename</title><button>Save</button><close>Cancel</close>`),
+      ),
+  },
+  {
+    name: "alert dialog",
+    trigger: "Delete",
+    mount: (options) =>
+      mount(alertDialog, options, markup("Delete", `<title>Delete?</title><close>Cancel</close>`)),
+  },
+  {
+    name: "drawer",
+    trigger: "Filters",
+    mount: (options) =>
+      mount(drawer, options, markup("Filters", `<title>Filters</title><close>Done</close>`, true)),
+  },
+  {
+    name: "menu",
+    trigger: "Actions",
+    mount: (options) => mount(menu, options, markup("Actions", `<item value="copy">Copy</item>`)),
+  },
+  {
+    name: "select",
+    trigger: "Fruit",
+    mount: (options) =>
+      mount(select, options, markup("Fruit", `<list><item value="apple">Apple</item></list>`)),
+  },
+  {
+    name: "date picker",
+    trigger: "Pick a date",
+    mount: (options) => mount(datePicker, options, markup("Pick a date", `<grid></grid>`)),
+  },
+]
 
 // Drawer measures itself, which a DOM made for tests can't.
 globalThis.ResizeObserver ??= class {
@@ -57,21 +81,38 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 } as unknown as typeof ResizeObserver
 
-let unmount: (() => void) | undefined
+const unmounts: (() => void)[] = []
 afterEach(() => {
-  unmount?.()
-  unmount = undefined
+  unmounts.splice(0).forEach((unmount) => unmount())
   document.body.replaceChildren()
 })
 
-function mountPopup(popup: PopupCase, options: object = {}) {
-  const view = mount(popup.primitive, options as never, markup(popup))
-  unmount = view.unmount
-  const api = view.api as { setOpen: (open: boolean) => void }
+function mountPopup(popup: PopupCase, options: Opening = {}) {
+  const view = popup.mount(options)
+  unmounts.push(view.unmount)
   const button = (text: string) =>
     [...view.root.querySelectorAll<HTMLElement>("button")].find((el) => el.textContent === text)!
-  const isOpen = () => (view.state as { open: boolean }).open
-  return { view, api, button, isOpen, trigger: () => view.part("trigger" as never)! }
+  const isOpen = () => view.state.open
+  return { view, api: view.api, button, isOpen, trigger: () => view.part("trigger")! }
+}
+
+// A dialog a popup opens from inside itself, like a confirmation.
+function mountNext(name: string) {
+  const view = mount(
+    dialog,
+    {},
+    `<div><content><title>${name}</title><close>Close ${name}</close></content></div>`,
+  )
+  unmounts.push(view.unmount)
+  return view
+}
+
+function focusElsewhere() {
+  const elsewhere = document.body.appendChild(
+    Object.assign(document.createElement("button"), { textContent: "Elsewhere" }),
+  )
+  elsewhere.focus()
+  return elsewhere
 }
 
 const focused = () => document.activeElement?.textContent
@@ -137,5 +178,83 @@ describe.each(popups)("$name", (popup) => {
     api.setOpen(false)
     await view.settle()
     expect(focused()).toBe("After")
+  })
+})
+
+// Opened without its trigger, a popup's focus goes back to what had it, even
+// through the dialogs it opens: one that outlives it returns there in its place.
+describe.each(popups)("$name opened without its trigger", (popup) => {
+  test.each(["from the start", "from code"])(
+    "opened %s, it hands what had focus to the next dialog",
+    async (how) => {
+      const elsewhere = focusElsewhere()
+      const { view, api, isOpen } = mountPopup(popup, how === "from the start" ? { defaultOpen: true } : {})
+      if (how === "from code") api.setOpen(true)
+      await view.settle()
+      expect(isOpen()).toBe(true)
+      const next = mountNext("Next")
+      next.api.setOpen(true)
+      await next.settle()
+      api.setOpen(false)
+      await view.settle()
+      await next.keys("Escape")
+      await next.settle()
+      expect(document.activeElement).toBe(elsewhere)
+    },
+  )
+})
+
+test.each(["from the start", "from code"])(
+  "a dialog opened %s hands what had focus on through two dialogs that outlive it",
+  async (how) => {
+    const elsewhere = focusElsewhere()
+    const first = mountPopup(
+      popups.find((popup) => popup.name === "dialog")!,
+      how === "from the start" ? { defaultOpen: true } : {},
+    )
+    if (how === "from code") first.api.setOpen(true)
+    await first.view.settle()
+    const second = mountNext("Second")
+    second.api.setOpen(true)
+    await second.settle()
+    const third = mountNext("Third")
+    third.api.setOpen(true)
+    await third.settle()
+    first.api.setOpen(false)
+    await first.view.settle()
+    second.api.setOpen(false)
+    await second.settle()
+    await third.keys("Escape")
+    await third.settle()
+    expect(document.activeElement).toBe(elsewhere)
+  },
+)
+
+test("a popup its trigger opened still gives focus back to the trigger after an earlier open from the start", async () => {
+  const popup = popups.find((entry) => entry.name === "dialog")!
+  focusElsewhere()
+  const { view, api, trigger } = mountPopup(popup, { defaultOpen: true })
+  await view.settle()
+  api.setOpen(false)
+  await view.settle()
+  await view.click(trigger())
+  await view.keys("Escape")
+  expect(document.activeElement).toBe(trigger())
+})
+
+// Safari doesn't focus a button a mouse presses, so focus stays where it was.
+describe.each(popups)("$name opened by a press that leaves focus elsewhere", (popup) => {
+  test.each([false, true])("gives focus to its trigger, after an open from the start: %s", async (first) => {
+    const { view, api, button, trigger } = mountPopup(popup, first ? { defaultOpen: true } : {})
+    if (first) {
+      await view.settle()
+      api.setOpen(false)
+      await view.settle()
+    }
+    button("Before").focus()
+    trigger().addEventListener("mousedown", (event) => event.preventDefault())
+    await view.click(trigger())
+    await view.keys("Escape")
+    expect(document.activeElement).toBe(trigger())
   })
 })

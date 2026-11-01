@@ -453,8 +453,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
   let openedWithoutTrigger = store.get().open
-  let openerLayer: Layer | undefined
-  let openerTarget: HTMLElement | undefined
+  // Where focus goes when what had it is gone: the popup this one opened from
+  // returns to its own target, else the focus that the last close left.
+  // Kept after a close, so a popup this one opened can still follow it.
+  let upstream: () => HTMLElement | undefined = () => undefined
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
@@ -492,8 +494,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       const active = isBrowser ? activeElement() : null
       before = active && active !== active.ownerDocument.body ? active : undefined
       openedWithoutTrigger = opener === "imperative"
-      openerLayer = before && findLayer(before)
-      openerTarget = openerLayer ? undefined : lastClosed()
+      const openerLayer = before && findLayer(before)
+      const openerTarget = openerLayer ? undefined : lastClosed()
+      upstream = openerLayer?.returnTarget ?? (() => openerTarget)
       store.set({ mounted: true } as Partial<State>)
       // Reopened while animating out, it attaches again: the close already let
       // go of the inert page and the close watcher, and focus has to move in.
@@ -514,9 +517,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const closed = observer?.(false)
     const el = shown?.el
     if (layer) markClosed(returnTarget())
-    const target = openerTarget
-    const from = openerLayer?.returnTarget ?? (() => target)
-    openerLayer = openerTarget = undefined
+    const from = upstream
     if (!el || !isBrowser) {
       options.onOpenChange?.(false, closed)
       store.set({ mounted: false } as Partial<State>)
@@ -577,10 +578,17 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const fallback = setTimeout(settle, 1000)
   })
 
-  // A popup opened from this one returns here after this one closed, so it
-  // falls back like `returnFocus`.
+  // Where focus goes back to, in order. Opened without its trigger, what had
+  // focus comes first, since the trigger was never used.
+  function returnChain(el: HTMLElement | undefined, from = upstream) {
+    return openedWithoutTrigger
+      ? [() => before, from, returnTrigger, () => neighbour(el), options.trigger]
+      : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
+  }
+
+  // A popup opened from this one returns here after this one closed.
   function returnTarget() {
-    return firstUsable([returnTrigger, () => before, () => neighbour(shown?.el), options.trigger], usable)
+    return firstUsable(returnChain(shown?.el), usable)
   }
 
   function neighbour(el: HTMLElement | undefined) {
@@ -609,9 +617,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   function returnFocus(el: HTMLElement, from: () => HTMLElement | undefined) {
     const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") return
-    const chain = openedWithoutTrigger
-      ? [() => before, from, returnTrigger, () => neighbour(el), options.trigger]
-      : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
+    const chain = returnChain(el, from)
     if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
     // Focusing can fail, on a hidden or inert element. Then the next one gets a turn.
     firstUsable(chain, (target) => {
