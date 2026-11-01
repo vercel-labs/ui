@@ -103,6 +103,11 @@ function boundElement(el: HTMLElement, target?: (el: HTMLElement) => HTMLElement
   return el.hasAttribute("as-child") ? (el.firstElementChild as HTMLElement | null) : el
 }
 
+// A part's key, as core tells parts of one slot apart. A new key is a new
+// part, so it binds again, like a scrollbar keyed by its orientation.
+const rekeyed = (previous: Record<string, unknown>, next: Record<string, unknown>) =>
+  previous.id !== next.id || previous.value !== next.value
+
 const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 /**
@@ -1108,7 +1113,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           if (other.reread) {
             const previous = other.props
             other.props = other.reread()
-            this.#rewatch(other, previous.value !== other.props.value)
+            this.#rewatch(other, rekeyed(previous, other.props))
           }
           this.#sync(other)
         }
@@ -1439,7 +1444,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
         this.#part.props = this.#props()
         const next = this.#part.props
         const rebind =
-          previous.value !== next.value || !!config.rebind?.some((name) => previous[name] !== next[name])
+          rekeyed(previous, next) || !!config.rebind?.some((name) => previous[name] !== next[name])
         this.#owner.update(this.#part, rebind)
         config.changed?.(this)
       }
