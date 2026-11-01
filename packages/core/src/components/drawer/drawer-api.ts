@@ -168,17 +168,12 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
 
   let wasOpen = store.get().open
   let wasMounted = store.get().mounted
-  let wasModal = store.get().modal
   let lastSnap = store.get().snapPoint
   // Whether the snap point was set while closed, like during the close
   // animation, so it's where the drawer opens next.
   let chosenWhileClosed = false
   store.subscribe(() => {
     const state = store.get()
-    if (state.modal !== wasModal) {
-      wasModal = state.modal
-      popup.updateModal()
-    }
     if (state.open !== wasOpen) {
       wasOpen = state.open
       if (state.open) {
