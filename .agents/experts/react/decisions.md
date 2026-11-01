@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
+Last reviewed: PRs 160 and 161 (2026-11-01, the focus trap fixes).
 
 
 ## Settled

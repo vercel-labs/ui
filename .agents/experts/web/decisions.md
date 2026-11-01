@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
+Last reviewed: PRs 160 and 161 (2026-11-01, the focus trap fixes).
 
 ## Settled
 
@@ -27,7 +27,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
 - **Text options read `undefined`**, not the default, without the attribute.
 - **No element interface** for drawer, slider, field, number input and progress.
 - **Typed JSX** for React, Vue and Svelte consumers.
-- **Focus inside shadow roots**: a popover in a closed root dismisses on inside presses and Escape drops focus to `body`; a modal popup's Tab loop skips slotted content (both probed 2026-10-28 in Chromium).
+- **Focus inside shadow roots**: a popover in a closed root dismisses on inside presses and Escape drops focus to `body`; a modal popup's Tab loop skips slotted content, and shadow-root stops before its first or after its last light DOM stop (probed 2026-10-28 and 2026-11-01 in Chromium).
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **Clicking a `<ui-field-label>`** checks its checkbox or radio but doesn't focus it.
 - **No-bundler pages can't reach the package's functions** (`toast()`, `confirm()`, the controllers, `createParts`): the browser files are side-effect entries with no exports. Waiting on shadcn for a URL (2026-10-29).
