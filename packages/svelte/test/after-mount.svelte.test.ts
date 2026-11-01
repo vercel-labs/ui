@@ -7,7 +7,7 @@ import {
   type Built,
   changesOf,
   idle,
-  markupOf,
+  pageOf,
   partsOf,
   tabStopProblem,
   title,
@@ -16,12 +16,6 @@ import {
 import { cases, type Case } from "../../core/test/after-mount.cases"
 import * as exported from "../src"
 import Tree from "./apps/after-mount-tree.svelte"
-
-// jsdom lays nothing out, so an anchor would never render and a placed popup
-// would never move again. Every element in the page renders, at no size.
-Element.prototype.getClientRects = function () {
-  return (this.isConnected ? [this.getBoundingClientRect()] : []) as never
-}
 
 const components = new Map<string, Component<any>>()
 for (const [name, value] of Object.entries(exported))
@@ -65,16 +59,6 @@ async function render(entry: Case, markup: string, options: Record<string, unkno
   return document.body
 }
 
-// The page as the case renders it: its own markup, then what it portaled to
-// the body, like a popup, in an order moves don't change. Announcers are shared.
-function pageOf(entry: Case) {
-  const portaled = [...document.body.children].filter(
-    (el) => el !== container && !el.hasAttribute("data-ui-sdk-announcer"),
-  )
-  const markup = (el: Element) => markupOf(el as HTMLElement, entry.history, svelteIds)
-  return [markup(container!), ...portaled.map(markup).sort()].join("\n")
-}
-
 function release() {
   if (app) unmount(app)
   app = undefined
@@ -96,13 +80,13 @@ for (const entry of cases)
           change.kind === "option" ? { ...base, [change.key]: value } : base
 
         const fresh = await render(entry, markupAt(change.to), optionsAt(change.to))
-        const expected = pageOf(entry)
+        const expected = pageOf(container!, entry.history, svelteIds)
         const freshProblem = tabStopProblem({ root: fresh })
         release()
 
         const changed = await render(entry, markupAt(change.from), optionsAt(change.from))
         await render(entry, markupAt(change.to), optionsAt(change.to))
-        expect(pageOf(entry)).toEqual(expected)
+        expect(pageOf(container!, entry.history, svelteIds)).toEqual(expected)
         if (entry.history?.includes("stop") && !freshProblem)
           expect(tabStopProblem({ root: changed })).toBeUndefined()
         const known = callbacks[`${entry.name} > ${title(change)}`]
