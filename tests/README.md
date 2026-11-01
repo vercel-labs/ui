@@ -65,7 +65,7 @@ From `.github/workflows`:
 
 | Tier               | When                                              | Playwright projects                                                                            | Also                                         |
 | ------------------ | ------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `affected`         | Pull requests and pushes to `main`                | The specs the changes can affect, from `pnpm test:pr`, on 1 to 10 runners                      | Typecheck, perf docs, unit tests             |
+| `affected`         | Pull requests and pushes to `main`                | The specs the changes can affect, from `pnpm test:pr`, on 1 to 12 runners                      | Typecheck, perf docs, unit tests             |
 | `affected-engines` | Pushes to a pull request with the `engines` label | `affected`, plus `web-webkit` and `web-firefox` for the touched specs                          | Typecheck, perf docs, unit tests             |
 | `engines`          | Adding the `engines` label to a pull request      | `*-webkit`, `*-firefox`                                                                        |                                              |
 | `main`             | Run workflow                                      | Every Chromium project: the 5 frameworks, `*-data`, `*-ssr`, `*-portal`, `*-sheet` (10 shards) | Typecheck, perf docs, unit tests             |
@@ -74,7 +74,7 @@ From `.github/workflows`:
 
 Pushes and pull requests that change only Markdown files or `.claude/` skip CI, unless one of them is `tests/perf/README.md`, which `pnpm docs:perf --check` reads.
 
-The affected tiers size themselves. The Plan affected specs job lists the plan's tests with `pnpm test:pr --shards`, estimates their time on one runner and asks for a runner per 10 minutes of it. Each runner then takes its share of every command with `--shard <n>/<count>`. A component change runs on one runner. A change to shared code, which runs a framework's whole project, takes a few. The estimate counts a leak test as 16 tests and a WebKit or Firefox test as 2; retune `testSeconds` in `scripts/affected-specs.mjs` from the runners' durations.
+The affected tiers size themselves. The Plan affected specs job lists the plan's tests with `pnpm test:pr --shards`, estimates their time on one runner and asks for a runner per 6 minutes of it, up to 12. Each runner then takes its share of every command with `--shard <n>/<count>`. A component change runs on one runner. A change to shared code, which runs a framework's whole project, takes a few. The estimate counts a leak test as 16 tests and a WebKit or Firefox test as 2; retune `testSeconds` in `scripts/affected-specs.mjs` from the runners' durations.
 
 To run a CI shard locally:
 

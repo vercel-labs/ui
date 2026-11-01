@@ -64,3 +64,100 @@ test("pressing the track left of the thumb scrolls toward the inline end", async
   await page.mouse.click(track.x + 4, track.y + track.height / 2)
   await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(0)
 })
+
+test("dragging the thumb follows the page when it turns right to left after mount", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  await trackBox(page, gallery.label, "horizontal")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await dragBy(page, thumb(page, gallery.label, "horizontal"), -40, 0)
+  await page.mouse.up()
+  await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(-10)
+})
+
+test("a rubber band past the start of a left to right area keeps the thumb at the start", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  const track = await trackBox(page, gallery.label, "horizontal")
+  // Safari reads a negative scrollLeft while it stretches past the start, which Chromium can't scroll to.
+  await viewport(page, gallery.label).evaluate((el) => {
+    Object.defineProperty(el, "scrollLeft", { configurable: true, get: () => -50 })
+    el.dispatchEvent(new Event("scroll"))
+  })
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+})
+
+test("the thumb follows the page when it turns right to left right after a rubber band", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  const track = await trackBox(page, gallery.label, "horizontal")
+  await viewport(page, gallery.label).evaluate((el) => {
+    Object.defineProperty(el, "scrollLeft", { configurable: true, get: () => -50 })
+    el.dispatchEvent(new Event("scroll"))
+  })
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+  // The stretch ends and the page turns before the next frame measures.
+  await viewport(page, gallery.label).evaluate((el) => {
+    delete (el as { scrollLeft?: number }).scrollLeft
+    el.dispatchEvent(new Event("scroll"))
+    document.documentElement.dir = "rtl"
+    el.scrollLeft = -1e6
+  })
+  const turned = await trackBox(page, gallery.label, "horizontal")
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - turned.x))
+    .toBeLessThan(2)
+})
+
+test("scrollToEnd on a horizontal area follows the page when it turns right to left after mount", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(framework !== "web", "The element's api is the controller.")
+  await open("scroll-area")
+  await viewport(page, gallery.label).evaluate((el) => (el.style.height = `${el.scrollHeight}px`))
+  await expect(area(page, gallery.label)).not.toHaveAttribute("data-overflow-y")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await area(page, gallery.label).evaluate((el) =>
+    (el as HTMLElement & { api: { scrollToEnd: (options: object) => void } }).api.scrollToEnd({
+      behavior: "instant",
+    }),
+  )
+  await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).left).toBeLessThan(-100)
+})
+
+test("the thumb follows scrolling when the area's own container turns right to left after mount", async ({
+  page,
+  open,
+}) => {
+  await open("scroll-area")
+  await trackBox(page, gallery.label, "horizontal")
+  await area(page, gallery.label).evaluate((el) => el.setAttribute("dir", "rtl"))
+  await setScroll(viewport(page, gallery.label), { left: -1e6 })
+  const track = await trackBox(page, gallery.label, "horizontal")
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+})
+
+test("the thumb follows scrolling when the page turns right to left after mount", async ({ page, open }) => {
+  await open("scroll-area")
+  await trackBox(page, gallery.label, "horizontal")
+  await page.evaluate(() => (document.documentElement.dir = "rtl"))
+  await setScroll(viewport(page, gallery.label), { left: -1e6 })
+  const track = await trackBox(page, gallery.label, "horizontal")
+  await expect
+    .poll(async () => Math.abs((await box(thumb(page, gallery.label, "horizontal"))).x - track.x))
+    .toBeLessThan(2)
+})
