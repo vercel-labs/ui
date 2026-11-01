@@ -357,7 +357,20 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   function placement(el: HTMLElement, props: () => PlacementProps, key: string | null, part: Part) {
     return {
       anchor: () => contentAnchor(el, props().anchor, () => triggerOf(key ?? shownItem())),
-      rendered: (listener: () => void) => onProps(part, listener),
+      // A new orientation moves the side it opens on, like new props.
+      rendered(listener: () => void) {
+        let { orientation } = store.get()
+        const offState = store.subscribe(() => {
+          if (store.get().orientation === orientation) return
+          orientation = store.get().orientation
+          listener()
+        })
+        const offProps = onProps(part, listener)
+        return () => {
+          offState()
+          offProps()
+        }
+      },
       position: () =>
         placementOptions(props(), {
           side: store.get().orientation === "vertical" ? "end" : "bottom",
@@ -379,6 +392,14 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     return true
   }
 
+  // The first content to render shows the viewport. Measured at once, it's
+  // placed for its real size before the browser paints it.
+  function showViewport(content: HTMLElement) {
+    if (!attachViewport()) return
+    viewportSize.measure(content)
+    surfaces.get(null)!.place()
+  }
+
   function detachViewport() {
     viewportPopup?.unbind?.()
     if (viewportPopup) viewportPopup.unbind = undefined
@@ -394,6 +415,10 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     viewportPopup = { el, config: { ...placement(el, props, null, part), initialFocus: () => undefined } }
     // Last: contents may move in and bind right away, and show the viewport.
     store.set({ viewport: true })
+    // Bound again, like into a new container, around content still showing in it.
+    const { value } = store.get()
+    const shown = value === null ? undefined : element("content", value)
+    if (shown && el.contains(shown)) showViewport(shown)
     // Listened to on the element itself, not through the framework: React
     // routes events from portaled contents through its own tree, where the
     // contents aren't inside the viewport.
@@ -455,12 +480,7 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // another item takes over, while the viewport stays.
   function bindInViewport(el: HTMLElement, key: string) {
     const stopObserving = viewportSize.observe(el)
-    // The first content to render shows the viewport. Measured at once, it's
-    // placed for its real size before the browser paints it.
-    if (attachViewport()) {
-      viewportSize.measure(el)
-      surfaces.get(null)!.place()
-    }
+    showViewport(el)
     let leaving = false
     let stopAnimation = animateIn(el)
     const unsubscribe = store.subscribe(() => {

@@ -26,6 +26,7 @@ import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { adoptPlatform, bindPartShortcut, shortcutOf } from "../../foundation/shortcuts/shortcut-slot"
 import { shortcuts } from "../../foundation/shortcuts/shortcuts"
 import { createChange } from "../../foundation/kernel/input-source"
+import { deriveFromOptions } from "../../foundation/kernel/derive"
 
 type CommandState = Omit<AutocompleteCoreState, "items"> & {
   items: CommandData | undefined
@@ -211,14 +212,22 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandState, stri
     }
   }
 
+  // A value from options is highlighted in the same pass; the reveal follows it.
+  deriveFromOptions(context, ["highlighted"], (synced, state) =>
+    "value" in synced && synced.value !== state.highlighted ? { highlighted: synced.value } : undefined,
+  )
   // The highlight follows the value, from a choice, a controller or a
   // controlled prop. A new page highlights its best match: at once for data,
   // and once its commands mount for a composed page.
+  let previousValue = store.get().value
   let previousPages = store.get().pages
   let previousMounts = store.get().mounts
   store.subscribe(() => {
     const state = store.get()
-    if (state.value !== state.highlighted) core.listbox.highlight(state.value)
+    if (state.value !== state.highlighted || state.value !== previousValue) {
+      previousValue = state.value
+      core.listbox.highlight(state.value)
+    }
     if (state.pages !== previousPages) {
       previousPages = state.pages
       const why = pageCause ?? { reason: "imperative" }

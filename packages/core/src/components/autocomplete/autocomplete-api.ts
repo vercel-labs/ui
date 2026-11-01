@@ -435,6 +435,11 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
   }
 
   // A value from outside, like a controlled prop or a controller, also becomes what filters.
+  deriveFromOptions(context, ["query"], (synced, state) =>
+    "value" in synced && synced.value !== state.value && synced.value !== requested
+      ? { query: synced.value }
+      : undefined,
+  )
   let previousValue = store.get().value
   store.subscribe(() => {
     const { value } = store.get()

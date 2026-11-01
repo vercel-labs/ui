@@ -14,7 +14,7 @@ import {
 import { localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { sameValue } from "../../foundation/kernel/store"
-import { deriveFromOptions } from "../../foundation/kernel/derive"
+import { deriveFromOptions, deriveState } from "../../foundation/kernel/derive"
 import type { SliderChangeOptions, SliderOptions, SliderValueChangeReason } from "./slider"
 import {
   fractionAlong,
@@ -337,12 +337,11 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   })
 
   // Each thumb's value by index follows the value, before any part hears it changed.
-  let valueShown = store.get().value
-  store.subscribe(() => {
-    const { value } = store.get()
-    if (value === valueShown) return
-    valueShown = value
-    store.set({ thumbValues: thumbValuesOf(value) })
+  // The same value makes the same record, so a framework's render and the handover agree.
+  let made = { value: store.get().value, thumbValues: store.get().thumbValues }
+  deriveState(context, ["thumbValues"], ({ value }) => {
+    if (!sameValue(value, made.value)) made = { value, thumbValues: thumbValuesOf(value) }
+    return { thumbValues: made.thumbValues }
   })
   // Disabling mid-drag ends the drag.
   store.subscribe(() => {

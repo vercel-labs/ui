@@ -17,6 +17,7 @@ import { localeOf } from "../../foundation/text/locale"
 import { isPartialNumber, parseNumber } from "./number-input-parse"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { sameValue } from "../../foundation/kernel/store"
+import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type {
   NumberInputChangeOptions,
   NumberInputOptions,
@@ -451,6 +452,13 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
   // user is typing. Formats compare by content, so a new object each render
   // changes nothing.
   const formatKey = (state: State) => JSON.stringify([state.format, localeOf(state), state.step])
+  // A value from options shows in the same pass, unless the text typed so far already reads as it.
+  deriveFromOptions(context, ["text"], (synced, state) => {
+    if (!("value" in synced) || sameValue(synced.value, state.value)) return
+    const next = { ...state, ...synced }
+    const typed = next.text.trim() === "" ? null : parseNumber(next.text, localeOf(next), next.format)
+    if (!sameValue(typed, next.value)) return { text: display(next.value, next) }
+  })
   let shown = store.get().value
   let shownState = store.get()
   let shownFormat = formatKey(shownState)
