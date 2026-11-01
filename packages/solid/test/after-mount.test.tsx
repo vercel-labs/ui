@@ -1,7 +1,7 @@
 // Every option and slot prop follows a change after the first render, in
 // Solid's own components, as in packages/core/test/after-mount.test.ts.
-import { createComponent, Dynamic, render } from "@solidjs/web"
-import { createSignal, flush, type JSX } from "solid-js"
+import { createComponent, Dynamic, type DynamicProps, type JSX, render } from "@solidjs/web"
+import { createSignal, flush } from "solid-js"
 import { afterEach, describe, expect, test } from "vitest"
 import {
   baseOptions,
@@ -19,9 +19,11 @@ import {
 import { cases } from "../../core/test/after-mount.cases"
 import * as exported from "../src"
 
-const components = new Map<string, (props: object) => JSX.Element>()
-for (const [name, value] of Object.entries(exported))
-  if (typeof value === "function" && /^[A-Z]/.test(name)) components.set(name, value as never)
+type Rendered = (props: Record<string, unknown>) => JSX.Element
+
+const components = new Map<string, Rendered>()
+for (const [name, value] of Object.entries<unknown>(exported))
+  if (typeof value === "function" && /^[A-Z]/.test(name)) components.set(name, value as Rendered)
 
 const solidIds = /mount-\d+|\bcl-\d+\b/g
 
@@ -32,9 +34,14 @@ const nodeAt = (tree: Built[], path: number[]) =>
 
 // Each node renders once, with props that read the tree shown now, so a new
 // value reaches the same component rather than a new one.
-function view(shown: () => Built[], trees: Built[][], path: number[]): JSX.Element {
+const view: (shown: () => Built[], trees: Built[][], path: number[]) => JSX.Element = (
+  shown,
+  trees,
+  path,
+) => {
   const first = nodeAt(trees[0]!, path)
-  if (typeof first === "string") return () => nodeAt(shown(), path) as string
+  // Solid renders a function child as reactive text, but its JSX types leave functions out.
+  if (typeof first === "string") return (() => nodeAt(shown(), path)) as unknown as JSX.Element
   const node = () => nodeAt(shown(), path) as Node
   const keys = new Set(trees.flatMap((tree) => Object.keys((nodeAt(tree, path) as Node).props)))
   const props: Record<string, unknown> = first.part ? {} : { component: first.tag }
@@ -43,7 +50,7 @@ function view(shown: () => Built[], trees: Built[][], path: number[]): JSX.Eleme
   const content = () => first.children.map((_, index) => view(shown, trees, [...path, index]))
   if (first.children.length) Object.defineProperty(props, "children", { enumerable: true, get: content })
   if (first.part) return createComponent(components.get(first.part)!, props)
-  if (first.tag) return createComponent(Dynamic as never, props)
+  if (first.tag) return createComponent(Dynamic<string>, props as DynamicProps<string>)
   return content()
 }
 
