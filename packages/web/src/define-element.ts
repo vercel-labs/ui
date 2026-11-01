@@ -231,7 +231,14 @@ function restoreQuietly(el: HTMLElement, state: unknown, mode: string) {
 
 // A restore that waits for the parts to bind, by element. Anything newer that
 // sets the state first wins: script, a state attribute, a reset or another restore.
-const pendingRestores = new WeakMap<HTMLElement, object>()
+const pendingRestores = new Map<HTMLElement, object>()
+
+// State set from script, through a property, a state attribute or the `api`,
+// wins over a waiting restore: the element's own, and a group's around it,
+// which a checkbox writes through.
+function wroteFromScript(el: HTMLElement) {
+  for (const waiting of pendingRestores.keys()) if (waiting.contains(el)) pendingRestores.delete(waiting)
+}
 
 function restoreOnceBound(el: HTMLElement, state: unknown, mode: string) {
   const token = {}
@@ -328,12 +335,19 @@ function instanceOf<Api = unknown>(el: Element | null | undefined) {
   return (el ? instances.get(el) : undefined) as (PrimitiveInstance & { api: Api }) | undefined
 }
 
+// Controller methods that leave the state as it is.
+const reads = /^(?:get|is|can)[A-Z]|^focus$/
+
 // The element's public api: only the controller's methods, never internals.
-function controllerView(api: object, methods: string[]) {
+function controllerView(el: HTMLElement, api: object, methods: string[]) {
   const view: Record<string, unknown> = {}
   for (const name of methods) {
-    const value = (api as Record<string, unknown>)[name]
-    if (typeof value === "function") view[name] = value.bind(api)
+    const method = (api as Record<string, unknown>)[name]
+    if (typeof method === "function")
+      view[name] = (...args: unknown[]) => {
+        if (!reads.test(name)) wroteFromScript(el)
+        return method.apply(api, args)
+      }
   }
   return Object.freeze(view)
 }
@@ -777,7 +791,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // The controller's methods. Internals stay out of reach.
       get api() {
         if (!this.#instance) return undefined
-        return (this.#view ??= controllerView(this.#instance.api as object, config.api ?? []))
+        return (this.#view ??= controllerView(this, this.#instance.api as object, config.api ?? []))
       }
       #parts = new Set<Part>()
       #pending = new Set<Part>()
@@ -804,7 +818,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
               return this.#instance ? get(this.#instance.api) : undefined
             },
             set(this: Owner, value: unknown) {
-              pendingRestores.delete(this)
+              wroteFromScript(this)
               if (this.#instance && !this.#gone) this.#quietly(() => set(this.#instance!.api, value))
               else this.#state[name] = value
             },
@@ -841,7 +855,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
 
       attributeChangedCallback(name: string, previous: string | null, value: string | null) {
         const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
-        if (key in state && value !== previous && !this.#rendering) pendingRestores.delete(this)
+        if (key in state && value !== previous && !this.#rendering) wroteFromScript(this)
         if (!this.#rendering || value === null) this.#rendered.delete(key)
         else if (previous === null) this.#rendered.add(key)
         if (!this.#connected) return
