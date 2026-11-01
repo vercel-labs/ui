@@ -6,7 +6,7 @@
 import { elements } from "../kernel/elements"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { announce } from "../platform/announce"
-import { dragThreshold, bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
 
 /**
  * The rectangle being drawn, relative to the surface, and what it selects so far.
@@ -60,13 +60,12 @@ function createLasso<State extends object>(
 ) {
   const { store } = context
   const setDraft = (draft: LassoDraft | null) => store.set({ [options.draft]: draft } as Partial<State>)
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   return {
     /** Starts a rectangle on `surface` once the pointer moves past `dragThreshold`. Escape lets go without selecting. */
     pointerdown(event: PointerEvent, surface: HTMLElement) {
-      if (event.button !== 0 || !event.isPrimary) return
+      if (!drags.accepts(event)) return
       const box = surface.getBoundingClientRect()
       const x0 = event.clientX - box.left
       const y0 = event.clientY - box.top
@@ -85,8 +84,7 @@ function createLasso<State extends object>(
             },
           }
         })
-      stop?.()
-      stop = bindDrag(surface, event, {
+      drags.start(surface, event, {
         threshold: dragThreshold,
         cancelOnEscape: true,
         onMove: ({ x, y }) => {

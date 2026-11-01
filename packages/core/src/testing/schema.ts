@@ -72,4 +72,4 @@ function tagOf(rendered: Record<string, unknown>) {
   return "div"
 }
 
-export { fromOf, kindOf, slotProps, tagOf }
+export { camel, fromOf, kindOf, slotProps, tagOf }

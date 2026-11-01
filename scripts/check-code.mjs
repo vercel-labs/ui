@@ -12,6 +12,9 @@
 // - popup-steps: no `popup.opening(` or `popup.returnFocus(` in packages/*/src
 //   outside the files in `popupStepsAllowlist`. A popup component opens and
 //   closes through `createOpenSteps`, which runs those steps in order.
+// - drag-session: no `bindDrag(` in packages/*/src outside the files in
+//   `dragSessionAllowlist`. A component drags through `createDragSession`,
+//   which takes one press at a time and ends a drag cut short as canceled.
 // - import-layers: core's folders import downward only. `foundation/kernel`
 //   imports nothing else in core. `foundation/platform` imports only the
 //   kernel. A job folder (`focus`, `lists`, `popups` and the rest) imports the
@@ -90,6 +93,16 @@ const popupStepsAllowlist = {
   "packages/core/src/foundation/popups/popup-steps.ts": "Runs them in order for every popup component.",
 }
 
+// Files under packages/ that may follow a pointer with `bindDrag` directly, each with why.
+const dragSessionAllowlist = {
+  "packages/core/src/foundation/drag-and-drop/pointer.ts": "Defines it, and the session on it.",
+  "packages/core/src/components/resizable/resizable-dom.ts":
+    "One press can drag two handles where they meet, one along each axis.",
+  "packages/core/src/components/toast/swipe.ts": "Captures the pointer only once a swipe picks its axis.",
+  "packages/core/src/foundation/direct-manipulation/swipe-actions.ts":
+    "Captures the pointer only once a swipe picks its axis.",
+}
+
 // Imports across core's layers that import-layers lets through, by folder, each with why.
 const importLayersAllowlist = {
   "foundation/kernel -> foundation/platform": "A pending action loads the announcer when it first needs it.",
@@ -141,6 +154,7 @@ const violations = []
 const allowances = []
 checkReturnTypes()
 checkPopupSteps()
+checkDragSession()
 checkImportLayers()
 const surface = publicExports(root)
 checkPublicDocs()
@@ -291,6 +305,24 @@ function checkPopupSteps() {
           line: index + 1,
           rule: "popup-steps",
           message: `open and close through \`createOpenSteps\` instead of calling \`popup.${step}\` yourself.`,
+        })
+      })
+  }
+}
+
+function checkDragSession() {
+  for (const file of packageSources()) {
+    const relative = path.relative(root, file)
+    if (relative in dragSessionAllowlist) continue
+    readFileSync(file, "utf8")
+      .split("\n")
+      .forEach((text, index) => {
+        if (!/\bbindDrag\(/.test(text)) return
+        violations.push({
+          file: relative,
+          line: index + 1,
+          rule: "drag-session",
+          message: "drag through `createDragSession` instead of calling `bindDrag` yourself.",
         })
       })
   }

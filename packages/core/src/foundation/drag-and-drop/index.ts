@@ -4,6 +4,7 @@
 export { type AutoScrollOptions, createAutoScroll } from "./auto-scroll"
 export {
   bindDrag,
+  createDragSession,
   dragThreshold,
   isDrag,
   type PointerSample,

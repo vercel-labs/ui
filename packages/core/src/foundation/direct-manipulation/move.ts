@@ -7,7 +7,7 @@
 // each item went.
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { announce } from "../platform/announce"
-import { dragThreshold, bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
 
 /**
  * Where an item is, in the units your positions use, usually CSS pixels.
@@ -118,8 +118,7 @@ function createMove<State extends object>(
   const { store } = context
   const positions = () => (store.get()[options.key] ?? {}) as Record<string, MovePoint>
   const setDraft = (draft: MoveDraft | null) => store.set({ [options.draft]: draft } as Partial<State>)
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   const group = (key: string) => (options.group?.(key) ?? [key]).filter((k) => !options.disabled?.(k))
   const place = (key: string, x: number, y: number, round: number) => {
@@ -179,12 +178,11 @@ function createMove<State extends object>(
     },
     /** Starts a drag once the pointer moves past `dragThreshold`, so a click stays a click. Escape puts the items back. */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (event.button !== 0 || !event.isPrimary || options.disabled?.(key)) return
+      if (!drags.accepts(event) || options.disabled?.(key)) return
       // Offsets count from the press, so the item keeps up with the pointer past the threshold.
       const startX = event.clientX
       const startY = event.clientY
-      stop?.()
-      stop = bindDrag(el, event, {
+      drags.start(el, event, {
         threshold: dragThreshold,
         cancelOnEscape: true,
         onStart: () => setDraft({ keys: group(key), dx: 0, dy: 0 }),

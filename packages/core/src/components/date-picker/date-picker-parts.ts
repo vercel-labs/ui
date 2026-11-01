@@ -11,6 +11,7 @@ import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-e
 import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
 import { openAttrs } from "../../foundation/kernel/attrs"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
+import { onProps } from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import type {
   DatePickerClearState,
@@ -228,12 +229,13 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
         if (ownsEvent(el!, event)) api.internal.popup.keydown(event)
       },
     },
-    bind(el, { api }) {
-      const { internal } = api
+    bind(el, part) {
+      const { internal } = part.api
       return internal.presentation.bind(el, {
         anchor: () => contentAnchor(el, internal.contentProps().anchor, internal.anchorElement),
         position: () => placementOptions(internal.contentProps(), { align: "start" }),
-        initialFocus: api.internal.initialFocus,
+        rendered: (listener) => onProps(part, listener),
+        initialFocus: internal.initialFocus,
       })
     },
   }),

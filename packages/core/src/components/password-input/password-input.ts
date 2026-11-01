@@ -238,6 +238,7 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
   sync: (options) => ({
     ...syncText(options),
     ...(options.visible === undefined ? {} : { visible: options.visible }),
+    ...(options.controlId === undefined ? {} : { controlId: options.controlId }),
     ...settings(options),
   }),
   api: (context) => {

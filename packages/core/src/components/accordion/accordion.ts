@@ -1,3 +1,4 @@
+import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { warn } from "#dev"
 import {
   bindPanel,
@@ -184,7 +185,7 @@ type AccordionPanelProps = Omit<PanelProps, "value">
 type AccordionRootState<T extends string = string> = {
   /** The open items' values. */
   value: T[]
-  /** Whether the whole accordion is disabled. */
+  /** Whether the whole accordion is disabled, by its `disabled` option or a disabled fieldset around it. */
   disabled: boolean
   /** Whether several items can be open at once. */
   multiple: boolean
@@ -227,6 +228,8 @@ type AccordionState = {
   multiple: boolean
   collapsible: boolean
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   keepMounted: boolean
   hiddenUntilFound: boolean
   // Panels animating out. They stay shown until their animation ends.
@@ -270,7 +273,7 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionState
 
   const isOpen = (key: string) => store.get().value.includes(key)
   const itemProps = (key: string) => props("item", key) as ItemProps | undefined
-  const itemDisabled = (key: string) => store.get().disabled || !!itemProps(key)?.disabled
+  const itemDisabled = (key: string) => isDisabled(store.get()) || !!itemProps(key)?.disabled
 
   // Every item's open callback hears first, and any of them can stop the change.
   function setValue(value: string[], { reason: why = "imperative", event }: Cause = {}) {
@@ -433,7 +436,7 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionState
 }
 
 const disabledOf = (state: AccordionState, key: string, api: AccordionApi, own?: boolean) =>
-  !!own || state.disabled || api.internal.itemDisabled(key)
+  !!own || isDisabled(state) || api.internal.itemDisabled(key)
 
 const keepsMounted = (state: AccordionState, props: PanelProps) => props.keepMounted ?? state.keepMounted
 const findable = (state: AccordionState, props: PanelProps) =>
@@ -464,6 +467,7 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
     multiple: false,
     collapsible: true,
     disabled: false,
+    formDisabled: false,
     keepMounted: false,
     hiddenUntilFound: false,
     exiting: [],
@@ -482,16 +486,20 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
   api: accordionApi,
   slots: (slot) => ({
     root: slot<{}, AccordionRootState>({
-      state: (state) => ({ value: state.value, disabled: state.disabled, multiple: state.multiple }),
-      attrs: (state) => ({ "data-disabled": state.disabled ? "" : undefined }),
-      // Items moved in the page, like a sorted list, change their index without registering again.
-      bind(el, { api }) {
-        if (typeof MutationObserver === "undefined") return
+      state: (state) => ({ value: state.value, disabled: isDisabled(state), multiple: state.multiple }),
+      attrs: (state) => ({ "data-disabled": isDisabled(state) ? "" : undefined }),
+      bind(el, { api, store }) {
+        const unwatch = watchFormDisabled(el, store)
+        if (typeof MutationObserver === "undefined") return unwatch
+        // Items moved in the page, like a sorted list, change their index without registering again.
         const observer = new MutationObserver((records) => {
           if (records.some((record) => !api.internal.insideItem(record.target, el))) api.internal.syncItems()
         })
         observer.observe(el, { childList: true, subtree: true })
-        return () => observer.disconnect()
+        return () => {
+          observer.disconnect()
+          unwatch()
+        }
       },
     }),
 

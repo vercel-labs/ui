@@ -459,7 +459,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
           if (!store.get().viewport) api.internal.leavePanel(event)
         },
       },
-      bind: (el, { api, key, props }) => api.internal.bindContent(el, key, props),
+      bind: (el, part) => part.api.internal.bindContent(el, part.key, part.props, part),
     }),
 
     link: slot<LinkProps, NavigationMenuLinkState>({
@@ -499,7 +499,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": state.orientation,
         ...openAttrs(state.value !== null),
       }),
-      bind: (el, { api }) => api.internal.bindViewport(el),
+      bind: (el, part) => part.api.internal.bindViewport(el, part),
     }),
 
     // Covers the open trigger, or the current page's link while closed.

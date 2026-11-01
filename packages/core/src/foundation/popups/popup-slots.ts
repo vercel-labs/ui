@@ -6,7 +6,8 @@ import { dev } from "#dev"
 import { checkName } from "#name-check"
 import { flagWhileBound, settleFlag } from "../kernel/bound-keys"
 import { openAttrs } from "../kernel/attrs"
-import type { SlotFactory } from "../kernel/primitive-types"
+import { onProps } from "../kernel/part"
+import type { Part, SlotFactory } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
 import type { Anchor, PortalProps, PositionProps } from "../platform/position"
 import { enforceHidden } from "../platform/style"
@@ -144,7 +145,7 @@ function contentKeydown(internal: PopupInternal, event: KeyboardEvent, el: HTMLE
 // Shows the content when the popup opens: placed beside its anchor when the
 // preset places it, with focus moving in when a press opens it, and as a
 // sheet when it presents as one. Components with their own content part bind it here too.
-function bindPopupContent(el: HTMLElement, internal: PopupInternal, key?: string) {
+function bindPopupContent(el: HTMLElement, internal: PopupInternal, key?: string, part?: Part) {
   const { preset, control, contentProps, triggerElement, element, popup, press, rules, presentation } =
     internal
   const { placement } = preset
@@ -158,6 +159,7 @@ function bindPopupContent(el: HTMLElement, internal: PopupInternal, key?: string
     position:
       placement &&
       (() => placement.options(contentProps(key), { side: preset.side, align: "center" }, element("arrow"))),
+    rendered: part && ((listener) => onProps(part, listener)),
     // Where focus goes once the popup and its children have bound. Hover content takes none.
     initialFocus:
       press &&
@@ -260,9 +262,9 @@ function popupContent<State extends PopupState, Api extends PopupApi>(slot: Slot
       pointerenter: (event, { api }) => api.internal.hover?.enter(event),
       pointerleave: (event, { api }) => api.internal.hover?.leaveContent(event),
     },
-    bind(el, { api, key, store }) {
-      settleFlag(store, "titled")
-      return bindPopupContent(el, api.internal, key)
+    bind(el, part) {
+      settleFlag(part.store, "titled")
+      return bindPopupContent(el, part.api.internal, part.key, part)
     },
   })
 }
