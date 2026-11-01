@@ -9,6 +9,7 @@ import type { ChangeOptions, ChangeReason, ChangeSource } from "../kernel/detail
 import { on } from "../kernel/events"
 import type { Store } from "../kernel/store"
 import {
+  activeLayers,
   findLayer,
   lastClosed,
   lastEscape,
@@ -396,6 +397,9 @@ function watchClose(close: (event: Event) => void) {
   return () => watcher?.destroy()
 }
 
+// Each shown layer's own elements, which a parent that turns modal later keeps out of its inert.
+const layerParts = new WeakMap<Layer, HTMLElement[]>()
+
 function createPopupLayer<State extends { open: boolean; mounted: boolean }, Reason extends string = string>(
   options: Partial<PopupBehavior> & {
     // The behavior to start from. Any behavior option passed here overrides it.
@@ -781,6 +785,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
                 }),
     }
     layer = own
+    layerParts.set(own, [el, ...(backdrop ? [backdrop] : [])])
     cleanups.push(pushLayer(own))
     for (const onShow of [options.onShow, config.onShow]) {
       const cleanup = onShow?.(own)
@@ -791,6 +796,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const freezePage = () => {
       const keep = [el, ...(shown?.backdrop ? [shown.backdrop] : []), ...(persistent as HTMLElement[])]
       if (trigger && behavior.keepTrigger) keep.push(trigger)
+      // A layer opened from this one before it turned modal stays usable too.
+      for (const layer of activeLayers())
+        for (let up = layer.parent; up; up = up.parent)
+          if (up === own) keep.push(...(layerParts.get(layer) ?? []))
       const inert = inertOutside(keep)
       own.keep = inert.keep
       releaseInert = releaseOwnInert = inert
