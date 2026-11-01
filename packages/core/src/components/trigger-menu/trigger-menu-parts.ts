@@ -10,6 +10,7 @@ import { enforceHidden } from "../../foundation/platform/style"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
+import { onProps } from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import type {
   TriggerMenuContentProps,
@@ -134,7 +135,8 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
     }),
     // Pressing the list keeps focus, the caret and the on-screen keyboard in the editor.
     on: pressKeepsFocus,
-    bind(el, { api, key, store }) {
+    bind(el, part) {
+      const { api, key, store } = part
       const { internal } = api
       let active = true
       // Items bind in the same commit. A microtask later, an empty list is really empty.
@@ -152,6 +154,7 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
       const unbind = internal.popup.bind(el, {
         anchor: () => contentAnchor(el, internal.contentProps(key).anchor, () => textAnchor),
         position: () => placementOptions(internal.contentProps(key), { align: "start" }),
+        rendered: (listener) => onProps(part, listener),
         // Focus stays in the editor.
         initialFocus: () => undefined,
       })

@@ -222,38 +222,58 @@ function associate(input: HTMLInputElement, options: Association & { focus: () =
   return () => cleanups.forEach((cleanup) => cleanup())
 }
 
+// What a watched element checks again once it moves, for a renderer that
+// keeps its binding through a move, like a custom element.
+const moves = new WeakMap<Element, () => void>()
+
 // Reports whether ancestor fieldsets disable `el`, now and whenever that
 // changes. Vue binds before the element is in its parents, so fieldsets are
 // found a microtask later. Returns a cleanup.
 function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
-  let disabled = false
+  let disabled: boolean | undefined
   let observer: MutationObserver | undefined
   let active = true
+  // A move out of a fieldset removes `el`, or a node between it and the
+  // fieldset, from its parent, so those parents are watched too.
+  const check = () => {
+    if (observer) {
+      observer.disconnect()
+      for (let node = el.parentElement; node?.closest("fieldset"); node = node.parentElement)
+        observer.observe(node, { childList: true, attributeFilter: ["disabled"] })
+    }
+    const now = fieldsetDisabled(el)
+    if (now !== disabled) onChange((disabled = now))
+  }
   const watch = () => {
     if (!active) return
-    disabled = fieldsetDisabled(el)
-    onChange(disabled)
-    if (typeof MutationObserver === "undefined") return
-    observer = new MutationObserver(() => {
-      if (fieldsetDisabled(el) === disabled) return
-      disabled = !disabled
-      onChange(disabled)
-    })
-    for (let node = el.parentElement; node; node = node.parentElement)
-      if (node instanceof HTMLFieldSetElement) observer.observe(node, { attributeFilter: ["disabled"] })
+    if (typeof MutationObserver !== "undefined") observer = new MutationObserver(check)
+    check()
+    moves.set(el, check)
   }
   if (el.isConnected) watch()
   else queueMicrotask(watch)
   return () => {
     active = false
     observer?.disconnect()
+    moves.delete(el)
   }
 }
+
+// Tells what watches `el` that it moved, which no mutation of the fieldsets shows.
+const elementMoved = (el: Element) => moves.get(el)?.()
 
 // A control's own `disabled` (or its field's), or a disabled fieldset around it
 // as `watchFieldsets` reports.
 const isDisabled = (state: { disabled: boolean; formDisabled: boolean }) =>
   state.disabled || state.formDisabled
+
+const watchFormDisabled = (el: Element, store: { set: (patch: { formDisabled: boolean }) => void }) =>
+  watchFieldsets(el, (formDisabled) => store.set({ formDisabled }))
+
+// Whether a person can't use `el`: natively disabled, by itself or a fieldset,
+// or marked `aria-disabled`.
+const isDisabledElement = (el: Element) =>
+  el.matches(":disabled") || el.getAttribute("aria-disabled") === "true"
 
 // Keeps a hidden input's checkedness in step with the control and reports
 // what happens to its form.
@@ -414,6 +434,7 @@ export {
   bindValueInput,
   claimInvalidFocus,
   dispatchChange,
+  elementMoved,
   fieldsetDisabled,
   focusWith,
   formInternals,
@@ -421,6 +442,7 @@ export {
   hiddenInputStyle,
   invalidFocusClaimed,
   isDisabled,
+  isDisabledElement,
   isLabelable,
   labelledBy,
   labelsOf,
@@ -431,4 +453,5 @@ export {
   validityChanged,
   valueMissingMessage,
   watchFieldsets,
+  watchFormDisabled,
 }

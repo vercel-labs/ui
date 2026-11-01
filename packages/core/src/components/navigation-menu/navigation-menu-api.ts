@@ -19,7 +19,8 @@ import { opensElsewhere } from "./navigation-menu-keyboard"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { ChangeOptions } from "../../foundation/kernel/details"
 import { on } from "../../foundation/kernel/events"
-import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import { onProps } from "../../foundation/kernel/part"
+import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 
@@ -353,9 +354,10 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
 
   // Where a surface goes: against its anchor prop, or the trigger, on the side
   // the orientation suggests unless the props say otherwise.
-  function placement(el: HTMLElement, props: () => PlacementProps, key: string | null) {
+  function placement(el: HTMLElement, props: () => PlacementProps, key: string | null, part: Part) {
     return {
       anchor: () => contentAnchor(el, props().anchor, () => triggerOf(key ?? shownItem())),
+      rendered: (listener: () => void) => onProps(part, listener),
       position: () =>
         placementOptions(props(), {
           side: store.get().orientation === "vertical" ? "end" : "bottom",
@@ -384,13 +386,12 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
 
   // The viewport binds as soon as it renders, closed or not, so contents know
   // to render into it before any item opens.
-  function bindViewport(el: HTMLElement) {
+  function bindViewport(el: HTMLElement, part: Part) {
     resetPopoverStyles(el.ownerDocument, popupSelectors)
     // Custom elements key a part without a value by a generated id, so it's found by element.
     const props = () => elements(context, "viewport")[0]?.props ?? context.props("viewport") ?? {}
-    const { anchor, position } = placement(el, props, null)
     const viewport = surfaces.get(null)!
-    viewportPopup = { el, config: { anchor, position, initialFocus: () => undefined } }
+    viewportPopup = { el, config: { ...placement(el, props, null, part), initialFocus: () => undefined } }
     // Last: contents may move in and bind right away, and show the viewport.
     store.set({ viewport: true })
     // Listened to on the element itself, not through the framework: React
@@ -414,7 +415,7 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
 
   // A content binds one of three ways: inside the viewport, kept in place
   // while closed next to a viewport, or as its own popup without one.
-  function bindContent(el: HTMLElement, key: string, props: { hiddenUntilFound?: boolean }) {
+  function bindContent(el: HTMLElement, key: string, props: { hiddenUntilFound?: boolean }, part: Part) {
     ensureSurface(key)
     const cleanups: (() => void)[] = []
     const viewport = element("viewport")
@@ -427,8 +428,8 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       queueMicrotask(() => {
         if (cancelled || store.get().viewport) return
         resetPopoverStyles(el.ownerDocument, popupSelectors)
-        const { anchor, position } = placement(el, () => context.props("content", key) ?? {}, key)
-        unbind = surfaces.get(key)!.bind(el, { anchor, position, initialFocus: () => undefined })
+        const placed = placement(el, () => context.props("content", key) ?? {}, key, part)
+        unbind = surfaces.get(key)!.bind(el, { ...placed, initialFocus: () => undefined })
       })
       cleanups.push(() => {
         cancelled = true

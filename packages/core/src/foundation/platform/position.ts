@@ -467,10 +467,20 @@ function position(
     watchedRoots = []
     stopped = true
   }
+  // Asks for a check when the options changed, like a new side rendered while
+  // open, without reading layout when they didn't.
+  let asked = optionsKey(read())
+  function follow() {
+    const next = optionsKey(read())
+    if (next === asked) return
+    asked = next
+    wake()
+  }
   // Places the popup again now, as its first placement, without animating:
   // for a popup whose size only just became known, like a navigation menu's
   // viewport once its content renders.
   return Object.assign(stop, {
+    follow,
     place() {
       placed = false
       last = ""
@@ -480,6 +490,16 @@ function position(
     },
   })
 }
+
+const optionsKey = (options: PositionOptions) =>
+  [
+    options.side,
+    options.align,
+    options.sideOffset,
+    options.alignOffset,
+    options.collisionPadding,
+    options.arrowPadding,
+  ].join()
 
 // The popup's border box before offsets round it to whole pixels, so a
 // scale read from it is exact. The offsets when styles don't give it, like a

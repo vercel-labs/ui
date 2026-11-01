@@ -59,9 +59,10 @@ function clearSlideOrder(slides: readonly Slide[]) {
  * page, every slide snaps by `align`, written on the server, so this is skipped.
  */
 function writeSnapAreas(slides: readonly Slide[], pages: readonly CarouselPage[], vertical: boolean) {
-  const marginProperty = vertical ? "scroll-margin-block-start" : "scroll-margin-inline-start"
+  const [marginProperty, crossProperty] = vertical ? snapMargins : [snapMargins[1], snapMargins[0]]
   const leaders = new Map(pages.map((page) => [page.leader, page.margin]))
   slides.forEach(({ el }, index) => {
+    el.style.removeProperty(crossProperty)
     const margin = leaders.get(index)
     if (margin === undefined) {
       el.style.setProperty("scroll-snap-align", "none")
@@ -71,6 +72,17 @@ function writeSnapAreas(slides: readonly Slide[], pages: readonly CarouselPage[]
     el.style.setProperty("scroll-snap-align", "start")
     el.style.setProperty(marginProperty, `${Math.round(margin * 100) / 100}px`)
   })
+}
+
+const snapMargins = ["scroll-margin-block-start", "scroll-margin-inline-start"] as const
+
+// Back to one slide a page, each slide snaps by `align` again. The style
+// attribute already says so, and a renderer doesn't write it twice.
+function clearSnapAreas(slides: readonly Slide[], align: string) {
+  for (const { el } of slides) {
+    el.style.setProperty("scroll-snap-align", align)
+    for (const property of snapMargins) el.style.removeProperty(property)
+  }
 }
 
 // The "1 of 5" labels the carousel wrote, so binding again knows them from an author's.
@@ -106,4 +118,4 @@ function labelSlide(
   return store.subscribe(label)
 }
 
-export { clearSlideOrder, labelSlide, readCarouselLayout, writeSlideOrder, writeSnapAreas }
+export { clearSlideOrder, clearSnapAreas, labelSlide, readCarouselLayout, writeSlideOrder, writeSnapAreas }

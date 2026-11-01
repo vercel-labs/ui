@@ -4,6 +4,7 @@
 // objects: keys are their strings, from `itemToValue`.
 import { type Listbox } from "./listbox"
 import { pageLocale } from "../text/locale"
+import { deriveFromOptions } from "../kernel/derive"
 import { type Store, sameValue } from "../kernel/store"
 
 const listFormats = new Map<string | undefined, Intl.ListFormat>()
@@ -40,7 +41,7 @@ const holds = (memo: { value: unknown; values: readonly unknown[] }, value: unkn
   Array.isArray(value) ? sameValue(memo.values, value) : memo.value === value
 
 function createValueSelection(config: {
-  store: Store<{ value: unknown; multiple: boolean; labels: number }>
+  store: Store<{ value: unknown; initial: unknown; multiple: boolean; labels: number }>
   options: () => {
     itemToValue?: (value: unknown) => string
     itemToLabel?: (value: unknown) => string
@@ -71,6 +72,15 @@ function createValueSelection(config: {
   let labelsQueued = false
   let learned = false
   let lastLabels: string[] = []
+
+  // A list that starts or stops holding several values keeps what was chosen,
+  // in its new shape, unless the value is controlled.
+  deriveFromOptions({ store }, ["value", "initial"], (synced, state, next: { value?: unknown }) => {
+    if (synced.multiple === undefined || synced.multiple === state.multiple) return
+    const shaped = (value: unknown) =>
+      synced.multiple ? listOf(value) : Array.isArray(value) ? (value[0] ?? null) : value
+    return { initial: shaped(state.initial), ...(next.value === undefined && { value: shaped(state.value) }) }
+  })
 
   function memoFor(value: unknown) {
     const given = options()

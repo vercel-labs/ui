@@ -701,6 +701,17 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     if (!settling) placed = null
   })
 
+  // Turned on after typing, `autoHighlight` highlights the best match once
+  // the options are handed over.
+  let autoMode = options().autoHighlight
+  context.onOptions((next) => {
+    if (next.autoHighlight === autoMode) return
+    autoMode = next.autoHighlight
+    queueMicrotask(() => {
+      if (store.get().open) settleHighlight(false)
+    })
+  })
+
   let listed = { items: store.get().items, mounts: store.get().mounts }
   store.subscribe(() => {
     const { items, mounts } = store.get()

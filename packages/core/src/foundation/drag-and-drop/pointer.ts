@@ -175,6 +175,65 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
   return stop
 }
 
+// A mouse is always primary, and a synthetic event without a type says nothing.
+const isSecondary = (event: PointerEvent) =>
+  !event.isPrimary && event.pointerType !== "mouse" && event.pointerType !== ""
+
+// One drag at a time for a component. A press starts one only with the main
+// button, and not from a second finger or pen, while no other runs. A drag cut
+// short, like by the component going away, ends as canceled, so its draft goes back.
+function createDragSession(onDestroy?: (cleanup: () => void) => void) {
+  let running: { down: PointerEvent; cancel: () => void } | undefined
+  onDestroy?.(() => running?.cancel())
+  return {
+    /**
+     * Whether a press can start a drag now. Check it first, before the
+     * component's own guards: ending a stale drag can change what they read.
+     */
+    accepts(event: PointerEvent) {
+      if (event.button !== 0 || isSecondary(event) || event.defaultPrevented) return false
+      // A new primary press of the same kind means the running drag missed its release. The
+      // press that started it, bubbling to a part around, like a handle's to its box, doesn't.
+      if (running && running.down !== event && running.down.pointerType === event.pointerType)
+        running.cancel()
+      return !running
+    },
+    /** Follows the press, like `bindDrag`, as this component's one drag. */
+    start(el: HTMLElement, down: PointerEvent, options: BindDragOptions) {
+      const finish = () => {
+        if (running === drag) running = undefined
+      }
+      const onStart = options.onStart
+      const stop = bindDrag(el, down, {
+        ...options,
+        // A drag that can't start leaves the way clear for the next press.
+        onStart:
+          onStart &&
+          ((event) => {
+            const started = onStart(event)
+            if (started === false) finish()
+            return started
+          }),
+        onEnd(event, canceled) {
+          finish()
+          options.onEnd(event, canceled)
+        },
+      })
+      const drag = {
+        down,
+        cancel() {
+          finish()
+          stop()
+          options.onEnd(down, true)
+        },
+      }
+      running = drag
+    },
+    /** Ends the running drag, if any, as canceled. */
+    cancel: () => running?.cancel(),
+  }
+}
+
 /**
  * How far a press moves, in CSS pixels, before it counts as a drag rather than a click.
  * @stable
@@ -243,6 +302,7 @@ function repeatWhileHeld(step: () => boolean, { delay = 400, interval = 60 } = {
 
 export {
   bindDrag,
+  createDragSession,
   dragThreshold,
   isDrag,
   type PointerSample,

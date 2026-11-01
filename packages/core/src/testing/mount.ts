@@ -4,7 +4,7 @@
 // announced.
 import { click, drag, hover, keys, settle, type } from "./input"
 import { parseMarkup, type MarkupNode } from "./markup"
-import { slotProps, tagOf } from "./schema"
+import { camel, fromOf, slotProps, tagOf } from "./schema"
 import { setAnnouncer } from "../foundation/platform/announce"
 import { applyAttrs } from "../foundation/kernel/live"
 import { attrs, bind, present, subscribe } from "../foundation/kernel/part"
@@ -13,6 +13,15 @@ import type { OptionsOf, Part, Primitive, SlotName } from "../foundation/kernel/
 import { listen, type ObservedChange } from "../page/observe/registry"
 
 let mounted = 0
+
+// What tests reach on a mount besides its public face: render it again with
+// new options or new slot props, as a framework does after the first render.
+// An empty key names a slot's first part.
+type Rerender = {
+  setOptions: (patch: Record<string, unknown>) => void
+  setProps: (slot: string, key: string, patch: Record<string, unknown>) => void
+}
+const rerenders = new WeakMap<object, Rerender>()
 
 // What each mount hears announced. `announce` names no instance, so every
 // mount hears what's announced while it's mounted, and the last one to
@@ -49,6 +58,9 @@ function layOut(el: HTMLElement) {
     const y = row ? 0 : index * height
     return { x, y, left: x, top: y, width, height, right: x + width, bottom: y + height, toJSON: () => ({}) }
   }
+  // Rendered while in the page, so what follows an element, like a popup its
+  // trigger, finds it there after the first look.
+  el.getClientRects = () => (el.isConnected ? [el.getBoundingClientRect()] : []) as unknown as DOMRectList
 }
 
 // What a DOM made for tests leaves out that primitives call: animations, which
@@ -117,8 +129,19 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
     listen((change) => change.id === id && changes.push(change), true),
     listen((change) => change.id === id && settled.push(change)),
   ]
-  const instance = primitive({ ...options, id } as never)
-  const parts: { slot: string; key: string; el: HTMLElement }[] = []
+  let current: Record<string, unknown> = { ...options, id }
+  const instance = primitive(current as never)
+  const parts: {
+    slot: string
+    key: string
+    el: HTMLElement
+    props: Record<string, unknown>
+    inherited: { key: string; slot: string; prop: string }[]
+    sync: () => void
+    rerender: (props: Record<string, unknown>) => void
+    shows: () => boolean
+  }[] = []
+  const syncs: (() => void)[] = []
   const container = doc.createElement("div")
   doc.body.append(container)
 
@@ -141,7 +164,7 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
       around,
       () => `${id}-${slot}-${parts.length}`,
     )
-    const part = instance.part(slot as SlotName<P>, props as never) as Part
+    let part = instance.part(slot as SlotName<P>, props as never) as Part
     const el = doc.createElement(as ?? tagOf(attrs(part)))
     for (const [name, value] of extra) el.setAttribute(name, value)
     layOut(el)
@@ -154,24 +177,52 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
     const sync = () => {
       applyAttrs(el, attrs(part))
       const shows = present(part)
-      if (shows && !el.isConnected) placeholder.replaceWith(el)
-      else if (!shows && el.isConnected) el.replaceWith(placeholder)
+      const swaps = shows ? placeholder.parentNode : el.parentNode
+      if (shows && swaps) placeholder.replaceWith(el)
+      else if (!shows && swaps) el.replaceWith(placeholder)
       if (!ready) return
-      if (shows && !unbind) {
+      // Nor is a part rendered inside one that isn't.
+      const rendered =
+        shows && !parts.some((outer) => outer.el !== el && !outer.shows() && outer.el.contains(el))
+      if (rendered && !unbind) {
         // Binding can change state, which calls this again before it returns.
         let cleanup: (() => void) | undefined
         unbind = () => cleanup?.()
         cleanup = bind(part, el)
-      } else if (!shows && unbind) {
+      } else if (!rendered && unbind) {
         unbind()
         unbind = undefined
       }
+      if (swaps) for (const inner of parts) if (inner.el !== el && el.contains(inner.el)) inner.sync()
     }
     sync()
-    parts.push({ slot, key: part.key, el })
+    syncs.push(sync)
+    const inherited = Object.keys(own).flatMap((key) => {
+      const from = fromOf(own[key], key)
+      return from && !node.attributes.some(([name]) => camel(name) === key) ? [{ key, ...from }] : []
+    })
+    let unsubscribe: (() => void) | undefined
+    // Props with a new key, like a new `id`, make another part, which a
+    // renderer binds the element to in place of the first.
+    const rerender = (next: Record<string, unknown>) => {
+      const found = instance.part(slot as SlotName<P>, next as never) as Part
+      if (found === part) return
+      unbind?.()
+      unbind = undefined
+      unsubscribe?.()
+      part = found
+      entry.key = part.key
+      if (ready) unsubscribe = subscribe(part, sync)
+    }
+    const entry = { slot, key: part.key, el, props, inherited, sync, rerender, shows: () => present(part) }
+    parts.push(entry)
     binds.push(() => {
       ready = true
-      cleanups.push(subscribe(part, sync), () => unbind?.())
+      unsubscribe = subscribe(part, sync)
+      cleanups.push(
+        () => unsubscribe?.(),
+        () => unbind?.(),
+      )
       sync()
     })
     for (const child of node.children) render(child, el, { ...around, [slot]: props })
@@ -183,7 +234,7 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
   binds.forEach((bindPart) => bindPart())
   const root = (container.firstElementChild as HTMLElement | null) ?? container
 
-  return {
+  const view = {
     /** The first element of the markup, usually the root part. */
     root,
     /** The element of a part, by slot and, for a slot with several parts, its key, like an item's value. */
@@ -221,6 +272,30 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
       stopAnnouncing()
     },
   }
+  rerenders.set(view, {
+    setOptions(patch) {
+      current = { ...current, ...patch, id }
+      instance.setOptions(current as never)
+      syncs.forEach((sync) => sync())
+    },
+    setProps(slot, key, patch) {
+      const entry = parts.find((found) => found.slot === slot && (key === "" || found.key === key))
+      if (!entry) throw new Error(`No ${slot} part keyed "${key}" in the markup.`)
+      entry.props = { ...entry.props, ...patch }
+      entry.rerender(entry.props)
+      for (const inner of parts) {
+        const taken = inner.inherited.filter((from) => from.slot === slot && from.prop in patch)
+        if (inner === entry || !taken.length || !entry.el.contains(inner.el)) continue
+        for (const from of taken) inner.props = { ...inner.props, [from.key]: patch[from.prop] }
+        inner.rerender(inner.props)
+      }
+      syncs.forEach((sync) => sync())
+    },
+  })
+  return view
 }
 
-export { mount }
+/** Renders a mount again with new options or slot props, as a framework does after its first render. For this repo's tests. */
+const rerenderOf = (mounted: object) => rerenders.get(mounted)!
+
+export { mount, rerenderOf }
