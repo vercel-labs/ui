@@ -222,3 +222,23 @@ test("a render that keeps a panel's size props measures nothing", async () => {
   expect(measured).not.toHaveBeenCalled()
   expect(instance.api.getLayout()).toEqual([40, 60])
 })
+
+test("disabling a group as its drag ends on new bounds commits and saves once", async () => {
+  const saved = new Map<string, string>()
+  const storage = {
+    getItem: (key: string) => saved.get(key) ?? null,
+    setItem: vi.fn((key: string, value: string) => void saved.set(key, value)),
+  }
+  const onLayoutCommit = vi.fn()
+  const options = { id: "g", autoSaveId: "editor", storage, onLayoutCommit }
+  const instance = mountDragging(options)
+  await Promise.resolve()
+  instance.api.internal.startDrag(0, "h")
+  instance.api.internal.dragBy(5)
+  instance.part("panel", { id: "a", defaultSize: 20, minSize: 40 })
+  await Promise.resolve()
+  instance.setOptions({ ...options, disabled: true })
+  expect(instance.api.getLayout()).toEqual([40, 60])
+  expect(onLayoutCommit).toHaveBeenCalledTimes(1)
+  expect(storage.setItem).toHaveBeenCalledTimes(1)
+})

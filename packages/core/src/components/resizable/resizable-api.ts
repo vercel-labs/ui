@@ -429,10 +429,11 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
       endDrag(event?: PointerEvent) {
         const ended = drag
         if (!ended) return
-        // Bounds or space that changed since the last move fit as part of the drag.
-        request(fitLayout(current(), store.get().constraints), "drag", event)
         drag = undefined
         store.set({ dragging: null })
+        // Bounds or space that changed since the last move fit as part of the
+        // drag, once it's over, so this write can't end it a second time.
+        request(fitLayout(current(), store.get().constraints), "drag", event)
         complete(ended.base, "drag", event)
       },
       keydown(event: KeyboardEvent, key: string, el: HTMLElement) {
