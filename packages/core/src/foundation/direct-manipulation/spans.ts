@@ -343,7 +343,7 @@ function createSpans<State extends object, S extends Span = Span>(
       onEnd: (endEvent, canceled) => {
         const dragged = dragging
         end()
-        if (!dragged) return click?.()
+        if (!dragged) return canceled ? undefined : click?.()
         const current = draft()
         if (canceled && action !== "draw") {
           const span = before.find((other) => other.id === id)

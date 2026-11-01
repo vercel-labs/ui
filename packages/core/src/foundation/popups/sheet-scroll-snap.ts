@@ -311,17 +311,20 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       const point = options.config().snapPoints.find((entry) => entry.id === targetId)
       if (point) animateTo(point.extent, point.extent - 20, performance.now(), () => settle(point.id))
     },
-    relayout() {
+    relayout(_immediate, fallback) {
       if (closing || touching) return
       const points = options.config().snapPoints
       const kept = points.findIndex((point) => point.id === targetId)
+      const wanted = points.findIndex((point) => point.id === fallback)
       const index =
         kept >= 0
           ? kept
-          : nearestIndex(
-              points.map((point) => point.extent),
-              scrollExtent(),
-            )
+          : wanted >= 0
+            ? wanted
+            : nearestIndex(
+                points.map((point) => point.extent),
+                scrollExtent(),
+              )
       layout()
       // Safari and Firefox don't always re-snap after the markers move, so the position is set.
       const point = points[index]

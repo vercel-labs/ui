@@ -45,6 +45,11 @@ class Sized {
 }
 globalThis.ResizeObserver ??= Sized as never
 globalThis.IntersectionObserver ??= Unobserved as never
+// jsdom lays nothing out, so an anchor would never render and a placed popup
+// would never move again. Every element in the page renders, at no size.
+Element.prototype.getClientRects = function () {
+  return (this.isConnected ? [this.getBoundingClientRect()] : []) as never
+}
 // Nor Element.animate, which a drawer's motion runs on. Each one ends a frame later.
 Element.prototype.animate ??= function () {
   let running = true
@@ -228,6 +233,16 @@ function kebab(name: string) {
   return name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 }
 
+// The page a case renders: its container, then what it portaled to the body,
+// like a popup, in an order moves don't change. Announcers are shared.
+function pageOf(container: HTMLElement, history?: readonly string[], ids?: RegExp) {
+  const portaled = [...container.ownerDocument.body.children].filter(
+    (el) => el !== container && !el.hasAttribute("data-ui-sdk-announcer"),
+  )
+  const markup = (el: Node) => markupOf(el, history, ids)
+  return [markup(container), ...portaled.map(markup).sort()].join("\n")
+}
+
 // A rendered tree as comparable markup. History attributes, and the tab stop
 // with "stop", are left out: one that stays where it was is as right as one a
 // first render puts first. Each renderer's own ids are made alike.
@@ -344,6 +359,7 @@ export {
   type Change,
   idle,
   markupOf,
+  pageOf,
   partsOf,
   relayedKeys,
   tabStopProblem,

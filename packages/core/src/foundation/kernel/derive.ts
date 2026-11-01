@@ -83,9 +83,11 @@ function withDerived<State extends object>(
   state: State,
 ) {
   const list = derivations.get(store)
-  if (!synced || !list) return synced
-  let result = synced as Record<string, unknown>
+  if (!list) return synced
+  let result = (synced ?? {}) as Record<string, unknown>
   for (const derivation of list) {
+    // With nothing synced, state is as it was, so only what options derive can change.
+    if (!synced && derivation.from === "state") continue
     const next = { ...state, ...result } as State
     const derived = (
       derivation.from === "state"
@@ -97,7 +99,7 @@ function withDerived<State extends object>(
       if (derived && key in derived) result[key] = derived[key]
       else if (derivation.from === "state") result[key] = next[key as keyof State]
   }
-  return result as Partial<State>
+  return (synced || Object.keys(result).length ? result : undefined) as Partial<State> | undefined
 }
 
 export { deriveFromOptions, deriveState, withDerived }

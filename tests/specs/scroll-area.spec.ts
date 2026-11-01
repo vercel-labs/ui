@@ -237,3 +237,18 @@ test.describe("keyboard", () => {
     await expect.poll(async () => (await scrollOf(viewport(page, gallery.label))).top).toBeGreaterThan(0)
   })
 })
+
+test.describe("web components", () => {
+  test.beforeEach(({ framework }) => test.skip(!framework.startsWith("web"), "Web components only."))
+
+  test("a scrollbar whose orientation changes sizes its thumb along the new axis", async ({ page }) => {
+    const bar = scrollbar(page, tags.label)
+    await expect(bar).toHaveAttribute("style", /--scroll-area-thumb-height/)
+    await bar.evaluate((el) =>
+      el.closest("ui-scroll-area-scrollbar")!.setAttribute("orientation", "horizontal"),
+    )
+    const turned = scrollbar(page, tags.label, "horizontal")
+    await expect(turned).toHaveAttribute("style", /--scroll-area-thumb-width/)
+    await expect(turned).not.toHaveAttribute("style", /--scroll-area-thumb-height/)
+  })
+})

@@ -66,7 +66,7 @@ function createLasso<State extends object>(
   return {
     /** Starts a rectangle on `surface` once the pointer moves past `dragThreshold`. Escape lets go without selecting. */
     pointerdown(event: PointerEvent, surface: HTMLElement) {
-      if (event.button !== 0) return
+      if (event.button !== 0 || !event.isPrimary) return
       const box = surface.getBoundingClientRect()
       const x0 = event.clientX - box.left
       const y0 = event.clientY - box.top
