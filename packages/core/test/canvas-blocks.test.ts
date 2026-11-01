@@ -589,6 +589,30 @@ describe("createLasso", () => {
     expect(instance.get().selected).toEqual(["b"])
   })
 
+  test("a second finger pressing the surface mid-rectangle leaves it to the first finger", async () => {
+    const { instance, surface } = mount()
+    const { lasso, set } = instance.api
+    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+      new PointerEvent(type, {
+        clientX,
+        clientY,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+      })
+    lasso.pointerdown(touch("pointerdown", 105, 105, 1), surface)
+    document.dispatchEvent(touch("pointermove", 300, 215, 1))
+    await frame()
+    lasso.pointerdown(touch("pointerdown", 450, 350, 2), surface)
+    document.dispatchEvent(touch("pointerup", 450, 350, 2))
+    expect(set).not.toHaveBeenCalled()
+    document.dispatchEvent(touch("pointerup", 300, 215, 1))
+    expect(set).toHaveBeenCalledTimes(1)
+    expect(instance.get().selected).toEqual(["a", "d"])
+  })
+
   test("a press that doesn't move past the threshold selects nothing", () => {
     const { instance, surface } = mount({ selected: ["a"] })
     instance.api.lasso.pointerdown(pointer("pointerdown", 300, 300), surface)
