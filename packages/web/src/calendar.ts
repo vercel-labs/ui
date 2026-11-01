@@ -141,9 +141,8 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
       if (!el.firstElementChild) el.append(element("ui-calendar-weekdays"), element("ui-calendar-weeks"))
     },
     changed(el) {
-      for (const child of el.children)
-        if (child.localName === "ui-calendar-weekdays" || child.localName === "ui-calendar-weeks")
-          scheduleRefresh(child as HTMLElement)
+      for (const part of el.querySelectorAll<HTMLElement>("ui-calendar-weekdays, ui-calendar-weeks"))
+        scheduleRefresh(part)
     },
   })
   // The weekdays are a row group, like a <thead>, around the header row
