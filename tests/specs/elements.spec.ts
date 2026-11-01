@@ -92,3 +92,48 @@ test("ARIA set on an OTP input or a slider thumb later reaches the input that ta
     .evaluate((el) => el.setAttribute("aria-label", "Lowest"))
   await expect(page.getByRole("slider", { name: "Lowest" })).toBeVisible()
 })
+
+// Svelte and custom elements can bind an arrow after its popup was placed. The
+// arrows here are absolute from the start, so the popup's size never changes.
+for (const name of ["popover", "combobox", "autocomplete"])
+  for (const animation of ["none", "running", "paused", "finished"])
+    test(`${name}: an arrow replaced by one the same size is placed, with animation: ${animation}`, async ({
+      page,
+      open,
+    }) => {
+      await open(name)
+      await page.locator(`ui-${name}-trigger button`).first().click()
+      const content = page.locator(`ui-${name}-content`).first()
+      await expect(content).toBeVisible()
+      const side = (id: string) => content.locator(`[id="${id}"]`).getAttribute("data-side")
+      const addArrow = (id: string) =>
+        content.evaluate(
+          (el, { name, id }) => {
+            const arrow = document.createElement(`ui-${name}-arrow`)
+            arrow.id = id
+            arrow.style.cssText = "position: absolute; display: block; width: 10px; height: 10px"
+            const old = el.querySelector(`ui-${name}-arrow`)
+            if (old) old.replaceWith(arrow)
+            else el.prepend(arrow)
+          },
+          { name, id },
+        )
+      await addArrow("first")
+      await expect.poll(() => side("first")).not.toBeNull()
+      await content.evaluate(async (el, animation) => {
+        if (animation === "none") return
+        const running = el.animate([{ opacity: 0.9 }, { opacity: 1 }], {
+          duration: animation === "finished" ? 1 : 60_000,
+          fill: "forwards",
+        })
+        running.id = "probe"
+        if (animation === "paused") running.pause()
+        if (animation === "finished") await running.finished
+      }, animation)
+      await addArrow("second")
+      await expect.poll(() => side("second")).not.toBeNull()
+      const playState = await content.evaluate(
+        (el) => el.getAnimations().find((running) => running.id === "probe")?.playState ?? "none",
+      )
+      expect(playState).toBe(animation)
+    })
