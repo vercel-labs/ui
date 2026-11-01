@@ -325,7 +325,7 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
 
   attaching = false
   const observer = new ResizeObserver(() => {
-    if (measure()) driver.relayout(false)
+    relayout(false)
   })
   observer.observe(el)
   observer.observe(host)
@@ -356,7 +356,7 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   // view or the page scrolling under the open keyboard, keeps the same height,
   // and the sheet tracks it frame by frame under any slide still running.
   function followKeyboard() {
-    if (measure()) driver.relayout(true)
+    relayout(true)
     revealFocused()
     const height = view.visualViewport?.height
     if (height === viewportHeight) return
@@ -418,6 +418,12 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     if (delta) area.scrollBy({ top: delta, behavior: reducedMotion?.matches ? "instant" : "smooth" })
   }
 
+  // A snap point the owner moved to as the resting one left, like a drawer
+  // whose new snap points drop it, wins over the nearest.
+  function relayout(immediate: boolean) {
+    if (measure()) driver.relayout(immediate, resolved[findSnapIndex(resolved, options.snapPoint())]?.id)
+  }
+
   function idOf(point: SnapPoint | null) {
     const index = findSnapIndex(resolved, point)
     return resolved[index >= 0 ? index : 0]?.id
@@ -451,7 +457,7 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     target: () => valueOf(driver.target()),
     isInteractiveAt: (point) => isAtOrBelow(resolved, point, options.modalAbove()),
     refresh() {
-      if (measure()) driver.relayout(false)
+      relayout(false)
     },
     destroy() {
       destroyed = true

@@ -468,6 +468,42 @@ describe("calendar", () => {
     expect(day("2026-10-16").getAttribute("tabindex")).toBe("0")
   })
 
+  test("pressing another month's day before min keeps the month and focus where they were", async () => {
+    const { container, day, focused, instance } = mount({ min: "2026-10-01" })
+    await tick()
+    day("2026-10-16").focus()
+    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    await tick()
+    expect(instance.api.getMonth()).toBe("2026-10")
+    expect(focused()).toBe("2026-10-16")
+  })
+
+  test("pressing another month's day after max keeps the month", async () => {
+    const { container, instance } = mount({ defaultMonth: "2026-11", max: "2026-11-30" })
+    await tick()
+    container.querySelector<HTMLElement>('[data-value="2026-12-02"][data-outside]')!.click()
+    await tick()
+    expect(instance.api.getMonth()).toBe("2026-11")
+  })
+
+  test("pressing another month's day before a min in the middle of that month keeps the month", async () => {
+    const { container, instance } = mount({ min: "2026-09-29" })
+    await tick()
+    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    await tick()
+    expect(instance.api.getMonth()).toBe("2026-10")
+  })
+
+  test("pressing another month's unavailable day within min and max still shows its month, picking nothing", async () => {
+    const onValueChange = vi.fn()
+    const { container, instance } = mount({ unavailable: ["2026-09-28"], onValueChange })
+    await tick()
+    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    await tick()
+    expect(instance.api.getMonth()).toBe("2026-09")
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
   test("a press whose focus change is canceled asks once, as a press", async () => {
     const onFocusedChange = vi.fn((_date: string, details: { cancel: () => void }) => details.cancel())
     const { day, focused } = mount({ onFocusedChange })

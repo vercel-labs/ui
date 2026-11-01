@@ -357,7 +357,88 @@ test("a hand-made menubar passes", async () => {
   await checkPattern(root, "menubar")
 })
 
+test("a hand-made listbox passes when its styles hide an option, which arrows skip", async () => {
+  // Names that start alike, so typeahead has no single target and stays out of it.
+  const root = render(`
+    <div role="listbox" aria-label="Fruit">
+      <div role="option" aria-selected="true" tabindex="0">Apple</div>
+      <div role="option" aria-selected="false" tabindex="-1" style="display: none">Apricot</div>
+      <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+    </div>`)
+  rove(root, "[role=option]:not([style])", { onMove: selectOnly("[role=option]") })
+  await checkPattern(root, "listbox")
+})
+
+test("a hand-made listbox passes when a stylesheet hides the group around options, which arrows skip", async () => {
+  const root = render(`
+    <div>
+    <style>.closed { display: none }</style>
+    <div role="listbox" aria-label="Fruit">
+      <div role="option" aria-selected="true" tabindex="0">Apple</div>
+      <div class="closed"><div role="option" aria-selected="false" tabindex="-1">Apricot</div></div>
+      <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+    </div>
+    </div>`)
+  rove(root, "[role=listbox] > [role=option]", { onMove: selectOnly("[role=option]") })
+  await checkPattern(root, "listbox")
+})
+
+test("a hand-made toolbar passes when a stylesheet hides a control, which arrows skip", async () => {
+  const root = render(`
+    <div>
+    <style>.closed { display: none }</style>
+    <div role="toolbar" aria-label="Format">
+      <button tabindex="0">Bold</button>
+      <span class="closed"><button tabindex="-1">Italic</button></span>
+      <button tabindex="-1">Underline</button>
+    </div>
+    </div>`)
+  rove(root, "[role=toolbar] > button", { next: "ArrowRight", previous: "ArrowLeft" })
+  await checkPattern(root, "toolbar")
+})
+
+test("a native radio group passes when styles hide its first radio, which Tab skips", async () => {
+  const root = render(`
+    <div role="radiogroup" aria-label="Size">
+      <label style="display: none"><input type="radio" name="size" value="s">Small</label>
+      <label><input type="radio" name="size" value="m">Medium</label>
+    </div>`)
+  await expect(checkPattern(root, "radio-group")).resolves.toBeUndefined()
+})
+
+test("a hand-made listbox passes when the slot it renders an option in is hidden", async () => {
+  const root = render(`<div role="listbox" aria-label="Fruit">
+    <div role="option" aria-selected="true" tabindex="0">Apple</div>
+    <div role="option" aria-selected="false" tabindex="-1" slot="closed">Apricot</div>
+    <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+  </div>`)
+  root.attachShadow({ mode: "open" }).innerHTML =
+    `<slot></slot><slot name="closed" style="display: none"></slot>`
+  rove(root, "[role=option]:not([slot])", { onMove: selectOnly("[role=option]") })
+  await checkPattern(root, "listbox")
+})
+
 describe("broken markup fails", () => {
+  test("a listbox whose arrows don't move past an option its styles hide", async () => {
+    const root = render(`
+      <div role="listbox" aria-label="Fruit">
+        <div role="option" aria-selected="true" tabindex="0">Apple</div>
+        <div role="option" aria-selected="false" tabindex="-1" style="display: none">Apricot</div>
+        <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
+      </div>`)
+    await expect(checkPattern(root, "listbox")).rejects.toThrow(/ArrowDown/)
+  })
+
+  test("a tree branch whose group its styles hide, without aria-expanded", async () => {
+    const root = render(`
+      <div role="tree" aria-label="Files">
+        <div role="treeitem" tabindex="0">src
+          <div role="group" style="display: none"><div role="treeitem" tabindex="-1">index.ts</div></div>
+        </div>
+      </div>`)
+    await expect(checkPattern(root, "tree")).rejects.toThrow(/has child items but no aria-expanded/)
+  })
+
   test("a dialog that keeps Tab inside without aria-modal", async () => {
     const root = render(`<div>
       <button id="opener" aria-haspopup="dialog" aria-expanded="true" aria-controls="box">Open</button>

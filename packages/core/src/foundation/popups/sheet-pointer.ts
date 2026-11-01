@@ -399,18 +399,21 @@ function createPointerDriver(options: SheetDriverOptions) {
     nudge() {
       if (!closing && !options.reducedMotion()) dispatch({ type: "nudge", time: performance.now() })
     },
-    relayout(immediate) {
+    relayout(immediate, fallback) {
       const points = options.config().snapPoints
       if (closing || targetId === null || state.phase === "dragging" || state.phase === "pending")
         return writeTranslate(shown)
       const kept = points.findIndex((point) => point.id === targetId)
+      const wanted = points.findIndex((point) => point.id === fallback)
       const index =
         kept >= 0
           ? kept
-          : nearestIndex(
-              points.map((point) => point.extent),
-              shown,
-            )
+          : wanted >= 0
+            ? wanted
+            : nearestIndex(
+                points.map((point) => point.extent),
+                shown,
+              )
       const { id, extent } = points[index]
       if (state.phase === "idle") {
         state = initialState(shown, kept)
