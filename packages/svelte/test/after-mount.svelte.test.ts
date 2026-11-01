@@ -1,6 +1,6 @@
 // Every option and slot prop follows a change after the first render, in
 // Svelte's own components, as in packages/core/test/after-mount.test.ts.
-import { flushSync, mount, tick, unmount, type Component } from "svelte"
+import { flushSync, mount, tick, unmount } from "svelte"
 import { afterEach, describe, expect, test } from "vitest"
 import {
   baseOptions,
@@ -15,11 +15,10 @@ import {
 } from "../../core/test/after-mount"
 import { cases, type Case } from "../../core/test/after-mount.cases"
 import * as exported from "../src"
-import Tree from "./apps/after-mount-tree.svelte"
+import Tree, { isPart, type Part } from "./apps/after-mount-tree.svelte"
 
-const components = new Map<string, Component<any>>()
-for (const [name, value] of Object.entries(exported))
-  if (typeof value === "function" && /^[A-Z]/.test(name)) components.set(name, value as never)
+const components = new Map<string, Part>()
+for (const [name, value] of Object.entries(exported)) if (isPart(name, value)) components.set(name, value)
 
 const svelteIds = /mount-\d+|\bc\d+\b/g
 
