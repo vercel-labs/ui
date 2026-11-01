@@ -1,5 +1,6 @@
 import { css } from "../../foundation/kernel/inline-style"
 import { createController } from "../../foundation/kernel/controller"
+import { deriveFromOptions } from "../../foundation/kernel/derive"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import { onProps } from "../../foundation/kernel/part"
 import type { Named, Part, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
@@ -252,6 +253,11 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
     const view = createScrollView(store)
     // stickToEnd turned on later sticks at once, as it does from the start, and
     // turned off stops.
+    deriveFromOptions(context, ["sticking"], (synced, state) =>
+      synced.stickToEnd === undefined || synced.stickToEnd === state.stickToEnd
+        ? undefined
+        : { sticking: synced.stickToEnd },
+    )
     let { stickToEnd, type, scrollHideDelay } = store.get()
     onDestroy(
       store.subscribe(() => {
@@ -262,7 +268,6 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
           state.scrollHideDelay === scrollHideDelay
         )
           return
-        if (state.stickToEnd !== stickToEnd) store.set({ sticking: state.stickToEnd })
         ;({ stickToEnd, type, scrollHideDelay } = state)
         view.refresh()
       }),

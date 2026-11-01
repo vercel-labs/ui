@@ -159,7 +159,7 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     const kept = (entry: SnapPoint) => points.some((other) => sameValue(other, entry))
     if (kept(point)) return
     const fallback = defaultSnap(arriving)
-    return { snapPoint: kept(fallback) ? fallback : points[0] }
+    return { snapPoint: kept(fallback) || !points.length ? fallback : points[0] }
   })
   // The modal setting in effect: none while the page behind is usable.
   deriveState(context, ["modal"], ({ interactive, modalSetting }) => ({
@@ -292,11 +292,15 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     const moved = nextPoints !== points
     shape = nextShape
     points = nextPoints
-    if (!sheet || !attached) return
-    if (reshaped) {
-      attach(...attached)
-      if (store.get().open) sheet?.open(false)
-    } else if (moved) sheet.refresh()
+    if (!reshaped && !moved) return
+    // Once the options are handed over, so the sheet's state isn't written beside them.
+    queueMicrotask(() => {
+      if (!sheet || !attached) return
+      if (reshaped) {
+        attach(...attached)
+        if (store.get().open) sheet?.open(false)
+      } else sheet.refresh()
+    })
   })
 
   // The handle: a press goes to the next larger snap point, wrapping, like iOS's grabber.

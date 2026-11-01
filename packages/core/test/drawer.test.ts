@@ -137,3 +137,10 @@ test("an open drawer whose snap point and default both leave its snap points mov
   instance.setOptions({ ...options, snapPoints: [1] })
   expect(instance.api.getSnapPoint()).toBe(1)
 })
+
+test("an open drawer whose snap points become empty keeps a snap point", () => {
+  const options: DrawerOptions & { id: string } = { id: "d", defaultOpen: true, snapPoints: [0.5, 1] }
+  const instance = drawer(options)
+  instance.setOptions({ ...options, snapPoints: [] })
+  expect(instance.api.getSnapPoint()).not.toBeUndefined()
+})
