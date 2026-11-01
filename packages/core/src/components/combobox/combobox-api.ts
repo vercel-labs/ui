@@ -101,9 +101,13 @@ type ComboboxState = PopupState & {
 // dismiss it, and focus moving among them doesn't close it.
 const controlSlots = ["input", "chips", "trigger", "clear", "label"]
 
-// The text a single combobox starts with: its value's label, which shows on
-// the server too, from `itemToLabel` or the data.
-function initialQuery(options: ComboboxOptions<any, any>, value: unknown) {
+// A single combobox's text for its value, on the server too: from `itemToLabel`,
+// the items data, the items rendered so far, then the value itself.
+function initialQuery(
+  options: ComboboxOptions<any, any>,
+  value: unknown,
+  rendered?: (key: string) => string | undefined,
+) {
   const first = listOf(value)[0]
   if (first === undefined || options.multiple) return ""
   const toKey = (item: unknown) => itemKey(item, options.itemToValue)
@@ -111,6 +115,7 @@ function initialQuery(options: ComboboxOptions<any, any>, value: unknown) {
   return (
     options.itemToLabel?.(first) ??
     (options.items && flattenData(options.items, toKey).find((entry) => entry.key === key)?.label) ??
+    rendered?.(key) ??
     (typeof first === "string" ? first : key)
   )
 }
@@ -198,13 +203,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   deriveFromOptions(context, ["query"], (synced, state, next) => {
     if (state.dirty || next.multiple || next.query !== undefined || committing) return
     if ("value" in synced && synced.value !== state.value) {
-      const first = listOf(synced.value)[0]
-      const label =
-        first === undefined
-          ? ""
-          : (next.itemToLabel?.(first) ??
-            listbox.labelOf(itemKey(first, next.itemToValue)) ??
-            initialQuery(next, first))
+      // Items that arrive with the value name it, not the ones they replace.
+      const label = initialQuery(next, synced.value, listbox.labelOf)
       if (label === state.query) return
       shownQuery = { from: state.query, to: label }
       return { query: label }
