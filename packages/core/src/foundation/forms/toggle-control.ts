@@ -165,14 +165,16 @@ function toggleControl<Checked extends CheckedState, Owner extends ToggleOwner =
     )
   }
 
+  function write(checked: CheckedState, details: { reason: CheckboxCheckedChangeReason; event?: Event }) {
+    const owner = group?.owner()
+    return group && owner ? group.write(owner, checked, details) : change("checked", checked, details)
+  }
+
   // Sets any state. Parts and forms use it; a switch's controller takes only booleans.
   function setState(checked: CheckedState, { reason = "imperative", event }: Details = {}) {
-    const details = { reason, event }
     const state = store.get()
-    // The browser restores a disabled or read-only control too, as a native one.
-    if (reason !== "restore" && (isDisabled(state) || state.readOnly)) return false
-    const owner = group?.owner()
-    const done = group && owner ? group.write(owner, checked, details) : change("checked", checked, details)
+    if (isDisabled(state) || state.readOnly) return false
+    const done = write(checked, { reason, event })
     if (done && reason !== "restore") dispatchChange(formElement())
     return done
   }
@@ -189,9 +191,10 @@ function toggleControl<Checked extends CheckedState, Owner extends ToggleOwner =
     focus: () => element("root")?.focus(),
     form: formOwner,
     internal: {
-      // The state a form restores after a reload, as `String(checked)` saved it.
+      // The state a form restores after a reload, as `String(checked)` saved
+      // it. The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
-        setState(saved === "indeterminate" ? "indeterminate" : saved === "true", { reason: "restore" })
+        write(saved === "indeterminate" ? "indeterminate" : saved === "true", { reason: "restore" })
       },
       reset() {
         // A group resets its checkboxes itself.

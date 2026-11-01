@@ -172,7 +172,7 @@ function createValueSelection(config: {
     empty: () => (store.get().multiple ? [] : null),
     // Sets the value a browser restored, from the keys it saved. Keys whose
     // items haven't arrived hold their place until they do, unless something
-    // sets the value first.
+    // sets the value first. Their items take it over with no change.
     restore(saved: string, set: (value: unknown) => void) {
       let keys: string[] = []
       try {
@@ -187,7 +187,7 @@ function createValueSelection(config: {
         const found = keys.map((key) => listbox.valueOf(key))
         if (found.some((value) => value === undefined)) return
         stop()
-        set(valueOf(found))
+        store.set({ value: valueOf(found) })
       })
     },
   }

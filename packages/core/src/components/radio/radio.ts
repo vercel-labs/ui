@@ -241,11 +241,8 @@ function radioGroupApi(context: PrimitiveContext<RadioGroupOptions, RadioGroupSt
     setValue(value: string | null, { reason = "imperative", event }: Details = {}) {
       const details = { reason, event }
       const state = store.get()
-      // The browser restores a disabled or read-only control too, as a native one.
-      if (reason !== "restore") {
-        if (isDisabled(state) || state.readOnly) return false
-        if (value !== null && (props("root", value) as ItemProps | undefined)?.disabled) return false
-      }
+      if (isDisabled(state) || state.readOnly) return false
+      if (value !== null && (props("root", value) as ItemProps | undefined)?.disabled) return false
       const done = change("value", value, details)
       if (done && reason !== "restore") dispatchChange(formElement())
       return done
@@ -259,6 +256,10 @@ function radioGroupApi(context: PrimitiveContext<RadioGroupOptions, RadioGroupSt
     internal: {
       reset() {
         change("value", store.get().initial, { reason: "reset" })
+      },
+      // The browser restores a disabled or read-only group too, as a native one.
+      restore(saved: string) {
+        change("value", saved || null, { reason: "restore" })
       },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
@@ -381,7 +382,7 @@ const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
         const unbind = bindInternals(el, {
           value: () => store.get().value,
           state: () => store.get().value ?? "",
-          restore: (saved) => api.setValue(saved || null, { reason: "restore" }),
+          restore: api.internal.restore,
           valueMissing: () => store.get().required && store.get().value === null,
           message: () => valueMissingMessage("radio"),
           anchor: api.internal.anchor,
