@@ -17,7 +17,7 @@ const candidates = [
 
 function isTabbable(el: Element): el is HTMLElement {
   if (!(el instanceof HTMLElement) || el.tabIndex < 0) return false
-  if ((el as HTMLButtonElement).disabled || el.closest("[inert]")) return false
+  if (el.matches(":disabled") || el.closest("[inert]")) return false
   // Only one radio button per group takes Tab: the checked one, or the first.
   if (el instanceof HTMLInputElement && el.type === "radio" && el.name && !el.checked) {
     const group = el.form?.elements.namedItem(el.name)
@@ -47,8 +47,7 @@ const focusables =
 
 const ownTabStops = new WeakSet<Element>()
 
-const takesFocus = (node: Element) =>
-  (node as HTMLElement).tabIndex >= 0 && !(node as HTMLButtonElement).disabled
+const takesFocus = (node: Element) => (node as HTMLElement).tabIndex >= 0 && !node.matches(":disabled")
 
 function holdsFocusableNode(node: Node) {
   if (!(node instanceof Element)) return false

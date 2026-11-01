@@ -974,6 +974,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     initialFocus,
     // Places the shown popup again now, without animating, like once its size is known.
     place: () => place?.(),
+    // The same, unless it animates, like when its arrow binds late: placing it
+    // anew would cut the animation short, and its placement follows anyway.
+    placeWhenStill: () => !shown?.el.getAnimations?.().length && place?.(),
     // Applies `modal` again while shown, after it changed, like a sheet
     // crossing the snap point above which it's modal. Focus doesn't move.
     updateModal: () => remodal?.(),

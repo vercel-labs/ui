@@ -1,4 +1,4 @@
-import { repeatWhileHeld, bindDrag } from "../../foundation/drag-and-drop/pointer"
+import { createDragSession, repeatWhileHeld } from "../../foundation/drag-and-drop/pointer"
 import { on } from "../../foundation/kernel/events"
 import {
   draggedPosition,
@@ -40,11 +40,16 @@ const lineHeight = 16
 
 function createScrollbarInput(host: ScrollbarHost) {
   const thumbs = new Map<Axis, HTMLElement>()
-  // How each thumb's drag or scrollbar's press that's still held ends, so a
-  // part leaving the page mid-gesture ends its own instead of listening on
-  // the document until the pointer lifts.
-  const held = new Map<HTMLElement, () => void>()
-  const endPress = (el: HTMLElement) => held.get(el)?.()
+  const drags = createDragSession()
+  // The part whose drag or press is held, so a part leaving the page
+  // mid-gesture ends its own instead of listening on the document until the pointer lifts.
+  let holder: HTMLElement | undefined
+  // Ended where it is: only Escape puts the content back.
+  const endPress = (el: HTMLElement) => {
+    if (holder !== el) return
+    holder = undefined
+    drags.cancel()
+  }
 
   // A scrollbar sits beside the viewport, not inside it, so a wheel over it
   // would scroll the page. It scrolls the viewport instead, as far as it would
@@ -71,7 +76,7 @@ function createScrollbarInput(host: ScrollbarHost) {
   function bindThumb(el: HTMLElement, axis: Axis) {
     thumbs.set(axis, el)
     const off = on(el, "pointerdown", (event) => {
-      if (event.button !== 0 || !host.viewport()) return
+      if (!host.viewport() || !drags.accepts(event)) return
       // The track's own press handler would page.
       event.stopPropagation()
       event.preventDefault()
@@ -94,34 +99,25 @@ function createScrollbarInput(host: ScrollbarHost) {
     const from = axis === "y" ? down.clientY : down.clientX
     // A scaled ancestor moves the pointer further on screen than in layout.
     const scale = scaleOf(el, axis)
-    const doc = el.ownerDocument
     const restoreSnap = suspendSnap(host.viewport()!)
     host.stopEasing()
     host.setDragging(axis)
-    const end = () => {
-      held.delete(el)
-      offEscape()
-      restoreSnap()
-      host.setDragging(null)
-    }
-    const stop = bindDrag(el, down, {
+    holder = el
+    drags.start(el, down, {
+      cancelOnEscape: true,
       onMove: (sample) => {
         const distance = ((axis === "y" ? sample.y : sample.x) - from) / scale
         const delta = axis === "x" && host.rtl() ? -distance : distance
         host.scrollTo(axis, draggedPosition(start, delta, host.metrics[axis], host.track[axis]))
       },
-      onEnd: end,
-    })
-    const offEscape = on(doc, "keydown", (event) => {
-      if (event.key !== "Escape") return
-      event.preventDefault()
-      stop()
-      host.scrollTo(axis, start)
-      end()
-    })
-    held.set(el, () => {
-      stop()
-      end()
+      // Only Escape puts the content back. It ends with the last move; a lost
+      // pointer or a new press ends with its own event.
+      onEnd: (end, canceled) => {
+        if (canceled && holder === el && end.type === "pointermove") host.scrollTo(axis, start)
+        holder = undefined
+        restoreSnap()
+        host.setDragging(null)
+      },
     })
   }
 
@@ -129,7 +125,7 @@ function createScrollbarInput(host: ScrollbarHost) {
   // held, until the thumb reaches the pointer. With Alt (Option on a Mac) it
   // jumps there and drags instead, like macOS.
   function pressTrack(event: PointerEvent, el: HTMLElement, axis: Axis) {
-    if (event.button !== 0 || !host.viewport()) return
+    if (!host.viewport() || !drags.accepts(event)) return
     event.preventDefault()
     if (axis === "x") host.readDirection()
     host.measure()
@@ -155,17 +151,13 @@ function createScrollbarInput(host: ScrollbarHost) {
       host.scrollTo(axis, target, "auto")
       return target > 0 && target < max
     })
-    const end = () => {
-      held.delete(el)
-      stopRepeat()
-    }
-    const stop = bindDrag(el, event, {
+    holder = el
+    drags.start(el, event, {
       onMove: (sample) => (point = trackPoint(el, axis, sample.event)),
-      onEnd: end,
-    })
-    held.set(el, () => {
-      stop()
-      end()
+      onEnd: () => {
+        holder = undefined
+        stopRepeat()
+      },
     })
   }
 

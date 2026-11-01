@@ -1,6 +1,11 @@
 // A number input's state and what it does: typing, keys, buttons, the wheel,
 // scrubs and commits. The parts and their attributes are in number-input.ts.
-import { isDrag, repeatWhileHeld, bindDrag, type PointerSample } from "../../foundation/drag-and-drop/pointer"
+import {
+  createDragSession,
+  isDrag,
+  repeatWhileHeld,
+  type PointerSample,
+} from "../../foundation/drag-and-drop/pointer"
 import { isBrowser, isIOS } from "../../foundation/platform/env"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
 import {
@@ -123,6 +128,7 @@ function isAndroid() {
 
 function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, string>) {
   const { store, element } = context
+  const drags = createDragSession(context.onDestroy)
   const change = createChange(context)
   const commitValue = createCommit(context)
   // The value when the current interaction began, so a commit only reports a
@@ -308,7 +314,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
       // Steps once now, then repeats while held. A tap with a finger steps on
       // release instead, so a scroll that starts on a button doesn't step.
       pressButton(event: PointerEvent, el: HTMLElement, direction: number) {
-        if (event.button !== 0 || !canStep(store.get(), direction)) return
+        if (!drags.accepts(event) || !canStep(store.get(), direction)) return
         // Keeps focus where it is, so a phone's keyboard stays as it was.
         event.preventDefault()
         if (event.pointerType === "mouse") input()?.focus({ preventScroll: true })
@@ -321,7 +327,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         })
         const blockMenu = (menu: Event) => menu.preventDefault()
         el.ownerDocument.addEventListener("contextmenu", blockMenu)
-        bindDrag(el, event, {
+        drags.start(el, event, {
           onMove: () => {},
           onEnd: (end, canceled) => {
             el.ownerDocument.removeEventListener("contextmenu", blockMenu)
@@ -372,7 +378,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         commit(event)
       },
       scrub(event: PointerEvent, el: HTMLElement, props: Omit<NumberInputScrubAreaProps, "controller">) {
-        if (event.button !== 0 || isLocked(store.get())) return
+        if (!drags.accepts(event) || isLocked(store.get())) return
         // No focus moves and no text is selected while dragging. Focus waits
         // for a press that turns out to be a click.
         event.preventDefault()
@@ -387,7 +393,7 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         const blockSelection = (select: Event) => select.preventDefault()
         doc.addEventListener("selectstart", blockSelection)
         store.set({ scrubbing: true })
-        bindDrag(el, event, {
+        drags.start(el, event, {
           lock: true,
           onMove: (sample: PointerSample) => {
             dragged ||= isDrag(sample.x - event.clientX, sample.y - event.clientY) || sample.locked

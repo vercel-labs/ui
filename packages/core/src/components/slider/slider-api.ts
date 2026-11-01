@@ -1,7 +1,7 @@
 // A slider's state and what it does: values, keys, drags and commits. The
 // parts and their attributes are in slider.ts, the pure decisions in slider-values.ts.
 import { orientationOf } from "../../foundation/focus/collection"
-import { bindDrag } from "../../foundation/drag-and-drop/pointer"
+import { createDragSession } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
 import {
@@ -131,13 +131,13 @@ type Gesture = {
   start: number | number[]
   reason: SliderValueChangeReason
   event: Event | undefined
-  stop?: () => void
 }
 
 function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   const { store, options, element } = context
   const change = createChange(context)
   const commitValue = createCommit(context)
+  const drags = createDragSession(context.onDestroy)
   let gesture: Gesture | undefined
   // Keys commit when they come up, so holding one commits once.
   let keys: { start: number | number[]; thumb: number; event?: KeyboardEvent } | undefined
@@ -201,7 +201,7 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     internal: {
       // A press on the web: the track's box is read once, so moves never read layout.
       press(event: PointerEvent, control: HTMLElement) {
-        if (event.button !== 0 || isDisabled(store.get()) || gesture) return
+        if (!drags.accepts(event) || isDisabled(store.get()) || gesture) return
         const rect = (element("track") ?? control).getBoundingClientRect()
         const rtl = isRTL(control)
         const vertical = store.get().orientation === "vertical"
@@ -216,13 +216,10 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
         event.preventDefault()
         const focused = api.internal.begin(at(event.clientX, event.clientY), thumb, event)
         thumbInput(focused)?.focus({ preventScroll: true })
-        const stop = bindDrag(control, event, {
+        drags.start(control, event, {
           onMove: (sample) => api.internal.move(at(sample.x, sample.y), sample.event),
           onEnd: (end) => api.internal.end(end),
         })
-        // `begin()` started the gesture, which TypeScript can't see through the call.
-        const started = gesture as Gesture | undefined
-        if (started) started.stop = stop
       },
       // Starts a drag at a value: on a thumb, which keeps its offset from the
       // press and doesn't move, or on the track, which moves the nearest thumb
@@ -346,10 +343,9 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   // Disabling mid-drag ends the drag.
   store.subscribe(() => {
     if (!gesture || !isDisabled(store.get())) return
-    gesture.stop?.()
+    drags.cancel()
     api.internal.end()
   })
-  context.onDestroy(() => gesture?.stop?.())
 
   return api
 }

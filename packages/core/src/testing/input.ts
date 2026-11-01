@@ -54,11 +54,11 @@ const codeOf = (key: string) =>
 
 function isEditable(el: Element | null): el is HTMLInputElement | HTMLTextAreaElement | HTMLElement {
   if (!el) return false
-  if (el instanceof HTMLTextAreaElement) return !el.readOnly && !el.disabled
+  if (el instanceof HTMLTextAreaElement) return !el.readOnly && !el.matches(":disabled")
   if (el instanceof HTMLInputElement)
     return (
       !el.readOnly &&
-      !el.disabled &&
+      !el.matches(":disabled") &&
       !/^(button|checkbox|radio|submit|reset|range|color|file|image)$/.test(el.type)
     )
   return (el as HTMLElement).isContentEditable
@@ -70,7 +70,7 @@ const isHidden = (el: Element) => !!el.closest("[hidden], [inert]")
 // The elements Tab stops at, in order: positive tabindex first, then the page's order.
 function tabOrder(doc: Document) {
   const stops = [...doc.querySelectorAll<HTMLElement>(focusable)].filter(
-    (el) => el.tabIndex >= 0 && !(el as HTMLButtonElement).disabled && !isHidden(el),
+    (el) => el.tabIndex >= 0 && !el.matches(":disabled") && !isHidden(el),
   )
   const positive = stops.filter((el) => el.tabIndex > 0).sort((a, b) => a.tabIndex - b.tabIndex)
   return [...positive, ...stops.filter((el) => el.tabIndex === 0)]
@@ -193,17 +193,23 @@ function pointer(type: string, at: { x: number; y: number }, pressed: boolean) {
 // The element focus goes to on a press: the nearest focusable one, else none.
 function focusTarget(el: Element) {
   const target = el.closest<HTMLElement>(focusable)
-  return target && !(target as HTMLButtonElement).disabled ? target : undefined
+  return target && !target.matches(":disabled") ? target : undefined
 }
 
-/** Clicks an element with a mouse: down, focus, up, then click. */
+/**
+ * Clicks an element with a mouse: down, focus, up, then click. A disabled form
+ * control, by itself or a fieldset, gets the pointer events and nothing else, as in browsers.
+ */
 async function click(el: Element) {
   const at = center(el)
+  const disabled = !!el.closest("button, input, select, textarea")?.matches(":disabled")
   const down = el.dispatchEvent(pointer("pointerdown", at, true))
-  if (el.dispatchEvent(pointer("mousedown", at, true)) && down) focusTarget(el)?.focus()
+  if (!disabled && el.dispatchEvent(pointer("mousedown", at, true)) && down) focusTarget(el)?.focus()
   el.dispatchEvent(pointer("pointerup", at, false))
-  el.dispatchEvent(pointer("mouseup", at, false))
-  el.dispatchEvent(pointer("click", at, false))
+  if (!disabled) {
+    el.dispatchEvent(pointer("mouseup", at, false))
+    el.dispatchEvent(pointer("click", at, false))
+  }
   await settle()
 }
 
