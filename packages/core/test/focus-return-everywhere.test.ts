@@ -311,3 +311,29 @@ test("the middle of three dialogs reopened from the last still closes", async ()
   await first.view.settle()
   expect(second.state.open).toBe(false)
 })
+
+// What had focus can turn disabled or hidden while a dialog it opened is up.
+describe.each(popups)("$name handing focus on after what had it can't take it", (popup) => {
+  test.each(["disabled", "hidden"])(
+    "opened from code, its trigger takes focus when what had it is %s",
+    async (how) => {
+      const elsewhere = focusElsewhere()
+      const { view, api, trigger } = mountPopup(popup)
+      api.setOpen(true)
+      await view.settle()
+      const content = document.querySelector<HTMLElement>(`[data-slot$="-content"][data-open]`)
+      const inside = content?.querySelector<HTMLElement>("button, [tabindex]")
+      if (inside && !content!.contains(document.activeElement)) inside.focus()
+      if (how === "disabled") elsewhere.disabled = true
+      else elsewhere.hidden = true
+      const next = mountNext("Next")
+      next.api.setOpen(true)
+      await next.settle()
+      api.setOpen(false)
+      await view.settle()
+      await next.keys("Escape")
+      await next.settle()
+      expect(document.activeElement).toBe(trigger())
+    },
+  )
+})

@@ -276,6 +276,12 @@ function usable(el: HTMLElement) {
   return el.isConnected && !el.closest("[inert]")
 }
 
+// Whether focus can land on `el` now. A popup that hands its target on can't
+// try it first, so a disabled or hidden one gives way to the next.
+function focusable(el: HTMLElement) {
+  return usable(el) && !el.matches(":disabled") && !el.closest("[hidden]") && el.checkVisibility?.() !== false
+}
+
 // Whether focus rests on nothing a person can use: the body, or an element
 // that's gone, inert or no longer rendered, before the browser moves it away.
 function focusIsLost() {
@@ -593,7 +599,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     if (resolving) return
     resolving = true
     try {
-      return firstUsable(returnChain(shown?.el), usable)
+      return firstUsable(returnChain(shown?.el), focusable)
     } finally {
       resolving = false
     }
