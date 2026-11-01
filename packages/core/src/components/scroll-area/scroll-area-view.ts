@@ -530,6 +530,7 @@ function createScrollView(store: Store<ScrollAreaModel>) {
       schedule()
     })
     resize.observe(el)
+    schedule()
     const cleanups = [
       () => resize.disconnect(),
       on(el, "wheel", input.forwardWheel, { passive: false }),
@@ -542,6 +543,10 @@ function createScrollView(store: Store<ScrollAreaModel>) {
       input.endPress(el)
       scrollbars.delete(part)
       countScrollbars()
+      // What it wrote for its axis goes with it, so bound again along the
+      // other one it holds only that one's.
+      for (const property in written.get(el)) el.style.removeProperty(property)
+      written.delete(el)
     }
   }
 

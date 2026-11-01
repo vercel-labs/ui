@@ -11,7 +11,7 @@ import { createAutoScroll, type AutoScrollOptions } from "./auto-scroll"
 import { bindDragPreview, type DragPreview } from "./drag-preview"
 import { createDraftMove } from "./draft-move"
 import { isRTL } from "../platform/env"
-import { dragThreshold, bindDrag } from "./pointer"
+import { createDragSession, dragThreshold } from "./pointer"
 import { labelOf } from "../text/typeahead"
 import { dropIndex } from "./reorder"
 
@@ -304,13 +304,11 @@ function createTreeReorder<State extends object>(
     })
   }
 
-  let stopDrag: (() => void) | undefined
-  context.onDestroy(() => stopDrag?.())
+  const drags = createDragSession(context.onDestroy)
 
   function pointerdown(event: PointerEvent, key: string) {
     const el = elements.get(key)
-    if (!el || event.button !== 0 || !event.isPrimary || event.defaultPrevented || draft()) return
-    stopDrag?.()
+    if (!el || !drags.accepts(event) || draft()) return
     const start = { x: event.clientX, y: event.clientY }
     let point = start
     let startDepth = 0
@@ -332,7 +330,7 @@ function createTreeReorder<State extends object>(
       !options.preview || options.createAutoScroll === false
         ? undefined
         : createAutoScroll({ ...options.createAutoScroll, ignore: () => elements.get(key), onScroll: track })
-    const stopTracking = bindDrag(el, event, {
+    drags.start(el, event, {
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
@@ -357,21 +355,15 @@ function createTreeReorder<State extends object>(
       },
       onEnd: (endEvent, canceled) => {
         const dragged = dragging
-        end()
+        scroller?.stop()
+        preview?.remove()
+        preview = undefined
+        dragging = false
         if (!dragged) return
         if (canceled) cancel()
         else drop("drag", lastMove ?? endEvent)
       },
     })
-    const end = () => {
-      stopTracking()
-      scroller?.stop()
-      preview?.remove()
-      preview = undefined
-      dragging = false
-      stopDrag = undefined
-    }
-    stopDrag = end
   }
 
   const tree = {

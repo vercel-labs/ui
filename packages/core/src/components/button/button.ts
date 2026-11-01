@@ -1,3 +1,4 @@
+import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { announcePending, runAction, type ActionDetails } from "../../foundation/kernel/action"
 import {
   buttonAttrs,
@@ -64,7 +65,7 @@ type ButtonInternalOptions = ButtonOptions & {
  * @stable
  */
 type ButtonState = {
-  /** Whether the `disabled` option is on. A running press shows in `pending` instead. */
+  /** Whether it's disabled, by the `disabled` option or a disabled fieldset around it. A running press shows in `pending` instead. */
   disabled: boolean
   /** Whether the Promise the last press returned is still running. Presses do nothing meanwhile. */
   pending: boolean
@@ -74,6 +75,7 @@ type ButtonState = {
 
 type State = {
   disabled: boolean
+  formDisabled: boolean
   focusableWhenDisabled: boolean
   type: "button" | "submit" | "reset"
   // What the part rendered as, known once it binds.
@@ -105,7 +107,7 @@ function buttonApi(context: PrimitiveContext<ButtonInternalOptions, State, strin
         action: (details: ButtonActionDetails) => unknown = (details) => options().action?.(event, details),
       ) {
         const state = store.get()
-        if (state.disabled || state.pending) return event?.preventDefault()
+        if (isDisabled(state) || state.pending) return event?.preventDefault()
         const source = changeSource("action", event)
         write("error", undefined, source)
         runAction(action, source, {
@@ -137,6 +139,7 @@ const buttonPrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: ButtonInternalOptions): State => ({
     disabled: !!options.disabled,
+    formDisabled: false,
     focusableWhenDisabled: !!options.focusableWhenDisabled,
     type: options.type ?? "button",
     element: "button",
@@ -151,18 +154,18 @@ const buttonPrimitive = /* @__PURE__ */ definePrimitive({
   api: (context) => buttonApi(context),
   slots: (slot) => ({
     root: slot<{}, ButtonState>({
-      state: (state) => ({ disabled: state.disabled, pending: state.pending, error: state.error }),
+      state: (state) => ({ disabled: isDisabled(state), pending: state.pending, error: state.error }),
       attrs: (state) => ({
         ...buttonAttrs(state.element, {
           type: state.type,
-          disabled: state.disabled,
+          disabled: isDisabled(state),
           focusable: state.focusableWhenDisabled,
         }),
         // Presses do nothing while it's pending, so screen readers hear it's
         // unavailable. Not the native attribute, which would drop focus.
-        ...(state.pending && !state.disabled && { "aria-disabled": "true" }),
+        ...(state.pending && !isDisabled(state) && { "aria-disabled": "true" }),
         "aria-busy": state.pending ? "true" : undefined,
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isDisabled(state) ? "" : undefined,
         "data-pending": state.pending ? "" : undefined,
       }),
       press: ({ api }, event) => api.internal.press(event),
@@ -172,6 +175,7 @@ const buttonPrimitive = /* @__PURE__ */ definePrimitive({
       },
       bind(el, { store }) {
         store.set({ element: buttonElement(el) })
+        return watchFormDisabled(el, store)
       },
     }),
   }),

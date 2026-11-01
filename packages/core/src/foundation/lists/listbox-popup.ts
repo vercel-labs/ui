@@ -10,7 +10,8 @@ import { popupContentAttrs } from "../popups/popup"
 import { registerPopupElement } from "../popups/popup-elements"
 import { contentAnchor, placementOptions } from "../popups/popup-features"
 import { type SheetConfig, sheetSnapPoints } from "../popups/presentation"
-import type { BaseSlotProps, SlotDefinition } from "../kernel/primitive-types"
+import { onProps } from "../kernel/part"
+import type { BaseSlotProps, Part, SlotDefinition } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
 
 type ListPopupState = {
@@ -100,9 +101,10 @@ function listContentPart<State extends ListPopupState, Api extends ListPopupApi>
       ...pressKeepsFocus,
       keydown: (event, { api }) => api.internal.onListKeyDown(event),
     },
-    bind: (el, { api, key, store }) =>
-      bindListContent(el, key, store, api.internal, {
-        anchor: api.internal.anchorElement,
+    bind: (el, part) =>
+      bindListContent(el, part.key, part.store, part.api.internal, {
+        part,
+        anchor: part.api.internal.anchorElement,
         // A sheet opens at half the screen at most, and grows for the keyboard.
         snapPoints: sheetSnapPoints,
       }),
@@ -119,6 +121,7 @@ function bindListContent(
   flags: Store<{ settled: boolean }>,
   internal: ListContentInternal,
   config: {
+    part: Part
     anchor: () => Anchor | undefined
     aligned?: () => Anchor | false | null | undefined
     snapPoints?: SheetConfig["snapPoints"]
@@ -140,6 +143,7 @@ function bindListContent(
         : props
       return placementOptions(over, { align: "start" }, internal.arrowElement())
     },
+    rendered: (listener) => onProps(config.part, listener),
     // Focus stays in the field, unless a screen reader's tap moved it into
     // the list. An arrow key that opened the list highlights now.
     initialFocus: internal.initialFocus,

@@ -26,7 +26,7 @@ export { elements } from "./elements"
 export { on, selectEvent } from "./events"
 export { createHistory, type HistoryOptions } from "./history"
 export { css } from "./inline-style"
-export { keep, release, unwatched, whenKept } from "./keep"
+export { isDestroying, keep, release, unwatched, whenKept } from "./keep"
 export { changeSource, createChange, createCommit, dispatch, inputSource } from "./input-source"
 export { applyAttrs, direct, live } from "./live"
 export {

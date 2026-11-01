@@ -94,7 +94,8 @@ function withDerived<State extends object>(
     ) as Record<string, unknown> | undefined
     result = { ...result }
     for (const key of derivation.keys)
-      result[key] = derived && key in derived ? derived[key] : next[key as keyof State]
+      if (derived && key in derived) result[key] = derived[key]
+      else if (derivation.from === "state") result[key] = next[key as keyof State]
   }
   return result as Partial<State>
 }

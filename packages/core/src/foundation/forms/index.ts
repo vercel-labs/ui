@@ -25,6 +25,7 @@ export {
   hiddenInputStyle,
   invalidFocusClaimed,
   isDisabled,
+  isDisabledElement,
   isLabelable,
   labelsOf,
   nameFromLabels,
@@ -33,6 +34,7 @@ export {
   submitImplicitly,
   valueMissingMessage,
   watchFieldsets,
+  watchFormDisabled,
 } from "./form"
 export {
   focusFromSurroundings,

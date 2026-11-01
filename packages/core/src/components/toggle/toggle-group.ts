@@ -9,6 +9,7 @@ import {
   type RovingScope,
 } from "../../foundation/focus/roving-scope"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
+import { watchFormDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
@@ -129,7 +130,7 @@ type ToggleGroupState<T extends string = string> = {
   value: T[]
   /** Whether several toggles can be pressed at once. */
   multiple: boolean
-  /** Whether the whole group is disabled. */
+  /** Whether the whole group is disabled, by its `disabled` option or a disabled fieldset around it. */
   disabled: boolean
   /** The group's `orientation` option, or `"horizontal"` when it's unset or invalid. */
   orientation: ToggleGroupOrientation
@@ -140,6 +141,8 @@ type State = {
   multiple: boolean
   deselectable: boolean
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   orientation: ToggleGroupOrientation
   // The toggle that holds the tab stop, by its roving key. Null until toggles bind.
   stop: string | null
@@ -149,6 +152,8 @@ type State = {
 }
 
 type Item = { key: string; el: HTMLElement; disabled: () => boolean }
+
+const isGroupDisabled = (state: State) => state.disabled || state.formDisabled || state.scopeDisabled
 
 /** The value after pressing or unpressing one toggle, in document order. */
 function nextValue(
@@ -185,7 +190,8 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
     focusable: memberFocusable,
     preferred: (toggle) => !!toggle.props.preferred?.(),
     claims: (state, toggle) =>
-      state.disabled || (!memberDisabled(toggle) && (!state.value.length || !!toggle.props.preferred?.())),
+      isGroupDisabled(state) ||
+      (!memberDisabled(toggle) && (!state.value.length || !!toggle.props.preferred?.())),
   })
   const own: RovingScope = {
     bind: roving.bind,
@@ -197,7 +203,7 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
     stop: () => store.get().stop,
     follow: (key, listener) => followStop(store, key, listener),
     orientation: () => store.get().orientation,
-    disabled: () => store.get().disabled,
+    disabled: () => isGroupDisabled(store.get()),
   }
   // A group in a toolbar is no tab stop of its own: its toggles join the toolbar's.
   const scope = () => options().toolbar?.() ?? own
@@ -210,7 +216,7 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
     if (
       scope() !== own &&
       (state.value !== previous.value ||
-        state.disabled !== previous.disabled ||
+        isGroupDisabled(state) !== isGroupDisabled(previous) ||
         state.scopeDisabled !== previous.scopeDisabled)
     )
       scope().queueCheck()
@@ -257,7 +263,7 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
       press,
       // A disabled toolbar disables the groups in it. Read from state, which
       // follows the toolbar the props pass now, before they're handed over.
-      disabled: () => store.get().disabled || store.get().scopeDisabled,
+      disabled: () => isGroupDisabled(store.get()),
       orientation: () => store.get().orientation,
       subscribe: store.subscribe,
       scope,
@@ -318,6 +324,7 @@ const toggleGroupPrimitive = /* @__PURE__ */ definePrimitive({
     multiple: !!options.multiple,
     deselectable: options.deselectable ?? true,
     disabled: !!options.disabled,
+    formDisabled: false,
     orientation: orientationOf(options.orientation, "horizontal"),
     stop: null,
     scopeDisabled: !!options.toolbar?.()?.disabled(),
@@ -336,7 +343,7 @@ const toggleGroupPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state) => ({
         value: state.value,
         multiple: state.multiple,
-        disabled: state.disabled,
+        disabled: isGroupDisabled(state),
         orientation: state.orientation,
       }),
       // A group, not a toolbar: a toolbar may hold one, and `aria-orientation`
@@ -344,8 +351,9 @@ const toggleGroupPrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (state) => ({
         role: "group",
         "data-orientation": state.orientation,
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isGroupDisabled(state) ? "" : undefined,
       }),
+      bind: (el, { store }) => watchFormDisabled(el, store),
     }),
   }),
   agent: { actions: ["setValue", "toggle"], closed: true },

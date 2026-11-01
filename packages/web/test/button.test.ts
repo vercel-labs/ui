@@ -20,3 +20,20 @@ test("the action event's detail says how the button was pressed", async () => {
   button.click()
   expect(sources).toEqual(["agent", "programmatic"])
 })
+
+test("a button moved into a disabled fieldset after it binds ignores presses", async () => {
+  defineButtonElements()
+  document.body.innerHTML = `<ui-button><span>Save</span></ui-button><fieldset disabled></fieldset>`
+  await wait()
+  const host = document.querySelector("ui-button")!
+  const span = document.querySelector("span")!
+  let actions = 0
+  host.addEventListener("action", () => actions++)
+  span.click()
+  expect(actions).toBe(1)
+  document.querySelector("fieldset")!.append(host)
+  await wait()
+  span.click()
+  expect(actions).toBe(1)
+  expect(span.hasAttribute("data-disabled")).toBe(true)
+})

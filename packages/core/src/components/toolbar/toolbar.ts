@@ -1,3 +1,4 @@
+import { watchFormDisabled } from "../../foundation/forms/form"
 import {
   buttonAttrs,
   buttonElement,
@@ -19,7 +20,8 @@ import { fieldKeeps, placeCaret } from "./toolbar-fields"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type { Named, Part, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import { onProps } from "../../foundation/kernel/part"
 import { selects } from "../../foundation/kernel/selects"
 
 /**
@@ -122,7 +124,7 @@ type ToolbarGroupProps = GroupProps
 type ToolbarRootState = {
   /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
-  /** Whether the whole toolbar is disabled. */
+  /** Whether the whole toolbar is disabled, by its `disabled` option or a disabled fieldset around it. */
   disabled: boolean
 }
 /**
@@ -175,6 +177,8 @@ type ToolbarSeparatorState = {
 type State = {
   orientation: ToolbarOrientation
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   // The item that holds the tab stop. Null until items bind.
   stop: string | null
   // Buttons rendered as something else, like a link, by key. Known once they bind.
@@ -182,8 +186,9 @@ type State = {
 }
 
 const across = (orientation: ToolbarOrientation) => (orientation === "horizontal" ? "vertical" : "horizontal")
+const isToolbarDisabled = (state: State) => state.disabled || state.formDisabled
 const isDisabled = (state: State, props: ItemProps) =>
-  !!(props.disabled || props.groupDisabled || state.disabled)
+  !!(props.disabled || props.groupDisabled || isToolbarDisabled(state))
 const isFocusable = (state: State, props: ItemProps) =>
   !isDisabled(state, props) || (props.focusableWhenDisabled ?? true)
 
@@ -231,7 +236,7 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
     stop: () => store.get().stop,
     follow: (key, listener) => followStop(store, key, listener),
     orientation,
-    disabled: () => store.get().disabled,
+    disabled: () => isToolbarDisabled(store.get()),
   }
   // What toggles inside a disabled group see. The scope is all they know of
   // the toolbar, so the group's disabled reaches them as the toolbar's.
@@ -242,11 +247,17 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
   // Joins an item. A disabled one keeps focus and moves between items, but
   // presses and keys never reach it or a component rendered through it, like
   // a menu trigger. Capturing them on the item stops them before any handler.
-  function join(slot: string, key: string, el: HTMLElement, keeps?: (event: KeyboardEvent) => boolean) {
+  function join(part: Part, el: HTMLElement, keeps?: (event: KeyboardEvent) => boolean) {
+    const { slot, key } = part
     const disabled = () => isDisabled(store.get(), itemProps(slot, key))
-    const leave = roving.bind(el, {
-      key,
-      props: { disabled, focusable: () => isFocusable(store.get(), itemProps(slot, key)) },
+    const focusable = () => isFocusable(store.get(), itemProps(slot, key))
+    const leave = roving.bind(el, { key, props: { disabled, focusable } })
+    // A prop that disables the item, its own or its group's, can move the stop.
+    let rules = [disabled(), focusable()]
+    const unwatch = onProps(part, () => {
+      if (rules[0] === disabled() && rules[1] === focusable()) return
+      rules = [disabled(), focusable()]
+      scope.queueCheck()
     })
     if (keeps) fields.set(el, keeps)
     const refuse = (event: Event) => {
@@ -267,6 +278,7 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
     const types = ["click", "pointerdown", "keydown"] as const
     for (const type of types) el.addEventListener(type, refuse, true)
     return () => {
+      unwatch()
       leave()
       if (fields.get(el) === keeps) fields.delete(el)
       for (const type of types) el.removeEventListener(type, refuse, true)
@@ -332,21 +344,27 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     disabled: "boolean",
     controller: "value",
   },
-  state: (options: ToolbarOptions): State => ({ ...fromOptions(options), stop: null, elements: {} }),
+  state: (options: ToolbarOptions): State => ({
+    ...fromOptions(options),
+    formDisabled: false,
+    stop: null,
+    elements: {},
+  }),
   sync: fromOptions,
   api: toolbarApi,
   slots: (slot) => ({
     root: slot<{}, ToolbarRootState>({
-      state: (state) => ({ orientation: state.orientation, disabled: state.disabled }),
+      state: (state) => ({ orientation: state.orientation, disabled: isToolbarDisabled(state) }),
       attrs: (state) => ({
         role: "toolbar",
         "aria-orientation": state.orientation,
         "data-orientation": state.orientation,
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isToolbarDisabled(state) ? "" : undefined,
       }),
       on: {
         keydown: (event, { api }) => api.internal.keydown(event),
       },
+      bind: (el, { store }) => watchFormDisabled(el, store),
     }),
 
     button: slot<ItemProps, ToolbarButtonState>({
@@ -377,9 +395,9 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         keydown: (event, { el }) => buttonKeydown(event, el!),
         keyup: (event, { el }) => buttonKeyup(event, el!),
       },
-      bind(el, { api, key }) {
-        api.internal.setElement(key, el)
-        return api.internal.join("button", key, el)
+      bind(el, part) {
+        part.api.internal.setElement(part.key, el)
+        return part.api.internal.join(part, el)
       },
     }),
 
@@ -391,7 +409,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         tabindex: api.internal.isStop(key, true) ? "0" : "-1",
         "data-orientation": state.orientation,
       }),
-      bind: (el, { api, key }) => api.internal.join("link", key, el),
+      bind: (el, part) => part.api.internal.join(part, el),
     }),
 
     // A text field. Arrows move its caret, and leave it only from the end they point at.
@@ -417,18 +435,18 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
           ...item.data,
         }
       },
-      bind: (el, { api, key }) => api.internal.join("input", key, el, (event) => fieldKeeps(event, el)),
+      bind: (el, part) => part.api.internal.join(part, el, (event) => fieldKeeps(event, el)),
     }),
 
     group: slot<GroupProps, ToolbarGroupState>({
       props: { id: "id", disabled: "boolean" },
       state: (state, { props }) => ({
-        disabled: !!(props.disabled || state.disabled),
+        disabled: !!props.disabled || isToolbarDisabled(state),
         orientation: state.orientation,
       }),
       attrs: (state, { props }) => ({
         role: "group",
-        "data-disabled": props.disabled || state.disabled ? "" : undefined,
+        "data-disabled": props.disabled || isToolbarDisabled(state) ? "" : undefined,
         "data-orientation": state.orientation,
       }),
     }),

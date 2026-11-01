@@ -12,6 +12,7 @@ import { labelOf } from "../../foundation/text/typeahead"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { checkedAttrs, openAttrs } from "../../foundation/kernel/attrs"
 import { on, selectEvent } from "../../foundation/kernel/events"
+import { onProps } from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { adoptPlatform } from "../../foundation/shortcuts/shortcut-slot"
 import { shortcuts as shortcutManager } from "../../foundation/shortcuts/shortcuts"
@@ -290,7 +291,8 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         if (store.get().highlighted !== null) api.internal.highlight(null)
       },
     },
-    bind(el, { api, key, props: initial }) {
+    bind(el, part) {
+      const { api, key, props: initial } = part
       const parentMenu = api.parentMenu()
       // Read on every check, so the popup follows prop changes while open.
       const props = () => api.itemProps<ContentProps>("content", key) ?? initial
@@ -315,6 +317,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
             alignOffset: -firstItem,
           })
         },
+        rendered: (listener) => onProps(part, listener),
         initialFocus: api.internal.runPendingFocus,
         // In a sheet, a submenu shows in its parent's place, under its trigger.
         drillIn: parentMenu && (() => [parentMenu.popupElement(), api.triggerElement()]),
