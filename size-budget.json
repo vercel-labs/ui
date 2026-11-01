@@ -81,7 +81,7 @@
   "@ui-sdk/svelte/calendar": 29402,
   "@ui-sdk/svelte/carousel": 31719,
   "@ui-sdk/svelte/checkbox": 21384,
-  "@ui-sdk/svelte/collapsible": 18299,
+  "@ui-sdk/svelte/collapsible": 18861,
   "@ui-sdk/svelte/combobox": 56251,
   "@ui-sdk/svelte/combobox (lazy)": 13587,
   "@ui-sdk/svelte/command": 35038,
