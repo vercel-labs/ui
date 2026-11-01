@@ -148,6 +148,38 @@ test("a disabled control gets its value back after going back, like a native one
   await expect(page.getByRole("checkbox", { name: "Insured" })).toBeDisabled()
 })
 
+for (const [tag, markup] of [
+  ["ui-select", `<ui-select-trigger><button aria-label="Pet"></button></ui-select-trigger>`],
+  ["ui-combobox", `<ui-combobox-input><input aria-label="Pet" /></ui-combobox-input>`],
+  ["ui-listbox", ""],
+])
+  for (const multiple of [false, true])
+    test(`a <${tag}> restored before its object items arrive submits the keys it saved, multiple: ${multiple}`, async ({
+      page,
+    }) => {
+      await page.goto("/form.html")
+      await page.evaluate(
+        async ({ tag, markup, multiple }) => {
+          const el = document.createElement(tag) as HTMLElement & {
+            itemToValue: (item: { id: number }) => string
+            formStateRestoreCallback: (state: string, mode: string) => void
+          }
+          el.setAttribute("name", "pet")
+          el.setAttribute("aria-label", "Pet")
+          el.toggleAttribute("multiple", multiple)
+          el.innerHTML = markup
+          document.querySelector("form")!.append(el)
+          await customElements.whenDefined(tag)
+          el.itemToValue = (item) => String(item.id)
+          el.formStateRestoreCallback(JSON.stringify(["2"]), "restore")
+        },
+        { tag, markup, multiple },
+      )
+      await expect
+        .poll(() => page.evaluate(() => new FormData(document.querySelector("form")!).getAll("pet")))
+        .toEqual(["2"])
+    })
+
 test("closed popups stay hidden before the scripts run", async ({ page }) => {
   await page.route(/\.js$/, (route) => route.abort())
   await page.goto("/settings.html")

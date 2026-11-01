@@ -247,3 +247,45 @@ test("a restore whose items arrive later fires no valuechange", async () => {
   await vi.waitFor(() => expect(select.value).toBe(pets[1]!.value))
   expect(heard).toEqual([])
 })
+
+const lists = [
+  {
+    name: "select",
+    insert: (multiple: string) =>
+      insert(
+        "ui-select",
+        `<ui-select name="pet" ${multiple}><ui-select-trigger><button aria-label="Pet"></button></ui-select-trigger></ui-select>`,
+      ),
+  },
+  {
+    name: "combobox",
+    insert: (multiple: string) =>
+      insert(
+        "ui-combobox",
+        `<ui-combobox name="pet" ${multiple}><ui-combobox-input><input aria-label="Pet" /></ui-combobox-input></ui-combobox>`,
+      ),
+  },
+  {
+    name: "listbox",
+    insert: (multiple: string) =>
+      insert("ui-listbox", `<ui-listbox name="pet" aria-label="Pet" ${multiple}></ui-listbox>`),
+  },
+]
+
+for (const { name, insert } of lists)
+  for (const multiple of [false, true])
+    test(`a ${name} put back while its restore waits for items still takes them, multiple: ${multiple}`, async () => {
+      const shaped = (value: unknown) => (multiple ? [value] : value)
+      const el = insert(multiple ? "multiple" : "")
+      el.itemToValue = itemToValue
+      await bound(el)
+      restoreForm(el, JSON.stringify(["2"]))
+      const form = el.parentElement!
+      el.remove()
+      // It saves its state a microtask after it leaves.
+      await Promise.resolve()
+      form.append(el)
+      await vi.waitFor(() => expect(el.value).toEqual(shaped("2")))
+      el.items = pets
+      await vi.waitFor(() => expect(el.value).toEqual(shaped(pets[1]!.value)))
+    })
