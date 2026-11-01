@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { PhysicalSide } from "@ui-sdk/core/drawer"
   import { Drawer, DrawerContent, DrawerTitle } from "../../src/drawer"
   import { ScrollArea, ScrollAreaContent, ScrollAreaViewport } from "../../src/scroll-area"
 
-  let { side, stickToEnd }: { side: PhysicalSide; stickToEnd: boolean } = $props()
+  let { side, stickToEnd }: { side: "bottom" | "right"; stickToEnd: boolean } = $props()
 </script>
 
 <Drawer defaultOpen {side}>
