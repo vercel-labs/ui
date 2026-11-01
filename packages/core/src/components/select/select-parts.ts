@@ -272,12 +272,13 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         if (ownsEvent(el!, event)) api.internal.onContentKeyDown(event)
       },
     },
-    bind(el, { api, key, store }) {
-      const { internal } = api
-      return bindListContent(el, key, store, internal, {
+    bind(el, part) {
+      const { internal } = part.api
+      return bindListContent(el, part.key, part.store, internal, {
+        part,
         anchor: internal.triggerElement,
         // The selected item over the trigger, when the content asks and it fits.
-        aligned: () => !!internal.contentProps(key).alignItemWithTrigger && internal.alignedAnchor(el),
+        aligned: () => !!internal.contentProps(part.key).alignItemWithTrigger && internal.alignedAnchor(el),
       })
     },
   }),

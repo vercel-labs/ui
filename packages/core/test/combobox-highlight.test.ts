@@ -5,6 +5,7 @@ import { afterEach, expect, test } from "vitest"
 import { combobox } from "../src/components/combobox/combobox"
 import type { OptionsOf } from "../src/foundation/kernel/primitive-types"
 import { mount } from "../src/testing"
+import { rerenderOf } from "../src/testing/mount"
 
 const mounts: { unmount: () => void }[] = []
 afterEach(() => {
@@ -81,6 +82,16 @@ test("a highlight the user moved back to the first match stays as results arrive
   await combo.keys("ArrowUp")
   expect(combo.state.highlighted).toBe("Banana")
   combo.api.internal.store.set({ items: ["Bacon", "Banana", "Blueberry"] })
+  await settle()
+  expect(combo.state.highlighted).toBe("Banana")
+})
+
+test("turning autoHighlight on after typing highlights the best match", async () => {
+  const combo = view({ items: ["Apple", "Banana", "Blueberry"], autoHighlight: false })
+  await combo.type("b")
+  await settle()
+  expect(combo.state.highlighted).toBeNull()
+  rerenderOf(combo).setOptions({ autoHighlight: true })
   await settle()
   expect(combo.state.highlighted).toBe("Banana")
 })

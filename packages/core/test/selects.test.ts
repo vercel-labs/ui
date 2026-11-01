@@ -569,9 +569,9 @@ describe("roving items select on the tab stop", () => {
           "join the items",
           () =>
             parts.forEach((part, index) => {
-              const key = String(part.props.value ?? part.props.id)
-              attrs((instance as PrimitiveInstance).part(part.slot, part.props))
-              leave.push(api.internal.join(part.slot, key, els[index]))
+              const item = (instance as PrimitiveInstance).part(part.slot, part.props)
+              attrs(item)
+              leave.push(api.internal.join(item, els[index]))
             }),
         ],
         ["focus an item", () => els[2].focus()],
@@ -609,8 +609,9 @@ describe("roving items select on the tab stop", () => {
           "join the items",
           () =>
             parts.forEach((part, index) => {
-              attrs((instance as PrimitiveInstance).part(part.slot, part.props))
-              api.internal.join(part.slot, String(part.props.value), els[index])
+              const item = (instance as PrimitiveInstance).part(part.slot, part.props)
+              attrs(item)
+              api.internal.join(item, els[index])
             }),
         ],
         ["focus an item", () => els[1].focus()],

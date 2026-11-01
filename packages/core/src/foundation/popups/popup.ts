@@ -297,6 +297,9 @@ type AttachConfig = {
   position?: () => PositionOptions
   // What to position against, read on every check. Defaults to the trigger.
   anchor?: () => Anchor | null | undefined
+  // Hears each render of the popup's part, so a new side or offset applies
+  // at once rather than at the next slow check.
+  rendered?: (listener: () => void) => () => void
   initialFocus?: () => HTMLElement | null | undefined | void
   // An element shown in the top layer just below the popup, like a dialog's
   // backdrop. It animates in and out with the popup, and pressing it is an outside press.
@@ -688,6 +691,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       const placement = options.position(() => config.anchor?.() ?? options.trigger(), el, config.position)
       place = placement.place
       cleanups.push(placement, () => (place = undefined))
+      if (config.rendered) cleanups.push(config.rendered(placement.follow))
     }
     if (!supportsTopLayer() && !host.style.zIndex) host.style.zIndex = "2147483000"
     cleanups.push(

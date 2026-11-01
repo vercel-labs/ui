@@ -1,3 +1,4 @@
+import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { css } from "../../foundation/kernel/inline-style"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
@@ -235,6 +236,7 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: ResizableOptions): State => ({
     ...settings(options),
+    formDisabled: false,
     layout: [],
     controlledLayout: options.layout,
     ids: [],
@@ -254,20 +256,23 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
     root: slot<{}, ResizableState>({
       state: (state) => ({
         orientation: state.orientation,
-        disabled: state.disabled,
+        disabled: isDisabled(state),
         dragging: state.dragging !== null,
         layout: state.layout,
       }),
       attrs: (state) => ({
         ...orientationAttrs(state),
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isDisabled(state) ? "" : undefined,
         "data-dragging": state.dragging !== null ? "" : undefined,
         style: css({
           display: "flex",
           "flex-direction": state.orientation === "vertical" ? "column" : "row",
         }),
       }),
-      bind: (el, { api }) => api.internal.bindRoot(el),
+      bind(el, { api, store }) {
+        const cleanups = [watchFormDisabled(el, store), api.internal.bindRoot(el)]
+        return () => cleanups.forEach((cleanup) => cleanup?.())
+      },
     }),
 
     panel: slot<ResizablePanelProps, ResizablePanelState>({
@@ -317,7 +322,7 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
           inert: collapsed && sameSize(size, 0) ? "" : undefined,
         }
       }),
-      bind: (_, { api }) => api.internal.bindPanel(),
+      bind: (_, part) => part.api.internal.bindPanel(part),
     }),
 
     // The window splitter: a focusable separator whose value is the size of
@@ -337,15 +342,16 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
       }),
       state: (state, { key, props }) => ({
         orientation: state.orientation,
-        disabled: state.disabled || !!props.disabled,
+        disabled: isDisabled(state) || !!props.disabled,
         dragging: state.dragging === key,
         hovered: state.hovered === key,
       }),
       attrs: (state, { key, props }) => {
-        const disabled = state.disabled || !!props.disabled
+        const disabled = isDisabled(state) || !!props.disabled
         return {
           role: "separator",
           tabindex: disabled ? undefined : "0",
+          "aria-disabled": disabled ? "true" : undefined,
           "aria-orientation": state.orientation === "horizontal" ? "vertical" : "horizontal",
           ...orientationAttrs(state),
           "data-disabled": disabled ? "" : undefined,

@@ -7,7 +7,7 @@
 import { elements } from "../kernel/elements"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { announce } from "../platform/announce"
-import { bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession } from "../drag-and-drop/pointer"
 
 /**
  * Why the preview changed.
@@ -67,8 +67,7 @@ function createPreview<State extends object>(
     options.set ? options.set(value, details) : (store.set({ [options.key]: value } as Partial<State>), true)
   const label = (key: string) => options.label?.(key) ?? key
   let scrubbing = false
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   const api = {
     /** Shows an option without choosing it. The chosen option and disabled ones show as nothing. */
@@ -96,7 +95,7 @@ function createPreview<State extends object>(
     scrubbing: () => scrubbing,
     /** Starts a scrub from a pressed option: each option the pointer slides over previews, letting go on one chooses it. */
     scrub(event: PointerEvent, key: string, surface: HTMLElement) {
-      if (event.button !== 0) return
+      if (!drags.accepts(event)) return
       event.preventDefault()
       // Boxes are read once, on press, so sliding measures nothing.
       const boxes = elements(context, options.slot).map((item) => ({
@@ -108,8 +107,7 @@ function createPreview<State extends object>(
         null
       scrubbing = true
       api.show(key, { reason: "item-hover", event })
-      stop?.()
-      stop = bindDrag(surface, event, {
+      drags.start(surface, event, {
         cancelOnEscape: true,
         onMove: ({ x, y, event: move }) => {
           const next = under(x, y)
@@ -117,7 +115,6 @@ function createPreview<State extends object>(
         },
         onEnd: (end, canceled) => {
           scrubbing = false
-          stop = undefined
           const landed = canceled ? null : under(end.clientX, end.clientY)
           if (landed && landed !== options.value?.()) api.choose(landed, { event: end })
           else api.clear({ reason: landed ? "item-press" : "focus-out", event: end })
