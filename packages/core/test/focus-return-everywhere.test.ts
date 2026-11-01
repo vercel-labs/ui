@@ -12,7 +12,6 @@ import { select } from "../src/components/select/select"
 import { mount } from "../src/testing/mount"
 
 type Opening = { defaultOpen?: boolean }
-// What these tests use of a mounted popup, whichever it is.
 type View = Pick<
   ReturnType<typeof mount<typeof dialog>>,
   "root" | "keys" | "click" | "settle" | "unmount"
@@ -96,7 +95,6 @@ function mountPopup(popup: PopupCase, options: Opening = {}) {
   return { view, api: view.api, button, isOpen, trigger: () => view.part("trigger")! }
 }
 
-// A dialog a popup opens from inside itself, like a confirmation.
 function mountNext(name: string) {
   const view = mount(
     dialog,
