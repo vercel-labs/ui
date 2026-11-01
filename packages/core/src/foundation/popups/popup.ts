@@ -931,7 +931,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
           ? order.at(event.shiftKey ? -1 : 0)
           : order.at((index + (event.shiftKey ? -1 : 1)) % order.length)
       const crossing = ahead.includes(active as HTMLElement) || (!!next && ahead.includes(next))
-      if (active !== popup && (index < 0 || !crossing)) return
+      const shadow = active?.shadowRoot
+      const entersShadow = !event.shiftKey && !!shadow && tabbables(shadow).length > 0
+      if (active !== popup && (index < 0 || !crossing || entersShadow)) return
       event.preventDefault()
       next?.focus({ preventScroll: true })
       return

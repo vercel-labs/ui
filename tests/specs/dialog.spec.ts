@@ -200,6 +200,19 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Save" })).toBeFocused()
   })
 
+  test("Tab from a custom element with a positive tabindex enters its shadow root", async ({ page, tab }) => {
+    await defineElement(page, "x-panel", `<button type="button">Inside</button>`)
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<x-panel tabindex="1" aria-label="Panel"></x-panel>`),
+    )
+    await page.locator("x-panel").focus()
+    await tab()
+    expect(await focusedText(page)).toBe("Inside")
+    await tab()
+    await expect(field(page)).toBeFocused()
+  })
+
   test("opening focuses the first field even when a later one has a positive tabindex", async ({ page }) => {
     await page.evaluate(() => {
       const raise = () =>

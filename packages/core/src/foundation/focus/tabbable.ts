@@ -31,7 +31,7 @@ function isTabbable(el: Element): el is HTMLElement {
   return el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
 }
 
-function tabbables(root: Element) {
+function tabbables(root: ParentNode) {
   return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
 }
 
