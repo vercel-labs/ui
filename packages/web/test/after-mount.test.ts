@@ -52,6 +52,13 @@ Element.prototype.getClientRects = function () {
 }
 await Promise.all(Object.values(import.meta.glob("../src/entries/*.ts")).map((load) => load()))
 
+// Vite's `import.meta.glob`, which Vite rewrites where it's written. This package doesn't load Vite's types.
+declare global {
+  interface ImportMeta {
+    glob: (pattern: string) => Record<string, () => Promise<unknown>>
+  }
+}
+
 const tagOf = (name: string) =>
   "ui-" +
   name.replace("OTP", "Otp").replace(/[A-Z]/g, (char, index) => (index ? "-" : "") + char.toLowerCase())

@@ -121,8 +121,9 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
   // the control's own, like a date picker's format hint, which its component
   // may write again at any time.
   let added = new Set<string>()
-  // The name the field gave its control, which follows the field's own.
-  let gaveName: string | undefined
+  // The element the field named and the name it gave, which follows the
+  // field's own. Another element with that name chose it itself.
+  let gave: { el: Element; name: string | undefined } | undefined
   const write = () => {
     const control = current
     if (!control || control.isConnected === false || api.internal.hasControlPart()) return
@@ -166,10 +167,10 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     const name = state.name
     const named = submitterOf(control, root)
     const own = named?.getAttribute("name")
-    if (!named || (own != null && own !== gaveName)) return
+    if (!named || (own != null && (gave?.el !== named || own !== gave.name))) return
     if (name) named.setAttribute("name", name)
     else if (own != null) named.removeAttribute("name")
-    gaveName = name
+    gave = { el: named, name }
   }
   // The control's component rewriting its own description drops the field's, so
   // the field adds them back. A new id is the one its labels point at.
