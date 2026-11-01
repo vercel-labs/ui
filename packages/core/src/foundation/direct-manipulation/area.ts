@@ -6,7 +6,8 @@
 // slider for the x axis whose text names both.
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { isRTL } from "../platform/env"
-import { bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession } from "../drag-and-drop/pointer"
+import { isDestroying } from "../kernel/keep"
 
 /**
  * A point in an area, in its own units.
@@ -93,8 +94,7 @@ function createArea<State extends object>(
   const x = () => axisOf(options.x?.())
   const y = () => axisOf(options.y?.())
   const value = () => options.value(store.get())
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   const fraction = (n: number, axis: ReturnType<typeof axisOf>) =>
     axis.max === axis.min ? 0 : (n - axis.min) / (axis.max - axis.min)
@@ -125,22 +125,21 @@ function createArea<State extends object>(
     set: (next: AreaValue) => set(next, { reason: "imperative" }),
     /** Jumps the thumb under the pointer and follows it until it lifts. Call from the surface's `pointerdown`. */
     pointerdown(event: PointerEvent, el: HTMLElement) {
-      if (event.button !== 0 || options.disabled?.()) return
+      if (!drags.accepts(event) || options.disabled?.()) return
       event.preventDefault()
       set(at(el, event.clientX, event.clientY), { reason: "track-press", event })
       // Focus goes to the thumb, so the keyboard picks up where the pointer left off.
       const thumb = el.querySelector<HTMLElement>("[data-area-thumb]")
       thumb?.focus({ preventScroll: true })
-      stop?.()
       // The commit names what changed the value last, as a slider's does.
       let reason: "track-press" | "drag" = "track-press"
-      stop = bindDrag(el, event, {
+      drags.start(el, event, {
         onMove: (sample) => {
           if (set(at(el, sample.x, sample.y), { reason: "drag", event: sample.event })) reason = "drag"
         },
+        // A teardown cut the drag short, so nobody ended it to commit.
         onEnd: (end) => {
-          stop = undefined
-          options.onCommit?.(value(), { reason, event: end })
+          if (!isDestroying()) options.onCommit?.(value(), { reason, event: end })
         },
       })
     },

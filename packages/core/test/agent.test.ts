@@ -4,10 +4,12 @@
 // for an adapter.
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { accordion } from "../src/components/accordion/accordion"
+import { autocomplete } from "../src/components/autocomplete/autocomplete"
 import { createAgent, registerTools, type AgentComponent } from "../src/page/agent/agent"
 import { button } from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { datePicker } from "../src/components/date-picker/date-picker"
+import { dialog } from "../src/components/dialog/dialog"
 import { input, textarea } from "../src/components/input/input"
 import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
@@ -327,7 +329,10 @@ describe("agent", () => {
     expect(() => registerTools(agent, { allow: () => true })()).not.toThrow()
   })
 
-  function mountRegion(items: { value: string; label: string }[], onValueChange = vi.fn()) {
+  function mountRegion(
+    items: { value: string; label: string; disabled?: boolean }[],
+    onValueChange = vi.fn(),
+  ) {
     const instance = select({ id: "region", items, onValueChange })
     const el = document.createElement("button")
     el.setAttribute("aria-label", "Region")
@@ -351,6 +356,216 @@ describe("agent", () => {
       /^No item "Tokyo" in Region \(c\d+\)\. Its items: Frankfurt, Singapore\.$/,
     )
     expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  test("setValue refuses a disabled item, by its label or its value, as a person can't choose it", async () => {
+    const agent = createAgent()
+    const onValueChange = vi.fn()
+    mountRegion(
+      [
+        { value: "fra", label: "Frankfurt", disabled: true },
+        { value: "sin", label: "Singapore" },
+      ],
+      onValueChange,
+    )
+    for (const args of [["Frankfurt"], ["fra"]]) {
+      const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args }] })
+      expect(outcome.error?.message).toMatch(/^"Frankfurt" in Region \(c\d+\) is disabled now\.$/)
+    }
+    expect(onValueChange).not.toHaveBeenCalled()
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Singapore"] }] })
+    expect(outcome.ok).toBe(true)
+  })
+
+  test("setValue compares object values by their contents, not as text", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "city",
+      items: [
+        { value: { id: "fra" }, label: "Frankfurt", disabled: true },
+        { value: { id: "tyo" }, label: "Tokyo" },
+      ],
+      itemToValue: (value: { id: string }) => value.id,
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "City")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const enabled = await agent.act({ steps: [{ ref: "City", action: "setValue", args: [{ id: "tyo" }] }] })
+    expect(enabled.ok).toBe(true)
+    expect(instance.get().value).toEqual({ id: "tyo" })
+    const refused = await agent.act({ steps: [{ ref: "City", action: "setValue", args: [{ id: "fra" }] }] })
+    expect(refused.ok).toBe(false)
+    expect(instance.get().value).toEqual({ id: "tyo" })
+  })
+
+  test("setValue keys object values the way the select does, so other fields can't pass a disabled item", async () => {
+    const agent = createAgent()
+    const instance = select({
+      id: "city",
+      items: [
+        { value: { id: 2, name: "B" }, label: "B", disabled: true },
+        { value: { id: 1, name: "A" }, label: "A" },
+      ],
+      itemToValue: (value: { id: number }) => String(value.id),
+    })
+    const el = document.body.appendChild(document.createElement("button"))
+    el.setAttribute("aria-label", "City")
+    cleanups.push(bind(instance.part("trigger"), el), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "City", action: "setValue", args: [{ id: 2, name: "x" }] }],
+    })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toBeNull()
+  })
+
+  test("setValue refuses a disabled option that renders only while its select is open", async () => {
+    const agent = createAgent()
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbindItems: (() => void)[] = []
+    const instance: ReturnType<typeof select> = select({
+      id: "region",
+      onOpenChange: (open) => {
+        unbindItems.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        if (!open) return
+        for (const [value, label, disabled] of [
+          ["fra", "Frankfurt", true],
+          ["tyo", "Tokyo", false],
+        ] as const) {
+          const item = content.appendChild(document.createElement("div"))
+          item.textContent = label
+          unbindItems.push(bind(instance.part("item", { value, disabled }), item))
+        }
+      },
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Region")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => {
+      unbindItems.forEach((unbind) => unbind())
+      instance.destroy()
+    })
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Frankfurt"] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toBeNull()
+  })
+
+  function mountRegionWhileOpen(options: { multiple?: boolean } = {}) {
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbindItems: (() => void)[] = []
+    const disabled = { fra: true }
+    const instance: ReturnType<typeof select> = select({
+      id: "region",
+      ...options,
+      onOpenChange: (open) => {
+        unbindItems.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        if (!open) return
+        for (const [value, label] of [
+          ["fra", "Frankfurt"],
+          ["tyo", "Tokyo"],
+        ] as const) {
+          const item = content.appendChild(document.createElement("div"))
+          item.textContent = label
+          unbindItems.push(
+            bind(instance.part("item", { value, disabled: value === "fra" && disabled.fra }), item),
+          )
+        }
+      },
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Region")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => {
+      unbindItems.forEach((unbind) => unbind())
+      instance.destroy()
+    })
+    return { instance, disabled }
+  }
+
+  test("setValue refuses a list of values holding a disabled option that renders only while open", async () => {
+    const agent = createAgent()
+    const { instance } = mountRegionWhileOpen({ multiple: true })
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: [["fra"]] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toEqual([])
+  })
+
+  test("an item enabled after a failed step can be chosen, since disabled items are read anew each step", async () => {
+    const agent = createAgent()
+    const { instance, disabled } = mountRegionWhileOpen()
+    expect((await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Nowhere"] }] })).ok).toBe(
+      false,
+    )
+    disabled.fra = false
+    instance.api.setOpen(true)
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Frankfurt"] }] })
+    expect(outcome.error).toBeUndefined()
+    expect(instance.get().value).toBe("fra")
+  })
+
+  test("opening a select names no item, so a disabled empty placeholder doesn't stop it", async () => {
+    const agent = createAgent()
+    const instance = mountRegion([
+      { value: "", label: "Choose a region", disabled: true },
+      { value: "tyo", label: "Tokyo" },
+    ])
+    expect((await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Tokyo"] }] })).ok).toBe(
+      true,
+    )
+    for (const action of ["open", "toggle"]) {
+      if (typeof (instance.api as Record<string, unknown>)[action] !== "function") continue
+      const outcome = await agent.act({ steps: [{ ref: "Region", action }] })
+      expect([action, outcome.error]).toEqual([action, undefined])
+      instance.api.setOpen(false)
+    }
+  })
+
+  test("opening a dialog with a payload opens it once, since a payload names no item", async () => {
+    const agent = createAgent()
+    const onOpenChange = vi.fn()
+    const instance = dialog({ id: "settings", onOpenChange })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.textContent = "Settings"
+    cleanups.push(bind(instance.part("trigger"), trigger), () => instance.destroy())
+    const outcome = await agent.act({
+      steps: [{ ref: "Settings", action: "open", args: [{ payload: { id: 1 } }] }],
+    })
+    expect(outcome.error).toBeUndefined()
+    expect(onOpenChange.mock.calls.map(([open]) => open)).toEqual([true])
+  })
+
+  test("setValue refuses a disabled object-valued option named by its label", async () => {
+    const agent = createAgent()
+    const instance = select({ id: "region", itemToValue: (value: { id: string }) => value.id })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Region")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => instance.destroy())
+    for (const [id, label, disabled] of [
+      ["fra", "Frankfurt", true],
+      ["tyo", "Tokyo", false],
+    ] as const) {
+      const item = document.body.appendChild(document.createElement("div"))
+      item.textContent = label
+      cleanups.push(bind(instance.part("item", { value: { id }, disabled }), item))
+    }
+    const outcome = await agent.act({ steps: [{ ref: "Region", action: "setValue", args: ["Frankfurt"] }] })
+    expect(outcome.ok).toBe(false)
+    expect(instance.get().value).toBeNull()
+  })
+
+  test("setValue takes text that matches a disabled suggestion in an autocomplete, as a person can type it", async () => {
+    const agent = createAgent()
+    const instance = autocomplete({
+      id: "city",
+      items: ["Berlin", { value: "Cherry", label: "Cherry", disabled: true }],
+    })
+    const el = document.createElement("input")
+    el.setAttribute("aria-label", "City")
+    document.body.append(el)
+    cleanups.push(bind(instance.part("input"), el), () => instance.destroy())
+    await Promise.resolve()
+    const outcome = await agent.act({ steps: [{ ref: "City", action: "setValue", args: ["Cherry"] }] })
+    expect(outcome.error).toBeUndefined()
+    expect(instance.get().value).toBe("Cherry")
   })
 
   test("setValue takes an item's label ignoring accents and case", async () => {

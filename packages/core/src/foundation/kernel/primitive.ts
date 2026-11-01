@@ -4,7 +4,7 @@ import { checkControlled, dev, emit, isMeasuring, warn, warnMissing } from "#dev
 import { connectController } from "./controller"
 import { withDerived } from "./derive"
 import { withSource, type ChangeSource } from "./details"
-import { discard, withLifecycle } from "./keep"
+import { discard, whileDestroying, withLifecycle } from "./keep"
 import { propsRendered, provisional, type PartOwner, type PartRecord } from "./part"
 import type {
   AnySlot,
@@ -318,7 +318,7 @@ function definePrimitive<
         if (destroyed) return
         destroyed = true
         discard(instance)
-        destroys.forEach((cleanup) => cleanup())
+        whileDestroying(() => destroys.forEach((cleanup) => cleanup()))
         if (dev) emit({ type: "instance", action: "destroy", ...from, controlled })
       },
     }

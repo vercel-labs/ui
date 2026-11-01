@@ -5,6 +5,7 @@ import { dev, emit } from "#dev"
 import { sourceOf, trackInput } from "./modality"
 import { changeFrom } from "./change"
 import { createDetails, resolveSource, withSource, type ChangeSource } from "./details"
+import { isDestroying } from "./keep"
 import { callbackName } from "./option-names"
 import type { PrimitiveContext, ReasonFor } from "./primitive-types"
 import { watchers } from "./watchers"
@@ -69,6 +70,7 @@ function createCommit<Options, State extends object>(
     value: State[Key],
     details: { reason: ReasonFor<Options, Key, "Commit">; event?: Event; [extra: string]: unknown },
   ) => {
+    if (isDestroying()) return
     const commitDetails = createDetails(details, source(details.reason, details.event), false)
     const callbacks = context.options() as Record<
       string,

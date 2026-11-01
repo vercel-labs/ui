@@ -15,6 +15,7 @@ import {
   bindElementInternals,
   conditional,
   connect,
+  elementMoved,
   type Feature,
   formCallback,
   inDocumentOrder,
@@ -853,7 +854,10 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       connectedCallback() {
         // Even a move within one task can take it into a shadow root or another document.
         adoptStyles(this)
-        if (this.#connected) return
+        if (this.#connected) {
+          for (const part of this.#parts) elementMoved(part.el)
+          return
+        }
         upgradeProperties(this, [...Object.keys(state), ...(config.properties ?? []), ...Object.keys(schema)])
         for (const [name, value] of Object.entries(config.host ?? {}))
           if (!this.hasAttribute(name)) this.setAttribute(name, value)

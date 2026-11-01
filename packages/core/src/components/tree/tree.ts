@@ -1,3 +1,4 @@
+import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { hiddenAttrs } from "../../foundation/motion/panel"
 import { checkedAttrs, idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
@@ -275,7 +276,7 @@ type TreeRootState = {
   selectionMode: TreeSelectionMode
   /** Whether items have checkboxes. */
   checkable: boolean
-  /** Whether the whole tree is disabled. */
+  /** Whether the whole tree is disabled, by its `disabled` option or a disabled fieldset around it. */
   disabled: boolean
 }
 
@@ -335,6 +336,8 @@ type TreeState = {
   activation: "automatic" | "manual"
   expandOnPress: boolean
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   focusableWhenDisabled: boolean
   keepMounted: boolean
   hiddenUntilFound: boolean
@@ -476,6 +479,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
     activation: "manual",
     expandOnPress: true,
     disabled: false,
+    formDisabled: false,
     focusableWhenDisabled: true,
     keepMounted: false,
     hiddenUntilFound: false,
@@ -514,16 +518,18 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
       state: (state) => ({
         selectionMode: state.selectionMode,
         checkable: state.checkable,
-        disabled: state.disabled,
+        disabled: isDisabled(state),
       }),
       attrs: (state) => ({
         role: "tree",
         "aria-multiselectable": state.selectionMode === "multiple" ? "true" : undefined,
-        "aria-disabled": state.disabled ? "true" : undefined,
-        "data-disabled": flag(state.disabled),
+        "aria-disabled": isDisabled(state) ? "true" : undefined,
+        "data-disabled": flag(isDisabled(state)),
       }),
-      // Items moved in the page, like a sorted folder, change their positions without binding again.
-      bind: (el, { api }) => api.internal.bindRoot(el),
+      bind(el, { api, store }) {
+        const cleanups = [watchFormDisabled(el, store), api.internal.bindRoot(el)]
+        return () => cleanups.forEach((cleanup) => cleanup?.())
+      },
     }),
 
     item: slot<ItemProps, TreeItemState>({

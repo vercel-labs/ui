@@ -8,7 +8,7 @@
 import { elements } from "../kernel/elements"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { announce } from "../platform/announce"
-import { bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession } from "../drag-and-drop/pointer"
 import { nearestInDirection } from "../focus/spatial"
 
 /**
@@ -110,8 +110,7 @@ function createConnect<State extends object>(
     announce((options.message ?? connectMessage)(message, label), { priority: "assertive" })
   const can = (from: string, to: string) => from !== to && (options.canConnect?.(from, to) ?? true)
   const ports = () => elements(context, options.slot)
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   const api = {
     /** Whether a connection is being drawn. */
@@ -149,8 +148,7 @@ function createConnect<State extends object>(
     /** Lets go of the connection without making it. */
     cancel() {
       const current = draft()
-      stop?.()
-      stop = undefined
+      drags.cancel()
       setDraft(null)
       if (current?.keyboard) say({ type: "cancel", from: current.from })
     },
@@ -189,7 +187,7 @@ function createConnect<State extends object>(
     },
     /** Drags a loose line out of a port; letting go near a port that can take it connects. */
     pointerdown(event: PointerEvent, from: string, el: HTMLElement) {
-      if (event.button !== 0) return
+      if (!drags.accepts(event)) return
       event.preventDefault()
       event.stopPropagation()
       const radius = options.radius?.() ?? 28
@@ -205,8 +203,7 @@ function createConnect<State extends object>(
         return best ? targets.find((target) => target.key === best.key)! : undefined
       }
       setDraft({ from, to: null, ...point(event.clientX, event.clientY), keyboard: false })
-      stop?.()
-      stop = bindDrag(el, event, {
+      drags.start(el, event, {
         cancelOnEscape: true,
         onMove: ({ x, y }) => {
           const near = nearest(x, y)
@@ -219,7 +216,6 @@ function createConnect<State extends object>(
           })
         },
         onEnd: (end, canceled) => {
-          stop = undefined
           if (canceled) api.cancel()
           else api.commit({ reason: "drag", event: end })
         },
