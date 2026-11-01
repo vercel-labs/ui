@@ -13,7 +13,7 @@ import {
 } from "../../foundation/text/number"
 import { localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
-import { sameValue } from "../../foundation/kernel/store"
+import { heldState, sameValue } from "../../foundation/kernel/store"
 import { deriveFromOptions, deriveState } from "../../foundation/kernel/derive"
 import type { SliderChangeOptions, SliderOptions, SliderValueChangeReason } from "./slider"
 import {
@@ -337,12 +337,12 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     if (!sameValue(value, state.value)) return { value }
   })
 
-  // Each thumb's value by index follows the value, before any part hears it changed.
-  // The same value makes the same record, so a framework's render and the handover
-  // agree, and a preview the framework drops never replaces the record state holds.
+  // The same value makes the same record, so a render and its handover agree. A dropped
+  // preview never replaces the held record, checked held since a value the framework
+  // rendered isn't written yet, and a thumb's input hears only writes.
   let made = { value: store.get().value, thumbValues: store.get().thumbValues }
-  deriveState(context, ["thumbValues"], ({ value, thumbValues }) => {
-    if (holdsValue(thumbValues, value)) return
+  deriveState(context, ["thumbValues"], ({ value }) => {
+    if (holdsValue(heldState(store).thumbValues, value)) return
     if (!sameValue(value, made.value)) made = { value, thumbValues: thumbValuesOf(value) }
     return { thumbValues: made.thumbValues }
   })
