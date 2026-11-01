@@ -17,7 +17,7 @@ import type { PrimitiveContext, PrimitiveOptions, WithGeneric } from "../../foun
 import { selects } from "../../foundation/kernel/selects"
 import { live } from "../../foundation/kernel/live"
 import { createChange } from "../../foundation/kernel/input-source"
-import { subscribe } from "../../foundation/kernel/part"
+import { onProps, subscribe } from "../../foundation/kernel/part"
 
 /**
  * Why the selection changed: a tab was pressed, arrow keys moved it, find in
@@ -612,16 +612,16 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         "data-activation-direction": state.direction,
       }),
       bind(el, part) {
-        const { api, key, store, props } = part
+        const { api, key, store } = part
         const cleanups = [api.internal.registerPanel(key)]
 
         // Find in page matched text in a hidden panel. Its tab selects.
         const found = bindFindable(el, {
           shown: () => store.get().value === key || store.get().exiting.includes(key),
-          findable: () => findable(store.get(), props),
+          findable: () => findable(store.get(), part.props),
           reveal: (event) => api.select(key, { reason: "find-in-page", event }),
         })
-        cleanups.push(found, subscribe(part, found.check))
+        cleanups.push(found, subscribe(part, found.check), onProps(part, found.check))
 
         // A panel is a tab stop only when nothing inside it can take focus,
         // so a panel that opens with a field doesn't add a stop before it.

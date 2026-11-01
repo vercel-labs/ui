@@ -42,12 +42,14 @@ class Sized {
     return []
   }
 }
-globalThis.ResizeObserver ??= Sized as never
-globalThis.IntersectionObserver ??= Unobserved as never
+globalThis.ResizeObserver ??= Sized as unknown as typeof ResizeObserver
+globalThis.IntersectionObserver ??= Unobserved as unknown as typeof IntersectionObserver
 // jsdom lays nothing out, so an anchor would never render and a placed popup
 // would never move again. Every element in the page renders, at no size.
 Element.prototype.getClientRects = function () {
-  return (this.isConnected ? [this.getBoundingClientRect()] : []) as never
+  const rects = this.isConnected ? [this.getBoundingClientRect()] : []
+  // An array with `item` stands in for a DOMRectList, which jsdom can't make.
+  return Object.assign(rects, { item: (index: number) => rects[index] ?? null }) as unknown as DOMRectList
 }
 // Nor Element.animate, which a drawer's motion runs on. Each one ends a frame later.
 Element.prototype.animate ??= function () {
@@ -64,7 +66,7 @@ Element.prototype.animate ??= function () {
     persist() {},
   }
   requestAnimationFrame(() => running && animation.onfinish?.())
-  return animation as never
+  return animation as unknown as Animation
 }
 
 // jsdom spaces frames 16ms apart. Nothing here measures time, so each frame

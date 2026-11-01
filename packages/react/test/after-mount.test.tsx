@@ -26,7 +26,8 @@ Element.prototype.getAnimations ??= () => []
 const components = new Map<string, React.ComponentType<Record<string, unknown>>>()
 for (const module of Object.values(import.meta.glob("../src/*.tsx", { eager: true })))
   for (const [name, value] of Object.entries(module as Record<string, unknown>))
-    if (typeof value === "function" && /^[A-Z]/.test(name)) components.set(name, value as never)
+    if (typeof value === "function" && /^[A-Z]/.test(name))
+      components.set(name, value as React.ComponentType<Record<string, unknown>>)
 
 const pascal = (name: string) => name.replace(/(^|[-\s])(\w)/g, (_, __, char: string) => char.toUpperCase())
 
