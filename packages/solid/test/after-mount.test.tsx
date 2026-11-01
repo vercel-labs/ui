@@ -16,7 +16,7 @@ import {
   title,
   withAttribute,
 } from "../../core/test/after-mount"
-import { cases, type Case } from "../../core/test/after-mount.cases"
+import { cases } from "../../core/test/after-mount.cases"
 import * as exported from "../src"
 
 const components = new Map<string, (props: object) => JSX.Element>()

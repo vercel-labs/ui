@@ -77,8 +77,9 @@ const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 // data select renders its own list only when there's none.
 const OwnContentContext = createContext<((present: boolean) => void) | null>(null)
 
-// The select's own placeholder, which the instance's state holds untracked.
-const PlaceholderContext = createContext<(() => string | undefined) | null>(null)
+// Each select's own placeholder, which the instance's state holds untracked.
+// By select, since a trigger can show another select than the one around it.
+const placeholders = new WeakMap<object, () => string | undefined>()
 
 function useSelect() {
   const context = useContext(SelectContext)
@@ -112,6 +113,7 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
     disabled: props.disabled || field?.disabled(),
   }))
   useControllerEntry(() => props.controller, select)
+  placeholders.set(select, () => props.placeholder)
   // Solid can't read the items among the children before they render, the
   // way React and Vue find the value's label there. Once mounted, a select
   // that still lacks a label mounts its list hidden, so the items say theirs.
@@ -127,17 +129,15 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
   return (
     <SelectContext value={select}>
       <ContainerContext value={() => props.container}>
-        <PlaceholderContext value={() => props.placeholder}>
-          {providePrimitive(select, () => (
-            <>
-              <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
-              <Show when={props.items && !hasContent()}>
-                <SelectContent />
-              </Show>
-              {formInputs(select, () => props.multiple)}
-            </>
-          ))}
-        </PlaceholderContext>
+        {providePrimitive(select, () => (
+          <>
+            <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
+            <Show when={props.items && !hasContent()}>
+              <SelectContent />
+            </Show>
+            {formInputs(select, () => props.multiple)}
+          </>
+        ))}
       </ContainerContext>
     </SelectContext>
   )
@@ -228,7 +228,7 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
       }),
     )
   }
-  const placeholder = useContext(PlaceholderContext) ?? (() => context.state.placeholder)
+  const placeholder = () => placeholders.get(context)?.() ?? context.state.placeholder
   const part = () => ({ placeholder: props.placeholder, max: props.max, moreLabel: props.moreLabel })
   const user = merge(rest, {
     get children() {
