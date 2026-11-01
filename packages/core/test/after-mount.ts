@@ -271,8 +271,6 @@ async function idle() {
 // Changes that run a change callback as the options land, so a framework that
 // hands options over from an effect, like Svelte or Solid, writes state there.
 const callbackRelays: Record<string, string[]> = {
-  'combobox > value: "Apple" to "Banana"': ["query"],
-  'combobox > value: "Banana" to "Apple"': ["query"],
   'command > query: "" to "a"': ["highlighted", "value"],
   'command > query: "a" to ""': ["highlighted", "value"],
 }

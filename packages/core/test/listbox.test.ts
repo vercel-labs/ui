@@ -306,6 +306,40 @@ describe("select and combobox headless", () => {
     expect(api.internal.listbox.entries()).toHaveLength(5)
   })
 
+  test("a controlled value shows its label as the options land, and onQueryChange still hears it", () => {
+    const onQueryChange = vi.fn()
+    const instance = combobox({ id: "c", items: fruits, value: "apple", onQueryChange })
+    const queries: string[] = []
+    instance.subscribe(() => queries.push(instance.api.getQuery()))
+    instance.setOptions({ id: "c", items: fruits, value: "blueberry", onQueryChange })
+    expect(instance.api.getQuery()).toBe("Blueberry")
+    expect(queries.every((query) => query === "Blueberry")).toBe(true)
+    expect(onQueryChange).toHaveBeenCalledOnce()
+    expect(onQueryChange).toHaveBeenLastCalledWith(
+      "Blueberry",
+      expect.objectContaining({ reason: "imperative" }),
+    )
+  })
+
+  test("a value and items that change together show the label from the new items", () => {
+    const onQueryChange = vi.fn()
+    const before = [
+      { value: "a", label: "Apple" },
+      { value: "b", label: "Banana" },
+    ]
+    const after = [
+      { value: "a", label: "Apricot" },
+      { value: "b", label: "Blackberry" },
+    ]
+    const instance = combobox({ id: "c", items: before, value: "a", onQueryChange })
+    instance.setOptions({ id: "c", items: after, value: "b", onQueryChange })
+    expect(instance.api.getQuery()).toBe("Blackberry")
+    expect(onQueryChange).toHaveBeenLastCalledWith(
+      "Blackberry",
+      expect.objectContaining({ reason: "imperative" }),
+    )
+  })
+
   test("a multiple combobox empties its text after each choice and respects maxSelected", () => {
     const instance = combobox({ id: "c", items: fruits, multiple: true, maxSelected: 2 })
     const api = instance.api
