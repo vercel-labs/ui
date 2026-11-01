@@ -132,7 +132,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     props?.branch ?? fromData()?.tree.isBranch(key) ?? false
 
   function isDisabled(state: TreeState, key: string, props = itemProps(key)) {
-    return state.disabled || !!props?.disabled || !!fromData()?.byKey.get(key)?.disabled
+    return state.disabled || state.formDisabled || !!props?.disabled || !!fromData()?.byKey.get(key)?.disabled
   }
 
   // Whether every ancestor is expanded, so the item shows. One set per expanded list.

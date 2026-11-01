@@ -1,7 +1,7 @@
 // The patterns that open over the page: menu (with its menu button),
 // dialog, alert dialog and combobox. Each checks the open popup and its
 // trigger, drives its keys, and opens it again when a key closed it.
-import { describe, ids, isDisabled, isRtl, isUnreachable, roleOf, tabStops, withRole } from "./aria"
+import { describe, ids, isRtl, isUnreachable, roleOf, tabStops, withRole } from "./aria"
 import {
   checkNavigation,
   checkTabStop,
@@ -23,6 +23,7 @@ import {
   type PatternContext,
 } from "./pattern-context"
 import { menuItemRoles, ownItems } from "./pattern-lists"
+import { isDisabledElement } from "../foundation/forms/form"
 
 // Presses `key` on the trigger, and checks it opened the popup with focus inside.
 async function reopen(
@@ -140,7 +141,7 @@ async function checkEnterActivates(context: PatternContext, popup: Element, trig
   }
   const item = composite
     .items()
-    .find((el) => roleOf(el) === "menuitem" && !el.hasAttribute("aria-haspopup") && !isDisabled(el))
+    .find((el) => roleOf(el) === "menuitem" && !el.hasAttribute("aria-haspopup") && !isDisabledElement(el))
   if (!item) return
   await returnTo(context, composite, item, { next: "ArrowDown", previous: "ArrowUp" })
   if (currentItem(context, composite) !== item) return

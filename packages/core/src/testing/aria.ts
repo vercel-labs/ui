@@ -59,12 +59,9 @@ const checkedOf = (el: Element) =>
     ? String(el.checked)
     : (el.getAttribute("aria-checked") ?? "")
 
-const isDisabled = (el: Element) =>
-  el.getAttribute("aria-disabled") === "true" || (el as HTMLButtonElement).disabled === true
-
 function isTabStop(el: Element, known: Map<Element, boolean>) {
   if (!el.matches(focusable) || isGone(el)) return false
-  if ((el as HTMLElement).tabIndex < 0 || (el as HTMLButtonElement).disabled) return false
+  if ((el as HTMLElement).tabIndex < 0 || el.matches(":disabled")) return false
   if (el instanceof HTMLInputElement && el.type === "hidden") return false
   if (isUndisplayed(el, known)) return false
   // Native radios that share a name are one stop: the checked one, else the first.
@@ -89,7 +86,7 @@ function focusables(scope: Element) {
   return [...scope.querySelectorAll(focusable)].filter(
     (el) =>
       !isGone(el) &&
-      !(el as HTMLButtonElement).disabled &&
+      !el.matches(":disabled") &&
       !(el instanceof HTMLInputElement && el.type === "hidden") &&
       !isUndisplayed(el, known),
   )
@@ -144,7 +141,6 @@ export {
   focusables,
   hasBoolean,
   ids,
-  isDisabled,
   isGone,
   isRtl,
   isUndisplayed,
