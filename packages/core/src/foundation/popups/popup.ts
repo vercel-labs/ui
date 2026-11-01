@@ -276,12 +276,6 @@ function usable(el: HTMLElement) {
   return el.isConnected && !el.closest("[inert]")
 }
 
-// Whether focus can land on `el` now. A popup that hands its target on can't
-// try it first, so a disabled or hidden one gives way to the next.
-function focusable(el: HTMLElement) {
-  return usable(el) && !el.matches(":disabled") && !el.closest("[hidden]") && el.checkVisibility?.() !== false
-}
-
 // Whether focus rests on nothing a person can use: the body, or an element
 // that's gone, inert or no longer rendered, before the browser moves it away.
 function focusIsLost() {
@@ -462,7 +456,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   // Where focus goes when what had it is gone: the popup this one opened from
   // returns to its own target, else the focus that the last close left.
   // Kept after a close, so a popup this one opened can still follow it.
-  let upstream: () => HTMLElement | undefined = () => undefined
+  let upstream: (take?: (target: HTMLElement) => boolean) => HTMLElement | undefined = () => undefined
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
@@ -586,20 +580,26 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
 
   // Where focus goes back to, in order. Opened without its trigger, what had
   // focus comes first, since the trigger was never used.
-  function returnChain(el: HTMLElement | undefined, from = upstream) {
+  function returnChain(
+    el: HTMLElement | undefined,
+    take?: (target: HTMLElement) => boolean,
+    from = upstream,
+  ) {
+    const inherited = () => from(take)
     return openedWithoutTrigger
-      ? [() => before, from, returnTrigger, () => neighbour(el), options.trigger]
-      : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
+      ? [() => before, inherited, returnTrigger, () => neighbour(el), options.trigger]
+      : [returnTrigger, () => before, inherited, () => neighbour(el), options.trigger]
   }
 
-  // A popup opened from this one returns here after this one closed. Reopened
-  // from that popup, each leads back to the other, so the lookup stops there.
+  // A popup opened from this one returns here after this one closed, trying
+  // each target in turn with its own `take`. Reopened from that popup, each
+  // leads back to the other, so the lookup stops there.
   let resolving = false
-  function returnTarget() {
+  function returnTarget(take: (target: HTMLElement) => boolean = usable) {
     if (resolving) return
     resolving = true
     try {
-      return firstUsable(returnChain(shown?.el), focusable)
+      return firstUsable(returnChain(shown?.el, take), take)
     } finally {
       resolving = false
     }
@@ -628,17 +628,19 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     }
   }
 
-  function returnFocus(el: HTMLElement, from: () => HTMLElement | undefined) {
+  function returnFocus(el: HTMLElement, from: typeof upstream) {
     const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") return
-    const chain = returnChain(el, from)
-    if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
-    // Focusing can fail, on a hidden or inert element. Then the next one gets a turn.
-    firstUsable(chain, (target) => {
+    // Focusing can fail, on a hidden or inert element. Then the next one gets a
+    // turn, in the popups this one inherits its target from too.
+    const take = (target: HTMLElement) => {
       if (!usable(target) || el.contains(target)) return false
       restoreFocus(target)
       return activeElement() === target
-    })
+    }
+    const chain = returnChain(el, take, from)
+    if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
+    firstUsable(chain, take)
   }
 
   function initialFocus(resolve?: () => HTMLElement | null | undefined | void) {

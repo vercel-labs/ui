@@ -337,3 +337,27 @@ describe.each(popups)("$name handing focus on after what had it can't take it", 
     },
   )
 })
+
+// What had focus can stop taking it without looking disabled or hidden, like a
+// div that loses its tabindex, so the next target gets a turn when focus fails.
+describe.each(popups)("$name handing focus on after what had it stops taking focus", (popup) => {
+  test("opened from code, its trigger takes focus when what had it loses its tabindex", async () => {
+    const holder = document.body.appendChild(Object.assign(document.createElement("div"), { tabIndex: 0 }))
+    holder.focus()
+    const { view, api, trigger } = mountPopup(popup)
+    api.setOpen(true)
+    await view.settle()
+    const content = document.querySelector<HTMLElement>(`[data-slot$="-content"][data-open]`)
+    const inside = content?.querySelector<HTMLElement>("button, [tabindex]")
+    if (inside && !content!.contains(document.activeElement)) inside.focus()
+    holder.removeAttribute("tabindex")
+    const next = mountNext("Next")
+    next.api.setOpen(true)
+    await next.settle()
+    api.setOpen(false)
+    await view.settle()
+    await next.keys("Escape")
+    await next.settle()
+    expect(document.activeElement).toBe(trigger())
+  })
+})
