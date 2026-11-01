@@ -3,6 +3,7 @@
 // them, but anything newer that sets the state first wins.
 import { beforeAll, expect, test } from "vitest"
 import { defineCheckboxElements } from "../src/checkbox"
+import type { UiCheckboxElement } from "../src/events"
 
 ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
 ElementInternals.prototype.setFormValue ??= () => {}
@@ -12,14 +13,12 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => defineCheckboxElements())
 
-type Checkbox = HTMLElement & {
-  checked: boolean | "indeterminate"
-  formStateRestoreCallback: (state: unknown, mode: string) => void
-}
+// The callback the browser calls as it restores a form, which the element type leaves out.
+type Checkbox = UiCheckboxElement & { formStateRestoreCallback: (state: unknown, mode: string) => void }
 
 function insert() {
   document.body.innerHTML = `<form><ui-checkbox name="gift"><button>Gift wrap</button></ui-checkbox></form>`
-  return { box: document.querySelector("ui-checkbox") as Checkbox }
+  return { box: document.querySelector("ui-checkbox")! as Checkbox }
 }
 
 test("a restore before the parts bind lands once they do", async () => {
