@@ -107,6 +107,25 @@ describe("ranking", () => {
     expect(filterData(items, "x", byLength, { rank: true })).toEqual(["ccc", "bb"])
   })
 
+  test("separators stay while scores move no entry", () => {
+    const separator = { type: "separator" } as const
+    const items: ListData = ["Apple", "Apricot", separator, "Avocado", "Banana"]
+    const startsWithA = (item: { label: string }) => item.label.startsWith("A")
+    expect(filterData(items, "a", startsWithA, { rank: true })).toEqual([
+      "Apple",
+      "Apricot",
+      separator,
+      "Avocado",
+    ])
+    const avocadoFirst = (item: { label: string }) => (item.label === "Avocado" ? 2 : 1)
+    expect(filterData(items, "a", avocadoFirst, { rank: true })).toEqual([
+      "Avocado",
+      "Apple",
+      "Apricot",
+      "Banana",
+    ])
+  })
+
   test("10,000 items: a fuzzy keystroke stays well under a frame", () => {
     const many: ListData = Array.from({ length: 10_000 }, (_, index) => ({
       value: `item-${index}`,
