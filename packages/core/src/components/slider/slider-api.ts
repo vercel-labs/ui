@@ -64,8 +64,11 @@ function thumbValuesOf(value: number | number[]) {
   return record
 }
 function holdsValue(thumbValues: Record<string, number>, value: number | number[]) {
-  if (!Array.isArray(value)) return thumbValues[0] === value && thumbValues[1] === undefined
-  return thumbValues[value.length] === undefined && value.every((item, index) => thumbValues[index] === item)
+  if (!Array.isArray(value)) return Object.is(thumbValues[0], value) && thumbValues[1] === undefined
+  return (
+    thumbValues[value.length] === undefined &&
+    value.every((item, index) => Object.is(thumbValues[index], item))
+  )
 }
 // Keeps a single value a number, so `onValueChange` gets back what it was given.
 const shaped = (values: number[], like: number | number[]) => (Array.isArray(like) ? values : values[0])

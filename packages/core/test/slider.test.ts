@@ -151,6 +151,18 @@ describe("slider", () => {
     expect(listener).not.toHaveBeenCalled()
   })
 
+  test.each([
+    { from: 0, to: -0 },
+    { from: -0, to: 0 },
+    { from: [0, 1], to: [-0, 1] },
+    { from: [-0, 1], to: [0, 1] },
+  ])("a thumb's value text follows a change of zero's sign: $from to $to", ({ from, to }) => {
+    const instance = kept(slider({ id: "s", value: from, min: -1, max: 1, locale: "en-US" }))
+    instance.setOptions({ id: "s", value: to, min: -1, max: 1, locale: "en-US" })
+    const text = Object.is(Array.isArray(to) ? to[0] : to, -0) ? "-0" : "0"
+    expect(attrs(instance.part("thumb-input", { id: "0", index: 0 }))["aria-valuetext"]).toBe(text)
+  })
+
   test("keeps a single value a number", () => {
     const onValueChange = vi.fn()
     const instance = slider({ id: "s", defaultValue: 5, onValueChange })
