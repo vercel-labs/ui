@@ -9,7 +9,7 @@ import {
   callbackRelays,
   changesOf,
   idle,
-  markupOf,
+  pageOf,
   partsOf,
   relayedKeys,
   tabStopProblem,
@@ -18,12 +18,6 @@ import {
 } from "../../core/test/after-mount"
 import { cases, type Case } from "../../core/test/after-mount.cases"
 import * as exported from "../src"
-
-// jsdom lays nothing out, so an anchor would never render and a placed popup
-// would never move again. Every element in the page renders, at no size.
-Element.prototype.getClientRects = function () {
-  return (this.isConnected ? [this.getBoundingClientRect()] : []) as never
-}
 
 const components = new Map<string, (props: object) => JSX.Element>()
 for (const [name, value] of Object.entries(exported))
@@ -77,16 +71,6 @@ async function settle() {
   await idle()
 }
 
-// The page as the case renders it: its own markup, then what it portaled to
-// the body, like a popup, in an order moves don't change. Announcers are shared.
-function pageOf(entry: Case) {
-  const portaled = [...document.body.children].filter(
-    (el) => el !== container && !el.hasAttribute("data-ui-sdk-announcer"),
-  )
-  const markup = (el: Element) => markupOf(el as HTMLElement, entry.history, solidIds)
-  return [markup(container!), ...portaled.map(markup).sort()].join("\n")
-}
-
 function release() {
   dispose?.()
   dispose = undefined
@@ -110,12 +94,12 @@ for (const entry of cases)
         const tree = (value: unknown) =>
           partsOf(entry, markupAt(value), optionsAt(value), (name) => components.has(name))
         await show([tree(change.to)])
-        const expected = pageOf(entry)
+        const expected = pageOf(container!, entry.history, solidIds)
         const freshProblem = tabStopProblem({ root: document.body })
         release()
 
         await show([tree(change.from), tree(change.to)])
-        expect(pageOf(entry)).toEqual(expected)
+        expect(pageOf(container!, entry.history, solidIds)).toEqual(expected)
         if (entry.history?.includes("stop") && !freshProblem)
           expect(tabStopProblem({ root: document.body })).toBeUndefined()
         expect(relayedKeys()).toEqual(callbackRelays[`${entry.name} > ${title(change)}`] ?? [])
