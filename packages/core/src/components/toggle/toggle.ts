@@ -5,6 +5,7 @@ import {
   buttonKeyup,
   type ButtonElement,
 } from "../../foundation/platform/button"
+import { watchFormDisabled } from "../../foundation/forms/form"
 import type { RovingScope } from "../../foundation/focus/roving-scope"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { createController } from "../../foundation/kernel/controller"
@@ -103,7 +104,7 @@ type ToggleInternalOptions = ToggleOptions & {
 type ToggleState = {
   /** Whether it's pressed. Inside a group, it follows the group's value. */
   pressed: boolean
-  /** Whether it's disabled, by itself or by its group. */
+  /** Whether it's disabled, by itself, its group or a fieldset around it. */
   disabled: boolean
 }
 
@@ -122,6 +123,8 @@ type ToggleIconState = ItemIconState
 type State = {
   pressed: boolean
   disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
   focusableWhenDisabled: boolean
   element: ButtonElement
   // In a group or a toolbar: whether the group is disabled, whether this
@@ -132,7 +135,7 @@ type State = {
   orientation: ToggleGroupOrientation | undefined
 }
 
-const isDisabled = (state: State) => state.disabled || state.groupDisabled
+const isDisabled = (state: State) => state.disabled || state.groupDisabled || state.formDisabled
 const keyOf = (options: ToggleInternalOptions & { id: string }) => options.value ?? options.id
 
 // The arrow keys and tab stop a toggle joins: its group's, or the toolbar's.
@@ -170,6 +173,7 @@ function toggleState(options: ToggleInternalOptions & { id: string }): State {
   const own = {
     pressed: options.pressed ?? options.defaultPressed ?? false,
     disabled,
+    formDisabled: false,
     focusableWhenDisabled: !!options.focusableWhenDisabled,
     element: "button" as const,
     roving: false,
@@ -242,11 +246,11 @@ function toggleApi(context: PrimitiveContext<ToggleInternalOptions, State, strin
         // the group's value and settings.
         const unfollow = [roving.follow(id, follow)]
         if (owner?.internal.inToolbar()) unfollow.push(owner.internal.subscribe(follow))
-        // Disabling a toggle can move the tab stop.
-        let wasDisabled = store.get().disabled
+        // Disabling a toggle, by itself, its group or a fieldset, can move the tab stop.
+        let wasDisabled = disabled()
         const unwatch = store.subscribe(() => {
-          if (store.get().disabled === wasDisabled) return
-          wasDisabled = store.get().disabled
+          if (disabled() === wasDisabled) return
+          wasDisabled = disabled()
           roving.queueCheck()
         })
         follow()
@@ -334,7 +338,8 @@ const togglePrimitive = /* @__PURE__ */ definePrimitive({
       },
       bind(el, { api, store }) {
         store.set({ element: buttonElement(el) })
-        return api.internal.join(el)
+        const cleanups = [watchFormDisabled(el, store), api.internal.join(el)]
+        return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
 

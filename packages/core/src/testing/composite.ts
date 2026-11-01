@@ -1,8 +1,9 @@
 // Moving through a composite widget's items with keys, as the APG patterns
 // describe it: one tab stop, arrows to the next and previous item, Home and
 // End, and typeahead, each checked after its key.
-import { accessibleName, describe, isDisabled, roleOf, tabStops } from "./aria"
+import { accessibleName, describe, roleOf, tabStops } from "./aria"
 import { stopped, type PatternContext } from "./pattern-context"
+import { isDisabledElement } from "../foundation/forms/form"
 
 /** A composite widget: its container, its items as they are now, and how problems name them. */
 type Composite = {
@@ -31,7 +32,7 @@ function scan(items: Element[], start: number, step: number) {
   const passed: Element[] = []
   for (let index = start; index >= 0 && index < items.length; index += step) {
     passed.push(items[index])
-    if (!isDisabled(items[index])) return { passed, reached: true }
+    if (!isDisabledElement(items[index])) return { passed, reached: true }
   }
   return { passed, reached: false }
 }
@@ -74,7 +75,7 @@ function checkTabStop(context: PatternContext, composite: Composite, required = 
 
 /** Focuses the composite's tab stop, as Tab would, and returns the item that has focus. */
 async function enter(context: PatternContext, composite: Composite) {
-  const stop = tabStops(composite.container)[0] ?? composite.items().find((item) => !isDisabled(item))
+  const stop = tabStops(composite.container)[0] ?? composite.items().find((item) => !isDisabledElement(item))
   if (!stop) throw stopped
   await context.focus(stop)
   return currentItem(context, composite)
@@ -217,7 +218,7 @@ async function checkTypeahead(
   const items = composite.items()
   const unique = items.filter(
     (item) =>
-      !isDisabled(item) &&
+      !isDisabledElement(item) &&
       /^[a-z0-9]$/.test(initialOf(item)) &&
       items.filter((other) => initialOf(other) === initialOf(item)).length === 1,
   )

@@ -5,7 +5,9 @@
 // each change it makes with the source `"agent"`. The marks an app writes on
 // its elements decide what an agent may do alone (`./marks`).
 import { dev, warn } from "#dev"
+import { isDisabledElement } from "../../foundation/forms/form"
 import { withSource } from "../../foundation/kernel/details"
+import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
 import { accessibleName } from "../../foundation/text/accessible-name"
 import { foldText } from "../../foundation/text/match"
@@ -120,8 +122,15 @@ const frames = () =>
     else requestAnimationFrame(() => requestAnimationFrame(resolve))
   })
 
+// An item's value as a key: the component's own, like a list's `itemToValue`, else an object by its
+// contents, since every object reads "[object Object]".
+const keyOf = (value: unknown) =>
+  value !== null && typeof value === "object" ? JSON.stringify(value) : String(value)
+const keyFor = (instance: PrimitiveInstance) =>
+  (instance.api as { internal?: { keyOf?: (value: unknown) => string } }).internal?.keyOf ?? keyOf
+
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
-function fromData(items: unknown) {
+function fromData(items: unknown, disabled?: Set<string>, key = keyOf) {
   if (!Array.isArray(items)) return
   const out: { value: string; label: string }[] = []
   const add = (item: unknown) => {
@@ -133,10 +142,12 @@ function fromData(items: unknown) {
         children?: unknown[]
         value?: unknown
         label?: string
+        disabled?: boolean
       }
       if (entry.type === "group") entry.items?.forEach(add)
       else if (entry.type !== "separator") {
         out.push({ value: String(entry.value), label: entry.label ?? "" })
+        if (entry.disabled === true) disabled?.add(key(entry.value))
         // A tree's branches, whose rows aren't rendered while they're closed.
         entry.children?.forEach(add)
       }
@@ -147,8 +158,29 @@ function fromData(items: unknown) {
 }
 
 // A component's items as data, from its state's `items` unless its `agent` key says where they are.
-function dataOf(entry: Entry, instance: PrimitiveInstance) {
-  return fromData(entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items)
+function dataOf(entry: Entry, instance: PrimitiveInstance, disabled?: Set<string>) {
+  return fromData(
+    entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items,
+    disabled,
+    keyFor(instance),
+  )
+}
+
+// The values of the items a person can't choose, like a disabled option, from the list's data and its elements.
+function disabledItems(entry: Entry, instance: PrimitiveInstance) {
+  const disabled = new Set<string>()
+  dataOf(entry, instance, disabled)
+  const parts = bound(instance)
+  const items = new Set(renderedItems(parts).map((item) => item.value))
+  for (const part of parts)
+    if (
+      items.has(part.key) &&
+      ((part.props as { disabled?: unknown } | undefined)?.disabled === true ||
+        part.el.matches(":disabled") ||
+        part.el.getAttribute("aria-disabled") === "true")
+    )
+      disabled.add(keyFor(instance)((part.props as { value?: unknown } | undefined)?.value ?? part.key))
+  return disabled
 }
 
 // The api methods an agent may call: the ones its `agent` key lists, else the ones named like a change.
@@ -248,6 +280,23 @@ function ownButton(parts: Bound[]) {
   if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
 }
 
+// The root part's state counts a group around the component, like a toggle's
+// in a disabled toggle group.
+function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
+  if (state.disabled === true || state.formDisabled === true || state.readOnly === true) return true
+  const root = parts.find((part) => /^(root|group|set)$/.test(part.slot) && !part.key)
+  if (root && (partState(root) as { disabled?: unknown }).disabled === true) return true
+  const button = ownButton(parts)
+  if (button && isDisabledElement(button)) return true
+  // A disabled fieldset disables a native root, like a Button's, and every field a component holds,
+  // like a DatePicker's inputs. One disabled radio, or a stepper button at its max, leaves it usable.
+  const fields = parts.filter((part) => part.el.matches("input, textarea, select"))
+  return (
+    !!rootOf(parts)?.matches(":disabled") ||
+    (fields.length > 0 && fields.every((part) => part.el.matches(":disabled")))
+  )
+}
+
 // Whether a state value changed, by content for a list's values.
 const differs = (was: unknown, now: unknown) =>
   !Object.is(was, now) && JSON.stringify(was) !== JSON.stringify(now)
@@ -342,16 +391,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (confirm) out.confirm = confirm
   const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
   if (buttons.length) out.buttons = buttons
-  const fields = parts.filter((part) => part.el.matches("input, textarea, select"))
-  const disabled =
-    state.disabled === true ||
-    state.formDisabled === true ||
-    state.readOnly === true ||
-    // A disabled fieldset disables a native root, like a Button's, and every field a component holds,
-    // like a DatePicker's inputs. One disabled radio, or a stepper button at its max, leaves it usable.
-    rootOf(parts)?.matches(":disabled") ||
-    (fields.length > 0 && fields.every((part) => part.el.matches(":disabled")))
-  if (disabled) out.disabled = true
+  if (isComponentDisabled(state, parts)) out.disabled = true
   else {
     out.actions = actionsOf(entry, api)
     // A popup that isn't a list, like a menu or a dialog, opens itself to press one of its buttons.
@@ -834,13 +874,19 @@ function createAgent(
         if (Number.isNaN(number)) throw new Error(`${entry.component} ${entry.ref} takes a number.`)
         args = [Array.isArray(state.value) ? [number] : number, ...args.slice(1)]
       }
+      // The disabled items this step saw while it opened the list, if it did.
+      let whileOpen: Set<string> | undefined
+      const seeOpen = (found: Set<string>) => (whileOpen = found)
+      const askToOpen = () => ask(args, targetsOf(args[0]), "make this change")
+      // Whether a label already named the item, so its key isn't keyed again.
+      let named = false
       // A value by its item's label, like "Germany (Frankfurt)" or an accordion's "Email", so the agent needn't look up the value first.
       const label = typeof args[0] === "string" && fold(args[0])
       if (label) {
         const data = dataOf(entry, instance)
         const items =
           action === "setValue"
-            ? await listItems(entry, instance, () => ask(args, targetsOf(args[0]), "make this change"))
+            ? await listItems(entry, instance, askToOpen, seeOpen)
             : data?.length
               ? data
               : renderedItems(bound(instance))
@@ -853,8 +899,10 @@ function createAgent(
             )
           // A closed list refuses text that names none of its items, but a
           // select's search text isn't an item. The first 20 keep the error short.
-          if (found.length === 1) args = [found[0].value, ...args.slice(1)]
-          else if (items.length && entry.agent?.closed && action !== "setQuery")
+          if (found.length === 1) {
+            args = [found[0].value, ...args.slice(1)]
+            named = true
+          } else if (items.length && entry.agent?.closed && action !== "setQuery")
             throw new Error(
               `No item "${args[0]}" in ${name}. Its items: ${items
                 .slice(0, 20)
@@ -864,6 +912,30 @@ function createAgent(
         }
       }
       if (/^set[A-Z]/.test(action)) args = [valueFor(entry, action, args[0]), ...args.slice(1)]
+      // The api takes a disabled item, which a person can't choose. One already chosen stays, and
+      // an autocomplete's value is text, which a person can still type. Opening names no item.
+      if (
+        entry.component !== "autocomplete" &&
+        args[0] !== undefined &&
+        ["setValue", "select", "open", "toggle"].includes(action)
+      ) {
+        const value = (instance.get() as { value?: unknown }).value
+        const key = keyFor(instance)
+        const held = (Array.isArray(value) ? value : [value]).map(key)
+        // Options that render only while the list is open are read by opening it, now. Only
+        // a choice opens it: a popup's open() takes a payload, not an item.
+        if (!whileOpen && (action === "setValue" || action === "select"))
+          await listItems(entry, instance, askToOpen, seeOpen)
+        const disabled = whileOpen ?? disabledItems(entry, instance)
+        const blocked = (
+          named ? [args[0] as string] : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
+        ).find((item) => disabled.has(item) && !held.includes(item))
+        if (blocked !== undefined) {
+          const items = dataOf(entry, instance) ?? renderedItems(bound(instance))
+          const label = items.find((item) => item.value === blocked)?.label || blocked
+          throw new Error(`"${label}" in ${entry.label ?? entry.component} (${entry.ref}) is disabled now.`)
+        }
+      }
       run = () => fn(...args)
     }
     // A press asks the button it clicks, and any other step the component's
@@ -929,7 +1001,12 @@ function createAgent(
 
   // A list's items: from its data, from the page, or, for a step that
   // `beforeOpen` lets, by opening it for a moment.
-  async function listItems(entry: Entry, instance: PrimitiveInstance, beforeOpen?: () => Promise<void>) {
+  async function listItems(
+    entry: Entry,
+    instance: PrimitiveInstance,
+    beforeOpen?: () => Promise<void>,
+    whileOpen?: (disabled: Set<string>) => void,
+  ) {
     const state = instance.get() as Record<string, unknown>
     const api = instance.api as { setOpen?: (open: boolean) => void }
     let items = dataOf(entry, instance) ?? renderedItems(bound(instance))
@@ -938,6 +1015,7 @@ function createAgent(
       asAgent(() => api.setOpen!(true))
       for (let tries = 0; tries < 60 && !(items = renderedItems(bound(instance))).length; tries++)
         await frames()
+      if (items.length) whileOpen?.(disabledItems(entry, instance))
       asAgent(() => api.setOpen!(false))
       await frames()
     }

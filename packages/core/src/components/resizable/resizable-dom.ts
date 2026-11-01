@@ -3,7 +3,8 @@
 import { isAfter } from "../../foundation/kernel/order"
 import { bindDrag } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
-import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import { onProps } from "../../foundation/kernel/part"
 import type { ResizableOptions } from "./resizable"
 import type { State } from "./resizable-api"
 import { refreshCursor, registerHandle, releaseHandle, type HandleTarget } from "./resizable-handles"
@@ -13,7 +14,7 @@ import { elements } from "../../foundation/kernel/elements"
 // What the DOM side needs from the group, read lazily, since the group's api
 // is built after this.
 type Group = {
-  setPanels: (ids: string[], sizes: PanelSizes[]) => void
+  setPanels: (ids: string[], sizes: PanelSizes[], space: number) => void
   setHandles: (handles: Record<string, number>) => void
   setSpace: (space: number) => void
   handleIndex: (key: string) => number | null
@@ -25,45 +26,55 @@ type Group = {
   handleValue: (key: string) => { now: number; min: number; max: number } | null
 }
 
+const sizeProps = ["defaultSize", "minSize", "maxSize", "collapsible", "collapsedSize"] as const
+
 function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>, group: () => Group) {
   const { store, element } = context
   // The pixels panels share, as last measured.
   let space = 0
 
   // The sum of the panels' sizes along the axis, whatever handles and gaps take.
-  function measure() {
+  function spaceOf() {
     const axis = group().vertical() ? "height" : "width"
     let total = 0
     for (const { el } of elements(context, "panel")) total += el.getBoundingClientRect()[axis]
-    space = total
-    group().setSpace(total)
+    return total
   }
 
+  function measure() {
+    space = spaceOf()
+    group().setSpace(space)
+  }
+
+  // New bounds and new space are fitted together, so a pixel bound the same
+  // render changed never moves a panel by its old value.
   function readPanels() {
     const panels = elements(context, "panel")
+    space = spaceOf()
     group().setPanels(
       panels.map((panel) => panel.key),
       panels.map((panel) => (panel.props ?? {}) as PanelSizes),
+      space,
     )
     return panels
   }
 
-  // Panels whose props changed since they bound, like a new `minSize`. Read
-  // before every interaction, since props change without binding again. The
-  // panels are in the order the last reconcile found, so nothing is sorted.
+  // Panels' current props, like a new `minSize`, read again before every
+  // interaction. The panels are in the order the last reconcile found, so
+  // nothing is sorted.
   function refresh() {
     if (!element("panel")) return
     const { ids } = store.get()
     group().setPanels(
       ids,
       ids.map((id) => (context.props("panel", id) ?? {}) as PanelSizes),
+      space,
     )
   }
 
   // Panels and handles in document order, a microtask after any of them
   // binds, so one commit reconciles once.
   function reconcile() {
-    measure()
     const panels = readPanels()
     // Both lists are in document order, so one pass pairs each handle with
     // the last panel before it.
@@ -146,9 +157,20 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         view.cancelAnimationFrame(frame)
       }
     },
-    bindPanel() {
+    bindPanel(part: Part) {
       schedule()
-      return schedule
+      // New size props, like a larger `minSize`, apply as the panel renders them.
+      let sizes = part.props as PanelSizes
+      const unwatch = onProps(part, () => {
+        const next = part.props as PanelSizes
+        if (sizeProps.every((name) => next[name] === sizes[name])) return
+        sizes = next
+        schedule()
+      })
+      return () => {
+        unwatch()
+        schedule()
+      }
     },
     bindHandle(el: HTMLElement, key: string) {
       schedule()

@@ -60,7 +60,7 @@ function itemState(state: ListboxState, key: string, props: ItemProps, api: List
   return {
     highlighted: state.highlighted === key,
     selected: api.internal.selection.isSelected(key, valueOfItem(key, props, api)),
-    disabled: !!props.disabled,
+    disabled: !!props.disabled || isDisabled(state),
   }
 }
 
