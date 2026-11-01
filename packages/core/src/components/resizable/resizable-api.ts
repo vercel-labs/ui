@@ -266,9 +266,11 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
     const state = store.get()
     const idsChanged = ids.length !== state.ids.length || ids.some((id, index) => id !== state.ids[index])
     if (!idsChanged && sameConstraints(constraints, state.constraints)) return
-    // New bounds on the same panels move them like new space does, with the `resize` reason.
-    if (!idsChanged && !drag) {
+    // New bounds on the same panels move them like new space does, with the
+    // `resize` reason. During a drag the drag's own moves fit them.
+    if (!idsChanged) {
       store.set({ constraints })
+      if (drag) return
       request(fitLayout(current(), constraints), "resize")
       // No interaction completes this one, so a controlled owner that ignores it leaves nothing asked.
       requested = undefined
@@ -427,6 +429,8 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
       endDrag(event?: PointerEvent) {
         const ended = drag
         if (!ended) return
+        // Bounds or space that changed since the last move fit as part of the drag.
+        request(fitLayout(current(), store.get().constraints), "drag", event)
         drag = undefined
         store.set({ dragging: null })
         complete(ended.base, "drag", event)
