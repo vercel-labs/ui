@@ -452,7 +452,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let openedOnPress = false
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
-  let openedImperatively = false
+  let openedWithoutTrigger = store.get().open
   let openerLayer: Layer | undefined
   let openerTarget: HTMLElement | undefined
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
@@ -491,7 +491,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       returnMode = true
       const active = isBrowser ? activeElement() : null
       before = active && active !== active.ownerDocument.body ? active : undefined
-      openedImperatively = opener === "imperative"
+      openedWithoutTrigger = opener === "imperative"
       openerLayer = before && findLayer(before)
       openerTarget = openerLayer ? undefined : lastClosed()
       store.set({ mounted: true } as Partial<State>)
@@ -609,7 +609,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   function returnFocus(el: HTMLElement, from: () => HTMLElement | undefined) {
     const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") return
-    const chain = openedImperatively
+    const chain = openedWithoutTrigger
       ? [() => before, from, returnTrigger, () => neighbour(el), options.trigger]
       : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
     if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
