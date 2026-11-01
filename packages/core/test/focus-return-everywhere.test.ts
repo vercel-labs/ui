@@ -258,3 +258,56 @@ describe.each(popups)("$name opened by a press that leaves focus elsewhere", (po
     expect(document.activeElement).toBe(trigger())
   })
 })
+
+// Reopened from a dialog it opened, each one leads back to the other.
+test.each(["from the start", "from code"])(
+  "a dialog opened %s and reopened from the dialog it opened still closes",
+  async (how) => {
+    focusElsewhere()
+    const first = mountPopup(
+      popups.find((popup) => popup.name === "dialog")!,
+      how === "from the start" ? { defaultOpen: true } : {},
+    )
+    if (how === "from code") first.api.setOpen(true)
+    await first.view.settle()
+    const next = mountNext("Next")
+    next.api.setOpen(true)
+    await next.settle()
+    first.api.setOpen(false)
+    await first.view.settle()
+    first.api.setOpen(true)
+    await first.view.settle()
+    first.api.setOpen(false)
+    await first.view.settle()
+    await next.keys("Escape")
+    await next.settle()
+    expect(first.isOpen()).toBe(false)
+    expect(document.activeElement).not.toBe(document.body)
+  },
+)
+
+test("the middle of three dialogs reopened from the last still closes", async () => {
+  focusElsewhere()
+  const first = mountPopup(
+    popups.find((popup) => popup.name === "dialog")!,
+    { defaultOpen: true },
+  )
+  await first.view.settle()
+  const second = mountNext("Second")
+  second.api.setOpen(true)
+  await second.settle()
+  const third = mountNext("Third")
+  third.api.setOpen(true)
+  await third.settle()
+  second.api.setOpen(false)
+  await second.settle()
+  second.api.setOpen(true)
+  await second.settle()
+  second.api.setOpen(false)
+  await second.settle()
+  third.api.setOpen(false)
+  await third.settle()
+  first.api.setOpen(false)
+  await first.view.settle()
+  expect(second.state.open).toBe(false)
+})

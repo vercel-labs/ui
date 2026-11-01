@@ -586,9 +586,17 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
   }
 
-  // A popup opened from this one returns here after this one closed.
+  // A popup opened from this one returns here after this one closed. Reopened
+  // from that popup, each leads back to the other, so the lookup stops there.
+  let resolving = false
   function returnTarget() {
-    return firstUsable(returnChain(shown?.el), usable)
+    if (resolving) return
+    resolving = true
+    try {
+      return firstUsable(returnChain(shown?.el), usable)
+    } finally {
+      resolving = false
+    }
   }
 
   function neighbour(el: HTMLElement | undefined) {
