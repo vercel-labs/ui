@@ -105,6 +105,49 @@ test("form controls get their values back after going back, with no events, like
   expect(heard).toEqual([])
 })
 
+// Runs `write` on the page as soon as `customElements.define` returns for `tag`,
+// before a restore the browser hands over can land.
+async function afterDefine(page: Page, tag: string, write: string) {
+  await page.addInitScript(
+    ({ tag, write }) => {
+      const define = customElements.define.bind(customElements)
+      customElements.define = (name, constructor, options) => {
+        define(name, constructor, options)
+        if (name === tag) new Function(write)()
+      }
+    },
+    { tag, write },
+  )
+}
+
+for (const [what, write] of [
+  ["a script write", `document.querySelector("ui-checkbox[name=gift]").checked = false`],
+  ["a form reset", `document.querySelector("form").reset()`],
+])
+  test(`${what} right after the elements are defined wins over the value going back restores`, async ({
+    page,
+  }) => {
+    await page.goto("/form.html")
+    await page.getByRole("checkbox", { name: "Gift wrap" }).click()
+    await afterDefine(page, "ui-checkbox", write)
+    await page.goto("/tabs.html")
+    await page.goBack()
+    await expect(page.getByRole("radio", { name: "Express" })).toBeVisible()
+    await expect(page.getByRole("checkbox", { name: "Gift wrap" })).not.toBeChecked()
+  })
+
+test("a disabled control gets its value back after going back, like a native one", async ({ page }) => {
+  await page.goto("/form.html")
+  const insured = page.locator("ui-checkbox[name=insured]")
+  await insured.evaluate((el) => el.removeAttribute("disabled"))
+  await page.getByRole("checkbox", { name: "Insured" }).click()
+  await insured.evaluate((el) => el.setAttribute("disabled", ""))
+  await page.goto("/tabs.html")
+  await page.goBack()
+  await expect(page.getByRole("checkbox", { name: "Insured" })).toBeChecked()
+  await expect(page.getByRole("checkbox", { name: "Insured" })).toBeDisabled()
+})
+
 test("closed popups stay hidden before the scripts run", async ({ page }) => {
   await page.route(/\.js$/, (route) => route.abort())
   await page.goto("/settings.html")

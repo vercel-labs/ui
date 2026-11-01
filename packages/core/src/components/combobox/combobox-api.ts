@@ -679,7 +679,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
         store.set({ formDisabled })
       },
       restore(saved: string) {
-        setValue(selection.restored(saved), { reason: "restore" })
+        selection.restore(saved, (value) => setValue(value, { reason: "restore" }))
       },
     },
   }

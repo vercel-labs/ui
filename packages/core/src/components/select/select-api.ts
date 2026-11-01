@@ -491,7 +491,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
         if (entry && !store.get().multiple) setValue(entry.value, { reason: "item-press" })
       },
       restore(saved: string) {
-        setValue(selection.restored(saved), { reason: "restore" })
+        selection.restore(saved, (value) => setValue(value, { reason: "restore" }))
       },
     },
   }

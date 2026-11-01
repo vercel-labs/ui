@@ -160,14 +160,25 @@ function createValueSelection(config: {
     without: (key: string) => values().filter((value) => toKey(value) !== key),
     // What selecting nothing is: `null`, or an empty list with `multiple`.
     empty: () => (store.get().multiple ? [] : null),
-    // The value a browser restored, from the keys it saved.
-    restored(saved: string) {
-      let restored: string[] = []
+    // Sets the value a browser restored, from the keys it saved. Keys whose
+    // items haven't arrived hold their place until they do, unless something
+    // sets the value first.
+    restore(saved: string, set: (value: unknown) => void) {
+      let keys: string[] = []
       try {
-        restored = JSON.parse(saved)
+        keys = JSON.parse(saved)
       } catch {}
-      const found = restored.map((key) => listbox.valueOf(key) ?? key)
-      return store.get().multiple ? found : (found[0] ?? null)
+      const valueOf = (found: unknown[]) => (store.get().multiple ? found : (found[0] ?? null))
+      set(valueOf(keys.map((key) => listbox.valueOf(key) ?? key)))
+      if (keys.every((key) => listbox.valueOf(key) !== undefined)) return
+      const held = store.get().value
+      const stop = store.subscribe(() => {
+        if (store.get().value !== held) return stop()
+        const found = keys.map((key) => listbox.valueOf(key))
+        if (found.some((value) => value === undefined)) return
+        stop()
+        set(valueOf(found))
+      })
     },
   }
 }

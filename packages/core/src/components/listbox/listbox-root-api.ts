@@ -309,7 +309,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
         setValue(store.get().initial, { reason: "reset" })
       },
       restore(saved: string) {
-        setValue(selection.restored(saved), { reason: "restore" })
+        selection.restore(saved, (value) => setValue(value, { reason: "restore" }))
       },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
