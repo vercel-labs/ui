@@ -21,24 +21,18 @@ import { cases, type Case } from "../../core/test/after-mount.cases"
 const targets = vi.hoisted(() => new Map<string, (el: HTMLElement) => HTMLElement | null>())
 vi.mock("../src/define-element", async (original) => {
   const module = await original<typeof import("../src/define-element")>()
-  const record = (options: unknown) => {
-    const { tag, target } = (typeof options === "string" ? { tag: options } : options) as {
-      tag: string
-      target?: (el: HTMLElement) => HTMLElement | null
-    }
-    if (target) targets.set(tag, target)
+  const record = (options?: string | { tag: string; target?: (el: HTMLElement) => HTMLElement | null }) => {
+    if (typeof options === "object" && options.target) targets.set(options.tag, options.target)
   }
-  return {
-    ...module,
-    createParts: (primitive: never, tags: Record<string, unknown>) => {
-      Object.values(tags).forEach((options) => options && record(options))
-      return module.createParts(primitive, tags as never)
-    },
-    definePart: (primitive: never, slot: never, options: unknown) => {
-      record(options)
-      return module.definePart(primitive, slot, options as never)
-    },
+  const createParts: typeof module.createParts = (primitive, tags) => {
+    Object.values(tags).forEach(record)
+    return module.createParts(primitive, tags)
   }
+  const definePart: typeof module.definePart = (primitive, slot, options) => {
+    record(options)
+    module.definePart(primitive, slot, options)
+  }
+  return { ...module, createParts, definePart }
 })
 
 // jsdom has no Web Animations API, no form values and no layout: nothing
@@ -48,7 +42,8 @@ Element.prototype.scrollIntoView ??= () => {}
 ElementInternals.prototype.setFormValue ??= () => {}
 ElementInternals.prototype.setValidity ??= () => {}
 Element.prototype.getClientRects = function () {
-  return (this.isConnected ? [this.getBoundingClientRect()] : []) as never
+  const rects = this.isConnected ? [this.getBoundingClientRect()] : []
+  return Object.assign(rects, { item: (index: number) => rects[index] ?? null })
 }
 await Promise.all(Object.values(import.meta.glob("../src/entries/*.ts")).map((load) => load()))
 
