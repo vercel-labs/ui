@@ -289,7 +289,10 @@ function withEvents<T extends object>(
         const { cancel, canceled, ...rest } = ((only ? value : details) ?? {}) as {
           cancel?: () => void
           canceled?: boolean
+          reason?: unknown
         }
+        // A restore that lands after the callback, once its items arrive, is still a restore.
+        if (rest.reason === "restore") return
         const detail: Record<string, unknown> = only ? rest : { ...rest, value }
         const wait = actions.includes(key) ? waitList() : undefined
         if (wait) detail.waitUntil = wait.waitUntil
