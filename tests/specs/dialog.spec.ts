@@ -86,6 +86,18 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
   })
 
+  test("Tab visits a positive tabindex first, like the browser", async ({ page, tab }) => {
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("button", { name: "Jump ahead" })).toBeFocused()
+    await tab()
+    await expect(field(page)).toBeFocused()
+  })
+
   test("Escape closes the dialog and returns focus to the trigger", async ({ page }) => {
     await openWithKeyboard(page)
     await page.keyboard.press("Escape")

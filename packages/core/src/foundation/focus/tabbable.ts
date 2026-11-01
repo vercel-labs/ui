@@ -31,15 +31,21 @@ function isTabbable(el: Element): el is HTMLElement {
   return el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
 }
 
+// In the order Tab visits them: positive tabindex values first, lowest first,
+// then the rest in document order.
 function tabbables(root: Element) {
-  return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
+  const stops = Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
+  const ahead = stops.filter((el) => el.tabIndex > 0).sort((a, b) => a.tabIndex - b.tabIndex)
+  return [...ahead, ...stops.filter((el) => el.tabIndex === 0)]
 }
 
 // The first tabbable element after `node` in the document, skipping anything
 // inside `skip`, like the popup that is handing focus back.
 function nextTabbable(node: Node, skip?: Element) {
   const doc = node.ownerDocument ?? document
-  return tabbables(doc.body).find((el) => !el.contains(node) && !skip?.contains(el) && isAfter(node, el))
+  return Array.from(doc.body.querySelectorAll(candidates))
+    .filter(isTabbable)
+    .find((el) => !el.contains(node) && !skip?.contains(el) && isAfter(node, el))
 }
 
 const focusables =
