@@ -183,7 +183,7 @@ const isSecondary = (event: PointerEvent) =>
 // button, and not from a second finger or pen, while no other runs. A drag cut
 // short, like by the component going away, ends as canceled, so its draft goes back.
 function createDragSession(onDestroy?: (cleanup: () => void) => void) {
-  let running: { pointerType: string; cancel: () => void } | undefined
+  let running: { down: PointerEvent; cancel: () => void } | undefined
   onDestroy?.(() => running?.cancel())
   return {
     /**
@@ -192,8 +192,10 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
      */
     accepts(event: PointerEvent) {
       if (event.button !== 0 || isSecondary(event) || event.defaultPrevented) return false
-      // A new primary press of the same kind means the running drag missed its release.
-      if (running?.pointerType === event.pointerType) running.cancel()
+      // A new primary press of the same kind means the running drag missed its release. The
+      // press that started it, bubbling to a part around, like a handle's to its box, doesn't.
+      if (running && running.down !== event && running.down.pointerType === event.pointerType)
+        running.cancel()
       return !running
     },
     /** Follows the press, like `bindDrag`, as this component's one drag. */
@@ -218,7 +220,7 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
         },
       })
       const drag = {
-        pointerType: down.pointerType,
+        down,
         cancel() {
           finish()
           stop()

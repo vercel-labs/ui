@@ -225,6 +225,22 @@ describe("createSpans", () => {
     expect(instance.get().events[1]).toMatchObject({ start: 900, end: 960 })
   })
 
+  test("a press on a span that bubbles to its track still moves the span", () => {
+    const instance = calendar({ id: "c", events: [standup] })
+    cleanups.push(() => instance.destroy())
+    const { spans } = instance.api
+    const day = box(0, 0, 100, 1440)
+    cleanups.push(spans.bindTrack(day, "mon"))
+    const event = box(0, 540, 100, 30, day)
+    cleanups.push(spans.bindSpan(event, "a"))
+    const down = Object.defineProperty(pointer("pointerdown", 50, 550), "target", { value: event })
+    spans.spanPointerdown(down, "a")
+    spans.trackPointerdown(down, "mon")
+    document.dispatchEvent(pointer("pointermove", 50, 612))
+    document.dispatchEvent(pointer("pointerup", 50, 612))
+    expect(instance.get().events[0]).toMatchObject({ track: "mon", start: 600, end: 630 })
+  })
+
   test("spanStyle places a span along its track and in its lane", () => {
     const instance = calendar({ id: "c", events: [standup] })
     cleanups.push(() => instance.destroy())
@@ -320,6 +336,20 @@ describe("createResize", () => {
     // Against the right of the bounds, the box grows only as far as the ratio allows there.
     resize.resizeBy("a", "ne", 1000, -1000)
     expect(instance.get().boxes.a).toEqual({ x: 90, y: 25, width: 310, height: 155 })
+  })
+
+  test("a press on a handle that bubbles to its box still resizes from the handle", () => {
+    const instance = mount()
+    const { resize } = instance.api
+    const el = box(100, 100, 100, 50)
+    const handle = box(196, 146, 8, 8, el)
+    handle.setAttribute("data-resize-handle", "")
+    const down = Object.defineProperty(pointer("pointerdown", 200, 150), "target", { value: handle })
+    resize.pointerdown(down, "a", "se", handle)
+    resize.pointerdown(down, "a", "move", el)
+    document.dispatchEvent(pointer("pointermove", 260, 160))
+    document.dispatchEvent(pointer("pointerup", 260, 160))
+    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 60 })
   })
 
   test("a drag resizes in a draft as custom properties, Escape puts it back, and the drop commits once", () => {
