@@ -77,6 +77,7 @@ function createValueSelection(config: {
   // A restored value's slots still waiting for their items, which submit their saved keys meanwhile.
   let restoring: Restoring | undefined
   let stopWaiting: (() => void) | undefined
+  let filling = false
   onDestroy(stopRestoring)
 
   // A list that starts or stops holding several values keeps what was chosen,
@@ -134,7 +135,12 @@ function createValueSelection(config: {
     const value = Array.isArray(current.value) ? values : values[0]
     if (keys.size) restoring = { value, keys }
     else stopRestoring()
-    store.set({ value })
+    filling = true
+    try {
+      store.set({ value })
+    } finally {
+      filling = false
+    }
   }
 
   const values = () => memoFor(store.get().value).values
@@ -240,6 +246,8 @@ function createValueSelection(config: {
       stopWaiting = store.subscribe(fillArrived)
     },
     stopRestoring,
+    // Whether the value changing now is a restore's late items taking their slots.
+    isFilling: () => filling,
   }
 }
 

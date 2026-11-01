@@ -743,7 +743,10 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     if (multiple || dirty || committing) return
     const first = listOf(value)[0]
     const label = first === undefined ? "" : selection.labelOf(first)
-    if (store.get().query !== label) setQuery(label, { reason: "imperative" })
+    if (store.get().query === label) return
+    // A restore's late items show their label as quietly as the restore itself.
+    if (selection.isFilling() && options().query === undefined) store.set({ query: label, dirty: false })
+    else setQuery(label, { reason: "imperative" })
   })
 
   return api

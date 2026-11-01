@@ -121,3 +121,22 @@ for (const [name, create] of lists)
           expect(instance.get().value).toEqual(one)
         })
     })
+
+test("a combobox shows its restored item's label as the item arrives, with no query change", async () => {
+  const heard: string[] = []
+  const options = {
+    id: "combobox",
+    itemToValue,
+    onQueryChange: (query: string, details: { cancel: () => void }) => {
+      heard.push(query)
+      details.cancel()
+    },
+  }
+  const instance = combobox(options)
+  instance.api.internal.restore(JSON.stringify(["2"]))
+  heard.length = 0
+  instance.setOptions({ ...options, items: both })
+  await flush()
+  expect(instance.get().query).toBe("Two")
+  expect(heard).toEqual([])
+})
