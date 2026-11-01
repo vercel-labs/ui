@@ -160,8 +160,12 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     metrics.y.position = el.scrollTop
     metrics.y.client = el.clientHeight
     metrics.y.scroll = el.scrollHeight
-    // Right to left, scrollLeft runs from 0 down to minus the maximum.
-    metrics.x.position = rtl ? -el.scrollLeft : el.scrollLeft
+    // Right to left, scrollLeft runs from 0 down to minus the maximum. A turned
+    // page resizes nothing but flips the sign, which Safari's rubber band does too,
+    // so a sign that disagrees asks the style.
+    const left = el.scrollLeft
+    if (left !== 0 && left < 0 !== rtl) rtl = isRTL(el)
+    metrics.x.position = rtl ? -left : left
     metrics.x.client = el.clientWidth
     metrics.x.scroll = el.scrollWidth
   }
@@ -343,8 +347,10 @@ function createScrollView(store: Store<ScrollAreaModel>) {
 
   function scrollToEdge(edge: "start" | "end", { behavior = "smooth" }: ScrollAreaScrollOptions = {}) {
     if (!viewport) return
-    measure()
     const axis = mainAxis(store.get())
+    // At scrollLeft 0 the sign can't show a turned page, so a horizontal call reads the direction.
+    if (axis === "x") rtl = isRTL(viewport)
+    measure()
     const smooth = behavior === "smooth" && !prefersReducedMotion()
     stopEasing()
     if (edge === "end" && axis === "y" && store.get().stickToEnd) setFlag("sticking", true)
@@ -492,6 +498,10 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     track,
     rtl: () => rtl,
     measure,
+    // At the start, scrollLeft has no sign to show a turned direction.
+    readDirection: () => {
+      rtl = isRTL(viewport!)
+    },
     scrollTo,
     release,
     stopEasing,

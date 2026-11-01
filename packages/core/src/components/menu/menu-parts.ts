@@ -276,6 +276,8 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         const entry = api.internal.entryOf(event.target as HTMLElement)
         if (entry && store.get().highlighted !== entry.key) store.set({ highlighted: entry.key })
       },
+      // Moves over separators and gaps count, so coming back to the same item reads as a move.
+      pointermove: (event, { api }) => api.internal.trackPointer(event),
       pointerenter(event, { api }) {
         api.parentMenu()?.internal.safeArea.stop()
       },

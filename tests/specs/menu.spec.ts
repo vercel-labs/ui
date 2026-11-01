@@ -1,3 +1,4 @@
+import type { Locator } from "@playwright/test"
 import { expect, focusIsWithin, isSheet, lastAction, menuNamed, test, waitForStill } from "../fixtures"
 import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
 
@@ -7,6 +8,25 @@ import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/po
 test.beforeEach(async ({ open }) => {
   await open("menu")
 })
+
+async function clip(menu: Locator, fromEnd: number) {
+  await menu.evaluate(async (el, offset) => {
+    el.style.maxHeight = "160px"
+    el.style.overflowY = "auto"
+    await new Promise(requestAnimationFrame)
+    el.scrollTop = el.scrollHeight - el.clientHeight - offset
+  }, fromEnd)
+}
+
+async function scrollUnder(menu: Locator, item: Locator, y: number) {
+  const box = (await item.boundingBox())!
+  await menu.evaluate(
+    (el, by) => {
+      el.scrollTop += by
+    },
+    box.y + box.height / 2 - y,
+  )
+}
 
 test.describe("trigger", () => {
   test("advertises its menu and reflects the open state", async ({ page }) => {
@@ -348,6 +368,103 @@ test.describe("submenu with a pointer", () => {
     await page.mouse.move(menu.x - 40, share.y + share.height / 2, { steps: 2 })
     await page.waitForTimeout(300)
     await expect(menuNamed(page, "Share")).toBeHidden()
+  })
+
+  test("returning to the submenu trigger from a separator opens it", async ({ page, open }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const separator = (await menuNamed(page, "File").getByRole("separator").last().boundingBox())!
+    const x = share.x + 12
+    const y = share.y + share.height / 2
+    await page.mouse.move(x, y)
+    await page.mouse.move(x, separator.y + separator.height / 2)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await page.mouse.move(x, y)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+  })
+
+  test("moving from a submenu trigger straight to another item highlights that item", async ({
+    page,
+    open,
+  }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    const box = (await remove.boundingBox())!
+    await page.mouse.move(share.x + 12, share.y + share.height / 2)
+    await page.mouse.move(box.x + 12, box.y + box.height / 2)
+    await expect(remove).toBeFocused()
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+  })
+
+  test("a pointermove without movement on an open submenu trigger keeps focus in the submenu", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const x = share.x + 12
+    const y = share.y + share.height / 2
+    await page.mouse.move(x, y)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await page.keyboard.press("ArrowRight")
+    const email = page.getByRole("menuitem", { name: "Email" })
+    await expect(email).toBeFocused()
+    await page.mouse.move(x, y)
+    await expect(email).toBeFocused()
+  })
+
+  test("content scrolling under a resting pointer after it leaves a closed submenu trigger keeps focus", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "File" }).click()
+    const menu = menuNamed(page, "File")
+    await clip(menu, 0)
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const x = share.x + 12
+    const y = share.y + share.height / 2
+    await page.mouse.move(x, y)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await page.keyboard.press("ArrowRight")
+    await expect(page.getByRole("menuitem", { name: "Email" })).toBeFocused()
+    await page.keyboard.press("ArrowLeft")
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await page.keyboard.press("ArrowDown")
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    await expect(remove).toBeFocused()
+
+    await scrollUnder(menu, page.getByRole("menuitemradio", { name: "Size" }), y)
+    await page.mouse.move(x, y)
+    await expect(remove).toBeFocused()
+  })
+
+  test("a closed submenu trigger that scrolls under a resting pointer stays closed", async ({
+    page,
+    open,
+  }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const menu = menuNamed(page, "File")
+    await clip(menu, 60)
+    const size = page.getByRole("menuitemradio", { name: "Size" })
+    const box = (await size.boundingBox())!
+    const x = box.x + 12
+    const y = box.y + box.height / 2
+    await page.mouse.move(x, y)
+    await expect(size).toBeFocused()
+
+    await scrollUnder(menu, page.getByRole("menuitem", { name: "Share" }), y)
+    await page.mouse.move(x, y)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await expect(size).toBeFocused()
   })
 })
 

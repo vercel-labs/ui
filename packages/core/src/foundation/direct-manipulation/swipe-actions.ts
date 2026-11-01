@@ -119,14 +119,14 @@ function createSwipeActions<State extends object>(
     offOutside?.()
     offOutside = undefined
     if (!next) return
-    // A press anywhere but the open row closes it.
+    // A press anywhere but the open row closes it, unless it's a second finger while one swipes.
     const doc = rows.get(next.key)?.ownerDocument
     if (doc)
       offOutside = on(
         doc,
         "pointerdown",
         (event) => {
-          if (!rows.get(next.key)?.contains(event.target as Node)) api.close()
+          if (event.isPrimary && !rows.get(next.key)?.contains(event.target as Node)) api.close()
         },
         { capture: true },
       )
@@ -206,7 +206,7 @@ function createSwipeActions<State extends object>(
      * and vertical scrolls keep working.
      */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (event.button !== 0 || options.disabled?.(key)) return
+      if (event.button !== 0 || !event.isPrimary || options.disabled?.(key)) return
       const shown = open()
       // A press inside the open actions is a click on one.
       if (shown?.key === key && actions.get(actionsId(key, shown.side))?.contains(event.target as Node))

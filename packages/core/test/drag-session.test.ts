@@ -248,6 +248,7 @@ function scrollbar() {
     release() {},
     stopEasing() {},
     setDragging() {},
+    readDirection() {},
   }
   const unbind = createScrollbarInput(host).bindThumb(thumb, "y")
   thumb.dispatchEvent(press("pointerdown", { pointerType: "mouse", clientY: 10 }))

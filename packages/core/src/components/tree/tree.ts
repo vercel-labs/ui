@@ -140,7 +140,7 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
   /** Runs when the selection wants to change. `details.reason` says why, and `details.cancel()` stops it. */
   onValueChange?: (value: TreeValue<Mode>, details: ChangeDetails<TreeValueChangeReason>) => void
   /**
-   * Whether moving focus with the arrow keys selects, with one item
+   * Whether moving focus with the keyboard selects, with one item
    * selectable: `"automatic"` selects the focused item, `"manual"` waits for
    * Enter, Space or a press.
    * @defaultValue "manual"
