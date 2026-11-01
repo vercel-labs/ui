@@ -57,8 +57,12 @@ type SheetDriver = {
   snapTo: (id: string, reason: SheetSnapReason) => void
   /** A refused dismissal: a small push toward closing that springs back. */
   nudge: () => void
-  /** The geometry changed: keep the resting snap point and move to its new extent, at once when `immediate`. */
-  relayout: (immediate: boolean) => void
+  /**
+   * The geometry changed: keep the resting snap point and move to its new
+   * extent, at once when `immediate`. If that point is gone, `fallback`, or
+   * else the nearest.
+   */
+  relayout: (immediate: boolean, fallback?: string) => void
   /** The snap point it rests on or is settling to, or null when closed or closing. */
   target: () => string | null
   /** Whether a gesture or a settle is in progress. */

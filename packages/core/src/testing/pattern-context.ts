@@ -7,6 +7,7 @@ import {
   describe,
   ids,
   isGone,
+  isUndisplayed,
   isUnreachable,
   roleOf,
   withRole,
@@ -185,10 +186,7 @@ function popupOf(el: Element, roles: string[]) {
 
 /** Whether a popup is open: rendered, and not hidden by `hidden` or `display: none`. */
 function isShown(el: Element | null | undefined) {
-  if (!el || isGone(el)) return false
-  for (let node: Element | null = el; node; node = node.parentElement)
-    if (getComputedStyle(node).display === "none") return false
-  return true
+  return !!el && !isGone(el) && !isUndisplayed(el)
 }
 
 export {
