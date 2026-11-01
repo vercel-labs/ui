@@ -1,24 +1,28 @@
-import { existsSync, readFileSync } from "node:fs"
+import { readFileSync, statSync } from "node:fs"
 import path from "node:path"
 import { frameworks, type Framework } from "./frameworks"
 
 type Manifest = Record<string, { file: string; imports?: string[] }>
 
-// Vite's manifest of the compiled examples in public/examples, read once per
-// framework. Turbopack skips tracing the path, as in repo-root.
-const manifests = new Map<string, Manifest | null>()
+// Vite's manifest of the compiled examples in public/examples, by framework.
+// The dev server rebuilds them while it runs, so a newer manifest is read again.
+// Turbopack skips tracing the path, as in repo-root.
+const manifests = new Map<string, { changed: number; manifest: Manifest }>()
 
 function manifestFor(example: string) {
-  if (!manifests.has(example)) {
-    const file = path.join(
-      /* turbopackIgnore: true */ process.cwd(),
-      "public/examples",
-      example,
-      ".vite/manifest.json",
-    )
-    manifests.set(example, existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null)
-  }
-  return manifests.get(example)
+  const file = path.join(
+    /* turbopackIgnore: true */ process.cwd(),
+    "public/examples",
+    example,
+    ".vite/manifest.json",
+  )
+  const changed = statSync(file, { throwIfNoEntry: false })?.mtimeMs
+  if (changed === undefined) return null
+  const cached = manifests.get(example)
+  if (cached?.changed === changed) return cached.manifest
+  const manifest: Manifest = JSON.parse(readFileSync(file, "utf8"))
+  manifests.set(example, { changed, manifest })
+  return manifest
 }
 
 /**
