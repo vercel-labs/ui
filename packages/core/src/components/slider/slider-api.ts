@@ -63,6 +63,10 @@ function thumbValuesOf(value: number | number[]) {
   valuesOf(value).forEach((item, index) => (record[index] = item))
   return record
 }
+function holdsValue(thumbValues: Record<string, number>, value: number | number[]) {
+  if (!Array.isArray(value)) return thumbValues[0] === value && thumbValues[1] === undefined
+  return thumbValues[value.length] === undefined && value.every((item, index) => thumbValues[index] === item)
+}
 // Keeps a single value a number, so `onValueChange` gets back what it was given.
 const shaped = (values: number[], like: number | number[]) => (Array.isArray(like) ? values : values[0])
 
@@ -334,9 +338,11 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   })
 
   // Each thumb's value by index follows the value, before any part hears it changed.
-  // The same value makes the same record, so a framework's render and the handover agree.
+  // The same value makes the same record, so a framework's render and the handover
+  // agree, and a preview the framework drops never replaces the record state holds.
   let made = { value: store.get().value, thumbValues: store.get().thumbValues }
-  deriveState(context, ["thumbValues"], ({ value }) => {
+  deriveState(context, ["thumbValues"], ({ value, thumbValues }) => {
+    if (holdsValue(thumbValues, value)) return
     if (!sameValue(value, made.value)) made = { value, thumbValues: thumbValuesOf(value) }
     return { thumbValues: made.thumbValues }
   })
