@@ -461,17 +461,32 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         unbind?.()
       })
     }
-    if (props.hiddenUntilFound) {
+    // Find in page follows `hiddenUntilFound` as it renders, and costs
+    // nothing while it's off.
+    const isFindable = () => !!(context.props("content", key) ?? props).hiddenUntilFound
+    let stopFinding: (() => void) | undefined
+    const follow = () => {
+      if (isFindable() === !!stopFinding) return
+      if (stopFinding) {
+        stopFinding()
+        stopFinding = undefined
+        return
+      }
       const findable = bindFindable(el, {
         shown: () => isShown(store.get(), key),
-        findable: () => !!(context.props("content", key) ?? props).hiddenUntilFound,
+        findable: isFindable,
         reveal: (event) => open(key, { reason: "find-in-page", event }),
       })
-      cleanups.push(findable, store.subscribe(findable.check))
+      const stops = [findable, store.subscribe(findable.check)]
       // Kept in place, its own width and padding would push the items beside it.
-      if (!viewport?.contains(el))
-        cleanups.push(collapseWhileHidden(el, () => isShown(store.get(), key), store))
+      if (!viewport?.contains(el)) stops.push(collapseWhileHidden(el, () => isShown(store.get(), key), store))
+      stopFinding = () => {
+        findable.check()
+        stops.forEach((stop) => stop())
+      }
     }
+    follow()
+    cleanups.push(onProps(part, follow), () => stopFinding?.())
     keys.contentBound(key, el)
     return () => cleanups.forEach((cleanup) => cleanup())
   }
