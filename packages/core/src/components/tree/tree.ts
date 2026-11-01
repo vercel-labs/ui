@@ -646,8 +646,13 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
           ...openAttrs(open),
         }
       },
-      bind: (el, { api, props, store }) =>
-        api.internal.bindGroup(el, itemOf(props), () => findable(store.get(), props)),
+      bind: (el, part) =>
+        part.api.internal.bindGroup(
+          el,
+          itemOf(part.props),
+          () => findable(part.store.get(), part.props),
+          part,
+        ),
     }),
   }),
   agent: {

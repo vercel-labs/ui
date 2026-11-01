@@ -13,7 +13,14 @@ export {
   type SheetSnapReason,
   type SheetState,
 } from "./machine"
-export { bindFindable, bindPanel, hiddenAttrs, type PanelBinding, supportsHiddenUntilFound } from "./panel"
+export {
+  bindFindable,
+  bindPanel,
+  hiddenAttrs,
+  type PanelBinding,
+  stateAndRenders,
+  supportsHiddenUntilFound,
+} from "./panel"
 export { sheetPhysics, type SheetPhysics } from "./physics"
 export { animateIn, animateOut, writeOpen } from "./presence"
 export { nearestIndex, projectDistance } from "./projection"

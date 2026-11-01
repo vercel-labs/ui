@@ -7,6 +7,7 @@ import {
   openAttrs,
   triggerKeydown,
 } from "../../foundation/disclosure/disclosure"
+import { stateAndRenders } from "../../foundation/motion/panel"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
@@ -266,7 +267,8 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         ...openAttrs(state.open),
         "data-disabled": state.disabled ? "" : undefined,
       }),
-      bind(el, { api, store, props }) {
+      bind(el, part) {
+        const { api, store } = part
         const unregister = api.internal.registerPanel()
         const unbind = bindPanel(el, {
           size(el, height, width) {
@@ -275,11 +277,11 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
           },
           isOpen: () => store.get().open,
           isExiting: () => store.get().exiting,
-          isFindable: () => !!props.hiddenUntilFound,
+          isFindable: () => !!part.props.hiddenUntilFound,
           opening: api.internal.opening,
           reveal: (event) => api.open({ reason: "find-in-page", event }),
           trigger: api.internal.triggerElement,
-          subscribe: store.subscribe,
+          subscribe: stateAndRenders(store, part),
           settled: api.internal.settled,
           exited: api.internal.exited,
         })

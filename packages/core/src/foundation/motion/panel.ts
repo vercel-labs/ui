@@ -1,6 +1,8 @@
 // A panel that shows and hides with its own enter and exit animations, size
 // variables, find in page and focus handling: Collapsible's and Accordion's
 // panels, and any panel a custom primitive shows, like a tree's group.
+import { onProps } from "../kernel/part"
+import type { Part } from "../kernel/primitive-types"
 import { animateIn, animateOut } from "./presence"
 
 /**
@@ -168,4 +170,17 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
   return () => cleanups.forEach((cleanup) => cleanup())
 }
 
-export { bindFindable, bindPanel, hiddenAttrs, type PanelBinding, supportsHiddenUntilFound }
+// A panel's `subscribe`: its state, and each render of its part, which can
+// change a prop like `hiddenUntilFound` with no state change.
+function stateAndRenders(store: { subscribe: (listener: () => void) => () => void }, part: Part) {
+  return (listener: () => void) => {
+    const offState = store.subscribe(listener)
+    const offProps = onProps(part, listener)
+    return () => {
+      offState()
+      offProps()
+    }
+  }
+}
+
+export { bindFindable, bindPanel, hiddenAttrs, type PanelBinding, stateAndRenders, supportsHiddenUntilFound }
