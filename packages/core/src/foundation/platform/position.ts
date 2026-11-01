@@ -347,7 +347,7 @@ function position(
     const a = anchorRect(shown ?? anchor)
     const viewport = visibleViewport()
     const offsets = { width: el.offsetWidth, height: el.offsetHeight }
-    const arrow = typeof options.arrow === "function" ? options.arrow() : options.arrow
+    const arrow = arrowOf(options)
     const arrowSize = arrow ? { width: arrow.offsetWidth, height: arrow.offsetHeight } : undefined
     const key = [
       a.x,
@@ -365,7 +365,8 @@ function position(
       ...Object.values(resolved),
       arrowPadding,
     ].join()
-    if (key === last) return false
+    // A new arrow element, even one the same size, has no placement of its own yet.
+    if (key === last && (!arrow || arrow === arrowWriter?.el)) return false
     last = key
     // The padding box, which arrows are placed in. Read only when something
     // moved, and before any write, so it never forces a second layout.
@@ -468,12 +469,17 @@ function position(
     stopped = true
   }
   // Asks for a check when the options changed, like a new side rendered while
-  // open, without reading layout when they didn't.
-  let asked = optionsKey(read())
+  // open or an arrow that bound late, without reading layout when they didn't.
+  const initial = read()
+  let asked = optionsKey(initial)
+  let askedArrow = arrowOf(initial)
   function follow() {
-    const next = optionsKey(read())
-    if (next === asked) return
+    const options = read()
+    const next = optionsKey(options)
+    const arrow = arrowOf(options)
+    if (next === asked && arrow === askedArrow) return
     asked = next
+    askedArrow = arrow
     wake()
   }
   // Places the popup again now, as its first placement, without animating:
@@ -490,6 +496,9 @@ function position(
     },
   })
 }
+
+const arrowOf = (options: PositionOptions) =>
+  typeof options.arrow === "function" ? options.arrow() : options.arrow
 
 const optionsKey = (options: PositionOptions) =>
   [

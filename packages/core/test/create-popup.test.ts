@@ -16,7 +16,11 @@ import { dialog } from "../src/components/dialog/dialog"
 import { hoverCard } from "../src/components/hover-card/hover-card"
 import { popover } from "../src/components/popover/popover"
 import { tooltip } from "../src/components/tooltip/tooltip"
-import type { Modal } from "../src/foundation/popups/popup"
+import { select } from "../src/components/select/select"
+import { combobox } from "../src/components/combobox/combobox"
+import { autocomplete } from "../src/components/autocomplete/autocomplete"
+import { findLayer } from "../src/foundation/platform/layers"
+import { type Modal, modalTriple } from "../src/foundation/popups/popup"
 import { checkPattern, checkServer, mount } from "../src/testing"
 import { rerenderOf } from "../src/testing/mount"
 
@@ -638,5 +642,68 @@ describe("our popups on the kit", () => {
         `<div><trigger>Save</trigger><content>Save</content></div>`,
       ),
     ).toContain('role="tooltip"')
+  })
+})
+
+describe("a shown popup's modal effects", () => {
+  const listMarkup = `<root><input><content><list></list></content></root>`
+  const selectMarkup = `<root><trigger><value></value></trigger><content><list></list></content></root>`
+  const changes = <T>(values: readonly T[]) =>
+    values.flatMap((from) => values.filter((to) => to !== from).map((to) => ({ from, to })))
+  const cases = [
+    ...changes([undefined, false, true, "trap-focus"] as const).flatMap(({ from, to }) => [
+      {
+        name: "a custom popup",
+        from,
+        to,
+        show: () => mount(unsyncedShare, { defaultOpen: true, modal: from }, shareMarkup),
+      },
+      {
+        name: "Dialog",
+        from,
+        to,
+        show: () => mount(dialog, { defaultOpen: true, modal: from }, shareMarkup),
+      },
+      {
+        name: "Popover",
+        from,
+        to,
+        show: () => mount(popover, { defaultOpen: true, modal: from }, shareMarkup),
+      },
+    ]),
+    ...changes([undefined, false, true, "pointer"] as const).flatMap(({ from, to }) => [
+      {
+        name: "Select",
+        from,
+        to,
+        show: () => mount(select, { defaultOpen: true, modal: from }, selectMarkup),
+      },
+      {
+        name: "Combobox",
+        from,
+        to,
+        show: () => mount(combobox, { defaultOpen: true, modal: from }, listMarkup),
+      },
+      {
+        name: "Autocomplete",
+        from,
+        to,
+        show: () => mount(autocomplete, { defaultOpen: true, modal: from }, listMarkup),
+      },
+    ]),
+  ]
+
+  test.each(cases)("$name follows modal from $from to $to while open", ({ show, to }) => {
+    const outside = document.body.appendChild(document.createElement("button"))
+    const view = show()
+    mounts.push(view)
+    const focused = document.activeElement
+    rerenderOf(view).setOptions({ modal: to })
+    const effects = modalTriple(view.state.modal)
+    expect(view.state.open).toBe(true)
+    expect(document.activeElement).toBe(focused)
+    expect(!!outside.inert).toBe(effects.inertAndLock)
+    expect(document.documentElement.style.overflow === "hidden").toBe(effects.inertAndLock)
+    expect(findLayer(view.part("content")!)?.modal).toBe(effects.consumeOutsidePress)
   })
 })

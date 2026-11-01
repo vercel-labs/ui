@@ -461,6 +461,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
+  let checkPlacement: (() => void) | undefined
   let remodal: (() => void) | undefined
   let observer: ((open: boolean) => PopupClose<Reason> | undefined) | undefined
 
@@ -668,7 +669,8 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     if (config.position && options.position) {
       const placement = options.position(() => config.anchor?.() ?? options.trigger(), el, config.position)
       place = placement.place
-      cleanups.push(placement, () => (place = undefined))
+      checkPlacement = placement.follow
+      cleanups.push(placement, () => (place = checkPlacement = undefined))
       if (config.rendered) cleanups.push(config.rendered(placement.follow))
     }
     if (!supportsTopLayer() && !host.style.zIndex) host.style.zIndex = "2147483000"
@@ -974,9 +976,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     initialFocus,
     // Places the shown popup again now, without animating, like once its size is known.
     place: () => place?.(),
-    // The same, unless it animates, like when its arrow binds late: placing it
-    // anew would cut the animation short, and its placement follows anyway.
-    placeWhenStill: () => !shown?.el.getAnimations?.().length && place?.(),
+    // Checks the shown popup's placement without starting it over, like when
+    // its arrow binds late, so an animation it runs goes on.
+    checkPlacement: () => checkPlacement?.(),
     // Applies `modal` again while shown, after it changed, like a sheet
     // crossing the snap point above which it's modal. Focus doesn't move.
     updateModal: () => remodal?.(),
