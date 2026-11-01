@@ -706,4 +706,20 @@ describe("a shown popup's modal effects", () => {
     expect(document.documentElement.style.overflow === "hidden").toBe(effects.inertAndLock)
     expect(findLayer(view.part("content")!)?.modal).toBe(effects.consumeOutsidePress)
   })
+
+  test.each([false, true])(
+    "a child shown outside its parent stays usable when the parent turns modal, child modal: %s",
+    (modal) => {
+      const parent = mount(dialog, { defaultOpen: true, modal: false }, shareMarkup)
+      const child = mount(dialog, { modal }, shareMarkup)
+      mounts.push(parent, child)
+      parent.part("content")!.append(child.part("trigger")!)
+      rerenderOf(child).setOptions({ modal, open: true })
+      const content = child.part("content")!
+      expect(findLayer(content)?.parent).toBe(findLayer(parent.part("content")!))
+      rerenderOf(parent).setOptions({ modal: true })
+      const inert = (node: HTMLElement | null): boolean => !!node && (node.inert || inert(node.parentElement))
+      expect(inert(content)).toBe(false)
+    },
+  )
 })
