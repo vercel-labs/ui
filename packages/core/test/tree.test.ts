@@ -203,6 +203,194 @@ describe("selection", () => {
     expect(instance.api.getValue()).toBe("docs")
   })
 
+  test('with `activation: "automatic"`, Right into a branch, Left out of it and typing select too', async () => {
+    const { instance, els, key, focused } = render({ activation: "automatic", defaultExpanded: ["src"] })
+    await tick()
+    els.get("src")!.focus()
+    key("ArrowRight")
+    expect(focused()).toBe("index.ts")
+    expect(instance.api.getValue()).toBe("index.ts")
+    key("ArrowLeft")
+    expect(focused()).toBe("src")
+    expect(instance.api.getValue()).toBe("src")
+    key("R", { shiftKey: true })
+    expect(focused()).toBe("README.md")
+    expect(instance.api.getValue()).toBe("README.md")
+  })
+
+  test('with `activation: "automatic"`, Right into a branch whose children are loading selects the first once it shows', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els, key, focused } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(focused()).toBe("child")
+    expect(instance.api.getValue()).toBe("child")
+  })
+
+  test('with `activation: "automatic"`, the child of a loading branch keeps the key press that stepped into it', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const onValueChange = vi.fn()
+    const { instance, els, key } = render({ activation: "automatic", loadChildren, onValueChange }, [
+      { value: "remote", branch: true },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "child",
+      expect.objectContaining({ event: expect.objectContaining({ key: "ArrowRight" }) }),
+    )
+  })
+
+  test('with `activation: "automatic"`, the child of a loading branch selects nothing once focus moved on', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+      { value: "other" },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    key("ArrowDown")
+    expect(instance.api.getValue()).toBe("other")
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(instance.api.getValue()).toBe("other")
+  })
+
+  test('with `activation: "automatic"`, the child of a loading branch selects nothing once focus left the tree', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    const before = instance.api.getValue()
+    const outside = document.body.appendChild(document.createElement("button"))
+    cleanups.push(() => outside.remove())
+    outside.focus()
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(instance.api.getValue()).toBe(before)
+  })
+
+  test('with `activation: "automatic"`, the child of a loading branch is selected inside a shadow root too', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    const remote = els.get("remote")!
+    const host = document.body.appendChild(document.createElement("div"))
+    cleanups.push(() => host.remove())
+    host.attachShadow({ mode: "open" }).append(remote.parentElement!)
+    await tick()
+    remote.focus()
+    const right = () =>
+      remote.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }),
+      )
+    right()
+    right()
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    remote.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(instance.api.getValue()).toBe("child")
+  })
+
+  test('with `activation: "automatic"`, collapsing a loading branch forgets the key press that stepped into it', async () => {
+    let resolve = () => {}
+    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
+      { value: "remote", branch: true },
+    ])
+    await tick()
+    els.get("remote")!.focus()
+    key("ArrowRight")
+    key("ArrowRight")
+    const before = instance.api.getValue()
+    instance.api.collapse("remote")
+    instance.api.expand("remote")
+    resolve()
+    await tick()
+    const child = document.createElement("div")
+    child.tabIndex = -1
+    const label = child.appendChild(document.createElement("span"))
+    label.textContent = "child"
+    els.get("remote")!.append(child)
+    cleanups.push(
+      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
+      bind(instance.part("label", { value: "child" }), label),
+    )
+    await tick()
+    expect(instance.api.getValue()).toBe(before)
+  })
+
   test('`selectionMode: "none"` writes no aria-selected and selects nothing', () => {
     const { instance, els } = render({ selectionMode: "none" })
     els.get("README.md")!.click()

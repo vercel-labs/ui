@@ -292,6 +292,35 @@ test.describe("keyboard", () => {
     await expect(link(page, "Analytics")).toBeFocused()
   })
 
+  test("an editable element in a panel keeps Down, and a tab stop that isn't editable passes it on", async ({
+    page,
+    tab,
+  }) => {
+    await trigger(page, "Products").focus()
+    await page.keyboard.press("Enter")
+    await tab()
+    await expect(link(page, "Analytics")).toBeFocused()
+    for (const [value, editable] of [
+      ["true", true],
+      ["inherit", false],
+      ["False", false],
+    ] as const) {
+      await link(page, "Analytics").evaluate((el, value) => {
+        const note = document.createElement("span")
+        note.id = "note"
+        note.tabIndex = 0
+        note.textContent = "Note"
+        note.setAttribute("contenteditable", value)
+        el.before(note)
+      }, value)
+      const note = page.locator("#note")
+      await note.focus()
+      await page.keyboard.press("ArrowDown")
+      await expect(editable ? note : link(page, "Analytics")).toBeFocused()
+      await note.evaluate((el) => el.remove())
+    }
+  })
+
   test("a vertical menu moves between items with Down and Up", async ({ page, open }) => {
     await open("navigation-menu", { orientation: "vertical" })
     await trigger(page, "Products").focus()
