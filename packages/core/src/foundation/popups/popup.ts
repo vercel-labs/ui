@@ -9,6 +9,7 @@ import type { ChangeOptions, ChangeReason, ChangeSource } from "../kernel/detail
 import { on } from "../kernel/events"
 import type { Store } from "../kernel/store"
 import {
+  activeLayers,
   findLayer,
   lastClosed,
   lastEscape,
@@ -396,6 +397,9 @@ function watchClose(close: (event: Event) => void) {
   return () => watcher?.destroy()
 }
 
+// Each shown layer's own elements, which a parent that turns modal later keeps out of its inert.
+const layerParts = new WeakMap<Layer, HTMLElement[]>()
+
 function createPopupLayer<State extends { open: boolean; mounted: boolean }, Reason extends string = string>(
   options: Partial<PopupBehavior> & {
     // The behavior to start from. Any behavior option passed here overrides it.
@@ -463,6 +467,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
+  let checkPlacement: (() => void) | undefined
   let remodal: (() => void) | undefined
   let observer: ((open: boolean) => PopupClose<Reason> | undefined) | undefined
 
@@ -690,7 +695,8 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     if (config.position && options.position) {
       const placement = options.position(() => config.anchor?.() ?? options.trigger(), el, config.position)
       place = placement.place
-      cleanups.push(placement, () => (place = undefined))
+      checkPlacement = placement.follow
+      cleanups.push(placement, () => (place = checkPlacement = undefined))
       if (config.rendered) cleanups.push(config.rendered(placement.follow))
     }
     if (!supportsTopLayer() && !host.style.zIndex) host.style.zIndex = "2147483000"
@@ -779,6 +785,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
                 }),
     }
     layer = own
+    layerParts.set(own, [el, ...(backdrop ? [backdrop] : [])])
     cleanups.push(pushLayer(own))
     for (const onShow of [options.onShow, config.onShow]) {
       const cleanup = onShow?.(own)
@@ -789,6 +796,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const freezePage = () => {
       const keep = [el, ...(shown?.backdrop ? [shown.backdrop] : []), ...(persistent as HTMLElement[])]
       if (trigger && behavior.keepTrigger) keep.push(trigger)
+      // A layer opened from this one before it turned modal stays usable too.
+      for (const layer of activeLayers())
+        for (let up = layer.parent; up; up = up.parent)
+          if (up === own) keep.push(...(layerParts.get(layer) ?? []))
       const inert = inertOutside(keep)
       own.keep = inert.keep
       releaseInert = releaseOwnInert = inert
@@ -1015,6 +1026,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     initialFocus,
     // Places the shown popup again now, without animating, like once its size is known.
     place: () => place?.(),
+    // Checks the shown popup's placement without starting it over, like when
+    // its arrow binds late, so an animation it runs goes on.
+    checkPlacement: () => checkPlacement?.(),
     // Applies `modal` again while shown, after it changed, like a sheet
     // crossing the snap point above which it's modal. Focus doesn't move.
     updateModal: () => remodal?.(),

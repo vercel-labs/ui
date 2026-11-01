@@ -78,7 +78,7 @@ const list = definePrimitive({
       set: (value, details) => change("value", value, details),
       order: () => roving.items().map((item) => item.key),
       multiple: () => !!context.options().multiple,
-      selectable: (key) => !context.props("item", key)?.disabled,
+      selectable: (key) => !context.props<ListItemProps>("item", key)?.disabled,
     })
     const recovery = createFocusRecovery<ListItemProps>({
       fallback: (lost) => (lost.props.parent ? context.element("item", lost.props.parent) : undefined),

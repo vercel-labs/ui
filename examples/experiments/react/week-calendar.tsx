@@ -87,8 +87,7 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
       syncHistory()
       return true
     }
-    const dayLabel = (day: string) =>
-      (context.props("day", day) as { label?: string } | undefined)?.label ?? day
+    const dayLabel = (day: string) => context.props<{ label?: string }>("day", day)?.label ?? day
     const label = (event: CalendarEvent) =>
       `${event.title}, ${dayLabel(event.track)} ${formatTime(event.start)} to ${formatTime(event.end)}`
 

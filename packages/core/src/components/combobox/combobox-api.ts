@@ -459,7 +459,11 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   }
 
   function createProps() {
-    return (elements(context, "create")[0]?.props ?? context.props("create") ?? {}) as ComboboxCreateProps
+    return (
+      elements<ComboboxCreateProps>(context, "create")[0]?.props ??
+      context.props<ComboboxCreateProps>("create") ??
+      {}
+    )
   }
 
   // Whether the create option shows: there's text enough, the user typed it,
@@ -652,7 +656,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       isEmpty: (state: ComboboxState) => (!!state.items || state.settled) && listbox.count() === 0,
       // How many items match, leaving out the create and select-all options.
       itemCount: () => listbox.count(),
-      itemProps: (key: string) => context.props("item", key) as ComboboxItemMeta | undefined,
+      itemProps: (key: string) => context.props<ComboboxItemMeta>("item", key),
       contentProps: (key?: string) => kit.internal.contentProps(key) as ComboboxContentProps,
       // The id aria-activedescendant points at, once that element is in the page.
       // None while real focus is in the list.

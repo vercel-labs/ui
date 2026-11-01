@@ -113,6 +113,37 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
   })
 
+  test("Shift+Tab from the first element wraps to the checked radio of a group outside a form", async ({
+    page,
+    tab,
+  }) => {
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<label><input type="radio" name="speed" checked> Standard</label><label><input type="radio" name="speed"> Express</label>`,
+      ),
+    )
+    await tab({ shift: true })
+    await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
+  })
+
+  test("Tab reaches radios whose group's checked radio is behind the dialog", async ({ page, tab }) => {
+    await outside(page, "After").evaluate((el) =>
+      el.insertAdjacentHTML("afterend", `<input type="radio" name="speed" aria-label="Page speed" checked>`),
+    )
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<label><input type="radio" name="speed"> Standard</label><label><input type="radio" name="speed"> Express</label>`,
+      ),
+    )
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
+  })
+
   test("Tab visits a positive tabindex first, like the browser", async ({ page, tab }) => {
     await openWithKeyboard(page)
     await dialog(page).evaluate((el) =>

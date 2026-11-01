@@ -204,7 +204,7 @@ Try leaving a field empty. The button finds it from the current page order, so t
 
 <ComponentExample name="core/first-empty-field" />
 
-For one part, use `context.element(slot, key)`. To read its latest props, use `context.props(slot, key)`. The `key` is the part's `id` prop, or its `value`, as with the stars in [Compose Behaviors](../compose-behaviors#add-a-star).
+For one part, use `context.element(slot, key)`. To read its latest props, use `context.props(slot, key)`, naming them the same way: `context.props<{ title: string }>("window", key)`. The `key` is the part's `id` prop, or its `value`, as with the stars in [Compose Behaviors](../compose-behaviors#add-a-star).
 
 ## What Agents Can Do
 

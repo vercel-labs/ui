@@ -137,6 +137,32 @@ describe("slider", () => {
     expect(range.get().value).toEqual([30, 60])
   })
 
+  test.each([
+    { value: 10, other: 30 },
+    { value: [10, 20], other: [30, 40] },
+  ])("a preview it drops leaves the same value handed over unchanged: $value", ({ value, other }) => {
+    const instance = kept(slider({ id: "s", value }))
+    instance.setOptions({ id: "s", value })
+    expect(instance.preview({ id: "s", value: other })).toBeDefined()
+    expect(instance.preview({ id: "s", value })).toBeUndefined()
+    const listener = vi.fn()
+    instance.subscribe(listener)
+    instance.setOptions({ id: "s", value })
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  test.each([
+    { from: 0, to: -0 },
+    { from: -0, to: 0 },
+    { from: [0, 1], to: [-0, 1] },
+    { from: [-0, 1], to: [0, 1] },
+  ])("a thumb's value text follows a change of zero's sign: $from to $to", ({ from, to }) => {
+    const instance = kept(slider({ id: "s", value: from, min: -1, max: 1, locale: "en-US" }))
+    instance.setOptions({ id: "s", value: to, min: -1, max: 1, locale: "en-US" })
+    const text = Object.is(Array.isArray(to) ? to[0] : to, -0) ? "-0" : "0"
+    expect(attrs(instance.part("thumb-input", { id: "0", index: 0 }))["aria-valuetext"]).toBe(text)
+  })
+
   test("keeps a single value a number", () => {
     const onValueChange = vi.fn()
     const instance = slider({ id: "s", defaultValue: 5, onValueChange })

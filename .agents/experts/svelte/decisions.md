@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 160 and 161 (2026-11-01, the focus trap fixes).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes).
 
 
 ## Settled
@@ -26,6 +26,7 @@ Last reviewed: PRs 160 and 161 (2026-11-01, the focus trap fixes).
 - **A popup stays shown when its anchor is clipped by a scroll container.** A marker like `data-anchor-hidden` is a public API and waits on discussion.
 - **An anchor moved by the Web Animations API** is followed by positioning's 500ms slow check, not on the next frame.
 - **A Combobox with `bind:value` records a relay on `query`** when the user types and presses Enter, from setting the input's text inside the handover (on main since `d9c0141`). No playground fixture binds a Combobox's value.
+- **Data lists key separators and groups by index** (`command-items.svelte`, `listbox-items.svelte`), so a separator that comes back shifts the keys and a `CommandGroup` instance can be reused for another group.
 
 ## Revisit
 

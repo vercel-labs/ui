@@ -319,6 +319,11 @@ function popupArrow<State extends PopupState, Api extends PopupApi>(slot: SlotFa
   return slot<{}, PopupPartState>({
     state: (state) => ({ open: state.open }),
     attrs: (state) => ({ "aria-hidden": "true", ...openAttrs(state.open) }),
+    // An arrow that binds after its popup was placed, like one Svelte binds
+    // after the content, points at the trigger at once.
+    bind(_, { api }) {
+      api.internal.popup.checkPlacement()
+    },
   })
 }
 
