@@ -78,13 +78,12 @@ function useBindings() {
         bound.delete(ref)
         return ref(null)
       }
-      let slots = held.get(el)
-      if (!slots) held.set(el, (slots = new Map()))
+      const slots = held.get(el) ?? new Map<string, PartRef>()
       const previous = slots.get(slot)
-      slots.set(slot, ref)
-      if (previous && previous !== ref && bound.get(previous) === el) {
-        bound.delete(previous)
-        if (!isReleased) previous(null)
+      held.set(el, slots.set(slot, ref))
+      if (previous !== ref && bound.get(previous!) === el) {
+        bound.delete(previous!)
+        if (!isReleased) previous!(null)
       }
       mine = el
       bound.set(ref, el)
