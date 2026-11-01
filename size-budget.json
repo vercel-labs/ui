@@ -204,7 +204,7 @@
   "@ui-sdk/vue/toast (lazy)": 107,
   "@ui-sdk/vue/toggle": 15163,
   "@ui-sdk/vue/token-input": 21145,
-  "@ui-sdk/vue/toolbar": 12580,
+  "@ui-sdk/vue/toolbar": 13005,
   "@ui-sdk/vue/tooltip": 30563,
   "@ui-sdk/vue/trigger-menu": 42491,
   "@ui-sdk/vue (perf pages)": 98538,

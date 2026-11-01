@@ -9,6 +9,7 @@ import {
   openAttrs,
   triggerKeydown,
 } from "../../foundation/disclosure/disclosure"
+import { stateAndRenders } from "../../foundation/motion/panel"
 import type { AccordionGeneric } from "./accordion-generic"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
@@ -584,7 +585,8 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
           "data-disabled": disabledOf(state, key, api) ? "" : undefined,
         }
       },
-      bind(el, { api, key, store, props }) {
+      bind(el, part) {
+        const { api, key, store } = part
         const unregister = api.internal.registerPanel(key)
         const unbind = bindPanel(el, {
           size(el, height, width) {
@@ -593,11 +595,11 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
           },
           isOpen: () => api.isOpen(key),
           isExiting: () => store.get().exiting.includes(key),
-          isFindable: () => findable(store.get(), props),
+          isFindable: () => findable(store.get(), part.props),
           opening: () => api.internal.opening(key),
           reveal: (event) => api.open(key, { reason: "find-in-page", event }),
           trigger: () => api.internal.triggerElement(key),
-          subscribe: store.subscribe,
+          subscribe: stateAndRenders(store, part),
           settled: (open) => api.internal.settled(key, open),
           exited: () => api.internal.finishExit(key),
         })
