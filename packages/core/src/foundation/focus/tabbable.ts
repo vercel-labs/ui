@@ -35,17 +35,16 @@ function tabbables(root: Element) {
   return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
 }
 
-// Tab visits positive tabindex values first, lowest first, then the rest in
-// document order. One slotted into a custom element orders only within its
-// slot, so it keeps its host's place. Returns `stops` itself when nothing moves.
-function inTabOrder(stops: HTMLElement[], root: Element) {
+// The stops Tab visits before the rest: positive tabindex values, lowest
+// first. One slotted into a custom element orders only within its slot, so it
+// keeps its host's place.
+function positiveTabStops(stops: HTMLElement[], root: Element) {
   const slotted = (el: Element) => {
     for (let node: Element | null = el; node && node !== root; node = node.parentElement)
       if (node.assignedSlot) return true
     return false
   }
-  const ahead = stops.filter((el) => el.tabIndex > 0 && !slotted(el)).sort((a, b) => a.tabIndex - b.tabIndex)
-  return ahead.length ? [...ahead, ...stops.filter((el) => !ahead.includes(el))] : stops
+  return stops.filter((el) => el.tabIndex > 0 && !slotted(el)).sort((a, b) => a.tabIndex - b.tabIndex)
 }
 
 // The first tabbable element after `node` in the document, skipping anything
@@ -130,4 +129,4 @@ function bindTabStop(
   return { check, stop: () => observer.disconnect() }
 }
 
-export { bindTabStop, inTabOrder, isTabbable, nextTabbable, tabbables }
+export { bindTabStop, isTabbable, nextTabbable, positiveTabStops, tabbables }

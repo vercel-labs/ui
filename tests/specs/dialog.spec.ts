@@ -16,6 +16,33 @@ const outside = (page: Page, text: string) => page.locator("button", { hasText: 
 
 const nestedDialog = (page: Page) => page.getByRole("dialog", { name: "Advanced settings" })
 
+// Defines a custom element whose open shadow root holds `html`.
+async function defineElement(page: Page, name: string, html: string) {
+  await page.evaluate(
+    ([name, html]) => {
+      if (customElements.get(name)) return
+      customElements.define(
+        name,
+        class extends HTMLElement {
+          constructor() {
+            super()
+            this.attachShadow({ mode: "open" }).innerHTML = html
+          }
+        },
+      )
+    },
+    [name, html],
+  )
+}
+
+// The text of the focused element, inside shadow roots too.
+const focusedText = (page: Page) =>
+  page.evaluate(() => {
+    let el = document.activeElement
+    while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement
+    return el?.textContent?.trim()
+  })
+
 async function openWithKeyboard(page: Page) {
   await trigger(page).focus()
   await page.keyboard.press("Enter")
@@ -116,28 +143,61 @@ test.describe("focus", () => {
   })
 
   test("a positive tabindex slotted into a custom element keeps its host's place", async ({ page, tab }) => {
+    await defineElement(page, "x-card", "<slot></slot>")
     await openWithKeyboard(page)
-    await dialog(page).evaluate((el) => {
-      if (!customElements.get("x-card"))
-        customElements.define(
-          "x-card",
-          class extends HTMLElement {
-            constructor() {
-              super()
-              this.attachShadow({ mode: "open" }).innerHTML = "<slot></slot>"
-            }
-          },
-        )
+    await dialog(page).evaluate((el) =>
       el.insertAdjacentHTML(
         "beforeend",
         `<x-card><button type="button" tabindex="1">Slotted</button></x-card>`,
-      )
-    })
+      ),
+    )
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
     await expect(page.getByRole("button", { name: "Slotted" })).toBeFocused()
     await tab()
     await expect(field(page)).toBeFocused()
+  })
+
+  test("with a positive tabindex in the dialog, Tab still moves through a shadow root and slots", async ({
+    page,
+    tab,
+  }) => {
+    await defineElement(
+      page,
+      "x-pair",
+      `<button type="button">Inner A</button><button type="button">Inner B</button>`,
+    )
+    await defineElement(page, "x-swap", `<slot name="a"></slot><slot name="b"></slot>`)
+    await openWithKeyboard(page)
+    await field(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "afterend",
+        `<x-pair></x-pair><x-swap><button type="button" slot="b">Slot B</button><button type="button" slot="a">Slot A</button></x-swap>`,
+      ),
+    )
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    const visited = []
+    for (let step = 0; step < 4; step++) {
+      await tab()
+      visited.push(await focusedText(page))
+    }
+    expect(visited).toEqual(["Inner A", "Inner B", "Slot A", "Slot B"])
+  })
+
+  test("with a positive tabindex in the dialog, Tab from a focused element outside the tab order goes to the next stop", async ({
+    page,
+    tab,
+  }) => {
+    await openWithKeyboard(page)
+    await field(page).evaluate((el) => el.insertAdjacentHTML("afterend", `<p tabindex="-1">Note</p>`))
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    await page.getByText("Note").focus()
+    await tab()
+    await expect(page.getByRole("button", { name: "Save" })).toBeFocused()
   })
 
   test("opening focuses the first field even when a later one has a positive tabindex", async ({ page }) => {
