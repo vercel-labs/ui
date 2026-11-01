@@ -25,7 +25,7 @@ function supportsHiddenUntilFound() {
  * Keeps a closed panel findable with `hidden="until-found"`, and calls
  * `reveal` when find in page matches text in it. Frameworks render `hidden` as
  * a boolean, and find in page removes it even when the opening is canceled;
- * either way, the value goes back. Returns a cleanup with a `check()` to call
+ * either way, the value goes back, and back to plain `hidden` once it isn't findable. Returns a cleanup with a `check()` to call
  * when the panel's state changes. `bindPanel` calls it for you.
  * @stable
  */
@@ -34,8 +34,11 @@ function bindFindable(
   panel: { shown: () => boolean; findable: () => boolean; reveal: (event: Event) => void },
 ) {
   const keep = () => {
-    if (panel.shown() || !panel.findable()) return
-    if (el.getAttribute("hidden") !== "until-found") el.setAttribute("hidden", "until-found")
+    if (panel.shown()) return
+    const hidden = el.getAttribute("hidden")
+    if (panel.findable()) {
+      if (hidden !== "until-found") el.setAttribute("hidden", "until-found")
+    } else if (hidden === "until-found") el.setAttribute("hidden", "")
   }
   keep()
   const observer = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(keep)
