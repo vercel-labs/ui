@@ -35,8 +35,8 @@
   examples/<name>/web/<example>.ts        exports mount(root)
   ```
 
-- Next never compiles the examples. `examples/vite.config.ts` builds each framework's, with the framework and the SDK bundled, to `examples/dist/<framework>` (`pnpm --filter examples build`, or `node examples/scripts/build.mjs react vue` for some). `apps/docs/app/examples/[...path]/route.ts` serves them, and `ExamplePreview` imports one and its framework's `mount.js` in the browser. A web example's `mount(root)` may return a cleanup, which the preview calls.
-- `examples/dist` is gitignored, so a deploy runs `pnpm --filter examples build` before `next build`, and `next.config.mjs` traces `examples/dist` into the examples route's function.
+- Next never compiles the examples. `examples/vite.config.ts` builds each framework's, with the framework and the SDK bundled, to `apps/docs/public/examples/<framework>` (`pnpm --filter examples build`, or `node scripts/build.mjs react vue` in `examples` for some). They're static files, so the CDN serves them. `ComponentExample` preloads every file an example imports, from Vite's manifest, so the browser fetches them with the page instead of one import at a time, and `ExamplePreview` imports the example and its framework's `mount.js` once the page hydrates. A web example's `mount(root)` may return a cleanup, which the preview calls.
+- `apps/docs/public/examples` is gitignored, so a deploy runs `pnpm --filter examples build` before `next build`.
 - Examples render in the page, not in an iframe, so overlays and focus behave as they do in apps.
 - Example code renders as Shiki's HTML, one element per block.
 - How to style them is in [examples.md](examples.md).

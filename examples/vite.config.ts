@@ -28,8 +28,9 @@ export default defineConfig(({ mode }) => {
     ...config,
     define: { ...config.define, "process.env.NODE_ENV": JSON.stringify("production") },
     build: {
-      outDir: `dist/${framework}`,
+      outDir: `../apps/docs/public/examples/${framework}`,
       emptyOutDir: true,
+      manifest: true,
       lib: {
         entry: { ...entries, mount: `mount/${framework}.ts` },
         formats: ["es"],

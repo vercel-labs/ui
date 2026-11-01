@@ -27,6 +27,9 @@ packages/*/docs/
 packages/web/custom-elements.json
 packages/web/html-custom-data.json
 
+# The docs examples, compiled by examples/vite.config.ts.
+apps/docs/public/examples/
+
 # The web components built for pages without a bundler, written by their build.
 packages/web/browser/
 # The @ui-sdk/web releases apps/docs/scripts/web-releases.mjs copies in before a build.

@@ -6,7 +6,8 @@ import { cn } from "cn"
 
 type Mount = (module: unknown, host: HTMLElement) => () => void
 
-// Imports a compiled example from examples/dist, which app/examples serves. This is a workaround to avoid bundling the examples in the docs app.
+// Imports a compiled example from public/examples, which examples/vite.config.ts
+// builds, so the docs app never bundles them. ComponentExample preloads its files.
 const load = (url: string) => import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url)
 
 function ExamplePreview({

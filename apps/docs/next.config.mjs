@@ -14,11 +14,6 @@ const config = {
   // examples/vite.config.ts compiles them, and the browser loads them.
   transpilePackages: ["@ui-sdk/core", "@ui-sdk/react"],
   turbopack: { root: path.resolve(import.meta.dirname, "../..") },
-  // The examples route reads examples/dist at runtime, so those files ship
-  // with its function.
-  outputFileTracingIncludes: {
-    "/examples/**": ["../../examples/dist/**/*.js"],
-  },
   // The newest `@ui-sdk/web` release of each major, like `{"1":"1.3.0"}`, for `proxy.ts`.
   env: {
     WEB_RELEASES: JSON.stringify(
@@ -26,7 +21,14 @@ const config = {
     ),
   },
   async headers() {
-    return webReleaseHeaders()
+    return [
+      ...webReleaseHeaders(),
+      // The examples' shared chunks are named by their hash, so they never change.
+      {
+        source: "/examples/:framework/chunks/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ]
   },
   // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
   // Agents' own `.md` files are the whole section, and they win.
