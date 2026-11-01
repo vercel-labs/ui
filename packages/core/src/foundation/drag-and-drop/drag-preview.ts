@@ -48,6 +48,11 @@ function bindDragPreview(el: HTMLElement, from: { x: number; y: number }) {
   const computed = getComputedStyle(el)
   const copy = el.cloneNode(true) as HTMLElement
   for (const node of [copy, ...copy.querySelectorAll("[id]")]) node.removeAttribute("id")
+  // A checked radio joining the page unchecks the rest of its named group, the element's own among
+  // them, and named details that join an open one close. The copy leaves every group.
+  const grouped = "input[type=radio][name], details[name]"
+  for (const node of [copy, ...copy.querySelectorAll(grouped)])
+    if (node.matches(grouped)) node.removeAttribute("name")
   copy.setAttribute("aria-hidden", "true")
   copy.setAttribute("data-drag-preview", "")
   copy.removeAttribute("tabindex")

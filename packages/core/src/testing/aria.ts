@@ -21,9 +21,32 @@ const isGone = (el: Element) => !el.isConnected || !!el.closest("[hidden], [iner
 // Rendered but hidden from screen readers, or unreachable: focus must never land here.
 const isUnreachable = (el: Element) => !!el.closest('[aria-hidden="true"], [inert]')
 
-/** Every element in `scope` with one of `roles`, in page order, leaving out what isn't rendered. */
-function withRole(scope: Element, roles: string[]) {
-  return [...scope.querySelectorAll("*")].filter((el) => roles.includes(roleOf(el)) && !isGone(el))
+// The parent the page renders an element in: the slot it's assigned to, or a shadow root's host.
+const renderedParent = (el: Element) =>
+  el.assignedSlot ?? el.parentElement ?? ((el.parentNode as ShadowRoot | null)?.host || null)
+
+/** Whether `display: none` on `el` or an element around it hides it, like a closed branch its styles hide. */
+// check-code: allow return-type recursive, so TypeScript cannot infer it.
+function isUndisplayed(el: Element | null, known = new Map<Element, boolean>()): boolean {
+  if (!el) return false
+  let hidden = known.get(el)
+  if (hidden === undefined)
+    known.set(
+      el,
+      (hidden = getComputedStyle(el).display === "none" || isUndisplayed(renderedParent(el), known)),
+    )
+  return hidden
+}
+
+/**
+ * Every element in `scope` with one of `roles`, in page order, leaving out what isn't rendered. With
+ * `displayed` false it keeps what styles hide, like a collapsed tree branch's group, for structure checks.
+ */
+function withRole(scope: Element, roles: string[], { displayed = true } = {}) {
+  const known = new Map<Element, boolean>()
+  return [...scope.querySelectorAll("*")].filter(
+    (el) => roles.includes(roleOf(el)) && !isGone(el) && (!displayed || !isUndisplayed(el, known)),
+  )
 }
 
 /** Whether an attribute is "true" or "false", as a boolean state must be. */
@@ -36,14 +59,15 @@ const checkedOf = (el: Element) =>
     ? String(el.checked)
     : (el.getAttribute("aria-checked") ?? "")
 
-function isTabStop(el: Element) {
+function isTabStop(el: Element, known: Map<Element, boolean>) {
   if (!el.matches(focusable) || isGone(el)) return false
   if ((el as HTMLElement).tabIndex < 0 || el.matches(":disabled")) return false
   if (el instanceof HTMLInputElement && el.type === "hidden") return false
+  if (isUndisplayed(el, known)) return false
   // Native radios that share a name are one stop: the checked one, else the first.
   if (el instanceof HTMLInputElement && el.type === "radio" && el.name) {
     const group = [...el.ownerDocument.querySelectorAll<HTMLInputElement>("input[type=radio]")].filter(
-      (radio) => radio.name === el.name && radio.form === el.form,
+      (radio) => radio.name === el.name && radio.form === el.form && !isUndisplayed(radio, known),
     )
     return el === (group.find((radio) => radio.checked) ?? group[0])
   }
@@ -52,14 +76,19 @@ function isTabStop(el: Element) {
 
 /** The elements in `scope`, itself included, that Tab stops at. */
 function tabStops(scope: Element) {
-  return [scope, ...scope.querySelectorAll(focusable)].filter(isTabStop)
+  const known = new Map<Element, boolean>()
+  return [scope, ...scope.querySelectorAll(focusable)].filter((el) => isTabStop(el, known))
 }
 
 /** The elements in `scope` that can take focus, by Tab or by script, like roving items. */
 function focusables(scope: Element) {
+  const known = new Map<Element, boolean>()
   return [...scope.querySelectorAll(focusable)].filter(
     (el) =>
-      !isGone(el) && !el.matches(":disabled") && !(el instanceof HTMLInputElement && el.type === "hidden"),
+      !isGone(el) &&
+      !el.matches(":disabled") &&
+      !(el instanceof HTMLInputElement && el.type === "hidden") &&
+      !isUndisplayed(el, known),
   )
 }
 
@@ -114,6 +143,7 @@ export {
   ids,
   isGone,
   isRtl,
+  isUndisplayed,
   isUnreachable,
   roleOf,
   tabStops,

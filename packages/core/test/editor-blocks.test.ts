@@ -358,6 +358,34 @@ describe("createResize", () => {
     )
   })
 
+  test("a second finger pressing another box mid-drag leaves both boxes to the first finger", async () => {
+    const instance = mount({ boxes: { a: start, b: { x: 250, y: 200, width: 50, height: 50 } } })
+    const { resize, set } = instance.api
+    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+      new PointerEvent(type, {
+        clientX,
+        clientY,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+    const a = box(100, 100, 100, 50)
+    const b = box(250, 200, 50, 50)
+    resize.pointerdown(touch("pointerdown", 200, 150, 1), "a", "se", a)
+    document.dispatchEvent(touch("pointermove", 240, 160, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    resize.pointerdown(touch("pointerdown", 260, 210, 2), "b", "move", b)
+    document.dispatchEvent(touch("pointerup", 260, 210, 2))
+    expect(instance.get().boxes.b).toEqual({ x: 250, y: 200, width: 50, height: 50 })
+    document.dispatchEvent(touch("pointermove", 260, 170, 1))
+    document.dispatchEvent(touch("pointerup", 260, 170, 1))
+    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 70 })
+    expect(set).toHaveBeenCalledTimes(1)
+  })
+
   test("Shift on a corner drag keeps the box's ratio, and handles carry their cursor", () => {
     const instance = mount()
     const { resize } = instance.api
@@ -618,6 +646,65 @@ describe("createSwipeActions", () => {
         resolve()
       }),
     )
+  })
+
+  test("a second finger pressing another row mid-swipe leaves the first row to the first finger", async () => {
+    const { instance, swipe: actions, row } = mount()
+    const other = box(0, 60, 400, 60)
+    cleanups.push(actions.bindRow(other, "b"), actions.bindActions(box(240, 60, 160, 60, other), "b", "end"))
+    const touch = (type: string, x: number, pointerId: number) => {
+      time += 50
+      const event = new PointerEvent(type, {
+        clientX: x,
+        clientY: 30,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+      Object.defineProperty(event, "timeStamp", { value: time })
+      return event
+    }
+    actions.pointerdown(touch("pointerdown", 300, 1), "a", row)
+    document.dispatchEvent(touch("pointermove", 280, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    actions.pointerdown(touch("pointerdown", 300, 2), "b", other)
+    document.dispatchEvent(touch("pointerup", 300, 2))
+    for (const x of [260, 230, 210, 200]) document.dispatchEvent(touch("pointermove", x, 1))
+    document.dispatchEvent(touch("pointerup", 200, 1))
+    expect(instance.get().open).toEqual({ key: "a", side: "end" })
+    expect(instance.get().swiping).toBeNull()
+  })
+
+  test("a second finger outside an open row leaves the first finger's swipe of it where it is", async () => {
+    const { instance, swipe: actions, row } = mount()
+    const other = box(0, 60, 400, 60)
+    cleanups.push(actions.bindRow(other, "b"))
+    const touch = (type: string, x: number, pointerId: number) => {
+      time += 50
+      const event = new PointerEvent(type, {
+        clientX: x,
+        clientY: 30,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+      Object.defineProperty(event, "timeStamp", { value: time })
+      return event
+    }
+    actions.show("a", "end")
+    actions.pointerdown(touch("pointerdown", 100, 1), "a", row)
+    document.dispatchEvent(touch("pointermove", 120, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const offset = actions.offset(instance.get(), "a")
+    other.dispatchEvent(touch("pointerdown", 300, 2))
+    expect(actions.offset(instance.get(), "a")).toBe(offset)
+    expect(instance.get().open).toEqual({ key: "a", side: "end" })
   })
 
   test("a long swipe runs the first action, and only then", () => {

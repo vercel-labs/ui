@@ -26,6 +26,8 @@ type ScrollbarHost = {
   track: Record<Axis, number>
   rtl: () => boolean
   measure: () => void
+  // Reads the direction again, for horizontal input as it starts.
+  readDirection: () => void
   scrollTo: (axis: Axis, position: number, behavior?: ScrollBehavior) => void
   // Lets go of the end, for input that scrolls toward the start.
   release: () => void
@@ -49,6 +51,7 @@ function createScrollbarInput(host: ScrollbarHost) {
   // over the content, and lets the page scroll once the viewport can't.
   function forwardWheel(event: WheelEvent) {
     if (!host.viewport() || event.ctrlKey) return
+    if (event.deltaX !== 0) host.readDirection()
     host.measure()
     const dx = wheelPixels(event.deltaX, event.deltaMode, lineHeight, host.metrics.x.client)
     const dy = wheelPixels(event.deltaY, event.deltaMode, lineHeight, host.metrics.y.client)
@@ -72,6 +75,7 @@ function createScrollbarInput(host: ScrollbarHost) {
       // The track's own press handler would page.
       event.stopPropagation()
       event.preventDefault()
+      if (axis === "x") host.readDirection()
       host.measure()
       drag(el, event, axis, host.metrics[axis].position)
     })
@@ -127,6 +131,7 @@ function createScrollbarInput(host: ScrollbarHost) {
   function pressTrack(event: PointerEvent, el: HTMLElement, axis: Axis) {
     if (event.button !== 0 || !host.viewport()) return
     event.preventDefault()
+    if (axis === "x") host.readDirection()
     host.measure()
     let point = trackPoint(el, axis, event)
     if (event.altKey) {

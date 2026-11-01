@@ -341,11 +341,11 @@ async function tree(context: PatternContext) {
   if (!box) return missing(context, "tree", "tree view")
   requireName(context, box, "tree view")
   checkOwned(context, box, ["treeitem"], "tree view")
-  const items = withRole(box, ["treeitem"])
+  const items = withRole(box, ["treeitem"], { displayed: false })
   if (!items.length)
     context.problem(box, "owns no treeitem; a tree's items have role treeitem (APG tree view).")
   for (const item of items) {
-    const group = withRole(item, ["group"]).find(
+    const group = withRole(item, ["group"], { displayed: false }).find(
       (el) => el.parentElement?.closest('[role="treeitem"]') === item,
     )
     if ((group || item.hasAttribute("aria-owns")) && !hasBoolean(item, "aria-expanded"))
