@@ -735,3 +735,100 @@ for (const tag of ["ui-checkbox", "ui-switch"])
     }, tag)
     expect(result).toEqual(["", "true", true])
   })
+
+const rendered = { "ui-checkbox": "checkbox", "ui-switch": "switch" } as const
+
+for (const tag of ["ui-checkbox", "ui-switch"] as const)
+  for (const [name, same, other] of [
+    ["role", rendered[tag], "button"],
+    ["aria-disabled", "true", "false"],
+  ] as const)
+    for (const value of [same, other])
+      test(`a ${tag} taken off the page keeps the ${name}="${value}" its author gave it after it rendered`, async ({
+        page,
+      }) => {
+        const result = await page.evaluate(
+          async ({ tag, name, value }) => {
+            const stage = document.querySelector("#stage")!
+            stage.innerHTML = `<${tag} aria-label="Terms" disabled></${tag}>`
+            const tick = () => new Promise((done) => setTimeout(done))
+            const control = stage.querySelector(tag)!
+            await tick()
+            control.setAttribute(name, value)
+            control.remove()
+            await tick()
+            return control.getAttribute(name)
+          },
+          { tag, name, value },
+        )
+        expect(result).toBe(value)
+      })
+
+for (const tag of ["ui-checkbox", "ui-switch"] as const)
+  for (const name of ["role", "aria-disabled"] as const)
+    test(`a ${tag} taken off the page doesn't get back the ${name} its author removed before it rendered again`, async ({
+      page,
+    }) => {
+      const result = await page.evaluate(
+        async ({ tag, name }) => {
+          const stage = document.querySelector("#stage")!
+          stage.innerHTML = `<${tag} aria-label="Terms" disabled role="button" aria-disabled="true"></${tag}>`
+          const tick = () => new Promise((done) => setTimeout(done))
+          const control = stage.querySelector(tag)!
+          await tick()
+          control.removeAttribute(name)
+          control.setAttribute("required", "")
+          await tick()
+          control.remove()
+          await tick()
+          return control.getAttribute(name)
+        },
+        { tag, name },
+      )
+      expect(result).toBe(null)
+    })
+
+for (const tag of ["ui-checkbox", "ui-switch"] as const)
+  test(`a ${tag} its author gives disabled="ui-sdk-disabled" is still disabled when it's put back on the page`, async ({
+    page,
+  }) => {
+    const result = await page.evaluate(async (tag) => {
+      const form = document.createElement("form")
+      form.innerHTML = `<${tag} name="terms" aria-label="Terms" disabled="ui-sdk-disabled"></${tag}>`
+      document.querySelector("#stage")!.append(form)
+      const tick = () => new Promise((done) => setTimeout(done))
+      const control = form.querySelector(tag)!
+      await tick()
+      control.remove()
+      await tick()
+      form.append(control)
+      await tick()
+      return [
+        control.hasAttribute("disabled"),
+        control.getAttribute("aria-disabled"),
+        control.matches(":disabled"),
+      ]
+    }, tag)
+    expect(result).toEqual([true, "true", true])
+  })
+
+test("a checkbox its group disabled keeps only its own attributes and id when it's taken off the page", async ({
+  page,
+}) => {
+  const result = await page.evaluate(async () => {
+    const stage = document.querySelector("#stage")!
+    stage.innerHTML = `
+      <ui-checkbox-group aria-label="Toppings" disabled>
+        <ui-checkbox value="cheese" aria-label="Cheese"></ui-checkbox>
+      </ui-checkbox-group>`
+    const tick = () => new Promise((done) => setTimeout(done))
+    const box = stage.querySelector("ui-checkbox")!
+    await tick()
+    const before = box.getAttributeNames()
+    box.remove()
+    await tick()
+    return { before, after: box.getAttributeNames().sort(), disabled: box.matches(":disabled") }
+  })
+  expect(result.before).toEqual(expect.arrayContaining(["disabled", "role", "aria-disabled", "aria-checked"]))
+  expect(result).toMatchObject({ after: ["aria-label", "id", "value"], disabled: false })
+})

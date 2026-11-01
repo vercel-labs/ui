@@ -1,6 +1,6 @@
 // Attributes core writes to a bound element itself, so a change to them
 // re-renders nothing: a slot's `live` attributes, and its `direct` ones.
-import { attrs, authorOwned, liveAttrs, madeLabel, subscribe } from "./part"
+import { attrs, authorOwned, liveAttrs, madeLabel, references, subscribe } from "./part"
 import type { Attrs, Part } from "./primitive-types"
 
 /**
@@ -75,6 +75,7 @@ type Direct = ReturnType<typeof direct>
 
 const applied = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
 const found = new WeakMap<HTMLElement, Record<string, Map<string, string>>>()
+let writing: HTMLElement | undefined
 
 /**
  * Writes attributes and removes the ones a previous call wrote but this one
@@ -98,16 +99,28 @@ function releaseAttrs(el: HTMLElement, channel: string) {
 }
 
 /**
- * Marks an attribute the author just wrote as theirs, even with the value a
- * channel wrote, like `disabled` set again on a checkbox its group disabled,
- * so letting go of the element keeps it.
+ * Marks an attribute someone other than a channel just wrote or removed as
+ * theirs, even with the value a channel wrote, like `disabled` set again on a
+ * checkbox its group disabled, so letting go of the element keeps it as they
+ * left it. A channel's own writes, which an observer hears too, change nothing.
  */
 function markAuthored(el: HTMLElement, name: string) {
+  if (el === writing) return
   for (const written of Object.values(applied.get(el) ?? {})) written.delete(name)
   for (const values of Object.values(found.get(el) ?? {})) values.delete(name)
 }
 
 function writeAttrs(el: HTMLElement, attrs: Attrs, channel: string, release: boolean) {
+  const outer = writing
+  writing = el
+  try {
+    writeChannel(el, attrs, channel, release)
+  } finally {
+    writing = outer
+  }
+}
+
+function writeChannel(el: HTMLElement, attrs: Attrs, channel: string, release: boolean) {
   const channels = applied.get(el) ?? {}
   const previous = channels[channel] ?? new Map()
   const written = new Map<string, string>()
@@ -139,12 +152,21 @@ function writeAttrs(el: HTMLElement, attrs: Attrs, channel: string, release: boo
   for (const name of authors) written.delete(name)
   for (const name of previous.keys()) {
     if (written.has(name) || authors.has(name) || (name === "id" && keeps)) continue
-    const original = release ? found.get(el)?.[channel]?.get(name) : undefined
-    if (original !== undefined) {
-      const current = el.getAttribute(name)
-      if (current === previous.get(name) && current !== original) el.setAttribute(name, original)
-    } else if (name.startsWith("style:")) el.style.removeProperty(name.slice(6))
-    else el.removeAttribute(name)
+    if (name.startsWith("style:")) {
+      el.style.removeProperty(name.slice(6))
+      continue
+    }
+    if (!release) {
+      el.removeAttribute(name)
+      keepFound(el, channel, name, null)
+      continue
+    }
+    // One changed since the channel last wrote it, or removed, is the author's.
+    const current = el.getAttribute(name)
+    if (current !== previous.get(name)) continue
+    const original = found.get(el)?.[channel]?.get(name)
+    if (original === undefined) el.removeAttribute(name)
+    else if (current !== original) el.setAttribute(name, original)
   }
   for (const [property, value] of styles)
     if (el.style.getPropertyValue(property) !== value) el.style.setProperty(property, value)
@@ -155,7 +177,7 @@ function writeAttrs(el: HTMLElement, attrs: Attrs, channel: string, release: boo
     // the start, so the property goes first, as every framework writes it.
     if (name === "value" && isTextField(el) && el.value !== value) el.value = value
     const current = name === "id" ? id : read.has(name) ? read.get(name) : el.getAttribute(name)
-    if (current != null && !previous.has(name)) keepFound(el, channel, name, current)
+    if (current !== (previous.get(name) ?? null)) keepFound(el, channel, name, current)
     if (current !== value) el.setAttribute(name, value)
   }
   channels[channel] = written
@@ -163,13 +185,22 @@ function writeAttrs(el: HTMLElement, attrs: Attrs, channel: string, release: boo
   if (release) delete found.get(el)?.[channel]
 }
 
-// A copied component's ids, and references to them, never come back.
-function keepFound(el: HTMLElement, channel: string, name: string, value: string) {
-  if (name === "id" || madeLabel(value)) return
+// What was on the element before the channel wrote over it, which letting go
+// puts back. A copied component's ids, and references to them, never come back.
+function keepFound(el: HTMLElement, channel: string, name: string, value?: string | null) {
+  const kept =
+    value == null || name === "id" ? undefined : references.includes(name) ? authoredIds(value) : value
+  if (kept === undefined) return void found.get(el)?.[channel]?.delete(name)
   let channels = found.get(el)
   if (!channels) found.set(el, (channels = {}))
-  ;(channels[channel] ??= new Map()).set(name, value)
+  ;(channels[channel] ??= new Map()).set(name, kept)
 }
+
+const authoredIds = (ids: string) =>
+  ids
+    .split(/\s+/)
+    .filter((id) => id && !id.startsWith("ui-sdk-"))
+    .join(" ") || undefined
 
 // An id a channel didn't write stays: an author's, a script's, or another
 // component's on the same element. The exception is an id ui-sdk made (every

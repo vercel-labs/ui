@@ -403,6 +403,7 @@ const references = [
   "aria-labelledby",
   "aria-owns",
   "for",
+  "headers",
 ]
 
 // The id the slot makes when the author gives none, which a slot that reads
@@ -553,6 +554,7 @@ export {
   press,
   propsRendered,
   ref,
+  references,
   selectedKeys,
   subscribe,
   takeOwnId,
