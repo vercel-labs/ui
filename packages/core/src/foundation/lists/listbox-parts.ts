@@ -396,10 +396,17 @@ function groupLabelPart<State extends GroupLabelsState, Api>() {
   } satisfies SlotDefinition<State, Api, { group?: string } & BaseSlotProps, {}>
 }
 
-function arrowPart<State extends { open: boolean }, Api>() {
+function arrowPart<
+  State extends { open: boolean },
+  Api extends { internal: { popup: { checkPlacement: () => void } } },
+>() {
   return {
     state: (state) => ({ open: state.open }),
     attrs: (state) => ({ "aria-hidden": "true", ...openAttrs(state.open) }),
+    // An arrow that binds after its list was placed points at the trigger at once.
+    bind(_, { api }) {
+      api.internal.popup.checkPlacement()
+    },
   } satisfies SlotDefinition<State, Api, BaseSlotProps, { open: boolean }>
 }
 
