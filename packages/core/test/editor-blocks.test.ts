@@ -3,6 +3,7 @@
 // on tracks, ranges of cells, boxes resized by their edges, and rows swiped
 // aside to their actions. Through the public entry only.
 import { afterEach, describe, expect, test, vi } from "vitest"
+import { setAnnouncer } from "../src/foundation/platform/announce"
 import {
   cellsToText,
   createCellRange,
@@ -225,6 +226,48 @@ describe("createSpans", () => {
     expect(instance.get().events[1]).toMatchObject({ start: 900, end: 960 })
   })
 
+  test("a press the browser takes over for a scroll makes no span", () => {
+    const instance = calendar({ id: "c", events: [] })
+    cleanups.push(() => instance.destroy())
+    const { spans, set } = instance.api
+    const day = box(0, 0, 100, 1440)
+    cleanups.push(spans.bindTrack(day, "mon"))
+    spans.trackPointerdown(
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
+      "mon",
+    )
+    document.dispatchEvent(pointer("pointercancel", 50, 905))
+    expect(set).not.toHaveBeenCalled()
+    expect(instance.get().events).toEqual([])
+    // A tap on the still-empty track then makes one span of the default size.
+    spans.trackPointerdown(
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
+      "mon",
+    )
+    document.dispatchEvent(pointer("pointerup", 50, 905))
+    expect(set).toHaveBeenCalledTimes(1)
+    expect(instance.get().events).toHaveLength(1)
+  })
+
+  test("a press on a span the browser takes over says nothing and changes nothing", () => {
+    const instance = calendar({ id: "c", events: [standup] })
+    const heard: string[] = []
+    setAnnouncer((text) => heard.push(text))
+    cleanups.push(
+      () => instance.destroy(),
+      () => setAnnouncer(undefined),
+    )
+    const { spans, set } = instance.api
+    const day = box(0, 0, 100, 1440)
+    cleanups.push(spans.bindTrack(day, "mon"))
+    cleanups.push(spans.bindSpan(box(0, 540, 100, 30, day), "a"))
+    spans.spanPointerdown(pointer("pointerdown", 50, 550), "a")
+    document.dispatchEvent(pointer("pointercancel", 50, 550))
+    expect(heard).toEqual([])
+    expect(set).not.toHaveBeenCalled()
+    expect(instance.get().draft).toBeNull()
+  })
+
   test("spanStyle places a span along its track and in its lane", () => {
     const instance = calendar({ id: "c", events: [standup] })
     cleanups.push(() => instance.destroy())
@@ -356,6 +399,34 @@ describe("createResize", () => {
         resolve()
       }),
     )
+  })
+
+  test("a second finger pressing another box mid-drag leaves both boxes to the first finger", async () => {
+    const instance = mount({ boxes: { a: start, b: { x: 250, y: 200, width: 50, height: 50 } } })
+    const { resize, set } = instance.api
+    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+      new PointerEvent(type, {
+        clientX,
+        clientY,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+    const a = box(100, 100, 100, 50)
+    const b = box(250, 200, 50, 50)
+    resize.pointerdown(touch("pointerdown", 200, 150, 1), "a", "se", a)
+    document.dispatchEvent(touch("pointermove", 240, 160, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    resize.pointerdown(touch("pointerdown", 260, 210, 2), "b", "move", b)
+    document.dispatchEvent(touch("pointerup", 260, 210, 2))
+    expect(instance.get().boxes.b).toEqual({ x: 250, y: 200, width: 50, height: 50 })
+    document.dispatchEvent(touch("pointermove", 260, 170, 1))
+    document.dispatchEvent(touch("pointerup", 260, 170, 1))
+    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 70 })
+    expect(set).toHaveBeenCalledTimes(1)
   })
 
   test("Shift on a corner drag keeps the box's ratio, and handles carry their cursor", () => {
@@ -618,6 +689,65 @@ describe("createSwipeActions", () => {
         resolve()
       }),
     )
+  })
+
+  test("a second finger pressing another row mid-swipe leaves the first row to the first finger", async () => {
+    const { instance, swipe: actions, row } = mount()
+    const other = box(0, 60, 400, 60)
+    cleanups.push(actions.bindRow(other, "b"), actions.bindActions(box(240, 60, 160, 60, other), "b", "end"))
+    const touch = (type: string, x: number, pointerId: number) => {
+      time += 50
+      const event = new PointerEvent(type, {
+        clientX: x,
+        clientY: 30,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+      Object.defineProperty(event, "timeStamp", { value: time })
+      return event
+    }
+    actions.pointerdown(touch("pointerdown", 300, 1), "a", row)
+    document.dispatchEvent(touch("pointermove", 280, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    actions.pointerdown(touch("pointerdown", 300, 2), "b", other)
+    document.dispatchEvent(touch("pointerup", 300, 2))
+    for (const x of [260, 230, 210, 200]) document.dispatchEvent(touch("pointermove", x, 1))
+    document.dispatchEvent(touch("pointerup", 200, 1))
+    expect(instance.get().open).toEqual({ key: "a", side: "end" })
+    expect(instance.get().swiping).toBeNull()
+  })
+
+  test("a second finger outside an open row leaves the first finger's swipe of it where it is", async () => {
+    const { instance, swipe: actions, row } = mount()
+    const other = box(0, 60, 400, 60)
+    cleanups.push(actions.bindRow(other, "b"))
+    const touch = (type: string, x: number, pointerId: number) => {
+      time += 50
+      const event = new PointerEvent(type, {
+        clientX: x,
+        clientY: 30,
+        pointerId,
+        pointerType: "touch",
+        isPrimary: pointerId === 1,
+        button: 0,
+        bubbles: true,
+        cancelable: true,
+      })
+      Object.defineProperty(event, "timeStamp", { value: time })
+      return event
+    }
+    actions.show("a", "end")
+    actions.pointerdown(touch("pointerdown", 100, 1), "a", row)
+    document.dispatchEvent(touch("pointermove", 120, 1))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    const offset = actions.offset(instance.get(), "a")
+    other.dispatchEvent(touch("pointerdown", 300, 2))
+    expect(actions.offset(instance.get(), "a")).toBe(offset)
+    expect(instance.get().open).toEqual({ key: "a", side: "end" })
   })
 
   test("a long swipe runs the first action, and only then", () => {

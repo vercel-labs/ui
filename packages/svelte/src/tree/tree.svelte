@@ -67,7 +67,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     value?: TreeValue<Mode>
     /** The value selected at first, when uncontrolled. */
     defaultValue?: TreeValue<Mode>
-    /** Whether moving focus with the arrow keys selects, with one item selectable. `"manual"` waits for Enter, Space or a press. */
+    /** Whether moving focus with the keyboard selects, with one item selectable. `"manual"` waits for Enter, Space or a press. */
     activation?: "automatic" | "manual"
     /** The expanded branches' values. Bind it with `bind:expanded` to control which branches are open. */
     expanded?: string[]
