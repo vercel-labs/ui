@@ -397,7 +397,7 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       contentElement,
       arrowElement: () => element("arrow"),
       text: (state: AutocompleteState) => state.value,
-      itemProps: (key: string) => context.props("item", key) as AutocompleteItemMeta | undefined,
+      itemProps: (key: string) => context.props<AutocompleteItemMeta>("item", key),
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
       // Where focus goes once the list opens: it stays in the field, unless a
       // screen reader's tap moved it into the list, to the first suggestion.

@@ -1,6 +1,6 @@
 <!--
 @component
-A line between groups. Hidden while the list is filtered.
+A line between groups. Composed separators hide while the list is filtered.
 @stable
 -->
 <script lang="ts">

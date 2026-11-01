@@ -326,4 +326,4 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
   }),
 })
 
-export { triggerMenuSlots }
+export { triggerMenuSlots, type TextProps }

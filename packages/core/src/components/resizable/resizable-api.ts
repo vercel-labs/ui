@@ -4,7 +4,12 @@
 import { isRTL } from "../../foundation/platform/env"
 import { deriveState } from "../../foundation/kernel/derive"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
-import type { ResizableChangeOptions, ResizableLayoutChangeReason, ResizableOptions } from "./resizable"
+import type {
+  ResizableChangeOptions,
+  ResizableHandleProps,
+  ResizableLayoutChangeReason,
+  ResizableOptions,
+} from "./resizable"
 import { resizableDom } from "./resizable-dom"
 import {
   allHandleBounds,
@@ -148,13 +153,14 @@ function resizableApi(context: PrimitiveContext<ResizableOptions, State, string>
 
   const current = () => requested ?? store.get().layout
   const isDisabled = () => store.get().disabled || store.get().formDisabled
-  const handleDisabled = (key: string) => isDisabled() || !!context.props("handle", key)?.disabled
+  const handleDisabled = (key: string) =>
+    isDisabled() || !!context.props<ResizableHandleProps>("handle", key)?.disabled
   // Which handles are disabled on their own, by index. Moves from the others
   // stop at them, so the panels past one keep their sizes.
   function locked() {
     const result: boolean[] = []
     for (const [key, index] of Object.entries(store.get().handles))
-      if (context.props("handle", key)?.disabled) result[index] = true
+      if (context.props<ResizableHandleProps>("handle", key)?.disabled) result[index] = true
     return result
   }
   const vertical = () => store.get().orientation === "vertical"

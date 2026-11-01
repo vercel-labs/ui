@@ -256,7 +256,7 @@ function dialogApi(
 
   // A trigger's shortcut presses it: it opens the dialog, or closes one that isn't modal.
   function shortcutPress(key: string, event: KeyboardEvent) {
-    const props = (context.props("trigger", key) ?? {}) as TriggerProps
+    const props = context.props<TriggerProps>("trigger", key) ?? {}
     if (props.disabled) return
     if (store.get().open) return control.hide({ reason: "shortcut", event })
     control.show({ event, by: "keyboard", reason: "shortcut", trigger: key, payload: props.payload })

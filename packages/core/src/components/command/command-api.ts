@@ -92,7 +92,7 @@ const currentPage = (state: { pages: string[] }) => state.pages.at(-1) ?? null
 function commandApi(context: PrimitiveContext<CommandOptions, CommandState, string>) {
   const { id, store, options, element } = context
   const change = createChange(context)
-  const itemProps = (key: string) => context.props("item", key) as CommandItemMeta | undefined
+  const itemProps = (key: string) => context.props<CommandItemMeta>("item", key)
   // The current page's data commands, or undefined for a page only parts compose.
   const items = () => pageItems(store.get().items, store.get().pages)
   const indexOf = (key: string | null) =>
