@@ -420,6 +420,7 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
           "aria-valuetext": formatValue(value, state),
           "aria-orientation": state.orientation,
           disabled: isDisabled(state) ? "" : undefined,
+          "data-disabled": isDisabled(state) ? "" : undefined,
           style: rangeInputStyle,
         }
       },

@@ -9,7 +9,7 @@ import { announce } from "../platform/announce"
 import { createAutoScroll } from "../drag-and-drop/auto-scroll"
 import { isRTL } from "../platform/env"
 import type { GridCell, GridFocus } from "../focus/grid-focus"
-import { bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession } from "../drag-and-drop/pointer"
 
 /**
  * A range from the cell it started at to the cell it reaches.
@@ -142,8 +142,7 @@ function createCellRange<State extends object>(
   const { store } = context
   const { grid } = options
   const cellOf = new WeakMap<Element, GridCell>()
-  let stop: (() => void) | undefined
-  context.onDestroy(() => stop?.())
+  const drags = createDragSession(context.onDestroy)
 
   const current = () => store.get()[options.key] as CellRange | null
   const set = (range: CellRange | null, details: { reason: CellRangeReason; event?: Event }) =>
@@ -303,7 +302,7 @@ function createCellRange<State extends object>(
      * edges. Shift stretches the range from the active cell instead.
      */
     pointerdown(event: PointerEvent, cell: GridCell) {
-      if (event.button !== 0) return
+      if (!drags.accepts(event)) return
       const active = grid.active()
       if (event.shiftKey && active) {
         event.preventDefault()
@@ -314,7 +313,6 @@ function createCellRange<State extends object>(
       api.select(null, { reason: "item-press", event })
       const el = event.currentTarget instanceof HTMLElement ? event.currentTarget : null
       if (!el) return
-      stop?.()
       let last = { x: event.clientX, y: event.clientY }
       const paint = () => {
         const hit = el.ownerDocument
@@ -328,20 +326,14 @@ function createCellRange<State extends object>(
         })
       }
       const scroll = createAutoScroll({ onScroll: paint })
-      const stopTracking = bindDrag(el, event, {
+      drags.start(el, event, {
         onMove: ({ x, y }) => {
           last = { x, y }
           scroll.update(x, y)
           paint()
         },
-        onEnd: () => end(),
+        onEnd: () => scroll.stop(),
       })
-      const end = () => {
-        stopTracking()
-        scroll.stop()
-        stop = undefined
-      }
-      stop = end
     },
     /** The range's text, read cell by cell, with tabs between cells and newlines between rows. */
     text(state: State, read: (cell: GridCell) => string) {

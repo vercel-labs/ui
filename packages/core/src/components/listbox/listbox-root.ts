@@ -230,7 +230,7 @@ type ListboxItemState = {
   highlighted: boolean
   /** Whether its value is in the listbox's value, compared with `isItemEqualToValue` when you pass one. */
   selected: boolean
-  /** Whether the item can't be chosen. */
+  /** Whether the item can't be chosen, by itself or a disabled listbox. */
   disabled: boolean
 }
 /**

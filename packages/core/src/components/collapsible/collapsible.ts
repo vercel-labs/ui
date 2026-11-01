@@ -7,6 +7,7 @@ import {
   openAttrs,
   triggerKeydown,
 } from "../../foundation/disclosure/disclosure"
+import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { stateAndRenders } from "../../foundation/motion/panel"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
@@ -114,7 +115,7 @@ type CollapsibleTriggerProps = {}
 type CollapsibleRootState = {
   /** Whether the panel is open. */
   open: boolean
-  /** Whether the trigger ignores presses. The `open` option and the controller can still open and close it. */
+  /** Whether the trigger ignores presses, by its own `disabled` or a disabled fieldset around it. The `open` option and the controller can still open and close it. */
   disabled: boolean
 }
 /**
@@ -152,6 +153,7 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
   state: (options: CollapsibleOptions) => ({
     open: options.defaultOpen ?? false,
     disabled: false,
+    formDisabled: false,
     // Shown while it animates out.
     exiting: false,
     // Whether the panel is in the page, so the trigger can point at it.
@@ -227,24 +229,25 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
   },
   slots: (slot) => ({
     root: slot<{}, CollapsibleRootState>({
-      state: (state) => ({ open: state.open, disabled: state.disabled }),
-      attrs: (state) => ({ ...openAttrs(state.open), "data-disabled": state.disabled ? "" : undefined }),
+      state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
+      attrs: (state) => ({ ...openAttrs(state.open), "data-disabled": isDisabled(state) ? "" : undefined }),
+      bind: (el, { store }) => watchFormDisabled(el, store),
     }),
 
     trigger: slot<CollapsibleTriggerProps, CollapsibleTriggerState>({
-      state: (state) => ({ open: state.open, disabled: state.disabled }),
+      state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
       attrs: (state, { id }) => ({
         id: `${id}-trigger`,
         type: "button",
         "aria-expanded": String(state.open),
-        "aria-disabled": state.disabled ? "true" : undefined,
+        "aria-disabled": isDisabled(state) ? "true" : undefined,
         ...openAttrs(state.open),
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isDisabled(state) ? "" : undefined,
       }),
       // Only a panel in the page can be pointed at.
       live: live((state, { id }) => ({ "aria-controls": state.panel ? `${id}-panel` : undefined })),
       press({ api, el, store }, event) {
-        if (store.get().disabled) {
+        if (isDisabled(store.get())) {
           // A disabled link must not navigate either.
           event?.preventDefault()
           return
@@ -260,12 +263,12 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
       props: { keepMounted: "boolean", hiddenUntilFound: "boolean" },
       present: (state, { props }) =>
         state.open || state.exiting || !!props.keepMounted || !!props.hiddenUntilFound,
-      state: (state) => ({ open: state.open, disabled: state.disabled }),
+      state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
       attrs: (state, { id, props }) => ({
         id: `${id}-panel`,
         ...hiddenAttrs(state.open || state.exiting, !!props.hiddenUntilFound),
         ...openAttrs(state.open),
-        "data-disabled": state.disabled ? "" : undefined,
+        "data-disabled": isDisabled(state) ? "" : undefined,
       }),
       bind(el, part) {
         const { api, store } = part
