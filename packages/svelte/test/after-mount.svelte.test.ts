@@ -5,10 +5,12 @@ import { afterEach, describe, expect, test } from "vitest"
 import {
   baseOptions,
   type Built,
+  callbackRelays,
   changesOf,
   idle,
   markupOf,
   partsOf,
+  relayedKeys,
   tabStopProblem,
   title,
   withAttribute,
@@ -28,22 +30,6 @@ for (const [name, value] of Object.entries(exported))
   if (typeof value === "function" && /^[A-Z]/.test(name)) components.set(name, value as never)
 
 const svelteIds = /mount-\d+|\bc\d+\b/g
-
-// Changes that run a change callback as the options land, so its state is
-// written inside Svelte's effect, which the setup fails on as a relay.
-const callbacks: Record<string, string[]> = {
-  'combobox > value: "Apple" to "Banana"': ["query"],
-  'combobox > value: "Banana" to "Apple"': ["query"],
-  'command > query: "" to "a"': ["highlighted", "value"],
-  'command > query: "a" to ""': ["highlighted", "value"],
-}
-
-function relayedKeys() {
-  const history = (globalThis as Record<symbol, { relays?: { keys: string[] }[] } | undefined>)[
-    Symbol.for("ui-sdk.devtools.history@1")
-  ]
-  return [...new Set(history?.relays?.splice(0).flatMap((relay) => relay.keys))].sort()
-}
 
 let app: ReturnType<typeof mount> | undefined
 let container: HTMLElement | undefined
@@ -105,7 +91,7 @@ for (const entry of cases)
         expect(pageOf(entry)).toEqual(expected)
         if (entry.history?.includes("stop") && !freshProblem)
           expect(tabStopProblem({ root: changed })).toBeUndefined()
-        const known = callbacks[`${entry.name} > ${title(change)}`]
+        const known = callbackRelays[`${entry.name} > ${title(change)}`]
         if (known) expect(relayedKeys()).toEqual(known)
       })
   })

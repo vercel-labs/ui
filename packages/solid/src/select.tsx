@@ -77,6 +77,9 @@ const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 // data select renders its own list only when there's none.
 const OwnContentContext = createContext<((present: boolean) => void) | null>(null)
 
+// The select's own placeholder, which the instance's state holds untracked.
+const PlaceholderContext = createContext<(() => string | undefined) | null>(null)
+
 function useSelect() {
   const context = useContext(SelectContext)
   if (!context) throw new Error("Select parts must be used inside <Select>.")
@@ -124,15 +127,17 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
   return (
     <SelectContext value={select}>
       <ContainerContext value={() => props.container}>
-        {providePrimitive(select, () => (
-          <>
-            <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
-            <Show when={props.items && !hasContent()}>
-              <SelectContent />
-            </Show>
-            {formInputs(select, () => props.multiple)}
-          </>
-        ))}
+        <PlaceholderContext value={() => props.placeholder}>
+          {providePrimitive(select, () => (
+            <>
+              <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
+              <Show when={props.items && !hasContent()}>
+                <SelectContent />
+              </Show>
+              {formInputs(select, () => props.multiple)}
+            </>
+          ))}
+        </PlaceholderContext>
       </ContainerContext>
     </SelectContext>
   )
@@ -223,13 +228,14 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
       }),
     )
   }
+  const placeholder = useContext(PlaceholderContext) ?? (() => context.state.placeholder)
   const part = () => ({ placeholder: props.placeholder, max: props.max, moreLabel: props.moreLabel })
   const user = merge(rest, {
     get children() {
       return (
         props.children ??
         ((state: SelectValueState) =>
-          state.placeholder ? (props.placeholder ?? context.state.placeholder ?? null) : state.label)
+          state.placeholder ? (props.placeholder ?? placeholder() ?? null) : state.label)
       )
     },
   })

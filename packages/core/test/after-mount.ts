@@ -251,6 +251,23 @@ async function idle() {
   for (let frame = 0; frame < 6; frame++) await new Promise((resolve) => requestAnimationFrame(resolve))
 }
 
+// Changes that run a change callback as the options land, so a framework that
+// hands options over from an effect, like Svelte or Solid, writes state there.
+const callbackRelays: Record<string, string[]> = {
+  'combobox > value: "Apple" to "Banana"': ["query"],
+  'combobox > value: "Banana" to "Apple"': ["query"],
+  'command > query: "" to "a"': ["highlighted", "value"],
+  'command > query: "a" to ""': ["highlighted", "value"],
+}
+
+/** The keys core's development build recorded writing while options were handed over, since the last call. */
+function relayedKeys() {
+  const history = (globalThis as Record<symbol, { relays?: { keys: string[] }[] } | undefined>)[
+    Symbol.for("ui-sdk.devtools.history@1")
+  ]
+  return [...new Set(history?.relays?.splice(0).flatMap((relay) => relay.keys))].sort()
+}
+
 const pascal = (name: string) => name.replace(/(^|[-\s])(\w)/g, (_, __, char: string) => char.toUpperCase())
 
 // Parts an adapter names its own way, and those it renders itself, inside or
@@ -322,11 +339,13 @@ function partsOf(
 export {
   baseOptions,
   type Built,
+  callbackRelays,
   changesOf,
   type Change,
   idle,
   markupOf,
   partsOf,
+  relayedKeys,
   tabStopProblem,
   title,
   withAttribute,
