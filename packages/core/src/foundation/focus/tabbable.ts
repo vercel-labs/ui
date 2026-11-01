@@ -31,21 +31,28 @@ function isTabbable(el: Element): el is HTMLElement {
   return el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
 }
 
-// In the order Tab visits them: positive tabindex values first, lowest first,
-// then the rest in document order.
 function tabbables(root: Element) {
-  const stops = Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
-  const ahead = stops.filter((el) => el.tabIndex > 0).sort((a, b) => a.tabIndex - b.tabIndex)
-  return [...ahead, ...stops.filter((el) => el.tabIndex === 0)]
+  return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
+}
+
+// Tab visits positive tabindex values first, lowest first, then the rest in
+// document order. One slotted into a custom element orders only within its
+// slot, so it keeps its host's place. Returns `stops` itself when nothing moves.
+function inTabOrder(stops: HTMLElement[], root: Element) {
+  const slotted = (el: Element) => {
+    for (let node: Element | null = el; node && node !== root; node = node.parentElement)
+      if (node.assignedSlot) return true
+    return false
+  }
+  const ahead = stops.filter((el) => el.tabIndex > 0 && !slotted(el)).sort((a, b) => a.tabIndex - b.tabIndex)
+  return ahead.length ? [...ahead, ...stops.filter((el) => !ahead.includes(el))] : stops
 }
 
 // The first tabbable element after `node` in the document, skipping anything
 // inside `skip`, like the popup that is handing focus back.
 function nextTabbable(node: Node, skip?: Element) {
   const doc = node.ownerDocument ?? document
-  return Array.from(doc.body.querySelectorAll(candidates))
-    .filter(isTabbable)
-    .find((el) => !el.contains(node) && !skip?.contains(el) && isAfter(node, el))
+  return tabbables(doc.body).find((el) => !el.contains(node) && !skip?.contains(el) && isAfter(node, el))
 }
 
 const focusables =
@@ -123,4 +130,4 @@ function bindTabStop(
   return { check, stop: () => observer.disconnect() }
 }
 
-export { bindTabStop, isTabbable, nextTabbable, tabbables }
+export { bindTabStop, inTabOrder, isTabbable, nextTabbable, tabbables }

@@ -29,7 +29,7 @@ import { resolveBehavior, type PopupBehavior, type PopupBehaviorName } from "./p
 import { registerPopupElement } from "./popup-elements"
 import type { Anchor, position, PositionOptions } from "../platform/position"
 import { animateIn, animateOut, writeOpen } from "../motion/presence"
-import { nextTabbable, tabbables } from "../focus/tabbable"
+import { inTabOrder, nextTabbable, tabbables } from "../focus/tabbable"
 
 /** How a popup was last opened. Decides where focus goes. */
 type PopupOpener = "pointer" | "touch" | "keyboard" | "hover" | "imperative" | "initial"
@@ -919,6 +919,17 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const active = activeElement()
     const atStart = !first || active === first || active === popup
     const atEnd = !last || active === last
+    // The browser visits every positive tabindex in the page before the rest,
+    // so the popup's stops aren't one run it keeps inside. The trap moves each step.
+    const order = mode === "trap" ? inTabOrder(list, popup) : list
+    if (order !== list) {
+      event.preventDefault()
+      const index = order.indexOf(active as HTMLElement)
+      const step = event.shiftKey ? -1 : 1
+      const next = index < 0 ? order.at(event.shiftKey ? -1 : 0) : order.at((index + step) % order.length)
+      next?.focus({ preventScroll: true })
+      return
+    }
     if (mode === "trap") {
       if (event.shiftKey ? atStart : atEnd) {
         event.preventDefault()

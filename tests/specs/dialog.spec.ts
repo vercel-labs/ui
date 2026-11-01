@@ -98,6 +98,58 @@ test.describe("focus", () => {
     await expect(field(page)).toBeFocused()
   })
 
+  test("a positive tabindex keeps Tab inside a dialog that leaves the page usable", async ({
+    page,
+    open,
+    tab,
+  }) => {
+    await open("dialog", { modal: "trap-focus" })
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    await page.getByRole("button", { name: "Jump ahead" }).focus()
+    await tab()
+    await expect(field(page)).toBeFocused()
+    await tab({ shift: true })
+    await expect(page.getByRole("button", { name: "Jump ahead" })).toBeFocused()
+  })
+
+  test("a positive tabindex slotted into a custom element keeps its host's place", async ({ page, tab }) => {
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) => {
+      if (!customElements.get("x-card"))
+        customElements.define(
+          "x-card",
+          class extends HTMLElement {
+            constructor() {
+              super()
+              this.attachShadow({ mode: "open" }).innerHTML = "<slot></slot>"
+            }
+          },
+        )
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<x-card><button type="button" tabindex="1">Slotted</button></x-card>`,
+      )
+    })
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("button", { name: "Slotted" })).toBeFocused()
+    await tab()
+    await expect(field(page)).toBeFocused()
+  })
+
+  test("opening focuses the first field even when a later one has a positive tabindex", async ({ page }) => {
+    await page.evaluate(() => {
+      const raise = () =>
+        document.querySelectorAll("button").forEach((el) => el.textContent === "Save" && (el.tabIndex = 1))
+      raise()
+      new MutationObserver(raise).observe(document.body, { childList: true, subtree: true })
+    })
+    await openWithKeyboard(page)
+  })
+
   test("Escape closes the dialog and returns focus to the trigger", async ({ page }) => {
     await openWithKeyboard(page)
     await page.keyboard.press("Escape")
