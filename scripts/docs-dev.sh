@@ -1,8 +1,8 @@
 #!/bin/bash
 # Runs the docs dev server. The docs load prebuilt examples from
-# examples/dist, outside Next, so this builds them before every start and
-# rebuilds a framework's within seconds of a change to its examples or its
-# adapter (a change to core rebuilds them all). Reload the page to see it.
+# apps/docs/public/examples, outside Next, so this builds them before every
+# start and rebuilds a framework's within seconds of a change to its examples
+# or its adapter (a change to core rebuilds them all). Reload the page to see it.
 # As a safeguard, it restarts the server with a clean build cache whenever
 # `.next/dev` grows past a limit: it once filled the disk.
 # Usage: scripts/docs-dev.sh (DOCS_PORT and DOCS_CACHE_LIMIT_MB are optional).
@@ -12,13 +12,14 @@ limit=${DOCS_CACHE_LIMIT_MB:-3000}
 root="$(cd "$(dirname "$0")/.." && pwd)"
 docs="$root/apps/docs"
 examples="$root/examples"
-stamp="$examples/dist/.built"
+stamp="$docs/public/examples/.built"
 frameworks="react vue svelte solid web"
 
 # Builds the named frameworks' examples, or every framework's. A failed build
 # leaves the stamp alone, so the next check tries again.
 build_examples() {
   local next="$stamp.next"
+  mkdir -p "$(dirname "$stamp")"
   touch "$next"
   if (cd "$examples" && node scripts/build.mjs "$@"); then
     mv "$next" "$stamp"
