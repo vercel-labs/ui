@@ -123,7 +123,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
     },
     noFiltering,
   )
-  const selection = createValueSelection({ store, options, listbox, toKey })
+  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
   const icons = createItemIcons(store)
 
   const order = () => listbox.entries().map((entry) => entry.key)
@@ -174,6 +174,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
   function setValue(value: unknown, { reason, event }: Change) {
     const state = store.get()
     if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    selection.stopRestoring()
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done

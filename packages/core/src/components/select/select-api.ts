@@ -210,7 +210,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       })
     },
   })
-  const selection = createValueSelection({ store, options, listbox, toKey })
+  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
   keepListing(store, listbox, {
     entry: (key, value) => (selection.isSelected(key, value) ? "s" : ""),
     inputs: () => [store.get().value],
@@ -308,6 +308,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   ) {
     const state = store.get()
     if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    selection.stopRestoring()
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done

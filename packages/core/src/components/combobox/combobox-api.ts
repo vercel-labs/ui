@@ -270,7 +270,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       })
     },
   })
-  const selection = createValueSelection({ store, options, listbox, toKey })
+  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
   keepListing(store, listbox, {
     entry: (key, value) => (selection.isSelected(key, value) ? "s" : maxReached() ? "f" : ""),
     inputs: () => [store.get().value, store.get().multiple, store.get().maxSelected],
@@ -389,6 +389,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   ) {
     const state = store.get()
     if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    selection.stopRestoring()
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done
