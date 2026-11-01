@@ -86,6 +86,21 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
   })
 
+  test("Shift+Tab from the first element wraps to the checked radio of a group outside a form", async ({
+    page,
+    tab,
+  }) => {
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<label><input type="radio" name="speed" checked> Standard</label><label><input type="radio" name="speed"> Express</label>`,
+      ),
+    )
+    await tab({ shift: true })
+    await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
+  })
+
   test("Escape closes the dialog and returns focus to the trigger", async ({ page }) => {
     await openWithKeyboard(page)
     await page.keyboard.press("Escape")
