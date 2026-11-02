@@ -801,3 +801,19 @@ describe("createReorder after a missed release", () => {
     expect(instance.get().value).toEqual(["a", "b", "c", "d"])
   })
 })
+
+// A drop commits the order the list has now, moved: only `set` changes which items there are.
+test("an item the owner removes mid-drag stays removed when the drag drops", async () => {
+  const onValueChange = vi.fn()
+  const { instance, list, els } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  stackRects(list)
+  await tick()
+  pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
+  pointer("pointermove", { x: 10, y: 65 })
+  await frame()
+  expect(instance.get().moving).toMatchObject({ key: "a", pointer: true })
+  instance.setOptions({ value: ["a", "b", "c"], onValueChange })
+  pointer("pointerup", { x: 10, y: 65 })
+  expect(onValueChange).toHaveBeenCalledTimes(1)
+  expect(onValueChange.mock.calls[0][0]).toEqual(["b", "a", "c"])
+})
