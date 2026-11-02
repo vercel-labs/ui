@@ -1,3 +1,4 @@
+import { dev, warn } from "#dev"
 import { whenKept } from "./keep"
 import type { PrimitiveContext } from "./primitive-types"
 
@@ -30,16 +31,22 @@ function detachController(controller: unknown, api: unknown) {
 const methodName = (key: PropertyKey) =>
   typeof key === "string" && /^[a-z]/.test(key) && !/^(internal|then|toJSON)$/.test(key) && !(key in {})
 
+// Reads like `isOpen()` render before mount on purpose, so only verbs warn.
+const isRead = (key: PropertyKey) => typeof key === "string" && /^(is|get|has|can)[A-Z]/.test(key)
+
 /**
  * A handle created outside any component and passed as the `controller` option.
  * Calls go to the instance it is attached to. Before it attaches, and once that
- * instance is gone, its methods do nothing and return undefined. A method read
- * earlier calls the instance attached when it's called. An api's `internal` is
- * for adapters, so a controller never hands it out.
+ * instance is gone, its methods do nothing and return undefined. Development
+ * builds warn once for each action called before it first attaches, like
+ * `open()`, but not for reads like `isOpen()`. A method read earlier calls the
+ * instance attached when it's called. An api's `internal` is for adapters, so a
+ * controller never hands it out.
  * @stable
  */
 function createController<Api extends object>() {
   let current: Api | undefined
+  let hasAttached = false
   // One function per method, kept across reads, which calls the method of
   // whichever instance is attached when it's called.
   const methods = new Map<PropertyKey, (...args: unknown[]) => unknown>()
@@ -48,9 +55,14 @@ function createController<Api extends object>() {
   const forward = (key: PropertyKey) => {
     let method = methods.get(key)
     if (method) return method
+    let warned = false
     method = (...args: unknown[]) => {
       const value = read(key)
-      return typeof value === "function" ? value.apply(current, args) : undefined
+      if (typeof value === "function") return value.apply(current, args)
+      if (dev && !hasAttached && !warned && !isRead(key)) {
+        warned = true
+        warn(`${String(key)}() was called before its component attached and did nothing.`)
+      }
     }
     methods.set(key, method)
     return method
@@ -65,7 +77,11 @@ function createController<Api extends object>() {
   // instead of wrapping it in a proxy that asks `has` before anything attaches.
   return new Proxy(Object.create(null) as Api, {
     get(_, key) {
-      if (key === attach) return (api: Api) => (current = api)
+      if (key === attach)
+        return (api: Api) => {
+          current = api
+          if (dev) hasAttached = true
+        }
       if (key === attached) return current !== undefined
       if (key === detach)
         return (api: Api) => {
