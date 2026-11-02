@@ -5,7 +5,7 @@ import { bindDrag } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
 import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { onProps } from "../../foundation/kernel/part"
-import type { ResizableOptions } from "./resizable"
+import type { ResizableHandleProps, ResizableOptions } from "./resizable"
 import type { State } from "./resizable-api"
 import { refreshCursor, registerHandle, releaseHandle, type HandleTarget } from "./resizable-handles"
 import type { PanelSizes } from "./resizable-layout"
@@ -119,7 +119,10 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         release()
       },
     })
-    drags.set(key, stop)
+    drags.set(key, () => {
+      stop()
+      release()
+    })
   }
   // Each handle's running drag, so a handle leaving the page ends its own.
   const drags = new Map<string, () => void>()
@@ -172,7 +175,8 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         schedule()
       }
     },
-    bindHandle(el: HTMLElement, key: string) {
+    bindHandle(el: HTMLElement, part: Part) {
+      const key = part.key
       schedule()
       const target: HandleTarget = {
         el,
@@ -191,7 +195,15 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         },
       }
       const unregister = registerHandle(target)
+      const unwatch = onProps(part, () => {
+        const stop = drags.get(key)
+        if (!stop || !(part.props as ResizableHandleProps).disabled) return
+        drags.delete(key)
+        stop()
+        group().endDrag()
+      })
       return () => {
+        unwatch()
         unregister()
         const stop = drags.get(key)
         drags.delete(key)
