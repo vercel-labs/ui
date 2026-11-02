@@ -61,7 +61,9 @@ function createController<Api extends object>() {
     return typeof value === "function" ? forward(key) : value
   }
   const isMember = (key: PropertyKey) => key !== "internal" && !!current && Object.hasOwn(current, key)
-  return new Proxy({} as Api, {
+  // A target without a prototype, so Svelte's `$state` keeps the controller
+  // instead of wrapping it in a proxy that asks `has` before anything attaches.
+  return new Proxy(Object.create(null) as Api, {
     get(_, key) {
       if (key === attach) return (api: Api) => (current = api)
       if (key === attached) return current !== undefined
