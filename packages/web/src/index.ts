@@ -131,6 +131,8 @@ export {
 export { createCarouselController } from "@ui-sdk/core/carousel"
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export { createDatePickerController } from "@ui-sdk/core/date-picker"
+export { createDateInputController } from "@ui-sdk/core/date-input"
+export { createTimeInputController } from "@ui-sdk/core/time-input"
 // Every component's controller, like in the other frameworks' packages.
 export { createAccordionController } from "@ui-sdk/core/accordion"
 export { createAlertDialogController } from "@ui-sdk/core/alert-dialog"
@@ -247,6 +249,7 @@ export type {
   AutocompleteEvents,
   ComboboxEvents,
   CommandEvents,
+  DateInputEvents,
   DatePickerEvents,
   DialogEvents,
   DrawerEvents,
@@ -269,6 +272,7 @@ export type {
   SliderEvents,
   SwitchEvents,
   TabsEvents,
+  TimeInputEvents,
   TokenInputEvents,
   ToggleEvents,
   ToggleGroupEvents,
@@ -287,6 +291,7 @@ export type {
   UiAutocompleteElement,
   UiComboboxElement,
   UiCommandElement,
+  UiDateInputElement,
   UiDatePickerElement,
   UiDetailedChangeEvent,
   UiDialogElement,
@@ -326,6 +331,7 @@ export type {
   UiSwitchElement,
   UiTabsElement,
   UiTextareaElement,
+  UiTimeInputElement,
   UiToastRegionElement,
   UiTokenInputElement,
   UiTreeElement,

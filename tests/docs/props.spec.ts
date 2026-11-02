@@ -659,6 +659,33 @@ const components: Record<string, Component> = {
       debug: "ScrollAreaOptions",
     },
   },
+  "date-input": {
+    source: "date-input/date-input.ts",
+    examples: "date-input",
+    types: ["DateInputOptions", "DateInputSegmentProps", "DateInputState", "DateInputSegmentState"],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "DateInputOptions",
+      // Names a form elsewhere in the page, as on a native input. The Forms section says so.
+      form: "DateInputOptions",
+      // What a segment renders by itself: its text, placeholder, name and element.
+      text: "DateInputSegmentState",
+      empty: "DateInputSegmentState",
+      label: "DateInputSegmentState",
+      editable: "DateInputSegmentState",
+    },
+  },
+  "time-input": {
+    source: "date-input/time-input.ts",
+    examples: "date-input",
+    types: ["TimeInputOptions"],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "TimeInputOptions",
+      // Names a form elsewhere in the page, as on a native input. The Forms section says so.
+      form: "TimeInputOptions",
+    },
+  },
   "otp-input": {
     source: "otp-input/otp-input.ts",
     examples: "otp-input",

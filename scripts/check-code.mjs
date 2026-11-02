@@ -107,6 +107,8 @@ const dragSessionAllowlist = {
 const importLayersAllowlist = {
   "foundation/kernel -> foundation/platform":
     "A pending action loads the announcer when it first needs it, and a part that can be hidden writes the rule that keeps it hidden.",
+  "components/date-input -> components/calendar":
+    "Date Input matches unavailable dates the way Calendar does.",
   "components/date-picker -> components/calendar": "Date Picker is a field over Calendar.",
   "components/drawer -> components/dialog": "Drawer is a dialog with a sheet.",
   "components/menu -> components/menubar": "A menu inside a menubar hands focus across.",

@@ -14,3 +14,10 @@ Open work, bugs and ideas. Add what you find; delete what lands.
 - **Bugs: trigger menu on web and Vue.** Web `container` creates a second content that positioning drops; web's `select` event clashes with the native event; Vue nested `#render` slots break FieldControl.
 - **Docs: about 60 public props have no example or snippet**, plus `debug` on every component. `tests/docs/props.spec.ts` lists them (it isn't run in CI). Add snippets or allow them with a reason.
 - **Idea: a menubar item without a menu.** A Menubar only holds Menus, so a top-level Help or Search entry that runs an action or follows a link has no part. A plain button inside the bar skips the arrow keys and takes its own tab stop, and a trigger with no content still announces `aria-haspopup="menu"`. The WAI-ARIA menubar pattern allows such items: a `MenubarItem` would join the roving tab stop and arrow keys, render `role="menuitem"` without `aria-haspopup`, run `onSelect` or render as a link, and close an open menu when focus reaches it. Public API: needs sign-off.
+
+## Date Input and Time Input
+
+- Time zones: a value with an offset, or one zoned to a place, beside the local values both inputs take now.
+- Calendars other than the Gregorian one, and the locale's own digits.
+- A range: two date inputs that read as one start and end.
+- Date Picker with a segmented input in place of its text input.

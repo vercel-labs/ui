@@ -571,7 +571,9 @@
     [data-slot="input-group"],
     [data-slot="password-input-root"],
     [data-slot="number-input-group"],
-    [data-slot="combobox-chips"]
+    [data-slot="combobox-chips"],
+    [data-slot="date-input-root"],
+    [data-slot="time-input-root"]
   ) {
     box-sizing: border-box;
     width: 20rem;

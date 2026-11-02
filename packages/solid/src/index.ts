@@ -40,6 +40,7 @@ export type {
   DatePickerValue,
   DatePickerValueChangeReason,
 } from "./date-picker"
+export * from "./date-input"
 export * from "./dialog"
 export * from "./drawer"
 export * from "./field"
@@ -70,6 +71,7 @@ export * from "./switch"
 export * from "./tabs"
 export * from "./text-match"
 export * from "./textarea"
+export * from "./time-input"
 export * from "./toast"
 export * from "./toggle"
 export * from "./token-input"

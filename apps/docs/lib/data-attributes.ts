@@ -40,6 +40,8 @@ import { progress } from "@ui-sdk/core/progress"
 import { meter } from "@ui-sdk/core/meter"
 import { scrollArea } from "@ui-sdk/core/scroll-area"
 import { otpInput } from "@ui-sdk/core/otp-input"
+import { dateInput, type DateInputSegmentData } from "@ui-sdk/core/date-input"
+import { timeInput } from "@ui-sdk/core/time-input"
 import { listbox } from "@ui-sdk/core/listbox"
 import { pagination } from "@ui-sdk/core/pagination"
 import { calendar } from "@ui-sdk/core/calendar"
@@ -69,6 +71,28 @@ const coreSource = (file: string) => {
 }
 
 type Description = { text: string; values?: string[] }
+
+// Date Input and Time Input set the same attributes.
+const segmentedDescriptions = (kind: "date" | "time"): Record<string, Description> => ({
+  "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+  "data-readonly": { text: "Present when read-only." },
+  "data-required": { text: "Present when required." },
+  "data-invalid": {
+    text:
+      kind === "date"
+        ? "Present while the date is before `min`, after `max` or unavailable."
+        : "Present while the time is before `min` or after `max`.",
+  },
+  "root:data-empty": { text: "Present while every segment is empty." },
+  "segment:data-empty": { text: "Present while the segment is empty. It shows its placeholder." },
+  "segment:data-type": {
+    text: "The segment's unit, or `literal` for the text between segments.",
+    values:
+      kind === "date"
+        ? ["year", "month", "day", "hour", "minute", "second", "dayPeriod", "literal"]
+        : ["hour", "minute", "second", "dayPeriod", "literal"],
+  },
+})
 
 // An instance with the features that register its optional parts, the way
 // an adapter registers one when its part renders.
@@ -1122,6 +1146,46 @@ const components: Record<
       group: { react: "OTPInputGroup", web: "<ui-otp-input-group>" },
       slot: { react: "OTPInputSlot", web: "<ui-otp-input-slot>" },
       separator: { react: "OTPInputSeparator", web: "<ui-otp-input-separator>" },
+    },
+  },
+  "date-input": {
+    instances: () => [
+      dateInput({ id: "docs", defaultValue: "2026-11-02", disabled: true, readOnly: true, required: true }),
+      dateInput({ id: "docs-invalid", defaultValue: "2026-12-02", max: "2026-11-30" }),
+      dateInput({ id: "docs-empty" }),
+    ],
+    samples: {
+      root: [{}],
+      segment: [
+        { segment: { key: "month" } as DateInputSegmentData },
+        { segment: { key: "literal-0" } as DateInputSegmentData },
+      ],
+    },
+    interactive: [],
+    descriptions: segmentedDescriptions("date"),
+    parts: {
+      root: { react: "DateInput", web: "<ui-date-input>" },
+      segment: { react: "DateInputSegment", web: "<ui-date-input-segment>" },
+    },
+  },
+  "time-input": {
+    instances: () => [
+      timeInput({ id: "docs", defaultValue: "14:30", disabled: true, readOnly: true, required: true }),
+      timeInput({ id: "docs-invalid", defaultValue: "18:00", max: "17:00" }),
+      timeInput({ id: "docs-empty" }),
+    ],
+    samples: {
+      root: [{}],
+      segment: [
+        { segment: { key: "hour" } as DateInputSegmentData },
+        { segment: { key: "literal-0" } as DateInputSegmentData },
+      ],
+    },
+    interactive: [],
+    descriptions: segmentedDescriptions("time"),
+    parts: {
+      root: { react: "TimeInput", web: "<ui-time-input>" },
+      segment: { react: "TimeInputSegment", web: "<ui-time-input-segment>" },
     },
   },
   "password-input": {
