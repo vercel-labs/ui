@@ -104,8 +104,8 @@ const board = /* @__PURE__ */ definePrimitive({
       draft: "moving",
       set: (value, details) => change("positions", value, details),
       group: (key) => (store.get().selected.includes(key) ? store.get().selected : [key]),
-      step: () => store.get().step,
-      grid: () => store.get().grid,
+      step: () => store.get().grid,
+      largeStep: () => store.get().step,
       disabled: (key) => !!card(key)?.disabled,
       label: (key) => card(key)?.label,
     })

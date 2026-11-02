@@ -1,0 +1,223 @@
+---
+title: Numbers
+description: Step, scale, format and read numbers in someone's language, with one keyboard map for numeric controls.
+---
+
+`@ui-sdk/core/number` provides steps and bounds, scales, formatting, parsing and the keyboard map numeric controls share.
+
+The helpers are plain functions that run without a DOM. Slider, Number Input, Progress and Meter use the same helpers, so a control of your own steps, formats and reads numbers the way they do.
+
+## Bounds and Steps
+
+### Snap to a Step
+
+`scrubTo` puts a value on the step grid within the bounds, and `stepValue` moves a number of steps from it. Both round away floating point noise, so `0.1 + 0.2` steps land on `0.3`:
+
+```ts
+import { clamp, roundTo, scrubTo, stepValue } from "@ui-sdk/core/number"
+
+const range = { min: 0, max: 10, step: 0.25 }
+
+scrubTo(3.3, range).value // 3.25
+stepValue(3.3, 1, range) // 3.5, off the grid moves onto it first
+stepValue(9.9, 1, range) // 10
+clamp(14, 0, 10) // 10
+roundTo(0.1 + 0.2, 2) // 0.3
+```
+
+The grid starts at `min` when it's finite, like a native range input, so `{ min: 1, max: 10, step: 2 }` steps through 1, 3, 5, 7 and 9. `maxOnGrid` returns that highest value, and `decimalsOf` counts a number's decimals. Give the range `snap` points and `scrubTo` lands on those too, as [scrubbing](#snap-while-scrubbing) shows. A step of 0 has no grid, so values stay exactly as they are, within the bounds.
+
+### Loops
+
+`wrap` keeps a value in a loop, for hues, angles, clock faces and carousels that go round:
+
+```ts
+import { wrap } from "@ui-sdk/core/number"
+
+wrap(370, 0, 360) // 10
+wrap(-15, 0, 360) // 345
+wrap(slide + 1, 0, slides.length) // the next slide, back to the first after the last
+```
+
+## Keys
+
+### One Keyboard Map
+
+`stepFromKey` reads a key into a move, as the APG's slider and spinbutton patterns describe: Up and Right step up, Down and Left step down, Shift takes the large step and Alt the small one, Page Up and Down take the large step, and Home and End go to the bounds. `stepBy` applies the move:
+
+```ts
+import { stepBy, stepFromKey } from "@ui-sdk/core/number"
+
+const range = { min: 0, max: 20, step: 0.5, largeStep: 5, smallStep: 0.1 }
+
+function onKeyDown(event: KeyboardEvent) {
+  const move = stepFromKey(event, { arrows: "vertical" })
+  if (!move) return
+  event.preventDefault()
+  value = stepBy(value, move, range)
+}
+```
+
+<ComponentExample
+  name="behaviors/number-steps"
+  caption="Focus the quantity and press the arrows, with Shift or Alt for bigger and smaller steps, then Home and End. Type a weight and press Enter: it snaps to the step."
+/>
+
+Right to left flips Left and Right on a horizontal control, as `{ dir: "rtl" }`; a vertical one keeps them. `{ arrows: "vertical" }` leaves Left and Right to a text caret, as a number field does. Without `largeStep`, a large step is ten steps; without `smallStep`, a small step is one.
+
+A move is `{ direction, size }` or `{ bound }`, so a control can treat a bound its own way, like a slider's thumb that stops at its neighbor.
+
+## Positions and Scales
+
+### Value to Position
+
+`fractionOf` gives where a value sits between bounds, from 0 to 1, and `valueAt` gives the value at a position. Together they place a thumb, fill a bar and turn a press into a value:
+
+```ts
+import { fractionOf, scrubTo, valueAt } from "@ui-sdk/core/number"
+
+fractionOf(30, { min: 0, max: 120 }) // 0.25
+const pressed = valueAt((event.clientX - box.left) / box.width, range)
+scrubTo(pressed, range).value
+```
+
+Values outside the bounds sit at an end, and bounds that are the same give 0.
+
+### Log and Custom Scales
+
+On a log scale, each tenfold takes the same distance, as frequency, volume and zoom controls need. Pass `"log"`, with a positive `min`, or a `to` and `from` pair that maps values into an even space and back:
+
+```ts
+fractionOf(200, { min: 20, max: 20000 }, "log") // 0.33: 20 to 200 is a third of the way
+valueAt(0.5, { min: 20, max: 20000 }, "log") // 632, halfway by ratio
+
+const area = { to: Math.sqrt, from: (position: number) => position * position }
+fractionOf(25, { min: 0, max: 100 }, area) // 0.5: a size that feels even by area, like a brush
+```
+
+<ComponentExample
+  name="behaviors/number-scale"
+  caption="Drag the slider to turn the needle from 1° to 180°, then switch between Linear and Log. On the log scale, small angles get most of the slider: 45° sits 73% along, and halfway turns it only 13°."
+/>
+
+To step a scaled control evenly, step its position and read the value back, like `valueAt(stepBy(fraction, move, { min: 0, max: 1, step: 0.01 }), range, "log")`.
+
+## Scrubbing
+
+### Snap While Scrubbing
+
+Give a range `snap` points and a `threshold`, and a scrub lands on a point when it comes that close, like a timeline's chapters or an editor's keyframes. `scrubTo` reads a pointer or a slider, and `stepBy` takes the same points for keys: a step stops at the first point it reaches ahead, and leaves the point it's on freely:
+
+```ts
+import { scrubTo, stepBy, stepFromKey } from "@ui-sdk/core/number"
+
+const range = { min: 0, max: 60, step: 0.1, snap: { points: [0, 9.5, 24, 38.5, 52], threshold: 1.5 } }
+
+scrubTo(23, range) // { value: 24, point: 24 }
+scrubTo(23, range, { snap: false }) // { value: 23, point: undefined }
+
+function onKeyDown(event: KeyboardEvent) {
+  const move = stepFromKey(event)
+  if (!move) return
+  event.preventDefault()
+  time = stepBy(time, move, range, { snap: !event.metaKey })
+}
+```
+
+`{ snap: false }` ignores the points, like while Cmd is held or for a typed number, and still lands on the step grid. A slider's `input` event doesn't say which keys are down, so read them from its pointer events:
+
+```tsx
+<input
+  type="range"
+  onPointerDown={(event) => (free = event.metaKey)}
+  onPointerMove={(event) => (free = event.metaKey)}
+  onChange={(event) => setTime(scrubTo(Number(event.target.value), range, { snap: !free }).value)}
+/>
+```
+
+<ComponentExample
+  name="behaviors/number-scrub"
+  caption="Drag the slider: the playhead snaps to each section as it comes within 1.5 seconds, and arrow keys stop at each one. Hold Command or Ctrl to scrub and step freely."
+/>
+
+`point` says which snap point a value is pulled to, so a release can commit `point ?? value`. With `{ ease: true }`, a value near a point moves toward it instead of jumping: not at all at the threshold, faster as it closes in, and onto the point at the end. Show `value` while dragging, and land on `point`:
+
+```ts
+scrubTo(23.25, range, { ease: true }) // { value: 23.625, point: 24 }
+scrubTo(22.5, range, { ease: true }) // { value: 22.5, point: 24 }, at the threshold
+```
+
+Pass a curve over closeness, from 0 at the threshold to 1 on the point, like `{ ease: (t) => t * t }`, to change how the pull builds. [Collapse Past a Threshold](./behaviors/drag-and-drop#collapse-past-a-threshold) eases a sidebar into collapsing.
+
+A control that leaves Up and Down to the page, like a timeline in a list of tracks, passes `{ arrows: "horizontal" }` to `stepFromKey`.
+
+## Formatting
+
+### Numbers in Any Language
+
+`formatNumber` shows a value through `Intl.NumberFormat` in a locale: currencies, percents, units and compact counts, with the locale's own digits and separators. Pass a function for text of your own. Null and values that aren't finite show as empty text:
+
+```ts
+import { formatNumber } from "@ui-sdk/core/number"
+
+formatNumber(1234.5, "de-DE", { style: "currency", currency: "EUR" }) // "1.234,50 €"
+formatNumber(1234.5, "ja-JP", { style: "currency", currency: "JPY" }) // "￥1,235"
+formatNumber(1234.5, "zh-CN", { style: "currency", currency: "CNY" }) // "¥1,234.50"
+formatNumber(0.256, "en-US", { style: "percent", maximumFractionDigits: 1 }) // "25.6%"
+formatNumber(1234567, "en-US", { notation: "compact" }) // "1.2M"
+formatNumber(3, "en-US", (value) => `${value} of 5 stars`) // "3 of 5 stars"
+```
+
+Use the same text for a control's `aria-valuetext`, so screen readers hear what's shown. `numberFormatter` returns the `Intl.NumberFormat` itself, built once per locale and options.
+
+### Ranges and Parts
+
+`formatNumberRange` writes what both ends share once, and `formatNumberToParts` returns each digit group and symbol, to style them apart or roll digits like an odometer:
+
+```ts
+import { formatNumberRange, formatNumberToParts } from "@ui-sdk/core/number"
+
+formatNumberRange(5, 10, "en-US", { style: "currency", currency: "USD" }) // "$5.00 – $10.00"
+formatNumberToParts(1234.5, "en-US", { style: "currency", currency: "USD" })
+// [{ type: "currency", value: "$" }, { type: "integer", value: "1" }, { type: "group", value: "," }, …]
+```
+
+<ComponentExample
+  name="behaviors/number-format"
+  caption="Pick a locale and a style. The large number is built from its parts, with the fraction and currency dimmed, and the range shares what both ends have."
+/>
+
+## Typing a Number
+
+### Read What People Type
+
+`parseNumber` reads a number typed in a locale's format: its digits, group and decimal separators, minus signs, and currency, percent and unit text. It returns null for text that isn't a number, and percent formats divide by 100. `isPartialNumber` says whether text could still become one, so a field can wait on a lone `"-"` instead of rejecting it:
+
+```ts
+import { isPartialNumber, parseNumber } from "@ui-sdk/core/number"
+
+parseNumber("1.234,5", "de-DE") // 1234.5
+parseNumber("٣٫٥", "ar-EG") // 3.5
+parseNumber("50 %", "fr-FR", { style: "percent" }) // 0.5
+parseNumber("-", "de-DE") // null
+isPartialNumber("-", "de-DE") // true
+```
+
+<ComponentExample
+  name="behaviors/number-parse"
+  caption="Type an amount the way the locale writes it, or switch the locale. A number that's on its way waits; text that can't become one is marked."
+/>
+
+## API Reference
+
+All of these functions come from `@ui-sdk/core/number`.
+
+| You Want To                               | Use                                                                                                       |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Keep a value on a step grid within bounds | [`scrubTo`, `stepValue`, `clamp`, `roundTo`, `decimalsOf`, `maxOnGrid`](#snap-to-a-step)                  |
+| Keep a value in a loop                    | [`wrap`](#loops)                                                                                          |
+| Turn keys into steps                      | [`stepFromKey`, `stepBy`](#one-keyboard-map)                                                              |
+| Map values to positions and back          | [`fractionOf`, `valueAt`](#value-to-position)                                                             |
+| Snap a scrub to points                    | [`scrubTo`, `stepBy`](#snap-while-scrubbing)                                                              |
+| Show numbers in someone's language        | [`formatNumber`, `formatNumberRange`, `formatNumberToParts`, `numberFormatter`](#numbers-in-any-language) |
+| Read typed numbers                        | [`parseNumber`, `isPartialNumber`](#read-what-people-type)                                                |

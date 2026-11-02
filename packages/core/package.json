@@ -64,6 +64,7 @@
     "./async-options": "./src/foundation/lists/async-options.ts",
     "./text-match": "./src/foundation/text/text-match.ts",
     "./date": "./src/foundation/date/date.ts",
+    "./number": "./src/foundation/number/number.ts",
     "./date-picker": "./src/components/date-picker/date-picker.ts",
     "./agent": "./src/page/agent/agent.ts",
     "./observe": "./src/page/observe/observe.ts",
@@ -300,6 +301,10 @@
       "./date": {
         "types": "./dist/foundation/date/date.d.ts",
         "default": "./dist/foundation/date/date.js"
+      },
+      "./number": {
+        "types": "./dist/foundation/number/number.d.ts",
+        "default": "./dist/foundation/number/number.js"
       },
       "./date-picker": {
         "types": "./dist/components/date-picker/date-picker.d.ts",

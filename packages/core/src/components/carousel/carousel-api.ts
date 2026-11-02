@@ -5,7 +5,7 @@
 // `carousel.ts`.
 import { dev } from "#dev"
 import { checkName } from "#name-check"
-import { clamp } from "../../foundation/text/number"
+import { clamp } from "../../foundation/number/steps"
 import { createAutoplay } from "./carousel-autoplay"
 import { clearSnapAreas, labelSlide, readCarouselLayout, writeSnapAreas } from "./carousel-dom"
 import { carouselIndicators } from "./carousel-indicators"

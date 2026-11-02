@@ -80,7 +80,6 @@ const imageCropper = /* @__PURE__ */ definePrimitive({
         return { left: 0, top: 0, right: width, bottom: height }
       },
       aspect: () => context.options().aspect,
-      grid: () => 1,
       label: () => "Crop",
     })
     return {

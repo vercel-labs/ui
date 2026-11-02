@@ -314,6 +314,8 @@ describe("createResize", () => {
         bounds: () => ({ left: 0, top: 0, right: 400, bottom: 300 }),
         aspect: () => context.options().aspect,
         label: () => "Crop",
+        step: () => 10,
+        largeStep: () => 50,
       })
       return { resize, set }
     },

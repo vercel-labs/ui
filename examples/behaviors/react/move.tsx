@@ -46,7 +46,7 @@ const stickers = definePrimitive({
         key: "positions",
         draft: "moving",
         set: (value, details) => change("positions", value, details),
-        grid: () => 4,
+        step: () => 4,
         bounds: () => ({ minX: 0, minY: 0, maxX: 264, maxY: 144 }),
       }),
     }

@@ -1,7 +1,8 @@
 import { bindValueInput, bindInternals } from "../../foundation/forms/form"
 import { css } from "../../foundation/kernel/inline-style"
 import { bindPageLocale } from "../../foundation/text/locale"
-import { parseRange, type NumberFormat } from "../../foundation/text/number"
+import { type NumberFormat } from "../../foundation/number/format"
+import { parseRange } from "../../foundation/number/parse"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
@@ -517,5 +518,5 @@ export {
   type SliderValueCommitDetails,
   type SliderValueState,
 }
-export type { NumberFormat } from "../../foundation/text/number"
+export type { NumberFormat } from "../../foundation/number/format"
 export type { SliderApi } from "./slider-api"

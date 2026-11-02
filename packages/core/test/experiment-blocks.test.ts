@@ -82,6 +82,8 @@ const board = definePrimitive({
       key: "positions",
       draft: "moving",
       set: (value, details) => change("positions", value, details),
+      step: () => 10,
+      largeStep: () => 50,
     })
     return { roving, move }
   },
@@ -130,7 +132,7 @@ describe("spatialMove and createMove", () => {
     expect(document.activeElement).toBe(els.b)
   })
 
-  test("Alt with an arrow nudges the card, Shift by five steps, in one change each", () => {
+  test("Alt with an arrow nudges the card a step, Shift a large step, in one change each", () => {
     const { instance, els, onPositionsChange } = setup()
     els.a.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", altKey: true, bubbles: true }))
     expect(instance.get().positions.a).toEqual({ x: 10, y: 0 })

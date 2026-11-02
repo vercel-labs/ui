@@ -13,8 +13,52 @@ async function drag(page: Page, from: Locator, to: Locator, offset = { x: 0.5, y
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "drag-and-drop")
-  await expect(page.locator("[data-example]")).toHaveCount(14)
+  await expect(page.locator("[data-example]")).toHaveCount(15)
   expect(errors).toEqual([])
+})
+
+test("collapse: below the minimum the sidebar eases toward collapsing or the minimum, and lands on one", async ({
+  page,
+}) => {
+  await openBehaviors(page, "drag-and-drop")
+  const divider = page.getByRole("separator", { name: "Resize sidebar" })
+  await divider.scrollIntoViewIfNeeded()
+  const root = (await divider.locator("..").boundingBox())!
+  const y = root.y + root.height / 2
+  const press = async () => {
+    const box = (await divider.boundingBox())!
+    await page.mouse.move(box.x + box.width / 2, y)
+    await page.mouse.down()
+  }
+  await expect(divider).toHaveAttribute("aria-valuenow", "200")
+  // At 120 pixels the sidebar is on its way back to 160, at 140; at 40 it's on its way to collapsing, at 20.
+  await press()
+  await page.mouse.move(root.x + 120, y, { steps: 6 })
+  await expect(divider).toHaveAttribute("aria-valuenow", "140")
+  await expect(page.getByText("Release to open at 160px")).toBeVisible()
+  await page.mouse.move(root.x + 40, y, { steps: 6 })
+  await expect(divider).toHaveAttribute("aria-valuenow", "20")
+  await expect(page.getByText("Release to collapse")).toBeVisible()
+  await page.mouse.up()
+  await expect(divider).toHaveAttribute("aria-valuetext", "Collapsed")
+  await press()
+  await page.mouse.move(root.x + 50, y, { steps: 6 })
+  await page.mouse.up()
+  await expect(divider).toHaveAttribute("aria-valuenow", "0")
+  await press()
+  await page.mouse.move(root.x + 100, y, { steps: 6 })
+  await page.mouse.up()
+  await expect(divider).toHaveAttribute("aria-valuenow", "160")
+  await divider.focus()
+  await page.keyboard.press("Enter")
+  await expect(divider).toHaveAttribute("aria-valuetext", "Collapsed")
+  await page.keyboard.press("Enter")
+  await expect(divider).toHaveAttribute("aria-valuenow", "160")
+  await page.keyboard.press("ArrowRight")
+  await expect(divider).toHaveAttribute("aria-valuenow", "176")
+  await page.keyboard.press("ArrowLeft")
+  await page.keyboard.press("ArrowLeft")
+  await expect(divider).toHaveAttribute("aria-valuenow", "0")
 })
 
 test("pointer drags: the divider follows the pointer, commits on release, and Escape puts it back", async ({

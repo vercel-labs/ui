@@ -47,7 +47,7 @@ type PreviewOptions<State extends object> = {
  * option: slot<{ value: string }>({
  *   attrs: (state, { key }) => ({ "data-previewing": state.preview === key ? "" : undefined }),
  *   on: {
- *     pointerdown: (event, { el, api, key }) => api.preview.scrub(event, key, el!.parentElement!),
+ *     pointerdown: (event, { el, api, key }) => api.preview.pointerdown(event, key, el!.parentElement!),
  *     keydown: (event, { el, api, key }) => api.preview.keydown(event, key) || api.roving.keydown(event, el!),
  *   },
  * }),
@@ -66,7 +66,7 @@ function createPreview<State extends object>(
   const set = (value: string | null, details: { reason: PreviewReason; event?: Event }) =>
     options.set ? options.set(value, details) : (store.set({ [options.key]: value } as Partial<State>), true)
   const label = (key: string) => options.label?.(key) ?? key
-  let scrubbing = false
+  let sliding = false
   const drags = createDragSession(context.onDestroy)
 
   const api = {
@@ -92,9 +92,9 @@ function createPreview<State extends object>(
       return done
     },
     /** Whether a pointer is pressed and sliding across the options. */
-    scrubbing: () => scrubbing,
-    /** Starts a scrub from a pressed option: each option the pointer slides over previews, letting go on one chooses it. */
-    scrub(event: PointerEvent, key: string, surface: HTMLElement) {
+    dragging: () => sliding,
+    /** Starts a press and slide from an option: each option the pointer slides over previews, letting go on one chooses it. */
+    pointerdown(event: PointerEvent, key: string, surface: HTMLElement) {
       if (!drags.accepts(event)) return
       event.preventDefault()
       // Boxes are read once, on press, so sliding measures nothing.
@@ -105,7 +105,7 @@ function createPreview<State extends object>(
       const under = (x: number, y: number) =>
         boxes.find(({ box }) => x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)?.key ??
         null
-      scrubbing = true
+      sliding = true
       api.show(key, { reason: "item-hover", event })
       drags.start(surface, event, {
         cancelOnEscape: true,
@@ -114,7 +114,7 @@ function createPreview<State extends object>(
           if (next !== current()) api.show(next, { reason: "item-hover", event: move })
         },
         onEnd: (end, canceled) => {
-          scrubbing = false
+          sliding = false
           const landed = canceled ? null : under(end.clientX, end.clientY)
           if (landed && landed !== options.value?.()) api.choose(landed, { event: end })
           else api.clear({ reason: landed ? "item-press" : "focus-out", event: end })

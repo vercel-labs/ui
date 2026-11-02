@@ -1,6 +1,7 @@
-// Reading numbers typed in a locale's format, for Number Input. Pure, so it
-// runs on the server too.
-import { decimalsOf, numberFormatter, roundTo } from "../../foundation/text/number"
+// Reading numbers people type in their locale's format, and the `"start/end"`
+// string a range submits as one form value. Pure, so it runs on the server too.
+import { numberFormatter } from "./format"
+import { decimalsOf, roundTo } from "./steps"
 
 const minusSigns = /[\u2212\u2012\u2013\uFE63\uFF0D]/g
 const plusSigns = /[\uFE62\uFF0B]/g
@@ -96,6 +97,7 @@ const partial = /^-?\d*\.?\d*$/
  * Reads a number typed in a locale's format: its digits, group and decimal
  * separators, minus signs, and currency, percent and unit text. Percent
  * formats divide by 100. Returns null for text that isn't a number.
+ * @experimental
  */
 function parseNumber(text: string, locale?: string, format?: Intl.NumberFormatOptions) {
   const symbols = symbolsOf(locale, format ?? {})
@@ -108,11 +110,12 @@ function parseNumber(text: string, locale?: string, format?: Intl.NumberFormatOp
 /**
  * Whether text could still become a number as someone types it, like "-",
  * "1." or "$1,2". Without `allowNegative`, a minus sign isn't accepted.
+ * @experimental
  */
 function isPartialNumber(
   text: string,
-  locale: string | undefined,
-  format: Intl.NumberFormatOptions | undefined,
+  locale?: string,
+  format?: Intl.NumberFormatOptions,
   { allowNegative = true } = {},
 ) {
   const normalized = normalize(text, symbolsOf(locale, format ?? {}))
@@ -120,4 +123,10 @@ function isPartialNumber(
   return allowNegative || !normalized.startsWith("-")
 }
 
-export { isPartialNumber, parseNumber }
+/** The numbers in a `"start/end"` string, or null when any part isn't one. */
+function parseRange(value: string) {
+  const parts = value.split("/").map((part) => (part.trim() === "" ? NaN : Number(part)))
+  return parts.every(Number.isFinite) ? parts : null
+}
+
+export { isPartialNumber, parseNumber, parseRange }
