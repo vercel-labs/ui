@@ -543,7 +543,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     hide,
     parentMenu: () => parent,
     popupElement: () => popup.element(),
-    itemProps: (slot: string, key: string) => props(slot, key),
+    itemProps: <Props extends object>(slot: string, key: string) => props<Props>(slot, key),
     triggerElement,
     focusTriggerItem,
     checkboxValue,

@@ -17,6 +17,7 @@ import {
 import type {
   FileInputDropzoneProps,
   FileInputChangeOptions,
+  FileInputItemProps,
   FileInputOptions,
   FileInputValueChangeReason,
 } from "./file-input"
@@ -237,7 +238,7 @@ function fileInputApi(
     })
   }
 
-  const items = () => elements(context, "item")
+  const items = () => elements<FileInputItemProps>(context, "item")
 
   // A removed item's focus goes to the next one, else the one before, else
   // the trigger, once the file has gone. A controlled value comes back by the

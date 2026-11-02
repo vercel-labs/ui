@@ -238,7 +238,7 @@ const CommandGroup = parts.Group
 const CommandGroupLabel = parts.GroupLabel
 
 /**
- * A line between groups. Hidden while the list is filtered.
+ * A line between groups. Composed separators hide while the list is filtered.
  * @stable
  */
 const CommandSeparator = parts.Separator

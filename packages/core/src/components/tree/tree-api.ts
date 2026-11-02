@@ -69,7 +69,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
   const { id, store, options } = context
   const change = createChange(context)
   const typeahead = createTypeahead()
-  const itemProps = (key: string) => context.props("item", key) as TreeItemProps | undefined
+  const itemProps = (key: string) => context.props<TreeItemProps>("item", key)
   const itemElement = (key: string | null | undefined) =>
     key == null ? undefined : context.element("item", key)
 

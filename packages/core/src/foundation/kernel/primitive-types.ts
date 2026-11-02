@@ -232,8 +232,11 @@ type PrimitiveContext<Options, State extends object, Slot extends string> = {
   parts(): Iterable<Part>
   /** A bound element of `slot` in the page: the part with `key`, or the first bound one. Undefined on the server. */
   element(slot: Slot, key?: string): HTMLElement | undefined
-  /** The props the part of `slot` with `key` last rendered with. `key` defaults to `""`, a part with no `id` or `value`. */
-  props(slot: Slot, key?: string): any
+  /**
+   * The props the part of `slot` with `key` last rendered with. `key` defaults to `""`, a part with no `id` or `value`.
+   * Name the slot's props to type them: `props<{ disabled?: boolean }>("item", key)`.
+   */
+  props<Props extends object = object>(slot: Slot, key?: string): Props | undefined
 }
 
 /**

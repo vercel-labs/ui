@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), and 158 and 159 (2026-11-01, follow-ups to 89 and 90).
 
 ## Settled
 
