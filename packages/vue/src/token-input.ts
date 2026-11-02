@@ -29,6 +29,7 @@ import { withElement } from "./create-parts"
 import { EditorKey } from "./editor-context"
 import { useFieldControl } from "./field-context"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 type ValueDetails = ChangeDetails<TokenInputValueChangeReason> & { inputType?: string; removed: Token[] }
 
@@ -86,7 +87,7 @@ const TokenInput = defineComponent({
     /** Renders each token's content: `#token="{ token }"`. */
     token?: (scope: { token: Token }) => VNode[]
   }>,
-  setup(props, { slots, emit }) {
+  setup(props, { slots, attrs, emit }) {
     const field = useFieldControl()
     const input = usePrimitive(tokenInputPrimitive, () => ({
       ...props,
@@ -94,6 +95,7 @@ const TokenInput = defineComponent({
       defaultValue: props.defaultValue && toRaw(props.defaultValue),
       name: props.name ?? field?.name(),
       disabled: props.disabled || field?.disabled(),
+      readOnly: readOnlyOf(props, attrs),
       onValueChange: (value: TokenInputValue, details: ValueDetails) => {
         emit("valueChange", value, details)
         if (details.canceled) return

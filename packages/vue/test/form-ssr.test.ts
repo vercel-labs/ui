@@ -2,7 +2,32 @@
 import { renderToString } from "@vue/server-renderer"
 import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
-import { Field, FieldError, FieldLabel, FieldLegend, FieldSet, Input, Textarea } from "../src"
+import {
+  Autocomplete,
+  AutocompleteInput,
+  Calendar,
+  Checkbox,
+  Combobox,
+  ComboboxInput,
+  DatePicker,
+  Field,
+  FieldError,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+  Input,
+  Listbox,
+  NumberInput,
+  OTPInput,
+  PasswordInput,
+  RadioGroup,
+  Select,
+  SelectTrigger,
+  Switch,
+  Textarea,
+  TokenInput,
+  TokenInputEditor,
+} from "../src"
 
 const render = (node: () => unknown) => renderToString(createSSRApp(() => node()))
 
@@ -60,6 +85,32 @@ describe("server rendering text fields and forms", () => {
       const html = await render(() => h(component, { readonly: "", defaultValue: "Hi" }))
       expect(html).toMatch(/readonly/)
       expect(html).toContain("data-readonly")
+    }
+  })
+
+  test("a native readonly attribute keeps every other read-only control read-only", async () => {
+    const controls = [
+      [Autocomplete, AutocompleteInput],
+      [Calendar],
+      [Checkbox],
+      [Combobox, ComboboxInput],
+      [DatePicker],
+      [Listbox],
+      [NumberInput],
+      [OTPInput],
+      [PasswordInput],
+      [RadioGroup],
+      [Select, SelectTrigger],
+      [Switch],
+      [TokenInput, TokenInputEditor],
+    ] as const
+    // Where the attribute itself lands differs, the state it sets doesn't.
+    const withoutAttribute = (html: string) => html.replace(/ readonly(?=[\s>])/g, "")
+    for (const [component, child] of controls) {
+      const content = child && (() => h(child))
+      const native = await render(() => h(component, { readonly: "" }, content))
+      const prop = await render(() => h(component, { readOnly: true }, content))
+      expect(withoutAttribute(native), component.name).toBe(withoutAttribute(prop))
     }
   })
 })

@@ -16,6 +16,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 // The field the group joined, so a radio joins only a field of its own.
 const GroupFieldKey: InjectionKey<FieldContext | null> = Symbol("radio-group-field")
@@ -48,14 +49,14 @@ const RadioGroup = withElement(
       valueChange: (_value: string | null, _details: ChangeDetails<RadioGroupValueChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof radioGroupPrimitive, "group">,
-    setup(props, { emit }) {
+    setup(props, { attrs, emit }) {
       provide(GroupFieldKey, inject(FieldKey, null))
       const field = useFieldControl()
       const group = usePrimitive(radioGroupPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
         defaultValue: props.defaultValue,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         required: props.required,
         name: props.name ?? field?.name(),
         form: props.form,

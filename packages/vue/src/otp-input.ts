@@ -11,6 +11,7 @@ import { slotContent } from "./children"
 import { useFieldControl } from "./field-context"
 import { createParts, withElement } from "./create-parts"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 const parts = createParts(otpInputPrimitive, { group: "div", separator: "div" })
 
@@ -69,7 +70,7 @@ const OTPInput = withElement(
         textAlign: props.textAlign,
         autoComplete: props.autoComplete,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         required: props.required,
         name: props.name ?? field?.name(),
         form: props.form,

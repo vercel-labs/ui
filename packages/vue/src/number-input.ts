@@ -20,6 +20,7 @@ import {
   useScope,
   type PartSlots,
 } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 type NumberInputContext = PrimitiveHandle<typeof numberInputPrimitive>
 
@@ -66,7 +67,7 @@ const NumberInput = withElement(
       valueCommit: (_value: Value, _details: CommitDetails<NumberInputValueChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof numberInputPrimitive, "root">,
-    setup(props, { emit }) {
+    setup(props, { attrs, emit }) {
       const field = useFieldControl()
       const numberInput = usePrimitive(numberInputPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
@@ -80,7 +81,7 @@ const NumberInput = withElement(
         locale: props.locale,
         wheel: props.wheel,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         required: props.required,
         name: props.name ?? field?.name(),
         form: props.form,

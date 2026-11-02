@@ -60,6 +60,7 @@ import {
 } from "./use-primitive"
 import { FormInputs } from "./form-inputs"
 import { renderless } from "./renderless"
+import { readOnlyOf } from "./text-control"
 
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("select-container")
 
@@ -137,7 +138,7 @@ const Select = /* @__PURE__ */ renderless(
       queryChange: (_query: string, _details: QueryDetails) => true,
       loadMore: () => true,
     },
-    setup(props, { slots, emit }) {
+    setup(props, { slots, attrs, emit }) {
       const field = useFieldControl()
       provide(ContainerKey, () => props.container)
       const select = usePrimitive(selectPrimitive, () => ({
@@ -146,6 +147,7 @@ const Select = /* @__PURE__ */ renderless(
         container: undefined,
         name: props.name ?? field?.name(),
         disabled: props.disabled || field?.disabled(),
+        readOnly: readOnlyOf(props, attrs),
         onValueChange: (value: unknown, details: ValueDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)

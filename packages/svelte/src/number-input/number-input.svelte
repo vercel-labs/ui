@@ -15,6 +15,7 @@ The root, and the hidden input that submits the number as is.
   import { useControllerEntry } from "../controller-target.svelte"
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
   import { NumberInputKey, type NumberInputContext } from "./context"
 
@@ -64,7 +65,7 @@ The root, and the hidden input that submits the number as is.
     locale,
     wheel,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     required,
     name: name ?? field?.name(),
     form,
