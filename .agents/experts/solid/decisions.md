@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/solid`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and the pre-launch audit fixes on fix/audit-bugs (2026-11-02).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes).
 
 
 ## Settled
