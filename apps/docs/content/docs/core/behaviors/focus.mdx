@@ -1,9 +1,9 @@
 ---
 title: Focus and Keys
-description: Move through lists and grids, find items by typing, and keep focus when the page changes.
+description: Move through lists and grids, find items by typing, keep focus when the page changes, and give fields the right keyboard.
 ---
 
-Use `createRovingFocus` for a group with one tab stop and arrow-key navigation, and `createGridFocus` for rows and columns. The other helpers find items by typing, choose nearby targets, and restore focus when items move or disappear.
+Use `createRovingFocus` for a group with one tab stop and arrow-key navigation, and `createGridFocus` for rows and columns. The other helpers find items by typing, choose nearby targets, restore focus when items move or disappear, and give a field the right keyboard with `inputHints`.
 
 Import them from `@ui-sdk/core`. [Compose Behaviors](../compose-behaviors#give-the-group-one-tab-stop) shows how to connect roving focus to a part. Your component decides what a focused item does; [Selection](./selection) covers choosing items and ranges.
 
@@ -401,6 +401,36 @@ This timetable shows six rows at a time.
 />
 
 `pageSize` sets how far Page Up and Page Down move. With a [virtualized list](./lists#long-lists), `reveal` can call `virtualizer.scrollToIndex(row)` instead. Focus lands when the cell binds.
+
+## Input Hints
+
+A few attributes tell the browser what a field holds: `inputmode` picks a phone's keys, like an `@` for an email address or a number pad for a code, and `enterkeyhint` picks its Return key. `autocomplete` says what to autofill, and `autocapitalize`, `autocorrect` and `spellcheck` say whether to change what people type. `inputHints` fills them in for a kind of field:
+
+```tsx
+import { inputHints } from "@ui-sdk/core"
+
+const hints = inputHints("email", { enter: "next" })
+// { inputMode: "email", enterKeyHint: "next", autoComplete: "email", autoCapitalize: "none", autoCorrect: "off", spellCheck: "false" }
+```
+
+Spread them on an `<input>` or `<textarea>`. They're spelled as React spells them, and HTML reads attribute names in any case, so the same object works in Vue, Svelte, Solid and `setAttribute`. `enter` sets the Return key, like `"next"` while more fields follow and `"done"` on the last one. iPhone's number pads, for `"tel"`, `"numeric"`, `"decimal"` and `"one-time-code"`, have no Return key, so there `enter` only shows on other phones.
+
+| Kind                                    | Keys and Return key                          | Autofill and corrections                              |
+| --------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| `"email"`, `"url"`                      | Keys for an address                          | Autofills the address, no capitals or corrections     |
+| `"tel"`, `"one-time-code"`              | A number pad                                 | Autofills the number, or the code from a text message |
+| `"numeric"`, `"decimal"`                | Digits, with a decimal point for `"decimal"` | No autofill                                           |
+| `"search"`                              | A search Return key                          | No autofill, capitals or spelling marks               |
+| `"name"`, `"username"`, `"postal-code"` | The usual keys                               | Autofills them, capitalizing names and postal codes   |
+| `"current-password"`, `"new-password"`  | The usual keys                               | Offers the saved password, or suggests a new one      |
+| `"message"`                             | A send Return key                            | Capitals, corrections and spelling marks on           |
+
+<ComponentExample
+  name="behaviors/input-hints"
+  caption="Tap each field on a phone: the keys change, and so does the Return key, which iOS 26 draws as a glyph, like › for next and → for search."
+/>
+
+They're only hints: a field keeps its own `type` and validation, so a `type="email"` field still checks the address. Attributes after the spread replace the hints.
 
 ## API Reference
 

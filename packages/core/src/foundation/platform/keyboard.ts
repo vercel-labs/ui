@@ -2,11 +2,60 @@
 // browsers shrink only the visual viewport when the keyboard opens, so a
 // centered dialog or a sheet would sit under it.
 
-// How much of the layout viewport's bottom the keyboard covers, in pixels.
-// Pinch zoom also shrinks the visual viewport, so a zoomed page reports none.
-function keyboardInset(viewport: { layoutHeight: number; height: number; offsetTop: number; scale: number }) {
-  if (viewport.scale !== 1) return 0
-  return Math.max(0, Math.round(viewport.layoutHeight - viewport.height - viewport.offsetTop))
+const keyboardless = new Set([
+  "button",
+  "checkbox",
+  "color",
+  "file",
+  "hidden",
+  "image",
+  "radio",
+  "range",
+  "reset",
+  "submit",
+])
+
+// A field, the only thing a tap opens the on-screen keyboard for. A frame's
+// field can't be seen from here, so a focused frame counts.
+function isField(target: EventTarget | null) {
+  let el = target as HTMLElement | null
+  while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement as HTMLElement
+  if (!el?.tagName) return false
+  if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "IFRAME") return true
+  return el.tagName === "INPUT" && !keyboardless.has((el as HTMLInputElement).type)
+}
+
+// The keyboard's height in CSS pixels: how much less of the screen the page
+// gets while a field has focus than before it. Compared on screen, so zoom, or
+// a layout viewport that shrinks along with the keyboard, doesn't hide it.
+function keyboardHeight(view: Window) {
+  let before = { width: 0, height: 0 }
+  return (size: ViewportSize, event?: Event) => {
+    const now = { width: size.width * size.scale, height: size.height * size.scale }
+    // Focus going from one field to the next keeps the keyboard open.
+    const moving = event?.type === "focusout" && isField((event as FocusEvent).relatedTarget)
+    if (!isField(view.document.activeElement) && !moving) {
+      // Focus leaves before the keyboard closes, so only a resize or a scroll measures the page without it.
+      if (!event?.type.startsWith("focus")) before = now
+      return 0
+    }
+    // Turned while typing, or opened with the keyboard up: the layout viewport is the page without it.
+    if (Math.abs(now.width - before.width) > 1)
+      before = { width: now.width, height: size.layoutHeight * size.scale }
+    return Math.max(0, Math.round((before.height - now.height) / size.scale))
+  }
+}
+
+const pageZoom = new WeakMap<Window, number>()
+
+// How much of the layout viewport's bottom the keyboard covers: what lies
+// below what's on screen, up to a measured keyboard. Unmeasured, a pinch-zoomed
+// page covers none, while Safari's own page zoom, its scale at full height, does.
+function keyboardInset(view: Window, size: ViewportSize, keyboard: number) {
+  const covered = Math.max(0, size.layoutHeight - size.offsetTop - size.height)
+  if (Math.abs(size.height - size.layoutHeight) <= 1) pageZoom.set(view, size.scale)
+  if (keyboard > 0) return Math.round(Math.min(keyboard, covered))
+  return size.scale > (pageZoom.get(view) ?? 1) + 0.01 ? 0 : Math.round(covered)
 }
 
 // Writes --keyboard-inset and --visual-viewport-height on `el`, and
@@ -18,8 +67,9 @@ function trackKeyboard(el: HTMLElement, onChange?: { before: () => void; after: 
   const viewport = view?.visualViewport
   if (!view || !viewport) return () => {}
   let current: number | null = null
+  // Only the covered part, which components need: the keyboard's height is `bindViewport`'s.
   const apply = (size: ViewportSize) => {
-    const inset = keyboardInset(size)
+    const inset = keyboardInset(view, size, 0)
     const changed = current !== null && inset !== current
     current = inset
     if (changed) onChange?.before()
@@ -42,10 +92,11 @@ function trackKeyboard(el: HTMLElement, onChange?: { before: () => void; after: 
   }
 }
 
-type ViewportSize = Parameters<typeof keyboardInset>[0]
+type ViewportSize = { width: number; layoutHeight: number; height: number; offsetTop: number; scale: number }
 
 function measureViewport(view: Window, viewport: VisualViewport) {
   return {
+    width: viewport.width,
     layoutHeight: view.innerHeight,
     height: viewport.height,
     offsetTop: viewport.offsetTop,
@@ -67,4 +118,11 @@ function measureViewportEarly(view: Window | null | undefined) {
   setTimeout(() => early.delete(view))
 }
 
-export { measureViewportEarly, trackKeyboard }
+export {
+  keyboardHeight,
+  keyboardInset,
+  measureViewport,
+  measureViewportEarly,
+  trackKeyboard,
+  type ViewportSize,
+}

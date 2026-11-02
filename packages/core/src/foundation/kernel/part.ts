@@ -145,6 +145,7 @@ const authorOwned = new Set([
   "autocorrect",
   "spellcheck",
   "inputmode",
+  "enterkeyhint",
 ])
 
 /** The part's attributes without the ones the author gives, for `given(name)` to say which. */

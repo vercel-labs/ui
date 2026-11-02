@@ -46,7 +46,7 @@ const propNames: Record<string, string> = {
   for: "htmlFor",
   checked: "defaultChecked",
   .../* @__PURE__ */ camelCase(
-    "tabIndex readOnly inputMode autoComplete autoCapitalize autoCorrect spellCheck contentEditable maxLength minLength",
+    "tabIndex readOnly inputMode enterKeyHint autoComplete autoCapitalize autoCorrect spellCheck contentEditable maxLength minLength",
   ),
 }
 const booleans = new Set(["hidden", "disabled", "readonly", "required", "inert", "checked", "multiple"])
