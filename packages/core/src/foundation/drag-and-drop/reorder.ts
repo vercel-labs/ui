@@ -13,6 +13,7 @@ import { bindDragPreview, type DragPreview } from "./drag-preview"
 import { createDraftMove } from "./draft-move"
 import { isRTL } from "../platform/env"
 import { createOrder } from "../kernel/order"
+import { deriveState } from "../kernel/derive"
 import { createDragSession, dragThreshold } from "./pointer"
 import { labelOf } from "../text/typeahead"
 import { isSameKeys } from "../selection/listbox-range"
@@ -205,6 +206,23 @@ function createReorder<State extends object, Props = any>(
     commit: (current, details) => options.set(current.order, details),
     say: (type, current, order) => say(type, current.key, order, current.keys.length),
     element,
+  })
+
+  // The owner can change the value mid-drag, like deleting an item elsewhere.
+  // The draft keeps its moves over the items the value has now.
+  deriveState(context, [options.draft], (state) => {
+    const current = state[options.draft] as ReorderDraft | null
+    const now = state[options.key] as string[]
+    if (!current) return
+    const present = new Set(now)
+    const kept = current.order.filter((key) => present.has(key))
+    if (kept.length === current.order.length && kept.length === now.length) return
+    if (!present.has(current.key)) return { [options.draft]: null } as Partial<State>
+    const known = new Set(current.order)
+    const order = [...kept]
+    now.forEach((key, index) => known.has(key) || order.splice(Math.min(index, order.length), 0, key))
+    const keys = current.keys.filter((key) => present.has(key))
+    return { [options.draft]: { ...current, keys, order } } as Partial<State>
   })
 
   function say(type: ReorderMessage["type"], key: string, order: readonly string[], count = 1) {
