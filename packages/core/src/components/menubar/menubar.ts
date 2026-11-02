@@ -248,8 +248,11 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       hover(key: string, event: PointerEvent) {
         const open = store.get().open
         const member = members.get(key)
-        if (open === null || open === key || !member || member.disabled() || event.pointerType === "touch")
-          return
+        if (open === null || open === key || !member || event.pointerType === "touch") return
+        if (member.disabled()) {
+          const next = roving.items().find((item) => item.key === key)
+          return moveTo(next, event, false)
+        }
         roving.remember(key)
         member.open({ focus: "popup", reason: "trigger-hover", event, by: "pointer" })
       },
