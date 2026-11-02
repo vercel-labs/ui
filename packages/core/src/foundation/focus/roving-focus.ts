@@ -233,6 +233,15 @@ function createRovingFocus<State extends object, Props = any>(
     /** Joins a bound part to the group. Call it from the item slot's `bind` and return its cleanup. */
     bind(el: HTMLElement, part: RovingFocusItem<Props>) {
       const leave = order.add({ key: part.key, el, part })
+      // The same element joining again under a new key, like an item whose
+      // value changed while it had focus, keeps the stop it had.
+      if (pending?.from === el) {
+        const was = pending.key
+        pending = null
+        if (remembered === was) remembered = part.key
+        if (store.get()[key] === was) store.set({ [key]: part.key } as Partial<State>)
+        if (el.ownerDocument.activeElement === el) holder = el
+      }
       const focused = () => {
         holder = el
         if (remember) roving.remember(part.key)
@@ -268,7 +277,9 @@ function createRovingFocus<State extends object, Props = any>(
         if (had && !pending && store.get()[key] === part.key) {
           const wait = (pending = { key: part.key, from: el })
           setTimeout(() => {
-            if (pending === wait) pending = null
+            if (pending !== wait) return
+            pending = null
+            queue(false)
           })
         }
         queue(true)
@@ -339,9 +350,12 @@ function createRovingFocus<State extends object, Props = any>(
     /**
      * Where the group's rules would put the stop if `preferred` said which
      * items are preferred, like the tab a value from options selects, without
-     * moving it. Undefined while the bound items can't decide it.
+     * moving it. Undefined while the bound items can't decide it, like when
+     * none is preferred yet: the item may be about to bind, as when its value
+     * changed, and the group decides once it has.
      */
-    stopFor,
+    stopFor: (preferred: (item: RovingFocusItem<Props>) => boolean) =>
+      order.list().some(({ part }) => preferred(part)) ? stopFor(preferred) : undefined,
   }
   return roving
 }
