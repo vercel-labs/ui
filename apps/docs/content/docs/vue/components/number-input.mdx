@@ -86,7 +86,7 @@ Use `min` and `max` to set bounds. A step button disables at its bound. Typed va
 
 ### Format
 
-Pass `Intl.NumberFormat` options through `format`. The input displays and parses that format while keeping a numeric value. For percentages, `0.15` is displayed as `15%`, and `step` defaults to `0.01`, one percent.
+Pass `Intl.NumberFormat` options through `format`. The input displays and parses that format while keeping a numeric value. For percentages, `0.15` is displayed as `15%`, and `step` defaults to the smallest percent the format shows: `0.01` for whole percents, `0.0001` with two fraction digits.
 
 <ComponentExample
   name="number-input/format"

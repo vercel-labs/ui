@@ -53,8 +53,11 @@ type State = {
 }
 
 function settings(options: NumberInputOptions) {
-  // A percent's value is a fraction, so a step of 1 would snap 25% to 0%.
-  const fallback = options.format?.style === "percent" ? 0.01 : 1
+  // A percent's value is a fraction, so a step of 1 would snap 25% to 0%,
+  // and each fraction digit it shows is two more places in the value.
+  const { style, maximumFractionDigits, minimumFractionDigits } = options.format ?? {}
+  const fallback =
+    style === "percent" ? 10 ** -(2 + (maximumFractionDigits ?? minimumFractionDigits ?? 0)) : 1
   const step = options.step && options.step > 0 ? options.step : fallback
   return {
     min: options.min ?? -Infinity,
