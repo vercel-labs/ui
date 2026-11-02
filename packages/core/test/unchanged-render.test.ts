@@ -29,7 +29,8 @@ for (const entry of cases)
         async ({ view, instance }, step) => {
           let told = 0
           const stop = instance.subscribe(() => told++)
-          const observer = new MutationObserver(() => {})
+          const records: MutationRecord[] = []
+          const observer = new MutationObserver((list) => records.push(...list))
           observer.observe(document, {
             subtree: true,
             childList: true,
@@ -40,7 +41,7 @@ for (const entry of cases)
             rerenderOf(view).setOptions(Object.fromEntries(Object.keys(inline).map((key) => [key, () => {}])))
             await idle()
           })
-          const records = observer.takeRecords()
+          records.push(...observer.takeRecords())
           observer.disconnect()
           stop()
           if (told) work.push(`after ${step.key}: told subscribers ${told} times`)
