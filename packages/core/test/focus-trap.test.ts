@@ -31,3 +31,18 @@ test("Tab steps onto a radio group in a dialog whose checked radio is behind it,
   expect(event.defaultPrevented).toBe(true)
   expect(document.activeElement?.getAttribute("aria-label")).toBe("Standard")
 })
+
+test("Tab leaves a radio group in a dialog the way the browser does", async () => {
+  const view = mount(
+    dialog,
+    {},
+    `<div><trigger>Rename</trigger><input type="radio" name="speed" aria-label="Page speed" checked inert></input><content><title>Rename</title><close>Close</close><input type="radio" name="speed" aria-label="Standard"></input><input type="radio" name="speed" aria-label="Express"></input><input type="radio" name="size" aria-label="Small"></input><input type="radio" name="size" aria-label="Large"></input><button>Save</button></content></div>`,
+  )
+  unmount = view.unmount
+  await view.click(view.part("trigger")!)
+  for (const label of ["Standard", "Small"]) {
+    const radio = document.querySelector<HTMLElement>(`[aria-label="${label}"]`)!
+    radio.focus()
+    expect(tab(radio).defaultPrevented).toBe(false)
+  }
+})

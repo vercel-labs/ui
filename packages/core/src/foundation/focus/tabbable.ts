@@ -21,21 +21,24 @@ function isTabbable(el: Element): el is HTMLElement {
   // Only one radio button per group takes Tab: the checked one, or the first.
   // Without a form, a radio's group is the same-named radios outside a form in
   // its document or shadow root. A checked radio that can't take focus leaves the rest reachable.
-  if (el instanceof HTMLInputElement && el.type === "radio" && el.name && !el.checked) {
-    const group = el.form
-      ? Array.from(el.form.elements)
-      : Array.from((el.getRootNode() as ParentNode).querySelectorAll(`input[name="${CSS.escape(el.name)}"]`))
-    const checked = (radio: Element) =>
+  const group = (el as HTMLInputElement).checked ? [] : radioGroup(el)
+  if (group.some((radio) => radio.checked && isTabbable(radio))) return false
+  if (typeof el.checkVisibility === "function") return el.checkVisibility({ visibilityProperty: true })
+  return el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
+}
+
+function radioGroup(el: Element) {
+  if (!(el instanceof HTMLInputElement) || el.type !== "radio" || !el.name) return []
+  const scope = el.form
+    ? Array.from(el.form.elements)
+    : Array.from((el.getRootNode() as ParentNode).querySelectorAll(`input[name="${CSS.escape(el.name)}"]`))
+  return scope.filter(
+    (radio): radio is HTMLInputElement =>
       radio instanceof HTMLInputElement &&
       radio.type === "radio" &&
       radio.name === el.name &&
-      radio.form === el.form &&
-      radio.checked &&
-      isTabbable(radio)
-    if (group.some(checked)) return false
-  }
-  if (typeof el.checkVisibility === "function") return el.checkVisibility({ visibilityProperty: true })
-  return el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
+      radio.form === el.form,
+  )
 }
 
 function tabbables(root: ParentNode) {
@@ -136,4 +139,4 @@ function bindTabStop(
   return { check, stop: () => observer.disconnect() }
 }
 
-export { bindTabStop, isTabbable, nextTabbable, positiveTabStops, tabbables }
+export { bindTabStop, isTabbable, nextTabbable, positiveTabStops, radioGroup, tabbables }
