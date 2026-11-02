@@ -349,6 +349,27 @@ test.describe("submenu with a pointer", () => {
     await expect(page.getByRole("menuitem", { name: "More" })).toHaveAttribute("data-highlighted", "")
   })
 
+  test("resting on a sibling item on the way to the submenu moves to it once the safe area expires", async ({
+    page,
+    open,
+  }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    await page.mouse.move(share.x + share.width - 12, share.y + share.height / 2)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    const box = (await remove.boundingBox())!
+    await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2, { steps: 4 })
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await expect(remove).toBeFocused()
+  })
+
   test("moving to a sibling item closes the submenu", async ({ page }) => {
     await page.getByRole("button", { name: "File" }).click()
     await page.getByRole("menuitem", { name: "Share" }).hover()
