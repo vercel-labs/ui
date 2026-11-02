@@ -616,8 +616,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   function neighbour(el: HTMLElement | undefined) {
     const trigger = path[0]?.node
     // A trigger still in the page that can't take focus, like one disabled while
-    // it was open, hands focus to what follows it, as one that left does.
-    if (trigger?.isConnected) {
+    // it was open, hands focus to what follows it, as one that left does. One
+    // inside the popup, like an input a sheet moves into its header, isn't one.
+    if (trigger?.isConnected && !el?.contains(trigger)) {
       for (const node of [...path.slice(1).map((step) => step.node), trigger.ownerDocument!.body]) {
         const list = tabbables(node as Element).filter((candidate) => !el?.contains(candidate))
         const found =
