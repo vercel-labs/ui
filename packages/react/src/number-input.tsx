@@ -116,7 +116,7 @@ const NumberInputGroup = parts.Group
 function NumberInputControl({
   render,
   ...props
-}: Omit<PartProps<"input", NumberInputState>, "value" | "defaultValue" | "children">) {
+}: Omit<PartProps<"input", NumberInputState>, "value" | "defaultValue" | "children" | "readOnly">) {
   const numberInput = useNumberInput("NumberInputControl")
   // The core writes the text as it changes, so React only renders where it starts.
   const control = (input: Record<string, any>, state: NumberInputState) => {
