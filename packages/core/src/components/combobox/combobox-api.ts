@@ -603,6 +603,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       if (!editable()) return
       // A canceled change keeps the value, and the input keeps its label.
       if (listOf(store.get().value).length && !setValue(selection.empty(), { reason, event })) return
+      clearedValue = null
       setQuery("", { reason: reason === "clear-press" ? "clear-press" : "imperative", event })
     },
     getQuery: () => store.get().query,
