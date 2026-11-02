@@ -115,7 +115,7 @@ function pressOpening(core: PopupCore) {
       "aria-labelledby": role ? (state.titled ? `${id}-title` : `${id}-trigger`) : undefined,
       "aria-describedby": state.described ? `${id}-description` : undefined,
       "aria-modal":
-        (role === "dialog" || role === "alertdialog") && state.modal !== false ? "true" : undefined,
+        (role === "dialog" || role === "alertdialog") && state.modal === true ? "true" : undefined,
       "data-presentation": preset.presentation && state.presentation,
     }),
     // A button that says what kind of popup it opens, and whether it's open.
