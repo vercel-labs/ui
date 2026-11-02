@@ -334,6 +334,29 @@ test.describe("forms", () => {
     await expect(submitted(page)).toHaveText("attachments=a.png&note=")
   })
 
+  test("files set from script update the field even when the announcement throws", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(!framework.startsWith("web"), "Web components take state set on their properties.")
+    await open("file-input", { required: "" })
+    await send(page).click()
+    await expect(page.getByText(f.field.error)).toBeVisible()
+    await page.evaluate(() => {
+      const el = document.querySelector<HTMLElement & { announcement: unknown; value: File[] }>(
+        'ui-file-input[data-kind="attachments"]',
+      )!
+      el.announcement = () => {
+        throw new Error("announcement")
+      }
+      try {
+        el.value = [new File(["a"], "a.png", { type: "image/png" })]
+      } catch {}
+    })
+    await expect(page.getByText(f.field.error)).toBeHidden()
+  })
+
   test("the field's label and the button's text name the trigger, and its description describes it", async ({
     page,
   }) => {
