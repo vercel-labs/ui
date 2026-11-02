@@ -265,7 +265,8 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
           session.start(el, move, {
             ...options,
             onEnd(up, canceled) {
-              const from = (event: PointerEvent) => isDrag(up.clientX - event.clientX, up.clientY - event.clientY)
+              const from = (event: PointerEvent) =>
+                isDrag(up.clientX - event.clientX, up.clientY - event.clientY)
               if (!canceled && from(down) && !from(move)) swallowNextClick(doc)
               options.onEnd(up, canceled)
             },
