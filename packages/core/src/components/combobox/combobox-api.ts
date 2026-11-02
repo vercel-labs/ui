@@ -267,6 +267,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
+    skipDisabled: true,
     active: () => store.get().open,
     blocked: (entry) => !entry.pinned && maxReached() && !selection.isSelected(entry.key, entry.value),
     onHighlight: (key, index, event) =>
@@ -436,7 +437,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   // first without text. Undefined when it highlights nothing of its own.
   function autoTarget() {
     const mode = options().autoHighlight
-    const list = listbox.entries().filter((entry) => !isSelectAll(entry.key))
+    const list = listbox.entries().filter((entry) => !isSelectAll(entry.key) && !listbox.disabled(entry))
     const items = list.filter((entry) => !entry.pinned)
     if (filterQuery()) return mode ? ((items[0] ?? list[0])?.key ?? null) : undefined
     if (mode !== "always") return undefined
@@ -652,7 +653,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       matchMode: () => matchMode(options().filter ?? "contains"),
       // The pointer highlights what it moves onto. Touch never does, since a finger scrolling past isn't choosing.
       hover(key: string, event: PointerEvent) {
-        if (event.pointerType === "touch" || !store.get().open) return
+        if (event.pointerType === "touch" || !store.get().open || listbox.isItemDisabled(key)) return
         if (store.get().highlighted !== key) listbox.highlight(key, { event })
       },
       chipsElement: () => element("chips"),
@@ -690,7 +691,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
           // the way if the sheet showed later. It takes focus back here.
           return store.get().presentation === "sheet" ? inputElement() : undefined
         }
-        const list = listbox.entries().filter((entry) => !entry.pinned)
+        const list = listbox.entries().filter((entry) => !entry.pinned && !listbox.disabled(entry))
         const item = list.find((entry) => selection.isSelected(entry.key, entry.value)) ?? list[0]
         if (!item) return contentElement()
         listbox.highlight(item.key, { focus: false })

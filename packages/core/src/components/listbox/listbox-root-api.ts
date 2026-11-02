@@ -115,6 +115,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
       filter: () => undefined,
       query: () => "",
       loop: () => options().loop ?? true,
+      skipDisabled: true,
       active: () => focusInside,
       container: rootElement,
       onHighlight: (key, index, event) =>
@@ -133,12 +134,14 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
   }
 
   // The option that holds the tab stop: the one focused last, the first
-  // selected, the first enabled, or the first, as the APG's listbox asks.
+  // selected, the first enabled, or the first, as the APG's listbox asks. A
+  // disabled selected option doesn't hold it, since keys skip disabled ones.
   function stopKey() {
     const list = listbox.entries()
     if (remembered !== null && list.some((entry) => entry.key === remembered)) return remembered
-    const selected = list.find((entry) => selection.isSelected(entry.key, entry.value))
-    return (selected ?? list.find((entry) => !entry.disabled) ?? list[0])?.key ?? null
+    const enabled = list.filter((entry) => !entry.disabled)
+    const selected = enabled.find((entry) => selection.isSelected(entry.key, entry.value))
+    return (selected ?? enabled[0] ?? list[0])?.key ?? null
   }
 
   function check() {

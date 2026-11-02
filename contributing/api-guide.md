@@ -183,7 +183,7 @@ Declare these once, in core, with JSDoc, and spread them into component types. C
 - **`FocusProps`:** `initialFocus` (`"auto" | "content" | "none" | selector | element | () => element`) and `finalFocus` (`"trigger" | "none" | …`).
 - **`modal`** (`Modal`): `true` makes the page inert, locks scroll, traps focus and consumes outside presses. `false` does none of these. A string keeps exactly one effect: `"trap-focus"` keeps the focus trap, and `"pointer"` keeps outside-press consumption. Each component accepts a documented subset of `boolean | "pointer" | "trap-focus"`.
 - **Form props**, matching HTML: `name`, `value` (the submitted value), `form`, `required`, `readOnly`, `disabled`.
-- **`disabled` means what the pattern says,** and the JSDoc says which: composite items (menu items, tabs, accordion triggers) stay focusable; radio items are skipped; form controls are natively disabled, not focusable and not submitted.
+- **`disabled` means what the pattern says,** and the JSDoc says which: composite items (menu items, tabs, accordion triggers) stay focusable; radio items and list options (Select, Combobox, Listbox, Autocomplete, Command) are skipped, like in a native select; form controls are natively disabled, not focusable and not submitted.
 
 ## 6. Data attributes and CSS variables
 

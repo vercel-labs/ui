@@ -3,7 +3,7 @@
 // selection follows. Space and Enter choose. With `multiple`, Shift extends a
 // range from the anchor, Ctrl or ⌘ moves or toggles without replacing, and
 // Ctrl or ⌘ with A selects everything. Typing finds an option by its label.
-import { moveIndex, stepFor } from "../../foundation/focus/collection"
+import { stepFor } from "../../foundation/focus/collection"
 import { sourceOf } from "../../foundation/kernel/modality"
 import { isRTL } from "../../foundation/platform/env"
 import { isTypeaheadKey } from "../../foundation/text/typeahead"
@@ -43,12 +43,7 @@ function createListboxKeyboard({
   function navigate(event: KeyboardEvent, step: number | "first" | "last", current: string | null) {
     const state = store.get()
     const extending = event.shiftKey && state.multiple
-    const list = listbox.entries()
-    const index = list.findIndex((entry) => entry.key === current)
-    const next =
-      extending && index !== -1
-        ? list[moveIndex(index, step, list.length, false)]?.key
-        : listbox.stepKey(step)
+    const next = extending ? listbox.stepKey(step, { loop: false }) : listbox.stepKey(step)
     if (next === undefined) return
     event.preventDefault()
     if (next !== current) listbox.highlight(next, { event })

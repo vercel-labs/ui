@@ -79,6 +79,28 @@ test.describe("highlight", () => {
     await expect(option(page, "Argentina")).toHaveAttribute("data-highlighted", "")
   })
 
+  test("arrow keys skip disabled items", async ({ page }) => {
+    await input(page).fill("e")
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => highlighted(page)).toBe("Argentina")
+    await page.keyboard.press("ArrowDown")
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => highlighted(page)).toBe("France")
+    await page.keyboard.press("ArrowUp")
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+  })
+
+  test("moving over a disabled item leaves the highlight where it was", async ({ page }) => {
+    await input(page).fill("e")
+    await waitForStill(listbox(page))
+    await option(page, "Chile").hover()
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+    await option(page, "Denmark").hover({ force: true })
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+  })
+
   test("the highlighted option has the id aria-activedescendant names", async ({ page }) => {
     await input(page).fill("can")
     await page.keyboard.press("ArrowDown")
@@ -100,6 +122,14 @@ test.describe("autoHighlight", () => {
     await expect.poll(() => highlighted(page)).toBe("Germany")
     await page.keyboard.press("Enter")
     await expect(input(page)).toHaveValue("Germany")
+  })
+
+  test("a disabled match is passed over", async ({ page, open }) => {
+    await open("combobox", { auto: "" })
+    await input(page).focus()
+    await page.keyboard.type("den")
+    await expect(option(page, "Denmark")).toBeVisible()
+    await expect.poll(() => highlighted(page)).toBe(null)
   })
 })
 

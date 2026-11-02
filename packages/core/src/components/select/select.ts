@@ -361,7 +361,7 @@ type SelectContentProps = PositionProps &
 type SelectItemProps<T = string> = {
   /** The text the trigger shows and typing finds, when the content isn't plain text. Not the accessible name: use `aria-label` for that. */
   label?: string
-  /** Keeps the item from being chosen. It can still be highlighted, as the listbox pattern asks. Sets `data-disabled` and `aria-disabled`. */
+  /** Keeps the item from being chosen. The keyboard and the pointer skip it. Sets `data-disabled` and `aria-disabled`. */
   disabled?: boolean
   /** The item's position among all items, for virtualized lists that render only some. Sets `aria-posinset` and `aria-setsize`. */
   index?: number
@@ -455,7 +455,7 @@ type SelectItemState = {
   highlighted: boolean
   /** Whether its value is in the select's value, compared with `isItemEqualToValue` when you pass one. */
   selected: boolean
-  /** Whether the item's own `disabled` prop is set. It can still be highlighted, but not chosen. */
+  /** Whether the item's own `disabled` prop is set. It can't be highlighted or chosen. */
   disabled: boolean
 }
 /**

@@ -30,8 +30,7 @@ for (const [name, options] of states) {
 
 test("no axe violations with focus on a disabled option", async ({ page, open }) => {
   await open("listbox")
-  await option(page, "Mushroom").focus()
-  await page.keyboard.press("ArrowDown")
+  await option(page, "Olive").click({ force: true })
   await expect(option(page, "Olive")).toBeFocused()
   expect(await audit(page)).toEqual([])
 })

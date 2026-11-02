@@ -49,15 +49,44 @@ test.describe("focus", () => {
     await expect(option(page, "Garlic")).toBeFocused()
   })
 
-  test("disabled options can be focused but not chosen", async ({ page, open }) => {
-    await open("listbox", { value: "mushroom" })
+  test("arrow keys skip disabled options", async ({ page, open }) => {
+    await open("listbox", { value: "mushroom", activation: "manual" })
     await option(page, "Mushroom").focus()
     await page.keyboard.press("ArrowDown")
-    await expect(option(page, "Olive")).toBeFocused()
+    await expect(option(page, "Onion")).toBeFocused()
     await expect(option(page, "Olive")).toHaveAttribute("aria-disabled", "true")
-    await expectSelected(page, ["Mushroom"])
+    await page.keyboard.press("ArrowUp")
+    await expect(option(page, "Mushroom")).toBeFocused()
+  })
+
+  test("a disabled option can't be chosen", async ({ page, open }) => {
+    await open("listbox", { value: "mushroom" })
     await option(page, "Olive").click({ force: true })
     await expectSelected(page, ["Mushroom"])
+  })
+
+  test("arrow keys from a pressed disabled option move to the enabled ones around it", async ({
+    page,
+    open,
+  }) => {
+    await open("listbox", { activation: "manual" })
+    await option(page, "Olive").click({ force: true })
+    await page.keyboard.press("ArrowDown")
+    await expect(option(page, "Onion")).toBeFocused()
+    await option(page, "Olive").click({ force: true })
+    await page.keyboard.press("ArrowUp")
+    await expect(option(page, "Mushroom")).toBeFocused()
+  })
+
+  test("Tab lands on the first enabled option when the selected one is disabled", async ({
+    page,
+    open,
+    tab,
+  }) => {
+    await open("listbox", { value: "olive" })
+    await tabIn(page, tab)
+    await expect(option(page, "Basil")).toBeFocused()
+    await expectSelected(page, ["Olive"])
   })
 })
 
@@ -193,6 +222,14 @@ test.describe("multiple selection", () => {
     await option(page, "Cheese").click()
     await option(page, "Mushroom").click({ modifiers: ["Shift"] })
     await expectSelected(page, ["Cheese", "Garlic", "Mushroom"])
+  })
+
+  test("Shift with an arrow passes over a disabled option", async ({ page, open }) => {
+    await open("listbox", { multiple: "" })
+    await option(page, "Mushroom").click()
+    await page.keyboard.press("Shift+ArrowDown")
+    await expect(option(page, "Onion")).toBeFocused()
+    await expectSelected(page, ["Mushroom", "Onion"])
   })
 
   test("a range skips disabled options", async ({ page, open }) => {

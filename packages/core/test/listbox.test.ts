@@ -112,7 +112,7 @@ describe("composed items", () => {
 })
 
 describe("navigation over data", () => {
-  const make = (loop = true, query = "") => {
+  const make = (loop = true, query = "", skipDisabled = false) => {
     const store = createStore({ highlighted: null as string | null }, ["highlighted"])
     const listbox = createListbox({
       store,
@@ -122,12 +122,13 @@ describe("navigation over data", () => {
       filter: () => "contains",
       query: () => query,
       loop: () => loop,
+      skipDisabled,
       active: () => true,
     })
     return { store, listbox }
   }
 
-  test("moves through every item, disabled ones included, and wraps", () => {
+  test("moves through every item, disabled ones included, and wraps, without skipDisabled", () => {
     const { store, listbox } = make()
     listbox.move(1)
     expect(store.get().highlighted).toBe("apple")
@@ -145,6 +146,47 @@ describe("navigation over data", () => {
     listbox.move("last")
     listbox.move(1)
     expect(store.get().highlighted).toBe("Éclair")
+  })
+
+  test("with skipDisabled, steps pass over disabled items", () => {
+    const { store, listbox } = make(true, "", true)
+    listbox.move("last")
+    listbox.move(-1)
+    expect(store.get().highlighted).toBe("blueberry")
+    listbox.move(1)
+    expect(store.get().highlighted).toBe("Éclair")
+  })
+
+  test("with skipDisabled, a step from a disabled item counts from where it sits", () => {
+    const { store, listbox } = make(false, "", true)
+    store.set({ highlighted: "cherry" })
+    listbox.move(-1)
+    expect(store.get().highlighted).toBe("blueberry")
+    store.set({ highlighted: "cherry" })
+    listbox.move(1)
+    expect(store.get().highlighted).toBe("Éclair")
+  })
+
+  test("with skipDisabled and nothing enabled, steps land nowhere", () => {
+    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const listbox = createListbox({
+      store,
+      focus: "virtual",
+      items: () => [
+        { value: "a", label: "A", disabled: true },
+        { value: "b", label: "B", disabled: true },
+      ],
+      toKey: (value) => itemKey(value),
+      filter: () => "contains",
+      query: () => "",
+      loop: () => true,
+      skipDisabled: true,
+      active: () => true,
+    })
+    expect(listbox.stepKey(1)).toBeUndefined()
+    expect(listbox.stepKey("last")).toBeUndefined()
+    listbox.move(1)
+    expect(store.get().highlighted).toBe(null)
   })
 
   test("typeahead skips disabled items", () => {
