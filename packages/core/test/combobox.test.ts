@@ -70,6 +70,18 @@ describe("combobox headless", () => {
     expect(reasons).toEqual(["input-change", "escape-key"])
   })
 
+  test("Escape brings back the value deleted last, not an earlier one", () => {
+    const instance = combobox({ id: "c", items: frameworks, defaultValue: "astro" })
+    // Deleting the text without the list opening, then setting a value from code.
+    instance.api.internal.typed("")
+    instance.api.setValue("next")
+    instance.api.internal.typed("N")
+    instance.api.internal.typed("")
+    instance.api.internal.hide({ reason: "escape-key" })
+    expect(instance.api.getValue()).toBe("next")
+    expect(instance.api.getQuery()).toBe("Next.js")
+  })
+
   test("clearing with nothing selected still empties the text", () => {
     const instance = combobox({ id: "c", items: frameworks })
     instance.api.setQuery("ne")
