@@ -550,7 +550,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       selected !== undefined &&
       setValue(null, { reason: "input-change", event })
     )
-      clearedValue ??= { value: selected }
+      clearedValue = { value: selected }
     if (!store.get().open) {
       // Items that mount with the list get the first highlight once they have.
       if (options().autoHighlight && text) pendingHighlight = "first"
