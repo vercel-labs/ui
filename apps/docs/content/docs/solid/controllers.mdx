@@ -30,6 +30,8 @@ Controller methods run the same change callbacks as user input. Controlled value
 
 Each component lists its methods, such as `open()`, `close()`, `setValue()`, or `focus()`.
 
+A read like `toggle.isPressed()` answers when you call it, so call it from an event handler or async code. It returns `undefined` until the component mounts, and JSX doesn't update when the state changes. To render the state, keep it in a signal with `pressed` and `onPressedChange`.
+
 ## Share a Popup
 
 External triggers can use the same controller. A `payload` tells the content which item was opened:

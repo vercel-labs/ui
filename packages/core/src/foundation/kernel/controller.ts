@@ -24,12 +24,18 @@ function detachController(controller: unknown, api: unknown) {
   ;(controller as { [detach]?: (api: unknown) => void } | undefined)?.[detach]?.(api)
 }
 
+// A render on the server or before mount calls methods before anything attaches.
+// Other names stay undefined, so `await` or a framework never takes the
+// controller for a promise, a ref or a React element.
+const methodName = (key: PropertyKey) =>
+  typeof key === "string" && /^[a-z]/.test(key) && !/^(internal|then|toJSON)$/.test(key) && !(key in {})
+
 /**
  * A handle created outside any component and passed as the `controller` option.
  * Calls go to the instance it is attached to. Before it attaches, and once that
- * instance is gone, its methods are undefined. A method read earlier calls
- * the instance attached when it's called. An api's `internal` is for
- * adapters, so a controller never hands it out.
+ * instance is gone, its methods do nothing and return undefined. A method read
+ * earlier calls the instance attached when it's called. An api's `internal` is
+ * for adapters, so a controller never hands it out.
  * @stable
  */
 function createController<Api extends object>() {
@@ -50,6 +56,7 @@ function createController<Api extends object>() {
     return method
   }
   const valueOf = (key: PropertyKey) => {
+    if (!current) return methodName(key) ? forward(key) : undefined
     const value = read(key)
     return typeof value === "function" ? forward(key) : value
   }
