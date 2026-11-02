@@ -43,6 +43,17 @@ test("a separator moves to the next segment", async ({ page, open }) => {
   await expect(segment(page, "month")).toHaveValue("01")
 })
 
+test("typing with separators over a filled date or time keeps every segment", async ({ page, open }) => {
+  await open("date-input", { date: "2026-11-02", time: "09:30" })
+  await segment(page, "month").click()
+  await page.keyboard.type("12/25/2027")
+  expect(await shown(page)).toBe("12/25/2027")
+  await segment(page, "hour", "time").click()
+  await page.keyboard.type("2:45p")
+  expect(await shown(page, "time")).toBe("02:45 PM")
+  await expect.poll(() => lastAction(page)).toBe(dateInputAction.change("time", "14:45", "input-change"))
+})
+
 test("ArrowUp and ArrowDown step a segment and wrap around", async ({ page, open }) => {
   await open("date-input", { date: "2026-12-02" })
   await segment(page, "month").click()
@@ -162,6 +173,19 @@ test("the form submits the ISO date and time under their names", async ({ page, 
     JSON.stringify([
       ["start", "2026-11-02"],
       ["time", "09:30"],
+    ]),
+  )
+})
+
+test("Enter submits the form with what was typed", async ({ page, open }) => {
+  await open("date-input", { date: "2026-11-02", time: "09:30" })
+  await segment(page, "minute", "time").click()
+  await page.keyboard.type("4")
+  await page.keyboard.press("Enter")
+  await expect(submitted(page)).toHaveText(
+    JSON.stringify([
+      ["start", "2026-11-02"],
+      ["time", "09:04"],
     ]),
   )
 })

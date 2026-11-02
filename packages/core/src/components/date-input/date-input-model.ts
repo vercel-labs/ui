@@ -247,8 +247,10 @@ function typeDigit(fields: Fields, buffer: Buffer, type: EditableType, digit: st
   const number = Number(text)
   const done = text.length >= digits || number * 10 > max
   const value = number >= min && number <= max ? number : null
+  const next = { ...fields, [type]: value }
   return {
-    fields: clampDay({ ...fields, [type]: value }),
+    // 2, 20 and 202 aren't leap years, so a year still being typed keeps February 29.
+    fields: type === "year" && !done ? next : clampDay(next),
     buffer: done ? null : { type, text },
     done,
   }
@@ -414,6 +416,7 @@ const dateOf = (value: string) => (datePattern.test(value.slice(0, 10)) ? value.
 
 export {
   boundsOf,
+  clampDay,
   compareTo,
   dateOf,
   type DateInputGranularity,

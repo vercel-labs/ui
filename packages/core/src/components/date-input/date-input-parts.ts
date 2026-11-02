@@ -221,6 +221,7 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
         autocapitalize: "off",
         spellcheck: "false",
         required: state.required ? "" : undefined,
+        form: state.form,
         disabled: isDisabled(state) ? "" : undefined,
         readonly: state.readOnly ? "" : undefined,
         "data-type": segment.type,

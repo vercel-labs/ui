@@ -2,6 +2,7 @@
 // typing, stepping and clearing them, and what the form asks of the input.
 import {
   boundsOf,
+  clampDay,
   compareTo,
   dateOf,
   emptyFields,
@@ -224,6 +225,9 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
         (item): item is { el: HTMLElement; type: EditableType } => !!item.type && item.type !== "literal",
       )
   const segmentElement = (type: string) => segmentElements().find((item) => item.type === type)?.el
+  // The segment focus moved to once the last one was done, so the separator
+  // typed next, as in 12/25, doesn't skip it.
+  let advancedTo: HTMLElement | null = null
 
   // The fields after an edit, and the value they make when all are filled.
   // A segment that may take another digit holds its value back, so typing a
@@ -240,7 +244,7 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
     const state = store.get()
     if (!state.buffer) return
     if (!editing(state)) return store.set({ buffer: null })
-    edit(state.fields, null, "input-change", event)
+    edit(clampDay(state.fields), null, "input-change", event)
   }
 
   function setValue(value: string | null, reason: DateInputValueChangeReason, event?: Event) {
@@ -298,12 +302,15 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
       const state = store.get()
       const fields = shownFields(state)
       const buffer = editing(state) ? state.buffer : null
+      const advanced = advancedTo === target
+      advancedTo = null
       if (/\d/.test(char) && current !== "dayPeriod") {
         const typed = typeDigit(fields, buffer, current, char, hourCycle)
         edit(typed.fields, typed.buffer, "input-change", event)
-        if (typed.done && !advance()) break
+        if (typed.done && advance()) advancedTo = target
+        else if (typed.done) break
       } else if (separators.test(char)) {
-        if (buffer?.type !== current && fields[current] === null) continue
+        if (advanced || (buffer?.type !== current && fields[current] === null)) continue
         finish(event)
         if (!advance()) break
       } else if (/\p{L}/u.test(char)) {
@@ -372,8 +379,10 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   }
 
   // Every edit goes through here, so the browser never writes the segment's text.
+  // Enter keeps its default, so the form submits with what was typed.
   function beforeinput(event: InputEvent, type: EditableType, el: HTMLElement) {
     if (event.isComposing && !event.cancelable) return
+    if (event.inputType === "insertLineBreak") return finish(event)
     event.preventDefault()
     if (!editable()) return
     const kind = event.inputType
@@ -404,7 +413,10 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
     target?.el.focus()
   }
 
-  const blur = (event?: Event) => finish(event)
+  function blur(event?: Event) {
+    advancedTo = null
+    finish(event)
+  }
 
   function reset() {
     setValue(store.get().initial, "reset")

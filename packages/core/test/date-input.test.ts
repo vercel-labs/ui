@@ -364,6 +364,43 @@ describe("date input", () => {
     expect(instance.get().value).toBe("2026-12-25")
   })
 
+  test("pasting a date in the locale's order sets it", () => {
+    const { segment, instance } = mount(dateInput, { locale: "en-GB" })
+    const event = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent
+    Object.defineProperty(event, "clipboardData", { value: { getData: () => "25/12/2026" } })
+    segment("day").dispatchEvent(event)
+    expect(instance.get().value).toBe("2026-12-25")
+  })
+
+  test("February 29 stays while its leap year is typed", () => {
+    for (const [locale, first, digits, value] of [
+      ["en-US", "month", "02292028", "2028-02-29"],
+      ["en-GB", "day", "29022028", "2028-02-29"],
+      ["en-US", "month", "02292027", "2027-02-28"],
+    ]) {
+      const { segment, type, instance } = mount(dateInput, { locale })
+      segment(first!).focus()
+      type(digits!)
+      expect(instance.get().value).toBe(value)
+    }
+    const { segment, type, instance } = mount(dateInput, { defaultValue: "2028-02-29" })
+    segment("year").focus()
+    type("2032")
+    expect(instance.get().value).toBe("2032-02-29")
+  })
+
+  test("an input outside its form still stops that form submitting", async () => {
+    const form = Object.assign(document.createElement("form"), { id: "outside" })
+    document.body.append(form)
+    const required = mount(dateInput, { form: "outside", required: true })
+    expect(form.checkValidity()).toBe(false)
+    cleanups.splice(0).forEach((cleanup) => cleanup())
+    required.container.remove()
+    mount(dateInput, { form: "outside", defaultValue: "2026-11-02", min: "2026-11-05" })
+    await tick()
+    expect(form.checkValidity()).toBe(false)
+  })
+
   test("a form reset goes back to the default value", async () => {
     const { segment, key, instance } = mount(dateInput, { defaultValue: "2026-11-02" })
     segment("day").focus()
