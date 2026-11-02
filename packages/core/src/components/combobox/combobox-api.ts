@@ -225,6 +225,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   let placed: string | null = null
   let settling = false
   let shownQuery: { from: string; to: string } | null = null
+  // The value deleting the text emptied while the list is open, which Escape brings back.
+  let clearedValue: { value: unknown } | null = null
 
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
   const inputElement = () => element("input")
@@ -397,6 +399,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   // Closing with text nobody chose puts the input back: the value's label, or
   // nothing. With `allowCustomValue`, a single combobox keeps the text as its value.
   function revertQuery(reason: ComboboxOpenChangeReason) {
+    const cleared = clearedValue
+    clearedValue = null
     const { dirty, multiple } = store.get()
     if (!multiple && dirty && options().allowCustomValue && commitCustom(reason)) return
     if (multiple) {
@@ -404,6 +408,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       return
     }
     if (!dirty) return
+    if (cleared && reason === "escape-key" && !selection.values().length) commit(cleared.value, "escape-key")
     setQuery(selectedLabel(), { reason })
   }
 
@@ -538,8 +543,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     const state = store.get()
     if (!editable()) return
     setQuery(text, { reason: "input-change", event, dirty: true })
-    if (!state.multiple && text === "" && selection.values().length)
+    const selected = selection.values()[0]
+    if (
+      !state.multiple &&
+      text === "" &&
+      selected !== undefined &&
       setValue(null, { reason: "input-change", event })
+    )
+      clearedValue ??= { value: selected }
     if (!store.get().open) {
       // Items that mount with the list get the first highlight once they have.
       if (options().autoHighlight && text) pendingHighlight = "first"

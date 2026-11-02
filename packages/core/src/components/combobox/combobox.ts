@@ -39,7 +39,14 @@ import { type DismissOptions } from "../../foundation/popups/dismissal"
  * @stable
  */
 type ComboboxValueChangeReason =
-  "item-press" | "input-change" | "clear-press" | "remove-press" | "reset" | "restore" | "imperative"
+  | "item-press"
+  | "input-change"
+  | "clear-press"
+  | "remove-press"
+  | "escape-key"
+  | "reset"
+  | "restore"
+  | "imperative"
 
 /**
  * Why a combobox's text wants to change. Closing the list puts back text nobody chose, with the reason it closed.
