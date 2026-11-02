@@ -161,7 +161,10 @@ function hoverOpening(core: PopupCore, group?: ReturnType<typeof warmGroup>) {
     enter(event: PointerEvent, key?: string, payload?: unknown) {
       if (!opens()) return
       if (key === undefined) return intent.enter(event)
+      // Disabled while the delay ran, it stays closed.
       const open = () =>
+        opens() &&
+        !core.triggerDisabled(key) &&
         core.control.show({ by: "hover", event, reason: "trigger-hover", trigger: key, payload })
       if (store.get().open) {
         intent.enter(event)
@@ -196,8 +199,12 @@ function focusOpening(core: PopupCore) {
     enter(key: string, payload: unknown, event: FocusEvent) {
       if (options().disabled || !isFocusFromKeyboard()) return
       const open = () => {
-        // Focus may have moved on while waiting.
-        if (core.element(core.triggerSlot, key)?.contains(document.activeElement))
+        // Focus may have moved on, or the trigger been disabled, while waiting.
+        if (
+          !options().disabled &&
+          !core.triggerDisabled(key) &&
+          core.element(core.triggerSlot, key)?.contains(document.activeElement)
+        )
           core.control.show({ by: "keyboard", event, reason: "trigger-focus", trigger: key, payload })
       }
       const wait = preset.focusDelay ?? options().delay ?? preset.delay ?? 0

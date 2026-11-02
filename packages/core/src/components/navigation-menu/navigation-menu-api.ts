@@ -304,7 +304,14 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     const warm =
       store.get().mounted || store.get().contents.length > 0 || performance.now() - closedAt < warmFor
     const delay = warm ? 0 : (options().delay ?? 50)
-    intent.enter(event, () => open(key, { reason: "trigger-hover", event, by: "hover" }), delay)
+    intent.enter(
+      event,
+      () =>
+        !context.props<{ disabled?: boolean }>("trigger", key)?.disabled &&
+        options().openOnHover !== false &&
+        open(key, { reason: "trigger-hover", event, by: "hover" }),
+      delay,
+    )
   }
 
   function triggerPress(key: string, el: HTMLElement | undefined, event?: Event) {

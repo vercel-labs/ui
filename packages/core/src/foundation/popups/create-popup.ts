@@ -93,6 +93,7 @@ type PopupCore = {
   control: ReturnType<typeof createOpenSteps<string>>
   triggerElement: () => HTMLElement | undefined
   triggerSlot: string
+  triggerDisabled: (key: string) => boolean
   contentProps: (key?: string) => PopupContentProps
   rules?: PopupRules
 }
@@ -315,6 +316,7 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     },
     triggerElement,
     triggerSlot,
+    triggerDisabled: (key) => !!context.props<{ disabled?: boolean }>(triggerSlot, key)?.disabled,
     contentProps,
   }
   const rules = (core.rules = config.rules?.(core))
