@@ -354,3 +354,22 @@ test("a new press on a stepper that the old hold's commit disabled steps nothing
     vi.useRealTimers()
   }
 })
+
+// bindDrag's contract: a release after the pointer moved past `dragThreshold` swallows its click.
+test("a swipe startOnMove picks swallows the click its release sends, like any drag", () => {
+  const { drags, el } = session()
+  const button = el.appendChild(document.createElement("button"))
+  const clicked = vi.fn()
+  button.addEventListener("click", clicked)
+  const down = press("pointerdown", { pointerType: "mouse", clientX: 0 })
+  drags.accepts(down)
+  drags.startOnMove(el, down, {
+    pick: (move) => (Math.abs(move.clientX) < 8 ? undefined : true),
+    onMove: () => {},
+    onEnd: () => {},
+  })
+  document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientX: 10 }))
+  document.dispatchEvent(press("pointerup", { pointerType: "mouse", clientX: 11 }))
+  button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+  expect(clicked).not.toHaveBeenCalled()
+})

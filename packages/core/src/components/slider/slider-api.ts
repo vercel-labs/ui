@@ -4,13 +4,9 @@ import { orientationOf } from "../../foundation/focus/collection"
 import { createDragSession } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
-import {
-  clamp,
-  displayOptions,
-  formatNumber,
-  parseRange,
-  type NumberFormat,
-} from "../../foundation/text/number"
+import { displayOptions, formatNumber, type NumberFormat } from "../../foundation/number/format"
+import { parseRange } from "../../foundation/number/parse"
+import { clamp } from "../../foundation/number/steps"
 import { localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { heldState, sameValue } from "../../foundation/kernel/store"

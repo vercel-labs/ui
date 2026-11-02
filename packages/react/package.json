@@ -31,6 +31,7 @@
     "./menubar": "./src/menubar.tsx",
     "./meter": "./src/meter.tsx",
     "./navigation-menu": "./src/navigation-menu.tsx",
+    "./number": "./src/number.ts",
     "./number-input": "./src/number-input.tsx",
     "./otp-input": "./src/otp-input.tsx",
     "./overlays": "./src/overlays.tsx",
@@ -172,6 +173,10 @@
       "./navigation-menu": {
         "types": "./dist/navigation-menu.d.ts",
         "default": "./dist/navigation-menu.js"
+      },
+      "./number": {
+        "types": "./dist/number.d.ts",
+        "default": "./dist/number.js"
       },
       "./number-input": {
         "types": "./dist/number-input.d.ts",

@@ -3,7 +3,8 @@
 // their track, indicator, label and value parts. Pure, so it runs on the server.
 import { css } from "../kernel/inline-style"
 import { localeOf } from "../text/locale"
-import { clamp, formatNumber, type NumberFormat } from "../text/number"
+import { formatNumber, type NumberFormat } from "../../foundation/number/format"
+import { clamp } from "../../foundation/number/steps"
 
 /**
  * What `getValueLabel` receives after the value. `Value` is `number` for a
@@ -164,4 +165,4 @@ export {
   percentBetween,
   roundPercent,
 }
-export type { NumberFormat } from "../text/number"
+export type { NumberFormat } from "../number/format"

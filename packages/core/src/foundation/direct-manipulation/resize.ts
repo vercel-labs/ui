@@ -7,7 +7,7 @@
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { css } from "../kernel/inline-style"
 import { announce } from "../platform/announce"
-import { clamp } from "../text/number"
+import { clamp } from "../../foundation/number/steps"
 import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
 
 /**
@@ -66,10 +66,10 @@ type ResizeOptions<State extends object> = {
    * on a corner keeps the ratio the box had when the drag started.
    */
   aspect?: (key: string) => number | undefined
-  /** How far an arrow moves an edge. Shift moves five times as far. Defaults to 10. */
+  /** The grid a dropped box lands on, and how far an arrow moves an edge. Defaults to 1. */
   step?: () => number
-  /** Rounds dropped boxes to a grid of this size. Defaults to 1. */
-  grid?: () => number
+  /** How far Shift with an arrow moves an edge. Defaults to ten steps. */
+  largeStep?: () => number
   /** How many screen pixels one unit takes, like a canvas's zoom. Defaults to 1. */
   scale?: () => number
   /** Whether a box can't be changed. */
@@ -265,7 +265,8 @@ function createResize<State extends object>(
       const [x, y] = direction
       if ((x && (handle === "n" || handle === "s")) || (y && (handle === "e" || handle === "w"))) return false
       event.preventDefault()
-      const by = (options.step?.() ?? 10) * (event.shiftKey ? 5 : 1)
+      const step = options.step?.() ?? 1
+      const by = event.shiftKey ? (options.largeStep?.() ?? step * 10) : step
       api.resizeBy(key, handle, x * by, y * by, { reason: "resize-key", event })
       return true
     },
@@ -293,7 +294,7 @@ function createResize<State extends object>(
           if (draft && !canceled)
             api.resizeTo(
               key,
-              round(draft.box, options.grid?.() ?? 1),
+              round(draft.box, options.step?.() ?? 1),
               { reason: "drag", event: endEvent },
               handle,
             )

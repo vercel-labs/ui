@@ -229,6 +229,7 @@ function createSwipeActions<State extends object>(
         store.set({ [options.draft]: { key, ...last } } as Partial<State>)
       }
       const finish = (end: PointerEvent, canceled: boolean) => {
+        if (options.disabled?.(key)) return setOpen(null)
         const { x, side, full } = last
         if (!canceled && full && options.onFullSwipe?.(key, side, { event: end })) return setOpen(null)
         const room = width(key, side)

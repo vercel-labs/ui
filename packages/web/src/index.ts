@@ -195,6 +195,37 @@ export {
 } from "@ui-sdk/core/date"
 export type { DateField, DateParts, DatePattern, ISODate } from "@ui-sdk/core/date"
 
+// Steps, scales, formatting and reading numbers, and the keys numeric controls share. `formatNumber(1234.5, "de-DE")` is "1.234,5".
+export {
+  clamp,
+  decimalsOf,
+  formatNumber,
+  formatNumberRange,
+  formatNumberToParts,
+  fractionOf,
+  isPartialNumber,
+  maxOnGrid,
+  numberFormatter,
+  parseNumber,
+  roundTo,
+  scrubTo,
+  stepBy,
+  stepFromKey,
+  stepValue,
+  valueAt,
+  wrap,
+} from "@ui-sdk/core/number"
+export type {
+  NumberFormat,
+  NumberKeyOptions,
+  NumberMove,
+  NumberRange,
+  NumberScale,
+  NumberScrub,
+  NumberSnap,
+  StepRange,
+} from "@ui-sdk/core/number"
+
 // Keyboard shortcuts scoped to open layers. `registerShortcut("mod+k", open)` returns an unregister function.
 export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
 export type {

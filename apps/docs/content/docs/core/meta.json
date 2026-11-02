@@ -8,6 +8,7 @@
     "kernel",
     "platform",
     "text",
+    "number",
     "storage",
     "date",
     "behaviors",

@@ -14,6 +14,7 @@ import { isRTL } from "../platform/env"
 import { keepFocus } from "../focus/keep-focus"
 import { documentOrder } from "../kernel/order"
 import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
+import { onGrid } from "../number/steps"
 
 /**
  * A range on a track, from `start` to `end` in the track's own units, like minutes from midnight.
@@ -210,11 +211,8 @@ function createSpans<State extends object, S extends Span = Span>(
   const minSize = () => Math.max(options.minSize?.() ?? step(), step())
   const axis = () => options.axis ?? "y"
 
-  // Rounds to the step from min, without float noise like 0.30000000000000004.
-  function snap(n: number, round: (n: number) => number = Math.round) {
-    const decimals = (String(step()).split(".")[1] ?? "").length
-    return Number((min() + round((n - min()) / step()) * step()).toFixed(decimals))
-  }
+  const snap = (n: number, round: (steps: number) => number = Math.round) =>
+    onGrid(n, { min: min(), max: max(), step: step() }, round)
 
   // The span's start and end held in range and size, keeping the edge that didn't move.
   function fit(span: S, keep: "start" | "end" | "size") {

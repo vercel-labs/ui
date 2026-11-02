@@ -7,6 +7,7 @@
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { isRTL } from "../platform/env"
 import { createDragSession } from "../drag-and-drop/pointer"
+import { snapToStep } from "../number/steps"
 import { isDestroying } from "../kernel/keep"
 
 /**
@@ -62,14 +63,6 @@ const axisOf = (axis: AreaAxis | undefined) => ({
   label: axis?.label,
 })
 
-// Snaps to the step from min and clamps, without float noise like 0.30000000000000004.
-function snap(value: number, axis: ReturnType<typeof axisOf>) {
-  const steps = Math.round((value - axis.min) / axis.step)
-  const decimals = (String(axis.step).split(".")[1] ?? "").length
-  const snapped = Number((axis.min + steps * axis.step).toFixed(decimals))
-  return Math.min(axis.max, Math.max(axis.min, snapped))
-}
-
 /**
  * Lets users pick a point on a surface. Call it once in `api`, keep it on
  * the api, and wire the surface and its thumb:
@@ -100,7 +93,7 @@ function createArea<State extends object>(
     axis.max === axis.min ? 0 : (n - axis.min) / (axis.max - axis.min)
 
   function set(next: AreaValue, details: { reason: AreaReason; event?: Event }) {
-    const snapped = { x: snap(next.x, x()), y: snap(next.y, y()) }
+    const snapped = { x: snapToStep(next.x, x()), y: snapToStep(next.y, y()) }
     const current = value()
     if (snapped.x === current.x && snapped.y === current.y) return false
     return options.set(snapped, details)

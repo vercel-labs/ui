@@ -260,7 +260,17 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
           const picked = pick(move)
           if (picked === undefined) return
           stopWaiting()
-          if (picked) session.start(el, move, options)
+          if (!picked) return
+          // The swipe follows from the move that picked it, but counts as a drag from the press.
+          session.start(el, move, {
+            ...options,
+            onEnd(up, canceled) {
+              const from = (event: PointerEvent) =>
+                isDrag(up.clientX - event.clientX, up.clientY - event.clientY)
+              if (!canceled && from(down) && !from(move)) swallowNextClick(doc)
+              options.onEnd(up, canceled)
+            },
+          })
         }),
         on(doc, "pointerup", (up) => {
           if (!ours(up)) return

@@ -2,7 +2,7 @@
 // constraints each panel puts on the layout, and how a layout moves when a
 // handle does. No DOM here, so every rule is unit tested
 // (packages/core/test/resizable.test.ts).
-import { clamp } from "../../foundation/text/number"
+import { clamp } from "../../foundation/number/steps"
 
 /**
  * A panel size: a percentage of the group as a number, like `30`, or a string
