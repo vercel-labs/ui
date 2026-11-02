@@ -147,6 +147,19 @@ test.describe("choosing", () => {
     await expect(option(page, "France")).toHaveAttribute("aria-selected", "true")
   })
 
+  test("a canceled choice closes the list and keeps the value's label in the input", async ({
+    page,
+    open,
+  }) => {
+    await open("combobox", { value: "fr", cancel: "br" })
+    await input(page).fill("bra")
+    await page.keyboard.press("ArrowDown")
+    await page.keyboard.press("Enter")
+    await expect(listbox(page)).toBeHidden()
+    await expect(input(page)).toHaveValue("France")
+    expect(await lastAction(page)).toBe("")
+  })
+
   test("text that matches nothing shows the empty message", async ({ page }) => {
     await input(page).fill("zzz")
     await expect(page.getByText("No countries found")).toBeVisible()
@@ -227,6 +240,16 @@ test.describe("multiple", () => {
     await page.keyboard.press("Enter")
     await expect(page.getByRole("button", { name: "Remove Brazil", includeHidden: true })).toBeVisible()
     await expect(input(page)).toHaveValue("")
+  })
+
+  test("a canceled choice adds no chip and keeps the text", async ({ page, open }) => {
+    await open("combobox", { multiple: "", cancel: "br" })
+    await input(page).fill("bra")
+    await page.keyboard.press("ArrowDown")
+    await page.keyboard.press("Enter")
+    await expect(page.getByRole("button", { name: "Remove Brazil", includeHidden: true })).toHaveCount(0)
+    await expect(input(page)).toHaveValue("bra")
+    await expect(listbox(page)).toBeVisible()
   })
 
   test("Backspace in an empty input removes the last chip", async ({ page }) => {

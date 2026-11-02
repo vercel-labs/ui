@@ -320,7 +320,7 @@ The selection, text, and popup have separate values:
 | `query` | `onQueryChange`     | The input’s text.                              |
 | `open`  | `onOpenChange`      | Whether the popup is open.                     |
 
-Control only the values you need. Change callbacks include a reason and `details.cancel()` to reject the request. Choosing an item writes its label into the input; closing without choosing restores that label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
+Control only the values you need. Change callbacks include a reason and `details.cancel()` to reject the request. Choosing an item writes its label into the input, and a canceled choice keeps the current one. Closing without choosing restores the value’s label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
 
 Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, cancel that close in `onOpenChange`.
 

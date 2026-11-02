@@ -26,6 +26,7 @@
     type ListData,
   } from "@ui-sdk/svelte"
   import {
+    cancelsValue,
     changedItems,
     comboboxFixture as f,
     comboboxOptions,
@@ -56,6 +57,7 @@
     nostatus,
     summary,
     labelsFromItems,
+    cancel,
     ...options
   } = comboboxOptions()
   let action = $state("")
@@ -89,7 +91,8 @@
   const dataMode = $derived(data || remoteMode || long || recent)
   const labelOf = (value: string) => labels.get(value) ?? value
 
-  function onValueChange(value: unknown) {
+  function onValueChange(value: unknown, details: { cancel: () => void }) {
+    if (cancelsValue(value, cancel)) return details.cancel()
     action = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
   }
 

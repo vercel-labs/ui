@@ -27,6 +27,33 @@ describe("combobox headless", () => {
     expect(instance.api.getQuery()).toBe("Astro")
   })
 
+  test("a canceled choice keeps the value and its label in the input", () => {
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+      onValueChange: (_value, details) => details.cancel(),
+    })
+    instance.api.setQuery("ne")
+    instance.api.internal.choose("next")
+    expect(instance.api.getValue()).toBe("astro")
+    expect(instance.api.getQuery()).toBe("Astro")
+  })
+
+  test("a canceled custom value puts the value's label back in the input", () => {
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+      allowCustomValue: true,
+      onValueChange: (_value, details) => details.cancel(),
+    })
+    instance.api.internal.typed("Remix")
+    instance.api.internal.hide({ reason: "focus-out" })
+    expect(instance.api.getValue()).toBe("astro")
+    expect(instance.api.getQuery()).toBe("Astro")
+  })
+
   test("clearing with nothing selected still empties the text", () => {
     const instance = combobox({ id: "c", items: frameworks })
     instance.api.setQuery("ne")

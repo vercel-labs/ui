@@ -367,10 +367,15 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   function commit(value: unknown, reason: ComboboxValueChangeReason, event?: Event) {
     committing = true
     try {
-      setValue(value, { reason, event })
+      return setValue(value, { reason, event })
     } finally {
       committing = false
     }
+  }
+
+  function selectedLabel() {
+    const value = selection.values()[0]
+    return value === undefined ? "" : selection.labelOf(value)
   }
 
   // Text nobody chose becomes the value, with `allowCustomValue`.
@@ -384,8 +389,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       if (!options().keepQuery) setQuery("", { reason, event })
       return true
     }
-    commit(query, "input-change", event)
-    store.set({ dirty: false })
+    if (commit(query, "input-change", event)) store.set({ dirty: false })
+    else setQuery(selectedLabel(), { reason, event })
     return true
   }
 
@@ -399,8 +404,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       return
     }
     if (!dirty) return
-    const value = selection.values()[0]
-    setQuery(value === undefined ? "" : selection.labelOf(value), { reason })
+    setQuery(selectedLabel(), { reason })
   }
 
   // The element that takes part in the form: the custom element, or the hidden input.
@@ -463,13 +467,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     if (!entry || listbox.disabled(entry) || !editable()) return
     listbox.remember(key, entry.label, entry.value)
     if (state.multiple) {
-      setValue(selection.toggled(key, entry.value), { reason: "item-press", event })
+      // A canceled choice leaves the text, which is what the user is filtering with.
+      if (!setValue(selection.toggled(key, entry.value), { reason: "item-press", event })) return
       if (!options().keepQuery && state.query) setQuery("", { reason: "item-press", event })
       else store.set({ dirty: false })
       return
     }
-    commit(entry.value, "item-press", event)
-    setQuery(entry.label, { reason: "item-press", event })
+    const chosen = commit(entry.value, "item-press", event)
+    setQuery(chosen ? entry.label : selectedLabel(), { reason: "item-press", event })
     hide({ reason: "item-press", event })
   }
 
