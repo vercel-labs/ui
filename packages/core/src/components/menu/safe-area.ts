@@ -34,12 +34,7 @@ function createSafeArea({ restTimeout = 300 } = {}) {
       const rect = submenu.getBoundingClientRect()
       const right = rect.left >= apex.x
       const edge = right ? rect.left : rect.right
-      const inside = inTriangle(
-        point,
-        { x: apex.x + (right ? -4 : 4), y: apex.y },
-        { x: edge, y: rect.top - 8 },
-        { x: edge, y: rect.bottom + 8 },
-      )
+      const inside = inTriangle(point, apex, { x: edge, y: rect.top - 8 }, { x: edge, y: rect.bottom + 8 })
       const progressing = !last || Math.abs(edge - point.x) <= Math.abs(edge - last.x) + 1
       last = point
       clearTimeout(restTimer)
