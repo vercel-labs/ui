@@ -2,6 +2,7 @@
 // when it opens, what screen readers hear, and the editor it follows. The
 // match and its levels live in trigger-menu-levels.ts, and choosing in
 // trigger-menu-select.ts.
+import { isComposing } from "../../foundation/kernel/events"
 import { createAsyncOptions, type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { createDetails } from "../../foundation/kernel/details"
 import { changeSource } from "../../foundation/kernel/input-source"
@@ -363,7 +364,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   })
 
   function onKeyDown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.isComposing || event.keyCode === 229) return
+    if (event.defaultPrevented || isComposing(event)) return
     const shortcut = options().shortcut ?? "ctrl+space"
     if (shortcut && matchesShortcut(event, shortcut)) {
       if (levels.reopen("shortcut", event)) event.preventDefault()

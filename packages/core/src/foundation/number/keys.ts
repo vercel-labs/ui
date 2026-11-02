@@ -1,5 +1,6 @@
 // One keyboard map for numeric controls, as the APG's slider and spinbutton
 // patterns describe it, read into a move that `stepBy` applies.
+import { isComposing } from "../kernel/events"
 import type { NumberMove } from "./steps"
 
 /**
@@ -22,13 +23,15 @@ type NumberKeyOptions = {
  * The move a key asks of a numeric control, or null for keys it leaves alone.
  * Up and Right step up, Down and Left step down, Shift takes the large step
  * and Alt the small one; Page Up and Down take the large step; Home and End go
- * to the bounds. Ctrl and Cmd are the caller's to check.
+ * to the bounds. Ctrl and Cmd are the caller's to check. A key an input
+ * method is composing with, like an arrow choosing a candidate, is null too.
  * @experimental
  */
 function stepFromKey(
-  event: { key: string; shiftKey?: boolean; altKey?: boolean },
+  event: { key: string; shiftKey?: boolean; altKey?: boolean } & Parameters<typeof isComposing>[0],
   { orientation = "horizontal", dir = "ltr", arrows = "all" }: NumberKeyOptions = {},
 ) {
+  if (isComposing(event)) return null
   if (event.key === "Home") return { bound: "min" } satisfies NumberMove
   if (event.key === "End") return { bound: "max" } satisfies NumberMove
   if (event.key === "PageUp" || event.key === "PageDown")

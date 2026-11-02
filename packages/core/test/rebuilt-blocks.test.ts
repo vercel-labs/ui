@@ -279,6 +279,20 @@ describe("createInlineEdit", () => {
     expect(document.activeElement).toBe(cell)
   })
 
+  test("an Enter that confirms an input method's text doesn't save, even Safari's", () => {
+    const { instance, input } = mount()
+    const { edit } = instance.api
+    edit.keydown(key("Enter"), "a")
+    edit.bindInput(input)
+    input.value = "東京"
+    expect(edit.inputKeydown(key("Enter", { isComposing: true }))).toBe(false)
+    // Safari ends the composition first, so its Enter says it isn't composing and has key code 229.
+    expect(edit.inputKeydown(key("Enter", { keyCode: 229 }))).toBe(false)
+    expect(instance.get().editing).toBe("a")
+    edit.inputKeydown(key("Enter"))
+    expect(instance.get().values.a).toBe("東京")
+  })
+
   test("typing starts over with the character, and Escape puts the text back", () => {
     const { instance, input } = mount()
     const { edit } = instance.api

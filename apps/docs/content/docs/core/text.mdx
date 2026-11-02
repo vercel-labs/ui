@@ -171,14 +171,53 @@ Try a few tags below:
 
 <ComponentExample name="core/language-tag" />
 
+## Properly Handle Input Method Editors
+
+Chinese, Japanese, Korean, Vietnamese and many other languages are typed through an input method editor, or IME. It turns keystrokes into text in steps: typing "nihon" in Japanese shows にほん, then Space offers 日本, and Enter confirms it. Until then, the text is still being composed, and a field that acts on every keystroke acts on fragments.
+
+### Search as Someone Types
+
+Every step of a composition fires an `input` event, so a search on each one runs for にh and にほn before the word is done. Skip the events `isComposing(event)` marks, and search once the input method commits, on `compositionend`:
+
+```ts
+import { isComposing } from "@ui-sdk/core"
+
+field.addEventListener("input", (event) => {
+  if (!isComposing(event)) search(field.value)
+})
+field.addEventListener("compositionend", () => search(field.value))
+```
+
+Chrome and Firefox end the composition after its last `input` event, so `compositionend` is what brings the committed text. On Android, Gboard composes English words too, so results there change a word at a time.
+
+<ComponentExample
+  name="core/search-as-you-type"
+  caption="Type with a Japanese or Chinese input method: the results wait for the text you confirm. Turn off the waiting to see a search for every step of the composition."
+/>
+
+### Enter to Send
+
+Enter often confirms what an input method suggests, so a field that sends on Enter would send half-written text. Check `isComposing(event)` before acting on the key:
+
+```ts
+textarea.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey || isComposing(event)) return
+  event.preventDefault()
+  send()
+})
+```
+
+`isComposing` takes React's events too, so the same lines go in `onChange` and `onKeyDown`. It reads the event's `isComposing`, and counts key code 229 as composing, because Safari on macOS ends the composition before that last Enter arrives and reports it as not composing. No state to keep: every event says for itself whether the input method has it. Core's own components already handle both.
+
 ## API Reference
 
-| For                                                         | Helpers                                                                       |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [Finding an item as someone types](#find-an-item-by-typing) | `createTypeahead`, `isTypeaheadKey`; the search has `active()` and `reset()`. |
-| [Reading an item's label](#what-an-item-is-called)          | `labelOf`                                                                     |
-| [Ranking search results](#rank-what-someone-searches-for)   | `fuzzyScore`                                                                  |
-| [Highlighting matches](#highlight-what-matched)             | `matchRanges`, `matchSegments`, `MatchRange`, `MatchSegment`                  |
-| [Choosing a language](#the-pages-language)                  | `pageLocale`, `userLocale`, [`toLocale`](#tags-from-elsewhere)                |
+| For                                                                    | Helpers                                                                       |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [Finding an item as someone types](#find-an-item-by-typing)            | `createTypeahead`, `isTypeaheadKey`; the search has `active()` and `reset()`. |
+| [Reading an item's label](#what-an-item-is-called)                     | `labelOf`                                                                     |
+| [Ranking search results](#rank-what-someone-searches-for)              | `fuzzyScore`                                                                  |
+| [Highlighting matches](#highlight-what-matched)                        | `matchRanges`, `matchSegments`, `MatchRange`, `MatchSegment`                  |
+| [Choosing a language](#the-pages-language)                             | `pageLocale`, `userLocale`, [`toLocale`](#tags-from-elsewhere)                |
+| [Handling input method editors](#properly-handle-input-method-editors) | `isComposing`                                                                 |
 
 The ranking and highlighting helpers come from `@ui-sdk/core/text-match`. The other helpers come from `@ui-sdk/core`.

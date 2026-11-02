@@ -218,6 +218,16 @@ describe("@ui-sdk/core/number", () => {
     expect(formatNumberToParts(null)).toEqual([])
   })
 
+  test("stepFromKey leaves keys an input method is composing with alone, Safari's last one too", () => {
+    expect(stepFromKey({ key: "ArrowDown", isComposing: true })).toBe(null)
+    expect(stepFromKey({ key: "ArrowDown", keyCode: 229 })).toBe(null)
+    expect(stepFromKey({ key: "ArrowDown", nativeEvent: { isComposing: true } })).toBe(null)
+    expect(stepFromKey({ key: "ArrowDown", nativeEvent: { isComposing: false, keyCode: 40 } })).toEqual({
+      direction: -1,
+      size: "step",
+    })
+  })
+
   test("stepFromKey reads the APG keys into a move", () => {
     expect(stepFromKey({ key: "ArrowUp" })).toEqual({ direction: 1, size: "step" })
     expect(stepFromKey({ key: "ArrowRight" })).toEqual({ direction: 1, size: "step" })
