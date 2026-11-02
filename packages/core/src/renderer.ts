@@ -51,7 +51,7 @@ export { writeFromScript } from "./foundation/forms/value"
 export { canceledAction } from "./foundation/kernel/action"
 export { createListSnapshots } from "./foundation/kernel/controlled-lists"
 export { on } from "./foundation/kernel/events"
-export { applyAttrs } from "./foundation/kernel/live"
+export { applyAttrs, markAuthored, releaseAttrs } from "./foundation/kernel/live"
 export { inDocumentOrder } from "./foundation/kernel/order"
 export {
   attrs,

@@ -105,6 +105,81 @@ test("form controls get their values back after going back, with no events, like
   expect(heard).toEqual([])
 })
 
+// Runs `write` on the page as soon as `customElements.define` returns for `tag`,
+// before a restore the browser hands over can land.
+async function afterDefine(page: Page, tag: string, write: string) {
+  await page.addInitScript(
+    ({ tag, write }) => {
+      const define = customElements.define.bind(customElements)
+      customElements.define = (name, constructor, options) => {
+        define(name, constructor, options)
+        if (name === tag) new Function(write)()
+      }
+    },
+    { tag, write },
+  )
+}
+
+for (const [what, write] of [
+  ["a script write", `document.querySelector("ui-checkbox[name=gift]").checked = false`],
+  ["a form reset", `document.querySelector("form").reset()`],
+])
+  test(`${what} right after the elements are defined wins over the value going back restores`, async ({
+    page,
+  }) => {
+    await page.goto("/form.html")
+    await page.getByRole("checkbox", { name: "Gift wrap" }).click()
+    await afterDefine(page, "ui-checkbox", write)
+    await page.goto("/tabs.html")
+    await page.goBack()
+    await expect(page.getByRole("radio", { name: "Express" })).toBeVisible()
+    await expect(page.getByRole("checkbox", { name: "Gift wrap" })).not.toBeChecked()
+  })
+
+test("a disabled control gets its value back after going back, like a native one", async ({ page }) => {
+  await page.goto("/form.html")
+  const insured = page.locator("ui-checkbox[name=insured]")
+  await insured.evaluate((el) => el.removeAttribute("disabled"))
+  await page.getByRole("checkbox", { name: "Insured" }).click()
+  await insured.evaluate((el) => el.setAttribute("disabled", ""))
+  await page.goto("/tabs.html")
+  await page.goBack()
+  await expect(page.getByRole("checkbox", { name: "Insured" })).toBeChecked()
+  await expect(page.getByRole("checkbox", { name: "Insured" })).toBeDisabled()
+})
+
+for (const [tag, markup] of [
+  ["ui-select", `<ui-select-trigger><button aria-label="Pet"></button></ui-select-trigger>`],
+  ["ui-combobox", `<ui-combobox-input><input aria-label="Pet" /></ui-combobox-input>`],
+  ["ui-listbox", ""],
+])
+  for (const multiple of [false, true])
+    test(`a <${tag}> restored before its object items arrive submits the keys it saved, multiple: ${multiple}`, async ({
+      page,
+    }) => {
+      await page.goto("/form.html")
+      await page.evaluate(
+        async ({ tag, markup, multiple }) => {
+          const el = document.createElement(tag) as HTMLElement & {
+            itemToValue: (item: { id: number }) => string
+            formStateRestoreCallback: (state: string, mode: string) => void
+          }
+          el.setAttribute("name", "pet")
+          el.setAttribute("aria-label", "Pet")
+          el.toggleAttribute("multiple", multiple)
+          el.innerHTML = markup
+          document.querySelector("form")!.append(el)
+          await customElements.whenDefined(tag)
+          el.itemToValue = (item) => String(item.id)
+          el.formStateRestoreCallback(JSON.stringify(["2"]), "restore")
+        },
+        { tag, markup, multiple },
+      )
+      await expect
+        .poll(() => page.evaluate(() => new FormData(document.querySelector("form")!).getAll("pet")))
+        .toEqual(["2"])
+    })
+
 test("closed popups stay hidden before the scripts run", async ({ page }) => {
   await page.route(/\.js$/, (route) => route.abort())
   await page.goto("/settings.html")

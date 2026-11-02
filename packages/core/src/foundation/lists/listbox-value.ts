@@ -49,8 +49,9 @@ function createValueSelection(config: {
   }
   listbox: Listbox
   toKey: (value: unknown) => string
+  onDestroy: (cleanup: () => void) => void
 }) {
-  const { store, options, listbox, toKey } = config
+  const { store, options, listbox, toKey, onDestroy } = config
   // The keys of the last value read, so items asking whether they're selected
   // share one lookup instead of mapping the value each. Renderers hand a list
   // changed in place over as a new copy (`createListSnapshots`). The memo
@@ -67,11 +68,17 @@ function createValueSelection(config: {
         values: unknown[]
         keys: string[]
         set: Set<string>
+        restoring: Restoring | undefined
       }
     | undefined
   let labelsQueued = false
   let learned = false
   let lastLabels: string[] = []
+  // A restored value's slots still waiting for their items, which submit their saved keys meanwhile.
+  let restoring: Restoring | undefined
+  let stopWaiting: (() => void) | undefined
+  let filling = false
+  onDestroy(stopRestoring)
 
   // A list that starts or stops holding several values keeps what was chosen,
   // in its new shape, unless the value is controlled.
@@ -85,7 +92,8 @@ function createValueSelection(config: {
   function memoFor(value: unknown) {
     const given = options()
     const { itemToValue } = given
-    const memo = keysMemo
+    const waiting = restoring?.value === value ? restoring : undefined
+    const memo = keysMemo?.restoring === waiting ? keysMemo : undefined
     if (memo && memo.value === value && memo.options === given) return memo
     if (memo && memo.itemToValue === itemToValue && holds(memo, value)) {
       memo.value = value
@@ -93,8 +101,46 @@ function createValueSelection(config: {
       return memo
     }
     const values = [...listOf(value)]
-    const keys = values.map(toKey)
-    return (keysMemo = { value, options: given, itemToValue, values, keys, set: new Set(keys) })
+    const keys = values.map((item, index) => waiting?.keys.get(index) ?? toKey(item))
+    return (keysMemo = {
+      value,
+      options: given,
+      itemToValue,
+      values,
+      keys,
+      set: new Set(keys),
+      restoring: waiting,
+    })
+  }
+
+  function stopRestoring() {
+    stopWaiting?.()
+    stopWaiting = restoring = undefined
+  }
+
+  // Items that arrive take their slots with no change: the value still names the same keys.
+  function fillArrived() {
+    const current = restoring
+    if (!current) return
+    if (store.get().value !== current.value) return stopRestoring()
+    const values = [...listOf(current.value)]
+    const keys = new Map(current.keys)
+    for (const [index, key] of current.keys) {
+      const value = listbox.valueOf(key)
+      if (value === undefined) continue
+      values[index] = value
+      keys.delete(index)
+    }
+    if (keys.size === current.keys.size) return
+    const value = Array.isArray(current.value) ? values : values[0]
+    if (keys.size) restoring = { value, keys }
+    else stopRestoring()
+    filling = true
+    try {
+      store.set({ value })
+    } finally {
+      filling = false
+    }
   }
 
   const values = () => memoFor(store.get().value).values
@@ -170,17 +216,42 @@ function createValueSelection(config: {
     without: (key: string) => values().filter((value) => toKey(value) !== key),
     // What selecting nothing is: `null`, or an empty list with `multiple`.
     empty: () => (store.get().multiple ? [] : null),
-    // The value a browser restored, from the keys it saved.
-    restored(saved: string) {
-      let restored: string[] = []
+    // Sets the value a browser restored, from the keys it saved, through
+    // `write`. Keys whose items haven't arrived hold their place until they
+    // do, unless something sets the value first.
+    restore(saved: string, write: (value: unknown) => void) {
+      stopRestoring()
+      let keys: string[] = []
       try {
-        restored = JSON.parse(saved)
+        keys = JSON.parse(saved)
       } catch {}
-      const found = restored.map((key) => listbox.valueOf(key) ?? key)
-      return store.get().multiple ? found : (found[0] ?? null)
+      const { multiple } = store.get()
+      if (!multiple) keys = keys.slice(0, 1)
+      const waiting = new Map<number, string>()
+      const found = keys.map((key, index) => {
+        const value = listbox.valueOf(key)
+        if (value === undefined) waiting.set(index, key)
+        return value ?? key
+      })
+      const value = multiple ? found : (found[0] ?? null)
+      if (!waiting.size) return write(value)
+      const request = { value, keys: waiting }
+      restoring = request
+      write(value)
+      // A callback may have canceled the restore, or set a value of its own.
+      if (restoring !== request) return
+      const held = store.get().value
+      if (!sameValue(held, value)) return stopRestoring()
+      restoring = { value: held, keys: waiting }
+      stopWaiting = store.subscribe(fillArrived)
     },
+    stopRestoring,
+    // Whether the value changing now is a restore's late items taking their slots.
+    isFilling: () => filling,
   }
 }
+
+type Restoring = { value: unknown; keys: ReadonlyMap<number, string> }
 
 type ValueSelection = ReturnType<typeof createValueSelection>
 

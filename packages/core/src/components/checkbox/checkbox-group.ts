@@ -237,6 +237,10 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
       reset() {
         change("value", store.get().initial, { reason: "reset" })
       },
+      // The browser restores a disabled group too, as a native one.
+      restore(saved: string) {
+        setValue(saved ? saved.split("\n") : [], { reason: "restore" })
+      },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },
@@ -321,7 +325,7 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
           value: () => store.get().value,
           name: () => store.get().name,
           state: () => store.get().value.join("\n"),
-          restore: (saved) => api.setValue(saved ? saved.split("\n") : [], { reason: "restore" }),
+          restore: api.internal.restore,
           valueMissing: () => store.get().required && store.get().value.length === 0,
           message: () => valueMissingMessage("checkbox"),
           anchor: api.internal.anchor,

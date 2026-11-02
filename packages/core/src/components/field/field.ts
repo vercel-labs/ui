@@ -115,8 +115,27 @@ type FieldErrorState = FieldState & {
   message: string
 }
 
+// A part takes its element's id as it changes, like one its author sets later,
+// so the control points at the id in the page.
+function registerById(el: HTMLElement, register: (id: string) => () => void) {
+  let id = el.id
+  let unregister = register(id)
+  if (typeof MutationObserver === "undefined") return () => unregister()
+  const observer = new MutationObserver(() => {
+    if (el.id === id) return
+    id = el.id
+    unregister()
+    unregister = register(id)
+  })
+  observer.observe(el, { attributeFilter: ["id"] })
+  return () => {
+    observer.disconnect()
+    unregister()
+  }
+}
+
 function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
-  const { id, store, options, element, parts } = context
+  const { id, store, element, parts } = context
   let root: HTMLElement | undefined
 
   // Whether errors show: what you pass, or the browser's once a submit found the field invalid.
@@ -207,7 +226,6 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       },
       // The browser's message for the current problem, which an empty error shows.
       message: () => store.get().validity.message,
-      name: () => options().name,
       // Controls rendered by a framework bind before their field's root.
       hasControlPart: () => !!element("control"),
       adopt(el: HTMLElement) {
@@ -358,6 +376,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: FieldOptions): FieldStore => ({
     disabled: !!options.disabled,
+    name: options.name,
     external: options.invalid,
     focused: false,
     revealed: false,
@@ -372,7 +391,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
     namedByContent: false,
     required: false,
   }),
-  sync: (options) => ({ disabled: !!options.disabled, external: options.invalid }),
+  sync: (options) => ({ disabled: !!options.disabled, name: options.name, external: options.invalid }),
   api: (context) => fieldApi(context),
   slots: (slot) => ({
     root: slot<{}, FieldState>({
@@ -400,7 +419,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         if (el instanceof HTMLLabelElement && el.control) return
         api.activate(event)
       },
-      bind: (el, { api }) => api.internal.register("labels", el.id),
+      bind: (el, { api }) => registerById(el, (id) => api.internal.register("labels", id)),
     }),
 
     description: slot<{}, FieldState>({
@@ -410,7 +429,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         id: props.id ?? `${id}-description`,
         ...dataAttrs(state, api),
       }),
-      bind: (el, { api }) => api.internal.register("descriptions", el.id),
+      bind: (el, { api }) => registerById(el, (id) => api.internal.register("descriptions", id)),
     }),
 
     error: slot<FieldErrorProps, FieldErrorState>({
@@ -425,7 +444,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         id: props.id ?? (key ? `${id}-error-${key}` : `${id}-error`),
         ...dataAttrs(state, api),
       }),
-      bind: (el, { api }) => api.internal.register("errors", el.id),
+      bind: (el, { api }) => registerById(el, (id) => api.internal.register("errors", id)),
     }),
 
     // The control, when a framework renders it: a control of this package, or

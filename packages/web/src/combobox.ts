@@ -288,7 +288,9 @@ function renderData(el: ComboboxElement, api: ComboboxApi) {
   const toKey = api.internal.keyOf
   // Markup content wins over data, but a list in it without items of its own
   // renders them. Remembered, since a container may move the content away.
-  const markup = el.querySelector(":scope > ui-combobox-content")
+  const markup = [...el.querySelectorAll("ui-combobox-content")].find(
+    (found) => found !== content && found.closest("ui-combobox") === el,
+  )
   if (markup && !markupLists.has(el)) markupLists.set(el, markup.querySelector("ui-combobox-list"))
   const list = markupLists.has(el)
     ? (markupLists.get(el) ?? null)

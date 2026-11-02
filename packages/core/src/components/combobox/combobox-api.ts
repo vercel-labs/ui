@@ -40,7 +40,10 @@ import { isPromise } from "../../foundation/kernel/action"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { type ItemIcons } from "../../foundation/lists/item-icon"
 import { createValueSelection, listOf } from "../../foundation/lists/listbox-value"
-import { createChange } from "../../foundation/kernel/input-source"
+import { changeSource, createChange } from "../../foundation/kernel/input-source"
+import { createDetails } from "../../foundation/kernel/details"
+import { log } from "../../foundation/kernel/change"
+import { watchers } from "../../foundation/kernel/watchers"
 import { elements } from "../../foundation/kernel/elements"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 
@@ -98,9 +101,13 @@ type ComboboxState = PopupState & {
 // dismiss it, and focus moving among them doesn't close it.
 const controlSlots = ["input", "chips", "trigger", "clear", "label"]
 
-// The text a single combobox starts with: its value's label, which shows on
-// the server too, from `itemToLabel` or the data.
-function initialQuery(options: ComboboxOptions<any, any>, value: unknown) {
+// A single combobox's text for its value, on the server too: from `itemToLabel`,
+// the items data, the items rendered so far, then the value itself.
+function initialQuery(
+  options: ComboboxOptions<any, any>,
+  value: unknown,
+  rendered?: (key: string) => string | undefined,
+) {
   const first = listOf(value)[0]
   if (first === undefined || options.multiple) return ""
   const toKey = (item: unknown) => itemKey(item, options.itemToValue)
@@ -108,6 +115,7 @@ function initialQuery(options: ComboboxOptions<any, any>, value: unknown) {
   return (
     options.itemToLabel?.(first) ??
     (options.items && flattenData(options.items, toKey).find((entry) => entry.key === key)?.label) ??
+    rendered?.(key) ??
     (typeof first === "string" ? first : key)
   )
 }
@@ -189,11 +197,20 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   deriveOpen(context, ["highlighted", "focusInList"], (open) =>
     open ? undefined : { highlighted: null, focusInList: false },
   )
-  // Items that load after the value, like from a request, put its label in
-  // place of the raw value the input showed, in the same pass.
+  // A value from options shows its label in the same pass, and items that
+  // load after the value, like from a request, put its label in place of the
+  // raw value the input showed.
   deriveFromOptions(context, ["query"], (synced, state, next) => {
-    if (synced.items === state.items || state.dirty || next.multiple || next.query !== undefined) return
-    const first = listOf("value" in synced ? synced.value : state.value)[0]
+    if (state.dirty || next.multiple || next.query !== undefined || committing) return
+    if ("value" in synced && synced.value !== state.value) {
+      // Items that arrive with the value name it, not the ones they replace.
+      const label = initialQuery(next, synced.value, listbox.labelOf)
+      if (label === state.query) return
+      shownQuery = { from: state.query, to: label }
+      return { query: label }
+    }
+    if (synced.items === state.items) return
+    const first = listOf(state.value)[0]
     if (first === undefined || state.query !== itemKey(first, next.itemToValue)) return
     return { query: initialQuery(next, first) }
   })
@@ -207,6 +224,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   // The highlight `autoHighlight` placed last, until anything else moves it.
   let placed: string | null = null
   let settling = false
+  let shownQuery: { from: string; to: string } | null = null
 
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
   const inputElement = () => element("input")
@@ -270,7 +288,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       })
     },
   })
-  const selection = createValueSelection({ store, options, listbox, toKey })
+  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
   keepListing(store, listbox, {
     entry: (key, value) => (selection.isSelected(key, value) ? "s" : maxReached() ? "f" : ""),
     inputs: () => [store.get().value, store.get().multiple, store.get().maxSelected],
@@ -335,6 +353,15 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     change("query", query, { reason, event })
   }
 
+  // A label a value from options showed in its own pass is past refusing, so
+  // `onQueryChange` hears it, and canceling keeps the text.
+  function reportQuery({ from, to }: { from: string; to: string }) {
+    const details = createDetails({ reason: "imperative" as const }, changeSource("imperative"))
+    log(context, "query", to, details)
+    options().onQueryChange?.(to, details)
+    watchers.change?.(id, "query", to, details, from)
+  }
+
   // Sets the value for a choice. The caller sets the text, so the value
   // subscriber below doesn't put the label in with `imperative`.
   function commit(value: unknown, reason: ComboboxValueChangeReason, event?: Event) {
@@ -389,6 +416,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   ) {
     const state = store.get()
     if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    selection.stopRestoring()
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done
@@ -681,8 +709,9 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },
+      // The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
-        setValue(selection.restored(saved), { reason: "restore" })
+        selection.restore(saved, (value) => change("value", value, { reason: "restore" }))
       },
     },
   }
@@ -742,10 +771,16 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     // Values whose items never mounted, like from a controller: mount them hidden so they say their labels.
     if (selection.needsItems(false) && !store.get().items && !options().itemToLabel && !store.get().prepared)
       store.set({ prepared: true })
+    const shown = shownQuery
+    shownQuery = null
+    if (shown && store.get().query === shown.to) return reportQuery(shown)
     if (multiple || dirty || committing) return
     const first = listOf(value)[0]
     const label = first === undefined ? "" : selection.labelOf(first)
-    if (store.get().query !== label) setQuery(label, { reason: "imperative" })
+    if (store.get().query === label) return
+    // A restore's late items show their label as quietly as the restore itself.
+    if (selection.isFilling() && options().query === undefined) store.set({ query: label, dirty: false })
+    else setQuery(label, { reason: "imperative" })
   })
 
   return api
