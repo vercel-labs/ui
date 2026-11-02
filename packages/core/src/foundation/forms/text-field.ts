@@ -114,8 +114,13 @@ function textFieldApi<Slot extends string>(
       clearPress: (event?: Event) => write("", "clear-press", event),
       bind(el: TextControl) {
         textFields.set(el, api)
-        // The server markup and a browser restoring the form may disagree with the default.
-        if (!isControlled()) read(el.value)
+        // The server markup and a browser restoring the form may disagree with the
+        // default. A field with no text, even in its markup, never had the default,
+        // which the browser may change on the way in, like a number's letters.
+        if (!isControlled()) {
+          if (el.value === "" && el.defaultValue === "") writeValue(el, store.get().value)
+          read(el.value)
+        }
         const cleanups = [
           // Typing goes through `change` below, and resets through the reset listener.
           watchValue(el, (source) => {

@@ -19,9 +19,11 @@ import {
   type Feature,
   formCallback,
   inDocumentOrder,
+  markAuthored,
   portalTarget,
   present as isPresent,
   type PrimitiveSchema,
+  releaseAttrs,
   renderVersion,
   schemaOf,
   selectedKeys,
@@ -110,6 +112,11 @@ const rekeyed = (previous: Record<string, unknown>, next: Record<string, unknown
   previous.id !== next.id || previous.value !== next.value
 
 const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+
+// Author writes core can't tell apart by value, like their own `role` or
+// `aria-disabled` set to what the part rendered, are heard instead. Any other
+// value, or a removal, shows when the part lets go of the element.
+const semantics = ["role", "aria-disabled"]
 
 /**
  * How an attribute becomes an option or prop. `"boolean"`: present, empty or
@@ -783,7 +790,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
   customElements.define(
     tagName,
     class Owner extends (config.formAssociated ? formAssociated(HTMLElement) : HTMLElement) {
-      static observedAttributes = Object.keys(schema).map(kebab)
+      static observedAttributes = [...Object.keys(schema).map(kebab), ...semantics]
       #view?: object
       get #instance() {
         return instances.get(this) as ReturnType<P> | undefined
@@ -854,6 +861,8 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       }
 
       attributeChangedCallback(name: string, previous: string | null, value: string | null) {
+        markAuthored(this, name)
+        if (semantics.includes(name)) return
         const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
         if (key in state && value !== previous && !this.#rendering) wroteFromScript(this)
         if (!this.#rendering || value === null) this.#rendered.delete(key)
@@ -1112,8 +1121,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         part.observer?.disconnect()
         part.observer = undefined
         this.#unbind(part)
-        // An element the part lets go of, like a button moved out of a tab, keeps nothing the owner wrote.
-        applyAttrs(part.el, {}, this.#channel)
+        // An element the part lets go of, like a button moved out of a tab, keeps
+        // nothing the owner wrote, and gets back what the owner wrote over.
+        releaseAttrs(part.el, this.#channel)
         part.disconnect?.()
         part.disconnect = undefined
         this.#restore(part)
@@ -1327,7 +1337,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
   customElements.define(
     tagName,
     class PartElement extends (config.formAssociated ? formAssociated(HTMLElement) : HTMLElement) {
-      static observedAttributes = [...Object.keys(schema).map(kebab), "for"]
+      static observedAttributes = [...Object.keys(schema).map(kebab), "for", ...semantics]
       #owner?: OwnerElement
       #part?: Part
       #properties: Record<string, unknown> = {}
@@ -1453,6 +1463,8 @@ function definePartElement(tagName: string, config: SlotConfig) {
       }
 
       attributeChangedCallback(name: string) {
+        markAuthored(this, name)
+        if (semantics.includes(name)) return
         // A new `for` names another owner, or none. Only a portal move keeps an
         // owner the page no longer names.
         if (name === "for") {

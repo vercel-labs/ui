@@ -156,6 +156,22 @@ test("a select trigger inside one select shows the value of the select its contr
   expect(view.querySelector("#trigger")!.textContent).toBe("banana")
 })
 
+test("a select trigger inside one select shows the placeholder of the select its controller names", async () => {
+  const other = createSelectController<string>()
+  const view = mount(() => (
+    <>
+      <Select items={["apple", "banana"]} placeholder="Around">
+        <SelectTrigger controller={other} id="trigger">
+          <SelectValue />
+        </SelectTrigger>
+      </Select>
+      <Select controller={other} items={["apple", "banana"]} placeholder="Other" />
+    </>
+  ))
+  await settle()
+  expect(view.querySelector("#trigger")!.textContent).toBe("Other")
+})
+
 test("a file input trigger inside one file input opens the picker of the one its controller names", async () => {
   const other = createFileInputController()
   const view = mount(() => (
