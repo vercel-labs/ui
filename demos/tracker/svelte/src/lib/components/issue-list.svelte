@@ -53,6 +53,7 @@
   const pageCount = $derived(Math.max(1, Math.ceil(issues.length / pageSize)))
   const page = $derived(Math.min(query.page, pageCount))
   const rows = $derived(issues.slice((page - 1) * pageSize, page * pageSize))
+  const latest = (payload: Issue) => issues.find((issue) => issue.id === payload.id) ?? payload
   const checked = $derived(selected.filter((id) => rows.some((issue) => issue.id === id)))
 
   function plural(count: number) {
@@ -201,7 +202,7 @@
               <MenuSubTrigger>Status</MenuSubTrigger>
               <MenuSubContent>
                 <MenuRadioGroup
-                  value={payload.status}
+                  value={latest(payload).status}
                   onValueChange={(status: string) => setStatus([payload.id], status as Status)}
                 >
                   {#each statuses as status (status.value)}
@@ -214,7 +215,7 @@
               <MenuSubTrigger>Priority</MenuSubTrigger>
               <MenuSubContent>
                 <MenuRadioGroup
-                  value={payload.priority}
+                  value={latest(payload).priority}
                   onValueChange={(priority: string) => setPriority([payload.id], priority as Priority)}
                 >
                   {#each priorities as priority (priority.value)}
