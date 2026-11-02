@@ -329,6 +329,23 @@ describe("createReorder with the keyboard", () => {
     expect(shownOrder()).toEqual(["a", "b", "c", "d"])
   })
 
+  test("a controlled list whose new value also drops an item lets go of the dropped one", async () => {
+    let instance!: ReturnType<typeof render>["instance"]
+    const onValueChange = (value: string[]) =>
+      queueMicrotask(() => instance.setOptions({ value: value.filter((key) => key !== "d"), onValueChange }))
+    const view = render({ value: ["a", "b", "c", "d"], onValueChange })
+    instance = view.instance
+    await tick()
+    view.els.get("a")!.focus()
+    view.press(" ")
+    view.press("ArrowDown")
+    view.press(" ")
+    await tick()
+    await tick()
+    expect(instance.get().moving).toBeNull()
+    expect(instance.api.reorder.order(instance.get())).toEqual(["b", "a", "c"])
+  })
+
   test("move() commits at once, for a menu item like Move to top", () => {
     const onValueChange = vi.fn()
     const { instance } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
