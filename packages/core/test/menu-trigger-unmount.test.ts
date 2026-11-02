@@ -44,6 +44,16 @@ describe("a menu whose trigger leaves the page", () => {
     expect(instance.get().open).toBe(true)
   })
 
+  test("stays open when the trigger binds again a microtask later, like a web component's swapped button", async () => {
+    const { instance, triggers } = setup()
+    await settle()
+    press(triggers[0].part)?.()
+    triggers[0].unbind()
+    queueMicrotask(() => queueMicrotask(() => bind(triggers[0].part, triggers[0].el)))
+    await settle()
+    expect(instance.get().open).toBe(true)
+  })
+
   test("stays open when another trigger leaves", async () => {
     const { instance, triggers } = setup()
     await settle()
