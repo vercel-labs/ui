@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test"
-import { entered, expect, lastAction, test } from "../fixtures"
+import { entered, expect, lastAction, pageNow, test } from "../fixtures"
 
 // Site navigation with the APG disclosure navigation pattern: buttons that
 // show panels of links inside a <nav>, not a menu. Tab reaches every trigger
@@ -36,20 +36,20 @@ test.describe("pointer", () => {
 
   test("the panel waits for its delay before opening", async ({ page, open }) => {
     await open("navigation-menu", { delay: "400" })
-    const start = Date.now()
+    const start = await pageNow(page)
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    expect(Date.now() - start).toBeGreaterThanOrEqual(400)
+    expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
   test("moving to another trigger while a panel is open switches at once", async ({ page, open }) => {
     await open("navigation-menu", { delay: "600" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    const start = Date.now()
+    const start = await pageNow(page)
     await pointAt(page, trigger(page, "Resources"))
     await expect(link(page, "Blog")).toBeVisible()
-    expect(Date.now() - start).toBeLessThan(500)
+    expect((await pageNow(page)) - start).toBeLessThan(500)
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
@@ -57,10 +57,10 @@ test.describe("pointer", () => {
     await open("navigation-menu", { closeDelay: "400" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    const start = Date.now()
+    const start = await pageNow(page)
     await moveAway(page)
     await expect(link(page, "Analytics")).toBeHidden()
-    expect(Date.now() - start).toBeGreaterThanOrEqual(400)
+    expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
   test("moving the pointer into the panel keeps it open", async ({ page }) => {

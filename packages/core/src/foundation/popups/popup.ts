@@ -967,6 +967,14 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       if (event.shiftKey ? atStart : atEnd) {
         event.preventDefault()
         ;((event.shiftKey ? last : first) ?? popup).focus({ preventScroll: true })
+        return
+      }
+      // WebKit and Firefox skip a radio group whose checked radio is behind
+      // the popup, so the trap steps onto radios itself.
+      const next = list[list.indexOf(active as HTMLElement) + (event.shiftKey ? -1 : 1)]
+      if (list.includes(active as HTMLElement) && next instanceof HTMLInputElement && next.type === "radio") {
+        event.preventDefault()
+        next.focus({ preventScroll: true })
       }
       return
     }

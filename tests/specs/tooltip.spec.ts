@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test"
-import { entered, expect, lastAction, test } from "../fixtures"
+import { entered, expect, lastAction, pageNow, test } from "../fixtures"
 
 // A tooltip shows a short text about its trigger while the pointer rests on
 // it or keyboard focus is on it, following the WAI-ARIA tooltip pattern:
@@ -48,10 +48,10 @@ test.describe("pointer", () => {
 
   test("the tooltip waits for its delay before opening", async ({ page, open }) => {
     await open("tooltip", { delay: "400" })
-    const start = Date.now()
+    const start = await pageNow(page)
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
-    expect(Date.now() - start).toBeGreaterThanOrEqual(400)
+    expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
   test("leaving the trigger before the delay keeps the tooltip closed", async ({ page, open }) => {

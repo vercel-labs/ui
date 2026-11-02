@@ -130,6 +130,10 @@ async function changeItems(page: Page, change: string) {
   )
 }
 
+// The page's own clock, which its timers run on. A delay timed on the test's
+// clock can come out short, since the two drift apart.
+const pageNow = (page: Page) => page.evaluate(() => Date.now())
+
 async function lastAction(page: Page) {
   return page.getByRole("status", { name: "Last action" }).textContent()
 }
@@ -296,6 +300,7 @@ export {
   lastAction,
   menuNamed,
   missingLabelledBy,
+  pageNow,
   panelNamed,
   panelOf,
   recordDialogNamesAtFocus,
