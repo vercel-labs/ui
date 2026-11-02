@@ -295,7 +295,7 @@ type CalendarDayState = {
   today: boolean
   /** Whether it belongs to the month before or after its grid's. */
   outside: boolean
-  /** Whether it can't be picked: outside `min` and `max`, unavailable, or the calendar is disabled. */
+  /** Whether it can't be picked: outside `min` and `max`, unavailable, unable to end the range being picked, or the calendar is disabled. */
   disabled: boolean
   /** Whether `unavailable` names it. */
   unavailable: boolean

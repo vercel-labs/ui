@@ -270,7 +270,7 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
             }
           : handler
       }
-      result.ref = bothRefs(user.ref, partRef(ref(part, { by: "framework", attaches: "all" })))
+      result.ref = bothRefs(user.ref, partRef(ref(part, { by: "framework", attaches: "all" }), name))
       return result
     },
   }

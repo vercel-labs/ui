@@ -30,8 +30,9 @@ type Layer = {
   // Keeps an element usable while this layer makes the rest of the page
   // inert, like a child popup rendered into a container. Returns a release.
   keep?: (el: HTMLElement) => () => void
-  // Where focus can go when a popup opened from inside this one closes.
-  returnTarget?: () => HTMLElement | undefined
+  // Where focus can go when a popup opened from inside this one closes: the
+  // first candidate `take` accepts, like one that took focus when tried.
+  returnTarget?: (take?: (target: HTMLElement) => boolean) => HTMLElement | undefined
   onEscape?: (event: KeyboardEvent) => void
   onOutsidePress?: (event: Event) => void
   onBlur?: (event: FocusEvent) => void

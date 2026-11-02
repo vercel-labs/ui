@@ -9,6 +9,7 @@ import type { ChangeOptions, ChangeReason, ChangeSource } from "../kernel/detail
 import { on } from "../kernel/events"
 import type { Store } from "../kernel/store"
 import {
+  activeLayers,
   findLayer,
   lastClosed,
   lastEscape,
@@ -396,6 +397,9 @@ function watchClose(close: (event: Event) => void) {
   return () => watcher?.destroy()
 }
 
+// Each shown layer's own elements, which a parent that turns modal later keeps out of its inert.
+const layerParts = new WeakMap<Layer, HTMLElement[]>()
+
 function createPopupLayer<State extends { open: boolean; mounted: boolean }, Reason extends string = string>(
   options: Partial<PopupBehavior> & {
     // The behavior to start from. Any behavior option passed here overrides it.
@@ -455,12 +459,15 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let openedOnPress = false
   let returnMode: ReturnMode = true
   let before: HTMLElement | undefined
-  let openedImperatively = false
-  let openerLayer: Layer | undefined
-  let openerTarget: HTMLElement | undefined
+  let openedWithoutTrigger = store.get().open
+  // Where focus goes when what had it is gone: the popup this one opened from
+  // returns to its own target, else the focus that the last close left.
+  // Kept after a close, so a popup this one opened can still follow it.
+  let upstream: (take?: (target: HTMLElement) => boolean) => HTMLElement | undefined = () => undefined
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
+  let checkPlacement: (() => void) | undefined
   let remodal: (() => void) | undefined
   let observer: ((open: boolean) => PopupClose<Reason> | undefined) | undefined
 
@@ -494,9 +501,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
       returnMode = true
       const active = isBrowser ? activeElement() : null
       before = active && active !== active.ownerDocument.body ? active : undefined
-      openedImperatively = opener === "imperative"
-      openerLayer = before && findLayer(before)
-      openerTarget = openerLayer ? undefined : lastClosed()
+      openedWithoutTrigger = opener === "imperative"
+      const openerLayer = before && findLayer(before)
+      const openerTarget = openerLayer ? undefined : lastClosed()
+      upstream = openerLayer?.returnTarget ?? (() => openerTarget)
       store.set({ mounted: true } as Partial<State>)
       // Reopened while animating out, it attaches again: the close already let
       // go of the inert page and the close watcher, and focus has to move in.
@@ -517,9 +525,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const closed = observer?.(false)
     const el = shown?.el
     if (layer) markClosed(returnTarget())
-    const target = openerTarget
-    const from = openerLayer?.returnTarget ?? (() => target)
-    openerLayer = openerTarget = undefined
+    const from = upstream
     if (!el || !isBrowser) {
       options.onOpenChange?.(false, closed)
       store.set({ mounted: false } as Partial<State>)
@@ -580,10 +586,31 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const fallback = setTimeout(settle, 1000)
   })
 
-  // A popup opened from this one returns here after this one closed, so it
-  // falls back like `returnFocus`.
-  function returnTarget() {
-    return firstUsable([returnTrigger, () => before, () => neighbour(shown?.el), options.trigger], usable)
+  // Where focus goes back to, in order. Opened without its trigger, what had
+  // focus comes first, since the trigger was never used.
+  function returnChain(
+    el: HTMLElement | undefined,
+    take?: (target: HTMLElement) => boolean,
+    from = upstream,
+  ) {
+    const inherited = () => from(take)
+    return openedWithoutTrigger
+      ? [() => before, inherited, returnTrigger, () => neighbour(el), options.trigger]
+      : [returnTrigger, () => before, inherited, () => neighbour(el), options.trigger]
+  }
+
+  // A popup opened from this one returns here after this one closed, trying
+  // each target in turn with its own `take`. Reopened from that popup, each
+  // leads back to the other, so the lookup stops there.
+  let resolving = false
+  function returnTarget(take: (target: HTMLElement) => boolean = usable) {
+    if (resolving) return
+    resolving = true
+    try {
+      return firstUsable(returnChain(shown?.el, take), take)
+    } finally {
+      resolving = false
+    }
   }
 
   function neighbour(el: HTMLElement | undefined) {
@@ -609,19 +636,19 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     }
   }
 
-  function returnFocus(el: HTMLElement, from: () => HTMLElement | undefined) {
+  function returnFocus(el: HTMLElement, from: typeof upstream) {
     const setting = options.finalFocus?.() ?? "trigger"
     if (setting === "none") return
-    const chain = openedImperatively
-      ? [() => before, from, returnTrigger, () => neighbour(el), options.trigger]
-      : [returnTrigger, () => before, from, () => neighbour(el), options.trigger]
-    if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
-    // Focusing can fail, on a hidden or inert element. Then the next one gets a turn.
-    firstUsable(chain, (target) => {
+    // Focusing can fail, on a hidden or inert element. Then the next one gets a
+    // turn, in the popups this one inherits its target from too.
+    const take = (target: HTMLElement) => {
       if (!usable(target) || el.contains(target)) return false
       restoreFocus(target)
       return activeElement() === target
-    })
+    }
+    const chain = returnChain(el, take, from)
+    if (setting !== "trigger") chain.unshift(() => resolveTarget(setting, el.ownerDocument))
+    firstUsable(chain, take)
   }
 
   function initialFocus(resolve?: () => HTMLElement | null | undefined | void) {
@@ -668,7 +695,8 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     if (config.position && options.position) {
       const placement = options.position(() => config.anchor?.() ?? options.trigger(), el, config.position)
       place = placement.place
-      cleanups.push(placement, () => (place = undefined))
+      checkPlacement = placement.follow
+      cleanups.push(placement, () => (place = checkPlacement = undefined))
       if (config.rendered) cleanups.push(config.rendered(placement.follow))
     }
     if (!supportsTopLayer() && !host.style.zIndex) host.style.zIndex = "2147483000"
@@ -757,6 +785,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
                 }),
     }
     layer = own
+    layerParts.set(own, [el, ...(backdrop ? [backdrop] : [])])
     cleanups.push(pushLayer(own))
     for (const onShow of [options.onShow, config.onShow]) {
       const cleanup = onShow?.(own)
@@ -767,6 +796,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const freezePage = () => {
       const keep = [el, ...(shown?.backdrop ? [shown.backdrop] : []), ...(persistent as HTMLElement[])]
       if (trigger && behavior.keepTrigger) keep.push(trigger)
+      // A layer opened from this one before it turned modal stays usable too.
+      for (const layer of activeLayers())
+        for (let up = layer.parent; up; up = up.parent)
+          if (up === own) keep.push(...(layerParts.get(layer) ?? []))
       const inert = inertOutside(keep)
       own.keep = inert.keep
       releaseInert = releaseOwnInert = inert
@@ -974,6 +1007,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     initialFocus,
     // Places the shown popup again now, without animating, like once its size is known.
     place: () => place?.(),
+    // Checks the shown popup's placement without starting it over, like when
+    // its arrow binds late, so an animation it runs goes on.
+    checkPlacement: () => checkPlacement?.(),
     // Applies `modal` again while shown, after it changed, like a sheet
     // crossing the snap point above which it's modal. Focus doesn't move.
     updateModal: () => remodal?.(),

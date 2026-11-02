@@ -7,7 +7,7 @@ import { warn } from "#dev"
 import { announce } from "../../foundation/platform/announce"
 import { isRTL } from "../../foundation/platform/env"
 import { createFocusRecovery } from "../../foundation/focus/focus-recovery"
-import { bindPanel } from "../../foundation/motion/panel"
+import { bindPanel, stateAndRenders } from "../../foundation/motion/panel"
 import { isApple } from "../../foundation/platform/platform"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { createTypeahead, isTypeaheadKey, labelOf } from "../../foundation/text/typeahead"
@@ -16,7 +16,7 @@ import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 import { isPromise } from "../../foundation/kernel/action"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
-import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createSelection } from "../../foundation/selection/selection-model"
 import { toggleTreeChecked, treeCheckedStates } from "../../foundation/lists/tree-checked"
 import {
@@ -69,7 +69,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
   const { id, store, options } = context
   const change = createChange(context)
   const typeahead = createTypeahead()
-  const itemProps = (key: string) => context.props("item", key) as TreeItemProps | undefined
+  const itemProps = (key: string) => context.props<TreeItemProps>("item", key)
   const itemElement = (key: string | null | undefined) =>
     key == null ? undefined : context.element("item", key)
 
@@ -812,7 +812,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
         return () => observer.disconnect()
       },
       // The group's enter and exit animations. A group in the page from the first render doesn't animate in.
-      bindGroup(el: HTMLElement, key: string, isFindable: () => boolean) {
+      bindGroup(el: HTMLElement, key: string, isFindable: () => boolean, part: Part) {
         // Open before any item bound means it rendered open with the page.
         let initial = store.get().active === null && store.get().expanded.includes(key)
         let found = false
@@ -828,7 +828,10 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
           },
           trigger: () => itemElement(key),
           subscribe: (listener) =>
-            store.subscribe(() => {
+            stateAndRenders(
+              store,
+              part,
+            )(() => {
               if (!store.get().expanded.includes(key)) initial = false
               listener()
             }),

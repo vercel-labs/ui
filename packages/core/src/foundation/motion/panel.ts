@@ -1,6 +1,8 @@
 // A panel that shows and hides with its own enter and exit animations, size
 // variables, find in page and focus handling: Collapsible's and Accordion's
 // panels, and any panel a custom primitive shows, like a tree's group.
+import { onProps } from "../kernel/part"
+import type { Part } from "../kernel/primitive-types"
 import { animateIn, animateOut } from "./presence"
 
 /**
@@ -23,7 +25,7 @@ function supportsHiddenUntilFound() {
  * Keeps a closed panel findable with `hidden="until-found"`, and calls
  * `reveal` when find in page matches text in it. Frameworks render `hidden` as
  * a boolean, and find in page removes it even when the opening is canceled;
- * either way, the value goes back. Returns a cleanup with a `check()` to call
+ * either way, the value goes back, and back to plain `hidden` once it isn't findable. Returns a cleanup with a `check()` to call
  * when the panel's state changes. `bindPanel` calls it for you.
  * @stable
  */
@@ -32,8 +34,11 @@ function bindFindable(
   panel: { shown: () => boolean; findable: () => boolean; reveal: (event: Event) => void },
 ) {
   const keep = () => {
-    if (panel.shown() || !panel.findable()) return
-    if (el.getAttribute("hidden") !== "until-found") el.setAttribute("hidden", "until-found")
+    if (panel.shown()) return
+    const hidden = el.getAttribute("hidden")
+    if (panel.findable()) {
+      if (hidden !== "until-found") el.setAttribute("hidden", "until-found")
+    } else if (hidden === "until-found") el.setAttribute("hidden", "")
   }
   keep()
   const observer = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(keep)
@@ -168,4 +173,17 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
   return () => cleanups.forEach((cleanup) => cleanup())
 }
 
-export { bindFindable, bindPanel, hiddenAttrs, type PanelBinding, supportsHiddenUntilFound }
+// A panel's `subscribe`: its state, and each render of its part, which can
+// change a prop like `hiddenUntilFound` with no state change.
+function stateAndRenders(store: { subscribe: (listener: () => void) => () => void }, part: Part) {
+  return (listener: () => void) => {
+    const offState = store.subscribe(listener)
+    const offProps = onProps(part, listener)
+    return () => {
+      offState()
+      offProps()
+    }
+  }
+}
+
+export { bindFindable, bindPanel, hiddenAttrs, type PanelBinding, stateAndRenders, supportsHiddenUntilFound }

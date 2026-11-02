@@ -300,7 +300,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
       formElement,
       serialized: selection.keys,
       // The props an item last rendered with, read live by its registration.
-      itemProps: (key: string) => context.props("item", key) as ListboxItemMeta | undefined,
+      itemProps: (key: string) => context.props<ListboxItemMeta>("item", key),
       // Web components read `default-value` as keys when items come later. Once
       // they arrive, a value that still names them takes their values, with no
       // change: it's still the default.

@@ -243,7 +243,7 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
         const target = pressed.el.isConnected
           ? pressed.el
           : pressed.slot === "link"
-            ? elements(context, "link").find((link) => link.props?.page === page)?.el
+            ? elements<PaginationLinkProps>(context, "link").find((link) => link.props?.page === page)?.el
             : element(pressed.slot)
         target?.focus({ preventScroll: true })
       })

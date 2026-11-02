@@ -84,7 +84,7 @@ const board = /* @__PURE__ */ definePrimitive({
   api: (context) => {
     const { store } = context
     const change = createChange(context)
-    const card = (key: string) => context.props("card", key) as BoardCardProps | undefined
+    const card = (key: string) => context.props<BoardCardProps>("card", key)
     const roving = createRovingFocus<BoardState, BoardCardProps>(context, {
       slot: "card",
       key: "focused",
