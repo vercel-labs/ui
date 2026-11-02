@@ -96,7 +96,7 @@ type NumberInputOptions = {
   max?: number
   /**
    * How far one step moves. Committed values snap to steps from `min`, or from 0 without one.
-   * @defaultValue 1
+   * @defaultValue 1, or 0.01 for a percent format
    */
   step?: number
   /**
