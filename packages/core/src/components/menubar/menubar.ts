@@ -135,6 +135,14 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
     claims: (state, trigger) => state.disabled || !trigger.props.disabled,
   })
 
+  // Pointing at a disabled trigger closes the open menu, but the menubar stays
+  // in menu mode while that trigger has focus, so the next trigger pointed at
+  // opens its menu. Escape and focus leaving the trigger end it.
+  let held: HTMLElement | null = null
+  const release = (event: Event) => {
+    if (event.target === held) held = null
+  }
+
   const openMember = () => {
     const open = store.get().open
     return open === null ? undefined : members.get(open)
@@ -186,8 +194,10 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
             member.close({ reason: "submenu-switch", event, focus: false })
       },
       openChanged(key: string, open: boolean) {
-        if (open) store.set({ open: key })
-        else if (store.get().open === key) store.set({ open: null })
+        if (open) {
+          held = null
+          store.set({ open: key })
+        } else if (store.get().open === key) store.set({ open: null })
       },
       // Left and Right inside an open menu, on an item without a submenu. A
       // horizontal menubar opens the neighbouring menu at its first item, as
@@ -208,6 +218,7 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       // arrow across the menubar, Enter and Space open it at its first item,
       // and Up at its last.
       triggerKeydown(event: KeyboardEvent, key: string, el: HTMLElement, disabled: boolean) {
+        if (event.key === "Escape") held = null
         const wasOpen = members.get(key)?.isOpen() ?? false
         const moved = event.shiftKey ? undefined : roving.keydown(event, el)
         if (moved) {
@@ -248,10 +259,14 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       hover(key: string, event: PointerEvent) {
         const open = store.get().open
         const member = members.get(key)
-        if (open === null || open === key || !member || event.pointerType === "touch") return
+        if ((open === null && !held) || open === key || !member || event.pointerType === "touch") return
         if (member.disabled()) {
           const next = roving.items().find((item) => item.key === key)
-          return moveTo(next, event, false)
+          if (!next) return
+          moveTo(next, event, false)
+          held = next.el
+          next.el.addEventListener("blur", release, { once: true })
+          return
         }
         roving.remember(key)
         member.open({ focus: "popup", reason: "trigger-hover", event, by: "pointer" })
