@@ -43,7 +43,11 @@ function box(el: HTMLElement, top: number, bottom: number) {
     ({ top, bottom, left: 0, right: 400, width: 400, height: bottom - top }) as DOMRect
 }
 
+// What a test started and didn't stop, so nothing listens into the next one.
+const cleanups: (() => void)[] = []
+
 afterEach(() => {
+  for (const cleanup of cleanups.splice(0)) cleanup()
   vi.restoreAllMocks()
   document.body.replaceChildren()
 })
@@ -92,7 +96,7 @@ describe("bindViewport", () => {
   test("finds the keyboard when iOS zooms into a small field, or shrinks the layout viewport with it", () => {
     const { move } = phone()
     const onChange = vi.fn()
-    bindViewport(document.createElement("div"), { onChange })
+    cleanups.push(bindViewport(document.createElement("div"), { onChange }))
     const field = type()
     // Zoomed to 115%: 300 points of keyboard leave 500 on screen, so it takes 261 of the page's pixels.
     move({ width: 400 / 1.15, height: 500 / 1.15, scale: 1.15 })
@@ -110,7 +114,7 @@ describe("bindViewport", () => {
     const { move } = phone()
     const root = document.createElement("div")
     const onChange = vi.fn()
-    bindViewport(root, { onChange })
+    cleanups.push(bindViewport(root, { onChange }))
     type()
     move({ height: 500 })
     expect(onChange.mock.lastCall?.[0].keyboard).toBe(300)
@@ -132,7 +136,7 @@ describe("bindViewport", () => {
     Object.assign(visual, { scale: 1.15 })
     const root = document.createElement("div")
     const onChange = vi.fn()
-    bindViewport(root, { onChange })
+    cleanups.push(bindViewport(root, { onChange }))
     // The page's own zoom: the visual viewport fills the layout viewport at 115%.
     move({ height: 500 })
     expect(root.style.getPropertyValue("--keyboard-inset")).toBe("300px")
@@ -159,7 +163,7 @@ describe("bindViewport", () => {
       return { getPropertyValue: (name: string) => insets[name] ?? "0px" } as CSSStyleDeclaration
     })
     const onChange = vi.fn()
-    bindViewport(document.createElement("div"), { onChange })
+    cleanups.push(bindViewport(document.createElement("div"), { onChange }))
     expect(onChange.mock.calls[0][0].safeArea).toEqual({ top: 47, right: 0, bottom: 34, left: 0 })
   })
 })
@@ -187,14 +191,14 @@ describe("bindAvoidKeyboard", () => {
     const field = type()
     // The bar keeps its own 2 pixels while lifted.
     move({ height: 500 })
-    expect(bar.style.translate).toBe("0px -298px")
+    expect(bar.style.translate).toBe("0 -298px")
     expect(composer.style.translate).toBe("0px -100px")
     expect(below.style.translate).toBe("")
     expect(bar.hasAttribute("data-keyboard")).toBe(true)
     // A lifted element measures where it's shown, and the lift holds.
     box(bar, 440, 500)
     move({ height: 500 })
-    expect(bar.style.translate).toBe("0px -298px")
+    expect(bar.style.translate).toBe("0 -298px")
     field.blur()
     move({ height: 800 })
     expect(bar.style.translate).toBe("0 2px")
@@ -225,6 +229,54 @@ describe("bindAvoidKeyboard", () => {
     expect(pill.style.translate).toBe("0px -30px")
     stop()
     expect(document.querySelector("[data-viewport-origin]")).toBe(null)
+  })
+
+  test("keeps a toolbar's own percentages, like -50% to center it, and lifts its y around them", () => {
+    const { move } = phone()
+    vi.spyOn(window, "getComputedStyle").mockImplementation(
+      (el) => ({ translate: (el as HTMLElement).style.translate || "none" }) as CSSStyleDeclaration,
+    )
+    const centered = document.createElement("div")
+    const middle = document.createElement("div")
+    centered.style.translate = "-50% 0px"
+    middle.style.translate = "-50% -50%"
+    box(centered, 740, 800)
+    box(middle, 740, 800)
+    const stops = [centered, middle].map((el) => bindAvoidKeyboard(el))
+    type()
+    move({ height: 500 })
+    expect(centered.style.translate).toBe("-50% -300px")
+    expect(middle.style.translate).toBe("-50% calc(-50% - 300px)")
+    // Shown lifted, it measures the lift from its own translate, and holds it.
+    box(middle, 440, 500)
+    move({ height: 500 })
+    expect(middle.style.translate).toBe("-50% calc(-50% - 300px)")
+    for (const stop of stops) stop()
+    expect(middle.style.translate).toBe("-50% -50%")
+  })
+
+  test("measures again when a container around it scrolls, whose scroll doesn't bubble", () => {
+    const { move } = phone()
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      callback(0)
+      return 1
+    })
+    vi.stubGlobal("cancelAnimationFrame", () => {})
+    const container = document.createElement("div")
+    const composer = document.createElement("div")
+    container.append(composer)
+    document.body.append(container)
+    box(composer, 440, 500)
+    const stop = bindAvoidKeyboard(composer)
+    type()
+    move({ height: 500 })
+    expect(composer.style.translate).toBe("")
+    // The container scrolls the composer down, under the keyboard.
+    box(composer, 540, 600)
+    container.dispatchEvent(new Event("scroll"))
+    expect(composer.style.translate).toBe("0px -100px")
+    stop()
+    vi.unstubAllGlobals()
   })
 
   test("does nothing without a visual viewport", () => {

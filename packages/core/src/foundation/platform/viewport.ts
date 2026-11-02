@@ -127,11 +127,27 @@ function bindViewport(el: HTMLElement, { onChange }: { onChange?: (viewport: Vie
   }
 }
 
+// A translate's y as computed style keeps it, percentage and pixels apart,
+// like "-50%", "12px" or "calc(-50% - 120px)".
+function lengthOf(value: string) {
+  const length = { percent: 0, px: 0 }
+  for (const [, number = "0", unit] of value
+    .replaceAll(" ", "")
+    .matchAll(/([+-]?[\d.]+(?:e[+-]?\d+)?)(%|px)?/gi))
+    length[unit === "%" ? "percent" : "px"] += Number.parseFloat(number)
+  return length
+}
+
+const cssLength = ({ percent, px }: { percent: number; px: number }) =>
+  !percent ? `${px}px` : `calc(${percent}% ${px < 0 ? "-" : "+"} ${Math.abs(px)}px)`
+
 /**
  * Keeps `el` above the on-screen keyboard, like a chat composer or a toolbar
  * at the bottom of the screen: while the keyboard is open, it lifts `el` by as
  * much of it as lies below what's on screen, through its `translate`, and sets
- * `data-keyboard`. An element below the layout viewport stays put. Returns a
+ * `data-keyboard`. Its own translate stays, percentages too, like a toolbar
+ * centered with `-50%`. An element below the layout viewport stays put, and
+ * scrolling the page or a container around `el` measures it again. Returns a
  * cleanup that puts `el`'s own `translate` back.
  * @experimental
  */
@@ -140,10 +156,13 @@ function bindAvoidKeyboard(el: HTMLElement) {
   const visual = view?.visualViewport
   if (!view || !visual) return () => {}
   const own = el.style.translate
-  // The translate el has now, as shown: mid-transition, part of the way to the lift.
+  // The translate el has now, as shown: mid-transition, part of the way to the
+  // lift. Its x and z stay as they're written; its y takes the lift.
   const shown = () => {
-    const [x = "0", y = "0"] = view.getComputedStyle(el).translate.split(" ")
-    return { x: Number.parseFloat(x) || 0, y: Number.parseFloat(y) || 0 }
+    const value = view.getComputedStyle(el).translate
+    // Spaces inside calc() aren't between parts, so split outside parentheses only.
+    const [x = "0px", y = "0px", z] = value === "none" ? [] : value.split(/ (?![^(]*\))/)
+    return { x, y: lengthOf(y), z }
   }
   const rest = shown()
   // iOS measures boxes from the visual viewport while it's panned, others from
@@ -160,14 +179,20 @@ function bindAvoidKeyboard(el: HTMLElement) {
     // Where el would be without the lift, in the layout viewport the keyboard
     // covers, against where the visible part of the page ends.
     const box = el.getBoundingClientRect()
-    const shift = shown().y - rest.y + origin.getBoundingClientRect().top
+    const now = shown().y
+    const shift =
+      now.px -
+      rest.y.px +
+      ((now.percent - rest.y.percent) * box.height) / 100 +
+      origin.getBoundingClientRect().top
     const bottom = Math.min(box.bottom - shift, view.innerHeight)
     const covered = box.top - shift < view.innerHeight ? bottom - visual.offsetTop - visual.height : 0
     const next = keyboard ? Math.round(Math.max(0, covered)) : 0
     el.toggleAttribute("data-keyboard", keyboard > 0)
     if (next === lifted) return
     lifted = next
-    el.style.translate = lifted ? `${rest.x}px ${rest.y - lifted}px` : own
+    const y = cssLength({ percent: rest.y.percent, px: rest.y.px - lifted })
+    el.style.translate = lifted ? [rest.x, y, rest.z].filter(Boolean).join(" ") : own
   }
   update()
   // Scrolling reports late and often, so it measures once a frame, as the page paints.
@@ -178,14 +203,15 @@ function bindAvoidKeyboard(el: HTMLElement) {
   }
   visual.addEventListener("resize", update)
   visual.addEventListener("scroll", scrolled)
-  view.addEventListener("scroll", scrolled, { passive: true })
+  // A container's scroll doesn't bubble, so the window hears every one as it passes down.
+  view.addEventListener("scroll", scrolled, { capture: true, passive: true })
   el.ownerDocument.addEventListener("focusin", update)
   el.ownerDocument.addEventListener("focusout", update)
   return () => {
     view.cancelAnimationFrame(frame)
     visual.removeEventListener("resize", update)
     visual.removeEventListener("scroll", scrolled)
-    view.removeEventListener("scroll", scrolled)
+    view.removeEventListener("scroll", scrolled, { capture: true })
     el.ownerDocument.removeEventListener("focusin", update)
     el.ownerDocument.removeEventListener("focusout", update)
     origin.remove()
