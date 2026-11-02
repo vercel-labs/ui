@@ -335,7 +335,7 @@
   "@ui-sdk/web/switch": 15509,
   "@ui-sdk/web/tabs": 19833,
   "@ui-sdk/web/textarea": 15263,
-  "@ui-sdk/web/toast": 24565,
+  "@ui-sdk/web/toast": 25432,
   "@ui-sdk/web/toast (lazy)": 107,
   "@ui-sdk/web/toggle": 18499,
   "@ui-sdk/web/token-input": 22960,
