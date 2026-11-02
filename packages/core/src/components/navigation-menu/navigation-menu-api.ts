@@ -18,7 +18,7 @@ import { createFocus } from "./navigation-menu-focus"
 import { opensElsewhere } from "./navigation-menu-keyboard"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { ChangeOptions } from "../../foundation/kernel/details"
-import { on } from "../../foundation/kernel/events"
+import { isComposing, on } from "../../foundation/kernel/events"
 import { onProps } from "../../foundation/kernel/part"
 import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
@@ -438,7 +438,7 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     const listeners = [
       on(el, "keydown", (event) => {
         // Keys from a nested menu's viewport are its own.
-        if (ownsEvent(el, event) && !event.defaultPrevented) viewport.keydown(event)
+        if (ownsEvent(el, event) && !event.defaultPrevented && !isComposing(event)) viewport.keydown(event)
       }),
       on(el, "pointerenter", (event) => intent.enter(event)),
       on(el, "pointerleave", leavePanel),

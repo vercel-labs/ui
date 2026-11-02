@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test, vi } from "vitest"
+import { navigationMenu } from "../src/components/navigation-menu/navigation-menu"
 import { createFocus } from "../src/components/navigation-menu/navigation-menu-focus"
+import { mount } from "../src/testing/mount"
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -97,4 +99,25 @@ test("arrow keys on a checkbox or button input inside a panel still move to the 
     expect(document.activeElement).toBe(panel.querySelector('a[href="#b"]'))
     panel.remove()
   }
+})
+
+test("Tab while an input method composes in a field inside the viewport stays in the field", () => {
+  const view = mount(
+    navigationMenu,
+    { defaultValue: "learn" },
+    `<root aria-label="Main"><list>
+      <item value="learn"><trigger>Learn</trigger></item>
+      <item value="about"><button>About</button></item>
+    </list><viewport><content value="learn"><link href="/docs">Docs</link><input aria-label="Search"></content></viewport></root>`,
+  )
+  const input = view.root.querySelector("input")!
+  input.focus()
+  for (const composing of [{ isComposing: true }, { keyCode: 229 }]) {
+    const event = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true, ...composing })
+    input.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+    expect(document.activeElement).toBe(input)
+    expect(view.state.value).toBe("learn")
+  }
+  view.unmount()
 })
