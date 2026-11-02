@@ -221,7 +221,7 @@ function createListboxEngine(
     // Whether data items are sorted by how well they match, best first.
     rank?: () => boolean
     loop: () => boolean
-    // Whether keys pass over items that can't be chosen, like a native select.
+    // Whether keys pass over disabled items, like a native select.
     skipDisabled?: boolean
     // Whether highlighting may move focus now, like while the popup is open.
     active: () => boolean
@@ -460,7 +460,7 @@ function createListboxEngine(
     config.onHighlight?.(key, index, event)
     // Skipped items at the end can't be reached, so the last one left counts.
     let last = list.length - 1
-    if (config.skipDisabled) while (last > 0 && disabled(list[last])) last--
+    if (config.skipDisabled) while (last > 0 && list[last].disabled) last--
     if (index !== -1 && index === last) config.onLastReached?.()
     if (key === null) return
     const el = registry.get(key)?.el
@@ -468,11 +468,11 @@ function createListboxEngine(
   }
 
   // The key a step from the highlight lands on, or the first or last item's,
-  // without moving there. Undefined for an empty list, or one where nothing
-  // can be chosen while it skips those items.
+  // without moving there. Undefined for an empty list, or one where every
+  // item is disabled while it skips them.
   function stepKey(step: number | "first" | "last", { loop = config.loop() } = {}) {
     const all = entries()
-    const list = config.skipDisabled ? all.filter((entry) => !disabled(entry)) : all
+    const list = config.skipDisabled ? all.filter((entry) => !entry.disabled) : all
     if (!list.length) return undefined
     const current = store.get().highlighted
     const index = list.findIndex((entry) => entry.key === current)
@@ -480,7 +480,7 @@ function createListboxEngine(
     // From a skipped item, like one a press focused, a step counts from where it sits.
     const skipped = all.findIndex((entry) => entry.key === current)
     if (skipped !== -1) {
-      const before = all.slice(0, skipped).filter((entry) => !disabled(entry)).length
+      const before = all.slice(0, skipped).filter((entry) => !entry.disabled).length
       return list[moveIndex(step > 0 ? before - 1 : before, step, list.length, loop)].key
     }
     // From no highlight, a step forward lands on the first item and a step back on the last.
@@ -587,11 +587,9 @@ function createListboxEngine(
     dataItems: () => data()?.flat,
     find,
     disabled,
-    // Whether an item can't be chosen, by itself or by `blocked`.
-    isItemDisabled(key: string) {
-      const entry = find(key)
-      return !!entry && disabled(entry)
-    },
+    // Whether an item is disabled by itself, which keys and the pointer pass
+    // over. A `blocked` item can't be chosen but stays reachable.
+    isItemDisabled: (key: string) => !!find(key)?.disabled,
     highlight,
     move,
     stepKey,

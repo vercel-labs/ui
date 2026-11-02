@@ -95,3 +95,17 @@ test("turning autoHighlight on after typing highlights the best match", async ()
   await settle()
   expect(combo.state.highlighted).toBe("Banana")
 })
+
+test("arrows still reach unchosen items once a multiple combobox is at maxSelected", async () => {
+  const combo = view({
+    items: ["Backlog", "Todo", "Done"],
+    multiple: true,
+    maxSelected: 2,
+    defaultValue: ["Backlog", "Todo"],
+  })
+  await combo.keys("ArrowDown")
+  await settle()
+  expect(combo.state.highlighted).toBe("Backlog")
+  await combo.keys("ArrowDown", "ArrowDown")
+  expect(combo.state.highlighted).toBe("Done")
+})
