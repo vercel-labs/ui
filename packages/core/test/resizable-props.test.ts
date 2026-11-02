@@ -242,3 +242,90 @@ test("disabling a group as its drag ends on new bounds commits and saves once", 
   expect(onLayoutCommit).toHaveBeenCalledTimes(1)
   expect(storage.setItem).toHaveBeenCalledTimes(1)
 })
+
+// The docs: "`disabled` on a handle fixes it in place", as the group's `disabled` does mid-drag.
+test("a handle disabled mid-drag stops following the pointer, like a disabled group", async () => {
+  const onLayoutCommit = vi.fn()
+  const instance = resizable({ id: "g", onLayoutCommit })
+  const root = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("root", {}), root)!)
+  const element = (left: number, width: number) => {
+    const el = root.appendChild(document.createElement("div"))
+    el.getBoundingClientRect = () => new DOMRect(left, 0, width, 10)
+    return el
+  }
+  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!)
+  const handle = element(50, 2)
+  cleanups.push(bind(instance.part("handle", { id: "h" }), handle)!)
+  cleanups.push(bind(instance.part("panel", { id: "b" }), element(52, 50))!)
+  await Promise.resolve()
+  const pointer = (type: string, clientX: number) =>
+    new PointerEvent(type, {
+      pointerId: 1,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: type === "pointerup" ? 0 : 1,
+      clientX,
+      clientY: 5,
+      bubbles: true,
+      cancelable: true,
+    })
+  const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+  handle.dispatchEvent(pointer("pointerdown", 51))
+  document.dispatchEvent(pointer("pointermove", 61))
+  await frame()
+  expect(instance.api.getLayout()).toEqual([60, 40])
+  instance.part("handle", { id: "h", disabled: true })
+  document.dispatchEvent(pointer("pointermove", 81))
+  await frame()
+  expect(instance.api.getLayout()).toEqual([60, 40])
+  expect(instance.get().dragging).toBeNull()
+  expect(onLayoutCommit).toHaveBeenCalledTimes(1)
+})
+
+// A drag's page-wide cursor and `user-select: none` last only while it runs, as a release clears them.
+test("a group disabled mid-drag gives the page back its cursor, text selection and iframes", async () => {
+  const options = { id: "g" }
+  const instance = resizable(options)
+  const root = document.body.appendChild(document.createElement("div"))
+  cleanups.push(bind(instance.part("root", {}), root)!)
+  const element = (left: number, width: number) => {
+    const el = root.appendChild(document.createElement("div"))
+    el.getBoundingClientRect = () => new DOMRect(left, 0, width, 10)
+    return el
+  }
+  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!)
+  const handle = element(50, 2)
+  cleanups.push(bind(instance.part("handle", { id: "h" }), handle)!)
+  cleanups.push(bind(instance.part("panel", { id: "b" }), element(52, 50))!)
+  await Promise.resolve()
+  const pageStyle = () =>
+    [
+      ...(document.adoptedStyleSheets ?? []).flatMap((sheet) =>
+        [...sheet.cssRules].map((rule) => rule.cssText),
+      ),
+      ...[...document.querySelectorAll("style")].map((style) => style.textContent),
+    ].join("\n")
+  handle.dispatchEvent(
+    new PointerEvent("pointerdown", {
+      pointerId: 1,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: 51,
+      clientY: 5,
+      bubbles: true,
+      cancelable: true,
+    }),
+  )
+  expect(pageStyle()).toContain("user-select")
+  instance.setOptions({ ...options, disabled: true })
+  expect(instance.get().dragging).toBeNull()
+  document.dispatchEvent(
+    new PointerEvent("pointerup", { pointerId: 1, pointerType: "mouse", isPrimary: true, bubbles: true }),
+  )
+  expect(pageStyle()).not.toContain("user-select")
+  expect(pageStyle()).not.toContain("resize")
+})

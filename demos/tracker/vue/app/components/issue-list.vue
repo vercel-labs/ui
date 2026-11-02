@@ -54,6 +54,7 @@ const page = computed(() => Math.min(props.query.page, pageCount.value))
 const rows = computed(() =>
   props.issues.slice((page.value - 1) * props.pageSize, page.value * props.pageSize),
 )
+const latest = (payload: Issue) => props.issues.find((issue) => issue.id === payload.id) ?? payload
 const checked = computed({
   get: () => selected.value.filter((id) => rows.value.some((issue) => issue.id === id)),
   set: (next) => (selected.value = next),
@@ -194,7 +195,7 @@ async function run(action: string) {
               <MenuSubTrigger>Status</MenuSubTrigger>
               <MenuSubContent>
                 <MenuRadioGroup
-                  :value="state.payload.status"
+                  :value="latest(state.payload).status"
                   @value-change="(status: string) => setStatus([state.payload.id], status as Status)"
                 >
                   <MenuRadioItem v-for="status in statuses" :key="status.value" :value="status.value">
@@ -207,7 +208,7 @@ async function run(action: string) {
               <MenuSubTrigger>Priority</MenuSubTrigger>
               <MenuSubContent>
                 <MenuRadioGroup
-                  :value="state.payload.priority"
+                  :value="latest(state.payload).priority"
                   @value-change="
                     (priority: string) => updateIssues([state.payload.id], { priority: priority as Priority })
                   "

@@ -15,6 +15,7 @@ import { ListItems, type ListParts } from "./list-items"
 import { createParts, type RenderableWith, type RootInstanceOf, type RootPropsOf } from "./create-parts"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
 import { FormInputs } from "./form-inputs"
+import { readOnlyOf } from "./text-control"
 
 type ValueDetails = ChangeDetails<ListboxValueChangeReason>
 
@@ -91,6 +92,7 @@ const Listbox = defineComponent({
       value: orModel(props.value, props.modelValue),
       name: props.name ?? field?.name(),
       disabled: props.disabled || field?.disabled(),
+      readOnly: readOnlyOf(props, attrs),
       onValueChange: (value: unknown, details: ValueDetails) => {
         // The change event runs first, so canceling it also keeps v-model as it was.
         emit("valueChange", value, details)

@@ -17,6 +17,7 @@ Previous and Next, and a grid for each month.
   } from "@ui-sdk/core/calendar"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
   import CalendarGrid from "./calendar-grid.svelte"
   import CalendarHeading from "./calendar-heading.svelte"
@@ -92,7 +93,7 @@ Previous and Next, and a grid for each month.
     max,
     unavailable,
     disabled,
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     deselectable,
     onFocusedChange,
     onAnchorChange,

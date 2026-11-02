@@ -639,7 +639,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     // In a sheet, a submenu replaces the items, so only a press opens it.
     if (entry.openSubmenu && !entry.disabled() && store.get().presentation !== "sheet")
       hoverTimer = setTimeout(
-        () => entry.openSubmenu!("none", "trigger-hover", event),
+        () => !entry.disabled() && entry.openSubmenu!("none", "trigger-hover", event),
         options().delay ?? 100,
       )
   }

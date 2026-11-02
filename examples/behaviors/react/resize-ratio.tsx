@@ -35,7 +35,7 @@ const video = definePrimitive({
         min: () => ({ width: 96, height: 54 }),
         max: () => ({ width: 256, height: 144 }),
         bounds: () => ({ left: 0, top: 0, right: 320, bottom: 200 }),
-        step: () => 16,
+        largeStep: () => 16,
       }),
     }
   },

@@ -76,7 +76,7 @@ const peek = /* @__PURE__ */ definePrimitive({
       attrs: () => ({ role: "radiogroup", "aria-roledescription": "preview group" }),
       on: {
         focusout: (event, { el, api }) => {
-          if (api.preview.scrubbing() || el?.contains(event.relatedTarget as Node)) return
+          if (api.preview.dragging() || el?.contains(event.relatedTarget as Node)) return
           api.preview.clear({ reason: "focus-out", event })
         },
       },
@@ -95,7 +95,7 @@ const peek = /* @__PURE__ */ definePrimitive({
       }),
       on: {
         pointerdown: (event, { el, api, key }) =>
-          el?.parentElement && api.preview.scrub(event, key, el.parentElement),
+          el?.parentElement && api.preview.pointerdown(event, key, el.parentElement),
         keydown: (event, { el, api, key }) => el && api.optionKeydown(event, el, key),
       },
       bind: (el, part) => part.api.roving.bind(el, part),

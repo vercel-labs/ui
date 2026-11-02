@@ -19,7 +19,7 @@ const move = createMove(context, {
   key: "positions",
   draft: "moving",
   set: (value, details) => change("positions", value, details),
-  grid: () => 4,
+  step: () => 4,
   bounds: () => ({ minX: 0, minY: 0, maxX: 264, maxY: 144 }),
 })
 ```
@@ -49,10 +49,10 @@ Render that slot as a focusable element with an accessible name, inside a positi
 
 <ComponentExample
   name="behaviors/move"
-  caption="Drag a sticker, or focus it and press Alt with an arrow. Add Shift to move five times as far. Escape during a drag puts it back."
+  caption="Drag a sticker, or focus it and press Alt with an arrow to move it 4 pixels. Add Shift to move ten times as far. Escape during a drag puts it back."
 />
 
-`grid` snaps the dropped position. `bounds` limits committed coordinates; the drag preview can go outside them before release. A drop reports `drag`, a keyboard nudge reports `move-key`, and screen readers hear the new position.
+`step` is the grid a dropped position lands on, and how far Alt with an arrow moves it; Shift moves `largeStep`, ten steps by default. `bounds` limits committed coordinates; the drag preview can go outside them before release. A drop reports `drag`, a keyboard nudge reports `move-key`, and screen readers hear the new position.
 
 ### Several at Once
 
@@ -68,7 +68,7 @@ disabled: (key) => key === "ship",
 label: (key) => titles[key],
 ```
 
-`step` sets the distance for Alt with an arrow, 10 by default. `disabled` blocks pointer and keyboard moves and removes that item from a moving group.
+`step` sets the grid and the distance for Alt with an arrow, 1 by default. `disabled` blocks pointer and keyboard moves and removes that item from a moving group.
 
 <ComponentExample
   name="behaviors/move-group"
@@ -114,7 +114,7 @@ const resize = createResize(context, {
   set: (value, details) => change("boxes", value, details),
   min: () => ({ width: 60, height: 40 }),
   bounds: () => ({ left: 0, top: 0, right: 320, bottom: 200 }),
-  grid: () => 4,
+  step: () => 4,
 })
 ```
 
@@ -139,7 +139,7 @@ Render handles as buttons with names such as "Resize bottom right". Their slots 
   caption="Drag a handle to resize the frame, or drag the frame to move it. Focus a handle and use the arrows; add Shift for larger steps. Escape cancels a drag."
 />
 
-`handleAttrs` doesn't supply a label or make an element focusable. The button does that. Arrow keys move an edge by 10 pixels by default, or five times that with Shift; an edge handle responds along its own axis. Changes report `drag` or `resize-key`.
+`handleAttrs` doesn't supply a label or make an element focusable. The button does that. Arrow keys move an edge by `step`, the grid a dropped box lands on, or by `largeStep` with Shift, ten steps by default; an edge handle responds along its own axis. Changes report `drag` or `resize-key`.
 
 ### Keeping a Shape
 
@@ -149,7 +149,7 @@ Set an aspect ratio and size limits in the resize options:
 aspect: () => (context.store.get().locked ? 16 / 9 : undefined),
 min: () => ({ width: 96, height: 54 }),
 max: () => ({ width: 256, height: 144 }),
-step: () => 16,
+largeStep: () => 16,
 ```
 
 <ComponentExample
@@ -157,7 +157,7 @@ step: () => 16,
   caption="Resize the video frame while 16:9 is checked. Uncheck it to resize freely, or hold Shift while dragging a corner to preserve the frame's starting ratio."
 />
 
-`aspect` is width divided by height. A corner follows the edge that moved further; an edge handle adjusts the other dimension around its center. `min` and `max` bound the size, while `bounds` describes the surrounding area and `grid` snaps a dropped box.
+`aspect` is width divided by height. A corner follows the edge that moved further; an edge handle adjusts the other dimension around its center. `min` and `max` bound the size, while `bounds` describes the surrounding area. Here `largeStep` makes Shift with an arrow move 16 pixels, while plain arrows keep moving 1.
 
 ### Several Boxes, and from Code
 
@@ -239,6 +239,30 @@ Return whether the action was accepted. `fullSwipe` is a fraction of the row's w
 />
 
 `swipe.show(key, "end", { focus: true })` opens a row and focuses its first action. `swipe.close({ focus: true })` closes it and returns focus to the row. Omit `focus` to leave focus where it is. `swipe.open()` reads the open row.
+
+### Drag to Dismiss
+
+A toast or card that's dragged far enough is dismissed on release. Give `scrubTo` a single snap point at 0: within the threshold its result has that `point`, so the toast snaps back, and past it, there's no point to return to. Ask on every move, so the toast can show what letting go will do:
+
+```ts
+import { scrubTo } from "@ui-sdk/core/number"
+
+const keeps = { min: -width, max: width, step: 1, snap: { points: [0], threshold: width * 0.3 } }
+
+onMove: ({ x }) => {
+  moved = x - startX
+  setOffset(moved)
+  setDismissing(scrubTo(moved, keeps).point === undefined)
+},
+onEnd: () => (scrubTo(moved, keeps).point === undefined ? dismiss(Math.sign(moved)) : setOffset(0)),
+```
+
+Style `data-dismissing` so the change is clear before release, like iOS: here the layer behind the toast turns red and says "Release to dismiss". Dragging back under the threshold takes it back. Keep a Dismiss button in each toast for the keyboard.
+
+<ComponentExample
+  name="behaviors/swipe-dismiss"
+  caption="Drag a toast sideways: past a third of its width, the layer behind turns red, and letting go dismisses it. Drag back, or press Escape, to keep it."
+/>
 
 ## Two-Dimensional Values
 
@@ -411,7 +435,7 @@ Keep the existing roving focus binding for the font slot, and add these handlers
 
 ```ts
 on: {
-  pointerdown: (event, { el, api, key }) => api.preview.scrub(event, key, el!.parentElement!),
+  pointerdown: (event, { el, api, key }) => api.preview.pointerdown(event, key, el!.parentElement!),
   keydown: (event, { el, api, key }) => {
     if (api.preview.keydown(event, key)) {
       return
@@ -429,18 +453,38 @@ on: {
   caption="Press a font and slide over the others to preview them. Release over one to choose it, or outside to cancel. With the keyboard, arrows preview and Enter or Space chooses."
 />
 
-Pass the common parent surface to `scrub` to track the gesture across the options. `show(key)` previews one, `choose(key)` commits it, and `clear()` returns to the chosen value. Enter and Space choose; Escape clears.
+Pass the common parent surface to `pointerdown` to track the gesture across the options. `show(key)` previews one, `choose(key)` commits it, and `clear()` returns to the chosen value. Enter and Space choose; Escape clears.
 
 Clear the preview when focus leaves the group, unless a pointer is still scrubbing:
 
 ```ts
 focusout: (event, { el, api }) => {
-  if (api.preview.scrubbing() || el?.contains(event.relatedTarget as Node)) {
+  if (api.preview.dragging() || el?.contains(event.relatedTarget as Node)) {
     return
   }
   api.preview.clear({ reason: "focus-out", event })
 },
 ```
+
+Pressing and sliding can also try out an order. Measure each tab when the press starts, and make the left edge of every slot the dragged tab could take a snap point. `scrubTo` pulls the tab into a slot as it comes close, the nearest slot shows the order it would make, and letting go keeps it:
+
+```ts
+const slots = lefts([...others, key], widths)
+
+onMove: ({ x, event }) => {
+  const { value: left } = scrubTo(start + x, { min: 0, max: slots.at(-1), step: 1, snap: { points: slots, threshold: 12 } }, {
+    snap: !event.metaKey,
+  })
+  preview(insert(others, key, nearest(slots, left)), left)
+},
+```
+
+For the keyboard, `stepFromKey` and `stepBy` move the focused tab one place, or to either end with Home and End, the same way they step a slider.
+
+<ComponentExample
+  name="behaviors/preview-tabs"
+  caption="Drag a tab along the bar: it snaps into each place as it nears it, and the others make room. Hold Command or Ctrl to place it freely, or press Escape to cancel. With the keyboard, Option or Alt with an arrow moves the focused tab."
+/>
 
 ### Hovering, and What's Read Out
 
@@ -472,7 +516,7 @@ The option tables link back to the examples that introduce them.
     key: "Place Anything",
     draft: "Place Anything",
     set: "Place Anything",
-    grid: "Place Anything",
+    largeStep: "Place Anything",
     bounds: "Place Anything",
     group: "Several at Once",
     step: "Several at Once",
@@ -494,10 +538,10 @@ The option tables link back to the examples that introduce them.
     set: "Handles on a Box",
     min: "Handles on a Box",
     bounds: "Handles on a Box",
-    grid: "Handles on a Box",
+    largeStep: "Keeping a Shape",
     aspect: "Keeping a Shape",
     max: "Keeping a Shape",
-    step: "Keeping a Shape",
+    step: "Handles on a Box",
     scale: "Several Boxes, and from Code",
     disabled: "Several Boxes, and from Code",
     label: "Several Boxes, and from Code",

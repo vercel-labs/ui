@@ -139,6 +139,14 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
   function stopKey() {
     const list = listbox.entries()
     if (remembered !== null && list.some((entry) => entry.key === remembered)) return remembered
+    // An option whose value changed while it had focus fires no focus event,
+    // so it's found by its element.
+    const active = remembered === null ? null : rootElement()?.ownerDocument.activeElement
+    const held = active && list.find((entry) => element("item", entry.key) === active)
+    if (held) {
+      if (store.get().highlighted === remembered) store.set({ highlighted: held.key })
+      return (remembered = held.key)
+    }
     const enabled = list.filter((entry) => !entry.disabled)
     const selected = enabled.find((entry) => selection.isSelected(entry.key, entry.value))
     return (selected ?? enabled[0] ?? list[0])?.key ?? null

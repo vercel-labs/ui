@@ -8,18 +8,11 @@ import {
 } from "../../foundation/drag-and-drop/pointer"
 import { isBrowser, isIOS } from "../../foundation/platform/env"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
-import {
-  clamp,
-  decimalsOf,
-  displayOptions,
-  formatNumber,
-  maxOnGrid,
-  numberFormatter,
-  snapToStep,
-  stepValue,
-} from "../../foundation/text/number"
+import { displayOptions, formatNumber, numberFormatter } from "../../foundation/number/format"
+import { stepFromKey } from "../../foundation/number/keys"
+import { clamp, decimalsOf, maxOnGrid, snapToStep, stepValue } from "../../foundation/number/steps"
 import { localeOf } from "../../foundation/text/locale"
-import { isPartialNumber, parseNumber } from "./number-input-parse"
+import { isPartialNumber, parseNumber } from "../../foundation/number/parse"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { sameValue } from "../../foundation/kernel/store"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
@@ -60,7 +53,9 @@ type State = {
 }
 
 function settings(options: NumberInputOptions) {
-  const step = options.step && options.step > 0 ? options.step : 1
+  // A percent's value is a fraction, so a step of 1 would snap 25% to 0%.
+  const fallback = options.format?.style === "percent" ? 0.01 : 1
+  const step = options.step && options.step > 0 ? options.step : fallback
   return {
     min: options.min ?? -Infinity,
     max: options.max ?? Infinity,
@@ -279,19 +274,16 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         const state = store.get()
         if (event.key === "Enter") return api.internal.commitText(event)
         if (event.ctrlKey || event.metaKey) return
-        const arrow = event.key === "ArrowUp" ? 1 : event.key === "ArrowDown" ? -1 : 0
-        const page = event.key === "PageUp" ? 1 : event.key === "PageDown" ? -1 : 0
-        if (arrow || (page && !event.altKey)) {
+        // Left and Right move the caret, and Alt leaves Page Up, Page Down, Home and End to it too.
+        const move = stepFromKey(event, { arrows: "vertical" })
+        if (!move || (event.altKey && !event.key.startsWith("Arrow"))) return
+        if (!("bound" in move)) {
           event.preventDefault()
-          return arrow
-            ? stepBy(arrow, stepSize(event), "step-key", event)
-            : stepBy(page, "large", "step-key", event)
+          return stepBy(move.direction, move.size, "step-key", event)
         }
-        if (event.altKey) return
         // Home and End go to a bound only when there is one. Otherwise they move the caret.
-        const bound =
-          event.key === "Home" ? state.min : event.key === "End" ? maxOnGrid(rangeOf(state)) : undefined
-        if (bound === undefined || !Number.isFinite(bound) || isLocked(state)) return
+        const bound = move.bound === "min" ? state.min : maxOnGrid(rangeOf(state))
+        if (!Number.isFinite(bound) || isLocked(state)) return
         event.preventDefault()
         setValue(bound, "step-key", event)
         showValue()

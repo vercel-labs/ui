@@ -10,6 +10,7 @@ import { defineComponent, inject, provide, type InjectionKey, type PropType } fr
 import { useFieldControl } from "./field-context"
 import { createParts, withElement } from "./create-parts"
 import { optionalBoolean, orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 // What the control takes from its root: the field it joins, and the value it shows.
 type ControlContext = {
@@ -54,7 +55,7 @@ const PasswordInput = withElement(
       visibleChange: (_visible: boolean, _details: ChangeDetails<PasswordInputVisibleChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof passwordInputPrimitive, "root">,
-    setup(props, { emit }) {
+    setup(props, { attrs, emit }) {
       const field = useFieldControl()
       const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
@@ -66,7 +67,7 @@ const PasswordInput = withElement(
         form: props.form,
         required: props.required,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         controller: props.controller,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.

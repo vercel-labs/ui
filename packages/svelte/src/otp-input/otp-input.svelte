@@ -15,6 +15,7 @@ and the `aria-*` naming attributes go to that input.
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
   import { inputAttributes } from "./context"
 
@@ -57,7 +58,7 @@ and the `aria-*` naming attributes go to that input.
     textAlign,
     autoComplete,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     required,
     name: name ?? field?.name(),
     form,

@@ -52,6 +52,42 @@ test.describe("selection", () => {
     await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
+
+  test("without a default value, the first render already selects the first enabled tab", async ({
+    page,
+    open,
+  }) => {
+    await page.addInitScript(() => {
+      const changes: string[] = []
+      ;(window as unknown as { __tabChanges: string[] }).__tabChanges = changes
+      new MutationObserver((records) => {
+        for (const record of records) {
+          const el = record.target as Element
+          const role = el.getAttribute("role")
+          // An attribute set for the first time is the first render's, like a custom element's.
+          if (
+            record.type === "attributes" &&
+            record.oldValue !== null &&
+            (role === "tab" || role === "tabpanel")
+          )
+            changes.push(`${el.textContent?.trim()} ${record.attributeName} was ${record.oldValue}`)
+          for (const node of record.addedNodes)
+            if (node instanceof Element && node.getAttribute("role") === "tabpanel")
+              changes.push(`${node.textContent?.trim()} added`)
+        }
+      }).observe(document, {
+        subtree: true,
+        childList: true,
+        attributeOldValue: true,
+        attributeFilter: ["aria-selected", "hidden"],
+      })
+    })
+    await open("tabs", { default: "none" })
+    await expect(panelNamed(page, "Account")).toBeVisible()
+    expect(await page.evaluate(() => (window as unknown as { __tabChanges: string[] }).__tabChanges)).toEqual(
+      [],
+    )
+  })
 })
 
 test.describe("keyboard navigation", () => {

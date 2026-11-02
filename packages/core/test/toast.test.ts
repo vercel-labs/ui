@@ -231,6 +231,28 @@ describe("timers", () => {
     expect(expired).toEqual(["a"])
   })
 
+  test("a canceled timeout counts the full duration again, and a pause only pauses it", () => {
+    const expired: string[] = []
+    let cancel = true
+    const timers = createToastTimers((id) => {
+      expired.push(id)
+      return !cancel
+    })
+    timers.update([shown("a", 1000)], new Set(["a"]))
+    vi.advanceTimersByTime(1000)
+    expect(expired).toEqual(["a"])
+    expect(timers.remaining("a")).toBe(1000)
+    cancel = false
+    vi.advanceTimersByTime(400)
+    timers.pause("item-hover")
+    timers.resume("item-hover")
+    expect(expired).toEqual(["a"])
+    vi.advanceTimersByTime(599)
+    expect(expired).toEqual(["a"])
+    vi.advanceTimersByTime(1)
+    expect(expired).toEqual(["a", "a"])
+  })
+
   test("a duration changed from Infinity to a number starts counting", () => {
     const expired: string[] = []
     const timers = createToastTimers((id) => expired.push(id))

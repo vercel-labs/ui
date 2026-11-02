@@ -92,6 +92,14 @@ test("while a menu is open, pointing at another trigger opens its menu instead",
   await expectFocus(page, "Show bookmarks")
 })
 
+test("while a menu is open, pointing at a disabled trigger closes it and opens nothing", async ({ page }) => {
+  await trigger(page, "File").click()
+  await expect(menuNamed(page, "File")).toBeVisible()
+  await trigger(page, "Help").hover()
+  await expect(page.getByRole("menu")).toHaveCount(0)
+  await expectFocus(page, "Help")
+})
+
 test("pointing at a trigger while every menu is closed opens nothing", async ({ page }) => {
   await trigger(page, "File").hover()
   await trigger(page, "Edit").hover()

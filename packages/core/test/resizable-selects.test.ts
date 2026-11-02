@@ -64,7 +64,10 @@ describe("resizable panels and handles select on what they show", () => {
     const { api } = instance
     const { doc, hover, leave } = fakeDocument()
     const unbind = [0, 1, 2].map((index) =>
-      api.internal.bindHandle(handleElement(index, (index + 1) * 250, doc), `h${index}`),
+      api.internal.bindHandle(
+        handleElement(index, (index + 1) * 250, doc),
+        instance.part("handle", { id: `h${index}` }),
+      ),
     )
     // Binding reads the page's panels a microtask later. There are none, so
     // the test sets them after.
@@ -131,7 +134,10 @@ describe("resizable panels and handles select on what they show", () => {
     const instance = resizable({ id: "g" })
     const { doc, hover } = fakeDocument()
     const unbind = [0, 1].map((index) =>
-      instance.api.internal.bindHandle(handleElement(index, (index + 1) * 300, doc), `h${index}`),
+      instance.api.internal.bindHandle(
+        handleElement(index, (index + 1) * 300, doc),
+        instance.part("handle", { id: `h${index}` }),
+      ),
     )
     await Promise.resolve()
     group({ id: "g" }, 3, instance)

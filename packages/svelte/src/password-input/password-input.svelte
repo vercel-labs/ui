@@ -15,6 +15,7 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
   import { setContext } from "svelte"
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
   import { PasswordInputKey, type PasswordInputContext } from "./context"
 
@@ -59,7 +60,7 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
     form,
     required,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     controller,
     debug,
     // The callbacks run first, so canceling there also keeps a bound value as it was.

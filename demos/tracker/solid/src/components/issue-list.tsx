@@ -164,38 +164,38 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
             }
           >
             <ul class="@container">
-              <For each={rows()}>
+              <For each={rows()} keyed={(issue) => issue.id}>
                 {(issue) => (
                   <li
-                    data-current={issue.id === props.query.issue || undefined}
+                    data-current={issue().id === props.query.issue || undefined}
                     class="flex h-11 items-center gap-3 border-b border-border ps-4 pe-2 transition-colors hover:bg-muted/50 has-data-checked:bg-muted/70 data-current:bg-muted"
                   >
-                    <Checkbox value={issue.id} aria-label={`Select ${issue.id}`} />
-                    <PriorityIcon priority={issue.priority} label />
+                    <Checkbox value={issue().id} aria-label={`Select ${issue().id}`} />
+                    <PriorityIcon priority={issue().priority} label />
                     <span class="hidden w-12 shrink-0 text-xs text-muted-foreground tabular-nums @md:block">
-                      {issue.id}
+                      {issue().id}
                     </span>
-                    <StatusIcon status={issue.status} label />
+                    <StatusIcon status={issue().status} label />
                     <a
-                      href={href(props.query, { issue: issue.id })}
+                      href={href(props.query, { issue: issue().id })}
                       noscroll
                       class="min-w-0 flex-1 truncate rounded-md font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
                     >
-                      {issue.title}
+                      {issue().title}
                     </a>
-                    <IssueLabels labels={issue.labels} class="hidden shrink-0 gap-1 @3xl:flex" />
-                    <Show when={issue.due}>
+                    <IssueLabels labels={issue().labels} class="hidden shrink-0 gap-1 @3xl:flex" />
+                    <Show when={issue().due}>
                       {(due) => (
                         <span class="hidden w-12 shrink-0 text-end text-xs text-muted-foreground @lg:block">
                           {formatDate(due())}
                         </span>
                       )}
                     </Show>
-                    <Assignee id={issue.assignee} />
+                    <Assignee id={issue().assignee} />
                     <MenuTrigger
                       controller={menu}
-                      payload={issue}
-                      aria-label={`Actions for ${issue.id}`}
+                      payload={issue()}
+                      aria-label={`Actions for ${issue().id}`}
                       class={buttonVariants({ size: "icon-sm", variant: "ghost" })}
                     >
                       <Ellipsis aria-hidden="true" />

@@ -5,7 +5,7 @@ const url = "/docs/core/text"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
-  await expect(page.locator("[data-example]")).toHaveCount(7)
+  await expect(page.locator("[data-example]")).toHaveCount(8)
   expect(errors).toEqual([])
 })
 
@@ -128,4 +128,36 @@ test("tags from elsewhere: a POSIX tag is repaired, and something else falls bac
   await expect(page.locator("[data-date]")).toHaveText("21. Oktober 2026")
   await tag.fill("zz-123-!")
   await expect(page.locator("[data-locale]")).toHaveText("Not a language tag")
+})
+
+test("search as you type: results wait for the input method to commit, unless the waiting is off", async ({
+  page,
+}) => {
+  await openExamples(page, "/docs/core/text")
+  const field = page.getByRole("searchbox", { name: "Filter" })
+  const results = page.getByRole("status").filter({ hasText: /Results for|Type to see results/ })
+  await field.scrollIntoViewIfNeeded()
+  // A step of a composition: the field's value changes, with an input event marked composing.
+  const compose = (value: string, type = "input") =>
+    field.evaluate(
+      (el, { value, type }) => {
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(el, value)
+        el.dispatchEvent(
+          type === "input"
+            ? new InputEvent("input", { bubbles: true, isComposing: true, data: value })
+            : new CompositionEvent("compositionend", { bubbles: true, data: value }),
+        )
+      },
+      { value, type },
+    )
+  await compose("にh")
+  await compose("にほn")
+  await expect(results).toHaveText("Type to see results")
+  await compose("日本", "compositionend")
+  await expect(results).toHaveText("Results for “日本”")
+  await page.getByRole("checkbox", { name: "Wait for the input method" }).uncheck()
+  await compose("日本ご")
+  await expect(results).toHaveText("Results for “日本ご”")
+  await field.fill("tokyo")
+  await expect(results).toHaveText("Results for “tokyo”")
 })

@@ -19,6 +19,7 @@ import { CalendarKey, GridKey } from "./calendar-context"
 import { slotContent } from "./children"
 import { withElement } from "./create-parts"
 import { optionalBoolean, orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 function useCalendar(part: string) {
   const context = inject(CalendarKey)
@@ -82,7 +83,7 @@ const Calendar = withElement(
       anchorChange: (_anchor: ISODate | null, _details: ChangeDetails<CalendarAnchorChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof calendarPrimitive, "root">,
-    setup(props, { slots, emit }) {
+    setup(props, { slots, attrs, emit }) {
       const calendar = usePrimitive(calendarPrimitive, () => ({
         mode: props.mode,
         value: orModel(props.value, props.modelValue),
@@ -93,7 +94,7 @@ const Calendar = withElement(
         max: props.max,
         unavailable: props.unavailable,
         disabled: props.disabled,
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         deselectable: props.deselectable,
         onFocusedChange: (date: ISODate, details: ChangeDetails<CalendarFocusedChangeReason>) =>
           emit("focusedChange", date, details),

@@ -27,6 +27,12 @@ describe("safe area", () => {
     expect(area.contains({ x: 195, y: 400 }, () => {})).toBe(false)
   })
 
+  test("moves straight down from a trigger next to the submenu are not", () => {
+    const area = createSafeArea()
+    area.start({ x: 195, y: 120 }, submenu)
+    expect(area.contains({ x: 195, y: 130 }, () => {})).toBe(false)
+  })
+
   test("resting inside the triangle expires the protection", () => {
     vi.useFakeTimers()
     const area = createSafeArea({ restTimeout: 300 })

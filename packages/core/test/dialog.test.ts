@@ -256,7 +256,7 @@ describe("typed results", () => {
     expect(await result).toEqual({ reason: "unmount", source: "programmatic" })
     expect(changes).toEqual(["imperative"])
     // The controller lets go of the instance that left.
-    expect(controller.isOpen).toBeUndefined()
+    expect("isOpen" in controller).toBe(false)
   })
 
   test("leaving the page keeps a controller another instance attached to since", () => {

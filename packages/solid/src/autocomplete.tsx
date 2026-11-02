@@ -120,7 +120,7 @@ const AutocompleteLabel = parts.Label
  * @stable
  */
 function AutocompleteInput(
-  props: Omit<PartProps<"input", AutocompleteInputState>, "value" | "defaultValue" | "children">,
+  props: Omit<PartProps<"input", AutocompleteInputState>, "value" | "defaultValue" | "children" | "readonly">,
 ) {
   const autocomplete = useAutocomplete()
   const input = joinField(useFieldControl(props), props, "input")

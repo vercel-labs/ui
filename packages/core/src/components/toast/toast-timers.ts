@@ -14,6 +14,7 @@ type ToastPauseReason = "item-hover" | "focus-in" | "window-blur" | "page-hide" 
 type Countdown = {
   // Which update of the toast it counts for. An update restarts it.
   version: number
+  duration: number
   remaining: number
   // When it last started running, or undefined while it waits.
   startedAt?: number
@@ -29,7 +30,7 @@ type TimedToast = {
   held: boolean
 }
 
-function createToastTimers(expire: (id: string) => void, now = () => Date.now()) {
+function createToastTimers(expire: (id: string) => unknown, now = () => Date.now()) {
   const countdowns = new Map<string, Countdown>()
   const reasons = new Set<string>()
   let shown: readonly TimedToast[] = []
@@ -50,7 +51,11 @@ function createToastTimers(expire: (id: string) => void, now = () => Date.now())
         countdown.startedAt = undefined
         countdown.timer = undefined
         countdown.remaining = 0
-        expire(id)
+        // An `onDismiss` that cancels the close starts a new countdown, so the toast tries again later.
+        if (expire(id) === false && countdowns.get(id) === countdown) {
+          countdown.remaining = countdown.duration
+          apply()
+        }
       },
       Math.max(0, countdown.remaining),
     )
@@ -66,7 +71,7 @@ function createToastTimers(expire: (id: string) => void, now = () => Date.now())
       let countdown = countdowns.get(toast.id)
       if (!countdown || countdown.version !== toast.version) {
         if (countdown) stop(countdown)
-        countdown = { version: toast.version, remaining: toast.duration }
+        countdown = { version: toast.version, duration: toast.duration, remaining: toast.duration }
         countdowns.set(toast.id, countdown)
       }
       if (reasons.size || toast.held) stop(countdown)
