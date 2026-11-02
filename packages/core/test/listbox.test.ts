@@ -189,6 +189,37 @@ describe("navigation over data", () => {
     expect(store.get().highlighted).toBe(null)
   })
 
+  test("with skipDisabled, the last enabled item counts as the end of the page", () => {
+    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    let reached = 0
+    const listbox = createListbox({
+      store,
+      focus: "virtual",
+      items: () => [
+        { value: "a", label: "A" },
+        { value: "b", label: "B" },
+        { value: "c", label: "C", disabled: true },
+      ],
+      toKey: (value) => itemKey(value),
+      filter: () => "contains",
+      query: () => "",
+      loop: () => false,
+      skipDisabled: true,
+      active: () => true,
+      onLastReached: () => reached++,
+    })
+    listbox.move("last")
+    expect(store.get().highlighted).toBe("b")
+    expect(reached).toBe(1)
+  })
+
+  test("a page step wraps in a list shorter than the page", () => {
+    const { store, listbox } = make(true, "", true)
+    listbox.move(1)
+    listbox.move(-10)
+    expect(store.get().highlighted).not.toBe(null)
+  })
+
   test("typeahead skips disabled items", () => {
     const { listbox } = make()
     expect(listbox.search("c", null)).toBeUndefined()

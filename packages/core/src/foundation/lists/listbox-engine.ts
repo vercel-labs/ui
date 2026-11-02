@@ -458,7 +458,10 @@ function createListboxEngine(
     const list = entries()
     const index = key === null ? -1 : list.findIndex((entry) => entry.key === key)
     config.onHighlight?.(key, index, event)
-    if (index !== -1 && index === list.length - 1) config.onLastReached?.()
+    // Skipped items at the end can't be reached, so the last one left counts.
+    let last = list.length - 1
+    if (config.skipDisabled) while (last > 0 && disabled(list[last])) last--
+    if (index !== -1 && index === last) config.onLastReached?.()
     if (key === null) return
     const el = registry.get(key)?.el
     if (el?.isConnected) reveal(el, focus)
