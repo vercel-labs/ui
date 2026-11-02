@@ -128,7 +128,7 @@ function createRovingFocus<State extends object, Props = any>(
   let remembered: string | null = null
   // An item focus is moving to that hasn't bound yet, and the element focus
   // left, so focus only follows if nothing else took it in between.
-  let pending: { key: string; from: Element | null } | null = null
+  let pending: { key: string; from: Element | null; left?: boolean } | null = null
   // The item element that has focus, which keeps it until it blurs.
   let holder: HTMLElement | null = null
 
@@ -234,10 +234,10 @@ function createRovingFocus<State extends object, Props = any>(
     bind(el: HTMLElement, part: RovingFocusItem<Props>) {
       const leave = order.add({ key: part.key, el, part })
       // The same element joining again under a new key, like an item whose
-      // value changed while it had focus, keeps the stop it had.
-      if (pending?.from === el) {
+      // value changed while it had focus, keeps the stop it had and takes focus back.
+      if (pending?.left && pending.from === el) {
         const was = pending.key
-        pending = null
+        pending.key = part.key
         if (remembered === was) remembered = part.key
         if (store.get()[key] === was) store.set({ [key]: part.key } as Partial<State>)
         if (el.ownerDocument.activeElement === el) holder = el
@@ -275,7 +275,7 @@ function createRovingFocus<State extends object, Props = any>(
         // card an undo moves to another column: focus follows it there if it
         // binds by the next task, unless a move already sends focus elsewhere.
         if (had && !pending && store.get()[key] === part.key) {
-          const wait = (pending = { key: part.key, from: el })
+          const wait = (pending = { key: part.key, from: el, left: true })
           setTimeout(() => {
             if (pending !== wait) return
             pending = null
