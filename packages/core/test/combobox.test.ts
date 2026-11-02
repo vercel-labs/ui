@@ -54,6 +54,22 @@ describe("combobox headless", () => {
     expect(instance.api.getQuery()).toBe("Astro")
   })
 
+  test("Escape after deleting the text brings the value back with the reason escape-key", () => {
+    const reasons: string[] = []
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+      onValueChange: (_value, details) => reasons.push(details.reason),
+    })
+    instance.api.internal.typed("")
+    expect(instance.api.getValue()).toBe(null)
+    instance.api.internal.hide({ reason: "escape-key" })
+    expect(instance.api.getValue()).toBe("astro")
+    expect(instance.api.getQuery()).toBe("Astro")
+    expect(reasons).toEqual(["input-change", "escape-key"])
+  })
+
   test("clearing with nothing selected still empties the text", () => {
     const instance = combobox({ id: "c", items: frameworks })
     instance.api.setQuery("ne")

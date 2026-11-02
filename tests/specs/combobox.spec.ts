@@ -180,6 +180,27 @@ test.describe("closing", () => {
     await expect(input(page)).toBeFocused()
   })
 
+  test("Escape after deleting the text brings back the value and its label", async ({ page, open }) => {
+    await open("combobox", { value: "fr" })
+    await input(page).fill("")
+    await expect(listbox(page)).toBeVisible()
+    expect(await lastAction(page)).toBe("value:null")
+    await page.keyboard.press("Escape")
+    await expect(listbox(page)).toBeHidden()
+    await expect(input(page)).toHaveValue("France")
+    expect(await lastAction(page)).toBe("value:fr")
+  })
+
+  test("leaving after deleting the text keeps the value empty", async ({ page, open, tab }) => {
+    await open("combobox", { value: "fr" })
+    await input(page).fill("")
+    await expect(listbox(page)).toBeVisible()
+    await tab()
+    await expect(listbox(page)).toBeHidden()
+    await expect(input(page)).toHaveValue("")
+    expect(await lastAction(page)).toBe("value:null")
+  })
+
   test("clicking outside closes the list", async ({ page }) => {
     await input(page).fill("a")
     await expect(listbox(page)).toBeVisible()
