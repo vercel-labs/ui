@@ -817,3 +817,20 @@ test("an item the owner removes mid-drag stays removed when the drag drops", asy
   expect(onValueChange).toHaveBeenCalledTimes(1)
   expect(onValueChange.mock.calls[0][0]).toEqual(["b", "a", "c"])
 })
+
+// React renders a controlled value before it hands it over.
+test("an item the owner removes mid-drag stays removed when the value renders before it lands", async () => {
+  const onValueChange = vi.fn()
+  const { instance, list, els } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  stackRects(list)
+  await tick()
+  pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
+  pointer("pointermove", { x: 10, y: 65 })
+  await frame()
+  const next = { value: ["a", "b", "c"], onValueChange }
+  instance.preview({ ...next, id: instance.id })
+  instance.setOptions(next)
+  pointer("pointerup", { x: 10, y: 65 })
+  expect(onValueChange).toHaveBeenCalledTimes(1)
+  expect(onValueChange.mock.calls[0][0]).toEqual(["b", "a", "c"])
+})

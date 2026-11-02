@@ -210,12 +210,10 @@ function createReorder<State extends object, Props = any>(
 
   // The owner can change the value mid-drag, like deleting an item elsewhere.
   // The draft keeps its moves over the items the value has now.
-  let followed: unknown
   deriveState(context, [options.draft], (state) => {
     const current = state[options.draft] as ReorderDraft | null
     const now = state[options.key] as string[]
-    if (!current || now === followed) return
-    followed = now
+    if (!current) return
     const present = new Set(now)
     const kept = current.order.filter((key) => present.has(key))
     if (kept.length === current.order.length && kept.length === now.length) return
@@ -247,7 +245,6 @@ function createReorder<State extends object, Props = any>(
     const keys = current.filter((k) => k === key || (group.has(k) && !isDisabled(k)))
     const before = current.slice(0, current.indexOf(key)).filter((k) => !keys.includes(k)).length
     const order = keys.length > 1 ? movedTo(current, keys, before) : [...current]
-    followed = current
     setDraft({ key, keys, order, pointer })
     say("grab", key, order, keys.length)
     if (!pointer && keys.length > 1) focusLater(key)
