@@ -165,7 +165,7 @@ const ComboboxLabel = parts.Label
  * @stable
  */
 function ComboboxInput(
-  props: Omit<PartProps<"input", ComboboxInputState>, "value" | "defaultValue" | "children">,
+  props: Omit<PartProps<"input", ComboboxInputState>, "value" | "defaultValue" | "children" | "readonly">,
 ) {
   const combobox = useCombobox()
   const input = joinField(useFieldControl(props), props, "input")

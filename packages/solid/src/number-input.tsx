@@ -118,7 +118,7 @@ const NumberInputGroup = parts.Group
  * @stable
  */
 function NumberInputControl(
-  props: Omit<PartProps<"input", NumberInputState>, "value" | "defaultValue" | "children">,
+  props: Omit<PartProps<"input", NumberInputState>, "value" | "defaultValue" | "children" | "readonly">,
 ) {
   const numberInput = useNumberInput("NumberInputControl")
   return usePart(
