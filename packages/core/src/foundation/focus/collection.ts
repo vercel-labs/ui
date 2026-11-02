@@ -75,7 +75,7 @@ function moveIndex(index: number, step: number | "first" | "last", count: number
   if (step === "first") return 0
   if (step === "last") return count - 1
   const next = index + step
-  if (loop) return (next + count) % count
+  if (loop) return ((next % count) + count) % count
   return Math.max(0, Math.min(count - 1, next))
 }
 

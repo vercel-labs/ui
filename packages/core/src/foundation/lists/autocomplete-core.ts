@@ -124,6 +124,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
     rank: () => config.filter() === "fuzzy" || typeof config.filter() === "function",
     query: config.query,
     loop: () => options().loop ?? true,
+    skipDisabled: true,
     active: () => store.get().open,
     onHighlight: config.onHighlight,
     onLastReached: loadMore.reached,
@@ -176,7 +177,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
       return true
     }
     event.preventDefault()
-    const key = listbox.stepKey(step, { skipDisabled: true })
+    const key = listbox.stepKey(step)
     if (key !== undefined) config.highlight(key, { reason: "list-navigation", event })
     return true
   }

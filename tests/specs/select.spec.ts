@@ -91,14 +91,13 @@ test.describe("keyboard in the list", () => {
     await expect(option(page, "Apple")).toBeFocused()
   })
 
-  test("disabled items can be focused but not chosen", async ({ page }) => {
+  test("arrow keys skip disabled items", async ({ page }) => {
     await openWithKeyboard(page)
     for (let step = 0; step < 4; step++) await page.keyboard.press("ArrowDown")
-    await expect(option(page, "Grape")).toBeFocused()
+    await expect(option(page, "Lemon")).toBeFocused()
     await expect(option(page, "Grape")).toHaveAttribute("aria-disabled", "true")
-    await page.keyboard.press("Enter")
-    await expect(listbox(page)).toBeVisible()
-    await expect(trigger(page)).toContainText("Pick a fruit")
+    await page.keyboard.press("ArrowUp")
+    await expect(option(page, "Cherry")).toBeFocused()
   })
 
   test("typing focuses the next item that starts with the text", async ({ page }) => {
@@ -190,6 +189,16 @@ test.describe("pointer", () => {
     await expect(trigger(page)).toContainText("Pick a fruit")
   })
 
+  test("moving over a disabled item leaves the highlight where it was", async ({ page }) => {
+    await trigger(page).click()
+    await waitForStill(listbox(page))
+    await option(page, "Cherry").hover()
+    await expect(option(page, "Cherry")).toHaveAttribute("data-highlighted", "")
+    await option(page, "Grape").hover({ force: true })
+    await expect(option(page, "Cherry")).toHaveAttribute("data-highlighted", "")
+    await expect(option(page, "Grape")).not.toHaveAttribute("data-highlighted", "")
+  })
+
   test("clicking outside closes without choosing", async ({ page }) => {
     await trigger(page).click()
     await expect(listbox(page)).toBeVisible()
@@ -237,6 +246,17 @@ test.describe("pointer", () => {
 })
 
 test.describe("value", () => {
+  test("a disabled value stays in the trigger, and the list opens on the first enabled item", async ({
+    page,
+    open,
+  }) => {
+    await open("select", { value: "grape" })
+    await expect(trigger(page)).toContainText("Grape")
+    await openWithKeyboard(page)
+    await expect(option(page, "Apple")).toBeFocused()
+    await expect(option(page, "Grape")).toHaveAttribute("aria-selected", "true")
+  })
+
   test("a default value shows its label and is selected", async ({ page, open }) => {
     await open("select", { value: "banana" })
     await expect(trigger(page)).toContainText("Banana")

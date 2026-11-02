@@ -22,7 +22,7 @@ type ListItem<T = string> = {
   label: string
   /** More words filtering matches, like `["team"]` for a plan called Pro. */
   keywords?: string[]
-  /** Keeps the item from being chosen. Arrow keys still highlight it, as the listbox pattern asks, except in Command and Autocomplete, which skip it. */
+  /** Keeps the item from being chosen. The keyboard skips it, like in a native select. */
   disabled?: boolean
 }
 
@@ -221,6 +221,8 @@ function createListboxEngine(
     // Whether data items are sorted by how well they match, best first.
     rank?: () => boolean
     loop: () => boolean
+    // Whether keys pass over items that can't be chosen, like a native select.
+    skipDisabled?: boolean
     // Whether highlighting may move focus now, like while the popup is open.
     active: () => boolean
     // An item can't be chosen for a reason beyond its own, like a full multiple selection.
@@ -456,28 +458,33 @@ function createListboxEngine(
     const list = entries()
     const index = key === null ? -1 : list.findIndex((entry) => entry.key === key)
     config.onHighlight?.(key, index, event)
-    if (index !== -1 && index === list.length - 1) config.onLastReached?.()
+    // Skipped items at the end can't be reached, so the last one left counts.
+    let last = list.length - 1
+    if (config.skipDisabled) while (last > 0 && disabled(list[last])) last--
+    if (index !== -1 && index === last) config.onLastReached?.()
     if (key === null) return
     const el = registry.get(key)?.el
     if (el?.isConnected) reveal(el, focus)
   }
 
   // The key a step from the highlight lands on, or the first or last item's,
-  // without moving there. Undefined for an empty list. Lists like a command
-  // palette's skip items that can't be chosen.
-  function stepKey(step: number | "first" | "last", { skipDisabled = false } = {}) {
-    const list = skipDisabled ? entries().filter((entry) => !disabled(entry)) : entries()
+  // without moving there. Undefined for an empty list, or one where nothing
+  // can be chosen while it skips those items.
+  function stepKey(step: number | "first" | "last", { loop = config.loop() } = {}) {
+    const all = entries()
+    const list = config.skipDisabled ? all.filter((entry) => !disabled(entry)) : all
     if (!list.length) return undefined
     const current = store.get().highlighted
     const index = list.findIndex((entry) => entry.key === current)
+    if (index !== -1 || typeof step !== "number") return list[moveIndex(index, step, list.length, loop)].key
+    // From a skipped item, like one a press focused, a step counts from where it sits.
+    const skipped = all.findIndex((entry) => entry.key === current)
+    if (skipped !== -1) {
+      const before = all.slice(0, skipped).filter((entry) => !disabled(entry)).length
+      return list[moveIndex(step > 0 ? before - 1 : before, step, list.length, loop)].key
+    }
     // From no highlight, a step forward lands on the first item and a step back on the last.
-    const next =
-      index === -1 && typeof step === "number"
-        ? step > 0
-          ? 0
-          : list.length - 1
-        : moveIndex(index, step, list.length, config.loop())
-    return list[next].key
+    return list[step > 0 ? 0 : list.length - 1].key
   }
 
   function move(step: number | "first" | "last", event?: Event) {
@@ -580,6 +587,11 @@ function createListboxEngine(
     dataItems: () => data()?.flat,
     find,
     disabled,
+    // Whether an item can't be chosen, by itself or by `blocked`.
+    isItemDisabled(key: string) {
+      const entry = find(key)
+      return !!entry && disabled(entry)
+    },
     highlight,
     move,
     stepKey,

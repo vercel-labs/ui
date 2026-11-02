@@ -114,6 +114,8 @@ function comboboxOptions() {
     long: params.has("long"),
     fieldset: params.has("fieldset"),
     late: params.has("late"),
+    // ?cancel=br cancels the value changes that select Brazil.
+    cancel: params.get("cancel"),
     // ?labels-from-items leaves out `itemToLabel`, so only the items know the labels.
     labelsFromItems: params.has("labels-from-items"),
     ...(container && { container: document.getElementById(container) }),
@@ -121,6 +123,10 @@ function comboboxOptions() {
     ...(params.get("modal") === "false" && { modal: false as const }),
     ...presentationOption(),
   }
+}
+
+function cancelsValue(value: unknown, cancel: string | null) {
+  return cancel !== null && [value].flat().includes(cancel)
 }
 
 // A fake server: countries whose label contains the text, after 150ms.
@@ -164,4 +170,12 @@ const changedItems = {
   ],
 }
 
-export { changedItems, comboboxFixture, comboboxOptions, createDelay, searchCountries, searchCountryPages }
+export {
+  cancelsValue,
+  changedItems,
+  comboboxFixture,
+  comboboxOptions,
+  createDelay,
+  searchCountries,
+  searchCountryPages,
+}

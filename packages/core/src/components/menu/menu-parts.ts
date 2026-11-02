@@ -236,6 +236,12 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       if (!parentMenu) {
         cleanups.push(bindItemShortcuts(store, el, api.runAction), () => {
           if (store.get().trigger === key && !store.get().open) store.set({ trigger: null })
+          // The trigger that opened the menu left, like a row a filter hid, so nothing updates its
+          // payload anymore. A task later, so a rebind an adapter queues as a microtask lands first.
+          setTimeout(() => {
+            if (store.get().trigger === key && api.isOpen() && api.popupElement() && !api.triggerElement())
+              api.hide({ reason: "imperative" })
+          })
         })
       }
       return () => cleanups.forEach((cleanup) => cleanup())

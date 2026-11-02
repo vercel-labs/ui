@@ -3,6 +3,7 @@
 // a character starts over with it, like a spreadsheet; Enter or leaving
 // saves, Escape puts the text back, and focus goes back to where editing
 // started either way.
+import { isComposing } from "../kernel/events"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 
 /**
@@ -128,7 +129,7 @@ function createInlineEdit<State extends object>(
     },
     /** Handles a key in the input: Enter and Tab save, Escape puts the text back. Returns whether it handled the key. */
     inputKeydown(event: KeyboardEvent) {
-      if (event.isComposing) return false
+      if (isComposing(event)) return false
       if (event.key === "Enter" && !(event.target instanceof HTMLTextAreaElement && event.shiftKey)) {
         event.preventDefault()
         return api.end("enter-key", event)

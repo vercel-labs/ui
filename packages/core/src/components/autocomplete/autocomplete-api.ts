@@ -412,7 +412,7 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
         }
         // Typing that opened the list highlights its best match, arrow keys the first or last.
         if (target === "first" && store.get().query) core.settle(true, null)
-        else if (target) core.listbox.highlight(core.listbox.stepKey(target, { skipDisabled: true }) ?? null)
+        else if (target) core.listbox.highlight(core.listbox.stepKey(target) ?? null)
         // In a sheet the field moved into its header, and loses focus on the
         // way if the sheet showed later. It takes focus back here.
         return store.get().presentation === "sheet" ? inputElement() : undefined

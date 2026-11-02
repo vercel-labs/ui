@@ -3,7 +3,7 @@
 // bind them. They're free functions, so each adapter bundles only the ones it
 // calls.
 import { dev, warn } from "#dev"
-import { on } from "./events"
+import { isComposing, on } from "./events"
 import type { AnySlot, Attrs, EventMap, Part } from "./primitive-types"
 import { eachMoved } from "./selects"
 import { renders, sameValue, subscribeSkipping, touch, type Listener } from "./store"
@@ -526,10 +526,7 @@ function rename(part: PartRecord, id: string | null | undefined) {
 // Keys an input method owns while it composes text, like Enter confirming a
 // Japanese candidate. Components never act on them.
 function composing(event: Event) {
-  return (
-    (event.type === "keydown" || event.type === "keyup") &&
-    ((event as KeyboardEvent).isComposing || (event as KeyboardEvent).keyCode === 229)
-  )
+  return (event.type === "keydown" || event.type === "keyup") && isComposing(event as KeyboardEvent)
 }
 
 export {

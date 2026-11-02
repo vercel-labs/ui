@@ -56,7 +56,7 @@ Typing filters the options. Arrow keys move the highlight; Enter chooses it and 
 
 ### Clear Button
 
-`ComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. Clearing the text by hand also clears a single selection.
+`ComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. Clearing the text by hand also clears a single selection. Escape brings the selection back while the list is still open.
 
 <ComponentExample
   name="combobox/clear"
@@ -65,11 +65,11 @@ Typing filters the options. Arrow keys move the highlight; Enter chooses it and 
 
 ### Disabled
 
-A disabled combobox cannot be focused or changed and submits nothing. A read-only one remains focusable and submits its value, but does not open or accept changes. A disabled option can be highlighted but not chosen.
+A disabled combobox cannot be focused or changed and submits nothing. A read-only one remains focusable and submits its value, but does not open or accept changes. Keyboard navigation skips a disabled option, and it cannot be chosen.
 
 <ComponentExample
   name="combobox/disabled"
-  caption="Try the Disabled and Read-only fields, then open Disabled item. Denmark can be highlighted but cannot be chosen."
+  caption="Try the Disabled and Read-only fields, then open Disabled item. Arrow keys skip Denmark, which cannot be chosen."
 />
 
 ### Auto Highlight
@@ -320,7 +320,7 @@ The selection, text, and popup have separate values:
 | `query` | `onQueryChange`     | The input’s text.                              |
 | `open`  | `onOpenChange`      | Whether the popup is open.                     |
 
-Control only the values you need. Change callbacks include a reason and `details.cancel()` to reject the request. Choosing an item writes its label into the input; closing without choosing restores that label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
+Control only the values you need. Change callbacks include a reason and `details.cancel()` to reject the request. Choosing an item writes its label into the input, and a canceled choice keeps the current one. Closing without choosing restores the value’s label unless custom values are allowed. [State and Events](../state-and-events) covers the binding pattern.
 
 Focus leaving the input closes the popup with the reason `focus-out`, even when code moves it, like a notice that takes focus. To keep the popup open, cancel that close in `onOpenChange`.
 

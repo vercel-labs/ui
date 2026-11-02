@@ -192,6 +192,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
     rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
+    skipDisabled: true,
     active: () => store.get().open,
     onHighlight: (key, index, event) =>
       options().onHighlight?.(key === null || isSelectAll(key) ? null : (listbox.valueOf(key) ?? null), {
@@ -274,9 +275,10 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   }
 
   // Where focus goes once the list opens: the selected item, or the first or
-  // last. With a search field, focus goes there and the item is only highlighted.
+  // last that can be chosen. With a search field, focus goes there and the
+  // item is only highlighted.
   function initialFocus() {
-    const list = listbox.entries().filter((entry) => !entry.pinned)
+    const list = listbox.entries().filter((entry) => !entry.pinned && !listbox.disabled(entry))
     const selected = list.find((entry) => selection.isSelected(entry.key, entry.value))
     const target =
       pendingFocus === "last" ? list.at(-1) : pendingFocus === "first" ? list[0] : (selected ?? list[0])
@@ -438,7 +440,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       // The pointer highlights what it moves onto, focusing it unless focus stays in the search field.
       hover(key: string, event: PointerEvent) {
         const { open, highlighted } = store.get()
-        if (event.pointerType === "touch" || !open) return
+        if (event.pointerType === "touch" || !open || listbox.isItemDisabled(key)) return
         const el = listbox.element(key)
         const focused = searching() || el?.ownerDocument.activeElement === el
         if (highlighted !== key || !focused) listbox.highlight(key, { event })

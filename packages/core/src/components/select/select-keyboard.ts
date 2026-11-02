@@ -7,7 +7,7 @@ import { composedClosest, composedContains, isApple } from "../../foundation/pla
 import { type Listbox } from "../../foundation/lists/listbox"
 import { listStep } from "../../foundation/lists/listbox-keyboard"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
-import { on } from "../../foundation/kernel/events"
+import { isComposing, on } from "../../foundation/kernel/events"
 import type { Store } from "../../foundation/kernel/store"
 import type { SelectOpenChangeReason, SelectValueChangeReason } from "./select"
 import type { SelectState, Show } from "./select-api"
@@ -107,7 +107,7 @@ function createSelectKeyboard({
   // highlight. Typing filters instead of searching by first letters, and Home,
   // End and Space stay the field's, as the APG's combobox asks.
   function onSearchKeyDown(event: KeyboardEvent) {
-    if (event.isComposing) return
+    if (isComposing(event)) return
     const { highlighted } = store.get()
     if (event.altKey && event.key === "ArrowUp") return chooseAndClose(event)
     const step = selectStep(event, { field: true })

@@ -39,7 +39,14 @@ import { type DismissOptions } from "../../foundation/popups/dismissal"
  * @stable
  */
 type ComboboxValueChangeReason =
-  "item-press" | "input-change" | "clear-press" | "remove-press" | "reset" | "restore" | "imperative"
+  | "item-press"
+  | "input-change"
+  | "clear-press"
+  | "remove-press"
+  | "escape-key"
+  | "reset"
+  | "restore"
+  | "imperative"
 
 /**
  * Why a combobox's text wants to change. Closing the list puts back text nobody chose, with the reason it closed.
@@ -354,7 +361,7 @@ type ComboboxItemProps<T = string> = {
   label?: string
   /** More words filtering matches. */
   keywords?: string[]
-  /** Keeps the item from being chosen. It can still be highlighted, as the listbox pattern asks. Sets `data-disabled` and `aria-disabled`. */
+  /** Keeps the item from being chosen. The keyboard and the pointer skip it. Sets `data-disabled` and `aria-disabled`. */
   disabled?: boolean
   /** The item's position among all visible items, for virtualized lists that render only some. Sets `aria-posinset` and `aria-setsize`. */
   index?: number

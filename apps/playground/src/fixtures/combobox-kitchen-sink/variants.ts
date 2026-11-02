@@ -499,7 +499,7 @@ const variants: Variant[] = [
     id: "disabled-items",
     section: "Items",
     title: "Disabled items",
-    note: "Denmark can be highlighted, not chosen.",
+    note: "Arrow keys skip Denmark, and it can't be chosen.",
   },
   {
     id: "data",

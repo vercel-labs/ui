@@ -233,7 +233,7 @@ const variants: Variant[] = [
     id: "disabled",
     section: "Items",
     title: "Disabled items",
-    note: "They can be highlighted, not run.",
+    note: "Arrow keys skip them, and they can't run.",
     list: "disabled",
   },
   {

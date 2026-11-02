@@ -10,7 +10,7 @@ import {
   matchesShortcut,
 } from "../platform/platform"
 import { inPopupElement } from "../popups/popup-elements"
-import { on } from "../kernel/events"
+import { isComposing, on } from "../kernel/events"
 import { isShortcutAllowed, isTypingIn, shortcutOrder } from "./shortcut-order"
 
 /**
@@ -108,7 +108,7 @@ function createShortcuts() {
   }
 
   function onKeydown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.repeat || event.isComposing || event.keyCode === 229) return
+    if (event.defaultPrevented || event.repeat || isComposing(event)) return
     // Read only once some keys match, so typing that matches nothing allocates nothing.
     let context: { typing: boolean; blocking: number | undefined } | undefined
     let best: { entry: Entry; order: number } | undefined

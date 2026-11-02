@@ -16,6 +16,7 @@ An always-visible list to choose one option from, or several with `multiple`.
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
   import ValueInput from "../value-input.svelte"
   import ListboxItems from "./listbox-items.svelte"
@@ -102,7 +103,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     itemToValue,
     isItemEqualToValue,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     required,
     name: name ?? field?.name(),
     form,

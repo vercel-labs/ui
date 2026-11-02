@@ -183,7 +183,7 @@ test.describe("loading more", { tag: "@enhancement" }, () => {
     await expect.poll(() => optionTexts(page)).toEqual(["Argentina", "Australia", "Austria", "Brazil"])
     await page.keyboard.press("ArrowUp")
     await expect(listbox(page).getByRole("option")).toHaveCount(7)
-    for (let step = 0; step < 3; step++) await page.keyboard.press("ArrowDown")
+    for (let step = 0; step < 2; step++) await page.keyboard.press("ArrowDown")
     await expect(option(page, "Germany")).toHaveAttribute("data-highlighted", "")
     await expect(page.getByText("Loading more…")).toBeHidden()
     await expect(listbox(page).getByRole("option")).toHaveCount(7)

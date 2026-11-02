@@ -21,7 +21,7 @@ document.querySelector("#toggle-bold")!.addEventListener("click", () => toggle.a
 
 Controller methods run the same change events as user input, including cancellation. Each component lists its methods, such as `open()`, `close()`, `setValue()`, or `focus()`.
 
-You can also create a controller with the component's entry, such as `createPopoverController()` from `@ui-sdk/web/popover`, and assign it to a root's `controller` property.
+You can also create a controller with the component's entry, such as `createPopoverController()` from `@ui-sdk/web/popover`, and assign it to a root's `controller` property. Before the element connects, its methods do nothing and return `undefined`. Once it's in the page, they run right away.
 
 ## Share a Popup
 

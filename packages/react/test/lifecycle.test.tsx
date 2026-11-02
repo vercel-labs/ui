@@ -171,14 +171,14 @@ test("a primitive that binds no element lets its controller go while hidden, and
     root!.render(<Hideable mode="hidden">{<Lamp controller={controller} />}</Hideable>),
   )
   await wait(5)
-  expect(controller.switchOn).toBeUndefined()
+  expect("switchOn" in controller).toBe(false)
   await React.act(async () =>
     root!.render(<Hideable mode="visible">{<Lamp controller={controller} />}</Hideable>),
   )
   await React.act(async () => controller.switchOn())
   expect(view.textContent).toBe("on")
   await React.act(async () => root!.render(null))
-  expect(controller.switchOn).toBeUndefined()
+  expect("switchOn" in controller).toBe(false)
 })
 
 test("<Activity> hid and showed again keeps a field's shown errors", async () => {

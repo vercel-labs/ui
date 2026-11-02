@@ -23,7 +23,7 @@ import {
   type ChangeOptions,
   type CommitDetails,
 } from "../../foundation/kernel/details"
-import { on } from "../../foundation/kernel/events"
+import { isComposing, on } from "../../foundation/kernel/events"
 import type { PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
 import { changeSource, createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
@@ -401,7 +401,7 @@ function otpInputApi(
       on(el, "keydown", (event) => {
         if (event.key !== "Backspace" && event.key !== "Delete") afterDelete = false
         // An input method owns the keys while it composes, like arrows choosing a candidate.
-        if (event.isComposing || event.keyCode === 229) return
+        if (isComposing(event)) return
         if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return
         const { selection, maxLength } = store.get()
         const next = keySelection(event.key, selection, el.value.length, maxLength, isRTL(el))

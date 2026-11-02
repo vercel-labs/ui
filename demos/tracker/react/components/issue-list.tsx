@@ -57,6 +57,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
   const pageCount = Math.max(1, Math.ceil(issues.length / pageSize))
   const page = Math.min(query.page, pageCount)
   const rows = issues.slice((page - 1) * pageSize, page * pageSize)
+  const latest = (payload: Issue) => issues.find((issue) => issue.id === payload.id) ?? payload
   const checked = selected.filter((id) => rows.some((issue) => issue.id === id))
 
   function update(ids: string[], patch: IssuePatch, message?: string) {
@@ -242,7 +243,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     <MenuSubTrigger>Status</MenuSubTrigger>
                     <MenuSubContent>
                       <MenuRadioGroup
-                        value={payload.status}
+                        value={latest(payload).status}
                         onValueChange={(status) => setStatus([payload.id], status as Status)}
                       >
                         {statuses.map((status) => (
@@ -257,7 +258,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     <MenuSubTrigger>Priority</MenuSubTrigger>
                     <MenuSubContent>
                       <MenuRadioGroup
-                        value={payload.priority}
+                        value={latest(payload).priority}
                         onValueChange={(priority) => setPriority([payload.id], priority as Priority)}
                       >
                         {priorities.map((priority) => (

@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes).
 
 ## Settled
 
@@ -19,6 +19,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
 - **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
+- **`value` reads `null` for a microtask after append** while the first tab already shows as selected through the claim. It catches up once the tabs bind, in the same task.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -40,6 +41,8 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **`el.autoHighlight` reads `undefined` without the attribute**, not `false`, since its schema parses `"always"` and the boolean fallback no longer applies (PR 88).
 - **A popup mounted open and bound again later**, like by a late menubar's `rebind()`, still has `opener` `"initial"` and would take whatever has focus then as its opener (suspected, PR 87).
 - **An owner whose `id` is set or changed after it connects** isn't found by `for` parts, and renaming it away leaves them bound. A native label's `for` and `popovertarget` resolve at use time.
+- **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
+- **A value change restored by Escape has no `detail.event`**, like the `querychange` before it: a popup's close carries no event to `revertQuery`.
 
 ## Revisit
 

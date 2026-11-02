@@ -19,6 +19,7 @@ import { useFieldControl } from "./field-context"
 import { containerProp, renderPopup, sheetViewport, usePopupContainer, type PopupContainer } from "./popup"
 import { createParts, withElement } from "./create-parts"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 // Where the popup renders. Set on <DatePicker> or <DatePickerContent>.
 const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("date-picker-container")
@@ -90,7 +91,7 @@ const DatePicker = withElement(
       dismissAttempt: (_details: DismissAttemptDetails<DatePickerDismissReason>) => true,
     },
     slots: Object as PartSlots<typeof datePickerPrimitive, "root">,
-    setup(props, { slots, emit }) {
+    setup(props, { slots, attrs, emit }) {
       const field = useFieldControl()
       const picker = usePrimitive(datePickerPrimitive, () => ({
         mode: props.mode,
@@ -107,7 +108,7 @@ const DatePicker = withElement(
         max: props.max,
         unavailable: props.unavailable,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         months: props.months,
         pageBy: props.pageBy,
         locale: props.locale,

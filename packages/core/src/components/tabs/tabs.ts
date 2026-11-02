@@ -286,6 +286,15 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
     for (const listener of tabsChanged) listener()
   }
 
+  // Until tabs bind, like on the server, uncontrolled tabs with nothing
+  // selected show the tab that claims the stop as selected, which is the one
+  // `check` selects, so the first render already shows its panel.
+  function shows(state: TabsState, key: string) {
+    if (checked || state.value !== null || controlled()) return state.value === key
+    const tab = props<TabProps>("tab", key)
+    return !!tab && roving.tabIndex(state, { key, props: tab }) === "0"
+  }
+
   // Brings a tab selected without focus, like by a controller or the URL,
   // into view inside a scrolling list. The page itself never scrolls.
   function reveal(value: string | null) {
@@ -353,6 +362,7 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
       id,
       options,
       orientation,
+      shows,
       isChanged: () => changed,
       listElement: () => element("list"),
       tabElement: (value: string) => element("tab", value),
@@ -492,9 +502,12 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         panels: ({ key }) => [key],
         elements: ({ key }) => [key],
       }),
-      state: (state, { key, props }) => ({ selected: state.value === key, disabled: !!props.disabled }),
+      state: (state, { key, props, api }) => ({
+        selected: api.internal.shows(state, key),
+        disabled: !!props.disabled,
+      }),
       attrs: (state, { id, key, props, api }) => {
-        const selected = state.value === key
+        const selected = api.internal.shows(state, key)
         return {
           id: `${id}-tab-${idPart(key)}`,
           role: "tab",
@@ -592,22 +605,26 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       props: { value: "string", keepMounted: "boolean", hiddenUntilFound: "boolean" },
       // Panels never read the tab stop, which moves with every arrow key, or
       // which panels are in the page, and only ask whether they're exiting.
+      // The one showing through the claim hears a change to or from null.
       selects: selects({
-        value: ({ key }) => [key],
+        value: ({ key }) => [key, null],
         stop: [],
         exiting: ({ key }) => [key],
         panels: [],
         elements: [],
       }),
-      present: (state, { key, props }) =>
-        !!props.keepMounted || findable(state, props) || state.value === key || state.exiting.includes(key),
-      state: (state, { key }) => ({ selected: state.value === key }),
+      present: (state, { key, props, api }) =>
+        !!props.keepMounted ||
+        findable(state, props) ||
+        api.internal.shows(state, key) ||
+        state.exiting.includes(key),
+      state: (state, { key, api }) => ({ selected: api.internal.shows(state, key) }),
       attrs: (state, { id, key, props, api }) => ({
         id: `${id}-panel-${idPart(key)}`,
         role: "tabpanel",
         "aria-labelledby": `${id}-tab-${idPart(key)}`,
-        ...hiddenAttrs(state.value === key || state.exiting.includes(key), findable(state, props)),
-        "data-selected": state.value === key ? "" : undefined,
+        ...hiddenAttrs(api.internal.shows(state, key) || state.exiting.includes(key), findable(state, props)),
+        "data-selected": api.internal.shows(state, key) ? "" : undefined,
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
       }),
@@ -617,7 +634,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
 
         // Find in page matched text in a hidden panel. Its tab selects.
         const found = bindFindable(el, {
-          shown: () => store.get().value === key || store.get().exiting.includes(key),
+          shown: () => api.internal.shows(store.get(), key) || store.get().exiting.includes(key),
           findable: () => findable(store.get(), part.props),
           reveal: (event) => api.select(key, { reason: "find-in-page", event }),
         })
@@ -630,13 +647,13 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
 
         // Enter and exit animations, never on the first paint.
         let stop: (() => void) | undefined
-        let selected = store.get().value === key
+        let selected = api.internal.shows(store.get(), key)
         if (selected && api.internal.isChanged()) stop = animateIn(el)
         cleanups.push(
           subscribe(part, () => {
-            const { value, exiting } = store.get()
-            if ((value === key) === selected) return
-            selected = value === key
+            const { exiting } = store.get()
+            if (api.internal.shows(store.get(), key) === selected) return
+            selected = !selected
             stop?.()
             stop = undefined
             // Ahead of the render, for exit keyframes keyed on the state.

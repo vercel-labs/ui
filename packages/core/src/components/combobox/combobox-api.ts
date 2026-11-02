@@ -225,6 +225,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   let placed: string | null = null
   let settling = false
   let shownQuery: { from: string; to: string } | null = null
+  // The value deleting the text emptied while the list is open, which Escape brings back.
+  let clearedValue: { value: unknown } | null = null
 
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
   const inputElement = () => element("input")
@@ -265,6 +267,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
+    skipDisabled: true,
     active: () => store.get().open,
     blocked: (entry) => !entry.pinned && maxReached() && !selection.isSelected(entry.key, entry.value),
     onHighlight: (key, index, event) =>
@@ -367,10 +370,15 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   function commit(value: unknown, reason: ComboboxValueChangeReason, event?: Event) {
     committing = true
     try {
-      setValue(value, { reason, event })
+      return setValue(value, { reason, event })
     } finally {
       committing = false
     }
+  }
+
+  function selectedLabel() {
+    const value = selection.values()[0]
+    return value === undefined ? "" : selection.labelOf(value)
   }
 
   // Text nobody chose becomes the value, with `allowCustomValue`.
@@ -384,14 +392,16 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       if (!options().keepQuery) setQuery("", { reason, event })
       return true
     }
-    commit(query, "input-change", event)
-    store.set({ dirty: false })
+    if (commit(query, "input-change", event)) store.set({ dirty: false })
+    else setQuery(selectedLabel(), { reason, event })
     return true
   }
 
   // Closing with text nobody chose puts the input back: the value's label, or
   // nothing. With `allowCustomValue`, a single combobox keeps the text as its value.
   function revertQuery(reason: ComboboxOpenChangeReason) {
+    const cleared = clearedValue
+    clearedValue = null
     const { dirty, multiple } = store.get()
     if (!multiple && dirty && options().allowCustomValue && commitCustom(reason)) return
     if (multiple) {
@@ -399,8 +409,8 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       return
     }
     if (!dirty) return
-    const value = selection.values()[0]
-    setQuery(value === undefined ? "" : selection.labelOf(value), { reason })
+    if (cleared && reason === "escape-key" && !selection.values().length) commit(cleared.value, "escape-key")
+    setQuery(selectedLabel(), { reason })
   }
 
   // The element that takes part in the form: the custom element, or the hidden input.
@@ -427,7 +437,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
   // first without text. Undefined when it highlights nothing of its own.
   function autoTarget() {
     const mode = options().autoHighlight
-    const list = listbox.entries().filter((entry) => !isSelectAll(entry.key))
+    const list = listbox.entries().filter((entry) => !isSelectAll(entry.key) && !listbox.disabled(entry))
     const items = list.filter((entry) => !entry.pinned)
     if (filterQuery()) return mode ? ((items[0] ?? list[0])?.key ?? null) : undefined
     if (mode !== "always") return undefined
@@ -463,13 +473,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     if (!entry || listbox.disabled(entry) || !editable()) return
     listbox.remember(key, entry.label, entry.value)
     if (state.multiple) {
-      setValue(selection.toggled(key, entry.value), { reason: "item-press", event })
+      // A canceled choice leaves the text, which is what the user is filtering with.
+      if (!setValue(selection.toggled(key, entry.value), { reason: "item-press", event })) return
       if (!options().keepQuery && state.query) setQuery("", { reason: "item-press", event })
       else store.set({ dirty: false })
       return
     }
-    commit(entry.value, "item-press", event)
-    setQuery(entry.label, { reason: "item-press", event })
+    const chosen = commit(entry.value, "item-press", event)
+    setQuery(chosen ? entry.label : selectedLabel(), { reason: "item-press", event })
     hide({ reason: "item-press", event })
   }
 
@@ -533,8 +544,14 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     const state = store.get()
     if (!editable()) return
     setQuery(text, { reason: "input-change", event, dirty: true })
-    if (!state.multiple && text === "" && selection.values().length)
+    const selected = selection.values()[0]
+    if (
+      !state.multiple &&
+      text === "" &&
+      selected !== undefined &&
       setValue(null, { reason: "input-change", event })
+    )
+      clearedValue = { value: selected }
     if (!store.get().open) {
       // Items that mount with the list get the first highlight once they have.
       if (options().autoHighlight && text) pendingHighlight = "first"
@@ -587,6 +604,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       if (!editable()) return
       // A canceled change keeps the value, and the input keeps its label.
       if (listOf(store.get().value).length && !setValue(selection.empty(), { reason, event })) return
+      clearedValue = null
       setQuery("", { reason: reason === "clear-press" ? "clear-press" : "imperative", event })
     },
     getQuery: () => store.get().query,
@@ -636,7 +654,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       matchMode: () => matchMode(options().filter ?? "contains"),
       // The pointer highlights what it moves onto. Touch never does, since a finger scrolling past isn't choosing.
       hover(key: string, event: PointerEvent) {
-        if (event.pointerType === "touch" || !store.get().open) return
+        if (event.pointerType === "touch" || !store.get().open || listbox.isItemDisabled(key)) return
         if (store.get().highlighted !== key) listbox.highlight(key, { event })
       },
       chipsElement: () => element("chips"),
@@ -674,7 +692,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
           // the way if the sheet showed later. It takes focus back here.
           return store.get().presentation === "sheet" ? inputElement() : undefined
         }
-        const list = listbox.entries().filter((entry) => !entry.pinned)
+        const list = listbox.entries().filter((entry) => !entry.pinned && !listbox.disabled(entry))
         const item = list.find((entry) => selection.isSelected(entry.key, entry.value)) ?? list[0]
         if (!item) return contentElement()
         listbox.highlight(item.key, { focus: false })

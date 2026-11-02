@@ -4,6 +4,7 @@
 // reads it back. Everything that would touch a token, every deletion, new
 // lines, paste, drop, cut and undo are cancelled and applied to the value, so
 // one keystroke removes one token in every engine and the history is ours.
+import { isComposing } from "../../foundation/kernel/events"
 import { isRTL } from "../../foundation/platform/env"
 import { isApple } from "../../foundation/platform/platform"
 import type { TextRange, Token } from "../../foundation/text/text-editor"
@@ -204,7 +205,7 @@ function bindTokenEditing(el: HTMLElement, view: TokenView, api: TokenInputApi) 
   }
 
   function onKeyDown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.isComposing || event.keyCode === 229) return
+    if (event.defaultPrevented || isComposing(event)) return
     const mod = isApple() ? event.metaKey : event.ctrlKey
     const key = event.key.toLowerCase()
     if (mod && !event.altKey && key === "z") {

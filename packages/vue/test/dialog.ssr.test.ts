@@ -96,8 +96,8 @@ describe("dialog server rendering", () => {
       ),
     )
     expect(html).toContain("Hi")
-    // A controller's methods are undefined while it reaches no dialog.
-    expect(shared.isOpen).toBeUndefined()
+    expect("isOpen" in shared).toBe(false)
+    expect(shared.isOpen()).toBeUndefined()
   })
 
   test("an open alert dialog renders its role", async () => {

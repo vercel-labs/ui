@@ -91,7 +91,7 @@ Set `side` to `top` or `bottom`, and `align` to `start`, `center`, or `end`. Sta
 
 ### Action and Cancel
 
-Add an `action` for something such as Undo, or a `cancel` action to dismiss the message. Their callbacks can update your app. `onDismiss` tells you why the toast closed.
+Add an `action` for something such as Undo, or a `cancel` action to dismiss the message. Their callbacks can update your app. `onDismiss` tells you why the toast is closing, and `details.cancel()` keeps it open. A canceled `timeout` starts the countdown again.
 
 <ComponentExample
   name="toast/action"

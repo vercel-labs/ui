@@ -15,7 +15,7 @@ test("an instance made on a server attaches no controller", () => {
   tabs({ id: "alice", defaultValue: "a", controller })
   tabs({ id: "bob", defaultValue: "b", controller })
   expect(isControllerAttached(controller)).toBe(false)
-  expect(controller.getValue).toBeUndefined()
+  expect(controller.getValue()).toBeUndefined()
 })
 
 test("an instance made on a server starts nothing whenKept waits on", () => {

@@ -79,6 +79,28 @@ test.describe("highlight", () => {
     await expect(option(page, "Argentina")).toHaveAttribute("data-highlighted", "")
   })
 
+  test("arrow keys skip disabled items", async ({ page }) => {
+    await input(page).fill("e")
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => highlighted(page)).toBe("Argentina")
+    await page.keyboard.press("ArrowDown")
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+    await page.keyboard.press("ArrowDown")
+    await expect.poll(() => highlighted(page)).toBe("France")
+    await page.keyboard.press("ArrowUp")
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+  })
+
+  test("moving over a disabled item leaves the highlight where it was", async ({ page }) => {
+    await input(page).fill("e")
+    await waitForStill(listbox(page))
+    await option(page, "Chile").hover()
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+    await option(page, "Denmark").hover({ force: true })
+    await expect.poll(() => highlighted(page)).toBe("Chile")
+  })
+
   test("the highlighted option has the id aria-activedescendant names", async ({ page }) => {
     await input(page).fill("can")
     await page.keyboard.press("ArrowDown")
@@ -100,6 +122,14 @@ test.describe("autoHighlight", () => {
     await expect.poll(() => highlighted(page)).toBe("Germany")
     await page.keyboard.press("Enter")
     await expect(input(page)).toHaveValue("Germany")
+  })
+
+  test("a disabled match is passed over", async ({ page, open }) => {
+    await open("combobox", { auto: "" })
+    await input(page).focus()
+    await page.keyboard.type("den")
+    await expect(option(page, "Denmark")).toBeVisible()
+    await expect.poll(() => highlighted(page)).toBe(null)
   })
 })
 
@@ -147,6 +177,19 @@ test.describe("choosing", () => {
     await expect(option(page, "France")).toHaveAttribute("aria-selected", "true")
   })
 
+  test("a canceled choice closes the list and keeps the value's label in the input", async ({
+    page,
+    open,
+  }) => {
+    await open("combobox", { value: "fr", cancel: "br" })
+    await input(page).fill("bra")
+    await page.keyboard.press("ArrowDown")
+    await page.keyboard.press("Enter")
+    await expect(listbox(page)).toBeHidden()
+    await expect(input(page)).toHaveValue("France")
+    expect(await lastAction(page)).toBe("")
+  })
+
   test("text that matches nothing shows the empty message", async ({ page }) => {
     await input(page).fill("zzz")
     await expect(page.getByText("No countries found")).toBeVisible()
@@ -165,6 +208,27 @@ test.describe("closing", () => {
     await page.keyboard.press("Escape")
     await expect(listbox(page)).toBeHidden()
     await expect(input(page)).toBeFocused()
+  })
+
+  test("Escape after deleting the text brings back the value and its label", async ({ page, open }) => {
+    await open("combobox", { value: "fr" })
+    await input(page).fill("")
+    await expect(listbox(page)).toBeVisible()
+    expect(await lastAction(page)).toBe("value:null")
+    await page.keyboard.press("Escape")
+    await expect(listbox(page)).toBeHidden()
+    await expect(input(page)).toHaveValue("France")
+    expect(await lastAction(page)).toBe("value:fr")
+  })
+
+  test("leaving after deleting the text keeps the value empty", async ({ page, open, tab }) => {
+    await open("combobox", { value: "fr" })
+    await input(page).fill("")
+    await expect(listbox(page)).toBeVisible()
+    await tab()
+    await expect(listbox(page)).toBeHidden()
+    await expect(input(page)).toHaveValue("")
+    expect(await lastAction(page)).toBe("value:null")
   })
 
   test("clicking outside closes the list", async ({ page }) => {
@@ -227,6 +291,16 @@ test.describe("multiple", () => {
     await page.keyboard.press("Enter")
     await expect(page.getByRole("button", { name: "Remove Brazil", includeHidden: true })).toBeVisible()
     await expect(input(page)).toHaveValue("")
+  })
+
+  test("a canceled choice adds no chip and keeps the text", async ({ page, open }) => {
+    await open("combobox", { multiple: "", cancel: "br" })
+    await input(page).fill("bra")
+    await page.keyboard.press("ArrowDown")
+    await page.keyboard.press("Enter")
+    await expect(page.getByRole("button", { name: "Remove Brazil", includeHidden: true })).toHaveCount(0)
+    await expect(input(page)).toHaveValue("bra")
+    await expect(listbox(page)).toBeVisible()
   })
 
   test("Backspace in an empty input removes the last chip", async ({ page }) => {

@@ -1,5 +1,5 @@
 import { dev, emit } from "#dev"
-import { on } from "../kernel/events"
+import { isComposing, on } from "../kernel/events"
 import { composedContains, composedHops } from "./platform"
 import { pressedScrollbar } from "./scrollbar"
 
@@ -284,7 +284,7 @@ function listen(doc: Document, win: Window) {
   const offKey = on(doc, "keydown", (event) => {
     if (event.key !== "Escape" || event.defaultPrevented) return
     // Escape ends an input method's composition first, like a Japanese candidate list.
-    if (event.isComposing || event.keyCode === 229) return
+    if (isComposing(event)) return
     // The topmost layer of this document: one open in another, like an
     // iframe's, didn't hear the key.
     const top = active()

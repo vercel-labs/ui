@@ -1,5 +1,6 @@
 import { createAsyncOptions } from "@ui-sdk/core/async-options"
 import {
+  cancelsValue,
   changedItems,
   comboboxFixture as f,
   comboboxOptions,
@@ -33,6 +34,7 @@ async function render(root: HTMLElement, data = false) {
     overflow,
     pages,
     nostatus,
+    cancel,
     ...options
   } = comboboxOptions()
   highlight = options.highlight
@@ -119,6 +121,7 @@ async function render(root: HTMLElement, data = false) {
   }
   combobox.addEventListener("valuechange", (event) => {
     const value = (event as CustomEvent<{ value: unknown }>).detail.value
+    if (cancelsValue(value, cancel)) return event.preventDefault()
     output.textContent = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
   })
   combobox.addEventListener("create", (event) => {
