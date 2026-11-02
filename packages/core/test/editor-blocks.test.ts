@@ -782,6 +782,20 @@ describe("createSwipeActions", () => {
     expect(instance.get().open).toEqual({ key: "a", side: "end" })
   })
 
+  test("a swipe cut short by its component going away puts the row back", async () => {
+    const { instance, swipe: actions, row } = mount()
+    actions.pointerdown(at("pointerdown", 300, 0), "a", row)
+    document.dispatchEvent(at("pointermove", 260, 50))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(instance.get().swiping).not.toBeNull()
+    instance.destroy()
+    expect(instance.get().swiping).toBeNull()
+    // The pointer no longer reaches it.
+    document.dispatchEvent(at("pointermove", 200, 50))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(instance.get().swiping).toBeNull()
+  })
+
   test("a long swipe runs the first action, and only then", () => {
     const row = mount()
     const { instance } = row

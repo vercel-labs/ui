@@ -8,7 +8,7 @@
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { isRTL } from "../platform/env"
 import { on } from "../kernel/events"
-import { bindDrag } from "../drag-and-drop/pointer"
+import { createDragSession } from "../drag-and-drop/pointer"
 import { rubberBand } from "../motion/rubber-band"
 import { createVelocityTracker } from "../motion/velocity"
 
@@ -93,12 +93,9 @@ function createSwipeActions<State extends object>(
   const rows = new Map<string, HTMLElement>()
   const actions = new Map<string, HTMLElement>()
   const actionsId = (key: string, side: SwipeSide) => `${side}:${key}`
-  let stop: (() => void) | undefined
+  const drags = createDragSession(context.onDestroy)
   let offOutside: (() => void) | undefined
-  context.onDestroy(() => {
-    stop?.()
-    offOutside?.()
-  })
+  context.onDestroy(() => offOutside?.())
 
   const open = () => store.get()[options.key] as SwipeOpen | null
   const rtl = (key: string) => {
@@ -206,15 +203,13 @@ function createSwipeActions<State extends object>(
      * and vertical scrolls keep working.
      */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (event.button !== 0 || !event.isPrimary || options.disabled?.(key)) return
+      if (!drags.accepts(event) || options.disabled?.(key)) return
       const shown = open()
       // A press inside the open actions is a click on one.
       if (shown?.key === key && actions.get(actionsId(key, shown.side))?.contains(event.target as Node))
         return
       const from = shown?.key === key ? sign(key, shown.side) * width(key, shown.side) : 0
       if (!from && !width(key, "start") && !width(key, "end")) return
-      stop?.()
-      const doc = el.ownerDocument
       const rowWidth = el.getBoundingClientRect().width || 1
       const fraction = options.fullSwipe?.() ?? 0.6
       const velocity = createVelocityTracker()
@@ -234,7 +229,6 @@ function createSwipeActions<State extends object>(
         store.set({ [options.draft]: { key, ...last } } as Partial<State>)
       }
       const finish = (end: PointerEvent, canceled: boolean) => {
-        stop = undefined
         const { x, side, full } = last
         if (!canceled && full && options.onFullSwipe?.(key, side, { event: end })) return setOpen(null)
         const room = width(key, side)
@@ -244,39 +238,25 @@ function createSwipeActions<State extends object>(
         setOpen(opening && room && x ? { key, side } : null)
       }
 
-      let stopTracking: (() => void) | undefined
-      const offs = [
-        on(doc, "pointermove", (move) => {
-          if (move.pointerId !== event.pointerId) return
+      drags.startOnMove(el, event, {
+        pick(move) {
           const dx = move.clientX - event.clientX
           const dy = move.clientY - event.clientY
-          if (Math.hypot(dx, dy) < slop) return
-          waited()
+          if (Math.hypot(dx, dy) < slop) return undefined
           // A press that moves up or down first is a scroll, not a swipe.
-          if (Math.abs(dy) >= Math.abs(dx)) return
+          if (Math.abs(dy) >= Math.abs(dx)) return false
           velocity.add(move.timeStamp, move.clientX)
           place(dx)
-          stopTracking = bindDrag(el, move, {
-            onMove: ({ x, event: next }) => {
-              velocity.add(next.timeStamp, x)
-              place(x - event.clientX)
-            },
-            onEnd: finish,
-          })
-        }),
-        on(doc, "pointerup", (up) => {
-          if (up.pointerId !== event.pointerId) return
-          waited()
-          // A tap on an open row closes it, as a tap on its content would on a phone.
-          if (from) api.close()
-        }),
-        on(doc, "pointercancel", (up) => up.pointerId === event.pointerId && waited()),
-      ]
-      const waited = () => offs.forEach((off) => off())
-      stop = () => {
-        waited()
-        stopTracking?.()
-      }
+          return true
+        },
+        onMove: ({ x, event: next }) => {
+          velocity.add(next.timeStamp, x)
+          place(x - event.clientX)
+        },
+        onEnd: finish,
+        // A tap on an open row closes it, as a tap on its content would on a phone.
+        onTap: () => from && api.close(),
+      })
     },
     /**
      * Handles a key on a row or its actions and returns whether it did. Left

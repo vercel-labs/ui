@@ -888,10 +888,13 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         try {
           writeFromScript(this, write)
         } finally {
-          if (!nested) quiet.delete(this)
+          // Fields read validity again on `input` and `change`, which this
+          // write doesn't fire, even when a page callback inside it threw.
+          if (!nested) {
+            quiet.delete(this)
+            validityChanged(this)
+          }
         }
-        // Fields read validity again on `input` and `change`, which this write doesn't fire.
-        if (!nested) validityChanged(this)
       }
 
       connectedCallback() {

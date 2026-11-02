@@ -98,9 +98,6 @@ const dragSessionAllowlist = {
   "packages/core/src/foundation/drag-and-drop/pointer.ts": "Defines it, and the session on it.",
   "packages/core/src/components/resizable/resizable-dom.ts":
     "One press can drag two handles where they meet, one along each axis.",
-  "packages/core/src/components/toast/swipe.ts": "Captures the pointer only once a swipe picks its axis.",
-  "packages/core/src/foundation/direct-manipulation/swipe-actions.ts":
-    "Captures the pointer only once a swipe picks its axis.",
 }
 
 // Imports across core's layers that import-layers lets through, by folder, each with why.
