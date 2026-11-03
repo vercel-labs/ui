@@ -19,6 +19,7 @@ import { registerShortcut } from "../../foundation/shortcuts/shortcuts"
 import {
   addToastStyles,
   focusAfterClose,
+  naturalHeight,
   pressedText,
   stackLayout,
   swipeDirections,
@@ -254,7 +255,8 @@ function toastRegionApi(
       items.map((item) => ({ id: item.toast.id, index: item.index, leaving: item.leaving })),
       heights,
     )
-    region.style.setProperty("--toast-front-height", `${stack.front}px`)
+    // Kept until a new front toast is measured, so the toasts behind it don't collapse for a frame.
+    if (stack.front !== undefined) region.style.setProperty("--toast-front-height", `${stack.front}px`)
     region.style.setProperty("--toast-stack-height", `${stack.total}px`)
     region.style.setProperty("--toast-count", String(stack.layout.size))
     for (const [toastId, place] of stack.layout) {
@@ -422,20 +424,51 @@ function toastRegionApi(
     const item = findItem(store.get().items, toastId)
     const cleanups = [item?.leaving ? () => {} : animateIn(el)]
     label(toastId)
-    const observer = new ResizeObserver(([entry]) => {
-      const state = store.get()
-      const current = findItem(state.items, toastId)
-      if (!current || current.leaving) return
-      // A toast behind a collapsed stack may be clipped to the front one's height, so it isn't measured then.
-      if (current.index !== 0 && !isExpanded(state)) return
-      const height = entry.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight
+    let bound = true
+    let width: number | undefined
+    let waiting = false
+    const measure = () => {
+      const current = findItem(store.get().items, toastId)
+      if (!bound || waiting || !current || current.leaving || !el.isConnected) return
+      // Measuring sets the height to auto for a moment, which would cut a height transition short.
+      const resizing = el
+        .getAnimations()
+        .filter(
+          (animation) => animation instanceof CSSTransition && animation.transitionProperty === "height",
+        )
+      if (resizing.length) {
+        waiting = true
+        Promise.allSettled(resizing.map((animation) => animation.finished)).then(() => {
+          waiting = false
+          measure()
+        })
+        return
+      }
+      const height = naturalHeight(el)
       if (heights.get(toastId) === height) return
       heights.set(toastId, height)
       layout()
+    }
+    // A new width reflows the content. Height changes are the stack's own.
+    const resizes = new ResizeObserver(([entry]) => {
+      const next = entry.borderBoxSize?.[0]?.inlineSize ?? el.offsetWidth
+      if (next === width) return
+      width = next
+      measure()
     })
-    observer.observe(el)
+    // Content changes, not the stack's attributes and variables on the toast itself.
+    const mutations = new MutationObserver((records) => {
+      if (records.some((record) => record.type !== "attributes" || record.target !== el)) measure()
+    })
+    resizes.observe(el)
+    mutations.observe(el, { subtree: true, childList: true, characterData: true, attributes: true })
+    measure()
     cleanups.push(
-      () => observer.disconnect(),
+      () => {
+        bound = false
+        resizes.disconnect()
+        mutations.disconnect()
+      },
       on(el, "pointerdown", (event) => startSwipe(el, toastId, event)),
     )
     layout()

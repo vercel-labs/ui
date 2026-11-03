@@ -280,6 +280,46 @@ test.describe("stacking", () => {
         .toBeCloseTo(front, 1)
     },
   )
+
+  test(
+    "a toast measures its content's height, whatever height it's given",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("toast")
+      const id = await show(page, { title: "Uploading", duration: forever })
+      const toast = toastNamed(page, "Uploading")
+      const before = (await toast.boundingBox())!.height
+      await page.addStyleTag({ content: ".toast { height: 10px }" })
+      await page.evaluate(
+        (id) =>
+          (
+            window as unknown as { toaster: { update: (id: string, o: { description: string }) => void } }
+          ).toaster.update(id, { description: "Two files left, about a minute remaining" }),
+        id,
+      )
+      const height = () =>
+        toast.evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue("--toast-height")))
+      await expect.poll(height).toBeGreaterThan(before)
+      expect((await toast.boundingBox())!.height).toBeLessThan(before)
+    },
+  )
+
+  test(
+    "a toast closing from the front stays in front while it animates out",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("toast", { animate: "infinite" })
+      await show(page, { title: "Older", duration: forever })
+      const id = await show(page, { title: "Newer", duration: forever })
+      await expect(toastNamed(page, "Newer")).toHaveCSS("opacity", "1")
+      await page.evaluate(
+        (id) => (window as unknown as { toaster: { dismiss: (id: string) => void } }).toaster.dismiss(id),
+        id,
+      )
+      await expect(page.locator(".toast[data-ending-style]")).toHaveAttribute("data-front", "")
+      await expect(toastNamed(page, "Older")).toHaveAttribute("data-front", "")
+    },
+  )
 })
 
 test.describe("swiping", () => {

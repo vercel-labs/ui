@@ -8,6 +8,7 @@ globalThis.ResizeObserver ??= class {
   unobserve() {}
   disconnect() {}
 } as unknown as typeof ResizeObserver
+Element.prototype.getAnimations ??= () => []
 
 let cleanups: (() => void)[] = []
 afterEach(() => {

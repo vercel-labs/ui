@@ -58,7 +58,25 @@ function stackLayout(
     total += height
   }
   const front = toasts.find((toast) => !toast.leaving)
-  return { layout, total, front: front ? (heights.get(front.id) ?? 0) : 0 }
+  return { layout, total, front: front ? heights.get(front.id) : 0 }
+}
+
+/**
+ * A toast's border-box height with its content laid out freely, whatever
+ * height the stack gives it, so the stack can animate between known heights.
+ */
+function naturalHeight(el: HTMLElement) {
+  const { style } = el
+  const value = style.getPropertyValue("height")
+  const priority = style.getPropertyPriority("height")
+  style.setProperty("height", "auto", "important")
+  const css = getComputedStyle(el)
+  let height = parseFloat(css.height)
+  if (css.boxSizing !== "border-box")
+    for (const side of ["Top", "Bottom"] as const)
+      height += parseFloat(css[`padding${side}`]) + parseFloat(css[`border${side}Width`])
+  style.setProperty("height", value, priority)
+  return height
 }
 
 /**
@@ -136,4 +154,12 @@ function watchAttention(
   }
 }
 
-export { addToastStyles, focusAfterClose, pressedText, stackLayout, swipeDirections, watchAttention }
+export {
+  addToastStyles,
+  focusAfterClose,
+  naturalHeight,
+  pressedText,
+  stackLayout,
+  swipeDirections,
+  watchAttention,
+}
