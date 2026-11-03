@@ -43,6 +43,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **An owner whose `id` is set or changed after it connects** isn't found by `for` parts, and renaming it away leaves them bound. A native label's `for` and `popovertarget` resolve at use time.
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **A value change restored by Escape has no `detail.event`**, like the `querychange` before it: a popup's close carries no event to `revertQuery`.
+- **A number input moved from one field to another** leaves the first field's label `for` on the moved input until that field finds a new control.
 
 ## Revisit
 
