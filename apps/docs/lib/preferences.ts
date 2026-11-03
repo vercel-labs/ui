@@ -23,6 +23,14 @@ const packageManager = createPreference({
   storage: createLocalStorage("tabs:package-manager"),
 })
 
+const styling = createPreference({
+  values: ["css", "tailwind"],
+  defaultValue: "css",
+  attribute: "data-styling",
+  global: true,
+  storage: createLocalStorage("tabs:styling"),
+})
+
 function setFramework(next: Framework) {
   framework.set(next)
 }
@@ -38,4 +46,4 @@ function useFramework() {
   return [current, setFramework] as const
 }
 
-export { colorScheme, framework, packageManager, setFramework, useFramework, useSavedFramework }
+export { colorScheme, framework, packageManager, setFramework, styling, useFramework, useSavedFramework }

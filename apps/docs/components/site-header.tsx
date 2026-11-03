@@ -7,15 +7,6 @@ import { HeaderMenu } from "./header-menu"
 function SiteHeader({ urls }: { urls: string[] }) {
   return (
     <header className="sticky top-0 z-10 hidden bg-canvas/85 backdrop-blur-md lg:block">
-      <aside aria-label="Private preview" className="bg-muted">
-        <Link
-          href="/docs/core/request-access"
-          className="block px-4 py-2.5 text-center text-sm leading-5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
-        >
-          UI SDK is in private preview.{" "}
-          <span className="whitespace-nowrap underline underline-offset-4">Request access</span>
-        </Link>
-      </aside>
       <div className="container flex h-16 items-center">
         <div className="flex shrink-0 items-center gap-4">
           <a

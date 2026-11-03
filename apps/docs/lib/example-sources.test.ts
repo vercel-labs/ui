@@ -16,7 +16,7 @@ vi.mock("./repo-root", async () => {
 const source = 'export const Example = () => <button className="rounded-lg">Save</button>'
 
 function writeFiles(files: Record<string, string>, framework = "react") {
-  const directory = path.join(repoRoot, "examples/button", framework)
+  const directory = path.join(repoRoot, "examples/components/button", framework)
   for (const [name, code] of Object.entries(files)) {
     const file = path.join(directory, name)
     mkdirSync(path.dirname(file), { recursive: true })

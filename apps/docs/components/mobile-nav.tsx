@@ -202,7 +202,7 @@ function MenuLink({
         onClick={onNavigate}
         className={cn(
           "block w-fit rounded-md text-2xl font-medium tracking-tight outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-          current ? "text-foreground" : "text-foreground/70 hover:text-foreground",
+          current ? "text-brand" : "text-foreground/70 hover:text-foreground",
         )}
       >
         {children}

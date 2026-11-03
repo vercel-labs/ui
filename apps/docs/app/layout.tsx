@@ -3,11 +3,12 @@ import { SiteHeader } from "@/components/site-header"
 import { SitePreferences } from "@/components/site-preferences"
 import { source } from "@/lib/source"
 import type { Metadata } from "next"
-import { Geist } from "next/font/google"
+import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./global.css"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 const DESCRIPTION =
   "An open source library of behaviors that an agent can use to build components. Written in TypeScript. Available for all frameworks."
@@ -27,7 +28,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
   const urls = source.getPages().map((page) => page.url)
 
   return (
-    <html lang="en" className={geist.variable} suppressHydrationWarning>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col bg-canvas font-sans text-foreground">
         <SitePreferences>
           <SiteHeader urls={urls} />

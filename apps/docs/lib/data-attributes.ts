@@ -156,9 +156,9 @@ const components: Record<
       }),
     samples: {
       trigger: [{}],
+      "context-trigger": [{ id: "c" }, { id: "d", disabled: true }],
       content: [{}],
       item: [{ id: "a" }, { id: "b", disabled: true }],
-      "context-trigger": [{ id: "c" }, { id: "d", disabled: true }],
       "checkbox-item": [
         { value: "a", defaultChecked: true },
         { value: "b", defaultChecked: false },
@@ -434,6 +434,7 @@ const components: Record<
       "item-text": [{ id: "a", text: "Calendar" }],
       "item-icon": [{ id: "i", mirror: true }],
     },
+    parts: { root: { react: "Command", web: "<ui-command>" } },
     interactive: [],
     extra: {
       item: ["data-highlighted", "data-pending", "data-has-icon"],
@@ -549,10 +550,11 @@ const components: Record<
       root: [{}],
       list: [{}],
       tab: [{ value: "a" }, { value: "b", disabled: true }],
+      "tab-icon": [{ id: "i", mirror: true }],
       indicator: [{}],
       panel: [{ value: "a" }],
-      "tab-icon": [{ id: "i", mirror: true }],
     },
+    parts: { root: { react: "Tabs", web: "<ui-tabs>" } },
     interactive: [{ file: "motion/presence.ts", slot: "panel" }],
     extra: { tab: ["data-has-icon"], list: ["data-has-icons"] },
     descriptions: {
@@ -586,6 +588,7 @@ const components: Record<
       trigger: [{ value: "a" }, { value: "b", disabled: true }],
       panel: [{ value: "a" }, { value: "b" }],
     },
+    parts: { root: { react: "Accordion", web: "<ui-accordion>" } },
     interactive: [{ file: "motion/presence.ts", slot: "panel" }],
     descriptions: {
       "data-open": { text: "Present while the item is open." },
@@ -1594,7 +1597,7 @@ const components: Record<
       handle: ["data-expanded"],
     },
     parts: {
-      viewport: { react: "The viewport around the content", web: "<ui-drawer-viewport>" },
+      viewport: { react: "Viewport", web: "<ui-drawer-viewport>" },
     },
     descriptions: {
       ...DIALOG_DESCRIPTIONS,
@@ -1932,6 +1935,14 @@ async function collect(component: string) {
 
 const pascal = (slot: string) => slot.replace(/(^|-)(\w)/g, (_, __, char: string) => char.toUpperCase())
 
+/** A part's name in `framework`, like `AccordionPanel` or `<ui-accordion-panel>`. */
+function partLabel(component: string, slot: string, framework: Framework) {
+  const part = components[component]?.parts?.[slot]
+  return framework === "web-components"
+    ? (part?.web ?? `<ui-${component}-${slot}>`)
+    : (part?.react ?? `${pascal(component)}${pascal(slot)}`)
+}
+
 /**
  * A component's styling hooks per part: its name in `framework`, its
  * `data-slot`, and each data attribute with its values and meaning. `plain`
@@ -1940,10 +1951,7 @@ const pascal = (slot: string) => slot.replace(/(^|-)(\w)/g, (_, __, char: string
 async function dataAttributeTables(component: string, framework: Framework) {
   const found = await collect(component)
   const { samples, descriptions, parts = {} } = components[component]
-  const name = (slot: string) =>
-    framework === "web-components"
-      ? (parts[slot]?.web ?? `<ui-${component}-${slot}>`)
-      : (parts[slot]?.react ?? `${pascal(component)}${pascal(slot)}`)
+  const name = (slot: string) => partLabel(component, slot, framework)
   const dataSlot = (slot: string) => parts[slot]?.slot ?? `${component}-${slot}`
   const slots = Object.keys(samples)
   return {
@@ -1968,131 +1976,7 @@ async function dataAttributeTables(component: string, framework: Framework) {
   }
 }
 
-// The file that writes each component's CSS variables.
-const variableSources: Record<string, string | string[]> = {
-  dialog: ["dialog/dialog.ts", "platform/keyboard.ts", "popups/sheet-presentation.ts"],
-  "alert-dialog": ["dialog/dialog.ts", "platform/keyboard.ts"],
-  drawer: ["popups/sheet-effects.ts", "platform/keyboard.ts"],
-  toast: ["toast/toast.ts", "platform/keyboard.ts"],
-  menu: ["platform/position.ts", "popups/sheet-presentation.ts"],
-  tabs: "tabs/tabs.ts",
-  popover: ["platform/position.ts", "popups/sheet-presentation.ts"],
-  select: ["platform/position.ts", "popups/sheet-presentation.ts"],
-  combobox: ["platform/position.ts", "popups/sheet-presentation.ts"],
-  autocomplete: ["platform/position.ts", "popups/sheet-presentation.ts"],
-  tooltip: "platform/position.ts",
-  "hover-card": "platform/position.ts",
-  "navigation-menu": ["navigation-menu/navigation-menu-dom.ts", "platform/position.ts"],
-  accordion: "accordion/accordion.ts",
-  collapsible: "collapsible/collapsible.ts",
-  slider: "slider/slider.ts",
-  progress: "progress/progress.ts",
-  meter: "meter/meter.ts",
-  "scroll-area": "scroll-area/scroll-area-view.ts",
-  resizable: "resizable/resizable.ts",
-  carousel: "carousel/carousel-api.ts",
-}
+/** Whether `component` has a data attributes table. */
+const hasDataAttributes = (component: string) => component in components
 
-// What each CSS variable means.
-const meaning: Record<string, string> = {
-  "--available-height":
-    "Space between the trigger and the viewport edge. Use it for max-height. Set on the popup and not inherited, so a child that needs it copies it on the popup, like `[--list-height:var(--available-height)]`, and reads `max-h-(--list-height)`. The first popup registers both names for the whole page with `CSS.registerProperty`, so they don't inherit anywhere. A page that needs them to inherit calls it first, with `inherits: true`. An `@property` rule can't, since a registration in script wins.",
-  "--available-width": "Space beside the menu, up to the viewport edge. Not inherited either.",
-  "--anchor-width": "Width of the trigger. Use it to match widths.",
-  "--anchor-height": "Height of the trigger.",
-  "--transform-origin": "The point on the trigger the menu opens from. Use it to scale from the right place.",
-  "--arrow-offset":
-    "Where the trigger's center falls along the popup's edge, kept `arrowPadding` from the corners. Position a ::before arrow with it.",
-  "--active-tab-left": "Distance from the tab list's left edge to the selected tab.",
-  "--active-tab-right": "Distance from the tab list's right edge to the selected tab.",
-  "--active-tab-top": "Distance from the tab list's top edge to the selected tab.",
-  "--active-tab-bottom": "Distance from the tab list's bottom edge to the selected tab.",
-  "--active-tab-width": "Width of the selected tab.",
-  "--active-tab-height": "Height of the selected tab.",
-  "--viewport-width":
-    "On the viewport: the open content's width plus the viewport's own border. Transition width for a viewport that resizes as it switches.",
-  "--viewport-height": "On the viewport: the open content's height plus the viewport's own border.",
-  "--active-item-left":
-    "On the indicator: distance from its positioned ancestor's left edge to the open trigger, or the current page's link.",
-  "--active-item-right": "On the indicator: distance from its positioned ancestor's right edge to the item.",
-  "--active-item-top": "On the indicator: distance from its positioned ancestor's top edge to the item.",
-  "--active-item-bottom":
-    "On the indicator: distance from its positioned ancestor's bottom edge to the item.",
-  "--active-item-width": "On the indicator: width of the item it sits under.",
-  "--active-item-height": "On the indicator: height of the item it sits under.",
-  "--accordion-panel-height":
-    "The panel's content height in pixels while it animates, auto once open and 0px while closed.",
-  "--accordion-panel-width": "The panel's content width, the same way. For accordions that open sideways.",
-  "--collapsible-panel-height":
-    "The panel's content height in pixels while it animates, auto once open and 0px while closed.",
-  "--collapsible-panel-width": "The panel's content width, the same way. For panels that open sideways.",
-  "--dialog-stack": "How many dialogs are open above this one, nested inside it. 0 for the topmost.",
-  "--carousel-interval":
-    "On the root: how long each page shows while rotating, like `500ms`. Time a progress bar's animation with it.",
-  "--carousel-progress":
-    "On the root: how far the slides have scrolled, from 0 at the first page to 1 at the last, or round the loop. It follows every frame of a scroll or spring.",
-  "--drawer-progress":
-    "On the content and outlets: how far open the drawer is, from 0 closed to 1 at its largest snap point. Never past 1.",
-  "--drawer-dim":
-    "On the content and outlets: how dim the page behind is, from 0 to 1. The backdrop's opacity follows it.",
-  "--drawer-expand":
-    "On the content and outlets: 0 at the second-largest snap point and below, 1 at the largest. With one snap point, the whole travel.",
-  "--drawer-stack":
-    "On a drawer while one opened from inside it is open: how many are open above it, rising smoothly as each one opens. Push it back with it.",
-  "--toast-index": "A toast's place in the stack, 0 for the newest. A closing toast keeps its place.",
-  "--toast-offset":
-    "The height of the toasts in front of this one, in pixels. Add gaps with `--toast-index` to place an expanded stack.",
-  "--toast-height": "The toast's own height, measured while it's in front or the stack is expanded.",
-  "--toast-front-height":
-    "On the region: the newest toast's height. Clip the toasts behind it to it in a collapsed stack.",
-  "--toast-stack-height": "On the region: the toasts' heights added up, for the height of an expanded stack.",
-  "--toast-count": "On the region: how many toasts show.",
-  "--toast-swipe-x": "How far a swipe moved the toast sideways, in pixels. Translate the toast by it.",
-  "--toast-swipe-y": "How far a swipe moved the toast up or down, in pixels.",
-  "--sheet-backdrop":
-    "Set it on the content: the color the page dims to while it presents as a sheet. Black at 0.2 by default.",
-  "--keyboard-inset": "How many pixels of the page the on-screen keyboard covers, 0 without one.",
-  "--visual-viewport-height": "The height of the part of the page you can see, above the keyboard.",
-  "--slider-thumb-position":
-    "Where the thumb sits along the track, as a percentage from the start. Use it for a label that follows the thumb.",
-  "--slider-indicator-start":
-    "Where the indicator starts along the track, as a percentage. 0% for a single thumb.",
-  "--slider-indicator-size": "How much of the track the indicator covers, as a percentage.",
-  "--scroll-area-thumb-height":
-    "On a vertical scrollbar: its thumb's length in pixels. The thumb's own inline height reads it.",
-  "--scroll-area-thumb-width":
-    "On a horizontal scrollbar: its thumb's length in pixels. The thumb's own inline width reads it.",
-  "--scroll-area-thumb-offset":
-    "On a scrollbar: how far its thumb sits from the track's start, in pixels, negative right to left. The thumb's inline transform reads it.",
-  "--scroll-area-corner-width":
-    "On the root: the vertical scrollbar's width while both scrollbars show, so the horizontal one stops short of it. 0px otherwise.",
-  "--scroll-area-corner-height":
-    "On the root: the horizontal scrollbar's height while both show, so the vertical one stops short of it. 0px otherwise.",
-  "--scroll-area-overflow-y-start":
-    "On the root: how far the content reaches above the view, in pixels. Grow a top fade or shadow with it. Not inherited, like the other overflow and progress variables, so scrolling never restyles the content. A child of the root that reads it takes it with `[--scroll-area-overflow-y-start:inherit]`.",
-  "--scroll-area-overflow-y-end": "On the root: how far the content reaches below the view, in pixels.",
-  "--scroll-area-overflow-x-start":
-    "On the root: how far the content reaches past the inline start, in pixels, left in LTR and right in RTL.",
-  "--scroll-area-overflow-x-end": "On the root: how far the content reaches past the inline end, in pixels.",
-  "--scroll-area-progress-y":
-    "On the root: how far down the view is, from 0 at the top to 1 at the bottom. A reading progress bar can scale with it.",
-  "--scroll-area-progress-x": "On the root: how far along the inline axis the view is, from 0 to 1.",
-  "--resizable-panel-size":
-    "On a panel: its share of the group, as a percentage. Written on every frame of a drag, without a render.",
-  "--meter-value": "Where the value sits between `min` and `max`, as a percentage, like 40%. On the root.",
-  "--progress-value":
-    "Where the value sits between `min` and `max`, as a percentage, like 40%. Unset while indeterminate. On the root.",
-}
-
-/** The CSS variables a component writes, read from the files that write them, with what each means. */
-async function cssVariableRows(component = "menu") {
-  const files = [variableSources[component]].flat()
-  const source = (await Promise.all(files.map((file) => readFile(coreSource(file), "utf8")))).join("\n")
-  // Any string that is a variable name: written with setProperty, as keys of
-  // an inline style object like the slider's, or from a table of names like
-  // the scroll area's.
-  const names = [...new Set([...source.matchAll(/"(--[\w-]+)"/g)].map((match) => match[1]))]
-  return names.map((name) => ({ name, text: meaning[name] }))
-}
-
-export { cssVariableRows, dataAttributeTables }
+export { dataAttributeTables, hasDataAttributes, partLabel }

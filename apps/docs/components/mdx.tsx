@@ -16,6 +16,7 @@ import {
   CodeBlockTabs,
   CodeBlockTabsList,
   CodeBlockTabsTrigger,
+  StyleTabs,
   FrameworkTabs,
 } from "./code-tabs"
 import { SpecList } from "./spec-list"
@@ -96,6 +97,7 @@ function getMDXComponents(
     CodeBlockTabs,
     CodeBlockTabsList,
     CodeBlockTabsTrigger,
+    StyleTabs,
     CodeBlockTab,
     FrameworkTabs,
     FrameworkTab: CodeBlockTab,
@@ -159,8 +161,12 @@ function getMDXComponents(
       compact?: boolean
     }) => <ComponentExample {...props} framework={framework} />,
     SpecList,
-    DataAttributes: (props: { component?: string }) => <DataAttributes {...props} framework={framework} />,
-    CssVariables,
+    DataAttributes: (props: { component?: string; part?: string }) => (
+      <DataAttributes {...props} framework={framework} />
+    ),
+    CssVariables: (props: { component?: string; part: string }) => (
+      <CssVariables {...props} framework={framework} />
+    ),
     StateTable,
     ReasonTable,
     ControllerTable,

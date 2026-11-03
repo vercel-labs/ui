@@ -1,6 +1,7 @@
 import path from "node:path"
 import { coreEntries, exportsByLayer, layerTitle, type CoreExport } from "./core-exports"
-import { cssVariableRows, dataAttributeTables } from "./data-attributes"
+import { cssVariableTable } from "./css-variables"
+import { dataAttributeTables } from "./data-attributes"
 import { readExampleSources } from "./example-sources"
 import { frameworks, type Framework } from "./frameworks"
 import { contentDir, docPages, readPage } from "./pages"
@@ -157,7 +158,8 @@ async function pageMarkdown(
   const [, firstExample = ""] = tag("ComponentExample").exec(body) ?? []
   const styledExample = lean ? attributes(firstExample).name : undefined
 
-  let text = body
+  // Markdown carries the CSS block of a style snippet; the Tailwind one is a site toggle.
+  let text = body.replace(/<StyleTabs>\s*(```[\s\S]*?\n```)\s*```[\s\S]*?\n```\s*<\/StyleTabs>/g, "$1")
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
@@ -276,41 +278,28 @@ async function pageMarkdown(
       return ran.length ? `${tests}\n\nRuns in ${listOf(ran)}.` : tests
     })
     out = await replaceAsync(out, tag("DataAttributes"), async (_, attrs: string) => {
-      const { styled, plain } = await dataAttributeTables(attributes(attrs).component ?? "menu", shown)
-      if (compact)
-        return styled
-          .map(
-            (part) =>
-              `- \`[data-slot="${part.dataSlot}"]\`: ${part.attributes
-                .map(
-                  ({ attribute, values }) =>
-                    `\`${attribute}\`${values.length ? ` (${values.map((value) => `\`${value}\``).join(", ")})` : ""}`,
-                )
-                .join(", ")}`,
-          )
-          .join("\n")
-      return [
-        ...styled.map((part) =>
+      const { component = "menu", part } = attributes(attrs)
+      const { styled } = await dataAttributeTables(component, shown)
+      // A page not yet split into a section per part lists every part.
+      return styled
+        .filter((each) => !part || each.slot === part)
+        .map((found) =>
           [
-            `${part.name ? `**${part.name}** ` : ""}\`[data-slot="${part.dataSlot}"]\``,
+            `${part ? "" : `**${found.name}** `}\`[data-slot="${found.dataSlot}"]\``,
             "",
-            ...part.attributes.map(
+            ...found.attributes.map(
               ({ attribute, values, text }) =>
-                `- \`${attribute}\`${values.length ? ` (${values.map((value) => `\`${value}\``).join(", ")})` : ""}${text ? `: ${text}` : ""}`,
+                `- \`${attribute}\`${values.length ? ` (${values.map((value) => `\`${value}\``).join(", ")})` : ""}${text && !compact ? `: ${text}` : ""}`,
             ),
           ].join("\n"),
-        ),
-        plain.length
-          ? `${plain.map((part) => `\`${part.name ?? `[data-slot="${part.dataSlot}"]`}\``).join(", ")} have no state attributes. Select them by their \`data-slot\`.`
-          : "",
-      ]
-        .filter(Boolean)
+        )
         .join("\n\n")
     })
-    out = await replaceAsync(out, tag("CssVariables"), async (_, attrs: string) => {
-      const variables = await cssVariableRows(attributes(attrs).component)
-      if (compact) return `${variables.map(({ name }) => `\`${name}\``).join(", ")}.`
-      return variables.map(({ name, text }) => `- \`${name}\`${text ? `: ${text}` : ""}`).join("\n")
+    out = out.replace(tag("CssVariables"), (_, attrs: string) => {
+      const { component = "menu", part } = attributes(attrs)
+      const found = cssVariableTable(component, shown).find((each) => each.part === part)
+      if (!found) return ""
+      return found.variables.map(({ name, text }) => `- \`${name}\`${compact ? "" : `: ${text}`}`).join("\n")
     })
 
     // Links last, so the ones tables and cards add are mapped too.
@@ -320,6 +309,8 @@ async function pageMarkdown(
     })
   })
 
+  // A heading's custom anchor, like `### AccordionPanel [#styling-accordionpanel]`, is the site's.
+  text = text.replace(/^(#{1,6} .*?)\s*\[#[\w-]+\]\s*$/gm, "$1")
   return `# ${title}\n\n${description ? `${description}\n\n` : ""}${text.replace(/\n{3,}/g, "\n\n").trim()}\n`
 }
 

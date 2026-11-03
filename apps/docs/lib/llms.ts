@@ -3,8 +3,8 @@ import path from "node:path"
 import { frameworks, type Framework } from "./frameworks"
 import { pageMarkdown, type LinkTarget, type PageLinks } from "./page-markdown"
 import { docPages, frameworkGuides, type DocPage } from "./pages"
-import { repoRoot } from "./repo-root"
 import { utilitiesFolder } from "./sections"
+import { exampleFolder } from "./example-folder"
 
 // A framework's docs as one Markdown file for an agent's context, served at
 // /docs/<framework>/llms.txt and shipped as each package's docs/llms.txt:
@@ -34,7 +34,7 @@ const bodyOf = (markdown: string) => markdown.replace(/^# .*\n\n(?:(?!#|```).*\n
 // The imports a component's examples write, like `@ui-sdk/react/popover`,
 // the most used first.
 function importsOf(component: string, framework: Framework) {
-  const dir = path.join(repoRoot, "examples", component, frameworks[framework].example)
+  const dir = path.join(exampleFolder(component), frameworks[framework].example)
   if (!existsSync(dir)) return []
   const count = new Map<string, number>()
   const pattern = new RegExp(`["'](@ui-sdk/${packageNames[framework]}(?:/[\\w-]+)?)["']`, "g")
@@ -97,7 +97,7 @@ ${guides.join("\n\n")}
 
 ## Components
 
-Each page has the component's anatomy, examples, styling hooks and every prop.
+Each page has the component's composition, examples, styling hooks and every prop.
 
 ${components.map((page) => componentLine(page, framework, to)).join("\n")}
 

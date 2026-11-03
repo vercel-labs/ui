@@ -3,7 +3,8 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
 import ts from "typescript"
-import { cssVariableRows, dataAttributeTables } from "./data-attributes"
+import { cssVariableTable } from "./css-variables"
+import { dataAttributeTables } from "./data-attributes"
 import type { Definition } from "./element-definitions"
 import { pageMarkdown } from "./page-markdown"
 import { docPage, docPages } from "./pages"
@@ -396,29 +397,33 @@ async function describeElements() {
   const cssProperties = new Map<string, ElementDoc["cssProperties"]>()
   for (const page of docPages("web-components/components")) {
     const source = readFileSync(page.file, "utf8")
-    for (const [, tag, component] of source.matchAll(
-      /<(DataAttributes|CssVariables)[^>]*component="([\w-]+)"/g,
-    )) {
-      if (tag === "DataAttributes")
-        for (const part of (await dataAttributeTables(component, "web-components")).styled) {
-          const tagName = part.name.replace(/^<|>$/g, "")
-          if (!definitions.has(tagName) || dataAttributes.has(tagName)) continue
-          dataAttributes.set(
-            tagName,
-            part.attributes.map((row) => ({
-              name: row.attribute,
-              description: row.text,
-              values: row.values.length ? row.values : undefined,
-            })),
-          )
-        }
-      else {
-        const owner = definitions.has(`ui-${component}`) ? `ui-${component}` : `ui-${page.slugs[1]}`
-        if (!cssProperties.has(owner))
-          cssProperties.set(
-            owner,
-            (await cssVariableRows(component)).map((row) => ({ name: row.name, description: row.text })),
-          )
+    const components = (tag: string) =>
+      new Set(
+        [...source.matchAll(new RegExp(`<${tag}[^>]*component="([\\w-]+)"`, "g"))].map(([, name]) => name),
+      )
+    for (const component of components("DataAttributes"))
+      for (const part of (await dataAttributeTables(component, "web-components")).styled) {
+        const tagName = part.name.replace(/^<|>$/g, "")
+        if (!definitions.has(tagName) || dataAttributes.has(tagName)) continue
+        dataAttributes.set(
+          tagName,
+          part.attributes.map((row) => ({
+            name: row.attribute,
+            description: row.text,
+            values: row.values.length ? row.values : undefined,
+          })),
+        )
+      }
+    // Each variable on the element that carries it, else on the owner, like one on <html>.
+    for (const component of components("CssVariables")) {
+      const owner = definitions.has(`ui-${component}`) ? `ui-${component}` : `ui-${page.slugs[1]}`
+      for (const { name, variables } of cssVariableTable(component, "web-components")) {
+        const tagName = definitions.has(name.replace(/^<|>$/g, "")) ? name.replace(/^<|>$/g, "") : owner
+        const rows = cssProperties.get(tagName) ?? []
+        for (const variable of variables)
+          if (!rows.some((row) => row.name === variable.name))
+            rows.push({ name: variable.name, description: variable.text })
+        cssProperties.set(tagName, rows)
       }
     }
   }
@@ -582,13 +587,13 @@ async function describeElements() {
     }
 
     // What it is: a component's root has its docs page's summary and
-    // anatomy. Other elements have the comment above their define call, and
+    // composition. Other elements have the comment above their define call, and
     // owners the comment above the function that defines them too.
     const page = tagName === `ui-${entry}` ? docPage(["web-components", "components", entry]) : undefined
     const fn = kind === "part" ? undefined : enclosingFunction(call)
     const described = describedNode(call, key)
     const description = page
-      ? [page.description, await anatomy(page.file)].filter(Boolean).join("\n\n")
+      ? [page.description, await composition(page.file)].filter(Boolean).join("\n\n")
       : (described ? commentAbove(described) : "") || (fn ? commentAbove(fn) : "")
     if (!description && kind !== "part") missing.push(label("description"))
 
@@ -613,11 +618,11 @@ async function describeElements() {
   return { entries, elements: docs, missing }
 }
 
-// A component's anatomy with web components, from its docs page: the markup
-// and what the page says about it.
-async function anatomy(file: string) {
+// A component's composition with web components, from its docs page: the
+// part tree and what the page says about it.
+async function composition(file: string) {
   const markdown = await pageMarkdown(file, "web-components", () => null)
-  return markdown.match(/\n## Anatomy\n([\s\S]*?)(?=\n## )/)?.[1].trim()
+  return markdown.match(/\n## Composition\n([\s\S]*?)(?=\n## )/)?.[1].trim()
 }
 
 // The entry an element is declared in: the one named like it, like `tabs`

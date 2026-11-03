@@ -12,9 +12,9 @@ function CopyButton({ label, className }: { label?: string; className?: string }
   React.useEffect(() => () => clearTimeout(timeout.current), [])
 
   async function copy(event: React.MouseEvent<HTMLButtonElement>) {
-    const code = event.currentTarget
-      .closest("[data-copy-scope], [data-code-frame]")
-      ?.querySelector("pre")?.textContent
+    const scope = event.currentTarget.closest("[data-copy-scope], [data-code-frame]")
+    const code = (scope?.querySelector('[role="tabpanel"]:not([hidden]) pre') ?? scope?.querySelector("pre"))
+      ?.textContent
     if (!code) return
     await navigator.clipboard.writeText(code)
     setCopied(true)

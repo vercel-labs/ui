@@ -112,4 +112,4 @@ function ControllerTable(props: { path: string; name: string }) {
   return <Rows label={props.name} rows={controllerRows(props)} />
 }
 
-export { ControllerTable, ReasonTable, Rows, StateTable, TypeTable }
+export { ControllerTable, ReasonTable, Rows, StateTable, Text, TypeTable }
