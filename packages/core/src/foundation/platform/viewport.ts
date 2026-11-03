@@ -174,8 +174,10 @@ function bindAvoidKeyboard(el: HTMLElement) {
   el.ownerDocument.body.append(origin)
   const keyboardOpen = keyboardHeight(view)
   let lifted = 0
+  let open = false
   const update = (event?: Event) => {
     const keyboard = keyboardOpen(sizeOf(view), event)
+    open = keyboard > 0
     // Where el would be without the lift, in the layout viewport the keyboard
     // covers, against where the visible part of the page ends.
     const box = el.getBoundingClientRect()
@@ -195,9 +197,11 @@ function bindAvoidKeyboard(el: HTMLElement) {
     el.style.translate = lifted ? [rest.x, y, rest.z].filter(Boolean).join(" ") : own
   }
   update()
-  // Scrolling reports late and often, so it measures once a frame, as the page paints.
+  // Scrolling reports late and often, so it measures once a frame, as the page
+  // paints, and only while the keyboard is open: closed, nothing is lifted.
   let frame = 0
   const scrolled = () => {
+    if (!open && !lifted) return
     view.cancelAnimationFrame(frame)
     frame = view.requestAnimationFrame(() => update())
   }

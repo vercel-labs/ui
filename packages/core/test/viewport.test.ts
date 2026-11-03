@@ -279,6 +279,27 @@ describe("bindAvoidKeyboard", () => {
     vi.unstubAllGlobals()
   })
 
+  test("doesn't measure on scroll while the keyboard is closed", () => {
+    const { move } = phone()
+    const frames = vi.fn((callback: FrameRequestCallback) => {
+      callback(0)
+      return 1
+    })
+    vi.stubGlobal("requestAnimationFrame", frames)
+    vi.stubGlobal("cancelAnimationFrame", () => {})
+    const bar = document.createElement("div")
+    box(bar, 740, 800)
+    const stop = bindAvoidKeyboard(bar)
+    window.dispatchEvent(new Event("scroll"))
+    expect(frames).not.toHaveBeenCalled()
+    type()
+    move({ height: 500 })
+    window.dispatchEvent(new Event("scroll"))
+    expect(frames).toHaveBeenCalledTimes(1)
+    stop()
+    vi.unstubAllGlobals()
+  })
+
   test("does nothing without a visual viewport", () => {
     Object.defineProperty(window, "visualViewport", { value: undefined, configurable: true })
     const el = document.createElement("div")
