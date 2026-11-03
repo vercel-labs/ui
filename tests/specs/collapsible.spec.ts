@@ -119,11 +119,38 @@ test.describe("mounting", () => {
     await expect(content(page)).toBeVisible()
   })
 
+  test("with keepMounted, a class that sets display doesn't show the closed panel", async ({
+    page,
+    open,
+  }) => {
+    await open("collapsible", { "keep-mounted": "" })
+    await page.addStyleTag({ content: ".collapsible-panel { display: flex }" })
+    await expect(panel(page)).toHaveCSS("display", "none")
+    await trigger(page).click()
+    await expect(content(page)).toBeVisible()
+    await expect(panel(page)).toHaveCSS("display", "flex")
+  })
+
   test("with hiddenUntilFound, the closed panel stays findable", async ({ page, open }) => {
     await open("collapsible", { "hidden-until-found": "" })
     await expect(panel(page)).toHaveAttribute("hidden", "until-found")
     // Content hidden until found keeps its boxes in WebKit, so ask the browser whether it shows.
     expect(await content(page).evaluate((el) => el.checkVisibility())).toBe(false)
+  })
+
+  test("with hiddenUntilFound, a class that sets display keeps the closed panel findable", async ({
+    page,
+    open,
+  }) => {
+    await open("collapsible", { "hidden-until-found": "" })
+    await page.addStyleTag({ content: ".collapsible-panel { display: flex }" })
+    await expect(panel(page)).toHaveAttribute("hidden", "until-found")
+    await expect(panel(page)).toHaveCSS("display", "flex")
+    expect(await content(page).evaluate((el) => el.checkVisibility())).toBe(false)
+    const id = await panel(page).getAttribute("id")
+    await page.evaluate((id) => (location.hash = `#${id}`), id)
+    await expect(trigger(page)).toHaveAttribute("aria-expanded", "true")
+    await expect(content(page)).toBeVisible()
   })
 
   test("finding text in the closed panel opens it", async ({ page, open }) => {

@@ -199,6 +199,18 @@ A few behaviors need a little CSS, like keeping a closed popup hidden or dimming
 
 A CSS Module loads with its component, too late to come first, so keep the line in the global stylesheet.
 
+ui-sdk adds this CSS once a component mounts, so HTML rendered on the server doesn't have it until the page hydrates. Closed content kept in the page, like a tooltip's, carries `hidden`, and a class that sets `display` shows it until then. Tailwind's base styles already hide `hidden` elements. With other CSS, add the same rule to your global stylesheet:
+
+```css
+@layer ui-sdk {
+  :where([data-slot][hidden]:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+```
+
+It leaves `hidden="until-found"` alone, so find in page can still open a closed panel.
+
 ## Content Security Policy
 
 A Content Security Policy without `'unsafe-inline'` in `style-src` blocks the CSS ui-sdk adds. Give ui-sdk your policy's nonce with a meta tag in the page's `<head>`:

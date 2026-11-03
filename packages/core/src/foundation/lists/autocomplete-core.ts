@@ -12,7 +12,6 @@ import { createListbox, type ListData, type ListFilter, type Listbox } from "./l
 import { listStep } from "./listbox-keyboard"
 import { keepListing, type Listing } from "./listbox-listing"
 import { positionAttrs, registerItem } from "./listbox-parts"
-import { enforceHidden } from "../platform/style"
 import { announceResults, createLoadMore, matchMode, type ListAnnouncement } from "./listbox-search"
 import { idPart } from "../kernel/attrs"
 import type { BaseSlotProps, PrimitiveContext, SlotDefinition } from "../kernel/primitive-types"
@@ -352,7 +351,6 @@ function optionPart<State extends AutocompleteCoreState, Api extends CoreApi>() 
     },
     press: ({ api, key }, event) => api.internal.press(key, event),
     bind(el, { api, key, props }) {
-      enforceHidden(el.ownerDocument)
       const unregister = registerItem(el, { api, key, props })
       return () => {
         unregister()

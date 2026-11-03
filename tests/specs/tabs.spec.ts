@@ -280,6 +280,16 @@ test.describe("panels", () => {
       await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!)
     }
   })
+
+  test("with keepMounted, a class that sets display doesn't show hidden panels", async ({ page, open }) => {
+    await open("tabs", { "keep-mounted": "" })
+    await page.addStyleTag({ content: ".panel { display: flex }" })
+    const displays = () =>
+      page.locator(".panel").evaluateAll((panels) => panels.map((el) => getComputedStyle(el).display))
+    await expect.poll(displays).toEqual(["flex", "none", "none", "none"])
+    await tabNamed(page, "Notifications").click()
+    await expect.poll(displays).toEqual(["none", "none", "none", "flex"])
+  })
 })
 
 test.describe("indicator", () => {

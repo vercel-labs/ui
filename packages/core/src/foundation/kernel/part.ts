@@ -3,6 +3,7 @@
 // bind them. They're free functions, so each adapter bundles only the ones it
 // calls.
 import { dev, warn } from "#dev"
+import { enforceHidden } from "../platform/style"
 import { isComposing, on } from "./events"
 import type { AnySlot, Attrs, EventMap, Part } from "./primitive-types"
 import { eachMoved } from "./selects"
@@ -310,6 +311,20 @@ function onProps(part: Part, listener: () => void) {
   }
 }
 
+// A slot names `hidden` in its attributes whether it's set or not, so one
+// read per slot says whether its parts can be hidden.
+const hidingSlots = new WeakMap<object, boolean>()
+
+function canHide(part: Part) {
+  const definition = definitionOf(part)
+  let hides = hidingSlots.get(definition)
+  if (hides === undefined) {
+    hides = !!definition.attrs && "hidden" in definition.attrs(part.store.get(), view(part, part.props))
+    hidingSlots.set(definition, hides)
+  }
+  return hides
+}
+
 /** Attaches behavior to an element. Leases the part while bound. Returns the cleanup. */
 function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   const kept = part as PartRecord
@@ -324,6 +339,7 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   part.el = el
   kept.binding = binding
   const cleanups = [lease(kept)]
+  if (canHide(part)) enforceHidden(el.ownerDocument)
 
   for (const [type, handler] of Object.entries(handlers(part))) {
     if (host.by === "core" || (host.attaches !== "all" && !host.attaches.includes(type)))
