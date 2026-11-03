@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   Dialog,
   DialogBackdrop,
@@ -10,31 +9,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [status, setStatus] = React.useState("Closed")
+  const log = useLog()
   return (
-    <>
-      <Dialog
-        onOpenChange={(open) => setStatus(open ? "Opening" : "Closing")}
-        onOpenChangeComplete={(open) => setStatus(open ? "Open" : "Closed")}
-      >
-        <DialogTrigger>Slide in</DialogTrigger>
-        <DialogBackdrop />
-        <DialogContent keepMounted>
-          <div data-slot="stack">
-            <DialogTitle>Slide and fade</DialogTitle>
-            <DialogDescription>
-              300ms in and out. Focus returns as soon as it starts closing.
-            </DialogDescription>
-          </div>
-          <div data-slot="row">
-            <DialogClose data-variant="solid">Close</DialogClose>
-          </div>
-        </DialogContent>
-      </Dialog>
-      <output data-slot="output">{status}</output>
-    </>
+    <Dialog onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
+      <DialogTrigger>Slide In</DialogTrigger>
+      <DialogBackdrop />
+      <DialogContent keepMounted>
+        <div data-slot="stack">
+          <DialogTitle>Slide and fade</DialogTitle>
+          <DialogDescription>300ms in and out. Focus returns as soon as it starts closing.</DialogDescription>
+        </div>
+        <div data-slot="row">
+          <DialogClose data-variant="solid">Close</DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

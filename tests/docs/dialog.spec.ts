@@ -5,7 +5,9 @@ import path from "node:path"
 const frameworks = ["react", "solid", "vue", "svelte", "web-components"]
 const folders = ["react", "solid", "vue", "svelte", "web"]
 const examplesIn = (component: string, folder: string) =>
-  readdirSync(path.join(import.meta.dirname, "../../examples", component, folder), { withFileTypes: true })
+  readdirSync(path.join(import.meta.dirname, "../../examples/components", component, folder), {
+    withFileTypes: true,
+  })
     .filter((file) => file.isFile())
     .map((file) => file.name.replace(/\.\w+$/, ""))
 
@@ -18,23 +20,21 @@ const pages: Record<string, { role: "dialog" | "alertdialog"; examples: Record<s
     role: "dialog",
     examples: {
       basic: /^Share$/,
-      scrollable: /^Scrollable content$/,
-      modal: /^Open notes$/,
-      "dirty-form": /^Write a post$/,
+      scrollable: /^Scrollable Content$/,
+      form: /^New Article$/,
+      controlled: /^Notification Settings$/,
+      shortcut: /^New Contact/,
+      animation: /^(Slide|Fade) In$/,
+      modal: /^Open Notes$/,
+      "dirty-form": /^Write a Post$/,
       nested: /^Account$/,
       "from-menu": async (preview, page) => {
-        await preview.getByRole("button", { name: "File actions" }).click()
+        await preview.getByRole("button", { name: "File Actions" }).click()
         await page.getByRole("menuitem", { name: /Rename/ }).click()
       },
       payload: /^Remind Globex$/,
-      form: /^New article$/,
-      focus: /^Invite$/,
-      controlled: /^Open$/,
-      shortcut: /^Search docs/,
-      persistent: /^Upgrade plan$/,
-      container: /^Open in (the box|a window)$/,
-      animation: /^(Slide|Fade) in$/,
-      presentation: /^Edit profile$/,
+      presentation: /^Edit Profile$/,
+      "custom-rendering": /^View Details/,
     },
   },
 }
@@ -54,9 +54,7 @@ for (const [component, { role, examples }] of Object.entries(pages)) {
       const previews = page.locator("[data-example]")
       await expect(previews).toHaveCount(order.length)
       for (const folder of folders)
-        expect(examplesIn(component, folder).sort(), folder).toEqual(
-          [...order, "close-button", "sticky-footer", "rtl", "custom-rendering"].sort(),
-        )
+        expect(examplesIn(component, folder).sort(), folder).toEqual([...order, "rtl"].sort())
 
       for (const [index, name] of order.entries()) {
         const preview = previews.nth(index)
@@ -82,10 +80,10 @@ for (const [component, { role, examples }] of Object.entries(pages)) {
 for (const framework of frameworks) {
   test(`a trigger's shortcut opens the dialog in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/dialog`)
-    const trigger = page.getByRole("button", { name: /^Search docs/ })
+    const trigger = page.getByRole("button", { name: /^New Contact/ })
     await expect(trigger).toHaveAttribute("aria-keyshortcuts", /^(Meta|Control)\+J$/)
     await page.keyboard.press("ControlOrMeta+j")
-    await expect(page.getByRole("dialog", { name: "Search docs" })).toBeVisible()
+    await expect(page.getByRole("dialog", { name: "New contact" })).toBeVisible()
   })
 }
 

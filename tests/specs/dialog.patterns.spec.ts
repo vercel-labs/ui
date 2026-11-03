@@ -43,7 +43,7 @@ test.describe("opening a dialog from a menu item", () => {
   })
 })
 
-test.describe("opening a dialog from a menu item", { tag: "@enhancement" }, () => {
+test.describe("the page and focus around a dialog opened from a menu item", { tag: "@enhancement" }, () => {
   test("the page around the dialog is inert, the menu's trigger included", async ({ page }) => {
     await fileTrigger(page).click()
     await page.getByRole("menuitem", { name: f.menu.rename }).click()

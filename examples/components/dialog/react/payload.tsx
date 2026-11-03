@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
+import { useLog } from "../../../shared/react/log"
 
 type Invoice = { id: string; customer: string; amount: string; status: "Paid" | "Due" }
 
@@ -22,15 +23,20 @@ const invoices: Invoice[] = [
 
 function Example() {
   const [reminder] = React.useState(() => createDialogController<Invoice, "send">())
-  const [status, setStatus] = React.useState("")
+  const log = useLog()
 
   async function remindFromCode() {
     const { reason, returnValue } = await reminder.open({ payload: invoices[2] })
-    setStatus(returnValue === "send" ? "Reminder sent from code" : `Closed with ${reason}`)
+    log(returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`)
   }
 
   return (
-    <>
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={remindFromCode}>
+          Open from Code
+        </button>
+      </div>
       <ul data-slot="list">
         {invoices.map((invoice) => (
           <li data-slot="row" key={invoice.id}>
@@ -49,13 +55,10 @@ function Example() {
           </li>
         ))}
       </ul>
-      <button type="button" onClick={remindFromCode}>
-        Open from code
-      </button>
       <Dialog
         controller={reminder}
         onOpenChange={(open, details) => {
-          if (!open && details.returnValue === "send") setStatus("Reminder sent")
+          if (!open && details.returnValue === "send") log("Reminder sent")
         }}
       >
         <DialogBackdrop />
@@ -81,8 +84,7 @@ function Example() {
           }}
         </DialogContent>
       </Dialog>
-      <output data-slot="output">{status}</output>
-    </>
+    </div>
   )
 }
 

@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 
 function Example() {
   const [open, setOpen] = React.useState(false)
@@ -28,14 +29,20 @@ function Example() {
       dismissible={!dirty}
       onDismissAttempt={() => setAsking(true)}
     >
-      <DialogTrigger>Write a post</DialogTrigger>
+      <DialogTrigger>Write a Post</DialogTrigger>
       <DialogBackdrop />
       <DialogContent>
         <div data-slot="stack">
           <DialogTitle>New post</DialogTitle>
-          <DialogDescription>Type something, then press Escape or click outside.</DialogDescription>
+          <DialogDescription>Share an update with your team.</DialogDescription>
         </div>
-        <textarea ref={post} aria-label="Post" onChange={(event) => setDirty(event.target.value !== "")} />
+        <Field>
+          <FieldLabel>Post</FieldLabel>
+          <FieldControl
+            render={<textarea ref={post} placeholder="What's new?" />}
+            onChange={(event) => setDirty(event.currentTarget.value !== "")}
+          />
+        </Field>
         {asking ? (
           <div data-slot="row" role="alert">
             Discard your changes?
@@ -47,7 +54,7 @@ function Example() {
                   post.current?.focus()
                 }}
               >
-                Keep editing
+                Keep Editing
               </button>
               <button data-variant="solid" type="button" onClick={close}>
                 Discard

@@ -111,11 +111,6 @@ A form with `method="dialog"` closes the dialog on a valid submission. The submi
 
 Use `initialFocus` to pick where focus starts, and `finalFocus` to choose where it goes next. The default returns to the trigger or the element focused before a controller opened the dialog. See [popup focus](../popups) for the shared focus rules.
 
-<ComponentExample
-  name="dialog/focus"
-  caption="Open Invite. Focus starts on Email; closing the dialog moves it to Next step."
-/>
-
 ### Controlled
 
 Use `v-model:open` to keep the dialog’s state in your component. Cancel a proposed change with `details.cancel()`. `onOpenChangeComplete` reports when opening or closing has finished; see [state and events](../state-and-events) for the common change contract.
@@ -138,19 +133,9 @@ A trigger’s `shortcut` opens it from the keyboard. `mod+j` means Command+J on 
 
 Keep a small part of the page usable while a modal dialog is open. `persistentElements` accepts an array of elements or selectors, or a function returning elements when the dialog opens. The chat launcher here uses a native popover to sit above the backdrop; persistent elements alone do not change stacking.
 
-<ComponentExample
-  name="dialog/persistent"
-  caption="Open Upgrade plan, then press Chat with us. Its count changes while the dialog stays open."
-/>
-
 ### Container
 
 Dialogs render where you put them and use the browser’s top layer. Set `container` when their DOM needs to live elsewhere. The shared [popup guide](../popups) covers containers, shadow roots, and iframes.
-
-<ComponentExample
-  name="dialog/container"
-  caption="Open in the box. The dialog still appears over the page, but its content is rendered in the marked container in the DOM."
-/>
 
 ### Animation
 

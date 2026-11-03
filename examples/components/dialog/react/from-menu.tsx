@@ -10,6 +10,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@ui-sdk/react/dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
 import { CopyIcon, EllipsisIcon, PencilIcon } from "lucide-react"
 
@@ -39,10 +40,10 @@ function Example() {
             <DialogTitle>Rename file</DialogTitle>
             <DialogDescription>Names must be unique in a folder.</DialogDescription>
           </div>
-          <label data-slot="label">
-            Name
-            <input defaultValue="report.pdf" />
-          </label>
+          <Field>
+            <FieldLabel>Name</FieldLabel>
+            <FieldControl defaultValue="report.pdf" />
+          </Field>
           <div data-slot="row">
             <DialogClose>Cancel</DialogClose>
             <DialogClose data-variant="solid" value="rename">

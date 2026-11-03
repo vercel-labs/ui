@@ -21,11 +21,11 @@ function Example() {
         <div data-slot="stack">
           <label data-slot="label">
             Name
-            <input value="Pedro Duarte" />
+            <input value="Hollis Grant" />
           </label>
           <label data-slot="label">
             Username
-            <input value="@peduarte" />
+            <input value="@hollis" />
           </label>
         </div>
         <div data-slot="row">

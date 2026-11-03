@@ -10,43 +10,64 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { CheckIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
+
+const topics = [
+  { label: "Product updates", checked: true },
+  { label: "Security alerts", checked: true },
+  { label: "Weekly digest", checked: false },
+]
 
 function Example() {
+  const log = useLog()
   const [open, setOpen] = React.useState(false)
-  const [log, setLog] = React.useState<string[]>([])
-  const write = (line: string) => setLog((lines) => [line, ...lines].slice(0, 8))
   return (
-    <>
-      <label data-slot="label">
-        <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
-        open
-      </label>
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Checkbox checked={open} onCheckedChange={(next) => setOpen(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
+          Open
+        </label>
+      </div>
       <Dialog
         open={open}
         onOpenChange={(next, details) => {
           setOpen(next)
-          write(`onOpenChange(${next}, "${details.reason}")`)
+          log(`${next ? "Opened" : "Closed"} (${details.reason})`)
         }}
-        onOpenChangeComplete={(next) => write(`onOpenChangeComplete(${next})`)}
+        onOpenChangeComplete={(next) => log(next ? "Finished opening" : "Finished closing")}
       >
-        <DialogTrigger>Open</DialogTrigger>
+        <DialogTrigger>Notification Settings</DialogTrigger>
         <DialogBackdrop />
         <DialogContent>
           <div data-slot="stack">
-            <DialogTitle>Controlled</DialogTitle>
-            <DialogDescription>Close it any way you like, and watch the log.</DialogDescription>
+            <DialogTitle>Notification settings</DialogTitle>
+            <DialogDescription>Choose what we email you about.</DialogDescription>
+          </div>
+          <div data-slot="stack">
+            {topics.map((topic) => (
+              <label data-slot="label" key={topic.label}>
+                <Checkbox defaultChecked={topic.checked}>
+                  <CheckboxIndicator>
+                    <CheckIcon aria-hidden="true" />
+                  </CheckboxIndicator>
+                </Checkbox>
+                {topic.label}
+              </label>
+            ))}
           </div>
           <div data-slot="row">
-            <DialogClose data-variant="solid">Close</DialogClose>
+            <DialogClose data-variant="solid">Done</DialogClose>
           </div>
         </DialogContent>
       </Dialog>
-      <ol data-slot="log">
-        {log.map((line, index) => (
-          <li key={index}>{line}</li>
-        ))}
-      </ol>
-    </>
+    </div>
   )
 }
 

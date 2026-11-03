@@ -1,36 +1,48 @@
+"use client"
+
 import {
   Dialog,
   DialogBackdrop,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogShortcut,
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
-import { FileIcon, SearchIcon } from "lucide-react"
-
-const pages = ["Introduction", "Installation", "Dialog", "Alert Dialog", "Menu"]
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { PlusIcon } from "lucide-react"
 
 function Example() {
   return (
     <Dialog>
       <DialogTrigger shortcut="mod+j">
-        <SearchIcon aria-hidden="true" />
-        Search docs
+        <PlusIcon aria-hidden="true" />
+        New Contact
         <DialogShortcut />
       </DialogTrigger>
       <DialogBackdrop />
       <DialogContent>
-        <DialogTitle>Search docs</DialogTitle>
-        <input aria-label="Search" placeholder="Search…" />
         <div data-slot="stack">
-          {pages.map((page) => (
-            <DialogClose key={page} value={page}>
-              <FileIcon aria-hidden="true" />
-              {page}
-            </DialogClose>
-          ))}
+          <DialogTitle>New contact</DialogTitle>
+          <DialogDescription>Add someone to your address book.</DialogDescription>
         </div>
+        <form data-slot="stack" method="dialog">
+          <Field>
+            <FieldLabel>Name</FieldLabel>
+            <FieldControl name="name" required placeholder="Kofi Mensah" />
+          </Field>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <FieldControl name="email" type="email" required placeholder="kofi@example.com" />
+          </Field>
+          <div data-slot="row">
+            <DialogClose>Cancel</DialogClose>
+            <button data-variant="solid" type="submit" value="save">
+              Save Contact
+            </button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )
