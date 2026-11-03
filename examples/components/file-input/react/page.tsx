@@ -4,21 +4,25 @@ import {
   FileInputItem,
   FileInputItemRemove,
   FileInputList,
+  FileInputTrigger,
   formatFileSize,
 } from "@ui-sdk/react/file-input"
 import { FileIcon, UploadIcon, XIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <FileInput multiple>
-      <p data-slot="hint">Drag a file anywhere over this page.</p>
+      <div data-slot="row">
+        <p data-slot="hint">Drop files anywhere.</p>
+        <FileInputTrigger>Upload Files</FileInputTrigger>
+      </div>
       <FileInputDropzone target="document" data-variant="overlay">
         <div data-slot="stack">
           <UploadIcon aria-hidden="true" />
           <p>Drop to attach</p>
         </div>
       </FileInputDropzone>
-      <FileInputList aria-label="Files">
+      <FileInputList aria-label="Attachments">
         <FileInputItem>
           {({ file }) => (
             <>
@@ -35,3 +39,5 @@ export function Example() {
     </FileInput>
   )
 }
+
+export { Example }

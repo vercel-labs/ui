@@ -9,14 +9,14 @@ import {
 } from "@ui-sdk/react/file-input"
 import { FileIcon, UploadIcon, XIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <FileInput multiple>
       <FileInputDropzone>
         <UploadIcon aria-hidden="true" />
         <p>Drag and drop files here</p>
-        <p data-slot="hint">Or paste them, or browse your computer.</p>
-        <FileInputTrigger>Browse files</FileInputTrigger>
+        <p data-slot="hint">Or paste them from your clipboard.</p>
+        <FileInputTrigger>Browse Files</FileInputTrigger>
       </FileInputDropzone>
       <FileInputList aria-label="Files">
         <FileInputItem>
@@ -35,3 +35,5 @@ export function Example() {
     </FileInput>
   )
 }
+
+export { Example }

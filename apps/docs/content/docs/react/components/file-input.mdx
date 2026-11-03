@@ -3,30 +3,70 @@ title: File Input
 description: Choose, drop, or paste files, validate them, and submit them with a form.
 ---
 
+A file input holds the files someone chooses, drops, or pastes, checks them against your rules, and submits them with a form. Uploading them to a server is up to your app.
+
 <ComponentExample
   name="file-input/basic"
-  caption="Choose or drop a few files, then remove one. You can also paste files while focus is inside the drop zone."
+  caption="Browse Files or drop a few files on the zone, then remove one. Tab to the list to move between files with the arrow keys, and press Delete to remove the focused one."
 />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/react @ui-sdk/core
+npm install @ui-sdk/react @ui-sdk/core
 ```
 
-<a id="composition" />
+## Composition
+
+Use the following composition to build a `FileInput`:
+
+```text
+FileInput
+├── FileInputTrigger
+├── FileInputDropzone
+└── FileInputList
+    └── FileInputItem
+        └── FileInputItemRemove
+```
+
+The trigger opens the system file picker. The drop zone takes files that are dropped on it or pasted while focus is inside it; keep a trigger beside it for people using a keyboard. The list renders its item once for each file, and an item's state has its `file` and `index`. A remove button removes its item's file.
 
 ## Usage
 
-Start with a trigger. Add a drop zone or list when the workflow needs one.
+Import the parts and put them together:
 
 ```tsx
-import { FileInput, FileInputTrigger } from "@ui-sdk/react/file-input"
+import {
+  FileInput,
+  FileInputDropzone,
+  FileInputItem,
+  FileInputItemRemove,
+  FileInputList,
+  FileInputTrigger,
+  formatFileSize,
+} from "@ui-sdk/react/file-input"
+import { XIcon } from "lucide-react"
 
 function Example() {
   return (
-    <FileInput name="attachment">
-      <FileInputTrigger>Choose a file</FileInputTrigger>
+    <FileInput name="attachments" multiple>
+      <FileInputDropzone>
+        <p>Drag and drop files here</p>
+        <FileInputTrigger>Browse Files</FileInputTrigger>
+      </FileInputDropzone>
+      <FileInputList aria-label="Files">
+        <FileInputItem>
+          {({ file }) => (
+            <>
+              <span>{file.name}</span>
+              <span>{formatFileSize(file.size)}</span>
+              <FileInputItemRemove>
+                <XIcon aria-hidden="true" />
+              </FileInputItemRemove>
+            </>
+          )}
+        </FileInputItem>
+      </FileInputList>
     </FileInput>
   )
 }
@@ -34,186 +74,266 @@ function Example() {
 export { Example }
 ```
 
-## Parts
+## Upload Button
 
-- `FileInput` holds the files and applies validation.
-- `FileInputTrigger` opens the picker.
-- `FileInputDropzone` accepts drops and pastes. Pair it with a trigger for keyboard access.
-- `FileInputList` repeats its item template for each file. An item’s state contains its `file` and `index`.
-- `FileInputItemRemove` removes its file.
+A trigger is enough when you only need the system file picker. Read the chosen file from the root's state to show its name beside the button.
 
-## Examples
+```tsx
+<FileInput name="resume">
+  {(state) => (
+    <>
+      <FileInputTrigger>Upload Resume</FileInputTrigger>
+      <span>{state.value[0]?.name ?? "No file chosen"}</span>
+    </>
+  )}
+</FileInput>
+```
 
-### Upload Button
+## Accepted Types
 
-A trigger is enough when you only need the system file picker. The component holds `File` objects; uploading them to a server is up to your app.
+`accept` takes MIME types, wildcards, and extensions, such as `image/*` and `.pdf`. It checks files from the picker, drops, and pastes. An extension matches the filename, even when the operating system reports an unexpected MIME type.
 
-<ComponentExample
-  name="file-input/trigger"
-  caption="Choose Upload a file and select a file. Its name appears beside the button."
-/>
+A rejected file never joins the value. `onReject` receives each one with its `reasons`, such as `file-type`, so you can say why it was left out. While files are dragged over a drop zone, `data-drag-reject` shows when their types won't be accepted.
 
-### Accept
+```tsx
+<FileInput multiple accept={["image/*", ".pdf"]} onReject={(rejected) => setRejected(rejected)}>
+```
 
-`accept` takes MIME types, wildcards, and extensions, such as `image/*,.pdf`. It checks files from the picker, drops, and pastes. An extension matches the filename, even if the operating system reports an unexpected MIME type.
+## Limits
 
-<ComponentExample
-  name="file-input/accept"
-  caption="Add an image or PDF, then try a text file. The unsupported file is rejected and the message explains why."
-/>
+Use `maxFiles` to limit the total count, and `minSize` or `maxSize` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full, and rejects the rest with `too-many-files`.
 
-### Limits
+```tsx
+<FileInput multiple maxFiles={3} minSize={1} maxSize={5_000_000}>
+```
 
-Use `maxFiles` to limit the total count, and `minSize` or `maxSize` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full.
+## One File
 
-<ComponentExample
-  name="file-input/limits"
-  caption="Add up to three files, then try another or one larger than 5 MB. Remove a file to make room."
-/>
+Without `multiple`, a new file replaces the current one. A rejected file leaves the current value unchanged. With `multiple`, accepted files join the list.
 
-### One File
+```tsx
+<FileInput accept=".pdf">
+  {({ value: [file] }) => <FileInputTrigger>{file ? "Replace PDF" : "Choose a PDF"}</FileInputTrigger>}
+</FileInput>
+```
 
-Without `multiple`, a new file replaces the current one. A rejected file leaves the current value unchanged. With `multiple`, accepted files are added to the list.
+## Validation
 
-<ComponentExample
-  name="file-input/single"
-  caption="Choose a PDF, then choose another. The second file replaces the first."
-/>
+Add `validate` for checks of your own. Return a reason string to reject a file, or `null` to accept it. It runs after the built-in type and size checks, and its reason reaches `onReject` like theirs. Validate uploads on your server too.
 
-### List
+```tsx
+const [files] = React.useState(createFileInputController)
+
+<FileInput
+  multiple
+  controller={files}
+  validate={(file) => (files.getValue().some((other) => other.name === file.name) ? "duplicate" : null)}
+  onReject={(rejected) => setRejected(rejected)}
+>
+```
+
+## File List
 
 The list has one Tab stop. Arrow keys, Home, and End move between files; Delete or Backspace removes the focused file. Remove buttons are named for their file and stay outside the Tab order.
 
-This example creates an object URL for each image preview and revokes it when the preview is removed.
+For an image preview, create an object URL for the file and revoke it when the item goes away:
 
-<ComponentExample
-  name="file-input/list"
-  caption="Add a few images. Tab to the list, use the arrow keys to move, and press Delete or Backspace to remove the focused image."
-/>
+```tsx
+;<FileInputItem>
+  {({ file }) => (
+    <>
+      <Preview file={file} />
+      <span>{file.name}</span>
+      <FileInputItemRemove>
+        <XIcon aria-hidden="true" />
+      </FileInputItemRemove>
+    </>
+  )}
+</FileInputItem>
 
-### Attachments
+function Preview({ file }: { file: File }) {
+  const [url, setUrl] = React.useState<string>()
+  React.useEffect(() => {
+    const next = URL.createObjectURL(file)
+    setUrl(next)
+    return () => URL.revokeObjectURL(next)
+  }, [file])
+  return url ? <img src={url} alt="" /> : null
+}
+```
 
-Combine a drop zone with a textarea to attach files to a message. File pastes inside the zone are accepted; text pastes keep their normal behavior. `pasteTarget` can also point to another element or `"document"`.
+## Attachments
 
-<ComponentExample
-  name="file-input/prompt"
-  caption="Type a message and attach a file. With the message empty, press Backspace to remove the last attachment. Send clears this local demo."
-/>
+Put a textarea inside a drop zone to attach files to a message. `pasteTarget` takes file pastes from the textarea too; text pastes keep their normal behavior. It can also be another element, a CSS selector, or `"document"`.
 
-### Page-Wide
+```tsx
+const message = React.useRef<HTMLTextAreaElement>(null)
 
-Set `target="document"` to accept files dropped anywhere on the page. `data-dragging` lets you show an overlay while a file is over the window. A drop on another zone stays with that zone.
+<FileInput multiple>
+  <FileInputDropzone pasteTarget={() => message.current}>
+    <FileInputList aria-label="Attachments">
+      <FileInputItem>{({ file }) => file.name}</FileInputItem>
+    </FileInputList>
+    <textarea ref={message} aria-label="Message" />
+    <FileInputTrigger aria-label="Attach Files">
+      <PlusIcon aria-hidden="true" />
+    </FileInputTrigger>
+  </FileInputDropzone>
+</FileInput>
+```
+
+## Page-Wide Drop
+
+Set `target="document"` to take files dropped anywhere on the page. The zone shows `data-dragging` while a file is over the window, so it can be a full-page overlay. A drop on another zone stays with that zone.
 
 <ComponentExample
   name="file-input/page"
-  caption="Drag a file over this page to see the overlay, then drop it outside the other drop zones. Remove it from the list afterward."
+  caption="Drag a file over this page to see the overlay, then drop it. The file joins the Attachments list; a drop on the first example's zone stays there."
 />
 
-### Folders
+While a drop zone is mounted, dropping a file outside every zone doesn't navigate away from the page. Drops onto native file inputs and ordinary text drops keep their behavior.
 
-`directory` enables folder selection and multiple files. Dropped folders are read recursively, up to 1,000 files, skipping system files such as `.DS_Store`. `relativePath(file)` returns the path inside the folder.
+## Folders
 
-<ComponentExample
-  name="file-input/folder"
-  caption="Choose or drop a folder. The list shows each file with its path inside the folder."
-/>
+`directory` picks a whole folder and turns on `multiple`. Dropped folders are read recursively, up to 1,000 files, skipping system files such as `.DS_Store`. `relativePath(file)` returns the path inside the folder.
 
-### Camera
+```tsx
+<FileInput directory>
+  <FileInputTrigger>Choose a Folder</FileInputTrigger>
+  <FileInputList aria-label="Files">
+    <FileInputItem>{({ file }) => relativePath(file)}</FileInputItem>
+  </FileInputList>
+</FileInput>
+```
 
-Use `capture="environment"` to request the rear camera, or `"user"` for the front camera. The picker offered depends on the device and browser.
+## Camera
 
-<ComponentExample
-  name="file-input/camera"
-  caption="Choose Take a photo. A supported mobile browser can offer the camera; other browsers open a file picker."
-/>
+Use `capture="environment"` to request the rear camera, or `"user"` for the front camera. The picker offered depends on the device and browser; a desktop browser opens a file picker.
 
-### Disabled
+```tsx
+<FileInput accept="image/*" capture="environment">
+  <FileInputTrigger>Take a Photo</FileInputTrigger>
+</FileInput>
+```
 
-`disabled` prevents picking, dropping, and pasting files. It also excludes the value from form submission.
+## Controlled
 
-<ComponentExample
-  name="file-input/disabled"
-  caption="Try Browse or drop a file on the zone. The disabled input keeps its value unchanged."
-/>
+Pass `value` and update it in `onValueChange`. `details` has the `reason` and the `added`, `removed`, and `rejected` files. Call `details.cancel()` to keep the current value. `onReject` reports rejected files even when none were accepted.
 
-### Avatar
+```tsx
+const [files, setFiles] = React.useState<File[]>([])
 
-Use a single image value to replace a profile photo. Keep the preview URL separate from the file and revoke it when the file changes or the example unmounts.
+<FileInput multiple value={files} onValueChange={(value) => setFiles(value)}>
+```
 
-<ComponentExample
-  name="file-input/avatar"
-  caption="Upload an image or drop one on the avatar. Replace it or choose Remove to clear the preview."
-/>
+## Opening from Anywhere
 
-## Behavior and Options
+Create a controller with `createFileInputController()` and pass it to `FileInput`. Use it to open the picker, add or remove files, clear the value, or read the files. Open the picker from a user action, such as a button press, so the browser allows it. A `FileInputTrigger` outside the file input connects through the same `controller` prop.
 
-### Controlled
+```tsx
+const [attachments] = React.useState(createFileInputController)
 
-Pass `value` and update it in `onValueChange`. `details` includes the `reason`, `added`, `removed`, and `rejected` files. Call `details.cancel()` to cancel the change. The `onReject` callback reports rejected files even when none were accepted.
+<button type="button" onClick={() => attachments.open()}>
+  Choose Files
+</button>
+<button type="button" onClick={() => attachments.clear()}>
+  Clear
+</button>
+<FileInput multiple controller={attachments} />
+```
 
-<ComponentExample
-  name="file-input/controlled"
-  caption="Add a file, remove one with its remove button, then try Remove last. The example keeps the files in application state."
-/>
+## Announcements
 
-### Validation
+The component announces accepted, removed, and rejected files through a polite live region. Use `announcement` to change the message, or return `null` to skip it.
 
-Add `validate` for app-specific checks. Return a reason string to reject a file, or `null` to accept it. This runs after the built-in type and size checks. Validate uploads on your server too.
-
-<ComponentExample
-  name="file-input/validate"
-  caption="Add a file, then try another file with the same name. The custom check rejects the duplicate."
-/>
-
-### Announcements
-
-The component announces accepted, removed, and rejected files. Use `announcement` to change the message, or return `null` to skip it.
-
-<ComponentExample
-  name="file-input/announcement"
-  caption="With a screen reader, add and remove images. The announcement includes their names. Try another file type to hear the rejection."
-/>
-
-### Controller
-
-Create a controller with `createFileInputController()` and pass it to `FileInput`. Use it to open the picker, add or remove files, clear the value, or read the files. Open the picker from a user action, such as a button press, so the browser allows it.
-
-<ComponentExample
-  name="file-input/controller"
-  caption="Choose Add a note to create a local text file, then Clear. Open the picker uses the same controller."
-/>
-
-### Outside the Zone
-
-While a file drop zone is mounted, dropping a file outside all zones does not navigate away from the page. Drops onto native file inputs and ordinary text drops keep their behavior.
+```tsx
+<FileInput
+  multiple
+  announcement={({ added, removed }) =>
+    added.length
+      ? `Added ${added.map((file) => file.name).join(", ")}.`
+      : removed.length
+        ? `Removed ${removed.map((file) => file.name).join(", ")}.`
+        : null
+  }
+>
+```
 
 ## Forms
 
-With `name`, the component submits its files through a native file input. A form reset returns to `defaultValue`. The server-rendered file input can submit before hydration. `form` connects a file input to a form elsewhere on the page. Rejected files never submit.
+With `name`, the component submits its files through a native file input, which can submit before hydration. A form reset returns to `defaultValue`. `form` connects the file input to a form elsewhere on the page. Rejected files never submit, and `disabled` leaves the value out of the submission as well as stopping picks, drops, and pastes.
 
-<ComponentExample
-  name="file-input/form"
-  caption="Choose Send to inspect the filenames that would submit. Add or remove files, then Reset to restore the starting file. Nothing is uploaded."
-/>
+```tsx
+<form method="post" encType="multipart/form-data">
+  <FileInput name="attachments" multiple defaultValue={[coverLetter]}>
+    <FileInputTrigger>Attach Files</FileInputTrigger>
+  </FileInput>
+  <button type="submit">Send</button>
+  <button type="reset">Reset</button>
+</form>
+```
 
-### Field
+## Fields
 
-Wrap the file input in a [Field](./field) to connect its label, description, and validation message. The trigger becomes the field’s control; pressing the label opens the picker. `required` prevents submission with no file.
+Wrap the file input in a [Field](./field) to connect its label, description, and validation message. The trigger becomes the field's control, and pressing the label opens the picker. `required` stops the form from submitting with no file.
 
-<ComponentExample
-  name="file-input/field"
-  caption="Choose Continue with no file to see the required error. Add a scan, submit again, then Reset."
-/>
-
-## Styling
-
-Use `data-dragging`, `data-drag-accept`, and `data-drag-reject` on the drop zone. Drag acceptance reflects the file information the browser exposes before a drop. A Field also adds attributes such as `data-invalid` to the trigger.
-
-<DataAttributes component="file-input" />
+```tsx
+<Field>
+  <FieldLabel>Proof of address</FieldLabel>
+  <FileInput name="proof" required accept={["image/*", ".pdf"]}>
+    <FileInputTrigger>Choose a File</FileInputTrigger>
+  </FileInput>
+  <FieldDescription>A utility bill or bank statement from the last 3 months.</FieldDescription>
+  <FieldError match="valueMissing">Add a scan to continue.</FieldError>
+</Field>
+```
 
 ## Custom Rendering
 
-Item state exposes `file` and `index` for filenames, sizes, and previews. See [Parts and Composition](../parts-and-composition) for changing the rendered element.
+Every part takes `render`, to render a different element in its place. The root, the drop zone, and an item also take a function as children, which receives the part's state:
+
+```tsx
+<FileInputDropzone render={<section aria-label="Gallery upload" />}>
+  {(state) => (state.dragReject ? "Images only" : state.dragAccept ? "Release to add" : "Drag images here")}
+</FileInputDropzone>
+<FileInputList render={<ul aria-label="Images" />}>
+  <FileInputItem render={<li />}>{(state) => `${state.index + 1}. ${state.file.name}`}</FileInputItem>
+</FileInputList>
+```
+
+See [Parts and Composition](../parts-and-composition) for more on `render`.
+
+## Styling
+
+Use `data-dragging`, `data-drag-accept`, and `data-drag-reject` on the drop zone to show what a drop would do. Drag acceptance reflects the file information the browser exposes before a drop. Inside a Field, the trigger also gets the field's attributes, such as `data-invalid`.
+
+Each part has a `data-slot`, such as `file-input-dropzone`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### FileInput [#data-attributes-fileinput]
+
+<DataAttributes component="file-input" part="root" />
+
+### FileInputTrigger [#data-attributes-fileinputtrigger]
+
+<DataAttributes component="file-input" part="trigger" />
+
+### FileInputDropzone [#data-attributes-fileinputdropzone]
+
+<DataAttributes component="file-input" part="dropzone" />
+
+### FileInputList [#data-attributes-fileinputlist]
+
+<DataAttributes component="file-input" part="list" />
+
+### FileInputItem [#data-attributes-fileinputitem]
+
+<DataAttributes component="file-input" part="item" />
+
+### FileInputItemRemove [#data-attributes-fileinputitemremove]
+
+<DataAttributes component="file-input" part="item-remove" />
 
 ## API Reference
 
@@ -223,13 +343,25 @@ Props are the same as below, as React props.
 
 <TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputOptions" />
 
+### FileInputTrigger
+
+<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputTriggerProps" />
+
 ### FileInputDropzone
 
 <TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputDropzoneProps" />
 
+### FileInputList
+
+Renders its children once for each file.
+
 ### FileInputItem
 
 <TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputItemProps" />
+
+### FileInputItemRemove
+
+Removes its item's file. It's named for the file and stays out of the Tab order.
 
 ### State
 
