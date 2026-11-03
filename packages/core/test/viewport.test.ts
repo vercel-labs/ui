@@ -155,6 +155,27 @@ describe("bindViewport", () => {
     expect(onChange.mock.lastCall?.[0].keyboard).toBe(350)
   })
 
+  test("keeps the keyboard for everything following it when another binding mounts between two fields", () => {
+    const { move } = phone()
+    const root = document.createElement("div")
+    const onChange = vi.fn()
+    cleanups.push(bindViewport(root, { onChange }))
+    const field = type()
+    move({ height: 500 })
+    expect(onChange.mock.lastCall?.[0].keyboard).toBe(300)
+    // The field blurs, and before the keyboard closes another binding mounts.
+    field.blur()
+    const later = vi.fn()
+    cleanups.push(bindViewport(document.createElement("div"), { onChange: later }))
+    type()
+    expect(onChange.mock.lastCall?.[0].keyboard).toBe(300)
+    expect(later.mock.lastCall?.[0].keyboard).toBe(300)
+    const bar = document.createElement("div")
+    box(bar, 740, 800)
+    cleanups.push(bindAvoidKeyboard(bar))
+    expect(bar.hasAttribute("data-keyboard")).toBe(true)
+  })
+
   test("reports the inset at Safari's page zoom without a focused field, and sees fields inside shadow roots", () => {
     const { visual, move } = phone()
     Object.assign(visual, { scale: 1.15 })

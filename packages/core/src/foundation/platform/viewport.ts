@@ -64,18 +64,21 @@ type KeyboardFollower = (size: ViewportSize, keyboard: number, event?: Event) =>
 
 const keyboardByView = new WeakMap<
   Window,
-  { followers: Set<KeyboardFollower>; keyboard: ReturnType<typeof keyboardHeight>; stop: () => void }
+  { followers: Set<KeyboardFollower>; height: number; stop: () => void }
 >()
 
 // Every bindViewport and bindAvoidKeyboard on a window shares one set of
 // listeners, which measure the viewport and the keyboard once per event.
 function followKeyboard(view: Window, follower: KeyboardFollower) {
   let shared = keyboardByView.get(view)
-  if (!shared?.followers.size) {
+  const joining = !!shared?.followers.size
+  if (!shared || !joining) {
     const followers = new Set<KeyboardFollower>()
     const keyboard = keyboardHeight(view)
+    const own = { followers, height: 0, stop: () => {} }
     const notify = (size: ViewportSize, event: Event) => {
       const height = keyboard(size, event)
+      own.height = height
       for (const follow of followers) follow(size, height, event)
     }
     const measure = (event: Event) => notify(sizeOf(view), event)
@@ -84,19 +87,22 @@ function followKeyboard(view: Window, follower: KeyboardFollower) {
     view.addEventListener("resize", measure)
     view.document.addEventListener("focusin", measure)
     view.document.addEventListener("focusout", measure)
-    const stop = () => {
+    own.stop = () => {
       stopViewport()
       view.removeEventListener("resize", measure)
       view.document.removeEventListener("focusin", measure)
       view.document.removeEventListener("focusout", measure)
     }
-    shared = { followers, keyboard, stop }
+    own.height = keyboard(sizeOf(view))
+    shared = own
     keyboardByView.set(view, shared)
   }
-  const { followers, keyboard, stop } = shared
+  const { followers, stop } = shared
   followers.add(follower)
-  const size = sizeOf(view)
-  follower(size, keyboard(size))
+  // A follower joining later hears the keyboard as it stands, without measuring
+  // anew: between one field's blur and the next one's focus that would read the
+  // page under an open keyboard as the page without one.
+  follower(sizeOf(view), shared.height)
   return () => {
     if (followers.delete(follower) && !followers.size) stop()
   }
