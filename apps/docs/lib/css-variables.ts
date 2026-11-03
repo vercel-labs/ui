@@ -16,7 +16,12 @@ const positioned = [
   "--arrow-offset",
 ]
 const sheetMotion = ["--drawer-progress", "--drawer-dim", "--drawer-expand"]
-const keyboard = ["--keyboard-inset", "--visual-viewport-height"]
+const keyboard = [
+  "--keyboard-inset",
+  "--visual-viewport-width",
+  "--visual-viewport-height",
+  "--visual-viewport-top",
+]
 
 const asSheet = "while it presents as a sheet"
 
@@ -195,6 +200,9 @@ const meaning: Record<string, string> = {
     "Set it yourself: the color the page dims to while it presents as a sheet. Black at 0.2 by default.",
   "--keyboard-inset": "How many pixels of the page the on-screen keyboard covers, 0 without one.",
   "--visual-viewport-height": "The height of the part of the page you can see, above the keyboard.",
+  "--visual-viewport-width": "The width of the part of the page you can see.",
+  "--visual-viewport-top":
+    "How far the part of the page you can see is scrolled from the top of the layout, as when the keyboard pushes it up.",
   "--scrollbar-width":
     "While a modal popup locks the page's scroll: the page scrollbar's width, 0px for overlay scrollbars. Fixed elements, like a header, can pad themselves by it.",
   "--slider-thumb-position":

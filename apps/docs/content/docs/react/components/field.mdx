@@ -263,13 +263,37 @@ Each part has a `data-slot`, such as `field-label`, and its state attributes are
 
 ### Field [#data-attributes-field]
 
-<DataAttributes component="field" />
+<DataAttributes component="field" part="root" />
+
+### FieldLabel [#data-attributes-fieldlabel]
+
+<DataAttributes component="field" part="label" />
+
+### FieldControl [#data-attributes-fieldcontrol]
+
+<DataAttributes component="field" part="control" />
+
+### FieldDescription [#data-attributes-fielddescription]
+
+<DataAttributes component="field" part="description" />
+
+### FieldError [#data-attributes-fielderror]
+
+<DataAttributes component="field" part="error" />
 
 ### FieldSet [#data-attributes-fieldset]
 
-A `FieldLegend` or `FieldDescription` that belongs to a field set gets the same attributes. `FieldGroup` has `data-slot="field-group"` and no state attributes.
+`FieldGroup` has `data-slot="field-group"` and no state attributes.
 
-<DataAttributes component="field-set" />
+<DataAttributes component="field-set" part="set" />
+
+### FieldLegend [#data-attributes-fieldlegend]
+
+<DataAttributes component="field-set" part="legend" />
+
+### FieldDescription in a FieldSet [#data-attributes-fieldset-description]
+
+<DataAttributes component="field-set" part="description" />
 
 ## API Reference
 
