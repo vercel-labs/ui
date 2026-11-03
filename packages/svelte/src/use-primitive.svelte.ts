@@ -20,7 +20,7 @@ import {
   present as isPresent,
   ref as partRef,
   renderVersion,
-  sameValue,
+  sameSlotState,
   schemaOf,
   selectedKeys,
   subscribe,
@@ -260,7 +260,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       if (read.size && snapshot) {
         const next = partState(current) as Record<string, unknown>
         for (const key of read) {
-          if (sameValue(next[key], snapshot[key])) continue
+          if (sameSlotState(next[key], snapshot[key])) continue
           snapshot = next
           // The render this causes reads its keys again.
           read.clear()

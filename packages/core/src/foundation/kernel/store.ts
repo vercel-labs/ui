@@ -41,6 +41,32 @@ function sameValue(a: unknown, b: unknown) {
   return a.every((item, index) => Object.is(item, b[index]))
 }
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== "object" || value === null) return false
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
+
+/**
+ * Whether two slot states, or values in them, hold the same values. Arrays
+ * and plain objects compare by their contents, so a slot's `state` that
+ * builds `{ x }` or `[{ x }]` on every read doesn't render again. Other
+ * objects, like dates, maps and elements, compare by identity.
+ */
+function sameSlotState(a: unknown, b: unknown) {
+  if (Object.is(a, b)) return true
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length || changedInPlace.has(a) || changedInPlace.has(b)) return false
+    for (let index = 0; index < a.length; index++) if (!sameSlotState(a[index], b[index])) return false
+    return true
+  }
+  if (!isPlainObject(a) || !isPlainObject(b)) return false
+  const keys = Object.keys(a)
+  if (keys.length !== Object.keys(b).length) return false
+  for (const key of keys) if (!(key in b) || !sameSlotState(a[key], b[key])) return false
+  return true
+}
+
 // What a listener hears: whether the change touched only live keys, which
 // adapters that write attributes can skip, since the core writes live ones,
 // whether it only handed over keys a framework already delivers, through
@@ -248,10 +274,12 @@ type Store<State extends object> = ReturnType<typeof createStore<State>>
 export {
   createStore,
   heldState,
+  isPlainObject,
   join,
   type Listener,
   markChangedInPlace,
   renders,
+  sameSlotState,
   sameValue,
   standFor,
   type Store,

@@ -128,4 +128,50 @@ describe("a part's state", () => {
     expect(renders).toBe(2)
     app.unmount()
   })
+
+  test("state derived as new objects renders once per change to their values", async () => {
+    type Point = { x: number }
+    const plot = definePrimitive({
+      name: "derived-objects",
+      state: (_options: {}) => ({ x: 0, title: "" }),
+      api: ({ store }) => ({
+        move: (x: number) => store.set({ x }),
+        rename: (title: string) => store.set({ title }),
+      }),
+      slots: (slot) => ({
+        marker: slot<{}, { point: Point; points: Point[] }>({
+          state: (state) => ({ point: { x: state.x }, points: [{ x: state.x }] }),
+        }),
+      }),
+    })
+    let instance: ReturnType<typeof plot> | undefined
+    let renders = 0
+    const Marker = defineComponent({
+      setup() {
+        const marker = usePart(plot, "marker")
+        return () => (renders++, `${marker.state.point.x},${marker.state.points[0]!.x}`)
+      },
+    })
+    const Plot = defineComponent({
+      setup() {
+        instance = usePrimitive(plot, () => ({})).instance
+        return () => h(Marker)
+      },
+    })
+    const root = fakeNode()
+    const app = createApp(Plot)
+    app.mount(root)
+    expect(textOf(root)).toBe("0,0")
+    expect(renders).toBe(1)
+
+    instance!.api.move(4)
+    await nextTick()
+    expect(textOf(root)).toBe("4,4")
+    expect(renders).toBe(2)
+
+    instance!.api.rename("Sprint")
+    await nextTick()
+    expect(renders).toBe(2)
+    app.unmount()
+  })
 })

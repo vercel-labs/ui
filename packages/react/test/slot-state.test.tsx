@@ -72,3 +72,53 @@ test("state derived as a new array renders once per change to its items", async 
   await React.act(async () => handle!.api.rename("Sprint"))
   expect(renders).toBe(2)
 })
+
+type Point = { x: number }
+
+const plot = definePrimitive({
+  name: "derived-objects",
+  state: (_options: {}) => ({ x: 0, title: "" }),
+  api: ({ store }) => ({
+    move: (x: number) => store.set({ x }),
+    rename: (title: string) => store.set({ title }),
+  }),
+  slots: (slot) => ({
+    marker: slot<{}, { point: Point; points: Point[] }>({
+      state: (state) => ({ point: { x: state.x }, points: [{ x: state.x }] }),
+    }),
+  }),
+})
+
+test("state derived as new objects renders once per change to their values", async () => {
+  let plotHandle: PrimitiveHandle<typeof plot> | undefined
+  let markerRenders = 0
+  function Marker() {
+    return usePart(
+      plotHandle!,
+      "marker",
+      {},
+      {
+        children: (state) => {
+          markerRenders++
+          return `${state.point.x},${state.points[0]!.x}`
+        },
+      },
+    )
+  }
+  function Plot() {
+    plotHandle = usePrimitive(plot, {})
+    return <Marker />
+  }
+  const container = document.body.appendChild(document.createElement("div"))
+  root = createRoot(container)
+  await React.act(async () => root!.render(<Plot />))
+  expect(container.textContent).toBe("0,0")
+  expect(markerRenders).toBe(1)
+
+  await React.act(async () => plotHandle!.api.move(4))
+  expect(container.textContent).toBe("4,4")
+  expect(markerRenders).toBe(2)
+
+  await React.act(async () => plotHandle!.api.rename("Sprint"))
+  expect(markerRenders).toBe(2)
+})

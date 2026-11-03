@@ -21,6 +21,7 @@ import {
   ref,
   release,
   renderVersion,
+  sameSlotState,
   sameValue,
   schemaOf,
   selectedKeys,
@@ -568,7 +569,7 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
           if (shown.read.size) {
             const next = partState(part, shown.props, now) as typeof shown.snapshot
             for (const key of shown.read) {
-              if (sameValue(next[key], shown.snapshot[key])) continue
+              if (sameSlotState(next[key], shown.snapshot[key])) continue
               shown.snapshot = next
               return true
             }
