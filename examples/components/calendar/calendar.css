@@ -80,6 +80,13 @@
     height: var(--size-sm);
   }
 
+  /* Two months side by side, with room between them. */
+  [data-slot="row"]:has(> [data-slot="calendar-grid"] + [data-slot="calendar-grid"]) {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
   [data-slot="calendar-grid"] {
     width: auto;
     border-collapse: separate;

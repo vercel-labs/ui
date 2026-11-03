@@ -14,35 +14,36 @@ import {
   DatePickerTrigger,
 } from "@ui-sdk/react/date-picker"
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 import * as React from "react"
 import type { DatePickerValue } from "@ui-sdk/react/date-picker"
 
-export function Example() {
+function Example() {
   const [value, setValue] = React.useState<DatePickerValue>("2026-10-16")
-  const [reason, setReason] = React.useState("initial")
+  const log = useLog()
   return (
     <DatePicker
       value={value}
       onValueChange={(next, details) => {
         setValue(next)
-        setReason(details.reason)
+        log(`${next ?? "No date"} (${details.reason})`)
       }}
     >
       <div data-slot="row">
         <DatePickerInput aria-label="Due date" />
-        <DatePickerTrigger>
-          <CalendarIcon />
+        <DatePickerTrigger data-variant="ghost">
+          <CalendarIcon aria-hidden="true" />
         </DatePickerTrigger>
       </div>
       <DatePickerHint />
       <DatePickerContent>
         <div data-slot="row">
           <CalendarPrevious data-variant="ghost">
-            <ChevronLeftIcon />
+            <ChevronLeftIcon aria-hidden="true" />
           </CalendarPrevious>
           <CalendarHeading />
           <CalendarNext data-variant="ghost">
-            <ChevronRightIcon />
+            <ChevronRightIcon aria-hidden="true" />
           </CalendarNext>
         </div>
         <CalendarGrid>
@@ -50,9 +51,8 @@ export function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </DatePickerContent>
-      <p data-slot="hint">
-        {value ?? "No date"} ({reason})
-      </p>
     </DatePicker>
   )
 }
+
+export { Example }

@@ -18,39 +18,43 @@ import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 const controller = createDatePickerController()
 
-export function Example() {
+function Example() {
   return (
-    <DatePicker controller={controller} defaultValue="2026-10-16">
-      <div data-slot="row">
-        <DatePickerInput aria-label="Due date" />
-        <DatePickerTrigger>
-          <CalendarIcon />
-        </DatePickerTrigger>
-      </div>
-      <DatePickerHint />
-      <DatePickerContent>
-        <div data-slot="row">
-          <CalendarPrevious data-variant="ghost">
-            <ChevronLeftIcon />
-          </CalendarPrevious>
-          <CalendarHeading />
-          <CalendarNext data-variant="ghost">
-            <ChevronRightIcon />
-          </CalendarNext>
-        </div>
-        <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
-        </CalendarGrid>
-      </DatePickerContent>
-      <div data-slot="row">
+    <div data-slot="stack">
+      <div data-slot="controls">
         <button type="button" onClick={() => controller.setValue("2026-12-25")}>
-          Christmas
+          Choose Christmas
         </button>
         <button type="button" onClick={() => controller.open()}>
           Open
         </button>
       </div>
-    </DatePicker>
+      <DatePicker controller={controller} defaultValue="2026-10-16">
+        <div data-slot="row">
+          <DatePickerInput aria-label="Due date" />
+          <DatePickerTrigger data-variant="ghost">
+            <CalendarIcon aria-hidden="true" />
+          </DatePickerTrigger>
+        </div>
+        <DatePickerHint />
+        <DatePickerContent>
+          <div data-slot="row">
+            <CalendarPrevious data-variant="ghost">
+              <ChevronLeftIcon aria-hidden="true" />
+            </CalendarPrevious>
+            <CalendarHeading />
+            <CalendarNext data-variant="ghost">
+              <ChevronRightIcon aria-hidden="true" />
+            </CalendarNext>
+          </div>
+          <CalendarGrid>
+            <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
+            <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          </CalendarGrid>
+        </DatePickerContent>
+      </DatePicker>
+    </div>
   )
 }
+
+export { Example }

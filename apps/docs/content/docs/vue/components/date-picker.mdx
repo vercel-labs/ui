@@ -69,10 +69,6 @@ The range is `null` until both ends are valid. Clearing either input clears the 
 
 A booking can combine two months, range limits, unavailable dates, and form submission. Here, `page-by="page"` moves both months together, and `allow-unavailable` allows a stay to cross a booked date. The `form` option connects the picker to a form elsewhere on the page.
 
-<ComponentExample
-  name="date-picker/booking"
-  caption="Choose October 20 through October 27, crossing the unavailable 24th, then press Book to see both ISO dates submitted."
-/>
 
 ### Presets
 
@@ -92,10 +88,6 @@ A booking can combine two months, range limits, unavailable dates, and form subm
   caption="Try typing 11/21/2026, then 10/16/2026. Dates outside the allowed bounds are invalid and cannot be picked."
 />
 
-<ComponentExample
-  name="date-picker/unavailable"
-  caption="Try 10/21/2026, then 10/22/2026. The first date and weekends are unavailable; the second date is accepted."
-/>
 
 For ranges, `min-days` and `max-days` count both endpoints. `allow-unavailable` permits unavailable dates between them, but never as an endpoint. See [Range Limits](./calendar#range-limits).
 
@@ -127,10 +119,6 @@ Calendar’s `week-starts-on`, `weekday-format`, `fixed-weeks`, `show-outside-da
 
 Set `close-on-select` to `false` to keep the calendar open after choosing a date, completing a range, or pressing a preset.
 
-<ComponentExample
-  name="date-picker/keep-open"
-  caption="Choose a date, then choose another. The calendar stays open until you close it."
-/>
 
 ### Keep It Open Until Both Dates Are Picked
 
@@ -154,15 +142,7 @@ Set `dismissible` to `false` while a choice is incomplete. Escape, an outside pr
 
 `disabled` prevents typing, opening, and selection. `read-only` lets people open the calendar and inspect its dates without changing the value.
 
-<ComponentExample
-  name="date-picker/disabled"
-  caption="Try typing or opening the calendar. The disabled picker has no available controls."
-/>
 
-<ComponentExample
-  name="date-picker/read-only"
-  caption="Open the calendar and move through dates. The selected value stays unchanged."
-/>
 
 ## Forms
 
@@ -175,10 +155,6 @@ Set `dismissible` to `false` while a choice is incomplete. Escape, an outside pr
 
 A [Field](./field) connects the label, description, and errors to the input, and shows an error for an empty required date or text that isn't a date. Its `name` is used when the picker has none, and a disabled field disables the picker.
 
-<ComponentExample
-  name="date-picker/field"
-  caption="Press the Due date label to focus the input. Its accessible description includes both the date format and the field description."
-/>
 
 ## Behavior and Options
 

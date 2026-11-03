@@ -1,4 +1,32 @@
 @scope ([data-example]) {
+  /* The field sits near the top, centered, with room below for the open calendar inside the preview. */
+  :scope[data-example^="date-picker/"] {
+    justify-content: flex-start;
+    min-height: 26rem;
+  }
+
+  :scope:is(
+    [data-example="date-picker/presets"],
+    [data-example="date-picker/dismissible"],
+    [data-example="date-picker/controller"]
+  ) {
+    min-height: 29rem;
+  }
+
+  /* In a field, the picker takes the field's width. */
+  [data-slot="field-root"] > [data-slot="date-picker-root"] {
+    align-self: stretch;
+
+    & > [data-slot="row"]:has(> [data-slot="date-picker-input"]) {
+      width: 100%;
+    }
+  }
+
+  /* A picker inside a stack sits on the stack's center line. */
+  [data-slot="stack"]:has(> [data-slot="date-picker-root"]) {
+    align-items: center;
+  }
+
   [data-slot="date-picker-root"] {
     display: flex;
     flex-direction: column;
@@ -14,7 +42,7 @@
       width: 12rem;
       max-width: 100%;
       height: var(--size);
-      padding-inline: 10px 3px;
+      padding-inline: 0 3px;
       border-radius: var(--radius-control);
       background: var(--surface-1);
       box-shadow: inset 0 0 0 1px var(--line);
@@ -48,11 +76,13 @@
     }
   }
 
+  /* The input reaches the field's start edge, so the calendar lines up with the field. */
   [data-slot="date-picker-input"] {
     flex: 1;
     min-width: 0;
     height: 100%;
     padding: 0;
+    padding-inline-start: 10px;
     border: 0;
     background: transparent;
     color: inherit;
@@ -69,7 +99,7 @@
     }
   }
 
-  [data-slot="date-picker-trigger"] {
+  :is([data-slot="date-picker-trigger"], [data-slot="date-picker-clear"]) {
     width: var(--size-sm);
     height: var(--size-sm);
     padding: 0;
@@ -92,12 +122,8 @@
     }
   }
 
-  [data-slot="date-picker-clear"] {
-    align-self: flex-start;
-
-    &[data-empty] {
-      visibility: hidden;
-    }
+  [data-slot="date-picker-clear"][data-empty] {
+    visibility: hidden;
   }
 
   [data-slot="date-picker-content"] {
@@ -116,15 +142,27 @@
     outline: none;
     transform-origin: var(--transform-origin);
 
+    /* As in Calendar, the header takes the grid's width rather than widening the popup for a long heading. */
     & > [data-slot="row"]:first-child {
       flex-wrap: nowrap;
       justify-content: space-between;
+      width: 0;
+      min-width: 100%;
       padding-bottom: var(--space-1);
     }
 
-    & > [data-slot="row"]:last-child:not(:first-child) {
+    & > [data-slot="row"]:has(> [data-slot="date-picker-preset"]) {
       gap: var(--space-1);
       padding-top: 6px;
+      border-top: 1px solid var(--line-faint);
+    }
+
+    /* Messages wrap to the grid's width instead of widening the popup. */
+    & > [data-slot="hint"] {
+      width: 0;
+      min-width: 100%;
+      margin: 0;
+      padding-top: var(--space-2);
       border-top: 1px solid var(--line-faint);
     }
 
