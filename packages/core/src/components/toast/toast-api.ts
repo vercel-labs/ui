@@ -433,9 +433,7 @@ function toastRegionApi(
       // Measuring sets the height to auto for a moment, which would cut a height transition short.
       const resizing = el
         .getAnimations()
-        .filter(
-          (animation) => animation instanceof CSSTransition && animation.transitionProperty === "height",
-        )
+        .filter((animation) => "transitionProperty" in animation && animation.transitionProperty === "height")
       if (resizing.length) {
         waiting = true
         Promise.allSettled(resizing.map((animation) => animation.finished)).then(() => {
@@ -449,19 +447,32 @@ function toastRegionApi(
       heights.set(toastId, height)
       layout()
     }
-    // A new width reflows the content. Height changes are the stack's own.
-    const resizes = new ResizeObserver(([entry]) => {
-      const next = entry.borderBoxSize?.[0]?.inlineSize ?? el.offsetWidth
-      if (next === width) return
-      width = next
+    // The toast's own height is the stack's, so its width and its children's sizes tell when the content
+    // reflows: a shadow root, a loaded image or a font.
+    const resizes = new ResizeObserver((entries) => {
+      let changed = false
+      for (const entry of entries) {
+        if (entry.target !== el) changed = true
+        else {
+          const next = entry.borderBoxSize?.[0]?.inlineSize ?? el.offsetWidth
+          if (next !== width) changed = true
+          width = next
+        }
+      }
+      if (changed) measure()
+    })
+    const observeChildren = () => {
+      for (const child of el.children) resizes.observe(child, { box: "border-box" })
+    }
+    // Content changes, and classes on the toast. The stack's own attributes and variables on it aren't.
+    const mutations = new MutationObserver((records) => {
+      if (!records.some((record) => record.type !== "attributes" || record.target === el)) return
+      observeChildren()
       measure()
     })
-    // Content changes, not the stack's attributes and variables on the toast itself.
-    const mutations = new MutationObserver((records) => {
-      if (records.some((record) => record.type !== "attributes" || record.target !== el)) measure()
-    })
     resizes.observe(el)
-    mutations.observe(el, { subtree: true, childList: true, characterData: true, attributes: true })
+    observeChildren()
+    mutations.observe(el, { subtree: true, childList: true, characterData: true, attributeFilter: ["class"] })
     measure()
     cleanups.push(
       () => {

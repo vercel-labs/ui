@@ -76,6 +76,8 @@ function naturalHeight(el: HTMLElement) {
     for (const side of ["Top", "Bottom"] as const)
       height += parseFloat(css[`padding${side}`]) + parseFloat(css[`border${side}Width`])
   style.setProperty("height", value, priority)
+  // Read again with its height back, so the next change transitions from it rather than from auto.
+  getComputedStyle(el).height
   return height
 }
 

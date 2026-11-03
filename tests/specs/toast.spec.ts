@@ -305,6 +305,61 @@ test.describe("stacking", () => {
   )
 
   test(
+    "a toast given its measured height animates to a new one when its content changes",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("toast")
+      await page.addStyleTag({
+        content: ".toast { height: var(--toast-height); transition: height 2s linear }",
+      })
+      const id = await show(page, { title: "Uploading", duration: forever })
+      const toast = toastNamed(page, "Uploading")
+      await expect
+        .poll(() => toast.evaluate((el) => el.style.getPropertyValue("--toast-height")))
+        .not.toBe("")
+      await page.evaluate(
+        (id) =>
+          (
+            window as unknown as { toaster: { update: (id: string, o: { description: string }) => void } }
+          ).toaster.update(id, { description: "Two files left, about a minute remaining" }),
+        id,
+      )
+      await expect
+        .poll(() =>
+          toast.evaluate((el) =>
+            el
+              .getAnimations()
+              .some((animation) => (animation as CSSTransition).transitionProperty === "height"),
+          ),
+        )
+        .toBe(true)
+    },
+  )
+
+  test(
+    "a toast measures again when a child or its own class changes size",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("toast")
+      await page.addStyleTag({
+        content: ".toast { height: var(--toast-height) } .toast.roomy { padding-block: 60px }",
+      })
+      await show(page, { title: "Uploading", duration: forever })
+      const toast = toastNamed(page, "Uploading")
+      const height = () =>
+        toast.evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue("--toast-height")))
+      await expect.poll(height).toBeGreaterThan(0)
+      const before = await height()
+      await toast.evaluate(
+        (el) => ((el.querySelector(".toast-title") as HTMLElement).style.paddingBottom = "40px"),
+      )
+      await expect.poll(height).toBeCloseTo(before + 40, 0)
+      await toast.evaluate((el) => el.classList.add("roomy"))
+      await expect.poll(height).toBeGreaterThan(before + 40)
+    },
+  )
+
+  test(
     "a toast closing from the front stays in front while it animates out",
     { tag: "@enhancement" },
     async ({ page, open }) => {
