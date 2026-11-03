@@ -561,7 +561,6 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       sheetModal(store.get().presentation, options().modal ?? bar()?.internal.modal(), "pointer"),
     menubar: bar,
     presentation: () => store.get().presentation,
-    // A controller's or a take-over's anchor, then the content's `anchor`, then the trigger.
     anchor: (el?: HTMLElement, setting?: Anchor | string | null) =>
       control.anchor() ?? (el ? contentAnchor(el, setting, triggerElement) : triggerElement()),
     // Runs a plain item and closes the whole tree. Focus returns to the root
@@ -572,7 +571,6 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       top.hide({ reason: "item-press", event, focus: "unless-moved" })
     },
     runAction: (value: string, event?: Event) => options().onAction?.(value, { event }),
-    // An item's Promise keeps it pending until it settles. `done` runs once it resolves.
     wait(key: string, pending: PromiseLike<unknown>, done: () => void) {
       store.set({ pending: [...store.get().pending, key] })
       const settled = () => store.get().pending.filter((other) => other !== key)

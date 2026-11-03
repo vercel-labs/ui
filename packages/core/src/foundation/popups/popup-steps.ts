@@ -5,6 +5,7 @@
 // the next step as a function, so the steps can't run out of order.
 import type { createDismissal } from "./dismissal"
 import type { createPopupPayload } from "./popup-payload"
+import { popupResult } from "../kernel/action"
 import { changeSource } from "../kernel/input-source"
 import type { ChangeOptions } from "../kernel/details"
 import type { Store } from "../kernel/store"
@@ -38,7 +39,9 @@ type HideRequest<Reason extends string, Result> = ChangeOptions<Reason> & {
 
 // What `open()` resolves with when nothing opened: refused, or given an aborted signal.
 function unopened<Reason extends string, Result = string>(reason: Reason, event?: Event) {
-  return Promise.resolve<PopupResult<Reason, Result>>({ reason, source: changeSource(reason, event) })
+  return popupResult(
+    Promise.resolve<PopupResult<Reason, Result>>({ reason, source: changeSource(reason, event) }),
+  )
 }
 
 function createOpenSteps<
@@ -110,7 +113,7 @@ function createOpenSteps<
   function result(signal?: AbortSignal) {
     if (!pending) {
       let resolve!: (result: PopupResult<Reason, Result>) => void
-      const promise = new Promise<PopupResult<Reason, Result>>((done) => (resolve = done))
+      const promise = popupResult(new Promise<PopupResult<Reason, Result>>((done) => (resolve = done)))
       pending = { promise, resolve }
     }
     if (signal && !signal.aborted) {

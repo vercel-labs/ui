@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest"
 import { menu } from "./menu-parts"
+import { dialog } from "../src/components/dialog/dialog"
 import { attrs, partState, press } from "../src/foundation/kernel/part"
 
 const deferred = () => {
@@ -60,5 +61,16 @@ describe("a menu item whose action returns a Promise", () => {
     save.resolve()
     await save.promise
     expect(instance.get().open).toBe(true)
+  })
+})
+
+describe("a menu item that opens a popup", () => {
+  test("closes the menu at once, since the popup's open() isn't a wait", () => {
+    const rename = dialog({ id: "rename" })
+    const instance = menu({ id: "file" })
+    instance.api.open()
+    press(instance.part("item", { value: "rename", onSelect: () => rename.api.open() }))?.()
+    expect(instance.get().open).toBe(false)
+    expect(rename.get().open).toBe(true)
   })
 })

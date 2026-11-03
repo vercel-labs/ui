@@ -78,7 +78,6 @@ function createTriggerSelect({
   highlighted: () => string | null
   itemProps: (key: string) => ItemMeta | undefined
   toKey: (value: unknown) => string
-  // An `onSelect` Promise, for the menu's pending announcement.
   waiting: (promise: Pending) => void
 }) {
   let writing = false

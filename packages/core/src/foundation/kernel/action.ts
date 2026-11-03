@@ -25,9 +25,14 @@ type ActionDetails = {
   source: ChangeSource
 }
 
+// What a popup controller's `open()` returned. A handler like `() => dialog.open()`
+// opens something; it isn't a wait, so its part doesn't go pending.
+const popupResults = new WeakSet<object>()
+const popupResult = <T extends object>(promise: T) => (popupResults.add(promise), promise)
+
 // Whether a handler returned a Promise, which marks its part pending.
 const isPromise = (value: unknown): value is PromiseLike<unknown> =>
-  !!value && typeof (value as PromiseLike<unknown>).then === "function"
+  !!value && typeof (value as PromiseLike<unknown>).then === "function" && !popupResults.has(value)
 
 // What an action handler returns when it was canceled, like a web component's
 // `action` event a listener prevented: nothing more happens, so the dialog a
@@ -111,4 +116,4 @@ function announcePending(
   })
 }
 
-export { type ActionDetails, announcePending, canceledAction, isPromise, runAction }
+export { type ActionDetails, announcePending, canceledAction, isPromise, popupResult, runAction }

@@ -1,7 +1,7 @@
 // What the rest of core may import from kernel's files. import-layers checks every
 // import from another folder against this list. Nothing imports this file, so bundles
 // don't pay for it.
-export { type ActionDetails, announcePending, isPromise, runAction } from "./action"
+export { type ActionDetails, announcePending, isPromise, popupResult, runAction } from "./action"
 export { checkedAttrs, idPart, openAttrs } from "./attrs"
 export { flagWhileBound, keyWhileBound, settleFlag } from "./bound-keys"
 export { changeFrom, log } from "./change"

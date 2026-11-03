@@ -93,7 +93,7 @@ Put the slider in a `Field`. The label names the thumb, the description describe
 
 ### Disabled
 
-Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted. A disabled `<fieldset>` around it disables it too.
+Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted. A disabled `<fieldset>` around it disables it too. `read-only` keeps it focusable and submitted, but drags, keys and screen reader adjustments leave its value alone. `required` adds `data-required`; a slider always has a value, so it never blocks a form.
 
 <ComponentExample
   name="slider/disabled"

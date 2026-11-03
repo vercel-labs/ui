@@ -211,8 +211,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   }).internal
   context.onDestroy(() => loader.cancel())
 
-  // Whether the last open or close went through, for the controller's writes,
-  // which reach it through the match levels.
+  // The controller's writes reach the popup through the match levels, so they read the outcome here.
   let moved = false
 
   function show(reason: TriggerMenuOpenChangeReason, event?: Event, by: PopupOpener = "keyboard") {
