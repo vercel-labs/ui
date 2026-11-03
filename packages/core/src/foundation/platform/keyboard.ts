@@ -108,26 +108,30 @@ const followersByViewport = new WeakMap<
   { followers: Set<ViewportFollower>; stop: () => void }
 >()
 
+// Made in a function of its own: closures made in one call share its scope,
+// so a `stop` made beside a follower would keep that follower and its element.
+function shareViewport(view: Window, viewport: VisualViewport) {
+  const followers = new Set<ViewportFollower>()
+  const measure = (event: Event) => {
+    const size = measureViewport(view, viewport)
+    for (const follow of followers) follow(size, event)
+  }
+  viewport.addEventListener("resize", measure)
+  viewport.addEventListener("scroll", measure)
+  const stop = () => {
+    viewport.removeEventListener("resize", measure)
+    viewport.removeEventListener("scroll", measure)
+    followersByViewport.delete(viewport)
+  }
+  const shared = { followers, stop }
+  followersByViewport.set(viewport, shared)
+  return shared
+}
+
 // A toast region, a dialog and a sheet follow the same visual viewport, so they
 // share its listeners and one measurement per event instead of one each.
 function followViewport(view: Window, viewport: VisualViewport, follower: ViewportFollower) {
-  let shared = followersByViewport.get(viewport)
-  if (!shared?.followers.size) {
-    const followers = new Set<ViewportFollower>()
-    const measure = (event: Event) => {
-      const size = measureViewport(view, viewport)
-      for (const follow of followers) follow(size, event)
-    }
-    viewport.addEventListener("resize", measure)
-    viewport.addEventListener("scroll", measure)
-    const stop = () => {
-      viewport.removeEventListener("resize", measure)
-      viewport.removeEventListener("scroll", measure)
-    }
-    shared = { followers, stop }
-    followersByViewport.set(viewport, shared)
-  }
-  const { followers, stop } = shared
+  const { followers, stop } = followersByViewport.get(viewport) ?? shareViewport(view, viewport)
   followers.add(follower)
   return () => {
     if (followers.delete(follower) && !followers.size) stop()

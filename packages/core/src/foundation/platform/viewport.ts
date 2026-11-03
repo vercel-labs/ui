@@ -67,36 +67,38 @@ const keyboardByView = new WeakMap<
   { followers: Set<KeyboardFollower>; height: number; stop: () => void }
 >()
 
+// Made apart from any follower, like `shareViewport`, so it never keeps one alive.
+function shareKeyboard(view: Window) {
+  const followers = new Set<KeyboardFollower>()
+  const keyboard = keyboardHeight(view)
+  const shared = { followers, height: 0, stop: () => {} }
+  const notify = (size: ViewportSize, event: Event) => {
+    const height = keyboard(size, event)
+    shared.height = height
+    for (const follow of followers) follow(size, height, event)
+  }
+  const measure = (event: Event) => notify(sizeOf(view), event)
+  const visual = view.visualViewport
+  const stopViewport = visual ? followViewport(view, visual, notify) : () => {}
+  view.addEventListener("resize", measure)
+  view.document.addEventListener("focusin", measure)
+  view.document.addEventListener("focusout", measure)
+  shared.stop = () => {
+    stopViewport()
+    view.removeEventListener("resize", measure)
+    view.document.removeEventListener("focusin", measure)
+    view.document.removeEventListener("focusout", measure)
+    keyboardByView.delete(view)
+  }
+  shared.height = keyboard(sizeOf(view))
+  keyboardByView.set(view, shared)
+  return shared
+}
+
 // Every bindViewport and bindAvoidKeyboard on a window shares one set of
 // listeners, which measure the viewport and the keyboard once per event.
 function followKeyboard(view: Window, follower: KeyboardFollower) {
-  let shared = keyboardByView.get(view)
-  const joining = !!shared?.followers.size
-  if (!shared || !joining) {
-    const followers = new Set<KeyboardFollower>()
-    const keyboard = keyboardHeight(view)
-    const own = { followers, height: 0, stop: () => {} }
-    const notify = (size: ViewportSize, event: Event) => {
-      const height = keyboard(size, event)
-      own.height = height
-      for (const follow of followers) follow(size, height, event)
-    }
-    const measure = (event: Event) => notify(sizeOf(view), event)
-    const visual = view.visualViewport
-    const stopViewport = visual ? followViewport(view, visual, notify) : () => {}
-    view.addEventListener("resize", measure)
-    view.document.addEventListener("focusin", measure)
-    view.document.addEventListener("focusout", measure)
-    own.stop = () => {
-      stopViewport()
-      view.removeEventListener("resize", measure)
-      view.document.removeEventListener("focusin", measure)
-      view.document.removeEventListener("focusout", measure)
-    }
-    own.height = keyboard(sizeOf(view))
-    shared = own
-    keyboardByView.set(view, shared)
-  }
+  const shared = keyboardByView.get(view) ?? shareKeyboard(view)
   const { followers, stop } = shared
   followers.add(follower)
   // A follower joining later hears the keyboard as it stands, without measuring
