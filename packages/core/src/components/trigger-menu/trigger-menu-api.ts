@@ -207,11 +207,23 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   }).internal
   context.onDestroy(() => loader.cancel())
 
+  // Whether the last open or close went through, for the controller's writes,
+  // which reach it through the match levels.
+  let moved = false
+
   function show(reason: TriggerMenuOpenChangeReason, event?: Event, by: PopupOpener = "keyboard") {
-    if (!store.get().open) control.show({ reason, event, by })
+    if (!store.get().open) moved = control.attempt({ reason, event, by }).opened
   }
 
-  const hide = (reason: TriggerMenuOpenChangeReason, event?: Event) => control.hide({ reason, event })
+  function hide(reason: TriggerMenuOpenChangeReason, event?: Event) {
+    moved = control.hide({ reason, event })
+  }
+
+  function moving(write: () => unknown) {
+    moved = false
+    write()
+    return moved
+  }
 
   function setQuery(query: string, reason: TriggerMenuQueryChangeReason, event?: Event) {
     if (store.get().query === query) return
@@ -470,10 +482,11 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       open: boolean,
       { reason = "imperative", event }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {},
     ) {
-      if (!open) return levels.end(reason, event)
+      if (!open) return moving(() => levels.end(reason, event))
       // A match that close() ended is still in the text, so it opens again.
-      if (levels.current()) show(reason, event, "imperative")
-      else levels.reopen(reason, event)
+      return moving(() =>
+        levels.current() ? show(reason, event, "imperative") : levels.reopen(reason, event),
+      )
     },
     open({
       trigger,
@@ -499,7 +512,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       return control.result(signal) as Promise<PopupResult<TriggerMenuOpenChangeReason, never>>
     },
     close: ({ reason = "imperative", event }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {}) =>
-      levels.end(reason, event),
+      moving(() => levels.end(reason, event)),
     getQuery: () => store.get().query,
     getMatch() {
       const level = levels.current()
@@ -514,6 +527,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       select.write({ start: level ? level.match.start : at, end: at }, content)
       if (level) levels.end("item-press")
     },
+    focus: () => editor()?.element?.focus(),
     // Internal. Used by slots and adapters.
     internal: {
       options,

@@ -63,8 +63,11 @@ function createTokenInputController() {
   return createController<{
     /** The value: text and tokens. */
     getValue: () => TokenInputValue
-    /** Replaces the value as one undoable step. */
-    setValue: (value: TokenInputValue, options?: TokenInputChangeOptions) => void
+    /**
+     * Replaces the value as one undoable step.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: TokenInputValue, options?: TokenInputChangeOptions) => boolean
     /** The value as codec text, like `Ask [@Ada](mention:ada)`. */
     getText: (codec?: TokenCodec) => string
     /** The value as people read it, with each token's label. */
@@ -72,6 +75,7 @@ function createTokenInputController() {
     /**
      * Inserts text, a token or a value at the caret, the end or a range, as one undoable step. With
      * `resolve`, a token is pending until it settles: updated with what it resolves to, removed if it rejects.
+     * Returns false when the change was canceled.
      */
     insert: (
       content: string | TokenInsert | TokenInputValue,
@@ -81,21 +85,30 @@ function createTokenInputController() {
         /** Keeps a token pending until this settles. */
         resolve?: PromiseLike<void | Partial<TokenInsert>>
       },
-    ) => void
-    /** Changes a token's status, data or label without an undo step or a caret move. */
-    updateToken: (id: string, patch: Partial<Omit<Token, "id">>) => void
-    /** Removes a token as one undoable step. */
-    removeToken: (id: string, options?: TokenInputChangeOptions) => void
-    /** Undoes the last step. */
-    undo: () => void
-    /** Redoes the last undone step. */
-    redo: () => void
+    ) => boolean
+    /**
+     * Changes a token's status, data or label without an undo step or a caret move.
+     * Returns false when there's no such token or nothing changed.
+     */
+    updateToken: (id: string, patch: Partial<Omit<Token, "id">>) => boolean
+    /**
+     * Removes a token as one undoable step.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    removeToken: (id: string, options?: TokenInputChangeOptions) => boolean
+    /** Undoes the last step. Returns false when there was none or the change was canceled. */
+    undo: () => boolean
+    /** Redoes the last undone step. Returns false when there was none or the change was canceled. */
+    redo: () => boolean
     /** Whether there's a step to undo. */
     canUndo: () => boolean
     /** Whether there's a step to redo. */
     canRedo: () => boolean
-    /** Empties the input as one undoable step. */
-    clear: (options?: TokenInputChangeOptions) => void
+    /**
+     * Empties the input as one undoable step.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: TokenInputChangeOptions) => boolean
     /** Focuses the editor, with the caret at its start or end. */
     focus: (options?: { at?: "start" | "end" }) => void
     /** The editor a TriggerMenu outside the token input reads and writes. A menu inside it finds it on its own. */

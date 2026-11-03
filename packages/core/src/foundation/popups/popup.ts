@@ -183,8 +183,8 @@ type PopupController<
 > = {
   /** Whether it's open. False as soon as it starts closing, while it still animates out. */
   isOpen: () => boolean
-  /** Opens or closes it. */
-  setOpen: (open: boolean, options?: PopupChangeOptions<Reason>) => void
+  /** Opens or closes it. Returns false when the change was canceled or it was already open or closed. */
+  setOpen: (open: boolean, options?: PopupChangeOptions<Reason>) => boolean
   /**
    * Opens it, and resolves once it closes, with why, how and any return value. Resolves exactly
    * once and never rejects: on the next close from any source, when `signal` aborts, or with reason
@@ -193,10 +193,10 @@ type PopupController<
   open: (
     options?: PopupOpenOptions<Payload, PayloadReason> & OpenOptions,
   ) => Promise<PopupResult<Reason, Result>>
-  /** Closes it. `returnValue` is passed to the promise `open()` returned. */
-  close: (options?: PopupChangeOptions<Reason> & { returnValue?: Result }) => void
-  /** Opens it when it's closed, and closes it when it's open. */
-  toggle: (options?: PopupChangeOptions<Reason>) => void
+  /** Closes it. `returnValue` is passed to the promise `open()` returned. Returns false when the close was canceled or it was already closed. */
+  close: (options?: PopupChangeOptions<Reason> & { returnValue?: Result }) => boolean
+  /** Opens it when it's closed, and closes it when it's open. Returns false when the change was canceled. */
+  toggle: (options?: PopupChangeOptions<Reason>) => boolean
   /** The payload of the last open, from a controller or the trigger that opened it. */
   getPayload: () => Payload | undefined
   /** Moves focus to the trigger that opened it last, or the first trigger. */

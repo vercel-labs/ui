@@ -82,8 +82,11 @@ type DrawerController<Payload = unknown, Result = string> = PopupController<
 > & {
   /** The snap point it rests on, or null before it first opens. */
   getSnapPoint: () => SnapPoint | null
-  /** Moves it to a snap point. While closed, it opens there next. */
-  setSnapPoint: (snapPoint: SnapPoint, options?: ChangeOptions<DrawerSnapPointChangeReason>) => void
+  /**
+   * Moves it to a snap point. While closed, it opens there next.
+   * Returns false when the change was canceled or it was already there.
+   */
+  setSnapPoint: (snapPoint: SnapPoint, options?: ChangeOptions<DrawerSnapPointChangeReason>) => boolean
 }
 
 /**

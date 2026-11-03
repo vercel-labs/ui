@@ -125,7 +125,7 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   const { popup, hide, dismissal } = dialog.internal
 
   function snapTo(point: SnapPoint, reason: DrawerSnapPointChangeReason, event?: Event) {
-    change("snapPoint", point, { reason, event })
+    return change("snapPoint", point, { reason, event })
   }
 
   // What an open starts with: the default snap point, unless it's controlled
@@ -311,12 +311,10 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   const api = {
     ...dialog,
     getSnapPoint: () => store.get().snapPoint,
-    setSnapPoint(
+    setSnapPoint: (
       point: SnapPoint,
       { reason = "imperative", event }: ChangeOptions<DrawerSnapPointChangeReason> = {},
-    ) {
-      snapTo(point, reason, event)
-    },
+    ) => snapTo(point, reason, event),
     internal: {
       ...dialog.internal,
       attach,

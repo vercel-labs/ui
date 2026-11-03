@@ -23,10 +23,13 @@ function createOTPInputController() {
   return createController<{
     /** The code. */
     getValue: () => string
-    /** Sets the code, as typing it would. Characters that don't fit the pattern are dropped. */
-    setValue: (value: string, options?: OTPInputChangeOptions) => void
-    /** Empties the code. */
-    clear: (options?: OTPInputChangeOptions) => void
+    /**
+     * Sets the code, as typing it would. Characters that don't fit the pattern are dropped.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: string, options?: OTPInputChangeOptions) => boolean
+    /** Empties the code. Returns false when the change was canceled or nothing changed. */
+    clear: (options?: OTPInputChangeOptions) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()

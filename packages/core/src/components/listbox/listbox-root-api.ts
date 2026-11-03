@@ -282,16 +282,14 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
   const api = {
     id,
     getValue: () => store.get().value,
-    setValue(value: unknown, { reason = "imperative", event }: ListboxChangeOptions = {}) {
-      setValue(value, { reason, event })
-    },
-    clear({ reason = "imperative", event }: ListboxChangeOptions = {}) {
-      setValue(selection.empty(), { reason, event })
-    },
+    setValue: (value: unknown, { reason = "imperative", event }: ListboxChangeOptions = {}) =>
+      setValue(value, { reason, event }),
+    clear: ({ reason = "imperative", event }: ListboxChangeOptions = {}) =>
+      setValue(selection.empty(), { reason, event }),
     selectAll({ reason = "imperative", event }: ListboxChangeOptions = {}) {
-      if (!store.get().multiple) return
+      if (!store.get().multiple) return false
       const missing = order().filter((key) => selectable(key) && !selection.isSelected(key))
-      if (missing.length) setKeys([...selection.keys(), ...missing], { reason, event })
+      return missing.length > 0 && setKeys([...selection.keys(), ...missing], { reason, event })
     },
     focus: focusStop,
     // Internal. Used by slots and adapters.

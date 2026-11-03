@@ -184,8 +184,11 @@ function createTriggerMenuController() {
   return createController<{
     /** Whether the menu is open. */
     isOpen: () => boolean
-    /** Opens or closes the menu. Opening needs a match; see `open()` for one that types the trigger. */
-    setOpen: (open: boolean, options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => void
+    /**
+     * Opens or closes the menu. Opening needs a match; see `open()` for one that types the trigger.
+     * Returns false when the change was canceled or it was already open or closed.
+     */
+    setOpen: (open: boolean, options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => boolean
     /**
      * Opens the menu for `trigger`, typing it at the caret first unless a match for it is already
      * there, and resolves once it closes. Resolves exactly once and never rejects.
@@ -198,14 +201,19 @@ function createTriggerMenuController() {
         signal?: AbortSignal
       },
     ) => Promise<PopupResult<TriggerMenuOpenChangeReason, never>>
-    /** Closes the menu. The match isn't dismissed, so typing in it opens it again. */
-    close: (options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => void
+    /**
+     * Closes the menu. The match isn't dismissed, so typing in it opens it again.
+     * Returns false when the close was canceled or it was already closed.
+     */
+    close: (options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => boolean
     /** The text after the trigger, or after the current argument's start. Empty while closed. */
     getQuery: () => string
     /** The current match, or null. */
     getMatch: () => TriggerMatch | null
     /** Replaces the current match with text or a token, or inserts at the caret without one. */
     insert: (content: string | TokenInsert) => void
+    /** Moves focus to the editor. */
+    focus: () => void
   }>()
 }
 

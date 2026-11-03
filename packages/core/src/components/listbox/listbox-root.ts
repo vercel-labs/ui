@@ -42,12 +42,21 @@ function createListboxController<T = string, Multiple extends boolean | undefine
   return createController<{
     /** The selected value. */
     getValue: () => ListboxValue<T, Multiple>
-    /** Selects a value, as a user would. A disabled or read-only listbox ignores it. */
-    setValue: (value: ListboxValue<T, Multiple>, options?: ListboxChangeOptions) => void
-    /** Selects nothing: `null`, or an empty list with `multiple`. */
-    clear: (options?: ListboxChangeOptions) => void
-    /** Selects every enabled item, with `multiple`. */
-    selectAll: (options?: ListboxChangeOptions) => void
+    /**
+     * Selects a value, as a user would. A disabled or read-only listbox ignores it.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: ListboxValue<T, Multiple>, options?: ListboxChangeOptions) => boolean
+    /**
+     * Selects nothing: `null`, or an empty list with `multiple`.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: ListboxChangeOptions) => boolean
+    /**
+     * Selects every enabled item, with `multiple`.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    selectAll: (options?: ListboxChangeOptions) => boolean
     /** Moves focus into the list, onto the option that holds its tab stop. */
     focus: () => void
   }>()

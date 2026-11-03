@@ -100,10 +100,11 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
 
   // The highlight is the value, through `onValueChange`, so a controlled one waits for it to come back.
   function highlight(key: string | null, why: HighlightCause<CommandValueChangeReason> | null) {
-    if (key === store.get().value) return
-    if (why) change("value", key, { reason: why.reason, event: why.event, index: indexOf(key) })
+    if (key === store.get().value) return false
+    if (why) return change("value", key, { reason: why.reason, event: why.event, index: indexOf(key) })
     // A highlight the component picks with nothing before it is a default, not a change.
-    else if (options().value === undefined) store.set({ value: key })
+    if (options().value === undefined) store.set({ value: key })
+    return false
   }
 
   // The cause of a composed page change, until its commands mount.
@@ -129,7 +130,7 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
 
   function setQuery(query: string, reason: CommandQueryChangeReason, event?: Event) {
     core.cause(reason, event)
-    change("query", query, { reason, event })
+    return change("query", query, { reason, event })
   }
 
   // The cause of the next page change, for the highlight that follows it.
@@ -138,18 +139,20 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
   function push(page: string, reason: CommandPagesChangeReason, event?: Event) {
     const { pages, query, queries } = store.get()
     pageCause = { reason, event }
-    if (!change("pages", [...pages, page], { reason, event })) return
+    if (!change("pages", [...pages, page], { reason, event })) return false
     store.set({ queries: [...queries.slice(0, pages.length), query] })
     setQuery("", reason, event)
+    return true
   }
 
   function pop(reason: CommandPagesChangeReason, event?: Event) {
     const { pages, queries } = store.get()
-    if (!pages.length) return
+    if (!pages.length) return false
     pageCause = { reason, event }
-    if (!change("pages", pages.slice(0, -1), { reason, event })) return
+    if (!change("pages", pages.slice(0, -1), { reason, event })) return false
     store.set({ queries: queries.slice(0, pages.length - 1) })
     setQuery(queries[pages.length - 1] ?? "", reason, event)
+    return true
   }
 
   // Runs a command, as Enter, a click or its shortcut would: its `onSelect`,
@@ -282,36 +285,29 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
   const api = {
     id,
     getValue: () => store.get().value,
-    setValue(
+    setValue: (
       value: string | null,
       { reason = "imperative", event }: CommandChangeOptions<CommandValueChangeReason> = {},
-    ) {
-      highlight(value, { reason, event })
-    },
+    ) => highlight(value, { reason, event }),
     getQuery: () => store.get().query,
-    setQuery(
+    setQuery: (
       query: string,
       { reason = "imperative", event }: CommandChangeOptions<CommandQueryChangeReason> = {},
-    ) {
-      setQuery(query, reason, event)
-    },
+    ) => setQuery(query, reason, event),
     getPages: () => store.get().pages,
     setPages(
       pages: string[],
       { reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {},
     ) {
       pageCause = { reason, event }
-      change("pages", pages, { reason, event })
+      return change("pages", pages, { reason, event })
     },
-    push(
+    push: (
       page: string,
       { reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {},
-    ) {
-      push(page, reason, event)
-    },
-    pop({ reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {}) {
-      pop(reason, event)
-    },
+    ) => push(page, reason, event),
+    pop: ({ reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {}) =>
+      pop(reason, event),
     run(value?: string) {
       const key = value ?? store.get().value
       if (key !== null) run(key, {})

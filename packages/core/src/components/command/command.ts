@@ -107,20 +107,32 @@ function createCommandController() {
   return createController<{
     /** The highlighted command's value, or `null`. */
     getValue: () => string | null
-    /** Highlights a command, and scrolls it into view. */
-    setValue: (value: string | null, options?: CommandChangeOptions<CommandValueChangeReason>) => void
+    /**
+     * Highlights a command, and scrolls it into view.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: string | null, options?: CommandChangeOptions<CommandValueChangeReason>) => boolean
     /** The search text. */
     getQuery: () => string
-    /** Changes the search text, which filters the commands. */
-    setQuery: (query: string, options?: CommandChangeOptions<CommandQueryChangeReason>) => void
+    /**
+     * Changes the search text, which filters the commands.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setQuery: (query: string, options?: CommandChangeOptions<CommandQueryChangeReason>) => boolean
     /** The stack of open pages, from the first page opened to the current one. Empty on the first page. */
     getPages: () => string[]
-    /** Replaces the stack of pages. */
-    setPages: (pages: string[], options?: CommandChangeOptions<CommandPagesChangeReason>) => void
-    /** Opens a page on top of the current one, by the `value` of a `CommandPage` or a data command. */
-    push: (page: string, options?: CommandChangeOptions<CommandPagesChangeReason>) => void
-    /** Goes back to the previous page, and puts back the search text typed there. */
-    pop: (options?: CommandChangeOptions<CommandPagesChangeReason>) => void
+    /** Replaces the stack of pages. Returns false when the change was canceled or nothing changed. */
+    setPages: (pages: string[], options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
+    /**
+     * Opens a page on top of the current one, by the `value` of a `CommandPage` or a data command.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    push: (page: string, options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
+    /**
+     * Goes back to the previous page, and puts back the search text typed there.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    pop: (options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
     /** Runs a command, as Enter would: the highlighted one, or the one with this value. */
     run: (value?: string) => void
     /** Moves focus to the search field. */

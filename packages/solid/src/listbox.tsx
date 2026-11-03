@@ -76,9 +76,7 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>(props
   const rest = merge(omit(loose, ...optionKeys), {
     // Without content, a data listbox renders its items.
     get children() {
-      return (
-        props.children ?? ((state: ListboxState) => props.items && <ListboxItems items={state.items} />)
-      )
+      return props.children ?? ((state: ListboxState) => props.items && <ListboxItems items={state.items} />)
     },
   })
   return (

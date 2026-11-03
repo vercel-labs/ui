@@ -354,7 +354,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     }: { reason?: ComboboxQueryChangeReason; event?: Event; dirty?: boolean } = {},
   ) {
     store.set({ dirty })
-    change("query", query, { reason, event })
+    return change("query", query, { reason, event })
   }
 
   // A label a value from options showed in its own pass is past refusing, so
@@ -598,23 +598,25 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     id,
     ...kit,
     getValue: () => store.get().value,
-    setValue: (value: unknown, { reason, event }: ComboboxChangeOptions<ComboboxValueChangeReason> = {}) => {
-      setValue(value, { reason, event })
-    },
+    setValue: (value: unknown, { reason, event }: ComboboxChangeOptions<ComboboxValueChangeReason> = {}) =>
+      setValue(value, { reason, event }),
     clear: ({ reason = "imperative", event }: ComboboxChangeOptions<ComboboxValueChangeReason> = {}) => {
-      if (!editable()) return
+      if (!editable()) return false
+      const selected = listOf(store.get().value).length > 0
       // A canceled change keeps the value, and the input keeps its label.
-      if (listOf(store.get().value).length && !setValue(selection.empty(), { reason, event })) return
+      if (selected && !setValue(selection.empty(), { reason, event })) return false
       clearedValue = null
-      setQuery("", { reason: reason === "clear-press" ? "clear-press" : "imperative", event })
+      const emptied = setQuery("", { reason: reason === "clear-press" ? "clear-press" : "imperative", event })
+      return selected || emptied
     },
     getQuery: () => store.get().query,
     setQuery: (
       query: string,
       { reason = "imperative", event }: ComboboxChangeOptions<ComboboxQueryChangeReason> = {},
     ) => {
-      setQuery(query, { reason, event, dirty: true })
+      const changed = setQuery(query, { reason, event, dirty: true })
       settleHighlight()
+      return changed
     },
     focus: () => inputElement()?.focus(),
     // Internal. Used by slots and adapters.

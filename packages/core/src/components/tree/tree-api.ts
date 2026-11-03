@@ -18,7 +18,11 @@ import { isPromise } from "../../foundation/kernel/action"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createSelection } from "../../foundation/selection/selection-model"
-import { toggleTreeChecked, treeCheckedStates, type TreeCheckStrategy } from "../../foundation/lists/tree-checked"
+import {
+  toggleTreeChecked,
+  treeCheckedStates,
+  type TreeCheckStrategy,
+} from "../../foundation/lists/tree-checked"
 import {
   createTreeCollection,
   treeDataNodes,

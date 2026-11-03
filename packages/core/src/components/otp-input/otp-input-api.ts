@@ -211,12 +211,13 @@ function otpInputApi(
     const { pattern, maxLength } = store.get()
     const code = cleanCode(value, pattern, maxLength)
     const previous = store.get().value
-    if (!change("value", code, { reason, event })) return
+    if (!change("value", code, { reason, event })) return false
     if (!isControlled()) store.set({ value: code })
     syncElement()
     // A reset may leave the element's value as it was, so the browser's flag is read either way.
     checkLength()
     if (code !== previous) complete(code, reason, event)
+    return true
   }
 
   // Follows whether the browser flags the code as too short. One read per change.

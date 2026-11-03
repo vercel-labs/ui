@@ -113,8 +113,11 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
   return createController<{
     /** Whether the list is open. */
     isOpen: () => boolean
-    /** Opens or closes the list. */
-    setOpen: (open: boolean, options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => void
+    /**
+     * Opens or closes the list.
+     * Returns false when the change was canceled or it was already open or closed.
+     */
+    setOpen: (open: boolean, options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
     /**
      * Opens the list, and resolves once it closes, with why and how. Resolves exactly once and never
      * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
@@ -126,23 +129,35 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
         signal?: AbortSignal
       },
     ) => Promise<PopupResult<ComboboxOpenChangeReason, never>>
-    /** Closes the list. */
-    close: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => void
-    /** Opens the list when it's closed, and closes it when it's open. */
-    toggle: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => void
+    /** Closes the list. Returns false when the close was canceled or it was already closed. */
+    close: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
+    /**
+     * Opens the list when it's closed, and closes it when it's open.
+     * Returns false when the change was canceled.
+     */
+    toggle: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
     /** The selected value. */
     getValue: () => ComboboxValue<T, Multiple>
-    /** Selects a value, as a user would. A disabled or read-only combobox ignores it. */
+    /**
+     * Selects a value, as a user would. A disabled or read-only combobox ignores it.
+     * Returns false when the change was canceled or nothing changed.
+     */
     setValue: (
       value: ComboboxValue<T, Multiple>,
       options?: ComboboxChangeOptions<ComboboxValueChangeReason>,
-    ) => void
-    /** Selects nothing and empties the input. */
-    clear: (options?: ComboboxChangeOptions<ComboboxValueChangeReason>) => void
+    ) => boolean
+    /**
+     * Selects nothing and empties the input.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: ComboboxChangeOptions<ComboboxValueChangeReason>) => boolean
     /** The input's text. */
     getQuery: () => string
-    /** Changes the input's text, which filters the list. */
-    setQuery: (query: string, options?: ComboboxChangeOptions<ComboboxQueryChangeReason>) => void
+    /**
+     * Changes the input's text, which filters the list.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setQuery: (query: string, options?: ComboboxChangeOptions<ComboboxQueryChangeReason>) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()

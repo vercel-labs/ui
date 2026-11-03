@@ -369,16 +369,17 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     setOpen: kit.setOpen,
     open: kit.open,
     close: kit.close,
+    toggle: kit.toggle,
     getValue: () => store.get().value,
-    setValue(
+    setValue: (
       value: string,
       { reason = "imperative", event }: AutocompleteChangeOptions<AutocompleteValueChangeReason> = {},
-    ) {
-      setValue(value, reason, { event })
-    },
-    clear({ reason = "imperative", event }: AutocompleteChangeOptions<AutocompleteValueChangeReason> = {}) {
-      setValue("", reason, { event })
-    },
+    ) => value !== store.get().value && setValue(value, reason, { event }),
+    clear: ({
+      reason = "imperative",
+      event,
+    }: AutocompleteChangeOptions<AutocompleteValueChangeReason> = {}) =>
+      store.get().value !== "" && setValue("", reason, { event }),
     focus: () => inputElement()?.focus(),
     // Internal. Used by slots and adapters.
     internal: {
