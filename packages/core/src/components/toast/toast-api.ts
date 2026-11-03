@@ -425,7 +425,7 @@ function toastRegionApi(
     const cleanups = [item?.leaving ? () => {} : animateIn(el)]
     label(toastId)
     let bound = true
-    let width: number | undefined
+    let box: string | undefined
     let waiting = false
     const measure = () => {
       const current = findItem(store.get().items, toastId)
@@ -447,16 +447,17 @@ function toastRegionApi(
       heights.set(toastId, height)
       layout()
     }
-    // The toast's own height is the stack's, so its width and its children's sizes tell when the content
-    // reflows: a shadow root, a loaded image or a font.
+    // The toast's own height is the stack's, so its width, its padding and its children's sizes tell
+    // when the content reflows: a shadow root, a loaded image or a font.
     const resizes = new ResizeObserver((entries) => {
       let changed = false
       for (const entry of entries) {
         if (entry.target !== el) changed = true
         else {
-          const next = entry.borderBoxSize?.[0]?.inlineSize ?? el.offsetWidth
-          if (next !== width) changed = true
-          width = next
+          const border = entry.borderBoxSize?.[0]
+          const next = `${border?.inlineSize} ${(border?.blockSize ?? 0) - (entry.contentBoxSize?.[0]?.blockSize ?? 0)}`
+          if (next !== box) changed = true
+          box = next
         }
       }
       if (changed) measure()

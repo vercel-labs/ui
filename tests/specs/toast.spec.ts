@@ -337,12 +337,13 @@ test.describe("stacking", () => {
   )
 
   test(
-    "a toast measures again when a child or its own class changes size",
+    "a toast measures again when a child, its class or its padding changes",
     { tag: "@enhancement" },
     async ({ page, open }) => {
       await open("toast")
       await page.addStyleTag({
-        content: ".toast { height: var(--toast-height) } .toast.roomy { padding-block: 60px }",
+        content:
+          ".toast { height: var(--toast-height) } .toast.roomy { padding-block: 60px } .toast[data-roomier] { padding-block: 90px }",
       })
       await show(page, { title: "Uploading", duration: forever })
       const toast = toastNamed(page, "Uploading")
@@ -356,6 +357,9 @@ test.describe("stacking", () => {
       await expect.poll(height).toBeCloseTo(before + 40, 0)
       await toast.evaluate((el) => el.classList.add("roomy"))
       await expect.poll(height).toBeGreaterThan(before + 40)
+      const roomy = await height()
+      await toast.evaluate((el) => el.setAttribute("data-roomier", ""))
+      await expect.poll(height).toBeCloseTo(roomy + 60, 0)
     },
   )
 
