@@ -1,5 +1,15 @@
 import type { Page } from "@playwright/test"
-import { dialogNamesAtFocus, expect, isSheet, lastAction, recordDialogNamesAtFocus, test } from "../fixtures"
+import {
+  dialogNamesAtFocus,
+  entered,
+  expect,
+  isSheet,
+  lastAction,
+  opacityOf,
+  recordDialogNamesAtFocus,
+  slowTransitions,
+  test,
+} from "../fixtures"
 import { addScroller, addShadowButton, composingEscape } from "../fixtures/popup"
 
 // The trigger is a button that opens a dialog, following the WAI-ARIA dialog
@@ -601,11 +611,20 @@ test.describe("a menu inside the popover", () => {
 })
 
 test.describe("animation", () => {
+  test("the popup animates in from its starting style", async ({ page, open, fixtureOptions }) => {
+    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    await open("popover", { animate: "" })
+    await slowTransitions(page)
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
+  })
+
   test("the popup stays mounted while it animates out", async ({ page, open }) => {
     await open("popover", { animate: "" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    await expect(dialog(page)).not.toHaveAttribute("data-starting-style")
+    await entered(page)
     await trigger(page).click()
     await expect(page.locator('[role="dialog"][data-ending-style]')).toHaveCount(1)
     await expect(page.getByRole("dialog")).toHaveCount(0)
@@ -661,7 +680,7 @@ test.describe("animation", () => {
       })
       await trigger(page).click()
       await expect(dialog(page)).toBeVisible()
-      await expect(dialog(page)).not.toHaveAttribute("data-starting-style")
+      await entered(page)
       // A button underneath the popup.
       const point = await dialog(page).evaluate((el) => {
         const rect = el.getBoundingClientRect()

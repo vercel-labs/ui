@@ -1,4 +1,13 @@
-import { coversTab, expect, lastAction, panelNamed, tabNamed, test } from "../fixtures"
+import {
+  coversTab,
+  expect,
+  lastAction,
+  opacityOf,
+  panelNamed,
+  slowTransitions,
+  tabNamed,
+  test,
+} from "../fixtures"
 
 // Behavior follows the WAI-ARIA tabs pattern:
 // https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
@@ -340,6 +349,15 @@ test.describe("activation direction", () => {
 })
 
 test.describe("animation", () => {
+  test("the next panel animates in from its starting style", async ({ page, open }) => {
+    await open("tabs", { animate: "" })
+    await slowTransitions(page)
+    await expect(panelNamed(page, "Account")).toBeVisible()
+    await tabNamed(page, "Password").click()
+    await expect(panelNamed(page, "Password")).toBeVisible()
+    expect(await opacityOf(panelNamed(page, "Password"))).toBeLessThan(0.5)
+  })
+
   test("the previous panel stays mounted while it animates out", async ({ page, open }) => {
     await open("tabs", { animate: "" })
     await expect(panelNamed(page, "Account")).toBeVisible()

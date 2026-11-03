@@ -273,6 +273,18 @@ async function entered(page: Page) {
   )
 }
 
+// Stretches transitions to ten seconds, linear, so a spec reads an enter
+// animation close to where it starts.
+async function slowTransitions(page: Page) {
+  await page.addStyleTag({
+    content: "* { transition-duration: 10s !important; transition-timing-function: linear !important }",
+  })
+}
+
+async function opacityOf(locator: Locator) {
+  return locator.evaluate((el) => Number(getComputedStyle(el).opacity))
+}
+
 // The key press that moves focus to the next control, for a spec that presses
 // it outside the tab fixture. Safari only tabs to buttons with Option held,
 // like its default setting, so WebKit gets Alt+Tab.
@@ -300,12 +312,14 @@ export {
   lastAction,
   menuNamed,
   missingLabelledBy,
+  opacityOf,
   pageNow,
   panelNamed,
   panelOf,
   recordDialogNamesAtFocus,
   regionNamed,
   shortcutKeys,
+  slowTransitions,
   tabKey,
   tabNamed,
   test,

@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test"
-import { entered, expect, lastAction, pageNow, test } from "../fixtures"
+import { entered, expect, lastAction, opacityOf, pageNow, slowTransitions, test } from "../fixtures"
 
 // Site navigation with the APG disclosure navigation pattern: buttons that
 // show panels of links inside a <nav>, not a menu. Tab reaches every trigger
@@ -451,6 +451,15 @@ test.describe("animation", () => {
   // The fixture turns its transitions off for reduced motion, which a machine's setting can ask for.
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" })
+  })
+
+  test("the viewport and its content animate in from their starting style", async ({ page, open }) => {
+    await open("navigation-menu", { animate: "" })
+    await slowTransitions(page)
+    await trigger(page, "Products").hover()
+    await expect(link(page, "Analytics")).toBeVisible()
+    expect(await opacityOf(page.locator(".nav-viewport"))).toBeLessThan(0.5)
+    expect(await opacityOf(page.locator(".nav-content", { has: link(page, "Analytics") }))).toBeLessThan(0.5)
   })
 
   test("the viewport stays in the page while it animates out", async ({ page, open }) => {

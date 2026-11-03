@@ -1,4 +1,4 @@
-import { expect, lastAction, test } from "../fixtures"
+import { expect, lastAction, slowTransitions, test } from "../fixtures"
 import { checkbox, fillRequired, radio, submitted, switchNamed } from "./forms.helpers"
 
 // Behavior follows the WAI-ARIA radio group pattern, and native radios:
@@ -184,5 +184,17 @@ test.describe("read-only and disabled", () => {
     await page.locator("label", { has: radio(page, "Pro") }).click({ force: true })
     await expect(radio(page, "Pro")).not.toBeFocused()
     await expect(radio(page, "Pro")).not.toBeChecked()
+  })
+})
+
+test.describe("animation", () => {
+  test("the indicator animates in from its starting style", async ({ page, open }) => {
+    await open("forms", { animate: "" })
+    await slowTransitions(page)
+    await radio(page, "Pro").click()
+    const indicator = radio(page, "Pro").locator(".radio-indicator")
+    await expect(indicator).toHaveCount(1)
+    const scale = await indicator.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)
+    expect(scale).toBeLessThan(0.5)
   })
 })

@@ -1,5 +1,15 @@
 import type { Locator } from "@playwright/test"
-import { expect, focusIsWithin, isSheet, lastAction, menuNamed, test, waitForStill } from "../fixtures"
+import {
+  expect,
+  focusIsWithin,
+  isSheet,
+  lastAction,
+  menuNamed,
+  opacityOf,
+  slowTransitions,
+  test,
+  waitForStill,
+} from "../fixtures"
 import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
 
 // Behavior follows the WAI-ARIA menu button pattern:
@@ -528,6 +538,16 @@ test.describe("positioning", () => {
 })
 
 test.describe("animation", () => {
+  test("the popup animates in from its starting style", async ({ page, open, fixtureOptions }) => {
+    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    await open("menu", { animate: "" })
+    await slowTransitions(page)
+    await page.getByRole("button", { name: "File" }).click()
+    const menu = menuNamed(page, "File")
+    await expect(menu).toBeVisible()
+    expect(await opacityOf(menu)).toBeLessThan(0.5)
+  })
+
   test("the popup stays mounted while it animates out", async ({ page, open }) => {
     await open("menu", { animate: "" })
     await page.getByRole("button", { name: "File" }).click()
