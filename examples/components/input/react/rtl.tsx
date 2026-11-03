@@ -1,8 +1,8 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import { Input, InputClear, InputGroup } from "@ui-sdk/react/input"
-import { SearchIcon, XIcon } from "lucide-react"
+import { XIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack" dir="rtl">
       <Field name="name">
@@ -11,12 +11,13 @@ export function Example() {
         <FieldDescription>كما يظهر في ملفك الشخصي.</FieldDescription>
       </Field>
       <InputGroup>
-        <SearchIcon />
         <Input type="search" aria-label="بحث" defaultValue="حسن" />
         <InputClear aria-label="مسح البحث">
-          <XIcon />
+          <XIcon aria-hidden="true" />
         </InputClear>
       </InputGroup>
     </div>
   )
 }
+
+export { Example }
