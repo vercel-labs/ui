@@ -281,6 +281,21 @@ async function slowTransitions(page: Page) {
   })
 }
 
+// Waits until an element's enter transition has finished. Closing during it would
+// reverse it, which CSS shortens to how far it got. A sheet's held script
+// animations never end, so only transitions count.
+async function transitionedIn(locator: Locator) {
+  await expect
+    .poll(() =>
+      locator.evaluate(
+        (el) =>
+          !el.hasAttribute("data-starting-style") &&
+          !el.getAnimations().some((animation) => "transitionProperty" in animation),
+      ),
+    )
+    .toBe(true)
+}
+
 async function opacityOf(locator: Locator) {
   return locator.evaluate((el) => Number(getComputedStyle(el).opacity))
 }
@@ -323,6 +338,7 @@ export {
   tabKey,
   tabNamed,
   test,
+  transitionedIn,
   triggerNamed,
   waitForStill,
 }

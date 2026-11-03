@@ -8,6 +8,7 @@ import {
   opacityOf,
   slowTransitions,
   test,
+  transitionedIn,
   waitForStill,
 } from "../fixtures"
 import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
@@ -553,7 +554,7 @@ test.describe("animation", () => {
     await page.getByRole("button", { name: "File" }).click()
     const menu = menuNamed(page, "File")
     await expect(menu).toBeVisible()
-    await expect(menu).not.toHaveAttribute("data-starting-style")
+    await transitionedIn(menu)
 
     await page.getByRole("button", { name: "File" }).click()
     await expect(page.locator("[data-ending-style]")).toHaveCount(1)
