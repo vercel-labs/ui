@@ -50,8 +50,16 @@
     }
   }
 
+  /* A legend sits outside the field set's flex gap, so it spaces itself. */
   [data-slot="field-legend"] {
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 22px;
+
+    &:has(+ [data-slot="field-description"]) {
+      margin-bottom: var(--space-1);
+    }
   }
 
   [data-slot="field-description"] {
@@ -59,18 +67,6 @@
     margin: 0;
     color: var(--muted);
     font-size: var(--text-sm);
-
-    &:has(> span + span) {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--space-4);
-
-      & > span:last-child {
-        flex-shrink: 0;
-        color: var(--ink);
-        font-variant-numeric: tabular-nums;
-      }
-    }
   }
 
   [data-slot="field-error"] {
@@ -90,10 +86,6 @@
     margin: 0;
     padding: 0;
     border: 0;
-
-    & > [data-slot="field-description"] {
-      margin-top: calc(var(--space-3) * -1);
-    }
   }
 
   [data-slot="field-group"] {

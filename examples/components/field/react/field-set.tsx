@@ -1,7 +1,7 @@
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/react/field"
 import { Input } from "@ui-sdk/react/input"
 
-export function Example() {
+function Example() {
   return (
     <FieldSet>
       <FieldLegend>Address</FieldLegend>
@@ -25,3 +25,5 @@ export function Example() {
     </FieldSet>
   )
 }
+
+export { Example }

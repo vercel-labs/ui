@@ -3,15 +3,27 @@ title: Field
 description: Connect a form control to its label, description, and validation errors.
 ---
 
-<ComponentExample name="field/input" caption="Press Username to focus the input, then enter a name." />
+A field connects a form control to its label, its description and the errors it shows, so you never wire up `id`, `for` or `aria-describedby` by hand.
+
+<ComponentExample name="field/input" caption="Press Username to focus the input, then type a name." />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/react @ui-sdk/core
+npm install @ui-sdk/react @ui-sdk/core
 ```
 
-<span id="composition" />
+## Composition
+
+Use the following composition to build a `Field`:
+
+```text
+Field
+├── FieldLabel
+├── FieldControl
+├── FieldDescription
+└── FieldError
+```
 
 ## Usage
 
@@ -49,54 +61,50 @@ Group related fields in a [field set](#field-sets):
 </FieldSet>
 ```
 
-## Examples
+## Controls
 
-### Textarea
+`FieldControl` renders an `<input>`. Render it as a `<textarea>` or a native `<select>` with `render`, and put the options inside:
 
-Render the control as a `<textarea>` with `render={<textarea />}`.
+```tsx
+<Field>
+  <FieldLabel>Feedback</FieldLabel>
+  <FieldControl render={<textarea />} name="feedback" />
+</Field>
 
-<ComponentExample
-  name="field/textarea"
-  caption="Press Feedback to focus the textarea, then write a message."
-/>
+<Field>
+  <FieldLabel>Department</FieldLabel>
+  <FieldControl render={<select />} name="department">
+    <option value="design">Design</option>
+    <option value="engineering">Engineering</option>
+  </FieldControl>
+</Field>
+```
 
-### Select
+A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field takes the place of `FieldControl` and uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
 
-Render the control as a native `<select>` with `render={<select />}`, and put the options inside.
+```tsx
+<Field>
+  <Switch name="mfa" />
+  <FieldLabel>Two-factor authentication</FieldLabel>
+  <FieldDescription>Ask for a code when you sign in.</FieldDescription>
+</Field>
 
-<ComponentExample
-  name="field/select"
-  caption="Open Department and choose an option. The label names the native select."
-/>
+<Field>
+  <FieldLabel>Plan</FieldLabel>
+  <RadioGroup name="plan" defaultValue="monthly">
+    <label>
+      <Radio value="monthly" />
+      Monthly
+    </label>
+    <label>
+      <Radio value="yearly" />
+      Yearly
+    </label>
+  </RadioGroup>
+</Field>
+```
 
-### Checkbox
-
-A [Checkbox](./checkbox) inside a field uses its label and description. Pressing the label toggles the checkbox.
-
-### Radio
-
-A [Radio Group](./radio) uses the field label to name the group. Give each radio its own label too.
-
-### Switch
-
-A [Switch](./switch) uses the same label and description association as a checkbox.
-
-### Choice Card
-
-A label can wrap a choice and its content. See [Radio](./radio) for selection behavior; the card layout is your own CSS.
-
-A `FieldLabel` can also wrap a whole `Field`, so one card holds a control with its own description. Outside a field, a `FieldLabel` is a plain `<label>` that labels the control inside it.
-
-<ComponentExample
-  name="field/wrapping-label"
-  caption="Click anywhere on a card to check its box. Its description still describes the checkbox."
-/>
-
-### Right to Left
-
-Fields follow the surrounding `dir`. Use logical spacing such as `ps-3` and `text-start` in your styles.
-
-### Validation and Errors
+## Validation
 
 Use native constraints such as `required`, `type="email"`, and `pattern`. Errors appear after a submit attempt and update as the value changes. The first invalid control takes focus.
 
@@ -107,109 +115,94 @@ Leave an error empty to show the browser's message, or use `match="valueMissing"
   caption="Press Subscribe with an empty or invalid email, then correct it to clear the error."
 />
 
-## Behavior and Options
-
-### Required and Disabled
-
-A required control marks every part with `data-required`, and the parts' state has `required`, so a label can show a mark with CSS alone.
-
-A disabled field disables its control and marks every part with `data-disabled`, the way a [disabled field set](#disabled-field-set) does for every field inside it.
-
-### Errors from Your Code
+## Errors from Your Code
 
 Pass `invalid` when your server or form library supplies an error. `true` shows it immediately. Clear the value to return to the browser's validation.
 
 Give this error its own text and set `match` to `true`. Named matches such as `valueMissing` still refer to native validation. `invalid={false}` hides the field's invalid state, but does not make an invalid native control pass validation.
 
-<ComponentExample
-  name="field/server-error"
-  caption="Try ada@example.com to see a server error. Change the email and submit again."
-/>
+```tsx
+<Field name="email" invalid={serverError ? true : undefined}>
+  <FieldLabel>Email</FieldLabel>
+  <FieldControl type="email" required onChange={() => setServerError(null)} />
+  <FieldError match="valueMissing">Enter your email address.</FieldError>
+  {serverError && <FieldError match>{serverError}</FieldError>}
+</Field>
+```
 
-### Character Count
+## Required and Disabled
 
-Keep the text in state and display its length in the description. Set `maxLength` on the control to enforce the limit.
+A required control marks every part with `data-required`, and the parts' state has `required`, so a label can show a mark with CSS alone.
 
-<ComponentExample
-  name="field/character-count"
-  caption="Edit the bio and watch the count. The textarea accepts up to 280 characters."
-/>
+A disabled field disables its control and marks every part with `data-disabled`, the way a [disabled field set](#disabled-field-sets) does for every field inside it.
+
+## Character Count
+
+Keep the text in state and show its length in the description. Set `maxLength` on the control to enforce the limit.
+
+```tsx
+<Field>
+  <FieldLabel>Bio</FieldLabel>
+  <FieldControl
+    render={<textarea />}
+    maxLength={280}
+    value={bio}
+    onChange={(event) => setBio(event.target.value)}
+  />
+  <FieldDescription>{bio.length} / 280</FieldDescription>
+</Field>
+```
 
 ## Forms
 
 The control submits its value under its own `name`, or the field's name if it has none. Reset restores the control's default and hides validation errors. Disabled controls are left out of the submitted values. See [Forms](../forms) for the shared form behavior.
 
-This sign-up form combines text fields, a required plan, a switch, and a required checkbox:
-
-<ComponentExample
-  name="field/sign-up"
-  caption="Submit the empty form to see its errors. Complete it to inspect the submitted values, then press Reset."
-/>
-
 ## Field Sets
+
+A field set groups related fields under a legend, and disables them together.
 
 <ComponentExample
   name="field/field-set"
   caption="Move through the address fields. Their legend and description name the group."
 />
 
-A field set groups related fields under a legend, and disables them together.
-
-`FieldSet` is a native `<fieldset>` and `FieldLegend` a native `<legend>`, so the set is named, and disabled, before scripts run. Keep the legend the first child. A legend rendered as another element still names the set, through `aria-labelledby`.
+`FieldSet` is a native `<fieldset>` and `FieldLegend` a native `<legend>`, so the set is named, and disabled, before scripts run. Keep the legend the first child. A legend rendered as another element, like `render={<div />}`, still names the set through `aria-labelledby`.
 
 A `FieldDescription` right inside the set, outside any `Field`, describes the set, so screen readers read it as focus enters. `FieldGroup` is a `<div>` that stacks the fields, with no role and no state: the field set is what names and disables a group.
 
-### Disabled Field Set
+## Disabled Field Sets
 
 Disabling the set disables its controls and nested field sets. The form leaves their values out of submissions.
 
-<ComponentExample
-  name="field/field-set-disabled"
-  caption="Turn off “Same as shipping address” to edit the billing address. Turn it back on to disable the whole set."
-/>
-
-### Checkboxes in a Field Set
-
-The legend names a [checkbox group](./checkbox#group), so the group needs no label of its own.
-
-<ComponentExample
-  name="field/field-set-checkboxes"
-  caption="Choose the notifications you want. The legend names the group."
-/>
-
-### Radios in a Field Set
-
-A [radio group](./radio) in a field set.
-
-Here the legend renders as a `<div>`, and still names the set.
-
-<ComponentExample
-  name="field/field-set-radios"
-  caption="Choose Monthly or Yearly. Use the arrow keys to change the selected plan."
-/>
-
-### Right to Left Field Set
-
-A field set follows its surrounding `dir`, just like an individual field.
-
-## Styling
-
-Apply classes directly to the parts. Each part receives the field’s state as data attributes:
-
 ```tsx
-<FieldLabel className="data-invalid:text-neutral-950" />
-<FieldControl className="border-neutral-300 data-invalid:border-neutral-950/50" />
+<FieldSet disabled={sameAsShipping}>
+  <FieldLegend>Billing address</FieldLegend>
+  <Field name="billing-street">
+    <FieldLabel>Street address</FieldLabel>
+    <FieldControl autoComplete="billing street-address" />
+  </Field>
+</FieldSet>
 ```
 
-`Field`:
+## Groups in a Field Set
 
-<DataAttributes component="field" />
+The legend names a [checkbox group](./checkbox#group) or a [radio group](./radio) inside the set, so the group needs no label of its own.
 
-`FieldSet`, and a `FieldLegend` or `FieldDescription` that belongs to it:
-
-<DataAttributes component="field-set" />
-
-`FieldGroup` has `data-slot="field-group"` and no state attributes.
+```tsx
+<FieldSet>
+  <FieldLegend>Notifications</FieldLegend>
+  <CheckboxGroup name="notify" defaultValue={["mentions"]}>
+    <label>
+      <Checkbox value="mentions" />
+      Mentions
+    </label>
+    <label>
+      <Checkbox value="follows" />
+      New followers
+    </label>
+  </CheckboxGroup>
+</FieldSet>
+```
 
 ## Custom Rendering
 
@@ -259,6 +252,24 @@ export function PhoneInput(props: React.ComponentProps<"input">) {
 The field reads validity from the native inputs, selects and textareas inside it, so `required` and `pattern` work on the input above. A control that isn't a native input, like a row of buttons, takes part through a native input of its own: ours render one, visually hidden, beside the control.
 
 To build a control from scratch on the primitives ours use, see [Primitives](../../core/kernel/define-a-primitive).
+
+## Styling
+
+Use `data-invalid` and `data-valid` for validation, and `data-focused`, `data-required` and `data-disabled` for the rest. Every part of a field gets the same attributes, so a label can turn red with its control.
+
+Each part has a `data-slot`, such as `field-label`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Field [#data-attributes-field]
+
+<DataAttributes component="field" />
+
+### FieldSet [#data-attributes-fieldset]
+
+A `FieldLegend` or `FieldDescription` that belongs to a field set gets the same attributes. `FieldGroup` has `data-slot="field-group"` and no state attributes.
+
+<DataAttributes component="field-set" />
 
 ## API Reference
 

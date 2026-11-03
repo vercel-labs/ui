@@ -2,7 +2,7 @@ import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
 import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import { CheckIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack" dir="rtl">
       <Field>
@@ -30,3 +30,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

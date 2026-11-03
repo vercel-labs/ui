@@ -1,39 +1,38 @@
 import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [status, setStatus] = React.useState("")
+function Example() {
+  const log = useLog()
 
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setStatus(`Subscribed ${new FormData(event.currentTarget).get("email")}.`)
+        log(`Subscribed ${new FormData(event.currentTarget).get("email")}`)
       }}
     >
       <Field name="email">
         <FieldLabel>Email</FieldLabel>
-        <FieldControl type="email" required placeholder="m@example.com" />
+        <FieldControl type="email" required placeholder="hollis@example.com" />
         <FieldDescription
           render={(props, state) => (
             <p {...props}>{state.valid ? "Looks good." : "We'll send you a confirmation link."}</p>
           )}
         />
-        <div>
-          <FieldError match="valueMissing">Enter your email address.</FieldError>
-          <FieldError match="typeMismatch">Enter an email address like m@example.com.</FieldError>
-        </div>
+        <FieldError match="valueMissing">Enter your email address.</FieldError>
+        <FieldError match="typeMismatch">Enter an email address like hollis@example.com.</FieldError>
       </Field>
       <Field name="website">
         <FieldLabel>Website</FieldLabel>
         <FieldControl type="url" required placeholder="https://example.com" />
-        <div>
-          <FieldError render={(props, state) => <p {...props}>{state.message}</p>} />
-        </div>
+        <FieldError />
       </Field>
-      <button type="submit">Subscribe</button>
-      <output data-slot="output">{status}</output>
+      <button type="submit" data-variant="solid">
+        Subscribe
+      </button>
     </form>
   )
 }
+
+export { Example }

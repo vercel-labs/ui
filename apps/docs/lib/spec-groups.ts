@@ -156,8 +156,9 @@ async function readSpec(spec: string) {
       // can mention people, like "@ada", so only the tag is dropped.
       const title = titleOf(node.arguments[0])?.replaceAll(" @enhancement", "")
       if (name.startsWith("test.describe") && title !== undefined) {
-        const inner: Group = { title, tests: [] }
-        groups.push(inner)
+        // Two describes with one title, like a plain and an enhancement block, read as one group.
+        let inner = groups.find((existing) => existing.title === title)
+        if (!inner) groups.push((inner = { title, tests: [] }))
         const callback = callbackOf(node)
         const innerSkips = callback ? [...skips, ...skipsIn(callback)] : skips
         ts.forEachChild(node, (child) => visit(child, inner, keys, innerSkips))
