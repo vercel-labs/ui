@@ -52,18 +52,14 @@ const DisclosurePanel = parts.Panel
 function Example() {
   const [open, setOpen] = React.useState(false)
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <label className="flex items-center gap-2">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
         Open from outside
       </label>
-      <Disclosure open={open} onOpenChange={setOpen} className="rounded-xl border border-border">
-        <DisclosureTrigger className="w-full px-3 py-2 text-left font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-          Shipping details
-        </DisclosureTrigger>
-        <DisclosurePanel className="px-3 pb-3 text-muted-foreground">
-          Ships in two days, free over $50.
-        </DisclosurePanel>
+      <Disclosure open={open} onOpenChange={setOpen}>
+        <DisclosureTrigger>Shipping details</DisclosureTrigger>
+        <DisclosurePanel>Ships in two days, free over $50.</DisclosurePanel>
       </Disclosure>
     </div>
   )

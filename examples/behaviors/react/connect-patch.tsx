@@ -156,57 +156,46 @@ const BayDraft = parts.Draft
 
 const BayAction = parts.Action
 
-const jackClass =
-  "-mt-2 -ml-2 size-4 cursor-crosshair rounded-full border-2 border-foreground bg-background data-[connect=candidate]:bg-muted data-[connect=target]:bg-foreground"
-
 function Example() {
   return (
-    <Bay className="flex w-72 flex-col gap-3 text-xs">
+    <Bay>
       {({ cables }) => (
         <>
-          <div className="relative h-36">
-            <svg className="pointer-events-none absolute inset-0 overflow-visible" width="1" height="1">
+          <div data-slot="connect-canvas">
+            <svg data-slot="connect-edges">
               {cables.map((cable) => (
                 <BayCable
                   key={`${cable.from}-${cable.to}`}
                   value={`${cable.from}-${cable.to}`}
                   from={cable.from}
                   to={cable.to}
-                  fill="none"
-                  className="stroke-foreground"
-                  strokeWidth={2}
                 />
               ))}
-              <BayDraft fill="none" className="stroke-foreground/60" strokeWidth={2} strokeDasharray="4 3" />
+              <BayDraft />
             </svg>
             {sources.map((source, index) => (
-              <BaySource
-                key={source}
-                value={source}
-                className="absolute left-0 h-8 w-24 rounded-md border border-border bg-background text-left px-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                style={{ top: 4 + index * 48 }}
-              >
+              <BaySource key={source} value={source} style={{ "--row": index } as React.CSSProperties}>
                 {names[source]}
               </BaySource>
             ))}
             {channels.map((channel, index) => (
               <span
                 key={channel}
-                className="absolute left-48 flex h-8 items-center pl-3"
-                style={{ top: 4 + index * 48 }}
+                data-slot="connect-channel"
+                style={{ "--row": index } as React.CSSProperties}
               >
                 {names[channel]}
               </span>
             ))}
             {[...sources, ...channels].map((port) => (
-              <BayJack key={port} value={port} className={jackClass} />
+              <BayJack key={port} value={port} />
             ))}
           </div>
-          <div className="flex gap-1">
-            <BayAction value="synth-ch3" className="rounded-md border border-border px-2 py-1">
+          <div data-slot="row">
+            <BayAction data-size="sm" value="synth-ch3">
               Synth into 3
             </BayAction>
-            <BayAction value="cancel" className="rounded-md border border-border px-2 py-1">
+            <BayAction data-size="sm" value="cancel">
               Cancel
             </BayAction>
           </div>

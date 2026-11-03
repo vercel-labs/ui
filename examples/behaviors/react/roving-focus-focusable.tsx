@@ -53,29 +53,18 @@ const FoldersItem = parts.Item
 
 const FoldersToggle = parts.Toggle
 
-const row =
-  "rounded-md px-3 py-1.5 text-start text-sm outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-
 function Example() {
   return (
-    <Folders role="group" aria-label="Folders" className="flex min-h-60 w-40 flex-col gap-0.5">
-      <FoldersItem value="Inbox" className={row}>
-        Inbox
-      </FoldersItem>
-      <FoldersItem value="Drafts" className={row}>
-        Drafts
-      </FoldersItem>
-      <FoldersToggle value="Labels" className={`${row} aria-expanded:font-medium`}>
-        Labels
-      </FoldersToggle>
+    <Folders role="group" aria-label="Folders">
+      <FoldersItem value="Inbox">Inbox</FoldersItem>
+      <FoldersItem value="Drafts">Drafts</FoldersItem>
+      <FoldersToggle value="Labels">Labels</FoldersToggle>
       {["Work", "Family", "Travel"].map((label) => (
-        <FoldersItem key={label} value={label} nested className={`${row} ps-7`}>
+        <FoldersItem key={label} value={label} nested>
           {label}
         </FoldersItem>
       ))}
-      <FoldersItem value="Trash" className={row}>
-        Trash
-      </FoldersItem>
+      <FoldersItem value="Trash">Trash</FoldersItem>
     </Folders>
   )
 }

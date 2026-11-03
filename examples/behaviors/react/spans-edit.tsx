@@ -124,38 +124,30 @@ const RoomAction = parts.Action
 
 function Example() {
   return (
-    <Room className="flex w-full max-w-md flex-col gap-2">
+    <Room>
       {({ bookings, note }) => (
         <>
-          <RoomTrack value="Atlas" aria-label="Atlas" className="h-10 rounded-lg bg-muted/60">
+          <RoomTrack value="Atlas" aria-label="Atlas">
             {bookings.map((booking) => (
-              <RoomBooking
-                key={booking.id}
-                value={booking.id}
-                className="h-full cursor-grab overflow-hidden rounded-md bg-primary px-2 text-xs leading-10 text-primary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-default aria-disabled:bg-foreground/60"
-              >
+              <RoomBooking key={booking.id} value={booking.id}>
                 {booking.title} {hour(booking.start)}
               </RoomBooking>
             ))}
           </RoomTrack>
-          <div className="flex flex-wrap items-center gap-2">
+          <div data-slot="row">
             {[
               ["later", "Later"],
               ["longer", "Longer"],
               ["delete", "Delete"],
               ["noon", "Book noon"],
             ].map(([value, text]) => (
-              <RoomAction
-                key={value}
-                value={value}
-                className="rounded-md border border-border px-2 py-1 text-xs"
-              >
+              <RoomAction data-size="sm" key={value} value={value}>
                 {text}
               </RoomAction>
             ))}
-            <p className="text-xs text-muted-foreground">{note}</p>
+            <p data-slot="hint">{note}</p>
           </div>
-          <p className="text-xs text-muted-foreground tabular-nums">
+          <p data-slot="output">
             {bookings
               .map((booking) => `${booking.title} ${hour(booking.start)}–${hour(booking.end)}`)
               .join(" · ")}

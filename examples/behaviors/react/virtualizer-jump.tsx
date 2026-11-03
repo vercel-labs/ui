@@ -101,35 +101,27 @@ const names = ["Ada", "Ben", "Cleo", "Dev", "Eli", "Fay", "Gus", "Hana", "Ivo", 
 
 function Example() {
   return (
-    <Contacts className="flex w-72 flex-col gap-2">
+    <Contacts>
       {({ items, count }) => (
         <>
-          <ContactsScroller className="h-56 rounded-xl border border-border text-sm">
-            <div className="sticky top-0 z-10 flex h-8 items-center border-b border-border bg-background px-3 text-xs font-medium">
-              {count} contacts
-            </div>
+          <ContactsScroller>
+            <div data-slot="virtualizer-header">{count} contacts</div>
             <ContactsBody aria-label="Contacts">
               {items.map((item) => (
-                <ContactsRow
-                  key={item.key}
-                  value={item.key}
-                  index={item.index}
-                  start={item.start}
-                  className="flex items-center px-3 outline-none focus:bg-muted"
-                >
+                <ContactsRow key={item.key} value={item.key} index={item.index} start={item.start}>
                   {names[item.index % names.length]} {item.index + 1}
                 </ContactsRow>
               ))}
             </ContactsBody>
           </ContactsScroller>
-          <div className="flex flex-wrap gap-1 text-xs">
+          <div data-slot="row">
             {[
               ["first", "First"],
               ["middle", "Center 50"],
               ["eighty", "Show 80"],
               ["last", "Last"],
             ].map(([value, text]) => (
-              <ContactsAction key={value} value={value} className="rounded-md border border-border px-2 py-1">
+              <ContactsAction data-size="sm" key={value} value={value}>
                 {text}
               </ContactsAction>
             ))}

@@ -54,25 +54,20 @@ function Example() {
   const [manager, setManager] = React.useState<keyof typeof commands>("pnpm")
   const [copies, setCopies] = React.useState(0)
   return (
-    <div className="flex flex-wrap items-center gap-3 text-sm">
+    <div data-slot="row">
       <select
         aria-label="Package manager"
         value={manager}
         onChange={(event) => setManager(event.target.value as keyof typeof commands)}
-        className="h-8 rounded-lg border border-border bg-transparent px-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <option value="pnpm">pnpm</option>
         <option value="npm">npm</option>
       </select>
-      <code className="rounded-md bg-muted px-2 py-1">{commands[manager]}</code>
-      <CopyButton
-        text={commands[manager]}
-        onCopy={() => setCopies((count) => count + 1)}
-        className="h-8 w-20 rounded-lg border border-border px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+      <code data-slot="copy-command">{commands[manager]}</code>
+      <CopyButton text={commands[manager]} onCopy={() => setCopies((count) => count + 1)}>
         {({ copied }) => (copied ? "Copied" : "Copy")}
       </CopyButton>
-      <span className="text-muted-foreground">
+      <span data-slot="hint">
         Copied {copies} {copies === 1 ? "time" : "times"}
       </span>
     </div>

@@ -16,6 +16,7 @@ const controller = createAccordionController()
 function Fixture() {
   const [action, setAction] = createSignal("")
   const [complete, setComplete] = createSignal("")
+  const [warrantyEnabled, setWarrantyEnabled] = createSignal(false)
   const { cancel, ...options } = accordionOptions()
   return (
     <div class="fixture">
@@ -35,7 +36,7 @@ function Fixture() {
             <AccordionItem
               class="accordion-item"
               value={item.value}
-              disabled={item.disabled}
+              disabled={item.disabled && !warrantyEnabled()}
               onOpenChangeComplete={(open) => setComplete(`${item.value} ${open ? "open" : "closed"}`)}
             >
               <AccordionHeader class="accordion-header">
@@ -63,6 +64,7 @@ function Fixture() {
       </output>
       <output aria-label="Last completed">{complete()}</output>
       <button onClick={() => controller.open("support")}>Show support</button>
+      <button onClick={() => setWarrantyEnabled((enabled) => !enabled)}>Toggle warranty</button>
     </div>
   )
 }

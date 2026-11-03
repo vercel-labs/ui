@@ -70,29 +70,16 @@ function Example() {
     <TagList
       onAdd={(tag: string) => setTags((tags) => (tags.includes(tag) ? tags : [...tags, tag]))}
       onCountChange={setCount}
-      className="flex w-72 flex-col gap-3 text-sm"
     >
-      <TagListInput
-        aria-label="New tag"
-        placeholder="Type a tag and press Enter"
-        className="h-8 rounded-lg border border-border bg-transparent px-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      />
-      <TagListList
-        role="group"
-        aria-label="Tags"
-        className="flex h-28 flex-wrap content-start items-start gap-1 overflow-y-auto p-1"
-      >
+      <TagListInput aria-label="New tag" placeholder="Type a tag and press Enter" />
+      <TagListList role="group" aria-label="Tags">
         {tags.map((tag) => (
-          <TagListTag
-            key={tag}
-            value={tag}
-            className="rounded-full border border-border px-2.5 py-1 outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
+          <TagListTag data-size="sm" key={tag} value={tag}>
             {tag}
           </TagListTag>
         ))}
       </TagListList>
-      <p className="text-muted-foreground">
+      <p data-slot="hint">
         {count} {count === 1 ? "tag" : "tags"}
       </p>
     </TagList>

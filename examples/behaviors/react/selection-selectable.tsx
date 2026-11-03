@@ -69,20 +69,11 @@ const owners = ["Ana"]
 
 function Example() {
   return (
-    <Members
-      owners={owners}
-      aria-label="Members"
-      className="flex w-56 flex-col rounded-lg border border-border p-1 text-sm select-none"
-    >
+    <Members owners={owners} aria-label="Members">
       {names.map((name) => (
-        <MembersMember
-          key={name}
-          value={name}
-          aria-disabled={owners.includes(name) || undefined}
-          className="flex justify-between rounded-md px-3 py-1.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-selected:bg-foreground/10 aria-selected:font-medium"
-        >
+        <MembersMember key={name} value={name} aria-disabled={owners.includes(name) || undefined}>
           {name}
-          {owners.includes(name) && <span className="text-xs text-muted-foreground">Owner</span>}
+          {owners.includes(name) && <span data-slot="hint">Owner</span>}
         </MembersMember>
       ))}
     </Members>

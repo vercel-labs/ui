@@ -121,24 +121,17 @@ const SightsMapAction = parts.Action
 
 function Example() {
   return (
-    <SightsMap className="flex w-80 flex-col gap-2 text-xs">
-      <SightsMapFrame
-        aria-label="Sights"
-        className="h-56 cursor-grab rounded-xl border border-border bg-muted/30 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
-      >
+    <SightsMap>
+      <SightsMapFrame aria-label="Sights">
         <SightsMapWorld>
           {sights.map((sight) => (
-            <SightsMapSight
-              key={sight.value}
-              value={sight.value}
-              className="rounded-full bg-background px-2 font-medium shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
+            <SightsMapSight key={sight.value} value={sight.value}>
               📍 {sight.label}
             </SightsMapSight>
           ))}
         </SightsMapWorld>
       </SightsMapFrame>
-      <div className="flex flex-wrap items-center gap-1">
+      <div data-slot="row">
         {[
           ["fit", "Fit"],
           ["out", "−"],
@@ -148,15 +141,15 @@ function Example() {
           ["right", "→"],
         ].map(([value, text]) => (
           <SightsMapAction
+            data-size="sm"
             key={value}
             value={value}
             aria-label={{ left: "Pan left", right: "Pan right", out: "Zoom out", in: "Zoom in" }[value]}
-            className="min-w-7 rounded-md border border-border px-2 py-1"
           >
             {text}
           </SightsMapAction>
         ))}
-        <SightsMapZoom className="ml-auto text-muted-foreground after:content-[attr(data-zoom)]" />
+        <SightsMapZoom />
       </div>
     </SightsMap>
   )

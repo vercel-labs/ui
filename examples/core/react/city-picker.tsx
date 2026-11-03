@@ -72,31 +72,22 @@ function Example() {
   const [slow, setSlow] = React.useState(false)
   const [picked, setPicked] = React.useState<string | null>(null)
   return (
-    <div className="flex w-56 flex-col gap-3 text-sm">
-      <label className="flex items-center gap-2 text-muted-foreground">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={slow} onChange={(event) => setSlow(event.target.checked)} />
         Wait 1.5 seconds between keys
       </label>
-      <CityPicker
-        aria-label="City"
-        delay={slow ? 1500 : 500}
-        onPick={setPicked}
-        className="flex flex-col rounded-lg border border-border p-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+      <CityPicker aria-label="City" delay={slow ? 1500 : 500} onPick={setPicked}>
         {cities.map((city) => (
-          <CityPickerCity
-            key={city}
-            value={city}
-            className="group flex justify-between rounded-md px-3 py-1.5 aria-selected:bg-muted aria-selected:font-medium"
-          >
+          <CityPickerCity key={city} value={city}>
             {city}
-            <span aria-hidden="true" className="hidden group-data-picked:inline">
+            <span aria-hidden="true" data-show="picked">
               ✓
             </span>
           </CityPickerCity>
         ))}
       </CityPicker>
-      <p data-picked-city className="text-muted-foreground">
+      <p data-picked-city data-slot="hint">
         {picked ? `Picked ${picked}` : "Nothing picked yet"}
       </p>
     </div>

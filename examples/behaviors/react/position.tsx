@@ -80,20 +80,14 @@ const PinsClose = parts.Close
 function Example() {
   return (
     <Pins>
-      <PinsMap
-        aria-label="Map, press to drop a pin"
-        className="h-40 w-72 cursor-crosshair rounded-xl border border-border bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] bg-size-[16px_16px] outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      />
-      <PinsCard
-        aria-label="Pin"
-        className="flex items-center gap-3 rounded-xl border border-border bg-popover p-2 pl-3 text-sm shadow-lg"
-      >
+      <PinsMap aria-label="Map, press to drop a pin" />
+      <PinsCard aria-label="Pin">
         {({ pin }) => (
           <>
             <span>
               Pin at {pin?.x}, {pin?.y}
             </span>
-            <PinsClose className="rounded-md px-2 py-1 text-xs hover:bg-muted">Done</PinsClose>
+            <PinsClose data-size="sm">Done</PinsClose>
           </>
         )}
       </PinsCard>

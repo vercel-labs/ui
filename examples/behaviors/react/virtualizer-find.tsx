@@ -22,17 +22,12 @@ function Example() {
   React.useEffect(() => virtual.connect(scroller.current!, { findable: true }), [])
 
   return (
-    <div className="flex w-[26rem] max-w-full flex-col gap-2">
-      <p className="m-0 text-sm text-muted-foreground">
-        Search <span className="font-medium text-foreground">Acme</span> with ⌘F or Ctrl+F
+    <div data-slot="stack">
+      <p data-slot="hint">
+        Search <span data-slot="virtualizer-term">Acme</span> with ⌘F or Ctrl+F
       </p>
-      <div
-        ref={scroller}
-        role="list"
-        aria-label="Invoices"
-        className="relative h-72 overflow-auto rounded-3xl bg-muted/50 outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-      >
-        <div className="relative" style={{ height: virtual.size() }}>
+      <div ref={scroller} role="list" aria-label="Invoices" data-slot="virtualizer-scroller">
+        <div data-slot="virtualizer-body" style={{ height: virtual.size() }}>
           {items.map((item) => (
             <div
               key={item.key}
@@ -40,14 +35,11 @@ function Example() {
               role="listitem"
               aria-setsize={invoices.length}
               aria-posinset={item.index + 1}
-              className="absolute inset-x-0 top-0 flex h-9 items-center gap-2 px-4 text-sm"
+              data-slot="virtualizer-row"
               style={{ transform: `translateY(${item.start}px)` }}
             >
-              <span
-                ref={(el) => virtual.findableText(item.index, el, 0)}
-                className="font-mono text-xs tabular-nums"
-              />{" "}
-              <span ref={(el) => virtual.findableText(item.index, el, 1)} className="text-muted-foreground" />
+              <span ref={(el) => virtual.findableText(item.index, el, 0)} data-slot="virtualizer-id" />{" "}
+              <span ref={(el) => virtual.findableText(item.index, el, 1)} data-slot="hint" />
             </div>
           ))}
         </div>

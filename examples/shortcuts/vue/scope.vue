@@ -21,15 +21,14 @@ useShortcut(
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-3">
+  <div data-slot="stack">
     <textarea
       v-model="text"
       aria-label="Note"
       placeholder="Write a note…"
-      class="field-sizing-content min-h-16 w-72 min-w-0 resize-none rounded-2xl border border-transparent bg-input/50 px-2.5 py-2 text-base outline-none transition-[color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 md:text-sm"
       @focus="shortcuts.setScope('note', true)"
       @blur="shortcuts.setScope('note', false)"
     />
-    <output class="text-sm text-muted-foreground">{{ status }}</output>
+    <output data-slot="output">{{ status }}</output>
   </div>
 </template>

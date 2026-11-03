@@ -47,7 +47,7 @@ const FileListDelete = parts.Delete
 function Example() {
   const [note, setNote] = React.useState("")
   return (
-    <div className="flex w-64 flex-col gap-2 text-sm">
+    <div data-slot="stack">
       <FileList
         aria-label="Files"
         defaultFiles={["README.md", "notes.txt", "draft.md"]}
@@ -57,27 +57,17 @@ function Example() {
             setNote("The readme stays.")
           } else setNote(`Deleted ${file}.`)
         }}
-        className="flex flex-col gap-1"
       >
         {({ files }) =>
           files.map((file) => (
-            <FileListItem
-              key={file}
-              value={file}
-              className="flex items-center justify-between rounded-md border border-border px-3 py-1.5"
-            >
+            <FileListItem key={file} value={file}>
               {file}
-              <FileListDelete
-                value={file}
-                className="rounded px-2 text-xs text-muted-foreground hover:bg-muted"
-              >
-                Delete
-              </FileListDelete>
+              <FileListDelete value={file}>Delete</FileListDelete>
             </FileListItem>
           ))
         }
       </FileList>
-      <p data-note className="text-xs text-muted-foreground">
+      <p data-note data-slot="output">
         {note || "Delete a file."}
       </p>
     </div>

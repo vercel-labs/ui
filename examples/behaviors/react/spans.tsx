@@ -89,26 +89,18 @@ function Example() {
         { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 10 * 60 + 30, title: "Standup" },
         { id: "review", track: "Birch", start: 13 * 60, end: 15 * 60, title: "Review" },
       ]}
-      className="flex w-full max-w-md flex-col gap-2"
     >
       {({ bookings }) =>
         ["Atlas", "Birch"].map((room) => (
-          <div key={room} className="flex items-center gap-2">
-            <span className="w-10 text-xs text-muted-foreground">{room}</span>
-            <RoomsRoom value={room} aria-label={room} className="h-10 flex-1 rounded-lg bg-muted/60">
+          <div key={room} data-slot="spans-lane">
+            <span data-slot="spans-label">{room}</span>
+            <RoomsRoom value={room} aria-label={room}>
               {bookings
                 .filter((booking) => booking.track === room)
                 .map((booking) => (
-                  <RoomsBooking
-                    key={booking.id}
-                    value={booking.id}
-                    className="h-full cursor-grab overflow-hidden rounded-md bg-primary px-2 text-xs leading-10 text-primary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:opacity-80"
-                  >
+                  <RoomsBooking key={booking.id} value={booking.id}>
                     {booking.title} {hour(booking.start)}
-                    <span
-                      data-span-edge="end"
-                      className="absolute inset-y-0 right-0 w-1.5 cursor-ew-resize"
-                    />
+                    <span data-span-edge="end" />
                   </RoomsBooking>
                 ))}
             </RoomsRoom>

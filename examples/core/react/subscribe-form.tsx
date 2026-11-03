@@ -40,22 +40,15 @@ const parts = createParts(subscribe, { root: "form", input: "input", error: "p",
 
 function Example() {
   return (
-    <parts.Root noValidate className="flex w-72 flex-col gap-2 text-sm">
-      <div className="flex gap-2">
-        <parts.Input
-          aria-label="Email"
-          placeholder="Email"
-          className="h-8 min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive"
-        />
-        <button
-          type="submit"
-          className="h-8 rounded-lg bg-foreground px-3 font-medium text-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+    <parts.Root noValidate>
+      <div data-slot="row">
+        <parts.Input aria-label="Email" placeholder="Email" />
+        <button type="submit" data-variant="solid">
           Subscribe
         </button>
       </div>
-      <parts.Error className="text-destructive">{({ error }) => error}</parts.Error>
-      <parts.Done className="text-muted-foreground">You're on the list.</parts.Done>
+      <parts.Error>{({ error }) => error}</parts.Error>
+      <parts.Done>You're on the list.</parts.Done>
     </parts.Root>
   )
 }

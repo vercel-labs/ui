@@ -11,21 +11,25 @@ import tseslint from "typescript-eslint"
 const react = [
   "packages/react/src/**/*.{ts,tsx}",
   "examples/*/react/**/*.tsx",
+  "examples/components/*/react/**/*.tsx",
   "apps/playground/src/fixtures/**/react*.tsx",
 ]
 const solidFiles = [
   "packages/solid/src/**/*.{ts,tsx}",
   "examples/*/solid/**/*.tsx",
+  "examples/components/*/solid/**/*.tsx",
   "apps/playground/src/fixtures/**/solid*.tsx",
 ]
 const vueFiles = [
   "packages/vue/src/**/*.vue",
   "examples/*/vue/**/*.vue",
+  "examples/components/*/vue/**/*.vue",
   "apps/playground/src/fixtures/**/*.vue",
 ]
 const svelteFiles = [
   "packages/svelte/src/**/*.svelte",
   "examples/*/svelte/**/*.svelte",
+  "examples/components/*/svelte/**/*.svelte",
   "apps/playground/src/fixtures/**/*.svelte",
 ]
 

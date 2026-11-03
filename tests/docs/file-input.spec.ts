@@ -5,7 +5,7 @@ import path from "node:path"
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
-  readdirSync(path.join(import.meta.dirname, "../../examples/file-input", folder), { withFileTypes: true })
+  readdirSync(path.join(import.meta.dirname, "../../examples/components/file-input", folder), { withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name.replace(/\.\w+$/, ""))
 

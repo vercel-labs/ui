@@ -66,43 +66,33 @@ const team: Person[] = [
 function Example() {
   const [shown, setShown] = React.useState("")
   return (
-    <div className="flex flex-col gap-3 text-sm">
+    <div data-slot="stack">
       <TeamCard
         onPayloadChange={(person: unknown, details: ChangeDetails<string>) =>
           setShown(`${(person as Person).name}, by ${details.reason}`)
         }
       >
-        <div className="flex gap-2">
+        <div data-slot="row">
           {team.map((person) => (
-            <TeamCardTrigger
-              key={person.initials}
-              payload={person}
-              aria-label={person.name}
-              className="grid size-9 place-items-center rounded-full bg-muted text-xs font-medium"
-            >
+            <TeamCardTrigger key={person.initials} payload={person} aria-label={person.name}>
               {person.initials}
             </TeamCardTrigger>
           ))}
         </div>
-        <TeamCardContent
-          sideOffset={8}
-          className="flex w-44 flex-col gap-0.5 rounded-xl bg-popover p-3 text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none"
-        >
+        <TeamCardContent sideOffset={8}>
           {(state) => {
             const person = state.payload as Person | undefined
             return (
               <>
-                <TeamCardArrow className="size-2.5 rotate-45 bg-popover data-[side=bottom]:-top-1 data-[side=top]:-bottom-1" />
-                <TeamCardTitle className="font-medium">{person?.name}</TeamCardTitle>
-                <TeamCardDescription className="text-xs text-muted-foreground">
-                  {person?.role}
-                </TeamCardDescription>
+                <TeamCardArrow />
+                <TeamCardTitle>{person?.name}</TeamCardTitle>
+                <TeamCardDescription>{person?.role}</TeamCardDescription>
               </>
             )
           }}
         </TeamCardContent>
       </TeamCard>
-      <p data-team-shown className="text-xs text-muted-foreground">
+      <p data-team-shown data-slot="output">
         {shown}
       </p>
     </div>

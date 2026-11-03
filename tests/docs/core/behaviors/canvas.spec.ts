@@ -108,7 +108,7 @@ test("viewport points: a double-click drops a dot under the pointer at any zoom,
   await frame.scrollIntoViewIfNeeded()
   const label = page.locator('[data-slot="dots-label"]')
   const box = (await frame.boundingBox())!
-  await page.mouse.dblclick(box.x + 40, box.y + 50)
+  await page.mouse.dblclick(Math.round(box.x) + 40, Math.round(box.y) + 50)
   await expect(label).toHaveAttribute("data-at", "40, 50")
   await frame.focus()
   await page.keyboard.press("+")

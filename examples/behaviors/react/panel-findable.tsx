@@ -91,35 +91,24 @@ const releases = [
 
 function Example() {
   return (
-    <Notes className="flex min-h-80 w-72 flex-col gap-2 text-sm">
+    <Notes>
       {({ settled }) => (
         <>
-          <div className="flex flex-col divide-y divide-border rounded-xl border border-border">
+          <div data-slot="panel-list">
             {releases.map((release) => (
               <div key={release.value}>
-                <NotesTrigger
-                  value={release.value}
-                  className="w-full px-3 py-2 text-left font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  Version {release.value}
-                </NotesTrigger>
-                <NotesPanel
-                  value={release.value}
-                  className="h-(--panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-starting-style:h-0 motion-reduce:transition-none"
-                >
-                  <p className="px-3 pb-3 text-muted-foreground">{release.notes}</p>
+                <NotesTrigger value={release.value}>Version {release.value}</NotesTrigger>
+                <NotesPanel value={release.value}>
+                  <p>{release.notes}</p>
                 </NotesPanel>
               </div>
             ))}
           </div>
-          <div className="mt-auto flex items-center justify-between text-xs">
-            <NotesExpand
-              value={releases.map((release) => release.value).join(" ")}
-              className="rounded-md border border-border px-2 py-1"
-            >
+          <div data-slot="row">
+            <NotesExpand value={releases.map((release) => release.value).join(" ")} data-size="sm">
               Open all
             </NotesExpand>
-            <span data-settled className="text-muted-foreground">
+            <span data-settled data-slot="hint">
               {settled}
             </span>
           </div>

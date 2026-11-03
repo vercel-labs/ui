@@ -42,14 +42,9 @@ const ToolbarItem = parts.Item
 
 function Example() {
   return (
-    <Toolbar aria-label="Edit" className="flex w-32 flex-col gap-1 rounded-lg border border-border p-1">
+    <Toolbar aria-label="Edit">
       {["Undo", "Redo", "Cut", "Copy", "Paste"].map((label) => (
-        <ToolbarItem
-          key={label}
-          value={label}
-          disabled={label === "Undo" || label === "Redo"}
-          className="rounded-md px-3 py-1.5 text-start text-sm outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:text-muted-foreground aria-disabled:hover:bg-transparent"
-        >
+        <ToolbarItem key={label} value={label} disabled={label === "Undo" || label === "Redo"}>
           {label}
         </ToolbarItem>
       ))}

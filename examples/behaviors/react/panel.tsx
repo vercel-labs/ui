@@ -83,21 +83,13 @@ const questions = [
 
 function Example() {
   return (
-    <div className="min-h-72 w-72">
-      <Faq className="flex flex-col divide-y divide-border rounded-xl border border-border text-sm">
+    <div data-slot="panel-frame">
+      <Faq>
         {questions.map((item) => (
           <div key={item.value}>
-            <FaqTrigger
-              value={item.value}
-              className="w-full px-3 py-2 text-left font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {item.question}
-            </FaqTrigger>
-            <FaqPanel
-              value={item.value}
-              className="h-(--panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-starting-style:h-0 motion-reduce:transition-none"
-            >
-              <p className="px-3 pb-3 text-muted-foreground">{item.answer}</p>
+            <FaqTrigger value={item.value}>{item.question}</FaqTrigger>
+            <FaqPanel value={item.value}>
+              <p>{item.answer}</p>
             </FaqPanel>
           </div>
         ))}

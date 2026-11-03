@@ -51,35 +51,29 @@ const CommandList = parts.Root
 
 const CommandListCommand = parts.Command
 
-const optionClass =
-  "flex items-center justify-between rounded-md px-3 py-1.5 text-sm aria-selected:bg-muted aria-selected:font-medium"
-
 function Example() {
   return (
-    <CommandList
-      aria-label="Edit"
-      className="flex w-48 flex-col rounded-lg border border-border p-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-    >
-      <CommandListCommand value="copy" className={optionClass}>
+    <CommandList aria-label="Edit">
+      <CommandListCommand value="copy">
         Copy{" "}
-        <kbd aria-hidden="true" className="text-xs text-muted-foreground">
+        <kbd aria-hidden="true" data-slot="kbd">
           ⌘C
         </kbd>
       </CommandListCommand>
-      <CommandListCommand value="cut" className={optionClass}>
+      <CommandListCommand value="cut">
         Cut{" "}
-        <kbd aria-hidden="true" className="text-xs text-muted-foreground">
+        <kbd aria-hidden="true" data-slot="kbd">
           ⌘X
         </kbd>
       </CommandListCommand>
-      <CommandListCommand value="paste" className={optionClass}>
+      <CommandListCommand value="paste">
         Paste{" "}
-        <kbd aria-hidden="true" className="text-xs text-muted-foreground">
+        <kbd aria-hidden="true" data-slot="kbd">
           ⌘V
         </kbd>
       </CommandListCommand>
-      <CommandListCommand value="delete" aria-label="Delete" className={optionClass}>
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-none stroke-current stroke-2">
+      <CommandListCommand value="delete" aria-label="Delete">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
           <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13" />
         </svg>
       </CommandListCommand>

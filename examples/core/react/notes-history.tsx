@@ -68,24 +68,20 @@ const parts = createParts(notes, {
   clear: "button",
 })
 
-const button =
-  "h-8 rounded-lg border border-border px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
-
 function Example() {
   return (
     <parts.Root>
-      <div className="flex w-80 flex-col gap-3 text-sm">
+      <div data-slot="stack">
         <parts.Input
           aria-label="Notes"
           rows={3}
           placeholder="Type a few words, pause, and type more. Try “teh”."
-          className="resize-none rounded-lg border border-border bg-transparent px-3 py-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         />
-        <div className="flex flex-wrap gap-2">
-          <parts.Undo className={button}>Undo</parts.Undo>
-          <parts.Redo className={button}>Redo</parts.Redo>
-          <parts.Fix className={button}>Fix “teh”</parts.Fix>
-          <parts.Clear className={button}>Clear</parts.Clear>
+        <div data-slot="row">
+          <parts.Undo>Undo</parts.Undo>
+          <parts.Redo>Redo</parts.Redo>
+          <parts.Fix>Fix “teh”</parts.Fix>
+          <parts.Clear>Clear</parts.Clear>
         </div>
       </div>
     </parts.Root>

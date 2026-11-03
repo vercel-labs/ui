@@ -83,25 +83,14 @@ const PackingItem = parts.Item
 
 function Example() {
   return (
-    <Packing
-      defaultLists={{ closet: ["Jacket", "Boots", "Scarf"], bag: ["Passport", "Charger"] }}
-      className="flex gap-3"
-    >
+    <Packing defaultLists={{ closet: ["Jacket", "Boots", "Scarf"], bag: ["Passport", "Charger"] }}>
       {({ lists }) =>
         Object.entries(lists).map(([list, items]) => (
-          <div key={list} className="flex w-36 flex-col gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground capitalize">{list}</span>
-            <PackingList
-              value={list}
-              aria-label={list}
-              className="flex min-h-36 flex-col gap-1.5 rounded-xl bg-muted/50 p-1.5"
-            >
+          <div key={list} data-slot="transfer-lane">
+            <span data-slot="transfer-label">{list}</span>
+            <PackingList value={list} aria-label={list}>
               {items.map((item) => (
-                <PackingItem
-                  key={item}
-                  value={item}
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:opacity-40"
-                >
+                <PackingItem key={item} value={item}>
                   {item}
                 </PackingItem>
               ))}

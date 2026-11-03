@@ -27,7 +27,7 @@ function owns(framework, file) {
   return (
     file.startsWith(`packages/${framework}/`) ||
     file.startsWith(`apps/docs/content/docs/${docsName(framework)}/`) ||
-    new RegExp(`^examples/[^/]+/${framework}/`).test(file) ||
+    new RegExp(`^examples/(components/)?[^/]+/${framework}/`).test(file) ||
     new RegExp(`^apps/playground/src/fixtures/[^/]+/${framework}[.-]`).test(file) ||
     (framework === "vue" && /^apps\/playground\/src\/fixtures\/.+\.vue$/.test(file)) ||
     (framework === "svelte" && /^apps\/playground\/src\/fixtures\/.+\.svelte$/.test(file))

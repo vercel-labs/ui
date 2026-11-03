@@ -4,7 +4,7 @@ import vue from "@vitejs/plugin-vue"
 import { globSync } from "node:fs"
 import { defineConfig, type UserConfig } from "vite"
 
-const solidFiles = ["**/packages/solid/**", "**/examples/*/solid/**"]
+const solidFiles = ["**/packages/solid/**", "**/examples/*/solid/**", "**/examples/components/*/solid/**"]
 const builds: Record<string, { ext: string; config?: UserConfig }> = {
   react: { ext: "tsx" },
   vue: { ext: "vue", config: { plugins: [vue()] } },
@@ -19,9 +19,9 @@ export default defineConfig(({ mode }) => {
   const framework = mode in builds ? mode : "vue"
   const { ext, config = {} } = builds[framework]
   const entries = Object.fromEntries(
-    globSync(`*/${framework}/*.${ext}`)
-      .filter((file) => !only || only.includes(file.split("/")[0]))
-      .map((file) => [file.replace(new RegExp(`/${framework}/(.+)\\.${ext}$`), "/$1"), file]),
+    globSync([`*/${framework}/*.${ext}`, `components/*/${framework}/*.${ext}`])
+      .map((file) => [file.replace(/^components\//, "").replace(new RegExp(`/${framework}/(.+)\\.${ext}$`), "/$1"), file])
+      .filter(([name]) => !only || only.includes(name.split("/")[0])),
   )
 
   return {

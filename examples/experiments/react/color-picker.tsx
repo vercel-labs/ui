@@ -199,40 +199,26 @@ const swatches = ["#ef4444", "#f59e0b", "#10b981", "#0ea5e9", "#6366f1", "#a855f
 
 function Example() {
   return (
-    <ColorPicker
-      defaultColor={{ h: 262, s: 0.7, v: 0.85 }}
-      className="flex w-64 flex-col gap-3 rounded-xl border border-border p-3"
-    >
+    <ColorPicker defaultColor={{ h: 262, s: 0.7, v: 0.85 }}>
       {({ hex }) => (
         <>
-          <ColorPickerArea className="h-40 w-full cursor-crosshair rounded-lg">
-            <ColorPickerThumb className="size-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgb(0_0_0/0.2),0_1px_3px_rgb(0_0_0/0.3)] outline-none focus-visible:ring-4 focus-visible:ring-ring/40" />
+          <ColorPickerArea>
+            <ColorPickerThumb />
           </ColorPickerArea>
-          <ColorPickerHue className="w-full">
-            <SliderControl className="flex w-full items-center py-1 select-none">
-              <SliderTrack className="h-3 w-full rounded-full bg-[linear-gradient(to_right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)]">
-                <SliderThumb
-                  aria-label="Hue"
-                  className="block size-4 rounded-full border-2 border-white shadow-[0_0_0_1px_rgb(0_0_0/0.2)] has-focus-visible:ring-4 has-focus-visible:ring-ring/40"
-                />
+          <ColorPickerHue>
+            <SliderControl>
+              <SliderTrack>
+                <SliderThumb aria-label="Hue" />
               </SliderTrack>
             </SliderControl>
           </ColorPickerHue>
-          <div className="flex items-center gap-2">
-            <span
-              aria-hidden="true"
-              className="size-8 shrink-0 rounded-md border border-border"
-              style={{ background: hex }}
-            />
-            <ColorPickerInput className="h-8 min-w-0 flex-1 rounded-md border border-input bg-background px-2 font-mono text-sm uppercase outline-none focus-visible:ring-3 focus-visible:ring-ring/50" />
+          <div data-slot="row">
+            <span data-slot="swatch" aria-hidden="true" style={{ background: hex }} />
+            <ColorPickerInput />
           </div>
-          <div className="flex justify-between" role="group" aria-label="Swatches">
+          <div data-slot="row" role="group" aria-label="Swatches">
             {swatches.map((swatch) => (
-              <ColorPickerSwatch
-                key={swatch}
-                value={swatch}
-                className="size-6 rounded-full border border-border outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-pressed:ring-2 aria-pressed:ring-foreground aria-pressed:ring-offset-2 aria-pressed:ring-offset-background"
-              />
+              <ColorPickerSwatch key={swatch} value={swatch} />
             ))}
           </div>
         </>

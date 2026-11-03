@@ -74,32 +74,21 @@ const notes = [
 
 function Example() {
   return (
-    <div className="flex flex-col gap-2">
-      <p className="m-0 text-sm text-muted-foreground">
-        Search <span className="font-medium text-foreground">lighthouse</span> with ⌘F or Ctrl+F
+    <div data-slot="stack">
+      <p data-slot="hint">
+        Search <span data-slot="viewport-term">lighthouse</span> with ⌘F or Ctrl+F
       </p>
-      <parts.Root
-        aria-label="Map"
-        className="h-56 w-80 cursor-grab rounded-xl border border-border bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] bg-size-[16px_16px] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
-      >
+      <parts.Root aria-label="Map">
         <parts.Pane>
           <parts.World>
             {notes.map((note) => (
-              <parts.Note
-                key={note.value}
-                value={note.value}
-                x={note.x}
-                y={note.y}
-                className="w-32 rounded-md border border-border bg-background p-2 text-xs text-foreground shadow-sm"
-              >
+              <parts.Note key={note.value} value={note.value} x={note.x} y={note.y}>
                 {note.text}
               </parts.Note>
             ))}
           </parts.World>
         </parts.Pane>
-        <parts.Reset className="absolute right-2 bottom-2 rounded-md border border-border bg-background px-2 py-1 text-xs hover:bg-muted">
-          Reset view
-        </parts.Reset>
+        <parts.Reset data-size="sm">Reset view</parts.Reset>
       </parts.Root>
     </div>
   )

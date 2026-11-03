@@ -25,6 +25,7 @@ function markup() {
       <output role="status" aria-label="Last action"></output>
       <output aria-label="Last completed"></output>
       <button id="controller">Show support</button>
+      <button id="toggle-warranty">Toggle warranty</button>
     </div>
   `
 }
@@ -48,6 +49,9 @@ async function mount(root: HTMLElement) {
   if (options.collapsible === false) accordion.setAttribute("collapsible", "false")
   await import("@ui-sdk/web/accordion")
   root.querySelector("#controller")!.addEventListener("click", () => accordion.api?.open("support"))
+  root
+    .querySelector("#toggle-warranty")!
+    .addEventListener("click", () => root.querySelector('[value="warranty"]')!.toggleAttribute("disabled"))
   for (const button of root.querySelectorAll<HTMLElement>("[data-close]"))
     button.addEventListener("click", () => accordion.api?.close(button.dataset.close!))
   root.addEventListener(

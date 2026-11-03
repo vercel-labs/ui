@@ -65,17 +65,10 @@ const QueueSong = parts.Song
 
 function Example() {
   return (
-    <Queue
-      aria-label="Queue"
-      className="flex h-48 w-56 flex-col gap-1 overflow-auto rounded-xl border border-border p-1.5"
-    >
+    <Queue aria-label="Queue">
       {({ order }) =>
         order.map((song) => (
-          <QueueSong
-            key={song}
-            value={song}
-            className="shrink-0 rounded-md border border-border bg-background px-3 py-1.5 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:border-dashed data-dragging:text-muted-foreground"
-          >
+          <QueueSong key={song} value={song}>
             {song}
           </QueueSong>
         ))

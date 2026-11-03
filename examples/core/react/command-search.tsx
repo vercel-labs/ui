@@ -51,19 +51,15 @@ function rank(query: string) {
 
 function Example() {
   return (
-    <CommandSearch className="flex w-64 flex-col gap-2 text-sm">
+    <CommandSearch>
       {({ query }) => (
         <>
-          <CommandSearchInput
-            aria-label="Search commands"
-            placeholder="Search commands"
-            className="h-8 rounded-lg border border-border bg-transparent px-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
-          <CommandSearchList className="flex flex-col gap-1">
+          <CommandSearchInput aria-label="Search commands" placeholder="Search commands" />
+          <CommandSearchList>
             {rank(query).map(({ command, score }) => (
-              <CommandSearchCommand key={command} className="flex justify-between px-1">
+              <CommandSearchCommand key={command}>
                 {command}
-                <span className="text-muted-foreground tabular-nums">{score.toFixed(2)}</span>
+                <span data-slot="hint">{score.toFixed(2)}</span>
               </CommandSearchCommand>
             ))}
           </CommandSearchList>

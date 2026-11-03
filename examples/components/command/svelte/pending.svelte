@@ -1,0 +1,43 @@
+<script lang="ts">
+  import { LoaderCircleIcon } from "@lucide/svelte"
+  import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/svelte/command"
+
+  const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
+  let log = $state("")
+
+  async function deploy() {
+    await wait(1200)
+    log = "Deployed"
+  }
+
+  async function sync() {
+    await wait(600)
+    throw new Error("Offline")
+  }
+</script>
+
+<div data-slot="stack">
+  <Command>
+    <CommandInput aria-label="Search actions" placeholder="Search actions..." />
+    <CommandList>
+      <CommandItem value="deploy" onSelect={deploy}>
+        {#snippet children(state)}
+          Deploy to production
+          {#if state.pending}<LoaderCircleIcon data-slot="spinner" aria-hidden="true" />{/if}
+        {/snippet}
+      </CommandItem>
+      <CommandItem value="sync" onSelect={sync}>
+        {#snippet children(state)}
+          Sync with server
+          {#if state.pending}
+            <LoaderCircleIcon data-slot="spinner" aria-hidden="true" />
+          {:else if state.error !== undefined}
+            <span data-slot="hint">Failed, try again</span>
+          {/if}
+        {/snippet}
+      </CommandItem>
+    </CommandList>
+  </Command>
+  <output data-slot="output">{log || "Run a command"}</output>
+</div>

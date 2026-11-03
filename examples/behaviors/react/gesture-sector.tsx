@@ -84,18 +84,12 @@ const Reaction = parts.Reaction
 
 function Example() {
   return (
-    <ReactionRing className="grid size-56 place-items-center rounded-full bg-muted text-sm">
+    <ReactionRing>
       {({ picked }) => (
         <>
-          <ReactionHandle className="grid size-16 cursor-grab place-items-center rounded-full bg-background text-2xl shadow-sm select-none">
-            {picked ?? "·"}
-          </ReactionHandle>
+          <ReactionHandle>{picked ?? "·"}</ReactionHandle>
           {reactions.map((reaction, index) => (
-            <Reaction
-              key={reaction}
-              index={index}
-              className="-mt-5 -ml-5 grid size-10 place-items-center rounded-full text-xl transition-transform outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-pressed:bg-background data-pointing:scale-125 data-pointing:bg-background"
-            >
+            <Reaction key={reaction} index={index}>
               {reaction}
             </Reaction>
           ))}

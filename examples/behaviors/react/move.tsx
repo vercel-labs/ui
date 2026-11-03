@@ -88,25 +88,15 @@ function Example() {
     "🚀": { x: 210, y: 16 },
   })
   return (
-    <div className="flex flex-col gap-2">
-      <Stickers
-        aria-label="Stickers"
-        defaultPositions={positions}
-        onPositionsChange={setPositions}
-        className="h-[200px] w-[320px] rounded-xl border border-border bg-muted/40"
-      >
+    <div data-slot="stack">
+      <Stickers aria-label="Stickers" defaultPositions={positions} onPositionsChange={setPositions}>
         {Object.keys(positions).map((sticker) => (
-          <StickersItem
-            key={sticker}
-            value={sticker}
-            aria-label={`Sticker ${sticker}`}
-            className="grid size-14 cursor-grab place-items-center rounded-xl border border-border bg-background text-2xl shadow-sm outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:cursor-grabbing data-dragging:shadow-lg"
-          >
+          <StickersItem key={sticker} value={sticker} aria-label={`Sticker ${sticker}`}>
             {sticker}
           </StickersItem>
         ))}
       </Stickers>
-      <p className="text-xs text-muted-foreground tabular-nums">
+      <p data-slot="output">
         🍋 at {positions["🍋"].x}, {positions["🍋"].y}
       </p>
     </div>

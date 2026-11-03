@@ -24,11 +24,7 @@ const parts = createParts(muteButton, { root: "button" })
 const MuteButton = parts.Root
 
 function Example() {
-  return (
-    <MuteButton className="h-8 w-24 rounded-lg border border-border px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50">
-      {({ muted }) => (muted ? "Unmute" : "Mute")}
-    </MuteButton>
-  )
+  return <MuteButton>{({ muted }) => (muted ? "Unmute" : "Mute")}</MuteButton>
 }
 
 export { Example, muteButton, MuteButton, type MuteButtonState }

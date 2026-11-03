@@ -94,21 +94,22 @@ function Example() {
   const [value, setValue] = React.useState(50)
   const [saved, setSaved] = React.useState(50)
   return (
-    <div className="flex w-72 flex-col gap-4 text-sm">
+    <div data-slot="stack">
       <Volume onValueChange={setValue} onValueCommit={setSaved}>
-        <VolumeTrack className="relative h-5 cursor-pointer touch-none">
-          <div className="absolute inset-x-0 top-2 h-1 rounded-full bg-muted">
-            <VolumeFill className="h-full rounded-full bg-foreground" />
+        <VolumeTrack>
+          <div data-slot="volume-rail">
+            <VolumeFill />
           </div>
-          <VolumeThumb
-            aria-label="Volume"
-            className="absolute top-0.5 size-4 -translate-x-1/2 rounded-full border border-border bg-background shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
+          <VolumeThumb aria-label="Volume" />
         </VolumeTrack>
       </Volume>
-      <p className="flex justify-between text-muted-foreground">
-        <span data-value>Volume {value}</span>
-        <span data-saved>Saved {saved}</span>
+      <p data-slot="row">
+        <span data-slot="hint" data-value>
+          Volume {value}
+        </span>
+        <span data-slot="hint" data-saved>
+          Saved {saved}
+        </span>
       </p>
     </div>
   )

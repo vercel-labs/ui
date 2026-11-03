@@ -21,48 +21,35 @@ function Example() {
     ["year", "+ Year", () => addYears(date, 1)],
   ]
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <p data-date className="font-mono text-base">
+    <div data-slot="stack">
+      <p data-date data-slot="date-value">
         {date}
       </p>
-      <div className="flex flex-wrap gap-1 text-xs">
+      <div data-slot="row">
         {steps.map(([value, text, next]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setDate(next())}
-            className="rounded-md border border-border px-2 py-1"
-          >
+          <button key={value} type="button" data-size="sm" onClick={() => setDate(next())}>
             {text}
           </button>
         ))}
-        <button
-          type="button"
-          onClick={() => setDate("2026-01-31")}
-          className="rounded-md border border-border px-2 py-1"
-        >
+        <button type="button" data-size="sm" onClick={() => setDate("2026-01-31")}>
           Reset
         </button>
       </div>
-      <label className="flex items-center gap-2 text-xs">
+      <label data-slot="label">
         Weeks start on
-        <select
-          value={weekStartsOn}
-          onChange={(event) => setWeekStartsOn(Number(event.target.value))}
-          className="rounded-md border border-border bg-background px-1 py-0.5"
-        >
+        <select value={weekStartsOn} onChange={(event) => setWeekStartsOn(Number(event.target.value))}>
           <option value={0}>Sunday</option>
           <option value={1}>Monday</option>
           <option value={6}>Saturday</option>
         </select>
       </label>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-        <dt className="text-muted-foreground">Week</dt>
+      <dl>
+        <dt>Week</dt>
         <dd data-this-week>
           {week.start} to {week.end}
           {!isSameMonth(week.start, week.end) && ", across two months"}
         </dd>
-        <dt className="text-muted-foreground">Month</dt>
+        <dt>Month</dt>
         <dd data-this-month>
           {startOfMonth(date)} to {endOfMonth(date)}, {daysInMonth(year, month)} days
         </dd>

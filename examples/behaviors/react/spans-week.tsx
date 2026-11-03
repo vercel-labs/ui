@@ -114,57 +114,40 @@ const WeekEdge = parts.Edge
 
 function Example() {
   return (
-    <Week className="flex w-full max-w-sm flex-col gap-2">
+    <Week>
       {({ hover }) => (
         <>
-          <div className="flex pl-10 text-xs text-muted-foreground">
+          <div data-slot="spans-week-head">
             {["Mon", "Tue", "Wed"].map((day) => (
-              <span key={day} className="flex-1 pl-1.5">
-                {day}
-              </span>
+              <span key={day}>{day}</span>
             ))}
           </div>
-          <div className="-mt-1 h-44 overflow-y-auto rounded-xl border border-border">
-            <div className="flex">
-              <div className="w-10 shrink-0">
-                {[8, 9, 10, 11, 12, 13].map((hour) => (
-                  <div key={hour} className="h-15 pt-0.5 pr-1 text-right text-[10px] text-muted-foreground">
-                    {hour}:00
-                  </div>
-                ))}
-              </div>
-              {["Mon", "Tue", "Wed"].map((day) => (
-                <WeekDay
-                  key={day}
-                  value={day}
-                  aria-label={day}
-                  className="h-90 flex-1 border-l border-border bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_59px,var(--color-border)_59px,var(--color-border)_60px)]"
-                >
-                  {({ plans }) =>
-                    plans.map((plan) => (
-                      <WeekPlan
-                        key={plan.id}
-                        value={plan.id}
-                        className="cursor-grab overflow-hidden rounded-md border border-background bg-primary px-1.5 text-[11px] text-primary-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:opacity-80"
-                      >
-                        {({ plan, action }) => (
-                          <>
-                            <WeekEdge edge="start" className="top-0" />
-                            {plan.title}
-                            {action && ` ${time(plan.start)}–${time(plan.end)}`}
-                            <WeekEdge edge="end" className="bottom-0" />
-                          </>
-                        )}
-                      </WeekPlan>
-                    ))
-                  }
-                </WeekDay>
+          <div data-slot="spans-week-frame">
+            <div data-slot="spans-week-hours">
+              {[8, 9, 10, 11, 12, 13].map((hour) => (
+                <div key={hour}>{hour}:00</div>
               ))}
             </div>
+            {["Mon", "Tue", "Wed"].map((day) => (
+              <WeekDay key={day} value={day} aria-label={day}>
+                {({ plans }) =>
+                  plans.map((plan) => (
+                    <WeekPlan key={plan.id} value={plan.id}>
+                      {({ plan, action }) => (
+                        <>
+                          <WeekEdge edge="start" />
+                          {plan.title}
+                          {action && ` ${time(plan.start)}–${time(plan.end)}`}
+                          <WeekEdge edge="end" />
+                        </>
+                      )}
+                    </WeekPlan>
+                  ))
+                }
+              </WeekDay>
+            ))}
           </div>
-          <p className="text-xs text-muted-foreground tabular-nums">
-            {hover === null ? "Point at a day" : `Pointer at ${time(hover)}`}
-          </p>
+          <p data-slot="output">{hover === null ? "Point at a day" : `Pointer at ${time(hover)}`}</p>
         </>
       )}
     </Week>

@@ -158,38 +158,28 @@ function Example() {
           setNotice(value === "quote" ? "Quoted." : "Highlighted.")
         }
       }}
-      className="flex w-full max-w-lg flex-col gap-3"
     >
-      <SelectionToolbarPassage
-        aria-label="Passage"
-        className="rounded-xl border border-border p-4 text-sm leading-relaxed caret-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+      <SelectionToolbarPassage aria-label="Passage">
         Most interfaces are rebuilt from the same handful of parts. A table that scrolls ten thousand rows, a
         log that follows its end, a board whose cards move between columns, a menu that opens where you click.
         Each one hides the same hard problems: where focus goes, what a screen reader hears, what happens at
         the edge of the screen. Select any of this text to see a toolbar appear above it.
       </SelectionToolbarPassage>
-      <SelectionToolbarPopup className="flex gap-0.5 rounded-lg border border-border bg-popover p-1 text-sm text-popover-foreground shadow-lg">
+      <SelectionToolbarPopup>
         {actions.map((action) => (
-          <SelectionToolbarAction
-            key={action.value}
-            value={action.value}
-            className="rounded-md px-2.5 py-1 outline-none hover:bg-accent focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
+          <SelectionToolbarAction key={action.value} value={action.value}>
             {action.label}
           </SelectionToolbarAction>
         ))}
       </SelectionToolbarPopup>
-      <p className="text-sm text-muted-foreground" aria-live="polite">
+      <p data-slot="hint" aria-live="polite">
         {notice ||
           "Select text with the pointer, or with Shift and the arrows. Alt+F10 moves into the toolbar."}
       </p>
       {quotes.length > 0 && (
-        <ul className="flex flex-col gap-1.5 text-sm">
+        <ul data-slot="selection-toolbar-quotes">
           {quotes.map((quote, i) => (
-            <li key={i} className="border-l-2 border-primary pl-3 text-muted-foreground">
-              {quote}
-            </li>
+            <li key={i}>{quote}</li>
           ))}
         </ul>
       )}

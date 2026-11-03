@@ -66,20 +66,16 @@ const Scrub = parts.Root
 function Example() {
   const [locked, setLocked] = React.useState(false)
   return (
-    <div className="flex flex-col gap-3 text-sm">
-      <label className="flex items-center gap-2 text-muted-foreground">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
         Locked
       </label>
-      <Scrub
-        aria-label="Opacity"
-        locked={locked}
-        className="flex w-48 items-center justify-between rounded-lg border border-border px-3 py-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+      <Scrub aria-label="Opacity" locked={locked}>
         {({ value }) => (
           <>
-            <span className="text-muted-foreground">Opacity</span>
-            <span className="tabular-nums">{value}%</span>
+            <span data-slot="hint">Opacity</span>
+            <span>{value}%</span>
           </>
         )}
       </Scrub>

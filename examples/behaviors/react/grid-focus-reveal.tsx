@@ -66,26 +66,21 @@ const cellText = (row: number, col: number) =>
 
 function Example() {
   return (
-    <Timetable className="flex w-72 flex-col text-sm">
+    <Timetable>
       {({ first }) => (
         <>
           <TimetableBody aria-label="Departures">
             {Array.from({ length: shown }, (_, offset) => first + offset).map((row) => (
-              <TimetableRow key={row} index={row} className="flex border-b border-border">
+              <TimetableRow key={row} index={row}>
                 {[0, 1, 2].map((col) => (
-                  <TimetableCell
-                    key={col}
-                    row={row}
-                    col={col}
-                    className="flex-1 px-2 py-1.5 tabular-nums outline-none focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset"
-                  >
+                  <TimetableCell key={col} row={row} col={col}>
                     {cellText(row, col)}
                   </TimetableCell>
                 ))}
               </TimetableRow>
             ))}
           </TimetableBody>
-          <p data-window className="pt-2 text-xs text-muted-foreground">
+          <p data-window data-slot="output">
             Rows {first + 1} to {first + shown} of {count}
           </p>
         </>

@@ -99,39 +99,34 @@ const flat = (list: TreeItemData[]): TreeItemData[] =>
 function Example() {
   const [strategy, setStrategy] = React.useState<TreeCheckStrategy>("leaf")
   return (
-    <div className="flex w-64 flex-col gap-3 text-sm">
-      <div role="radiogroup" aria-label="Strategy" className="flex gap-1">
+    <div data-slot="stack">
+      <div role="radiogroup" aria-label="Strategy" data-slot="check-tree-strategy">
         {(["leaf", "trunk"] as const).map((option) => (
           <button
             key={option}
             type="button"
             role="radio"
             aria-checked={strategy === option}
+            data-size="sm"
             onClick={() => setStrategy(option)}
-            className="rounded-md border border-border px-2 py-1 text-xs aria-checked:bg-muted"
           >
             {option}
           </button>
         ))}
       </div>
-      <CheckTree items={items} strategy={strategy} aria-label="Files" className="flex flex-col">
+      <CheckTree items={items} strategy={strategy} aria-label="Files">
         {({ checked }) => (
           <>
             {flat(items).map((item) => (
-              <CheckTreeItem
-                key={item.value}
-                value={item.value}
-                aria-label={item.label}
-                className="group flex items-center gap-2 rounded-md py-1 pr-2 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                <span className="grid size-4 place-items-center rounded border border-input text-[10px] group-data-checked:bg-foreground group-data-checked:text-background group-data-indeterminate:bg-foreground/40">
-                  <span className="hidden group-data-checked:inline">✓</span>
-                  <span className="hidden group-data-indeterminate:inline">–</span>
+              <CheckTreeItem key={item.value} value={item.value} aria-label={item.label}>
+                <span data-slot="check-tree-box">
+                  <span data-show="checked">✓</span>
+                  <span data-show="indeterminate">–</span>
                 </span>
                 {item.label}
               </CheckTreeItem>
             ))}
-            <p data-value className="mt-2 h-16 overflow-auto text-xs text-muted-foreground">
+            <p data-slot="output" data-value>
               Value: {checked.length ? checked.join(", ") : "none"}
             </p>
           </>

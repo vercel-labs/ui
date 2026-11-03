@@ -78,46 +78,29 @@ const choices: { value: ColorSchemeValue; label: string }[] = [
 
 function Example() {
   return (
-    <SchemePicker
-      className={({ colorScheme }) =>
-        colorScheme.resolved === "dark"
-          ? "dark flex w-80 flex-col gap-5 rounded-3xl bg-card p-5 text-sm text-card-foreground shadow-sm ring-1 ring-foreground/10 transition-colors"
-          : colorScheme.resolved === "light"
-            ? "light flex w-80 flex-col gap-5 rounded-3xl bg-card p-5 text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 transition-colors"
-            : "flex w-80 flex-col gap-5 rounded-3xl bg-card p-5 text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 transition-colors"
-      }
-    >
+    <SchemePicker>
       {({ colorScheme: { value, resolved } }) => (
         <>
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+          <div data-slot="row">
+            <span data-slot="media">
               {value === "system" ? (
-                <MonitorIcon className="size-4" aria-hidden="true" />
+                <MonitorIcon aria-hidden="true" />
               ) : resolved === "dark" ? (
-                <MoonIcon className="size-4" aria-hidden="true" />
+                <MoonIcon aria-hidden="true" />
               ) : (
-                <SunIcon className="size-4" aria-hidden="true" />
+                <SunIcon aria-hidden="true" />
               )}
             </span>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-base font-medium">
+            <div data-slot="stack">
+              <span data-slot="label">
                 {resolved === "dark" ? "Dark" : resolved === "light" ? "Light" : "System"}
               </span>
-              <span className="text-muted-foreground">
-                {value === "system" ? "Following your system" : "Chosen here"}
-              </span>
+              <span data-slot="hint">{value === "system" ? "Following your system" : "Chosen here"}</span>
             </div>
           </div>
-          <SchemePickerList
-            aria-label="Color scheme"
-            className="inline-flex h-8 w-full items-center rounded-2xl bg-muted p-[3px] text-muted-foreground"
-          >
+          <SchemePickerList aria-label="Color scheme">
             {choices.map((choice) => (
-              <SchemePickerOption
-                key={choice.value}
-                value={choice.value}
-                className="inline-flex h-full flex-1 items-center justify-center rounded-2xl border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:bg-background data-checked:text-foreground data-checked:shadow-sm dark:text-muted-foreground dark:data-checked:border-input dark:data-checked:bg-input/30 dark:data-checked:text-foreground"
-              >
+              <SchemePickerOption key={choice.value} value={choice.value}>
                 {choice.label}
               </SchemePickerOption>
             ))}

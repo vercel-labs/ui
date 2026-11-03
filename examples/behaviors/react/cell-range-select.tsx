@@ -109,37 +109,26 @@ const LedgerGridSummary = parts.Summary
 function Example() {
   return (
     <LedgerGrid>
-      <div className="flex flex-col gap-2 text-sm">
-        <div className="flex flex-wrap gap-1">
+      <div data-slot="stack">
+        <div data-slot="row">
           {Object.entries(shortcuts).map(([value, label]) => (
-            <LedgerGridShortcut
-              key={value}
-              value={value}
-              className="rounded-md border border-border px-2 py-1 text-xs outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
+            <LedgerGridShortcut data-size="sm" key={value} value={value}>
               {label}
             </LedgerGridShortcut>
           ))}
         </div>
-        <LedgerGridGrid aria-label="Ledger" className="flex flex-col">
+        <LedgerGridGrid aria-label="Ledger">
           {values.map((row, r) => (
-            <LedgerGridRow key={r} id={String(r)} className="flex">
+            <LedgerGridRow key={r} id={String(r)}>
               {row.map((value, c) => (
-                <LedgerGridCell
-                  key={c}
-                  row={r}
-                  col={c}
-                  className="-mt-px -ml-px grid h-9 w-14 place-items-center border border-border tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset data-selected:bg-foreground/15"
-                >
+                <LedgerGridCell key={c} row={r} col={c}>
                   {value}
                 </LedgerGridCell>
               ))}
             </LedgerGridRow>
           ))}
         </LedgerGridGrid>
-        <LedgerGridSummary data-summary className="text-xs text-muted-foreground">
-          {({ text }) => text}
-        </LedgerGridSummary>
+        <LedgerGridSummary data-summary>{({ text }) => text}</LedgerGridSummary>
       </div>
     </LedgerGrid>
   )

@@ -42,17 +42,9 @@ const notes = [
 
 function Example() {
   return (
-    <Pinboard
-      aria-label="Notes"
-      className="relative h-56 w-full max-w-sm rounded-xl border border-border bg-muted/40"
-    >
+    <Pinboard aria-label="Notes">
       {notes.map((note) => (
-        <PinboardNote
-          key={note.text}
-          value={note.text}
-          style={{ left: `${note.x}%`, top: `${note.y}%` }}
-          className="absolute rounded-md border border-border bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+        <PinboardNote key={note.text} value={note.text} style={{ left: `${note.x}%`, top: `${note.y}%` }}>
           {note.text}
         </PinboardNote>
       ))}

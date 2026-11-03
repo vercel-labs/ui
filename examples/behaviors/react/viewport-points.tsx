@@ -116,7 +116,7 @@ function Example() {
   const [viewport, setViewport] = React.useState<Viewport>({ x: 0, y: 0, zoom: 1 })
   const [reason, setReason] = React.useState<ViewportReason | null>(null)
   return (
-    <div className="flex w-80 flex-col gap-2 text-xs">
+    <div data-slot="stack">
       <Dots
         aria-label="Dots"
         viewport={viewport}
@@ -124,25 +124,20 @@ function Example() {
           setViewport(next)
           setReason(details.reason)
         }}
-        className="h-56 cursor-crosshair rounded-xl border border-border bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] bg-size-[16px_16px] outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         {({ dots }) => (
           <>
             <DotsWorld>
               {dots.map((dot, index) => (
-                <span
-                  key={index}
-                  className="absolute -mt-1.5 -ml-1.5 size-3 rounded-full bg-foreground"
-                  style={{ left: dot.x, top: dot.y }}
-                />
+                <span key={index} data-slot="viewport-dot" style={{ left: dot.x, top: dot.y }} />
               ))}
             </DotsWorld>
-            <DotsView className="pointer-events-none absolute bottom-2 left-2 rounded bg-background/80 px-1.5 py-0.5 text-muted-foreground before:content-['In_view:_'] after:content-[attr(data-view)]" />
-            <DotsLabel className="ml-2 -translate-y-1/2 rounded bg-background px-1.5 py-0.5 shadow-sm after:content-[attr(data-at)]" />
+            <DotsView />
+            <DotsLabel />
           </>
         )}
       </Dots>
-      <p data-reason className="text-muted-foreground">
+      <p data-reason data-slot="output">
         {reason
           ? `Moved by ${reason}, zoom ${Math.round(viewport.zoom * 100)}%`
           : "Double-click to drop a dot"}

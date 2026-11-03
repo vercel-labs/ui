@@ -34,13 +34,9 @@ const ToolbarItem = parts.Item
 
 function Example() {
   return (
-    <Toolbar aria-label="Formatting" className="flex gap-1 rounded-lg border border-border p-1">
+    <Toolbar aria-label="Formatting">
       {["Bold", "Italic", "Underline", "Strike"].map((label) => (
-        <ToolbarItem
-          key={label}
-          value={label}
-          className="rounded-md px-3 py-1.5 text-sm outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+        <ToolbarItem key={label} value={label}>
           {label}
         </ToolbarItem>
       ))}

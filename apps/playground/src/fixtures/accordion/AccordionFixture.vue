@@ -10,6 +10,7 @@ const { cancel, ...options } = accordionOptions()
 
 const action = ref("")
 const complete = ref("")
+const warrantyEnabled = ref(false)
 
 function onValueChange(value: string[], details: { cancel: () => void }) {
   if (cancel && value.includes(cancel) && !controller.getValue().includes(cancel)) return details.cancel()
@@ -26,7 +27,7 @@ function onValueChange(value: string[], details: { cancel: () => void }) {
         :key="item.value"
         class="accordion-item"
         :value="item.value"
-        :disabled="item.disabled"
+        :disabled="item.disabled && !warrantyEnabled"
         @open-change-complete="(open: boolean) => (complete = `${item.value} ${open ? 'open' : 'closed'}`)"
       >
         <AccordionHeader class="accordion-header">
@@ -43,5 +44,6 @@ function onValueChange(value: string[], details: { cancel: () => void }) {
     <output role="status" aria-label="Last action">{{ action }}</output>
     <output aria-label="Last completed">{{ complete }}</output>
     <button @click="controller.open('support')">Show support</button>
+    <button @click="warrantyEnabled = !warrantyEnabled">Toggle warranty</button>
   </div>
 </template>

@@ -34,42 +34,32 @@ function Example() {
   React.useEffect(() => setAvailable(storage.available()), [storage])
 
   return (
-    <div className="flex w-80 flex-col gap-4 rounded-3xl bg-card p-5 text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 dark:ring-foreground/10">
-      <div
-        role="group"
-        aria-label="Keep the note in"
-        className="inline-flex h-8 w-full items-center rounded-2xl bg-muted p-[3px] text-muted-foreground"
-      >
+    <div data-slot="stack">
+      <div role="group" aria-label="Keep the note in" data-slot="row">
         {storages.map(({ label }, index) => (
           <button
             key={label}
             type="button"
             aria-pressed={picked === index}
+            data-size="sm"
             onClick={() => setPicked(index)}
-            className="inline-flex h-full flex-1 items-center justify-center rounded-2xl border border-transparent px-1.5 py-0.5 text-sm font-medium whitespace-nowrap text-foreground/60 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm dark:text-muted-foreground dark:aria-pressed:border-input dark:aria-pressed:bg-input/30 dark:aria-pressed:text-foreground"
           >
             {label}
           </button>
         ))}
       </div>
-      <label className="flex flex-col gap-2">
-        <span className="font-medium">Note</span>
+      <label data-slot="label">
+        <span>Note</span>
         <input
           value={note ?? ""}
           onChange={(event) => storage.set(event.target.value)}
           placeholder={available ? "Type, then reload the page" : "Unavailable here"}
           disabled={!available}
-          className="h-8 w-full min-w-0 rounded-2xl border border-transparent bg-input/50 px-2.5 py-1 text-base outline-none transition-[color,box-shadow] duration-200 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50 md:text-sm"
         />
       </label>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-muted-foreground">{available ? lasts : "This browser blocks it here."}</p>
-        <button
-          type="button"
-          onClick={() => storage.remove()}
-          disabled={note === null}
-          className="inline-flex h-7 shrink-0 items-center justify-center gap-1 rounded-2xl border border-border bg-background bg-clip-padding px-3 text-sm font-medium whitespace-nowrap outline-none select-none transition-[color,background-color,box-shadow] hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50 dark:bg-transparent dark:hover:bg-input/30"
-        >
+      <div data-slot="row">
+        <p data-slot="hint">{available ? lasts : "This browser blocks it here."}</p>
+        <button type="button" data-size="sm" onClick={() => storage.remove()} disabled={note === null}>
           Clear
         </button>
       </div>

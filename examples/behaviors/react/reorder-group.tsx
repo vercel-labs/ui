@@ -97,18 +97,11 @@ const BacklogTick = parts.Tick
 
 function Example() {
   return (
-    <Backlog aria-label="Backlog" className="flex w-60 flex-col gap-1">
+    <Backlog aria-label="Backlog">
       {({ order }) =>
         order.map((task) => (
-          <BacklogTask
-            key={task}
-            value={task}
-            className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-moving:border-primary data-moving:bg-primary/10 data-dragging:shadow-md"
-          >
-            <BacklogTick
-              value={task}
-              className="grid size-4 place-items-center rounded border border-border text-[10px] aria-checked:border-primary aria-checked:bg-primary aria-checked:text-primary-foreground"
-            />
+          <BacklogTask key={task} value={task}>
+            <BacklogTick value={task} />
             {task}
           </BacklogTask>
         ))

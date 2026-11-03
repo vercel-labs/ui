@@ -204,10 +204,11 @@ const desktop = /* @__PURE__ */ definePrimitive({
         open: !state.closed.includes(key),
         active: api.front(state) === key,
       }),
-      attrs: (state, { key }) => ({
+      attrs: (state, { key, api }) => ({
         type: "button",
         "aria-pressed": String(!state.closed.includes(key)),
         "data-open": state.closed.includes(key) ? undefined : "",
+        "data-active": api.front(state) === key ? "" : undefined,
       }),
       on: { click: (_event, { api, key }) => api.show(key) },
     }),
@@ -264,17 +265,6 @@ const DesktopInstructions = parts.Instructions
 
 const size = { width: 560, height: 340 }
 const handles = ["n", "e", "s", "w", "ne", "nw", "se", "sw"] as const
-const place: Record<(typeof handles)[number], string> = {
-  n: "top-0 inset-x-2 h-1.5 -translate-y-1/2",
-  s: "bottom-0 inset-x-2 h-1.5 translate-y-1/2",
-  e: "right-0 inset-y-2 w-1.5 translate-x-1/2",
-  w: "left-0 inset-y-2 w-1.5 -translate-x-1/2",
-  ne: "top-0 right-0 size-3 translate-x-1/2 -translate-y-1/2",
-  nw: "top-0 left-0 size-3 -translate-x-1/2 -translate-y-1/2",
-  se: "bottom-0 right-0 size-3 translate-x-1/2 translate-y-1/2",
-  sw: "bottom-0 left-0 size-3 -translate-x-1/2 translate-y-1/2",
-}
-
 const apps = [
   { id: "notes", title: "Notes", box: { x: 24, y: 24, width: 240, height: 180 } },
   { id: "photos", title: "Photos", box: { x: 190, y: 84, width: 280, height: 200 } },
@@ -284,33 +274,30 @@ const apps = [
 function AppContent({ id }: { id: string }) {
   if (id === "notes")
     return (
-      <p className="p-3 text-sm leading-relaxed text-muted-foreground">
+      <p data-slot="hint">
         Windows move by their title and resize by any edge or corner. Click one to bring it forward.
       </p>
     )
   if (id === "photos")
     return (
-      <div className="grid h-full grid-cols-3 gap-1.5 p-2">
-        {["from-amber-200 to-rose-300", "from-sky-200 to-indigo-300", "from-emerald-200 to-teal-400"]
+      <div data-slot="desktop-photos">
+        {["#fdba74", "#a5b4fc", "#5eead4"]
           .flatMap((tone) => [tone, tone])
           .map((tone, i) => (
-            <div key={i} className={`rounded-md bg-linear-to-br ${tone}`} />
+            <div key={i} data-slot="desktop-photo" style={{ background: tone }} />
           ))}
       </div>
     )
   return (
-    <div className="flex flex-col gap-2 p-3 text-sm">
-      <span className="font-medium">Gymnopédie No. 1</span>
-      <span className="text-muted-foreground">Erik Satie</span>
-      <span className="h-1 rounded-full bg-muted">
-        <span className="block h-full w-1/3 rounded-full bg-primary" />
+    <div data-slot="stack">
+      <span>Gymnopédie No. 1</span>
+      <span data-slot="hint">Erik Satie</span>
+      <span data-slot="desktop-progress">
+        <span />
       </span>
     </div>
   )
 }
-
-const control =
-  "flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 outline-none"
 
 function Example() {
   return (
@@ -318,25 +305,21 @@ function Example() {
       size={size}
       defaultBoxes={Object.fromEntries(apps.map((app) => [app.id, app.box]))}
       aria-label="Desktop"
-      className="rounded-xl border border-border bg-muted/40"
-      style={{ width: size.width, height: size.height + 48 }}
+      style={
+        {
+          "--desktop-width": `${size.width}px`,
+          "--desktop-height": `${size.height}px`,
+        } as React.CSSProperties
+      }
     >
-      <div className="relative" style={{ height: size.height }}>
+      <div data-slot="desktop-screen">
         {apps.map((app) => (
-          <DesktopWindow
-            key={app.id}
-            value={app.id}
-            title={app.title}
-            className="flex flex-col overflow-visible rounded-lg border border-border bg-background shadow-md outline-none data-active:shadow-xl data-maximized:rounded-none"
-          >
-            <div className="flex h-8 shrink-0 items-center gap-1 border-b border-border pr-1.5">
-              <DesktopTitle className="flex h-full min-w-0 flex-1 items-center truncate px-3 text-xs font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-inset">
-                {app.title}
-              </DesktopTitle>
-              <DesktopMaximize className={control}>
+          <DesktopWindow key={app.id} value={app.id} title={app.title}>
+            <div data-slot="desktop-titlebar">
+              <DesktopTitle>{app.title}</DesktopTitle>
+              <DesktopMaximize>
                 <svg
                   viewBox="0 0 16 16"
-                  className="size-3"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
@@ -345,10 +328,9 @@ function Example() {
                   <rect x="3" y="3" width="10" height="10" rx="1.5" />
                 </svg>
               </DesktopMaximize>
-              <DesktopClose className={control}>
+              <DesktopClose>
                 <svg
                   viewBox="0 0 16 16"
-                  className="size-3"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.5"
@@ -358,28 +340,18 @@ function Example() {
                 </svg>
               </DesktopClose>
             </div>
-            <div className="min-h-0 flex-1 overflow-hidden">
+            <div data-slot="desktop-body">
               <AppContent id={app.id} />
             </div>
             {handles.map((which) => (
-              <DesktopHandle
-                key={which}
-                handle={which}
-                className={`absolute z-1 rounded-full outline-none focus-visible:bg-ring ${place[which]}`}
-              />
+              <DesktopHandle key={which} handle={which} />
             ))}
           </DesktopWindow>
         ))}
       </div>
-      <DesktopDock className="flex h-12 items-center justify-center gap-1.5 border-t border-border">
+      <DesktopDock>
         {apps.map((app) => (
-          <DesktopDockItem
-            key={app.id}
-            value={app.id}
-            className={({ open, active }) =>
-              `relative rounded-md px-3 py-1 text-xs font-medium outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring/50 ${active ? "bg-accent" : ""} ${open ? "after:absolute after:inset-x-1/2 after:-bottom-1 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-foreground" : "text-muted-foreground"}`
-            }
-          >
+          <DesktopDockItem key={app.id} value={app.id}>
             {app.title}
           </DesktopDockItem>
         ))}

@@ -67,19 +67,15 @@ const SizePickerItem = parts.Item
 function Example() {
   const [size, setSize] = React.useState("M")
   return (
-    <div className="flex flex-col items-start gap-3 text-sm">
-      <SizePicker aria-label="Size" value={size} onValueChange={setSize} className="flex gap-1">
+    <div data-slot="stack">
+      <SizePicker aria-label="Size" value={size} onValueChange={setSize}>
         {["S", "M", "L", "XL"].map((label) => (
-          <SizePickerItem
-            key={label}
-            value={label}
-            className="size-9 rounded-lg border border-border font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 aria-checked:border-foreground aria-checked:bg-foreground aria-checked:text-background"
-          >
+          <SizePickerItem key={label} value={label}>
             {label}
           </SizePickerItem>
         ))}
       </SizePicker>
-      <p className="text-muted-foreground">Size: {size}</p>
+      <p data-slot="output">Size: {size}</p>
     </div>
   )
 }

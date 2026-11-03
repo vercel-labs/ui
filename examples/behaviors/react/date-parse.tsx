@@ -15,14 +15,9 @@ function Example() {
   const pattern = datePattern(locale)
   const date = parseDate(text, locale, { referenceDate: reference })
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <div className="flex gap-2">
-        <select
-          aria-label="Locale"
-          value={locale}
-          onChange={(event) => setLocale(event.target.value)}
-          className="rounded-md border border-border bg-background px-2 py-1 text-xs"
-        >
+    <div data-slot="stack">
+      <div data-slot="date-field-group">
+        <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
           {locales.map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -34,7 +29,6 @@ function Example() {
           aria-label="Reference date"
           value={reference}
           onChange={(event) => setReference(event.target.value || "2026-10-16")}
-          className="h-7 flex-1 rounded-md border border-input bg-background px-2 text-xs"
         />
       </div>
       <input
@@ -43,12 +37,11 @@ function Example() {
         placeholder={pattern.placeholder}
         value={text}
         onChange={(event) => setText(event.target.value)}
-        className="h-9 rounded-md border border-input bg-background px-2"
       />
-      <p data-parsed className="text-xs">
+      <p data-parsed>
         {date ? `${date}, ${formatDate(date, locale)}` : `Type a date, like ${pattern.example}`}
       </p>
-      <p data-pattern className="text-xs text-muted-foreground">
+      <p data-pattern data-slot="hint">
         {pattern.fields.join(` ${pattern.separator} `)}
       </p>
     </div>

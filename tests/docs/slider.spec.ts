@@ -1,10 +1,11 @@
 import { expect, test, type Locator } from "@playwright/test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
+import { onPage } from "./docs-helpers"
 
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/slider")
+const root = path.join(import.meta.dirname, "../../examples/components/slider")
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -31,7 +32,8 @@ const thumbs: Record<string, { name: RegExp; from: string; to: string }> = {
   render: { name: /^Brightness$/, from: "60", to: "61" },
   form: { name: /^Minimum price$/, from: "200", to: "210" },
 }
-const order = Object.keys(thumbs)
+const fixtures = Object.keys(thumbs)
+const order = fixtures.filter(onPage)
 
 // A thumb's value: the range input's, or aria-valuenow on any other element.
 const valueOf = (thumb: Locator) =>
@@ -45,7 +47,7 @@ for (const framework of frameworks) {
     await page.goto(`/docs/${framework}/components/slider`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order].sort())
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
 
     for (const [index, name] of order.entries()) {
       const { name: label, from, to } = thumbs[name]

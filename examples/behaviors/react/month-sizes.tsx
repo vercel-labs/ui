@@ -6,20 +6,15 @@ const months = ["2026-02-01", "2026-03-01", "2026-08-01"]
 function Example() {
   const [fixedWeeks, setFixedWeeks] = React.useState(true)
   return (
-    <div className="flex flex-col items-center gap-3 text-xs">
-      <div className="flex items-start gap-4">
+    <div data-slot="stack">
+      <div data-slot="month-sizes-row">
         {months.map((month) => (
-          <div key={month} data-month={month} className="flex w-32 flex-col gap-1">
-            <p className="text-center font-medium">
-              {formatDate(month, "en-US", { month: "long", year: "numeric" })}
-            </p>
+          <div key={month} data-month={month} data-slot="month-sizes-month">
+            <p>{formatDate(month, "en-US", { month: "long", year: "numeric" })}</p>
             {monthGrid(month, { fixedWeeks }).map((week) => (
-              <div key={week[0]} data-week className="grid grid-cols-7 text-center tabular-nums">
+              <div key={week[0]} data-week data-slot="month-sizes-week">
                 {week.map((day) => (
-                  <span
-                    key={day}
-                    className={isSameMonth(day, month) ? undefined : "text-muted-foreground/40"}
-                  >
+                  <span key={day} data-outside={isSameMonth(day, month) ? undefined : ""}>
                     {Number(day.slice(8))}
                   </span>
                 ))}
@@ -28,7 +23,7 @@ function Example() {
           </div>
         ))}
       </div>
-      <label className="flex items-center gap-1.5">
+      <label data-slot="label">
         <input
           type="checkbox"
           checked={fixedWeeks}

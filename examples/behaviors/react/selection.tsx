@@ -92,28 +92,19 @@ function Example() {
   const [selected, setSelected] = React.useState<string[]>([])
   const [replace, setReplace] = React.useState(false)
   return (
-    <div className="flex w-56 flex-col gap-2">
-      <label className="flex items-center gap-2 text-sm text-muted-foreground">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={replace} onChange={(event) => setReplace(event.target.checked)} />
         Ranges replace the selection
       </label>
-      <Files
-        aria-label="Files"
-        replaceRanges={replace}
-        onValueChange={setSelected}
-        className="flex flex-col rounded-lg border border-border p-1 select-none"
-      >
+      <Files aria-label="Files" replaceRanges={replace} onValueChange={setSelected}>
         {names.map((name) => (
-          <FilesItem
-            key={name}
-            value={name}
-            className="rounded-md px-3 py-1.5 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-selected:bg-foreground data-selected:text-background"
-          >
+          <FilesItem key={name} value={name}>
             {name}
           </FilesItem>
         ))}
       </Files>
-      <p className="text-xs text-muted-foreground">{selected.length} selected</p>
+      <p data-slot="output">{selected.length} selected</p>
     </div>
   )
 }

@@ -1,0 +1,26 @@
+import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import { createSignal } from "solid-js"
+
+function Example() {
+  const [moves, setMoves] = createSignal(0)
+  const [saved, setSaved] = createSignal("nothing yet")
+  return (
+    <div data-slot="stack">
+      <Resizable
+        onLayoutChange={() => setMoves((count) => count + 1)}
+        onLayoutCommit={(layout, details) =>
+          setSaved(`${layout.map(Math.round).join(" / ")} after ${details.reason}`)
+        }
+      >
+        <ResizablePanel defaultSize={40}>Files</ResizablePanel>
+        <ResizableHandle aria-label="Resize files" />
+        <ResizablePanel>Editor</ResizablePanel>
+      </Resizable>
+      <output data-slot="output">
+        {moves()} changes, saved {saved()}
+      </output>
+    </div>
+  )
+}
+
+export { Example }

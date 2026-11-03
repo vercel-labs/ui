@@ -9,7 +9,7 @@ function Example() {
   const [timed, setTimed] = React.useState(false)
   const [status, setStatus] = React.useState("Click anywhere on the card")
   return (
-    <div className="flex w-72 flex-col gap-2 text-sm">
+    <div data-slot="stack">
       <div
         role="button"
         tabIndex={0}
@@ -25,16 +25,12 @@ function Example() {
             `Closed by ${result.reason} (${result.source})${result.returnValue ? `, ${result.returnValue}` : ""}`,
           )
         }}
-        className="grid h-36 place-items-center rounded-xl border border-dashed border-border text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        data-slot="popup-surface"
       >
         Click to leave a note
       </div>
       <Popover controller={note}>
-        <PopoverContent<Spot>
-          align="start"
-          sideOffset={4}
-          className="flex w-44 flex-col gap-2 rounded-xl bg-popover p-3 text-xs shadow-lg ring-1 ring-foreground/5 outline-none"
-        >
+        <PopoverContent<Spot> align="start" sideOffset={4}>
           {(state) => {
             const spot = state.payload
             return (
@@ -42,8 +38,9 @@ function Example() {
                 <p data-spot>{spot ? `A note at ${spot.x}, ${spot.y}` : ""}</p>
                 <button
                   type="button"
+                  data-variant="solid"
+                  data-size="sm"
                   onClick={() => note.close({ returnValue: "kept" })}
-                  className="self-start rounded-md bg-foreground px-2 py-1 text-background"
                 >
                   Keep
                 </button>
@@ -52,11 +49,11 @@ function Example() {
           }}
         </PopoverContent>
       </Popover>
-      <label className="flex items-center gap-1.5 text-xs">
+      <label data-slot="label">
         <input type="checkbox" checked={timed} onChange={(event) => setTimed(event.target.checked)} />
         Close by itself
       </label>
-      <p data-note-status className="text-xs text-muted-foreground">
+      <p data-note-status data-slot="output">
         {status}
       </p>
     </div>

@@ -30,17 +30,13 @@ const Swatches = parts.Root
 
 const Swatch = parts.Swatch
 
-const colors = { slate: "bg-slate-500", rose: "bg-rose-500", amber: "bg-amber-500", teal: "bg-teal-500" }
+const colors = { slate: "#64748b", rose: "#f43f5e", amber: "#f59e0b", teal: "#14b8a6" }
 
 function Example() {
   return (
-    <Swatches aria-label="Color" className="flex gap-2">
+    <Swatches aria-label="Color">
       {Object.entries(colors).map(([color, background]) => (
-        <Swatch
-          key={color}
-          value={color}
-          className={`size-8 rounded-full ${background} outline-none ring-offset-2 ring-offset-background focus-visible:ring-3 focus-visible:ring-ring/50 aria-pressed:ring-2 aria-pressed:ring-foreground`}
-        />
+        <Swatch key={color} value={color} style={{ "--swatch-color": background } as React.CSSProperties} />
       ))}
     </Swatches>
   )

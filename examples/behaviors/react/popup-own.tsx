@@ -43,19 +43,11 @@ const InviteClose = parts.Close
 function Example() {
   return (
     <Invite>
-      <InviteTrigger className="rounded-md border border-border px-3 py-1.5 text-sm">Invite</InviteTrigger>
-      <InviteContent
-        sideOffset={6}
-        className="flex w-56 flex-col gap-2 rounded-xl bg-popover p-3 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none"
-      >
+      <InviteTrigger>Invite</InviteTrigger>
+      <InviteContent sideOffset={6}>
         <p>Anyone with the link can join.</p>
-        <input
-          readOnly
-          aria-label="Link"
-          value="https://example.com/s/7f3a"
-          className="rounded-md border border-border bg-background px-2 py-1 text-xs"
-        />
-        <InviteClose className="self-end rounded-md bg-foreground px-2 py-1 text-xs text-background">
+        <input readOnly aria-label="Link" value="https://example.com/s/7f3a" />
+        <InviteClose data-variant="solid" data-size="sm">
           Done
         </InviteClose>
       </InviteContent>

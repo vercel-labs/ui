@@ -67,24 +67,21 @@ function Example() {
   const [locked, setLocked] = React.useState(false)
   const [saved, setSaved] = React.useState({ x: 60, y: 80 })
   return (
-    <ColorPicker locked={locked} onColorCommit={setSaved} className="flex w-56 flex-col gap-2">
+    <ColorPicker locked={locked} onColorCommit={setSaved}>
       {({ swatch }) => (
         <>
-          <ColorSquare className="size-48 rounded-xl bg-[linear-gradient(to_top,black,transparent),linear-gradient(to_right,white,hsl(210_100%_50%))] ring-1 ring-border">
-            <ColorThumb
-              aria-label="Color"
-              className="absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            />
+          <ColorSquare>
+            <ColorThumb aria-label="Color" />
           </ColorSquare>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="size-5 rounded-md ring-1 ring-border" style={{ background: swatch }} />
-            <span className="tabular-nums">
+          <div data-slot="row">
+            <span data-slot="swatch" style={{ background: swatch }} />
+            <span data-slot="output">
               Saved {saved.x}% saturation, {saved.y}% brightness
             </span>
           </div>
-          <div className="flex items-center gap-3 text-xs">
-            <ColorReset className="rounded-md border border-border px-2 py-1">Reset</ColorReset>
-            <label className="flex items-center gap-1.5 text-muted-foreground">
+          <div data-slot="row">
+            <ColorReset data-size="sm">Reset</ColorReset>
+            <label data-slot="label">
               <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
               Lock
             </label>

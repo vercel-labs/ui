@@ -1,6 +1,5 @@
 import * as React from "react"
 import { fuzzyScore, matchRanges, matchSegments } from "@ui-sdk/core/text-match"
-import { ChevronDownIcon } from "lucide-react"
 import { CommandSearch, CommandSearchCommand, CommandSearchInput, CommandSearchList } from "./command-search"
 
 type Mode = "contains" | "startsWith" | "fuzzy"
@@ -17,13 +16,7 @@ const commands = [
 
 function Highlight({ text, query, mode }: { text: string; query: string; mode: Mode }) {
   return matchSegments(text, matchRanges(text, query, mode)).map((segment, index) =>
-    segment.match ? (
-      <mark key={index} className="rounded-sm bg-amber-200 text-foreground dark:bg-amber-500/40">
-        {segment.text}
-      </mark>
-    ) : (
-      segment.text
-    ),
+    segment.match ? <mark key={index}>{segment.text}</mark> : segment.text,
   )
 }
 
@@ -35,37 +28,22 @@ function matches(text: string, query: string, mode: Mode) {
 function Example() {
   const [mode, setMode] = React.useState<Mode>("fuzzy")
   return (
-    <CommandSearch className="flex w-64 flex-col gap-2 text-sm">
+    <CommandSearch>
       {({ query }) => (
         <>
-          <div className="flex gap-2">
-            <CommandSearchInput
-              aria-label="Search commands"
-              placeholder="Search"
-              className="h-8 min-w-0 flex-1 rounded-lg border border-border bg-transparent px-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            />
-            <div className="relative w-32 shrink-0">
-              <select
-                aria-label="Match"
-                value={mode}
-                onChange={(event) => setMode(event.target.value as Mode)}
-                className="h-8 w-full appearance-none rounded-lg border border-border bg-background ps-3 pe-8 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                <option value="fuzzy">Fuzzy</option>
-                <option value="contains">Contains</option>
-                <option value="startsWith">Starts with</option>
-              </select>
-              <ChevronDownIcon
-                className="pointer-events-none absolute end-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                aria-hidden="true"
-              />
-            </div>
+          <div data-slot="row">
+            <CommandSearchInput aria-label="Search commands" placeholder="Search" />
+            <select aria-label="Match" value={mode} onChange={(event) => setMode(event.target.value as Mode)}>
+              <option value="fuzzy">Fuzzy</option>
+              <option value="contains">Contains</option>
+              <option value="startsWith">Starts with</option>
+            </select>
           </div>
-          <CommandSearchList className="flex min-h-44 flex-col gap-1">
+          <CommandSearchList>
             {commands
               .filter((command) => matches(command, query, mode))
               .map((command) => (
-                <CommandSearchCommand key={command} className="px-1">
+                <CommandSearchCommand key={command}>
                   <Highlight text={command} query={query} mode={mode} />
                 </CommandSearchCommand>
               ))}

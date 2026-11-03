@@ -58,22 +58,14 @@ const locked = ["City", "Lake"]
 
 function Example() {
   return (
-    <Photos
-      locked={locked}
-      aria-label="Photos"
-      className="grid w-80 grid-cols-3 gap-3 rounded-xl border border-border bg-muted/40 p-3"
-    >
+    <Photos locked={locked} aria-label="Photos">
       {names.map((name) => (
-        <PhotosPhoto
-          key={name}
-          value={name}
-          className="pointer-events-none flex h-16 flex-col justify-end rounded-md border-2 border-border bg-background p-1 text-xs text-foreground data-lassoed:border-foreground data-selected:border-foreground"
-        >
+        <PhotosPhoto key={name} value={name}>
           {name}
-          {locked.includes(name) && <span className="text-[10px] text-muted-foreground">Locked</span>}
+          {locked.includes(name) && <span data-slot="badge">Locked</span>}
         </PhotosPhoto>
       ))}
-      <PhotosLasso className="rounded-sm border border-foreground bg-foreground/10" />
+      <PhotosLasso />
     </Photos>
   )
 }

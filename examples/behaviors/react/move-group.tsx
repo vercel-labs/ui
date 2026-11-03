@@ -125,25 +125,16 @@ function Example() {
     ship: { x: 220, y: 100 },
   })
   return (
-    <div className="flex flex-col gap-2">
-      <Board
-        aria-label="Notes"
-        defaultPositions={positions}
-        onPositionsChange={setPositions}
-        className="h-[200px] w-[320px] rounded-xl border border-border bg-muted/40"
-      >
+    <div data-slot="stack">
+      <Board aria-label="Notes" defaultPositions={positions} onPositionsChange={setPositions}>
         {Object.entries(titles).map(([key, title]) => (
-          <BoardNote
-            key={key}
-            value={key}
-            className="w-20 cursor-grab rounded-lg border border-border bg-background px-3 py-2 text-sm shadow-sm outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-default aria-disabled:bg-muted aria-disabled:text-muted-foreground aria-selected:border-primary aria-selected:bg-primary/10 data-dragging:cursor-grabbing data-dragging:shadow-lg"
-          >
+          <BoardNote key={key} value={key}>
             {title}
             {key === "ship" && " 📌"}
           </BoardNote>
         ))}
       </Board>
-      <p className="text-xs text-muted-foreground tabular-nums">
+      <p data-slot="output">
         Plan at {positions.plan.x}, {positions.plan.y} · Draft at {positions.draft.x}, {positions.draft.y}
       </p>
     </div>

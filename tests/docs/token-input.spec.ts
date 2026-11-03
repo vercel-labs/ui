@@ -3,7 +3,7 @@ import { readdirSync } from "node:fs"
 import path from "node:path"
 
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
-const root = path.join(import.meta.dirname, "../../examples/token-input")
+const root = path.join(import.meta.dirname, "../../examples/components/token-input")
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })

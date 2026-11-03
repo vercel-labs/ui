@@ -41,19 +41,12 @@ const parts = createParts(boldText, { root: "div", toggle: "button", keys: "kbd"
 
 function Example() {
   return (
-    <parts.Root className="flex w-72 flex-col gap-2 text-sm">
-      <parts.Toggle className="flex h-8 w-fit items-center gap-2 rounded-lg border border-border px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 aria-pressed:bg-foreground aria-pressed:text-background">
+    <parts.Root>
+      <parts.Toggle>
         Bold
-        <parts.Keys className="font-sans text-xs opacity-70" />
+        <parts.Keys />
       </parts.Toggle>
-      <parts.Text
-        aria-label="Note"
-        rows={2}
-        defaultValue="Press the shortcut while typing."
-        className={({ bold }) =>
-          `resize-none rounded-lg border border-border bg-transparent px-3 py-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${bold ? "font-bold" : ""}`
-        }
-      />
+      <parts.Text aria-label="Note" rows={2} defaultValue="Press the shortcut while typing." />
     </parts.Root>
   )
 }

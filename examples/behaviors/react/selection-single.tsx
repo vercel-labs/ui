@@ -75,24 +75,15 @@ function Example() {
   const [chosen, setChosen] = React.useState<string[]>([])
   const [going, setGoing] = React.useState<string | null>(null)
   return (
-    <div className="flex w-56 flex-col gap-2 text-sm">
-      <Plans
-        aria-label="Plan"
-        onValueChange={setChosen}
-        onContinue={setGoing}
-        className="flex flex-col gap-1 select-none"
-      >
+    <div data-slot="stack">
+      <Plans aria-label="Plan" onValueChange={setChosen} onContinue={setGoing}>
         {names.map((name) => (
-          <PlansPlan
-            key={name}
-            value={name}
-            className="rounded-md border border-border px-3 py-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-selected:border-foreground aria-selected:bg-foreground/10"
-          >
+          <PlansPlan key={name} value={name}>
             {name}
           </PlansPlan>
         ))}
       </Plans>
-      <p data-chosen className="text-xs text-muted-foreground">
+      <p data-chosen data-slot="output">
         {going ? `Continuing with ${going}` : chosen.length ? `Chosen: ${chosen[0]}` : "No plan chosen"}
       </p>
     </div>

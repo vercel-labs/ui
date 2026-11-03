@@ -1,0 +1,109 @@
+<script setup lang="ts">
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@ui-sdk/vue/navigation-menu"
+import { MinusIcon, PlusIcon } from "@lucide/vue"
+
+const sections = [
+  {
+    value: "guides",
+    label: "Guides",
+    links: [
+      {
+        title: "Introduction",
+        href: "https://example.com/docs",
+        description: "Unstyled components with one core for every framework.",
+      },
+      {
+        title: "Installation",
+        href: "https://example.com/docs/installation",
+        description: "Add the package for your framework and render your first part.",
+      },
+      {
+        title: "Styling",
+        href: "https://example.com/docs/styling",
+        description: "Style parts with data attributes, CSS variables and any CSS.",
+      },
+    ],
+  },
+  {
+    value: "components",
+    label: "Components",
+    links: [
+      {
+        title: "Alert Dialog",
+        href: "https://example.com/docs/components/alert-dialog",
+        description: "Asks for a decision before anything else on the page can be used.",
+      },
+      {
+        title: "Hover Card",
+        href: "https://example.com/docs/components/hover-card",
+        description: "A preview of what a link points to, for people who pause on it.",
+      },
+      {
+        title: "Progress",
+        href: "https://example.com/docs/components/progress",
+        description: "Shows how far along a task is, like an upload.",
+      },
+      {
+        title: "Scroll Area",
+        href: "https://example.com/docs/components/scroll-area",
+        description: "Scrolls its content with scrollbars you can style.",
+      },
+    ],
+  },
+]
+</script>
+
+<template>
+  <NavigationMenu aria-label="Main">
+    <NavigationMenuList>
+      <NavigationMenuItem v-for="section in sections" :key="section.value" :value="section.value">
+        <NavigationMenuTrigger>
+          <template #render="{ props, state }">
+            <button v-bind="props">
+              {{ section.label }}
+              <MinusIcon v-if="state.open" />
+              <PlusIcon v-else />
+            </button>
+          </template>
+        </NavigationMenuTrigger>
+        <NavigationMenuContent :aria-label="section.label">
+          <template #render="{ props, state }">
+            <section v-bind="props">
+              <p data-slot="hint">
+                {{ state.motion ? `Moved in ${state.motion}` : "Opened" }}
+              </p>
+              <ul>
+                <li v-for="(link, index) in section.links" :key="link.href">
+                  <NavigationMenuLink v-slot="{ state: linkState }" :href="link.href" :active="index === 0">
+                    <span>{{ link.title }}</span>
+                    <span v-if="linkState.active" data-slot="hint" data-show="active">You're here</span>
+                  </NavigationMenuLink>
+                </li>
+              </ul>
+            </section>
+          </template>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+      <NavigationMenuItem value="pricing">
+        <NavigationMenuTrigger disabled>
+          <template #render="{ props, state }">
+            <button v-bind="props">
+              Pricing
+              <span v-if="state.disabled" data-slot="badge" data-show="disabled">Soon</span>
+            </button>
+          </template>
+        </NavigationMenuTrigger>
+        <NavigationMenuContent>Plans for teams.</NavigationMenuContent>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+    <NavigationMenuViewport :side-offset="8" />
+  </NavigationMenu>
+</template>

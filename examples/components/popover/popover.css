@@ -1,0 +1,102 @@
+@scope ([data-example]) {
+  [data-slot="popover-content"] {
+    gap: var(--space-3);
+    width: 18rem;
+
+    & > button,
+    & [data-slot="popover-close"]:not(a) {
+      align-self: flex-end;
+    }
+
+    & > [data-slot="row"] {
+      justify-content: flex-end;
+    }
+
+    & > textarea {
+      width: 100%;
+    }
+
+    & > form[data-slot="stack"] {
+      align-items: stretch;
+
+      & > button {
+        align-self: flex-end;
+      }
+
+      & > [data-slot="row"] {
+        justify-content: flex-end;
+      }
+    }
+
+    & > [data-slot="stack"] {
+      align-items: stretch;
+      gap: var(--space-2);
+    }
+
+    & > [data-slot="stack"] > [data-slot="label"]:has(> input) {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      align-items: center;
+      gap: var(--space-3);
+      max-width: none;
+      font-weight: 400;
+
+      & > input {
+        width: 100%;
+        height: var(--size-sm);
+      }
+    }
+
+    & > [role="alert"] {
+      padding: var(--space-2);
+      border-radius: var(--radius-control);
+      background: var(--surface-1);
+      box-shadow: var(--shadow-1);
+      font-size: var(--text-sm);
+
+      & > button:first-of-type {
+        margin-inline-start: auto;
+      }
+    }
+
+    &[data-presentation="sheet"] {
+      width: auto;
+      max-width: none;
+      border-radius: var(--radius-popup) var(--radius-popup) 0 0;
+      padding: var(--space-4);
+      padding-bottom: max(env(safe-area-inset-bottom), var(--space-4));
+    }
+  }
+
+  [data-slot="popover-title"] {
+    margin: 0;
+    font-size: var(--text-md);
+    font-weight: 600;
+  }
+
+  [data-slot="popover-description"] {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--text-sm);
+  }
+
+  [data-slot="popover-title"] + [data-slot="popover-description"] {
+    margin-top: calc(var(--space-3) * -1 + 2px);
+  }
+
+  a[data-slot="popover-close"] {
+    align-self: flex-start;
+    color: var(--ink);
+    text-underline-offset: 3px;
+  }
+
+  [data-slot="popover-trigger"]:not([data-open]) [data-show="open"],
+  [data-slot="popover-trigger"][data-open] [data-hide="open"] {
+    display: none;
+  }
+
+  ul:has([data-slot="popover-trigger"]) {
+    width: 20rem;
+    max-width: 100%;
+  }
+}

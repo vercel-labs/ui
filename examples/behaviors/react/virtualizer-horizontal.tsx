@@ -57,16 +57,11 @@ const date = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", 
 
 function Example() {
   return (
-    <Strip className="h-16 w-80 rounded-xl border border-border outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+    <Strip>
       {({ items }) => (
         <StripBody aria-label="Days">
           {items.map((item) => (
-            <StripDay
-              key={item.key}
-              value={item.key}
-              start={item.start}
-              className="grid place-items-center border-r border-border text-xs tabular-nums"
-            >
+            <StripDay key={item.key} value={item.key} start={item.start}>
               {date.format(Date.UTC(2026, 0, item.index + 1))}
             </StripDay>
           ))}

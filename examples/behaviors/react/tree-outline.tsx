@@ -21,7 +21,7 @@ const outline = createTreeCollection([
 
 function Example() {
   return (
-    <div className="flex w-72 flex-col gap-1 text-sm">
+    <div data-slot="tree-behavior-list">
       {outline.keys().map((key) => {
         const { index, size } = outline.position(key)
         const parent = outline.parent(key)
@@ -29,21 +29,22 @@ function Example() {
           <div
             key={key}
             data-section={key}
-            className="flex items-baseline justify-between gap-2 rounded-md px-2 py-1 hover:bg-muted"
+            data-slot="tree-behavior-row"
+            data-branch={outline.isBranch(key) ? "" : undefined}
             style={{ paddingInlineStart: `${(outline.level(key) - 1) * 16 + 8}px` }}
           >
-            <span className={outline.isBranch(key) ? "font-medium" : undefined}>
+            <span>
               {outline.isBranch(key) ? "▸ " : ""}
               {titles[key]}
             </span>
-            <span className="text-xs text-muted-foreground tabular-nums">
+            <span data-slot="hint">
               Level {outline.level(key)}, {index} of {size}
               {parent ? ` in ${titles[parent]}` : ""}
             </span>
           </div>
         )
       })}
-      <p className="mt-2 text-xs text-muted-foreground">
+      <p data-slot="output">
         {outline.size} sections{outline.has("appendix") ? ", with an appendix" : ", no appendix yet"}
       </p>
     </div>

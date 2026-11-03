@@ -59,13 +59,9 @@ const names = ["Cheese", "Basil", "Olives", "Mushrooms", "Peppers"]
 
 function Example() {
   return (
-    <Toppings aria-label="Toppings" className="flex w-72 flex-wrap gap-1.5 text-sm select-none">
+    <Toppings aria-label="Toppings">
       {names.map((name) => (
-        <ToppingsTopping
-          key={name}
-          value={name}
-          className="rounded-full border border-border px-3 py-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-selected:border-foreground aria-selected:bg-foreground aria-selected:text-background"
-        >
+        <ToppingsTopping key={name} value={name}>
           {name}
         </ToppingsTopping>
       ))}

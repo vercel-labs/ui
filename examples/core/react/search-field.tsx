@@ -53,21 +53,12 @@ function Example() {
   const [query, setQuery] = React.useState("")
   const matches = fruits.filter((fruit) => fruit.toLowerCase().includes(query.toLowerCase()))
   return (
-    <div className="flex w-64 flex-col gap-3 text-sm">
-      <SearchField
-        onQueryChange={setQuery}
-        className="flex items-center gap-1 rounded-lg border border-border px-2"
-      >
-        <SearchFieldInput
-          aria-label="Search fruit"
-          placeholder="Search fruit"
-          className="h-8 min-w-0 flex-1 bg-transparent outline-none [&::-webkit-search-cancel-button]:hidden"
-        />
-        <SearchFieldClear className="rounded-md px-1.5 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
-          ✕
-        </SearchFieldClear>
+    <div data-slot="stack">
+      <SearchField onQueryChange={setQuery}>
+        <SearchFieldInput aria-label="Search fruit" placeholder="Search fruit" />
+        <SearchFieldClear>✕</SearchFieldClear>
       </SearchField>
-      <p className="min-h-10 text-muted-foreground">{matches.join(", ") || "No fruit matches."}</p>
+      <p data-slot="hint">{matches.join(", ") || "No fruit matches."}</p>
     </div>
   )
 }

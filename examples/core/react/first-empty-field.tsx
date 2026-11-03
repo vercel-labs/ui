@@ -36,23 +36,14 @@ const CheckoutField = parts.Field
 
 const CheckoutNext = parts.Next
 
-const field =
-  "h-8 rounded-lg border border-border bg-transparent px-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-
 function Example() {
   return (
     <Checkout>
-      <div className="flex w-72 flex-col gap-2 text-sm">
-        <CheckoutField
-          value="name"
-          aria-label="Name"
-          placeholder="Name"
-          defaultValue="Ada"
-          className={field}
-        />
-        <CheckoutField value="email" aria-label="Email" placeholder="Email" className={field} />
-        <CheckoutField value="address" aria-label="Address" placeholder="Address" className={field} />
-        <CheckoutNext className="h-8 rounded-lg bg-foreground px-3 font-medium text-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+      <div data-slot="stack">
+        <CheckoutField value="name" aria-label="Name" placeholder="Name" defaultValue="Ada" />
+        <CheckoutField value="email" aria-label="Email" placeholder="Email" />
+        <CheckoutField value="address" aria-label="Address" placeholder="Address" />
+        <CheckoutNext data-variant="solid">
           {({ missing }) => (missing ? `Fill in ${missing}` : "Find the first empty field")}
         </CheckoutNext>
       </div>

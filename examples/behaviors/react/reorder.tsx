@@ -73,19 +73,11 @@ const RankingItem = parts.Item
 
 function Example() {
   return (
-    <Ranking
-      aria-label="Favorite seasons"
-      defaultValue={["Spring", "Summer", "Autumn", "Winter"]}
-      className="flex w-56 flex-col gap-1.5"
-    >
+    <Ranking aria-label="Favorite seasons" defaultValue={["Spring", "Summer", "Autumn", "Winter"]}>
       {({ order }) =>
         order.map((season, index) => (
-          <RankingItem
-            key={season}
-            value={season}
-            className="flex items-center gap-3 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-grabbed:relative data-grabbed:z-10 data-grabbed:translate-x-(--drag-x) data-grabbed:translate-y-(--drag-y) data-grabbed:shadow-md"
-          >
-            <span className="text-muted-foreground tabular-nums">{index + 1}</span>
+          <RankingItem key={season} value={season}>
+            <span data-slot="hint">{index + 1}</span>
             {season}
           </RankingItem>
         ))

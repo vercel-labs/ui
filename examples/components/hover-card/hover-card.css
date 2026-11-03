@@ -1,0 +1,46 @@
+@scope ([data-example]) {
+  [data-slot="hover-card-trigger"] {
+    border-radius: 4px;
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 3px;
+
+    &:hover,
+    &[data-open] {
+      text-decoration-color: var(--ink);
+    }
+
+    &:has(> [data-slot="avatar"]) {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+  }
+
+  [data-slot="hover-card-content"] {
+    gap: var(--space-1);
+    width: 18rem;
+    font-size: var(--text-sm);
+
+    &:not([data-open]) {
+      pointer-events: none;
+    }
+
+    & > p:first-of-type,
+    & [data-slot="stack"] > p:first-child {
+      font-size: var(--text-md);
+      font-weight: 600;
+    }
+
+    & [data-slot="stack"] {
+      gap: var(--space-1);
+    }
+  }
+
+  ul:has([data-slot="hover-card-trigger"]) {
+    width: 20rem;
+    max-width: 100%;
+  }
+}

@@ -4,7 +4,7 @@ import path from "node:path"
 
 const frameworks = ["react", "solid", "vue", "svelte", "web-components"]
 const folders = ["react", "solid", "vue", "svelte", "web"]
-const root = path.join(import.meta.dirname, "../../examples/drawer")
+const root = path.join(import.meta.dirname, "../../examples/components/drawer")
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((file) => file.isFile())

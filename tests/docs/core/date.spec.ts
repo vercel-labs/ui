@@ -76,7 +76,7 @@ test("locale: names, ranges and the first day follow the locale, and Persian kee
   await expect(page.locator("[data-long]")).toHaveText("Friday, October 16, 2026")
   await expect(page.locator("[data-range]")).toHaveText("Oct 16 – 20, 2026")
   await expect(page.locator("[data-weekdays]")).toHaveText("Sun Mon Tue Wed Thu Fri Sat")
-  await expect(page.locator("[data-label] .font-semibold")).toHaveText("16")
+  await expect(page.locator('[data-label] [data-type="day"]')).toHaveText("16")
   await locale.selectOption("en-US-u-fw-mon")
   await expect(page.locator("[data-weekdays]")).toHaveText("Mon Tue Wed Thu Fri Sat Sun")
   await locale.selectOption("de-DE")

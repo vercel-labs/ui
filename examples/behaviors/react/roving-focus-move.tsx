@@ -48,13 +48,9 @@ const KeypadDigit = parts.Digit
 
 function Example() {
   return (
-    <Keypad aria-label="Keypad" className="grid grid-cols-3 gap-1">
+    <Keypad aria-label="Keypad">
       {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
-        <KeypadDigit
-          key={digit}
-          value={digit}
-          className="size-10 rounded-lg border border-border text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+        <KeypadDigit key={digit} value={digit}>
           {digit}
         </KeypadDigit>
       ))}

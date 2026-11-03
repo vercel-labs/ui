@@ -51,14 +51,10 @@ const EditorField = parts.Field
 
 function Example() {
   return (
-    <Editor className="flex w-80 flex-col gap-2 text-sm">
-      <EditorToolbar aria-label="Format" className="flex gap-1 rounded-lg border border-border p-1">
+    <Editor>
+      <EditorToolbar aria-label="Format">
         {Object.values(shortcuts).map((label) => (
-          <EditorButton
-            key={label}
-            value={label}
-            className="rounded-md px-3 py-1.5 outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
+          <EditorButton key={label} value={label}>
             {label}
           </EditorButton>
         ))}
@@ -67,7 +63,6 @@ function Example() {
         aria-label="Notes"
         rows={3}
         defaultValue="Press Control or Command with U, then Shift+Tab."
-        className="resize-none rounded-lg border border-border bg-transparent p-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       />
     </Editor>
   )

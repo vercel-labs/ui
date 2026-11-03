@@ -4,7 +4,7 @@ import path from "node:path"
 
 const frameworks = ["react", "vue", "svelte", "solid", "web-components"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/navigation-menu")
+const root = path.join(import.meta.dirname, "../../examples/components/navigation-menu")
 const folders = ["react", "vue", "svelte", "solid", "web"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })

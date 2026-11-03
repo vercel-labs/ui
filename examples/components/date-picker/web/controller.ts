@@ -1,0 +1,51 @@
+import { createDatePickerController } from "@ui-sdk/web/date-picker"
+import { Calendar, ChevronLeft, ChevronRight, createElement } from "lucide"
+
+export function mount(root: HTMLElement) {
+  root.innerHTML = `
+    <ui-date-picker default-value="2026-10-16">
+      <div data-slot="row">
+        <ui-date-picker-input><input aria-label="Due date" /></ui-date-picker-input>
+        <ui-date-picker-trigger>
+          <button>
+            ${createElement(Calendar, { "aria-hidden": "true" }).outerHTML}
+          </button>
+        </ui-date-picker-trigger>
+      </div>
+      <ui-date-picker-hint></ui-date-picker-hint>
+      <ui-date-picker-content>
+        <div data-slot="row">
+          <ui-calendar-previous>
+            <button data-variant="ghost">
+              ${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-calendar-previous>
+          <ui-calendar-heading></ui-calendar-heading>
+          <ui-calendar-next>
+            <button data-variant="ghost">
+              ${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-calendar-next>
+        </div>
+        <ui-calendar-grid>
+          <ui-calendar-weekdays>
+            <template><ui-calendar-weekday></ui-calendar-weekday></template>
+          </ui-calendar-weekdays>
+          <ui-calendar-weeks>
+            <template><ui-calendar-day></ui-calendar-day></template>
+          </ui-calendar-weeks>
+        </ui-calendar-grid>
+      </ui-date-picker-content>
+      <div data-slot="row">
+        <button type="button" data-action="christmas">Christmas</button>
+        <button type="button" data-action="open">Open</button>
+      </div>
+    </ui-date-picker>
+  `
+  const controller = createDatePickerController()
+  root.querySelector("ui-date-picker")!.controller = controller
+  root
+    .querySelector('[data-action="christmas"]')!
+    .addEventListener("click", () => controller.setValue("2026-12-25"))
+  root.querySelector('[data-action="open"]')!.addEventListener("click", () => controller.open())
+}

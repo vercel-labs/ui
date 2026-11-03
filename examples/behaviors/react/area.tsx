@@ -50,14 +50,11 @@ const MixerThumb = parts.Thumb
 function Example() {
   const [mix, setMix] = React.useState({ warmth: 30, energy: 70 })
   return (
-    <div className="flex flex-col gap-2">
-      <Mixer defaultMix={mix} onMixChange={setMix} className="size-48 rounded-xl bg-muted ring-1 ring-border">
-        <MixerThumb
-          aria-label="Mix"
-          className="absolute size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        />
+    <div data-slot="stack">
+      <Mixer defaultMix={mix} onMixChange={setMix}>
+        <MixerThumb aria-label="Mix" />
       </Mixer>
-      <p className="text-xs text-muted-foreground tabular-nums">
+      <p data-slot="output">
         Warmth {mix.warmth}, energy {mix.energy}
       </p>
     </div>

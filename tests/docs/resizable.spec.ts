@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
+import { onPage } from "./docs-helpers"
 
 const frameworks = ["react", "vue", "svelte", "solid", "web-components"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/resizable")
+const root = path.join(import.meta.dirname, "../../examples/components/resizable")
 const folders = ["react", "vue", "svelte", "solid", "web"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -30,7 +31,8 @@ const handles: Record<string, { name: string; key: string; by: number }> = {
   disabled: { name: "Resize two", key: "ArrowRight", by: 1 },
   render: { name: "Resize files", key: "ArrowRight", by: 1 },
 }
-const order = Object.keys(handles)
+const fixtures = Object.keys(handles)
+const order = fixtures.filter(onPage)
 
 for (const framework of frameworks) {
   test(`every resizable example works in ${framework}`, async ({ page }) => {
@@ -40,7 +42,7 @@ for (const framework of frameworks) {
     await page.goto(`/docs/${framework}/components/resizable`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order].sort())
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
 
     for (const [index, name] of order.entries()) {
       const { name: label, key, by } = handles[name]

@@ -105,34 +105,21 @@ const actions = { grab: "Pick up", up: "Up", down: "Down", drop: "Drop", cancel:
 
 function Example() {
   return (
-    <Recipe className="flex w-64 flex-col gap-2 text-sm">
+    <Recipe>
       {({ order }) => (
         <>
-          <div className="flex gap-1">
+          <div data-slot="row">
             {Object.entries(actions).map(([value, label]) => (
-              <RecipeAction
-                key={value}
-                value={value}
-                className="rounded-md border border-border px-2 py-1 text-xs disabled:opacity-40"
-              >
+              <RecipeAction data-size="sm" key={value} value={value}>
                 {label}
               </RecipeAction>
             ))}
           </div>
-          <RecipeList aria-label="Recipe" className="flex flex-col gap-1">
+          <RecipeList aria-label="Recipe">
             {order.map((step) => (
-              <RecipeStep
-                key={step}
-                value={step}
-                className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-1.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-grabbed:border-primary data-grabbed:bg-primary/10"
-              >
+              <RecipeStep key={step} value={step}>
                 {step}
-                <RecipeToTop
-                  value={step}
-                  className="rounded px-1.5 text-xs text-muted-foreground hover:bg-muted"
-                >
-                  ↑ Top
-                </RecipeToTop>
+                <RecipeToTop value={step}>↑ Top</RecipeToTop>
               </RecipeStep>
             ))}
           </RecipeList>

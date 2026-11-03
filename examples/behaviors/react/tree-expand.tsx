@@ -61,34 +61,29 @@ const name = (key: string) => key.split("/").at(-1)
 
 function Example() {
   return (
-    <FileList className="flex w-64 flex-col gap-1 text-sm">
+    <FileList>
       {({ shown, picked }) => (
         <>
-          <p data-path className="truncate text-xs text-muted-foreground">
+          <p data-path data-slot="hint">
             {picked ? [...files.ancestors(picked), picked].map(name).join(" / ") : "Pick a file"}
           </p>
-          <div className="flex h-64 flex-col gap-1">
+          <div data-slot="tree-behavior-list">
             {shown.map((key) => (
-              <FileRow
-                key={key}
-                value={key}
-                className="flex items-center justify-between rounded-md py-1 pr-2 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 aria-current:bg-muted aria-current:font-medium"
-              >
+              <FileRow key={key} value={key}>
                 <span>
                   {files.isBranch(key) ? "📁 " : ""}
                   {name(key)}
                 </span>
                 {files.isBranch(key) && (
-                  <span className="text-xs text-muted-foreground">
+                  <span data-slot="hint">
                     {files.descendants(key).filter((below) => !files.isBranch(below)).length} files
                   </span>
                 )}
               </FileRow>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {files.children(null).length} at the top ·{" "}
-            <FileExpandAll className="underline underline-offset-2">Expand all</FileExpandAll>
+          <p data-slot="hint">
+            {files.children(null).length} at the top · <FileExpandAll>Expand all</FileExpandAll>
           </p>
         </>
       )}

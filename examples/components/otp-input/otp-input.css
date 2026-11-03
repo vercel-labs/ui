@@ -1,0 +1,104 @@
+@scope ([data-example]) {
+  [data-slot="otp-input-root"] {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  [data-slot="otp-input-group"] {
+    display: flex;
+    border-radius: var(--radius-control);
+
+    [data-focused] > & {
+      outline: none;
+    }
+  }
+
+  [data-slot="otp-input-slot"] {
+    position: relative;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: var(--size);
+    height: 40px;
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--line);
+    color: var(--ink);
+    font-size: var(--text-md);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+
+    & + & {
+      margin-inline-start: -1px;
+    }
+
+    &:first-child {
+      border-start-start-radius: var(--radius-control);
+      border-end-start-radius: var(--radius-control);
+    }
+
+    &:last-child {
+      border-start-end-radius: var(--radius-control);
+      border-end-end-radius: var(--radius-control);
+    }
+
+    [data-complete] & {
+      background: var(--tint);
+    }
+
+    &[data-active] {
+      z-index: 1;
+      outline: 3px solid var(--halo);
+      outline-offset: 0;
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+
+    &[data-fake-caret]:empty::after,
+    & > span:empty {
+      content: "";
+      width: 1px;
+      height: var(--size-icon);
+      background: var(--ink);
+      animation: otp-input-caret 1s step-end infinite;
+    }
+
+    [data-slot="otp-input-root"]:has([readonly]) & {
+      box-shadow: inset 0 0 0 1px var(--line-faint);
+    }
+
+    [data-slot="otp-input-root"]:has([aria-invalid="true"]) & {
+      box-shadow: inset 0 0 0 1px var(--danger);
+
+      &[data-active] {
+        outline-color: color-mix(in oklab, var(--danger) 20%, transparent);
+      }
+    }
+
+    &[data-disabled] {
+      box-shadow: inset 0 0 0 1px var(--line-faint);
+      color: var(--line-disabled);
+    }
+  }
+
+  [data-slot="otp-input-separator"] {
+    display: flex;
+    color: var(--muted);
+
+    &[data-disabled] {
+      color: var(--line-disabled);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="otp-input-slot"]::after,
+    [data-slot="otp-input-slot"] > span {
+      animation: none;
+    }
+  }
+}
+
+@keyframes otp-input-caret {
+  50% {
+    opacity: 0;
+  }
+}

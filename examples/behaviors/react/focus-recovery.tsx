@@ -44,27 +44,21 @@ function Example() {
   const [list, setList] = React.useState(["Write the intro", "Add examples", "Fix the links", "Ship it"])
   const done = (task: string) => setList((current) => current.filter((other) => other !== task))
   return (
-    <Tasks aria-label="Tasks" className="flex min-h-40 w-64 flex-col gap-1">
+    <Tasks aria-label="Tasks">
       {list.map((task, index) => (
         <TasksItem
           key={task}
           value={task}
           index={index}
           onKeyDown={(event) => event.key === "Delete" && done(task)}
-          className="flex items-center justify-between rounded-md border border-border px-3 py-1.5 text-sm outline-none focus-within:ring-3 focus-within:ring-ring/50"
         >
           {task}
-          <button
-            type="button"
-            tabIndex={-1}
-            onClick={() => done(task)}
-            className="rounded px-2 text-xs text-muted-foreground hover:bg-muted"
-          >
+          <button type="button" tabIndex={-1} data-variant="ghost" data-size="sm" onClick={() => done(task)}>
             Done
           </button>
         </TasksItem>
       ))}
-      {!list.length && <p className="text-sm text-muted-foreground">All done.</p>}
+      {!list.length && <p data-slot="hint">All done.</p>}
     </Tasks>
   )
 }

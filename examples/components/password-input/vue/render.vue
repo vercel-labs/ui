@@ -1,0 +1,30 @@
+<script setup lang="ts">
+import { EyeIcon, EyeOffIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+</script>
+
+<template>
+  <Field name="password">
+    <FieldLabel>Password</FieldLabel>
+    <PasswordInput>
+      <template #render="{ props, state }">
+        <div v-bind="props">
+          <PasswordInputControl>
+            <template #render="{ props: control, state: field }">
+              <input v-bind="control" />
+            </template>
+          </PasswordInputControl>
+          <PasswordInputToggle aria-label="Show password">
+            <template #render="{ props: toggle, state: shown }">
+              <button v-bind="toggle">
+                <EyeOffIcon v-if="shown.visible" />
+                <EyeIcon v-else />
+              </button>
+            </template>
+          </PasswordInputToggle>
+        </div>
+      </template>
+    </PasswordInput>
+  </Field>
+</template>

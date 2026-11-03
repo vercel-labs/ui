@@ -71,24 +71,18 @@ const emojis = ["🎉", "👍", "❤️", "😂", "👀", "🚀"]
 function Example() {
   const [reactions, setReactions] = React.useState<string[]>([])
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div data-slot="row">
       <EmojiPicker onPick={(emoji) => setReactions((current) => [...current, emoji])}>
-        <PopoverTrigger className="h-8 rounded-2xl border border-border px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-open:bg-muted">
-          React
-        </PopoverTrigger>
-        <PopoverContent className="grid grid-cols-6 gap-1 rounded-2xl bg-popover p-1.5 shadow-lg ring-1 ring-foreground/5 outline-none">
+        <PopoverTrigger>React</PopoverTrigger>
+        <PopoverContent>
           {emojis.map((emoji) => (
-            <EmojiPickerItem
-              key={emoji}
-              value={emoji}
-              className="grid size-8 place-items-center rounded-lg text-lg outline-none hover:bg-muted focus-visible:bg-muted"
-            >
+            <EmojiPickerItem key={emoji} value={emoji}>
               {emoji}
             </EmojiPickerItem>
           ))}
         </PopoverContent>
       </EmojiPicker>
-      <span data-reactions className="text-muted-foreground">
+      <span data-reactions data-slot="hint">
         {reactions.length ? reactions.join(" ") : "No reactions yet"}
       </span>
     </div>

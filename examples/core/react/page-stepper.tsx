@@ -47,26 +47,18 @@ const Pager = parts.Root
 function Example() {
   const [rtl, setRtl] = React.useState(false)
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <label className="flex items-center gap-2 text-muted-foreground">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={rtl} onChange={(event) => setRtl(event.target.checked)} />
         Right to left
       </label>
-      <Pager
-        dir={rtl ? "rtl" : "ltr"}
-        aria-label="Page"
-        className="flex flex-col gap-3 rounded-lg border border-border p-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+      <Pager dir={rtl ? "rtl" : "ltr"} aria-label="Page">
         {({ page }) => (
           <>
-            <span className="text-center text-muted-foreground">Page {page} of 5</span>
-            <span aria-hidden className="flex items-center justify-between">
+            <span data-slot="hint">Page {page} of 5</span>
+            <span aria-hidden data-slot="pager-pages">
               {Array.from({ length: 5 }, (_, index) => index + 1).map((number) => (
-                <span
-                  key={number}
-                  data-active={number === page ? "" : undefined}
-                  className="inline-flex size-8 items-center justify-center rounded-md font-medium tabular-nums data-active:bg-foreground data-active:text-background"
-                >
+                <span key={number} data-slot="pager-page" data-active={number === page ? "" : undefined}>
                   {number}
                 </span>
               ))}
@@ -74,7 +66,7 @@ function Example() {
           </>
         )}
       </Pager>
-      <p className="text-xs text-muted-foreground">Next page: {rtl ? "← Left arrow" : "→ Right arrow"}</p>
+      <p data-slot="hint">Next page: {rtl ? "← Left arrow" : "→ Right arrow"}</p>
     </div>
   )
 }

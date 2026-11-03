@@ -39,14 +39,12 @@ const SaveBarStatus = parts.Status
 function Example() {
   return (
     <SaveBar>
-      <div className="flex w-72 flex-col gap-3 text-sm">
-        <div className="flex items-center gap-3">
-          <SaveBarButton className="h-8 rounded-lg bg-foreground px-3 font-medium text-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-            Save
-          </SaveBarButton>
-          <SaveBarHint className="text-muted-foreground">Enter or Space saves</SaveBarHint>
+      <div data-slot="stack">
+        <div data-slot="row">
+          <SaveBarButton data-variant="solid">Save</SaveBarButton>
+          <SaveBarHint>Enter or Space saves</SaveBarHint>
         </div>
-        <SaveBarStatus className="text-muted-foreground">
+        <SaveBarStatus>
           {({ savedWith }) =>
             savedWith ? `Saved with ${savedWith}` : "Click Save, or Tab to it and press Enter."
           }

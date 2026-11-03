@@ -42,42 +42,32 @@ const filters = createParts(popupWith("filters", popoverPreset), tags)
 const rename = createParts(popupWith("rename", dialogPreset), tags)
 const help = createParts(popupWith("help", tooltipPreset), tags)
 
-const button = "rounded-md border border-border px-3 py-1.5 text-sm"
-const panel =
-  "flex flex-col gap-2 rounded-xl bg-popover p-3 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none"
-
 function Example() {
   return (
-    <div className="flex items-center gap-2">
+    <div data-slot="row">
       <filters.Root>
-        <filters.Trigger className={button}>Filters</filters.Trigger>
-        <filters.Content sideOffset={6} className={`${panel} w-48`}>
-          <filters.Title className="font-medium">Filters</filters.Title>
-          <label className="flex items-center gap-1.5">
+        <filters.Trigger>Filters</filters.Trigger>
+        <filters.Content sideOffset={6}>
+          <filters.Title>Filters</filters.Title>
+          <label data-slot="label">
             <input type="checkbox" defaultChecked /> Unread only
           </label>
-          <filters.Close className="self-end text-xs underline">Done</filters.Close>
+          <filters.Close data-size="sm">Done</filters.Close>
         </filters.Content>
       </filters.Root>
       <rename.Root>
-        <rename.Trigger className={button}>Rename</rename.Trigger>
-        <rename.Content className={`${panel} m-auto w-64 backdrop:bg-black/40`}>
-          <rename.Title className="font-medium">Rename file</rename.Title>
-          <input
-            aria-label="Name"
-            defaultValue="notes.md"
-            className="rounded-md border border-border bg-background px-2 py-1"
-          />
-          <rename.Close className="self-end rounded-md bg-foreground px-2 py-1 text-xs text-background">
+        <rename.Trigger>Rename</rename.Trigger>
+        <rename.Content>
+          <rename.Title>Rename file</rename.Title>
+          <input aria-label="Name" defaultValue="notes.md" />
+          <rename.Close data-variant="solid" data-size="sm">
             Save
           </rename.Close>
         </rename.Content>
       </rename.Root>
       <help.Root>
-        <help.Trigger aria-label="Help" className={`${button} size-8 px-0`}>
-          ?
-        </help.Trigger>
-        <help.Content sideOffset={6} className="rounded-md bg-foreground px-2 py-1 text-xs text-background">
+        <help.Trigger aria-label="Help">?</help.Trigger>
+        <help.Content sideOffset={6}>
           Filters narrow the list, and Rename changes the file's name.
         </help.Content>
       </help.Root>

@@ -57,18 +57,13 @@ function Example() {
     return () => clearInterval(timer)
   }, [])
   return (
-    <BuildLog className="relative w-80">
-      <BuildLogLines
-        aria-label="Build output"
-        className="h-48 rounded-xl border border-border bg-muted/40 p-3 font-mono text-xs leading-5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+    <BuildLog>
+      <BuildLogLines aria-label="Build output">
         {lines.map((line, index) => (
           <div key={index}>{line}</div>
         ))}
       </BuildLogLines>
-      <BuildLogJump className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-border bg-background px-3 py-1 text-xs shadow-sm data-unseen:border-foreground">
-        Jump to latest
-      </BuildLogJump>
+      <BuildLogJump data-size="sm">Jump to latest</BuildLogJump>
     </BuildLog>
   )
 }

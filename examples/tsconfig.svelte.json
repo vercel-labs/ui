@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.base.json",
-  "include": ["*/svelte/*.svelte"],
+  "include": ["*/svelte/*.svelte", "components/*/svelte/*.svelte"],
   "compilerOptions": {
     "noUnusedLocals": false,
     "types": ["svelte"]

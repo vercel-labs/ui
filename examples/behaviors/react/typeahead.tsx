@@ -63,13 +63,9 @@ const fruits = ["Apple", "Banana", "Cherry", "Peach", "Pear", "Plum", "Quince"]
 
 function Example() {
   return (
-    <FruitList aria-label="Fruit" className="flex w-48 flex-col rounded-lg border border-border p-1">
+    <FruitList aria-label="Fruit">
       {fruits.map((fruit) => (
-        <FruitListItem
-          key={fruit}
-          value={fruit}
-          className="rounded-md px-3 py-1.5 text-sm outline-none focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+        <FruitListItem key={fruit} value={fruit}>
           {fruit}
         </FruitListItem>
       ))}

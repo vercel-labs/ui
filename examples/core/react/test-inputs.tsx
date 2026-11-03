@@ -51,18 +51,14 @@ async function test() {
 function Example() {
   const [checks, setChecks] = React.useState<Check[] | null>(null)
   return (
-    <div className="flex w-80 flex-col gap-3 text-sm">
-      <button
-        type="button"
-        onClick={async () => setChecks(await test())}
-        className="h-8 w-fit rounded-lg bg-foreground px-3 font-medium text-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+    <div data-slot="stack">
+      <button type="button" data-variant="solid" onClick={async () => setChecks(await test())}>
         Run the tests
       </button>
       {checks && (
-        <ul aria-label="Results" className="flex flex-col gap-1">
+        <ul aria-label="Results" data-slot="list">
           {checks.map((check) => (
-            <li key={check.label} data-ok={check.ok} className="data-[ok=false]:font-medium">
+            <li key={check.label} data-slot="test-result" data-ok={check.ok}>
               {check.ok ? "✓" : "✗"} {check.label}
             </li>
           ))}

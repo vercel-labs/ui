@@ -1,0 +1,5 @@
+@scope ([data-example]) {
+  [data-density="compact"] [data-slot="list"] > li {
+    padding-block: var(--space-1);
+  }
+}

@@ -99,25 +99,16 @@ function Example() {
   const [bookmark, setBookmark] = React.useState<string | null>(null)
   return (
     <Book onBookmarkChange={setBookmark}>
-      <div className="flex w-60 flex-col gap-2 text-sm">
-        <BookBookmark className="self-start rounded-full border border-border bg-background px-3 py-1 text-xs data-drag-preview:shadow-lg">
-          🔖 Bookmark
-        </BookBookmark>
-        <BookChapters
-          aria-label="Chapters"
-          className="flex h-44 flex-col overflow-auto rounded-xl border border-border p-1"
-        >
+      <div data-slot="stack">
+        <BookBookmark data-size="sm">🔖 Bookmark</BookBookmark>
+        <BookChapters aria-label="Chapters">
           {chapters.map((chapter) => (
-            <BookChapter
-              key={chapter}
-              value={chapter}
-              className="shrink-0 rounded-md px-3 py-1.5 data-bookmarked:font-medium data-over:bg-primary/10"
-            >
+            <BookChapter key={chapter} value={chapter}>
               {chapter}
             </BookChapter>
           ))}
         </BookChapters>
-        <p data-bookmark className="text-xs text-muted-foreground">
+        <p data-bookmark data-slot="output">
           {bookmark ? `Bookmarked ${bookmark}` : "Drag the bookmark onto a chapter."}
         </p>
       </div>

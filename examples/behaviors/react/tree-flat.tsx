@@ -22,13 +22,11 @@ function Example() {
       current.includes(value) ? current.filter((other) => other !== value) : [...current, value],
     )
   return (
-    <div className="flex min-h-44 w-64 flex-col text-sm">
+    <div data-slot="tree-behavior-list">
       {rows.map(({ item, level, index, parent }) => {
         const style = { paddingInlineStart: `${(level - 1) * 16 + 8}px` }
-        const className =
-          "flex justify-between rounded-md py-1 pr-2 text-left hover:bg-muted aria-disabled:text-muted-foreground aria-disabled:line-through"
         const note = (
-          <span className="text-xs text-muted-foreground tabular-nums">
+          <span data-slot="hint">
             row {index + 1}
             {parent ? `, in ${parent}` : ""}
           </span>
@@ -39,19 +37,19 @@ function Example() {
             type="button"
             aria-expanded={expanded.includes(item.value)}
             onClick={() => toggle(item.value)}
-            className={`${className} font-medium`}
+            data-slot="tree-behavior-row"
             style={style}
           >
             {item.label}
             {note}
           </button>
         ) : item.href ? (
-          <a key={item.value} href={item.href} className={className} style={style}>
+          <a key={item.value} href={item.href} data-slot="tree-behavior-row" style={style}>
             {item.label}
             {note}
           </a>
         ) : (
-          <span key={item.value} aria-disabled={item.disabled} className={className} style={style}>
+          <span key={item.value} aria-disabled={item.disabled} data-slot="tree-behavior-row" style={style}>
             {item.label}
             {note}
           </span>

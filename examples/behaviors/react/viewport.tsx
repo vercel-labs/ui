@@ -68,26 +68,15 @@ const notes = [
 
 function Example() {
   return (
-    <Board
-      aria-label="Board"
-      className="h-56 w-80 cursor-grab rounded-xl border border-border bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] bg-size-[16px_16px] outline-none focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing"
-    >
+    <Board aria-label="Board">
       <BoardWorld>
         {notes.map((note) => (
-          <BoardNote
-            key={note.value}
-            value={note.value}
-            x={note.x}
-            y={note.y}
-            className="w-28 rounded-md border border-border bg-background p-2 text-xs text-foreground shadow-sm"
-          >
+          <BoardNote key={note.value} value={note.value} x={note.x} y={note.y}>
             {note.text}
           </BoardNote>
         ))}
       </BoardWorld>
-      <BoardReset className="absolute right-2 bottom-2 rounded-md border border-border bg-background px-2 py-1 text-xs hover:bg-muted">
-        Reset view
-      </BoardReset>
+      <BoardReset data-size="sm">Reset view</BoardReset>
     </Board>
   )
 }

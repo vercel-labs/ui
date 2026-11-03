@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs"
+import { existsSync, globSync, readdirSync, readFileSync, statSync } from "node:fs"
 import path from "node:path"
 import ts from "typescript"
 
@@ -8,6 +8,8 @@ import ts from "typescript"
 // come from the core's exported types, so a new prop fails this test until an
 // example uses it.
 const repo = path.join(import.meta.dirname, "../..")
+const exampleFolder = (name: string) =>
+  [path.join(repo, "examples/components", name), path.join(repo, "examples", name)].find((dir) => existsSync(dir))!
 
 type Component = {
   // The core module, in packages/core/src/foundation or components.
@@ -444,6 +446,10 @@ const components: Record<string, Component> = {
       "TabsTabIconProps",
       "TabsTabIconState",
     ],
+    allowed: {
+      // Shown as data-activation-direction, which the animation example's panels slide by.
+      direction: "TabsRootState",
+    },
   },
   accordion: {
     source: "accordion/accordion.ts",
@@ -577,6 +583,10 @@ const components: Record<string, Component> = {
     source: "slider/slider.ts",
     examples: "slider",
     types: ["SliderOptions", "SliderThumbProps", "SliderState", "SliderThumbState", "SliderValueState"],
+    allowed: {
+      // The thumb sets it as `--slider-thumb-position`, which the render example's bubble reads.
+      percent: "SliderThumbState",
+    },
   },
   resizable: {
     source: "resizable/resizable.ts",
@@ -835,7 +845,7 @@ function exampleSource(folders: string | string[], framework: "react" | "solid")
     }
   }
   for (const folder of [folders].flat()) {
-    const examples = path.join(repo, "examples", folder, framework)
+    const examples = path.join(exampleFolder(folder), framework)
     for (const file of readdirSync(examples)) read(path.join(examples, file))
   }
   return (
@@ -858,14 +868,19 @@ function uses(code: string, name: string) {
 
 // The examples show a part's state through its data attribute, which the docs
 // stylesheet selects, so a state field the stylesheet styles counts as shown.
-const stylesheet = readFileSync(path.join(repo, "apps/docs/app/examples.css"), "utf8")
+// A boolean's attribute drops its prefix: `isActive` is `data-active`.
+const stylesheet = globSync("examples/{styles,components/*}/*.css", { cwd: repo })
+  .map((file) => readFileSync(path.join(repo, file), "utf8"))
+  .join("\n")
 const styled = (name: string) =>
-  stylesheet.includes(`[data-${name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`)
+  stylesheet.includes(
+    `[data-${name.replace(/^(is|has)(?=[A-Z])/, "").replace(/[A-Z]/g, (c, i) => `${i ? "-" : ""}${c.toLowerCase()}`)}`,
+  )
 
 // The Solid examples are ports of React's, so they show the same props. They're
 // checked once every folder a component counts has them.
 const hasSolidExamples = (component: Component) =>
-  [component.examples].flat().every((folder) => existsSync(path.join(repo, "examples", folder, "solid")))
+  [component.examples].flat().every((folder) => existsSync(path.join(exampleFolder(folder), "solid")))
 
 for (const [name, component] of Object.entries(components)) {
   const frameworks = hasSolidExamples(component) ? (["react", "solid"] as const) : (["react"] as const)

@@ -128,18 +128,9 @@ const FanThumb = parts.Thumb
 
 function Example() {
   return (
-    <div className="flex w-72 flex-col gap-2 text-sm">
-      <Fan className="h-10 rounded-full bg-muted [--thumb-size:4.5rem]">
-        {({ speed }) => (
-          <FanThumb
-            aria-label="Fan speed"
-            className="top-1 grid h-8 w-(--thumb-size) cursor-grab place-items-center rounded-full bg-background text-xs font-medium shadow-sm outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:cursor-grabbing"
-          >
-            {speeds[speed]}
-          </FanThumb>
-        )}
-      </Fan>
-      <div className="flex justify-between px-2 text-xs text-muted-foreground">
+    <div data-slot="stack">
+      <Fan>{({ speed }) => <FanThumb aria-label="Fan speed">{speeds[speed]}</FanThumb>}</Fan>
+      <div data-slot="gesture-scale">
         {speeds.map((speed) => (
           <span key={speed}>{speed}</span>
         ))}

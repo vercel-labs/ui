@@ -70,24 +70,22 @@ const PixelsUndo = parts.Undo
 const PixelsRedo = parts.Redo
 
 const cells = Array.from({ length: 36 }, (_, index) => `${Math.floor(index / 6)}:${index % 6}`)
-const button = "rounded-md border border-border px-2 py-1 text-xs hover:bg-muted disabled:opacity-50"
 
 function Example() {
   return (
-    <Pixels className="flex flex-col items-center gap-2">
-      <div role="group" aria-label="Pixels" className="grid grid-cols-6 gap-1">
+    <Pixels>
+      <div role="group" aria-label="Pixels" data-slot="history-grid">
         {cells.map((cell) => (
           <PixelsCell
             key={cell}
             value={cell}
             aria-label={`Row ${Number(cell[0]) + 1}, column ${Number(cell[2]) + 1}`}
-            className="size-7 rounded-sm bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring/50 data-painted:bg-primary"
           />
         ))}
       </div>
-      <div className="flex gap-2">
-        <PixelsUndo className={button}>Undo</PixelsUndo>
-        <PixelsRedo className={button}>Redo</PixelsRedo>
+      <div data-slot="row">
+        <PixelsUndo data-size="sm">Undo</PixelsUndo>
+        <PixelsRedo data-size="sm">Redo</PixelsRedo>
       </div>
     </Pixels>
   )

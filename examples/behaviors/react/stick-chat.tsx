@@ -64,31 +64,28 @@ const ThreadAction = parts.Action
 
 function Example() {
   return (
-    <Thread className="flex w-80 flex-col gap-2">
+    <Thread>
       {({ messages, following, atBottom, unseen }) => (
         <>
-          <ThreadLog
-            aria-label="Thread"
-            className="flex h-48 flex-col gap-1 rounded-xl border border-border p-3 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
+          <ThreadLog aria-label="Thread">
             {messages.map((message) => (
-              <div key={message} className="w-fit shrink-0 rounded-lg bg-muted px-2.5 py-1">
+              <div key={message} data-slot="stick-message">
                 {message}
               </div>
             ))}
           </ThreadLog>
-          <div className="flex flex-wrap items-center gap-1 text-xs">
+          <div data-slot="row">
             {[
               ["send", "Send"],
               ["older", "Load older"],
               ["release", "Let go"],
             ].map(([value, text]) => (
-              <ThreadAction key={value} value={value} className="rounded-md border border-border px-2 py-1">
+              <ThreadAction data-size="sm" key={value} value={value}>
                 {text}
               </ThreadAction>
             ))}
           </div>
-          <p data-log-state className="text-xs text-muted-foreground">
+          <p data-log-state data-slot="output">
             {following ? "Following" : "Not following"}
             {atBottom ? ", at the end" : ""}
             {unseen ? ", new below" : ""}

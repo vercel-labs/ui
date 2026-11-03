@@ -130,37 +130,26 @@ const MonthPrevious = parts.Previous
 
 const MonthNext = parts.Next
 
-const nav = "grid size-7 place-items-center rounded-md hover:bg-muted"
-
 function Example() {
   const [locale, setLocale] = React.useState("en-US")
   return (
-    <div className="flex flex-col items-center gap-3 text-sm">
-      <select
-        aria-label="Locale"
-        value={locale}
-        onChange={(event) => setLocale(event.target.value)}
-        className="rounded-md border border-border bg-background px-2 py-1 text-xs"
-      >
+    <div data-slot="stack">
+      <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
         <option value="en-US">English (US)</option>
         <option value="de-DE">Deutsch</option>
       </select>
-      <Month defaultValue="2026-10-16" locale={locale} className="flex w-64 flex-col gap-2">
+      <Month defaultValue="2026-10-16" locale={locale}>
         {({ title, weekdays, weeks }) => (
           <>
-            <div className="flex items-center justify-between">
-              <MonthPrevious aria-label="Previous month" className={nav}>
-                ‹
-              </MonthPrevious>
-              <span aria-live="polite" className="font-medium">
+            <div data-slot="row">
+              <MonthPrevious aria-label="Previous month">‹</MonthPrevious>
+              <span aria-live="polite" data-slot="month-heading">
                 {title}
               </span>
-              <MonthNext aria-label="Next month" className={nav}>
-                ›
-              </MonthNext>
+              <MonthNext aria-label="Next month">›</MonthNext>
             </div>
-            <MonthGrid aria-label={title} className="flex flex-col gap-1">
-              <div role="row" className="grid grid-cols-7 text-center text-xs text-muted-foreground">
+            <MonthGrid aria-label={title}>
+              <div role="row" data-slot="month-row">
                 {weekdays.map((name) => (
                   <span key={name} role="columnheader">
                     {name}
@@ -168,13 +157,9 @@ function Example() {
                 ))}
               </div>
               {weeks.map((week) => (
-                <div key={week[0]} role="row" className="grid grid-cols-7 gap-1">
+                <div key={week[0]} role="row" data-slot="month-row">
                   {week.map((day) => (
-                    <MonthDay
-                      key={day}
-                      value={day}
-                      className="grid h-8 place-items-center rounded-md tabular-nums outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-outside:text-muted-foreground/50 data-selected:bg-foreground data-selected:text-background"
-                    >
+                    <MonthDay key={day} value={day}>
                       {Number(day.slice(8))}
                     </MonthDay>
                   ))}

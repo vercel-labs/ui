@@ -280,36 +280,21 @@ const defaultRows = [
 
 function Example() {
   return (
-    <Outline
-      defaultRows={defaultRows}
-      defaultExpanded={["start", "guides", "forms"]}
-      aria-label="Pages"
-      className="flex w-72 flex-col rounded-xl border border-border p-1 text-sm"
-    >
+    <Outline defaultRows={defaultRows} defaultExpanded={["start", "guides", "forms"]} aria-label="Pages">
       {({ rows }) => (
         <>
           {rows.map((row) => (
-            <OutlineItem
-              key={row.key}
-              value={row.key}
-              className="group/row relative flex h-8 cursor-grab items-center gap-1 rounded-md pr-2 pl-[calc(var(--depth)*20px+4px)] outline-none select-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:bg-transparent data-dragging:*:invisible data-dragging:before:absolute data-dragging:before:inset-y-1 data-dragging:before:right-1 data-dragging:before:left-[calc(var(--depth)*20px+4px)] data-dragging:before:rounded-md data-dragging:before:border data-dragging:before:border-dashed data-dragging:before:border-primary/50 data-dragging:before:bg-primary/5 data-drag-preview:cursor-grabbing data-drag-preview:bg-background data-drag-preview:shadow-lg data-drag-preview:ring-1 data-drag-preview:ring-border data-drag-count:after:ml-auto data-drag-count:after:rounded-full data-drag-count:after:bg-primary data-drag-count:after:px-1.5 data-drag-count:after:text-xs data-drag-count:after:text-primary-foreground data-drag-count:after:content-[attr(data-drag-count)]"
-            >
+            <OutlineItem key={row.key} value={row.key}>
               {({ parent }) => (
                 <>
-                  <OutlineToggle className="flex size-5 shrink-0 cursor-default items-center justify-center rounded text-muted-foreground hover:bg-border/60">
+                  <OutlineToggle>
                     {parent && (
-                      <svg
-                        viewBox="0 0 16 16"
-                        className="size-3 transition-transform group-aria-expanded/row:rotate-90"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M6 4l4 4-4 4" />
                       </svg>
                     )}
                   </OutlineToggle>
-                  <span className="truncate">{pages[row.key]}</span>
+                  <span>{pages[row.key]}</span>
                 </>
               )}
             </OutlineItem>

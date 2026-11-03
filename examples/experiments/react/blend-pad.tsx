@@ -297,37 +297,25 @@ function Example() {
   const [value, setValue] = React.useState<BlendPoint>({ x: 0.5, y: 0.45 })
   const weights = blendWeights(value, anchors)
   const style = {
-    borderRadius: `${blendNumber(weights, radius)}px`,
-    fontWeight: Math.round(blendNumber(weights, weight)),
-    background: `oklch(0.62 ${blendNumber(weights, chroma).toFixed(3)} ${blendNumber(weights, hue).toFixed(0)})`,
-  }
+    "--blend-radius": `${blendNumber(weights, radius)}px`,
+    "--blend-weight": Math.round(blendNumber(weights, weight)),
+    "--blend-color": `oklch(0.62 ${blendNumber(weights, chroma).toFixed(3)} ${blendNumber(weights, hue).toFixed(0)})`,
+  } as React.CSSProperties
   return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-8">
-      <BlendPad
-        anchors={anchors}
-        value={value}
-        onValueChange={setValue}
-        className="size-64 rounded-2xl border bg-muted/40"
-      >
+    <div data-slot="blend-pad-layout">
+      <BlendPad anchors={anchors} value={value} onValueChange={setValue}>
         {anchors.map((anchor) => (
-          <BlendPadAnchor
-            key={anchor.value}
-            value={anchor.value}
-            className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium shadow-sm aria-pressed:border-primary aria-pressed:text-primary"
-          >
+          <BlendPadAnchor key={anchor.value} value={anchor.value}>
             {anchor.label}
           </BlendPadAnchor>
         ))}
-        <BlendPadPuck
-          aria-label="Style mix"
-          className="size-6 cursor-grab rounded-full border-2 border-background bg-primary shadow-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        />
+        <BlendPadPuck aria-label="Style mix" />
       </BlendPad>
-      <div className="flex w-56 flex-col items-center gap-3">
-        <button type="button" className="px-5 py-2.5 text-sm text-white shadow-sm" style={style}>
+      <div data-slot="stack">
+        <button type="button" data-slot="blend-pad-preview" style={style}>
           Get started
         </button>
-        <p className="text-center text-xs text-muted-foreground">{describeBlend(weights, anchors)}</p>
+        <p data-slot="hint">{describeBlend(weights, anchors)}</p>
       </div>
     </div>
   )

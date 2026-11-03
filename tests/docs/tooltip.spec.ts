@@ -6,7 +6,7 @@ import path from "node:path"
 // every framework, with hover and Tab.
 
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
-const root = path.join(import.meta.dirname, "../../examples/tooltip")
+const root = path.join(import.meta.dirname, "../../examples/components/tooltip")
 const folders = ["react", "vue", "svelte", "web", "solid"]
 
 // The order examples appear on the Tooltip page.

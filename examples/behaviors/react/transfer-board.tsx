@@ -104,33 +104,21 @@ const BoardFinish = parts.Finish
 
 function Example() {
   return (
-    <Board className="flex gap-2">
+    <Board>
       {({ lists }) =>
         Object.keys(columns).map((list) => (
-          <div key={list} className="flex w-32 flex-col gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground">
+          <div key={list} data-slot="transfer-lane">
+            <span data-slot="transfer-label">
               {columns[list]}
               {list === "doing" && " (2 at most)"}
             </span>
-            <BoardColumn
-              value={list}
-              aria-label={columns[list]}
-              className="flex min-h-40 flex-col gap-1.5 rounded-xl bg-muted/50 p-1.5"
-            >
+            <BoardColumn value={list} aria-label={columns[list]}>
               {lists[list].map((card) => (
-                <BoardCard
-                  key={card}
-                  value={card}
-                  className="flex flex-col gap-1 rounded-lg border border-border bg-background p-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:border-dashed data-dragging:opacity-40"
-                >
+                <BoardCard key={card} value={card}>
                   {card}
-                  <span className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span data-slot="transfer-meta">
                     {tags[card]}
-                    {list !== "done" && card !== blocked && (
-                      <BoardFinish value={card} className="rounded px-1 hover:bg-muted">
-                        Done
-                      </BoardFinish>
-                    )}
+                    {list !== "done" && card !== blocked && <BoardFinish value={card}>Done</BoardFinish>}
                   </span>
                 </BoardCard>
               ))}

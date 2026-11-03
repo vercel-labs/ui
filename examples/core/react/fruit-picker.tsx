@@ -53,16 +53,9 @@ const fruits = ["Apple", "Banana", "Cherry", "Peach", "Pear", "Plum", "Quince"]
 
 function Example() {
   return (
-    <FruitPicker
-      aria-label="Fruit"
-      className="flex w-48 flex-col rounded-lg border border-border p-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-    >
+    <FruitPicker aria-label="Fruit">
       {fruits.map((fruit) => (
-        <FruitPickerOption
-          key={fruit}
-          value={fruit}
-          className="rounded-md px-3 py-1.5 text-sm aria-selected:bg-muted aria-selected:font-medium"
-        >
+        <FruitPickerOption key={fruit} value={fruit}>
           {fruit}
         </FruitPickerOption>
       ))}

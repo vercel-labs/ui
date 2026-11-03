@@ -1,0 +1,61 @@
+<script lang="ts">
+  import {
+    type TriggerMenuDataItem,
+    TriggerMenu,
+    TriggerMenuContent,
+    TriggerMenuEmpty,
+    TriggerMenuInput,
+    TriggerMenuItem,
+    TriggerMenuList,
+    TriggerMenuStatus,
+  } from "@ui-sdk/svelte/trigger-menu"
+
+  const channels = ["general", "random", "design", "engineering", "marketing", "support"]
+
+  function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
+    return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+      const timer = setTimeout(
+        () =>
+          resolve(
+            channels
+              .filter((channel) => channel.includes(query.toLowerCase()))
+              .map((channel) => ({ value: channel, label: channel })),
+          ),
+        400,
+      )
+      signal.addEventListener("abort", () => {
+        clearTimeout(timer)
+        reject(signal.reason)
+      })
+    })
+  }
+</script>
+
+<TriggerMenu triggers={[{ char: "#", type: "channel", items: searchChannels }]}>
+  <div data-slot="stack">
+    <TriggerMenuInput aria-label="Message" placeholder="Type # to link a channel" />
+    <TriggerMenuStatus>
+      {#snippet children(state)}
+        {state.loading
+          ? "Loading channels…"
+          : state.open
+            ? `${state.count} channels`
+            : state.status === "error"
+              ? "Couldn't load channels."
+              : ""}
+      {/snippet}
+    </TriggerMenuStatus>
+  </div>
+  <TriggerMenuContent>
+    <TriggerMenuEmpty>No channels found.</TriggerMenuEmpty>
+    <TriggerMenuList>
+      {#snippet children(state)}
+        {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+            {item.label}
+          </TriggerMenuItem>
+        {/each}
+      {/snippet}
+    </TriggerMenuList>
+  </TriggerMenuContent>
+</TriggerMenu>

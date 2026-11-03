@@ -96,20 +96,10 @@ const mixes = [
 
 function Example() {
   return (
-    <Playlists aria-label="Playlists" defaultItems={mixes} className="flex w-64 flex-col gap-1 text-sm">
+    <Playlists aria-label="Playlists" defaultItems={mixes}>
       {mixes.map((mix) => (
-        <PlaylistsItem
-          key={mix.id}
-          value={mix.id}
-          className="flex h-9 items-center rounded-md border border-border px-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          {({ name, editing }) =>
-            editing ? (
-              <PlaylistsInput className="-mx-1.5 h-7 w-full rounded-sm border border-input bg-background px-1.5 outline-none focus:ring-2 focus:ring-ring/50" />
-            ) : (
-              name
-            )
-          }
+        <PlaylistsItem key={mix.id} value={mix.id}>
+          {({ name, editing }) => (editing ? <PlaylistsInput /> : name)}
         </PlaylistsItem>
       ))}
     </Playlists>

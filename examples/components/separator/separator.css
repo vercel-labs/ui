@@ -1,0 +1,42 @@
+@scope ([data-example]) {
+  [data-slot="separator-root"] {
+    flex-shrink: 0;
+    border: 0;
+    background: var(--line-faint);
+
+    &[data-orientation="horizontal"] {
+      width: 100%;
+      height: 1px;
+    }
+
+    &[data-orientation="vertical"] {
+      align-self: stretch;
+      width: 1px;
+    }
+  }
+
+  [data-slot="row"]:has(> [data-slot="separator-root"][data-orientation="horizontal"]) {
+    flex-wrap: nowrap;
+    gap: var(--space-3);
+    width: 20rem;
+    max-width: 100%;
+    color: var(--muted);
+    font-size: var(--text-sm);
+
+    & > [data-slot="separator-root"] {
+      flex: 1;
+    }
+  }
+
+  [data-slot="row"]:has(> [data-slot="separator-root"][data-orientation="vertical"]) {
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: var(--space-4);
+  }
+
+  [data-slot="stack"]:has(> [data-slot="separator-root"]) {
+    align-items: stretch;
+    width: 20rem;
+    max-width: 100%;
+  }
+}

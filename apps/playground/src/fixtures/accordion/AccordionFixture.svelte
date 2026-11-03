@@ -9,6 +9,7 @@
 
   let action = $state("")
   let complete = $state("")
+  let warrantyEnabled = $state(false)
 
   function onValueChange(value: string[], details: { cancel: () => void }) {
     if (cancel && value.includes(cancel) && !controller.getValue().includes(cancel)) return details.cancel()
@@ -23,7 +24,7 @@
       <AccordionItem
         class="accordion-item"
         value={item.value}
-        disabled={item.disabled}
+        disabled={item.disabled && !warrantyEnabled}
         onOpenChangeComplete={(open) => (complete = `${item.value} ${open ? "open" : "closed"}`)}
       >
         <AccordionHeader class="accordion-header">
@@ -45,4 +46,5 @@
   <output role="status" aria-label="Last action">{action}</output>
   <output aria-label="Last completed">{complete}</output>
   <button onclick={() => controller.open("support")}>Show support</button>
+  <button onclick={() => (warrantyEnabled = !warrantyEnabled)}>Toggle warranty</button>
 </div>

@@ -37,26 +37,18 @@ function Example() {
   )
 
   return (
-    <div className="flex flex-col items-center gap-4 py-4">
-      <div className="flex flex-col items-center gap-1">
-        <output data-value aria-label="Rating" className="text-5xl font-medium tracking-tight tabular-nums">
+    <div data-slot="stack">
+      <div data-slot="rating-readout">
+        <output data-slot="rating-value" data-value aria-label="Rating">
           {state.value}
         </output>
-        <span className="text-xs text-muted-foreground">Rating</span>
+        <span data-slot="hint">Rating</span>
       </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={(event) => handle.api.rate(3, event.nativeEvent)}
-          className="inline-flex h-8 items-center justify-center rounded-full border border-border px-3 text-xs font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+      <div data-slot="row">
+        <button type="button" data-size="sm" onClick={(event) => handle.api.rate(3, event.nativeEvent)}>
           Set to 3
         </button>
-        <button
-          type="button"
-          onClick={(event) => handle.api.rate(0, event.nativeEvent)}
-          className="inline-flex h-8 items-center justify-center rounded-full border border-border px-3 text-xs font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+        <button type="button" data-size="sm" onClick={(event) => handle.api.rate(0, event.nativeEvent)}>
           Reset
         </button>
       </div>

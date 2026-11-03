@@ -51,20 +51,18 @@ const RecipeMethod = parts.Method
 
 function Example() {
   return (
-    <Recipe className="flex w-72 flex-col gap-2 rounded-xl border border-border p-3 text-sm">
+    <Recipe>
       {({ shown, findable }) => (
         <>
-          <p className="font-medium">Tomato soup</p>
-          <RecipeToggle className="self-start rounded-md border border-border px-2 py-1 text-xs">
-            {shown ? "Hide method" : "Show method"}
-          </RecipeToggle>
-          <div className="min-h-20">
-            <RecipeMethod className="text-muted-foreground">
+          <p data-slot="label">Tomato soup</p>
+          <RecipeToggle data-size="sm">{shown ? "Hide method" : "Show method"}</RecipeToggle>
+          <div data-slot="findable-method">
+            <RecipeMethod>
               Soften the onion in butter, add the tomatoes and stock, and simmer for twenty minutes. Blend
               until smooth.
             </RecipeMethod>
           </div>
-          <p data-findable className="text-xs text-muted-foreground">
+          <p data-findable data-slot="hint">
             {findable ? "Find in page can show the method." : "This browser can't find hidden text."}
           </p>
         </>

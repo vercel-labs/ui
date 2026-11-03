@@ -195,33 +195,22 @@ const ratios = [
 ]
 const corners = ["nw", "ne", "sw", "se"] as const
 const edges = ["n", "e", "s", "w"] as const
-const place: Record<Exclude<ResizeHandle, "move">, string> = {
-  nw: "top-0 left-0",
-  ne: "top-0 left-full",
-  sw: "top-full left-0",
-  se: "top-full left-full",
-  n: "top-0 left-1/2",
-  s: "top-full left-1/2",
-  e: "top-1/2 left-full",
-  w: "top-1/2 left-0",
-}
-
 function Example() {
   const [crop, setCrop] = React.useState<ResizeBox>({ x: 96, y: 60, width: 288, height: 180 })
   const [aspect, setAspect] = React.useState<number | undefined>(undefined)
   return (
-    <div className="flex w-full flex-col items-center gap-3">
-      <div className="flex gap-1 rounded-lg bg-muted p-1 text-sm" role="group" aria-label="Ratio">
+    <div data-slot="stack">
+      <div data-slot="row" role="group" aria-label="Ratio">
         {ratios.map((ratio) => (
           <button
             key={ratio.label}
             type="button"
+            data-size="sm"
             aria-pressed={aspect === ratio.value}
             onClick={() => {
               setAspect(ratio.value)
               if (ratio.value) setCrop(fitAspect(crop, ratio.value, size))
             }}
-            className="rounded-md px-2.5 py-1 text-muted-foreground aria-pressed:bg-background aria-pressed:text-foreground aria-pressed:shadow-sm"
           >
             {ratio.label}
           </button>
@@ -233,51 +222,39 @@ function Example() {
         onCropChange={setCrop}
         aspect={aspect}
         aria-label="Photo"
-        className="rounded-xl"
-        style={{ width: size.width, height: size.height }}
+        style={
+          {
+            "--image-cropper-width": `${size.width}px`,
+            "--image-cropper-height": `${size.height}px`,
+          } as React.CSSProperties
+        }
       >
-        <Landscape className="absolute inset-0 size-full" />
-        <ImageCropperBox className="shadow-[0_0_0_9999px_rgb(0_0_0/0.5)] outline outline-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
-          {({ dragging }) => (
-            <>
-              <span
-                aria-hidden="true"
-                className={`pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3 transition-opacity *:border-white/40 ${dragging ? "opacity-100" : "opacity-0"}`}
-              >
-                {Array.from({ length: 9 }, (_, i) => (
-                  <span key={i} className={`${i % 3 < 2 ? "border-r" : ""} ${i < 6 ? "border-b" : ""}`} />
-                ))}
-              </span>
-              {corners.map((corner) => (
-                <ImageCropperHandle
-                  key={corner}
-                  handle={corner}
-                  className={`absolute size-4 -translate-1/2 rounded-full border-2 border-white bg-primary shadow outline-none focus-visible:ring-3 focus-visible:ring-ring/60 ${place[corner]}`}
-                />
-              ))}
-              {edges.map((edge) => (
-                <ImageCropperHandle
-                  key={edge}
-                  handle={edge}
-                  className={`absolute -translate-1/2 rounded-full bg-white shadow outline-none focus-visible:ring-3 focus-visible:ring-ring/60 ${edge === "n" || edge === "s" ? "h-1.5 w-6" : "h-6 w-1.5"} ${place[edge]}`}
-                />
-              ))}
-            </>
-          )}
+        <Landscape data-slot="image-cropper-image" />
+        <ImageCropperBox>
+          <span data-slot="image-cropper-grid" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => (
+              <span key={i} />
+            ))}
+          </span>
+          {corners.map((corner) => (
+            <ImageCropperHandle key={corner} handle={corner} />
+          ))}
+          {edges.map((edge) => (
+            <ImageCropperHandle key={edge} handle={edge} />
+          ))}
         </ImageCropperBox>
         <ImageCropperInstructions>
           Drag the crop or its handles. Arrows move the crop while it has focus, and move an edge while its
           handle has focus. Shift moves five times as far.
         </ImageCropperInstructions>
       </ImageCropper>
-      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+      <div data-slot="row">
         <span
           aria-hidden="true"
-          className="relative overflow-hidden rounded-md border border-border"
-          style={{ width: 96, height: (96 * crop.height) / crop.width }}
+          data-slot="image-cropper-preview"
+          style={{ height: (96 * crop.height) / crop.width }}
         >
           <Landscape
-            className="absolute max-w-none"
             style={{
               width: (size.width * 96) / crop.width,
               height: (size.height * 96) / crop.width,
@@ -286,7 +263,7 @@ function Example() {
             }}
           />
         </span>
-        <span>
+        <span data-slot="hint">
           {crop.width} × {crop.height} at {crop.x}, {crop.y}
         </span>
       </div>

@@ -68,23 +68,19 @@ const items = [
 function Example() {
   const [selected, setSelected] = React.useState<string[]>([])
   return (
-    <div className="flex flex-col gap-2">
-      <Shapes
-        aria-label="Shapes"
-        onSelectedChange={setSelected}
-        className="h-52 w-80 rounded-xl border border-border bg-muted/40"
-      >
+    <div data-slot="stack">
+      <Shapes aria-label="Shapes" onSelectedChange={setSelected}>
         {items.map((item) => (
           <ShapesItem
             key={item.key}
             value={item.key}
+            data-shape={item.round ? "round" : undefined}
             style={{ left: item.x, top: item.y }}
-            className={`pointer-events-none absolute size-14 border-2 border-border bg-background data-lassoed:border-foreground data-selected:border-foreground data-selected:bg-foreground/15 ${item.round ? "rounded-full" : "rounded-md"}`}
           />
         ))}
-        <ShapesLasso className="rounded-sm border border-foreground bg-foreground/10" />
+        <ShapesLasso />
       </Shapes>
-      <p className="text-xs text-muted-foreground">
+      <p data-slot="output">
         {selected.length ? `Selected: ${selected.join(", ")}` : "Drag on the surface to select."}
       </p>
     </div>

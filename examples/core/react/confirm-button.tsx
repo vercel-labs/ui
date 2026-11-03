@@ -47,14 +47,11 @@ const ConfirmButton = parts.Root
 function Example() {
   const [deleted, setDeleted] = React.useState(0)
   return (
-    <div className="flex items-center gap-3 text-sm">
-      <ConfirmButton
-        onConfirm={() => setDeleted((count) => count + 1)}
-        className="h-8 rounded-2xl border border-destructive/20 bg-destructive/5 px-3 font-medium text-destructive outline-none transition-colors hover:bg-destructive/10 focus-visible:ring-3 focus-visible:ring-destructive/30 data-armed:border-destructive/40 data-armed:bg-destructive/10"
-      >
+    <div data-slot="row">
+      <ConfirmButton onConfirm={() => setDeleted((count) => count + 1)}>
         {({ armed }) => (armed ? "Press again to delete" : "Delete")}
       </ConfirmButton>
-      <span data-deleted className="text-muted-foreground">
+      <span data-deleted data-slot="hint">
         Deleted {deleted} {deleted === 1 ? "time" : "times"}
       </span>
     </div>

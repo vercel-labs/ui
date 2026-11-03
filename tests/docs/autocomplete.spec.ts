@@ -3,7 +3,7 @@ import { readdirSync } from "node:fs"
 import path from "node:path"
 
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/autocomplete")
+const root = path.join(import.meta.dirname, "../../examples/components/autocomplete")
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -15,6 +15,10 @@ type Check = (preview: Locator, page: Page) => Promise<void>
 // The first field in an example that can be typed in.
 const fieldIn = (preview: Locator) =>
   preview.locator('[role="combobox"]:not([disabled]):not([readonly])').first()
+
+// The newest line in the preview's console pane, where examples log events.
+const lastLogIn = (preview: Locator) =>
+  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])').last()
 
 // The list the field controls, wherever it renders, and its suggestions.
 async function listOf(field: Locator, page: Page) {
@@ -131,7 +135,7 @@ const web: Record<string, Check> = {
 
   async search(preview) {
     const field = fieldIn(preview)
-    const output = preview.locator("output")
+    const output = lastLogIn(preview)
     await type(field, "kotlin")
     await field.press("Enter")
     await expect(output).toHaveText("Searched “kotlin”")
@@ -181,20 +185,20 @@ const web: Record<string, Check> = {
 
   async form(preview, page) {
     const field = fieldIn(preview)
-    const output = preview.locator("output")
+    const output = lastLogIn(preview)
     await preview.getByRole("button", { name: "Submit" }).click()
-    await expect(output).toHaveText("fruit=Apple")
+    await expect(output).toHaveText("Submitted fruit=Apple")
     // Enter on a suggestion only fills it in.
     await type(field, "man")
     await field.press("ArrowDown")
     await field.press("Enter")
     await expect(field).toHaveValue("Mango")
-    await expect(output).toHaveText("fruit=Apple")
+    await expect(output).toHaveText("Submitted fruit=Apple")
     // Required blocks an empty submit.
     await field.fill("")
     await close(field, page)
     await preview.getByRole("button", { name: "Submit" }).click()
-    await expect(output).toHaveText("fruit=Apple")
+    await expect(output).toHaveText("Submitted fruit=Apple")
     expect(await field.evaluate((el: HTMLInputElement) => el.validity.valueMissing)).toBe(true)
     await preview.getByRole("button", { name: "Reset" }).click()
     await expect(field).toHaveValue("Apple")
@@ -277,7 +281,7 @@ const web: Record<string, Check> = {
 
   async controlled(preview) {
     const field = fieldIn(preview)
-    const output = preview.locator("output")
+    const output = lastLogIn(preview)
     await field.click()
     await field.press("ArrowDown")
     await expect(output).toHaveText("opened and settled")
@@ -313,10 +317,9 @@ const web: Record<string, Check> = {
     await field.press("ArrowDown")
     await expect(field).toHaveAttribute("aria-expanded", "true")
     // It renders inside the box, above it, at its end.
-    const box = preview.locator(".border-dashed")
+    const box = preview.locator('[data-slot="card"]')
     const content = box.locator('[data-slot="autocomplete-content"]')
     await expect(content).toBeVisible()
-    await expect(content.locator('[data-slot="autocomplete-arrow"]')).toBeVisible()
     const boxRect = (await box.boundingBox())!
     const contentRect = (await content.boundingBox())!
     expect(contentRect.y + contentRect.height).toBeLessThanOrEqual(boxRect.y)
@@ -345,27 +348,23 @@ const web: Record<string, Check> = {
 
   async "custom-rendering"(preview, page) {
     const field = fieldIn(preview)
-    await field.click()
+    // The section hint doesn't count toward filtering.
+    await type(field, "con")
+    await expect((await optionsOf(field, page)).filter({ visible: true })).toHaveCount(0)
+    // Each suggestion is a link, and Enter follows the highlighted one.
+    await field.fill("")
+    await type(field, "sty")
     await field.press("ArrowDown")
-    const options = await optionsOf(field, page)
-    await expect(options.first()).toHaveAttribute("data-highlighted", "")
-    await field.press("ArrowDown")
-    // A function of its state makes the highlighted suggestion bold, with an arrow.
-    await expect(options.nth(1)).toHaveClass(/font-medium/)
-    await expect(options.nth(1).locator("svg")).toBeVisible()
-    await expect(options.nth(2).locator("svg")).toBeHidden()
-    // Enter on the link follows it.
-    await field.press("ArrowUp")
     await field.press("Enter")
-    await expect(page).toHaveURL(/#fruit-guide$/)
+    await expect(page).toHaveURL(/#styling$/)
   },
 }
 
 const fixtureNames = Object.keys(web)
 const order = [
   "demo",
-  "clear",
   "disabled",
+  "clear",
   "open-on-focus",
   "auto-highlight",
   "inline",
@@ -374,11 +373,15 @@ const order = [
   "groups",
   "icons",
   "data",
+  "controlled",
+  "controller",
+  "positioning",
+  "animation",
+  "presentation",
+  "form",
+  "search",
   "recent",
   "async",
-  "search",
-  "form",
-  "presentation",
   "custom-rendering",
 ]
 

@@ -62,43 +62,32 @@ function Example() {
   const [align, setAlign] = React.useState<Align>("center")
   const [offsets, setOffsets] = React.useState({ sideOffset: 8, alignOffset: 0, collisionPadding: 8 })
   return (
-    <Hint
-      {...{ side, align, ...offsets, arrowPadding: 8 }}
-      className="flex w-72 flex-col items-center gap-4 text-xs"
-    >
-      <div className="grid h-28 place-items-center">
-        <HintTarget className="rounded-md border border-border px-3 py-1.5 text-sm">Shortcuts</HintTarget>
+    <Hint {...{ side, align, ...offsets, arrowPadding: 8 }}>
+      <div data-slot="position-stage">
+        <HintTarget>Shortcuts</HintTarget>
       </div>
-      <HintBubble className="w-36 rounded-md bg-foreground px-2 py-1.5 text-background before:content-['On_the_'_attr(data-side)_'_side']">
-        <HintArrow className="size-2.5 rotate-45 bg-foreground data-[side=bottom]:-top-1 data-[side=left]:-right-1 data-[side=right]:-left-1 data-[side=top]:-bottom-1" />
+      <HintBubble>
+        <HintArrow />
       </HintBubble>
-      <div className="grid w-full grid-cols-2 gap-2">
-        <label className="flex flex-col gap-1">
+      <div data-slot="grid">
+        <label data-slot="label">
           Side
-          <select
-            value={side}
-            onChange={(event) => setSide(event.target.value as Side)}
-            className="rounded-md border border-border bg-background px-1 py-0.5"
-          >
+          <select value={side} onChange={(event) => setSide(event.target.value as Side)}>
             {sides.map((value) => (
               <option key={value}>{value}</option>
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1">
+        <label data-slot="label">
           Align
-          <select
-            value={align}
-            onChange={(event) => setAlign(event.target.value as Align)}
-            className="rounded-md border border-border bg-background px-1 py-0.5"
-          >
+          <select value={align} onChange={(event) => setAlign(event.target.value as Align)}>
             {aligns.map((value) => (
               <option key={value}>{value}</option>
             ))}
           </select>
         </label>
         {(["sideOffset", "alignOffset", "collisionPadding"] as const).map((key) => (
-          <label key={key} className="flex flex-col gap-1">
+          <label key={key} data-slot="label">
             {key}
             <input
               type="range"

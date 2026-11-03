@@ -47,21 +47,15 @@ const rows = ["A", "B", "C", "D"]
 
 function Example() {
   return (
-    <Seats aria-label="Seats" className="flex flex-col items-center gap-3 text-sm">
-      <div className="grid grid-cols-8 gap-1.5">
+    <Seats aria-label="Seats">
+      <div data-slot="seats-grid">
         {rows.flatMap((row) =>
           Array.from({ length: 8 }, (_, index) => `${row}${index + 1}`).map((value) => (
-            <Seat
-              key={value}
-              value={value}
-              className="size-6 rounded-md border border-border outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-hovered:bg-muted aria-pressed:border-foreground aria-pressed:bg-foreground"
-            />
+            <Seat key={value} value={value} />
           )),
         )}
       </div>
-      <SeatsLabel data-seat className="text-muted-foreground">
-        {({ seat }) => (seat ? `Seat ${seat}` : "Choose a seat")}
-      </SeatsLabel>
+      <SeatsLabel data-seat>{({ seat }) => (seat ? `Seat ${seat}` : "Choose a seat")}</SeatsLabel>
     </Seats>
   )
 }

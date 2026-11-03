@@ -54,9 +54,9 @@ const taken = ["0:1", "0:2", "1:3", "2:0", "2:4"]
 
 function Example() {
   return (
-    <Theater taken={taken} aria-label="Theater" className="flex flex-col gap-1.5">
+    <Theater taken={taken} aria-label="Theater">
       {[0, 1, 2].map((row) => (
-        <TheaterRow key={row} id={String(row)} className="flex gap-1.5">
+        <TheaterRow key={row} id={String(row)}>
           {[0, 1, 2, 3, 4, 5].map((col) => {
             const isTaken = taken.includes(`${row}:${col}`)
             return (
@@ -66,7 +66,6 @@ function Example() {
                 col={col}
                 aria-label={`Seat ${letters[row]}${col + 1}${isTaken ? ", taken" : ""}`}
                 aria-disabled={isTaken || undefined}
-                className="grid size-9 place-items-center rounded-md border border-border text-xs outline-none aria-disabled:border-dashed aria-disabled:text-muted-foreground/50 data-active:bg-muted focus-visible:bg-primary focus-visible:text-primary-foreground"
               >
                 {letters[row]}
                 {col + 1}

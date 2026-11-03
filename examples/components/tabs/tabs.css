@@ -1,0 +1,174 @@
+@scope ([data-example]) {
+  [data-slot="tabs-root"] {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 28rem;
+    max-width: 100%;
+
+    &[data-orientation="vertical"] {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: var(--space-3) var(--space-6);
+    }
+  }
+
+  [data-slot="tabs-list"] {
+    position: relative;
+    display: flex;
+    align-self: flex-start;
+    flex-wrap: wrap;
+    max-width: 100%;
+    gap: var(--space-1);
+
+    &[data-orientation="vertical"] {
+      flex-direction: column;
+      gap: 2px;
+      min-width: 9rem;
+    }
+  }
+
+  [data-slot="tabs-tab"] {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-2);
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-weight: 500;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: default;
+
+    &:hover:not([data-disabled]) {
+      color: var(--ink);
+    }
+
+    &[data-selected] {
+      background: var(--surface-1);
+      box-shadow:
+        inset 0 0 0 1px var(--ink),
+        var(--shadow-drop);
+      color: var(--ink);
+    }
+
+    &[data-disabled] {
+      color: var(--line-disabled);
+    }
+
+    &:focus-visible {
+      outline-offset: 0;
+    }
+
+    &[data-orientation="vertical"] {
+      justify-content: flex-start;
+      padding-inline: 10px;
+      border-radius: var(--radius-row);
+
+      &:hover:not([data-disabled], [data-selected]) {
+        background: var(--tint);
+      }
+    }
+
+    [data-slot="tabs-list"]:has([data-slot="tabs-indicator"]) > &[data-selected] {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+
+  [data-slot="tabs-tab-icon"] {
+    display: flex;
+    color: var(--muted);
+
+    [data-selected] > & {
+      color: inherit;
+    }
+
+    &[data-mirror]:is([dir="rtl"], [dir="rtl"] *) {
+      scale: -1 1;
+    }
+  }
+
+  [data-slot="tabs-indicator"] {
+    position: absolute;
+    top: var(--active-tab-top);
+    left: var(--active-tab-left);
+    box-sizing: border-box;
+    width: var(--active-tab-width);
+    height: var(--active-tab-height);
+    border-radius: var(--radius-control);
+    background: var(--surface-1);
+    box-shadow:
+      inset 0 0 0 1px var(--ink),
+      var(--shadow-drop);
+  }
+
+  [data-slot="tabs-panel"] {
+    box-sizing: border-box;
+    padding: 0 2px;
+    border-radius: var(--radius-row);
+    color: var(--muted);
+    font-size: var(--text-md);
+
+    &[data-orientation="vertical"] {
+      flex: 1 1 12rem;
+      padding-top: 6px;
+      color: var(--ink);
+    }
+
+    &[hidden] {
+      display: none;
+    }
+  }
+
+  [data-slot="stack"]:has(> [data-slot="tabs-panel"]) {
+    display: grid;
+    overflow: hidden;
+
+    & > [data-slot="tabs-panel"] {
+      grid-area: 1 / 1;
+    }
+  }
+
+  /* The indicator glides in the demos that show it. */
+  :scope:is([data-example="tabs/indicator"], [data-example="tabs/animation"]) {
+    & [data-slot="tabs-indicator"] {
+      transition-property: top, left, width, height;
+      transition-duration: calc(var(--duration) * 2);
+
+      &[data-activation-direction="none"] {
+        transition: none;
+      }
+    }
+  }
+
+  :scope[data-example="tabs/animation"] {
+    & [data-slot="stack"] > [data-slot="tabs-panel"] {
+      transition:
+        opacity var(--duration),
+        translate var(--duration);
+
+      &:is([data-starting-style], [data-ending-style]) {
+        opacity: 0;
+      }
+
+      &[data-activation-direction="right"][data-starting-style],
+      &[data-activation-direction="left"][data-ending-style] {
+        translate: 2rem 0;
+      }
+
+      &[data-activation-direction="left"][data-starting-style],
+      &[data-activation-direction="right"][data-ending-style] {
+        translate: -2rem 0;
+      }
+    }
+  }
+}

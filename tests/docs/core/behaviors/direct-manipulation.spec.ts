@@ -260,7 +260,7 @@ test("spans week: overlaps share a day, a click books an hour, and drags move, r
   await page.mouse.up()
   await expect(page.getByLabel("Call, Mon 9:30 to 12:30")).toBeVisible()
   await expect
-    .poll(() => day("Mon").evaluate((el) => el.closest(".overflow-y-auto")!.scrollTop))
+    .poll(() => day("Mon").evaluate((el) => el.closest('[data-slot="spans-week-frame"]')!.scrollTop))
     .toBeGreaterThan(0)
 })
 

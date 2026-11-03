@@ -4,7 +4,7 @@ import path from "node:path"
 
 const frameworks = ["react", "vue", "svelte", "solid", "web-components"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/accordion")
+const root = path.join(import.meta.dirname, "../../examples/components/accordion")
 const folders = ["react", "vue", "svelte", "solid", "web"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -16,8 +16,6 @@ const next: Record<string, RegExp> = {
   basic: /^What is your return policy\?/,
   multiple: /^Privacy and security/,
   disabled: /^How do I update my email address\?/,
-  borders: /^Is my data secure\?/,
-  card: /^How does billing work\?/,
   rtl: /^ما هي سياسة الإرجاع؟/,
   collapsible: /^Timeline/,
   "find-in-page": /^Is it organic\?/,
@@ -36,14 +34,16 @@ const order = [
   "multiple",
   "disabled",
   "collapsible",
+  "keep-mounted",
   "find-in-page",
   "deep-link",
-  "keep-mounted",
   "animation",
   "controlled",
   "expand-all",
   "nested",
   "search",
+  "rtl",
+  "render",
 ]
 
 for (const framework of frameworks) {
@@ -105,21 +105,20 @@ for (const framework of frameworks) {
       preview("animation").getByText("Finished opening “Where does the height come from?”"),
     ).toBeVisible()
 
-    // Expand all and Collapse all go through the controller, so they report their reason and run
-    // every item's onOpenChange. Security asks before it closes, in every framework.
+    // Review security goes through the controller, so it reports its reason. Security asks
+    // before it closes, in every framework.
     const settings = preview("controlled")
-    await settings.getByRole("button", { name: "Expand all" }).click()
-    await expect(
-      settings.getByText(/Open: account, security, sessions, last change: imperative/),
-    ).toBeVisible()
+    await settings.getByRole("button", { name: "Review security" }).click()
+    await expect(settings.getByText(/Open: .*security.*, last change: imperative/)).toBeVisible()
+    const security = settings.getByRole("button", { name: /^Security/ })
     const answers: string[] = []
     page.once("dialog", (dialog) => (answers.push(dialog.message()), dialog.dismiss()))
-    await settings.getByRole("button", { name: "Collapse all" }).click()
+    await security.click()
     await expect.poll(() => answers).toEqual(["Close the security settings?"])
-    await expect(settings.getByRole("button", { name: /^Security/ })).toHaveAttribute("aria-expanded", "true")
+    await expect(security).toHaveAttribute("aria-expanded", "true")
     page.once("dialog", (dialog) => dialog.accept())
-    await settings.getByRole("button", { name: "Collapse all" }).click()
-    await expect(settings.getByText(/Open: none, last change: imperative/)).toBeVisible()
+    await security.click()
+    await expect(security).toHaveAttribute("aria-expanded", "false")
 
     // A disabled item stays in the tab order.
     const access = preview("disabled").getByRole("button", { name: /^Can I access my account history/ })

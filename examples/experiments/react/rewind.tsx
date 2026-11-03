@@ -157,44 +157,34 @@ const runAgent = () =>
     ],
   })
 
-const button =
-  "rounded-lg border border-border px-2.5 py-1 text-xs font-medium hover:bg-accent disabled:opacity-50"
-
 function Example() {
   return (
-    <Rewind agent={agent} className="flex w-full max-w-md flex-col gap-4">
+    <Rewind agent={agent}>
       {({ entries, current }) => (
         <>
-          <RewindPanel className="flex flex-col gap-4 rounded-xl border border-border p-4 text-sm font-medium">
+          <RewindPanel>
             <Settings />
           </RewindPanel>
-          <div className="flex flex-col gap-2 rounded-xl border border-border p-3">
-            <RewindScrubber
-              aria-label="Rewind"
-              className="flex h-8 items-center gap-1 rounded-lg px-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <RewindStart className="h-4 w-1.5 rounded-full bg-muted-foreground/40" />
+          <div data-slot="rewind-controls">
+            <RewindScrubber aria-label="Rewind">
+              <RewindStart />
               {entries.map((entry) => (
-                <RewindStep
-                  key={entry.id}
-                  value={entry.id}
-                  className="h-4 flex-1 rounded-full bg-foreground/15 transition-colors data-applied:bg-foreground/70 data-reverted:opacity-30 data-[source=agent]:bg-violet-500/30 data-[source=agent]:data-applied:bg-violet-500"
-                />
+                <RewindStep key={entry.id} value={entry.id} />
               ))}
             </RewindScrubber>
-            <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="truncate text-muted-foreground">
+            <div data-slot="row">
+              <span data-slot="hint">
                 {current
                   ? current.reverted
                     ? `Undone: ${describeEntry(current)}`
                     : describeEntry(current)
                   : "Change a setting, or let the agent."}
               </span>
-              <div className="flex shrink-0 gap-1">
-                <button type="button" onClick={runAgent} className={button}>
+              <div data-slot="row">
+                <button type="button" onClick={runAgent} data-size="sm">
                   Run the agent
                 </button>
-                <RewindUndo source="agent" className={button}>
+                <RewindUndo data-size="sm" source="agent">
                   Undo the agent
                 </RewindUndo>
               </div>
@@ -211,35 +201,29 @@ const densities = ["comfortable", "compact"]
 function Settings() {
   return (
     <>
-      <div className="flex items-center gap-4">
-        <span className="w-28">Volume</span>
-        <Slider defaultValue={60} className="flex-1">
-          <SliderControl className="flex w-full items-center py-2 select-none">
-            <SliderTrack className="h-1 w-full rounded-full bg-input/90">
-              <SliderIndicator className="rounded-full bg-primary" />
-              <SliderThumb
-                aria-label="Volume"
-                className="block size-4 rounded-full bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-ring/30"
-              />
+      <div data-slot="row">
+        <span>Volume</span>
+        <Slider defaultValue={60}>
+          <SliderControl>
+            <SliderTrack>
+              <SliderIndicator />
+              <SliderThumb aria-label="Volume" />
             </SliderTrack>
           </SliderControl>
         </Slider>
       </div>
-      <label className="flex items-center gap-4">
-        <span className="w-28">Do not disturb</span>
-        <Switch className="inline-flex h-5 w-8 shrink-0 items-center rounded-full border-2 border-transparent bg-input/90 outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:bg-primary">
-          <SwitchThumb className="block size-4 rounded-full bg-background shadow-sm transition-transform data-checked:translate-x-[calc(100%-4px)]" />
+      <label data-slot="label">
+        <span>Do not disturb</span>
+        <Switch>
+          <SwitchThumb />
         </Switch>
       </label>
-      <RadioGroup defaultValue="comfortable" aria-label="Density" className="flex items-center gap-4">
-        <span className="w-28">Density</span>
+      <RadioGroup defaultValue="comfortable" aria-label="Density">
+        <span>Density</span>
         {densities.map((density) => (
-          <label key={density} className="flex items-center gap-2 font-normal capitalize">
-            <Radio
-              value={density}
-              className="flex size-4 items-center justify-center rounded-full bg-input/90 outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:bg-primary"
-            >
-              <RadioIndicator className="size-2 rounded-full bg-primary-foreground" />
+          <label key={density} data-slot="label">
+            <Radio value={density}>
+              <RadioIndicator />
             </Radio>
             {density}
           </label>

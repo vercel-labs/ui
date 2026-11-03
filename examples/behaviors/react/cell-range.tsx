@@ -70,22 +70,17 @@ const values = [
 
 function Example() {
   return (
-    <Sheet rows={3} cols={4} aria-label="Numbers" className="flex flex-col">
+    <Sheet rows={3} cols={4} aria-label="Numbers">
       {values.map((row, r) => (
-        <SheetRow key={r} id={String(r)} className="flex">
+        <SheetRow key={r} id={String(r)}>
           {row.map((value, c) => (
-            <SheetCell
-              key={c}
-              row={r}
-              col={c}
-              className="grid h-9 w-14 place-items-center border border-border text-sm tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset data-selected:bg-foreground/15"
-            >
+            <SheetCell key={c} row={r} col={c}>
               {value}
             </SheetCell>
           ))}
         </SheetRow>
       ))}
-      <SheetSummary className="mt-2 text-xs text-muted-foreground">
+      <SheetSummary>
         {({ top, left, bottom, right }) => {
           let total = 0
           for (let row = Math.max(top, 0); row <= bottom; row++)

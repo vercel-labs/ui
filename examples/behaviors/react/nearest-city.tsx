@@ -77,27 +77,17 @@ const labels = { ArrowUp: "North", ArrowLeft: "West", ArrowRight: "East", ArrowD
 function Example() {
   return (
     <CityMap>
-      <div className="flex w-72 flex-col gap-3 text-sm">
-        <CityMapMap className="relative h-44 rounded-xl border border-border bg-muted/40 outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+      <div data-slot="stack">
+        <CityMapMap>
           {Object.entries(cities).map(([city, { x, y }]) => (
-            <CityMapCity
-              key={city}
-              value={city}
-              aria-hidden="true"
-              style={{ left: `${x}%`, top: `${y}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full px-2 py-0.5 text-xs data-chosen:bg-primary data-chosen:text-primary-foreground"
-            >
+            <CityMapCity key={city} value={city} aria-hidden="true" style={{ left: `${x}%`, top: `${y}%` }}>
               {city}
             </CityMapCity>
           ))}
         </CityMapMap>
-        <div className="flex justify-center gap-1">
+        <div data-slot="row">
           {Object.entries(labels).map(([key, label]) => (
-            <CityMapArrow
-              key={key}
-              value={key}
-              className="rounded-md border border-border px-2.5 py-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
+            <CityMapArrow key={key} value={key} data-size="sm">
               {label}
             </CityMapArrow>
           ))}

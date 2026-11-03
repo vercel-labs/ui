@@ -279,10 +279,10 @@ const days = [
 ]
 
 const tones = {
-  sky: "border-sky-500 bg-sky-500/15 text-sky-950 dark:text-sky-100",
-  violet: "border-violet-500 bg-violet-500/15 text-violet-950 dark:text-violet-100",
-  emerald: "border-emerald-500 bg-emerald-500/15 text-emerald-950 dark:text-emerald-100",
-  amber: "border-amber-500 bg-amber-500/15 text-amber-950 dark:text-amber-100",
+  sky: "#0ea5e9",
+  violet: "#8b5cf6",
+  emerald: "#10b981",
+  amber: "#f59e0b",
 }
 
 const defaultEvents: CalendarEvent[] = [
@@ -301,83 +301,57 @@ const defaultEvents: CalendarEvent[] = [
 const min = 8 * 60
 const max = 18 * 60
 const hour = 48
-const button = "h-8 rounded-md border border-border px-3 text-sm disabled:opacity-50"
 
 function Example() {
   return (
-    <WeekCalendar
-      defaultEvents={defaultEvents}
-      min={min}
-      max={max}
-      aria-label="Week"
-      className="flex w-full max-w-3xl flex-col gap-2 text-sm"
-    >
-      <div className="flex items-center gap-2">
-        <WeekCalendarUndo className={button}>Undo</WeekCalendarUndo>
-        <WeekCalendarRedo className={button}>Redo</WeekCalendarRedo>
-        <span className="text-muted-foreground">Drag a day to add an event.</span>
+    <WeekCalendar defaultEvents={defaultEvents} min={min} max={max} aria-label="Week">
+      <div data-slot="row">
+        <WeekCalendarUndo>Undo</WeekCalendarUndo>
+        <WeekCalendarRedo>Redo</WeekCalendarRedo>
+        <span data-slot="hint">Drag a day to add an event.</span>
       </div>
-      <div className="overflow-hidden rounded-xl border border-border">
-        <div className="grid grid-cols-[3rem_repeat(5,minmax(0,1fr))] border-b border-border bg-muted/40">
+      <div data-slot="week-calendar-frame">
+        <div data-slot="week-calendar-head">
           <span />
           {days.map((day) => (
-            <span
-              key={day.value}
-              aria-hidden="true"
-              className="px-2 py-1.5 text-xs font-medium text-muted-foreground"
-            >
+            <span key={day.value} aria-hidden="true">
               {day.label.slice(0, 3)}
             </span>
           ))}
         </div>
-        <div className="h-96 overflow-y-auto">
+        <div data-slot="scroll">
           <div
-            className="grid grid-cols-[3rem_repeat(5,minmax(0,1fr))]"
-            style={{ height: ((max - min) / 60) * hour }}
+            data-slot="week-calendar-body"
+            style={{ "--hour": `${hour}px`, height: ((max - min) / 60) * hour } as React.CSSProperties}
           >
-            <div aria-hidden="true" className="relative">
+            <div aria-hidden="true" data-slot="week-calendar-gutter">
               {Array.from({ length: (max - min) / 60 }, (_, i) => (
-                <span
-                  key={i}
-                  className="absolute right-1.5 text-[10px] text-muted-foreground"
-                  style={{ top: i * hour }}
-                >
+                <span key={i} style={{ top: i * hour }}>
                   {formatTime(min + i * 60)}
                 </span>
               ))}
             </div>
             {days.map((day) => (
-              <WeekCalendarDay
-                key={day.value}
-                value={day.value}
-                label={day.label}
-                className="border-l border-border bg-[repeating-linear-gradient(to_bottom,var(--border)_0_1px,transparent_1px_48px)]"
-              >
+              <WeekCalendarDay key={day.value} value={day.value} label={day.label}>
                 {({ events }) =>
                   events.map((event) => (
                     <WeekCalendarEvent
                       key={event.id}
                       value={event.id}
-                      className={`flex cursor-grab flex-col overflow-hidden rounded-md border-l-2 px-1.5 py-0.5 text-xs outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:z-10 data-dragging:cursor-grabbing data-dragging:shadow-lg data-drawing:opacity-80 data-resizing:z-10 ${tones[(event.tone as keyof typeof tones) ?? "sky"] ?? tones.sky}`}
+                      style={
+                        {
+                          "--tone": tones[(event.tone as keyof typeof tones) ?? "sky"] ?? tones.sky,
+                        } as React.CSSProperties
+                      }
                     >
                       {({ editing }) => (
                         <>
-                          <WeekCalendarEventEdge
-                            edge="start"
-                            className="absolute inset-x-0 top-0 h-1.5 cursor-ns-resize"
-                          />
-                          {editing ? (
-                            <WeekCalendarEventInput className="w-full min-w-0 rounded-sm bg-background px-1 font-medium text-foreground outline-none" />
-                          ) : (
-                            <span className="truncate font-medium">{event.title}</span>
-                          )}
-                          <span className="truncate opacity-70">
+                          <WeekCalendarEventEdge edge="start" />
+                          {editing ? <WeekCalendarEventInput /> : <span>{event.title}</span>}
+                          <span data-slot="hint">
                             {formatTime(event.start)} – {formatTime(event.end)}
                           </span>
-                          <WeekCalendarEventEdge
-                            edge="end"
-                            className="absolute inset-x-0 bottom-0 h-1.5 cursor-ns-resize"
-                          />
+                          <WeekCalendarEventEdge edge="end" />
                         </>
                       )}
                     </WeekCalendarEvent>

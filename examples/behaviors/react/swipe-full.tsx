@@ -138,58 +138,35 @@ function Example() {
       pinned="Pinned: welcome"
       first={messages[1]}
       onAction={(key: string, side: SwipeSide) => (side === "start" ? toggleRead(key) : archive(key))}
-      className="flex w-72 flex-col gap-2"
     >
-      <MailboxList
-        aria-label="Mailbox"
-        className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border"
-      >
+      <MailboxList aria-label="Mailbox">
         {messages.map((message) => (
-          <MailboxRow
-            key={message}
-            value={message}
-            className="outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
-            <MailboxContent
-              value={message}
-              className="flex justify-between bg-background px-4 py-3 text-sm transition-transform data-full:bg-muted data-swiping:transition-none"
-            >
+          <MailboxRow key={message} value={message}>
+            <MailboxContent value={message}>
               {message}
-              {read.includes(message) && <span className="text-xs text-muted-foreground">Read</span>}
+              {read.includes(message) && <span data-slot="hint">Read</span>}
             </MailboxContent>
             <MailboxActions row={message} side="start">
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={() => toggleRead(message)}
-                className="bg-primary px-4 text-sm text-primary-foreground"
-              >
+              <button type="button" tabIndex={-1} data-variant="solid" onClick={() => toggleRead(message)}>
                 {read.includes(message) ? "Unread" : "Read"}
               </button>
             </MailboxActions>
             <MailboxActions row={message} side="end">
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={() => archive(message)}
-                className="bg-muted px-4 text-sm text-foreground"
-              >
+              <button type="button" tabIndex={-1} onClick={() => archive(message)}>
                 Archive
               </button>
             </MailboxActions>
           </MailboxRow>
         ))}
       </MailboxList>
-      <div className="flex items-center gap-2">
-        <MailboxAction value="peek" className="rounded-md border border-border px-2 py-1 text-xs">
+      <div data-slot="row">
+        <MailboxAction data-size="sm" value="peek">
           Peek
         </MailboxAction>
-        <MailboxAction value="close" className="rounded-md border border-border px-2 py-1 text-xs">
+        <MailboxAction data-size="sm" value="close">
           Close
         </MailboxAction>
-        <p className="text-xs text-muted-foreground">
-          {archived ? `Archived ${archived}` : "Nothing archived"}
-        </p>
+        <p data-slot="hint">{archived ? `Archived ${archived}` : "Nothing archived"}</p>
       </div>
     </Mailbox>
   )

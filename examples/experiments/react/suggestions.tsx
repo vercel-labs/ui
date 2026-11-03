@@ -15,7 +15,7 @@ import { createParts } from "@ui-sdk/react/primitive"
 import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { stageChanges } from "@ui-sdk/react/timeline"
-import { Check, X } from "lucide-react"
+import { CheckIcon, XIcon } from "lucide-react"
 
 type Agent = ReturnType<typeof createAgent>
 
@@ -327,41 +327,33 @@ const proposed: Suggestion[] = [
   { id: "brightness", ref: "Brightness", value: 80, reason: "The room is bright" },
 ]
 
-const action = "invisible rounded-md p-1 group-data-[status=pending]:visible hover:bg-background"
-
 function Example() {
   return (
     <Suggestions agent={agent} suggestions={proposed}>
-      <div className="flex w-full flex-wrap items-start justify-center gap-6">
+      <div data-slot="suggestions-layout">
         <Settings />
-        <div className="flex w-72 flex-col gap-1 rounded-xl border p-1.5">
-          <SuggestionsList aria-label="Suggestions" className="flex flex-col gap-1">
+        <div data-slot="suggestions-panel">
+          <SuggestionsList aria-label="Suggestions">
             {proposed.map((suggestion) => (
-              <SuggestionsItem
-                key={suggestion.id}
-                value={suggestion.id}
-                className="group flex items-center gap-2 rounded-lg p-2 text-sm outline-none data-previewing:bg-accent data-[status=accepted]:opacity-60 data-[status=rejected]:line-through data-[status=rejected]:opacity-40 focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                <span className="flex flex-1 flex-col">
-                  <span className="font-medium">
+              <SuggestionsItem key={suggestion.id} value={suggestion.id}>
+                <span data-slot="stack">
+                  <span>
                     {suggestion.ref} to {showValue(suggestion.value)}
                   </span>
-                  <span className="text-xs text-muted-foreground">{suggestion.reason}</span>
+                  <span data-slot="hint">{suggestion.reason}</span>
                 </span>
-                <SuggestionsAccept value={suggestion.id} aria-label="Accept" className={action}>
-                  <Check className="size-4" />
+                <SuggestionsAccept value={suggestion.id} aria-label="Accept">
+                  <CheckIcon />
                 </SuggestionsAccept>
-                <SuggestionsReject value={suggestion.id} aria-label="Reject" className={action}>
-                  <X className="size-4" />
+                <SuggestionsReject value={suggestion.id} aria-label="Reject">
+                  <XIcon />
                 </SuggestionsReject>
               </SuggestionsItem>
             ))}
           </SuggestionsList>
-          <SuggestionsAcceptAll className="mt-1 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50">
-            Accept all
-          </SuggestionsAcceptAll>
+          <SuggestionsAcceptAll data-variant="solid">Accept all</SuggestionsAcceptAll>
         </div>
-        <SuggestionsSpotlight className="z-50 rounded-xl ring-2 ring-violet-500 ring-offset-4 ring-offset-background transition-all" />
+        <SuggestionsSpotlight />
       </div>
     </Suggestions>
   )
@@ -369,16 +361,13 @@ function Example() {
 
 function Level({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center gap-4">
-      <span className="w-24">{label}</span>
-      <Slider defaultValue={value} className="flex-1">
-        <SliderControl className="flex w-full items-center py-2 select-none">
-          <SliderTrack className="h-1 w-full rounded-full bg-input/90">
-            <SliderIndicator className="rounded-full bg-primary" />
-            <SliderThumb
-              aria-label={label}
-              className="block size-4 rounded-full bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-ring/30"
-            />
+    <div data-slot="row">
+      <span>{label}</span>
+      <Slider defaultValue={value}>
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb aria-label={label} />
           </SliderTrack>
         </SliderControl>
       </Slider>
@@ -388,13 +377,13 @@ function Level({ label, value }: { label: string; value: number }) {
 
 function Settings() {
   return (
-    <div className="flex w-72 flex-col gap-4 rounded-xl border border-border p-4 text-sm font-medium">
+    <div data-slot="suggestions-settings">
       <Level label="Volume" value={70} />
       <Level label="Brightness" value={40} />
-      <label className="flex items-center gap-4">
-        <span className="w-24">Focus mode</span>
-        <Switch className="inline-flex h-5 w-8 shrink-0 items-center rounded-full border-2 border-transparent bg-input/90 outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:bg-primary">
-          <SwitchThumb className="block size-4 rounded-full bg-background shadow-sm transition-transform data-checked:translate-x-[calc(100%-4px)]" />
+      <label data-slot="label">
+        <span>Focus mode</span>
+        <Switch>
+          <SwitchThumb />
         </Switch>
       </label>
     </div>

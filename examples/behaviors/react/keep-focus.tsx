@@ -42,30 +42,25 @@ const ChecklistTask = parts.Task
 
 const tasks = ["Write the intro", "Add examples", "Fix the links"]
 
-const taskClass =
-  "w-full rounded-md border border-border px-3 py-1.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-pressed:text-muted-foreground aria-pressed:line-through"
-
 function Example() {
   const [keep, setKeep] = React.useState(true)
   return (
-    <div className="flex flex-col gap-3 text-sm">
-      <label className="flex items-center gap-2 text-muted-foreground">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={keep} onChange={(event) => setKeep(event.target.checked)} />
         Keep focus on the task
       </label>
-      <Checklist keep={keep} className="grid min-h-36 w-80 grid-cols-2 items-start gap-3">
+      <Checklist keep={keep}>
         {({ done }) =>
           [false, true].map((finished) => (
-            <section key={String(finished)} className="flex flex-col gap-1.5">
-              <h4 className="font-medium">{finished ? "Done" : "To do"}</h4>
-              <ChecklistList aria-label={finished ? "Done" : "To do"} className="flex flex-col gap-1">
+            <section key={String(finished)} data-slot="keep-focus-column">
+              <h4>{finished ? "Done" : "To do"}</h4>
+              <ChecklistList aria-label={finished ? "Done" : "To do"}>
                 {tasks
                   .filter((task) => done.includes(task) === finished)
                   .map((task) => (
                     <li key={task}>
-                      <ChecklistTask value={task} className={taskClass}>
-                        {task}
-                      </ChecklistTask>
+                      <ChecklistTask value={task}>{task}</ChecklistTask>
                     </li>
                   ))}
               </ChecklistList>

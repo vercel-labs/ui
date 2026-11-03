@@ -86,16 +86,10 @@ function AccessMenu({ access }: { access: Access }) {
   const { api } = useShare()
   return (
     <Menu onAction={(value) => api.setAccess(value as Access)}>
-      <MenuTrigger className="rounded-md border border-border px-2 py-1 text-xs outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30">
-        {labels[access]}
-      </MenuTrigger>
-      <MenuContent className="min-w-32 rounded-xl bg-popover p-1 text-sm shadow-lg ring-1 ring-foreground/5 outline-none">
+      <MenuTrigger data-size="sm">{labels[access]}</MenuTrigger>
+      <MenuContent>
         {(Object.keys(labels) as Access[]).map((value) => (
-          <MenuItem
-            key={value}
-            value={value}
-            className="rounded-lg px-2 py-1.5 outline-none select-none data-highlighted:bg-accent"
-          >
+          <MenuItem key={value} value={value}>
             {labels[value]}
           </MenuItem>
         ))}
@@ -107,13 +101,8 @@ function AccessMenu({ access }: { access: Access }) {
 function Example() {
   return (
     <Share>
-      <ShareTrigger className="h-8 rounded-2xl border border-border px-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30">
-        Share
-      </ShareTrigger>
-      <SharePanel
-        aria-label="Share"
-        className="flex w-64 items-center justify-between gap-2 rounded-xl border border-border bg-popover p-3 text-sm shadow-lg"
-      >
+      <ShareTrigger>Share</ShareTrigger>
+      <SharePanel aria-label="Share">
         {({ access }) => (
           <>
             <span>Anyone with the link</span>

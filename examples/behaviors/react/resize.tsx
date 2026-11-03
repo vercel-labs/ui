@@ -63,38 +63,20 @@ function FrameHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<
   return usePart(frame, "handle", { id: handle, handle }, props, "div")
 }
 
-const places: Record<Exclude<ResizeHandle, "move">, string> = {
-  nw: "-left-1.5 -top-1.5 cursor-nwse-resize",
-  n: "left-1/2 -top-1.5 -translate-x-1/2 cursor-ns-resize",
-  ne: "-right-1.5 -top-1.5 cursor-nesw-resize",
-  e: "-right-1.5 top-1/2 -translate-y-1/2 cursor-ew-resize",
-  se: "-right-1.5 -bottom-1.5 cursor-nwse-resize",
-  s: "left-1/2 -bottom-1.5 -translate-x-1/2 cursor-ns-resize",
-  sw: "-left-1.5 -bottom-1.5 cursor-nesw-resize",
-  w: "-left-1.5 top-1/2 -translate-y-1/2 cursor-ew-resize",
-}
+const handles: Exclude<ResizeHandle, "move">[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"]
 
 function Example() {
   const [box, setBox] = React.useState({ x: 88, y: 48, width: 140, height: 92 })
   return (
-    <div className="flex flex-col gap-2">
-      <div className="relative h-[200px] w-[320px] rounded-xl border border-border bg-muted/40">
-        <Frame
-          aria-label="Frame"
-          defaultBox={box}
-          onBoxesChange={(boxes) => setBox(boxes.frame)}
-          className="cursor-move rounded-sm border-2 border-primary bg-primary/10"
-        >
-          {(Object.keys(places) as (keyof typeof places)[]).map((name) => (
-            <FrameHandle
-              key={name}
-              handle={name}
-              className={`absolute size-3 rounded-full border-2 border-primary bg-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${places[name]}`}
-            />
+    <div data-slot="stack">
+      <div data-slot="resize-stage">
+        <Frame aria-label="Frame" defaultBox={box} onBoxesChange={(boxes) => setBox(boxes.frame)}>
+          {handles.map((name) => (
+            <FrameHandle key={name} handle={name} />
           ))}
         </Frame>
       </div>
-      <p className="text-xs text-muted-foreground tabular-nums">
+      <p data-slot="output">
         {box.width} × {box.height} at {box.x}, {box.y}
       </p>
     </div>

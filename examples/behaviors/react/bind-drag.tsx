@@ -82,13 +82,10 @@ const SplitDivider = parts.Divider
 
 function Example() {
   return (
-    <Split className="flex h-40 w-full max-w-md overflow-hidden rounded-xl border border-border text-sm select-none">
-      <div className="grid w-(--split) place-items-center bg-muted/50">Files</div>
-      <SplitDivider
-        aria-label="Resize panes"
-        className="w-1.5 cursor-col-resize bg-border outline-none hover:bg-primary/50 focus-visible:bg-primary"
-      />
-      <div className="grid flex-1 place-items-center">Editor</div>
+    <Split>
+      <div data-slot="bind-pane">Files</div>
+      <SplitDivider aria-label="Resize panes" />
+      <div data-slot="bind-pane">Editor</div>
     </Split>
   )
 }

@@ -32,16 +32,12 @@ function Example() {
     }
   }
   return (
-    <div className="flex w-80 flex-col gap-3 text-sm">
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={check}
-          className="h-8 rounded-lg bg-foreground px-3 font-medium text-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+    <div data-slot="check">
+      <div data-slot="row">
+        <button type="button" data-variant="solid" onClick={check}>
           Check both directions
         </button>
-        <label className="flex items-center gap-2 text-muted-foreground">
+        <label data-slot="label">
           <input
             type="checkbox"
             checked={broken}
@@ -54,7 +50,7 @@ function Example() {
         </label>
       </div>
       {result && (
-        <p role="status" className={result.ok ? "" : "whitespace-pre-wrap font-medium text-foreground"}>
+        <p role="status" data-slot="check-result" data-status={result.ok ? "pass" : "fail"}>
           {result.text}
         </p>
       )}

@@ -37,11 +37,11 @@ stale_frameworks() {
     -not -path '*/node_modules/*' -not -path '*/dist/*' -not -name '*.test.ts' 2>/dev/null |
     while read -r file; do
       case "${file#"$root"/}" in
-        examples/*/react/* | examples/mount/react.ts | packages/react/*) echo react ;;
-        examples/*/vue/* | examples/mount/vue.ts | packages/vue/*) echo vue ;;
-        examples/*/svelte/* | examples/mount/svelte.ts | packages/svelte/*) echo svelte ;;
-        examples/*/solid/* | examples/mount/solid.ts | packages/solid/*) echo solid ;;
-        examples/*/web/* | examples/mount/web.ts | packages/web/*) echo web ;;
+        examples/*/react/* | examples/components/*/react/* | examples/mount/react.ts | packages/react/*) echo react ;;
+        examples/*/vue/* | examples/components/*/vue/* | examples/mount/vue.ts | packages/vue/*) echo vue ;;
+        examples/*/svelte/* | examples/components/*/svelte/* | examples/mount/svelte.ts | packages/svelte/*) echo svelte ;;
+        examples/*/solid/* | examples/components/*/solid/* | examples/mount/solid.ts | packages/solid/*) echo solid ;;
+        examples/*/web/* | examples/components/*/web/* | examples/mount/web.ts | packages/web/*) echo web ;;
         *) echo "$frameworks" ;;
       esac
     done | tr ' ' '\n' | sort -u | tr '\n' ' '

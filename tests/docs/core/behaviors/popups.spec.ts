@@ -21,7 +21,8 @@ test("own popup: Escape, a press outside and Done each close it, and focus goes 
   await expect(trigger).toBeFocused()
   await trigger.click()
   await expect(popover).toBeVisible()
-  await page.mouse.click(5, 5)
+  const corner = (await page.locator('[data-example="behaviors/popup-own"]').boundingBox())!
+  await page.mouse.click(corner.x + 5, corner.y + 5)
   await expect(popover).toBeHidden()
   await trigger.click()
   await popover.getByRole("button", { name: "Done" }).click()
@@ -71,6 +72,7 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await count.click()
   await expect(status, "not modal: a press outside closes it").toHaveText("Closed by outside-press")
   await expect(count, "not modal: the press reaches the button beneath").toHaveText("Likes 1")
+  await expect(content).toBeHidden()
   await example.getByRole("checkbox", { name: "Modal" }).check()
   await cart.click()
   await expect(count).toHaveAttribute("inert", "")
@@ -86,6 +88,7 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await expect(content).toBeVisible()
   await content.getByRole("button", { name: "Check out" }).click()
   await expect(status).toHaveText("Closed by close-press")
+  await expect(content).toBeHidden()
   await example.getByRole("checkbox", { name: "Dismissible" }).check()
   await example.getByRole("checkbox", { name: "Open on hover" }).check()
   await cart.hover()
@@ -107,9 +110,12 @@ test("payload: every avatar opens the same card with its own person", async ({ p
   const moved = page.getByRole("dialog", { name: "Grace Hopper" })
   await expect(moved).toBeVisible()
   await expect(moved).toHaveAccessibleDescription("Compilers")
-  const at = (await moved.boundingBox())!
-  const from = (await grace.boundingBox())!
-  expect(Math.abs(at.x + at.width / 2 - (from.x + from.width / 2))).toBeLessThan(2)
+  const offset = async () => {
+    const at = (await moved.boundingBox())!
+    const from = (await grace.boundingBox())!
+    return Math.abs(at.x + at.width / 2 - (from.x + from.width / 2))
+  }
+  await expect.poll(offset).toBeLessThan(2)
   await expect(page.locator("[data-team-shown]")).toHaveText("Grace Hopper, by trigger-press")
 })
 
@@ -227,7 +233,7 @@ test("position options: the hint lands on the side asked, follows new options, a
   await expect(arrow).toHaveAttribute("data-side", "top")
   const gap = async () =>
     (await target.boundingBox())!.y - ((await bubble.boundingBox())!.y + (await bubble.boundingBox())!.height)
-  expect(Math.round(await gap())).toBe(8)
+  await expect.poll(async () => Math.round(await gap())).toBe(8)
   await page.getByLabel("sideOffset").fill("30")
   await expect.poll(async () => Math.round(await gap())).toBe(30)
   await page.getByRole("combobox", { name: /^Side/ }).selectOption("right")

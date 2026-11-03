@@ -104,29 +104,22 @@ const messages = ["Lunch on Friday?", "Your invoice is ready", "Design review no
 
 function Example() {
   return (
-    <Inbox className="flex w-72 flex-col gap-2 text-sm">
+    <Inbox>
       {({ refreshing, speed, refreshed }) => (
         <>
-          <div className="relative h-48 overflow-hidden rounded-xl border border-border bg-muted">
-            <p className="absolute inset-x-0 top-3 text-center text-xs text-muted-foreground">
-              {refreshing ? "Refreshing…" : "Pull to refresh"}
-            </p>
-            <InboxList
-              aria-label="Inbox"
-              className="relative flex h-full cursor-grab flex-col divide-y divide-border bg-background select-none data-pulling:cursor-grabbing"
-            >
+          <div data-slot="gesture-frame">
+            <p>{refreshing ? "Refreshing…" : "Pull to refresh"}</p>
+            <InboxList aria-label="Inbox">
               {messages.map((message) => (
-                <div key={message} role="listitem" className="px-3 py-2.5">
+                <div key={message} role="listitem">
                   {message}
                 </div>
               ))}
             </InboxList>
           </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <InboxRefresh className="rounded-md border border-border px-2 py-1 text-foreground">
-              Refresh
-            </InboxRefresh>
-            <span data-pull-state>
+          <div data-slot="row">
+            <InboxRefresh data-size="sm">Refresh</InboxRefresh>
+            <span data-pull-state data-slot="hint">
               {speed === null ? "" : `Let go at ${speed.toFixed(2)} px/ms, `}
               refreshed {refreshed} {refreshed === 1 ? "time" : "times"}
             </span>

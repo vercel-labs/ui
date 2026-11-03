@@ -92,35 +92,17 @@ const TabsTab = parts.Tab
 
 const TabsPanel = parts.Panel
 
-const tab =
-  "h-11 min-w-11 rounded-2xl px-2 text-sm font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 aria-selected:bg-muted aria-selected:text-foreground"
-
-const panel =
-  "min-h-20 rounded-xl border border-border bg-card p-4 text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-
 function Example() {
   return (
-    <Tabs defaultValue="overview" className="flex w-full max-w-sm flex-col gap-3 text-sm">
-      <TabsList aria-label="Project" className="grid grid-cols-3 gap-1">
-        <TabsTab value="overview" className={tab}>
-          Overview
-        </TabsTab>
-        <TabsTab value="activity" className={tab}>
-          Activity
-        </TabsTab>
-        <TabsTab value="files" className={tab}>
-          Files
-        </TabsTab>
+    <Tabs defaultValue="overview">
+      <TabsList aria-label="Project">
+        <TabsTab value="overview">Overview</TabsTab>
+        <TabsTab value="activity">Activity</TabsTab>
+        <TabsTab value="files">Files</TabsTab>
       </TabsList>
-      <TabsPanel value="overview" className={panel}>
-        Eight of twelve tasks are done.
-      </TabsPanel>
-      <TabsPanel value="activity" className={panel}>
-        The homepage design was approved.
-      </TabsPanel>
-      <TabsPanel value="files" className={panel}>
-        Project brief, wireframes and brand assets.
-      </TabsPanel>
+      <TabsPanel value="overview">Eight of twelve tasks are done.</TabsPanel>
+      <TabsPanel value="activity">The homepage design was approved.</TabsPanel>
+      <TabsPanel value="files">Project brief, wireframes and brand assets.</TabsPanel>
     </Tabs>
   )
 }

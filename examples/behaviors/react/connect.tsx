@@ -151,32 +151,24 @@ const nodes: FlowNode[] = [
   { value: "summary", label: "Summary", x: 200, y: 124 },
 ]
 
-const port =
-  "absolute top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-background bg-muted-foreground/60 data-[side=left]:-left-1.5 data-[side=right]:-right-1.5 data-[connect=candidate]:bg-foreground/60 data-[connect=source]:bg-foreground data-[connect=target]:scale-150 data-[connect=target]:bg-foreground"
-
 function Example() {
   return (
-    <Flow nodes={nodes} className="h-45 w-80 text-sm">
+    <Flow nodes={nodes}>
       {({ edges }) => (
         <>
-          <svg className="pointer-events-none absolute inset-0 size-full overflow-visible fill-none stroke-2">
+          <svg data-slot="connect-edges">
             {edges.map((edge) => (
-              <FlowEdgePath key={`${edge.from}>${edge.to}`} edge={edge} className="stroke-foreground" />
+              <FlowEdgePath key={`${edge.from}>${edge.to}`} edge={edge} />
             ))}
-            <FlowDraft className="stroke-foreground/60 [stroke-dasharray:4_4]" />
+            <FlowDraft />
           </svg>
           {nodes.map((node) => (
-            <FlowNode
-              key={node.value}
-              value={node.value}
-              aria-label={node.label}
-              className="grid place-items-center rounded-lg border border-border bg-background shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
+            <FlowNode key={node.value} value={node.value} aria-label={node.label}>
               {node.label}
               {node.value === "prompt" ? (
-                <FlowPort value="prompt:out" className={port} />
+                <FlowPort value="prompt:out" />
               ) : (
-                <FlowPort value={`${node.value}:in`} className={port} />
+                <FlowPort value={`${node.value}:in`} />
               )}
             </FlowNode>
           ))}

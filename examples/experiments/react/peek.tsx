@@ -110,10 +110,10 @@ const Peek = parts.Root
 const PeekOption = parts.Option
 
 const themes = {
-  paper: { label: "Paper", card: "bg-white text-neutral-900", accent: "bg-neutral-900" },
-  night: { label: "Night", card: "bg-neutral-900 text-neutral-100", accent: "bg-sky-400" },
-  sepia: { label: "Sepia", card: "bg-amber-50 text-amber-950", accent: "bg-amber-700" },
-  forest: { label: "Forest", card: "bg-emerald-950 text-emerald-50", accent: "bg-emerald-400" },
+  paper: { label: "Paper", card: "#ffffff", text: "#171717", accent: "#171717" },
+  night: { label: "Night", card: "#171717", text: "#f5f5f5", accent: "#38bdf8" },
+  sepia: { label: "Sepia", card: "#fffbeb", text: "#451a03", accent: "#b45309" },
+  forest: { label: "Forest", card: "#022c22", text: "#ecfdf5", accent: "#34d399" },
 }
 type Theme = keyof typeof themes
 
@@ -122,31 +122,24 @@ function Example() {
   const [preview, setPreview] = React.useState<string | null>(null)
   const shown = themes[(preview ?? value ?? "paper") as Theme]
   return (
-    <div className="flex w-full max-w-sm flex-col gap-4">
+    <div data-slot="stack">
       <div
-        className={`flex flex-col gap-2 rounded-xl border border-border p-5 shadow-sm transition-colors ${shown.card}`}
+        data-slot="peek-card"
+        style={
+          { "--card": shown.card, "--card-text": shown.text, "--accent": shown.accent } as React.CSSProperties
+        }
       >
-        <span className={`h-1.5 w-10 rounded-full ${shown.accent}`} />
-        <span className="font-medium">Reading view</span>
-        <span className="text-sm opacity-70">
+        <span data-slot="peek-accent" />
+        <span>Reading view</span>
+        <span>
           {preview
             ? `Previewing ${themes[preview as Theme].label}. Let go to keep it.`
             : "Press a theme and slide across the others."}
         </span>
       </div>
-      <Peek
-        value={value}
-        onValueChange={setValue}
-        onPreviewChange={setPreview}
-        aria-label="Theme"
-        className="flex gap-1 rounded-xl bg-muted p-1"
-      >
+      <Peek value={value} onValueChange={setValue} onPreviewChange={setPreview} aria-label="Theme">
         {Object.entries(themes).map(([key, theme]) => (
-          <PeekOption
-            key={key}
-            value={key}
-            className="flex-1 rounded-lg px-2 py-1.5 text-sm text-muted-foreground outline-none data-checked:bg-background data-checked:text-foreground data-checked:shadow-sm data-previewing:bg-background/60 data-previewing:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
+          <PeekOption key={key} value={key}>
             {theme.label}
           </PeekOption>
         ))}

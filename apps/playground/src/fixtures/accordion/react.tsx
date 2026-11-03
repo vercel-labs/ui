@@ -16,6 +16,7 @@ const controller = createAccordionController()
 function Fixture() {
   const [action, setAction] = React.useState("")
   const [complete, setComplete] = React.useState("")
+  const [warrantyEnabled, setWarrantyEnabled] = React.useState(false)
   const { cancel, ...options } = accordionOptions()
   return (
     <div className="fixture">
@@ -35,7 +36,7 @@ function Fixture() {
             key={item.value}
             className="accordion-item"
             value={item.value}
-            disabled={item.disabled}
+            disabled={item.disabled && !warrantyEnabled}
             onOpenChangeComplete={(open) => setComplete(`${item.value} ${open ? "open" : "closed"}`)}
           >
             <AccordionHeader className="accordion-header">
@@ -60,6 +61,7 @@ function Fixture() {
       </output>
       <output aria-label="Last completed">{complete}</output>
       <button onClick={() => controller.open("support")}>Show support</button>
+      <button onClick={() => setWarrantyEnabled((enabled) => !enabled)}>Toggle warranty</button>
     </div>
   )
 }

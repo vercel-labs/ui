@@ -63,23 +63,15 @@ const ToastDismiss = parts.Dismiss
 
 function Example() {
   return (
-    <Toasts className="flex h-56 w-72 flex-col gap-2 text-sm">
+    <Toasts>
       {({ toasts }) => (
         <>
-          <ToastsAdd className="shrink-0 self-start rounded-md border border-border px-2 py-1 text-xs">
-            Save
-          </ToastsAdd>
-          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-1">
+          <ToastsAdd data-size="sm">Save</ToastsAdd>
+          <div data-slot="scroll">
             {toasts.map((key) => (
-              <Toast
-                key={key}
-                value={key}
-                className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 shadow-sm transition-[opacity,translate] duration-200 data-ending-style:opacity-0 data-starting-style:translate-y-2 data-starting-style:opacity-0 motion-reduce:transition-none"
-              >
+              <Toast key={key} value={key}>
                 Saved
-                <ToastDismiss value={key} className="rounded px-1 text-muted-foreground">
-                  ✕
-                </ToastDismiss>
+                <ToastDismiss value={key}>✕</ToastDismiss>
               </Toast>
             ))}
           </div>

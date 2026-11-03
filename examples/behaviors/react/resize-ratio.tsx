@@ -65,45 +65,34 @@ function VideoHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<
   return usePart(video, "handle", { id: handle, handle }, props, "div")
 }
 
-const places: Partial<Record<ResizeHandle, [string, string]>> = {
-  nw: ["Top left", "-left-1.5 -top-1.5"],
-  ne: ["Top right", "-right-1.5 -top-1.5"],
-  e: ["Right", "-right-1.5 top-1/2 -translate-y-1/2"],
-  se: ["Bottom right", "-right-1.5 -bottom-1.5"],
-  sw: ["Bottom left", "-left-1.5 -bottom-1.5"],
-  w: ["Left", "-left-1.5 top-1/2 -translate-y-1/2"],
+const places: Partial<Record<ResizeHandle, string>> = {
+  nw: "Top left",
+  ne: "Top right",
+  e: "Right",
+  se: "Bottom right",
+  sw: "Bottom left",
+  w: "Left",
 }
 
 function Example() {
   const [locked, setLocked] = React.useState(true)
   const [box, setBox] = React.useState({ width: 160, height: 90 })
   return (
-    <div className="flex flex-col gap-2">
-      <div className="relative h-[200px] w-[320px] rounded-xl border border-border bg-muted/40">
-        <Video
-          aria-label="Video"
-          locked={locked}
-          onBoxesChange={(boxes) => setBox(boxes.video)}
-          className="grid cursor-move place-items-center rounded-sm bg-foreground/80 text-xs text-background"
-        >
+    <div data-slot="stack">
+      <div data-slot="resize-stage">
+        <Video aria-label="Video" locked={locked} onBoxesChange={(boxes) => setBox(boxes.video)}>
           ▶
           {(Object.keys(places) as ResizeHandle[]).map((name) => (
-            <VideoHandle
-              key={name}
-              handle={name}
-              aria-label={`${places[name]![0]} handle`}
-              tabIndex={0}
-              className={`absolute size-3 rounded-full border-2 border-primary bg-background outline-none focus-visible:ring-3 focus-visible:ring-ring/50 ${places[name]![1]}`}
-            />
+            <VideoHandle key={name} handle={name} aria-label={`${places[name]} handle`} tabIndex={0} />
           ))}
         </Video>
       </div>
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <label className="flex items-center gap-1.5">
+      <div data-slot="row">
+        <label data-slot="label">
           <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
           Keep 16:9
         </label>
-        <span className="tabular-nums">
+        <span data-slot="hint">
           {Math.round(box.width)} × {Math.round(box.height)}
         </span>
       </div>

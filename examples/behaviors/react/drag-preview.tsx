@@ -91,28 +91,19 @@ const TaggerNote = parts.Note
 function Example() {
   return (
     <Tagger>
-      <div className="flex w-72 flex-col gap-3">
-        <div className="flex gap-1.5">
+      <div data-slot="stack">
+        <div data-slot="row">
           {["Urgent", "Design", "Later"].map((tag) => (
-            <TaggerTag
-              key={tag}
-              value={tag}
-              className="rounded-full border border-border bg-background px-3 py-1 text-xs outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-drag-preview:shadow-lg data-over:border-primary data-over:bg-primary data-over:text-primary-foreground"
-            >
+            <TaggerTag data-size="sm" key={tag} value={tag}>
               {tag}
             </TaggerTag>
           ))}
         </div>
-        <TaggerNote
-          aria-label="Note"
-          className="flex min-h-24 flex-col gap-2 rounded-xl border-2 border-dashed border-border p-3 text-sm data-over:border-primary data-over:bg-primary/5"
-        >
+        <TaggerNote aria-label="Note">
           {({ tags }) => (
             <>
-              <span className="font-medium">Launch plan</span>
-              <span className="text-xs text-muted-foreground">
-                {tags.length ? `Tags: ${tags.join(", ")}` : "Drag a tag here."}
-              </span>
+              <span data-slot="label">Launch plan</span>
+              <span data-slot="hint">{tags.length ? `Tags: ${tags.join(", ")}` : "Drag a tag here."}</span>
             </>
           )}
         </TaggerNote>

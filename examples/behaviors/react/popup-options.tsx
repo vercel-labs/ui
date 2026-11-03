@@ -63,8 +63,8 @@ function Example() {
   const [status, setStatus] = React.useState("Closed")
   const [count, setCount] = React.useState(0)
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <div className="flex items-center gap-2">
+    <div data-slot="stack">
+      <div data-slot="row">
         <Cart
           open={open}
           onOpenChange={(next: boolean, details: ChangeDetails<string>) => {
@@ -77,31 +77,24 @@ function Example() {
           dismissible={dismissible}
           onDismissAttempt={(details: { reason: string }) => setStatus(`Kept open: ${details.reason}`)}
         >
-          <CartTrigger className="rounded-md border border-border px-3 py-1.5">Cart</CartTrigger>
-          <CartContent
-            sideOffset={6}
-            className="flex w-52 flex-col gap-2 rounded-xl bg-popover p-3 text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none"
-          >
+          <CartTrigger>Cart</CartTrigger>
+          <CartContent sideOffset={6}>
             <p>2 items, $48</p>
-            <CartClose className="self-end rounded-md bg-foreground px-2 py-1 text-xs text-background">
+            <CartClose data-variant="solid" data-size="sm">
               Check out
             </CartClose>
           </CartContent>
         </Cart>
-        <button
-          type="button"
-          onClick={() => setCount(count + 1)}
-          className="rounded-md border border-border px-3 py-1.5"
-        >
+        <button type="button" onClick={() => setCount(count + 1)}>
           Likes {count}
         </button>
       </div>
-      <div className="flex flex-wrap gap-3 text-xs">
-        <label className="flex items-center gap-1.5">
+      <div data-slot="row">
+        <label data-slot="label">
           <input type="checkbox" checked={modal} onChange={(event) => setModal(event.target.checked)} />
           Modal
         </label>
-        <label className="flex items-center gap-1.5">
+        <label data-slot="label">
           <input
             type="checkbox"
             checked={openOnHover}
@@ -109,7 +102,7 @@ function Example() {
           />
           Open on hover
         </label>
-        <label className="flex items-center gap-1.5">
+        <label data-slot="label">
           <input
             type="checkbox"
             checked={dismissible}
@@ -118,7 +111,7 @@ function Example() {
           Dismissible
         </label>
       </div>
-      <p data-cart-status className="text-xs text-muted-foreground">
+      <p data-cart-status data-slot="output">
         {status}
       </p>
     </div>

@@ -99,34 +99,30 @@ const DesktopAction = parts.Action
 
 function Example() {
   return (
-    <Desktop className="flex flex-col gap-2">
+    <Desktop>
       {({ mail }) => (
         <>
-          <div className="h-[180px] w-[300px] overflow-hidden rounded-xl border border-border bg-muted/40">
+          <div data-slot="resize-stage">
             <DesktopScreen>
               {Object.entries(titles).map(([key, title]) => (
-                <DesktopWindow
-                  key={key}
-                  value={key}
-                  className="cursor-move overflow-hidden rounded-md border border-border bg-background text-xs shadow-sm aria-disabled:cursor-default aria-disabled:opacity-70 data-resizing:shadow-lg"
-                >
-                  <div className="border-b border-border bg-muted px-2 py-1 font-medium">
+                <DesktopWindow key={key} value={key}>
+                  <div data-slot="resize-titlebar">
                     {title}
                     {key === "notes" && " 🔒"}
                   </div>
-                  <DesktopCorner box={key} className="absolute right-0 bottom-0 size-3 bg-primary/40" />
+                  <DesktopCorner box={key} />
                 </DesktopWindow>
               ))}
             </DesktopScreen>
           </div>
-          <div className="flex items-center gap-2">
-            <DesktopAction value="maximize" className="rounded-md border border-border px-2 py-1 text-xs">
+          <div data-slot="row">
+            <DesktopAction data-size="sm" value="maximize">
               Maximize
             </DesktopAction>
-            <DesktopAction value="grow" className="rounded-md border border-border px-2 py-1 text-xs">
+            <DesktopAction data-size="sm" value="grow">
               Grow
             </DesktopAction>
-            <p className="text-xs text-muted-foreground tabular-nums">
+            <p data-slot="output">
               Mail {Math.round(mail!.width)} × {Math.round(mail!.height)}
             </p>
           </div>

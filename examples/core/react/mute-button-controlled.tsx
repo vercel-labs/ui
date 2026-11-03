@@ -34,16 +34,8 @@ function Example() {
   const [muted, setMuted] = React.useState(false)
 
   return (
-    <MuteButton
-      muted={muted}
-      onMutedChange={setMuted}
-      className="flex items-center justify-center gap-1.5 h-8 rounded-full border border-border pl-2.5 pr-3 text-sm font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 focus-visible:border-ring aria-pressed:border-muted aria-pressed:bg-muted aria-pressed:focus-visible:border-ring"
-    >
-      {muted ? (
-        <VolumeOffIcon aria-hidden="true" className="size-4" />
-      ) : (
-        <Volume2Icon aria-hidden="true" className="size-4" />
-      )}
+    <MuteButton muted={muted} onMutedChange={setMuted}>
+      {muted ? <VolumeOffIcon aria-hidden="true" /> : <Volume2Icon aria-hidden="true" />}
       {muted ? "Unmute" : "Mute"}
     </MuteButton>
   )

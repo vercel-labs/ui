@@ -1,0 +1,105 @@
+@scope ([data-example]) {
+  [data-slot="collapsible-root"] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 20rem;
+    max-width: 100%;
+
+    & > h3 {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
+      margin: 0;
+      font: inherit;
+    }
+
+    &:not([data-open]) [data-show="open"],
+    &[data-open] [data-show="closed"] {
+      display: none;
+    }
+
+    &[data-disabled] {
+      color: var(--line-disabled);
+    }
+
+    li > & {
+      gap: 0;
+    }
+  }
+
+  [data-slot="collapsible-trigger"] {
+    align-self: flex-start;
+
+    &[data-open] > svg:last-child {
+      rotate: 180deg;
+    }
+
+    &:is([dir="rtl"], [dir="rtl"] *) > svg:first-child:not(:last-child) {
+      scale: -1 1;
+    }
+
+    &[data-open] > svg:first-child:not(:last-child) {
+      rotate: 90deg;
+    }
+
+    &[data-open]:is([dir="rtl"], [dir="rtl"] *) > svg:first-child:not(:last-child) {
+      rotate: -90deg;
+    }
+
+    &[data-variant="ghost"] {
+      align-self: stretch;
+      justify-content: flex-start;
+      height: var(--size-sm);
+      padding-inline: var(--space-1);
+      border-radius: var(--radius-row);
+      font-weight: 400;
+
+      & > svg {
+        color: var(--muted);
+      }
+    }
+  }
+
+  [data-slot="collapsible-panel"] {
+    font-size: var(--text-sm);
+  }
+
+  ul:has([data-slot="collapsible-root"]) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    & ul {
+      margin: 0;
+      margin-inline-start: 14px;
+      padding: 0;
+      padding-inline-start: 6px;
+      border-inline-start: 1px solid var(--line-faint);
+      list-style: none;
+    }
+
+    & li > [data-slot="row"] {
+      min-height: var(--size-sm);
+      padding-inline-start: calc(var(--space-1) + var(--size-icon) + var(--space-2));
+    }
+  }
+
+  /* Only this demo animates; the height transition is what it shows. */
+  :scope[data-example="collapsible/animation"] {
+    & [data-slot="collapsible-trigger"] > svg {
+      transition: rotate var(--duration);
+    }
+
+    & [data-slot="collapsible-panel"] {
+      height: var(--collapsible-panel-height);
+      overflow: hidden;
+      transition: height calc(var(--duration) * 2) ease-out;
+
+      &:is([data-starting-style], [data-ending-style]) {
+        height: 0;
+      }
+    }
+  }
+}

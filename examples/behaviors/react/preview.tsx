@@ -95,33 +95,21 @@ function Example() {
   const [shown, setShown] = React.useState("Sans")
   const [preview, setPreview] = React.useState<string | null>(null)
   return (
-    <div className="flex w-72 flex-col gap-3">
+    <div data-slot="stack">
       <p
-        className="rounded-xl border border-border p-4 text-lg"
-        style={{ fontFamily: families[preview ?? shown] }}
+        data-slot="preview-sample"
+        style={{ "--preview-font": families[preview ?? shown] } as React.CSSProperties}
       >
         The quick brown fox
       </p>
-      <Fonts
-        aria-label="Font"
-        defaultValue="Sans"
-        onValueChange={setShown}
-        onPreviewChange={setPreview}
-        className="flex gap-1 rounded-lg bg-muted p-1"
-      >
+      <Fonts aria-label="Font" defaultValue="Sans" onValueChange={setShown} onPreviewChange={setPreview}>
         {Object.keys(families).map((font) => (
-          <FontsOption
-            key={font}
-            value={font}
-            className="flex-1 rounded-md py-1.5 text-sm text-muted-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-checked:bg-background data-checked:text-foreground data-checked:shadow-sm data-previewing:bg-background/60 data-previewing:text-foreground"
-          >
+          <FontsOption key={font} value={font}>
             {font}
           </FontsOption>
         ))}
       </Fonts>
-      <p className="text-xs text-muted-foreground">
-        {preview ? `Previewing ${preview}` : `Chosen: ${shown}`}
-      </p>
+      <p data-slot="hint">{preview ? `Previewing ${preview}` : `Chosen: ${shown}`}</p>
     </div>
   )
 }

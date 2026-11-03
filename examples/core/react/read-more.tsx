@@ -39,13 +39,11 @@ const ReadMorePanel = parts.Panel
 
 function Example() {
   return (
-    <ReadMore className="flex w-80 flex-col gap-2 text-sm">
+    <ReadMore>
       <p>Core is the part of ui-sdk that makes an interface work.</p>
-      <ReadMoreTrigger className="w-fit rounded-md font-medium underline underline-offset-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-        {({ open }) => (open ? "Show less" : "Read more")}
-      </ReadMoreTrigger>
-      <div className="min-h-20">
-        <ReadMorePanel className="text-muted-foreground">
+      <ReadMoreTrigger>{({ open }) => (open ? "Show less" : "Read more")}</ReadMoreTrigger>
+      <div data-slot="read-more-body">
+        <ReadMorePanel>
           It handles what happens on every key, press and drag, so your code stays focused on how the
           interface looks.
         </ReadMorePanel>

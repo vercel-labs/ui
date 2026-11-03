@@ -23,7 +23,7 @@ import {
 } from "@ui-sdk/core"
 import { edgePath } from "../edge-path"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
-import { Maximize, Minus, Plus, X } from "lucide-react"
+import { MaximizeIcon, MinusIcon, PlusIcon, XIcon } from "lucide-react"
 
 type CanvasEdgeData = { id: string; from: string; to: string }
 
@@ -472,68 +472,42 @@ const edges = [
   { id: "draft:out->check:in", from: "draft:out", to: "check:in" },
 ]
 
-const port =
-  "absolute top-1/2 size-3 -translate-y-1/2 rounded-full border-2 border-background bg-muted-foreground/60 transition-[scale,background-color] hover:scale-150 data-[side=left]:-left-1.5 data-[side=right]:-right-1.5 data-[connect=candidate]:bg-primary/60 data-[connect=source]:bg-primary data-[connect=target]:scale-150 data-[connect=target]:bg-primary"
-const control = "rounded-lg p-1.5 hover:bg-accent"
-
 function Example() {
   return (
-    <Canvas
-      nodes={nodes}
-      defaultPositions={positions}
-      defaultEdges={edges}
-      className="h-[420px] w-full cursor-grab rounded-xl bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] [background-size:calc(16px*var(--canvas-zoom))_calc(16px*var(--canvas-zoom))] active:cursor-grabbing data-connecting:cursor-crosshair"
-    >
+    <Canvas nodes={nodes} defaultPositions={positions} defaultEdges={edges}>
       {({ edges }) => (
         <>
           <CanvasWorld>
-            <svg className="pointer-events-none absolute top-0 left-0 overflow-visible" width="1" height="1">
+            <svg data-slot="canvas-edges" width="1" height="1">
               {edges.map((edge) => (
-                <CanvasEdge
-                  key={edge.id}
-                  value={edge.id}
-                  className="stroke-muted-foreground/50"
-                  strokeWidth={2}
-                />
+                <CanvasEdge key={edge.id} value={edge.id} strokeWidth={2} />
               ))}
-              <CanvasWire
-                className="stroke-primary data-snapped:[stroke-dasharray:none]"
-                strokeWidth={2}
-                strokeDasharray="6 4"
-              />
+              <CanvasWire strokeWidth={2} strokeDasharray="6 4" />
             </svg>
             {edges.map((edge) => (
-              <CanvasUnlink
-                key={edge.id}
-                value={edge.id}
-                className="flex size-5 items-center justify-center rounded-full border border-border bg-background text-muted-foreground opacity-0 shadow-sm transition-opacity hover:text-foreground hover:opacity-100 focus-visible:opacity-100"
-              >
-                <X className="size-3" />
+              <CanvasUnlink key={edge.id} value={edge.id}>
+                <XIcon />
               </CanvasUnlink>
             ))}
             {nodes.map((node) => (
-              <CanvasNode
-                key={node.id}
-                value={node.id}
-                className="flex cursor-default items-center rounded-xl border border-border bg-card px-4 text-sm font-medium text-card-foreground shadow-sm outline-none select-none data-dragging:cursor-grabbing data-dragging:shadow-lg data-lassoed:ring-2 data-lassoed:ring-primary/40 data-selected:border-primary data-selected:ring-2 data-selected:ring-primary/30 focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
+              <CanvasNode key={node.id} value={node.id}>
                 {node.label}
-                {node.inputs && <CanvasPort side="in" className={port} />}
-                {node.outputs && <CanvasPort side="out" className={port} />}
+                {node.inputs && <CanvasPort side="in" />}
+                {node.outputs && <CanvasPort side="out" />}
               </CanvasNode>
             ))}
           </CanvasWorld>
-          <CanvasLasso className="rounded-sm border border-primary/60 bg-primary/10" />
-          <div className="absolute right-3 bottom-3 flex items-center gap-1 rounded-xl border border-border bg-background p-1 text-xs shadow-sm">
-            <CanvasZoomOut className={control}>
-              <Minus className="size-3.5" />
+          <CanvasLasso />
+          <div data-slot="canvas-controls">
+            <CanvasZoomOut>
+              <MinusIcon />
             </CanvasZoomOut>
-            <CanvasZoom className="w-10 text-center tabular-nums" />
-            <CanvasZoomIn className={control}>
-              <Plus className="size-3.5" />
+            <CanvasZoom />
+            <CanvasZoomIn>
+              <PlusIcon />
             </CanvasZoomIn>
-            <CanvasFit className={control}>
-              <Maximize className="size-3.5" />
+            <CanvasFit>
+              <MaximizeIcon />
             </CanvasFit>
           </div>
           <CanvasInstructions>

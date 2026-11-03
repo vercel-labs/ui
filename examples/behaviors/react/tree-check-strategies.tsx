@@ -84,41 +84,34 @@ const strategies: TreeCheckStrategy[] = ["leaf", "trunk", "branch", "independent
 function Example() {
   const [strategy, setStrategy] = React.useState<TreeCheckStrategy>("leaf")
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <div role="radiogroup" aria-label="Strategy" className="flex flex-wrap gap-1">
+    <div data-slot="stack">
+      <div role="radiogroup" aria-label="Strategy" data-slot="tree-behavior-strategies">
         {strategies.map((option) => (
           <button
             key={option}
             type="button"
             role="radio"
             aria-checked={strategy === option}
+            data-size="sm"
             onClick={() => setStrategy(option)}
-            className="rounded-md border border-border px-2 py-1 text-xs aria-checked:bg-muted"
           >
             {option}
           </button>
         ))}
       </div>
-      <Backup strategy={strategy} aria-label="Backup" className="flex flex-col">
+      <Backup strategy={strategy} aria-label="Backup">
         {({ checked }) => (
           <>
             {tree.keys().map((key) => (
-              <BackupItem
-                key={key}
-                value={key}
-                aria-label={itemOf.get(key)!.label}
-                className="group flex items-center gap-2 rounded-md py-1 pr-2 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:text-muted-foreground"
-              >
-                <span className="grid size-4 place-items-center rounded border border-input text-[10px] group-aria-checked:bg-foreground group-aria-checked:text-background group-aria-[checked=mixed]:bg-foreground/40">
-                  <span className="hidden group-aria-checked:inline group-aria-[checked=mixed]:hidden">
-                    ✓
-                  </span>
-                  <span className="hidden group-aria-[checked=mixed]:inline">–</span>
+              <BackupItem key={key} value={key} aria-label={itemOf.get(key)!.label}>
+                <span data-slot="tree-behavior-checkbox">
+                  <span data-show="checked">✓</span>
+                  <span data-show="mixed">–</span>
                 </span>
                 {itemOf.get(key)!.label}
               </BackupItem>
             ))}
-            <p data-value className="mt-2 h-16 overflow-auto text-xs text-muted-foreground">
+            <p data-value data-slot="output">
               Value: {checked.length ? checked.join(", ") : "none"}
             </p>
           </>

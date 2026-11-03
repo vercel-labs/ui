@@ -88,28 +88,16 @@ function Example() {
     "New comment on the docs",
   ])
   return (
-    <Rows
-      aria-label="Messages"
-      className="flex w-72 flex-col divide-y divide-border rounded-xl border border-border"
-    >
+    <Rows aria-label="Messages">
       {items.map((item) => (
-        <RowsItem
-          key={item}
-          value={item}
-          className="outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <RowsContent
-            value={item}
-            className="bg-background px-4 py-3 text-sm transition-transform data-swiping:transition-none"
-          >
-            {item}
-          </RowsContent>
+        <RowsItem key={item} value={item}>
+          <RowsContent value={item}>{item}</RowsContent>
           <RowsActions row={item} side="end">
             <button
               type="button"
               tabIndex={-1}
+              data-variant="destructive"
               onClick={() => setItems((current) => current.filter((other) => other !== item))}
-              className="bg-destructive px-4 text-sm text-white"
             >
               Delete
             </button>

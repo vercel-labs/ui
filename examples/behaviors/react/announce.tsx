@@ -43,20 +43,12 @@ const CopyButton = parts.Root
 
 function Example() {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-muted/30 py-1.5 pr-1.5 pl-3 font-mono text-sm">
+    <div data-slot="announce-command">
       <span>npm add @ui-sdk/core</span>
-      <CopyButton
-        text="npm add @ui-sdk/core"
-        aria-label="Copy command"
-        className="inline-flex h-8 w-24 shrink-0 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 font-sans text-xs font-medium shadow-xs outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30"
-      >
+      <CopyButton data-size="sm" text="npm add @ui-sdk/core" aria-label="Copy command">
         {({ copied }) => (
           <>
-            {copied ? (
-              <CheckIcon className="size-3.5" aria-hidden="true" />
-            ) : (
-              <CopyIcon className="size-3.5" aria-hidden="true" />
-            )}
+            {copied ? <CheckIcon aria-hidden="true" /> : <CopyIcon aria-hidden="true" />}
             {copied ? "Copied" : "Copy"}
           </>
         )}

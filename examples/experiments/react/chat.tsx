@@ -146,42 +146,29 @@ function Example() {
   const atStart = oldest <= oldestLoadable
 
   return (
-    <Chat
-      controller={controller}
-      className="relative flex h-[26rem] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-border bg-background"
-    >
-      <ChatLog
-        aria-label="Conversation"
-        className="flex flex-1 flex-col gap-3 p-4 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
+    <Chat controller={controller}>
+      <ChatLog aria-label="Conversation">
         <ChatEarlier
           disabled={atStart}
           onClick={() => {
             setMessages((list) => [...earlierMessages(oldest - 12, 12), ...list])
             setOldest(oldest - 12)
           }}
-          className="self-center rounded-full px-3 py-1 text-xs text-muted-foreground hover:bg-muted disabled:opacity-50"
         >
           {atStart ? "Start of conversation" : "Load earlier messages"}
         </ChatEarlier>
         {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${message.from === "you" ? "self-end bg-primary text-primary-foreground" : "self-start bg-muted"}`}
-          >
-            {message.text || <span className="text-muted-foreground">…</span>}
+          <div key={message.id} data-slot="chat-message" data-from={message.from}>
+            {message.text || <span data-slot="hint">…</span>}
           </div>
         ))}
       </ChatLog>
-      <ChatJump className="pointer-events-none absolute bottom-20 left-1/2 flex -translate-x-1/2 translate-y-2 items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium opacity-0 shadow-md transition data-visible:pointer-events-auto data-visible:translate-y-0 data-visible:opacity-100">
-        <span
-          aria-hidden="true"
-          className="hidden size-1.5 rounded-full bg-primary [[data-unseen]>&]:block"
-        />
+      <ChatJump>
+        <span data-slot="chat-unseen" aria-hidden="true" />
         Jump to latest
       </ChatJump>
       <form
-        className="flex items-end gap-2 border-t border-border p-3"
+        data-slot="chat-composer"
         onSubmit={(event) => {
           event.preventDefault()
           send()
@@ -198,13 +185,8 @@ function Example() {
               send()
             }
           }}
-          className="max-h-24 min-h-9 flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         />
-        <button
-          type="submit"
-          disabled={typing || !draft.trim()}
-          className="h-9 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
-        >
+        <button type="submit" data-variant="solid" disabled={typing || !draft.trim()}>
           Send
         </button>
       </form>

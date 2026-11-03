@@ -193,50 +193,30 @@ function search(query: string) {
 function Example() {
   const [picked, setPicked] = React.useState<string | null>(null)
   return (
-    <EmojiPicker
-      onPick={(value: string) => setPicked(value)}
-      className="flex w-full max-w-80 flex-col overflow-hidden rounded-xl border border-border bg-popover text-sm text-popover-foreground"
-    >
+    <EmojiPicker onPick={(value: string) => setPicked(value)}>
       {({ query, active }) => {
         const results = search(query)
         return (
           <>
-            <EmojiPickerSearch
-              aria-label="Search emoji"
-              placeholder="Search emoji"
-              className="h-10 border-b border-border bg-transparent px-3 outline-none placeholder:text-muted-foreground"
-            />
-            <EmojiPickerGrid
-              aria-label="Emoji"
-              className="grid h-48 auto-rows-min grid-cols-[repeat(auto-fill,minmax(2.5rem,1fr))] overflow-y-auto p-1.5"
-            >
+            <EmojiPickerSearch aria-label="Search emoji" placeholder="Search emoji" />
+            <EmojiPickerGrid aria-label="Emoji">
               {results.map(([value, name]) => (
-                <EmojiPickerEmoji
-                  key={value}
-                  value={value}
-                  aria-label={name}
-                  className="grid aspect-square place-items-center rounded-lg text-2xl outline-none hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50"
-                >
+                <EmojiPickerEmoji key={value} value={value} aria-label={name}>
                   {value}
                 </EmojiPickerEmoji>
               ))}
-              {results.length === 0 && (
-                <p className="col-span-full py-8 text-center text-muted-foreground">No emoji found.</p>
-              )}
+              {results.length === 0 && <p data-slot="hint">No emoji found.</p>}
             </EmojiPickerGrid>
-            <div
-              data-footer
-              className="flex h-11 items-center gap-2 border-t border-border px-3 text-muted-foreground"
-            >
+            <div data-footer data-slot="emoji-picker-footer">
               {active ? (
                 <>
-                  <span className="text-xl">{active}</span>
-                  <span className="truncate">{names[active]}</span>
+                  <span data-slot="emoji-picker-preview">{active}</span>
+                  <span>{names[active]}</span>
                 </>
               ) : picked ? (
                 <>
-                  <span className="text-xl">{picked}</span>
-                  <span className="truncate">Picked {names[picked]}</span>
+                  <span data-slot="emoji-picker-preview">{picked}</span>
+                  <span>Picked {names[picked]}</span>
                 </>
               ) : (
                 "Pick an emoji"

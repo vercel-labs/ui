@@ -114,29 +114,22 @@ const PricesCopyAll = parts.CopyAll
 
 function Example() {
   return (
-    <Prices className="flex w-72 flex-col gap-2 text-sm">
+    <Prices>
       {({ copied }) => (
         <>
-          <PricesGrid aria-label="Prices" className="flex flex-col">
+          <PricesGrid aria-label="Prices">
             {start.map((cells, r) => (
-              <PricesRow key={r} id={String(r)} className="flex">
+              <PricesRow key={r} id={String(r)}>
                 {cells.map((_, c) => (
-                  <PricesCell
-                    key={c}
-                    row={r}
-                    col={c}
-                    className="-mt-px -ml-px h-9 flex-1 truncate border border-border px-2 leading-9 tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset data-selected:bg-foreground/15"
-                  >
+                  <PricesCell key={c} row={r} col={c}>
                     {({ text }) => text}
                   </PricesCell>
                 ))}
               </PricesRow>
             ))}
           </PricesGrid>
-          <PricesCopyAll className="self-start rounded-md border border-border px-2 py-1 text-xs outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-            Copy the whole sheet
-          </PricesCopyAll>
-          <pre data-copied className="h-24 overflow-auto rounded-md bg-muted p-2 text-xs whitespace-pre-wrap">
+          <PricesCopyAll data-size="sm">Copy the whole sheet</PricesCopyAll>
+          <pre data-copied data-slot="log">
             {copied ? copied.replaceAll("\t", " → ") : "Copied cells show here, with → for each tab."}
           </pre>
         </>

@@ -12,16 +12,16 @@ function Example() {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   return (
-    <dl className="grid w-64 grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+    <dl>
       {zones.map(([zone, city]) => (
         <React.Fragment key={zone}>
-          <dt className="text-muted-foreground">{city}</dt>
+          <dt>{city}</dt>
           <dd data-zone={zone}>
             {mounted ? formatDate(todayDate(zone), "en-US", { dateStyle: "medium" }) : ""}
           </dd>
         </React.Fragment>
       ))}
-      <dt className="text-muted-foreground">Here</dt>
+      <dt>Here</dt>
       <dd data-zone="here">{mounted ? todayDate() : ""}</dd>
     </dl>
   )

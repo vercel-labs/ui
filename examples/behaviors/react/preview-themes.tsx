@@ -69,28 +69,32 @@ const ThemesList = parts.List
 
 const ThemesOption = parts.Theme
 
-const looks: Record<string, string> = {
-  light: "bg-white text-neutral-900",
-  dark: "bg-neutral-900 text-neutral-100",
-  sepia: "bg-[#f4ecd8] text-[#5b4636]",
-  contrast: "bg-black text-yellow-300",
+const looks: Record<string, { paper: string; text: string }> = {
+  light: { paper: "#ffffff", text: "#171717" },
+  dark: { paper: "#171717", text: "#f5f5f5" },
+  sepia: { paper: "#f4ecd8", text: "#5b4636" },
+  contrast: { paper: "#000000", text: "#fde047" },
 }
 
 function Example() {
   return (
-    <Themes className="flex w-72 flex-col gap-3">
+    <Themes>
       {({ shown }) => (
         <>
-          <p className={`rounded-xl border border-border p-4 text-sm ${looks[shown]}`}>
+          <p
+            data-slot="preview-sample"
+            style={
+              {
+                "--preview-paper": looks[shown].paper,
+                "--preview-text": looks[shown].text,
+              } as React.CSSProperties
+            }
+          >
             Showing {names[shown]}
           </p>
-          <ThemesList aria-label="Theme" className="flex flex-col gap-1">
+          <ThemesList aria-label="Theme">
             {Object.keys(names).map((theme) => (
-              <ThemesOption
-                key={theme}
-                value={theme}
-                className="rounded-md px-3 py-1.5 text-left text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-checked:bg-muted aria-checked:font-medium aria-disabled:text-muted-foreground data-previewing:bg-muted/60"
-              >
+              <ThemesOption key={theme} value={theme}>
                 {names[theme]}
                 {theme === "contrast" && " (soon)"}
               </ThemesOption>

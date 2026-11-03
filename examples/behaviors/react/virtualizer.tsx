@@ -97,28 +97,18 @@ const amount = (index: number) => ((index * 7919) % 100000) / 100
 
 function Example() {
   return (
-    <Ledger
-      count={10000}
-      className="h-64 w-72 rounded-xl border border-border text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-    >
+    <Ledger count={10000}>
       {({ items }) => (
         <>
           <LedgerBody aria-label="Ledger">
             {items.map((item) => (
-              <LedgerRow
-                key={item.key}
-                item={item}
-                className="flex items-center justify-between border-b border-border px-3"
-              >
-                <span className="text-muted-foreground">Entry {item.index + 1}</span>
-                <span className="tabular-nums">{money.format(amount(item.index))}</span>
+              <LedgerRow key={item.key} item={item}>
+                <span data-slot="hint">Entry {item.index + 1}</span>
+                <span>{money.format(amount(item.index))}</span>
               </LedgerRow>
             ))}
           </LedgerBody>
-          <p
-            data-rendered={items.length}
-            className="sticky bottom-0 border-t border-border bg-background px-3 py-1.5 text-xs text-muted-foreground"
-          >
+          <p data-rendered={items.length} data-slot="output">
             {items.length} of 10,000 rows in the page
           </p>
         </>

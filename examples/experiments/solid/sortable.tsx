@@ -19,56 +19,44 @@ const tracks: Record<string, { title: string; artist: string; length: string }> 
 }
 
 const photos: Record<string, { label: string; tone: string }> = {
-  p1: { label: "Dunes", tone: "from-amber-300 to-orange-500" },
-  p2: { label: "Fjord", tone: "from-sky-300 to-indigo-500" },
-  p3: { label: "Meadow", tone: "from-lime-300 to-emerald-500" },
-  p4: { label: "Dusk", tone: "from-fuchsia-300 to-purple-600" },
-  p5: { label: "Glacier", tone: "from-cyan-200 to-sky-500" },
-  p6: { label: "Canyon", tone: "from-orange-300 to-red-600" },
-  p7: { label: "Forest", tone: "from-emerald-300 to-green-700" },
-  p8: { label: "Harbor", tone: "from-slate-300 to-slate-600" },
-  p9: { label: "Lagoon", tone: "from-teal-200 to-cyan-600" },
+  p1: { label: "Dunes", tone: "#f97316" },
+  p2: { label: "Fjord", tone: "#6366f1" },
+  p3: { label: "Meadow", tone: "#10b981" },
+  p4: { label: "Dusk", tone: "#9333ea" },
+  p5: { label: "Glacier", tone: "#0ea5e9" },
+  p6: { label: "Canyon", tone: "#dc2626" },
+  p7: { label: "Forest", tone: "#15803d" },
+  p8: { label: "Harbor", tone: "#475569" },
+  p9: { label: "Lagoon", tone: "#0891b2" },
 }
-
-const button = "h-8 rounded-md border border-border px-3 text-sm"
-const item =
-  "relative outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 data-dragging:opacity-40 data-drag-preview:cursor-grabbing data-drag-preview:shadow-lg data-drag-count:after:absolute data-drag-count:after:-top-2 data-drag-count:after:-right-2 data-drag-count:after:flex data-drag-count:after:size-5 data-drag-count:after:items-center data-drag-count:after:justify-center data-drag-count:after:rounded-full data-drag-count:after:bg-primary data-drag-count:after:text-xs data-drag-count:after:text-primary-foreground data-drag-count:after:content-[attr(data-drag-count)]"
 
 function Example() {
   const [playlist, setPlaylist] = createSignal(Object.keys(tracks))
   return (
-    <div class="flex w-full max-w-2xl flex-col gap-6 text-sm sm:flex-row sm:items-start">
-      <div class="flex flex-1 flex-col gap-2">
-        <div class="flex items-center gap-2">
+    <div data-slot="sortable-layout">
+      <div data-slot="stack">
+        <div data-slot="row">
           <button
             type="button"
-            class={button}
+            data-size="sm"
             onClick={() =>
               setPlaylist([...playlist()].sort((a, b) => tracks[a].title.localeCompare(tracks[b].title)))
             }
           >
             Sort by title
           </button>
-          <button type="button" class={button} onClick={() => setPlaylist([...playlist()].reverse())}>
+          <button type="button" data-size="sm" onClick={() => setPlaylist([...playlist()].reverse())}>
             Reverse
           </button>
         </div>
-        <Sortable
-          value={playlist()}
-          onValueChange={(value) => setPlaylist(value)}
-          aria-label="Playlist"
-          class="flex flex-col gap-1 rounded-xl border border-border p-1"
-        >
+        <Sortable value={playlist()} onValueChange={(value) => setPlaylist(value)} aria-label="Playlist">
           {(state) => (
             <>
               <For each={state.order}>
                 {(key, index) => (
-                  <SortableItem
-                    value={key}
-                    class={`${item} flex items-center gap-3 rounded-lg bg-background px-2 py-1.5 data-selected:bg-accent`}
-                  >
-                    <SortableHandle class="cursor-grab px-0.5 text-muted-foreground">
-                      <svg viewBox="0 0 16 16" class="size-4" fill="currentColor" aria-hidden="true">
+                  <SortableItem value={key}>
+                    <SortableHandle>
+                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
                         <circle cx="6" cy="4" r="1.2" />
                         <circle cx="10" cy="4" r="1.2" />
                         <circle cx="6" cy="8" r="1.2" />
@@ -77,14 +65,12 @@ function Example() {
                         <circle cx="10" cy="12" r="1.2" />
                       </svg>
                     </SortableHandle>
-                    <span class="w-4 text-right text-xs text-muted-foreground tabular-nums">
-                      {index() + 1}
+                    <span data-slot="sortable-index">{index() + 1}</span>
+                    <span data-slot="stack">
+                      <span>{tracks[key].title}</span>
+                      <span data-slot="hint">{tracks[key].artist}</span>
                     </span>
-                    <span class="flex min-w-0 flex-1 flex-col">
-                      <span class="truncate font-medium">{tracks[key].title}</span>
-                      <span class="truncate text-xs text-muted-foreground">{tracks[key].artist}</span>
-                    </span>
-                    <span class="text-xs text-muted-foreground tabular-nums">{tracks[key].length}</span>
+                    <span data-slot="hint">{tracks[key].length}</span>
                   </SortableItem>
                 )}
               </For>
@@ -97,20 +83,12 @@ function Example() {
           )}
         </Sortable>
       </div>
-      <Sortable
-        defaultValue={Object.keys(photos)}
-        orientation="grid"
-        aria-label="Photos"
-        class="grid w-full grid-cols-4 gap-2 sm:w-64 sm:grid-cols-3"
-      >
+      <Sortable defaultValue={Object.keys(photos)} orientation="grid" aria-label="Photos">
         {(state) => (
           <>
             <For each={state.order}>
               {(key) => (
-                <SortableItem
-                  value={key}
-                  class={`${item} flex aspect-square cursor-grab items-end rounded-lg bg-linear-to-br p-1.5 text-xs font-medium text-white ${photos[key].tone} data-selected:ring-2 data-selected:ring-primary data-selected:ring-offset-2 data-selected:ring-offset-background`}
-                >
+                <SortableItem value={key} style={{ "--tone": photos[key].tone }}>
                   {photos[key].label}
                 </SortableItem>
               )}

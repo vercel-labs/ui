@@ -49,8 +49,8 @@ function Example() {
   const [strict, setStrict] = React.useState(false)
   const [last, setLast] = React.useState("")
   return (
-    <div className="flex w-80 flex-col gap-3 text-sm">
-      <label className="flex items-center gap-2 text-muted-foreground">
+    <div data-slot="stack">
+      <label data-slot="label">
         <input type="checkbox" checked={strict} onChange={(event) => setStrict(event.target.checked)} />
         Close only with the button
       </label>
@@ -61,24 +61,15 @@ function Example() {
           if (strict && isDismissal(details.reason)) details.cancel()
           setLast(`${details.reason}${details.canceled ? ", canceled" : ""}`)
         }}
-        className="flex items-start gap-3 rounded-xl border border-border p-3"
       >
-        <p className="flex-1 text-muted-foreground">
-          Press Escape here, or use the button, to close this tip.
-        </p>
-        <NoticeClose className="rounded-md px-2 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50">
-          Got it
-        </NoticeClose>
+        <p>Press Escape here, or use the button, to close this tip.</p>
+        <NoticeClose data-size="sm">Got it</NoticeClose>
       </Notice>
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => setRound((count) => count + 1)}
-          className="h-8 rounded-lg border border-border px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
+      <div data-slot="row">
+        <button type="button" onClick={() => setRound((count) => count + 1)}>
           Show the tip again
         </button>
-        <span data-last className="text-muted-foreground">
+        <span data-slot="hint" data-last>
           {last && `Last: ${last}`}
         </span>
       </div>

@@ -62,16 +62,11 @@ const columns = "ABCD"
 
 function Example() {
   return (
-    <Sheet aria-label="Sheet" className="flex flex-col">
+    <Sheet aria-label="Sheet">
       {[0, 1, 2, 3].map((row) => (
-        <SheetRow key={row} id={String(row)} className="flex">
+        <SheetRow key={row} id={String(row)}>
           {[0, 1, 2, 3].map((col) => (
-            <SheetCell
-              key={col}
-              row={row}
-              col={col}
-              className="-mt-px -ml-px grid h-8 w-14 place-items-center border border-border text-xs tabular-nums outline-none select-none aria-selected:bg-primary/15 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
-            >
+            <SheetCell key={col} row={row} col={col}>
               {columns[col]}
               {row + 1}
             </SheetCell>

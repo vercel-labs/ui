@@ -62,6 +62,11 @@ const rangeName = ({ top, left, bottom, right }: CellBounds) => {
   const start = cellName({ row: top, col: left })
   return top === bottom && left === right ? start : `${start}:${cellName({ row: bottom, col: right })}`
 }
+const covers = (bounds: CellBounds | null, axis: "row" | "col", index: number) =>
+  !!bounds &&
+  (axis === "row"
+    ? index >= bounds.top && index <= bounds.bottom
+    : index >= bounds.left && index <= bounds.right)
 const format = (value: number | string) =>
   typeof value === "number" ? (Number.isFinite(value) ? String(Number(value.toFixed(2))) : "#DIV/0!") : value
 
@@ -366,22 +371,26 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
     }),
     columnheader: slot<{ value: string }, SpreadsheetHeaderState>({
       props: { value: "string" },
-      state: (state, { key, api }) => {
-        const bounds = api.range.bounds(state)
-        const col = Number(key)
-        return { selected: !!bounds && !!state.range && col >= bounds.left && col <= bounds.right }
-      },
-      attrs: (_state, { key }) => ({ role: "columnheader", "aria-colindex": String(Number(key) + 2) }),
+      state: (state, { key, api }) => ({
+        selected: !!state.range && covers(api.range.bounds(state), "col", Number(key)),
+      }),
+      attrs: (state, { key, api }) => ({
+        role: "columnheader",
+        "aria-colindex": String(Number(key) + 2),
+        "data-selected": state.range && covers(api.range.bounds(state), "col", Number(key)) ? "" : undefined,
+      }),
       on: { pointerdown: (event, { api, key }) => api.headerPointerdown(event, "col", Number(key)) },
     }),
     rowheader: slot<{ value: string }, SpreadsheetHeaderState>({
       props: { value: "string" },
-      state: (state, { key, api }) => {
-        const bounds = api.range.bounds(state)
-        const row = Number(key)
-        return { selected: !!bounds && !!state.range && row >= bounds.top && row <= bounds.bottom }
-      },
-      attrs: () => ({ role: "rowheader", "aria-colindex": "1" }),
+      state: (state, { key, api }) => ({
+        selected: !!state.range && covers(api.range.bounds(state), "row", Number(key)),
+      }),
+      attrs: (state, { key, api }) => ({
+        role: "rowheader",
+        "aria-colindex": "1",
+        "data-selected": state.range && covers(api.range.bounds(state), "row", Number(key)) ? "" : undefined,
+      }),
       on: { pointerdown: (event, { api, key }) => api.headerPointerdown(event, "row", Number(key)) },
     }),
     cell: slot<{ id: string; row: number; col: number }, SpreadsheetCellState>({
@@ -404,6 +413,7 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
         tabindex: api.grid.tabIndex(state, props),
         "data-active": api.grid.isActive(state, props) ? "" : undefined,
         "data-editing": state.editing === key ? "" : undefined,
+        "data-numeric": typeof api.valueOf(key) === "number" ? "" : undefined,
         ...api.range.cellAttrs(state, props),
       }),
       on: {
@@ -505,77 +515,36 @@ const budget: SpreadsheetCells = {
 
 const ROWS = 12
 const COLS = 6
-const header =
-  "flex h-8 items-center justify-center bg-muted text-xs font-medium text-muted-foreground select-none"
 
 function Example() {
   return (
     <Spreadsheet rows={ROWS} cols={COLS} defaultCells={budget}>
-      <div className="flex w-full max-w-2xl flex-col gap-2">
-        <div className="flex items-center gap-2 font-mono text-xs">
-          <SpreadsheetNameBox className="w-20 rounded-md border border-border px-2 py-1">
-            {({ selection }) => selection}
-          </SpreadsheetNameBox>
-          <SpreadsheetFormulaBar className="h-6.5 min-w-0 flex-1 truncate rounded-md border border-border px-2 py-1 text-muted-foreground">
-            {({ formula }) => formula}
-          </SpreadsheetFormulaBar>
+      <div data-slot="spreadsheet-frame">
+        <div data-slot="row">
+          <SpreadsheetNameBox>{({ selection }) => selection}</SpreadsheetNameBox>
+          <SpreadsheetFormulaBar>{({ formula }) => formula}</SpreadsheetFormulaBar>
         </div>
-        <SpreadsheetGrid
-          aria-label="Budget"
-          className="overflow-hidden rounded-xl border border-border text-sm"
-        >
+        <SpreadsheetGrid aria-label="Budget">
           <SpreadsheetRow value={-1}>
-            <SpreadsheetCorner className={`${header} w-10 border-r border-b border-border`} />
+            <SpreadsheetCorner />
             {Array.from({ length: COLS }, (_, col) => (
-              <SpreadsheetColumnHeader
-                key={col}
-                value={col}
-                className={({ selected }) =>
-                  `${header} border-r border-b border-border last:border-r-0 ${selected ? "bg-primary/15 text-foreground" : ""}`
-                }
-              >
+              <SpreadsheetColumnHeader key={col} value={col}>
                 {columnName(col)}
               </SpreadsheetColumnHeader>
             ))}
           </SpreadsheetRow>
           {Array.from({ length: ROWS }, (_, row) => (
             <SpreadsheetRow key={row} value={row}>
-              <SpreadsheetRowHeader
-                value={row}
-                className={({ selected }) =>
-                  `${header} border-r border-b border-border ${selected ? "bg-primary/15 text-foreground" : ""}`
-                }
-              >
-                {row + 1}
-              </SpreadsheetRowHeader>
+              <SpreadsheetRowHeader value={row}>{row + 1}</SpreadsheetRowHeader>
               {Array.from({ length: COLS }, (_, col) => (
-                <SpreadsheetCell
-                  key={col}
-                  row={row}
-                  col={col}
-                  className={({ numeric, active, selected }) =>
-                    [
-                      "relative h-8 truncate border-b border-border px-2 leading-8 outline-none select-none not-last:border-r",
-                      "before:pointer-events-none before:absolute before:inset-0 before:border-primary data-[range-edge~=top]:before:border-t-2 data-[range-edge~=right]:before:border-r-2 data-[range-edge~=bottom]:before:border-b-2 data-[range-edge~=left]:before:border-l-2",
-                      numeric ? "text-right tabular-nums" : "",
-                      selected ? "bg-primary/10" : "",
-                      active ? "z-1 ring-2 ring-primary ring-inset" : "",
-                    ].join(" ")
-                  }
-                >
-                  {({ value, editing }) =>
-                    editing ? (
-                      <SpreadsheetEditor className="absolute inset-0 bg-background px-2 outline-2 -outline-offset-2 outline-primary" />
-                    ) : (
-                      value
-                    )
-                  }
+                <SpreadsheetCell key={col} row={row} col={col}>
+                  {({ value, editing }) => (editing ? <SpreadsheetEditor /> : value)}
                 </SpreadsheetCell>
               ))}
             </SpreadsheetRow>
           ))}
         </SpreadsheetGrid>
-        <SpreadsheetSummary className="h-5 text-xs text-muted-foreground">
+        <SpreadsheetSummary>
           {({ range, sum, average, count }) =>
             range
               ? `Sum ${format(sum)} · Average ${format(average)} · Count ${count}`

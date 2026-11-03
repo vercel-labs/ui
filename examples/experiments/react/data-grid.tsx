@@ -435,38 +435,27 @@ const columns: (DataGridColumn & { label: string; width: string })[] = [
 
 const template = columns.map((column) => column.width).join(" ")
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })
-const tones: Record<string, string> = { Active: "bg-emerald-500", Invited: "bg-amber-500" }
+const tones: Record<string, string> = { Active: "#10b981", Invited: "#f59e0b" }
 
 const PersonRow = React.memo(function PersonRow({ item }: { item: VirtualItem }) {
   return (
-    <DataGridRow
-      item={item}
-      className="grid border-b border-border bg-background text-sm data-selected:bg-primary/5"
-      style={{ gridTemplateColumns: template }}
-    >
+    <DataGridRow item={item}>
       {columns.map((column, col) => (
-        <DataGridCell
-          key={column.key}
-          col={col}
-          className={`flex items-center truncate px-3 outline-none data-active:ring-2 data-active:ring-inset data-active:ring-primary/60 ${column.numeric ? "justify-end tabular-nums" : ""}`}
-        >
+        <DataGridCell key={column.key} col={col} data-numeric={column.numeric ? "" : undefined}>
           {({ value, editing }) =>
             editing ? (
-              <DataGridEditor
-                className={`h-7 w-full min-w-0 rounded-sm border border-input bg-background px-1.5 outline-none focus:ring-2 focus:ring-ring/50 ${column.numeric ? "text-right" : ""}`}
-              />
+              <DataGridEditor />
             ) : column.key === "status" ? (
-              <span className="flex items-center gap-1.5">
+              <span data-slot="row">
                 <span
+                  data-slot="swatch"
                   aria-hidden="true"
-                  className={`size-1.5 rounded-full ${tones[value as string] ?? "bg-zinc-400"}`}
+                  style={{ background: tones[value as string] ?? "var(--muted)" }}
                 />
                 {value as string}
               </span>
             ) : (
-              <span className="truncate">
-                {column.numeric ? money.format(value as number) : String(value)}
-              </span>
+              <span>{column.numeric ? money.format(value as number) : String(value)}</span>
             )
           }
         </DataGridCell>
@@ -533,29 +522,26 @@ function Example() {
   const [rows] = React.useState(() => people(10000))
   const [selected, setSelected] = React.useState<string[]>([])
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div data-slot="stack">
       <DataGrid
         columns={columns}
         defaultRows={rows}
         selected={selected}
         onSelectedChange={setSelected}
         aria-label="People"
-        className="h-96 w-full rounded-xl border border-border bg-background"
+        style={{ "--data-grid-columns": template } as React.CSSProperties}
       >
         {({ items, sort }) => (
-          <div className="min-w-[40rem]">
-            <DataGridHeader
-              className="grid border-b border-border bg-muted text-xs font-medium text-muted-foreground"
-              style={{ gridTemplateColumns: template }}
-            >
+          <div data-slot="data-grid-content">
+            <DataGridHeader>
               {columns.map((column, col) => (
                 <DataGridColumnHeader
                   key={column.key}
                   col={col}
-                  className={`flex cursor-pointer items-center gap-1 px-3 outline-none select-none data-active:ring-2 data-active:ring-inset data-active:ring-primary/60 ${column.numeric ? "justify-end" : ""}`}
+                  data-numeric={column.numeric ? "" : undefined}
                 >
                   {column.label}
-                  <span aria-hidden="true" className="w-3 text-foreground">
+                  <span data-slot="data-grid-sort" aria-hidden="true">
                     {sort?.col === col ? (sort.direction === "ascending" ? "↑" : "↓") : ""}
                   </span>
                 </DataGridColumnHeader>
@@ -569,7 +555,7 @@ function Example() {
           </div>
         )}
       </DataGrid>
-      <p className="text-sm text-muted-foreground">
+      <p data-slot="output">
         {rows.length.toLocaleString()} people.{" "}
         {selected.length ? `${selected.length.toLocaleString()} selected.` : "Space selects a row."} Enter, F2
         or typing edits Name, Email and Spend.

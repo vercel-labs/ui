@@ -101,32 +101,26 @@ const NotebookAction = parts.Action
 
 function Example() {
   return (
-    <Notebook className="flex w-80 flex-col gap-2">
+    <Notebook>
       {({ items, newest, large }) => (
         <>
-          <NotebookScroller className="h-64 rounded-xl border border-border outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-            <NotebookBody aria-label="Notes" className={large ? "text-base" : "text-sm"}>
+          <NotebookScroller>
+            <NotebookBody aria-label="Notes" data-large={large ? "" : undefined}>
               {items.map((item) => (
-                <NotebookRow
-                  key={item.index}
-                  value={item.key}
-                  index={item.index}
-                  start={item.start}
-                  className="border-b border-border px-3 py-2"
-                >
+                <NotebookRow key={item.index} value={item.key} index={item.index} start={item.start}>
                   {({ text }) => text}
                 </NotebookRow>
               ))}
             </NotebookBody>
           </NotebookScroller>
-          <div className="flex items-center gap-2 text-xs">
-            <NotebookAction value="flip" className="rounded-md border border-border px-2 py-1">
+          <div data-slot="row">
+            <NotebookAction data-size="sm" value="flip">
               {newest ? "Oldest first" : "Newest first"}
             </NotebookAction>
-            <NotebookAction value="enlarge" className="rounded-md border border-border px-2 py-1">
+            <NotebookAction data-size="sm" value="enlarge">
               {large ? "Smaller text" : "Larger text"}
             </NotebookAction>
-            <span className="text-muted-foreground">{items.length} rows in the page</span>
+            <span data-slot="hint">{items.length} rows in the page</span>
           </div>
         </>
       )}

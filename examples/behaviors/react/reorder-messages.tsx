@@ -79,18 +79,12 @@ const lengths: Record<string, string> = { intro: "0:48", tides: "3:12", ember: "
 
 function Example() {
   return (
-    <Tracks pinned="intro" aria-label="Tracks" className="flex w-56 flex-col gap-1 text-sm">
+    <Tracks pinned="intro" aria-label="Tracks">
       {({ order }) =>
         order.map((track) => (
-          <TracksTrack
-            key={track}
-            value={track}
-            className="flex justify-between rounded-lg border border-border bg-background px-3 py-1.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-grabbed:border-primary data-grabbed:bg-primary/10"
-          >
+          <TracksTrack key={track} value={track}>
             {titles[track]}
-            <span className="text-muted-foreground tabular-nums">
-              {track === "intro" ? "Pinned" : lengths[track]}
-            </span>
+            <span data-slot="hint">{track === "intro" ? "Pinned" : lengths[track]}</span>
           </TracksTrack>
         ))
       }

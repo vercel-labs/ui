@@ -36,6 +36,12 @@ const shows =
     await expect(preview.getByRole("textbox", { name }).first()).toBeVisible()
   }
 
+// Right-to-left examples stay in the example folders but are off their pages for now.
+const pixel =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+
+const onPage = (example: string) => !/(^|-)rtl$/.test(example)
+
 // Opens a docs page in every framework and runs each example's check, in
 // page order. Every framework folder must have the same examples.
 function testExamples(
@@ -44,7 +50,7 @@ function testExamples(
   section = "components",
   fixtures = Object.keys(checks),
 ) {
-  const order = Object.keys(checks)
+  const order = Object.keys(checks).filter(onPage)
   const root = path.join(import.meta.dirname, "../../examples", component)
   const examplesIn = (folder: string) =>
     readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -64,6 +70,10 @@ function testExamples(
         if (message.type() === "error" || /^Feature flags? __VUE_/.test(message.text()))
           errors.push(message.text())
       })
+      // Examples show GitHub avatars. A local image stands in, so the specs need no network.
+      await page.route(/^https:\/\/github\.com\/[\w-]+\.png/, (route) =>
+        route.fulfill({ contentType: "image/png", body: Buffer.from(pixel, "base64") }),
+      )
       await page.goto(`/docs/${framework}/${docsFolder(framework, section)}/${component}`)
       const previews = page.locator("[data-example]")
       await expect(previews).toHaveCount(order.length)
@@ -79,4 +89,4 @@ function testExamples(
   }
 }
 
-export { type Check, docsFolder, fill, frameworks, search, shows, testExamples }
+export { type Check, docsFolder, fill, frameworks, onPage, search, shows, testExamples }

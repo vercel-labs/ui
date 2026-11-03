@@ -1,0 +1,94 @@
+@scope ([data-example]) {
+  [data-slot="switch-root"] {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    box-sizing: border-box;
+    width: 38px;
+    height: 22px;
+    padding: 3px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: default;
+    transition:
+      background-color var(--duration),
+      box-shadow var(--duration);
+
+    &:hover:not([data-disabled], [data-readonly], [data-checked]) {
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+    }
+
+    &[data-checked] {
+      background: var(--ink);
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+
+    &:is([data-invalid], [aria-invalid="true"]) {
+      box-shadow: inset 0 0 0 1px var(--danger);
+    }
+
+    &[data-readonly]:not([data-checked]) {
+      background: var(--tint);
+    }
+
+    &[data-disabled] {
+      box-shadow: inset 0 0 0 1px var(--line-faint);
+    }
+
+    &[data-disabled][data-checked] {
+      background: var(--line-disabled);
+      box-shadow: inset 0 0 0 1px var(--line-disabled);
+    }
+
+    &[data-size="sm"] {
+      width: 30px;
+      height: 18px;
+    }
+  }
+
+  [data-slot="switch-thumb"] {
+    display: block;
+    box-sizing: border-box;
+    width: var(--size-icon);
+    height: var(--size-icon);
+    border-radius: 50%;
+    background: var(--surface-1);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 1px 2px color-mix(in oklab, var(--ink) 10%, transparent);
+    transition: translate var(--duration);
+
+    &[data-checked] {
+      translate: 16px 0;
+      background: var(--paper);
+      box-shadow: var(--shadow-drop);
+
+      &:is([dir="rtl"], [dir="rtl"] *) {
+        translate: -16px 0;
+      }
+    }
+
+    [data-disabled] > & {
+      box-shadow: inset 0 0 0 1px var(--line-faint);
+    }
+
+    [data-size="sm"] > & {
+      width: 12px;
+      height: 12px;
+
+      &[data-checked] {
+        translate: 12px 0;
+
+        &:is([dir="rtl"], [dir="rtl"] *) {
+          translate: -12px 0;
+        }
+      }
+    }
+  }
+
+  :is([data-slot="label"], [data-slot="field-root"]):has([data-slot="switch-root"][data-disabled]) {
+    color: var(--line-disabled);
+  }
+}

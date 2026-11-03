@@ -29,15 +29,12 @@ const date = new Date(Date.UTC(2026, 9, 21))
 
 function Example() {
   return (
-    <LanguageTag className="flex w-64 flex-col gap-2 text-sm">
+    <LanguageTag>
       {({ locale }) => (
         <>
-          <LanguageTagInput
-            aria-label="Language tag"
-            className="h-8 rounded-lg border border-border bg-transparent px-3 font-mono outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          />
+          <LanguageTagInput aria-label="Language tag" />
           <p data-locale>{locale ? `Intl reads ${locale}` : "Not a language tag"}</p>
-          <p data-date className="text-muted-foreground">
+          <p data-date data-slot="hint">
             {new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(date)}
           </p>
         </>

@@ -253,9 +253,6 @@ const mail: InboxMessageData[] = [
   },
 ]
 
-const button =
-  "flex w-20 flex-col items-center justify-center gap-0.5 text-xs font-medium text-white outline-none"
-
 function Example() {
   const [messages, setMessages] = React.useState(mail)
   const [notice, setNotice] = React.useState("")
@@ -267,57 +264,38 @@ function Example() {
         if (reason === "archive") setNotice("Archived.")
       }}
     >
-      <div className="flex w-full max-w-md flex-col gap-3">
-        <InboxList className="flex flex-col overflow-hidden rounded-xl border border-border">
+      <div data-slot="stack">
+        <InboxList>
           {({ messages }) =>
             messages.map((message) => (
-              <InboxMessage
-                key={message.id}
-                value={message.id}
-                className="group/row border-b border-border outline-none last:border-b-0 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset"
-              >
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity delay-300 duration-0 group-has-[[data-swipe=start]]/row:pointer-events-auto group-has-[[data-swipe=start]]/row:opacity-100 group-has-[[data-swipe=start]]/row:delay-0">
-                  <div aria-hidden="true" className="absolute inset-0 bg-sky-600" />
+              <InboxMessage key={message.id} value={message.id}>
+                <div data-slot="inbox-side" data-show="start">
+                  <div data-slot="inbox-fill" aria-hidden="true" />
                   <InboxActions side="start">
-                    <InboxAction action="read" className={`${button} bg-sky-600 focus-visible:bg-sky-700`}>
+                    <InboxAction action="read">
                       {({ message }) => (message.unread ? "Read" : "Unread")}
                     </InboxAction>
                   </InboxActions>
                 </div>
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity delay-300 duration-0 group-has-[[data-swipe=end]]/row:pointer-events-auto group-has-[[data-swipe=end]]/row:opacity-100 group-has-[[data-swipe=end]]/row:delay-0">
-                  <div aria-hidden="true" className="absolute inset-0 bg-emerald-600" />
+                <div data-slot="inbox-side" data-show="end">
+                  <div data-slot="inbox-fill" aria-hidden="true" />
                   <InboxActions side="end">
-                    <InboxAction
-                      action="flag"
-                      className={`${button} bg-amber-500 focus-visible:bg-amber-600`}
-                    >
+                    <InboxAction action="flag">
                       {({ message }) => (message.flagged ? "Unflag" : "Flag")}
                     </InboxAction>
-                    <InboxAction
-                      action="archive"
-                      className={`${button} bg-emerald-600 focus-visible:bg-emerald-700`}
-                    >
-                      Archive
-                    </InboxAction>
+                    <InboxAction action="archive">Archive</InboxAction>
                   </InboxActions>
                 </div>
-                <InboxContent className="flex gap-3 bg-background px-4 py-3 transition-transform duration-300 ease-out data-swiping:transition-none">
-                  <span
-                    aria-hidden="true"
-                    className={`mt-1.5 size-2 shrink-0 rounded-full ${message.unread ? "bg-sky-600" : ""}`}
-                  />
-                  <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-sm">
-                    <span className="flex items-baseline gap-2">
-                      <span className={`truncate ${message.unread ? "font-semibold" : "font-medium"}`}>
-                        {message.from}
-                      </span>
-                      {message.flagged && (
-                        <span aria-hidden="true" className="size-2 rounded-full bg-amber-500" />
-                      )}
-                      <span className="ml-auto shrink-0 text-xs text-muted-foreground">{message.time}</span>
+                <InboxContent>
+                  <span data-slot="inbox-dot" aria-hidden="true" />
+                  <span data-slot="stack">
+                    <span data-slot="row">
+                      <span data-slot="inbox-from">{message.from}</span>
+                      {message.flagged && <span data-slot="inbox-flag" aria-hidden="true" />}
+                      <span data-slot="hint">{message.time}</span>
                     </span>
-                    <span className="truncate">{message.subject}</span>
-                    <span className="truncate text-muted-foreground">{message.preview}</span>
+                    <span>{message.subject}</span>
+                    <span data-slot="hint">{message.preview}</span>
                   </span>
                 </InboxContent>
               </InboxMessage>
@@ -327,13 +305,13 @@ function Example() {
         <InboxInstructions>
           Left and Right show the message's actions, and Escape hides them. Up and Down move between messages.
         </InboxInstructions>
-        <p className="text-sm text-muted-foreground" aria-live="polite">
+        <p data-slot="output" aria-live="polite">
           {notice || "Swipe a message left or right, or press Left or Right on it."}
         </p>
         {messages.length < mail.length && (
           <button
             type="button"
-            className="self-start text-sm font-medium underline-offset-4 hover:underline"
+            data-variant="link"
             onClick={() => {
               setMessages(mail)
               setNotice("")

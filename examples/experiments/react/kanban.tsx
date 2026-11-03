@@ -193,20 +193,20 @@ const KanbanRedo = parts.Redo
 const KanbanInstructions = parts.Instructions
 
 const cards: Record<string, { title: string; tag: string; tone: string }> = {
-  c1: { title: "Virtual list", tag: "Core", tone: "bg-sky-500" },
-  c2: { title: "Grid focus", tag: "Core", tone: "bg-sky-500" },
-  c3: { title: "Inline edit", tag: "Core", tone: "bg-sky-500" },
-  c4: { title: "Chat log", tag: "Demo", tone: "bg-violet-500" },
-  c5: { title: "Kanban", tag: "Demo", tone: "bg-violet-500" },
-  c6: { title: "Color picker", tag: "Demo", tone: "bg-violet-500" },
-  c7: { title: "Context menu", tag: "Demo", tone: "bg-violet-500" },
-  c8: { title: "Docs for agents", tag: "Docs", tone: "bg-amber-500" },
-  c9: { title: "Size check", tag: "Infra", tone: "bg-emerald-500" },
-  c10: { title: "Unit tests", tag: "Infra", tone: "bg-emerald-500" },
-  c11: { title: "Selection toolbar", tag: "Demo", tone: "bg-violet-500" },
-  c12: { title: "Auto scroll", tag: "Core", tone: "bg-sky-500" },
-  c13: { title: "Undo history", tag: "Core", tone: "bg-sky-500" },
-  c14: { title: "Morning summary", tag: "Docs", tone: "bg-amber-500" },
+  c1: { title: "Virtual list", tag: "Core", tone: "#0ea5e9" },
+  c2: { title: "Grid focus", tag: "Core", tone: "#0ea5e9" },
+  c3: { title: "Inline edit", tag: "Core", tone: "#0ea5e9" },
+  c4: { title: "Chat log", tag: "Demo", tone: "#8b5cf6" },
+  c5: { title: "Kanban", tag: "Demo", tone: "#8b5cf6" },
+  c6: { title: "Color picker", tag: "Demo", tone: "#8b5cf6" },
+  c7: { title: "Context menu", tag: "Demo", tone: "#8b5cf6" },
+  c8: { title: "Docs for agents", tag: "Docs", tone: "#f59e0b" },
+  c9: { title: "Size check", tag: "Infra", tone: "#10b981" },
+  c10: { title: "Unit tests", tag: "Infra", tone: "#10b981" },
+  c11: { title: "Selection toolbar", tag: "Demo", tone: "#8b5cf6" },
+  c12: { title: "Auto scroll", tag: "Core", tone: "#0ea5e9" },
+  c13: { title: "Undo history", tag: "Core", tone: "#0ea5e9" },
+  c14: { title: "Morning summary", tag: "Docs", tone: "#f59e0b" },
 }
 
 const columns = [
@@ -225,24 +225,17 @@ const defaultLists = {
 
 const limits = { doing: 3 }
 const labels = Object.fromEntries(columns.map((column) => [column.value, column.label]))
-const button = "h-8 rounded-md border border-border px-3 text-sm disabled:opacity-50"
 
 function Example() {
   return (
-    <Kanban
-      defaultLists={defaultLists}
-      limits={limits}
-      labels={labels}
-      aria-label="Sprint"
-      className="flex w-full flex-col gap-2"
-    >
+    <Kanban defaultLists={defaultLists} limits={limits} labels={labels} aria-label="Sprint">
       {({ lists }) => (
         <>
-          <div className="flex items-center gap-2">
-            <KanbanUndo className={button}>Undo</KanbanUndo>
-            <KanbanRedo className={button}>Redo</KanbanRedo>
+          <div data-slot="row">
+            <KanbanUndo>Undo</KanbanUndo>
+            <KanbanRedo>Redo</KanbanRedo>
           </div>
-          <div className="flex w-full gap-3 overflow-x-auto pb-2">
+          <div data-slot="kanban-board">
             {columns.map((column) => {
               const limit = limits[column.value as keyof typeof limits]
               const count = lists[column.value]?.length ?? 0
@@ -250,33 +243,26 @@ function Example() {
                 <section
                   key={column.value}
                   aria-labelledby={`kanban-${column.value}`}
-                  className="flex w-48 shrink-0 flex-col rounded-xl bg-muted/60 p-2"
+                  data-slot="kanban-lane"
                 >
-                  <h3
-                    id={`kanban-${column.value}`}
-                    className="flex items-center justify-between px-1 pb-2 text-xs font-medium text-muted-foreground"
-                  >
+                  <h3 id={`kanban-${column.value}`}>
                     {column.label}
-                    <span className={limit !== undefined && count >= limit ? "text-amber-600" : ""}>
+                    <span data-full={limit !== undefined && count >= limit ? "" : undefined}>
                       {count}
                       {limit === undefined ? "" : ` / ${limit}`}
                     </span>
                   </h3>
-                  <KanbanColumn
-                    value={column.value}
-                    aria-labelledby={`kanban-${column.value}`}
-                    className="flex max-h-64 min-h-24 flex-col gap-2 overflow-y-auto p-0.5"
-                  >
+                  <KanbanColumn value={column.value} aria-labelledby={`kanban-${column.value}`}>
                     {({ cards: keys }) =>
                       keys.map((key) => (
-                        <KanbanCard
-                          key={key}
-                          value={key}
-                          className="flex cursor-grab flex-col gap-1 rounded-lg border border-border bg-background p-2.5 text-sm shadow-xs outline-none select-none focus-visible:ring-3 focus-visible:ring-ring/50 data-moving:ring-2 data-moving:ring-primary data-dragging:opacity-40 data-dragging:ring-0 data-drag-preview:rotate-2 data-drag-preview:cursor-grabbing data-drag-preview:shadow-lg"
-                        >
-                          <span className="font-medium">{cards[key].title}</span>
-                          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <span aria-hidden="true" className={`size-1.5 rounded-full ${cards[key].tone}`} />
+                        <KanbanCard key={key} value={key}>
+                          <span>{cards[key].title}</span>
+                          <span data-slot="hint">
+                            <span
+                              aria-hidden="true"
+                              data-slot="kanban-tone"
+                              style={{ "--tone": cards[key].tone } as React.CSSProperties}
+                            />
                             {cards[key].tag}
                           </span>
                         </KanbanCard>

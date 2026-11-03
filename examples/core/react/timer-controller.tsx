@@ -54,21 +54,18 @@ const parts = createParts(countdown, { root: "div" })
 
 const Countdown = parts.Root
 
-const button =
-  "h-8 rounded-lg border border-border px-3 font-medium outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-
 function Example() {
   const [controller] = React.useState(createCountdownController)
   return (
-    <div className="flex w-72 flex-col items-start gap-3 text-sm">
-      <Countdown controller={controller} aria-label="Tea" className="text-2xl font-medium tabular-nums">
+    <div data-slot="stack">
+      <Countdown controller={controller} aria-label="Tea">
         {({ left }) => `0:${String(left).padStart(2, "0")}`}
       </Countdown>
-      <div className="flex gap-2">
-        <button type="button" className={button} onClick={() => controller.start(30)}>
+      <div data-slot="row">
+        <button type="button" onClick={() => controller.start(30)}>
           Start 30 seconds
         </button>
-        <button type="button" className={button} onClick={() => controller.stop()}>
+        <button type="button" onClick={() => controller.stop()}>
           Stop
         </button>
       </div>

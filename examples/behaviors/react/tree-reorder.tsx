@@ -82,14 +82,10 @@ const outline = [
 
 function Example() {
   return (
-    <Pages aria-label="Pages" defaultRows={outline} className="flex w-60 flex-col gap-0.5">
+    <Pages aria-label="Pages" defaultRows={outline}>
       {({ rows }) =>
         rows.map((row) => (
-          <PagesRow
-            key={row.key}
-            value={row.key}
-            className="ms-[calc(var(--depth)*20px)] rounded-md px-3 py-1.5 text-sm outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-moving:bg-muted data-moving:text-muted-foreground"
-          >
+          <PagesRow key={row.key} value={row.key}>
             {row.key}
           </PagesRow>
         ))

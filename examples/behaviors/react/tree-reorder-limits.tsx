@@ -113,33 +113,17 @@ const FoldersOutdent = parts.Outdent
 
 function Example() {
   return (
-    <Folders aria-label="Folders" className="flex w-64 flex-col gap-0.5 text-sm">
+    <Folders aria-label="Folders">
       {({ rows }) =>
         rows.map((row) => (
-          <FoldersRow
-            key={row.key}
-            value={row.key}
-            className="group ms-[calc(var(--depth)*16px)] flex items-center gap-2 rounded-md px-2 py-1 outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 data-moving:bg-muted data-moving:text-muted-foreground"
-          >
-            <span aria-hidden="true" className="text-muted-foreground group-data-parent:text-foreground">
-              {row.key === "Inbox" ? "📥" : "📁"}
-            </span>
-            <span className="flex-1">{row.key}</span>
-            <span className="text-xs text-muted-foreground tabular-nums">{counts[row.key]}</span>
+          <FoldersRow key={row.key} value={row.key}>
+            <span aria-hidden="true">{row.key === "Inbox" ? "📥" : "📁"}</span>
+            <span>{row.key}</span>
+            <span data-slot="hint">{counts[row.key]}</span>
             {row.key !== "Inbox" && (
               <>
-                <FoldersOutdent
-                  value={row.key}
-                  className="rounded px-1 text-xs text-muted-foreground hover:bg-background"
-                >
-                  ←
-                </FoldersOutdent>
-                <FoldersIndent
-                  value={row.key}
-                  className="rounded px-1 text-xs text-muted-foreground hover:bg-background"
-                >
-                  →
-                </FoldersIndent>
+                <FoldersOutdent value={row.key}>←</FoldersOutdent>
+                <FoldersIndent value={row.key}>→</FoldersIndent>
               </>
             )}
           </FoldersRow>

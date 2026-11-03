@@ -344,31 +344,24 @@ function Example() {
         )
       }
     >
-      <div className="flex w-full flex-col items-center gap-3">
-        <MarkingMenuSurface
-          aria-label="Message, press and hold for actions"
-          className="flex h-56 w-full max-w-md cursor-default flex-col justify-center gap-1 rounded-xl border bg-card p-6 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <span className="font-medium">Design review moved to Thursday</span>
-          <span className="text-muted-foreground">
+      <div data-slot="stack">
+        <MarkingMenuSurface aria-label="Message, press and hold for actions">
+          <span>Design review moved to Thursday</span>
+          <span data-slot="hint">
             Press and hold here, then move toward an action. Or flick: a quick stroke runs it without the
             ring.
           </span>
         </MarkingMenuSurface>
-        <p className="text-sm text-muted-foreground" aria-live="polite">
+        <p data-slot="hint" aria-live="polite">
           {last ? `Ran ${last}` : "Enter or Shift+F10 opens the ring from the keyboard."}
         </p>
-        <MarkingMenuStroke className="z-50">
-          <span className="absolute top-0 left-0 h-0.5 w-(--stroke-length) origin-left rotate-(--stroke-angle) rounded-full bg-primary/50" />
+        <MarkingMenuStroke>
+          <span />
         </MarkingMenuStroke>
         <MarkingMenuRing>
-          <span aria-hidden="true" className="absolute size-3 -translate-1/2 rounded-full bg-primary" />
+          <span aria-hidden="true" />
           {items.map((item) => (
-            <MarkingMenuItem
-              key={item.value}
-              value={item.value}
-              className="flex h-8 -translate-1/2 items-center rounded-full border border-border bg-popover px-3 text-sm whitespace-nowrap text-popover-foreground shadow-md outline-none select-none data-highlighted:bg-primary data-highlighted:text-primary-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
+            <MarkingMenuItem key={item.value} value={item.value}>
               {item.label}
             </MarkingMenuItem>
           ))}

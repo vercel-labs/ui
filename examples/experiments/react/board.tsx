@@ -246,47 +246,41 @@ const BoardLasso = parts.Lasso
 const BoardInstructions = parts.Instructions
 
 const cards = [
-  { value: "research", label: "Research", note: "Five interviews", x: 12, y: 12, tone: "bg-sky-500" },
-  { value: "sketch", label: "Sketch", note: "Three directions", x: 176, y: 36, tone: "bg-amber-500" },
-  { value: "prototype", label: "Prototype", note: "Click-through", x: 340, y: 16, tone: "bg-emerald-500" },
-  { value: "test", label: "Test", note: "Five sessions", x: 80, y: 168, tone: "bg-rose-500" },
-  { value: "ship", label: "Ship", note: "Behind a flag", x: 268, y: 184, tone: "bg-violet-500" },
+  { value: "research", label: "Research", note: "Five interviews", x: 12, y: 12, tone: "#0ea5e9" },
+  { value: "sketch", label: "Sketch", note: "Three directions", x: 176, y: 36, tone: "#f59e0b" },
+  { value: "prototype", label: "Prototype", note: "Click-through", x: 340, y: 16, tone: "#10b981" },
+  { value: "test", label: "Test", note: "Five sessions", x: 80, y: 168, tone: "#f43f5e" },
+  { value: "ship", label: "Ship", note: "Behind a flag", x: 268, y: 184, tone: "#8b5cf6" },
 ]
 const defaultPositions = Object.fromEntries(cards.map((card) => [card.value, { x: card.x, y: card.y }]))
 
 function Example() {
   const [selected, setSelected] = React.useState<string[]>([])
   return (
-    <div className="flex w-full flex-col gap-2">
+    <div data-slot="stack">
       <Board
         defaultPositions={defaultPositions}
         selected={selected}
         onSelectedChange={setSelected}
         grid={8}
         aria-label="Plan"
-        className="h-80 w-full overflow-hidden rounded-xl bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] [background-size:16px_16px]"
       >
         {cards.map((card) => (
-          <BoardCard
-            key={card.value}
-            value={card.value}
-            label={card.label}
-            className="flex w-36 cursor-grab flex-col gap-0.5 rounded-xl border border-border bg-card p-3 text-sm shadow-sm outline-none select-none data-dragging:cursor-grabbing data-dragging:shadow-lg data-lassoed:ring-2 data-lassoed:ring-primary/40 data-selected:border-primary data-selected:ring-2 data-selected:ring-primary/30 focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
-            <span className="flex items-center gap-2 font-medium">
-              <span aria-hidden="true" className={`size-2 rounded-full ${card.tone}`} />
+          <BoardCard key={card.value} value={card.value} label={card.label}>
+            <span data-slot="row">
+              <span data-slot="swatch" aria-hidden="true" style={{ background: card.tone }} />
               {card.label}
             </span>
-            <span className="text-muted-foreground">{card.note}</span>
+            <span data-slot="hint">{card.note}</span>
           </BoardCard>
         ))}
-        <BoardLasso className="rounded-sm border border-primary/60 bg-primary/10" />
+        <BoardLasso />
         <BoardInstructions>
           Arrow keys move to the nearest card. Shift with an arrow adds it to the selection. Space selects.
           Alt with an arrow moves the selection.
         </BoardInstructions>
       </Board>
-      <p className="text-sm text-muted-foreground">
+      <p data-slot="output">
         {selected.length ? `Selected: ${selected.join(", ")}` : "Drag on empty space to select cards."}
       </p>
     </div>

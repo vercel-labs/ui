@@ -71,14 +71,10 @@ const AlbumPhoto = parts.Photo
 
 function Example() {
   return (
-    <Album aria-label="Album" className="grid w-80 grid-cols-4 gap-2">
+    <Album aria-label="Album">
       {({ order }) =>
         order.map((photo) => (
-          <AlbumPhoto
-            key={photo}
-            value={photo}
-            className="flex aspect-square items-end rounded-lg border border-border bg-muted p-1.5 text-xs text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-grabbed:relative data-grabbed:z-10 data-grabbed:translate-x-(--drag-x) data-grabbed:translate-y-(--drag-y) data-grabbed:shadow-lg"
-          >
+          <AlbumPhoto key={photo} value={photo}>
             {photo}
           </AlbumPhoto>
         ))

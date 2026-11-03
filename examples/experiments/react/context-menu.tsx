@@ -246,36 +246,28 @@ function Example() {
         )
       }
     >
-      <div className="flex w-full max-w-md flex-col gap-2">
-        <ContextMenuArea className="flex flex-col gap-1 rounded-xl border border-border p-2 select-none [-webkit-touch-callout:none]">
+      <div data-slot="stack">
+        <ContextMenuArea>
           {files.map((file) => (
-            <div
-              key={file.value}
-              data-target={file.value}
-              tabIndex={0}
-              className="flex items-center justify-between rounded-md px-3 py-2 text-sm outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <span className="font-medium">{file.value}</span>
-              <span className="text-muted-foreground">
+            <div key={file.value} data-target={file.value} tabIndex={0} data-slot="context-menu-file">
+              <span>{file.value}</span>
+              <span data-slot="hint">
                 {file.kind} · {file.size}
               </span>
             </div>
           ))}
         </ContextMenuArea>
-        <p className="text-sm text-muted-foreground" aria-live="polite">
+        <p data-slot="output" aria-live="polite">
           {log}
         </p>
       </div>
-      <ContextMenuPopup
-        aria-label="File actions"
-        className="min-w-44 rounded-lg border border-border bg-popover p-1 text-sm text-popover-foreground shadow-lg outline-none"
-      >
+      <ContextMenuPopup aria-label="File actions">
         {actions.map((action) => (
           <ContextMenuItem
             key={action.value}
             value={action.value}
             disabled={action.disabled}
-            className={`flex cursor-default items-center rounded-md px-2 py-1.5 outline-none focus:bg-accent focus:text-accent-foreground data-disabled:opacity-50 ${action.value === "trash" ? "text-destructive" : ""}`}
+            data-destructive={action.value === "trash" ? "" : undefined}
           >
             {action.label}
           </ContextMenuItem>

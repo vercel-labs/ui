@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.base.json",
-  "include": ["*/solid/*.tsx"],
+  "include": ["*/solid/*.tsx", "components/*/solid/*.tsx"],
   "compilerOptions": {
     "noUnusedLocals": false,
     "jsx": "preserve",

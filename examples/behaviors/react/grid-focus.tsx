@@ -46,17 +46,11 @@ const letters = "ABCD"
 
 function Example() {
   return (
-    <SeatMap rows={3} cols={6} aria-label="Seats" className="flex flex-col gap-1.5">
+    <SeatMap rows={3} cols={6} aria-label="Seats">
       {[0, 1, 2].map((row) => (
-        <SeatMapRow key={row} id={String(row)} className="flex gap-1.5">
+        <SeatMapRow key={row} id={String(row)}>
           {[0, 1, 2, 3, 4, 5].map((col) => (
-            <SeatMapSeat
-              key={col}
-              row={row}
-              col={col}
-              aria-label={`Seat ${letters[row]}${col + 1}`}
-              className="grid size-9 place-items-center rounded-md border border-border text-xs outline-none focus-visible:bg-primary focus-visible:text-primary-foreground"
-            >
+            <SeatMapSeat key={col} row={row} col={col} aria-label={`Seat ${letters[row]}${col + 1}`}>
               {letters[row]}
               {col + 1}
             </SeatMapSeat>

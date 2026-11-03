@@ -1,10 +1,11 @@
 import { expect, test } from "@playwright/test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
+import { onPage } from "./docs-helpers"
 
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/hover-card")
+const root = path.join(import.meta.dirname, "../../examples/components/hover-card")
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -26,7 +27,8 @@ const triggers: Record<string, RegExp> = {
   animation: /^@grace$/,
   "custom-rendering": /Ada Lovelace$/,
 }
-const order = Object.keys(triggers)
+const fixtures = Object.keys(triggers)
+const order = fixtures.filter(onPage)
 
 for (const framework of frameworks) {
   test(`every hover card example works in ${framework}`, async ({ page }) => {
@@ -37,7 +39,7 @@ for (const framework of frameworks) {
     await page.waitForLoadState("networkidle")
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order].sort())
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
     const cards = page.locator('[data-slot="hover-card-content"]:visible')
 
     for (const [index, name] of order.entries()) {

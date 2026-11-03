@@ -1,0 +1,143 @@
+@scope ([data-example]) {
+  [data-slot="listbox-root"] {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    box-sizing: border-box;
+    width: 14rem;
+    max-width: 100%;
+    padding: 5px;
+    border-radius: var(--radius-surface);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
+    color: var(--ink);
+    font-size: var(--text-md);
+
+    &[data-readonly] {
+      box-shadow: 0 0 0 1px var(--line-faint);
+    }
+
+    &[data-disabled] {
+      box-shadow: 0 0 0 1px var(--line-faint);
+      color: var(--line-disabled);
+    }
+
+    [data-slot="field-root"] > & {
+      width: 100%;
+    }
+  }
+
+  [data-slot="listbox-item"] {
+    position: relative;
+    padding-inline-end: 30px;
+    color: inherit;
+    text-decoration: none;
+
+    &:hover:not([data-highlighted], [data-disabled]) {
+      background: var(--tint);
+    }
+
+    &:is([data-selected], [aria-selected="true"]) {
+      font-weight: 400;
+    }
+
+    &[data-highlighted] {
+      background: var(--tint);
+      box-shadow: inset 0 0 0 1px var(--ink);
+    }
+
+    &:focus-visible {
+      outline-offset: -3px;
+    }
+
+    [data-disabled] > &[data-selected] {
+      background: none;
+      box-shadow: none;
+    }
+
+    & > svg:last-child {
+      margin-inline-start: auto;
+    }
+
+    &:not([data-selected]) > svg:last-child {
+      visibility: hidden;
+    }
+  }
+
+  [data-slot="listbox-item-indicator"] {
+    position: absolute;
+    inset-inline-end: 10px;
+    display: flex;
+    padding: 0;
+
+    & > svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  [data-slot="listbox-item-icon"] {
+    display: flex;
+    color: var(--muted);
+
+    :is([data-highlighted], [data-selected]) > & {
+      color: inherit;
+    }
+  }
+
+  [data-slot="listbox-group"] {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  /* Horizontal: plain labels, the selected one is a raised pill like a selected tab. */
+  [data-slot="listbox-root"][data-orientation="horizontal"] {
+    flex-direction: row;
+    gap: 2px;
+    width: auto;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+
+    & [data-slot="listbox-item"] {
+      justify-content: center;
+      min-width: var(--size);
+      height: 30px;
+      min-height: 0;
+      padding: 0 var(--space-3);
+      border-radius: var(--radius-control);
+      color: var(--muted);
+      font-weight: 500;
+
+      &:hover:not([data-disabled], [data-selected]) {
+        background: none;
+        color: var(--ink);
+      }
+
+      &[data-highlighted]:not([data-selected]) {
+        background: var(--tint);
+        box-shadow: none;
+        color: var(--ink);
+      }
+
+      &[data-selected] {
+        background: var(--surface-1);
+        box-shadow:
+          inset 0 0 0 1px var(--ink),
+          var(--shadow-drop);
+        color: var(--ink);
+      }
+
+      &[data-disabled] {
+        color: var(--line-disabled);
+      }
+
+      &:focus-visible {
+        outline: 3px solid var(--halo);
+        outline-offset: 0;
+      }
+    }
+  }
+}

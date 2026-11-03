@@ -3,27 +3,31 @@ import { readdirSync } from "node:fs"
 import path from "node:path"
 
 const frameworks = ["react", "solid", "vue", "svelte", "web-components"]
-const root = path.join(import.meta.dirname, "../../examples/alert-dialog")
+const root = path.join(import.meta.dirname, "../../examples/components/alert-dialog")
 const folders = ["react", "solid", "vue", "svelte", "web"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name.replace(/\.\w+$/, ""))
 
-const retainedFixtures = ["small", "media", "small-media", "destructive", "rtl"]
+const retainedFixtures = ["rtl"]
 
 // The order examples appear on the page, with each one's trigger and answers.
 const examples = {
-  basic: { trigger: "Delete project", title: "Delete this project?", cancel: "Cancel", agree: "Delete" },
+  basic: { trigger: "Delete Project", title: "Delete this project?", cancel: "Cancel", agree: "Delete" },
   controlled: {
-    trigger: "Review changes",
+    trigger: "Review Changes",
     title: "Discard unsaved changes?",
-    cancel: "Keep editing",
+    cancel: "Keep Editing",
     agree: "Discard",
   },
+  shortcut: undefined,
+  animation: undefined,
+  nested: undefined,
+  "async-action": undefined,
+  "confirm-anywhere": undefined,
   confirm: undefined,
   queue: undefined,
-  "async-action": undefined,
 }
 const exact = (text: string) => new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`)
 
@@ -116,7 +120,7 @@ for (const framework of frameworks) {
     test.setTimeout(60_000)
     const { errors, example } = await load(page, framework)
     const preview = example("async-action")
-    const trigger = preview.getByRole("button", { name: "Delete project" })
+    const trigger = preview.getByRole("button", { name: "Delete Project" })
     const alert = page.getByRole("alertdialog")
     const action = alert.getByRole("button").last()
 
@@ -127,11 +131,11 @@ for (const framework of frameworks) {
     await page.keyboard.press("Escape")
     await alert.getByRole("button", { name: "Cancel" }).click()
     await expect(alert, "nothing else closes it while pending").toBeVisible()
-    await expect(action).toHaveText("Try again")
+    await expect(action).toHaveText("Try Again")
     await expect(action).not.toHaveAttribute("aria-busy", "true")
     await expect(alert).toBeVisible()
     await expect(alert.getByRole("alert"), "the first try fails, then the error shows").toHaveText(
-      "Couldn't delete the project. Try again.",
+      "Couldn't delete the project.",
     )
 
     await alert.getByRole("button", { name: "Cancel" }).click()
@@ -153,7 +157,7 @@ for (const framework of frameworks) {
   test(`the trigger says it opens a dialog in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/alert-dialog`)
     const trigger = page.locator('[data-example="alert-dialog/basic"]').getByRole("button", {
-      name: "Delete project",
+      name: "Delete Project",
     })
     await expect(trigger).toHaveAttribute("aria-haspopup", "dialog")
   })
@@ -164,9 +168,9 @@ for (const framework of frameworks) {
     const { errors, example } = await load(page, framework)
     const preview = example("controlled")
     await expect(preview.getByRole("status")).toHaveText("Open: false")
-    await preview.getByRole("button", { name: "Review changes" }).click()
+    await preview.getByRole("button", { name: "Review Changes" }).click()
     await expect(preview.getByRole("status", { includeHidden: true })).toHaveText("Open: true")
-    await page.getByRole("alertdialog").getByRole("button", { name: "Keep editing" }).click()
+    await page.getByRole("alertdialog").getByRole("button", { name: "Keep Editing" }).click()
     await expect(preview.getByRole("status")).toHaveText("Open: false")
     expect(errors).toEqual([])
   })
@@ -174,7 +178,7 @@ for (const framework of frameworks) {
   test(`confirms answer queued questions one at a time in ${framework}`, async ({ page }) => {
     const { errors, example } = await load(page, framework)
     const preview = example("queue")
-    const trigger = preview.getByRole("button", { name: "Review two projects" })
+    const trigger = preview.getByRole("button", { name: "Review Two Projects" })
     const alert = page.getByRole("alertdialog")
     await trigger.click()
     await expect(alert).toHaveCount(1)

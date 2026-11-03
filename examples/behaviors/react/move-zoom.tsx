@@ -95,48 +95,36 @@ function Example() {
   const [zoom, setZoom] = React.useState(1)
   const [positions, setPositions] = React.useState<Record<string, MovePoint>>({ circle: { x: 40, y: 40 } })
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex gap-1">
+    <div data-slot="stack">
+      <div data-slot="row">
         {[0.5, 1, 1.5].map((option) => (
           <button
             key={option}
             type="button"
+            data-variant="ghost"
+            data-size="sm"
             aria-pressed={zoom === option}
             onClick={() => setZoom(option)}
-            className="rounded-md px-2 py-1 text-xs aria-pressed:bg-muted"
           >
             {option * 100}%
           </button>
         ))}
       </div>
-      <Canvas
-        aria-label="Canvas"
-        zoom={zoom}
-        onPositionsChange={setPositions}
-        className="flex flex-col gap-2"
-      >
-        <div className="h-[200px] w-[320px] overflow-hidden rounded-xl border border-border bg-muted/40">
+      <Canvas aria-label="Canvas" zoom={zoom} onPositionsChange={setPositions}>
+        <div data-slot="move-area">
           <CanvasSurface>
-            <CanvasShape
-              value="circle"
-              aria-label="Circle"
-              className="size-12 cursor-grab rounded-full bg-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            />
-            <CanvasShape
-              value="square"
-              aria-label="Square"
-              className="size-12 cursor-grab rounded-md bg-foreground/70 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            />
+            <CanvasShape value="circle" aria-label="Circle" data-shape="round" />
+            <CanvasShape value="square" aria-label="Square" />
           </CanvasSurface>
         </div>
-        <div className="flex items-center gap-2">
-          <CanvasAction value="center" className="rounded-md border border-border px-2 py-1 text-xs">
+        <div data-slot="row">
+          <CanvasAction value="center" data-size="sm">
             Center
           </CanvasAction>
-          <CanvasAction value="nudge" className="rounded-md border border-border px-2 py-1 text-xs">
+          <CanvasAction value="nudge" data-size="sm">
             Nudge right
           </CanvasAction>
-          <p className="text-xs text-muted-foreground tabular-nums">
+          <p data-slot="output">
             Circle at {positions.circle.x}, {positions.circle.y}
           </p>
         </div>

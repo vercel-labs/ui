@@ -42,15 +42,11 @@ const countries = ["Argentina", "Australia", "Austria", "Belgium", "Brazil", "Ca
 function Example() {
   return (
     <FilterList>
-      <div className="flex w-64 flex-col gap-2 text-sm">
-        <FilterListInput
-          aria-label="Filter countries"
-          placeholder="Filter countries"
-          className="h-8 rounded-lg border border-border bg-transparent px-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        />
-        <FilterListList className="flex flex-col gap-1">
+      <div data-slot="stack">
+        <FilterListInput aria-label="Filter countries" placeholder="Filter countries" />
+        <FilterListList>
           {countries.map((country) => (
-            <FilterListItem key={country} value={country} className="px-1">
+            <FilterListItem key={country} value={country}>
               {country}
             </FilterListItem>
           ))}

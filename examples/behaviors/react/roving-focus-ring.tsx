@@ -42,15 +42,15 @@ const RingAction = parts.Action
 
 function Example() {
   return (
-    <Ring aria-label="Message" className="relative size-60 rounded-full border border-border bg-muted/40">
+    <Ring aria-label="Message">
       {actions.map((action) => {
         const { x, y } = place(action)
         return (
           <RingAction
+            data-size="sm"
             key={action}
             value={action}
-            style={{ left: `${50 + x * 36}%`, top: `${50 + y * 36}%` }}
-            className="absolute -translate-x-1/2 -translate-y-1/2 rounded-md border border-border bg-background px-2.5 py-1.5 text-sm shadow-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            style={{ "--x": `${50 + x * 36}%`, "--y": `${50 + y * 36}%` } as React.CSSProperties}
           >
             {action}
           </RingAction>

@@ -1,0 +1,5 @@
+@scope ([data-example]) {
+  [data-slot="textarea-root"] + [data-slot="field-description"] {
+    font-variant-numeric: tabular-nums;
+  }
+}

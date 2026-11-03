@@ -93,39 +93,30 @@ function Example() {
       onClose={(reason: string) =>
         setClosed(isDismissal(reason) ? `Dismissed by ${reason}` : `Closed by ${reason}`)
       }
-      className="flex w-72 flex-col gap-3 text-sm"
     >
-      <div className="flex items-center gap-2">
-        <TimerTrigger className="rounded-md border border-border px-2 py-1">Set a timer</TimerTrigger>
-        <button
-          type="button"
-          onClick={() => setCount(count + 1)}
-          className="rounded-md border border-border px-2 py-1"
-        >
+      <div data-slot="row">
+        <TimerTrigger>Set a timer</TimerTrigger>
+        <button type="button" onClick={() => setCount(count + 1)}>
           Count {count}
         </button>
       </div>
-      <TimerPanel className="flex w-48 flex-col gap-2 rounded-xl border border-border bg-popover p-3 shadow-lg">
+      <TimerPanel>
         <p>Remind me in 10 minutes.</p>
-        <TimerDone className="self-start rounded-md bg-foreground px-2 py-1 text-xs text-background">
+        <TimerDone data-variant="solid" data-size="sm">
           Done
         </TimerDone>
       </TimerPanel>
-      <TimerPlayer className="flex items-center justify-between rounded-lg bg-muted px-3 py-2 text-xs">
+      <TimerPlayer>
         {playing ? "Playing: Rain sounds" : "Paused"}
-        <button
-          type="button"
-          onClick={() => setPlaying(!playing)}
-          className="rounded px-1.5 py-0.5 hover:bg-background"
-        >
+        <button type="button" data-variant="ghost" data-size="sm" onClick={() => setPlaying(!playing)}>
           {playing ? "Pause" : "Play"}
         </button>
       </TimerPlayer>
-      <label className="flex items-center gap-1.5 text-xs">
+      <label data-slot="label">
         <input type="checkbox" checked={modal} onChange={(event) => setModal(event.target.checked)} />
         Modal
       </label>
-      <p data-last-close className="text-xs text-muted-foreground">
+      <p data-last-close data-slot="output">
         {closed}
       </p>
     </Timer>
