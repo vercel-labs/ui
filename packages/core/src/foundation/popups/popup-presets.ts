@@ -93,6 +93,7 @@ const popoverPreset = {
   presentation: sheetPresentation,
   press: pressOpening,
   hover: hoverOpening,
+  resetStyles: styleReset,
 } satisfies PopupPreset
 
 /**

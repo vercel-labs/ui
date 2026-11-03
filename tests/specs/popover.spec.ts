@@ -513,6 +513,21 @@ test.describe("positioning", () => {
     const anchor = (await trigger(page).boundingBox())!
     expect(Math.abs(arrow.x + arrow.width / 2 - (anchor.x + anchor.width / 2))).toBeLessThanOrEqual(1)
   })
+
+  test("the arrow outside the popover isn't clipped, and page styles still apply", async ({ page }) => {
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    const style = await dialog(page).evaluate((el) => {
+      const { overflow, paddingTop, borderTopWidth } = getComputedStyle(el)
+      return { overflow, paddingTop, borderTopWidth }
+    })
+    expect(style).toEqual({ overflow: "visible", paddingTop: "12px", borderTopWidth: "1px" })
+    const arrow = page.locator('.arrow, [data-slot="popover-arrow"]').first()
+    const box = (await arrow.boundingBox())!
+    const tip = { x: box.x + box.width / 2, y: box.y + 1 }
+    const hit = await arrow.evaluate((el, { x, y }) => el.contains(document.elementFromPoint(x, y)), tip)
+    expect(hit).toBe(true)
+  })
 })
 
 test.describe("nested popovers", () => {
