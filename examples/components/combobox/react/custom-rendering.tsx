@@ -6,31 +6,39 @@ import {
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
+  ComboboxTrigger,
 } from "@ui-sdk/react/combobox"
-import { CheckIcon, SearchIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react"
 
 const users = [
-  { id: 1, name: "Ada Lovelace", username: "ada", role: "Owner" },
-  { id: 2, name: "Grace Hopper", username: "grace", role: "Admin" },
-  { id: 3, name: "Alan Turing", username: "alan", role: "Member" },
-  { id: 4, name: "Margaret Hamilton", username: "margaret", role: "Member" },
-  { id: 5, name: "Edsger Dijkstra", username: "edsger", role: "Guest" },
+  { id: 1, name: "Hollis Grant", username: "hollis", role: "Owner" },
+  { id: 2, name: "Inès Moreau", username: "ines", role: "Admin" },
+  { id: 3, name: "Kofi Mensah", username: "kofi", role: "Member" },
+  { id: 4, name: "Wren Takahashi", username: "wren", role: "Member" },
+  { id: 5, name: "Tomasz Wójcik", username: "tomasz", role: "Guest" },
 ]
 
-export function Example() {
+function Example() {
   return (
     <Combobox>
       <div data-slot="stack">
-        <ComboboxLabel>Mention</ComboboxLabel>
-        <ComboboxInput
-          placeholder="@username"
-          render={(props) => (
-            <div data-slot="row">
-              <SearchIcon />
-              <input {...props} />
-            </div>
-          )}
-        />
+        <ComboboxLabel>Assignee</ComboboxLabel>
+        <div data-slot="row">
+          <ComboboxInput
+            placeholder="Search people"
+            render={(props) => (
+              <div data-slot="row">
+                <SearchIcon aria-hidden="true" />
+                <input {...props} />
+              </div>
+            )}
+          />
+          <ComboboxTrigger aria-label="Show people">
+            {(state) =>
+              state.open ? <ChevronUpIcon aria-hidden="true" /> : <ChevronDownIcon aria-hidden="true" />
+            }
+          </ComboboxTrigger>
+        </div>
       </div>
       <ComboboxContent>
         <ComboboxEmpty>No one by that name.</ComboboxEmpty>
@@ -44,7 +52,11 @@ export function Example() {
                     {user.name}
                     <span data-slot="hint">@{user.username}</span>
                   </span>
-                  {state.selected && <CheckIcon />}
+                  {state.selected ? (
+                    <CheckIcon aria-hidden="true" />
+                  ) : state.highlighted ? (
+                    <kbd data-slot="kbd">Enter</kbd>
+                  ) : null}
                 </>
               )}
             </ComboboxItem>
@@ -54,3 +66,5 @@ export function Example() {
     </Combobox>
   )
 }
+
+export { Example }

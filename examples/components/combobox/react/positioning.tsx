@@ -1,6 +1,5 @@
 import {
   Combobox,
-  ComboboxArrow,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
@@ -8,7 +7,17 @@ import {
   ComboboxItemIndicator,
   ComboboxList,
 } from "@ui-sdk/react/combobox"
-import { CheckIcon } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import * as React from "react"
 
 const frameworks = [
@@ -21,38 +30,69 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-const sides = ["top", "right", "bottom", "left"] as const
-const aligns = ["start", "center", "end"] as const
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+]
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
+type Side = "top" | "right" | "bottom" | "left"
+type Align = "start" | "center" | "end"
 
-export function Example() {
-  const [side, setSide] = React.useState<(typeof sides)[number]>("bottom")
-  const [align, setAlign] = React.useState<(typeof aligns)[number]>("start")
+function Example() {
+  const [side, setSide] = React.useState<Side>("bottom")
+  const [align, setAlign] = React.useState<Align>("start")
   const [box, setBox] = React.useState<HTMLDivElement | null>(null)
   const [anchored, setAnchored] = React.useState(false)
 
   return (
     <div data-slot="stack">
-      <div data-slot="stack">
-        <div role="group" aria-label="Side" data-slot="row">
-          {sides.map((value) => (
-            <button key={value} type="button" aria-pressed={side === value} onClick={() => setSide(value)}>
-              {value}
-            </button>
-          ))}
-        </div>
-        <div role="group" aria-label="Align" data-slot="row">
-          {aligns.map((value) => (
-            <button key={value} type="button" aria-pressed={align === value} onClick={() => setAlign(value)}>
-              {value}
-            </button>
-          ))}
-        </div>
+      <div data-slot="controls">
+        <Select items={sides} value={side} onValueChange={(next) => next && setSide(next as Side)}>
+          <SelectLabel>Side</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon />
+          </SelectTrigger>
+          <SelectContent>
+            {sides.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select items={aligns} value={align} onValueChange={(next) => next && setAlign(next as Align)}>
+          <SelectLabel>Align</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon />
+          </SelectTrigger>
+          <SelectContent>
+            {aligns.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <label data-slot="label">
-          <input
-            type="checkbox"
-            checked={anchored}
-            onChange={(event) => setAnchored(event.currentTarget.checked)}
-          />
+          <Checkbox checked={anchored} onCheckedChange={(next) => setAnchored(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
           Anchor to the box
         </label>
       </div>
@@ -67,7 +107,6 @@ export function Example() {
             collisionPadding={16}
             anchor={anchored ? box : null}
           >
-            <ComboboxArrow />
             <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
             <ComboboxList>
               {frameworks.map((framework) => (
@@ -85,3 +124,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

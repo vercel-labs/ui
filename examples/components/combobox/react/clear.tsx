@@ -13,6 +13,7 @@ import {
   ComboboxTrigger,
 } from "@ui-sdk/react/combobox"
 import { CheckIcon, ChevronDownIcon, XIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 import * as React from "react"
 
 const frameworks = [
@@ -29,39 +30,44 @@ const frameworkLabel = (value: string) =>
   frameworks.find((framework) => framework.value === value)?.label ?? value
 
 function Example() {
+  const log = useLog()
   const [value, setValue] = React.useState<string | null>("sveltekit")
 
   return (
-    <div data-slot="stack">
-      <Combobox value={value} onValueChange={setValue} itemToLabel={frameworkLabel}>
-        <div data-slot="stack">
-          <ComboboxLabel>Framework</ComboboxLabel>
-          <div data-slot="row">
-            <ComboboxInput placeholder="Select a framework" />
-            <ComboboxClear aria-label="Clear framework">
-              <XIcon aria-hidden="true" />
-            </ComboboxClear>
-            <ComboboxTrigger aria-label="Show frameworks">
-              <ChevronDownIcon aria-hidden="true" />
-            </ComboboxTrigger>
-          </div>
+    <Combobox
+      value={value}
+      onValueChange={(next, details) => {
+        setValue(next)
+        log(`${next ? frameworkLabel(next) : "Cleared"} (${details.reason})`)
+      }}
+      itemToLabel={frameworkLabel}
+    >
+      <div data-slot="stack">
+        <ComboboxLabel>Framework</ComboboxLabel>
+        <div data-slot="row">
+          <ComboboxInput placeholder="Select a framework" />
+          <ComboboxClear aria-label="Clear framework">
+            <XIcon aria-hidden="true" />
+          </ComboboxClear>
+          <ComboboxTrigger aria-label="Show frameworks">
+            <ChevronDownIcon aria-hidden="true" />
+          </ComboboxTrigger>
         </div>
-        <ComboboxContent>
-          <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-          <ComboboxList>
-            {frameworks.map((framework) => (
-              <ComboboxItem key={framework.value} value={framework.value} label={framework.label}>
-                {framework.label}
-                <ComboboxItemIndicator>
-                  <CheckIcon aria-hidden="true" />
-                </ComboboxItemIndicator>
-              </ComboboxItem>
-            ))}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-      <output data-slot="output">Value: {JSON.stringify(value)}</output>
-    </div>
+      </div>
+      <ComboboxContent>
+        <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
+        <ComboboxList>
+          {frameworks.map((framework) => (
+            <ComboboxItem key={framework.value} value={framework.value} label={framework.label}>
+              {framework.label}
+              <ComboboxItemIndicator>
+                <CheckIcon aria-hidden="true" />
+              </ComboboxItemIndicator>
+            </ComboboxItem>
+          ))}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
   )
 }
 

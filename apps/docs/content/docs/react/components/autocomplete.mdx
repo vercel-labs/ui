@@ -65,6 +65,13 @@ function Example() {
 export { Example }
 ```
 
+## Autocomplete vs Combobox
+
+Both filter a list as you type. They differ in what the value is.
+
+- **Autocomplete**: the value is the text. Suggestions help fill it in, and anything typed is valid. Use it for a search box, an address or a free-form field.
+- **[Combobox](./combobox)**: the value is an option from the list, or several with `multiple`. The text is only a query; closing without choosing restores the selected label, and a form submits the value, not the text. Use it for a country, an assignee or a set of labels.
+
 ## Build Your Own
 
 `@ui-sdk/react/autocomplete` comes with a ready-made Autocomplete. If you'd like to build your own, with your own names, start from the `autocomplete` primitive in `@ui-sdk/core`:
@@ -257,7 +264,10 @@ The content has `data-starting-style` while it opens and `data-ending-style` whi
 
 </StyleTabs>
 
-<ComponentExample name="autocomplete/animation" caption="Type to open the suggestions. They slide and fade in, and fade out before they unmount." />
+<ComponentExample
+  name="autocomplete/animation"
+  caption="Type to open the suggestions. They slide and fade in, and fade out before they unmount."
+/>
 
 ## Presentation
 
@@ -587,7 +597,7 @@ Callbacks get the new state first, then the details.
 
 ## Accessibility
 
-The autocomplete follows the [WAI-ARIA combobox pattern with list autocomplete](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/), and [list and inline](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/) with `inlineComplete`. 
+The autocomplete follows the [WAI-ARIA combobox pattern with list autocomplete](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/), and [list and inline](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/) with `inlineComplete`.
 
 Typing filters the suggestions. Arrow keys move the highlight; Enter fills in the highlighted text and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted suggestion. A touch screen-reader trigger can move focus into the list, and a sheet has its own [focus behavior](#presentation).
 

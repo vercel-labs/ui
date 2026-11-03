@@ -238,8 +238,8 @@
 
     &[data-presentation="sheet"] {
       width: auto;
-      height: 85dvh;
-      max-height: none;
+      height: auto;
+      max-height: 85dvh;
       padding: var(--space-2) var(--space-2) max(env(safe-area-inset-bottom), var(--space-3));
       scroll-padding-top: 48px;
 
@@ -252,6 +252,7 @@
       }
 
       & [data-slot="combobox-input"] {
+        width: 100%;
         max-width: none;
       }
     }

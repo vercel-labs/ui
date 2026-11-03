@@ -83,11 +83,6 @@ Add `auto-highlight` to highlight the first match while typing, so Enter can cho
 
 Use `keywords` for text that should match without appearing in the label, such as a username or a country’s local name.
 
-<ComponentExample
-  name="combobox/keywords"
-  caption="Type “deutschland”. Germany matches through a keyword even though its displayed label is different."
-/>
-
 ### Filter
 
 `filter` accepts `"contains"` (the default), `"startsWith"`, a function of the item and query, or `false` for results already filtered by a server. A function can return a score instead of `true` or `false`, and items you pass as `items` then sort by it, best first. `fuzzyScore` from `@ui-sdk/core/text-match` scores an exact match above a prefix, and a prefix above a match inside the label. Assign a custom function to the `filter` property.
@@ -119,11 +114,6 @@ Use `ui-combobox-group` and `ui-combobox-group-label` to name groups. Filtering 
 
 You can map an array into parts with your markup and classes, as below. Each item’s `label` supplies the text for filtering and the input; `keywords` and `disabled` work the same as with handwritten items.
 
-<ComponentExample
-  name="combobox/data"
-  caption="Search the fruits or choose one from Citrus. Orange is disabled, and typing “red” finds Cherry through its keyword."
-/>
-
 Pass `items` when the combobox needs the whole collection, such as recent items, server results, or virtualization. Assign it as a property and use a `<template>` to style the generated parts. [Lists and Menus](../lists-and-menus) covers the `ListData` format.
 
 Items can change while the list is open. Selection and highlight stay on their items; removing the highlighted item clears the highlight.
@@ -151,11 +141,6 @@ Wrap the input and icon together, then use that wrapper as the popup’s `anchor
 ### Object Values
 
 Use `itemToValue` for an object’s string identity and form value, `itemToLabel` for its displayed text, and `isItemEqualToValue` when two different objects can represent the same option.
-
-<ComponentExample
-  name="combobox/object-values"
-  caption="Choose a reviewer. The displayed selection retains the person’s object, while the form value uses their ID."
-/>
 
 ### Multiple
 
@@ -198,11 +183,6 @@ Add `ui-combobox-chips-overflow` to keep chips on one line. It measures which ch
 ### Keep Query
 
 Add `keep-query` to a multiple combobox to choose several matches without retyping the query.
-
-<ComponentExample
-  name="combobox/keep-query"
-  caption="Type “d”, then choose Design and Documentation. The query stays in the input between choices."
-/>
 
 ### Async Search
 
@@ -267,11 +247,6 @@ This example windows 10,000 items. Keep the actual row height aligned with your 
 ### Invalid
 
 A [Field](./field) supplies the input’s accessible name, description, and error. Submitting this required field without a selection sets `aria-invalid` and `data-invalid`.
-
-<ComponentExample
-  name="combobox/invalid"
-  caption="Press Continue without choosing a country. The error appears and describes the input; choose a country to complete the form."
-/>
 
 ### Forms
 

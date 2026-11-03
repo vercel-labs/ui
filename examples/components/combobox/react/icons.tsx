@@ -14,7 +14,14 @@ import {
   ComboboxTrigger,
   ComboboxValueIcon,
 } from "@ui-sdk/react/combobox"
-import { ArrowRightIcon, CheckIcon, ChevronDownIcon, CircleIcon, CircleCheckIcon, CircleXIcon } from "lucide-react"
+import {
+  ArrowRightIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  CircleIcon,
+  CircleCheckIcon,
+  CircleXIcon,
+} from "lucide-react"
 import * as React from "react"
 
 function Example() {

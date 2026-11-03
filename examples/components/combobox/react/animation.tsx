@@ -10,7 +10,7 @@ import {
   ComboboxTrigger,
 } from "@ui-sdk/react/combobox"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -22,14 +22,11 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-export function Example() {
-  const [status, setStatus] = React.useState("Closed")
+function Example() {
+  const log = useLog()
 
   return (
-    <Combobox
-      onOpenChange={(open) => setStatus(open ? "Opening…" : "Closing…")}
-      onOpenChangeComplete={(open) => setStatus(open ? "Open" : "Closed")}
-    >
+    <Combobox onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
       <div data-slot="stack">
         <ComboboxLabel>Framework</ComboboxLabel>
         <div data-slot="row">
@@ -38,7 +35,6 @@ export function Example() {
             <ChevronDownIcon />
           </ComboboxTrigger>
         </div>
-        <output data-slot="output">{status}</output>
       </div>
       <ComboboxContent>
         <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
@@ -56,3 +52,5 @@ export function Example() {
     </Combobox>
   )
 }
+
+export { Example }
