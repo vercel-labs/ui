@@ -30,11 +30,33 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/vue/d
 
 Each [component page](./components) lists the parts you can use.
 
+## Use with Nuxt
+
+Install the same two packages in a Nuxt app. There's no Nuxt module or plugin to add: import components from their entries as above, and they render on the server and hydrate in the browser.
+
+Nuxt auto-imports the components in your `components/` directory, not those of a package. To use ui-sdk parts in templates without importing them, register an entry's exports with `addComponentExports` from an inline module:
+
+```ts title="nuxt.config.ts"
+import { addComponentExports } from "nuxt/kit"
+
+export default defineNuxtConfig({
+  modules: [
+    () => {
+      for (const entry of ["dialog", "select"]) {
+        addComponentExports({ filePath: `@ui-sdk/vue/${entry}` })
+      }
+    },
+  ],
+})
+```
+
+Every named export of those entries becomes an auto-imported component, like `<DialogTrigger>`. Pass `prefix` if the names clash with your own components.
+
 ## Add Your Styles
 
 Components are unstyled. The examples use Tailwind CSS, but you can use your app's CSS too. [Styling and Animation](./styling-and-animation) covers both approaches.
 
-You can render your first component without setting up a provider, importing a UI SDK stylesheet, or adding a portal root. [Server Rendering](./server-rendering) covers rendering the initial HTML and adding interactions during hydration.
+You can render your first component without setting up a provider, importing a UI SDK stylesheet, or adding a portal root. [Server Rendering](./server-rendering) covers rendering the initial HTML and adding interactions during hydration, in Nuxt or your own server. If your Nuxt app sends a Content Security Policy, [Content Security Policy](./styling-and-animation#content-security-policy) covers nuxt-security.
 
 ## Right to Left
 
