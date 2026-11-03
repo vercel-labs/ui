@@ -70,20 +70,15 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
   const [preferredFramework] = useFramework()
   const router = useRouter()
 
-  const { search, setSearch, query } = useDocsSearch({ type: "fetch", api: "/api/search", delayMs: 100 })
-  const searching = search !== "" && (query.isLoading || (query.data === "empty" && !query.error))
   const framework = section && isFramework(section) ? section : preferredFramework
-  const results =
-    query.data && query.data !== "empty"
-      ? query.data.filter((result) =>
-          ["core", "agents", framework].some(
-            (shown) =>
-              result.url === `/docs/${shown}` ||
-              result.url.startsWith(`/docs/${shown}/`) ||
-              result.url.startsWith(`/docs/${shown}#`),
-          ),
-        )
-      : []
+  const { search, setSearch, query } = useDocsSearch({
+    type: "fetch",
+    api: "/api/search",
+    tag: framework,
+    delayMs: 100,
+  })
+  const searching = search !== "" && (query.isLoading || (query.data === "empty" && !query.error))
+  const results = query.data && query.data !== "empty" ? query.data : []
 
   return (
     <Dialog
