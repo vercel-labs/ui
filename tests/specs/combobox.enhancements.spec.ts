@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test"
 import { expect, lastAction, test } from "../fixtures"
 import { comboboxFixture as f } from "../fixtures/combobox"
+import { scrollIn, scrolledIntoView } from "../fixtures/popup"
 
 // Behavior past the WAI-ARIA pattern, tagged `@enhancement`.
 
@@ -148,4 +149,19 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await page.getByRole("button", { name: "Submit" }).click()
     await expect(page.getByRole("status", { name: "Submitted" })).toHaveText("country=fr")
   })
+
+  for (const part of ["content", "list"] as const) {
+    test(`arrow keys keep the highlighted item in view when the ${part} scrolls`, async ({ page, open }) => {
+      await open("combobox")
+      await input(page).focus()
+      await page.keyboard.press("ArrowDown")
+      await expect(listbox(page)).toBeVisible()
+      await scrollIn(listbox(page), part)
+      const last = listbox(page).getByRole("option", { name: "Germany", exact: true })
+      for (let i = 0; i < 12 && (await last.getAttribute("data-highlighted")) === null; i++)
+        await page.keyboard.press("ArrowDown")
+      await expect(last).toHaveAttribute("data-highlighted", "")
+      expect(await scrolledIntoView(last)).toBe(true)
+    })
+  }
 })

@@ -229,8 +229,11 @@ function createListboxEngine(
     blocked?: (entry: ListEntry) => boolean
     // Tells a virtualizer which index to reveal.
     onHighlight?: (key: string | null, index: number, event?: Event) => void
-    // The element that scrolls, for revealing items without scrolling the page.
+    // The list, which takes focus back when its focused item leaves.
     container?: () => HTMLElement | undefined
+    // The outermost element that may scroll to reveal an item, like the popup
+    // content around the list, so the page never scrolls. Defaults to `container`.
+    scrollRoot?: () => HTMLElement | undefined
     // Runs when an item mounts or unmounts, like a highlighted one a virtualizer
     // just rendered, so parts that depend on the list can update.
     onRegister?: (key: string) => void
@@ -450,7 +453,7 @@ function createListboxEngine(
   // Focuses a mounted item, or only scrolls it into view with virtual focus.
   function reveal(el: HTMLElement, focus: boolean) {
     if (focusMode() === "real" && focus && config.active()) el.focus({ preventScroll: true })
-    revealInList(el, config.container?.())
+    revealInList(el, (config.scrollRoot ?? config.container)?.())
   }
 
   function highlight(key: string | null, { focus = true, event }: { focus?: boolean; event?: Event } = {}) {

@@ -158,6 +158,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     loop: () => options().loop ?? true,
     active: () => store.get().open,
     container: () => element("list") ?? popup.element() ?? element("content"),
+    scrollRoot: () => popup.element() ?? element("content"),
     onRegister() {
       if (mountsQueued) return
       mountsQueued = true

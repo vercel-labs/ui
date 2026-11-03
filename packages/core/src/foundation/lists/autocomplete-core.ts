@@ -96,6 +96,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
     // Notifies a virtualizer which index to reveal.
     onHighlight?: (key: string | null, index: number, event?: Event) => void
     container: () => HTMLElement | undefined
+    scrollRoot?: () => HTMLElement | undefined
     // Whether the component settles the highlight itself once the items mount,
     // like a command page that just opened, with its own reason.
     settlesMount?: () => boolean
@@ -128,6 +129,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
     onHighlight: config.onHighlight,
     onLastReached: loadMore.reached,
     container: config.container,
+    scrollRoot: config.scrollRoot,
     onRegister() {
       if (mountsQueued) return
       mountsQueued = true
