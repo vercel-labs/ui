@@ -149,7 +149,7 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
   let messages: string[] = []
 
   const codec = () => options().codec ?? defaultCodec
-  const describe = (token: Token) => options().describeToken?.(token) ?? defaultDescription(token)
+  const describe = (token: Token) => options().getTokenDescription?.(token) ?? defaultDescription(token)
   const editable = () => {
     const state = store.get()
     return !isDisabled(state) && !state.readOnly

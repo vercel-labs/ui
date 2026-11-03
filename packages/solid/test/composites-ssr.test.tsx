@@ -128,7 +128,7 @@ describe("server rendering a navigation menu", () => {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink href="/pricing" active>
+          <NavigationMenuLink href="/pricing" current>
             Pricing
           </NavigationMenuLink>
         </NavigationMenuItem>

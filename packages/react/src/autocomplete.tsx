@@ -138,6 +138,7 @@ function AutocompleteContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   keepMounted,
   container,
@@ -148,7 +149,16 @@ function AutocompleteContent({
   usePlaceContent()
   const autocomplete = useAutocomplete()
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const content = { side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }
+  const content = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+    keepMounted,
+  }
   const [, setHeader] = React.useContext(SheetHeaderContext)
   // Reading the part's state subscribes, so items that arrive after the
   // autocomplete rendered still render the list. `autocomplete.state` doesn't subscribe.

@@ -34,7 +34,7 @@ import {
 type DialogContextValue = PrimitiveHandle<typeof dialogPrimitive>
 
 type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "onChange"> &
-  DialogTriggerProps
+  Omit<DialogTriggerProps, "controller">
 type ContentPartProps<Payload = unknown> = PartProps<"div", DialogContentState<Payload>> & DialogContentProps
 type ShortcutPartProps = PartProps<"span", DialogShortcutState> & DialogShortcutProps
 

@@ -7,7 +7,7 @@
 // listbox engine and the popup layer Combobox uses.
 import { type AsyncOptionsContext, type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type PopupResult } from "../../foundation/popups/popup"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { type ListData, type ListFilter, type ListGroup, type ListItem } from "../../foundation/lists/listbox"
 import { createController } from "../../foundation/kernel/controller"
@@ -312,8 +312,6 @@ type TriggerMenuContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the list against this instead of the trigger's place in the text. */
-    anchor?: Anchor | string | null
     /**
      * Whether the list stays in the page, hidden, while closed.
      * @defaultValue false

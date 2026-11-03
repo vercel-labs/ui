@@ -31,7 +31,7 @@ const links = new Set(
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-tree aria-label="Docs" selection-mode="none" current="tree" class="flex h-80 w-72 max-w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground">
+    <ui-tree aria-label="Docs" mode="none" current="tree" class="flex h-80 w-72 max-w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground">
       <template>
         <ui-tree-item class="flex flex-wrap items-center outline-none">
           <ui-tree-item-indicator class="flex size-4 cursor-default shrink-0 items-center justify-center text-muted-foreground transition-transform duration-200 data-expanded:rotate-90 rtl:rotate-180 rtl:data-expanded:rotate-90 before:content-['›']"></ui-tree-item-indicator>

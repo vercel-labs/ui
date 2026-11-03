@@ -53,6 +53,7 @@ const placementProps = {
   sideOffset: Number,
   alignOffset: Number,
   collisionPadding: Number,
+  arrowPadding: Number,
   anchor: [Object, String] as PropType<Anchor | string | null>,
   // Renders the popup into this element instead of in place.
   container: containerProp,

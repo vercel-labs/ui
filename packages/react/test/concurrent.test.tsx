@@ -390,7 +390,7 @@ test("a tree item from a render React threw away isn't checked with its folder",
     <Tree
       aria-label="Files"
       checkable
-      selectionMode="none"
+      mode="none"
       defaultExpanded={["src"]}
       onCheckedChange={onCheckedChange}
     >

@@ -18,13 +18,13 @@ import type { TreeGeneric } from "./tree-generic"
  * Checkboxes are separate, with `checkable`.
  * @stable
  */
-type TreeSelectionMode = "none" | "single" | "multiple"
+type TreeMode = "none" | "single" | "multiple"
 
 /**
- * The selected value: one item's value or `null`, or a list with `selectionMode: "multiple"`.
+ * The selected value: one item's value or `null`, or a list with `mode: "multiple"`.
  * @stable
  */
-type TreeValue<Mode extends TreeSelectionMode = "single"> = Mode extends "multiple" ? string[] : string | null
+type TreeValue<Mode extends TreeMode = "single"> = Mode extends "multiple" ? string[] : string | null
 
 /**
  * Why branches expanded or collapsed: a branch's row was pressed, its
@@ -98,7 +98,7 @@ function createTreeController() {
     expandAll: (options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
     /** Collapses every branch. */
     collapseAll: (options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
-    /** The selected value: a value or `null`, or a list with `selectionMode: "multiple"`. */
+    /** The selected value: a value or `null`, or a list with `mode: "multiple"`. */
     getValue: () => string | string[] | null
     /** Selects these items. */
     setValue: (value: string | string[] | null, options?: TreeChangeOptions<TreeValueChangeReason>) => boolean
@@ -125,7 +125,7 @@ type TreeController = ReturnType<typeof createTreeController>
  * The options `tree` takes. A component takes them as props on its root.
  * @stable
  */
-type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
+type TreeOptions<Mode extends TreeMode = TreeMode> = {
   /** The items as data: each a `value`, a `label` and, for a branch, `children`. Renders them for you, and gives the tree its whole shape even where rows aren't rendered. */
   items?: TreeItemData[]
   /** Items from file paths, like `["src/index.ts", "README.md"]`: each folder becomes a branch, folders first. A path ending in `/` is an empty folder. */
@@ -134,8 +134,8 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
    * How many items can be selected.
    * @defaultValue "single"
    */
-  selectionMode?: Mode
-  /** The selected value. Pass it to control the selection. `null` selects nothing, and with `selectionMode: "multiple"` it's a list. */
+  mode?: Mode
+  /** The selected value. Pass it to control the selection. `null` selects nothing, and with `mode: "multiple"` it's a list. */
   value?: TreeValue<Mode>
   /** The value selected at first, when uncontrolled. */
   defaultValue?: TreeValue<Mode>
@@ -280,7 +280,7 @@ type TreeGroupProps = Omit<GroupProps, "value">
  */
 type TreeState = {
   /** How many items can be selected. */
-  selectionMode: TreeSelectionMode
+  mode: TreeMode
   /** Whether items have checkboxes. */
   checkable: boolean
   /** Whether the whole tree is disabled, by its `disabled` option or a disabled fieldset around it. */
@@ -408,7 +408,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   options: {
     items: "value",
     paths: "value",
-    selectionMode: "string",
+    mode: "string",
     value: "string",
     defaultValue: "string",
     onValueChange: "callback",
@@ -436,12 +436,12 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   },
   controlled: ["value", "expanded", "checked"],
   state: (options: TreeOptions): TreeStore => ({
-    value: options.defaultValue ?? (options.selectionMode === "multiple" ? [] : null),
+    value: options.defaultValue ?? (options.mode === "multiple" ? [] : null),
     selected: [],
     expanded: options.defaultExpanded ?? [],
     checked: options.defaultChecked ?? [],
     checks: {},
-    selectionMode: "single",
+    mode: "single",
     checkable: false,
     checkStrategy: "leaf",
     activation: "manual",
@@ -464,7 +464,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   }),
   live: ["version", "siblings"],
   sync: (options) => ({
-    selectionMode: options.selectionMode ?? "single",
+    mode: options.mode ?? "single",
     checkable: options.checkable ?? false,
     checkStrategy: options.checkStrategy ?? "leaf",
     activation: options.activation ?? "manual",
@@ -484,13 +484,13 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   slots: (slot) => ({
     root: slot<{}, TreeState>({
       state: (state) => ({
-        selectionMode: state.selectionMode,
+        mode: state.mode,
         checkable: state.checkable,
         disabled: isDisabled(state),
       }),
       attrs: (state) => ({
         role: "tree",
-        "aria-multiselectable": state.selectionMode === "multiple" ? "true" : undefined,
+        "aria-multiselectable": state.mode === "multiple" ? "true" : undefined,
         "aria-disabled": isDisabled(state) ? "true" : undefined,
         "data-disabled": flag(isDisabled(state)),
       }),
@@ -528,7 +528,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
           "aria-posinset": position && String(position.index),
           "aria-setsize": position && String(position.size),
           "aria-expanded": item.branch ? String(item.expanded) : undefined,
-          "aria-selected": state.selectionMode === "none" ? undefined : String(item.selected),
+          "aria-selected": state.mode === "none" ? undefined : String(item.selected),
           "aria-checked": state.checkable
             ? item.checked === "indeterminate"
               ? "mixed"
@@ -666,7 +666,7 @@ export {
   type TreeOptions,
   type TreePrimitive,
   type TreeState,
-  type TreeSelectionMode,
+  type TreeMode,
   type TreeValue,
   type TreeValueChangeReason,
 }

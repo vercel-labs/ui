@@ -42,6 +42,17 @@ type PositionProps = {
    * @defaultValue 8
    */
   collisionPadding?: number
+  /**
+   * Space to keep between the arrow and the popup's corners, in pixels.
+   * @defaultValue 6
+   */
+  arrowPadding?: number
+  /**
+   * Positions the popup against this instead of its trigger: an element, a CSS selector, a point
+   * like `{ x, y }`, or anything with `getBoundingClientRect()`. It's read on every check, so it can
+   * move. A controller's `open({ anchor })` wins for that open.
+   */
+  anchor?: Anchor | string | null
 }
 
 /**

@@ -18,7 +18,7 @@ function routed({ href, ...props }: Record<string, unknown>) {
 }
 
 const step =
-  "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium text-foreground outline-none select-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 not-data-disabled:hover:bg-muted data-disabled:opacity-50 data-active:border-border data-active:bg-background motion-reduce:transition-none"
+  "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium text-foreground outline-none select-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 not-data-disabled:hover:bg-muted data-disabled:opacity-50 data-current:border-border data-current:bg-background motion-reduce:transition-none"
 </script>
 
 <template>

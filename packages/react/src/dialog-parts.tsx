@@ -35,7 +35,7 @@ import {
 } from "./use-primitive"
 
 type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "defaultValue" | "onChange"> &
-  DialogTriggerProps
+  Omit<DialogTriggerProps, "controller">
 type ContentPartProps<Payload = unknown> = PartProps<"div", DialogContentState<Payload>> & DialogContentProps
 type ClosePartProps = Omit<PartProps<"button", DialogCloseState>, "value" | "action"> & DialogCloseProps
 type ShortcutPartProps = PartProps<"span", DialogShortcutState> & DialogShortcutProps

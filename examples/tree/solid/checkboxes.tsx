@@ -71,7 +71,7 @@ function Example() {
         aria-label="Stack"
         items={items}
         checkable
-        selectionMode="none"
+        mode="none"
         checkStrategy="trunk"
         defaultChecked={initial}
         onCheckedChange={setChecked}

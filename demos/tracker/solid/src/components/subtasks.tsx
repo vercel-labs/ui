@@ -53,7 +53,7 @@ function Subtasks(props: { issue: Issue }) {
           aria-labelledby="subtasks-label"
           items={items()}
           checkable
-          selectionMode="none"
+          mode="none"
           checkStrategy="leaf"
           checked={checked()}
           onCheckedChange={(next) => setSubtasksDone(props.issue.id, next)}

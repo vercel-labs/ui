@@ -10,7 +10,7 @@ import { autocompleteSlots } from "./autocomplete-parts"
 import { autocompleteApi, initialAutocompleteState, syncAutocompleteState } from "./autocomplete-api"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import { type SearchFilter } from "../../foundation/lists/autocomplete-core"
 import {
@@ -257,8 +257,6 @@ type AutocompleteContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the suggestions against this instead of the field. */
-    anchor?: Anchor | string | null
     /**
      * Whether the suggestions stay in the page, hidden, while closed.
      * @defaultValue false

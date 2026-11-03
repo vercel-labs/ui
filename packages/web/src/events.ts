@@ -1353,7 +1353,14 @@ interface UiTokenInputElement
     UiElement<TokenInputEvents>,
     FormControlProperties<
       typeof tokenInput,
-      "api" | "codec" | "controller" | "defaultValue" | "describeToken" | "history" | "renderToken" | "value"
+      | "api"
+      | "codec"
+      | "controller"
+      | "defaultValue"
+      | "getTokenDescription"
+      | "history"
+      | "renderToken"
+      | "value"
     > {
   /** The value: text and tokens. Setting a string parses it with the codec. */
   get value(): TokenInputValue
@@ -1365,7 +1372,7 @@ interface UiTokenInputElement
   /** How tokens become text and back. */
   codec?: TokenCodec
   /** What a token says to screen readers besides its label. */
-  describeToken?: (token: Token) => string
+  getTokenDescription?: (token: Token) => string
   /** Renders a token's content into its host. Without it, a `<template>` child is cloned per token. */
   renderToken?: (token: Token, host: HTMLElement) => void
   api: Omit<TokenInputController, "editor">
@@ -1442,7 +1449,7 @@ interface UiTreeElement
       | "paths"
       | "value"
     > {
-  /** The selected value, a list with `selection-mode="multiple"`. */
+  /** The selected value, a list with `mode="multiple"`. */
   value: string | string[] | null
   /** The expanded branches. */
   expanded: string[]
@@ -1552,6 +1559,7 @@ declare global {
       | "sideOffset"
       | "alignOffset"
       | "collisionPadding"
+      | "arrowPadding"
       | "container"
       | "anchor"
       | "keepMounted"
@@ -1604,6 +1612,7 @@ declare global {
       | "sideOffset"
       | "alignOffset"
       | "collisionPadding"
+      | "arrowPadding"
       | "container"
       | "anchor"
       | "keepMounted"
@@ -1657,6 +1666,7 @@ declare global {
       | "sideOffset"
       | "alignOffset"
       | "collisionPadding"
+      | "arrowPadding"
       | "container"
       | "anchor"
       | "finalFocus"
@@ -1726,12 +1736,27 @@ declare global {
     "ui-menu-content": UiPartElement<
       typeof menu,
       "content",
-      "side" | "align" | "sideOffset" | "alignOffset" | "collisionPadding" | "container" | "keepMounted"
+      | "side"
+      | "align"
+      | "sideOffset"
+      | "alignOffset"
+      | "collisionPadding"
+      | "arrowPadding"
+      | "anchor"
+      | "container"
+      | "keepMounted"
     >
     "ui-menu-sub-content": UiPartElement<
       typeof menu,
       "content",
-      "side" | "align" | "sideOffset" | "alignOffset" | "collisionPadding" | "keepMounted"
+      | "side"
+      | "align"
+      | "sideOffset"
+      | "alignOffset"
+      | "collisionPadding"
+      | "arrowPadding"
+      | "anchor"
+      | "keepMounted"
     >
     "ui-menu-sub-trigger": UiPartElement<typeof menu, "trigger", "disabled" | "shortcut", "payload">
     "ui-menu-item": UiPartElement<
@@ -1771,6 +1796,7 @@ declare global {
       | "sideOffset"
       | "alignOffset"
       | "collisionPadding"
+      | "arrowPadding"
       | "anchor"
       | "keepMounted"
       | "hiddenUntilFound"
@@ -1780,7 +1806,7 @@ declare global {
     "ui-navigation-menu-viewport": UiPartElement<
       typeof navigationMenu,
       "viewport",
-      "side" | "align" | "sideOffset" | "alignOffset" | "collisionPadding" | "anchor"
+      "side" | "align" | "sideOffset" | "alignOffset" | "collisionPadding" | "arrowPadding" | "anchor"
     >
     "ui-navigation-menu-indicator": UiPartElement<typeof navigationMenu, "indicator">
     "ui-number-input-group": UiPartElement<typeof numberInput, "group">
@@ -1861,6 +1887,7 @@ declare global {
       | "sideOffset"
       | "alignOffset"
       | "collisionPadding"
+      | "arrowPadding"
       | "container"
       | "anchor"
       | "alignItemWithTrigger"
@@ -1930,6 +1957,7 @@ declare global {
       | "sideOffset"
       | "alignOffset"
       | "collisionPadding"
+      | "arrowPadding"
       | "container"
       | "anchor"
       | "keepMounted"

@@ -115,6 +115,7 @@ function NavigationMenuContent(
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     keepMounted: props.keepMounted,
     hiddenUntilFound: props.hiddenUntilFound,
@@ -126,6 +127,7 @@ function NavigationMenuContent(
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
     "anchor",
     "keepMounted",
     "hiddenUntilFound",
@@ -192,6 +194,7 @@ function NavigationMenuViewport(
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
   })
   const rest = omit(
@@ -201,6 +204,7 @@ function NavigationMenuViewport(
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
     "anchor",
     "container",
   )

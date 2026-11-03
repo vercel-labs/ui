@@ -6,7 +6,7 @@
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import {
   filterAttribute,
@@ -297,8 +297,8 @@ type SelectTriggerProps = {
    * @defaultValue false
    */
   disabled?: boolean
-  /** @internal Whether a Field or its own `aria-labelledby` names the trigger. Set by each framework. */
-  named?: boolean
+  /** Connects a trigger outside the select to the select with this controller. */
+  controller?: SelectController<any, any>
 }
 
 /**
@@ -343,8 +343,6 @@ type SelectContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the list against this instead of the trigger. */
-    anchor?: Anchor | string | null
     /**
      * Whether the list overlaps the trigger so the selected item sits on it, like a native select on macOS. Falls back to opening below when there isn't room, and for touch.
      * @defaultValue false

@@ -1,4 +1,4 @@
-import { dialog as dialogPrimitive, type DialogController, type DialogOptions } from "@ui-sdk/core/dialog"
+import { dialog as dialogPrimitive, type DialogOptions, type DialogTriggerProps } from "@ui-sdk/core/dialog"
 import type { JSX } from "@solidjs/web"
 import { createDialogParts, type TriggerPartProps } from "./dialog-parts"
 import { sheetViewport } from "./popup"
@@ -24,12 +24,7 @@ function Dialog(props: DialogProps) {
  * `controller`.
  * @stable
  */
-function DialogTrigger(
-  props: TriggerPartProps & {
-    /** Connects a trigger outside the dialog, like one per table row, to the dialog with this controller. */
-    controller?: DialogController<any, any>
-  },
-) {
+function DialogTrigger(props: TriggerPartProps & Pick<DialogTriggerProps, "controller">) {
   return <dialogParts.Trigger {...props} />
 }
 

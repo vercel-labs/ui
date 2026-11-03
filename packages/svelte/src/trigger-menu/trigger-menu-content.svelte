@@ -24,6 +24,7 @@ The popup that holds the suggestions, anchored at the caret.
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     keepMounted,
     container,
@@ -48,7 +49,7 @@ The popup that holds the suggestions, anchored at the caret.
   const content = useHandlePart(
     menu,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }),
+    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, keepMounted }),
     portalTo(target),
   )
 </script>

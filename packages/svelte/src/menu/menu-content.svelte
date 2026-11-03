@@ -19,6 +19,8 @@ The popup that holds the items, positioned against the trigger that opened it.
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
+    anchor,
     keepMounted,
     container,
     fromRoot,
@@ -48,7 +50,7 @@ The popup that holds the items, positioned against the trigger that opened it.
   const content = useHandlePart(
     menu,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, keepMounted }),
+    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, keepMounted }),
     portalTo(() => (nested || viewport.present ? false : target())),
   )
 </script>

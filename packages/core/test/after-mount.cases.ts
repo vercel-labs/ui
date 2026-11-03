@@ -86,6 +86,7 @@ const placed = {
   "content.sideOffset": [0, 8],
   "content.alignOffset": [0, 4],
   "content.collisionPadding": [0, 8],
+  "content.arrowPadding": [0, 8],
 }
 const popupSkips = {
   presentation: "Decided each time it opens, so an open one keeps how it presents.",
@@ -521,7 +522,7 @@ const cases: Case[] = [
     history: ["stop", "version", "siblings"],
     values: {
       pendingAnnouncement: ["Loading", "Saving"],
-      selectionMode: ["single", "multiple"],
+      mode: ["single", "multiple"],
       value: ["docs", "index"],
       expanded: [[], ["src"]],
       expandOnPress: [false, true],
@@ -618,7 +619,6 @@ const cases: Case[] = [
       delay: [0, 300],
       closeDelay: [0, 300],
       dismissible: [true, false],
-      "content.arrowPadding": [0, 8],
     },
     skip: popupSkips,
   },
@@ -629,7 +629,7 @@ const cases: Case[] = [
     history: ["titled"],
     markup: `<div><trigger href="/ada">Ada</trigger><content><arrow></arrow>Ada Lovelace</content></div>`,
     parts: { content: { "": {} } },
-    values: { ...popups, ...placed, delay: [0, 300], closeDelay: [0, 300], "content.arrowPadding": [0, 8] },
+    values: { ...popups, ...placed, delay: [0, 300], closeDelay: [0, 300] },
     skip: popupSkips,
   },
   {
@@ -648,7 +648,6 @@ const cases: Case[] = [
       closeOnPress: [true, false],
       type: ["label", "description"],
       shortcut: ["mod+s", "mod+shift+s"],
-      "content.arrowPadding": [0, 8],
     },
     skip: {
       ...popupSkips,
@@ -674,7 +673,7 @@ const cases: Case[] = [
       pendingAnnouncement: ["Loading", "Saving"],
       ...popups,
       ...placed,
-      shortcuts: [true, false],
+      itemShortcuts: [true, false],
       delay: [0, 300],
       dismissible: [true, false],
       "item.value": ["cut", "trim"],
@@ -949,7 +948,7 @@ const cases: Case[] = [
     },
     skip: {
       codec: "Reads and writes the text, which the codec tests cover.",
-      describeToken: "A function, called for each token's name.",
+      getTokenDescription: "A function, called for each token's name.",
       history: "Read when an edit is undone.",
     },
   },

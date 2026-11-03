@@ -173,7 +173,7 @@ type TokenInputOptions = {
    * What a token says to screen readers besides its label, like its kind and status.
    * @defaultValue the type, and "loading" while pending
    */
-  describeToken?: (token: Token) => string
+  getTokenDescription?: (token: Token) => string
   /** Undo history: how many steps it keeps, and how long a typing pause starts a new step. */
   history?: HistoryOptions
   /** Disables the input: it can't be focused or changed, and isn't submitted. */
@@ -255,7 +255,7 @@ const tokenInputPrimitive = /* @__PURE__ */ definePrimitive({
     tokenDeletion: "string",
     copy: "string",
     codec: "value",
-    describeToken: "value",
+    getTokenDescription: "value",
     history: "value",
     disabled: "boolean",
     readOnly: "boolean",

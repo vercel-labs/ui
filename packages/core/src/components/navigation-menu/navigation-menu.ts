@@ -1,6 +1,6 @@
 import { triggerKeydown } from "../../foundation/disclosure/disclosure"
 import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { motionOf, type NavigationMenuMotion } from "./navigation-menu-keyboard"
 import {
@@ -157,8 +157,6 @@ type PlacementProps = PositionProps & {
    * @defaultValue 0
    */
   alignOffset?: number
-  /** Positions it against this instead of the open trigger: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. */
-  anchor?: Anchor | string | null
 }
 
 type ContentProps = PlacementProps &
@@ -421,6 +419,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         sideOffset: "number",
         alignOffset: "number",
         collisionPadding: "number",
+        arrowPadding: "number",
         anchor: "string",
         container: "value",
         value: { kind: "string", from: "item" },
@@ -489,6 +488,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         sideOffset: "number",
         alignOffset: "number",
         collisionPadding: "number",
+        arrowPadding: "number",
         anchor: "string",
         container: "value",
       },

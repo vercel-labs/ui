@@ -164,6 +164,7 @@ function ComboboxContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   keepMounted,
   container,
@@ -174,7 +175,16 @@ function ComboboxContent({
   usePlaceContent()
   const combobox = useCombobox()
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const content = { side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }
+  const content = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+    keepMounted,
+  }
   const [, setHeader] = React.useContext(SheetHeaderContext)
   // Reading the part's state subscribes, so items that arrive after the
   // combobox rendered still render the list. `combobox.state` doesn't subscribe.

@@ -14,7 +14,7 @@ function Fixture() {
       <button>Before</button>
       <Menu
         items={casesData({ align: align(), journal: journal() })}
-        shortcuts={shortcuts()}
+        itemShortcuts={shortcuts()}
         onAction={setAction}
       >
         <MenuTrigger>Edit</MenuTrigger>

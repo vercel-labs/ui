@@ -8,7 +8,7 @@ import {
   type TreeController,
   type TreeExpandedChangeReason,
   type TreeItemData,
-  type TreeSelectionMode,
+  type TreeMode,
   type TreeValueChangeReason,
 } from "@ui-sdk/core/tree"
 import type { ChangeDetails } from "@ui-sdk/core"
@@ -43,7 +43,7 @@ const Tree = withElement(
     props: {
       items: Array as PropType<TreeItemData[]>,
       paths: Array as PropType<string[]>,
-      selectionMode: String as PropType<TreeSelectionMode>,
+      mode: String as PropType<TreeMode>,
       value: { type: null as unknown as PropType<Value>, default: undefined },
       modelValue: { type: null as unknown as PropType<Value>, default: undefined },
       defaultValue: { type: null as unknown as PropType<Value>, default: undefined },
@@ -255,7 +255,7 @@ export type {
   TreePrimitive,
   TreeState,
   TreeRow,
-  TreeSelectionMode,
+  TreeMode,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

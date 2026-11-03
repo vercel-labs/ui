@@ -128,11 +128,11 @@ function changedValue(before: readonly string[], after: readonly string[]) {
 function treeOptions() {
   const params = new URLSearchParams(location.search)
   const list = (name: string) => params.get(name)?.split(",").filter(Boolean)
-  const selectionMode = (params.get("selection") ?? "single") as "none" | "single" | "multiple"
+  const mode = (params.get("selection") ?? "single") as "none" | "single" | "multiple"
   const selected = list("default")
   return {
-    selectionMode,
-    defaultValue: selectionMode === "multiple" ? (selected ?? []) : (selected?.[0] ?? null),
+    mode,
+    defaultValue: mode === "multiple" ? (selected ?? []) : (selected?.[0] ?? null),
     defaultExpanded: list("expanded") ?? [],
     checkable: params.has("checkable"),
     checkStrategy: (params.get("strategy") ?? "leaf") as "leaf" | "trunk" | "branch" | "independent",

@@ -35,7 +35,7 @@ export type {
   TreePrimitive,
   TreeState,
   TreeRow,
-  TreeSelectionMode,
+  TreeMode,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

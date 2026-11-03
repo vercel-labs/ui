@@ -1,17 +1,12 @@
-import type {
-  DialogShortcutProps,
-  DialogShortcutState,
-  DialogTriggerProps,
-  DialogTriggerState,
-} from "@ui-sdk/core/dialog"
+import type { DialogShortcutProps, DialogShortcutState, DialogTriggerState } from "@ui-sdk/core/dialog"
 import {
   drawer,
   type DrawerBackdropState,
   type DrawerContentProps,
   type DrawerContentState,
-  type DrawerController,
   type DrawerOptions,
   type DrawerOutletProps,
+  type DrawerTriggerProps,
   type DrawerOutletState,
 } from "@ui-sdk/core/drawer"
 import * as React from "react"
@@ -45,10 +40,7 @@ const parts = createParts(drawer, {
 })
 
 type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "defaultValue" | "onChange"> &
-  DialogTriggerProps & {
-    /** Connects a trigger outside the drawer, like one per table row, to the drawer with this controller. */
-    controller?: DrawerController<any, any>
-  }
+  DrawerTriggerProps
 type ShortcutPartProps = PartProps<"span", DialogShortcutState> & DialogShortcutProps
 
 // Where the drawer renders. Set on the root or the content.
@@ -185,14 +177,7 @@ function ShortcutPart({
  * Outside the drawer, pass the drawer's `controller`.
  * @stable
  */
-function DrawerOutlet({
-  controller,
-  ...props
-}: PartProps<"div", DrawerOutletState> &
-  DrawerOutletProps & {
-    /** Connects an outlet outside the drawer, like the app's shell, to the drawer with this controller. */
-    controller?: DrawerController<any, any>
-  }) {
+function DrawerOutlet({ controller, ...props }: PartProps<"div", DrawerOutletState> & DrawerOutletProps) {
   const { keyframes: _, render, ...rest } = props
   return (
     <Connected
@@ -225,6 +210,7 @@ export type {
   DrawerPrimitive,
   DrawerSide,
   DrawerSnapPointChangeReason,
+  DrawerTriggerProps,
   SheetPhysics,
   SnapPoint,
 } from "@ui-sdk/core/drawer"

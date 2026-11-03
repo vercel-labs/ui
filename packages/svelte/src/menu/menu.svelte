@@ -33,7 +33,7 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     open = $bindable(),
     defaultOpen,
     items,
-    shortcuts,
+    itemShortcuts,
     loop,
     delay,
     presentation,
@@ -59,7 +59,7 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     /** The menu as data. Renders the content for you, unless you place a `MenuContent` of your own, and runs the items' shortcuts. */
     items?: MenuData
     /** Whether a data menu runs its items' shortcuts while closed. */
-    shortcuts?: boolean
+    itemShortcuts?: boolean
     /** Whether arrow keys wrap from the last item to the first. */
     loop?: boolean
     /** Milliseconds the pointer rests on a submenu trigger before its submenu opens. */
@@ -107,7 +107,7 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     },
     defaultOpen,
     items,
-    shortcuts,
+    itemShortcuts,
     loop,
     delay,
     presentation,

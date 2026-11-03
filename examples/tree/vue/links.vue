@@ -81,7 +81,7 @@ function onAction(value: string, { event }: TreeActionDetails) {
   <Tree
     aria-label="Docs"
     :items="pages"
-    selection-mode="none"
+    mode="none"
     :current="current"
     :on-action="onAction"
     class="flex h-80 w-72 max-w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground"

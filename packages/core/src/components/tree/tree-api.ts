@@ -37,7 +37,7 @@ import type {
   TreeExpandedChangeReason,
   TreeItemProps,
   TreeOptions,
-  TreeSelectionMode,
+  TreeMode,
   TreeValueChangeReason,
 } from "./tree"
 
@@ -49,7 +49,7 @@ type TreeStore = {
   // The checked value as reported, and every item's checkbox that isn't unchecked.
   checked: string[]
   checks: Record<string, true | "indeterminate">
-  selectionMode: TreeSelectionMode
+  mode: TreeMode
   checkable: boolean
   checkStrategy: TreeCheckStrategy
   activation: "automatic" | "manual"
@@ -240,11 +240,10 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
 
   const selection = createSelection<TreeOptions, TreeStore, "selected", TreeValueChangeReason>(context, {
     key: "selected",
-    set: (keys, details) =>
-      setValue(store.get().selectionMode === "multiple" ? keys : (keys[0] ?? null), details),
+    set: (keys, details) => setValue(store.get().mode === "multiple" ? keys : (keys[0] ?? null), details),
     order: visibleKeys,
-    multiple: () => store.get().selectionMode === "multiple",
-    selectable: (key) => store.get().selectionMode !== "none" && !isDisabled(store.get(), key),
+    multiple: () => store.get().mode === "multiple",
+    selectable: (key) => store.get().mode !== "none" && !isDisabled(store.get(), key),
   })
 
   function setValue(value: TreeStore["value"], why: Why<TreeValueChangeReason>) {
@@ -308,8 +307,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
   // A tree that starts or stops selecting several keeps what was chosen, in
   // its new shape, unless the value is controlled.
   deriveFromOptions(context, ["value", "selected"], (synced, state, next) => {
-    const several = synced.selectionMode === "multiple"
-    if (synced.selectionMode === undefined || several === (state.selectionMode === "multiple")) return
+    const several = synced.mode === "multiple"
+    if (synced.mode === undefined || several === (state.mode === "multiple")) return
     if (next.value !== undefined) return
     const value = several ? toKeys(state.value) : (toKeys(state.value)[0] ?? null)
     return { value, selected: toKeys(value) }
@@ -351,9 +350,9 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
     store.set({ checks: checksFor(store.get()) })
     seen = store.get()
   }
-  if (store.get().checkable && store.get().selectionMode !== "none")
+  if (store.get().checkable && store.get().mode !== "none")
     warn(
-      'has checkboxes and a selection, so items are both checked and selected. Pass `selectionMode="none"` unless both mean something.',
+      'has checkboxes and a selection, so items are both checked and selected. Pass `mode="none"` unless both mean something.',
       { component: "tree", id },
     )
 
@@ -538,8 +537,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
 
   // With one item selectable, automatic activation selects wherever a key moves focus.
   function follow(key: string, event?: KeyboardEvent) {
-    const { selectionMode, activation } = store.get()
-    if (selectionMode === "single" && activation === "automatic")
+    const { mode, activation } = store.get()
+    if (mode === "single" && activation === "automatic")
       selection.choose(key, { reason: "list-navigation", event })
   }
 
@@ -599,10 +598,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
     if (isDisabled(state, key) || state.pending.includes(key)) return
     const mouse = event as MouseEvent | undefined
     const why = { reason: "item-press" as const, event }
-    if (state.selectionMode === "multiple" && mouse?.shiftKey)
-      selection.extend(key, { ...why, from: state.active })
-    else if (state.selectionMode === "multiple" || mouse?.ctrlKey || mouse?.metaKey)
-      selection.toggle(key, why)
+    if (state.mode === "multiple" && mouse?.shiftKey) selection.extend(key, { ...why, from: state.active })
+    else if (state.mode === "multiple" || mouse?.ctrlKey || mouse?.metaKey) selection.toggle(key, why)
     else selection.choose(key, why)
     if (isBranch(key) && state.expandOnPress) setOpen(key, !state.expanded.includes(key), why)
     act(key, event)
@@ -625,7 +622,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
       options().onHighlight?.(target, { index, event })
       const homeOrEnd = event.key === "Home" || event.key === "End"
       const why = { reason: "list-navigation" as const, event }
-      if (state.selectionMode === "multiple" && event.shiftKey && (!homeOrEnd || mod))
+      if (state.mode === "multiple" && event.shiftKey && (!homeOrEnd || mod))
         selection.extend(target, { ...why, from: key })
       else if (!event.shiftKey) follow(target, event)
       return
@@ -675,7 +672,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
         .filter((sibling) => isBranch(sibling) && !isDisabled(state, sibling) && !needsLoad(sibling))
       setExpanded([...state.expanded, ...siblings], nav)
     } else if (mod && !event.shiftKey && !event.altKey && event.key.toLowerCase() === "a") {
-      if (state.selectionMode !== "multiple") return
+      if (state.mode !== "multiple") return
       selection.toggleAll(nav)
     } else if (event.key === "Enter" && !mod && !event.altKey) {
       // A link label navigates, and its click presses the item.
@@ -685,9 +682,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
     } else if (event.key === " " && !typeahead.active()) {
       const why = { reason: "item-press" as const, event }
       if (state.checkable) toggleChecked(key, why)
-      else if (state.selectionMode === "multiple" && event.shiftKey)
-        selection.extend(key, { ...why, from: key })
-      else if (state.selectionMode !== "none") selection.toggle(key, why)
+      else if (state.mode === "multiple" && event.shiftKey) selection.extend(key, { ...why, from: key })
+      else if (state.mode !== "none") selection.toggle(key, why)
       else return
     } else if (isTypeaheadKey(event)) {
       const keys = fromData() ? visibleKeys() : roving.items().map((item) => item.key)
@@ -761,7 +757,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
     },
     focus: (value?: string) => roving.focus(value),
     internal: {
-      selectionMode: () => store.get().selectionMode,
+      mode: () => store.get().mode,
       isBranch,
       isDisabled,
       // An item's depth, from data, or from the parents its props name.

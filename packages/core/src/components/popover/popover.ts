@@ -1,7 +1,7 @@
 import { ariaKeyshortcuts, initialApple } from "../../foundation/platform/platform"
 import { createPopupController, type Modal, type PopupFocusTarget } from "../../foundation/popups/popup"
 import { modalAttribute } from "../../foundation/popups/modal-attribute"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { type PresentationSetting } from "../../foundation/popups/presentation"
 import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
 import { popoverPreset } from "../../foundation/popups/popup-presets"
@@ -180,13 +180,6 @@ type ContentProps = PositionProps &
      */
     alignOffset?: number
     /**
-     * Space to keep between the arrow and the popover's corners, in pixels.
-     * @defaultValue 6
-     */
-    arrowPadding?: number
-    /** Positions the popover against this instead of the trigger: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. */
-    anchor?: Anchor | string | null
-    /**
      * Where focus goes when the popover opens. Opening on hover never moves focus, and opening with touch focuses the popover itself so no on-screen keyboard appears.
      * @defaultValue "auto"
      */
@@ -212,7 +205,10 @@ type ShortcutProps = {
  * The props the `trigger` slot of `popover` takes.
  * @stable
  */
-type PopoverTriggerProps = TriggerProps
+type PopoverTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the popover, like one per table row, to the popover with this controller. */
+  controller?: PopoverController<any>
+}
 /**
  * The props the `content` slot of `popover` takes.
  * @stable

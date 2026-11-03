@@ -3,7 +3,6 @@ import {
   type ListData,
   type SelectContentProps,
   type SelectContentState,
-  type SelectController,
   type SelectEmptyState,
   type SelectItemIconProps,
   type SelectItemIconState,
@@ -125,11 +124,7 @@ function SelectTrigger({
   controller,
   render,
   ...props
-}: Omit<PartProps<"button", SelectTriggerState>, Clashing> &
-  SelectTriggerProps & {
-    /** Connects a trigger outside the select to the select with this controller. */
-    controller?: SelectController<any, any>
-  }) {
+}: Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps) {
   const unconnected = () =>
     renderElement("button", { type: "button", disabled, ...props }, render, {
       open: false,
@@ -217,6 +212,7 @@ function SelectContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   alignItemWithTrigger,
   keepMounted,
@@ -234,6 +230,7 @@ function SelectContent({
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     alignItemWithTrigger,
     keepMounted,

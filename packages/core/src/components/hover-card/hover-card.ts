@@ -1,5 +1,5 @@
 import { createPopupController } from "../../foundation/popups/popup"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
 import { hoverCardPreset } from "../../foundation/popups/popup-hover-presets"
 import { popupArrow, popupContent, popupTrigger } from "../../foundation/popups/popup-slots"
@@ -116,13 +116,6 @@ type ContentProps = PositionProps &
      */
     alignOffset?: number
     /**
-     * Space to keep between the arrow and the card's corners, in pixels.
-     * @defaultValue 6
-     */
-    arrowPadding?: number
-    /** Positions the card against this instead of the trigger: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. */
-    anchor?: Anchor | string | null
-    /**
      * Whether the card stays in the page, hidden, while closed. For animation libraries that drive the exit from state.
      * @defaultValue false
      */
@@ -133,7 +126,10 @@ type ContentProps = PositionProps &
  * The props the `trigger` slot of `hoverCard` takes.
  * @stable
  */
-type HoverCardTriggerProps = TriggerProps
+type HoverCardTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the card, like every author link in a feed, to the card with this controller. */
+  controller?: HoverCardController<any>
+}
 /**
  * The props the `content` slot of `hoverCard` takes.
  * @stable

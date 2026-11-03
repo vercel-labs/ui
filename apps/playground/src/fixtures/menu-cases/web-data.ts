@@ -34,7 +34,9 @@ async function mount(root: HTMLElement) {
   }
   root.querySelector("#align-right")!.addEventListener("click", () => update({ align: "right" }))
   root.querySelector("#journal")!.addEventListener("click", () => update({ journal: true }))
-  root.querySelector("#shortcuts")!.addEventListener("click", () => menu.setAttribute("shortcuts", "false"))
+  root
+    .querySelector("#shortcuts")!
+    .addEventListener("click", () => menu.setAttribute("item-shortcuts", "false"))
   root.addEventListener(
     "action",
     (event) => {

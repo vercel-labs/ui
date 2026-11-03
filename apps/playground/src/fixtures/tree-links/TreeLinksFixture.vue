@@ -18,7 +18,7 @@ onBeforeUnmount(() => window.removeEventListener("hashchange", changed))
       class="tree"
       :aria-label="treeLinksFixture.label"
       :items="treeLinksFixture.items"
-      selection-mode="none"
+      mode="none"
       :current="current"
     >
       <TreeFixtureItems :items="treeLinksFixture.items" :checkable="false" />

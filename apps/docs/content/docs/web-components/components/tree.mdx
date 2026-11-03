@@ -99,7 +99,7 @@ Add `checkable` and `ui-tree-item-checkbox` for a checked state separate from se
 
 ### Multiple Selection
 
-`selection-mode="multiple"` makes the value an array. Cmd-click or Ctrl-click toggles one item, Shift extends a range, and Cmd+A or Ctrl+A selects the visible items.
+`mode="multiple"` makes the value an array. Cmd-click or Ctrl-click toggles one item, Shift extends a range, and Cmd+A or Ctrl+A selects the visible items.
 
 <ComponentExample
   name="tree/multiple"
@@ -108,7 +108,7 @@ Add `checkable` and `ui-tree-item-checkbox` for a checked state separate from se
 
 ### Links
 
-Set `selection-mode="none"` for a navigation tree, then render labels as links. `current` identifies the current page with `aria-current="page"`, expands its ancestors, and gives it the initial Tab stop. Update it when your route changes.
+Set `mode="none"` for a navigation tree, then render labels as links. `current` identifies the current page with `aria-current="page"`, expands its ancestors, and gives it the initial Tab stop. Update it when your route changes.
 
 <ComponentExample
   name="tree/links"
@@ -165,7 +165,7 @@ Option is Alt on a Mac. Left and Right swap in right-to-left text.
 
 ### Selection
 
-The default `selection-mode="single"` uses one string value or `null`. Use `"multiple"` for an array, or `"none"` when items should only navigate or perform actions.
+The default `mode="single"` uses one string value or `null`. Use `"multiple"` for an array, or `"none"` when items should only navigate or perform actions.
 
 `activation="automatic"` selects while arrow keys move in single selection mode. Pressing a branch also expands or collapses it; set `expand-on-press` to `false` to leave expansion to the indicator and arrow keys.
 
@@ -240,7 +240,7 @@ Every item also exposes its depth as `--tree-level`, useful for indentation in a
 
 ## API Reference
 
-Props are attributes in kebab case, like `selection-mode` and `default-expanded`. Lists, like `expanded`,
+Props are attributes in kebab case, like `mode` and `default-expanded`. Lists, like `expanded`,
 are values separated by commas. `items`, `paths`, `loadChildren`, `announcement` and
 `controller` are properties. Callbacks are DOM events.
 

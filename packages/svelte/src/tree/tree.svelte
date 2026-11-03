@@ -3,7 +3,7 @@
 A tree of items that expand and collapse, with one tab stop and arrow keys between its items.
 @stable
 -->
-<script lang="ts" generics="Mode extends TreeSelectionMode = 'single'">
+<script lang="ts" generics="Mode extends TreeMode = 'single'">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     tree as treePrimitive,
@@ -16,7 +16,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     type TreeExpandedChangeReason,
     type TreeItemData,
     type TreeState,
-    type TreeSelectionMode,
+    type TreeMode,
     type TreeValue,
     type TreeValueChangeReason,
   } from "@ui-sdk/core/tree"
@@ -30,7 +30,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
   let {
     items,
     paths,
-    selectionMode,
+    mode,
     value = $bindable(),
     defaultValue,
     activation,
@@ -64,8 +64,8 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** Items from file paths, like `["src/index.ts", "README.md"]`: each folder becomes a branch, folders first. A path ending in `/` is an empty folder. */
     paths?: readonly string[]
     /** How many items can be selected: `"none"`, `"single"` or `"multiple"`. */
-    selectionMode?: Mode
-    /** The selected value. Bind it with `bind:value` to control the selection. `null` selects nothing, and with `selectionMode: "multiple"` it's a list. */
+    mode?: Mode
+    /** The selected value. Bind it with `bind:value` to control the selection. `null` selects nothing, and with `mode: "multiple"` it's a list. */
     value?: TreeValue<Mode>
     /** The value selected at first, when uncontrolled. */
     defaultValue?: TreeValue<Mode>
@@ -122,7 +122,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     id,
     items,
     paths,
-    selectionMode,
+    mode,
     get value() {
       return value
     },

@@ -197,6 +197,7 @@ function ComboboxContent(props: PartProps<"div", ComboboxContentState> & Combobo
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     keepMounted: props.keepMounted,
   })
@@ -208,6 +209,7 @@ function ComboboxContent(props: PartProps<"div", ComboboxContentState> & Combobo
       "sideOffset",
       "alignOffset",
       "collisionPadding",
+      "arrowPadding",
       "anchor",
       "keepMounted",
       "container",

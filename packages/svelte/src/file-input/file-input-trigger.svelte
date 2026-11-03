@@ -7,8 +7,8 @@ button's own text. Outside the file input, it connects through `controller`.
 <script lang="ts">
   import {
     fileInput as fileInputPrimitive,
-    type FileInputController,
     type FileInputState,
+    type FileInputTriggerProps,
   } from "@ui-sdk/core/file-input"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
@@ -20,10 +20,7 @@ button's own text. Outside the file input, it connects through `controller`.
   let {
     controller,
     ...rest
-  }: PartProps<"button", FileInputState> & {
-    /** Connects a trigger outside the file input, like one in a toolbar, to the file input with this controller. */
-    controller?: FileInputController
-  } = $props()
+  }: PartProps<"button", FileInputState> & FileInputTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<FileInputContext | undefined>(fileInputPrimitive))
   const fileInput = $derived(connected())

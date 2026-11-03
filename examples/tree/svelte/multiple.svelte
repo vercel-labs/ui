@@ -65,7 +65,7 @@
   <Tree
     aria-label="Folders"
     {items}
-    selectionMode="multiple"
+    mode="multiple"
     bind:value
     expandOnPress={false}
     defaultExpanded={["inbox", "projects"]}

@@ -3,6 +3,7 @@ import type { MenubarApi } from "../menubar/menubar"
 import { isRTL } from "../../foundation/platform/env"
 import { composedClosest, composedContains } from "../../foundation/platform/platform"
 import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
+import { contentAnchor } from "../../foundation/popups/popup-features"
 import { menuPreset } from "../../foundation/popups/popup-presets"
 import {
   deriveOpen,
@@ -212,7 +213,7 @@ function eachShortcut(items: MenuData, run: (value: string, shortcut: string) =>
 }
 
 // Registers a data menu's item shortcuts in the trigger's layer, so a modal
-// above it pauses them, and again whenever the items or `shortcuts` change.
+// above it pauses them, and again whenever the items or `itemShortcuts` change.
 function bindItemShortcuts(
   store: Store<MenuState>,
   layer: HTMLElement,
@@ -560,7 +561,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       sheetModal(store.get().presentation, options().modal ?? bar()?.internal.modal(), "pointer"),
     menubar: bar,
     presentation: () => store.get().presentation,
-    anchor: () => control.anchor() ?? triggerElement(),
+    // A controller's or a take-over's anchor, then the content's `anchor`, then the trigger.
+    anchor: (el?: HTMLElement, setting?: Anchor | string | null) =>
+      control.anchor() ?? (el ? contentAnchor(el, setting, triggerElement) : triggerElement()),
     // Runs a plain item and closes the whole tree. Focus returns to the root
     // trigger, unless the item opened something that took it, like a dialog.
     action(value: string | undefined, event?: Event) {
@@ -885,7 +888,7 @@ type MenuState = {
   groupLabels: readonly string[]
   // The button triggers in the page, so the content is named only by one that exists.
   triggers: readonly string[]
-  // A data menu's items while `shortcuts` is on, so triggers register their shortcuts again when they change.
+  // A data menu's items while `itemShortcuts` is on, so triggers register their shortcuts again when they change.
   shortcutItems: MenuData | undefined
   // Items whose `onSelect` or `onAction` Promise hasn't settled, and the last one that failed.
   pending: string[]

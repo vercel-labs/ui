@@ -46,7 +46,7 @@ async function setUp(root: HTMLElement) {
   const { cancel, ...options } = treeOptions()
   const tree = root.querySelector<TreeElement>("ui-tree")!
   const attributes: Record<string, string | boolean | undefined> = {
-    "selection-mode": options.selectionMode,
+    mode: options.mode,
     "default-value": Array.isArray(options.defaultValue)
       ? options.defaultValue.join(",")
       : (options.defaultValue ?? undefined),

@@ -127,7 +127,7 @@
 
 <Menu
   items={fileMenu}
-  shortcuts
+  itemShortcuts
   onAction={(value: string) => (status = `Ran ${value}`)}
   onCheckedChange={(checked, details) => (status = `${details.value} ${checked ? "on" : "off"}`)}
   onValueChange={(value, details) => (status = `${details.group}: ${value}`)}

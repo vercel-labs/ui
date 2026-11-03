@@ -68,7 +68,7 @@ const TokenInput = /* @__PURE__ */ renderless(
       tokenDeletion: String as PropType<TokenDeletion>,
       copy: String as PropType<"codec" | "label">,
       codec: Object as PropType<TokenCodec>,
-      describeToken: Function as PropType<(token: Token) => string>,
+      getTokenDescription: Function as PropType<(token: Token) => string>,
       history: Object as PropType<HistoryOptions>,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,

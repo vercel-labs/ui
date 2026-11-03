@@ -7,7 +7,7 @@
 import type { ISOMonth } from "../calendar/calendar-model"
 import type { CalendarMonthChangeReason, CalendarOptions } from "../calendar/calendar"
 import { type ISODate } from "../../foundation/date/plain-date"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { type PopupFocusTarget, type PopupResult } from "../../foundation/popups/popup"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
 import { type PresentationSetting } from "../../foundation/popups/presentation"
@@ -326,8 +326,6 @@ type DatePickerContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the popup against this instead of the input: an element, a CSS selector, or anything with `getBoundingClientRect()`. */
-    anchor?: Anchor | string | null
     /**
      * Where focus goes when the popup closes while focus is inside it.
      * @defaultValue "trigger"

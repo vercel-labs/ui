@@ -33,7 +33,7 @@ function defineMenuElements() {
   definePart(menu, "root", {
     tag: "ui-menu",
     kinds: { ...popupKinds, parent: null, menubar: null },
-    defaults: { loop: true, shortcuts: true, dismissible: true },
+    defaults: { loop: true, itemShortcuts: true, dismissible: true },
     // Read when needed, since the menubar may upgrade after the menu.
     options: (el) => ({ container: undefined, menubar: () => menubarOf(el) }),
     // In a menubar, the wrappers sit between its items. Without this, screen
@@ -79,7 +79,7 @@ function defineMenuElements() {
     display: "contents",
     // A submenu opens from its parent, and takes none of the root menu's own options.
     kinds: {
-      shortcuts: null,
+      itemShortcuts: null,
       presentation: null,
       modal: null,
       dismissible: null,

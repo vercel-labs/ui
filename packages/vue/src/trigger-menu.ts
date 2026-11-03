@@ -136,6 +136,7 @@ const TriggerMenuContent = withElement(
       sideOffset: Number,
       alignOffset: Number,
       collisionPadding: Number,
+      arrowPadding: Number,
       anchor: [Object, String] as PropType<Anchor | string | null>,
       keepMounted: optionalBoolean,
       container: containerProp,

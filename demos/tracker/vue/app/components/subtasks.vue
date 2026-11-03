@@ -46,7 +46,7 @@ function toItems(subtasks: Subtask[]): TreeItemData[] {
       aria-labelledby="subtasks-label"
       :items="items"
       checkable
-      selection-mode="none"
+      mode="none"
       check-strategy="leaf"
       :default-expanded="expanded"
       class="flex flex-col rounded-2xl border border-border p-1"

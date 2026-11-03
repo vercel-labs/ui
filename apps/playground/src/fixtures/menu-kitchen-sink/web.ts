@@ -24,7 +24,7 @@ const attributes: Record<string, string> = {
   presentation: "presentation",
   loop: "loop",
   delay: "delay",
-  shortcuts: "shortcuts",
+  itemShortcuts: "item-shortcuts",
 }
 
 function mount(root: HTMLElement) {

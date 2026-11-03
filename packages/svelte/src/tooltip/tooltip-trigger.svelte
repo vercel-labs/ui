@@ -6,7 +6,6 @@ The element the tooltip names or describes, usually a button.
 <script lang="ts">
   import {
     tooltip as tooltipPrimitive,
-    type TooltipController,
     type TooltipTriggerProps,
     type TooltipTriggerState,
   } from "@ui-sdk/core/tooltip"
@@ -22,10 +21,7 @@ The element the tooltip names or describes, usually a button.
     controller,
     ...rest
   }: PartProps<"button", TooltipTriggerState> &
-    TooltipTriggerProps & {
-      /** Connects a trigger outside the tooltip to the tooltip with this controller. */
-      controller?: TooltipController<any>
-    } = $props()
+    TooltipTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<TooltipContext | undefined>(tooltipPrimitive))
   const tooltip = $derived(connected())

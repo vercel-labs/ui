@@ -3,7 +3,6 @@ import {
   type ListData,
   type SelectContentProps,
   type SelectContentState,
-  type SelectController,
   type SelectEmptyState,
   type SelectItemIconProps,
   type SelectItemIconState,
@@ -149,11 +148,7 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
  */
 const SelectLabel = parts.Label
 
-type TriggerPartProps = Omit<PartProps<"button", SelectTriggerState>, Clashing> &
-  SelectTriggerProps & {
-    /** Connects a trigger outside the select to the select with this controller. */
-    controller?: SelectController<any, any>
-  }
+type TriggerPartProps = Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps
 
 /**
  * The button that opens the list: a combobox named by the label. Typing on it selects the item that matches.
@@ -263,6 +258,7 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     alignItemWithTrigger: props.alignItemWithTrigger,
     keepMounted: props.keepMounted,
@@ -275,6 +271,7 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
       "sideOffset",
       "alignOffset",
       "collisionPadding",
+      "arrowPadding",
       "anchor",
       "alignItemWithTrigger",
       "keepMounted",

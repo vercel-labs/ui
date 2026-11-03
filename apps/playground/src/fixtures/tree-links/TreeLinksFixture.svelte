@@ -17,7 +17,7 @@
     class="tree"
     aria-label={treeLinksFixture.label}
     items={treeLinksFixture.items}
-    selectionMode="none"
+    mode="none"
     {current}
   >
     <TreeFixtureItems items={treeLinksFixture.items} checkable={false} />

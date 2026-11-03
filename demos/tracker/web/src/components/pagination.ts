@@ -3,7 +3,7 @@ import { unsafeHTML } from "lit-html/directives/unsafe-html.js"
 import { icon, iconMarkup } from "../lib/icons"
 
 const step =
-  "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium text-foreground outline-none select-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 not-data-disabled:hover:bg-muted data-disabled:opacity-50 data-active:border-border data-active:bg-background motion-reduce:transition-none"
+  "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium text-foreground outline-none select-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 not-data-disabled:hover:bg-muted data-disabled:opacity-50 data-current:border-border data-current:bg-background motion-reduce:transition-none"
 
 const templates = `<template>
   <ui-pagination-item><ui-pagination-link><a class="${step}"></a></ui-pagination-link></ui-pagination-item>

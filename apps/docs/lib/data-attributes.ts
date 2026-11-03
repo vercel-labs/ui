@@ -779,7 +779,7 @@ const components: Record<
         tree({
           id: "docs",
           items,
-          selectionMode: "multiple",
+          mode: "multiple",
           defaultValue: ["a.ts"],
           defaultExpanded: ["src"],
           checkable: true,

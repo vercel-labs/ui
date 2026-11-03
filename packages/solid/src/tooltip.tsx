@@ -2,7 +2,6 @@ import {
   tooltip as tooltipPrimitive,
   type TooltipContentProps,
   type TooltipContentState,
-  type TooltipController,
   type TooltipOptions,
   type TooltipShortcutProps,
   type TooltipShortcutState,
@@ -71,10 +70,7 @@ type TriggerPartProps = Omit<
   PartProps<"button", TooltipTriggerState>,
   "value" | "defaultValue" | "onChange"
 > &
-  TooltipTriggerProps & {
-    /** Connects a trigger outside the tooltip, like one per table row, to the tooltip with this controller. */
-    controller?: TooltipController<any>
-  }
+  TooltipTriggerProps
 
 /**
  * The element the tooltip names or describes, usually a button.

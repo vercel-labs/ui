@@ -143,6 +143,15 @@ type FileInputDropzoneTarget = "element" | "document"
 type FileInputPasteTarget = "document" | string | Element | null | (() => Element | null | undefined)
 
 /**
+ * The props of the trigger, in every framework.
+ * @stable
+ */
+type FileInputTriggerProps = {
+  /** Connects a trigger outside the file input, like one in a toolbar, to the file input with this controller. */
+  controller?: FileInputController
+}
+
+/**
  * The props the `dropzone` slot of `fileInput` takes.
  * @stable
  */
@@ -441,6 +450,7 @@ export {
   type FileInputPasteTarget,
   type FileInputPrimitive,
   type FileInputState,
+  type FileInputTriggerProps,
   type FileInputValueChangeDetails,
   type FileInputValueChangeReason,
 }

@@ -1,4 +1,4 @@
-import { formatShortcut, type ChangeDetails, type DismissAttemptDetails } from "@ui-sdk/core"
+import { formatShortcut, type Anchor, type ChangeDetails, type DismissAttemptDetails } from "@ui-sdk/core"
 import {
   menu as menuPrimitive,
   type MenuActionDetails,
@@ -75,7 +75,7 @@ const Menu = /* @__PURE__ */ renderless(
       modelValue: optionalBoolean,
       defaultOpen: optionalBoolean,
       items: Array as PropType<MenuData>,
-      shortcuts: optionalBoolean,
+      itemShortcuts: optionalBoolean,
       loop: optionalBoolean,
       delay: Number,
       presentation: String as PropType<"auto" | "popover" | "sheet">,
@@ -224,6 +224,8 @@ const MenuContent = withPayload(
         sideOffset: Number,
         alignOffset: Number,
         collisionPadding: Number,
+        arrowPadding: Number,
+        anchor: [Object, String] as PropType<Anchor | string | null>,
         keepMounted: optionalBoolean,
         // Renders the popup into this element instead of in place. Submenus stay
         // inside their parent's popup.

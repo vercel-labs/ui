@@ -73,7 +73,7 @@ const checked = ref(["react", "postgres"])
       aria-label="Stack"
       :items="items"
       checkable
-      selection-mode="none"
+      mode="none"
       check-strategy="trunk"
       :default-expanded="['frontend', 'backend', 'databases']"
       class="flex h-80 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground"

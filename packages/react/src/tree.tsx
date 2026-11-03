@@ -5,7 +5,7 @@ import {
   type TreeItemState,
   type TreeOptions,
   type TreeState,
-  type TreeSelectionMode,
+  type TreeMode,
 } from "@ui-sdk/core/tree"
 import * as React from "react"
 import { hasChild } from "./children"
@@ -23,7 +23,7 @@ type Clashing = "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSe
  * The props of `Tree`.
  * @stable
  */
-type TreeProps<Mode extends TreeSelectionMode = "single"> = Omit<
+type TreeProps<Mode extends TreeMode = "single"> = Omit<
   PartProps<"div", TreeState>,
   Clashing | keyof TreeOptions
 > &
@@ -33,10 +33,10 @@ type TreeProps<Mode extends TreeSelectionMode = "single"> = Omit<
  * A tree of items that expand and collapse, with one tab stop and arrow keys between its items.
  * @stable
  */
-function Tree<Mode extends TreeSelectionMode = "single">({
+function Tree<Mode extends TreeMode = "single">({
   items,
   paths,
-  selectionMode,
+  mode,
   value,
   defaultValue,
   onValueChange,
@@ -68,7 +68,7 @@ function Tree<Mode extends TreeSelectionMode = "single">({
   const tree = usePrimitive(treePrimitive, {
     items,
     paths,
-    selectionMode,
+    mode,
     value,
     defaultValue,
     onValueChange,
@@ -215,7 +215,7 @@ export type {
   TreePrimitive,
   TreeState,
   TreeRow,
-  TreeSelectionMode,
+  TreeMode,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

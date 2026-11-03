@@ -16,7 +16,7 @@ type Variant = {
     presentation?: "auto" | "popover" | "sheet"
     loop?: boolean
     delay?: number
-    shortcuts?: boolean
+    itemShortcuts?: boolean
     debug?: boolean
   }
   content?: {
@@ -301,7 +301,7 @@ const variants: Variant[] = [
     note: "Data menu. ⌘N or Ctrl+N runs New file while closed.",
     items: basic,
     mode: "data",
-    options: { shortcuts: true },
+    options: { itemShortcuts: true },
   },
 
   {

@@ -74,7 +74,7 @@
 <Tree
   aria-label="Docs"
   items={pages}
-  selectionMode="none"
+  mode="none"
   {current}
   onAction={(value, { event }) => {
     if (!links.has(value)) return

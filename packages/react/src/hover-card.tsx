@@ -2,7 +2,6 @@ import {
   hoverCard,
   type HoverCardContentProps,
   type HoverCardContentState,
-  type HoverCardController,
   type HoverCardOptions,
   type HoverCardTriggerProps,
   type HoverCardTriggerState,
@@ -57,11 +56,7 @@ function HoverCard({ children, container, ...options }: HoverCardProps) {
 function HoverCardTrigger({
   controller,
   ...props
-}: PartProps<"a", HoverCardTriggerState> &
-  HoverCardTriggerProps & {
-    /** Connects a trigger outside the card, like every author link in a feed, to the card with this controller. */
-    controller?: HoverCardController<any>
-  }) {
+}: PartProps<"a", HoverCardTriggerState> & HoverCardTriggerProps) {
   const { payload: _, render, ...rest } = props
   // Until the card it names mounts, a trigger outside the card is a plain link.
   const unconnected = () => renderElement("a", rest, render, { open: false })

@@ -283,6 +283,7 @@ export type {
   FileInputPasteTarget,
   FileInputPrimitive,
   FileInputState,
+  FileInputTriggerProps,
   FileInputValueChangeDetails,
   FileInputValueChangeReason,
   FileLike,

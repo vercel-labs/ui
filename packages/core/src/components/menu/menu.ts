@@ -223,7 +223,7 @@ type MenuOptions = PortalProps & {
    * Whether a data menu runs its items' shortcuts while closed.
    * @defaultValue true
    */
-  shortcuts?: boolean
+  itemShortcuts?: boolean
   /**
    * Whether arrow keys wrap from the last item to the first.
    * @defaultValue true
@@ -253,12 +253,18 @@ type MenuOptions = PortalProps & {
  * The props the `trigger` slot of `menu` takes.
  * @stable
  */
-type MenuTriggerProps = TriggerProps
+type MenuTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the menu, like one per table row, to the menu with this controller. */
+  controller?: MenuController<any>
+}
 /**
  * The props the `context-trigger` slot of `menu` takes.
  * @stable
  */
-type MenuContextTriggerProps = ContextTriggerProps
+type MenuContextTriggerProps = ContextTriggerProps & {
+  /** Connects an area outside the menu to the menu with this controller. */
+  controller?: MenuController<any>
+}
 /**
  * The props the `item` slot of `menu` takes.
  * @stable
@@ -420,7 +426,7 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
     onCheckedChange: "callback",
     onValueChange: "callback",
     items: "value",
-    shortcuts: "boolean",
+    itemShortcuts: "boolean",
     loop: "boolean",
     delay: "number",
     presentation: "string",
@@ -452,7 +458,7 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
   }),
   live: ["highlighted", "shortcutItems"],
   sync: (options) => ({
-    shortcutItems: options.shortcuts === false ? undefined : options.items,
+    shortcutItems: options.itemShortcuts === false ? undefined : options.items,
     ...(options.open === undefined ? {} : { open: options.open }),
   }),
   api: (context) => {

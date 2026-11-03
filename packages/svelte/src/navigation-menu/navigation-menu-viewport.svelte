@@ -23,6 +23,7 @@ as --viewport-width and --viewport-height, and moves to the open trigger.
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     container,
     ...rest
@@ -34,7 +35,7 @@ as --viewport-width and --viewport-height, and moves to the open trigger.
   const viewport = useHandlePart(
     menu,
     "viewport",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, anchor }),
+    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }),
     portalTo(target),
   )
 </script>

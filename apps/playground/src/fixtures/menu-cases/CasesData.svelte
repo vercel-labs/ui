@@ -12,7 +12,7 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Menu {items} {shortcuts} onAction={(value) => (action = value)}>
+  <Menu {items} itemShortcuts={shortcuts} onAction={(value) => (action = value)}>
     <MenuTrigger>Edit</MenuTrigger>
   </Menu>
   <button onclick={() => (align = "right")}>Align right</button>

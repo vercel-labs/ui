@@ -3,6 +3,7 @@ import {
   type DatePickerContentProps,
   type DatePickerContentState,
   type DatePickerHintState,
+  type DatePickerInputProps,
   type DatePickerInputState,
   type DatePickerOptions,
   type DatePickerPresetState,
@@ -177,9 +178,8 @@ function DatePickerInput({
   end,
   render,
   ...props
-}: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children" | "readOnly"> & {
-  end?: boolean
-}) {
+}: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children" | "readOnly"> &
+  DatePickerInputProps) {
   const picker = useDatePicker("DatePickerInput")
   // Field names the first input. The core writes the text as it changes, so React only renders where it starts.
   const input = (merged: Record<string, any>, state: DatePickerInputState) => {
@@ -220,6 +220,7 @@ function DatePickerContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   finalFocus,
   keepMounted,
@@ -236,6 +237,7 @@ function DatePickerContent({
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     finalFocus,
     keepMounted,

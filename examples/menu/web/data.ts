@@ -42,7 +42,7 @@ const fileMenu: MenuData = [
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-menu shortcuts>
+    <ui-menu item-shortcuts>
       <ui-menu-trigger>
         <button class="inline-flex cursor-default h-8 shrink-0 items-center justify-center gap-1.5 rounded-2xl border border-border bg-background bg-clip-padding px-3 text-sm font-medium whitespace-nowrap outline-none select-none transition-[color,background-color,box-shadow] hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-open:bg-muted data-open:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50 motion-reduce:transition-none">File</button>
       </ui-menu-trigger>

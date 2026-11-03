@@ -47,7 +47,7 @@ test("new items keep focus on the item that had it", async () => {
 })
 
 test("checking an item from the keyboard, with a page that renders new items back, keeps focus on it", async () => {
-  document.body.innerHTML = `<ui-tree aria-label="Tasks" checkable selection-mode="none"></ui-tree>`
+  document.body.innerHTML = `<ui-tree aria-label="Tasks" checkable mode="none"></ui-tree>`
   const tree = document.body.firstElementChild as TreeElement
   tree.items = items()
   tree.addEventListener("checkedchange", (event) => {

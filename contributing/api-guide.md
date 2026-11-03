@@ -37,6 +37,13 @@ Rules every component follows, current and future. "Must" is a rule, and "prefer
 | A line or mark that's only visual               | `decorative` (Separator): hidden from assistive technology                                                                                           |
 | Keep a layer open while it holds unsaved work   | `dismissible` and `onDismissAttempt`                                                                                                                 |
 | Stay scrolled to the end as content grows       | `stickToEnd` (Scroll Area). Not `anchor`, which is what a popup is positioned against                                                                |
+| The item for the current page                   | `current`, with `data-current` and `aria-current="page"` (Tree, PaginationLink, NavigationMenuLink). Never `active`                                  |
+| The pointer is over a part                      | `hovering` and `data-hovering`, like `dragging` and `scrolling`. Never `hovered`                                                                     |
+| A bound, and a count                            | `min` and `max` for bounds; `max<Noun>` for counts: `maxFiles`, `maxDays`, `maxSelected`, `maxVisible` (Toast), `maxLabels` (SelectValue)            |
+| A function that returns text                    | `get<Noun>`: `getHref`, `getValueLabel`, `getMoreLabel`, `getTokenDescription`. `announcement` and `itemToValue` / `itemToLabel` keep their names    |
+| Alignment along a line of text                  | `"start" \| "center" \| "end"`, which follow the reading direction. Never `"left"` or `"right"` (OTPInput's `textAlign`)                             |
+| The highlight moved                             | `onHighlight(value, { index, event })` on every list: Select, Combobox, Listbox, Autocomplete, Tree                                                  |
+| Text announced while an action is pending       | `pendingAnnouncement` (§2)                                                                                                                           |
 
 - **Component names:**
   - Controls you type or pick values into are `<Kind>Input`: `Input`, `NumberInput`, `FileInput`, `TokenInput`, `OTPInput`. Never `Input<Kind>`, and never `<Kind>Field`: `Field` is the label, description and error wrapper.
@@ -49,6 +56,7 @@ Rules every component follows, current and future. "Must" is a rule, and "prefer
   - A part that works from anywhere connects inside its root on its own and outside through `controller` (web: `for="id"`), like triggers (§8). Example: `NumberInputScrubArea`.
 - **Groups are parts, not components.** A group is a part of the component it groups: `Checkbox` with `CheckboxGroup`, `Toggle` with `ToggleGroup`, `Radio` with `RadioGroup`, `Field` with `FieldSet`, `FieldLegend` and `FieldGroup`. One entry, one docs page per component. A pattern with its own keyboard model or role stays its own component (Accordion, Alert Dialog). Every component with its own docs page has its own entry, so `switch`, `alert-dialog` and `textarea` are entries even though core serves them from `checkbox`, `dialog` and `input`.
 - **No `dir` prop.** Direction is read from the DOM with `isRTL(el)`.
+- **A boolean that turns behavior on or off names what it covers,** so it can't be taken for a value of the same word: Menu's `itemShortcuts`, beside an item's `shortcut`.
 - **No boolean traps.** A boolean says one thing. When there are three or more modes, use a string union (`activation`, `presentation`), never two booleans that conflict.
 - **Core's public functions say their kind.** `define*` makes a primitive, `create*` something stateful, `bind*` takes an element and returns a cleanup, a bare verb is an action, a noun, `*Of`, `*Attrs` or `*Message` is a pure helper, `is*`, `has*`, `supports*` and `matches*` answer yes or no, and `register*` is only for page-wide registries. A behavior is one job an interface does, like `createRovingFocus`, and is listed under Behaviors. The kernel's own `create*` functions (`createChange`, `createCommit`, `createController`, `createHistory`) make the pieces a primitive is built from, and aren't behaviors. `pnpm lint` checks what a script can (`public-names`).
 
@@ -65,14 +73,15 @@ onOpenChange?: (open: boolean, details: ChangeDetails<PopoverOpenChangeReason>) 
 - **Keys are `open`, `value` or `checked`.** Use another key only for genuinely new state, like Drawer's `snapPoint`.
 - **`value` is `string`** for one and `string[]` for many. Nothing selected is `null`, never `undefined`, because `undefined` means uncontrolled.
 - **Formatted values use their standard string:** dates `YYYY-MM-DD`, times `HH:mm`, colors as CSS color strings, phone numbers as E.164. Bounds also take `"today"` and `"now"`. Parsers live in core. A date range is `[start, end]`.
-- **When a value has three or more shapes, a `mode` union picks one** instead of `multiple`, like Calendar's `mode="single" | "multiple" | "range"`.
-- **The new value comes first, then the details.** Extra context, like which item, goes in the details: `(checked, details & { value })`, never `(value, checked)`.
+- **When a value has three or more shapes, a `mode` union picks one** instead of `multiple`, like Calendar's `mode="single" | "multiple" | "range"` and Tree's `mode="none" | "single" | "multiple"`. Tree's `checkable` doesn't make `mode` ambiguous: checkboxes have their own `checked` value, and `mode` decides only the shape of `value`.
+- **The new value comes first, then the details.** Extra context, like which item, goes in the details: `(checked, details & { value })`, never `(value, checked)`. Every callback that hears about a value gets a details object, even one with only `event`, and it's a named, exported type: `MenuActionDetails`, `TokenInputSubmitDetails`, `AutocompleteSubmitDetails`. Never an inline `{ event?: Event }`.
+- **Finishing a value is `on<Key>Commit`, through `createCommit`:** Slider and NumberInput when the drag or key press ends, OTPInput when every slot is filled.
 - **Never fire on mount.** A default the component picks is not a change.
 - **Controlled and uncontrolled:** no type-level unions. `definePrimitive` warns in development when both `x` and `defaultX` are passed, or when `x` switches between defined and `undefined`.
 - **Change callbacks are synchronous,** because `cancel()` must be decided at once. For async confirmation, cancel, then call the controller later. Only action handlers (below) may return a Promise.
 - **Use `change()` only for keys that have a public `on<Key>Change`.** Internal state uses `store.set`.
 
-**Action handlers may return a Promise.** `onAction`, `onSelect`, `onCreate`, a Close part's `action` and Button's `onClick` run an action, and a returned Promise means pending:
+**Action handlers may return a Promise.** `onAction`, `onSelect`, `onCreate`, a Close part's `action` and Button's `onClick` run an action, and a returned Promise means pending. Type them as returning `unknown`, like `(value: string, details: MenuActionDetails) => unknown`, never `void | Promise<unknown>`, so one-line handlers that return a value, like Vue's `(v) => (last = v)` or a Solid setter, still type-check. Every component that runs one takes `pendingAnnouncement` and announces through `announcePending` (`kernel/action.ts`): Button, Dialog, Alert Dialog, Drawer, Toast, Menu, Command, Tree, Trigger Menu and Combobox:
 
 - The part gets `data-pending` and `aria-busy`, stays focusable, and has `pending` in its state. Repeat activations are ignored. After about a second, core announces a short localizable "Loading", and a pending part sets `aria-disabled` until it settles.
 - A layer that closes on select closes when the Promise resolves. A Close `action` closes with the reason `action`.
@@ -175,14 +184,15 @@ type ChangeDetails<Reason extends string = string> = Reason extends unknown // O
 
 Declare these once, in core, with JSDoc, and spread them into component types. Components document only their defaults. `PositionProps`, `PortalProps`, `Side`, `Align` and `Anchor` live in `platform/position.ts`, and `Modal` in `popups/popup.ts`; all are exported from `@ui-sdk/core`.
 
-- **`PositionProps`** on every positioned `Content`: `side` (`"top" | "bottom" | "left" | "right"`, plus logical `"start" | "end"`), `align` (`"start" | "center" | "end"`), `sideOffset`, `alignOffset`, `collisionPadding`, `arrowPadding`, and `anchor`: an element, a CSS selector, a point `{ x, y }`, or anything with `getBoundingClientRect()`. It's read on every check, so it can move. A controller's `open({ anchor })` overrides it for that open.
+- **`PositionProps`** on every positioned `Content`, never re-declared by a component except to document its own default: `side` (`"top" | "bottom" | "left" | "right"`, plus logical `"start" | "end"`), `align` (`"start" | "center" | "end"`), `sideOffset`, `alignOffset`, `collisionPadding`, `arrowPadding`, and `anchor`: an element, a CSS selector, a point `{ x, y }`, or anything with `getBoundingClientRect()`. It's read on every check, so it can move. A controller's `open({ anchor })` overrides it for that open.
 - **Viewport placement uses `side` and `align` too:** `<ToastRegion side="bottom" align="end" />`. No `position` prop.
 - **`PortalProps`:** `container?: Element | DocumentFragment | null`. Web takes a CSS selector. A popup without `container` inherits the nearest enclosing popup's, and an explicit `container` wins.
+- **`keepMounted`** on every popup `Content` that leaves the page while closed. Not on Tooltip's: it's always in the page, so its trigger is named or described before focus reaches it.
 - **`presentation`** on Menu, Popover, Dialog (`"auto" | "dialog" | "sheet"`), Select, Combobox and Autocomplete, default the component's own. Not on Alert Dialog, Trigger Menu, Tooltip, Hover Card, Navigation Menu or Menubar, and a context menu stays a popover. A sheet keeps the popup's role and keys; it adds motion, a swipe to dismiss (reason `"swipe"`) and a dim, the viewport's `::backdrop` colored by `--sheet-backdrop`. A sheet is modal, even for popups that aren't by default, unless `modal={false}` is passed. The sheet code preloads in idle time, once per page, only for a popup created with `"sheet"`, or `"auto"` on a coarse pointer. No public `snapPoints` yet.
 - **In a Combobox or Autocomplete sheet,** the input renders in the sheet's header while it's open; a touch open focuses the sheet, not the input, so the keyboard doesn't open; focusing the input grows the sheet to its largest snap point; choosing an option closes it, and `multiple` stays open.
 - **`FocusProps`:** `initialFocus` (`"auto" | "content" | "none" | selector | element | () => element`) and `finalFocus` (`"trigger" | "none" | …`).
 - **`modal`** (`Modal`): `true` makes the page inert, locks scroll, traps focus and consumes outside presses. `false` does none of these. A string keeps exactly one effect: `"trap-focus"` keeps the focus trap, and `"pointer"` keeps outside-press consumption. Each component accepts a documented subset of `boolean | "pointer" | "trap-focus"`.
-- **Form props**, matching HTML: `name`, `value` (the submitted value), `form`, `required`, `readOnly`, `disabled`.
+- **Form props**, matching HTML: `name`, `value` (the submitted value), `form`, `required`, `readOnly`, `disabled`. Every form control takes the whole set, with `data-readonly` and `data-required`, even where its native element ignores one: a slider's range input ignores `readonly`, so Slider says it with `aria-readonly` and stops drags, keys and screen reader adjustments; it always has a value, so `required` never blocks a form. A group's `readOnly` (CheckboxGroup) reaches every control in it, like `disabled`.
 - **`disabled` means what the pattern says,** and the JSDoc says which: composite items (menu items, tabs, accordion triggers) stay focusable; radio items and list options (Select, Combobox, Listbox, Autocomplete, Command) are skipped, like in a native select; form controls are natively disabled, not focusable and not submitted.
 
 ## 6. Data attributes and CSS variables
@@ -208,7 +218,8 @@ Declare these once, in core, with JSDoc, and spread them into component types. C
 
 ## 7. Render state
 
-- **Export `<Component><Part>State` for every part with state**, with JSDoc on each field, declared through `slot<Props, State>`.
+- **Export `<Component><Part>State` for every part with state**, with JSDoc on each field, declared through `slot<Props, State>`. The root's is `<Component>State`, never `<Component>RootState`.
+- **A primitive's store type stays internal.** Name it `<Component>Store` or `State` in the component's `*-api.ts`, and never export it from the component's entry.
 - **Use the same field names as the attributes:** `open`, `checked`, `indeterminate`, `selected`, `highlighted`, `disabled`, `readOnly`, `required`, `pending`, `orientation`, `side`, `align`. An action's rejection is `error`.
 - **Never a field that is always one value for some parts.** Make it real, or leave it out.
 - **Settings in state are the setting's type,** like `modal: boolean | "trap-focus"`, not a lossy boolean.
@@ -225,6 +236,8 @@ tabs.focus()
 
 - **Every component with state exports `create<Name>Controller()`,** re-exported from every framework package. Read and write methods follow the rule above.
 - **Every write method takes an optional `ChangeOptions<Reason>`, `{ reason, event }`,** which reaches the change callback's details, and every method has JSDoc.
+- **Every write method returns `boolean`:** false when the change was canceled, refused (disabled, read-only) or changed nothing. A controlled component returns true once it asked, before the new value comes back. A popup's `open()` returns its result Promise instead.
+- **Every component offers the verbs its parts do:** a popup has `open`, `close`, `toggle`, `setOpen` and `focus`; a component with a Clear part has `clear()`.
 - **The same surface is the web component's API.** `isOpen()` becomes the `open` property, and `getValue()` and `setValue()` become `value`. The attribute of the same name sets where the state starts, and changing it later changes the state like setting the property. Removing a boolean one clears it, like `open` on `<details>`. Verbs are methods of the element's `api` property (`menu.api.open()`, `tabs.api.select("billing")`). A popup's `open()` can't be an element method, since `open` is the property.
 - **Never expose `api.internal`.** The controller's attach hook hides behind a symbol (`attachController()`, for adapters and tests only).
 - **Popups:** `create<Name>Controller<Payload, Result = string>()` adds `open({ payload, anchor, reason, signal })`, `close({ returnValue })` and `getPayload()`. The payload stays until the next open, so content doesn't blank while it animates out. A Close part's `value` becomes the `returnValue`, which `onOpenChange`'s details carry too.
@@ -238,7 +251,7 @@ tabs.focus()
 
 - **Adapters must tear down.** `PrimitiveInstance.destroy()` settles open promises and detaches the controller, unless another instance attached since.
 - **`open({ payload })` on an open popup replaces the payload,** like a trigger handover: `onPayloadChange` fires with reason `imperative` and can cancel it, the same promise is returned, the trigger that opened it stays expanded, and an `anchor` passed with the new payload moves it. An `open()` without a `payload` key, or with the same payload, changes nothing.
-- **Every Trigger works outside its root** through `controller` (`for="<root id>"` on web, like `popovertarget`), and passes `payload`. Several triggers can share one root. Only the one that opened it is expanded, anchors it and gets focus back. Every popup ships this in its first version.
+- **Every Trigger works outside its root** through `controller`, declared in core on `<Name>TriggerProps` (and `MenuContextTriggerProps`, `DrawerOutletProps`, `CarouselControlProps`), never re-declared by an adapter, (`for="<root id>"` on web, like `popovertarget`), and passes `payload`. Several triggers can share one root. Only the one that opened it is expanded, anchors it and gets focus back. Every popup ships this in its first version.
 - **Component contexts stay internal.** No public `use<Component>()` hooks; custom parts go through `render` and the framework's rendering docs.
 
 ## 9. Generics

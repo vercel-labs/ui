@@ -260,7 +260,9 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       sideOffset: "number",
       alignOffset: "number",
       collisionPadding: "number",
+      arrowPadding: "number",
       container: "value",
+      anchor: "string",
       keepMounted: "boolean",
     },
     selects: selects({ values: [] }),
@@ -308,7 +310,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       const props = () => api.itemProps<ContentProps>("content", key) ?? initial
       let firstItem: number | undefined
       return api.internal.presentation.bind(el, {
-        anchor: api.anchor,
+        anchor: () => api.anchor(el, props().anchor),
         position: () => {
           const trigger = api.triggerElement()
           firstItem ??= parentMenu ? firstItemOffset(el) : 0

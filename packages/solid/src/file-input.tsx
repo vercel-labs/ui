@@ -1,11 +1,11 @@
 import {
   fileInput as fileInputPrimitive,
-  type FileInputController,
   type FileInputItemProps,
   type FileInputItemRemoveState,
   type FileInputItemState,
   type FileInputOptions,
   type FileInputState,
+  type FileInputTriggerProps,
 } from "@ui-sdk/core/file-input"
 import { fileKey } from "@ui-sdk/core/renderer"
 import type { JSX } from "@solidjs/web"
@@ -126,12 +126,7 @@ const unconnected: FileInputState = { value: [], disabled: false, required: fals
  * button's own text. Outside the file input, it connects through `controller`.
  * @stable
  */
-function FileInputTrigger(
-  props: ButtonProps<FileInputState> & {
-    /** Connects a trigger outside the file input, like one in a toolbar, to the file input with this controller. */
-    controller?: FileInputController
-  },
-) {
+function FileInputTrigger(props: ButtonProps<FileInputState> & FileInputTriggerProps) {
   const fileInput = useControllerTarget(() => props.controller, useContext(FileInputContext))
   const rest = omit(props, "controller")
   const field = useFieldControl()
@@ -215,6 +210,7 @@ export type {
   FileInputPasteTarget,
   FileInputPrimitive,
   FileInputState,
+  FileInputTriggerProps,
   FileInputValueChangeDetails,
   FileInputValueChangeReason,
   FileLike,

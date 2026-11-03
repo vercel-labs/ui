@@ -1,6 +1,6 @@
 import type {
-  AlertDialogController,
   AlertDialogOptions,
+  AlertDialogTriggerProps,
   dialog as dialogPrimitive,
 } from "@ui-sdk/core/dialog"
 // From its own module, so an app with only alert dialogs doesn't carry Dialog's presentation.
@@ -30,12 +30,7 @@ function AlertDialog(props: AlertDialogProps) {
  * The button that opens the alert dialog. A trigger outside the alert dialog connects through `controller`.
  * @stable
  */
-function AlertDialogTrigger(
-  props: TriggerPartProps & {
-    /** Connects a trigger outside the alert dialog to the alert dialog with this controller. */
-    controller?: AlertDialogController<any, any>
-  },
-) {
+function AlertDialogTrigger(props: TriggerPartProps & Pick<AlertDialogTriggerProps, "controller">) {
   return <alertParts.Trigger {...props} />
 }
 

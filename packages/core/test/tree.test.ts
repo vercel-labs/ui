@@ -136,7 +136,7 @@ describe("server markup", () => {
   })
 
   test("the current item takes the stop, and its ancestors start expanded", () => {
-    const instance = tree({ id: "t", items: data, current: "util.ts", selectionMode: "none" })
+    const instance = tree({ id: "t", items: data, current: "util.ts", mode: "none" })
     expect(instance.api.getExpanded()).toEqual(["src", "lib"])
     const stop = ["src", "index.ts", "lib", "util.ts"].filter(
       (value) => attrs(instance.part("item", { value })).tabindex === "0",
@@ -178,14 +178,14 @@ describe("selection", () => {
     expect(one.els.get("README.md")!.getAttribute("aria-selected")).toBe("true")
 
     const many = vi.fn()
-    const multi = render({ selectionMode: "multiple", onValueChange: many })
+    const multi = render({ mode: "multiple", onValueChange: many })
     multi.els.get("src")!.click()
     multi.els.get("README.md")!.click()
     expect(many).toHaveBeenLastCalledWith(["src", "README.md"], expect.anything())
   })
 
   test("Shift extends over the items that show, and Ctrl+A selects them all", async () => {
-    const { instance, els, key } = render({ selectionMode: "multiple", defaultExpanded: ["src"] })
+    const { instance, els, key } = render({ mode: "multiple", defaultExpanded: ["src"] })
     await tick()
     els.get("src")!.focus()
     key("ArrowDown", { shiftKey: true })
@@ -391,8 +391,8 @@ describe("selection", () => {
     expect(instance.api.getValue()).toBe(before)
   })
 
-  test('`selectionMode: "none"` writes no aria-selected and selects nothing', () => {
-    const { instance, els } = render({ selectionMode: "none" })
+  test('`mode: "none"` writes no aria-selected and selects nothing', () => {
+    const { instance, els } = render({ mode: "none" })
     els.get("README.md")!.click()
     expect(instance.api.getValue()).toBeNull()
     expect(els.get("README.md")!.hasAttribute("aria-selected")).toBe(false)
@@ -485,7 +485,7 @@ describe("checkboxes", () => {
       id: "t",
       items: data,
       checkable: true,
-      selectionMode: "none",
+      mode: "none",
       defaultChecked: ["util.ts"],
     })
     expect(attrs(instance.part("item", { value: "lib" }))).toMatchObject({
@@ -498,7 +498,7 @@ describe("checkboxes", () => {
 
   test("Space checks the focused item, and checking a branch checks what's in it", async () => {
     const onCheckedChange = vi.fn()
-    const { instance, els, key } = render({ checkable: true, selectionMode: "none", onCheckedChange })
+    const { instance, els, key } = render({ checkable: true, mode: "none", onCheckedChange })
     await tick()
     els.get("src")!.focus()
     key(" ")
@@ -524,7 +524,7 @@ describe("checkboxes", () => {
         },
       ],
       checkable: true,
-      selectionMode: "none",
+      mode: "none",
     })
     instance.api.internal.pressCheckbox("a")
     expect(instance.api.getChecked()).toEqual(["c"])
@@ -663,7 +663,7 @@ describe("selects", () => {
       id: "t",
       items: data,
       checkable: true,
-      selectionMode: "multiple",
+      mode: "multiple",
     }) as PrimitiveInstance
     const api = (instance as unknown as ReturnType<typeof tree>).api
     const parts = ["src", "lib", "util.ts", "README.md"].flatMap((value) => [

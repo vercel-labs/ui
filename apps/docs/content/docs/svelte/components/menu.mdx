@@ -243,7 +243,7 @@ Connect external triggers and one menu to a `createMenuController<File>()`. Each
 
 ### Menus as Data
 
-`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `shortcuts` false to disable that.
+`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `itemShortcuts` to false to turn that off.
 
 `onCheckedChange` reports the checkbox’s value in `details.value`; `onValueChange` reports the radio group’s name in `details.group`. Either change can be canceled. This example renders its own styled parts from the same data while `items` keeps the shortcuts registered. The [lists and menus guide](../lists-and-menus) covers the data shape.
 

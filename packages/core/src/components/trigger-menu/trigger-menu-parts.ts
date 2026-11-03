@@ -119,6 +119,7 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
       sideOffset: "number",
       alignOffset: "number",
       collisionPadding: "number",
+      arrowPadding: "number",
       container: "value",
       anchor: "string",
       keepMounted: "boolean",

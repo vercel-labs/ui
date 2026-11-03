@@ -26,7 +26,7 @@ const items: TreeItemData[] = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div class="flex w-72 max-w-full flex-col gap-3">
-      <ui-tree aria-label="Folders" selection-mode="multiple" default-value="updates,website" expand-on-press="false" default-expanded="inbox,projects" class="flex h-80 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground">
+      <ui-tree aria-label="Folders" mode="multiple" default-value="updates,website" expand-on-press="false" default-expanded="inbox,projects" class="flex h-80 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground">
         <template>
           <ui-tree-item class="flex flex-wrap items-center outline-none">
             <ui-tree-item-indicator class="flex size-4 cursor-default shrink-0 items-center justify-center text-muted-foreground transition-transform duration-200 data-expanded:rotate-90 rtl:rotate-180 rtl:data-expanded:rotate-90 before:content-['›']"></ui-tree-item-indicator>

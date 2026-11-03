@@ -150,7 +150,7 @@ const status = ref("")
 <template>
   <Menu
     :items="fileMenu"
-    shortcuts
+    item-shortcuts
     @action="(value: string) => (status = `Ran ${value}`)"
     @checked-change="(checked, details) => (status = `${details.value} ${checked ? 'on' : 'off'}`)"
     @value-change="(value, details) => (status = `${details.group}: ${value}`)"

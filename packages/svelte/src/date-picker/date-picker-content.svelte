@@ -23,6 +23,7 @@ grid for each month; every Calendar part works inside it.
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     finalFocus,
     keepMounted,
@@ -45,7 +46,7 @@ grid for each month; every Calendar part works inside it.
   const content = useHandlePart(
     picker,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, anchor, finalFocus, keepMounted }),
+    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, finalFocus, keepMounted }),
     portalTo(() => (viewport.present ? false : target())),
   )
   const offsets = $derived(monthOffsets(picker.months()))

@@ -46,7 +46,7 @@ function Subtasks({ issue }: { issue: Issue }) {
         aria-labelledby="subtasks-label"
         items={toItems(issue.subtasks)}
         checkable
-        selectionMode="none"
+        mode="none"
         checkStrategy="leaf"
         checked={checked}
         onCheckedChange={(next) =>

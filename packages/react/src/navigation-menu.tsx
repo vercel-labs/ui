@@ -140,6 +140,7 @@ function NavigationMenuContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   keepMounted,
   hiddenUntilFound,
@@ -156,6 +157,7 @@ function NavigationMenuContent({
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     keepMounted,
     hiddenUntilFound,
@@ -192,12 +194,13 @@ function NavigationMenuViewport({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   container,
   ...props
 }: PartProps<"div", NavigationMenuViewportState> & NavigationMenuViewportProps) {
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const viewport = { side, align, sideOffset, alignOffset, collisionPadding, anchor }
+  const viewport = { side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }
   const element = usePart(navigationMenu, "viewport", viewport, props)
   return element && renderPopup(element, target)
 }

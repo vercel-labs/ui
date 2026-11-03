@@ -12,7 +12,7 @@ const owner = "ui-token-input"
 // The properties rich values are set through.
 type TokenInputElement = HTMLElement & {
   codec?: TokenCodec
-  describeToken?: (token: Token) => string
+  getTokenDescription?: (token: Token) => string
   // Renders a token's content into its host. Without it, a <template> child is cloned per token.
   renderToken?: (token: Token, host: HTMLElement) => void
 }

@@ -8,7 +8,7 @@ import {
   type TreeItemProps,
   type TreeItemState,
   type TreeOptions,
-  type TreeSelectionMode,
+  type TreeMode,
 } from "@ui-sdk/core/tree"
 import { isServer } from "@solidjs/web"
 import {
@@ -46,14 +46,14 @@ type Clashing = "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSe
  * The props of `Tree`.
  * @stable
  */
-type TreeProps<Mode extends TreeSelectionMode = "single"> = TreeOptions<Mode> &
+type TreeProps<Mode extends TreeMode = "single"> = TreeOptions<Mode> &
   Omit<ComponentProps<typeof parts.Root>, keyof TreeOptions> & {}
 
 /**
  * A tree of items that expand and collapse, with one tab stop and arrow keys between its items.
  * @stable
  */
-function Tree<Mode extends TreeSelectionMode = "single">(props: TreeProps<Mode>) {
+function Tree<Mode extends TreeMode = "single">(props: TreeProps<Mode>) {
   // The items a data tree renders, from the props: core syncs its options
   // after rendering, so asking it would render the items it had before.
   const data = createMemo(() => props.items ?? (props.paths && treeFromPaths(props.paths)))
@@ -204,7 +204,7 @@ export type {
   TreePrimitive,
   TreeState,
   TreeRow,
-  TreeSelectionMode,
+  TreeMode,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

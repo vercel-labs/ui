@@ -13,9 +13,9 @@ const { Root: Tree } = createParts(tree, { root: "div" })
     void wrong
   }}
 />
-// `selectionMode: "multiple"` makes the value a list.
+// `mode: "multiple"` makes the value a list.
 ;<Tree
-  selectionMode="multiple"
+  mode="multiple"
   onValueChange={(value) => {
     const known: string[] = value
     // @ts-expect-error `value` is a list.
@@ -27,4 +27,4 @@ const { Root: Tree } = createParts(tree, { root: "div" })
 // @ts-expect-error A single selection isn't a list.
 ;<Tree defaultValue={["src"]} />
 // @ts-expect-error A multiple selection is a list.
-;<Tree selectionMode="multiple" defaultValue="src" />
+;<Tree mode="multiple" defaultValue="src" />

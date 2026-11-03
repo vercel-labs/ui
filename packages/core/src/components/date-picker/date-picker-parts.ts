@@ -208,6 +208,7 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       sideOffset: "number",
       alignOffset: "number",
       collisionPadding: "number",
+      arrowPadding: "number",
       container: "value",
       anchor: "string",
       finalFocus: "string",

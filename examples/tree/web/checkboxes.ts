@@ -31,7 +31,7 @@ const items: TreeItemData[] = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div class="flex w-72 max-w-full flex-col gap-3">
-      <ui-tree aria-label="Stack" checkable selection-mode="none" check-strategy="trunk" default-checked="react,postgres" default-expanded="frontend,backend,databases" class="flex h-80 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground">
+      <ui-tree aria-label="Stack" checkable mode="none" check-strategy="trunk" default-checked="react,postgres" default-expanded="frontend,backend,databases" class="flex h-80 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-background p-1 text-sm leading-5 text-foreground">
         <template>
           <ui-tree-item class="flex flex-wrap items-center outline-none">
             <ui-tree-item-checkbox class="relative ms-2 flex size-4 cursor-default shrink-0 items-center justify-center rounded-[5px] border border-input bg-background after:text-[10px] after:leading-none after:text-primary-foreground data-checked:border-primary data-checked:bg-primary data-checked:after:content-['✓'] data-indeterminate:border-primary data-indeterminate:bg-primary data-indeterminate:after:content-['–']"></ui-tree-item-checkbox>
