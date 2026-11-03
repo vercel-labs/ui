@@ -14,18 +14,16 @@ description: Show a measurement within a known range, such as storage used or an
 pnpm add @ui-sdk/react @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Meter`:
 
-```tsx
-<Meter value={40}>
-  <MeterLabel />
-  <MeterValue />
-  <MeterTrack>
-    <MeterIndicator />
-  </MeterTrack>
-</Meter>
+```text
+Meter
+├── MeterLabel
+├── MeterValue
+└── MeterTrack
+    └── MeterIndicator
 ```
 
 - `Meter` holds the value and range.
@@ -86,9 +84,7 @@ Use [Progress](./progress) for a task that is working toward completion, such as
 
 Give the track a height, background, and width. The indicator sets its width as an inline percentage of the track. Both styling options are shown in each example's Code tab.
 
-The root exposes a CSS variable for positioning other content alongside the reading:
-
-<CssVariables component="meter" />
+The root exposes a CSS variable, listed under [Meter](#meter), for positioning other content alongside the reading.
 
 <span id="render-functions" />
 
@@ -103,6 +99,8 @@ Props are the same as below, as React props.
 ### Meter
 
 <TypeTable path="../../packages/core/src/components/meter/meter.ts" name="MeterOptions" />
+
+<CssVariables component="meter" part="root" />
 
 ### State
 

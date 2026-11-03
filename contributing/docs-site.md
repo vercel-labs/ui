@@ -17,9 +17,9 @@
 
 ## Component pages
 
-- One page per framework: `apps/docs/content/docs/<framework>/components/<name>.mdx`. Write React's first, then copy it to each framework and rewrite only what differs: installation, anatomy, code, callback names (`@open-change` in Vue, the `openchange` event on web components) and framework notes.
+- One page per framework: `apps/docs/content/docs/<framework>/components/<name>.mdx`. Write React's first, then copy it to each framework and rewrite only what differs: installation, composition, code, callback names (`@open-change` in Vue, the `openchange` event on web components) and framework notes.
 - Examples render with `<ComponentExample name="<name>/<example>" />`.
-- The API reference comes from the code: `<TypeTable path="../../packages/core/src/components/<name>/<name>.ts" name="..." />`, `<StateTable>`, `<ReasonTable>` and `<ControllerTable>` (same `path` and `name` props, read from the exported types), `<DataAttributes component="<name>" />`, `<CssVariables>` and `<SpecList spec="<name>" />`, which lists behavior from spec titles.
+- The API reference comes from the code: `<TypeTable path="../../packages/core/src/components/<name>/<name>.ts" name="..." />`, `<StateTable>`, `<ReasonTable>` and `<ControllerTable>` (same `path` and `name` props, read from the exported types), `<DataAttributes component="<name>" part="<slot>" />` and `<CssVariables component="<name>" part="<slot>" />` (one part's table each, from `lib/data-attributes.ts` and `lib/css-variables.ts`), and `<SpecList spec="<name>" />`, which lists behavior from spec titles.
 - `TypeTable` example links use heading text in the `examples` map. When renaming a heading, update these maps and incoming fragment links too.
 - Add the component to `tests/docs/props.spec.ts`, which checks that every exported prop and state field appears in at least one React example.
 
@@ -28,11 +28,11 @@
 - Laid out framework first, with the same example names in every framework, each doing the same thing. `pnpm test:docs` fails if a folder is missing one.
 
   ```
-  examples/<name>/react/<example>.tsx     exports Example
-  examples/<name>/vue/<example>.vue
-  examples/<name>/svelte/<example>.svelte
-  examples/<name>/solid/<example>.tsx     exports Example
-  examples/<name>/web/<example>.ts        exports mount(root)
+  examples/components/<name>/react/<example>.tsx     exports Example
+  examples/components/<name>/vue/<example>.vue
+  examples/components/<name>/svelte/<example>.svelte
+  examples/components/<name>/solid/<example>.tsx     exports Example
+  examples/components/<name>/web/<example>.ts        exports mount(root)
   ```
 
 - Next never compiles the examples. `examples/vite.config.ts` builds each framework's, with the framework and the SDK bundled, to `examples/dist/<framework>` (`pnpm --filter examples build`, or `node examples/scripts/build.mjs react vue` for some). `apps/docs/app/examples/[...path]/route.ts` serves them, and `ExamplePreview` imports one and its framework's `mount.js` in the browser. A web example's `mount(root)` may return a cleanup, which the preview calls.

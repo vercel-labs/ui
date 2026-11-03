@@ -14,13 +14,11 @@ description: Choose one option, move the selection with arrow keys, and submit i
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
 ## Usage
 
 Give each radio a `value` and put it inside a named `RadioGroup`. The group's value is the checked radio's value. Without `defaultValue`, nothing starts checked and Tab enters on the first enabled radio.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```vue
 <script setup lang="ts">
@@ -86,15 +84,6 @@ Put a required group in [Field](./field) with a label and an error message. Subm
 <ComponentExample
   name="radio/invalid"
   caption="Press Save without a choice to see the error. Choose SMS only, then save again."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on an ancestor. Left moves to the next radio and Right moves to the previous one. Up and Down keep their direction.
-
-<ComponentExample
-  name="radio/rtl"
-  caption="Focus a density option and use Left or Right. Focus and the checked option follow the page's direction."
 />
 
 ## Behavior and Options
@@ -185,29 +174,6 @@ Use a part's `#render` slot to choose its element and read its state. Bind `prop
 
 Props are the same as below, and callbacks are events.
 
-### Events
-
-Events get the new value first, then the details. `v-model` only updates when the change event wasn't canceled.
-
-| Binding         | On           | Receives                                                          |
-| --------------- | ------------ | ----------------------------------------------------------------- |
-| `v-model:value` | `RadioGroup` | The checked value                                                 |
-| `@value-change` | `RadioGroup` | `(value, details)`: the checked value, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the checked value changed.
-
-<ReasonTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupValueChangeReason" />
-
-### Controller
-
-Create one with `createRadioGroupController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
-
-<ControllerTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupController" />
-
 ### RadioGroup
 
 <TypeTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupOptions" />
@@ -229,6 +195,29 @@ What render functions, state-based class names and slots receive.
 <StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioState" />
 
 <StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioIndicatorState" />
+
+### Reasons
+
+`details.reason` says why the checked value changed.
+
+<ReasonTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupValueChangeReason" />
+
+### Controller
+
+Create one with `createRadioGroupController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupController" />
+
+### Events
+
+Events get the new value first, then the details. `v-model` only updates when the change event wasn't canceled.
+
+| Binding         | On           | Receives                                                          |
+| --------------- | ------------ | ----------------------------------------------------------------- |
+| `v-model:value` | `RadioGroup` | The checked value                                                 |
+| `@value-change` | `RadioGroup` | `(value, details)`: the checked value, and the [reason](#reasons) |
 
 ## Accessibility
 

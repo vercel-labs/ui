@@ -20,21 +20,19 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/input"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-input` or a `ui-input-group`:
 
-```html
-<ui-input><input /></ui-input>
+```text
+ui-input
+└── input
 
-<ui-input-group>
-  <ui-input>
-    <input />
-  </ui-input>
-  <ui-input-clear>
-    <button></button>
-  </ui-input-clear>
-</ui-input-group>
+ui-input-group
+├── ui-input
+│   └── input
+└── ui-input-clear
+    └── button
 ```
 
 `<ui-input>` wraps your own `<input>`, which keeps every native behavior. A plain `<input>` works in a field too; wrap it when you want `valuechange`, `data-filled` or the `api`.
@@ -97,8 +95,6 @@ Place text around an input with `InputGroup`. Clicking that text focuses the inp
   caption="Choose Clear search. The text clears, focus returns to the input, and the last change shows clear-press. Type again to bring the button back."
 />
 
-The search and clear icons come from `lucide`. Install that package if you copy this example.
-
 ### Controlled
 
 Set the `value` property and listen for `valuechange`. Its detail contains the new value and the reason. The example derives a read-only profile URL from the display name.
@@ -158,16 +154,6 @@ Arrange fields with ordinary layout styles. Logical padding and margins follow t
 `<ui-input>` has no attributes of its own: put native ones on the `<input>`. It fires a `valuechange`
 event that doesn't bubble, with `detail: { value, reason, event, source }`, and `preventDefault()` cancels the change.
 
-### Reasons
-
-<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods.
-
-<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
-
 ### Input
 
 <TypeTable path="../../packages/core/src/components/input/input.ts" name="InputOptions" />
@@ -185,6 +171,16 @@ The element's `api` property has the same methods.
 `InputGroup` and `InputClear` receive the state of the field inside the group.
 
 <StateTable path="../../packages/core/src/components/input/input.ts" name="InputGroupState" />
+
+### Reasons
+
+<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods.
+
+<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
 
 ## Accessibility
 

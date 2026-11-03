@@ -16,38 +16,21 @@ Date Picker combines a text field with [Calendar](./calendar). People can type a
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `@lucide/svelte` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `DatePicker`:
 
-```bash
-npm install @lucide/svelte
+```text
+DatePicker
+├── DatePickerInput
+├── DatePickerTrigger
+├── DatePickerHint
+└── DatePickerContent
 ```
-
-## Anatomy
 
 The input accepts a date, the trigger opens the calendar, and the hint describes the expected format. An empty content part renders a calendar for you.
 
-```svelte
-<script lang="ts">
-  import {
-    DatePicker,
-    DatePickerContent,
-    DatePickerHint,
-    DatePickerInput,
-    DatePickerTrigger,
-  } from "@ui-sdk/svelte/date-picker"
-</script>
-
-<DatePicker defaultValue="2026-10-16">
-  <DatePickerInput aria-label="Due date" />
-  <DatePickerTrigger>Choose date</DatePickerTrigger>
-  <DatePickerHint />
-  <DatePickerContent />
-</DatePicker>
-```
-
-Every [Calendar part](./calendar#anatomy) also works inside `DatePickerContent` and is exported from the Date Picker entry. Write those parts out when you need to add styles, change the layout, or include custom day content.
+Every [Calendar part](./calendar#composition) also works inside `DatePickerContent` and is exported from the Date Picker entry. Write those parts out when you need to add styles, change the layout, or include custom day content.
 
 An empty `DatePicker` renders the input, trigger, and calendar too. In range mode, it renders an input for each end.
 
@@ -225,58 +208,43 @@ Opening focuses the selected date, otherwise today, otherwise the first focusabl
 
 The root, inputs, and trigger expose `data-disabled`. Invalid input sets `data-invalid` on that input and the root. The root and trigger expose `data-open`; presets expose `data-selected`, and Clear exposes `data-empty`. Calendar days carry [Calendar’s state attributes](./calendar#styling).
 
-<DataAttributes component="date-picker" />
+### DatePickerContent [#styling-datepickercontent]
+
+<CssVariables component="date-picker" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="date-picker" part="viewport" />
+
+## Data Attributes
+
+### DatePicker [#data-attributes-datepicker]
+
+<DataAttributes component="date-picker" part="root" />
+
+### DatePickerInput [#data-attributes-datepickerinput]
+
+<DataAttributes component="date-picker" part="input" />
+
+### DatePickerTrigger [#data-attributes-datepickertrigger]
+
+<DataAttributes component="date-picker" part="trigger" />
+
+### DatePickerContent [#data-attributes-datepickercontent]
+
+<DataAttributes component="date-picker" part="content" />
+
+### DatePickerClear [#data-attributes-datepickerclear]
+
+<DataAttributes component="date-picker" part="clear" />
+
+### DatePickerPreset [#data-attributes-datepickerpreset]
+
+<DataAttributes component="date-picker" part="preset" />
 
 ## API Reference
 
 Props and callbacks are the same as below, as Svelte props.
-
-### Events
-
-Callbacks get the new value first, then the details. A bound value only updates when the callback didn't cancel.
-
-| Prop                   | On           | Receives                                                           |
-| ---------------------- | ------------ | ------------------------------------------------------------------ |
-| `bind:value`           | `DatePicker` | The selected value                                                 |
-| `bind:open`            | `DatePicker` | Whether the popup is open                                          |
-| `bind:month`           | `DatePicker` | The calendar's first month                                         |
-| `onValueChange`        | `DatePicker` | `(value, details)`: the new value, and the [reason](#reasons)      |
-| `onOpenChange`         | `DatePicker` | `(open, details)`: whether the popup opens, and the reason         |
-| `onOpenChangeComplete` | `DatePicker` | `(open)`: once the popup has finished opening or closing           |
-| `onMonthChange`        | `DatePicker` | `(month, details)`: the calendar's new first month, and the reason |
-| `onDismissAttempt`     | `DatePicker` | `({ reason, event })`, when a dismissal was refused                |
-
-### Reasons
-
-`details.reason` says why the value changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerValueChangeReason"
-/>
-
-Why the popup opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerDismissReason"
-/>
-
-### Controller
-
-Create one with `createDatePickerController()` and pass it as `controller`.
-
-<ControllerTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerController"
-/>
 
 ### DatePicker
 
@@ -292,7 +260,6 @@ Create one with `createDatePickerController()` and pass it as `controller`.
   path="../../packages/core/src/components/date-picker/date-picker.ts"
   name="DatePickerContentProps"
 />
-
 ### DatePickerPreset
 
 <TypeTable
@@ -348,6 +315,53 @@ What render functions, state-based class names and children functions receive, p
   path="../../packages/core/src/components/date-picker/date-picker.ts"
   name="DatePickerClearState"
 />
+
+### Reasons
+
+`details.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerValueChangeReason"
+/>
+
+Why the popup opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerDismissReason"
+/>
+
+### Controller
+
+Create one with `createDatePickerController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerController"
+/>
+
+### Events
+
+Callbacks get the new value first, then the details. A bound value only updates when the callback didn't cancel.
+
+| Prop                   | On           | Receives                                                           |
+| ---------------------- | ------------ | ------------------------------------------------------------------ |
+| `bind:value`           | `DatePicker` | The selected value                                                 |
+| `bind:open`            | `DatePicker` | Whether the popup is open                                          |
+| `bind:month`           | `DatePicker` | The calendar's first month                                         |
+| `onValueChange`        | `DatePicker` | `(value, details)`: the new value, and the [reason](#reasons)      |
+| `onOpenChange`         | `DatePicker` | `(open, details)`: whether the popup opens, and the reason         |
+| `onOpenChangeComplete` | `DatePicker` | `(open)`: once the popup has finished opening or closing           |
+| `onMonthChange`        | `DatePicker` | `(month, details)`: the calendar's new first month, and the reason |
+| `onDismissAttempt`     | `DatePicker` | `({ reason, event })`, when a dismissal was refused                |
 
 ## Accessibility
 

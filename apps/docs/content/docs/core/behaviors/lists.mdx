@@ -188,7 +188,7 @@ The element holds the very text find in page searches, so the browser highlights
 The row find in page matched is `found` in `items()` until the next match, until it scrolls away, or until someone presses or types in the list. A row that renders its text without `findableText` still scrolls into view, but the browser's highlight can't show on it, so mark it yourself:
 
 ```tsx
-<div data-found={item.found ? "" : undefined} className="data-found:bg-muted">
+<div data-found={item.found ? "" : undefined} className="data-found:bg-neutral-100">
 ```
 
 ### How It Works

@@ -14,8 +14,6 @@ description: Divide groups of content with a horizontal or vertical line.
 pnpm add @ui-sdk/vue @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
-
 ## Usage
 
 A separator marks a boundary between groups of content. Give it a size and a background:
@@ -28,13 +26,13 @@ import { Separator } from "@ui-sdk/vue/separator"
 <template>
   <section>
     <h2>Account</h2>
-    <Separator class="h-px bg-border" />
+    <Separator class="h-px bg-neutral-200" />
     <p>Manage your profile and preferences.</p>
   </section>
 </template>
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 It renders with `role="separator"` and `aria-orientation="horizontal"` by default. It does not receive focus or resize the content around it.
 

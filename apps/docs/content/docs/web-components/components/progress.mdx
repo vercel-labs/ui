@@ -20,18 +20,16 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/progress"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-progress`:
 
-```html
-<ui-progress value="40">
-  <ui-progress-label></ui-progress-label>
-  <ui-progress-value></ui-progress-value>
-  <ui-progress-track>
-    <ui-progress-indicator></ui-progress-indicator>
-  </ui-progress-track>
-</ui-progress>
+```text
+ui-progress
+├── ui-progress-label
+├── ui-progress-value
+└── ui-progress-track
+    └── ui-progress-indicator
 ```
 
 - `Progress` holds the value and range.
@@ -114,9 +112,7 @@ Give the track a height, background, and width. The indicator sets its width as 
 
 <DataAttributes component="progress" />
 
-The root exposes a CSS variable for positioning other content alongside the reading:
-
-<CssVariables component="progress" />
+The root exposes a CSS variable, listed under [Progress](#progress), for positioning other content alongside the reading.
 
 <span id="render-functions" />
 
@@ -132,6 +128,8 @@ Without a `value` attribute, the bar is indeterminate.
 ### Progress
 
 <TypeTable path="../../packages/core/src/components/progress/progress.ts" name="ProgressOptions" />
+
+<CssVariables component="progress" part="root" />
 
 ### State
 

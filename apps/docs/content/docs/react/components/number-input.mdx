@@ -14,32 +14,16 @@ description: Enter numbers, step through values, and format them for a locale.
 pnpm add @ui-sdk/react @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme). The examples use `lucide-react` for icons.
+## Composition
 
-## Anatomy
+Use the following composition to build a `NumberInput`:
 
-```tsx
-import {
-  NumberInput,
-  NumberInputGroup,
-  NumberInputControl,
-  NumberInputDecrement,
-  NumberInputIncrement,
-} from "@ui-sdk/react/number-input"
-
-function Example() {
-  return (
-    <NumberInput defaultValue={1} min={0}>
-      <NumberInputGroup>
-        <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
-        <NumberInputControl aria-label="Quantity" />
-        <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
-      </NumberInputGroup>
-    </NumberInput>
-  )
-}
-
-export { Example }
+```text
+NumberInput
+└── NumberInputGroup
+    ├── NumberInputDecrement
+    ├── NumberInputControl
+    └── NumberInputIncrement
 ```
 
 `NumberInput` holds the numeric value. `NumberInputGroup` wraps the text input and optional step buttons. `NumberInputControl` renders the input; `NumberInputDecrement` and `NumberInputIncrement` change its value.
@@ -213,35 +197,6 @@ Use logical spacing so the layout follows the surrounding direction. [Parts and 
 
 Props and callbacks are the same as below, as React props.
 
-### Events
-
-Callbacks get the new value first, then the details.
-
-| Prop            | On            | Receives                                                                          |
-| --------------- | ------------- | --------------------------------------------------------------------------------- |
-| `onValueChange` | `NumberInput` | `(value, details)`: the new value, or null when empty, and the [reason](#reasons) |
-| `onValueCommit` | `NumberInput` | `(value, details)`: the value once the interaction ends, and its reason           |
-
-### Reasons
-
-`details.reason` says why the value changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/number-input/number-input.ts"
-  name="NumberInputValueChangeReason"
-/>
-
-### Controller
-
-Create one with `createNumberInputController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
-
-<ControllerTable
-  path="../../packages/core/src/components/number-input/number-input.ts"
-  name="NumberInputController"
-/>
-
 ### NumberInput
 
 <TypeTable path="../../packages/core/src/components/number-input/number-input.ts" name="NumberInputOptions" />
@@ -272,6 +227,35 @@ The buttons' state, `NumberInputButtonState`, says whether that button can step,
   path="../../packages/core/src/components/number-input/number-input.ts"
   name="NumberInputButtonState"
 />
+
+### Reasons
+
+`details.reason` says why the value changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createNumberInputController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputController"
+/>
+
+### Events
+
+Callbacks get the new value first, then the details.
+
+| Prop            | On            | Receives                                                                          |
+| --------------- | ------------- | --------------------------------------------------------------------------------- |
+| `onValueChange` | `NumberInput` | `(value, details)`: the new value, or null when empty, and the [reason](#reasons) |
+| `onValueCommit` | `NumberInput` | `(value, details)`: the value once the interaction ends, and its reason           |
 
 ## Accessibility
 

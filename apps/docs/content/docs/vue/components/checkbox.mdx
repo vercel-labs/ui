@@ -16,26 +16,16 @@ Use a checkbox for a choice someone can check or uncheck. Use a group when sever
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-## Anatomy
+Use the following composition to build a `Checkbox`:
 
-Wrap the checkbox and its text in a label. The indicator shows while the checkbox is checked or mixed:
-
-```vue
-<script setup lang="ts">
-import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
-</script>
-
-<template>
-  <label>
-    <Checkbox>
-      <CheckboxIndicator aria-hidden="true">✓</CheckboxIndicator>
-    </Checkbox>
-    Accept terms and conditions
-  </label>
-</template>
+```text
+Checkbox
+└── CheckboxIndicator
 ```
+
+Wrap the checkbox and its text in a label. The indicator shows while the checkbox is checked or mixed.
 
 `Checkbox` renders a button with the `checkbox` role and a hidden native checkbox that handles forms.
 
@@ -209,16 +199,31 @@ The checkbox, indicator, and group can render your own elements. Keep the part's
 Props are the same as below. `onCheckedChange` is `v-model:checked`, or `@checked-change` for the reason,
 and `onValueChange` is `v-model:value`, or `@value-change`.
 
-### Events
+### Checkbox
 
-Events get the new state or value first, then the details. `v-model` only updates when the change event wasn't canceled.
+<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxOptions" />
 
-| Binding           | On              | Receives                                                           |
-| ----------------- | --------------- | ------------------------------------------------------------------ |
-| `v-model:checked` | `Checkbox`      | The checked state                                                  |
-| `@checked-change` | `Checkbox`      | `(checked, details)`: the new state, and the [reason](#reasons)    |
-| `v-model:value`   | `CheckboxGroup` | The checked values                                                 |
-| `@value-change`   | `CheckboxGroup` | `(value, details)`: the checked values, and the [reason](#reasons) |
+### CheckboxIndicator
+
+<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorProps" />
+
+### CheckboxGroup
+
+<TypeTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupOptions" />
+
+### State
+
+What render functions, state-based class names and slots receive.
+
+<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxState" />
+
+The indicator receives the same state.
+
+<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorState" />
+
+The group:
+
+<StateTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupState" />
 
 ### Reasons
 
@@ -255,31 +260,16 @@ Its write methods work like the checkbox controller's.
   name="CheckboxGroupController"
 />
 
-### Checkbox
+### Events
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxOptions" />
+Events get the new state or value first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-### CheckboxIndicator
-
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorProps" />
-
-### CheckboxGroup
-
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupOptions" />
-
-### State
-
-What render functions, state-based class names and slots receive.
-
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxState" />
-
-The indicator receives the same state.
-
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorState" />
-
-The group:
-
-<StateTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupState" />
+| Binding           | On              | Receives                                                           |
+| ----------------- | --------------- | ------------------------------------------------------------------ |
+| `v-model:checked` | `Checkbox`      | The checked state                                                  |
+| `@checked-change` | `Checkbox`      | `(checked, details)`: the new state, and the [reason](#reasons)    |
+| `v-model:value`   | `CheckboxGroup` | The checked values                                                 |
+| `@value-change`   | `CheckboxGroup` | `(value, details)`: the checked values, and the [reason](#reasons) |
 
 ## Accessibility
 

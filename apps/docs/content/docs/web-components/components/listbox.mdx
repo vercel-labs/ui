@@ -22,30 +22,19 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/listbox"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-listbox`:
 
-```bash
-npm install lucide
+```text
+ui-listbox
+├── ui-listbox-item
+│   └── ui-listbox-item-indicator
+└── ui-listbox-item
+    └── ui-listbox-item-indicator
 ```
-
-## Anatomy
 
 Give the list an accessible name and each option a unique value. `ui-listbox-item-indicator` shows its content when that option is selected.
-
-```html
-<ui-listbox aria-label="Toppings" default-value="basil">
-  <ui-listbox-item value="basil">
-    Basil
-    <ui-listbox-item-indicator>✓</ui-listbox-item-indicator>
-  </ui-listbox-item>
-  <ui-listbox-item value="olive">
-    Olive
-    <ui-listbox-item-indicator>✓</ui-listbox-item-indicator>
-  </ui-listbox-item>
-</ui-listbox>
-```
 
 You can also name the list with a [Field label](./field) or `aria-labelledby`. Keep buttons, search fields, and empty messages outside the list: its contents should be options, groups, and separators.
 
@@ -234,35 +223,6 @@ Props are attributes in kebab case, like `default-value` and `read-only`. A `def
 their keys, comma-separated with `multiple`. `items`, `itemToValue`, `isItemEqualToValue` and
 `controller` are properties, and `value` is a live property. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiListboxElement` for typed listeners.
-
-| Member              | On           | Description                                                      |
-| ------------------- | ------------ | ---------------------------------------------------------------- |
-| `value` property    | `ui-listbox` | The selected value. A string names items by key, comma-separated |
-| `api` property      | `ui-listbox` | The [controller](#controller)                                    |
-| `items` property    | `ui-listbox` | The items as data                                                |
-| `valuechange` event | `ui-listbox` | `detail: { value, reason, event, source }`                       |
-| `highlight` event   | `ui-listbox` | `detail: { value, index, event }`: the option that has focus     |
-
-### Reasons
-
-`event.detail.reason` says why the value changed: `item-press` for a press, Space or Enter, `list-navigation` for keys that select as they move, Shift ranges with arrows and Ctrl or ⌘ with A, `reset` and `restore` from the form, and `imperative` from a controller.
-
-<ReasonTable
-  path="../../packages/core/src/components/listbox/listbox-root.ts"
-  name="ListboxValueChangeReason"
-/>
-
-### Controller
-
-The element's `api` property has the same methods.
-
-Every write method takes an optional `{ reason, event }`, passed to `valuechange`.
-
-<ControllerTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxController" />
-
 ### Listbox
 
 <TypeTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxOptions" />
@@ -302,6 +262,35 @@ The same state shows as attributes on each part.
   path="../../packages/core/src/components/listbox/listbox-root.ts"
   name="ListboxItemIndicatorState"
 />
+
+### Reasons
+
+`event.detail.reason` says why the value changed: `item-press` for a press, Space or Enter, `list-navigation` for keys that select as they move, Shift ranges with arrows and Ctrl or ⌘ with A, `reset` and `restore` from the form, and `imperative` from a controller.
+
+<ReasonTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxValueChangeReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods.
+
+Every write method takes an optional `{ reason, event }`, passed to `valuechange`.
+
+<ControllerTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiListboxElement` for typed listeners.
+
+| Member              | On           | Description                                                      |
+| ------------------- | ------------ | ---------------------------------------------------------------- |
+| `value` property    | `ui-listbox` | The selected value. A string names items by key, comma-separated |
+| `api` property      | `ui-listbox` | The [controller](#controller)                                    |
+| `items` property    | `ui-listbox` | The items as data                                                |
+| `valuechange` event | `ui-listbox` | `detail: { value, reason, event, source }`                       |
+| `highlight` event   | `ui-listbox` | `detail: { value, index, event }`: the option that has focus     |
 
 ## Accessibility
 

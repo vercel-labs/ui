@@ -16,60 +16,70 @@ Use Autocomplete for a text field with helpful suggestions. Choosing one fills i
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide-react` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build an `Autocomplete`:
 
-```bash
-npm install lucide-react
+```text
+Autocomplete
+├── AutocompleteLabel
+├── AutocompleteInput
+└── AutocompleteContent
+    ├── AutocompleteEmpty
+    └── AutocompleteList
+        ├── AutocompleteItem
+        └── AutocompleteItem
 ```
-
-## Anatomy
 
 Name the input, then put suggestions in a list inside the popup. Each suggestion needs a unique value.
 
-```tsx
-import {
-  Autocomplete,
-  AutocompleteContent,
-  AutocompleteInput,
-  AutocompleteItem,
-  AutocompleteLabel,
-  AutocompleteList,
-} from "@ui-sdk/react/autocomplete"
+## Build Your Own
 
-function Example() {
-  return (
-    <Autocomplete>
-      <AutocompleteLabel>Fruit</AutocompleteLabel>
-      <AutocompleteInput placeholder="Type a fruit" />
-      <AutocompleteContent>
-        <AutocompleteList>
-          <AutocompleteItem value="Apple">Apple</AutocompleteItem>
-          <AutocompleteItem value="Banana">Banana</AutocompleteItem>
-        </AutocompleteList>
-      </AutocompleteContent>
-    </Autocomplete>
-  )
-}
+`@ui-sdk/react/autocomplete` comes with a ready-made Autocomplete. If you'd like to build your own, with your own names, start from the `autocomplete` primitive in `@ui-sdk/core`:
 
-export { Example }
+```ts title="fruit-search.ts"
+"use client"
+
+import { autocomplete } from "@ui-sdk/core/autocomplete"
+import { createParts } from "@ui-sdk/react/primitive"
+
+const {
+  Root: FruitSearch,
+  Label: FruitLabel,
+  Input: FruitInput,
+  Content: FruitPopup,
+  List: FruitList,
+  Item: FruitOption,
+  Empty: FruitEmpty,
+} = createParts(autocomplete, {
+  label: "label",
+  input: "input",
+  content: "div",
+  list: "div",
+  item: "div",
+  empty: "div",
+})
+
+export { FruitEmpty, FruitInput, FruitLabel, FruitList, FruitOption, FruitPopup, FruitSearch }
 ```
 
-Typing filters the suggestions. Arrow keys move the highlight; Enter fills in the highlighted text and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted suggestion. A touch screen-reader trigger can move focus into the list, and a sheet has its own [focus behavior](#presentation).
+```tsx
+<FruitSearch>
+  <FruitLabel>Fruit</FruitLabel>
+  <FruitInput />
+  <FruitPopup>
+    <FruitEmpty>No fruits found.</FruitEmpty>
+    <FruitList>
+      <FruitOption value="Apple">Apple</FruitOption>
+      <FruitOption value="Mango">Mango</FruitOption>
+    </FruitList>
+  </FruitPopup>
+</FruitSearch>
+```
 
-## Examples
+Each part keeps the behavior, state and data attributes of its ready-made counterpart: typing filters the options, arrow keys move the highlight and the popup opens in the top layer. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
 
-### Clear and Trigger
-
-`AutocompleteClear` empties the field and returns focus to it. `AutocompleteTrigger` lets someone open the suggestions without typing. Give the trigger a label that describes what it opens.
-
-<ComponentExample
-  name="autocomplete/clear"
-  caption="Clear Mango, then press Show fruits to open the suggestions. The clear button disappears while the field is empty."
-/>
-
-### Disabled
+## Disabled
 
 A disabled field cannot be focused or changed and submits nothing. A read-only field stays focusable and submits its value, but does not open or accept changes. Disabled suggestions are skipped by keyboard navigation and cannot fill in the field.
 
@@ -78,7 +88,16 @@ A disabled field cannot be focused or changed and submits nothing. A read-only f
   caption="Try the Disabled and Read-only fields. In Disabled suggestion, type “b”: arrow keys skip Banana and a press cannot choose it."
 />
 
-### Open on Focus
+## Clear and Trigger
+
+`AutocompleteClear` empties the field and returns focus to it. `AutocompleteTrigger` lets someone open the suggestions without typing. Give the trigger a label that describes what it opens.
+
+<ComponentExample
+  name="autocomplete/clear"
+  caption="Clear Mango, then press Show fruits to open the suggestions. The clear button disappears while the field is empty."
+/>
+
+## Open on Focus
 
 Add `openOnFocus` to offer suggestions as soon as the input receives focus. This works well when there are useful choices before someone types.
 
@@ -87,7 +106,7 @@ Add `openOnFocus` to offer suggestions as soon as the input receives focus. This
   caption="Focus Search docs to see recent searches before typing. Escape closes them; pressing the field opens them again."
 />
 
-### Auto Highlight
+## Auto Highlight
 
 `autoHighlight` highlights the first match while typing, so Enter can choose it immediately. Set `loop` to `false` to stop arrow keys at either end of the list.
 
@@ -96,7 +115,7 @@ Add `openOnFocus` to offer suggestions as soon as the input receives focus. This
   caption="Type “pe” and press Enter to choose the first match. Arrow keys stop at the ends because this example disables looping."
 />
 
-### Inline Completion
+## Inline Completion
 
 `inlineComplete` fills in the rest of the first suggestion that starts with the typed text, with the added text selected. Arrow keys fill in the suggestion they highlight. End or Right Arrow accepts the completion; Backspace or Escape takes it back out.
 
@@ -105,7 +124,7 @@ Add `openOnFocus` to offer suggestions as soon as the input receives focus. This
   caption="Type “bl” to complete blackberry inline. Backspace removes the completion; Down Arrow fills in Blueberry. Press End to accept the text."
 />
 
-### Highlight Matches
+## Highlight Matches
 
 `AutocompleteItemText` marks the matching text, ignoring case and accents using the current locale. Its state exposes the matching segments when you want to render them yourself, as this example does in bold.
 
@@ -114,7 +133,7 @@ Add `openOnFocus` to offer suggestions as soon as the input receives focus. This
   caption="Type “berry”. The matching letters are bold while each suggestion keeps its original spelling."
 />
 
-### Filter and Keywords
+## Filter and Keywords
 
 The default filter matches text anywhere in a suggestion. Use `"startsWith"` or `"fuzzy"` for a different match, a function for your own filter, or `false` for results already filtered by a server. `keywords` adds searchable text without changing what goes in the field.
 
@@ -123,7 +142,7 @@ The default filter matches text anywhere in a suggestion. Use `"startsWith"` or 
   caption="Type “bug” to find fix through its keywords. Type “re” to find labels or keywords that start with those letters."
 />
 
-### Groups
+## Groups
 
 Use `AutocompleteGroup` and `AutocompleteGroupLabel` to name related suggestions. Filtering hides empty groups and separators.
 
@@ -132,7 +151,7 @@ Use `AutocompleteGroup` and `AutocompleteGroupLabel` to name related suggestions
   caption="Type “an”. Banana and Mango remain in Tropical; groups with no matches disappear."
 />
 
-### Icons
+## Icons
 
 `AutocompleteItemIcon` keeps decorative icons out of accessible names, filtering, and the text put in the field. Add `mirror` for directional icons. An icon-only suggestion still needs an `aria-label`.
 
@@ -141,7 +160,7 @@ Use `AutocompleteGroup` and `AutocompleteGroupLabel` to name related suggestions
   caption="Type “rep” and choose Replies. The icon stays out of the text put in the field."
 />
 
-### Items as Data
+## Items as Data
 
 Map an array into parts when you want to write the markup yourself. This example maps fruit groups and adds a separator between them.
 
@@ -154,47 +173,61 @@ Pass `items` when the autocomplete needs the whole collection, such as server re
 
 Suggestions can change while the list is open. The highlight stays with its suggestion, and the typed text stays unchanged. Removing the highlighted suggestion clears the highlight.
 
-### Recent Searches
+## Controlled
 
-Pair `emptyItems` with `items` to show one collection while the field is empty and search the full collection once someone types. Add `openOnFocus` to show the recent searches on focus.
-
-<ComponentExample
-  name="autocomplete/recent"
-  caption="Focus the empty field to see Recent searches. Type “react” to search all topics, then clear the text to return to recent searches."
-/>
-
-### Async Suggestions
-
-Use [async options](../hooks/async-options) to wait for typing to pause and discard stale results. Pass its `items` and `status`, set `filter` to `false`, and send text changes to its `setQuery()` method.
-
-`AutocompleteStatus` and `AutocompleteEmpty` provide loading, error, and empty messages. Without a status part, `announcement` controls what screen readers hear when typing pauses. `onLoadMore` can request another page when scrolling or highlighting reaches the last suggestion.
+The value is always a string. Control it with `value` and `onValueChange`, or start uncontrolled with `defaultValue`. Suggestions have a separate `open` state and `onOpenChange`. Callbacks receive the proposed value first, then change details. Call `details.cancel()` to reject a text or open change. [State and Events](../state-and-events) covers controlled state and cancellation.
 
 <ComponentExample
-  name="autocomplete/async"
-  caption="Type “b” and wait for the city suggestions. Keep typing to replace the search; the status describes the latest results."
+  name="autocomplete/controlled"
+  caption="Type more than 12 characters and the extra text is refused. The console shows each change and its reason."
 />
 
-### Search
+## Controller
 
-Enter with no suggestion highlighted runs the `onSubmit` callback with the text, then allows the surrounding form to submit. Call `preventDefault()` on `details.event` if your handler already performs the search.
-
-Choosing a suggestion normally only fills in the field. Add `submitOnSelect` to search as soon as someone chooses one.
+Create a `createAutocompleteController()` for one instance and pass it as `controller`. It can `setValue()`, `clear()`, `focus()`, `setOpen()`, or read `getValue()` and `isOpen()`. `open()` returns a promise that resolves when the popup closes, including abort and unmount; `close()` closes it. See [Controllers](../controllers) for lifecycle and change options.
 
 <ComponentExample
-  name="autocomplete/search"
-  caption="Type “kotlin” and press Enter to search. Choose a suggestion to search for that text instead."
+  name="autocomplete/controller"
+  caption="Use the buttons to open the suggestions, type Pea, clear the field or focus it from outside."
 />
 
-### Forms
+## Positioning
 
-The native input is the form control: `name` gives its submitted key, `required` rejects empty text, and reset restores `defaultValue`. Text does not have to match a suggestion. Use `form` to associate the field with a form elsewhere in the page.
+Use `side`, `align`, offsets, or a custom `anchor` to position the suggestions. `container` chooses where they render, and `keepMounted` keeps closed content in the DOM. [Popups](../popups) covers positioning, portals, animation, and modal behavior.
 
 <ComponentExample
-  name="autocomplete/form"
-  caption="Submit Apple, then choose Mango. Choosing it fills the field without submitting. Reset restores Apple."
+  name="autocomplete/positioning"
+  caption="Open the suggestions. They appear above the card, aligned to its end."
 />
 
-### Presentation
+## Animation
+
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the popup stays mounted until the exit finishes:
+
+<StyleTabs>
+
+```css
+[data-slot="autocomplete-content"] {
+  transition:
+    opacity 0.15s,
+    translate 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+```
+
+```tsx
+<AutocompleteContent className="transition-[opacity,translate] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-starting-style:-translate-y-1.5 data-starting-style:opacity-0 data-ending-style:-translate-y-1.5 data-ending-style:opacity-0" />
+```
+
+</StyleTabs>
+
+<ComponentExample name="autocomplete/animation" caption="Type to open the suggestions. They slide and fade in, and fade out before they unmount." />
+
+## Presentation
 
 `presentation="sheet"` opens suggestions in a sheet. `"auto"` chooses a sheet on small touch screens and a popover elsewhere, each time the list opens. The server starts with the popover.
 
@@ -207,94 +240,120 @@ A sheet is modal unless `modal` is `false`. Give it a height, keep suggestions i
   caption="Open the field to see a sheet. On touch, tap the field in its header to show the keyboard, or swipe down to close it."
 />
 
-### Custom Rendering
+## Forms
 
-Suggestions can also be links. Render an anchor for a suggestion that should navigate, and keep its `href` on the anchor. Enter follows the highlighted link; ordinary suggestions continue to fill in the input. [Parts and Composition](../parts-and-composition) covers the render API.
+The native input is the form control: `name` gives its submitted key, `required` rejects empty text, and reset restores `defaultValue`. Text does not have to match a suggestion. Use `form` to associate the field with a form elsewhere in the page.
+
+<ComponentExample
+  name="autocomplete/form"
+  caption="Submit Apple, then choose Mango. Choosing it fills the field without submitting. Reset restores Apple."
+/>
+
+## Search
+
+Enter with no suggestion highlighted runs the `onSubmit` callback with the text, then allows the surrounding form to submit. Call `preventDefault()` on `details.event` if your handler already performs the search.
+
+Choosing a suggestion normally only fills in the field. Add `submitOnSelect` to search as soon as someone chooses one.
+
+<ComponentExample
+  name="autocomplete/search"
+  caption="Type “kotlin” and press Enter to search. Choose a suggestion to search for that text instead."
+/>
+
+## Recent Searches
+
+Pair `emptyItems` with `items` to show one collection while the field is empty and search the full collection once someone types. Add `openOnFocus` to show the recent searches on focus.
+
+<ComponentExample
+  name="autocomplete/recent"
+  caption="Focus the empty field to see Recent searches. Type “react” to search all topics, then clear the text to return to recent searches."
+/>
+
+## Async Suggestions
+
+Use [async options](../hooks/async-options) to wait for typing to pause and discard stale results. Pass its `items` and `status`, set `filter` to `false`, and send text changes to its `setQuery()` method.
+
+`AutocompleteStatus` and `AutocompleteEmpty` provide loading, error, and empty messages. Without a status part, `announcement` controls what screen readers hear when typing pauses. `onLoadMore` can request another page when scrolling or highlighting reaches the last suggestion.
+
+<ComponentExample
+  name="autocomplete/async"
+  caption="Type “b” and wait for the city suggestions. Keep typing to replace the search; the status describes the latest results."
+/>
+
+## Custom Rendering
+
+Use `render` to give a suggestion a different element. Here each suggestion is a link, so the autocomplete works as a jump-to menu: Enter or a click follows the highlighted link, and the text after the title is a hint that doesn't affect filtering. [Parts and Composition](../parts-and-composition) covers the render API.
 
 <ComponentExample
   name="autocomplete/custom-rendering"
-  caption="Open the suggestions and press Enter on Read the fruit guide to follow the link. The other suggestions fill in the field."
+  caption="Type “sty” and press Enter to jump to the Styling section of this page."
 />
-
-## State and Popup Options
-
-### Controlled
-
-The value is always a string. Control it with `value` and `onValueChange`, or start uncontrolled with `defaultValue`. Suggestions have a separate `open` state and `onOpenChange`. Callbacks receive the proposed value first, then change details. Call `details.cancel()` to reject a text or open change. [State and Events](../state-and-events) covers controlled state and cancellation.
-
-### Controller
-
-Create a `createAutocompleteController()` for one instance and pass it as `controller`. It can `setValue()`, `clear()`, `focus()`, `setOpen()`, or read `getValue()` and `isOpen()`. `open()` returns a promise that resolves when the popup closes, including abort and unmount; `close()` closes it. See [Controllers](../controllers) for lifecycle and change options.
-
-### Positioning
-
-Use `side`, `align`, offsets, or a custom `anchor` to position the suggestions. `container` chooses where they render, and `keepMounted` keeps closed content in the DOM. [Popups](../popups) covers positioning, portals, animation, and modal behavior.
-
-### RTL
-
-Set `dir="rtl"` on a containing element. Input text, popup alignment, and directional icons follow that direction without a provider.
 
 ## Styling
 
-Style the parts through their data attributes, which are the same in every framework.
-
-<DataAttributes component="autocomplete" />
+Each part has a `data-slot`, such as `autocomplete-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
 
 The popup exposes sizing and animation variables. `--anchor-width` is the input’s width; use `--available-height` on the content to keep a long list in the viewport.
 
-<CssVariables component="autocomplete" />
-
 While focus stays in the input, use the content’s `data-modality="keyboard"` with an item’s `data-highlighted` to show a keyboard focus indicator on the highlighted suggestion.
+
+### AutocompleteContent [#styling-autocompletecontent]
+
+<CssVariables component="autocomplete" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="autocomplete" part="viewport" />
+
+## Data Attributes
+
+### AutocompleteLabel [#data-attributes-autocompletelabel]
+
+<DataAttributes component="autocomplete" part="label" />
+
+### AutocompleteInput [#data-attributes-autocompleteinput]
+
+<DataAttributes component="autocomplete" part="input" />
+
+### AutocompleteTrigger [#data-attributes-autocompletetrigger]
+
+<DataAttributes component="autocomplete" part="trigger" />
+
+### AutocompleteClear [#data-attributes-autocompleteclear]
+
+<DataAttributes component="autocomplete" part="clear" />
+
+### AutocompleteContent [#data-attributes-autocompletecontent]
+
+<DataAttributes component="autocomplete" part="content" />
+
+### AutocompleteItem [#data-attributes-autocompleteitem]
+
+<DataAttributes component="autocomplete" part="item" />
+
+### AutocompleteItemText [#data-attributes-autocompleteitemtext]
+
+<DataAttributes component="autocomplete" part="item-text" />
+
+### AutocompleteEmpty [#data-attributes-autocompleteempty]
+
+<DataAttributes component="autocomplete" part="empty" />
+
+### AutocompleteStatus [#data-attributes-autocompletestatus]
+
+<DataAttributes component="autocomplete" part="status" />
+
+### AutocompleteArrow [#data-attributes-autocompletearrow]
+
+<DataAttributes component="autocomplete" part="arrow" />
+
+### AutocompleteItemIcon [#data-attributes-autocompleteitemicon]
+
+<DataAttributes component="autocomplete" part="item-icon" />
 
 ## API Reference
 
 Props and callbacks are the same as below, as React props.
-
-### Events
-
-Callbacks get the new state first, then the details.
-
-| Prop                   | On             | Receives                                                     |
-| ---------------------- | -------------- | ------------------------------------------------------------ |
-| `onValueChange`        | `Autocomplete` | `(value, details)`: the new text, and the [reason](#reasons) |
-| `onOpenChange`         | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons) |
-| `onOpenChangeComplete` | `Autocomplete` | `(open)`, after the animation                                |
-| `onSubmit`             | `Autocomplete` | `(value, { event })`: the text, when Enter submits           |
-| `onHighlight`          | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion      |
-| `onLoadMore`           | `Autocomplete` | `()`, when the last suggestion is reached                    |
-| `onDismissAttempt`     | `Autocomplete` | `({ reason, event })`, when a dismissal was refused          |
-
-### Reasons
-
-Why the text changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteValueChangeReason"
-/>
-
-And why the suggestions opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteDismissReason"
-/>
-
-### Controller
-
-Create one with `createAutocompleteController()` and pass it as `controller`.
-
-<ControllerTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteController"
-/>
 
 ### Autocomplete
 
@@ -303,12 +362,55 @@ Create one with `createAutocompleteController()` and pass it as `controller`.
   name="AutocompleteOptions"
 />
 
+### AutocompleteLabel
+
+Names the input. Renders a `label` tied to the input, so you don't need a `Field`.
+
+### AutocompleteInput
+
+The text field. Renders an `input` with the combobox role, and accepts its props.
+
+### AutocompleteTrigger
+
+An optional button that opens and closes the suggestions. Renders a `button`.
+
+### AutocompleteClear
+
+<TypeTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteClearProps"
+/>
+
 ### AutocompleteContent
 
 <TypeTable
   path="../../packages/core/src/components/autocomplete/autocomplete.ts"
   name="AutocompleteContentProps"
 />
+
+### AutocompleteArrow
+
+An optional arrow pointing at the input. Renders a `div` positioned on the content's edge.
+
+### AutocompleteStatus
+
+Announces loading and result counts to screen readers. Its children can be a function of the state.
+
+### AutocompleteEmpty
+
+Shows when no suggestion matches. Its children can be a function of the state.
+
+### AutocompleteList
+
+Holds the suggestions. Renders the listbox, and renders `items` when you pass no children.
+
+### AutocompleteGroup
+
+Groups related suggestions. Renders a `div` with the group role.
+
+### AutocompleteGroupLabel
+
+Names its group. Renders a `div` the group is labelled by.
 
 ### AutocompleteItem
 
@@ -324,12 +426,13 @@ Create one with `createAutocompleteController()` and pass it as `controller`.
   name="AutocompleteItemIconProps"
 />
 
-### AutocompleteClear
+### AutocompleteItemText
 
-<TypeTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteClearProps"
-/>
+The suggestion's text, with the matched part marked. Its children can be a function that receives the matched `segments`.
+
+### AutocompleteSeparator
+
+A divider between suggestions or groups. Renders a `div` with the separator role.
 
 ### Items as Data
 
@@ -404,9 +507,59 @@ What render functions, state-based class names and slots receive, per part.
   name="AutocompleteItemIconState"
 />
 
+### Reasons
+
+Why the text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteValueChangeReason"
+/>
+
+And why the suggestions opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteDismissReason"
+/>
+
+### Controller
+
+Create one with `createAutocompleteController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteController"
+/>
+
+### Events
+
+Callbacks get the new state first, then the details.
+
+| Prop                   | On             | Receives                                                     |
+| ---------------------- | -------------- | ------------------------------------------------------------ |
+| `onValueChange`        | `Autocomplete` | `(value, details)`: the new text, and the [reason](#reasons) |
+| `onOpenChange`         | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons) |
+| `onOpenChangeComplete` | `Autocomplete` | `(open)`, after the animation                                |
+| `onSubmit`             | `Autocomplete` | `(value, { event })`: the text, when Enter submits           |
+| `onHighlight`          | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion      |
+| `onLoadMore`           | `Autocomplete` | `()`, when the last suggestion is reached                    |
+| `onDismissAttempt`     | `Autocomplete` | `({ reason, event })`, when a dismissal was refused          |
+
 ## Accessibility
 
-The autocomplete follows the [WAI-ARIA combobox pattern with list autocomplete](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/), and [list and inline](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/) with `inlineComplete`. Every line below is an automated test.
+The autocomplete follows the [WAI-ARIA combobox pattern with list autocomplete](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-list/), and [list and inline](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-autocomplete-both/) with `inlineComplete`. 
+
+Typing filters the suggestions. Arrow keys move the highlight; Enter fills in the highlighted text and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted suggestion. A touch screen-reader trigger can move focus into the list, and a sheet has its own [focus behavior](#presentation).
+
+Every line below is an automated test.
 
 <SpecList spec="autocomplete" />
 

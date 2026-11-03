@@ -16,24 +16,26 @@ A dialog gives a task its own space: share a link, edit a record, or collect a f
 npm install @ui-sdk/web
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
-
-## Anatomy
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/dialog"
 ```
 
-```html
-<ui-dialog>
-  <ui-dialog-trigger><button>Open</button></ui-dialog-trigger>
-  <ui-dialog-backdrop></ui-dialog-backdrop>
-  <ui-dialog-content>
-    <ui-dialog-title>Project details</ui-dialog-title>
-    <ui-dialog-description>Review the details before continuing.</ui-dialog-description>
-    <ui-dialog-close><button>Close</button></ui-dialog-close>
-  </ui-dialog-content>
-</ui-dialog>
+## Composition
+
+Use the following composition to build a `ui-dialog`:
+
+```text
+ui-dialog
+├── ui-dialog-trigger
+│   └── button
+├── ui-dialog-backdrop
+└── ui-dialog-content
+    ├── ui-dialog-title
+    ├── ui-dialog-description
+    └── ui-dialog-close
+        └── button
 ```
 
 The title names the dialog; the description gives it context. A dialog can have several Close parts. Give an icon-only close button an accessible name, as the first example does.
@@ -184,11 +186,31 @@ Style `data-presentation` to support both layouts. The sheet manages its own pos
 
 Style parts with their state attributes and CSS variables. Logical properties, such as the examples’ `end-4`, keep the same layout in right-to-left text.
 
-<DataAttributes component="dialog" />
+### `<ui-dialog-content>` [#styling-dialogcontent]
 
-<CssVariables component="dialog" />
+<CssVariables component="dialog" part="content" />
 
-`--keyboard-inset` follows the on-screen keyboard. `--scrollbar-width` reports the space removed by scroll locking, so fixed page elements can compensate.
+### `<ui-dialog-viewport>` [#styling-viewport]
+
+<CssVariables component="dialog" part="viewport" />
+
+## Data Attributes
+
+### `<ui-dialog-trigger>` [#data-attributes-dialogtrigger]
+
+<DataAttributes component="dialog" part="trigger" />
+
+### `<ui-dialog-backdrop>` [#data-attributes-dialogbackdrop]
+
+<DataAttributes component="dialog" part="backdrop" />
+
+### `<ui-dialog-content>` [#data-attributes-dialogcontent]
+
+<DataAttributes component="dialog" part="content" />
+
+### `<ui-dialog-close>` [#data-attributes-dialogclose]
+
+<DataAttributes component="dialog" part="close" />
 
 ## Custom Rendering
 
@@ -198,45 +220,6 @@ Web parts keep their own elements. Trigger and Close parts bind to the native bu
 
 Props are attributes in kebab case, like `close-on-outside-press`: `"false"` is false. `container` takes a
 CSS selector, and `persistent-elements` a comma-separated list of selectors. Callbacks are DOM events.
-
-### Events
-
-Events fire on their own element and don't bubble. Calling `preventDefault()` on `openchange` cancels the change.
-
-| Member                     | On                  | Description                                                                             |
-| -------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
-| `open` property, attribute | `ui-dialog`         | Whether the dialog is open. The attribute sets where it starts, and is live             |
-| `api` property             | `ui-dialog`         | The [controller](#controller)                                                           |
-| `controller` property      | `ui-dialog`         | A controller from `createDialogController()`, to drive it from code                     |
-| `openchange` event         | `ui-dialog`         | `detail: { value: open, reason, event, returnValue }`                                   |
-| `openchangecomplete` event | `ui-dialog`         | `detail: { value: open }`, after the animation                                          |
-| `payloadchange` event      | `ui-dialog`         | `detail: { value: payload, reason, event, source }`, when the content's payload changes |
-| `dismissattempt` event     | `ui-dialog`         | `detail: { reason, event }`, when a dismissal was refused                               |
-| `payload` property         | `ui-dialog-trigger` | Data for the content, read when the trigger connects                                    |
-| `for` attribute            | `ui-dialog-trigger` | The `id` of a dialog the trigger opens from outside it                                  |
-
-### Reasons
-
-`event.detail.reason` says why the dialog opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogOpenChangeReason" />
-
-For a payload change, it says what opened the dialog or took it over.
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogPayloadChangeReason" />
-
-The dismissals `dismissible` can refuse:
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogDismissReason" />
-
-### Controller
-
-The element's `api` property has the same methods. The `open` property reads and sets whether the dialog is
-open.
-
-Every write method takes an optional `{ reason, event }`, passed to `openchange`. Closing with a controller always works, even when the dialog isn't dismissible or an action is running.
-
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogController" />
 
 ### Dialog
 
@@ -251,7 +234,6 @@ A trigger outside the dialog names it with `for="dialog-id"`, and takes `payload
 ### DialogContent
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogContentProps" />
-
 ### DialogClose
 
 With the `action` attribute, its `action` event's `detail.source` says how the part was pressed, as [Button](./button#changes-after-an-await) describes.
@@ -285,6 +267,45 @@ The same state shows as data attributes on each element.
 `DialogShortcut`:
 
 <StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogShortcutState" />
+
+### Reasons
+
+`event.detail.reason` says why the dialog opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogOpenChangeReason" />
+
+For a payload change, it says what opened the dialog or took it over.
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogPayloadChangeReason" />
+
+The dismissals `dismissible` can refuse:
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogDismissReason" />
+
+### Controller
+
+The element's `api` property has the same methods. The `open` property reads and sets whether the dialog is
+open.
+
+Every write method takes an optional `{ reason, event }`, passed to `openchange`. Closing with a controller always works, even when the dialog isn't dismissible or an action is running.
+
+<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogController" />
+
+### Events
+
+Events fire on their own element and don't bubble. Calling `preventDefault()` on `openchange` cancels the change.
+
+| Member                     | On                  | Description                                                                             |
+| -------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
+| `open` property, attribute | `ui-dialog`         | Whether the dialog is open. The attribute sets where it starts, and is live             |
+| `api` property             | `ui-dialog`         | The [controller](#controller)                                                           |
+| `controller` property      | `ui-dialog`         | A controller from `createDialogController()`, to drive it from code                     |
+| `openchange` event         | `ui-dialog`         | `detail: { value: open, reason, event, returnValue }`                                   |
+| `openchangecomplete` event | `ui-dialog`         | `detail: { value: open }`, after the animation                                          |
+| `payloadchange` event      | `ui-dialog`         | `detail: { value: payload, reason, event, source }`, when the content's payload changes |
+| `dismissattempt` event     | `ui-dialog`         | `detail: { reason, event }`, when a dismissal was refused                               |
+| `payload` property         | `ui-dialog-trigger` | Data for the content, read when the trigger connects                                    |
+| `for` attribute            | `ui-dialog-trigger` | The `id` of a dialog the trigger opens from outside it                                  |
 
 ## Accessibility
 

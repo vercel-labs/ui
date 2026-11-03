@@ -14,25 +14,18 @@ description: Resize, collapse, and save panel layouts with pointer and keyboard 
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Resizable`:
+
+```text
+Resizable
+├── ResizablePanel
+├── ResizableHandle
+└── ResizablePanel
+```
 
 Put a handle between the panels you want to resize.
-
-```tsx
-<script setup lang="ts">
-import { Resizable, ResizablePanel, ResizableHandle } from "@ui-sdk/vue/resizable"
-</script>
-
-<template>
-<Resizable>
-  <ResizablePanel />
-  <ResizableHandle aria-label="Resize sidebar" />
-  <ResizablePanel />
-</Resizable>
-</template>
-```
 
 - **Resizable** is the group. It lays its panels out in a row, or a column with `orientation="vertical"`, so give it a size: a vertical group needs a height.
 - **ResizablePanel** is one region. Its size is a percentage of the space panels share, written to `--resizable-panel-size` and used as its flex basis.
@@ -58,15 +51,6 @@ Put anything inside a handle, like a grip that shows it can be dragged. The hand
 <ComponentExample
   name="resizable/handle"
   caption="Grab the visible grip or focus the handle and use the arrow keys."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the group. The first panel is on the right, ArrowLeft grows the panel before the handle, and drags follow the pointer.
-
-<ComponentExample
-  name="resizable/rtl"
-  caption="Resize the panels in a right-to-left layout. ArrowLeft grows the first panel."
 />
 
 ### Collapsible
@@ -185,27 +169,56 @@ Parts are unstyled, apart from the layout they need: the group is a flex row or 
 
 ```vue
 <ResizableHandle
-  class="relative flex w-px items-center justify-center bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovered:bg-ring data-dragging:bg-ring aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full"
+  class="relative flex w-px items-center justify-center bg-neutral-200 outline-none focus-visible:ring-3 focus-visible:ring-neutral-400/50 data-hovered:bg-neutral-400 data-dragging:bg-neutral-400 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full"
 />
 ```
 
-<DataAttributes component="resizable" />
+### ResizablePanel [#styling-resizablepanel]
 
-<CssVariables component="resizable" />
+<CssVariables component="resizable" part="panel" />
+
+## Data Attributes
+
+### Resizable [#data-attributes-resizable]
+
+<DataAttributes component="resizable" part="root" />
+
+### ResizablePanel [#data-attributes-resizablepanel]
+
+<DataAttributes component="resizable" part="panel" />
+
+### ResizableHandle [#data-attributes-resizablehandle]
+
+<DataAttributes component="resizable" part="handle" />
 
 ## API Reference
 
 Props are the same as below, and callbacks are events.
 
-### Events
+### Resizable
 
-Events get the new layout first, then the details. `v-model` only updates when the change event wasn't canceled.
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
 
-| Binding          | On          | Receives                                                       |
-| ---------------- | ----------- | -------------------------------------------------------------- |
-| `v-model:layout` | `Resizable` | The layout: one percentage per panel                           |
-| `@layout-change` | `Resizable` | `(layout, details)`: the new layout and the [reason](#reasons) |
-| `@layout-commit` | `Resizable` | `(layout, details)`: the layout once the interaction ends      |
+### ResizablePanel
+
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+### ResizableHandle
+
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+
+### State
+
+What render functions, state-based class names and slots receive.
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+
+Panels:
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+
+Handles:
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
 
 ### Reasons
 
@@ -227,31 +240,15 @@ Write methods take an optional `{ reason, event }`, run the change callback like
   name="ResizableController"
 />
 
-### Resizable
+### Events
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+Events get the new layout first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-### ResizablePanel
-
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
-
-### ResizableHandle
-
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
-
-### State
-
-What render functions, state-based class names and slots receive.
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
-
-Panels:
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
-
-Handles:
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+| Binding          | On          | Receives                                                       |
+| ---------------- | ----------- | -------------------------------------------------------------- |
+| `v-model:layout` | `Resizable` | The layout: one percentage per panel                           |
+| `@layout-change` | `Resizable` | `(layout, details)`: the new layout and the [reason](#reasons) |
+| `@layout-commit` | `Resizable` | `(layout, details)`: the layout once the interaction ends      |
 
 ## Accessibility
 

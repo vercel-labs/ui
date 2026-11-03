@@ -7,6 +7,7 @@ Use Tabs when several views share the same space, such as settings sections or a
 
 <ComponentExample
   name="tabs/basic"
+  inspect
   caption="Choose Password to show its panel. Use the left and right arrow keys to move between the tabs."
 />
 
@@ -16,30 +17,20 @@ Use Tabs when several views share the same space, such as settings sections or a
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-## Anatomy
+Use the following composition to build a `Tabs`:
+
+```text
+Tabs
+├── TabsList
+│   ├── TabsTab
+│   └── TabsTab
+├── TabsPanel
+└── TabsPanel
+```
 
 Give each tab and its panel the same unique `value`. Give the list an accessible name. Set `defaultValue` to choose the initial tab; otherwise, the first enabled tab is selected.
-
-```tsx
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
-
-function Example() {
-  return (
-    <Tabs defaultValue="account">
-      <TabsList aria-label="Settings">
-        <TabsTab value="account">Account</TabsTab>
-        <TabsTab value="password">Password</TabsTab>
-      </TabsList>
-      <TabsPanel value="account">Manage your profile.</TabsPanel>
-      <TabsPanel value="password">Choose a new password.</TabsPanel>
-    </Tabs>
-  )
-}
-
-export { Example }
-```
 
 Tab enters the list at the selected tab. Left and Right Arrow move between tabs and select them. Home and End move to the first and last tabs.
 
@@ -218,11 +209,7 @@ Use `data-selected` and `data-disabled` to style a tab. Icon parts also provide 
 
 <DataAttributes component="tabs" />
 
-### Indicator Variables
-
-The indicator’s position and size are measured from the tab list. Use the same variables for an underline, a background, or a marker beside a vertical list.
-
-<CssVariables component="tabs" />
+The indicator’s position and size are measured from the tab list into the [TabsIndicator](#tabsindicator) variables. Use them for an underline, a background, or a marker beside a vertical list.
 
 ## Custom Rendering
 
@@ -233,28 +220,6 @@ Use the framework’s `render` prop or slot to change a part’s element, as in 
 ## API Reference
 
 Props and callbacks are the same as below, as Solid props.
-
-### Events
-
-Callbacks get the new value first, then the details. `onValueChange` never runs on mount.
-
-| Prop            | On     | Receives                                                      |
-| --------------- | ------ | ------------------------------------------------------------- |
-| `onValueChange` | `Tabs` | `(value, details)`: the new value, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the selection changed.
-
-<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
-
-### Controller
-
-Create one with `createTabsController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, runs `onValueChange` like a press, and returns `false` when the change is canceled.
-
-<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
 
 ### Tabs
 
@@ -267,6 +232,12 @@ Every write method takes an optional `{ reason, event }`, runs `onValueChange` l
 ### TabsTabIcon
 
 <TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabIconProps" />
+
+### TabsIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="tabs" part="indicator" />
 
 ### TabsPanel
 
@@ -299,6 +270,28 @@ What render functions, state-based class names and slots receive, per part.
 `TabsIndicator`:
 
 <StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsIndicatorState" />
+
+### Reasons
+
+`details.reason` says why the selection changed.
+
+<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
+
+### Controller
+
+Create one with `createTabsController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs `onValueChange` like a press, and returns `false` when the change is canceled.
+
+<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
+
+### Events
+
+Callbacks get the new value first, then the details. `onValueChange` never runs on mount.
+
+| Prop            | On     | Receives                                                      |
+| --------------- | ------ | ------------------------------------------------------------- |
+| `onValueChange` | `Tabs` | `(value, details)`: the new value, and the [reason](#reasons) |
 
 ## Accessibility
 

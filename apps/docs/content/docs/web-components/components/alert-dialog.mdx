@@ -16,29 +16,30 @@ Use an alert dialog when someone needs to answer a question before an action con
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-## Anatomy
-
-Importing the component defines its elements; on the server the import does nothing. Put the question in `ui-alert-dialog-title`, explain what happens in `ui-alert-dialog-description`, and wrap each answer’s native button in `ui-alert-dialog-close`:
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/alert-dialog"
 ```
 
-```html
-<ui-alert-dialog>
-  <ui-alert-dialog-trigger><button>Delete project</button></ui-alert-dialog-trigger>
-  <ui-alert-dialog-content hidden>
-    <ui-alert-dialog-title>Delete this project?</ui-alert-dialog-title>
-    <ui-alert-dialog-description>
-      The project and its files will be deleted for everyone.
-    </ui-alert-dialog-description>
-    <ui-alert-dialog-close><button>Cancel</button></ui-alert-dialog-close>
-    <ui-alert-dialog-close value="confirm"><button>Delete</button></ui-alert-dialog-close>
-  </ui-alert-dialog-content>
-</ui-alert-dialog>
+## Composition
+
+Use the following composition to build a `ui-alert-dialog`:
+
+```text
+ui-alert-dialog
+├── ui-alert-dialog-trigger
+│   └── button
+└── ui-alert-dialog-content
+    ├── ui-alert-dialog-title
+    ├── ui-alert-dialog-description
+    ├── ui-alert-dialog-close
+    │   └── button
+    └── ui-alert-dialog-close
+        └── button
 ```
+
+Put the question in `ui-alert-dialog-title`, explain what happens in `ui-alert-dialog-description`, and wrap each answer’s native button in `ui-alert-dialog-close`.
 
 The dialog uses the `alertdialog` role and keeps the rest of the page inert while it is open. Screen readers announce its title and description. Add `ui-alert-dialog-backdrop` when you want to dim the page, as the examples do. Give the content and backdrop `hidden` to keep them hidden before the elements upgrade.
 
@@ -104,30 +105,31 @@ The root’s `pending-announcement` attribute sets what screen readers hear afte
 
 [Styling and Animation](../styling-and-animation) covers state attributes and entry and exit transitions.
 
-<DataAttributes component="alert-dialog" />
+### `<ui-alert-dialog-content>` [#styling-alertdialogcontent]
 
-<CssVariables component="alert-dialog" />
+<CssVariables component="alert-dialog" part="content" />
+
+## Data Attributes
+
+### `<ui-alert-dialog-trigger>` [#data-attributes-alertdialogtrigger]
+
+<DataAttributes component="alert-dialog" part="trigger" />
+
+### `<ui-alert-dialog-backdrop>` [#data-attributes-alertdialogbackdrop]
+
+<DataAttributes component="alert-dialog" part="backdrop" />
+
+### `<ui-alert-dialog-content>` [#data-attributes-alertdialogcontent]
+
+<DataAttributes component="alert-dialog" part="content" />
+
+### `<ui-alert-dialog-close>` [#data-attributes-alertdialogclose]
+
+<DataAttributes component="alert-dialog" part="close" />
 
 ## API Reference
 
 Alert Dialog shares [Dialog's](./dialog) options, except `modal`, `closeOnOutsidePress`, and `presentation`. It is always modal, never closes on an outside press, and does not present as a sheet.
-
-### Reasons
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOpenChangeReason" />
-
-`payloadchange` runs before `openchange` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
-
-<ReasonTable
-  path="../../packages/core/src/components/dialog/dialog.ts"
-  name="AlertDialogPayloadChangeReason"
-/>
-
-### Controller
-
-Use `createAlertDialogController<Payload, Result>()` from `@ui-sdk/web/alert-dialog` for direct control. The root element’s `api` property has the same methods. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
-
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
 
 ### Confirm Options
 
@@ -146,7 +148,6 @@ The shared `confirm()` function uses these options when a `ui-overlay-host` rend
 ### AlertDialogContent
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogContentProps" />
-
 ### AlertDialogClose
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogCloseProps" />
@@ -168,6 +169,23 @@ The shared `confirm()` function uses these options when a `ui-overlay-host` rend
 `AlertDialogShortcut`:
 
 <StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogShortcutState" />
+
+### Reasons
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOpenChangeReason" />
+
+`payloadchange` runs before `openchange` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
+
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogPayloadChangeReason"
+/>
+
+### Controller
+
+Use `createAlertDialogController<Payload, Result>()` from `@ui-sdk/web/alert-dialog` for direct control. The root element’s `api` property has the same methods. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
+
+<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
 
 ## Accessibility
 

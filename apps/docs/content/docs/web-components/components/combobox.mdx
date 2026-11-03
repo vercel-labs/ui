@@ -22,30 +22,22 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/combobox"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-combobox`:
 
-```bash
-npm install lucide
+```text
+ui-combobox
+├── ui-combobox-label
+├── ui-combobox-input
+│   └── input
+└── ui-combobox-content
+    └── ui-combobox-list
+        ├── ui-combobox-item
+        └── ui-combobox-item
 ```
-
-## Anatomy
 
 Name the input, give each option a unique value, and put the options in a list inside the popup. `ui-combobox-input` wraps a native input. The label names the input; choosing an option puts its label in the input.
-
-```html
-<ui-combobox>
-  <ui-combobox-label>Fruit</ui-combobox-label>
-  <ui-combobox-input><input placeholder="Search fruits" /></ui-combobox-input>
-  <ui-combobox-content>
-    <ui-combobox-list>
-      <ui-combobox-item value="apple">Apple</ui-combobox-item>
-      <ui-combobox-item value="banana">Banana</ui-combobox-item>
-    </ui-combobox-list>
-  </ui-combobox-content>
-</ui-combobox>
-```
 
 Typing filters the options. Arrow keys move the highlight; Enter chooses it and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted option. A touch screen-reader trigger can move real focus into the list, and a sheet has its own [focus behavior](#presentation).
 
@@ -361,65 +353,12 @@ Use `data-highlighted` for the active option and `data-selected` for chosen valu
 
 `--anchor-width` follows the input or chips. `--available-height` does not inherit: when a nested scroller needs it, copy it to a custom property on the content, such as `--list-height: var(--available-height)`, then use that property on the scroller.
 
-<CssVariables component="combobox" />
-
 ## API Reference
 
 Props are attributes in kebab case, like `default-value`, `max-selected` and `auto-highlight`: `"false"` is
 false, and numbers are numbers. `filter` takes `contains`, `startsWith` or `false`. `items`,
 `itemToValue`, `itemToLabel` and `isItemEqualToValue` are properties. `container` and `anchor` take CSS
 selectors. Callbacks are DOM events.
-
-### Events
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on a change event cancels it.
-
-| Member                     | On            | Description                                                          |
-| -------------------------- | ------------- | -------------------------------------------------------------------- |
-| `value` property           | `ui-combobox` | The selected value. Setting it selects, as a controller would        |
-| `query` property           | `ui-combobox` | The input's text                                                     |
-| `open` property, attribute | `ui-combobox` | Whether the list is open. The attribute sets where it starts         |
-| `api` property             | `ui-combobox` | The [controller](#controller-1)                                      |
-| `valuechange` event        | `ui-combobox` | `detail: { value, reason, event, source }`                           |
-| `querychange` event        | `ui-combobox` | `detail: { value: query, reason, event, source }`                    |
-| `openchange` event         | `ui-combobox` | `detail: { value: open, reason, event, source }`                     |
-| `openchangecomplete` event | `ui-combobox` | `detail: { value: open }`, after the animation                       |
-| `highlight` event          | `ui-combobox` | `detail: { value, index, event }`                                    |
-| `loadmore` event           | `ui-combobox` | When the last item is reached                                        |
-| `create` event             | `ui-combobox` | `detail: { value: query, waitUntil(promise) }`, from the create part |
-| `dismissattempt` event     | `ui-combobox` | `detail: { reason, event }`, when a dismissal was refused            |
-
-### Reasons
-
-`event.detail.reason` says why the value changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/combobox/combobox.ts"
-  name="ComboboxValueChangeReason"
-/>
-
-Why the text changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/combobox/combobox.ts"
-  name="ComboboxQueryChangeReason"
-/>
-
-And why the list opened or closed:
-
-<ReasonTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxOpenChangeReason" />
-
-With `dismissible` false, the refused dismissals `dismissattempt` reports:
-
-<ReasonTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxDismissReason" />
-
-### Controller
-
-The element's `api` property has the same methods.
-
-Every write method takes an optional `{ reason, event }`, which the change event carries.
-
-<ControllerTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxController" />
 
 ### Combobox
 
@@ -428,6 +367,8 @@ Every write method takes an optional `{ reason, event }`, which the change event
 ### ComboboxContent
 
 <TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxContentProps" />
+
+<CssVariables component="combobox" part="content" />
 
 ### ComboboxItem
 
@@ -548,6 +489,57 @@ The same state shows as data attributes on each element.
   path="../../packages/core/src/components/combobox/combobox.ts"
   name="ComboboxChipsOverflowState"
 />
+
+### Reasons
+
+`event.detail.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxValueChangeReason"
+/>
+
+Why the text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxQueryChangeReason"
+/>
+
+And why the list opened or closed:
+
+<ReasonTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxOpenChangeReason" />
+
+With `dismissible` false, the refused dismissals `dismissattempt` reports:
+
+<ReasonTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxDismissReason" />
+
+### Controller
+
+The element's `api` property has the same methods.
+
+Every write method takes an optional `{ reason, event }`, which the change event carries.
+
+<ControllerTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on a change event cancels it.
+
+| Member                     | On            | Description                                                          |
+| -------------------------- | ------------- | -------------------------------------------------------------------- |
+| `value` property           | `ui-combobox` | The selected value. Setting it selects, as a controller would        |
+| `query` property           | `ui-combobox` | The input's text                                                     |
+| `open` property, attribute | `ui-combobox` | Whether the list is open. The attribute sets where it starts         |
+| `api` property             | `ui-combobox` | The [controller](#controller-1)                                      |
+| `valuechange` event        | `ui-combobox` | `detail: { value, reason, event, source }`                           |
+| `querychange` event        | `ui-combobox` | `detail: { value: query, reason, event, source }`                    |
+| `openchange` event         | `ui-combobox` | `detail: { value: open, reason, event, source }`                     |
+| `openchangecomplete` event | `ui-combobox` | `detail: { value: open }`, after the animation                       |
+| `highlight` event          | `ui-combobox` | `detail: { value, index, event }`                                    |
+| `loadmore` event           | `ui-combobox` | When the last item is reached                                        |
+| `create` event             | `ui-combobox` | `detail: { value: query, waitUntil(promise) }`, from the create part |
+| `dismissattempt` event     | `ui-combobox` | `detail: { reason, event }`, when a dismissal was refused            |
 
 ## Accessibility
 

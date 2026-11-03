@@ -69,6 +69,8 @@ In prose, bold visible labels when it helps identify what to press or look for. 
 
 Component docs show what people can build and how it behaves. They aren't a design-system catalog: omit examples whose only difference is a visual variant, size, or decorative icon. An icon or color is useful when it explains behavior, such as a pending indicator or a color-scheme preference.
 
+Don't mention the icon library the examples use, and don't add an install step for it. The components are headless, and the icons are part of the example, not the API.
+
 When changing demos, follow [the example styling guide](examples.md).
 
 ## Keep Each Page Focused
@@ -78,7 +80,17 @@ When changing demos, follow [the example styling guide](examples.md).
 - **Component pages** explain behavior, state, and composition. Show the same behavior across frameworks while keeping each framework's code idiomatic.
 - **Agent guides** distinguish building with an agent from connecting an agent to a UI. Reuse the established walkthrough rather than starting a new app on every page.
 
-For a new component page, start from the usual outline: a short introduction and demo, Installation, Anatomy or Usage, Examples with a subsection per behavior, Styling, API Reference, and Accessibility. Adapt it to the component: a simple Button can use Usage and direct behavior headings; a component with several parts benefits from Anatomy. Preserve useful existing variations rather than adding empty sections to match the outline.
+For a new component page, start from the usual outline: a short introduction and demo, Installation, Composition or Usage, Examples with a subsection per behavior, Custom Rendering, Styling, Data Attributes, API Reference, and Accessibility. Adapt it to the component: a simple Button can use Usage and direct behavior headings; a component with several parts benefits from Composition. Preserve useful existing variations rather than adding empty sections to match the outline.
+
+- **Composition** shows only how the parts nest: one line, "Use the following composition to build an `Accordion`:", then a plain text tree of part names. Show a repeating part twice so the repetition is visible. No props, content or imports.
+- **Examples** (pending review, accordion only for now): no "Examples" or "Patterns" group headings. Each example is its own `##` section with a short title, ordered from simplest to most involved. Keep an old anchor with `<span id="…" />` when a title changes.
+- **Build Your Own** comes right after Composition (pending review, accordion only for now): one sentence saying the component's real import path (such as `@ui-sdk/react/accordion`) ships a ready-made component and you can build your own with your own names from the core primitive, a `createParts` block that renames the parts, a short usage block, and links to Rendering and Custom Parts.
+- **Styling** explains how to style the parts, then gives each part that carries CSS variables its own `### PartName [#styling-partname]` heading (the element name on web components pages) with `<CssVariables component="…" part="…" />` below it, in API Reference order. It has no CSS code snippets; the Animation section is the exception.
+- **Data Attributes** follows Styling: each part with data attributes gets a `### PartName [#data-attributes-partname]` heading with `<DataAttributes component="…" part="…" />`, which shows its `[data-slot]` once and its attributes. The `[#…]` anchors keep these headings from taking the API Reference entries' anchors. `css-variables.test.ts` fails when a part that core gives variables or attributes has no section.
+- Component pages have no right-to-left section for now.
+- **API Reference** lists the parts in markup order, then State, Reasons, Controller and Events.
+
+Demo content should read like a real product: a trigger never repeats the label inside its panel, and at least one panel shows more than one paragraph.
 
 Use a table when it makes choices easier to compare. Keep API references focused on the SDK's options, methods, states, and attributes. Explain browser defaults only when they affect the example; don't reproduce inherited browser APIs or tuck an exhaustive duplicate into a “Full API” collapsible. Generated API table descriptions come from source JSDoc. When they disagree with the prose, reconcile both with the implementation.
 

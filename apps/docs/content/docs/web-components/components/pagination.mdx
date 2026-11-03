@@ -20,34 +20,29 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/pagination"
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-pagination`:
+
+```text
+ui-pagination
+└── ui-pagination-list
+    ├── ui-pagination-item
+    │   └── ui-pagination-previous
+    │       └── button
+    ├── template
+    │   └── ui-pagination-item
+    │       └── ui-pagination-link
+    │           └── button
+    ├── template
+    │   └── ui-pagination-item
+    │       └── ui-pagination-ellipsis
+    └── ui-pagination-item
+        └── ui-pagination-next
+            └── button
+```
 
 Name the navigation with `aria-label`, then put the page links and steps in a list.
-
-```html
-<ui-pagination aria-label="Pagination" page-count="10">
-  <ui-pagination-list>
-    <ui-pagination-item>
-      <ui-pagination-previous><button>Previous</button></ui-pagination-previous>
-    </ui-pagination-item>
-    <template>
-      <ui-pagination-item>
-        <ui-pagination-link><button></button></ui-pagination-link>
-      </ui-pagination-item>
-    </template>
-    <template data-ellipsis>
-      <ui-pagination-item>
-        <ui-pagination-ellipsis>…</ui-pagination-ellipsis>
-      </ui-pagination-item>
-    </template>
-    <ui-pagination-item>
-      <ui-pagination-next><button>Next</button></ui-pagination-next>
-    </ui-pagination-item>
-  </ui-pagination-list>
-</ui-pagination>
-```
 
 A list with a `<template>` renders the range from it: one copy for each page, with the page number in an empty button, and the `<template data-ellipsis>` for each gap. Without the ellipsis template, gaps get a plain `<ui-pagination-ellipsis>`. Links and steps wrap your own `<button>`, or an `<a>` with [`getHref`](#links), so style those. Links written out by hand, like a server's, take a `page` attribute.
 
@@ -104,12 +99,6 @@ pagination here.
   name="pagination/router"
   caption="Choose a page. The example updates the URL and current page without reloading."
 />
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the pagination. The list runs from the right, so Previous sits on the right and Next on the left. Turn directional icons with `rtl:rotate-180`.
-
-<ComponentExample name="pagination/rtl" caption="Use Previous and Next in a right-to-left layout." />
 
 ## Behavior and Options
 
@@ -219,38 +208,6 @@ Import it from `@ui-sdk/web`.
 Props are attributes in kebab case, like `page-count`, `default-page` and `page-size`, and numbers are
 numbers. `getHref` and `controller` are properties. `page` is a live property. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new page in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiPaginationElement` for typed listeners.
-
-| Member                | On              | Description                                          |
-| --------------------- | --------------- | ---------------------------------------------------- |
-| `page` property       | `ui-pagination` | The current page. Setting it goes there              |
-| `api` property        | `ui-pagination` | The [controller](#controller)                        |
-| `getHref` property    | `ui-pagination` | A page's URL. With it, wrap links instead of buttons |
-| `controller` property | `ui-pagination` | A controller from `createPaginationController()`     |
-| `pagechange` event    | `ui-pagination` | `detail: { value: page, reason, event, source }`     |
-
-### Reasons
-
-`event.detail.reason` says why the page changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/pagination/pagination.ts"
-  name="PaginationPageChangeReason"
-/>
-
-### Controller
-
-The element's `api` property has the same methods.
-
-Every write method takes an optional `{ reason, event }`, passed to `pagechange`, and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable
-  path="../../packages/core/src/components/pagination/pagination.ts"
-  name="PaginationController"
-/>
-
 ### Pagination
 
 <TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
@@ -276,6 +233,38 @@ The same state shows as attributes on each link and step.
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
 <StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+
+### Reasons
+
+`event.detail.reason` says why the page changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationPageChangeReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods.
+
+Every write method takes an optional `{ reason, event }`, passed to `pagechange`, and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationController"
+/>
+
+### Events
+
+Events fire on their own element and don't bubble, with the new page in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiPaginationElement` for typed listeners.
+
+| Member                | On              | Description                                          |
+| --------------------- | --------------- | ---------------------------------------------------- |
+| `page` property       | `ui-pagination` | The current page. Setting it goes there              |
+| `api` property        | `ui-pagination` | The [controller](#controller)                        |
+| `getHref` property    | `ui-pagination` | A page's URL. With it, wrap links instead of buttons |
+| `controller` property | `ui-pagination` | A controller from `createPaginationController()`     |
+| `pagechange` event    | `ui-pagination` | `detail: { value: page, reason, event, source }`     |
 
 ## Accessibility
 

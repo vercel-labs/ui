@@ -21,19 +21,15 @@ import "@ui-sdk/web/otp-input"
 import "@ui-sdk/web/field"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme). The separator icons use `lucide`.
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-otp-input`:
 
-```html
-<ui-otp-input max-length="4" aria-label="Verification code">
-  <ui-otp-input-group>
-    <ui-otp-input-slot></ui-otp-input-slot>
-    <ui-otp-input-slot></ui-otp-input-slot>
-    <ui-otp-input-slot></ui-otp-input-slot>
-    <ui-otp-input-slot></ui-otp-input-slot>
-  </ui-otp-input-group>
-</ui-otp-input>
+```text
+ui-otp-input
+└── ui-otp-input-group
+    ├── ui-otp-input-slot
+    └── ui-otp-input-slot
 ```
 
 `ui-otp-input` creates the native input and holds the code. A group lays out its slots. Slots without an explicit `index` follow their order in the input. Add `ui-otp-input-separator` between groups when the code is easier to read in sections.
@@ -97,15 +93,6 @@ Pass `aria-invalid` and `aria-describedby` to mark the code invalid and associat
   caption="Focus Verification code. It is marked invalid, and the associated message explains that the code was not accepted."
 />
 
-### Right to Left
-
-The input follows its surrounding `dir`. In a right-to-left layout, the first slot is on the right and ArrowLeft advances to the next slot. Logical borders keep the group corners in place.
-
-<ComponentExample
-  name="otp-input/rtl"
-  caption="Enter a code from the rightmost slot. Use ArrowLeft to advance and ArrowRight to move back, or click a slot to edit it."
-/>
-
 ## Behavior and Options
 
 ### Controlled
@@ -166,16 +153,23 @@ The root's state exposes all `slots`. Each slot exposes `char`, `isActive`, and 
 Props are attributes in kebab case, like `max-length`, `default-value` and `auto-complete`. `pattern` is a
 preset name or the source of a regular expression. `controller` is a property. Callbacks are DOM events.
 
-### Events
+### OTPInput
 
-Events fire on their own element and don't bubble, with the code in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
+<TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputOptions" />
 
-| Member                      | On             | Description                                                |
-| --------------------------- | -------------- | ---------------------------------------------------------- |
-| `value` property, attribute | `ui-otp-input` | The code                                                   |
-| `api` property              | `ui-otp-input` | The [controller](#controller)                              |
-| `valuechange` event         | `ui-otp-input` | `detail: { value, reason, event }`, on every change        |
-| `complete` event            | `ui-otp-input` | `detail: { value, reason, event }`, when a change fills it |
+### OTPInputSlot
+
+<TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotProps" />
+
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputState" />
+
+Slots get their own:
+
+<StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotState" />
 
 ### Reasons
 
@@ -194,23 +188,16 @@ The element's `api` property has the same methods. The `value` property reads an
 
 <ControllerTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputController" />
 
-### OTPInput
+### Events
 
-<TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputOptions" />
+Events fire on their own element and don't bubble, with the code in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
 
-### OTPInputSlot
-
-<TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotProps" />
-
-### State
-
-The same state shows as data attributes on each element.
-
-<StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputState" />
-
-Slots get their own:
-
-<StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotState" />
+| Member                      | On             | Description                                                |
+| --------------------------- | -------------- | ---------------------------------------------------------- |
+| `value` property, attribute | `ui-otp-input` | The code                                                   |
+| `api` property              | `ui-otp-input` | The [controller](#controller)                              |
+| `valuechange` event         | `ui-otp-input` | `detail: { value, reason, event }`, on every change        |
+| `complete` event            | `ui-otp-input` | `detail: { value, reason, event }`, when a change fills it |
 
 ## Accessibility
 

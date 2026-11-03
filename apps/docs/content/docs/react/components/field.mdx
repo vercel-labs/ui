@@ -11,7 +11,7 @@ description: Connect a form control to its label, description, and validation er
 pnpm add @ui-sdk/react @ui-sdk/core
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -194,11 +194,11 @@ A field set follows its surrounding `dir`, just like an individual field.
 
 ## Styling
 
-The demos use the shared [example theme](../styling-and-animation#example-theme). Apply classes directly to the parts. Each part receives the field’s state as data attributes:
+Apply classes directly to the parts. Each part receives the field’s state as data attributes:
 
 ```tsx
-<FieldLabel className="data-invalid:text-foreground" />
-<FieldControl className="border-input data-invalid:border-foreground/50" />
+<FieldLabel className="data-invalid:text-neutral-950" />
+<FieldControl className="border-neutral-300 data-invalid:border-neutral-950/50" />
 ```
 
 `Field`:

@@ -16,42 +16,23 @@ Use a Tree when items have children, like files in folders or pages in a docs si
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `@lucide/vue` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `Tree`:
 
-```bash
-npm install @lucide/vue
+```text
+Tree
+├── TreeItem
+│   ├── TreeItemLabel
+│   │   └── TreeItemIndicator
+│   └── TreeGroup
+│       └── TreeItem
+│           └── TreeItemLabel
+└── TreeItem
+    └── TreeItemLabel
 ```
-
-## Anatomy
 
 Give the tree an accessible name and every item a unique `value`. An item with a `TreeGroup` inside it is a branch. The group holds its children; the label names the item.
-
-```vue
-<script setup lang="ts">
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/vue/tree"
-</script>
-
-<template>
-  <Tree aria-label="Project files">
-    <TreeItem value="src">
-      <TreeItemLabel>
-        <TreeItemIndicator>›</TreeItemIndicator>
-        src
-      </TreeItemLabel>
-      <TreeGroup>
-        <TreeItem value="src/index.ts">
-          <TreeItemLabel>index.ts</TreeItemLabel>
-        </TreeItem>
-      </TreeGroup>
-    </TreeItem>
-    <TreeItem value="package.json">
-      <TreeItemLabel>package.json</TreeItemLabel>
-    </TreeItem>
-  </Tree>
-</template>
-```
 
 The tree has one Tab stop. Arrow keys move between visible items, open branches, and return to their parents. The indicator and checkbox are optional; they belong to the item around them, so you can put them inside or beside its label.
 
@@ -226,40 +207,46 @@ Style each row through `TreeItemLabel`, which carries its item’s data attribut
 
 ```vue
 <TreeItem value="example" class="outline-none">
-  <TreeItemLabel class="rounded-xl px-2 data-selected:bg-accent [:focus-visible>&]:ring-3 [:focus-visible>&]:ring-ring/30">
+  <TreeItemLabel class="rounded-xl px-2 data-selected:bg-neutral-100 [:focus-visible>&]:ring-3 [:focus-visible>&]:ring-neutral-400/50">
     Label
   </TreeItemLabel>
 </TreeItem>
 ```
 
-Every item also exposes its depth as `--tree-level`, useful for indentation in a flat tree.
+### TreeItem [#styling-treeitem]
 
-<DataAttributes component="tree" />
+<CssVariables component="tree" part="item" />
+
+### TreeGroup [#styling-treegroup]
+
+<CssVariables component="tree" part="group" />
+
+## Data Attributes
+
+### TreeItem [#data-attributes-treeitem]
+
+<DataAttributes component="tree" part="item" />
+
+### TreeItemLabel [#data-attributes-treeitemlabel]
+
+<DataAttributes component="tree" part="label" />
+
+### TreeItemIndicator [#data-attributes-treeitemindicator]
+
+<DataAttributes component="tree" part="indicator" />
+
+### TreeItemCheckbox [#data-attributes-treeitemcheckbox]
+
+<DataAttributes component="tree" part="checkbox" />
+
+### TreeGroup [#data-attributes-treegroup]
+
+<DataAttributes component="tree" part="group" />
 
 ## API Reference
 
 Props are the same as below, and callbacks are events, except `onAction` and `loadChildren`, which are
 function props.
-
-### Reasons
-
-Why branches expanded or collapsed:
-
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeExpandedChangeReason" />
-
-Why the selection changed:
-
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeValueChangeReason" />
-
-And why the checkboxes changed:
-
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeCheckedChangeReason" />
-
-### Controller
-
-Create one with `createTreeController()` and pass it as `controller`.
-
-<ControllerTable path="../../packages/core/src/components/tree/tree.ts" name="TreeController" />
 
 ### Tree
 
@@ -298,6 +285,26 @@ What render functions, state-based class names and slots receive, per part.
 `TreeGroup`:
 
 <StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeGroupState" />
+
+### Reasons
+
+Why branches expanded or collapsed:
+
+<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeExpandedChangeReason" />
+
+Why the selection changed:
+
+<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeValueChangeReason" />
+
+And why the checkboxes changed:
+
+<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeCheckedChangeReason" />
+
+### Controller
+
+Create one with `createTreeController()` and pass it as `controller`.
+
+<ControllerTable path="../../packages/core/src/components/tree/tree.ts" name="TreeController" />
 
 ## Accessibility
 

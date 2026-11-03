@@ -14,23 +14,18 @@ description: Resize, collapse, and save panel layouts with pointer and keyboard 
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Resizable`:
+
+```text
+Resizable
+├── ResizablePanel
+├── ResizableHandle
+└── ResizablePanel
+```
 
 Put a handle between the panels you want to resize.
-
-```tsx
-<script lang="ts">
-  import { Resizable, ResizablePanel, ResizableHandle } from "@ui-sdk/svelte/resizable"
-</script>
-
-<Resizable>
-  <ResizablePanel />
-  <ResizableHandle aria-label="Resize sidebar" />
-  <ResizablePanel />
-</Resizable>
-```
 
 - **Resizable** is the group. It lays its panels out in a row, or a column with `orientation="vertical"`, so give it a size: a vertical group needs a height.
 - **ResizablePanel** is one region. Its size is a percentage of the space panels share, written to `--resizable-panel-size` and used as its flex basis.
@@ -56,15 +51,6 @@ Put anything inside a handle, like a grip that shows it can be dragged. The hand
 <ComponentExample
   name="resizable/handle"
   caption="Grab the visible grip or focus the handle and use the arrow keys."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the group. The first panel is on the right, ArrowLeft grows the panel before the handle, and drags follow the pointer.
-
-<ComponentExample
-  name="resizable/rtl"
-  caption="Resize the panels in a right-to-left layout. ArrowLeft grows the first panel."
 />
 
 ### Collapsible
@@ -184,26 +170,55 @@ The primitive writes drag sizes directly to panel styles. Reading `size` or `lay
 Parts are unstyled, apart from the layout they need: the group is a flex row or column, panels take their size as a flex basis, and handles don't shrink and take `touch-action: none`. While a handle is hovered or dragged, its cursor shows over the whole page, and points the only way it can go at a limit.
 
 ```svelte
-<ResizableHandle class="relative flex w-px items-center justify-center bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovered:bg-ring data-dragging:bg-ring aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full" />
+<ResizableHandle class="relative flex w-px items-center justify-center bg-neutral-200 outline-none focus-visible:ring-3 focus-visible:ring-neutral-400/50 data-hovered:bg-neutral-400 data-dragging:bg-neutral-400 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full" />
 ```
 
-<DataAttributes component="resizable" />
+### ResizablePanel [#styling-resizablepanel]
 
-<CssVariables component="resizable" />
+<CssVariables component="resizable" part="panel" />
+
+## Data Attributes
+
+### Resizable [#data-attributes-resizable]
+
+<DataAttributes component="resizable" part="root" />
+
+### ResizablePanel [#data-attributes-resizablepanel]
+
+<DataAttributes component="resizable" part="panel" />
+
+### ResizableHandle [#data-attributes-resizablehandle]
+
+<DataAttributes component="resizable" part="handle" />
 
 ## API Reference
 
 Props and callbacks are the same as below, as Svelte props. `layout` can be bound with `bind:layout`.
 
-### Events
+### Resizable
 
-Callbacks get the new layout first, then the details. A bound `layout` only updates when `onLayoutChange` wasn't canceled.
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
 
-| Prop             | On          | Receives                                                       |
-| ---------------- | ----------- | -------------------------------------------------------------- |
-| `bind:layout`    | `Resizable` | The layout: one percentage per panel                           |
-| `onLayoutChange` | `Resizable` | `(layout, details)`: the new layout and the [reason](#reasons) |
-| `onLayoutCommit` | `Resizable` | `(layout, details)`: the layout once the interaction ends      |
+### ResizablePanel
+
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+### ResizableHandle
+
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+
+### State
+
+What `render` and `children` snippets receive, per part.
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+
+Panels:
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+
+Handles:
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
 
 ### Reasons
 
@@ -225,31 +240,15 @@ Write methods take an optional `{ reason, event }`, run the change callback like
   name="ResizableController"
 />
 
-### Resizable
+### Events
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+Callbacks get the new layout first, then the details. A bound `layout` only updates when `onLayoutChange` wasn't canceled.
 
-### ResizablePanel
-
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
-
-### ResizableHandle
-
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
-
-### State
-
-What `render` and `children` snippets receive, per part.
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
-
-Panels:
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
-
-Handles:
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+| Prop             | On          | Receives                                                       |
+| ---------------- | ----------- | -------------------------------------------------------------- |
+| `bind:layout`    | `Resizable` | The layout: one percentage per panel                           |
+| `onLayoutChange` | `Resizable` | `(layout, details)`: the new layout and the [reason](#reasons) |
+| `onLayoutCommit` | `Resizable` | `(layout, details)`: the layout once the interaction ends      |
 
 ## Accessibility
 

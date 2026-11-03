@@ -16,34 +16,20 @@ Command puts a search field over a list of actions. The list stays open while so
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `@lucide/vue` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `Command`:
 
-```bash
-npm install @lucide/vue
+```text
+Command
+├── CommandInput
+├── CommandEmpty
+└── CommandList
+    ├── CommandItem
+    └── CommandItem
 ```
-
-## Anatomy
 
 Give the input an accessible name and each command a unique value. Keep empty and status messages outside the list, which holds commands and groups.
-
-```vue
-<script setup lang="ts">
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/vue/command"
-</script>
-
-<template>
-  <Command>
-    <CommandInput aria-label="Search commands" />
-    <CommandEmpty>No commands found.</CommandEmpty>
-    <CommandList>
-      <CommandItem value="new-file">New file</CommandItem>
-      <CommandItem value="new-folder">New folder</CommandItem>
-    </CommandList>
-  </Command>
-</template>
-```
 
 Typing filters the commands. Arrow keys move the highlight, and Enter runs the highlighted command. Focus stays in the input, which points to the highlight with `aria-activedescendant`. `@action` reports the value of the command that ran; use it to perform the action.
 
@@ -233,42 +219,6 @@ Style the parts through their data attributes, which are the same in every frame
 Props are the same as below, and callbacks are events, except `onAction` and `onSelect`, which are function
 props.
 
-### Events
-
-Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
-
-| Binding         | On            | Receives                                                                            |
-| --------------- | ------------- | ----------------------------------------------------------------------------------- |
-| `v-model:value` | `Command`     | The highlighted command                                                             |
-| `v-model:query` | `Command`     | The search text                                                                     |
-| `v-model:pages` | `Command`     | The stack of pages                                                                  |
-| `@value-change` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index` |
-| `@query-change` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                        |
-| `@pages-change` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                       |
-| `@action`       | `Command`     | `(value, { event })`, a function prop. Return a Promise to mark the command pending |
-| `@load-more`    | `Command`     | When the last command is reached                                                    |
-| `@select`       | `CommandItem` | `(event)`, a function prop. Return a Promise to mark the command pending            |
-
-### Reasons
-
-Why the highlighted command changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
-
-Why the search text changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
-
-And why the stack of pages changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
-
-### Controller
-
-Create one with `createCommandController()` and pass it as `controller`.
-
-<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
-
 ### Command
 
 <TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandOptions" />
@@ -334,6 +284,42 @@ What render functions, state-based class names and slots receive, per part.
 `CommandItemIcon`:
 
 <StateTable path="../../packages/core/src/components/command/command.ts" name="CommandItemIconState" />
+
+### Reasons
+
+Why the highlighted command changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
+
+Why the search text changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
+
+And why the stack of pages changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
+
+### Controller
+
+Create one with `createCommandController()` and pass it as `controller`.
+
+<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
+
+### Events
+
+Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
+
+| Binding         | On            | Receives                                                                            |
+| --------------- | ------------- | ----------------------------------------------------------------------------------- |
+| `v-model:value` | `Command`     | The highlighted command                                                             |
+| `v-model:query` | `Command`     | The search text                                                                     |
+| `v-model:pages` | `Command`     | The stack of pages                                                                  |
+| `@value-change` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index` |
+| `@query-change` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                        |
+| `@pages-change` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                       |
+| `@action`       | `Command`     | `(value, { event })`, a function prop. Return a Promise to mark the command pending |
+| `@load-more`    | `Command`     | When the last command is reached                                                    |
+| `@select`       | `CommandItem` | `(event)`, a function prop. Return a Promise to mark the command pending            |
 
 ## Accessibility
 

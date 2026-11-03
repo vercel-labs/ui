@@ -14,39 +14,26 @@ description: Navigate pages with buttons, links, or your router.
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Pagination`:
+
+```text
+Pagination
+└── PaginationList
+    ├── PaginationItem
+    │   └── PaginationPrevious
+    ├── PaginationItem
+    │   └── PaginationLink
+    ├── PaginationItem
+    │   └── PaginationEllipsis
+    ├── PaginationItem
+    │   └── PaginationLink
+    └── PaginationItem
+        └── PaginationNext
+```
 
 Name the navigation with `aria-label`, then put the page links and steps in a list.
-
-```svelte
-<script lang="ts">
-  import { Pagination, PaginationEllipsis, PaginationItem, PaginationLink, PaginationList, PaginationNext, PaginationPrevious } from "@ui-sdk/svelte/pagination"
-</script>
-
-<Pagination aria-label="Pagination" pageCount={10}>
-  <PaginationList>
-    {#snippet children(state)}
-      <PaginationItem>
-        <PaginationPrevious>Previous</PaginationPrevious>
-      </PaginationItem>
-      {#each state.items as item (item)}
-        <PaginationItem>
-          {#if typeof item === "number"}
-            <PaginationLink page={item} />
-          {:else}
-            <PaginationEllipsis />
-          {/if}
-        </PaginationItem>
-      {/each}
-      <PaginationItem>
-        <PaginationNext>Next</PaginationNext>
-      </PaginationItem>
-    {/snippet}
-  </PaginationList>
-</Pagination>
-```
 
 `items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
 
@@ -104,12 +91,6 @@ component goes in the `render` snippet, with `{...props}`. It receives the part'
   name="pagination/router"
   caption="Choose a page. The example updates the URL and current page without reloading."
 />
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the pagination. The list runs from the right, so Previous sits on the right and Next on the left. Turn directional icons with `rtl:rotate-180`.
-
-<ComponentExample name="pagination/rtl" caption="Use Previous and Next in a right-to-left layout." />
 
 ## Behavior and Options
 
@@ -211,35 +192,6 @@ whether it's `disabled`. The `children` snippet receives the state too.
 
 Props and callbacks are the same as below, as Svelte props.
 
-### Events
-
-Callbacks get the new page first, then the details. A bound `page` only updates when `onPageChange` wasn't canceled.
-
-| Prop           | On           | Receives                                                    |
-| -------------- | ------------ | ----------------------------------------------------------- |
-| `bind:page`    | `Pagination` | The current page                                            |
-| `onPageChange` | `Pagination` | `(page, details)`: the new page, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the page changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/pagination/pagination.ts"
-  name="PaginationPageChangeReason"
-/>
-
-### Controller
-
-Create one with `createPaginationController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, passed to `onPageChange`, and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable
-  path="../../packages/core/src/components/pagination/pagination.ts"
-  name="PaginationController"
-/>
-
 ### Pagination
 
 <TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
@@ -265,6 +217,35 @@ What `render` and `children` snippets receive, per part.
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
 <StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+
+### Reasons
+
+`details.reason` says why the page changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationPageChangeReason"
+/>
+
+### Controller
+
+Create one with `createPaginationController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to `onPageChange`, and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationController"
+/>
+
+### Events
+
+Callbacks get the new page first, then the details. A bound `page` only updates when `onPageChange` wasn't canceled.
+
+| Prop           | On           | Receives                                                    |
+| -------------- | ------------ | ----------------------------------------------------------- |
+| `bind:page`    | `Pagination` | The current page                                            |
+| `onPageChange` | `Pagination` | `(page, details)`: the new page, and the [reason](#reasons) |
 
 ## Accessibility
 

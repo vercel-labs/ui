@@ -7,6 +7,7 @@ Use Tabs when several views share the same space, such as settings sections or a
 
 <ComponentExample
   name="tabs/basic"
+  inspect
   caption="Choose Password to show its panel. Use the left and right arrow keys to move between the tabs."
 />
 
@@ -16,34 +17,20 @@ Use Tabs when several views share the same space, such as settings sections or a
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The icon example uses `@lucide/vue`. Install it to copy that example as shown, or use your own icons.
+Use the following composition to build a `Tabs`:
 
-```bash
-npm install @lucide/vue
+```text
+Tabs
+├── TabsList
+│   ├── TabsTab
+│   └── TabsTab
+├── TabsPanel
+└── TabsPanel
 ```
-
-## Anatomy
 
 Give each tab and its panel the same unique `value`. Give the list an accessible name. Set `default-value` to choose the initial tab; otherwise, the first enabled tab is selected.
-
-```vue
-<script setup lang="ts">
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
-</script>
-
-<template>
-  <Tabs default-value="account">
-    <TabsList aria-label="Settings">
-      <TabsTab value="account">Account</TabsTab>
-      <TabsTab value="password">Password</TabsTab>
-    </TabsList>
-    <TabsPanel value="account">Manage your profile.</TabsPanel>
-    <TabsPanel value="password">Choose a new password.</TabsPanel>
-  </Tabs>
-</template>
-```
 
 Tab enters the list at the selected tab. Left and Right Arrow move between tabs and select them. Home and End move to the first and last tabs.
 
@@ -226,11 +213,7 @@ Use `data-selected` and `data-disabled` to style a tab. Icon parts also provide 
 
 <DataAttributes component="tabs" />
 
-### Indicator Variables
-
-The indicator’s position and size are measured from the tab list. Use the same variables for an underline, a background, or a marker beside a vertical list.
-
-<CssVariables component="tabs" />
+The indicator’s position and size are measured from the tab list into the [TabsIndicator](#tabsindicator) variables. Use them for an underline, a background, or a marker beside a vertical list.
 
 ## Custom Rendering
 
@@ -241,29 +224,6 @@ Use the framework’s `render` prop or slot to change a part’s element, as in 
 ## API Reference
 
 Props are the same as below, and callbacks are events.
-
-### Events
-
-Events get the new value first, then the details. `v-model` only updates when `@value-change` wasn't canceled.
-
-| Binding         | On     | Receives                                                      |
-| --------------- | ------ | ------------------------------------------------------------- |
-| `v-model:value` | `Tabs` | The selected tab's value                                      |
-| `@value-change` | `Tabs` | `(value, details)`: the new value, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the selection changed.
-
-<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
-
-### Controller
-
-Create one with `createTabsController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, runs `@value-change` like a press, and returns `false` when the change is canceled.
-
-<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
 
 ### Tabs
 
@@ -276,6 +236,12 @@ Every write method takes an optional `{ reason, event }`, runs `@value-change` l
 ### TabsTabIcon
 
 <TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabIconProps" />
+
+### TabsIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="tabs" part="indicator" />
 
 ### TabsPanel
 
@@ -308,6 +274,29 @@ What render functions, state-based class names and slots receive, per part.
 `TabsIndicator`:
 
 <StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsIndicatorState" />
+
+### Reasons
+
+`details.reason` says why the selection changed.
+
+<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
+
+### Controller
+
+Create one with `createTabsController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs `@value-change` like a press, and returns `false` when the change is canceled.
+
+<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
+
+### Events
+
+Events get the new value first, then the details. `v-model` only updates when `@value-change` wasn't canceled.
+
+| Binding         | On     | Receives                                                      |
+| --------------- | ------ | ------------------------------------------------------------- |
+| `v-model:value` | `Tabs` | The selected tab's value                                      |
+| `@value-change` | `Tabs` | `(value, details)`: the new value, and the [reason](#reasons) |
 
 ## Accessibility
 

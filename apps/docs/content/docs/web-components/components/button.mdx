@@ -20,9 +20,7 @@ Importing the component registers `<ui-button>` in the browser. On the server th
 import "@ui-sdk/web/button"
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -62,12 +60,6 @@ button.addEventListener("action", (event) => {
 ```
 
 After one second, it announces "Loading" to screen readers. Set `pending-announcement="Saving"` on `<ui-button>` to change that message, or use an empty string to silence it.
-
-The demo uses `LoaderCircle` from `lucide` for its spinner. Install that package if you copy the example:
-
-```bash
-npm install lucide
-```
 
 <ComponentExample
   name="button/pending"
@@ -183,14 +175,6 @@ State attributes go on the inner element: use `data-pending` to show a spinner o
 
 Set options as kebab-case attributes or camelCase properties on `<ui-button>`, such as `focusable-when-disabled` or `focusableWhenDisabled`. `type` comes from the inner button.
 
-### Events
-
-Listen on `<ui-button>` itself. The `action` event is cancelable and composed, but does not bubble. A disabled or pending button does not fire it.
-
-| Event    | Receives                                                                                                                               |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `action` | `detail: { source, waitUntil(promise) }`. Pass a Promise to `waitUntil()` during dispatch to keep the button pending until it settles. |
-
 ### Button
 
 <TypeTable path="../../packages/core/src/components/button/button.ts" name="ButtonOptions" />
@@ -200,6 +184,14 @@ Listen on `<ui-button>` itself. The `action` event is cancelable and composed, b
 Web components have no render function. Style the inner element's state attributes and handle your action's Promise to display errors.
 
 <StateTable path="../../packages/core/src/components/button/button.ts" name="ButtonState" />
+
+### Events
+
+Listen on `<ui-button>` itself. The `action` event is cancelable and composed, but does not bubble. A disabled or pending button does not fire it.
+
+| Event    | Receives                                                                                                                               |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `action` | `detail: { source, waitUntil(promise) }`. Pass a Promise to `waitUntil()` during dispatch to keep the button pending until it settles. |
 
 ## Accessibility
 

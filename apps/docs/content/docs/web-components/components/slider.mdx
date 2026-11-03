@@ -5,6 +5,7 @@ description: Adjust a number or a range with draggable thumbs and keyboard contr
 
 <ComponentExample
   name="slider/basic"
+  inspect
   caption="Drag the thumb or focus it and use the arrow keys to adjust Volume."
 />
 
@@ -21,23 +22,20 @@ import "@ui-sdk/web/slider"
 import "@ui-sdk/web/field"
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-slider`:
+
+```text
+ui-slider
+├── ui-slider-value
+└── ui-slider-control
+    └── ui-slider-track
+        ├── ui-slider-indicator
+        └── ui-slider-thumb
+```
 
 A control handles presses around the track. Put a thumb on that track for each value.
-
-```html
-<ui-slider default-value="50">
-  <ui-slider-value></ui-slider-value>
-  <ui-slider-control>
-    <ui-slider-track>
-      <ui-slider-indicator></ui-slider-indicator>
-      <ui-slider-thumb aria-label="Volume"></ui-slider-thumb>
-    </ui-slider-track>
-  </ui-slider-control>
-</ui-slider>
-```
 
 - **Slider** holds the value and is a group around the thumbs.
 - **SliderControl** is where presses land. Pressing it moves the nearest thumb and starts a drag. Give it some height around a thin track.
@@ -98,15 +96,6 @@ Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted
 <ComponentExample
   name="slider/disabled"
   caption="The disabled slider keeps its value and cannot be focused or dragged."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the slider. It starts from the right, ArrowLeft increases it, and the thumbs and indicator are placed with `inset-inline-start`, so nothing in your styles needs to flip. `locale` sets the digits.
-
-<ComponentExample
-  name="slider/rtl"
-  caption="Adjust the range in a right-to-left layout. ArrowLeft increases the value."
 />
 
 ## Behavior and Options
@@ -213,11 +202,11 @@ Parts are unstyled. Style them through the attributes they render, which are the
 ```html
 <ui-slider-control class="flex items-center py-2 data-disabled:opacity-50">
   <ui-slider-track
-    class="h-1 w-full rounded-2xl bg-input/90 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1"
+    class="h-1 w-full rounded-2xl bg-neutral-200 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1"
   >
-    <ui-slider-indicator class="rounded-2xl bg-primary"></ui-slider-indicator>
+    <ui-slider-indicator class="rounded-2xl bg-neutral-900"></ui-slider-indicator>
     <ui-slider-thumb
-      class="size-4 rounded-2xl bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-ring/30 data-dragging:ring-4 data-dragging:ring-ring/30"
+      class="size-4 rounded-2xl bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-neutral-400/50 data-dragging:ring-4 data-dragging:ring-neutral-400/50"
     ></ui-slider-thumb>
   </ui-slider-track>
 </ui-slider-control>
@@ -225,9 +214,7 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 <DataAttributes component="slider" />
 
-Thumbs and the indicator are placed with inline styles: `position: absolute`, and `inset-inline-start` or `bottom` in percent. They also get these CSS variables, for anything else that should follow them:
-
-<CssVariables component="slider" />
+Thumbs and the indicator are placed with inline styles: `position: absolute`, and `inset-inline-start` or `bottom` in percent. They also get CSS variables, listed under [SliderIndicator](#sliderindicator) and [SliderThumb](#sliderthumb), for anything else that should follow them.
 
 ## Custom Rendering
 
@@ -238,17 +225,35 @@ The parts are the elements themselves, so there is nothing to replace. Put anyth
 Props are attributes in kebab case, like `default-value` and `min-steps-between-thumbs`. A range is written
 as `"20/80"`. `format` and `controller` are properties. Callbacks are DOM events.
 
-### Events
+### Slider
 
-Events fire on their own element and don't bubble, with the value in `event.detail.value` and the `reason`, `thumb` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
+<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
 
-| Member                      | On          | Description                                                                  |
-| --------------------------- | ----------- | ---------------------------------------------------------------------------- |
-| `value` property, attribute | `ui-slider` | The value. The attribute sets it as text, like `"40"` or `"20/80"`           |
-| `format` property           | `ui-slider` | `Intl.NumberFormat` options or a function, for the value's text              |
-| `api` property              | `ui-slider` | The [controller](#controller)                                                |
-| `valuechange` event         | `ui-slider` | `detail: { value, reason, thumb, event, source }`, on every step             |
-| `valuecommit` event         | `ui-slider` | `detail: { value, reason, thumb, event, source }`, once the interaction ends |
+### SliderIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="slider" part="indicator" />
+
+### SliderThumb
+
+<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
+
+<CssVariables component="slider" part="thumb" />
+
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderState" />
+
+Thumbs add their own fields, and have their own value, `thumbValue`, in place of the whole `value`, so a thumb renders only when its own value moves:
+
+<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbState" />
+
+`SliderValue` adds the formatted text:
+
+<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueState" />
 
 ### Reasons
 
@@ -264,27 +269,17 @@ The element's `api` property has the same methods. The `value` property reads an
 
 <ControllerTable path="../../packages/core/src/components/slider/slider.ts" name="SliderController" />
 
-### Slider
+### Events
 
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
+Events fire on their own element and don't bubble, with the value in `event.detail.value` and the `reason`, `thumb` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
 
-### SliderThumb
-
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
-
-### State
-
-The same state shows as data attributes on each element.
-
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderState" />
-
-Thumbs add their own fields, and have their own value, `thumbValue`, in place of the whole `value`, so a thumb renders only when its own value moves:
-
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbState" />
-
-`SliderValue` adds the formatted text:
-
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueState" />
+| Member                      | On          | Description                                                                  |
+| --------------------------- | ----------- | ---------------------------------------------------------------------------- |
+| `value` property, attribute | `ui-slider` | The value. The attribute sets it as text, like `"40"` or `"20/80"`           |
+| `format` property           | `ui-slider` | `Intl.NumberFormat` options or a function, for the value's text              |
+| `api` property              | `ui-slider` | The [controller](#controller)                                                |
+| `valuechange` event         | `ui-slider` | `detail: { value, reason, thumb, event, source }`, on every step             |
+| `valuecommit` event         | `ui-slider` | `detail: { value, reason, thumb, event, source }`, once the interaction ends |
 
 ## Accessibility
 

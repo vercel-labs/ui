@@ -21,24 +21,19 @@ import "@ui-sdk/web/number-input"
 import "@ui-sdk/web/field"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme). The examples use `lucide` for icons.
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-number-input`:
 
-```html
-<ui-number-input default-value="1" min="0">
-  <ui-number-input-group>
-    <ui-number-input-decrement>
-      <button aria-label="Decrease">−</button>
-    </ui-number-input-decrement>
-    <ui-number-input-control>
-      <input aria-label="Quantity" />
-    </ui-number-input-control>
-    <ui-number-input-increment>
-      <button aria-label="Increase">+</button>
-    </ui-number-input-increment>
-  </ui-number-input-group>
-</ui-number-input>
+```text
+ui-number-input
+└── ui-number-input-group
+    ├── ui-number-input-decrement
+    │   └── button
+    ├── ui-number-input-control
+    │   └── input
+    └── ui-number-input-increment
+        └── button
 ```
 
 `ui-number-input` holds the numeric value. The control and button wrappers connect to your native input and buttons. Put input styles and accessible names on those native elements.
@@ -213,38 +208,6 @@ Use logical spacing so the layout follows the surrounding direction. [Parts and 
 Props are attributes in kebab case, like `default-value`, `large-step` and `read-only`. `format` and
 `controller` are properties. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
-
-| Member                      | On                | Description                                                           |
-| --------------------------- | ----------------- | --------------------------------------------------------------------- |
-| `value` property, attribute | `ui-number-input` | The value, or null when empty. An empty attribute is empty            |
-| `format` property           | `ui-number-input` | `Intl.NumberFormat` options                                           |
-| `api` property              | `ui-number-input` | The [controller](#controller)                                         |
-| `valuechange` event         | `ui-number-input` | `detail: { value, reason, event, source }`, as the value changes      |
-| `valuecommit` event         | `ui-number-input` | `detail: { value, reason, event, source }`, once the interaction ends |
-
-### Reasons
-
-`event.detail.reason` says why the value changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/number-input/number-input.ts"
-  name="NumberInputValueChangeReason"
-/>
-
-### Controller
-
-The element's `api` property has the same methods. The `value` property reads and sets the value.
-
-Every write method takes an optional `{ reason, event }`, fires the change event like a press, and returns `false` when the change is canceled.
-
-<ControllerTable
-  path="../../packages/core/src/components/number-input/number-input.ts"
-  name="NumberInputController"
-/>
-
 ### NumberInput
 
 <TypeTable path="../../packages/core/src/components/number-input/number-input.ts" name="NumberInputOptions" />
@@ -275,6 +238,38 @@ The buttons' state, `NumberInputButtonState`, says whether that button can step,
   path="../../packages/core/src/components/number-input/number-input.ts"
   name="NumberInputButtonState"
 />
+
+### Reasons
+
+`event.detail.reason` says why the value changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputValueChangeReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods. The `value` property reads and sets the value.
+
+Every write method takes an optional `{ reason, event }`, fires the change event like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputController"
+/>
+
+### Events
+
+Events fire on their own element and don't bubble, with the value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
+
+| Member                      | On                | Description                                                           |
+| --------------------------- | ----------------- | --------------------------------------------------------------------- |
+| `value` property, attribute | `ui-number-input` | The value, or null when empty. An empty attribute is empty            |
+| `format` property           | `ui-number-input` | `Intl.NumberFormat` options                                           |
+| `api` property              | `ui-number-input` | The [controller](#controller)                                         |
+| `valuechange` event         | `ui-number-input` | `detail: { value, reason, event, source }`, as the value changes      |
+| `valuecommit` event         | `ui-number-input` | `detail: { value, reason, event, source }`, once the interaction ends |
 
 ## Accessibility
 

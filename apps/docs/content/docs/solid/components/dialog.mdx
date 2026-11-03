@@ -16,36 +16,18 @@ A dialog gives a task its own space: share a link, edit a record, or collect a f
 npm install @ui-sdk/solid
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Dialog`:
 
-```tsx
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@ui-sdk/solid/dialog"
-
-function Example() {
-  return (
-    <Dialog>
-      <DialogTrigger>Open</DialogTrigger>
-      <DialogBackdrop />
-      <DialogContent>
-        <DialogTitle>Project details</DialogTitle>
-        <DialogDescription>Review the details before continuing.</DialogDescription>
-        <DialogClose>Close</DialogClose>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-export { Example }
+```text
+Dialog
+├── DialogTrigger
+├── DialogBackdrop
+└── DialogContent
+    ├── DialogTitle
+    ├── DialogDescription
+    └── DialogClose
 ```
 
 The title names the dialog; the description gives it context. A dialog can have several Close parts. Give an icon-only close button an accessible name, as the first example does.
@@ -196,51 +178,37 @@ Style `data-presentation` to support both layouts. The sheet manages its own pos
 
 Style parts with their state attributes and CSS variables. Logical properties, such as the examples’ `end-4`, keep the same layout in right-to-left text.
 
-<DataAttributes component="dialog" />
+### DialogContent [#styling-dialogcontent]
 
-<CssVariables component="dialog" />
+<CssVariables component="dialog" part="content" />
 
-`--keyboard-inset` follows the on-screen keyboard. `--scrollbar-width` reports the space removed by scroll locking, so fixed page elements can compensate.
+### Viewport [#styling-viewport]
+
+<CssVariables component="dialog" part="viewport" />
+
+## Data Attributes
+
+### DialogTrigger [#data-attributes-dialogtrigger]
+
+<DataAttributes component="dialog" part="trigger" />
+
+### DialogBackdrop [#data-attributes-dialogbackdrop]
+
+<DataAttributes component="dialog" part="backdrop" />
+
+### DialogContent [#data-attributes-dialogcontent]
+
+<DataAttributes component="dialog" part="content" />
+
+### DialogClose [#data-attributes-dialogclose]
+
+<DataAttributes component="dialog" part="close" />
 
 ## Custom Rendering
 
 Use the shared [composition guide](../parts-and-composition) when a part needs to render your own element.
 
 ## API Reference
-
-### Events
-
-Callbacks get the new state first, then the details.
-
-| Prop                   | On       | Receives                                                                       |
-| ---------------------- | -------- | ------------------------------------------------------------------------------ |
-| `onOpenChange`         | `Dialog` | `(open, details)`: the new state, the [reason](#reasons) and any `returnValue` |
-| `onOpenChangeComplete` | `Dialog` | `(open)`, after the animation                                                  |
-| `onPayloadChange`      | `Dialog` | `(payload, details)`: the content's new payload, and the [reason](#reasons)    |
-| `onDismissAttempt`     | `Dialog` | `({ reason, event })`, when a dismissal was refused                            |
-
-### Reasons
-
-`details.reason` says why the dialog opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogOpenChangeReason" />
-
-For a payload change, it says what opened the dialog or took it over.
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogPayloadChangeReason" />
-
-The dismissals `dismissible` can refuse:
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogDismissReason" />
-
-### Controller
-
-Create one with `createDialogController<Payload, Result>()` and pass it as `controller`, to the dialog and to any
-triggers outside it.
-
-Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`. Closing with a controller always works, even when the dialog isn't dismissible or an action is running.
-
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogController" />
 
 ### Dialog
 
@@ -255,7 +223,6 @@ A trigger outside the dialog also takes `controller`.
 ### DialogContent
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogContentProps" />
-
 ### DialogClose
 
 Its `action` receives the event and `{ source }`, how the part was pressed, as [Button](./button#changes-after-an-await) describes.
@@ -289,6 +256,40 @@ What render functions, state-based class names and slots receive, per part.
 `DialogShortcut`:
 
 <StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogShortcutState" />
+
+### Reasons
+
+`details.reason` says why the dialog opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogOpenChangeReason" />
+
+For a payload change, it says what opened the dialog or took it over.
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogPayloadChangeReason" />
+
+The dismissals `dismissible` can refuse:
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogDismissReason" />
+
+### Controller
+
+Create one with `createDialogController<Payload, Result>()` and pass it as `controller`, to the dialog and to any
+triggers outside it.
+
+Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`. Closing with a controller always works, even when the dialog isn't dismissible or an action is running.
+
+<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogController" />
+
+### Events
+
+Callbacks get the new state first, then the details.
+
+| Prop                   | On       | Receives                                                                       |
+| ---------------------- | -------- | ------------------------------------------------------------------------------ |
+| `onOpenChange`         | `Dialog` | `(open, details)`: the new state, the [reason](#reasons) and any `returnValue` |
+| `onOpenChangeComplete` | `Dialog` | `(open)`, after the animation                                                  |
+| `onPayloadChange`      | `Dialog` | `(payload, details)`: the content's new payload, and the [reason](#reasons)    |
+| `onDismissAttempt`     | `Dialog` | `({ reason, event })`, when a dismissal was refused                            |
 
 ## Accessibility
 

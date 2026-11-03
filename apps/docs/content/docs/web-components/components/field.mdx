@@ -17,7 +17,7 @@ Importing the component defines every field part, [field sets](#field-sets) incl
 import "@ui-sdk/web/field"
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -194,11 +194,11 @@ A field set follows its surrounding `dir`, just like an individual field.
 
 ## Styling
 
-The demos use the shared [example theme](../styling-and-animation#example-theme). Apply classes directly to the parts. Each part receives the field’s state as data attributes:
+Apply classes directly to the parts. Each part receives the field’s state as data attributes:
 
 ```html
-<ui-field-label class="data-invalid:text-foreground">Email</ui-field-label>
-<input class="border-input data-invalid:border-foreground/50" />
+<ui-field-label class="data-invalid:text-neutral-950">Email</ui-field-label>
+<input class="border-neutral-300 data-invalid:border-neutral-950/50" />
 ```
 
 The field writes the same attributes on the control inside it.

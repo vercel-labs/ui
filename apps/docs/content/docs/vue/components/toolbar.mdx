@@ -14,15 +14,11 @@ description: Give buttons, toggles, menus and fields one tab stop with arrow-key
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-The demos use icons from `@lucide/vue`. Install that package if you copy their source.
-
 ## Usage
 
 Put controls inside a named `Toolbar`. The toolbar provides one tab stop and moves focus between its controls with the arrow keys.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```vue
 <script setup lang="ts">
@@ -105,15 +101,6 @@ Use `ToolbarGroup` to name related controls. Set `disabled` on the group to disa
 <ComponentExample
   name="toolbar/group"
   caption="Move through Clipboard and History with the arrow keys. Undo and Redo remain focusable but are disabled."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on an ancestor. Left moves to the next item and Right moves to the previous one.
-
-<ComponentExample
-  name="toolbar/rtl"
-  caption="Focus the first control and press Left to move forward through the right-to-left toolbar."
 />
 
 ## Behavior and Options
@@ -199,13 +186,13 @@ Props are the same as below.
 
 <TypeTable path="../../packages/core/src/components/toolbar/toolbar.ts" name="ToolbarGroupProps" />
 
-### Controller
-
-<ControllerTable path="../../packages/core/src/components/toolbar/toolbar.ts" name="ToolbarController" />
-
 ### State
 
 <StateTable path="../../packages/core/src/components/toolbar/toolbar.ts" name="ToolbarButtonState" />
+
+### Controller
+
+<ControllerTable path="../../packages/core/src/components/toolbar/toolbar.ts" name="ToolbarController" />
 
 ## Accessibility
 

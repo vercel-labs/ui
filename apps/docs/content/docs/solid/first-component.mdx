@@ -43,14 +43,14 @@ Open your app. You should see a button labeled Bookmark. Next, add styles so you
 
 When the toggle is pressed, it has a `data-pressed` attribute. Use that attribute to change its appearance.
 
-With Tailwind CSS and the [example theme](./styling-and-animation#example-theme) configured in your app, add utility classes to `class`:
+With Tailwind CSS configured in your app, add utility classes to `class`. The `data-pressed:` variant applies while the toggle is pressed:
 
 ```tsx title="bookmark-button.tsx"
 import { Toggle } from "@ui-sdk/solid/toggle"
 
 function BookmarkButton() {
   return (
-    <Toggle class="inline-flex h-8 min-w-8 cursor-default items-center justify-center gap-1 rounded-2xl border border-input bg-transparent px-2.5 py-0 text-sm leading-5 font-medium whitespace-nowrap text-foreground transition-colors outline-none hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 data-pressed:bg-muted motion-reduce:transition-none">
+    <Toggle class="inline-flex h-8 items-center rounded-md border border-neutral-300 px-3 text-sm font-medium hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 data-pressed:bg-neutral-900 data-pressed:text-white">
       Bookmark
     </Toggle>
   )

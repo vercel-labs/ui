@@ -14,9 +14,7 @@ description: Run an action, wait for it to finish, and handle disabled states.
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -180,14 +178,6 @@ Use `data-pending` to show a spinner or waiting cursor, and `data-disabled` to s
 
 Button accepts native button props and the options below. `render`, `children`, `class` and `style` can read the button’s state.
 
-### Events
-
-Solid’s bound form, `onClick={[handler, data]}`, calls `handler(data, event, { source })`.
-
-| Prop      | Receives                                                                                                                   |
-| --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `onClick` | The native click event and `{ source }`, how the button was pressed. A returned Promise keeps it pending until it settles. |
-
 ### Button
 
 <TypeTable path="../../packages/core/src/components/button/button.ts" name="ButtonOptions" />
@@ -195,6 +185,14 @@ Solid’s bound form, `onClick={[handler, data]}`, calls `handler(data, event, {
 ### State
 
 <StateTable path="../../packages/core/src/components/button/button.ts" name="ButtonState" />
+
+### Events
+
+Solid’s bound form, `onClick={[handler, data]}`, calls `handler(data, event, { source })`.
+
+| Prop      | Receives                                                                                                                   |
+| --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `onClick` | The native click event and `{ source }`, how the button was pressed. A returned Promise keeps it pending until it settles. |
 
 ## Accessibility
 

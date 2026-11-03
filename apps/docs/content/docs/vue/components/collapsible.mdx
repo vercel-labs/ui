@@ -14,15 +14,11 @@ description: Show and hide a panel, preserve its contents, and animate its heigh
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-The demos also use icons from `@lucide/vue`. Install that package if you copy their source.
-
 ## Usage
 
 Put a trigger and a panel inside `Collapsible`. The trigger reports whether the panel is open with `aria-expanded` and points to the panel with `aria-controls` while it is mounted.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```vue
 <script setup lang="ts">
@@ -136,11 +132,23 @@ See [State and Events](../state-and-events) for controlled state, cancellation a
 
 Use the parts' data attributes to style open and disabled states. The examples rotate their chevron from the trigger's `data-open` attribute.
 
-<DataAttributes component="collapsible" />
+### CollapsiblePanel [#styling-collapsiblepanel]
 
-### Panel Variables
+<CssVariables component="collapsible" part="panel" />
 
-<CssVariables component="collapsible" />
+## Data Attributes
+
+### Collapsible [#data-attributes-collapsible]
+
+<DataAttributes component="collapsible" part="root" />
+
+### CollapsibleTrigger [#data-attributes-collapsibletrigger]
+
+<DataAttributes component="collapsible" part="trigger" />
+
+### CollapsiblePanel [#data-attributes-collapsiblepanel]
+
+<DataAttributes component="collapsible" part="panel" />
 
 ## Custom Rendering
 
@@ -156,15 +164,29 @@ Use a part's `#render` slot to choose its element and read its state. Bind the s
 Props are the same as below. `onOpenChange` is `v-model:open`, or `@open-change` for the details, and
 `onOpenChangeComplete` is `@open-change-complete`.
 
-### Events
+### Collapsible
 
-Events get the new state first, then the details. `v-model` only updates when `@open-change` wasn't canceled.
+<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
 
-| Binding                 | On            | Receives                                                     |
-| ----------------------- | ------------- | ------------------------------------------------------------ |
-| `v-model:open`          | `Collapsible` | Whether the panel is open                                    |
-| `@open-change`          | `Collapsible` | `(open, details)`: the new state, and the [reason](#reasons) |
-| `@open-change-complete` | `Collapsible` | `(open)`, after the panel's animation                        |
+### CollapsibleTrigger
+
+The trigger takes no options of its own, only the props of the element it renders.
+
+### CollapsiblePanel
+
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsiblePanelProps"
+/>
+### State
+
+What render functions, state-based class names and slots receive. The trigger and the panel receive the same
+state as the collapsible.
+
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleRootState"
+/>
 
 ### Reasons
 
@@ -186,30 +208,15 @@ Every write method takes an optional `{ reason, event }`, and returns `false` wh
   name="CollapsibleController"
 />
 
-### Collapsible
+### Events
 
-<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
+Events get the new state first, then the details. `v-model` only updates when `@open-change` wasn't canceled.
 
-### CollapsibleTrigger
-
-The trigger takes no options of its own, only the props of the element it renders.
-
-### CollapsiblePanel
-
-<TypeTable
-  path="../../packages/core/src/components/collapsible/collapsible.ts"
-  name="CollapsiblePanelProps"
-/>
-
-### State
-
-What render functions, state-based class names and slots receive. The trigger and the panel receive the same
-state as the collapsible.
-
-<StateTable
-  path="../../packages/core/src/components/collapsible/collapsible.ts"
-  name="CollapsibleRootState"
-/>
+| Binding                 | On            | Receives                                                     |
+| ----------------------- | ------------- | ------------------------------------------------------------ |
+| `v-model:open`          | `Collapsible` | Whether the panel is open                                    |
+| `@open-change`          | `Collapsible` | `(open, details)`: the new state, and the [reason](#reasons) |
+| `@open-change-complete` | `Collapsible` | `(open)`, after the panel's animation                        |
 
 ## Accessibility
 

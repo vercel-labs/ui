@@ -85,16 +85,16 @@ Parts rendered from data start out bare, with no classes. To style them, put a `
     <button><ui-select-value></ui-select-value></button>
   </ui-select-trigger>
   <template>
-    <ui-select-content class="rounded-2xl bg-popover p-1 shadow-lg">
+    <ui-select-content class="rounded-2xl bg-white p-1 shadow-lg">
       <ui-select-group>
-        <ui-select-group-label class="px-2 py-1 text-xs text-muted-foreground"></ui-select-group-label>
+        <ui-select-group-label class="px-2 py-1 text-xs text-neutral-500"></ui-select-group-label>
         <ui-select-item
-          class="relative flex items-center rounded-xl py-1.5 ps-2 pe-8 data-highlighted:bg-accent"
+          class="relative flex items-center rounded-xl py-1.5 ps-2 pe-8 data-highlighted:bg-neutral-100"
         >
           <ui-select-item-indicator class="absolute end-2">✓</ui-select-item-indicator>
         </ui-select-item>
       </ui-select-group>
-      <ui-select-separator class="-mx-1 my-1 h-px bg-border"></ui-select-separator>
+      <ui-select-separator class="-mx-1 my-1 h-px bg-neutral-200"></ui-select-separator>
     </ui-select-content>
   </template>
 </ui-select>
@@ -115,7 +115,7 @@ Select, Combobox, Autocomplete, Command, Listbox and Trigger Menu copy their con
 
 ```html
 <template>
-  <ui-combobox-chip class="flex items-center gap-1 rounded-2xl bg-input ps-1.5 pe-0.5 text-xs">
+  <ui-combobox-chip class="flex items-center gap-1 rounded-2xl bg-neutral-200 ps-1.5 pe-0.5 text-xs">
     <ui-combobox-chip-remove>
       <button type="button" class="opacity-50 hover:opacity-100">×</button>
     </ui-combobox-chip-remove>
@@ -134,7 +134,7 @@ A tree copies its items, indicators, checkboxes, labels and groups. A branch get
       <ui-tree-item-indicator
         class="size-4 before:content-['›'] data-expanded:rotate-90"
       ></ui-tree-item-indicator>
-      <ui-tree-item-label class="flex-1 rounded-xl px-2 data-selected:bg-accent"></ui-tree-item-label>
+      <ui-tree-item-label class="flex-1 rounded-xl px-2 data-selected:bg-neutral-100"></ui-tree-item-label>
       <ui-tree-group class="basis-full ps-4"></ui-tree-group>
     </ui-tree-item>
   </template>

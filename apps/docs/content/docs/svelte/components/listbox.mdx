@@ -16,34 +16,19 @@ Use a Listbox when the choices should stay in view. It works like a native selec
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `@lucide/svelte` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `Listbox`:
 
-```bash
-npm install @lucide/svelte
+```text
+Listbox
+├── ListboxItem
+│   └── ListboxItemIndicator
+└── ListboxItem
+    └── ListboxItemIndicator
 ```
-
-## Anatomy
 
 Give the list an accessible name and each option a unique value. `ListboxItemIndicator` shows its content when that option is selected.
-
-```svelte
-<script lang="ts">
-  import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
-</script>
-
-<Listbox aria-label="Toppings" defaultValue="basil">
-  <ListboxItem value="basil">
-    Basil
-    <ListboxItemIndicator>✓</ListboxItemIndicator>
-  </ListboxItem>
-  <ListboxItem value="olive">
-    Olive
-    <ListboxItemIndicator>✓</ListboxItemIndicator>
-  </ListboxItem>
-</Listbox>
-```
 
 You can also name the list with a [Field label](./field) or `aria-labelledby`. Keep buttons, search fields, and empty messages outside the list: its contents should be options, groups, and separators.
 
@@ -232,33 +217,6 @@ Render an option as a link when choosing it should navigate. A press or Enter fo
 
 Props and callbacks are the same as below, as Svelte props. `value` can be bound with `bind:value`.
 
-### Events
-
-Callbacks get the new value first, then the details. A bound `value` only updates when `onValueChange` wasn't canceled.
-
-| Prop            | On        | Receives                                                      |
-| --------------- | --------- | ------------------------------------------------------------- |
-| `bind:value`    | `Listbox` | The selected value                                            |
-| `onValueChange` | `Listbox` | `(value, details)`: the new value, and the [reason](#reasons) |
-| `onHighlight`   | `Listbox` | `(value, details)`: the focused option's value, and its index |
-
-### Reasons
-
-`details.reason` says why the value changed: `item-press` for a press, Space or Enter, `list-navigation` for keys that select as they move, Shift ranges with arrows and Ctrl or ⌘ with A, `reset` and `restore` from the form, and `imperative` from a controller.
-
-<ReasonTable
-  path="../../packages/core/src/components/listbox/listbox-root.ts"
-  name="ListboxValueChangeReason"
-/>
-
-### Controller
-
-Create one with `createListboxController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, passed to `onValueChange`.
-
-<ControllerTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxController" />
-
 ### Listbox
 
 <TypeTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxOptions" />
@@ -298,6 +256,33 @@ What `render` and `children` snippets receive, per part.
   path="../../packages/core/src/components/listbox/listbox-root.ts"
   name="ListboxItemIndicatorState"
 />
+
+### Reasons
+
+`details.reason` says why the value changed: `item-press` for a press, Space or Enter, `list-navigation` for keys that select as they move, Shift ranges with arrows and Ctrl or ⌘ with A, `reset` and `restore` from the form, and `imperative` from a controller.
+
+<ReasonTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createListboxController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to `onValueChange`.
+
+<ControllerTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxController" />
+
+### Events
+
+Callbacks get the new value first, then the details. A bound `value` only updates when `onValueChange` wasn't canceled.
+
+| Prop            | On        | Receives                                                      |
+| --------------- | --------- | ------------------------------------------------------------- |
+| `bind:value`    | `Listbox` | The selected value                                            |
+| `onValueChange` | `Listbox` | `(value, details)`: the new value, and the [reason](#reasons) |
+| `onHighlight`   | `Listbox` | `(value, details)`: the focused option's value, and its index |
 
 ## Accessibility
 

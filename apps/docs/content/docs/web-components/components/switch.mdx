@@ -16,19 +16,19 @@ A switch changes a setting between on and off. Keep its label the same in both s
 npm install @ui-sdk/web
 ```
 
-The styled examples use the shared [example theme](../styling-and-animation#example-theme).
-
-## Anatomy
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/switch"
 ```
 
-```html
-<label>
-  <ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch>
-  Airplane Mode
-</label>
+## Composition
+
+Use the following composition to build a `ui-switch`:
+
+```text
+ui-switch
+└── ui-switch-thumb
 ```
 
 `ui-switch` is the focusable control. `ui-switch-thumb` stays mounted and reflects the checked state, so CSS can slide it. The custom element participates in forms through `ElementInternals`; it does not add a hidden input.
@@ -133,15 +133,15 @@ The switch itself is the interactive element. Put its visual children inside it 
 Props are attributes in kebab case, like `default-checked` and `read-only`: `"false"` is false. `checked` is
 a live property and attribute. Callbacks are DOM events.
 
-### Events
+### Switch
 
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
+<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
 
-| Member                        | On          | Description                                                               |
-| ----------------------------- | ----------- | ------------------------------------------------------------------------- |
-| `checked` property, attribute | `ui-switch` | Whether the switch is on. The attribute sets where it starts, and is live |
-| `api` property                | `ui-switch` | The [controller](#controller)                                             |
-| `checkedchange` event         | `ui-switch` | `detail: { value: checked, reason, event, source }`                       |
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
 
 ### Reasons
 
@@ -157,15 +157,15 @@ Every write method takes an optional `{ reason, event }`, fires the change event
 
 <ControllerTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchController" />
 
-### Switch
+### Events
 
-<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
 
-### State
-
-The same state shows as data attributes on each element.
-
-<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
+| Member                        | On          | Description                                                               |
+| ----------------------------- | ----------- | ------------------------------------------------------------------------- |
+| `checked` property, attribute | `ui-switch` | Whether the switch is on. The attribute sets where it starts, and is live |
+| `api` property                | `ui-switch` | The [controller](#controller)                                             |
+| `checkedchange` event         | `ui-switch` | `detail: { value: checked, reason, event, source }`                       |
 
 ## Accessibility
 

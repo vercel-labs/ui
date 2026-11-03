@@ -14,8 +14,6 @@ description: Choose one option, move the selection with arrow keys, and submit i
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
 Import the component in your client entry point to register its elements:
 
 ```ts
@@ -26,7 +24,7 @@ import "@ui-sdk/web/radio"
 
 Give each radio a `value` and put it inside a named `ui-radio-group`. The group's value is the checked radio's value. Without `default-value`, nothing starts checked and Tab enters on the first enabled radio.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```html
 <ui-radio-group default-value="comfortable" aria-label="Density">
@@ -88,15 +86,6 @@ Put a required group in [Field](./field) with a label and an error message. Subm
 <ComponentExample
   name="radio/invalid"
   caption="Press Save without a choice to see the error. Choose SMS only, then save again."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on an ancestor. Left moves to the next radio and Right moves to the previous one. Up and Down keep their direction.
-
-<ComponentExample
-  name="radio/rtl"
-  caption="Focus a density option and use Left or Right. Focus and the checked option follow the page's direction."
 />
 
 ## Behavior and Options
@@ -188,30 +177,6 @@ The radio is your custom element. Put content inside it and use `data-checked` t
 Props are attributes in kebab case, like `default-value`, `read-only` and `keep-mounted`: `"false"` is
 false, so `loop="false"` turns looping off. `value` is a live property and attribute. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
-
-| Member                      | On               | Description                                                        |
-| --------------------------- | ---------------- | ------------------------------------------------------------------ |
-| `value` property, attribute | `ui-radio-group` | The checked value. The attribute sets where it starts, and is live |
-| `api` property              | `ui-radio-group` | The [controller](#controller)                                      |
-| `valuechange` event         | `ui-radio-group` | `detail: { value, reason, event, source }`                         |
-
-### Reasons
-
-`event.detail.reason` says why the checked value changed.
-
-<ReasonTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupValueChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods. The `value` property reads and sets the checked value.
-
-Every write method takes an optional `{ reason, event }`, fires the change event like a press, and returns `false` when the change is canceled.
-
-<ControllerTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupController" />
-
 ### RadioGroup
 
 <TypeTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupOptions" />
@@ -233,6 +198,30 @@ The same state shows as data attributes on each element.
 <StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioState" />
 
 <StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioIndicatorState" />
+
+### Reasons
+
+`event.detail.reason` says why the checked value changed.
+
+<ReasonTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupValueChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods. The `value` property reads and sets the checked value.
+
+Every write method takes an optional `{ reason, event }`, fires the change event like a press, and returns `false` when the change is canceled.
+
+<ControllerTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
+
+| Member                      | On               | Description                                                        |
+| --------------------------- | ---------------- | ------------------------------------------------------------------ |
+| `value` property, attribute | `ui-radio-group` | The checked value. The attribute sets where it starts, and is live |
+| `api` property              | `ui-radio-group` | The [controller](#controller)                                      |
+| `valuechange` event         | `ui-radio-group` | `detail: { value, reason, event, source }`                         |
 
 ## Accessibility
 

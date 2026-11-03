@@ -18,14 +18,13 @@ pnpm add @ui-sdk/web @ui-sdk/core
 import "@ui-sdk/web/textarea"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-textarea`:
 
-```html
-<ui-textarea>
-  <textarea aria-label="Message" placeholder="Type your message here."></textarea>
-</ui-textarea>
+```text
+ui-textarea
+└── textarea
 ```
 
 `ui-textarea` connects to the native textarea inside it. Put native attributes and styles on that textarea.

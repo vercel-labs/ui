@@ -20,18 +20,16 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/meter"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-meter`:
 
-```html
-<ui-meter value="40">
-  <ui-meter-label></ui-meter-label>
-  <ui-meter-value></ui-meter-value>
-  <ui-meter-track>
-    <ui-meter-indicator></ui-meter-indicator>
-  </ui-meter-track>
-</ui-meter>
+```text
+ui-meter
+├── ui-meter-label
+├── ui-meter-value
+└── ui-meter-track
+    └── ui-meter-indicator
 ```
 
 - `Meter` holds the value and range.
@@ -94,9 +92,7 @@ Use [Progress](./progress) for a task that is working toward completion, such as
 
 Give the track a height, background, and width. The indicator sets its width as an inline percentage of the track. Both styling options are shown in each example's Code tab.
 
-The root exposes a CSS variable for positioning other content alongside the reading:
-
-<CssVariables component="meter" />
+The root exposes a CSS variable, listed under [Meter](#meter), for positioning other content alongside the reading.
 
 <span id="render-functions" />
 
@@ -111,6 +107,8 @@ Props are attributes, like `value`, `min`, `max` and `locale`. `format` and `get
 ### Meter
 
 <TypeTable path="../../packages/core/src/components/meter/meter.ts" name="MeterOptions" />
+
+<CssVariables component="meter" part="root" />
 
 ### State
 

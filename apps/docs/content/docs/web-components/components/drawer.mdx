@@ -16,24 +16,26 @@ A drawer gives a task its own sheet without leaving the page. It shares [Dialog�
 npm install @ui-sdk/web
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
-
-## Anatomy
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/drawer"
 ```
 
-```html
-<ui-drawer>
-  <ui-drawer-trigger><button>Filters</button></ui-drawer-trigger>
-  <ui-drawer-backdrop></ui-drawer-backdrop>
-  <ui-drawer-content>
-    <ui-drawer-title>Filters</ui-drawer-title>
-    <ui-drawer-description>Narrow down the results.</ui-drawer-description>
-    <ui-drawer-close><button>Done</button></ui-drawer-close>
-  </ui-drawer-content>
-</ui-drawer>
+## Composition
+
+Use the following composition to build a `ui-drawer`:
+
+```text
+ui-drawer
+├── ui-drawer-trigger
+│   └── button
+├── ui-drawer-backdrop
+└── ui-drawer-content
+    ├── ui-drawer-title
+    ├── ui-drawer-description
+    └── ui-drawer-close
+        └── button
 ```
 
 The content is the sheet. The drawer positions it inside a full-screen viewport and moves it with `translate`. Give it a size, a surface, and corners; leave positioning and translation to the drawer. Give the backdrop a color, such as `bg-black/30`; the drawer manages its opacity.
@@ -253,9 +255,7 @@ The drawer shares [Dialog’s focus behavior](./dialog#focus): focus moves insid
 
 <DataAttributes component="drawer" />
 
-<CssVariables component="drawer" />
-
-Leave the content’s `translate` and the backdrop’s opacity to the drawer. You can style scale, corners, colors, and the inner scroll area. A bottom sheet can use an `after` element below its edge to cover the gap during overscroll, as the examples do. `--keyboard-inset`, `--visual-viewport-height`, and `data-keyboard` are on the viewport around the content.
+Leave the content’s `translate` and the backdrop’s opacity to the drawer. You can style scale, corners, colors, and the inner scroll area. A bottom sheet can use an `after` element below its edge to cover the gap during overscroll, as the examples do.
 
 The drawer respects reduced motion, fading instead of sliding.
 
@@ -269,54 +269,6 @@ Props are attributes in kebab case, like `modal-above`: `"false"` is false. `sna
 comma-separated list, like `"0.5,1"` or `"240px,content"`. `container` takes a CSS selector, and
 `persistent-elements` a comma-separated list of selectors. `physics` and `controller` are properties.
 Callbacks are DOM events.
-
-### Events
-
-Events fire on their own element and don't bubble. Calling `preventDefault()` on `openchange` or `snappointchange` cancels the change.
-
-| Member                          | On                  | Description                                                                             |
-| ------------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
-| `open` property, attribute      | `ui-drawer`         | Whether the drawer is open. The attribute sets where it starts, and is live             |
-| `snapPoint` property, attribute | `ui-drawer`         | The snap point it rests on. The `snap-point` attribute sets where it starts             |
-| `api` property                  | `ui-drawer`         | The [controller](#controller)                                                           |
-| `controller` property           | `ui-drawer`         | A controller from `createDrawerController()`, to drive it from code                     |
-| `physics` property              | `ui-drawer`         | Overrides for `sheetPhysics.ios`                                                        |
-| `openchange` event              | `ui-drawer`         | `detail: { value: open, reason, event, returnValue }`                                   |
-| `openchangecomplete` event      | `ui-drawer`         | `detail: { value: open }`, once it has settled                                          |
-| `payloadchange` event           | `ui-drawer`         | `detail: { value: payload, reason, event, source }`, when the content's payload changes |
-| `snappointchange` event         | `ui-drawer`         | `detail: { value: snapPoint, reason, event }`                                           |
-| `dismissattempt` event          | `ui-drawer`         | `detail: { reason, event }`, when a dismissal was refused                               |
-| `payload` property              | `ui-drawer-trigger` | Data for the content, read when the trigger connects                                    |
-| `for` attribute                 | `ui-drawer-trigger` | The `id` of a drawer the trigger opens from outside it                                  |
-| `for` attribute                 | `ui-drawer-outlet`  | The `id` of a drawer the outlet follows from outside it                                 |
-| `keyframes` property            | `ui-drawer-outlet`  | The keyframes it plays as the drawer expands                                            |
-
-### Reasons
-
-`event.detail.reason` says why the drawer opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOpenChangeReason" />
-
-For a payload change, it says what opened the drawer or took it over.
-
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerPayloadChangeReason" />
-
-Why it moved to another snap point:
-
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerSnapPointChangeReason" />
-
-The dismissals `dismissible` can refuse:
-
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerDismissReason" />
-
-### Controller
-
-The element's `api` property has the same methods. The `open` and `snapPoint` properties read and set whether it's
-open and where it rests.
-
-Every write method takes an optional `{ reason, event }`, which the events carry. Closing with a controller always works, even when the drawer isn't dismissible or an action is running.
-
-<ControllerTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerController" />
 
 ### Drawer
 
@@ -332,6 +284,8 @@ A trigger outside the drawer names it with `for="drawer-id"`, and takes `payload
 
 <TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerContentProps" />
 
+<CssVariables component="drawer" part="content" />
+
 ### DrawerClose
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseProps" />
@@ -343,6 +297,8 @@ A trigger outside the drawer names it with `for="drawer-id"`, and takes `payload
 ### DrawerOutlet
 
 <TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletProps" />
+
+<CssVariables component="drawer" part="outlet" />
 
 ### State
 
@@ -371,6 +327,54 @@ The same state shows as data attributes on each element.
 `DrawerOutlet`:
 
 <StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletState" />
+
+### Reasons
+
+`event.detail.reason` says why the drawer opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOpenChangeReason" />
+
+For a payload change, it says what opened the drawer or took it over.
+
+<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerPayloadChangeReason" />
+
+Why it moved to another snap point:
+
+<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerSnapPointChangeReason" />
+
+The dismissals `dismissible` can refuse:
+
+<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerDismissReason" />
+
+### Controller
+
+The element's `api` property has the same methods. The `open` and `snapPoint` properties read and set whether it's
+open and where it rests.
+
+Every write method takes an optional `{ reason, event }`, which the events carry. Closing with a controller always works, even when the drawer isn't dismissible or an action is running.
+
+<ControllerTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerController" />
+
+### Events
+
+Events fire on their own element and don't bubble. Calling `preventDefault()` on `openchange` or `snappointchange` cancels the change.
+
+| Member                          | On                  | Description                                                                             |
+| ------------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
+| `open` property, attribute      | `ui-drawer`         | Whether the drawer is open. The attribute sets where it starts, and is live             |
+| `snapPoint` property, attribute | `ui-drawer`         | The snap point it rests on. The `snap-point` attribute sets where it starts             |
+| `api` property                  | `ui-drawer`         | The [controller](#controller)                                                           |
+| `controller` property           | `ui-drawer`         | A controller from `createDrawerController()`, to drive it from code                     |
+| `physics` property              | `ui-drawer`         | Overrides for `sheetPhysics.ios`                                                        |
+| `openchange` event              | `ui-drawer`         | `detail: { value: open, reason, event, returnValue }`                                   |
+| `openchangecomplete` event      | `ui-drawer`         | `detail: { value: open }`, once it has settled                                          |
+| `payloadchange` event           | `ui-drawer`         | `detail: { value: payload, reason, event, source }`, when the content's payload changes |
+| `snappointchange` event         | `ui-drawer`         | `detail: { value: snapPoint, reason, event }`                                           |
+| `dismissattempt` event          | `ui-drawer`         | `detail: { reason, event }`, when a dismissal was refused                               |
+| `payload` property              | `ui-drawer-trigger` | Data for the content, read when the trigger connects                                    |
+| `for` attribute                 | `ui-drawer-trigger` | The `id` of a drawer the trigger opens from outside it                                  |
+| `for` attribute                 | `ui-drawer-outlet`  | The `id` of a drawer the outlet follows from outside it                                 |
+| `keyframes` property            | `ui-drawer-outlet`  | The keyframes it plays as the drawer expands                                            |
 
 ## Accessibility
 

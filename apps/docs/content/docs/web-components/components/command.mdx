@@ -22,28 +22,21 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/command"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-command`:
 
-```bash
-npm install lucide
+```text
+ui-command
+├── ui-command-input
+│   └── input
+├── ui-command-empty
+└── ui-command-list
+    ├── ui-command-item
+    └── ui-command-item
 ```
-
-## Anatomy
 
 Give the input an accessible name and each command a unique value. Keep empty and status messages outside the list, which holds commands and groups.
-
-```html
-<ui-command>
-  <ui-command-input><input aria-label="Search commands" /></ui-command-input>
-  <ui-command-empty>No commands found.</ui-command-empty>
-  <ui-command-list>
-    <ui-command-item value="new-file">New file</ui-command-item>
-    <ui-command-item value="new-folder">New folder</ui-command-item>
-  </ui-command-list>
-</ui-command>
-```
 
 Typing filters the commands. Arrow keys move the highlight, and Enter runs the highlighted command. Focus stays in the input, which points to the highlight with `aria-activedescendant`. `action` reports the value of the command that ran; read it from `event.detail.value`.
 
@@ -233,43 +226,6 @@ Style the parts through their data attributes, which are the same in every frame
 Props are attributes in kebab case, like `default-pages` and `auto-highlight`. `filter` takes `fuzzy`,
 `contains`, `startsWith` or `false`. `items` and a `filter` function are properties. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on a change event cancels it.
-
-| Member              | On                | Description                                                           |
-| ------------------- | ----------------- | --------------------------------------------------------------------- |
-| `value` property    | `ui-command`      | The highlighted command. Setting it highlights, as a controller would |
-| `query` property    | `ui-command`      | The search text                                                       |
-| `pages` property    | `ui-command`      | The stack of pages                                                    |
-| `api` property      | `ui-command`      | The [controller](#controller-1)                                       |
-| `valuechange` event | `ui-command`      | `detail: { value, reason, event, source, index }`                     |
-| `querychange` event | `ui-command`      | `detail: { value: query, reason, event, source }`                     |
-| `pageschange` event | `ui-command`      | `detail: { value: pages, reason, event, source }`                     |
-| `action` event      | `ui-command`      | `detail: { value, waitUntil(promise) }`, when a command runs          |
-| `loadmore` event    | `ui-command`      | When the last command is reached                                      |
-| `select` event      | `ui-command-item` | The command ran. `preventDefault()` skips the `action` event          |
-
-### Reasons
-
-Why the highlighted command changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
-
-Why the search text changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
-
-And why the stack of pages changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods.
-
-<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
-
 ### Command
 
 <TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandOptions" />
@@ -337,6 +293,43 @@ The same state shows as data attributes on each element.
 `CommandItemIcon`:
 
 <StateTable path="../../packages/core/src/components/command/command.ts" name="CommandItemIconState" />
+
+### Reasons
+
+Why the highlighted command changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
+
+Why the search text changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
+
+And why the stack of pages changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods.
+
+<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on a change event cancels it.
+
+| Member              | On                | Description                                                           |
+| ------------------- | ----------------- | --------------------------------------------------------------------- |
+| `value` property    | `ui-command`      | The highlighted command. Setting it highlights, as a controller would |
+| `query` property    | `ui-command`      | The search text                                                       |
+| `pages` property    | `ui-command`      | The stack of pages                                                    |
+| `api` property      | `ui-command`      | The [controller](#controller-1)                                       |
+| `valuechange` event | `ui-command`      | `detail: { value, reason, event, source, index }`                     |
+| `querychange` event | `ui-command`      | `detail: { value: query, reason, event, source }`                     |
+| `pageschange` event | `ui-command`      | `detail: { value: pages, reason, event, source }`                     |
+| `action` event      | `ui-command`      | `detail: { value, waitUntil(promise) }`, when a command runs          |
+| `loadmore` event    | `ui-command`      | When the last command is reached                                      |
+| `select` event      | `ui-command-item` | The command ran. `preventDefault()` skips the `action` event          |
 
 ## Accessibility
 

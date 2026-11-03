@@ -16,41 +16,23 @@ Calendar shows dates directly on the page. Use it for a booking flow, a schedule
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-## Anatomy
+Use the following composition to build a `Calendar`:
+
+```text
+Calendar
+├── CalendarPrevious
+├── CalendarHeading
+├── CalendarNext
+└── CalendarGrid
+    ├── CalendarWeekdays
+    │   └── CalendarWeekday
+    └── CalendarWeeks
+        └── CalendarDay
+```
 
 The heading names the displayed month. Previous and Next change it, and a grid holds its weekday headers and dates. The weekday and week helpers render the table structure, while you render each header and date.
-
-```tsx
-import {
-  Calendar,
-  CalendarDay,
-  CalendarGrid,
-  CalendarHeading,
-  CalendarNext,
-  CalendarPrevious,
-  CalendarWeekday,
-  CalendarWeekdays,
-  CalendarWeeks,
-} from "@ui-sdk/solid/calendar"
-
-function Example() {
-  return (
-    <Calendar defaultValue="2026-10-16">
-      <CalendarPrevious />
-      <CalendarHeading />
-      <CalendarNext />
-      <CalendarGrid>
-        <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-        <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
-      </CalendarGrid>
-    </Calendar>
-  )
-}
-
-export { Example }
-```
 
 An empty `Calendar` renders the default structure, and an empty `CalendarGrid` renders its headers and weeks. Write the parts out to add your classes and content. Each grid is named by its month and has the `grid` role.
 
@@ -255,53 +237,6 @@ The grid’s state exposes its month, label, weekdays, and weeks when you need t
 
 Props and callbacks are the same as below, as Solid props.
 
-### Events
-
-Callbacks get the new value first, then the details.
-
-| Prop              | On         | Receives                                                                               |
-| ----------------- | ---------- | -------------------------------------------------------------------------------------- |
-| `onValueChange`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)                          |
-| `onMonthChange`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons)                    |
-| `onFocusedChange` | `Calendar` | `(date, details)`: the day focus moves to, and the [reason](#reasons)                  |
-| `onAnchorChange`  | `Calendar` | `(date, details)`: a range's start, or `null` once it ends, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the value changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarValueChangeReason"
-/>
-
-And why the month changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarMonthChangeReason"
-/>
-
-Why focus moves to another day:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarFocusedChangeReason"
-/>
-
-And why a range's start changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarAnchorChangeReason"
-/>
-
-### Controller
-
-Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarController" />
-
 ### Calendar
 
 <TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarOptions" />
@@ -351,6 +286,53 @@ What render functions, state-based class names and children functions receive, p
 `CalendarDay`:
 
 <StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarDayState" />
+
+### Reasons
+
+`details.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarValueChangeReason"
+/>
+
+And why the month changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarMonthChangeReason"
+/>
+
+Why focus moves to another day:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarFocusedChangeReason"
+/>
+
+And why a range's start changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarAnchorChangeReason"
+/>
+
+### Controller
+
+Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarController" />
+
+### Events
+
+Callbacks get the new value first, then the details.
+
+| Prop              | On         | Receives                                                                               |
+| ----------------- | ---------- | -------------------------------------------------------------------------------------- |
+| `onValueChange`   | `Calendar` | `(value, details)`: the new value, and the [reason](#reasons)                          |
+| `onMonthChange`   | `Calendar` | `(month, details)`: the new first month, and the [reason](#reasons)                    |
+| `onFocusedChange` | `Calendar` | `(date, details)`: the day focus moves to, and the [reason](#reasons)                  |
+| `onAnchorChange`  | `Calendar` | `(date, details)`: a range's start, or `null` once it ends, and the [reason](#reasons) |
 
 ## Accessibility
 

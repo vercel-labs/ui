@@ -11,7 +11,7 @@ description: Connect a form control to its label, description, and validation er
 pnpm add @ui-sdk/vue @ui-sdk/core
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -192,11 +192,11 @@ A field set follows its surrounding `dir`, just like an individual field.
 
 ## Styling
 
-The demos use the shared [example theme](../styling-and-animation#example-theme). Apply classes directly to the parts. Each part receives the field’s state as data attributes:
+Apply classes directly to the parts. Each part receives the field’s state as data attributes:
 
 ```vue
-<FieldLabel class="data-invalid:text-foreground" />
-<FieldControl class="border-input data-invalid:border-foreground/50" />
+<FieldLabel class="data-invalid:text-neutral-950" />
+<FieldControl class="border-neutral-300 data-invalid:border-neutral-950/50" />
 ```
 
 `Field`:

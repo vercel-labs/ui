@@ -14,18 +14,12 @@ description: Enter multiple lines of text, grow the field as you type, and conne
 pnpm add @ui-sdk/solid @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Textarea`:
 
-```tsx
-import { Textarea } from "@ui-sdk/solid/textarea"
-
-function Example() {
-  return <Textarea aria-label="Message" placeholder="Type your message here." />
-}
-
-export { Example }
+```text
+Textarea
 ```
 
 `Textarea` renders a native textarea. Pass native attributes such as `rows`, `required`, and `placeholder` directly.

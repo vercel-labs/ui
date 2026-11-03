@@ -16,21 +16,13 @@ A switch changes a setting between on and off. Keep its label the same in both s
 npm install @ui-sdk/vue
 ```
 
-The styled examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Switch`:
 
-```vue
-<script setup lang="ts">
-import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
-</script>
-
-<template>
-  <label>
-    <Switch><SwitchThumb /></Switch>
-    Airplane Mode
-  </label>
-</template>
+```text
+Switch
+└── SwitchThumb
 ```
 
 `Switch` renders a button with `role="switch"`. `SwitchThumb` stays mounted and reflects the checked state, so CSS can slide it. The switch adds a hidden native checkbox for form submission, validation, and reset.
@@ -134,14 +126,16 @@ The [composition guide](../parts-and-composition) explains how to forward part p
 
 Props are the same as below, and callbacks are events.
 
-### Events
+### Switch
 
-Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
+<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
 
-| Binding           | On       | Receives                                                        |
-| ----------------- | -------- | --------------------------------------------------------------- |
-| `v-model:checked` | `Switch` | Whether the switch is on                                        |
-| `@checked-change` | `Switch` | `(checked, details)`: the new state, and the [reason](#reasons) |
+### State
+
+What render functions, state-based class names and slots receive. The thumb's state, `SwitchThumbState`, is
+the same.
+
+<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
 
 ### Reasons
 
@@ -157,16 +151,14 @@ Every write method takes an optional `{ reason, event }`, runs the change callba
 
 <ControllerTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchController" />
 
-### Switch
+### Events
 
-<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
+Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-### State
-
-What render functions, state-based class names and slots receive. The thumb's state, `SwitchThumbState`, is
-the same.
-
-<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
+| Binding           | On       | Receives                                                        |
+| ----------------- | -------- | --------------------------------------------------------------- |
+| `v-model:checked` | `Switch` | Whether the switch is on                                        |
+| `@checked-change` | `Switch` | `(checked, details)`: the new state, and the [reason](#reasons) |
 
 ## Accessibility
 

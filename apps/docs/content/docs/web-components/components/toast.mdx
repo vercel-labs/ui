@@ -21,9 +21,7 @@ Mount `OverlayHost` once near your app's root, then call `toast()` when an actio
 ```html
 <button id="save" type="button">Save</button>
 <template id="toast-template">
-  <ui-toast
-    class="rounded-2xl bg-popover p-4 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5"
-  >
+  <ui-toast class="rounded-2xl bg-white p-4 text-sm text-neutral-950 shadow-lg ring-1 ring-neutral-950/5">
     <ui-toast-title></ui-toast-title>
   </ui-toast>
 </template>
@@ -42,23 +40,24 @@ Mount `OverlayHost` once near your app's root, then call `toast()` when an actio
 </script>
 ```
 
-Set `host.toast` before connecting the host. Its `attributes` go on the regions it creates, and its `template` supplies the markup for each toast. The classes use the shared [example theme](../styling-and-animation#example-theme).
+Set `host.toast` before connecting the host. Its `attributes` go on the regions it creates, and its `template` supplies the markup for each toast.
 
 You can also place a `ToastRegion` yourself. It takes over rendering for its toaster. Use `createToaster()` for an independent queue, as the demos below do.
 
-## Anatomy
+## Composition
 
-```html
-<ui-toast-region>
-  <template>
-    <ui-toast>
-      <ui-toast-title></ui-toast-title>
-      <ui-toast-description></ui-toast-description>
-      <ui-toast-action><button></button></ui-toast-action>
-      <ui-toast-close><button></button></ui-toast-close>
-    </ui-toast>
-  </template>
-</ui-toast-region>
+Use the following composition to build a `ui-toast-region`:
+
+```text
+ui-toast-region
+└── template
+    └── ui-toast
+        ├── ui-toast-title
+        ├── ui-toast-description
+        ├── ui-toast-action
+        │   └── button
+        └── ui-toast-close
+            └── button
 ```
 
 The region groups notifications. A toast gets its name from its title and its description from the description part. Empty title, description, and action parts show the corresponding text from the toast data.
@@ -201,9 +200,27 @@ The region remains reachable while a modal dialog is open. Tab moves through its
 
 Use Tailwind classes directly on the parts. State attributes and CSS variables expose the stack position, expansion, and swipe progress:
 
-<DataAttributes component="toast" />
+### `<ui-toast-region>` [#styling-toastregion]
 
-<CssVariables component="toast" />
+<CssVariables component="toast" part="region" />
+
+### `<ui-toast>` [#styling-toast]
+
+<CssVariables component="toast" part="root" />
+
+## Data Attributes
+
+### `<ui-toast-region>` [#data-attributes-toastregion]
+
+<DataAttributes component="toast" part="region" />
+
+### `<ui-toast>` [#data-attributes-toast]
+
+<DataAttributes component="toast" part="root" />
+
+### `<ui-toast-action>` [#data-attributes-toastaction]
+
+<DataAttributes component="toast" part="action" />
 
 ## API Reference
 
@@ -219,10 +236,6 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 
 <TypeTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastCancel" events={false} />
 
-### Reasons
-
-<ReasonTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastDismissReason" />
-
 ### ToastRegion
 
 <TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastRegionOptions" />
@@ -234,6 +247,14 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 ### ToastClose
 
 <TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastCloseProps" />
+
+### OverlayHost
+
+`<ui-overlay-host>` takes a `toast` property with two fields. `attributes` go on the toast regions it renders, like `side`, `align`, `max` and `class`. `template` is an `HTMLTemplateElement` holding a `<ui-toast>`, which each toast copies, like the `<template>` inside `<ui-toast-region>`.
+
+### Confirm
+
+<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
 
 ### State
 
@@ -249,10 +270,6 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 
 <StateTable path="../../packages/core/src/components/toast/toast.ts" name="ToastButtonState" />
 
-### OverlayHost
+### Reasons
 
-`<ui-overlay-host>` takes a `toast` property with two fields. `attributes` go on the toast regions it renders, like `side`, `align`, `max` and `class`. `template` is an `HTMLTemplateElement` holding a `<ui-toast>`, which each toast copies, like the `<template>` inside `<ui-toast-region>`.
-
-### Confirm
-
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
+<ReasonTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastDismissReason" />

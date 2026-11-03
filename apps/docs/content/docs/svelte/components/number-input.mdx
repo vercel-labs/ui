@@ -14,22 +14,16 @@ description: Enter numbers, step through values, and format them for a locale.
 pnpm add @ui-sdk/svelte @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme). The examples use `@lucide/svelte` for icons.
+## Composition
 
-## Anatomy
+Use the following composition to build a `NumberInput`:
 
-```svelte
-<script lang="ts">
-  import { NumberInput, NumberInputGroup, NumberInputControl, NumberInputDecrement, NumberInputIncrement } from "@ui-sdk/svelte/number-input"
-</script>
-
-<NumberInput defaultValue={1} min={0}>
-  <NumberInputGroup>
-    <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
-    <NumberInputControl aria-label="Quantity" />
-    <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
-  </NumberInputGroup>
-</NumberInput>
+```text
+NumberInput
+└── NumberInputGroup
+    ├── NumberInputDecrement
+    ├── NumberInputControl
+    └── NumberInputIncrement
 ```
 
 `NumberInput` holds the numeric value. `NumberInputGroup` wraps the text input and optional step buttons. `NumberInputControl` renders the input; `NumberInputDecrement` and `NumberInputIncrement` change its value.
@@ -203,36 +197,6 @@ Use logical spacing so the layout follows the surrounding direction. [Parts and 
 
 Props are the same as below. `value` is bindable.
 
-### Events
-
-Callbacks get the new value first, then the details. A bound `value` only updates when `onValueChange` didn't cancel the change.
-
-| Prop            | On            | Receives                                                                          |
-| --------------- | ------------- | --------------------------------------------------------------------------------- |
-| `bind:value`    | `NumberInput` | The value, or null when empty                                                     |
-| `onValueChange` | `NumberInput` | `(value, details)`: the new value, or null when empty, and the [reason](#reasons) |
-| `onValueCommit` | `NumberInput` | `(value, details)`: the value once the interaction ends, and its reason           |
-
-### Reasons
-
-`details.reason` says why the value changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/number-input/number-input.ts"
-  name="NumberInputValueChangeReason"
-/>
-
-### Controller
-
-Create one with `createNumberInputController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
-
-<ControllerTable
-  path="../../packages/core/src/components/number-input/number-input.ts"
-  name="NumberInputController"
-/>
-
 ### NumberInput
 
 <TypeTable path="../../packages/core/src/components/number-input/number-input.ts" name="NumberInputOptions" />
@@ -263,6 +227,36 @@ The buttons' state, `NumberInputButtonState`, says whether that button can step,
   path="../../packages/core/src/components/number-input/number-input.ts"
   name="NumberInputButtonState"
 />
+
+### Reasons
+
+`details.reason` says why the value changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createNumberInputController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputController"
+/>
+
+### Events
+
+Callbacks get the new value first, then the details. A bound `value` only updates when `onValueChange` didn't cancel the change.
+
+| Prop            | On            | Receives                                                                          |
+| --------------- | ------------- | --------------------------------------------------------------------------------- |
+| `bind:value`    | `NumberInput` | The value, or null when empty                                                     |
+| `onValueChange` | `NumberInput` | `(value, details)`: the new value, or null when empty, and the [reason](#reasons) |
+| `onValueCommit` | `NumberInput` | `(value, details)`: the value once the interaction ends, and its reason           |
 
 ## Accessibility
 

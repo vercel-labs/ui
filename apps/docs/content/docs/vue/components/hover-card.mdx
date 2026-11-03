@@ -14,24 +14,17 @@ description: Preview a link on hover or keyboard focus while keeping its normal 
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `HoverCard`:
+
+```text
+HoverCard
+├── HoverCardTrigger
+└── HoverCardContent
+```
 
 Wrap a link and its preview in a hover card.
-
-```vue
-<script setup lang="ts">
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@ui-sdk/vue/hover-card"
-</script>
-
-<template>
-  <HoverCard>
-    <HoverCardTrigger href="https://example.com/people/ada">Ada Lovelace</HoverCardTrigger>
-    <HoverCardContent>A preview of Ada's profile.</HoverCardContent>
-  </HoverCard>
-</template>
-```
 
 The trigger is a link (an `<a>`, so give it an `href`), and pressing it follows the link. The card only adds a preview for people who pause on it: everything in it should be reachable from the page the link goes to, since touch and screen reader users may never open it. For a tip on a button, use a [Tooltip](./tooltip). For content that opens with a press, use a [Popover](./popover).
 
@@ -52,15 +45,6 @@ The trigger is a link (an `<a>`, so give it an `href`), and pressing it follows 
 <ComponentExample
   name="hover-card/delay"
   caption="Change the delays, then move between the link and card to see when it opens and closes."
-/>
-
-### RTL
-
-Start and end follow the text direction.
-
-<ComponentExample
-  name="hover-card/rtl"
-  caption="Hover the links to see logical alignment in right-to-left text."
 />
 
 ### Offsets
@@ -147,9 +131,7 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 <DataAttributes component="hover-card" />
 
-Open cards also set these CSS variables, for sizing and animation.
-
-<CssVariables component="hover-card" />
+Open cards also set CSS variables for sizing and animation, listed under [HoverCardContent](#hovercardcontent).
 
 Animate with `data-starting-style` and `data-ending-style`. The card stays mounted until its exit animation finishes.
 
@@ -182,16 +164,37 @@ Each part's state is listed under [State](#state).
 
 Props are the same as below, and callbacks are events.
 
-### Events
+### HoverCard
 
-Events get the new state first, then the details. `v-model` only updates when `@open-change` wasn't canceled.
+<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
 
-| Binding                 | On          | Receives                                                                    |
-| ----------------------- | ----------- | --------------------------------------------------------------------------- |
-| `v-model:open`          | `HoverCard` | Whether the card is open                                                    |
-| `@open-change`          | `HoverCard` | `(open, details)`: the new state, and the [reason](#reasons)                |
-| `@open-change-complete` | `HoverCard` | `(open)`, after the animation                                               |
-| `@payload-change`       | `HoverCard` | `(payload, details)`: the content's new payload, and the [reason](#reasons) |
+### HoverCardTrigger
+
+A trigger outside the card also takes `controller`.
+
+<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
+
+### HoverCardContent
+
+<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
+
+<CssVariables component="hover-card" part="content" />
+
+### State
+
+What render functions, state-based class names and slots receive, per part.
+
+`HoverCardTrigger`:
+
+<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
+
+`HoverCardContent`:
+
+<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
+
+`HoverCardArrow`:
+
+<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
 
 ### Reasons
 
@@ -221,35 +224,16 @@ Every write method takes an optional `{ reason, event }`, passed to `@open-chang
   name="HoverCardController"
 />
 
-### HoverCard
+### Events
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
+Events get the new state first, then the details. `v-model` only updates when `@open-change` wasn't canceled.
 
-### HoverCardTrigger
-
-A trigger outside the card also takes `controller`.
-
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
-
-### HoverCardContent
-
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
-
-### State
-
-What render functions, state-based class names and slots receive, per part.
-
-`HoverCardTrigger`:
-
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
-
-`HoverCardContent`:
-
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
-
-`HoverCardArrow`:
-
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
+| Binding                 | On          | Receives                                                                    |
+| ----------------------- | ----------- | --------------------------------------------------------------------------- |
+| `v-model:open`          | `HoverCard` | Whether the card is open                                                    |
+| `@open-change`          | `HoverCard` | `(open, details)`: the new state, and the [reason](#reasons)                |
+| `@open-change-complete` | `HoverCard` | `(open)`, after the animation                                               |
+| `@payload-change`       | `HoverCard` | `(payload, details)`: the content's new payload, and the [reason](#reasons) |
 
 ## Accessibility
 

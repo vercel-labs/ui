@@ -16,40 +16,21 @@ Use an alert dialog when someone needs to answer a question before an action con
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-## Anatomy
+Use the following composition to build an `AlertDialog`:
 
-Put the question in `AlertDialogTitle`, explain what happens in `AlertDialogDescription`, and use `AlertDialogClose` for each answer:
-
-```tsx
-import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@ui-sdk/solid/alert-dialog"
-
-function Example() {
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger>Delete project</AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogTitle>Delete this project?</AlertDialogTitle>
-        <AlertDialogDescription>
-          The project and its files will be deleted for everyone.
-        </AlertDialogDescription>
-        <AlertDialogClose>Cancel</AlertDialogClose>
-        <AlertDialogClose value="confirm">Delete</AlertDialogClose>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
-
-export { Example }
+```text
+AlertDialog
+├── AlertDialogTrigger
+└── AlertDialogContent
+    ├── AlertDialogTitle
+    ├── AlertDialogDescription
+    ├── AlertDialogClose
+    └── AlertDialogClose
 ```
+
+Put the question in `AlertDialogTitle`, explain what happens in `AlertDialogDescription`, and use `AlertDialogClose` for each answer.
 
 The dialog uses the `alertdialog` role and keeps the rest of the page inert while it is open. Screen readers announce its title and description. Add `AlertDialogBackdrop` when you want to dim the page, as the examples do.
 
@@ -115,30 +96,31 @@ The root's `pendingAnnouncement` sets what screen readers hear after a second of
 
 [Styling and Animation](../styling-and-animation) covers state attributes and entry and exit transitions.
 
-<DataAttributes component="alert-dialog" />
+### AlertDialogContent [#styling-alertdialogcontent]
 
-<CssVariables component="alert-dialog" />
+<CssVariables component="alert-dialog" part="content" />
+
+## Data Attributes
+
+### AlertDialogTrigger [#data-attributes-alertdialogtrigger]
+
+<DataAttributes component="alert-dialog" part="trigger" />
+
+### AlertDialogBackdrop [#data-attributes-alertdialogbackdrop]
+
+<DataAttributes component="alert-dialog" part="backdrop" />
+
+### AlertDialogContent [#data-attributes-alertdialogcontent]
+
+<DataAttributes component="alert-dialog" part="content" />
+
+### AlertDialogClose [#data-attributes-alertdialogclose]
+
+<DataAttributes component="alert-dialog" part="close" />
 
 ## API Reference
 
 Alert Dialog shares [Dialog's](./dialog) options, except `modal`, `closeOnOutsidePress`, and `presentation`. It is always modal, never closes on an outside press, and does not present as a sheet.
-
-### Reasons
-
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOpenChangeReason" />
-
-`onPayloadChange(payload, details)` runs before `onOpenChange` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
-
-<ReasonTable
-  path="../../packages/core/src/components/dialog/dialog.ts"
-  name="AlertDialogPayloadChangeReason"
-/>
-
-### Controller
-
-Use `createAlertDialogController<Payload, Result>()` for direct control. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
-
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
 
 ### Confirm Options
 
@@ -157,7 +139,6 @@ The shared `confirm()` function uses these options when an `OverlayHost` renders
 ### AlertDialogContent
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogContentProps" />
-
 ### AlertDialogClose
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogCloseProps" />
@@ -179,6 +160,23 @@ The shared `confirm()` function uses these options when an `OverlayHost` renders
 `AlertDialogShortcut`:
 
 <StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogShortcutState" />
+
+### Reasons
+
+<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOpenChangeReason" />
+
+`onPayloadChange(payload, details)` runs before `onOpenChange` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
+
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogPayloadChangeReason"
+/>
+
+### Controller
+
+Use `createAlertDialogController<Payload, Result>()` for direct control. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
+
+<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
 
 ## Accessibility
 

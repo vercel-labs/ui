@@ -75,10 +75,13 @@ function Example() {
       <SelectTrigger aria-label="Fruit">
         <SelectValue placeholder="Choose a fruit" />
       </SelectTrigger>
-      <SelectContent class="rounded-2xl bg-popover p-1">
+      <SelectContent class="rounded-2xl bg-white p-1">
         <For each={fruits}>
           {(fruit) => (
-            <SelectItem value={fruit.value} class="flex rounded-xl px-2 py-1.5 data-highlighted:bg-accent">
+            <SelectItem
+              value={fruit.value}
+              class="flex rounded-xl px-2 py-1.5 data-highlighted:bg-neutral-100"
+            >
               {fruit.label}
               <SelectItemIndicator class="ms-auto">✓</SelectItemIndicator>
             </SelectItem>
@@ -101,7 +104,7 @@ Items that only exist in state, like results from a server, render from the list
   {(state) => (
     <For each={state.items as { value: string; label: string }[]}>
       {(item) => (
-        <ComboboxItem value={item.value} class="rounded-xl px-2 py-1.5 data-highlighted:bg-accent">
+        <ComboboxItem value={item.value} class="rounded-xl px-2 py-1.5 data-highlighted:bg-neutral-100">
           {item.label}
         </ComboboxItem>
       )}

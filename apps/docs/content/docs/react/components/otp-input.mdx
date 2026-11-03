@@ -14,27 +14,15 @@ description: Enter a one-time code with support for pasting, autofill, and nativ
 pnpm add @ui-sdk/react @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme). The separator icons use `lucide-react`.
+## Composition
 
-## Anatomy
+Use the following composition to build an `OTPInput`:
 
-```tsx
-import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
-
-function Example() {
-  return (
-    <OTPInput maxLength={4} aria-label="Verification code">
-      <OTPInputGroup>
-        <OTPInputSlot index={0} />
-        <OTPInputSlot index={1} />
-        <OTPInputSlot index={2} />
-        <OTPInputSlot index={3} />
-      </OTPInputGroup>
-    </OTPInput>
-  )
-}
-
-export { Example }
+```text
+OTPInput
+└── OTPInputGroup
+    ├── OTPInputSlot
+    └── OTPInputSlot
 ```
 
 `OTPInput` creates the native input and holds the code. `OTPInputGroup` lays out a run of slots. Each `OTPInputSlot` displays the character at its zero-based `index`. Add `OTPInputSeparator` between groups when the code is easier to read in sections.
@@ -98,15 +86,6 @@ Pass `aria-invalid` and `aria-describedby` to mark the code invalid and associat
   caption="Focus Verification code. It is marked invalid, and the associated message explains that the code was not accepted."
 />
 
-### Right to Left
-
-The input follows its surrounding `dir`. In a right-to-left layout, the first slot is on the right and ArrowLeft advances to the next slot. Logical borders keep the group corners in place.
-
-<ComponentExample
-  name="otp-input/rtl"
-  caption="Enter a code from the rightmost slot. Use ArrowLeft to advance and ArrowRight to move back, or click a slot to edit it."
-/>
-
 ## Behavior and Options
 
 ### Controlled
@@ -167,32 +146,6 @@ The root's state exposes all `slots`. Each slot exposes `char`, `isActive`, and 
 Props and callbacks are the same as below, as React props. `id`, `autoFocus`, `aria-label`,
 `aria-labelledby`, `aria-describedby` and `aria-invalid` go to the input.
 
-### Events
-
-Callbacks get the code first, then the details.
-
-| Prop            | On         | Receives                                                        |
-| --------------- | ---------- | --------------------------------------------------------------- |
-| `onValueChange` | `OTPInput` | `(value, details)`: the new code and the [reason](#reasons)     |
-| `onComplete`    | `OTPInput` | `(value, details)`: the full code and the reason that filled it |
-
-### Reasons
-
-`details.reason` says why the code changed. Autofill and a code from the keyboard's suggestions are `input-change`.
-
-<ReasonTable
-  path="../../packages/core/src/components/otp-input/otp-input.ts"
-  name="OTPInputValueChangeReason"
-/>
-
-### Controller
-
-Create one with `createOTPInputController()` and pass it as `controller`.
-
-`setValue()` and `clear()` take an optional `{ reason, event }`, and run the change callback like typing.
-
-<ControllerTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputController" />
-
 ### OTPInput
 
 <TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputOptions" />
@@ -211,6 +164,32 @@ input's state.
 Slots get their own:
 
 <StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotState" />
+
+### Reasons
+
+`details.reason` says why the code changed. Autofill and a code from the keyboard's suggestions are `input-change`.
+
+<ReasonTable
+  path="../../packages/core/src/components/otp-input/otp-input.ts"
+  name="OTPInputValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createOTPInputController()` and pass it as `controller`.
+
+`setValue()` and `clear()` take an optional `{ reason, event }`, and run the change callback like typing.
+
+<ControllerTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputController" />
+
+### Events
+
+Callbacks get the code first, then the details.
+
+| Prop            | On         | Receives                                                        |
+| --------------- | ---------- | --------------------------------------------------------------- |
+| `onValueChange` | `OTPInput` | `(value, details)`: the new code and the [reason](#reasons)     |
+| `onComplete`    | `OTPInput` | `(value, details)`: the full code and the reason that filled it |
 
 ## Accessibility
 

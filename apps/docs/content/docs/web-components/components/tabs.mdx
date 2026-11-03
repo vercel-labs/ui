@@ -7,6 +7,7 @@ Use Tabs when several views share the same space, such as settings sections or a
 
 <ComponentExample
   name="tabs/basic"
+  inspect
   caption="Choose Password to show its panel. Use the left and right arrow keys to move between the tabs."
 />
 
@@ -22,28 +23,22 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/tabs"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The icon example uses `lucide`. Install it to copy that example as shown, or use your own icons.
+Use the following composition to build a `ui-tabs`:
 
-```bash
-npm install lucide
+```text
+ui-tabs
+├── ui-tabs-list
+│   ├── ui-tabs-tab
+│   │   └── button
+│   └── ui-tabs-tab
+│       └── button
+├── ui-tabs-panel
+└── ui-tabs-panel
 ```
-
-## Anatomy
 
 Give each tab and its panel the same unique `value`. Give the list an accessible name. Put a native button inside each `ui-tabs-tab`. Set `default-value` to choose the initial tab; otherwise, the first enabled tab is selected.
-
-```html
-<ui-tabs default-value="account">
-  <ui-tabs-list aria-label="Settings">
-    <ui-tabs-tab value="account"><button type="button">Account</button></ui-tabs-tab>
-    <ui-tabs-tab value="password"><button type="button">Password</button></ui-tabs-tab>
-  </ui-tabs-list>
-  <ui-tabs-panel value="account">Manage your profile.</ui-tabs-panel>
-  <ui-tabs-panel value="password" hidden>Choose a new password.</ui-tabs-panel>
-</ui-tabs>
-```
 
 Tab enters the list at the selected tab. Left and Right Arrow move between tabs and select them. Home and End move to the first and last tabs.
 
@@ -228,11 +223,7 @@ Use `data-selected` and `data-disabled` to style a tab. Icon parts also provide 
 
 <DataAttributes component="tabs" />
 
-### Indicator Variables
-
-The indicator’s position and size are measured from the tab list. Use the same variables for an underline, a background, or a marker beside a vertical list.
-
-<CssVariables component="tabs" />
+The indicator’s position and size are measured from the tab list into the [TabsIndicator](#tabsindicator) variables. Use them for an underline, a background, or a marker beside a vertical list.
 
 ## Custom Rendering
 
@@ -245,30 +236,6 @@ Put a native button or link inside `ui-tabs-tab`; it receives the tab behavior. 
 Props are attributes in kebab case, like `default-value`, `keep-mounted` and `hidden-until-found`: `"false"`
 is false. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` keeps the current tab.
-
-| Member                      | On        | Description                                    |
-| --------------------------- | --------- | ---------------------------------------------- |
-| `value` property, attribute | `ui-tabs` | The selected tab. Setting either selects a tab |
-| `api` property              | `ui-tabs` | The [controller](#controller)                  |
-| `valuechange` event         | `ui-tabs` | `detail: { value, reason, event, source }`     |
-
-### Reasons
-
-`event.detail.reason` says why the selection changed.
-
-<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods. The `value` property reads and sets the selection.
-
-Every write method takes an optional `{ reason, event }`, runs `valuechange` like a press, and returns `false` when the change is canceled.
-
-<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
-
 ### Tabs
 
 <TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsOptions" />
@@ -280,6 +247,12 @@ Every write method takes an optional `{ reason, event }`, runs `valuechange` lik
 ### TabsTabIcon
 
 <TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabIconProps" />
+
+### TabsIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="tabs" part="indicator" />
 
 ### TabsPanel
 
@@ -312,6 +285,30 @@ The same state shows as data attributes on each element.
 `TabsIndicator`:
 
 <StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsIndicatorState" />
+
+### Reasons
+
+`event.detail.reason` says why the selection changed.
+
+<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods. The `value` property reads and sets the selection.
+
+Every write method takes an optional `{ reason, event }`, runs `valuechange` like a press, and returns `false` when the change is canceled.
+
+<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` keeps the current tab.
+
+| Member                      | On        | Description                                    |
+| --------------------------- | --------- | ---------------------------------------------- |
+| `value` property, attribute | `ui-tabs` | The selected tab. Setting either selects a tab |
+| `api` property              | `ui-tabs` | The [controller](#controller)                  |
+| `valuechange` event         | `ui-tabs` | `detail: { value, reason, event, source }`     |
 
 ## Accessibility
 

@@ -16,38 +16,20 @@ Command puts a search field over a list of actions. The list stays open while so
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `@lucide/svelte` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `Command`:
 
-```bash
-npm install @lucide/svelte
+```text
+Command
+├── CommandInput
+├── CommandEmpty
+└── CommandList
+    ├── CommandItem
+    └── CommandItem
 ```
-
-## Anatomy
 
 Give the input an accessible name and each command a unique value. Keep empty and status messages outside the list, which holds commands and groups.
-
-```svelte
-<script lang="ts">
-  import {
-    Command,
-    CommandEmpty,
-    CommandInput,
-    CommandItem,
-    CommandList,
-  } from "@ui-sdk/svelte/command"
-</script>
-
-<Command>
-  <CommandInput aria-label="Search commands" />
-  <CommandEmpty>No commands found.</CommandEmpty>
-  <CommandList>
-    <CommandItem value="new-file">New file</CommandItem>
-    <CommandItem value="new-folder">New folder</CommandItem>
-  </CommandList>
-</Command>
-```
 
 Typing filters the commands. Arrow keys move the highlight, and Enter runs the highlighted command. Focus stays in the input, which points to the highlight with `aria-activedescendant`. `onAction` reports the value of the command that ran; use it to perform the action.
 
@@ -236,42 +218,6 @@ Style the parts through their data attributes, which are the same in every frame
 
 Props and callbacks are the same as below, as Svelte props.
 
-### Events
-
-Callbacks get the new state first, then the details. A bound `value`, `query` or `pages` only updates when its callback wasn't canceled.
-
-| Prop            | On            | Receives                                                                              |
-| --------------- | ------------- | ------------------------------------------------------------------------------------- |
-| `bind:value`    | `Command`     | The highlighted command                                                               |
-| `bind:query`    | `Command`     | The search text                                                                       |
-| `bind:pages`    | `Command`     | The stack of pages                                                                    |
-| `onValueChange` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index`   |
-| `onQueryChange` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                          |
-| `onPagesChange` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                         |
-| `onAction`      | `Command`     | `(value, { event })`: the command that ran. Return a Promise to mark it pending       |
-| `onLoadMore`    | `Command`     | `()`, when the last command is reached                                                |
-| `onSelect`      | `CommandItem` | `(event)`: before `onAction`. `preventDefault()` skips it. A Promise marks it pending |
-
-### Reasons
-
-Why the highlighted command changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
-
-Why the search text changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
-
-And why the stack of pages changed:
-
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
-
-### Controller
-
-Create one with `createCommandController()` and pass it as `controller`.
-
-<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
-
 ### Command
 
 <TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandOptions" />
@@ -337,6 +283,42 @@ What `render` and `children` snippets receive, per part.
 `CommandItemIcon`:
 
 <StateTable path="../../packages/core/src/components/command/command.ts" name="CommandItemIconState" />
+
+### Reasons
+
+Why the highlighted command changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
+
+Why the search text changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
+
+And why the stack of pages changed:
+
+<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
+
+### Controller
+
+Create one with `createCommandController()` and pass it as `controller`.
+
+<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
+
+### Events
+
+Callbacks get the new state first, then the details. A bound `value`, `query` or `pages` only updates when its callback wasn't canceled.
+
+| Prop            | On            | Receives                                                                              |
+| --------------- | ------------- | ------------------------------------------------------------------------------------- |
+| `bind:value`    | `Command`     | The highlighted command                                                               |
+| `bind:query`    | `Command`     | The search text                                                                       |
+| `bind:pages`    | `Command`     | The stack of pages                                                                    |
+| `onValueChange` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index`   |
+| `onQueryChange` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                          |
+| `onPagesChange` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                         |
+| `onAction`      | `Command`     | `(value, { event })`: the command that ran. Return a Promise to mark it pending       |
+| `onLoadMore`    | `Command`     | `()`, when the last command is reached                                                |
+| `onSelect`      | `CommandItem` | `(event)`: before `onAction`. `preventDefault()` skips it. A Promise marks it pending |
 
 ## Accessibility
 

@@ -7,6 +7,7 @@ Use a Select when someone needs to choose from a set of options. It handles open
 
 <ComponentExample
   name="select/demo"
+  inspect
   caption="Open Fruit and choose Blueberry. The list closes and the trigger shows your choice."
 />
 
@@ -16,41 +17,23 @@ Use a Select when someone needs to choose from a set of options. It handles open
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
 The examples include their SVG icons, so no icon package is required.
 
-## Anatomy
+## Composition
+
+Use the following composition to build a `Select`:
+
+```text
+Select
+├── SelectLabel
+├── SelectTrigger
+│   └── SelectValue
+└── SelectContent
+    ├── SelectItem
+    └── SelectItem
+```
 
 Start with a label, a trigger, and a list of items. `SelectValue` shows the selected item's label inside the trigger.
-
-```tsx
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@ui-sdk/solid/select"
-
-function Example() {
-  return (
-    <Select placeholder="Select a fruit">
-      <SelectLabel>Fruit</SelectLabel>
-      <SelectTrigger>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="apple">Apple</SelectItem>
-        <SelectItem value="blueberry">Blueberry</SelectItem>
-      </SelectContent>
-    </Select>
-  )
-}
-
-export { Example }
-```
 
 The trigger has the `combobox` role, and the popup is a `listbox`. `SelectLabel` names the trigger. If you don't need a visible label, give `SelectTrigger` an `aria-label` instead.
 
@@ -324,54 +307,71 @@ Select keeps closing content mounted until its exit animation finishes. `onOpenC
 
 Style the parts with the attributes below. The popup also exposes variables such as `--anchor-width` and `--available-height` for sizing.
 
-<DataAttributes component="select" />
+### SelectContent [#styling-selectcontent]
 
-<CssVariables component="select" />
+<CssVariables component="select" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="select" part="viewport" />
+
+## Data Attributes
+
+### SelectLabel [#data-attributes-selectlabel]
+
+<DataAttributes component="select" part="label" />
+
+### SelectTrigger [#data-attributes-selecttrigger]
+
+<DataAttributes component="select" part="trigger" />
+
+### SelectValue [#data-attributes-selectvalue]
+
+<DataAttributes component="select" part="value" />
+
+### SelectClear [#data-attributes-selectclear]
+
+<DataAttributes component="select" part="clear" />
+
+### SelectContent [#data-attributes-selectcontent]
+
+<DataAttributes component="select" part="content" />
+
+### SelectItem [#data-attributes-selectitem]
+
+<DataAttributes component="select" part="item" />
+
+### SelectItemText [#data-attributes-selectitemtext]
+
+<DataAttributes component="select" part="item-text" />
+
+### SelectItemIndicator [#data-attributes-selectitemindicator]
+
+<DataAttributes component="select" part="item-indicator" />
+
+### SelectSelectAll [#data-attributes-selectselectall]
+
+<DataAttributes component="select" part="select-all" />
+
+### SelectEmpty [#data-attributes-selectempty]
+
+<DataAttributes component="select" part="empty" />
+
+### SelectStatus [#data-attributes-selectstatus]
+
+<DataAttributes component="select" part="status" />
+
+### SelectArrow [#data-attributes-selectarrow]
+
+<DataAttributes component="select" part="arrow" />
+
+### SelectItemIcon [#data-attributes-selectitemicon]
+
+<DataAttributes component="select" part="item-icon" />
 
 ## API Reference
 
 Props and callbacks are the same as below, as Solid props.
-
-### Events
-
-Callbacks get the new state first, then the details.
-
-| Prop                   | On       | Receives                                                        |
-| ---------------------- | -------- | --------------------------------------------------------------- |
-| `onValueChange`        | `Select` | `(value, details)`: the new value, and the [reason](#reasons)   |
-| `onOpenChange`         | `Select` | `(open, details)`: the new state, and the [reason](#reasons)    |
-| `onOpenChangeComplete` | `Select` | `(open)`, after the animation                                   |
-| `onHighlight`          | `Select` | `(value, { index, event })`: the highlighted item and its row   |
-| `onQueryChange`        | `Select` | `(query, details)`: the search text, and the [reason](#reasons) |
-| `onLoadMore`           | `Select` | `()`, when the last item is reached                             |
-| `onDismissAttempt`     | `Select` | `({ reason, event })`, when a dismissal was refused             |
-
-### Reasons
-
-`details.reason` says why the value changed:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectValueChangeReason" />
-
-And why the list opened or closed:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectOpenChangeReason" />
-
-With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectDismissReason" />
-
-And why the search text changed:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectQueryChangeReason" />
-
-### Controller
-
-Create one with `createSelectController<Value, Multiple>()` and pass it as `controller`, to the select and to
-a trigger outside it.
-
-Every write method takes an optional `{ reason, event }`, passed to the change callback.
-
-<ControllerTable path="../../packages/core/src/components/select/select.ts" name="SelectController" />
 
 ### Select
 
@@ -474,6 +474,47 @@ What render functions, state-based class names and slots receive, per part.
 `SelectStatus`:
 
 <StateTable path="../../packages/core/src/components/select/select.ts" name="SelectStatusState" />
+
+### Reasons
+
+`details.reason` says why the value changed:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectValueChangeReason" />
+
+And why the list opened or closed:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectOpenChangeReason" />
+
+With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectDismissReason" />
+
+And why the search text changed:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectQueryChangeReason" />
+
+### Controller
+
+Create one with `createSelectController<Value, Multiple>()` and pass it as `controller`, to the select and to
+a trigger outside it.
+
+Every write method takes an optional `{ reason, event }`, passed to the change callback.
+
+<ControllerTable path="../../packages/core/src/components/select/select.ts" name="SelectController" />
+
+### Events
+
+Callbacks get the new state first, then the details.
+
+| Prop                   | On       | Receives                                                        |
+| ---------------------- | -------- | --------------------------------------------------------------- |
+| `onValueChange`        | `Select` | `(value, details)`: the new value, and the [reason](#reasons)   |
+| `onOpenChange`         | `Select` | `(open, details)`: the new state, and the [reason](#reasons)    |
+| `onOpenChangeComplete` | `Select` | `(open)`, after the animation                                   |
+| `onHighlight`          | `Select` | `(value, { index, event })`: the highlighted item and its row   |
+| `onQueryChange`        | `Select` | `(query, details)`: the search text, and the [reason](#reasons) |
+| `onLoadMore`           | `Select` | `()`, when the last item is reached                             |
+| `onDismissAttempt`     | `Select` | `({ reason, event })`, when a dismissal was refused             |
 
 ## Accessibility
 

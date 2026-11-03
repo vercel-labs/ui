@@ -16,26 +16,24 @@ Use a checkbox for a choice someone can check or uncheck. Use a group when sever
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-## Anatomy
-
-Wrap the checkbox and its text in a label. The indicator shows while the checkbox is checked or mixed:
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/checkbox"
 ```
 
-```html
-<label>
-  <ui-checkbox>
-    <ui-checkbox-indicator aria-hidden="true">✓</ui-checkbox-indicator>
-  </ui-checkbox>
-  Accept terms and conditions
-</label>
+## Composition
+
+Use the following composition to build a `ui-checkbox`:
+
+```text
+ui-checkbox
+└── ui-checkbox-indicator
 ```
 
-`ui-checkbox` is the control itself. It uses the `checkbox` role and takes part in forms through `ElementInternals`, without a hidden input. Importing the entry defines the checkbox and group elements; on the server the import does nothing.
+Wrap the checkbox and its text in a label. The indicator shows while the checkbox is checked or mixed.
+
+`ui-checkbox` is the control itself. It uses the `checkbox` role and takes part in forms through `ElementInternals`, without a hidden input.
 
 ## Examples
 
@@ -208,18 +206,31 @@ Props are attributes in kebab case, like `default-checked`, `read-only` and `all
 false, and a group's `value`, `default-value` and `all-values` take comma-separated values. `checked` and
 `value` are live properties and attributes. Callbacks are DOM events.
 
-### Events
+### Checkbox
 
-Events fire on their own element and don't bubble, with the new state or value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
+<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxOptions" />
 
-| Member                        | On                  | Description                                                                             |
-| ----------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
-| `checked` property, attribute | `ui-checkbox`       | The checked state. The attribute sets where it starts, and is live                      |
-| `api` property                | `ui-checkbox`       | The [controller](#checkbox-controller)                                                  |
-| `checkedchange` event         | `ui-checkbox`       | `detail: { value: checked, reason, event, source }`                                     |
-| `value` property, attribute   | `ui-checkbox-group` | The checked values. The attribute is comma-separated, sets where it starts, and is live |
-| `api` property                | `ui-checkbox-group` | The [controller](#checkboxgroup-controller)                                             |
-| `valuechange` event           | `ui-checkbox-group` | `detail: { value, reason, event, source }`                                              |
+### CheckboxIndicator
+
+<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorProps" />
+
+### CheckboxGroup
+
+<TypeTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupOptions" />
+
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxState" />
+
+The indicator receives the same state.
+
+<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorState" />
+
+The group:
+
+<StateTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupState" />
 
 ### Reasons
 
@@ -256,31 +267,18 @@ Its write methods work like the checkbox controller's.
   name="CheckboxGroupController"
 />
 
-### Checkbox
+### Events
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxOptions" />
+Events fire on their own element and don't bubble, with the new state or value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
 
-### CheckboxIndicator
-
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorProps" />
-
-### CheckboxGroup
-
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupOptions" />
-
-### State
-
-The same state shows as data attributes on each element.
-
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxState" />
-
-The indicator receives the same state.
-
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorState" />
-
-The group:
-
-<StateTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupState" />
+| Member                        | On                  | Description                                                                             |
+| ----------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
+| `checked` property, attribute | `ui-checkbox`       | The checked state. The attribute sets where it starts, and is live                      |
+| `api` property                | `ui-checkbox`       | The [controller](#checkbox-controller)                                                  |
+| `checkedchange` event         | `ui-checkbox`       | `detail: { value: checked, reason, event, source }`                                     |
+| `value` property, attribute   | `ui-checkbox-group` | The checked values. The attribute is comma-separated, sets where it starts, and is live |
+| `api` property                | `ui-checkbox-group` | The [controller](#checkboxgroup-controller)                                             |
+| `valuechange` event           | `ui-checkbox-group` | `detail: { value, reason, event, source }`                                              |
 
 ## Accessibility
 

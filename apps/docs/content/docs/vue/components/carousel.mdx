@@ -14,37 +14,21 @@ description: Page through slides with native scrolling, keyboard controls, and o
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Carousel`:
+
+```text
+Carousel
+├── CarouselViewport
+│   └── CarouselContent
+│       ├── CarouselItem
+│       └── CarouselItem
+├── CarouselPrevious
+└── CarouselNext
+```
 
 Put the slides inside a viewport, then add the controls you need.
-
-```vue
-<script setup lang="ts">
-import {
-  Carousel,
-  CarouselViewport,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
-} from "@ui-sdk/vue/carousel"
-</script>
-
-<template>
-  <Carousel aria-label="Featured">
-    <CarouselViewport>
-      <CarouselContent>
-        <CarouselItem>First slide</CarouselItem>
-        <CarouselItem>Second slide</CarouselItem>
-      </CarouselContent>
-    </CarouselViewport>
-    <CarouselPrevious>Previous</CarouselPrevious>
-    <CarouselNext>Next</CarouselNext>
-  </Carousel>
-</template>
-```
 
 The root is a region described as a carousel, so name it with `aria-label`, like "Featured products". The viewport is the scrolling window, and the content is the row of slides inside it, a flex row (a column when vertical). Give each slide its size with a flex basis, like `basis-full` for one to a view or `basis-1/3` for three.
 
@@ -150,15 +134,6 @@ A gallery and a strip of thumbnails share the selected page. The thumbnail carou
   caption="Choose a thumbnail to change the gallery, or scroll either strip."
 />
 
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the carousel. The slides run from the right, the next one comes in from the left, and the left arrow key goes to it. Turn directional icons with `rtl:-scale-x-100`.
-
-<ComponentExample
-  name="carousel/rtl"
-  caption="Move through the slides in a right-to-left layout. ArrowLeft advances the page."
-/>
-
 ## Behavior and Options
 
 ### Controlled
@@ -236,15 +211,45 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 ```vue
 <CarouselNext class="aria-disabled:opacity-50" />
-<CarouselIndicator class="bg-foreground/20 data-selected:bg-primary" />
+<CarouselIndicator class="bg-neutral-950/20 data-selected:bg-neutral-900" />
 <CarouselItem class="opacity-40 data-in-view:opacity-100" />
 ```
 
 The viewport writes the few styles scrolling needs inline: its overflow, `scroll-snap-type` and `overscroll-behavior`. Slides get `flex-shrink: 0` and their snap alignment. Hide the scrollbar with `[scrollbar-width:none]` if you like.
 
-<DataAttributes component="carousel" />
+### Carousel [#styling-carousel]
 
-<CssVariables component="carousel" />
+<CssVariables component="carousel" part="root" />
+
+## Data Attributes
+
+### Carousel [#data-attributes-carousel]
+
+<DataAttributes component="carousel" part="root" />
+
+### CarouselViewport [#data-attributes-carouselviewport]
+
+<DataAttributes component="carousel" part="viewport" />
+
+### CarouselContent [#data-attributes-carouselcontent]
+
+<DataAttributes component="carousel" part="content" />
+
+### CarouselItem [#data-attributes-carouselitem]
+
+<DataAttributes component="carousel" part="item" />
+
+### CarouselPrevious [#data-attributes-carouselprevious]
+
+<DataAttributes component="carousel" part="previous" />
+
+### CarouselIndicator [#data-attributes-carouselindicator]
+
+<DataAttributes component="carousel" part="indicator" />
+
+### CarouselPlayToggle [#data-attributes-carouselplaytoggle]
+
+<DataAttributes component="carousel" part="play-toggle" />
 
 ## Custom Rendering
 
@@ -261,43 +266,9 @@ state, and the default slot receives the state too: a slide's `index`, `active` 
 
 Props are the same as below, and callbacks are events.
 
-### Events
-
-Events get the new value first, then the details. `v-model` only updates when the change event wasn't canceled.
-
-| Binding                 | On         | Receives                                                    |
-| ----------------------- | ---------- | ----------------------------------------------------------- |
-| `v-model:page`          | `Carousel` | The current page                                            |
-| `v-model:playing`       | `Carousel` | Whether it rotates                                          |
-| `@page-change`          | `Carousel` | `(page, details)`: the new page, and the [reason](#reasons) |
-| `@page-change-complete` | `Carousel` | `(page)`: the page the slides came to rest on               |
-| `@playing-change`       | `Carousel` | `(playing, details)`: whether it rotates, and the reason    |
-
-### Reasons
-
-`details.reason` says why the page changed.
-
-<ReasonTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPageChangeReason" />
-
-And why rotation started or stopped.
-
-<ReasonTable
-  path="../../packages/core/src/components/carousel/carousel.ts"
-  name="CarouselPlayingChangeReason"
-/>
-
-### Controller
-
-Create one with `createCarouselController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, passed to the change callback, and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselController" />
-
 ### Carousel
 
 <TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselOptions" />
-
 ### CarouselIndicator
 
 <TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselIndicatorProps" />
@@ -346,6 +317,39 @@ What render functions, state-based class names and slots receive, per part.
 `CarouselPlayToggle`:
 
 <StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPlayToggleState" />
+
+### Reasons
+
+`details.reason` says why the page changed.
+
+<ReasonTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPageChangeReason" />
+
+And why rotation started or stopped.
+
+<ReasonTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselPlayingChangeReason"
+/>
+
+### Controller
+
+Create one with `createCarouselController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to the change callback, and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselController" />
+
+### Events
+
+Events get the new value first, then the details. `v-model` only updates when the change event wasn't canceled.
+
+| Binding                 | On         | Receives                                                    |
+| ----------------------- | ---------- | ----------------------------------------------------------- |
+| `v-model:page`          | `Carousel` | The current page                                            |
+| `v-model:playing`       | `Carousel` | Whether it rotates                                          |
+| `@page-change`          | `Carousel` | `(page, details)`: the new page, and the [reason](#reasons) |
+| `@page-change-complete` | `Carousel` | `(page)`: the page the slides came to rest on               |
+| `@playing-change`       | `Carousel` | `(playing, details)`: whether it rotates, and the reason    |
 
 ## Accessibility
 

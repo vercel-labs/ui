@@ -82,7 +82,6 @@ Things that cost real debugging time. Read them before you write core or adapter
 - **`apps/docs/next-env.d.ts` is rewritten by the docs server.** Restore it before committing.
 - **Disk space.** `apps/docs/.next/dev` can grow past 10 GB in a few hours, and headless browsers leave folders in the temp directory on every launch. Delete `.next` and `test-results` after long runs, and check free space before a full sweep.
 - **Examples are precompiled,** so a stale `examples/dist` shows old code in the docs. Run `pnpm --filter examples build` after changing an example or an adapter, and never while someone else is testing the docs: it empties a framework's folder while it runs.
-- **Tailwind only sees classes it scans.** Examples live outside `apps/docs`, so `global.css` has `@source` for them. Build class names from whole strings, never by concatenation.
 - **Edits that silently don't land.** Prettier rewrites quotes and wrapping, so a later exact-match edit can miss. Re-read a file after editing it and before trusting a test result.
 - **Merges drop closing braces at seams** (TypeScript interfaces, CSS layers, JSX). Check brace balance, and rebuild JSON files like `package.json` exports with a parser instead of text unions. After a merge, check `git diff --stat` against main for whole sections removed.
 - **Pushing workflow changes needs the `workflow` scope:** `gh auth refresh -h github.com -s workflow`.

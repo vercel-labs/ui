@@ -14,21 +14,17 @@ description: Keep a button pressed, or group toggles with a shared value and arr
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
 Import the component in your client entry point to register its elements:
 
 ```ts
 import "@ui-sdk/web/toggle"
 ```
 
-The demos use icons from `lucide`. Install that package if you copy their source.
-
 ## Usage
 
 Wrap a native button in `ui-toggle`. It reports its state with `aria-pressed` and always uses `type="button"`, so pressing it does not submit a form.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```html
 <ui-toggle>
@@ -62,9 +58,7 @@ Set `disabled` to prevent presses and remove a standalone toggle from the tab or
   caption="Both toggles ignore clicks and are skipped by Tab. The second toggle starts pressed."
 />
 
-<span id="right-to-left" />
-
-The layout follows an ancestor's `dir="rtl"`. Groups also [reverse their horizontal arrow keys](#right-to-left-group).
+The layout follows an ancestor's `dir="rtl"`. Groups also reverse their horizontal arrow keys.
 
 ## Behavior and Options
 
@@ -133,15 +127,6 @@ Use the group's value to update other content. Here the selected weight also cha
 <ComponentExample
   name="toggle/group-custom"
   caption="Choose a font weight to update the sample text. Pressing the selected weight keeps it selected."
-/>
-
-### Right to Left Group
-
-Set `dir="rtl"` on an ancestor. The group reads that direction from the DOM, so Left moves forward and Right moves back.
-
-<ComponentExample
-  name="toggle/group-rtl"
-  caption="Focus قائمة and press Left to move to شبكة. Space presses the focused toggle."
 />
 
 ### One or Several
@@ -240,18 +225,31 @@ comma-separated values, like `default-value="bold,italic"`. `pressed` is a live 
 Callbacks are DOM events. Elements have no `controller` attribute: their `api` property
 is one.
 
-### Events
+### Toggle
 
-Events fire on their own element and don't bubble, with the new state or value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
+<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
 
-| Member                        | On                | Description                                                                                                                   |
-| ----------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `pressed` property, attribute | `ui-toggle`       | Whether the toggle is pressed. The attribute sets where it starts, and is live                                                |
-| `api` property                | `ui-toggle`       | The [controller](#toggle-controller)                                                                                          |
-| `pressedchange` event         | `ui-toggle`       | `detail: { value: pressed, reason, event, source }`. In a group, it fires before the group's `valuechange`, and can cancel it |
-| `value` property              | `ui-toggle-group` | The pressed toggles' values. Setting it presses toggles                                                                       |
-| `api` property                | `ui-toggle-group` | The [controller](#togglegroup-controller)                                                                                     |
-| `valuechange` event           | `ui-toggle-group` | `detail: { value, reason, event, source }`                                                                                    |
+### ToggleIcon
+
+<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
+
+### ToggleGroup
+
+<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
+
+### State
+
+The same state shows as data attributes on each button and on the group.
+
+<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
+
+In a group, a toggle's `disabled` includes the group's. The group:
+
+<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
+
+`ToggleIcon`:
+
+<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
 
 ### Reasons
 
@@ -285,31 +283,18 @@ Every write method takes an optional `{ reason, event }`, runs `valuechange` lik
   name="ToggleGroupController"
 />
 
-### Toggle
+### Events
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
+Events fire on their own element and don't bubble, with the new state or value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
 
-### ToggleIcon
-
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
-
-### ToggleGroup
-
-<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
-
-### State
-
-The same state shows as data attributes on each button and on the group.
-
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
-
-In a group, a toggle's `disabled` includes the group's. The group:
-
-<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
-
-`ToggleIcon`:
-
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
+| Member                        | On                | Description                                                                                                                   |
+| ----------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `pressed` property, attribute | `ui-toggle`       | Whether the toggle is pressed. The attribute sets where it starts, and is live                                                |
+| `api` property                | `ui-toggle`       | The [controller](#toggle-controller)                                                                                          |
+| `pressedchange` event         | `ui-toggle`       | `detail: { value: pressed, reason, event, source }`. In a group, it fires before the group's `valuechange`, and can cancel it |
+| `value` property              | `ui-toggle-group` | The pressed toggles' values. Setting it presses toggles                                                                       |
+| `api` property                | `ui-toggle-group` | The [controller](#togglegroup-controller)                                                                                     |
+| `valuechange` event           | `ui-toggle-group` | `detail: { value, reason, event, source }`                                                                                    |
 
 ## Accessibility
 

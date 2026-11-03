@@ -80,12 +80,12 @@ function Example() {
       <SelectTrigger aria-label="Fruit">
         <SelectValue placeholder="Choose a fruit" />
       </SelectTrigger>
-      <SelectContent className="rounded-2xl bg-popover p-1">
+      <SelectContent className="rounded-2xl bg-white p-1">
         {fruits.map((fruit) => (
           <SelectItem
             key={fruit.value}
             value={fruit.value}
-            className="flex rounded-xl px-2 py-1.5 data-highlighted:bg-accent"
+            className="flex rounded-xl px-2 py-1.5 data-highlighted:bg-neutral-100"
           >
             {fruit.label}
             <SelectItemIndicator className="ms-auto">✓</SelectItemIndicator>
@@ -110,7 +110,7 @@ Items that only exist in state, like results from a server, render from the list
       <ComboboxItem
         key={item.value}
         value={item.value}
-        className="rounded-xl px-2 py-1.5 data-highlighted:bg-accent"
+        className="rounded-xl px-2 py-1.5 data-highlighted:bg-neutral-100"
       >
         {item.label}
       </ComboboxItem>

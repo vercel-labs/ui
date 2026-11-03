@@ -25,7 +25,7 @@ Mount `OverlayHost` once near your app's root, then call `toast()` when an actio
 </script>
 
 {#snippet toastItem()}
-  <Toast class="rounded-2xl bg-popover p-4 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5">
+  <Toast class="rounded-2xl bg-white p-4 text-sm text-neutral-950 shadow-lg ring-1 ring-neutral-950/5">
     <ToastTitle />
   </Toast>
 {/snippet}
@@ -34,23 +34,21 @@ Mount `OverlayHost` once near your app's root, then call `toast()` when an actio
 <OverlayHost toast={{ expanded: true, class: "m-4 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none", children: toastItem }} />
 ```
 
-The `children` snippet passed in `toast` renders each toast. It receives the toast data and then its position and leaving state. The classes use the shared [example theme](../styling-and-animation#example-theme).
+The `children` snippet passed in `toast` renders each toast. It receives the toast data and then its position and leaving state.
 
 You can also place a `ToastRegion` yourself. It takes over rendering for its toaster. Use `createToaster()` for an independent queue, as the demos below do.
 
-## Anatomy
+## Composition
 
-```svelte
-<ToastRegion>
-  {#snippet children(toast)}
-    <Toast>
-      <ToastTitle />
-      <ToastDescription />
-      <ToastAction />
-      <ToastClose />
-    </Toast>
-  {/snippet}
-</ToastRegion>
+Use the following composition to build a `ToastRegion`:
+
+```text
+ToastRegion
+└── Toast
+    ├── ToastTitle
+    ├── ToastDescription
+    ├── ToastAction
+    └── ToastClose
 ```
 
 The region groups notifications. A toast gets its name from its title and its description from the description part. Empty title, description, and action parts show the corresponding text from the toast data.
@@ -193,9 +191,27 @@ The region remains reachable while a modal dialog is open. Tab moves through its
 
 Use Tailwind classes directly on the parts. State attributes and CSS variables expose the stack position, expansion, and swipe progress:
 
-<DataAttributes component="toast" />
+### ToastRegion [#styling-toastregion]
 
-<CssVariables component="toast" />
+<CssVariables component="toast" part="region" />
+
+### Toast [#styling-toast]
+
+<CssVariables component="toast" part="root" />
+
+## Data Attributes
+
+### ToastRegion [#data-attributes-toastregion]
+
+<DataAttributes component="toast" part="region" />
+
+### Toast [#data-attributes-toast]
+
+<DataAttributes component="toast" part="root" />
+
+### ToastAction [#data-attributes-toastaction]
+
+<DataAttributes component="toast" part="action" />
 
 ## API Reference
 
@@ -211,10 +227,6 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 
 <TypeTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastCancel" events={false} />
 
-### Reasons
-
-<ReasonTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastDismissReason" />
-
 ### ToastRegion
 
 <TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastRegionOptions" />
@@ -226,6 +238,10 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 ### ToastClose
 
 <TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastCloseProps" />
+
+### Confirm
+
+<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
 
 ### State
 
@@ -241,6 +257,6 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 
 <StateTable path="../../packages/core/src/components/toast/toast.ts" name="ToastButtonState" />
 
-### Confirm
+### Reasons
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
+<ReasonTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastDismissReason" />

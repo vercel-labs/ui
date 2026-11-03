@@ -14,17 +14,16 @@ description: Enter text, add a clear button, and connect the value to your form 
 pnpm add @ui-sdk/solid @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build an `Input` or an `InputGroup`:
 
-```tsx
-<Input />
+```text
+Input
 
-<InputGroup>
-  <Input />
-  <InputClear />
-</InputGroup>
+InputGroup
+├── Input
+└── InputClear
 ```
 
 `Input` renders a native `input`. Pass its type, placeholder, autocomplete, and other native attributes directly. `InputGroup` wraps optional text or buttons around it; `InputClear` clears the value and returns focus to the input.
@@ -85,8 +84,6 @@ Place text around an input with `InputGroup`. Clicking that text focuses the inp
   caption="Choose Clear search. The text clears, focus returns to the input, and the last change shows clear-press. Type again to bring the button back."
 />
 
-The search and clear icons come from `lucide`. Install that package if you copy this example.
-
 ### Controlled
 
 Pass a reactive `value` and update it in `onValueChange`. The example derives a read-only profile URL from the display name.
@@ -145,16 +142,6 @@ Arrange fields with ordinary layout styles. Logical padding and margins follow t
 
 Props are the same as below, as Solid props, plus every native input prop.
 
-### Reasons
-
-<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
-
-### Controller
-
-Create one with `createInputController()` and pass it as `controller`.
-
-<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
-
 ### Input
 
 <TypeTable path="../../packages/core/src/components/input/input.ts" name="InputOptions" />
@@ -172,6 +159,16 @@ Create one with `createInputController()` and pass it as `controller`.
 `InputGroup` and `InputClear` receive the state of the field inside the group.
 
 <StateTable path="../../packages/core/src/components/input/input.ts" name="InputGroupState" />
+
+### Reasons
+
+<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
+
+### Controller
+
+Create one with `createInputController()` and pass it as `controller`.
+
+<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
 
 ## Accessibility
 

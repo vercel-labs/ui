@@ -22,30 +22,22 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/autocomplete"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-autocomplete`:
 
-```bash
-npm install lucide
+```text
+ui-autocomplete
+├── ui-autocomplete-label
+├── ui-autocomplete-input
+│   └── input
+└── ui-autocomplete-content
+    └── ui-autocomplete-list
+        ├── ui-autocomplete-item
+        └── ui-autocomplete-item
 ```
-
-## Anatomy
 
 Name the input, then put suggestions in a list inside the popup. `ui-autocomplete-input` wraps a native input. Each suggestion needs a unique value.
-
-```html
-<ui-autocomplete>
-  <ui-autocomplete-label>Fruit</ui-autocomplete-label>
-  <ui-autocomplete-input><input placeholder="Type a fruit" /></ui-autocomplete-input>
-  <ui-autocomplete-content>
-    <ui-autocomplete-list>
-      <ui-autocomplete-item value="Apple">Apple</ui-autocomplete-item>
-      <ui-autocomplete-item value="Banana">Banana</ui-autocomplete-item>
-    </ui-autocomplete-list>
-  </ui-autocomplete-content>
-</ui-autocomplete>
-```
 
 Typing filters the suggestions. Arrow keys move the highlight; Enter fills in the highlighted text and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted suggestion. A touch screen-reader trigger can move focus into the list, and a sheet has its own [focus behavior](#presentation).
 
@@ -233,8 +225,6 @@ Style the parts through their data attributes, which are the same in every frame
 
 The popup exposes sizing and animation variables. `--anchor-width` is the input’s width; use `--available-height` on the content to keep a long list in the viewport.
 
-<CssVariables component="autocomplete" />
-
 While focus stays in the input, use the content’s `data-modality="keyboard"` with an item’s `data-highlighted` to show a keyboard focus indicator on the highlighted suggestion.
 
 ## API Reference
@@ -242,55 +232,6 @@ While focus stays in the input, use the content’s `data-modality="keyboard"` w
 Props are attributes in kebab case, like `default-value`, `inline-complete` and `open-on-focus`. `filter`
 takes `contains`, `startsWith`, `fuzzy` or `false`. `items` and a `filter` function are
 properties. `container` and `anchor` take CSS selectors. Callbacks are DOM events.
-
-### Events
-
-Events fire on `<ui-autocomplete>` and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` or `openchange` cancels the change.
-
-| Member                     | On                | Description                                                     |
-| -------------------------- | ----------------- | --------------------------------------------------------------- |
-| `value` property           | `ui-autocomplete` | The text. Setting it changes the text, as a controller would    |
-| `open` property, attribute | `ui-autocomplete` | Whether the suggestions are open                                |
-| `api` property             | `ui-autocomplete` | The [controller](#controller-1)                                 |
-| `valuechange` event        | `ui-autocomplete` | `detail: { value, reason, event, source }`                      |
-| `openchange` event         | `ui-autocomplete` | `detail: { value: open, reason, event, source }`                |
-| `openchangecomplete` event | `ui-autocomplete` | `detail: { value: open }`, after the animation                  |
-| `highlight` event          | `ui-autocomplete` | `detail: { value, index, event }`                               |
-| `loadmore` event           | `ui-autocomplete` | When the last suggestion is reached                             |
-| `submit` event             | `ui-autocomplete` | `detail: { value }`. Cancel it to keep the form from submitting |
-| `dismissattempt` event     | `ui-autocomplete` | `detail: { reason, event }`, when a dismissal was refused       |
-
-### Reasons
-
-Why the text changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteValueChangeReason"
-/>
-
-And why the suggestions opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `dismissattempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteDismissReason"
-/>
-
-### Controller
-
-The element's `api` property has the same methods.
-
-<ControllerTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteController"
-/>
 
 ### Autocomplete
 
@@ -305,6 +246,8 @@ The element's `api` property has the same methods.
   path="../../packages/core/src/components/autocomplete/autocomplete.ts"
   name="AutocompleteContentProps"
 />
+
+<CssVariables component="autocomplete" part="content" />
 
 ### AutocompleteItem
 
@@ -401,6 +344,55 @@ The same state shows as data attributes on each element.
   path="../../packages/core/src/components/autocomplete/autocomplete.ts"
   name="AutocompleteItemIconState"
 />
+
+### Reasons
+
+Why the text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteValueChangeReason"
+/>
+
+And why the suggestions opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `dismissattempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteDismissReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods.
+
+<ControllerTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteController"
+/>
+
+### Events
+
+Events fire on `<ui-autocomplete>` and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` or `openchange` cancels the change.
+
+| Member                     | On                | Description                                                     |
+| -------------------------- | ----------------- | --------------------------------------------------------------- |
+| `value` property           | `ui-autocomplete` | The text. Setting it changes the text, as a controller would    |
+| `open` property, attribute | `ui-autocomplete` | Whether the suggestions are open                                |
+| `api` property             | `ui-autocomplete` | The [controller](#controller-1)                                 |
+| `valuechange` event        | `ui-autocomplete` | `detail: { value, reason, event, source }`                      |
+| `openchange` event         | `ui-autocomplete` | `detail: { value: open, reason, event, source }`                |
+| `openchangecomplete` event | `ui-autocomplete` | `detail: { value: open }`, after the animation                  |
+| `highlight` event          | `ui-autocomplete` | `detail: { value, index, event }`                               |
+| `loadmore` event           | `ui-autocomplete` | When the last suggestion is reached                             |
+| `submit` event             | `ui-autocomplete` | `detail: { value }`. Cancel it to keep the form from submitting |
+| `dismissattempt` event     | `ui-autocomplete` | `detail: { reason, event }`, when a dismissal was refused       |
 
 ## Accessibility
 

@@ -20,7 +20,7 @@ Use Token Input on its own when your code supplies the tokens. Add a Trigger Men
 pnpm add @ui-sdk/web @ui-sdk/core
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -119,39 +119,11 @@ The remove part is a pointer shortcut. Keep its default non-focusable element; k
 
 ## Styling
 
-The demos use the shared [example theme](../styling-and-animation#example-theme). Apply Tailwind classes directly to the editor and token parts. Token hosts expose `data-token-type`, `data-pending`, `data-unresolved`, and `data-selected`, even without a custom token renderer.
+Apply Tailwind classes directly to the editor and token parts. Token hosts expose `data-token-type`, `data-pending`, `data-unresolved`, and `data-selected`, even without a custom token renderer.
 
 <DataAttributes component="token-input" />
 
 ## API Reference
-
-### Callbacks
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value`.
-
-| Member              | On               | Description                                          |
-| ------------------- | ---------------- | ---------------------------------------------------- |
-| `value` property    | `ui-token-input` | The value. Setting a string parses it with the codec |
-| `api` property      | `ui-token-input` | The [controller](#controller-1)                      |
-| `valuechange` event | `ui-token-input` | `detail: { value, reason, inputType, removed }`      |
-
-The submit shortcut submits the form the element is in, so the form's own `submit` event hears it.
-
-Setting the `value` property is one undoable step, like `setValue()`. For the first value, use the `value` attribute with codec text, or set `defaultValue` and `codec` before the element connects: the `value` attribute reads with the default codec. `history` applies from the next edit whenever you set it.
-
-### Reasons
-
-<ReasonTable
-  path="../../packages/core/src/components/token-input/token-input.ts"
-  name="TokenInputValueChangeReason"
-/>
-
-### Controller
-
-<ControllerTable
-  path="../../packages/core/src/components/token-input/token-input.ts"
-  name="TokenInputController"
-/>
 
 ### TokenInput
 
@@ -187,6 +159,34 @@ Setting the `value` property is one undoable step, like `setValue()`. For the fi
   path="../../packages/core/src/components/token-input/token-input.ts"
   name="TokenInputTokenState"
 />
+
+### Reasons
+
+<ReasonTable
+  path="../../packages/core/src/components/token-input/token-input.ts"
+  name="TokenInputValueChangeReason"
+/>
+
+### Controller
+
+<ControllerTable
+  path="../../packages/core/src/components/token-input/token-input.ts"
+  name="TokenInputController"
+/>
+
+### Callbacks
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value`.
+
+| Member              | On               | Description                                          |
+| ------------------- | ---------------- | ---------------------------------------------------- |
+| `value` property    | `ui-token-input` | The value. Setting a string parses it with the codec |
+| `api` property      | `ui-token-input` | The [controller](#controller-1)                      |
+| `valuechange` event | `ui-token-input` | `detail: { value, reason, inputType, removed }`      |
+
+The submit shortcut submits the form the element is in, so the form's own `submit` event hears it.
+
+Setting the `value` property is one undoable step, like `setValue()`. For the first value, use the `value` attribute with codec text, or set `defaultValue` and `codec` before the element connects: the `value` attribute reads with the default codec. `history` applies from the next edit whenever you set it.
 
 ## Accessibility
 

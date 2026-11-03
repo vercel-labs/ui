@@ -14,18 +14,16 @@ description: Show a task’s progress, or an indeterminate state while its progr
 pnpm add @ui-sdk/svelte @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Progress`:
 
-```svelte
-<Progress value={40}>
-  <ProgressLabel />
-  <ProgressValue />
-  <ProgressTrack>
-    <ProgressIndicator />
-  </ProgressTrack>
-</Progress>
+```text
+Progress
+├── ProgressLabel
+├── ProgressValue
+└── ProgressTrack
+    └── ProgressIndicator
 ```
 
 - `Progress` holds the value and range.
@@ -106,9 +104,7 @@ Give the track a height, background, and width. The indicator sets its width as 
 
 <DataAttributes component="progress" />
 
-The root exposes a CSS variable for positioning other content alongside the reading:
-
-<CssVariables component="progress" />
+The root exposes a CSS variable, listed under [Progress](#progress), for positioning other content alongside the reading.
 
 <span id="render-functions" />
 
@@ -123,6 +119,8 @@ Props are the same as below.
 ### Progress
 
 <TypeTable path="../../packages/core/src/components/progress/progress.ts" name="ProgressOptions" />
+
+<CssVariables component="progress" part="root" />
 
 ### State
 

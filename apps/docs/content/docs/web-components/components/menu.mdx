@@ -7,6 +7,7 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 
 <ComponentExample
   name="menu/basic"
+  inspect
   caption="Open Project and choose an item. The menu closes and the readout shows its value. You can also use the arrow keys and Enter."
 />
 
@@ -16,22 +17,23 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 npm install @ui-sdk/web
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
-
-## Anatomy
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/menu"
 ```
 
-```html
-<ui-menu>
-  <ui-menu-trigger><button>Actions</button></ui-menu-trigger>
-  <ui-menu-content>
-    <ui-menu-item value="rename">Rename</ui-menu-item>
-    <ui-menu-item value="duplicate">Duplicate</ui-menu-item>
-  </ui-menu-content>
-</ui-menu>
+## Composition
+
+Use the following composition to build a `ui-menu`:
+
+```text
+ui-menu
+├── ui-menu-trigger
+│   └── button
+└── ui-menu-content
+    ├── ui-menu-item
+    └── ui-menu-item
 ```
 
 Give items a `value` and handle the menu’s `action` event to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
@@ -263,8 +265,6 @@ Put a native link inside `ui-menu-item as-child`. Enter follows the link like a 
 
 <DataAttributes />
 
-<CssVariables />
-
 Use `data-highlighted` for the active item, `data-disabled` for unavailable actions, and `data-checked` for selected settings. Popup sizing and motion hooks are shared with the [styling guide](../styling-and-animation).
 
 ## Custom Rendering
@@ -274,57 +274,6 @@ See [Links and Custom Rendering](#links-and-custom-rendering) for a native-link 
 ## API Reference
 
 Props are attributes in kebab case, like `default-checked` and `side-offset`. Attributes can change at any time, including the options on `<ui-menu>`: `"false"` is false, and numbers are numbers. Callbacks are DOM events.
-
-### Events
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
-
-| Member                     | On                      | Description                                                                             |
-| -------------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
-| `open` property, attribute | `ui-menu`               | Whether the menu is open. The attribute sets where it starts, and is live               |
-| `api` property             | `ui-menu`               | The [controller](#controller)                                                           |
-| `items` property           | `ui-menu`               | A data menu, rendered from its `<template>`                                             |
-| `openchange` event         | `ui-menu`               | `detail: { value: open, reason, event, source }`                                        |
-| `openchangecomplete` event | `ui-menu`               | `detail: { value: open }`, after the animation                                          |
-| `payloadchange` event      | `ui-menu`               | `detail: { value: payload, reason, event, source }`, when the content's payload changes |
-| `action` event             | `ui-menu`               | `detail: { value }` for every plain item                                                |
-| `dismissattempt` event     | `ui-menu`               | `detail: { reason, event }`, when a dismissal was refused                               |
-| `select` event             | `ui-menu-item`          | Before the menu closes. `preventDefault()` keeps it open                                |
-| `checkedchange` event      | `ui-menu-checkbox-item` | `detail: { value: checked, reason, event, source }`. Listen on the item                 |
-| `valuechange` event        | `ui-menu-radio-group`   | `detail: { value, reason, event, source }`. Listen on the group                         |
-| `payload` property         | `ui-menu-trigger`       | Data for the content, read when the trigger connects                                    |
-| `for` attribute            | `ui-menu-trigger`       | The `id` of a menu the trigger opens from outside it                                    |
-
-### Reasons
-
-`event.detail.reason` says why the menu or a submenu opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOpenChangeReason" />
-
-For a payload change, it says what opened the menu or took it over.
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuPayloadChangeReason" />
-
-With `dismissible` false, the refused dismissals `dismissattempt` reports:
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuDismissReason" />
-
-Checkbox items report why they toggled, in `checkedchange`:
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckedChangeReason" />
-
-Radio groups report why their value changed, in `valuechange`:
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuValueChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods. The `open` property reads and sets whether the menu is
-open.
-
-Every write method takes an optional `{ reason, event }`, passed to `openchange`. `open()` also takes `focus`: `"first"`, `"last"`, `"popup"` or `"none"`.
-
-<ControllerTable path="../../packages/core/src/components/menu/menu.ts" name="MenuController" />
 
 ### Menu
 
@@ -343,6 +292,8 @@ A trigger outside the menu names it with `for="menu-id"`, and takes `payload` as
 ### MenuContent
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuContentProps" />
+
+<CssVariables component="menu" part="content" />
 
 ### MenuItem
 
@@ -403,6 +354,57 @@ The same state shows as data attributes on each element.
 `MenuItemIcon`:
 
 <StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIconState" />
+
+### Reasons
+
+`event.detail.reason` says why the menu or a submenu opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOpenChangeReason" />
+
+For a payload change, it says what opened the menu or took it over.
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuPayloadChangeReason" />
+
+With `dismissible` false, the refused dismissals `dismissattempt` reports:
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuDismissReason" />
+
+Checkbox items report why they toggled, in `checkedchange`:
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckedChangeReason" />
+
+Radio groups report why their value changed, in `valuechange`:
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuValueChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods. The `open` property reads and sets whether the menu is
+open.
+
+Every write method takes an optional `{ reason, event }`, passed to `openchange`. `open()` also takes `focus`: `"first"`, `"last"`, `"popup"` or `"none"`.
+
+<ControllerTable path="../../packages/core/src/components/menu/menu.ts" name="MenuController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
+
+| Member                     | On                      | Description                                                                             |
+| -------------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
+| `open` property, attribute | `ui-menu`               | Whether the menu is open. The attribute sets where it starts, and is live               |
+| `api` property             | `ui-menu`               | The [controller](#controller)                                                           |
+| `items` property           | `ui-menu`               | A data menu, rendered from its `<template>`                                             |
+| `openchange` event         | `ui-menu`               | `detail: { value: open, reason, event, source }`                                        |
+| `openchangecomplete` event | `ui-menu`               | `detail: { value: open }`, after the animation                                          |
+| `payloadchange` event      | `ui-menu`               | `detail: { value: payload, reason, event, source }`, when the content's payload changes |
+| `action` event             | `ui-menu`               | `detail: { value }` for every plain item                                                |
+| `dismissattempt` event     | `ui-menu`               | `detail: { reason, event }`, when a dismissal was refused                               |
+| `select` event             | `ui-menu-item`          | Before the menu closes. `preventDefault()` keeps it open                                |
+| `checkedchange` event      | `ui-menu-checkbox-item` | `detail: { value: checked, reason, event, source }`. Listen on the item                 |
+| `valuechange` event        | `ui-menu-radio-group`   | `detail: { value, reason, event, source }`. Listen on the group                         |
+| `payload` property         | `ui-menu-trigger`       | Data for the content, read when the trigger connects                                    |
+| `for` attribute            | `ui-menu-trigger`       | The `id` of a menu the trigger opens from outside it                                    |
 
 ## Accessibility
 

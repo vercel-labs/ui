@@ -16,34 +16,17 @@ A popover keeps a small task close to the thing it belongs to. Put fields, butto
 npm install @ui-sdk/solid
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Popover`:
 
-```tsx
-import {
-  Popover,
-  PopoverClose,
-  PopoverContent,
-  PopoverDescription,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@ui-sdk/solid/popover"
-
-function Example() {
-  return (
-    <Popover>
-      <PopoverTrigger>Edit</PopoverTrigger>
-      <PopoverContent>
-        <PopoverTitle>Project details</PopoverTitle>
-        <PopoverDescription>Make a quick change without leaving the page.</PopoverDescription>
-        <PopoverClose>Done</PopoverClose>
-      </PopoverContent>
-    </Popover>
-  )
-}
-
-export { Example }
+```text
+Popover
+├── PopoverTrigger
+└── PopoverContent
+    ├── PopoverTitle
+    ├── PopoverDescription
+    └── PopoverClose
 ```
 
 The content has the dialog role. Its title names it and its description adds context. The trigger can live inside the popover or [connect from elsewhere](#triggers-outside-the-popover).
@@ -80,6 +63,7 @@ Set `dismissible` to false while there is unsaved work. Deliberate dismissal att
 
 <ComponentExample
   name="popover/placement"
+  inspect
   caption="Choose a side and alignment, adjust the offsets, then open Placement. Near a window edge, the popover can flip or shift to stay visible."
 />
 
@@ -192,9 +176,27 @@ Style `data-presentation` for both layouts. The sheet manages its own position a
 
 Use the state attributes to style each part and the positioning variables to size or animate the panel. `--transform-origin` keeps a scale animation attached to the anchor.
 
-<DataAttributes component="popover" />
+### PopoverContent [#styling-popovercontent]
 
-<CssVariables component="popover" />
+<CssVariables component="popover" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="popover" part="viewport" />
+
+## Data Attributes
+
+### PopoverTrigger [#data-attributes-popovertrigger]
+
+<DataAttributes component="popover" part="trigger" />
+
+### PopoverContent [#data-attributes-popovercontent]
+
+<DataAttributes component="popover" part="content" />
+
+### PopoverArrow [#data-attributes-popoverarrow]
+
+<DataAttributes component="popover" part="arrow" />
 
 ## Custom Rendering
 
@@ -202,16 +204,42 @@ Use the shared [composition guide](../parts-and-composition) when a part needs y
 
 ## API Reference
 
-### Events
+### Popover
 
-Callbacks get the new state first, then the details.
+<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverOptions" />
 
-| Prop                   | On        | Receives                                                                    |
-| ---------------------- | --------- | --------------------------------------------------------------------------- |
-| `onOpenChange`         | `Popover` | `(open, details)`: the new state, and the [reason](#reasons)                |
-| `onOpenChangeComplete` | `Popover` | `(open)`, after the animation                                               |
-| `onPayloadChange`      | `Popover` | `(payload, details)`: the content's new payload, and the [reason](#reasons) |
-| `onDismissAttempt`     | `Popover` | `({ reason, event })`, when a dismissal was refused                         |
+### PopoverTrigger
+
+A trigger outside the popover also takes `controller`.
+
+<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverTriggerProps" />
+
+### PopoverContent
+
+<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentProps" />
+### PopoverShortcut
+
+<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutProps" />
+
+### State
+
+What render functions, state-based class names and slots receive, per part.
+
+`PopoverTrigger`:
+
+<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverTriggerState" />
+
+`PopoverContent`:
+
+<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentState" />
+
+`PopoverArrow`:
+
+<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverArrowState" />
+
+`PopoverShortcut`:
+
+<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutState" />
 
 ### Reasons
 
@@ -236,43 +264,16 @@ Every write method takes an optional `{ reason, event }`, passed to `onOpenChang
 
 <ControllerTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverController" />
 
-### Popover
+### Events
 
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverOptions" />
+Callbacks get the new state first, then the details.
 
-### PopoverTrigger
-
-A trigger outside the popover also takes `controller`.
-
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverTriggerProps" />
-
-### PopoverContent
-
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentProps" />
-
-### PopoverShortcut
-
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutProps" />
-
-### State
-
-What render functions, state-based class names and slots receive, per part.
-
-`PopoverTrigger`:
-
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverTriggerState" />
-
-`PopoverContent`:
-
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentState" />
-
-`PopoverArrow`:
-
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverArrowState" />
-
-`PopoverShortcut`:
-
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutState" />
+| Prop                   | On        | Receives                                                                    |
+| ---------------------- | --------- | --------------------------------------------------------------------------- |
+| `onOpenChange`         | `Popover` | `(open, details)`: the new state, and the [reason](#reasons)                |
+| `onOpenChangeComplete` | `Popover` | `(open)`, after the animation                                               |
+| `onPayloadChange`      | `Popover` | `(payload, details)`: the content's new payload, and the [reason](#reasons) |
+| `onDismissAttempt`     | `Popover` | `({ reason, event })`, when a dismissal was refused                         |
 
 ## Accessibility
 

@@ -14,37 +14,39 @@ description: Groups site links into panels that open from a row of triggers.
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-These examples use Tailwind CSS and the shared [Example Theme](../styling-and-animation#example-theme).
-
 Importing the component defines its elements. On the server the import does nothing.
 
 ```ts
 import "@ui-sdk/web/navigation-menu"
 ```
 
-## Anatomy
+## Composition
 
-```html
-<ui-navigation-menu aria-label="Main">
-  <ui-navigation-menu-list>
-    <ui-navigation-menu-item value="guides">
-      <ui-navigation-menu-trigger><button>Guides</button></ui-navigation-menu-trigger>
-      <ui-navigation-menu-content class="absolute start-0 top-0 w-64 p-2">
-        <ui-navigation-menu-link><a href="/docs">Introduction</a></ui-navigation-menu-link>
-      </ui-navigation-menu-content>
-    </ui-navigation-menu-item>
-  </ui-navigation-menu-list>
-  <ui-navigation-menu-viewport
-    class="h-(--viewport-height) w-(--viewport-width) overflow-hidden"
-  ></ui-navigation-menu-viewport>
-</ui-navigation-menu>
+Use the following composition to build a `ui-navigation-menu`:
+
+```text
+ui-navigation-menu
+├── ui-navigation-menu-list
+│   ├── ui-navigation-menu-item
+│   │   ├── ui-navigation-menu-trigger
+│   │   │   └── button
+│   │   └── ui-navigation-menu-content
+│   │       └── ui-navigation-menu-link
+│   │           └── a
+│   └── ui-navigation-menu-item
+│       ├── ui-navigation-menu-trigger
+│       │   └── button
+│       └── ui-navigation-menu-content
+│           └── ui-navigation-menu-link
+│               └── a
+└── ui-navigation-menu-viewport
 ```
 
 The trigger and the link wrap your own `<button>` and `<a>`, so they stay a real button and a real link. The list and its items take the `list` and `listitem` roles.
 
 Give the navigation an `aria-label`. Each item holds a trigger and its panel, or a plain link. This follows the [disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/): buttons show groups of ordinary links. Use a [Menu](./menu) for actions instead.
 
-The viewport holds the open panel and follows its size and position. The sizing classes above are needed when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
+The viewport holds the open panel and follows its size and position. Give it `h-(--viewport-height) w-(--viewport-width) overflow-hidden` when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
 
 ## Examples
 
@@ -62,15 +64,6 @@ The link wraps your own `<a>`, so your router's click handling stays on it. Togg
 #### Router Links
 
 Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `closeOnSelect` to false to keep it open on every press, see [Close on Select](#close-on-select).
-
-### RTL
-
-Start and end follow the text direction: panels line up with their trigger's right edge, and Left and Right swap.
-
-<ComponentExample
-  name="navigation-menu/rtl"
-  caption="Use Left and Right to move between triggers in a right-to-left layout."
-/>
 
 ### Icons
 
@@ -109,7 +102,7 @@ Resting the pointer on a trigger opens its panel. With `openOnHover` set to fals
 
 ### Indicator
 
-`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#css-variables), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
+`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#navigationmenuindicator), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
 
 <ComponentExample
   name="navigation-menu/indicator"
@@ -229,10 +222,6 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 <DataAttributes component="navigation-menu" />
 
-### CSS Variables
-
-<CssVariables component="navigation-menu" />
-
 ### Contents in the Viewport
 
 The viewport is one popup that holds whichever content is open. For it to take that content's size:
@@ -310,37 +299,6 @@ The trigger and link wrap your own elements, and `as-child` renders a content as
 Props are attributes in kebab case, like `close-delay` and `side-offset`: `"false"` is false, and numbers
 are numbers. `anchor` and `container` take CSS selectors. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change. Type the element as `UiNavigationMenuElement` for typed listeners.
-
-| Member                      | On                   | Description                                                            |
-| --------------------------- | -------------------- | ---------------------------------------------------------------------- |
-| `value` property, attribute | `ui-navigation-menu` | The open item's value. The attribute sets where it starts, and is live |
-| `api` property              | `ui-navigation-menu` | The [controller](#controller)                                          |
-| `valuechange` event         | `ui-navigation-menu` | `detail: { value, reason, event }`                                     |
-| `openchangecomplete` event  | `ui-navigation-menu` | `detail: { value: open }`, after the animation                         |
-
-### Reasons
-
-`event.detail.reason` says why an item opened or closed.
-
-<ReasonTable
-  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
-  name="NavigationMenuValueChangeReason"
-/>
-
-### Controller
-
-The element's `api` property has the same methods.
-
-Every write method takes an optional `{ reason, event }`, passed to `valuechange`.
-
-<ControllerTable
-  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
-  name="NavigationMenuController"
-/>
-
 ### NavigationMenu
 
 <TypeTable
@@ -369,6 +327,8 @@ Every write method takes an optional `{ reason, event }`, passed to `valuechange
   name="NavigationMenuContentProps"
 />
 
+<CssVariables component="navigation-menu" part="content" />
+
 ### NavigationMenuLink
 
 <TypeTable
@@ -390,7 +350,15 @@ Every write method takes an optional `{ reason, event }`, passed to `valuechange
   name="NavigationMenuViewportProps"
 />
 
-`NavigationMenuList` and `NavigationMenuIndicator` take no props of their own.
+<CssVariables component="navigation-menu" part="viewport" />
+
+`NavigationMenuList` takes no props of its own.
+
+### NavigationMenuIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="navigation-menu" part="indicator" />
 
 ### State
 
@@ -458,6 +426,37 @@ The same state shows as data attributes on each element.
   path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
   name="NavigationMenuIndicatorState"
 />
+
+### Reasons
+
+`event.detail.reason` says why an item opened or closed.
+
+<ReasonTable
+  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
+  name="NavigationMenuValueChangeReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods.
+
+Every write method takes an optional `{ reason, event }`, passed to `valuechange`.
+
+<ControllerTable
+  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
+  name="NavigationMenuController"
+/>
+
+### Events
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change. Type the element as `UiNavigationMenuElement` for typed listeners.
+
+| Member                      | On                   | Description                                                            |
+| --------------------------- | -------------------- | ---------------------------------------------------------------------- |
+| `value` property, attribute | `ui-navigation-menu` | The open item's value. The attribute sets where it starts, and is live |
+| `api` property              | `ui-navigation-menu` | The [controller](#controller)                                          |
+| `valuechange` event         | `ui-navigation-menu` | `detail: { value, reason, event }`                                     |
+| `openchangecomplete` event  | `ui-navigation-menu` | `detail: { value: open }`, after the animation                         |
 
 ## Accessibility
 

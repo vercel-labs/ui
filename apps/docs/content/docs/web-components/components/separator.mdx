@@ -20,8 +20,6 @@ Import the component once to register its element:
 import "@ui-sdk/web/separator"
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
-
 ## Usage
 
 A separator marks a boundary between groups of content. Give it a size and a background:
@@ -29,12 +27,12 @@ A separator marks a boundary between groups of content. Give it a size and a bac
 ```html
 <section>
   <h2>Account</h2>
-  <ui-separator class="h-px bg-border"></ui-separator>
+  <ui-separator class="h-px bg-neutral-200"></ui-separator>
   <p>Manage your profile and preferences.</p>
 </section>
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 It renders with `role="separator"` and `aria-orientation="horizontal"` by default. It does not receive focus or resize the content around it.
 

@@ -14,28 +14,17 @@ description: Name a control or add a short hint on hover and keyboard focus.
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Tooltip`:
+
+```text
+Tooltip
+├── TooltipTrigger
+└── TooltipContent
+```
 
 Wrap the trigger and its hint in a tooltip.
-
-```tsx
-"use client"
-
-import { Tooltip, TooltipTrigger, TooltipContent } from "@ui-sdk/react/tooltip"
-
-function ShareHint() {
-  return (
-    <Tooltip>
-      <TooltipTrigger>Share</TooltipTrigger>
-      <TooltipContent>Anyone with the link can view</TooltipContent>
-    </Tooltip>
-  )
-}
-
-export { ShareHint }
-```
 
 The content has the `tooltip` role. It names its trigger when the trigger has no name of its own, like an icon button, and describes it otherwise, as shown in [Icon Buttons](#icon-buttons). Keep it to plain text: a tooltip can't be focused, so links or buttons inside it can't be reached. For anything interactive, use a [Popover](./popover) or a [Hover Card](./hover-card).
 
@@ -121,15 +110,6 @@ To show a tooltip only when text is cut off, cancel the open in `onOpenChange` w
   caption="Hover or focus each filename. Only names that are cut off open a tooltip."
 />
 
-### RTL
-
-Start and end follow the text direction.
-
-<ComponentExample
-  name="tooltip/rtl"
-  caption="Hover the triggers to see logical alignment in right-to-left text."
-/>
-
 ### Offsets
 
 `sideOffset` is the gap to the trigger, 4 pixels by default. `alignOffset` shifts along it, `align` lines it up with the start, center or end of the trigger, and `collisionPadding` is the space kept from the edges of the window.
@@ -211,9 +191,7 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 The content also gets `data-instant` when it opened without its delay, because another tooltip was open a moment ago.
 
-Open tooltips also set these CSS variables, for sizing and animation.
-
-<CssVariables component="tooltip" />
+Open tooltips also set CSS variables for sizing and animation, listed under [TooltipContent](#tooltipcontent).
 
 Animate with `data-starting-style` and `data-ending-style`. The tooltip stays mounted until its exit animation finishes.
 
@@ -252,35 +230,6 @@ Each part's state is listed under [State](#state).
 
 Props and callbacks are the same as below, as React props.
 
-### Events
-
-Callbacks get the new state first, then the details.
-
-| Prop                   | On        | Receives                                                                    |
-| ---------------------- | --------- | --------------------------------------------------------------------------- |
-| `onOpenChange`         | `Tooltip` | `(open, details)`: the new state, and the [reason](#reasons)                |
-| `onOpenChangeComplete` | `Tooltip` | `(open)`, after the animation                                               |
-| `onPayloadChange`      | `Tooltip` | `(payload, details)`: the content's new payload, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the tooltip opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipOpenChangeReason" />
-
-For a payload change, it says what opened the tooltip or took it over.
-
-<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipPayloadChangeReason" />
-
-### Controller
-
-Create one with `createTooltipController<Payload>()` and pass it as `controller`, to the tooltip and to any
-triggers outside it. `Payload` is the type of the data triggers and `open()` pass.
-
-Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`.
-
-<ControllerTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipController" />
-
 ### Tooltip
 
 <TypeTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipOptions" />
@@ -294,6 +243,8 @@ A trigger outside the tooltip also takes `controller`.
 ### TooltipContent
 
 <TypeTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipContentProps" />
+
+<CssVariables component="tooltip" part="content" />
 
 ### TooltipShortcut
 
@@ -318,6 +269,35 @@ What render functions, state-based class names and slots receive, per part.
 `TooltipShortcut`:
 
 <StateTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipShortcutState" />
+
+### Reasons
+
+`details.reason` says why the tooltip opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipOpenChangeReason" />
+
+For a payload change, it says what opened the tooltip or took it over.
+
+<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipPayloadChangeReason" />
+
+### Controller
+
+Create one with `createTooltipController<Payload>()` and pass it as `controller`, to the tooltip and to any
+triggers outside it. `Payload` is the type of the data triggers and `open()` pass.
+
+Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`.
+
+<ControllerTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipController" />
+
+### Events
+
+Callbacks get the new state first, then the details.
+
+| Prop                   | On        | Receives                                                                    |
+| ---------------------- | --------- | --------------------------------------------------------------------------- |
+| `onOpenChange`         | `Tooltip` | `(open, details)`: the new state, and the [reason](#reasons)                |
+| `onOpenChangeComplete` | `Tooltip` | `(open)`, after the animation                                               |
+| `onPayloadChange`      | `Tooltip` | `(payload, details)`: the content's new payload, and the [reason](#reasons) |
 
 ## Accessibility
 

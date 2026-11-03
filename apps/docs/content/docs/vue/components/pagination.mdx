@@ -14,42 +14,26 @@ description: Navigate pages with buttons, links, or your router.
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Pagination`:
+
+```text
+Pagination
+└── PaginationList
+    ├── PaginationItem
+    │   └── PaginationPrevious
+    ├── PaginationItem
+    │   └── PaginationLink
+    ├── PaginationItem
+    │   └── PaginationEllipsis
+    ├── PaginationItem
+    │   └── PaginationLink
+    └── PaginationItem
+        └── PaginationNext
+```
 
 Name the navigation with `aria-label`, then put the page links and steps in a list.
-
-```vue
-<script setup lang="ts">
-import {
-  Pagination,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationList,
-  PaginationNext,
-  PaginationPrevious,
-} from "@ui-sdk/vue/pagination"
-</script>
-
-<template>
-  <Pagination aria-label="Pagination" :page-count="10">
-    <PaginationList v-slot="{ state }">
-      <PaginationItem>
-        <PaginationPrevious>Previous</PaginationPrevious>
-      </PaginationItem>
-      <PaginationItem v-for="item in state.items" :key="item">
-        <PaginationLink v-if="typeof item === 'number'" :page="item" />
-        <PaginationEllipsis v-else />
-      </PaginationItem>
-      <PaginationItem>
-        <PaginationNext>Next</PaginationNext>
-      </PaginationItem>
-    </PaginationList>
-  </Pagination>
-</template>
-```
 
 `items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
 
@@ -115,12 +99,6 @@ Render the router's link with the `render` slot. With Vue Router, use `RouterLin
   name="pagination/router"
   caption="Choose a page. The example updates the URL and current page without reloading."
 />
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the pagination. The list runs from the right, so Previous sits on the right and Next on the left. Turn directional icons with `rtl:rotate-180`.
-
-<ComponentExample name="pagination/rtl" caption="Use Previous and Next in a right-to-left layout." />
 
 ## Behavior and Options
 
@@ -220,35 +198,6 @@ and the part's state: whether a link is `active`, and for a step, the `page` it 
 
 Props are the same as below, and callbacks are events.
 
-### Events
-
-Events get the new page first, then the details. `v-model` only updates when `@page-change` wasn't canceled.
-
-| Binding        | On           | Receives                                                    |
-| -------------- | ------------ | ----------------------------------------------------------- |
-| `v-model:page` | `Pagination` | The current page                                            |
-| `@page-change` | `Pagination` | `(page, details)`: the new page, and the [reason](#reasons) |
-
-### Reasons
-
-`details.reason` says why the page changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/pagination/pagination.ts"
-  name="PaginationPageChangeReason"
-/>
-
-### Controller
-
-Create one with `createPaginationController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, passed to `@page-change`, and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable
-  path="../../packages/core/src/components/pagination/pagination.ts"
-  name="PaginationController"
-/>
-
 ### Pagination
 
 <TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
@@ -274,6 +223,35 @@ What render functions, state-based class names and slots receive, per part.
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
 <StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+
+### Reasons
+
+`details.reason` says why the page changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationPageChangeReason"
+/>
+
+### Controller
+
+Create one with `createPaginationController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to `@page-change`, and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationController"
+/>
+
+### Events
+
+Events get the new page first, then the details. `v-model` only updates when `@page-change` wasn't canceled.
+
+| Binding        | On           | Receives                                                    |
+| -------------- | ------------ | ----------------------------------------------------------- |
+| `v-model:page` | `Pagination` | The current page                                            |
+| `@page-change` | `Pagination` | `(page, details)`: the new page, and the [reason](#reasons) |
 
 ## Accessibility
 

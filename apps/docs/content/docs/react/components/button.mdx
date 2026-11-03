@@ -14,8 +14,6 @@ description: Run an action, wait for it to finish, and handle disabled states.
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
 ## Usage
 
 Use `onClick` to run an action. Button renders a native `<button>` with `type="button"` by default.
@@ -51,12 +49,6 @@ Return a Promise from `onClick` to keep the button pending until it settles. The
 ```
 
 After one second, it announces "Loading" to screen readers. Set `pendingAnnouncement` to change that message, as above, or use an empty string to silence it.
-
-The demo uses `LoaderCircle` from `lucide-react` for its spinner. Install that package if you copy the example:
-
-```bash
-npm install lucide-react
-```
 
 <ComponentExample
   name="button/pending"
@@ -178,12 +170,6 @@ Use `data-pending` to show a spinner or waiting cursor, and `data-disabled` to s
 
 Button accepts native button props and the options below. `render`, `children`, `className` and `style` can read the button's state; see [Parts and Composition](/docs/react/parts-and-composition).
 
-### Events
-
-| Prop      | Receives                                                                                                                        |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `onClick` | React's click event and `{ source }`, how the button was pressed. Return a Promise to keep the button pending until it settles. |
-
 ### Button
 
 <TypeTable path="../../packages/core/src/components/button/button.ts" name="ButtonOptions" />
@@ -191,6 +177,12 @@ Button accepts native button props and the options below. `render`, `children`, 
 ### State
 
 <StateTable path="../../packages/core/src/components/button/button.ts" name="ButtonState" />
+
+### Events
+
+| Prop      | Receives                                                                                                                        |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `onClick` | React's click event and `{ source }`, how the button was pressed. Return a Promise to keep the button pending until it settles. |
 
 ## Accessibility
 

@@ -14,41 +14,27 @@ description: Groups site links into panels that open from a row of triggers.
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-These examples use Tailwind CSS and the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `NavigationMenu`:
 
-```vue
-<script setup lang="ts">
-import {
-  NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
-  NavigationMenuLink,
-  NavigationMenuViewport,
-} from "@ui-sdk/vue/navigation-menu"
-</script>
-
-<template>
-  <NavigationMenu aria-label="Main">
-    <NavigationMenuList>
-      <NavigationMenuItem value="guides">
-        <NavigationMenuTrigger>Guides</NavigationMenuTrigger>
-        <NavigationMenuContent class="absolute start-0 top-0 w-64 p-2">
-          <NavigationMenuLink href="/docs">Introduction</NavigationMenuLink>
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    </NavigationMenuList>
-    <NavigationMenuViewport class="h-(--viewport-height) w-(--viewport-width) overflow-hidden" />
-  </NavigationMenu>
-</template>
+```text
+NavigationMenu
+├── NavigationMenuList
+│   ├── NavigationMenuItem
+│   │   ├── NavigationMenuTrigger
+│   │   └── NavigationMenuContent
+│   │       └── NavigationMenuLink
+│   └── NavigationMenuItem
+│       ├── NavigationMenuTrigger
+│       └── NavigationMenuContent
+│           └── NavigationMenuLink
+└── NavigationMenuViewport
 ```
 
 Give the navigation an `aria-label`. Each item holds a trigger and its panel, or a plain link. This follows the [disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/): buttons show groups of ordinary links. Use a [Menu](./menu) for actions instead.
 
-The viewport holds the open panel and follows its size and position. The sizing classes above are needed when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
+The viewport holds the open panel and follows its size and position. Give it `h-(--viewport-height) w-(--viewport-width) overflow-hidden` when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
 
 ## Examples
 
@@ -76,15 +62,6 @@ Render the router's link with the `render` slot. With Vue Router, use `RouterLin
 #### Router Links
 
 Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `closeOnSelect` to false to keep it open on every press, see [Close on Select](#close-on-select).
-
-### RTL
-
-Start and end follow the text direction: panels line up with their trigger's right edge, and Left and Right swap.
-
-<ComponentExample
-  name="navigation-menu/rtl"
-  caption="Use Left and Right to move between triggers in a right-to-left layout."
-/>
 
 ### Icons
 
@@ -123,7 +100,7 @@ Resting the pointer on a trigger opens its panel. With `openOnHover` set to fals
 
 ### Indicator
 
-`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#css-variables), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
+`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#navigationmenuindicator), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
 
 <ComponentExample
   name="navigation-menu/indicator"
@@ -238,10 +215,6 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 <DataAttributes component="navigation-menu" />
 
-### CSS Variables
-
-<CssVariables component="navigation-menu" />
-
 ### Contents in the Viewport
 
 The viewport is one popup that holds whichever content is open. For it to take that content's size:
@@ -318,36 +291,6 @@ Every part takes a `render` slot, which receives the props to bind and the part'
 
 Props are the same as below, and callbacks are events.
 
-### Events
-
-Events get the new state first, then the details. `v-model` only updates when `@value-change` wasn't canceled.
-
-| Binding                 | On               | Receives                                                      |
-| ----------------------- | ---------------- | ------------------------------------------------------------- |
-| `v-model:value`         | `NavigationMenu` | The open item's value, or `null`                              |
-| `@value-change`         | `NavigationMenu` | `(value, details)`: the open item, and the [reason](#reasons) |
-| `@open-change-complete` | `NavigationMenu` | `(open)`, after the animation                                 |
-
-### Reasons
-
-`details.reason` says why an item opened or closed.
-
-<ReasonTable
-  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
-  name="NavigationMenuValueChangeReason"
-/>
-
-### Controller
-
-Create one with `createNavigationMenuController()` and pass it as `controller`.
-
-Every write method takes an optional `{ reason, event }`, passed to `@value-change`.
-
-<ControllerTable
-  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
-  name="NavigationMenuController"
-/>
-
 ### NavigationMenu
 
 <TypeTable
@@ -376,6 +319,8 @@ Every write method takes an optional `{ reason, event }`, passed to `@value-chan
   name="NavigationMenuContentProps"
 />
 
+<CssVariables component="navigation-menu" part="content" />
+
 ### NavigationMenuLink
 
 <TypeTable
@@ -397,7 +342,15 @@ Every write method takes an optional `{ reason, event }`, passed to `@value-chan
   name="NavigationMenuViewportProps"
 />
 
-`NavigationMenuList` and `NavigationMenuIndicator` take no props of their own.
+<CssVariables component="navigation-menu" part="viewport" />
+
+`NavigationMenuList` takes no props of its own.
+
+### NavigationMenuIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="navigation-menu" part="indicator" />
 
 ### State
 
@@ -465,6 +418,36 @@ What render functions, state-based class names and slots receive, per part.
   path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
   name="NavigationMenuIndicatorState"
 />
+
+### Reasons
+
+`details.reason` says why an item opened or closed.
+
+<ReasonTable
+  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
+  name="NavigationMenuValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createNavigationMenuController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, passed to `@value-change`.
+
+<ControllerTable
+  path="../../packages/core/src/components/navigation-menu/navigation-menu.ts"
+  name="NavigationMenuController"
+/>
+
+### Events
+
+Events get the new state first, then the details. `v-model` only updates when `@value-change` wasn't canceled.
+
+| Binding                 | On               | Receives                                                      |
+| ----------------------- | ---------------- | ------------------------------------------------------------- |
+| `v-model:value`         | `NavigationMenu` | The open item's value, or `null`                              |
+| `@value-change`         | `NavigationMenu` | `(value, details)`: the open item, and the [reason](#reasons) |
+| `@open-change-complete` | `NavigationMenu` | `(open)`, after the animation                                 |
 
 ## Accessibility
 

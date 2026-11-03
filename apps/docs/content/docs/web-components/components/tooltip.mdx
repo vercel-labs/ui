@@ -20,18 +20,18 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/tooltip"
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-tooltip`:
+
+```text
+ui-tooltip
+├── ui-tooltip-trigger
+│   └── button
+└── ui-tooltip-content
+```
 
 Wrap the trigger and its hint in a tooltip.
-
-```html
-<ui-tooltip>
-  <ui-tooltip-trigger><button>Share</button></ui-tooltip-trigger>
-  <ui-tooltip-content>Anyone with the link can view</ui-tooltip-content>
-</ui-tooltip>
-```
 
 The trigger wraps your own `<button>` or link, so it keeps everything a native button does. Wrapped around another component's trigger, like `<ui-popover-trigger>`, it binds the button deepest in.
 
@@ -119,15 +119,6 @@ To show a tooltip only when text is cut off, cancel the open in `openchange` whe
 <ComponentExample
   name="tooltip/truncated"
   caption="Hover or focus each filename. Only names that are cut off open a tooltip."
-/>
-
-### RTL
-
-Start and end follow the text direction.
-
-<ComponentExample
-  name="tooltip/rtl"
-  caption="Hover the triggers to see logical alignment in right-to-left text."
 />
 
 ### Offsets
@@ -218,9 +209,7 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 The content also gets `data-instant` when it opened without its delay, because another tooltip was open a moment ago.
 
-Open tooltips also set these CSS variables, for sizing and animation.
-
-<CssVariables component="tooltip" />
+Open tooltips also set CSS variables for sizing and animation, listed under [TooltipContent](#tooltipcontent).
 
 Animate with `data-starting-style` and `data-ending-style`. The tooltip stays mounted until its exit animation finishes.
 
@@ -259,39 +248,6 @@ Each part's state is listed under [State](#state).
 
 Props are attributes in kebab case, like `close-delay` and `side-offset`: `"false"` is false, and numbers are numbers. `anchor` and `container` take CSS selectors. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `openchange` cancels the change.
-
-| Member                     | On                   | Description                                                                     |
-| -------------------------- | -------------------- | ------------------------------------------------------------------------------- |
-| `open` property, attribute | `ui-tooltip`         | Whether the tooltip is open. The attribute sets where it starts, and is live    |
-| `api` property             | `ui-tooltip`         | The [controller](#controller)                                                   |
-| `openchange` event         | `ui-tooltip`         | `detail: { value: open, reason, event }`                                        |
-| `openchangecomplete` event | `ui-tooltip`         | `detail: { value: open }`, after the animation                                  |
-| `payloadchange` event      | `ui-tooltip`         | `detail: { value: payload, reason, event }`, when the content's payload changes |
-| `payload` property         | `ui-tooltip-trigger` | Data for the content, read when the trigger connects                            |
-| `for` attribute            | `ui-tooltip-trigger` | The `id` of a tooltip the trigger shows from outside it                         |
-
-### Reasons
-
-`event.detail.reason` says why the tooltip opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipOpenChangeReason" />
-
-For a payload change, it says what opened the tooltip or took it over.
-
-<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipPayloadChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods. The `open` property reads and sets whether the tooltip
-is open.
-
-Every write method takes an optional `{ reason, event }`, passed to `openchange`.
-
-<ControllerTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipController" />
-
 ### Tooltip
 
 <TypeTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipOptions" />
@@ -305,6 +261,8 @@ A trigger outside the tooltip names it with `for="tooltip-id"`, and takes `paylo
 ### TooltipContent
 
 <TypeTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipContentProps" />
+
+<CssVariables component="tooltip" part="content" />
 
 ### TooltipShortcut
 
@@ -329,6 +287,39 @@ The same state shows as data attributes on each element.
 `TooltipShortcut`:
 
 <StateTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipShortcutState" />
+
+### Reasons
+
+`event.detail.reason` says why the tooltip opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipOpenChangeReason" />
+
+For a payload change, it says what opened the tooltip or took it over.
+
+<ReasonTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipPayloadChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods. The `open` property reads and sets whether the tooltip
+is open.
+
+Every write method takes an optional `{ reason, event }`, passed to `openchange`.
+
+<ControllerTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `openchange` cancels the change.
+
+| Member                     | On                   | Description                                                                     |
+| -------------------------- | -------------------- | ------------------------------------------------------------------------------- |
+| `open` property, attribute | `ui-tooltip`         | Whether the tooltip is open. The attribute sets where it starts, and is live    |
+| `api` property             | `ui-tooltip`         | The [controller](#controller)                                                   |
+| `openchange` event         | `ui-tooltip`         | `detail: { value: open, reason, event }`                                        |
+| `openchangecomplete` event | `ui-tooltip`         | `detail: { value: open }`, after the animation                                  |
+| `payloadchange` event      | `ui-tooltip`         | `detail: { value: payload, reason, event }`, when the content's payload changes |
+| `payload` property         | `ui-tooltip-trigger` | Data for the content, read when the trigger connects                            |
+| `for` attribute            | `ui-tooltip-trigger` | The `id` of a tooltip the trigger shows from outside it                         |
 
 ## Accessibility
 

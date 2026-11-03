@@ -14,21 +14,17 @@ description: Show and hide a panel, preserve its contents, and animate its heigh
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
 Import the component in your client entry point to register its elements:
 
 ```ts
 import "@ui-sdk/web/collapsible"
 ```
 
-The demos also use icons from `lucide`. Install that package if you copy their source.
-
 ## Usage
 
 Put a trigger and a panel inside `ui-collapsible`. The trigger reports whether the panel is open with `aria-expanded` and points to the panel with `aria-controls` while it is mounted.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```html
 <ui-collapsible>
@@ -138,11 +134,23 @@ See [State and Events](../state-and-events) for controlled state, cancellation a
 
 Use the parts' data attributes to style open and disabled states. The examples rotate their chevron from the trigger's `data-open` attribute.
 
-<DataAttributes component="collapsible" />
+### `<ui-collapsible-panel>` [#styling-collapsiblepanel]
 
-### Panel Variables
+<CssVariables component="collapsible" part="panel" />
 
-<CssVariables component="collapsible" />
+## Data Attributes
+
+### `<ui-collapsible>` [#data-attributes-collapsible]
+
+<DataAttributes component="collapsible" part="root" />
+
+### `<ui-collapsible-trigger>` [#data-attributes-collapsibletrigger]
+
+<DataAttributes component="collapsible" part="trigger" />
+
+### `<ui-collapsible-panel>` [#data-attributes-collapsiblepanel]
+
+<DataAttributes component="collapsible" part="panel" />
 
 ## Custom Rendering
 
@@ -159,16 +167,28 @@ Props are attributes in kebab case, like `default-open`, `keep-mounted` and `hid
 is false. Callbacks are DOM events. Elements have no `controller` attribute: their
 `api` property is one.
 
-### Events
+### Collapsible
 
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `openchange` cancels the change.
+<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
 
-| Member                     | On               | Description                                                                |
-| -------------------------- | ---------------- | -------------------------------------------------------------------------- |
-| `open` property, attribute | `ui-collapsible` | Whether the panel is open. The attribute sets where it starts, and is live |
-| `api` property             | `ui-collapsible` | The [controller](#controller)                                              |
-| `openchange` event         | `ui-collapsible` | `detail: { value: open, reason, event, source }`                           |
-| `openchangecomplete` event | `ui-collapsible` | `detail: { value: open }`, after the panel's animation                     |
+### CollapsibleTrigger
+
+The trigger takes no options of its own, only the props of the element it renders.
+
+### CollapsiblePanel
+
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsiblePanelProps"
+/>
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleRootState"
+/>
 
 ### Reasons
 
@@ -191,29 +211,16 @@ Every write method takes an optional `{ reason, event }`, and returns `false` wh
   name="CollapsibleController"
 />
 
-### Collapsible
+### Events
 
-<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `openchange` cancels the change.
 
-### CollapsibleTrigger
-
-The trigger takes no options of its own, only the props of the element it renders.
-
-### CollapsiblePanel
-
-<TypeTable
-  path="../../packages/core/src/components/collapsible/collapsible.ts"
-  name="CollapsiblePanelProps"
-/>
-
-### State
-
-The same state shows as data attributes on each element.
-
-<StateTable
-  path="../../packages/core/src/components/collapsible/collapsible.ts"
-  name="CollapsibleRootState"
-/>
+| Member                     | On               | Description                                                                |
+| -------------------------- | ---------------- | -------------------------------------------------------------------------- |
+| `open` property, attribute | `ui-collapsible` | Whether the panel is open. The attribute sets where it starts, and is live |
+| `api` property             | `ui-collapsible` | The [controller](#controller)                                              |
+| `openchange` event         | `ui-collapsible` | `detail: { value: open, reason, event, source }`                           |
+| `openchangecomplete` event | `ui-collapsible` | `detail: { value: open }`, after the panel's animation                     |
 
 ## Accessibility
 

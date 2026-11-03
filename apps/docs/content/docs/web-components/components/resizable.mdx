@@ -20,19 +20,18 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/resizable"
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-resizable`:
+
+```text
+ui-resizable
+├── ui-resizable-panel
+├── ui-resizable-handle
+└── ui-resizable-panel
+```
 
 Put a handle between the panels you want to resize.
-
-```html
-<ui-resizable>
-  <ui-resizable-panel></ui-resizable-panel>
-  <ui-resizable-handle aria-label="Resize sidebar"></ui-resizable-handle>
-  <ui-resizable-panel></ui-resizable-panel>
-</ui-resizable>
-```
 
 - **Resizable** is the group. It lays its panels out in a row, or a column with `orientation="vertical"`, so give it a size: a vertical group needs a height.
 - **ResizablePanel** is one region. Its size is a percentage of the space panels share, written to `--resizable-panel-size` and used as its flex basis.
@@ -58,15 +57,6 @@ Put anything inside a handle, like a grip that shows it can be dragged. The hand
 <ComponentExample
   name="resizable/handle"
   caption="Grab the visible grip or focus the handle and use the arrow keys."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the group. The first panel is on the right, ArrowLeft grows the panel before the handle, and drags follow the pointer.
-
-<ComponentExample
-  name="resizable/rtl"
-  caption="Resize the panels in a right-to-left layout. ArrowLeft grows the first panel."
 />
 
 ### Collapsible
@@ -183,29 +173,57 @@ Parts are unstyled, apart from the layout they need: the group is a flex row or 
 
 ```html
 <ui-resizable-handle
-  class="relative flex w-px items-center justify-center bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovered:bg-ring data-dragging:bg-ring aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full"
+  class="relative flex w-px items-center justify-center bg-neutral-200 outline-none focus-visible:ring-3 focus-visible:ring-neutral-400/50 data-hovered:bg-neutral-400 data-dragging:bg-neutral-400 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full"
 ></ui-resizable-handle>
 ```
 
-<DataAttributes component="resizable" />
+### `<ui-resizable-panel>` [#styling-resizablepanel]
 
-<CssVariables component="resizable" />
+<CssVariables component="resizable" part="panel" />
+
+## Data Attributes
+
+### `<ui-resizable>` [#data-attributes-resizable]
+
+<DataAttributes component="resizable" part="root" />
+
+### `<ui-resizable-panel>` [#data-attributes-resizablepanel]
+
+<DataAttributes component="resizable" part="panel" />
+
+### `<ui-resizable-handle>` [#data-attributes-resizablehandle]
+
+<DataAttributes component="resizable" part="handle" />
 
 ## API Reference
 
 Props are attributes in kebab case, like `default-size` and `auto-save-id`. A layout is written as
 `"30,70"`. `storage` and `controller` are properties. Callbacks are DOM events.
 
-### Events
+### Resizable
 
-Events fire on their own element and don't bubble, with the layout in `event.detail.value` and the `reason`, `event` and `source` beside it. Calling `preventDefault()` on `layoutchange` cancels the change.
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
 
-| Member                       | On             | Description                                                 |
-| ---------------------------- | -------------- | ----------------------------------------------------------- |
-| `layout` property, attribute | `ui-resizable` | The layout. The attribute sets it as text, like `"30,70"`   |
-| `api` property               | `ui-resizable` | The [controller](#controller)                               |
-| `layoutchange` event         | `ui-resizable` | `detail: { value, reason, event, source }`, on every change |
-| `layoutcommit` event         | `ui-resizable` | `detail: { value, reason, event, source }`, once it ends    |
+### ResizablePanel
+
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+### ResizableHandle
+
+<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+
+Panels:
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+
+Handles:
+
+<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
 
 ### Reasons
 
@@ -227,31 +245,16 @@ Write methods take an optional `{ reason, event }`, fire the change event like a
   name="ResizableController"
 />
 
-### Resizable
+### Events
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+Events fire on their own element and don't bubble, with the layout in `event.detail.value` and the `reason`, `event` and `source` beside it. Calling `preventDefault()` on `layoutchange` cancels the change.
 
-### ResizablePanel
-
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
-
-### ResizableHandle
-
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
-
-### State
-
-The same state shows as data attributes on each element.
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
-
-Panels:
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
-
-Handles:
-
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+| Member                       | On             | Description                                                 |
+| ---------------------------- | -------------- | ----------------------------------------------------------- |
+| `layout` property, attribute | `ui-resizable` | The layout. The attribute sets it as text, like `"30,70"`   |
+| `api` property               | `ui-resizable` | The [controller](#controller)                               |
+| `layoutchange` event         | `ui-resizable` | `detail: { value, reason, event, source }`, on every change |
+| `layoutcommit` event         | `ui-resizable` | `detail: { value, reason, event, source }`, once it ends    |
 
 ## Accessibility
 

@@ -5,6 +5,7 @@ description: Adjust a number or a range with draggable thumbs and keyboard contr
 
 <ComponentExample
   name="slider/basic"
+  inspect
   caption="Drag the thumb or focus it and use the arrow keys to adjust Volume."
 />
 
@@ -14,38 +15,20 @@ description: Adjust a number or a range with draggable thumbs and keyboard contr
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Slider`:
+
+```text
+Slider
+├── SliderValue
+└── SliderControl
+    └── SliderTrack
+        ├── SliderIndicator
+        └── SliderThumb
+```
 
 A control handles presses around the track. Put a thumb on that track for each value.
-
-```tsx
-import {
-  Slider,
-  SliderValue,
-  SliderControl,
-  SliderTrack,
-  SliderIndicator,
-  SliderThumb,
-} from "@ui-sdk/solid/slider"
-
-function VolumeSlider() {
-  return (
-    <Slider defaultValue={50}>
-      <SliderValue />
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb aria-label="Volume" />
-        </SliderTrack>
-      </SliderControl>
-    </Slider>
-  )
-}
-
-export { VolumeSlider }
-```
 
 - **Slider** holds the value and is a group around the thumbs.
 - **SliderControl** is where presses land. Pressing it moves the nearest thumb and starts a drag. Give it some height around a thin track.
@@ -104,15 +87,6 @@ Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted
 <ComponentExample
   name="slider/disabled"
   caption="The disabled slider keeps its value and cannot be focused or dragged."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the slider. It starts from the right, ArrowLeft increases it, and the thumbs and indicator are placed with `inset-inline-start`, so nothing in your styles needs to flip. `locale` sets the digits.
-
-<ComponentExample
-  name="slider/rtl"
-  caption="Adjust the range in a right-to-left layout. ArrowLeft increases the value."
 />
 
 ## Behavior and Options
@@ -213,22 +187,20 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 ```tsx
 <SliderControl class="flex items-center py-2 data-disabled:opacity-50">
-  <SliderTrack class="h-1 w-full rounded-2xl bg-input/90 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1">
-    <SliderIndicator class="rounded-2xl bg-primary" />
-    <SliderThumb class="size-4 rounded-2xl bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-ring/30 data-dragging:ring-4 data-dragging:ring-ring/30" />
+  <SliderTrack class="h-1 w-full rounded-2xl bg-neutral-200 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1">
+    <SliderIndicator class="rounded-2xl bg-neutral-900" />
+    <SliderThumb class="size-4 rounded-2xl bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-neutral-400/50 data-dragging:ring-4 data-dragging:ring-neutral-400/50" />
   </SliderTrack>
 </SliderControl>
 ```
 
 <DataAttributes component="slider" />
 
-Thumbs and the indicator are placed with inline styles: `position: absolute`, and `inset-inline-start` or `bottom` in percent. They also get these CSS variables, for anything else that should follow them:
-
-<CssVariables component="slider" />
+Thumbs and the indicator are placed with inline styles: `position: absolute`, and `inset-inline-start` or `bottom` in percent. They also get CSS variables, listed under [SliderIndicator](#sliderindicator) and [SliderThumb](#sliderthumb), for anything else that should follow them.
 
 ## Custom Rendering
 
-Every part takes `render`, a function that receives the props to spread and the part's state. `class`, `style` and `children` can be functions of the same state: `class={(state) => (state.dragging ? "bg-primary" : "bg-primary/70")}`.
+Every part takes `render`, a function that receives the props to spread and the part's state. `class`, `style` and `children` can be functions of the same state: `class={(state) => (state.dragging ? "bg-neutral-900" : "bg-neutral-900/70")}`.
 
 ```tsx
 // A bubble above the thumb with its value.
@@ -241,14 +213,35 @@ See [Parts and Composition](../parts-and-composition) for the rendering contract
 
 Props and callbacks are the same as below, as Solid props.
 
-### Events
+### Slider
 
-Callbacks get the new value first, then the details.
+<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
 
-| Prop            | On       | Receives                                                                                |
-| --------------- | -------- | --------------------------------------------------------------------------------------- |
-| `onValueChange` | `Slider` | `(value, details)`: the new value, the [reason](#reasons) and `details.thumb`           |
-| `onValueCommit` | `Slider` | `(value, details)`: the value once the interaction ends, its reason and `details.thumb` |
+### SliderIndicator
+
+The indicator takes no props of its own.
+
+<CssVariables component="slider" part="indicator" />
+
+### SliderThumb
+
+<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
+
+<CssVariables component="slider" part="thumb" />
+
+### State
+
+What render functions, state-based class names and slots receive. Every part gets the slider's state.
+
+<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderState" />
+
+Thumbs add their own fields, and have their own value, `thumbValue`, in place of the whole `value`, so a thumb renders only when its own value moves:
+
+<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbState" />
+
+`SliderValue` adds the formatted text:
+
+<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueState" />
 
 ### Reasons
 
@@ -264,27 +257,14 @@ Create one with `createSliderController()` and pass it as `controller`.
 
 <ControllerTable path="../../packages/core/src/components/slider/slider.ts" name="SliderController" />
 
-### Slider
+### Events
 
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
+Callbacks get the new value first, then the details.
 
-### SliderThumb
-
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
-
-### State
-
-What render functions, state-based class names and slots receive. Every part gets the slider's state.
-
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderState" />
-
-Thumbs add their own fields, and have their own value, `thumbValue`, in place of the whole `value`, so a thumb renders only when its own value moves:
-
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbState" />
-
-`SliderValue` adds the formatted text:
-
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueState" />
+| Prop            | On       | Receives                                                                                |
+| --------------- | -------- | --------------------------------------------------------------------------------------- |
+| `onValueChange` | `Slider` | `(value, details)`: the new value, the [reason](#reasons) and `details.thumb`           |
+| `onValueCommit` | `Slider` | `(value, details)`: the value once the interaction ends, its reason and `details.thumb` |
 
 ## Accessibility
 

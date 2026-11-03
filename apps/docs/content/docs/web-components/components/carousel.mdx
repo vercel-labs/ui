@@ -20,24 +20,23 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/carousel"
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-carousel`:
+
+```text
+ui-carousel
+├── ui-carousel-viewport
+│   └── ui-carousel-content
+│       ├── ui-carousel-item
+│       └── ui-carousel-item
+├── ui-carousel-previous
+│   └── button
+└── ui-carousel-next
+    └── button
+```
 
 Put the slides inside a viewport, then add the controls you need.
-
-```html
-<ui-carousel aria-label="Featured">
-  <ui-carousel-viewport>
-    <ui-carousel-content>
-      <ui-carousel-item>First slide</ui-carousel-item>
-      <ui-carousel-item>Second slide</ui-carousel-item>
-    </ui-carousel-content>
-  </ui-carousel-viewport>
-  <ui-carousel-previous><button>Previous</button></ui-carousel-previous>
-  <ui-carousel-next><button>Next</button></ui-carousel-next>
-</ui-carousel>
-```
 
 Previous, Next, the indicators and the play toggle wrap your own `<button>`, so style those. The rest are the elements themselves, which display as blocks.
 
@@ -145,15 +144,6 @@ A gallery and a strip of thumbnails share the selected page. The thumbnail carou
   caption="Choose a thumbnail to change the gallery, or scroll either strip."
 />
 
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the carousel. The slides run from the right, the next one comes in from the left, and the left arrow key goes to it. Turn directional icons with `rtl:-scale-x-100`.
-
-<ComponentExample
-  name="carousel/rtl"
-  caption="Move through the slides in a right-to-left layout. ArrowLeft advances the page."
-/>
-
 ## Behavior and Options
 
 ### Controlled
@@ -233,16 +223,46 @@ Parts are unstyled. Style them through the attributes they render, which are the
 ```html
 <ui-carousel-next><button class="aria-disabled:opacity-50">Next</button></ui-carousel-next>
 <ui-carousel-indicator
-  ><button class="bg-foreground/20 data-selected:bg-primary"></button
+  ><button class="bg-neutral-950/20 data-selected:bg-neutral-900"></button
 ></ui-carousel-indicator>
 <ui-carousel-item class="opacity-40 data-in-view:opacity-100">…</ui-carousel-item>
 ```
 
 The viewport writes the few styles scrolling needs inline: its overflow, `scroll-snap-type` and `overscroll-behavior`. Slides get `flex-shrink: 0` and their snap alignment. Hide the scrollbar with `[scrollbar-width:none]` if you like.
 
-<DataAttributes component="carousel" />
+### Carousel [#styling-carousel]
 
-<CssVariables component="carousel" />
+<CssVariables component="carousel" part="root" />
+
+## Data Attributes
+
+### Carousel [#data-attributes-carousel]
+
+<DataAttributes component="carousel" part="root" />
+
+### CarouselViewport [#data-attributes-carouselviewport]
+
+<DataAttributes component="carousel" part="viewport" />
+
+### CarouselContent [#data-attributes-carouselcontent]
+
+<DataAttributes component="carousel" part="content" />
+
+### CarouselItem [#data-attributes-carouselitem]
+
+<DataAttributes component="carousel" part="item" />
+
+### CarouselPrevious [#data-attributes-carouselprevious]
+
+<DataAttributes component="carousel" part="previous" />
+
+### CarouselIndicator [#data-attributes-carouselindicator]
+
+<DataAttributes component="carousel" part="indicator" />
+
+### CarouselPlayToggle [#data-attributes-carouselplaytoggle]
+
+<DataAttributes component="carousel" part="play-toggle" />
 
 ## Custom Rendering
 
@@ -258,45 +278,9 @@ Elements have no render functions. Style the elements, and what's inside them, f
 Props are attributes in kebab case, like `default-page`, `slides-per-page` and `default-playing`, and
 numbers are numbers. `controller` is a property. `page` and `playing` are live properties. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCarouselElement` for typed listeners.
-
-| Member                     | On            | Description                                             |
-| -------------------------- | ------------- | ------------------------------------------------------- |
-| `page` property            | `ui-carousel` | The current page. Setting it goes there                 |
-| `playing` property         | `ui-carousel` | Whether it rotates                                      |
-| `api` property             | `ui-carousel` | The [controller](#controller)                           |
-| `controller` property      | `ui-carousel` | A controller from `createCarouselController()`          |
-| `pagechange` event         | `ui-carousel` | `detail: { value: page, reason, event, source }`        |
-| `pagechangecomplete` event | `ui-carousel` | `detail: { value: page }`, once the slides come to rest |
-| `playingchange` event      | `ui-carousel` | `detail: { value: playing, reason, event, source }`     |
-
-### Reasons
-
-`event.detail.reason` says why the page changed.
-
-<ReasonTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPageChangeReason" />
-
-And why rotation started or stopped.
-
-<ReasonTable
-  path="../../packages/core/src/components/carousel/carousel.ts"
-  name="CarouselPlayingChangeReason"
-/>
-
-### Controller
-
-The element's `api` property has the same methods.
-
-Every write method takes an optional `{ reason, event }`, which the change event carries, and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselController" />
-
 ### Carousel
 
 <TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselOptions" />
-
 ### CarouselIndicator
 
 <TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselIndicatorProps" />
@@ -345,6 +329,41 @@ The same state shows as attributes on each part.
 `CarouselPlayToggle`:
 
 <StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPlayToggleState" />
+
+### Reasons
+
+`event.detail.reason` says why the page changed.
+
+<ReasonTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPageChangeReason" />
+
+And why rotation started or stopped.
+
+<ReasonTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselPlayingChangeReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods.
+
+Every write method takes an optional `{ reason, event }`, which the change event carries, and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCarouselElement` for typed listeners.
+
+| Member                     | On            | Description                                             |
+| -------------------------- | ------------- | ------------------------------------------------------- |
+| `page` property            | `ui-carousel` | The current page. Setting it goes there                 |
+| `playing` property         | `ui-carousel` | Whether it rotates                                      |
+| `api` property             | `ui-carousel` | The [controller](#controller)                           |
+| `controller` property      | `ui-carousel` | A controller from `createCarouselController()`          |
+| `pagechange` event         | `ui-carousel` | `detail: { value: page, reason, event, source }`        |
+| `pagechangecomplete` event | `ui-carousel` | `detail: { value: page }`, once the slides come to rest |
+| `playingchange` event      | `ui-carousel` | `detail: { value: playing, reason, event, source }`     |
 
 ## Accessibility
 

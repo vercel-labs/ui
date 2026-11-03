@@ -16,34 +16,22 @@ Wrap a few [Menus](./menu) in a Menubar to connect their triggers. Tab enters th
 npm install @ui-sdk/vue
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Menubar`:
 
-```vue
-<script setup lang="ts">
-import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
-import { Menubar } from "@ui-sdk/vue/menubar"
-</script>
-
-<template>
-  <Menubar aria-label="Application">
-    <Menu>
-      <MenuTrigger>File</MenuTrigger>
-      <MenuContent>
-        <MenuItem>New file</MenuItem>
-        <MenuItem>Open file</MenuItem>
-      </MenuContent>
-    </Menu>
-    <Menu>
-      <MenuTrigger>Edit</MenuTrigger>
-      <MenuContent>
-        <MenuItem>Undo</MenuItem>
-        <MenuItem>Redo</MenuItem>
-      </MenuContent>
-    </Menu>
-  </Menubar>
-</template>
+```text
+Menubar
+├── Menu
+│   ├── MenuTrigger
+│   └── MenuContent
+│       ├── MenuItem
+│       └── MenuItem
+└── Menu
+    ├── MenuTrigger
+    └── MenuContent
+        ├── MenuItem
+        └── MenuItem
 ```
 
 Each Menu joins its surrounding Menubar automatically. There are no separate menubar trigger or item components. Name the bar with `aria-label` when people need to distinguish it from another one.
@@ -144,7 +132,7 @@ These directions describe a horizontal bar in left-to-right text. Right-to-left 
 
 ## Styling
 
-The bar gets `data-open` while any menu is open; a trigger gets it only for its own menu. Use `data-orientation` for row or column layout. Style the popups and their items through the same [Menu attributes](./menu#styling).
+The bar gets `data-open` while any menu is open; a trigger gets it only for its own menu. Use `data-orientation` for row or column layout. Style the popups and their items through the same [Menu attributes and CSS variables](./menu#styling).
 
 <DataAttributes component="menubar" />
 
@@ -158,10 +146,6 @@ Props are the same as below.
 
 Menus, items and their icons take the props on the Menu page, like [`MenuItemIcon`](./menu#menuitemicon).
 
-### Controller
-
-<ControllerTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarController" />
-
 ### State
 
 <StateTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarState" />
@@ -169,6 +153,10 @@ Menus, items and their icons take the props on the Menu page, like [`MenuItemIco
 ### Reasons
 
 A menu that another menu in the menubar takes over closes with `submenu-switch`, one opened by pointing at its trigger opens with `trigger-hover`, and one opened with an arrow key opens with `trigger-press`. See [Menu](./menu#reasons) for every reason.
+
+### Controller
+
+<ControllerTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarController" />
 
 ## Accessibility
 

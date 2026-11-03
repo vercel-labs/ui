@@ -16,25 +16,13 @@ A switch changes a setting between on and off. Keep its label the same in both s
 npm install @ui-sdk/solid
 ```
 
-The styled examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Switch`:
 
-```tsx
-import { Switch, SwitchThumb } from "@ui-sdk/solid/switch"
-
-function Example() {
-  return (
-    <label>
-      <Switch>
-        <SwitchThumb />
-      </Switch>
-      Airplane Mode
-    </label>
-  )
-}
-
-export { Example }
+```text
+Switch
+└── SwitchThumb
 ```
 
 `Switch` renders a button with `role="switch"`. `SwitchThumb` stays mounted and reflects the checked state, so CSS can slide it. The switch adds a hidden native checkbox for form submission, validation, and reset.
@@ -136,13 +124,16 @@ The [composition guide](../parts-and-composition) explains how to forward part p
 
 ## API Reference
 
-### Events
+### Switch
 
-Callbacks get the new state first, then the details.
+<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
 
-| Prop              | On       | Receives                                                        |
-| ----------------- | -------- | --------------------------------------------------------------- |
-| `onCheckedChange` | `Switch` | `(checked, details)`: the new state, and the [reason](#reasons) |
+### State
+
+What render functions, state-based class names and slots receive. The thumb's state, `SwitchThumbState`, is
+the same.
+
+<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
 
 ### Reasons
 
@@ -158,16 +149,13 @@ Every write method takes an optional `{ reason, event }`, runs the change callba
 
 <ControllerTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchController" />
 
-### Switch
+### Events
 
-<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
+Callbacks get the new state first, then the details.
 
-### State
-
-What render functions, state-based class names and slots receive. The thumb's state, `SwitchThumbState`, is
-the same.
-
-<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
+| Prop              | On       | Receives                                                        |
+| ----------------- | -------- | --------------------------------------------------------------- |
+| `onCheckedChange` | `Switch` | `(checked, details)`: the new state, and the [reason](#reasons) |
 
 ## Accessibility
 

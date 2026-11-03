@@ -22,33 +22,27 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/calendar"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-calendar`:
 
-```bash
-npm install lucide
+```text
+ui-calendar
+├── ui-calendar-previous
+│   └── button
+├── ui-calendar-heading
+├── ui-calendar-next
+│   └── button
+└── ui-calendar-grid
+    ├── ui-calendar-weekdays
+    │   └── template
+    │       └── ui-calendar-weekday
+    └── ui-calendar-weeks
+        └── template
+            └── ui-calendar-day
 ```
-
-## Anatomy
 
 The heading names the displayed month. Previous and Next change it, and a grid holds its weekday headers and dates. Templates inside the weekdays and weeks are copied for each header and date.
-
-```html
-<ui-calendar default-value="2026-10-16">
-  <ui-calendar-previous><button></button></ui-calendar-previous>
-  <ui-calendar-heading></ui-calendar-heading>
-  <ui-calendar-next><button></button></ui-calendar-next>
-  <ui-calendar-grid>
-    <ui-calendar-weekdays>
-      <template><ui-calendar-weekday></ui-calendar-weekday></template>
-    </ui-calendar-weekdays>
-    <ui-calendar-weeks>
-      <template><ui-calendar-day></ui-calendar-day></template>
-    </ui-calendar-weeks>
-  </ui-calendar-grid>
-</ui-calendar>
-```
 
 An empty `ui-calendar` renders the default structure, and an empty `ui-calendar-grid` renders its headers and weeks. Write the parts out to add your classes and content. Each grid is named by its month and has the `grid` role.
 
@@ -255,57 +249,6 @@ Props are attributes in kebab case, like `default-value`, `week-starts-on` and `
 numbers are numbers. `value`, `default-value` and `unavailable` take comma-separated dates, and the
 `unavailable` property takes any matcher, like `{ weekday: [0, 6] }`. `controller` is a property. Callbacks are DOM events.
 
-### Events
-
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCalendarElement` for typed listeners.
-
-| Member                | On            | Description                                                                         |
-| --------------------- | ------------- | ----------------------------------------------------------------------------------- |
-| `value` property      | `ui-calendar` | The selected value. Setting it selects it                                           |
-| `month` property      | `ui-calendar` | The first month shown. Setting it turns there                                       |
-| `api` property        | `ui-calendar` | The [controller](#controller)                                                       |
-| `controller` property | `ui-calendar` | A controller from `createCalendarController()`                                      |
-| `valuechange` event   | `ui-calendar` | `detail: { value, reason, event, source }`                                          |
-| `monthchange` event   | `ui-calendar` | `detail: { value: month, reason, event, source }`                                   |
-| `focusedchange` event | `ui-calendar` | `detail: { value: date, reason, event, source }`, before focus moves to another day |
-| `anchorchange` event  | `ui-calendar` | `detail: { value: start, reason, event, source }`, `null` once the range ends       |
-
-### Reasons
-
-`event.detail.reason` says why the value changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarValueChangeReason"
-/>
-
-And why the month changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarMonthChangeReason"
-/>
-
-Why focus moves to another day:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarFocusedChangeReason"
-/>
-
-And why a range's start changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/calendar/calendar.ts"
-  name="CalendarAnchorChangeReason"
-/>
-
-### Controller
-
-Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled or there's nowhere to go.
-
-<ControllerTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarController" />
-
 ### Calendar
 
 <TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarOptions" />
@@ -355,6 +298,57 @@ What render functions, state-based class names and children functions receive, p
 `CalendarDay`:
 
 <StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarDayState" />
+
+### Reasons
+
+`event.detail.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarValueChangeReason"
+/>
+
+And why the month changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarMonthChangeReason"
+/>
+
+Why focus moves to another day:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarFocusedChangeReason"
+/>
+
+And why a range's start changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarAnchorChangeReason"
+/>
+
+### Controller
+
+Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled or there's nowhere to go.
+
+<ControllerTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiCalendarElement` for typed listeners.
+
+| Member                | On            | Description                                                                         |
+| --------------------- | ------------- | ----------------------------------------------------------------------------------- |
+| `value` property      | `ui-calendar` | The selected value. Setting it selects it                                           |
+| `month` property      | `ui-calendar` | The first month shown. Setting it turns there                                       |
+| `api` property        | `ui-calendar` | The [controller](#controller)                                                       |
+| `controller` property | `ui-calendar` | A controller from `createCalendarController()`                                      |
+| `valuechange` event   | `ui-calendar` | `detail: { value, reason, event, source }`                                          |
+| `monthchange` event   | `ui-calendar` | `detail: { value: month, reason, event, source }`                                   |
+| `focusedchange` event | `ui-calendar` | `detail: { value: date, reason, event, source }`, before focus moves to another day |
+| `anchorchange` event  | `ui-calendar` | `detail: { value: start, reason, event, source }`, `null` once the range ends       |
 
 ## Accessibility
 

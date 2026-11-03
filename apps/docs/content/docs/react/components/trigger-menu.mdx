@@ -20,42 +20,18 @@ Use Trigger Menu with a textarea or input to insert text. Put it inside a Token 
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-These examples use Tailwind CSS and the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `TriggerMenu`:
 
-```tsx
-"use client"
-
-import {
-  TriggerMenu,
-  TriggerMenuInput,
-  TriggerMenuStatus,
-  TriggerMenuContent,
-  TriggerMenuList,
-  TriggerMenuItem,
-} from "@ui-sdk/react/trigger-menu"
-
-function Example() {
-  return (
-    <TriggerMenu triggers={[{ char: "@" }]}>
-      <TriggerMenuInput aria-label="Message" placeholder="Type @ to mention someone" />
-      <TriggerMenuStatus className="sr-only" />
-      <TriggerMenuContent>
-        <TriggerMenuList>
-          <TriggerMenuItem value="ada" label="Ada Lovelace">
-            Ada Lovelace
-          </TriggerMenuItem>
-          <TriggerMenuItem value="grace" label="Grace Hopper">
-            Grace Hopper
-          </TriggerMenuItem>
-        </TriggerMenuList>
-      </TriggerMenuContent>
-    </TriggerMenu>
-  )
-}
-
-export { Example }
+```text
+TriggerMenu
+├── TriggerMenuInput
+├── TriggerMenuStatus
+└── TriggerMenuContent
+    └── TriggerMenuList
+        ├── TriggerMenuItem
+        └── TriggerMenuItem
 ```
 
 Inside a [Token Input](./token-input), leave out `TriggerMenuInput`: the menu suggests into the token input. Without a `TriggerMenuContent` among its direct children, the menu renders the current trigger's items for you.
@@ -170,53 +146,33 @@ A custom editor adapter must make each replacement one undo step; [Token Input](
 
 ## Styling
 
-<DataAttributes component="trigger-menu" />
+### TriggerMenuContent [#styling-triggermenucontent]
+
+<CssVariables component="trigger-menu" part="content" />
+
+## Data Attributes
+
+### TriggerMenuInput [#data-attributes-triggermenuinput]
+
+<DataAttributes component="trigger-menu" part="input" />
+
+### TriggerMenuContent [#data-attributes-triggermenucontent]
+
+<DataAttributes component="trigger-menu" part="content" />
+
+### TriggerMenuItem [#data-attributes-triggermenuitem]
+
+<DataAttributes component="trigger-menu" part="item" />
+
+### TriggerMenuEmpty [#data-attributes-triggermenuempty]
+
+<DataAttributes component="trigger-menu" part="empty" />
+
+### TriggerMenuItemIcon [#data-attributes-triggermenuitemicon]
+
+<DataAttributes component="trigger-menu" part="item-icon" />
 
 ## API Reference
-
-### Callbacks
-
-Callbacks get the new state first, then the details.
-
-| Prop                   | On                               | Receives                                                                         |
-| ---------------------- | -------------------------------- | -------------------------------------------------------------------------------- |
-| `onOpenChange`         | `TriggerMenu`                    | `(open, details)`: the new state, the [reason](#reasons) and the `trigger`       |
-| `onOpenChangeComplete` | `TriggerMenu`                    | `(open)`, after the animation                                                    |
-| `onQueryChange`        | `TriggerMenu`                    | `(query, details)`: the text after the trigger, and the `argument` being typed   |
-| `onDismissAttempt`     | `TriggerMenu`                    | `({ reason, event })`, when a dismissal was refused                              |
-| `onSelect`             | `TriggerMenu`, `TriggerMenuItem` | `(value, details)`: the item, its `arguments`, `insert()` and `preventDefault()` |
-
-When `onSelect` returns a Promise and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so you keep typing.
-
-### Reasons
-
-Why the menu opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuDismissReason"
-/>
-
-Why the query changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuQueryChangeReason"
-/>
-
-### Controller
-
-<ControllerTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuController"
-/>
 
 ### TriggerMenu
 
@@ -308,6 +264,50 @@ Why the query changed:
   path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
   name="TriggerMenuHintState"
 />
+
+### Reasons
+
+Why the menu opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuDismissReason"
+/>
+
+Why the query changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuQueryChangeReason"
+/>
+
+### Controller
+
+<ControllerTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuController"
+/>
+
+### Callbacks
+
+Callbacks get the new state first, then the details.
+
+| Prop                   | On                               | Receives                                                                         |
+| ---------------------- | -------------------------------- | -------------------------------------------------------------------------------- |
+| `onOpenChange`         | `TriggerMenu`                    | `(open, details)`: the new state, the [reason](#reasons) and the `trigger`       |
+| `onOpenChangeComplete` | `TriggerMenu`                    | `(open)`, after the animation                                                    |
+| `onQueryChange`        | `TriggerMenu`                    | `(query, details)`: the text after the trigger, and the `argument` being typed   |
+| `onDismissAttempt`     | `TriggerMenu`                    | `({ reason, event })`, when a dismissal was refused                              |
+| `onSelect`             | `TriggerMenu`, `TriggerMenuItem` | `(value, details)`: the item, its `arguments`, `insert()` and `preventDefault()` |
+
+When `onSelect` returns a Promise and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so you keep typing.
 
 ## Accessibility
 

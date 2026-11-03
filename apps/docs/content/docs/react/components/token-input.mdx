@@ -20,7 +20,7 @@ Use Token Input on its own when your code supplies the tokens. Add a Trigger Men
 pnpm add @ui-sdk/react @ui-sdk/core
 ```
 
-<span id="anatomy" />
+<span id="composition" />
 
 ## Usage
 
@@ -123,34 +123,11 @@ The remove part is a pointer shortcut. Keep its default non-focusable element; k
 
 ## Styling
 
-The demos use the shared [example theme](../styling-and-animation#example-theme). Apply Tailwind classes directly to the editor and token parts. Token hosts expose `data-token-type`, `data-pending`, `data-unresolved`, and `data-selected`, even without a custom token renderer.
+Apply Tailwind classes directly to the editor and token parts. Token hosts expose `data-token-type`, `data-pending`, `data-unresolved`, and `data-selected`, even without a custom token renderer.
 
 <DataAttributes component="token-input" />
 
 ## API Reference
-
-### Callbacks
-
-Callbacks get the new state first, then the details.
-
-| Prop            | On           | Receives                                                                         |
-| --------------- | ------------ | -------------------------------------------------------------------------------- |
-| `onValueChange` | `TokenInput` | `(value, details)`: the value, the [reason](#reasons), `inputType` and `removed` |
-| `onSubmit`      | `TokenInput` | `(value)`, on the submit shortcut                                                |
-
-### Reasons
-
-<ReasonTable
-  path="../../packages/core/src/components/token-input/token-input.ts"
-  name="TokenInputValueChangeReason"
-/>
-
-### Controller
-
-<ControllerTable
-  path="../../packages/core/src/components/token-input/token-input.ts"
-  name="TokenInputController"
-/>
 
 ### TokenInput
 
@@ -186,6 +163,29 @@ Callbacks get the new state first, then the details.
   path="../../packages/core/src/components/token-input/token-input.ts"
   name="TokenInputTokenState"
 />
+
+### Reasons
+
+<ReasonTable
+  path="../../packages/core/src/components/token-input/token-input.ts"
+  name="TokenInputValueChangeReason"
+/>
+
+### Controller
+
+<ControllerTable
+  path="../../packages/core/src/components/token-input/token-input.ts"
+  name="TokenInputController"
+/>
+
+### Callbacks
+
+Callbacks get the new state first, then the details.
+
+| Prop            | On           | Receives                                                                         |
+| --------------- | ------------ | -------------------------------------------------------------------------------- |
+| `onValueChange` | `TokenInput` | `(value, details)`: the value, the [reason](#reasons), `inputType` and `removed` |
+| `onSubmit`      | `TokenInput` | `(value)`, on the submit shortcut                                                |
 
 ## Accessibility
 

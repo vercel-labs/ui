@@ -16,19 +16,13 @@ A switch changes a setting between on and off. Keep its label the same in both s
 npm install @ui-sdk/svelte
 ```
 
-The styled examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Switch`:
 
-```svelte
-<script lang="ts">
-  import { Switch, SwitchThumb } from "@ui-sdk/svelte/switch"
-</script>
-
-<label>
-  <Switch><SwitchThumb /></Switch>
-  Airplane Mode
-</label>
+```text
+Switch
+└── SwitchThumb
 ```
 
 `Switch` renders a button with `role="switch"`. `SwitchThumb` stays mounted and reflects the checked state, so CSS can slide it. The switch adds a hidden native checkbox for form submission, validation, and reset.
@@ -132,14 +126,15 @@ The [composition guide](../parts-and-composition) explains how to forward part p
 
 Props and callbacks are the same as below, as Svelte props. `checked` can be bound with `bind:checked`.
 
-### Events
+### Switch
 
-Callbacks get the new state first, then the details. A bound `checked` only updates when `onCheckedChange` wasn't canceled.
+<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
 
-| Prop              | On       | Receives                                                        |
-| ----------------- | -------- | --------------------------------------------------------------- |
-| `bind:checked`    | `Switch` | Whether the switch is on                                        |
-| `onCheckedChange` | `Switch` | `(checked, details)`: the new state, and the [reason](#reasons) |
+### State
+
+What `render` and `children` snippets receive. The thumb's state, `SwitchThumbState`, is the same.
+
+<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
 
 ### Reasons
 
@@ -155,15 +150,14 @@ Every write method takes an optional `{ reason, event }`, runs the change callba
 
 <ControllerTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchController" />
 
-### Switch
+### Events
 
-<TypeTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchOptions" />
+Callbacks get the new state first, then the details. A bound `checked` only updates when `onCheckedChange` wasn't canceled.
 
-### State
-
-What `render` and `children` snippets receive. The thumb's state, `SwitchThumbState`, is the same.
-
-<StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
+| Prop              | On       | Receives                                                        |
+| ----------------- | -------- | --------------------------------------------------------------- |
+| `bind:checked`    | `Switch` | Whether the switch is on                                        |
+| `onCheckedChange` | `Switch` | `(checked, details)`: the new state, and the [reason](#reasons) |
 
 ## Accessibility
 

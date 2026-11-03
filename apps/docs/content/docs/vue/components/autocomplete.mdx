@@ -16,43 +16,21 @@ Use Autocomplete for a text field with helpful suggestions. Choosing one fills i
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `@lucide/vue` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build an `Autocomplete`:
 
-```bash
-npm install @lucide/vue
+```text
+Autocomplete
+├── AutocompleteLabel
+├── AutocompleteInput
+└── AutocompleteContent
+    └── AutocompleteList
+        ├── AutocompleteItem
+        └── AutocompleteItem
 ```
-
-## Anatomy
 
 Name the input, then put suggestions in a list inside the popup. Each suggestion needs a unique value.
-
-```vue
-<script setup lang="ts">
-import {
-  Autocomplete,
-  AutocompleteContent,
-  AutocompleteInput,
-  AutocompleteItem,
-  AutocompleteLabel,
-  AutocompleteList,
-} from "@ui-sdk/vue/autocomplete"
-</script>
-
-<template>
-  <Autocomplete>
-    <AutocompleteLabel>Fruit</AutocompleteLabel>
-    <AutocompleteInput placeholder="Type a fruit" />
-    <AutocompleteContent>
-      <AutocompleteList>
-        <AutocompleteItem value="Apple">Apple</AutocompleteItem>
-        <AutocompleteItem value="Banana">Banana</AutocompleteItem>
-      </AutocompleteList>
-    </AutocompleteContent>
-  </Autocomplete>
-</template>
-```
 
 Typing filters the suggestions. Arrow keys move the highlight; Enter fills in the highlighted text and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted suggestion. A touch screen-reader trigger can move focus into the list, and a sheet has its own [focus behavior](#presentation).
 
@@ -240,61 +218,11 @@ Style the parts through their data attributes, which are the same in every frame
 
 The popup exposes sizing and animation variables. `--anchor-width` is the input’s width; use `--available-height` on the content to keep a long list in the viewport.
 
-<CssVariables component="autocomplete" />
-
 While focus stays in the input, use the content’s `data-modality="keyboard"` with an item’s `data-highlighted` to show a keyboard focus indicator on the highlighted suggestion.
 
 ## API Reference
 
 Props are the same as below, and callbacks are events.
-
-### Events
-
-Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
-
-| Binding                 | On             | Receives                                                     |
-| ----------------------- | -------------- | ------------------------------------------------------------ |
-| `v-model:value`         | `Autocomplete` | The text                                                     |
-| `v-model:open`          | `Autocomplete` | Whether the suggestions are open                             |
-| `@value-change`         | `Autocomplete` | `(value, details)`: the new text, and the [reason](#reasons) |
-| `@open-change`          | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons) |
-| `@open-change-complete` | `Autocomplete` | `(open)`, after the animation                                |
-| `@submit`               | `Autocomplete` | `(value, { event })`: the text, when Enter submits           |
-| `@highlight`            | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion      |
-| `@load-more`            | `Autocomplete` | When the last suggestion is reached                          |
-| `@dismiss-attempt`      | `Autocomplete` | `({ reason, event })`, when a dismissal was refused          |
-
-### Reasons
-
-Why the text changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteValueChangeReason"
-/>
-
-And why the suggestions opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `@dismiss-attempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteDismissReason"
-/>
-
-### Controller
-
-Create one with `createAutocompleteController()` and pass it as `controller`.
-
-<ControllerTable
-  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
-  name="AutocompleteController"
-/>
 
 ### Autocomplete
 
@@ -309,6 +237,8 @@ Create one with `createAutocompleteController()` and pass it as `controller`.
   path="../../packages/core/src/components/autocomplete/autocomplete.ts"
   name="AutocompleteContentProps"
 />
+
+<CssVariables component="autocomplete" part="content" />
 
 ### AutocompleteItem
 
@@ -403,6 +333,54 @@ What render functions, state-based class names and slots receive, per part.
   path="../../packages/core/src/components/autocomplete/autocomplete.ts"
   name="AutocompleteItemIconState"
 />
+
+### Reasons
+
+Why the text changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteValueChangeReason"
+/>
+
+And why the suggestions opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `@dismiss-attempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteDismissReason"
+/>
+
+### Controller
+
+Create one with `createAutocompleteController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/autocomplete/autocomplete.ts"
+  name="AutocompleteController"
+/>
+
+### Events
+
+Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
+
+| Binding                 | On             | Receives                                                     |
+| ----------------------- | -------------- | ------------------------------------------------------------ |
+| `v-model:value`         | `Autocomplete` | The text                                                     |
+| `v-model:open`          | `Autocomplete` | Whether the suggestions are open                             |
+| `@value-change`         | `Autocomplete` | `(value, details)`: the new text, and the [reason](#reasons) |
+| `@open-change`          | `Autocomplete` | `(open, details)`: the new state, and the [reason](#reasons) |
+| `@open-change-complete` | `Autocomplete` | `(open)`, after the animation                                |
+| `@submit`               | `Autocomplete` | `(value, { event })`: the text, when Enter submits           |
+| `@highlight`            | `Autocomplete` | `(value, { index, event })`: the highlighted suggestion      |
+| `@load-more`            | `Autocomplete` | When the last suggestion is reached                          |
+| `@dismiss-attempt`      | `Autocomplete` | `({ reason, event })`, when a dismissal was refused          |
 
 ## Accessibility
 

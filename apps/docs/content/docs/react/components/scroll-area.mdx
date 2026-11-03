@@ -14,38 +14,19 @@ description: Add styled scrollbars, edge indicators, and follow-to-end behavior 
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ScrollArea`:
+
+```text
+ScrollArea
+├── ScrollAreaViewport
+│   └── ScrollAreaContent
+└── ScrollAreaScrollbar
+    └── ScrollAreaThumb
+```
 
 Put the content inside a viewport, then add a scrollbar for each axis you want to style.
-
-```tsx
-"use client"
-
-import {
-  ScrollArea,
-  ScrollAreaViewport,
-  ScrollAreaContent,
-  ScrollAreaScrollbar,
-  ScrollAreaThumb,
-} from "@ui-sdk/react/scroll-area"
-
-function ReleaseNotes() {
-  return (
-    <ScrollArea>
-      <ScrollAreaViewport role="region" aria-label="Release notes">
-        <ScrollAreaContent>Content to scroll</ScrollAreaContent>
-      </ScrollAreaViewport>
-      <ScrollAreaScrollbar orientation="vertical">
-        <ScrollAreaThumb />
-      </ScrollAreaScrollbar>
-    </ScrollArea>
-  )
-}
-
-export { ReleaseNotes }
-```
 
 The viewport is the real scroller. Give the root a size and the viewport `size-full`. Scrollbars sit over the viewport's edges. A thumb appears when its axis overflows; [`type`](#when-scrollbars-show) controls when the scrollbar is visible. Render only the scrollbars you want: with none, the browser's own scrollbars stay.
 
@@ -67,15 +48,6 @@ With both scrollbars, each stops short of the corner where they meet, which `Scr
 <ComponentExample
   name="scroll-area/both-axes"
   caption="Scroll the release list vertically and horizontally."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on the page or any element around the scroll area. The vertical scrollbar moves to the left, and the horizontal thumb starts at the right, the way `scrollLeft` counts in every browser.
-
-<ComponentExample
-  name="scroll-area/rtl"
-  caption="Scroll the tags in a right-to-left layout. The vertical scrollbar sits on the left."
 />
 
 ### Chat and Streaming
@@ -174,11 +146,39 @@ A [controller](#controller-1), from `createScrollAreaController()`, scrolls the 
 
 Parts are unstyled. Style them through the attributes they render, which are the same in every framework.
 
-<DataAttributes component="scroll-area" />
+### ScrollArea [#styling-scrollarea]
 
-### CSS Variables
+<CssVariables component="scroll-area" part="root" />
 
-<CssVariables component="scroll-area" />
+### ScrollAreaScrollbar [#styling-scrollareascrollbar]
+
+<CssVariables component="scroll-area" part="scrollbar" />
+
+## Data Attributes
+
+### ScrollArea [#data-attributes-scrollarea]
+
+<DataAttributes component="scroll-area" part="root" />
+
+### ScrollAreaViewport [#data-attributes-scrollareaviewport]
+
+<DataAttributes component="scroll-area" part="viewport" />
+
+### ScrollAreaContent [#data-attributes-scrollareacontent]
+
+<DataAttributes component="scroll-area" part="content" />
+
+### ScrollAreaScrollbar [#data-attributes-scrollareascrollbar]
+
+<DataAttributes component="scroll-area" part="scrollbar" />
+
+### ScrollAreaThumb [#data-attributes-scrollareathumb]
+
+<DataAttributes component="scroll-area" part="thumb" />
+
+### ScrollAreaScrollToEnd [#data-attributes-scrollareascrolltoend]
+
+<DataAttributes component="scroll-area" part="scroll-to-end" />
 
 ## Custom Rendering
 
@@ -196,22 +196,6 @@ Read a part's state to update its content or styles when that state changes. See
 ## API Reference
 
 Props are the same as below, as React props.
-
-### Controller
-
-Create one with `createScrollAreaController()` and pass it as `controller`.
-
-<ControllerTable
-  path="../../packages/core/src/components/scroll-area/scroll-area.ts"
-  name="ScrollAreaController"
-/>
-
-`scrollToEnd` and `scrollToStart` take an optional `{ behavior }`:
-
-<TypeTable
-  path="../../packages/core/src/components/scroll-area/scroll-area-view.ts"
-  name="ScrollAreaScrollOptions"
-/>
 
 ### ScrollArea
 
@@ -254,6 +238,22 @@ receive the scroll area's state.
 <StateTable
   path="../../packages/core/src/components/scroll-area/scroll-area.ts"
   name="ScrollAreaScrollToEndState"
+/>
+
+### Controller
+
+Create one with `createScrollAreaController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/scroll-area/scroll-area.ts"
+  name="ScrollAreaController"
+/>
+
+`scrollToEnd` and `scrollToStart` take an optional `{ behavior }`:
+
+<TypeTable
+  path="../../packages/core/src/components/scroll-area/scroll-area-view.ts"
+  name="ScrollAreaScrollOptions"
 />
 
 ## Accessibility

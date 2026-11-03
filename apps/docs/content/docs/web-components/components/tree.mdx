@@ -22,36 +22,23 @@ Import the element definitions once in your application:
 import "@ui-sdk/web/tree"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-tree`:
 
-```bash
-npm install lucide
+```text
+ui-tree
+├── ui-tree-item
+│   ├── ui-tree-item-label
+│   │   └── ui-tree-item-indicator
+│   └── ui-tree-group
+│       └── ui-tree-item
+│           └── ui-tree-item-label
+└── ui-tree-item
+    └── ui-tree-item-label
 ```
-
-## Anatomy
 
 Give the tree an accessible name and every item a unique `value`. An item with a `ui-tree-group` inside it is a branch. The group holds its children; the label names the item.
-
-```html
-<ui-tree aria-label="Project files">
-  <ui-tree-item value="src">
-    <ui-tree-item-label>
-      <ui-tree-item-indicator>›</ui-tree-item-indicator>
-      src
-    </ui-tree-item-label>
-    <ui-tree-group>
-      <ui-tree-item value="src/index.ts">
-        <ui-tree-item-label>index.ts</ui-tree-item-label>
-      </ui-tree-item>
-    </ui-tree-group>
-  </ui-tree-item>
-  <ui-tree-item value="package.json">
-    <ui-tree-item-label>package.json</ui-tree-item-label>
-  </ui-tree-item>
-</ui-tree>
-```
 
 The tree has one Tab stop. Arrow keys move between visible items, open branches, and return to their parents. The indicator and checkbox are optional; they belong to the item around them, so you can put them inside or beside its label.
 
@@ -227,46 +214,48 @@ Style each row through `ui-tree-item-label`, which carries its item’s data att
 ```html
 <ui-tree-item value="example" class="outline-none">
   <ui-tree-item-label
-    class="rounded-xl px-2 data-selected:bg-accent [:focus-visible>&]:ring-3 [:focus-visible>&]:ring-ring/30"
+    class="rounded-xl px-2 data-selected:bg-neutral-100 [:focus-visible>&]:ring-3 [:focus-visible>&]:ring-neutral-400/50"
   >
     Label
   </ui-tree-item-label>
 </ui-tree-item>
 ```
 
-Every item also exposes its depth as `--tree-level`, useful for indentation in a flat tree.
+### `<ui-tree-item>` [#styling-treeitem]
 
-<DataAttributes component="tree" />
+<CssVariables component="tree" part="item" />
+
+### `<ui-tree-group>` [#styling-treegroup]
+
+<CssVariables component="tree" part="group" />
+
+## Data Attributes
+
+### `<ui-tree-item>` [#data-attributes-treeitem]
+
+<DataAttributes component="tree" part="item" />
+
+### `<ui-tree-item-label>` [#data-attributes-treeitemlabel]
+
+<DataAttributes component="tree" part="label" />
+
+### `<ui-tree-item-indicator>` [#data-attributes-treeitemindicator]
+
+<DataAttributes component="tree" part="indicator" />
+
+### `<ui-tree-item-checkbox>` [#data-attributes-treeitemcheckbox]
+
+<DataAttributes component="tree" part="checkbox" />
+
+### `<ui-tree-group>` [#data-attributes-treegroup]
+
+<DataAttributes component="tree" part="group" />
 
 ## API Reference
 
 Props are attributes in kebab case, like `selection-mode` and `default-expanded`. Lists, like `expanded`,
 are values separated by commas. `items`, `paths`, `loadChildren`, `announcement` and
 `controller` are properties. Callbacks are DOM events.
-
-### Events
-
-Events fire on `<ui-tree>` and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange`, `expandedchange` or `checkedchange` cancels the change. `action` fires when an item is pressed or gets Enter, with the item's value in `event.detail.value`. Pass a Promise to `event.detail.waitUntil()` to keep the item pending until it settles.
-
-### Reasons
-
-Why branches expanded or collapsed:
-
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeExpandedChangeReason" />
-
-Why the selection changed:
-
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeValueChangeReason" />
-
-And why the checkboxes changed:
-
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeCheckedChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods.
-
-<ControllerTable path="../../packages/core/src/components/tree/tree.ts" name="TreeController" />
 
 ### Tree
 
@@ -305,6 +294,30 @@ The same state shows as data attributes on each element.
 `TreeGroup`:
 
 <StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeGroupState" />
+
+### Reasons
+
+Why branches expanded or collapsed:
+
+<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeExpandedChangeReason" />
+
+Why the selection changed:
+
+<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeValueChangeReason" />
+
+And why the checkboxes changed:
+
+<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeCheckedChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods.
+
+<ControllerTable path="../../packages/core/src/components/tree/tree.ts" name="TreeController" />
+
+### Events
+
+Events fire on `<ui-tree>` and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange`, `expandedchange` or `checkedchange` cancels the change. `action` fires when an item is pressed or gets Enter, with the item's value in `event.detail.value`. Pass a Promise to `event.detail.waitUntil()` to keep the item pending until it settles.
 
 ## Accessibility
 

@@ -20,38 +20,25 @@ Use Trigger Menu with a textarea or input to insert text. Put it inside a Token 
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-These examples use Tailwind CSS and the shared [Example Theme](../styling-and-animation#example-theme).
-
 Importing the component defines its elements. On the server the import does nothing.
 
 ```ts
 import "@ui-sdk/web/trigger-menu"
 ```
 
-## Anatomy
+## Composition
 
-```ts
-import "@ui-sdk/web/trigger-menu"
+Use the following composition to build a `ui-trigger-menu`:
 
-function mount(root: HTMLElement) {
-  root.innerHTML = `
-    <ui-trigger-menu>
-      <ui-trigger-menu-input>
-        <textarea aria-label="Message" placeholder="Type @ to mention someone"></textarea>
-      </ui-trigger-menu-input>
-      <ui-trigger-menu-status class="sr-only"></ui-trigger-menu-status>
-      <ui-trigger-menu-content>
-        <ui-trigger-menu-list>
-          <ui-trigger-menu-item value="ada" label="Ada Lovelace">Ada Lovelace</ui-trigger-menu-item>
-          <ui-trigger-menu-item value="grace" label="Grace Hopper">Grace Hopper</ui-trigger-menu-item>
-        </ui-trigger-menu-list>
-      </ui-trigger-menu-content>
-    </ui-trigger-menu>
-  `
-  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "@" }]
-}
-
-export { mount }
+```text
+ui-trigger-menu
+├── ui-trigger-menu-input
+│   └── textarea
+├── ui-trigger-menu-status
+└── ui-trigger-menu-content
+    └── ui-trigger-menu-list
+        ├── ui-trigger-menu-item
+        └── ui-trigger-menu-item
 ```
 
 Set `triggers` as a property. The input part wraps your own `<textarea>` or `<input>`. A list without items of its own renders the current trigger's data items.
@@ -166,56 +153,33 @@ A custom editor adapter must make each replacement one undo step; [Token Input](
 
 ## Styling
 
-<DataAttributes component="trigger-menu" />
+### `<ui-trigger-menu-content>` [#styling-triggermenucontent]
+
+<CssVariables component="trigger-menu" part="content" />
+
+## Data Attributes
+
+### `<ui-trigger-menu-input>` [#data-attributes-triggermenuinput]
+
+<DataAttributes component="trigger-menu" part="input" />
+
+### `<ui-trigger-menu-content>` [#data-attributes-triggermenucontent]
+
+<DataAttributes component="trigger-menu" part="content" />
+
+### `<ui-trigger-menu-item>` [#data-attributes-triggermenuitem]
+
+<DataAttributes component="trigger-menu" part="item" />
+
+### `<ui-trigger-menu-empty>` [#data-attributes-triggermenuempty]
+
+<DataAttributes component="trigger-menu" part="empty" />
+
+### `<ui-trigger-menu-item-icon>` [#data-attributes-triggermenuitemicon]
+
+<DataAttributes component="trigger-menu" part="item-icon" />
 
 ## API Reference
-
-### Callbacks
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value`.
-
-| Member                 | On                | Description                                                                                          |
-| ---------------------- | ----------------- | ---------------------------------------------------------------------------------------------------- |
-| `triggers` property    | `ui-trigger-menu` | The triggers and what each one lists                                                                 |
-| `editor` property      | `ui-trigger-menu` | An editor adapter, for a field without an input part                                                 |
-| `open` property        | `ui-trigger-menu` | Whether the menu is open                                                                             |
-| `api` property         | `ui-trigger-menu` | The [controller](#controller-1)                                                                      |
-| `openchange` event     | `ui-trigger-menu` | `detail: { value: open, reason, trigger }`                                                           |
-| `querychange` event    | `ui-trigger-menu` | `detail: { value: query, reason, trigger, argument }`                                                |
-| `select` event         | `ui-trigger-menu` | `detail: { value, arguments, insert(), waitUntil(promise) }`. `preventDefault()` skips the insertion |
-| `dismissattempt` event | `ui-trigger-menu` | `detail: { reason, event }`, when a dismissal was refused                                            |
-
-When `select` returns a Promise and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so you keep typing.
-
-### Reasons
-
-Why the menu opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `dismissattempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuDismissReason"
-/>
-
-Why the query changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuQueryChangeReason"
-/>
-
-### Controller
-
-<ControllerTable
-  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
-  name="TriggerMenuController"
-/>
 
 ### TriggerMenu
 
@@ -307,6 +271,53 @@ Why the query changed:
   path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
   name="TriggerMenuHintState"
 />
+
+### Reasons
+
+Why the menu opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `dismissattempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuDismissReason"
+/>
+
+Why the query changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuQueryChangeReason"
+/>
+
+### Controller
+
+<ControllerTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuController"
+/>
+
+### Callbacks
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value`.
+
+| Member                 | On                | Description                                                                                          |
+| ---------------------- | ----------------- | ---------------------------------------------------------------------------------------------------- |
+| `triggers` property    | `ui-trigger-menu` | The triggers and what each one lists                                                                 |
+| `editor` property      | `ui-trigger-menu` | An editor adapter, for a field without an input part                                                 |
+| `open` property        | `ui-trigger-menu` | Whether the menu is open                                                                             |
+| `api` property         | `ui-trigger-menu` | The [controller](#controller-1)                                                                      |
+| `openchange` event     | `ui-trigger-menu` | `detail: { value: open, reason, trigger }`                                                           |
+| `querychange` event    | `ui-trigger-menu` | `detail: { value: query, reason, trigger, argument }`                                                |
+| `select` event         | `ui-trigger-menu` | `detail: { value, arguments, insert(), waitUntil(promise) }`. `preventDefault()` skips the insertion |
+| `dismissattempt` event | `ui-trigger-menu` | `detail: { reason, event }`, when a dismissal was refused                                            |
+
+When `select` returns a Promise and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so you keep typing.
 
 ## Accessibility
 

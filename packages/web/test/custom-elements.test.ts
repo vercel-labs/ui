@@ -129,7 +129,7 @@ describe("custom elements manifest", () => {
 
   test("reads the core's types and docs", () => {
     const tabs = declarations().find((declaration) => declaration.tagName === "ui-tabs")!
-    expect(tabs.description).toContain("<ui-tabs-list>")
+    expect(tabs.description).toContain("── ui-tabs-list")
     expect(tabs.attributes.find((attribute) => attribute.name === "orientation")).toMatchObject({
       type: { text: '"horizontal" | "vertical"' },
       description: expect.stringContaining("arrow keys"),

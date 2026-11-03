@@ -7,6 +7,7 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 
 <ComponentExample
   name="menu/basic"
+  inspect
   caption="Open Project and choose an item. The menu closes and the readout shows its value. You can also use the arrow keys and Enter."
 />
 
@@ -16,26 +17,16 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 npm install @ui-sdk/react
 ```
 
-The examples use the shared [example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `Menu`:
 
-```tsx
-import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
-
-function Example() {
-  return (
-    <Menu>
-      <MenuTrigger>Actions</MenuTrigger>
-      <MenuContent>
-        <MenuItem value="rename">Rename</MenuItem>
-        <MenuItem value="duplicate">Duplicate</MenuItem>
-      </MenuContent>
-    </Menu>
-  )
-}
-
-export { Example }
+```text
+Menu
+├── MenuTrigger
+└── MenuContent
+    ├── MenuItem
+    └── MenuItem
 ```
 
 Give items a `value` and handle `onAction` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
@@ -267,8 +258,6 @@ Render an item as a native link using the shared [composition API](../parts-and-
 
 <DataAttributes />
 
-<CssVariables />
-
 Use `data-highlighted` for the active item, `data-disabled` for unavailable actions, and `data-checked` for selected settings. Popup sizing and motion hooks are shared with the [styling guide](../styling-and-animation).
 
 ## Custom Rendering
@@ -278,54 +267,6 @@ See [Links and Custom Rendering](#links-and-custom-rendering) for a native-link 
 ## API Reference
 
 Props and callbacks are the same as below, as React props.
-
-### Events
-
-Callbacks get the new state first, then the details.
-
-| Prop                   | On                 | Receives                                                                       |
-| ---------------------- | ------------------ | ------------------------------------------------------------------------------ |
-| `onOpenChange`         | `Menu`             | `(open, details)`: the new state, and the [reason](#reasons)                   |
-| `onOpenChangeComplete` | `Menu`             | `(open)`, after the animation                                                  |
-| `onPayloadChange`      | `Menu`             | `(payload, details)`: the content's new payload, and the [reason](#reasons)    |
-| `onAction`             | `Menu`             | `(value, { event })` for every plain item, including items in submenus         |
-| `onCheckedChange`      | `Menu`             | `(checked, details)`, with the item's value in `details.value`. For data menus |
-| `onValueChange`        | `Menu`             | `(value, details)`, with the group's name in `details.group`. For data menus   |
-| `onDismissAttempt`     | `Menu`             | `({ reason, event })`, when a dismissal was refused                            |
-| `onSelect`             | `MenuItem`         | `(event)`, before the menu closes. `event.preventDefault()` keeps it open      |
-| `onCheckedChange`      | `MenuCheckboxItem` | `(checked, details)`, before the menu's                                        |
-| `onValueChange`        | `MenuRadioGroup`   | `(value, details)`, before the menu's                                          |
-
-### Reasons
-
-`details.reason` says why the menu or a submenu opened or closed.
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOpenChangeReason" />
-
-For a payload change, it says what opened the menu or took it over.
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuPayloadChangeReason" />
-
-With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuDismissReason" />
-
-Checkbox items report why they toggled, in `onCheckedChange`:
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckedChangeReason" />
-
-Radio groups report why their value changed, in `onValueChange`:
-
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuValueChangeReason" />
-
-### Controller
-
-Create one with `createMenuController<Payload>()` and pass it as `controller`, to the menu and to any
-triggers outside it. `Payload` is the type of the data triggers and `open()` pass.
-
-Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`. `open()` also takes `focus`: `"first"`, `"last"`, `"popup"` or `"none"`.
-
-<ControllerTable path="../../packages/core/src/components/menu/menu.ts" name="MenuController" />
 
 ### Menu
 
@@ -344,6 +285,8 @@ A trigger outside the menu also takes `controller`.
 ### MenuContent
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuContentProps" />
+
+<CssVariables component="menu" part="content" />
 
 ### MenuItem
 
@@ -404,6 +347,54 @@ What render functions, state-based class names and slots receive, per part.
 `MenuItemIcon`:
 
 <StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIconState" />
+
+### Reasons
+
+`details.reason` says why the menu or a submenu opened or closed.
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOpenChangeReason" />
+
+For a payload change, it says what opened the menu or took it over.
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuPayloadChangeReason" />
+
+With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuDismissReason" />
+
+Checkbox items report why they toggled, in `onCheckedChange`:
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckedChangeReason" />
+
+Radio groups report why their value changed, in `onValueChange`:
+
+<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuValueChangeReason" />
+
+### Controller
+
+Create one with `createMenuController<Payload>()` and pass it as `controller`, to the menu and to any
+triggers outside it. `Payload` is the type of the data triggers and `open()` pass.
+
+Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`. `open()` also takes `focus`: `"first"`, `"last"`, `"popup"` or `"none"`.
+
+<ControllerTable path="../../packages/core/src/components/menu/menu.ts" name="MenuController" />
+
+### Events
+
+Callbacks get the new state first, then the details.
+
+| Prop                   | On                 | Receives                                                                       |
+| ---------------------- | ------------------ | ------------------------------------------------------------------------------ |
+| `onOpenChange`         | `Menu`             | `(open, details)`: the new state, and the [reason](#reasons)                   |
+| `onOpenChangeComplete` | `Menu`             | `(open)`, after the animation                                                  |
+| `onPayloadChange`      | `Menu`             | `(payload, details)`: the content's new payload, and the [reason](#reasons)    |
+| `onAction`             | `Menu`             | `(value, { event })` for every plain item, including items in submenus         |
+| `onCheckedChange`      | `Menu`             | `(checked, details)`, with the item's value in `details.value`. For data menus |
+| `onValueChange`        | `Menu`             | `(value, details)`, with the group's name in `details.group`. For data menus   |
+| `onDismissAttempt`     | `Menu`             | `({ reason, event })`, when a dismissal was refused                            |
+| `onSelect`             | `MenuItem`         | `(event)`, before the menu closes. `event.preventDefault()` keeps it open      |
+| `onCheckedChange`      | `MenuCheckboxItem` | `(checked, details)`, before the menu's                                        |
+| `onValueChange`        | `MenuRadioGroup`   | `(value, details)`, before the menu's                                          |
 
 ## Accessibility
 

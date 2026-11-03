@@ -14,15 +14,11 @@ description: Keep a button pressed, or group toggles with a shared value and arr
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-The demos use icons from `lucide-react`. Install that package if you copy their source.
-
 ## Usage
 
 `Toggle` renders a native button. It reports its state with `aria-pressed` and always uses `type="button"`, so pressing it does not submit a form.
 
-<span id="anatomy" />
+<span id="composition" />
 
 ```tsx
 import { Toggle } from "@ui-sdk/react/toggle"
@@ -60,9 +56,7 @@ Set `disabled` to prevent presses and remove a standalone toggle from the tab or
   caption="Both toggles ignore clicks and are skipped by Tab. The second toggle starts pressed."
 />
 
-<span id="right-to-left" />
-
-The layout follows an ancestor's `dir="rtl"`. Groups also [reverse their horizontal arrow keys](#right-to-left-group).
+The layout follows an ancestor's `dir="rtl"`. Groups also reverse their horizontal arrow keys.
 
 ## Behavior and Options
 
@@ -133,15 +127,6 @@ Use the group's value to update other content. Here the selected weight also cha
 <ComponentExample
   name="toggle/group-custom"
   caption="Choose a font weight to update the sample text. Pressing the selected weight keeps it selected."
-/>
-
-### Right to Left Group
-
-Set `dir="rtl"` on an ancestor. The group reads that direction from the DOM, so Left moves forward and Right moves back.
-
-<ComponentExample
-  name="toggle/group-rtl"
-  caption="Focus قائمة and press Left to move to شبكة. Space presses the focused toggle."
 />
 
 ### One or Several
@@ -236,14 +221,31 @@ A render function receives the props to spread and the part's state. Keep the be
 
 Props and callbacks are the same as below, as React props.
 
-### Events
+### Toggle
 
-Callbacks get the new state or value first, then the details. `onValueChange` never runs on mount.
+<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
 
-| Prop              | On            | Receives                                                                                                                     |
-| ----------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `onPressedChange` | `Toggle`      | `(pressed, details)`: the new state, and the [reason](#reasons). In a group, it runs first and can cancel the group's change |
-| `onValueChange`   | `ToggleGroup` | `(value, details)`: the pressed toggles' values, and the [reason](#reasons)                                                  |
+### ToggleIcon
+
+<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
+
+### ToggleGroup
+
+<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
+
+### State
+
+What render functions, state-based class names and slots receive.
+
+<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
+
+In a group, a toggle's `disabled` includes the group's. The group:
+
+<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
+
+`ToggleIcon`:
+
+<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
 
 ### Reasons
 
@@ -277,31 +279,14 @@ Every write method takes an optional `{ reason, event }`, runs `onValueChange` l
   name="ToggleGroupController"
 />
 
-### Toggle
+### Events
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
+Callbacks get the new state or value first, then the details. `onValueChange` never runs on mount.
 
-### ToggleIcon
-
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
-
-### ToggleGroup
-
-<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
-
-### State
-
-What render functions, state-based class names and slots receive.
-
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
-
-In a group, a toggle's `disabled` includes the group's. The group:
-
-<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
-
-`ToggleIcon`:
-
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
+| Prop              | On            | Receives                                                                                                                     |
+| ----------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `onPressedChange` | `Toggle`      | `(pressed, details)`: the new state, and the [reason](#reasons). In a group, it runs first and can cancel the group's change |
+| `onValueChange`   | `ToggleGroup` | `(value, details)`: the pressed toggles' values, and the [reason](#reasons)                                                  |
 
 ## Accessibility
 

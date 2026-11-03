@@ -14,15 +14,14 @@ description: Show an image with a fallback while it loads or if it fails.
 pnpm add @ui-sdk/svelte @ui-sdk/core
 ```
 
-The examples use the [shared example theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build an `Avatar`:
 
-```svelte
-<Avatar>
-  <AvatarImage src="/ada.png" alt="Ada Lovelace" />
-  <AvatarFallback>AL</AvatarFallback>
-</Avatar>
+```text
+Avatar
+├── AvatarImage
+└── AvatarFallback
 ```
 
 - `Avatar` shares the image's loading state with its parts.
@@ -39,19 +38,9 @@ The image is a real `img`, including in server markup. The browser can start fet
 
 Set `delay` on the fallback to wait before showing it. This avoids flashing initials when an image loads quickly. Without a delay, the fallback appears immediately, including on the server.
 
-<ComponentExample
-  name="avatar/delay"
-  caption="Click Replay. The first fallback appears immediately; the second waits 600 milliseconds. Both keep their space while waiting."
-/>
-
 ### Loading Status
 
 `onLoadingStatusChange` receives the new status and change details. The possible statuses are `loading`, `loaded`, `error`, and `idle`.
-
-<ComponentExample
-  name="avatar/status"
-  caption="Click Break to show the fallback, Remove to clear the image, and Load to restore it. The status beside the avatar follows each change."
-/>
 
 When you replace a loaded image, the browser keeps it visible while the next source loads. A failed replacement shows the fallback. The change details explain why the status changed; see [Reasons](#reasons).
 
@@ -59,21 +48,11 @@ When you replace a loaded image, the browser keeps it visible while the next sou
 
 Pass image attributes such as `srcSet`, `crossOrigin`, and `referrerPolicy` to the image. They work on the same `img` the browser loads. For avatars farther down a page, use `loading="lazy"`.
 
-<ComponentExample
-  name="avatar/referrer"
-  caption="Inspect the image in developer tools. Its source set, cross-origin mode, and referrer policy are applied to the real img element."
-/>
-
 <span id="render-functions" />
 
 ### Interactive Avatar
 
 Use a button when clicking an avatar performs an action. Give it an accessible name that stays available while the image loads.
-
-<ComponentExample
-  name="avatar/render"
-  caption="Focus the avatar and press Enter or Space, or click it. The press count increases with each activation."
-/>
 
 [Parts and Composition](../parts-and-composition) explains how to change the root element in this framework.
 
@@ -98,23 +77,6 @@ Use [Parts and Composition](../parts-and-composition) to replace an element or r
 
 Props and callbacks are the same as below, as Svelte props.
 
-### Events
-
-Callbacks get the new status first, then the details.
-
-| Prop                    | On       | Receives                                                                            |
-| ----------------------- | -------- | ----------------------------------------------------------------------------------- |
-| `onLoadingStatusChange` | `Avatar` | `(status, details)`: the image's status, the [reason](#reasons) and `details.event` |
-
-### Reasons
-
-`details.reason` says why the status changed.
-
-<ReasonTable
-  path="../../packages/core/src/components/avatar/avatar.ts"
-  name="AvatarLoadingStatusChangeReason"
-/>
-
 ### Avatar
 
 <TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
@@ -128,6 +90,23 @@ Callbacks get the new status first, then the details.
 What render functions, state-based class names and slots receive. Every part gets the same state.
 
 <StateTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarState" />
+
+### Reasons
+
+`details.reason` says why the status changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarLoadingStatusChangeReason"
+/>
+
+### Events
+
+Callbacks get the new status first, then the details.
+
+| Prop                    | On       | Receives                                                                            |
+| ----------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `onLoadingStatusChange` | `Avatar` | `(status, details)`: the image's status, the [reason](#reasons) and `details.event` |
 
 ## Accessibility
 

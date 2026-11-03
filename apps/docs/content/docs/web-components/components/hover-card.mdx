@@ -20,20 +20,18 @@ Importing the component defines its elements. On the server the import does noth
 import "@ui-sdk/web/hover-card"
 ```
 
-The examples use the shared [Example Theme](../styling-and-animation#example-theme).
+## Composition
 
-## Anatomy
+Use the following composition to build a `ui-hover-card`:
+
+```text
+ui-hover-card
+├── ui-hover-card-trigger
+│   └── a
+└── ui-hover-card-content
+```
 
 Wrap a link and its preview in a hover card.
-
-```html
-<ui-hover-card>
-  <ui-hover-card-trigger>
-    <a href="https://example.com/people/ada">Ada Lovelace</a>
-  </ui-hover-card-trigger>
-  <ui-hover-card-content>A preview of Ada's profile.</ui-hover-card-content>
-</ui-hover-card>
-```
 
 The trigger wraps your own `<a>`, so it stays a link.
 
@@ -56,15 +54,6 @@ The trigger is a link, and pressing it follows the link. The card only adds a pr
 <ComponentExample
   name="hover-card/delay"
   caption="Change the delays, then move between the link and card to see when it opens and closes."
-/>
-
-### RTL
-
-Start and end follow the text direction.
-
-<ComponentExample
-  name="hover-card/rtl"
-  caption="Hover the links to see logical alignment in right-to-left text."
 />
 
 ### Offsets
@@ -157,9 +146,7 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 <DataAttributes component="hover-card" />
 
-Open cards also set these CSS variables, for sizing and animation.
-
-<CssVariables component="hover-card" />
+Open cards also set CSS variables for sizing and animation, listed under [HoverCardContent](#hovercardcontent).
 
 Animate with `data-starting-style` and `data-ending-style`. The card stays mounted until its exit animation finishes.
 
@@ -192,19 +179,37 @@ Each part's state is listed under [State](#state).
 
 Props are attributes in kebab case, like `close-delay` and `side-offset`: `"false"` is false, and numbers are numbers. `anchor` and `container` take CSS selectors. Callbacks are DOM events.
 
-### Events
+### HoverCard
 
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `openchange` cancels the change.
+<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
 
-| Member                     | On                      | Description                                                                     |
-| -------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
-| `open` property, attribute | `ui-hover-card`         | Whether the card is open. The attribute sets where it starts, and is live       |
-| `api` property             | `ui-hover-card`         | The [controller](#controller)                                                   |
-| `openchange` event         | `ui-hover-card`         | `detail: { value: open, reason, event }`                                        |
-| `openchangecomplete` event | `ui-hover-card`         | `detail: { value: open }`, after the animation                                  |
-| `payloadchange` event      | `ui-hover-card`         | `detail: { value: payload, reason, event }`, when the content's payload changes |
-| `payload` property         | `ui-hover-card-trigger` | Data for the content, read when the trigger connects                            |
-| `for` attribute            | `ui-hover-card-trigger` | The `id` of a card the trigger opens from outside it                            |
+### HoverCardTrigger
+
+A trigger outside the card names it with `for="card-id"`, and takes `payload` as a property.
+
+<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
+
+### HoverCardContent
+
+<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
+
+<CssVariables component="hover-card" part="content" />
+
+### State
+
+The same state shows as data attributes on each element.
+
+`HoverCardTrigger`:
+
+<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
+
+`HoverCardContent`:
+
+<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
+
+`HoverCardArrow`:
+
+<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
 
 ### Reasons
 
@@ -234,35 +239,19 @@ Every write method takes an optional `{ reason, event }`, passed to `openchange`
   name="HoverCardController"
 />
 
-### HoverCard
+### Events
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `openchange` cancels the change.
 
-### HoverCardTrigger
-
-A trigger outside the card names it with `for="card-id"`, and takes `payload` as a property.
-
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
-
-### HoverCardContent
-
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
-
-### State
-
-The same state shows as data attributes on each element.
-
-`HoverCardTrigger`:
-
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
-
-`HoverCardContent`:
-
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
-
-`HoverCardArrow`:
-
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
+| Member                     | On                      | Description                                                                     |
+| -------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
+| `open` property, attribute | `ui-hover-card`         | Whether the card is open. The attribute sets where it starts, and is live       |
+| `api` property             | `ui-hover-card`         | The [controller](#controller)                                                   |
+| `openchange` event         | `ui-hover-card`         | `detail: { value: open, reason, event }`                                        |
+| `openchangecomplete` event | `ui-hover-card`         | `detail: { value: open }`, after the animation                                  |
+| `payloadchange` event      | `ui-hover-card`         | `detail: { value: payload, reason, event }`, when the content's payload changes |
+| `payload` property         | `ui-hover-card-trigger` | Data for the content, read when the trigger connects                            |
+| `for` attribute            | `ui-hover-card-trigger` | The `id` of a card the trigger opens from outside it                            |
 
 ## Accessibility
 

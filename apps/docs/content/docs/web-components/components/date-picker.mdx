@@ -22,28 +22,22 @@ Import the element definitions once in your application. This also defines the C
 import "@ui-sdk/web/date-picker"
 ```
 
-To use the examples’ Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
+## Composition
 
-The examples use `lucide` for icons. Install it to copy them as shown, or use your own icons.
+Use the following composition to build a `ui-date-picker`:
 
-```bash
-npm install lucide
+```text
+ui-date-picker
+├── ui-date-picker-input
+│   └── input
+├── ui-date-picker-trigger
+├── ui-date-picker-hint
+└── ui-date-picker-content
 ```
-
-## Anatomy
 
 The input accepts a date, the trigger opens the calendar, and the hint describes the expected format. An empty content part renders a calendar for you.
 
-```html
-<ui-date-picker default-value="2026-10-16">
-  <ui-date-picker-input><input aria-label="Due date" /></ui-date-picker-input>
-  <ui-date-picker-trigger>Choose date</ui-date-picker-trigger>
-  <ui-date-picker-hint></ui-date-picker-hint>
-  <ui-date-picker-content></ui-date-picker-content>
-</ui-date-picker>
-```
-
-Every [Calendar part](./calendar#anatomy) also works inside `ui-date-picker-content` and is exported from the Date Picker entry. Write those parts out when you need to add styles, change the layout, or include custom day content.
+Every [Calendar part](./calendar#composition) also works inside `ui-date-picker-content` and is exported from the Date Picker entry. Write those parts out when you need to add styles, change the layout, or include custom day content.
 
 An input element wraps your native `<input>` or creates one. The trigger, Clear, and presets wrap a `<button>` or create one around their content.
 
@@ -221,7 +215,39 @@ Opening focuses the selected date, otherwise today, otherwise the first focusabl
 
 The root, inputs, and trigger expose `data-disabled`. Invalid input sets `data-invalid` on that input and the root. The root and trigger expose `data-open`; presets expose `data-selected`, and Clear exposes `data-empty`. Calendar days carry [Calendar’s state attributes](./calendar#styling).
 
-<DataAttributes component="date-picker" />
+### `<ui-date-picker-content>` [#styling-datepickercontent]
+
+<CssVariables component="date-picker" part="content" />
+
+### `<ui-date-picker-viewport>` [#styling-viewport]
+
+<CssVariables component="date-picker" part="viewport" />
+
+## Data Attributes
+
+### `<ui-date-picker>` [#data-attributes-datepicker]
+
+<DataAttributes component="date-picker" part="root" />
+
+### `<ui-date-picker-input>` [#data-attributes-datepickerinput]
+
+<DataAttributes component="date-picker" part="input" />
+
+### `<ui-date-picker-trigger>` [#data-attributes-datepickertrigger]
+
+<DataAttributes component="date-picker" part="trigger" />
+
+### `<ui-date-picker-content>` [#data-attributes-datepickercontent]
+
+<DataAttributes component="date-picker" part="content" />
+
+### `<ui-date-picker-clear>` [#data-attributes-datepickerclear]
+
+<DataAttributes component="date-picker" part="clear" />
+
+### `<ui-date-picker-preset>` [#data-attributes-datepickerpreset]
+
+<DataAttributes component="date-picker" part="preset" />
 
 ## API Reference
 
@@ -230,55 +256,6 @@ numbers. `value`, `default-value` and `unavailable` take comma-separated dates, 
 property takes any matcher, like `{ weekday: [0, 6] }`. `container` takes a `#id`. `controller` is a
 property. Callbacks are DOM events. The element is form-associated, so it submits with
 no hidden input.
-
-### Events
-
-Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiDatePickerElement` for typed listeners.
-
-| Member                     | On               | Description                                               |
-| -------------------------- | ---------------- | --------------------------------------------------------- |
-| `value` property           | `ui-date-picker` | The selected value. Setting it selects it                 |
-| `open` property            | `ui-date-picker` | Whether the popup is open. Setting it opens or closes it  |
-| `month` property           | `ui-date-picker` | The calendar's first month. Setting it turns there        |
-| `api` property             | `ui-date-picker` | The [controller](#controller)                             |
-| `controller` property      | `ui-date-picker` | A controller from `createDatePickerController()`          |
-| `valuechange` event        | `ui-date-picker` | `detail: { value, reason, event, source }`                |
-| `openchange` event         | `ui-date-picker` | `detail: { value: open, reason, event, source }`          |
-| `openchangecomplete` event | `ui-date-picker` | `detail: { value: open }`, once any animation finished    |
-| `monthchange` event        | `ui-date-picker` | `detail: { value: month, reason, event, source }`         |
-| `dismissattempt` event     | `ui-date-picker` | `detail: { reason, event }`, when a dismissal was refused |
-
-### Reasons
-
-`event.detail.reason` says why the value changed:
-
-<ReasonTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerValueChangeReason"
-/>
-
-Why the popup opened or closed:
-
-<ReasonTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerOpenChangeReason"
-/>
-
-With `dismissible` false, the refused dismissals `dismissattempt` reports:
-
-<ReasonTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerDismissReason"
-/>
-
-### Controller
-
-Create one with `createDatePickerController()` and pass it as `controller`.
-
-<ControllerTable
-  path="../../packages/core/src/components/date-picker/date-picker.ts"
-  name="DatePickerController"
-/>
 
 ### DatePicker
 
@@ -294,7 +271,6 @@ Create one with `createDatePickerController()` and pass it as `controller`.
   path="../../packages/core/src/components/date-picker/date-picker.ts"
   name="DatePickerContentProps"
 />
-
 ### DatePickerPreset
 
 <TypeTable
@@ -350,6 +326,55 @@ What render functions, state-based class names and children functions receive, p
   path="../../packages/core/src/components/date-picker/date-picker.ts"
   name="DatePickerClearState"
 />
+
+### Reasons
+
+`event.detail.reason` says why the value changed:
+
+<ReasonTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerValueChangeReason"
+/>
+
+Why the popup opened or closed:
+
+<ReasonTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerOpenChangeReason"
+/>
+
+With `dismissible` false, the refused dismissals `dismissattempt` reports:
+
+<ReasonTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerDismissReason"
+/>
+
+### Controller
+
+Create one with `createDatePickerController()` and pass it as `controller`.
+
+<ControllerTable
+  path="../../packages/core/src/components/date-picker/date-picker.ts"
+  name="DatePickerController"
+/>
+
+### Events
+
+Events fire on their own element and don't bubble, with the new value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change. Type the element as `UiDatePickerElement` for typed listeners.
+
+| Member                     | On               | Description                                               |
+| -------------------------- | ---------------- | --------------------------------------------------------- |
+| `value` property           | `ui-date-picker` | The selected value. Setting it selects it                 |
+| `open` property            | `ui-date-picker` | Whether the popup is open. Setting it opens or closes it  |
+| `month` property           | `ui-date-picker` | The calendar's first month. Setting it turns there        |
+| `api` property             | `ui-date-picker` | The [controller](#controller)                             |
+| `controller` property      | `ui-date-picker` | A controller from `createDatePickerController()`          |
+| `valuechange` event        | `ui-date-picker` | `detail: { value, reason, event, source }`                |
+| `openchange` event         | `ui-date-picker` | `detail: { value: open, reason, event, source }`          |
+| `openchangecomplete` event | `ui-date-picker` | `detail: { value: open }`, once any animation finished    |
+| `monthchange` event        | `ui-date-picker` | `detail: { value: month, reason, event, source }`         |
+| `dismissattempt` event     | `ui-date-picker` | `detail: { reason, event }`, when a dismissal was refused |
 
 ## Accessibility
 

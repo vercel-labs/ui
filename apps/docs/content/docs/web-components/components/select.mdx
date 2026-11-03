@@ -7,6 +7,7 @@ Use a Select when someone needs to choose from a set of options. It handles open
 
 <ComponentExample
   name="select/demo"
+  inspect
   caption="Open Fruit and choose Blueberry. The list closes and the trigger shows your choice."
 />
 
@@ -16,36 +17,28 @@ Use a Select when someone needs to choose from a set of options. It handles open
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-To use the examples' Tailwind classes, add the [example theme](../styling-and-animation#example-theme) to your global stylesheet.
-
-The examples use `lucide` for icons. Install it to copy the examples as shown, or replace the icons with your own:
-
-```bash
-npm install lucide
-```
-
 Importing Select registers its custom elements in the browser. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/select"
 ```
 
-## Anatomy
+## Composition
+
+Use the following composition to build a `ui-select`:
+
+```text
+ui-select
+├── ui-select-label
+├── ui-select-trigger
+│   └── button
+│       └── ui-select-value
+└── ui-select-content
+    ├── ui-select-item
+    └── ui-select-item
+```
 
 Start with a label, a trigger, and a list of items. `ui-select-value` shows the selected item's label inside the trigger.
-
-```html
-<ui-select placeholder="Select a fruit">
-  <ui-select-label>Fruit</ui-select-label>
-  <ui-select-trigger>
-    <button><ui-select-value></ui-select-value></button>
-  </ui-select-trigger>
-  <ui-select-content>
-    <ui-select-item value="apple">Apple</ui-select-item>
-    <ui-select-item value="blueberry">Blueberry</ui-select-item>
-  </ui-select-content>
-</ui-select>
-```
 
 The trigger has the `combobox` role, and the popup is a `listbox`. `ui-select-label` names the trigger. If you don't need a visible label, give its button an `aria-label` instead.
 
@@ -323,58 +316,71 @@ Select keeps closing content mounted until its exit animation finishes. `opencha
 
 Style the parts with the attributes below. The popup also exposes variables such as `--anchor-width` and `--available-height` for sizing.
 
-<DataAttributes component="select" />
+### `<ui-select-content>` [#styling-selectcontent]
 
-<CssVariables component="select" />
+<CssVariables component="select" part="content" />
+
+### `<ui-select-viewport>` [#styling-viewport]
+
+<CssVariables component="select" part="viewport" />
+
+## Data Attributes
+
+### `<ui-select-label>` [#data-attributes-selectlabel]
+
+<DataAttributes component="select" part="label" />
+
+### `<ui-select-trigger>` [#data-attributes-selecttrigger]
+
+<DataAttributes component="select" part="trigger" />
+
+### `<ui-select-value>` [#data-attributes-selectvalue]
+
+<DataAttributes component="select" part="value" />
+
+### `<ui-select-clear>` [#data-attributes-selectclear]
+
+<DataAttributes component="select" part="clear" />
+
+### `<ui-select-content>` [#data-attributes-selectcontent]
+
+<DataAttributes component="select" part="content" />
+
+### `<ui-select-item>` [#data-attributes-selectitem]
+
+<DataAttributes component="select" part="item" />
+
+### `<ui-select-item-text>` [#data-attributes-selectitemtext]
+
+<DataAttributes component="select" part="item-text" />
+
+### `<ui-select-item-indicator>` [#data-attributes-selectitemindicator]
+
+<DataAttributes component="select" part="item-indicator" />
+
+### `<ui-select-select-all>` [#data-attributes-selectselectall]
+
+<DataAttributes component="select" part="select-all" />
+
+### `<ui-select-empty>` [#data-attributes-selectempty]
+
+<DataAttributes component="select" part="empty" />
+
+### `<ui-select-status>` [#data-attributes-selectstatus]
+
+<DataAttributes component="select" part="status" />
+
+### `<ui-select-arrow>` [#data-attributes-selectarrow]
+
+<DataAttributes component="select" part="arrow" />
+
+### `<ui-select-item-icon>` [#data-attributes-selectitemicon]
+
+<DataAttributes component="select" part="item-icon" />
 
 ## API Reference
 
 Props are attributes in kebab case, like `default-value` and `align-item-with-trigger`: `"false"` is false, and numbers are numbers. `items`, `itemToValue`, `itemToLabel` and `isItemEqualToValue` are properties. `container` and `anchor` take CSS selectors. Callbacks are DOM events.
-
-### Events
-
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on a change event cancels it.
-
-| Member                     | On                  | Description                                                   |
-| -------------------------- | ------------------- | ------------------------------------------------------------- |
-| `value` property           | `ui-select`         | The selected value. Setting it selects, as a controller would |
-| `open` property, attribute | `ui-select`         | Whether the list is open. The attribute sets where it starts  |
-| `api` property             | `ui-select`         | The [controller](#controller-1)                               |
-| `valuechange` event        | `ui-select`         | `detail: { value, reason, event, source }`                    |
-| `openchange` event         | `ui-select`         | `detail: { value: open, reason, event, source }`              |
-| `openchangecomplete` event | `ui-select`         | `detail: { value: open }`, after the animation                |
-| `highlight` event          | `ui-select`         | `detail: { value, index, event }`                             |
-| `query` property           | `ui-select`         | The search text                                               |
-| `querychange` event        | `ui-select`         | `detail: { value: query, reason, event, source }`             |
-| `loadmore` event           | `ui-select`         | When the last item is reached                                 |
-| `dismissattempt` event     | `ui-select`         | `detail: { reason, event }`, when a dismissal was refused     |
-| `for` attribute            | `ui-select-trigger` | The `id` of a select the trigger opens from outside it        |
-
-### Reasons
-
-`event.detail.reason` says why the value changed:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectValueChangeReason" />
-
-And why the list opened or closed:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectOpenChangeReason" />
-
-With `dismissible` false, the refused dismissals `dismissattempt` reports:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectDismissReason" />
-
-And why the search text changed:
-
-<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectQueryChangeReason" />
-
-### Controller
-
-The element's `api` property has the same methods.
-
-Every write method takes an optional `{ reason, event }`, which the change event carries.
-
-<ControllerTable path="../../packages/core/src/components/select/select.ts" name="SelectController" />
 
 ### Select
 
@@ -479,6 +485,51 @@ The same state shows as data attributes on each element.
 `ui-select-status`:
 
 <StateTable path="../../packages/core/src/components/select/select.ts" name="SelectStatusState" />
+
+### Reasons
+
+`event.detail.reason` says why the value changed:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectValueChangeReason" />
+
+And why the list opened or closed:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectOpenChangeReason" />
+
+With `dismissible` false, the refused dismissals `dismissattempt` reports:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectDismissReason" />
+
+And why the search text changed:
+
+<ReasonTable path="../../packages/core/src/components/select/select.ts" name="SelectQueryChangeReason" />
+
+### Controller
+
+The element's `api` property has the same methods.
+
+Every write method takes an optional `{ reason, event }`, which the change event carries.
+
+<ControllerTable path="../../packages/core/src/components/select/select.ts" name="SelectController" />
+
+### Events
+
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on a change event cancels it.
+
+| Member                     | On                  | Description                                                   |
+| -------------------------- | ------------------- | ------------------------------------------------------------- |
+| `value` property           | `ui-select`         | The selected value. Setting it selects, as a controller would |
+| `open` property, attribute | `ui-select`         | Whether the list is open. The attribute sets where it starts  |
+| `api` property             | `ui-select`         | The [controller](#controller-1)                               |
+| `valuechange` event        | `ui-select`         | `detail: { value, reason, event, source }`                    |
+| `openchange` event         | `ui-select`         | `detail: { value: open, reason, event, source }`              |
+| `openchangecomplete` event | `ui-select`         | `detail: { value: open }`, after the animation                |
+| `highlight` event          | `ui-select`         | `detail: { value, index, event }`                             |
+| `query` property           | `ui-select`         | The search text                                               |
+| `querychange` event        | `ui-select`         | `detail: { value: query, reason, event, source }`             |
+| `loadmore` event           | `ui-select`         | When the last item is reached                                 |
+| `dismissattempt` event     | `ui-select`         | `detail: { reason, event }`, when a dismissal was refused     |
+| `for` attribute            | `ui-select-trigger` | The `id` of a select the trigger opens from outside it        |
 
 ## Accessibility
 
