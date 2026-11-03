@@ -957,7 +957,7 @@
     }
 
     &:not([data-pending]) > [data-slot="spinner"] {
-      visibility: hidden;
+      display: none;
     }
   }
 

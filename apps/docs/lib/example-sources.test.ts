@@ -50,6 +50,7 @@ test("an example returns its named source", async () => {
   writeFiles({ "basic.tsx": `${source}\n` })
   expect(await readExampleSources("button/basic", "react")).toEqual({
     files: [{ name: "basic.tsx", lang: "tsx", code: source }],
+    log: false,
   })
 })
 
@@ -57,6 +58,7 @@ test("web components read TypeScript from the web example folder", async () => {
   writeFiles({ "basic.ts": 'import "@ui-sdk/web/button"' }, "web")
   expect(await readExampleSources("button/basic", "web-components")).toEqual({
     files: [{ name: "basic.ts", lang: "ts", code: 'import "@ui-sdk/web/button"' }],
+    log: false,
   })
 })
 

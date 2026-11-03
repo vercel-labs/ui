@@ -1,22 +1,7 @@
 @scope ([data-example]) {
-  [data-slot="row"]:is([role="group"], [role="toolbar"]) {
-    gap: 0;
-
-    & > :is([data-slot="button-root"], button:not([data-slot])) {
-      &:not(:first-child) {
-        margin-inline-start: -1px;
-        border-start-start-radius: 0;
-        border-end-start-radius: 0;
-      }
-
-      &:not(:last-child) {
-        border-start-end-radius: 0;
-        border-end-end-radius: 0;
-      }
-
-      &:focus-visible {
-        z-index: 1;
-      }
-    }
+  /* Content marked with data-show="pending" or "idle" shows only in that state. */
+  [data-slot="button-root"]:not([data-pending]) [data-show="pending"],
+  [data-slot="button-root"][data-pending] [data-show="idle"] {
+    display: none;
   }
 }

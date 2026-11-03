@@ -1,10 +1,11 @@
 "use client"
 
-import * as React from "react"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import { Button } from "@ui-sdk/react/button"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [submitted, setSubmitted] = React.useState<{ email: string; count: number }>()
+  const log = useLog()
 
   return (
     <form
@@ -12,22 +13,17 @@ function Example() {
       onSubmit={(event) => {
         event.preventDefault()
         const email = String(new FormData(event.currentTarget).get("email"))
-        setSubmitted((current) => ({ email, count: (current?.count ?? 0) + 1 }))
+        log(`Subscribed ${email}`)
       }}
-      onReset={() => setSubmitted(undefined)}
     >
-      <label data-slot="label">
-        Email
-        <input name="email" type="email" defaultValue="ada@example.com" />
-      </label>
+      <Field>
+        <FieldLabel>Email</FieldLabel>
+        <FieldControl name="email" type="email" defaultValue="ada@example.com" />
+      </Field>
       <div data-slot="row">
         <Button type="submit">Subscribe</Button>
         <Button type="reset">Reset</Button>
       </div>
-      <output data-slot="output">
-        {submitted &&
-          `Submitted: ${submitted.email} (${submitted.count} ${submitted.count === 1 ? "time" : "times"})`}
-      </output>
     </form>
   )
 }

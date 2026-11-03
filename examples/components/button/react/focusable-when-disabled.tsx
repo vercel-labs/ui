@@ -2,35 +2,33 @@
 
 import * as React from "react"
 import { Button } from "@ui-sdk/react/button"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
+  const log = useLog()
   const [title, setTitle] = React.useState("")
-  const [published, setPublished] = React.useState(false)
   const hint = React.useId()
   const ready = title.trim() !== ""
 
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        Title
-        <input
-          value={title}
-          onChange={(event) => {
-            setTitle(event.target.value)
-            setPublished(false)
-          }}
-        />
-      </label>
+      <Field>
+        <FieldLabel>Title</FieldLabel>
+        <FieldControl value={title} onChange={(event) => setTitle(event.target.value)} />
+      </Field>
       <div data-slot="row">
         <Button
           disabled={!ready}
           focusableWhenDisabled
           aria-describedby={hint}
-          onClick={() => setPublished(true)}
+          onClick={() => log(`Published “${title}”`)}
         >
           Publish
         </Button>
-        <p id={hint}>{!ready ? "Add a title to publish." : published ? "Published." : "Ready to publish."}</p>
+        <p id={hint} data-slot="hint">
+          {ready ? "Ready to publish." : "Add a title to publish."}
+        </p>
       </div>
     </div>
   )

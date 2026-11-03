@@ -93,18 +93,18 @@ function ExampleConsole({ entries }: { entries: string[] }) {
 
   return (
     <section aria-label="Console" className="border-t border-border/60 text-xs">
-      <div className="px-4 pt-2 text-muted-foreground">Console</div>
+      <div className="border-b border-border/40 px-4 py-1.5 text-muted-foreground">Console</div>
       <ol
         ref={list}
         aria-live="polite"
-        className="h-[calc(4lh+1rem)] overflow-y-auto px-4 py-2 font-mono leading-5 text-foreground/80"
+        className="h-[6.5rem] overflow-y-auto px-4 py-1 font-mono leading-5 text-foreground/80"
       >
         {entries.map((entry, index) => (
-          <li key={index} className="border-b border-border/40 py-0.5">
+          <li key={index} className="flex h-6 items-center border-b border-border/40">
             {entry}
           </li>
         ))}
-        <li aria-hidden className="flex h-5 items-center text-muted-foreground/60">
+        <li aria-hidden className="flex h-6 items-center text-muted-foreground/60">
           <ChevronRightIcon className="-ms-[5px] size-3.5" />
         </li>
       </ol>

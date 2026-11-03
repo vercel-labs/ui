@@ -14,18 +14,14 @@ async function readExampleSources(name: string, framework: Framework) {
     return null
   }
 
-  // The docs-only logger reads as plain `console.log` in the shown code. Other files from
+  // Examples log to the preview's console through `useLog()`. The code shows it as written, from
+  // "./log"; the logger itself is docs-only, so its file isn't shown. Other files from
   // examples/shared show beside the example, imported from the same folder, so copying both works.
   const files = [{ name: filename, lang, code: code.trimEnd() }]
   const log = /from "(?:\.\.\/)+shared\/[^"]+\/log"/.test(code)
-  if (log) {
-    files[0].code = files[0].code
-      .replace(/^import \{ useLog \} from "[^"]+"\n/m, "")
-      .replace(/^\s*const log = useLog\(\)\n/m, "")
-      .replace(/(?<![.\w])log\(/g, "console.log(")
-  }
+  if (log) files[0].code = files[0].code.replace(/from "(?:\.\.\/)+shared\/[^"]+\/log"/, 'from "./log"')
   const shared = [...files[0].code.matchAll(/from "((?:\.\.\/)+shared\/[^"]+)"/g)].map((match) => match[1])
-  for (const specifier of new Set(shared)) {
+  for (const specifier of new Set(shared.filter((specifier) => !specifier.endsWith("/log")))) {
     const resolved = path.resolve(directory, specifier)
     const sharedFile = [`${resolved}.${ext}`, `${resolved}.ts`, resolved].find((file) => existsSync(file))
     if (!sharedFile) continue
