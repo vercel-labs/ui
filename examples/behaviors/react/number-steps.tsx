@@ -16,11 +16,9 @@ function Example() {
     setTyped(null)
   }
   return (
-    <div className="flex w-72 flex-col gap-3 text-sm">
-      <div className="flex items-center justify-between gap-3">
-        <label htmlFor="quantity" className="text-muted-foreground">
-          Quantity in kg
-        </label>
+    <div>
+      <div>
+        <label htmlFor="quantity">Quantity in kg</label>
         <input
           id="quantity"
           role="spinbutton"
@@ -41,10 +39,9 @@ function Example() {
             setValue(stepBy(current(), move, range))
             setTyped(null)
           }}
-          className="h-9 w-24 rounded-md border border-input bg-background px-3 text-right font-mono tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </div>
-      <p className="m-0 text-xs text-muted-foreground">
+      <p>
         Arrows step by 0.5, Shift by 5, Alt by 0.1. Home and End go to 0 and 20. Typed weights snap to 0.5.
       </p>
     </div>

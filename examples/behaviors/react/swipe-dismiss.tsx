@@ -49,11 +49,10 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
   }
 
   return (
-    <li className="relative overflow-hidden rounded-lg">
+    <li>
       <div
         aria-hidden
         data-dismissing={dismissing || undefined}
-        className="absolute inset-y-0 flex items-center justify-center overflow-hidden bg-muted text-xs font-medium whitespace-nowrap text-muted-foreground transition-colors duration-150 data-dismissing:bg-red-500 data-dismissing:text-white"
         style={{
           [offset < 0 ? "right" : "left"]: 0,
           width: Math.abs(offset),
@@ -65,18 +64,16 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
       <div
         data-dragging={dragging || undefined}
         onPointerDown={pointerdown}
-        className="relative flex cursor-grab touch-pan-y items-start justify-between gap-3 rounded-lg border border-border bg-background p-3 shadow-sm transition-[translate] duration-200 select-none data-dragging:cursor-grabbing data-dragging:transition-none"
         style={{ translate: `${offset}px 0` }}
       >
-        <div className="flex flex-col gap-0.5">
-          <span className="font-medium">{toast.title}</span>
-          <span className="text-muted-foreground">{toast.body}</span>
+        <div>
+          <span>{toast.title}</span>
+          <span>{toast.body}</span>
         </div>
         <button
           type="button"
           aria-label={`Dismiss ${toast.title}`}
           onClick={(event) => dismiss(1, event.currentTarget.parentElement!.offsetWidth)}
-          className="rounded-md px-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           ×
         </button>
@@ -88,8 +85,8 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
 function Example() {
   const [toasts, setToasts] = React.useState(initial)
   return (
-    <div className="flex w-80 flex-col gap-3 text-sm">
-      <ul aria-label="Notifications" className="m-0 flex min-h-48 list-none flex-col gap-2 p-0">
+    <div>
+      <ul aria-label="Notifications">
         {toasts.map((toast) => (
           <SwipeToast
             key={toast.id}
@@ -98,12 +95,7 @@ function Example() {
           />
         ))}
       </ul>
-      <button
-        type="button"
-        onClick={() => setToasts(initial)}
-        disabled={toasts.length === initial.length}
-        className="self-start rounded-md border border-border px-2.5 py-1 hover:bg-muted disabled:opacity-50"
-      >
+      <button type="button" onClick={() => setToasts(initial)} disabled={toasts.length === initial.length}>
         Show all again
       </button>
     </div>

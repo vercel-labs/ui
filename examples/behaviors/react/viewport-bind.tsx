@@ -18,25 +18,19 @@ function Example() {
       ]
     : []
   return (
-    <div ref={ref} className="group flex w-full max-w-72 flex-col gap-3 text-sm">
-      <input
-        aria-label="Message"
-        placeholder="Tap here on a phone"
-        className="h-9 rounded-md border border-border bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-      <dl aria-label="Viewport" className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+    <div ref={ref}>
+      <input aria-label="Message" placeholder="Tap here on a phone" />
+      <dl aria-label="Viewport">
         {rows.map(([name, value]) => (
           <React.Fragment key={name}>
-            <dt className="text-muted-foreground">{name}</dt>
-            <dd className="m-0 font-mono tabular-nums" data-row={name}>
-              {value}
-            </dd>
+            <dt>{name}</dt>
+            <dd data-row={name}>{value}</dd>
           </React.Fragment>
         ))}
       </dl>
-      <p className="m-0 text-xs text-muted-foreground group-data-keyboard:text-foreground">
-        <span className="group-data-keyboard:hidden">No keyboard open</span>
-        <span className="hidden group-data-keyboard:inline">The keyboard covers the bottom of the page</span>
+      <p>
+        <span>No keyboard open</span>
+        <span>The keyboard covers the bottom of the page</span>
       </p>
     </div>
   )

@@ -21,49 +21,31 @@ function Example() {
   const [value, end] = values[style]
   const format = styles[style]
   return (
-    <div className="flex w-80 flex-col gap-3 text-sm">
-      <div className="flex gap-2">
-        <select
-          aria-label="Locale"
-          value={locale}
-          onChange={(event) => setLocale(event.target.value)}
-          className="h-8 flex-1 rounded-md border border-input bg-background px-2"
-        >
+    <div>
+      <div>
+        <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
           {locales.map((option) => (
             <option key={option}>{option}</option>
           ))}
         </select>
-        <select
-          aria-label="Style"
-          value={style}
-          onChange={(event) => setStyle(event.target.value)}
-          className="h-8 flex-1 rounded-md border border-input bg-background px-2"
-        >
+        <select aria-label="Style" value={style} onChange={(event) => setStyle(event.target.value)}>
           {Object.keys(styles).map((option) => (
             <option key={option}>{option}</option>
           ))}
         </select>
       </div>
-      <p data-formatted className="m-0 text-2xl font-medium">
+      <p data-formatted>
         {formatNumberToParts(value, locale, format).map((part, index) => (
-          <span
-            key={index}
-            data-type={part.type}
-            className="data-[type=fraction]:text-muted-foreground data-[type=currency]:text-muted-foreground"
-          >
+          <span key={index} data-type={part.type}>
             {part.value}
           </span>
         ))}
       </p>
-      <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-        <dt className="text-muted-foreground">Plain</dt>
-        <dd data-plain className="m-0 font-mono">
-          {formatNumber(value, locale, format)}
-        </dd>
-        <dt className="text-muted-foreground">Range</dt>
-        <dd data-range className="m-0 font-mono">
-          {formatNumberRange(value, end, locale, format)}
-        </dd>
+      <dl>
+        <dt>Plain</dt>
+        <dd data-plain>{formatNumber(value, locale, format)}</dd>
+        <dt>Range</dt>
+        <dd data-range>{formatNumberRange(value, end, locale, format)}</dd>
       </dl>
     </div>
   )

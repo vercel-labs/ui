@@ -90,12 +90,11 @@ function Example() {
   const shown = drag ? insert(drag.others, drag.key, drag.target) : order
   const placed = drag ? lefts(shown, drag.widths) : []
   return (
-    <div className="flex w-full max-w-lg flex-col gap-3 text-sm">
+    <div>
       <div
         role="tablist"
         aria-label="Mailboxes"
         data-dragging={drag ? "" : undefined}
-        className="relative flex h-9 w-fit gap-1 rounded-lg bg-muted p-0.5 select-none"
         style={
           drag ? { width: placed[placed.length - 1] + drag.widths[shown[shown.length - 1]] + 4 } : undefined
         }
@@ -117,24 +116,16 @@ function Example() {
             onPointerDown={(event) => pointerdown(event, key)}
             onKeyDown={(event) => keydown(event, key)}
             onClick={() => setSelected(key)}
-            className="h-8 shrink-0 cursor-grab touch-none rounded-md px-3 whitespace-nowrap text-muted-foreground transition-[left] duration-150 outline-none focus-visible:ring-2 focus-visible:ring-ring aria-selected:bg-background aria-selected:text-foreground aria-selected:shadow-sm data-moving:z-10 data-moving:cursor-grabbing data-moving:shadow-md data-moving:transition-none [[data-dragging]_&]:absolute [[data-dragging]_&]:top-0.5"
             style={drag ? { left: (drag.key === key ? drag.left : placed[index]) + 2 } : undefined}
           >
             {tabs[key]}
           </button>
         ))}
       </div>
-      <div
-        role="tabpanel"
-        id="mailbox-panel"
-        aria-labelledby={`mailbox-${selected}`}
-        className="text-muted-foreground"
-      >
+      <div role="tabpanel" id="mailbox-panel" aria-labelledby={`mailbox-${selected}`}>
         {tabs[selected]} is tab {order.indexOf(selected) + 1} of {order.length}.
       </div>
-      <p className="m-0 text-xs text-muted-foreground">
-        Hold ⌘ or Ctrl while dragging to place a tab freely.
-      </p>
+      <p>Hold ⌘ or Ctrl while dragging to place a tab freely.</p>
     </div>
   )
 }

@@ -33,20 +33,14 @@ const returns: Record<EnterKeyHint, string> = {
 
 function Example() {
   return (
-    <form
-      className="flex w-full max-w-80 flex-col gap-3 text-sm"
-      onSubmit={(event) => event.preventDefault()}
-    >
+    <form onSubmit={(event) => event.preventDefault()}>
       {fields.map(({ label, kind, enter }) => {
         const hints = inputHints(kind, { enter })
         return (
-          <label key={kind} className="flex flex-col gap-1">
-            <span className="font-medium">{label}</span>
-            <input
-              {...hints}
-              className="rounded-lg border border-border bg-background px-3 py-2 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-            <span className="text-xs text-muted-foreground">
+          <label key={kind}>
+            <span>{label}</span>
+            <input {...hints} />
+            <span>
               {keys[hints.inputMode ?? "text"]}
               {pads.has(hints.inputMode ?? "")
                 ? ""

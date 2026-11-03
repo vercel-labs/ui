@@ -122,32 +122,20 @@ const SidebarDivider = parts.Divider
 
 function Example() {
   return (
-    <Sidebar className="group flex h-48 w-full max-w-md overflow-hidden rounded-xl border border-border text-sm select-none">
-      <nav
-        aria-label="Files"
-        className="flex w-(--sidebar) shrink-0 justify-end overflow-hidden bg-muted/50 transition-[width,filter] duration-150 group-data-dragging:transition-[filter] group-data-[landing=collapsed]:brightness-75"
-      >
-        <ul className="m-0 flex w-full min-w-40 shrink-0 list-none flex-col gap-1 p-3 transition-[filter] duration-150 group-data-[landing=collapsed]:blur-[2px]">
+    <Sidebar>
+      <nav aria-label="Files">
+        <ul>
           {["README.md", "package.json", "src", "tests"].map((file) => (
-            <li key={file} className="truncate rounded-md px-2 py-1 hover:bg-muted">
-              {file}
-            </li>
+            <li key={file}>{file}</li>
           ))}
         </ul>
       </nav>
-      <SidebarDivider
-        aria-label="Resize sidebar"
-        className="w-1.5 shrink-0 cursor-col-resize bg-border outline-none hover:bg-primary/50 focus-visible:bg-primary"
-      />
-      <div className="grid flex-1 place-items-center text-muted-foreground">
-        <span className="group-data-collapsed:hidden group-data-landing:hidden">
-          Drag the divider left to collapse
-        </span>
-        <span className="hidden group-data-collapsed:inline group-data-landing:hidden">
-          Drag right a bit to open
-        </span>
-        <span className="hidden group-data-[landing=collapsed]:inline">Release to collapse</span>
-        <span className="hidden group-data-[landing=open]:inline">Release to open at {minWidth}px</span>
+      <SidebarDivider aria-label="Resize sidebar" />
+      <div>
+        <span>Drag the divider left to collapse</span>
+        <span>Drag right a bit to open</span>
+        <span>Release to collapse</span>
+        <span>Release to open at {minWidth}px</span>
       </div>
     </Sidebar>
   )
