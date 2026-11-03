@@ -423,6 +423,15 @@
     & > li + li {
       border-top: 1px solid var(--line-faint);
     }
+
+    /* A row's action sits at its end, after the item and its details. */
+    & > [data-slot="row"] {
+      flex-wrap: nowrap;
+
+      & > :last-child:not(:first-child):is(button, [data-slot$="-trigger"]) {
+        margin-inline-start: auto;
+      }
+    }
   }
 
   [data-slot="log"] {

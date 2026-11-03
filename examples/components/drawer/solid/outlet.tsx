@@ -11,10 +11,10 @@ import {
 import { For } from "solid-js"
 
 const messages = [
-  { from: "Ada", text: "The proofs are back from the printer." },
-  { from: "Grace", text: "Lunch on Thursday?" },
-  { from: "Linus", text: "Pushed the fix for the release build." },
-  { from: "Margaret", text: "Can you review the launch checklist?" },
+  { from: "Inès", text: "The proofs are back from the printer." },
+  { from: "Kofi", text: "Lunch on Thursday?" },
+  { from: "Wren", text: "Pushed the fix for the release build." },
+  { from: "Tomasz", text: "Can you review the launch checklist?" },
 ]
 
 function Example() {

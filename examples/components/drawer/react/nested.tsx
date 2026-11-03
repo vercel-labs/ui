@@ -7,6 +7,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/react/drawer"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 
 function Example() {
   return (
@@ -22,7 +23,7 @@ function Example() {
         <dl>
           <div data-slot="row">
             <dt>Email</dt>
-            <dd>ada@example.com</dd>
+            <dd>hollis@example.com</dd>
           </div>
           <div data-slot="row">
             <dt>Password</dt>
@@ -35,7 +36,7 @@ function Example() {
         </dl>
         <div data-slot="stack">
           <Drawer>
-            <DrawerTrigger>Change password</DrawerTrigger>
+            <DrawerTrigger>Change Password</DrawerTrigger>
             <DrawerBackdrop />
             <DrawerContent>
               <div data-slot="grip" aria-hidden />
@@ -43,10 +44,10 @@ function Example() {
                 <DrawerTitle>Change password</DrawerTitle>
                 <DrawerDescription>Use at least 12 characters.</DrawerDescription>
               </div>
-              <label data-slot="label">
-                New password
-                <input type="password" />
-              </label>
+              <Field>
+                <FieldLabel>New password</FieldLabel>
+                <FieldControl type="password" />
+              </Field>
               <div data-slot="stack">
                 <DrawerClose data-variant="solid">Update</DrawerClose>
               </div>

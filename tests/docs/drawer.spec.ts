@@ -21,6 +21,14 @@ type Example = {
   close?: (context: Context) => Promise<void>
 }
 
+// The last line an example logged to its console.
+function lastLog(preview: Locator) {
+  return preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+}
+
 // Checks the drawer shows its title.
 const hasTitle = (drawer: Locator, title: string) =>
   expect(drawer.getByRole("heading", { name: title, exact: true })).toBeVisible()
@@ -34,16 +42,16 @@ const examples: Record<string, Example> = {
       await expect(drawer.getByText("360", { exact: true })).toBeVisible()
     },
   },
-  scrollable: { trigger: /^Scrollable content$/ },
+  scrollable: { trigger: /^Scrollable Content$/ },
   sides: {
     trigger: /^Top$/,
     check: async ({ drawer }) => {
-      await hasTitle(drawer, "Drawer from the top")
+      await hasTitle(drawer, "Notifications")
       await expect(drawer).toHaveAttribute("data-side", "top")
     },
   },
   "snap-points": {
-    trigger: /^Find a place$/,
+    trigger: /^Find a Place$/,
     check: async ({ drawer }) => {
       // It opens at defaultSnapPoint, and a press on the handle moves to the next one.
       await expect(drawer).toHaveAttribute("data-snap-point", "0.5")
@@ -51,32 +59,8 @@ const examples: Record<string, Example> = {
       await expect(drawer).toHaveAttribute("data-snap-point", "1")
     },
   },
-  handle: {
-    trigger: /^Resize with the handle$/,
-    check: async ({ drawer }) => {
-      await expect(drawer.getByText("160")).toBeVisible()
-      await drawer.getByLabel("Resize").click()
-      await expect(drawer.getByText("20rem")).toBeVisible()
-    },
-  },
-  controlled: {
-    trigger: /^Open$/,
-    check: async ({ drawer }) => {
-      await expect(drawer.getByText(/^Open at 0\.5\./)).toBeVisible()
-    },
-  },
-  "non-dismissible": {
-    trigger: /^Write a post$/,
-    // Escape is refused, and the drawer says how it was tried.
-    check: async ({ drawer, page }) => {
-      await page.keyboard.press("Escape")
-      await expect(drawer.getByRole("alert")).toContainText("Refused: escape-key")
-      await expect(drawer).toBeVisible()
-    },
-    close: async ({ drawer }) => drawer.getByRole("button", { name: "Post" }).click(),
-  },
   "non-modal": {
-    trigger: /^Get directions$/,
+    trigger: /^Get Directions$/,
     check: async ({ drawer }) => {
       await hasTitle(drawer, "To Blue Bottle Coffee")
       // At its smallest snap point the page stays usable.
@@ -85,30 +69,17 @@ const examples: Record<string, Example> = {
     },
     close: async ({ drawer }) => drawer.getByRole("button", { name: "Done" }).click(),
   },
-  modal: {
-    trigger: /^Open notes$/,
-    close: async ({ drawer }) => drawer.getByRole("button", { name: "Done" }).click(),
-  },
   nested: {
     trigger: /^Account$/,
     // Escape closes only the topmost drawer.
     check: async ({ drawer, page }) => {
       const drawers = page.getByRole("dialog")
-      await drawer.getByRole("button", { name: "Change password" }).click()
+      await drawer.getByRole("button", { name: "Change Password" }).click()
       await expect(drawers).toHaveCount(2)
       await hasTitle(drawers.last(), "Change password")
       await page.keyboard.press("Escape")
       await expect(drawers).toHaveCount(1)
       await hasTitle(drawers.first(), "Account")
-    },
-  },
-  form: {
-    trigger: /^Edit profile$/,
-    // The first save fails, so the drawer stays open with the error.
-    check: async ({ drawer }) => {
-      await drawer.getByRole("button", { name: "Save changes" }).click()
-      await expect(drawer.getByRole("button", { name: "Couldn't save. Try again" })).toBeVisible()
-      await expect(drawer).toBeVisible()
     },
   },
   outlet: {
@@ -117,20 +88,8 @@ const examples: Record<string, Example> = {
       await expect(preview.locator('[data-slot="drawer-outlet"]')).toHaveAttribute("data-open", "")
     },
   },
-  controller: {
-    trigger: /^Share Budget\.xlsx$/,
-    check: async ({ drawer, preview }) => {
-      await hasTitle(drawer, "Share Budget.xlsx")
-      await expect(preview.getByRole("button", { name: "Share Launch video.mp4" })).toBeDisabled()
-    },
-    // The Close part's value is what the drawer reports when it closes.
-    close: async ({ drawer, preview }) => {
-      await drawer.getByRole("button", { name: "Copy link" }).click()
-      await expect(preview.getByRole("status")).toHaveText("Shared: copy")
-    },
-  },
   "action-sheet": {
-    trigger: /^Photo options$/,
+    trigger: /^Photo Options$/,
     // A keyboard or code open starts on the first action, never the destructive one.
     check: async ({ drawer }) => {
       await expect(drawer.getByRole("button", { name: "Share" })).toBeFocused()
@@ -138,33 +97,9 @@ const examples: Record<string, Example> = {
     // The action chosen is what open() resolves with.
     close: async ({ drawer, preview }) => {
       await drawer.getByRole("button", { name: "Delete" }).click()
-      await expect(preview.getByRole("status")).toHaveText("Chose delete")
+      await expect(lastLog(preview)).toHaveText("Chose delete")
     },
   },
-  "scroll-snap": { trigger: /^Native scrolling$/ },
-  "theme-color": { trigger: /^Dim the toolbar$/ },
-  physics: {
-    trigger: /^Try the physics$/,
-    check: async ({ drawer }) => {
-      await hasTitle(drawer, "Bouncy")
-    },
-  },
-  persistent: {
-    trigger: /^Upgrade plan$/,
-    // The chat stays usable while the drawer is modal, and pressing it doesn't close it.
-    check: async ({ drawer, page }) => {
-      await page.getByRole("button", { name: /^Chat with us/ }).click()
-      await expect(page.getByRole("button", { name: "Chat with us (1)" })).toBeVisible()
-      await expect(drawer).toBeVisible()
-    },
-  },
-  container: {
-    trigger: /^Open in (the box|a window)$/,
-    check: async ({ preview }) => {
-      await expect(preview.getByRole("dialog")).toBeVisible()
-    },
-  },
-  responsive: { trigger: /^Edit profile$/ },
 }
 const order = Object.keys(examples)
 
@@ -180,8 +115,7 @@ for (const framework of frameworks) {
     await page.waitForLoadState("networkidle")
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders)
-      expect(examplesIn(folder).sort(), folder).toEqual([...order, "rtl", "custom-rendering"].sort())
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order, "rtl"].sort())
 
     for (const [index, name] of order.entries()) {
       await test.step(name, async () => {
@@ -207,17 +141,6 @@ for (const framework of frameworks) {
   })
 }
 
-// The custom rendering example's trigger opens with its keys, which it advertises.
-for (const framework of frameworks) {
-  test(`a trigger's shortcut opens the drawer in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/drawer`)
-    await page.waitForLoadState("networkidle")
-    const trigger = page.getByRole("button", { name: /^View details/ })
-    await expect(trigger).toHaveAttribute("aria-keyshortcuts", /^(Meta|Control)\+J$/)
-    await page.keyboard.press("ControlOrMeta+j")
-    await expect(page.getByRole("dialog", { name: "Details" })).toBeVisible()
-  })
-}
 
 // The drawer is named by its title.
 for (const framework of frameworks) {

@@ -39,7 +39,7 @@ function Example() {
         ))}
       </ul>
       <Drawer snapPoints={[0.2, 0.6]} modalAbove={0.2}>
-        <DrawerTrigger>Get directions</DrawerTrigger>
+        <DrawerTrigger>Get Directions</DrawerTrigger>
         <DrawerBackdrop />
         <DrawerContent>
           {(state) => (
@@ -50,8 +50,8 @@ function Example() {
                   <DrawerTitle>To {destination}</DrawerTitle>
                   <DrawerDescription>
                     {state.interactive
-                      ? "The page behind stays usable. Pick another place."
-                      : "Modal now. Drag it down to use the page again."}
+                      ? "12 min walk. Pick another place behind the sheet."
+                      : "12 min walk. Drag the sheet down to see the places."}
                   </DrawerDescription>
                 </div>
                 <DrawerClose>Done</DrawerClose>

@@ -8,12 +8,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/react/drawer"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 
 const messages = [
-  { from: "Ada", text: "The proofs are back from the printer." },
-  { from: "Grace", text: "Lunch on Thursday?" },
-  { from: "Linus", text: "Pushed the fix for the release build." },
-  { from: "Margaret", text: "Can you review the launch checklist?" },
+  { from: "Inès", text: "The proofs are back from the printer." },
+  { from: "Kofi", text: "Lunch on Thursday?" },
+  { from: "Wren", text: "Pushed the fix for the release build." },
+  { from: "Tomasz", text: "Can you review the launch checklist?" },
 ]
 
 function Example() {
@@ -40,12 +41,16 @@ function Example() {
         <div data-slot="grip" aria-hidden />
         <div data-slot="stack">
           <DrawerTitle>New message</DrawerTitle>
-          <DrawerDescription>Drag it down slowly and watch the inbox follow.</DrawerDescription>
+          <DrawerDescription>Write a quick note to the team.</DrawerDescription>
         </div>
-        <div data-slot="stack">
-          <input aria-label="To" placeholder="To" />
-          <textarea aria-label="Message" placeholder="Message" />
-        </div>
+        <Field>
+          <FieldLabel>To</FieldLabel>
+          <FieldControl defaultValue="Design team" />
+        </Field>
+        <Field>
+          <FieldLabel>Message</FieldLabel>
+          <FieldControl render={<textarea placeholder="What's new?" />} />
+        </Field>
         <div data-slot="stack">
           <DrawerClose data-variant="solid" value="send">
             Send

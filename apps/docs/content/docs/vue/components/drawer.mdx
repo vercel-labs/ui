@@ -83,11 +83,6 @@ A Handle is a button with an accessible name. Pressing it moves to the next larg
 
 For a sheet with one snap point, use a decorative bar instead of an inactive button.
 
-<ComponentExample
-  name="drawer/handle"
-  caption="Tab to Resize. Press it to cycle through the snap points, or use Up, Down, Home, and End to choose one directly."
-/>
-
 ### Controlled
 
 Use `v-model:open` and `v-model:snap-point`. You can control opening and snap points independently. Cancel a proposed change with `details.cancel()`; a canceled swipe springs back. `onOpenChangeComplete` runs after the sheet settles.
@@ -120,11 +115,6 @@ Set `modalAbove` when the page should stay usable beside a small sheet. At or be
 ### Modal
 
 `modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A non-modal drawer closes on an outside press only when `closeOnOutsidePress` is enabled.
-
-<ComponentExample
-  name="drawer/modal"
-  caption="Choose a modal setting, open the notes, then try Tab and the controls behind the sheet. The setting changes what remains usable behind the sheet."
-/>
 
 ### Nested Drawers
 
@@ -187,19 +177,9 @@ Put the least risky action first because a keyboard or code open starts there. U
 
 The default `"auto"` chooses native scrolling for a bottom sheet on a touch screen. It uses pointer dragging for mouse and pen, other sides, `modalAbove`, or `expandOnScroll` false. `data-driver` reports the active choice. Both drivers use the same snap points and state.
 
-<ComponentExample
-  name="drawer/scroll-snap"
-  caption="Open the sheet and scroll or swipe it between snap points. This bottom sheet explicitly uses the native scrolling driver."
-/>
-
 ### Theme Color
 
 `themeColor` dims an existing `<meta name="theme-color">` with the backdrop. It leaves pages without that tag alone. This demo supplies a neutral tag when needed so you can see the change in its readout.
-
-<ComponentExample
-  name="drawer/theme-color"
-  caption="Open and close the sheet and watch the theme-color readout. In Safari on an iPhone, the browser’s toolbars can follow that color too."
-/>
 
 ### Physics
 
@@ -207,28 +187,13 @@ The default `"auto"` chooses native scrolling for a bottom sheet on a touch scre
 
 Override part of `sheetPhysics.ios` with `physics`. `response` changes spring timing, `dampingRatio` changes settling, `momentumDampingRatio` affects flings, and `rubberBand` changes resistance past the largest point. These options affect the pointer driver, so the example selects it explicitly.
 
-<ComponentExample
-  name="drawer/physics"
-  caption="Choose a physics preset, open the sheet, and fling or pull it past its largest point. The displayed values show what the preset changes."
-/>
-
 ### Persistent Elements
 
 `persistentElements` keeps selected elements usable while the drawer is modal. Pass an array of elements or selectors, or a function returning elements. Something that must stay above the backdrop also needs its own top-layer surface, as the chat button has here.
 
-<ComponentExample
-  name="drawer/persistent"
-  caption="Open Upgrade plan and press Chat with us. Its counter changes while the modal sheet stays open."
-/>
-
 ### Container
 
 Drawers normally render in place and use the top layer. `container` moves the backdrop and viewport elsewhere, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups).
-
-<ComponentExample
-  name="drawer/container"
-  caption="Open the sheet in its chosen container. It still behaves like a drawer, including Escape and focus recovery."
-/>
 
 ### Responsive
 

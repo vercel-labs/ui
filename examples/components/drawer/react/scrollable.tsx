@@ -22,7 +22,7 @@ const paragraphs = [
 function Example() {
   return (
     <Drawer>
-      <DrawerTrigger>Scrollable content</DrawerTrigger>
+      <DrawerTrigger>Scrollable Content</DrawerTrigger>
       <DrawerBackdrop />
       <DrawerContent initialFocus="content">
         <div data-slot="grip" aria-hidden />
@@ -38,7 +38,7 @@ function Example() {
           ))}
         </div>
         <div data-slot="stack">
-          <DrawerClose data-variant="solid">Got it</DrawerClose>
+          <DrawerClose data-variant="solid">Got It</DrawerClose>
         </div>
       </DrawerContent>
     </Drawer>
