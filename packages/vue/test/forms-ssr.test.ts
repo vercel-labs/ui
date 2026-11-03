@@ -10,10 +10,18 @@ import {
   FieldDescription,
   FieldLabel,
   Input,
+  NumberInput,
+  NumberInputControl,
+  PasswordInput,
+  PasswordInputControl,
   Radio,
   RadioGroup,
   Select,
   SelectTrigger,
+  Slider,
+  SliderControl,
+  SliderThumb,
+  SliderTrack,
   Switch,
 } from "../src"
 
@@ -78,6 +86,16 @@ describe("server rendering form controls", () => {
     )
     const id = html.match(/<input[^>]*id="([^"]+)"/)![1]
     expect(html).toContain(`for="${id}"`)
+  })
+
+  test.each([
+    ["NumberInput", () => h(NumberInput, null, () => h(NumberInputControl))],
+    ["PasswordInput", () => h(PasswordInput, null, () => h(PasswordInputControl))],
+    ["Slider", () => h(Slider, null, () => h(SliderControl, null, () => h(SliderTrack, null, () => h(SliderThumb))))],
+  ])("a field ties its label to a %s's control", async (_name, control) => {
+    const html = await render(() => h(Field, null, () => [h(FieldLabel, null, () => "Amount"), control()]))
+    const label = attribute(tags(html).find((tag) => tag.includes('data-slot="field-label"')), "for")
+    expect(tags(html).some((tag) => attribute(tag, "id") === label)).toBe(true)
   })
 
   test.each([
