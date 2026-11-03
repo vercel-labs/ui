@@ -35,6 +35,20 @@ Progress
 
 The value is already part of the root's accessible description. The visible value is hidden from screen readers to avoid reading it twice.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+<Progress value={40}>
+  <ProgressLabel />
+  <ProgressValue />
+  <ProgressTrack>
+    <ProgressIndicator />
+  </ProgressTrack>
+</Progress>
+```
+
 ## Examples
 
 ### Indeterminate

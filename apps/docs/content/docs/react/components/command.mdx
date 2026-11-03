@@ -33,6 +33,29 @@ Give the input an accessible name and each command a unique value. Keep empty an
 
 Typing filters the commands. Arrow keys move the highlight, and Enter runs the highlighted command. Focus stays in the input, which points to the highlight with `aria-activedescendant`. `onAction` reports the value of the command that ran; use it to perform the action.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/react/command"
+
+function Example() {
+  return (
+    <Command>
+      <CommandInput aria-label="Search commands" />
+      <CommandEmpty>No commands found.</CommandEmpty>
+      <CommandList>
+        <CommandItem value="new-file">New file</CommandItem>
+        <CommandItem value="new-folder">New folder</CommandItem>
+      </CommandList>
+    </Command>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Dialog

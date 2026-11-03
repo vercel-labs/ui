@@ -34,6 +34,38 @@ Name the input, give each option a unique value, and put the options in a list i
 
 Typing filters the options. Arrow keys move the highlight; Enter chooses it and Escape closes the list. Focus usually stays in the input while `aria-activedescendant` identifies the highlighted option. A touch screen-reader trigger can move real focus into the list, and a sheet has its own [focus behavior](#presentation).
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxLabel,
+  ComboboxList,
+} from "@ui-sdk/react/combobox"
+
+function Example() {
+  return (
+    <Combobox>
+      <ComboboxLabel>Fruit</ComboboxLabel>
+      <ComboboxInput placeholder="Search fruits" />
+      <ComboboxContent>
+        <ComboboxList>
+          <ComboboxItem value="apple">Apple</ComboboxItem>
+          <ComboboxItem value="banana">Banana</ComboboxItem>
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Clear Button

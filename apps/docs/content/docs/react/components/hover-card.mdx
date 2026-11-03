@@ -28,6 +28,27 @@ Wrap a link and its preview in a hover card.
 
 The trigger is a link (an `<a>`, so give it an `href`), and pressing it follows the link. The card only adds a preview for people who pause on it: everything in it should be reachable from the page the link goes to, since touch and screen reader users may never open it. For a tip on a button, use a [Tooltip](./tooltip). For content that opens with a press, use a [Popover](./popover).
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@ui-sdk/react/hover-card"
+
+function ProfilePreview() {
+  return (
+    <HoverCard>
+      <HoverCardTrigger href="https://example.com/people/ada">Ada Lovelace</HoverCardTrigger>
+      <HoverCardContent>A preview of Ada's profile.</HoverCardContent>
+    </HoverCard>
+  )
+}
+
+export { ProfilePreview }
+```
+
 ## Examples
 
 ### Side

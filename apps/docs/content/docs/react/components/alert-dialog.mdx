@@ -35,6 +35,39 @@ Put the question in `AlertDialogTitle`, explain what happens in `AlertDialogDesc
 
 A Close part reports its `value` when it closes. `value="confirm"` is the agreeing answer that the [confirm helper](#confirm) recognizes.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@ui-sdk/react/alert-dialog"
+
+function Example() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger>Delete Project</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+        <AlertDialogDescription>
+          The project and its files will be deleted for everyone.
+        </AlertDialogDescription>
+        <AlertDialogClose>Cancel</AlertDialogClose>
+        <AlertDialogClose value="confirm">Delete</AlertDialogClose>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+export { Example }
+```
+
 ## Build Your Own
 
 `@ui-sdk/react/alert-dialog` comes with a ready-made Alert Dialog. If you'd like to build your own, with your own names, start from the `alertDialog` primitive in `@ui-sdk/core`:

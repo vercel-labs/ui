@@ -12,23 +12,24 @@ import {
 } from "@ui-sdk/react/calendar"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 export function Example() {
   const [value, setValue] = React.useState<CalendarValue>("2026-10-16")
   const [month, setMonth] = React.useState("2026-10")
-  const [reason, setReason] = React.useState("")
+  const log = useLog()
   return (
     <div>
       <Calendar
         value={value}
         onValueChange={(next, details) => {
           setValue(next)
-          setReason(details.reason)
+          log(`Selected ${String(next)} (${details.reason})`)
         }}
         month={month}
         onMonthChange={(next, details) => {
           setMonth(next)
-          setReason(details.reason)
+          log(`Showing ${next} (${details.reason})`)
         }}
       >
         <div data-slot="row">
@@ -45,9 +46,6 @@ export function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </Calendar>
-      <output data-slot="output">
-        {String(value)}, showing {month} {reason && `(${reason})`}
-      </output>
     </div>
   )
 }

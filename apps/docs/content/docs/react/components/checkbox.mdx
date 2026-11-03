@@ -29,6 +29,27 @@ Wrap the checkbox and its text in a label. The indicator shows while the checkbo
 
 `Checkbox` renders a button with the `checkbox` role and a hidden native checkbox that handles forms.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+
+function Example() {
+  return (
+    <label>
+      <Checkbox>
+        <CheckboxIndicator aria-hidden="true">✓</CheckboxIndicator>
+      </Checkbox>
+      Accept terms and conditions
+    </label>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Description

@@ -38,6 +38,44 @@ Inside a [Token Input](./token-input), leave out `TriggerMenuInput`: the menu su
 
 The field keeps focus while the arrow keys move the highlight. A `<textarea>` stays a textbox, which ARIA allows no other role, and points at the list with `aria-controls` and, after an arrow key, `aria-activedescendant`. An `<input>` is a combobox. Counts and states are said through a polite status, never through the field.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import {
+  TriggerMenu,
+  TriggerMenuInput,
+  TriggerMenuStatus,
+  TriggerMenuContent,
+  TriggerMenuList,
+  TriggerMenuItem,
+} from "@ui-sdk/react/trigger-menu"
+
+function Example() {
+  return (
+    <TriggerMenu triggers={[{ char: "@" }]}>
+      <TriggerMenuInput aria-label="Message" placeholder="Type @ to mention someone" />
+      <TriggerMenuStatus className="sr-only" />
+      <TriggerMenuContent>
+        <TriggerMenuList>
+          <TriggerMenuItem value="ada" label="Ada Lovelace">
+            Ada Lovelace
+          </TriggerMenuItem>
+          <TriggerMenuItem value="grace" label="Grace Hopper">
+            Grace Hopper
+          </TriggerMenuItem>
+        </TriggerMenuList>
+      </TriggerMenuContent>
+    </TriggerMenu>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Triggers as Data

@@ -33,6 +33,38 @@ Autocomplete
 
 Name the input, then put suggestions in a list inside the popup. Each suggestion needs a unique value.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  Autocomplete,
+  AutocompleteContent,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteLabel,
+  AutocompleteList,
+} from "@ui-sdk/react/autocomplete"
+
+function Example() {
+  return (
+    <Autocomplete>
+      <AutocompleteLabel>Fruit</AutocompleteLabel>
+      <AutocompleteInput placeholder="Type a fruit" />
+      <AutocompleteContent>
+        <AutocompleteList>
+          <AutocompleteItem value="Apple">Apple</AutocompleteItem>
+          <AutocompleteItem value="Banana">Banana</AutocompleteItem>
+        </AutocompleteList>
+      </AutocompleteContent>
+    </Autocomplete>
+  )
+}
+
+export { Example }
+```
+
 ## Build Your Own
 
 `@ui-sdk/react/autocomplete` comes with a ready-made Autocomplete. If you'd like to build your own, with your own names, start from the `autocomplete` primitive in `@ui-sdk/core`:

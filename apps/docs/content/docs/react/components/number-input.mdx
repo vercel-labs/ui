@@ -34,6 +34,34 @@ The step buttons repeat while held. They stay out of the Tab order because the f
 
 Typing updates the numeric value when the text is valid and within bounds. Enter or blur commits it: the text is parsed, clamped, snapped to the step, and formatted. An empty input has the value `null`.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  NumberInput,
+  NumberInputGroup,
+  NumberInputControl,
+  NumberInputDecrement,
+  NumberInputIncrement,
+} from "@ui-sdk/react/number-input"
+
+function Example() {
+  return (
+    <NumberInput defaultValue={1} min={0}>
+      <NumberInputGroup>
+        <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
+        <NumberInputControl aria-label="Quantity" />
+        <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
+      </NumberInputGroup>
+    </NumberInput>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Field

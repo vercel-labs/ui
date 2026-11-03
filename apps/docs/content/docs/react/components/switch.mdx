@@ -27,6 +27,27 @@ Switch
 
 `Switch` renders a button with `role="switch"`. `SwitchThumb` stays mounted and reflects the checked state, so CSS can slide it. The switch adds a hidden native checkbox for form submission, validation, and reset.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
+
+function Example() {
+  return (
+    <label>
+      <Switch>
+        <SwitchThumb />
+      </Switch>
+      Airplane Mode
+    </label>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Description

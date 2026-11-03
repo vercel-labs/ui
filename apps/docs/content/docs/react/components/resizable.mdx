@@ -33,6 +33,28 @@ Put a handle between the panels you want to resize.
 
 A group nests inside a panel, for layouts like an editor beside a terminal. Name each handle with `aria-label`, like "Resize sidebar".
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import { Resizable, ResizablePanel, ResizableHandle } from "@ui-sdk/react/resizable"
+
+function PanelLayout() {
+  return (
+    <Resizable>
+      <ResizablePanel />
+      <ResizableHandle aria-label="Resize sidebar" />
+      <ResizablePanel />
+    </Resizable>
+  )
+}
+
+export { PanelLayout }
+```
+
 ## Examples
 
 ### Vertical

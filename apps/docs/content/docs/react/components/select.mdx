@@ -35,6 +35,38 @@ Start with a label, a trigger, and a list of items. `SelectValue` shows the sele
 
 The trigger has the `combobox` role, and the popup is a `listbox`. `SelectLabel` names the trigger. If you don't need a visible label, give `SelectTrigger` an `aria-label` instead.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+
+function Example() {
+  return (
+    <Select placeholder="Select a fruit">
+      <SelectLabel>Fruit</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="apple">Apple</SelectItem>
+        <SelectItem value="blueberry">Blueberry</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Items as Data

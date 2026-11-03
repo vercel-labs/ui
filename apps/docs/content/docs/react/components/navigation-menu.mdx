@@ -36,6 +36,42 @@ Give the navigation an `aria-label`. Each item holds a trigger and its panel, or
 
 The viewport holds the open panel and follows its size and position. Give it `h-(--viewport-height) w-(--viewport-width) overflow-hidden` when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+  NavigationMenuViewport,
+} from "@ui-sdk/react/navigation-menu"
+
+function Example() {
+  return (
+    <NavigationMenu aria-label="Main">
+      <NavigationMenuList>
+        <NavigationMenuItem value="guides">
+          <NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+          <NavigationMenuContent className="absolute start-0 top-0 w-64 p-2">
+            <NavigationMenuLink href="/docs">Introduction</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+      <NavigationMenuViewport className="h-(--viewport-height) w-(--viewport-width) overflow-hidden" />
+    </NavigationMenu>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Link Component

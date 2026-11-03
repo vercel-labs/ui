@@ -28,6 +28,27 @@ Wrap the trigger and its hint in a tooltip.
 
 The content has the `tooltip` role. It names its trigger when the trigger has no name of its own, like an icon button, and describes it otherwise, as shown in [Icon Buttons](#icon-buttons). Keep it to plain text: a tooltip can't be focused, so links or buttons inside it can't be reached. For anything interactive, use a [Popover](./popover) or a [Hover Card](./hover-card).
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import { Tooltip, TooltipTrigger, TooltipContent } from "@ui-sdk/react/tooltip"
+
+function ShareHint() {
+  return (
+    <Tooltip>
+      <TooltipTrigger>Share</TooltipTrigger>
+      <TooltipContent>Anyone with the link can view</TooltipContent>
+    </Tooltip>
+  )
+}
+
+export { ShareHint }
+```
+
 ## Examples
 
 ### Side

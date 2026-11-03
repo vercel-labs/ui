@@ -31,6 +31,36 @@ Popover
 
 The content has the dialog role. Its title names it and its description adds context. The trigger can live inside the popover or [connect from elsewhere](#triggers-outside-the-popover).
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
+
+function Example() {
+  return (
+    <Popover>
+      <PopoverTrigger>Edit</PopoverTrigger>
+      <PopoverContent>
+        <PopoverTitle>Project details</PopoverTitle>
+        <PopoverDescription>Make a quick change without leaving the page.</PopoverDescription>
+        <PopoverClose>Done</PopoverClose>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### With Form

@@ -30,6 +30,17 @@ Avatar
 
 The image is a real `img`, including in server markup. The browser can start fetching it before hydration. The fallback stays visible until the image loads; if loading fails, the fallback remains.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+<Avatar>
+  <AvatarImage src="/ada.png" alt="Ada Lovelace" />
+  <AvatarFallback>AL</AvatarFallback>
+</Avatar>
+```
+
 ## Build Your Own
 
 `@ui-sdk/react/avatar` comes with a ready-made Avatar. If you'd like to build your own, with your own names, start from the `avatar` primitive in `@ui-sdk/core`:

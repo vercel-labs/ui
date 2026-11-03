@@ -39,6 +39,29 @@ The slots display the value of a single native input. That input handles selecti
 
 Arrow keys, Home, and End move the selection. Pasting a code such as `123-456` removes separators. The active slot gets `data-active`; an empty active slot gets `data-fake-caret` for drawing its caret.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
+
+function Example() {
+  return (
+    <OTPInput maxLength={4} aria-label="Verification code">
+      <OTPInputGroup>
+        <OTPInputSlot index={0} />
+        <OTPInputSlot index={1} />
+        <OTPInputSlot index={2} />
+        <OTPInputSlot index={3} />
+      </OTPInputGroup>
+    </OTPInput>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Four Digits

@@ -36,6 +36,38 @@ The title names the dialog; the description gives it context. A dialog can have 
 
 The backdrop is optional. Without one, style the content’s `::backdrop`. For a question that requires an explicit answer, use [Alert Dialog](./alert-dialog).
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/react/dialog"
+
+function Example() {
+  return (
+    <Dialog>
+      <DialogTrigger>Open</DialogTrigger>
+      <DialogBackdrop />
+      <DialogContent>
+        <DialogTitle>Project details</DialogTitle>
+        <DialogDescription>Review the details before continuing.</DialogDescription>
+        <DialogClose>Close</DialogClose>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Scrollable Content

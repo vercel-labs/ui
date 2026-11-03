@@ -35,6 +35,20 @@ Meter
 
 The value is already part of the root's accessible description. The visible value is hidden from screen readers to avoid reading it twice.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+<Meter value={40}>
+  <MeterLabel />
+  <MeterValue />
+  <MeterTrack>
+    <MeterIndicator />
+  </MeterTrack>
+</Meter>
+```
+
 ## Examples
 
 ### Bounds

@@ -90,7 +90,11 @@ async function DataAttributes({
                   ))}
                 </span>
               )}
-              {text && <Text>{text}</Text>}
+              {text && (
+                <span>
+                  <Text>{text}</Text>
+                </span>
+              )}
             </span>,
           ],
         }))}

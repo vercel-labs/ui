@@ -32,6 +32,31 @@ Give the list an accessible name and each option a unique value. `ListboxItemInd
 
 You can also name the list with a [Field label](./field) or `aria-labelledby`. Keep buttons, search fields, and empty messages outside the list: its contents should be options, groups, and separators.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
+
+function Example() {
+  return (
+    <Listbox aria-label="Toppings" defaultValue="basil">
+      <ListboxItem value="basil">
+        Basil
+        <ListboxItemIndicator>✓</ListboxItemIndicator>
+      </ListboxItem>
+      <ListboxItem value="olive">
+        Olive
+        <ListboxItemIndicator>✓</ListboxItemIndicator>
+      </ListboxItem>
+    </Listbox>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Multiple

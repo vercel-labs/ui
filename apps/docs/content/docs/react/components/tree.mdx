@@ -36,6 +36,37 @@ Give the tree an accessible name and every item a unique `value`. An item with a
 
 The tree has one Tab stop. Arrow keys move between visible items, open branches, and return to their parents. The indicator and checkbox are optional; they belong to the item around them, so you can put them inside or beside its label.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/react/tree"
+
+function Example() {
+  return (
+    <Tree aria-label="Project files">
+      <TreeItem value="src">
+        <TreeItemLabel>
+          <TreeItemIndicator>›</TreeItemIndicator>
+          src
+        </TreeItemLabel>
+        <TreeGroup>
+          <TreeItem value="src/index.ts">
+            <TreeItemLabel>index.ts</TreeItemLabel>
+          </TreeItem>
+        </TreeGroup>
+      </TreeItem>
+      <TreeItem value="package.json">
+        <TreeItemLabel>package.json</TreeItemLabel>
+      </TreeItem>
+    </Tree>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Items as Data

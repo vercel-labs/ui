@@ -65,47 +65,12 @@ const checks: Record<string, Check> = {
     await expectSelected(preview, "Friday, October 23, 2026")
     await expectSelected(preview, "Friday, October 16, 2026", false)
   },
-  "range-limits": async (preview) => {
-    await showMonth(preview, "October 2026")
-    await expectUnavailable(preview, "Saturday, October 17, 2026")
-    await day(preview, "Wednesday, October 14, 2026").click()
-    await day(preview, "Thursday, October 15, 2026").click()
-    await day(preview, "Tuesday, October 20, 2026").click()
-    await expect(
-      day(preview, "Wednesday, October 14, 2026"),
-      "a press that would make a stay too short keeps its start",
-    ).toHaveAttribute("aria-selected", "true")
-    await expectSelected(preview, "Thursday, October 15, 2026")
-    await expect(
-      day(preview, "Sunday, October 18, 2026"),
-      "the stay may span the booked weekend",
-    ).toHaveAttribute("aria-selected", "true")
-    await expectSelected(preview, "Tuesday, October 20, 2026")
-  },
-  "range-progress": async (preview) => {
-    await showMonth(preview, "October 2026")
-    await day(preview, "Monday, October 12, 2026").click()
-    await expect(
-      preview.getByText("Started on 2026-10-12, focus on 2026-10-12", { exact: true }),
-    ).toBeVisible()
-    await preview.page().keyboard.press("ArrowRight")
-    await expect(
-      preview.getByText("Started on 2026-10-12, focus on 2026-10-13", { exact: true }),
-    ).toBeVisible()
-    await preview.page().keyboard.press("Enter")
-    await expect(preview.getByText("Focus on 2026-10-13", { exact: true })).toBeVisible()
-    await expectSelected(preview, "Monday, October 12, 2026")
-    await expectSelected(preview, "Tuesday, October 13, 2026")
-  },
   multiple: async (preview) => {
-    await expect(preview.getByText("2 selected")).toBeVisible()
+    await expectSelected(preview, "Wednesday, October 7, 2026")
     await day(preview, "Tuesday, October 20, 2026").click()
-    await expect(preview.getByText("3 selected")).toBeVisible()
-    await expectSelected(preview, "Tuesday, October 6, 2026")
     await expectSelected(preview, "Tuesday, October 20, 2026")
-    await day(preview, "Tuesday, October 6, 2026").click()
-    await expect(preview.getByText("2 selected")).toBeVisible()
-    await expectSelected(preview, "Tuesday, October 6, 2026", false)
+    await day(preview, "Wednesday, October 7, 2026").click()
+    await expectSelected(preview, "Wednesday, October 7, 2026", false)
   },
   unavailable: async (preview) => {
     await showMonth(preview, "October 2026")
@@ -128,50 +93,6 @@ const checks: Record<string, Check> = {
     await expectUnavailable(preview, "Saturday, November 21, 2026")
     await expect(step(preview, "Next month")).toBeDisabled()
   },
-  "two-months": async (preview) => {
-    await expect(preview.getByRole("grid", { name: "October 2026" })).toBeVisible()
-    await expect(preview.getByRole("grid", { name: "November 2026" })).toBeVisible()
-    await step(preview, "Next month").click()
-    await expect(preview.getByRole("grid", { name: "December 2026" })).toBeVisible()
-    await expect(preview.getByRole("grid", { name: "January 2027" })).toBeVisible()
-  },
-  "month-year-select": async (preview) => {
-    await expect(preview.getByRole("heading")).toHaveText("June 1990")
-    await preview.getByRole("combobox", { name: "Year" }).selectOption("1962")
-    await preview.getByRole("combobox", { name: "Month" }).selectOption({ label: "March" })
-    await expect(preview.getByRole("heading")).toHaveText("March 1962")
-    await expect(preview.getByRole("combobox", { name: "Year" }).getByRole("option").first()).toHaveText(
-      "1920",
-    )
-    await day(preview, "Friday, March 16, 1962").click()
-    await expectSelected(preview, "Friday, March 16, 1962")
-  },
-  locale: async (preview) => {
-    await expect(preview.getByRole("heading")).toHaveText("Oktober 2026")
-    await expect(
-      preview.getByRole("columnheader").first(),
-      "the week starts on Monday, and headers read their full names",
-    ).toHaveAccessibleName("Montag")
-    await pick(preview, "Freitag, 16. Oktober 2026", "Dienstag, 20. Oktober 2026")
-  },
-  "custom-day": async (preview) => {
-    await expect(day(preview, "Friday, October 16, 2026").getByText("$100")).toBeVisible()
-    await expect(
-      day(preview, "Sunday, September 27, 2026").getByText("$"),
-      "days of the months around it show no price",
-    ).toBeHidden()
-    await pick(preview, "Friday, October 16, 2026", "Tuesday, October 20, 2026")
-  },
-  "fixed-weeks": async (preview) => {
-    // February 2026 fills four weeks, but there are always six, after the weekdays' row.
-    await expect(preview.getByRole("heading")).toHaveText("February 2026")
-    await expect(preview.getByRole("row")).toHaveCount(7)
-    await expect(day(preview, "Saturday, January 31, 2026")).toHaveCount(0)
-    await expect(day(preview, "Sunday, March 1, 2026")).toHaveCount(0)
-    await step(preview, "Next month").click()
-    await expect(preview.getByRole("heading")).toHaveText("March 2026")
-    await expect(preview.getByRole("row")).toHaveCount(7)
-  },
   disabled: async (preview) => {
     expect(await tabStops(preview)).toBe(0)
     await expect(step(preview, "Previous month")).toBeDisabled()
@@ -186,6 +107,98 @@ const checks: Record<string, Check> = {
     await expectSelected(preview, "Friday, October 16, 2026")
     await expectSelected(preview, "Tuesday, October 20, 2026", false)
     await expect(preview.getByRole("grid")).toHaveAttribute("aria-readonly", "true")
+  },
+  "two-months": async (preview) => {
+    await expect(preview.getByRole("grid", { name: "October 2026" })).toBeVisible()
+    await expect(preview.getByRole("grid", { name: "November 2026" })).toBeVisible()
+    await step(preview, "Next month").click()
+    await expect(preview.getByRole("grid", { name: "December 2026" })).toBeVisible()
+    await expect(preview.getByRole("grid", { name: "January 2027" })).toBeVisible()
+  },
+  "fixed-weeks": async (preview) => {
+    // February 2026 fills four weeks, but there are always six, after the weekdays' row.
+    await expect(preview.getByRole("heading")).toHaveText("February 2026")
+    await expect(preview.getByRole("row")).toHaveCount(7)
+    await expect(day(preview, "Saturday, January 31, 2026")).toHaveCount(0)
+    await expect(day(preview, "Sunday, March 1, 2026")).toHaveCount(0)
+    await step(preview, "Next month").click()
+    await expect(preview.getByRole("heading")).toHaveText("March 2026")
+    await expect(preview.getByRole("row")).toHaveCount(7)
+  },
+  "month-year-select": async (preview) => {
+    await expect(preview.getByRole("heading")).toHaveText("June 1990")
+    await preview.getByRole("combobox", { name: "Year" }).selectOption("1962")
+    await preview.getByRole("combobox", { name: "Month" }).selectOption({ label: "March" })
+    await expect(preview.getByRole("heading")).toHaveText("March 1962")
+    await expect(preview.getByRole("combobox", { name: "Year" }).getByRole("option").first()).toHaveText(
+      "1920",
+    )
+    await day(preview, "Friday, March 16, 1962").click()
+    await expectSelected(preview, "Friday, March 16, 1962")
+  },
+  "custom-select": async (preview) => {
+    await preview.getByRole("combobox", { name: "Year" }).click()
+    await preview.page().getByRole("option", { name: "2027" }).click()
+    await showMonth(preview, "October 2027")
+  },
+  locale: async (preview) => {
+    await expect(preview.getByRole("heading")).toHaveText("Oktober 2026")
+    await expect(
+      preview.getByRole("columnheader").first(),
+      "the week starts on Monday, and headers read their full names",
+    ).toHaveAccessibleName("Montag")
+    await pick(preview, "Freitag, 16. Oktober 2026", "Dienstag, 20. Oktober 2026")
+  },
+  formats: async (preview) => {
+    await expect(preview.locator('[data-slot="calendar-heading"]')).toHaveText(/^Oct . Nov 2026$/)
+    await expect(preview.getByRole("columnheader").first()).toHaveText("S")
+  },
+  "custom-day": async (preview) => {
+    await expect(day(preview, "Friday, October 16, 2026").getByText("$100")).toBeVisible()
+    await expect(
+      day(preview, "Sunday, September 27, 2026").getByText("$"),
+      "days of the months around it show no price",
+    ).toBeHidden()
+    await pick(preview, "Friday, October 16, 2026", "Tuesday, October 20, 2026")
+  },
+  "range-limits": async (preview) => {
+    await showMonth(preview, "October 2026")
+    await expectUnavailable(preview, "Saturday, October 17, 2026")
+    await day(preview, "Wednesday, October 14, 2026").click()
+    await day(preview, "Thursday, October 15, 2026").click()
+    await day(preview, "Tuesday, October 20, 2026").click()
+    await expect(
+      day(preview, "Wednesday, October 14, 2026"),
+      "a press that would make a stay too short keeps its start",
+    ).toHaveAttribute("aria-selected", "true")
+    await expectSelected(preview, "Thursday, October 15, 2026")
+    await expect(
+      day(preview, "Sunday, October 18, 2026"),
+      "the stay may span the booked weekend",
+    ).toHaveAttribute("aria-selected", "true")
+    await expectSelected(preview, "Tuesday, October 20, 2026")
+  },
+  "range-progress": async (preview) => {
+    const lines = preview
+      .locator("xpath=ancestor::figure[1]")
+      .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    await showMonth(preview, "October 2026")
+    await day(preview, "Monday, October 12, 2026").click()
+    await expect(lines.filter({ hasText: "Started on 2026-10-12" })).toHaveCount(1)
+    await preview.page().keyboard.press("ArrowRight")
+    await expect(lines.last()).toHaveText("Focus on 2026-10-13")
+    await preview.page().keyboard.press("Enter")
+    await expectSelected(preview, "Monday, October 12, 2026")
+    await expectSelected(preview, "Tuesday, October 13, 2026")
+  },
+  controlled: async (preview) => {
+    await day(preview, "Tuesday, October 20, 2026").click()
+    await expect(
+      preview
+        .locator("xpath=ancestor::figure[1]")
+        .locator('section[aria-label="Console"] li:not([aria-hidden])')
+        .last(),
+    ).toHaveText(/^Selected 2026-10-20/)
   },
   "time-zone": async (preview) => {
     // Today is the date in Kiritimati, which can be a day ahead of the browser's.
@@ -206,6 +219,14 @@ const checks: Record<string, Check> = {
     await expect(preview.getByRole("heading")).toHaveText("December 2026")
     await expect(day(preview, "Friday, December 25, 2026")).toBeFocused()
   },
+  presets: async (preview) => {
+    await preview.getByRole("button", { name: "Last 7 Days" }).click()
+    await expectSelected(preview, "Saturday, October 10, 2026")
+    await expectSelected(preview, "Friday, October 16, 2026")
+  },
+  "custom-grid": async (preview) => {
+    await expect(preview.getByRole("grid")).toBeVisible()
+  },
 }
 
-testExamples("calendar", checks, "components", [...Object.keys(checks), "rtl", "controlled", "custom-grid"])
+testExamples("calendar", checks, "components", [...Object.keys(checks), "rtl"])

@@ -32,6 +32,38 @@ Drawer
 
 The content is the sheet. The drawer positions it inside a full-screen viewport and moves it with `translate`. Give it a size, a surface, and corners; leave positioning and translation to the drawer. Give the backdrop a color, such as `bg-black/30`; the drawer manages its opacity.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  Drawer,
+  DrawerBackdrop,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@ui-sdk/react/drawer"
+
+function Example() {
+  return (
+    <Drawer>
+      <DrawerTrigger>Filters</DrawerTrigger>
+      <DrawerBackdrop />
+      <DrawerContent>
+        <DrawerTitle>Filters</DrawerTitle>
+        <DrawerDescription>Narrow down the results.</DrawerDescription>
+        <DrawerClose>Done</DrawerClose>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Scrollable Content

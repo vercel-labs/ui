@@ -38,6 +38,40 @@ readers, so Tab and the virtual cursor only reach what shows.
 
 `CarouselPrevious`, `CarouselNext`, the indicators and the play toggle have no text of their own. Give them text, or an `aria-label` when they hold an icon.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import {
+  Carousel,
+  CarouselViewport,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@ui-sdk/react/carousel"
+
+function FeaturedSlides() {
+  return (
+    <Carousel aria-label="Featured">
+      <CarouselViewport>
+        <CarouselContent>
+          <CarouselItem>First slide</CarouselItem>
+          <CarouselItem>Second slide</CarouselItem>
+        </CarouselContent>
+      </CarouselViewport>
+      <CarouselPrevious>Previous</CarouselPrevious>
+      <CarouselNext>Next</CarouselNext>
+    </Carousel>
+  )
+}
+
+export { FeaturedSlides }
+```
+
 ## Examples
 
 ### Sizes

@@ -31,6 +31,28 @@ Menu
 
 Give items a `value` and handle `onAction` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
+
+function Example() {
+  return (
+    <Menu>
+      <MenuTrigger>Actions</MenuTrigger>
+      <MenuContent>
+        <MenuItem value="rename">Rename</MenuItem>
+        <MenuItem value="duplicate">Duplicate</MenuItem>
+      </MenuContent>
+    </Menu>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Submenus

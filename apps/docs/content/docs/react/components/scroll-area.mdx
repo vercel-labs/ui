@@ -30,6 +30,37 @@ Put the content inside a viewport, then add a scrollbar for each axis you want t
 
 The viewport is the real scroller. Give the root a size and the viewport `size-full`. Scrollbars sit over the viewport's edges. A thumb appears when its axis overflows; [`type`](#when-scrollbars-show) controls when the scrollbar is visible. Render only the scrollbars you want: with none, the browser's own scrollbars stay.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import {
+  ScrollArea,
+  ScrollAreaViewport,
+  ScrollAreaContent,
+  ScrollAreaScrollbar,
+  ScrollAreaThumb,
+} from "@ui-sdk/react/scroll-area"
+
+function ReleaseNotes() {
+  return (
+    <ScrollArea>
+      <ScrollAreaViewport role="region" aria-label="Release notes">
+        <ScrollAreaContent>Content to scroll</ScrollAreaContent>
+      </ScrollAreaViewport>
+      <ScrollAreaScrollbar orientation="vertical">
+        <ScrollAreaThumb />
+      </ScrollAreaScrollbar>
+    </ScrollArea>
+  )
+}
+
+export { ReleaseNotes }
+```
+
 ## Examples
 
 ### Horizontal

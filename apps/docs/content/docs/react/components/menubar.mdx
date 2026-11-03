@@ -36,6 +36,38 @@ Menubar
 
 Each Menu joins its surrounding Menubar automatically. There are no separate menubar trigger or item components. Name the bar with `aria-label` when people need to distinguish it from another one.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
+import { Menubar } from "@ui-sdk/react/menubar"
+
+function Example() {
+  return (
+    <Menubar aria-label="Application">
+      <Menu>
+        <MenuTrigger>File</MenuTrigger>
+        <MenuContent>
+          <MenuItem>New file</MenuItem>
+          <MenuItem>Open file</MenuItem>
+        </MenuContent>
+      </Menu>
+      <Menu>
+        <MenuTrigger>Edit</MenuTrigger>
+        <MenuContent>
+          <MenuItem>Undo</MenuItem>
+          <MenuItem>Redo</MenuItem>
+        </MenuContent>
+      </Menu>
+    </Menubar>
+  )
+}
+
+export { Example }
+```
+
 ## Examples
 
 ### Submenu

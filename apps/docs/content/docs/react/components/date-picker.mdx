@@ -34,6 +34,33 @@ Every [Calendar part](./calendar#composition) also works inside `DatePickerConte
 
 An empty `DatePicker` renders the input, trigger, and calendar too. In range mode, it renders an input for each end.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  DatePicker,
+  DatePickerContent,
+  DatePickerHint,
+  DatePickerInput,
+  DatePickerTrigger,
+} from "@ui-sdk/react/date-picker"
+
+function Example() {
+  return (
+    <DatePicker defaultValue="2026-10-16">
+      <DatePickerInput aria-label="Due date" />
+      <DatePickerTrigger>Choose date</DatePickerTrigger>
+      <DatePickerHint />
+      <DatePickerContent />
+    </DatePicker>
+  )
+}
+
+export { Example }
+```
+
 ## Values
 
 Dates are strings such as `"2026-10-16"`, with no time or time zone attached. No date library is needed.

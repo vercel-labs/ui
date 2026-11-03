@@ -45,6 +45,39 @@ A single thumb is named by a `FieldLabel` in a `Field`, or by `aria-label` on th
 each thumb its own `aria-label`, like "Minimum price", and name the group with a `FieldLabel` or
 `aria-label` on the slider.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import {
+  Slider,
+  SliderValue,
+  SliderControl,
+  SliderTrack,
+  SliderIndicator,
+  SliderThumb,
+} from "@ui-sdk/react/slider"
+
+function VolumeSlider() {
+  return (
+    <Slider defaultValue={50}>
+      <SliderValue />
+      <SliderControl>
+        <SliderTrack>
+          <SliderIndicator />
+          <SliderThumb aria-label="Volume" />
+        </SliderTrack>
+      </SliderControl>
+    </Slider>
+  )
+}
+
+export { VolumeSlider }
+```
+
 ## Examples
 
 ### Range
