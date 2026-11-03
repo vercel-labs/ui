@@ -5,9 +5,16 @@ import { Checkbox, CheckboxGroup, CheckboxIndicator } from "../src/checkbox"
 import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "../src/field"
 import { DatePicker, DatePickerInput } from "../src/date-picker"
 import { Input } from "../src/input"
-import { NumberInput, NumberInputControl } from "../src/number-input"
+import {
+  NumberInput,
+  NumberInputControl,
+  NumberInputDecrement,
+  NumberInputIncrement,
+} from "../src/number-input"
+import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../src/password-input"
 import { Radio, RadioGroup } from "../src/radio"
 import { Select, SelectTrigger } from "../src/select"
+import { Slider, SliderControl, SliderThumb, SliderTrack, SliderValue } from "../src/slider"
 import { Switch } from "../src/switch"
 
 // The attributes of every <input> in the markup, in any order.
@@ -17,6 +24,16 @@ const inputs = (html: string) => html.match(/<input[^>]*>/g) ?? []
 const tags = (html: string) => html.match(/<[a-z][^>]*>/g) ?? []
 const attribute = (tag: string | undefined, name: string) =>
   tag?.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1]
+
+// The ids a label or control reference points at that no element has. A
+// control points at its field's description before one renders, so that one
+// isn't checked.
+const dangling = (html: string) => {
+  const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
+  return ["for", "aria-controls", "aria-labelledby"]
+    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .filter((id) => !ids.has(id))
+}
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering form controls", () => {
@@ -86,6 +103,48 @@ describe("server rendering form controls", () => {
     const id = html.match(/<input[^>]*id="([^"]+)"/)![1]
     expect(html).toContain(`for="${id}"`)
     expect(html).not.toContain('data-slot="field-error"')
+  })
+
+  test.each([
+    [
+      "NumberInput",
+      <NumberInput>
+        <NumberInputDecrement />
+        <NumberInputControl />
+        <NumberInputIncrement />
+      </NumberInput>,
+    ],
+    [
+      "PasswordInput",
+      <PasswordInput>
+        <PasswordInputControl />
+        <PasswordInputToggle />
+      </PasswordInput>,
+    ],
+    [
+      "Slider",
+      <Slider>
+        <SliderControl>
+          <SliderTrack>
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+        <SliderValue />
+      </Slider>,
+    ],
+  ])("a field ties its label to a %s's control", (_name, control) => {
+    const html = renderToString(
+      <Field>
+        <FieldLabel>Amount</FieldLabel>
+        {control}
+      </Field>,
+    )
+    const label = attribute(
+      tags(html).find((tag) => tag.includes('data-slot="field-label"')),
+      "for",
+    )
+    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+    expect(dangling(html)).toEqual([])
   })
 
   test.each([

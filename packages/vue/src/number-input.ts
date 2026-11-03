@@ -7,7 +7,7 @@ import {
 import type { ChangeDetails, CommitDetails } from "@ui-sdk/core"
 import { defineComponent, h, inject, provide, Teleport, type InjectionKey, type PropType } from "vue"
 import { renderUnbound, useControllerEntry, useControllerTarget } from "./controller-target"
-import { useFieldControl } from "./field-context"
+import { useFieldControl, useFieldControlId } from "./field-context"
 import { createParts, withElement } from "./create-parts"
 import {
   optionalBoolean,
@@ -69,6 +69,7 @@ const NumberInput = withElement(
     slots: Object as PartSlots<typeof numberInputPrimitive, "root">,
     setup(props, { attrs, emit }) {
       const field = useFieldControl()
+      const controlId = useFieldControlId()
       const numberInput = usePrimitive(numberInputPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
         defaultValue: props.defaultValue,
@@ -86,6 +87,7 @@ const NumberInput = withElement(
         name: props.name ?? field?.name(),
         form: props.form,
         controller: props.controller,
+        controlId,
         debug: props.debug,
         onValueChange: (value: Value, details: ChangeDetails<NumberInputValueChangeReason>) => {
           // The change event runs first, so canceling it also keeps v-model as it was.

@@ -7,7 +7,7 @@ import {
   type SliderValueState,
 } from "@ui-sdk/core/slider"
 import * as React from "react"
-import { controlRender, useFieldControl } from "./field-context"
+import { controlRender, useFieldControl, useFieldControlId } from "./field-context"
 import {
   createParts,
   extendHandle,
@@ -78,6 +78,7 @@ function Slider<Value extends number | number[] = number | number[]>({
   ...props
 }: SliderOptions<Value> & DivProps<SliderState>) {
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const slider = usePrimitive(sliderPrimitive, {
     value,
     defaultValue,
@@ -98,6 +99,7 @@ function Slider<Value extends number | number[] = number | number[]>({
     locale,
     controller,
     debug,
+    thumbInputId: controlId,
   })
   // A range is a group the field's label names. A single thumb is the control itself.
   const shape = value ?? defaultValue

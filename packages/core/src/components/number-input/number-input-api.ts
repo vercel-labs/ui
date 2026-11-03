@@ -45,6 +45,7 @@ type State = {
   required: boolean
   name: string | undefined
   form: string | undefined
+  controlId: string | null
   scrubbing: boolean
   // The device's keyboard, known once bound. The server renders "other".
   platform: "ios" | "android" | "other"

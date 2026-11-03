@@ -88,7 +88,7 @@ type ToastState = {
   type: Toast["type"]
   /** Its place in the stack, 0 for the newest. */
   index: number
-  /** Whether it's the newest, on top of a collapsed stack. */
+  /** Whether it's the newest, on top of a collapsed stack. A closing toast keeps it. */
   front: boolean
   /** Whether the stack is expanded. */
   expanded: boolean

@@ -13,7 +13,7 @@ The root: a group around the thumbs, and the hidden input the form submits.
     type SliderValueCommitDetails,
   } from "@ui-sdk/core/slider"
   import { setContext, untrack } from "svelte"
-  import { useFieldControl } from "../field/context"
+  import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
   import { SliderKey, type SliderContext } from "./context"
@@ -88,6 +88,7 @@ The root: a group around the thumbs, and the hidden input the form submits.
 
   const id = $props.id()
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const slider = usePrimitive(sliderPrimitive, () => ({
     id,
     get value() {
@@ -109,6 +110,7 @@ The root: a group around the thumbs, and the hidden input the form submits.
     locale,
     controller,
     debug,
+    thumbInputId: controlId,
     onValueChange: (next: Value, details: SliderValueChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)

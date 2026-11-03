@@ -1,5 +1,5 @@
 import type { field } from "@ui-sdk/core/field"
-import { madeLabel } from "@ui-sdk/core/renderer"
+import { fieldControlId, madeLabel } from "@ui-sdk/core/renderer"
 import { dynamic, type JSX } from "@solidjs/web"
 import { createComponent, createContext, merge, omit, untrack, useContext } from "solid-js"
 import type { PartProps, PrimitiveHandle } from "./use-primitive"
@@ -89,4 +89,16 @@ type ButtonControlProps<State> = Omit<
   "value" | "name" | "form" | "onChange" | "onSelect"
 >
 
-export { type ButtonControlProps, FieldContext, type FieldContextValue, joinField, useFieldControl }
+function useFieldControlId() {
+  const field = useContext(FieldContext)
+  return field ? fieldControlId(field.api.id) : undefined
+}
+
+export {
+  type ButtonControlProps,
+  FieldContext,
+  type FieldContextValue,
+  joinField,
+  useFieldControl,
+  useFieldControlId,
+}

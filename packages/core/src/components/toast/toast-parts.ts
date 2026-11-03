@@ -46,7 +46,8 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
       return {
         tabindex: "0",
         "data-type": item.toast.type,
-        "data-front": item.index === 0 && !item.leaving ? "" : undefined,
+        // A closing toast keeps it, so it leaves from where it was.
+        "data-front": item.index === 0 ? "" : undefined,
         "data-expanded": isExpanded(state) ? "" : undefined,
         // Swipes are the toast's, not the page's.
         style: item.toast.dismissible === false ? undefined : "touch-action:none",
@@ -57,7 +58,7 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
       return {
         type: item?.toast.type ?? "default",
         index: item?.index ?? 0,
-        front: !!item && item.index === 0 && !item.leaving,
+        front: !!item && item.index === 0,
         expanded: isExpanded(state),
         // A part can render once more after its toast left the region.
         leaving: !item || item.leaving,

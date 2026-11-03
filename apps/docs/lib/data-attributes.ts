@@ -1547,7 +1547,9 @@ const components: Record<
         text: "What the toast is about.",
         values: ["default", "success", "error", "info", "warning", "loading"],
       },
-      "data-front": { text: "Present on the newest toast, in front of a collapsed stack." },
+      "data-front": {
+        text: "Present on the newest toast, in front of a collapsed stack. A closing toast keeps it while it animates out.",
+      },
       "data-swiping": { text: "Present while the toast is being swiped." },
       "data-swipe-direction": {
         text: "The direction a swipe dismissed the toast toward, while it animates out.",
@@ -2042,7 +2044,8 @@ const meaning: Record<string, string> = {
   "--toast-index": "A toast's place in the stack, 0 for the newest. A closing toast keeps its place.",
   "--toast-offset":
     "The height of the toasts in front of this one, in pixels. Add gaps with `--toast-index` to place an expanded stack.",
-  "--toast-height": "The toast's own height, measured while it's in front or the stack is expanded.",
+  "--toast-height":
+    "The toast's own height with its content laid out freely, whatever height it's given. Set it as the height to animate the stack.",
   "--toast-front-height":
     "On the region: the newest toast's height. Clip the toasts behind it to it in a collapsed stack.",
   "--toast-stack-height": "On the region: the toasts' heights added up, for the height of an expanded stack.",

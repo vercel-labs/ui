@@ -9,7 +9,7 @@ import {
 } from "@ui-sdk/core/slider"
 import { computed, defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
 import { slotContent } from "./children"
-import { useFieldControl } from "./field-context"
+import { useFieldControl, useFieldControlId } from "./field-context"
 import { createParts, type RootInstanceOf, type RootPropsOf, withElement } from "./create-parts"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
 
@@ -75,6 +75,7 @@ const Slider = defineComponent({
   slots: Object as PartSlots<typeof sliderPrimitive, "root">,
   setup(props, { slots, emit }) {
     const field = useFieldControl()
+    const controlId = useFieldControlId()
     const model = () => orModel(props.value, props.modelValue)
     const slider = usePrimitive(sliderPrimitive, () => ({
       value: model(),
@@ -93,6 +94,7 @@ const Slider = defineComponent({
       format: props.format,
       locale: props.locale,
       controller: props.controller,
+      thumbInputId: controlId,
       debug: props.debug,
       onValueChange: (value: Value, details: SliderValueChangeDetails) => {
         // The change event runs first, so canceling it also keeps v-model as it was.

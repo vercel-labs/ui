@@ -1,6 +1,6 @@
 import type { FieldApi, FieldErrorProps } from "./field"
 import type { Validity } from "./field-control"
-import { formInternals } from "../../foundation/forms/form"
+import { fieldControlId, formInternals } from "../../foundation/forms/form"
 import { madeLabel } from "../../foundation/kernel/part"
 import type { Store } from "../../foundation/kernel/store"
 
@@ -137,7 +137,7 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
       state,
       api,
       { id: control.id, describedBy },
-      `${api.id}-control`,
+      fieldControlId(api.id),
     )
     const { descriptions, errors } = references(state, api)
     added = new Set([...descriptions, ...errors])
@@ -174,7 +174,7 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
   }
   // Labels point at the control's id, or one the field gives it when it has none.
   const adopt = (control: HTMLElement) => {
-    if (!control.id) control.id = `${api.id}-control`
+    if (!control.id) control.id = fieldControlId(api.id)
     api.internal.adopt(control)
   }
   // The control's component rewriting its own description drops the field's, so
