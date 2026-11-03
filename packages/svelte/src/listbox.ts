@@ -24,7 +24,7 @@ export type {
   ListboxItemState,
   ListboxOptions,
   ListboxPrimitive,
-  ListboxRootState,
+  ListboxState,
   ListboxValue,
   ListboxValueChangeReason,
 } from "@ui-sdk/core/listbox"

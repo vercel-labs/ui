@@ -51,7 +51,7 @@ function markup() {
         <ui-navigation-menu-list class="${vertical ? "nav-list vertical" : "nav-list"}">
           ${items}
           <ui-navigation-menu-item>
-            <ui-navigation-menu-link active><a class="nav-link" href="${fixture.link.href}">${fixture.link.label}</a></ui-navigation-menu-link>
+            <ui-navigation-menu-link current><a class="nav-link" href="${fixture.link.href}">${fixture.link.label}</a></ui-navigation-menu-link>
           </ui-navigation-menu-item>
         </ui-navigation-menu-list>
         <ui-navigation-menu-indicator class="nav-indicator"></ui-navigation-menu-indicator>

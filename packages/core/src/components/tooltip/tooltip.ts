@@ -3,7 +3,7 @@ import { nameFrom } from "#name-check"
 import { announce } from "../../foundation/platform/announce"
 import { ariaKeyshortcuts, initialApple } from "../../foundation/platform/platform"
 import { createPopupController, openerOf } from "../../foundation/popups/popup"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { textOf } from "../../foundation/text/typeahead"
 import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
 import { tooltipPreset } from "../../foundation/popups/popup-hover-presets"
@@ -146,13 +146,6 @@ type ContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /**
-     * Space to keep between the arrow and the tooltip's corners, in pixels.
-     * @defaultValue 6
-     */
-    arrowPadding?: number
-    /** Positions the tooltip against this instead of the trigger: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. */
-    anchor?: Anchor | string | null
   }
 
 type ShortcutProps = {
@@ -164,7 +157,10 @@ type ShortcutProps = {
  * The props the `trigger` slot of `tooltip` takes.
  * @stable
  */
-type TooltipTriggerProps = TriggerProps
+type TooltipTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the tooltip, like one per table row, to the tooltip with this controller. */
+  controller?: TooltipController<any>
+}
 /**
  * The props the `content` slot of `tooltip` takes.
  * @stable

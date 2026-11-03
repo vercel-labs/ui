@@ -13,6 +13,7 @@ it. The `token` snippet renders each token's content.
     type TokenCodec,
     type TokenDeletion,
     type TokenInputController,
+    type TokenInputSubmitDetails,
     type TokenInputValue,
     type TokenInputValueChangeReason,
   } from "@ui-sdk/core/token-input"
@@ -34,7 +35,7 @@ it. The `token` snippet renders each token's content.
     tokenDeletion,
     copy,
     codec,
-    describeToken,
+    getTokenDescription,
     history,
     disabled,
     readOnly,
@@ -61,7 +62,7 @@ it. The `token` snippet renders each token's content.
     /** How tokens become text and back, for the clipboard and forms. */
     codec?: TokenCodec
     /** What a token says to screen readers besides its label, like its kind and status. */
-    describeToken?: (token: Token) => string
+    getTokenDescription?: (token: Token) => string
     /** Undo history: how many steps it keeps, and how long a typing pause starts a new step. */
     history?: HistoryOptions
     /** Disables the input: it can't be focused or changed, and isn't submitted. */
@@ -79,7 +80,7 @@ it. The `token` snippet renders each token's content.
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs on the submit shortcut. Without it, the shortcut submits the form the input is in. */
-    onSubmit?: (value: TokenInputValue) => void
+    onSubmit?: (value: TokenInputValue, details: TokenInputSubmitDetails) => void
     /** Runs when typing, pasting, a menu, undo or a controller wants to change the value. `details.cancel()` stops it. */
     onValueChange?: (value: TokenInputValue, details: ValueDetails) => void
     children?: Snippet
@@ -99,7 +100,7 @@ it. The `token` snippet renders each token's content.
     tokenDeletion,
     copy,
     codec,
-    describeToken,
+    getTokenDescription,
     history,
     disabled: disabled || field?.disabled(),
     readOnly,

@@ -26,7 +26,7 @@ export function Example() {
           Always expanded
         </label>
       </div>
-      <ToastRegion toaster={toast} max={4} expanded={expanded}>
+      <ToastRegion toaster={toast} maxVisible={4} expanded={expanded}>
         {(item) => (
           <Toast>
             <div data-slot="stack">

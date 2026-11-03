@@ -10,7 +10,7 @@ const status = ref("")
     <OTPInput
       aria-label="Verification code"
       @value-change="status = ''"
-      @complete="(value, details) => (status = `Checking ${value}, from ${details.reason}.`)"
+      @value-commit="(value, details) => (status = `Checking ${value}, from ${details.reason}.`)"
     >
       <OTPInputGroup>
         <OTPInputSlot v-for="index in 6" :key="index" :index="index - 1" />

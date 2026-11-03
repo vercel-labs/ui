@@ -46,7 +46,7 @@ async function render(root: HTMLElement, data = false) {
   const control = `
     <ui-select name="${f.name}" placeholder="${f.placeholder}">
       <ui-select-label class="label">${f.label}</ui-select-label>
-      <ui-select-trigger><button class="trigger"><ui-select-value class="value"${max ? ` max="${max}"` : ""}></ui-select-value><span aria-hidden="true">▾</span></button></ui-select-trigger>
+      <ui-select-trigger><button class="trigger"><ui-select-value class="value"${max ? ` max-labels="${max}"` : ""}></ui-select-value><span aria-hidden="true">▾</span></button></ui-select-trigger>
       <ui-select-clear><button>${f.clear}</button></ui-select-clear>
       ${content}${fromData ? template : ""}
     </ui-select>`

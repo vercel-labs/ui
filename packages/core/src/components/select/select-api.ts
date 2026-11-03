@@ -292,10 +292,11 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
 
   // The search field's text changed: the list filters, and the best match is highlighted.
   function setQuery(query: string, reason: SelectQueryChangeReason, event?: Event) {
-    if (!change("query", query, { reason, event })) return
-    if (!store.get().open) return
+    if (!change("query", query, { reason, event })) return false
+    if (!store.get().open) return true
     const first = listbox.firstEnabled() ?? null
     if (store.get().highlighted !== first) listbox.highlight(first, { focus: false, event })
+    return true
   }
 
   // The element that takes part in the form: the custom element, or the hidden input.
@@ -398,12 +399,10 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
     id,
     ...kit,
     getValue: () => store.get().value,
-    setValue: (value: unknown, { reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}) => {
-      setValue(value, { reason, event })
-    },
-    clear: ({ reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}) => {
-      setValue(selection.empty(), { reason, event })
-    },
+    setValue: (value: unknown, { reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}) =>
+      setValue(value, { reason, event }),
+    clear: ({ reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}) =>
+      setValue(selection.empty(), { reason, event }),
     getQuery: () => store.get().query,
     setQuery: (
       query: string,

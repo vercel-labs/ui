@@ -29,8 +29,7 @@ type ListPopupState = {
   prepared?: boolean
 }
 
-type ListContentProps = PositionProps &
-  PortalProps & { anchor?: Anchor | string | null; keepMounted?: boolean }
+type ListContentProps = PositionProps & PortalProps & { keepMounted?: boolean }
 
 // What a list's content binds with, from its component.
 type ListContentInternal = {
@@ -83,6 +82,7 @@ function listContentPart<State extends ListPopupState, Api extends ListPopupApi>
       sideOffset: "number",
       alignOffset: "number",
       collisionPadding: "number",
+      arrowPadding: "number",
       container: "value",
       anchor: "string",
       keepMounted: "boolean",

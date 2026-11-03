@@ -61,7 +61,7 @@
     aria-label="Stack"
     {items}
     checkable
-    selectionMode="none"
+    mode="none"
     checkStrategy="trunk"
     defaultChecked={initial}
     onCheckedChange={(next) => (checked = next)}

@@ -46,7 +46,7 @@ function Fixture() {
               )}
             />
             <NavigationMenuContent className="nav-content" render={<section aria-label="Guides panel" />}>
-              <NavigationMenuLink render={<RouterLink to="#intro" />} active>
+              <NavigationMenuLink render={<RouterLink to="#intro" />} current>
                 Introduction
               </NavigationMenuLink>
               <NavigationMenuLink render={<RouterLink to="#install" />}>Install</NavigationMenuLink>

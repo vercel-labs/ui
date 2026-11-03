@@ -23,7 +23,7 @@ const menu = (props: { defaultValue?: string; keepMounted?: boolean } = {}) =>
           ]),
         ]),
         h(NavigationMenuItem, () => [
-          h(NavigationMenuLink, { href: "/pricing", active: true }, () => "Pricing"),
+          h(NavigationMenuLink, { href: "/pricing", current: true }, () => "Pricing"),
         ]),
       ]),
       h(NavigationMenuViewport),

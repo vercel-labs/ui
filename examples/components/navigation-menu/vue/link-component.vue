@@ -62,7 +62,7 @@ const RouterLink = defineComponent({
           <NavigationMenuContent>
             <ul>
               <li v-for="page in gettingStarted" :key="page.href">
-                <NavigationMenuLink :active="route === page.href">
+                <NavigationMenuLink :current="route === page.href">
                   <template #render="{ props }">
                     <RouterLink v-bind="props" :to="page.href">
                       <span>{{ page.title }}</span>
@@ -75,7 +75,7 @@ const RouterLink = defineComponent({
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink :active="route === '#components'">
+          <NavigationMenuLink :current="route === '#components'">
             <template #render="{ props }">
               <RouterLink v-bind="props" to="#components"> Components </RouterLink>
             </template>

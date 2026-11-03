@@ -1,5 +1,5 @@
 import type { PrimitiveGeneric } from "../../foundation/kernel/primitive-types"
-import type { NavigationMenuOptions, NavigationMenuRootState } from "./navigation-menu"
+import type { NavigationMenuOptions, NavigationMenuState } from "./navigation-menu"
 import type { NavigationMenuInternalOptions } from "./navigation-menu-api"
 
 // The navigation menu's types as functions of its item value type `T`, so
@@ -10,6 +10,6 @@ interface NavigationMenuGeneric extends PrimitiveGeneric {
   options: NavigationMenuOptions<this["T"] & string> & NavigationMenuInternalOptions
   state: NavigationMenuStates<this["T"] & string>
 }
-type NavigationMenuStates<T extends string> = { root: NavigationMenuRootState<T> }
+type NavigationMenuStates<T extends string> = { root: NavigationMenuState<T> }
 
 export type { NavigationMenuGeneric }

@@ -21,7 +21,7 @@
       </NavigationMenuContent>
     </NavigationMenuItem>
     <NavigationMenuItem>
-      <NavigationMenuLink href="/pricing" active>Pricing</NavigationMenuLink>
+      <NavigationMenuLink href="/pricing" current>Pricing</NavigationMenuLink>
     </NavigationMenuItem>
   </NavigationMenuList>
   <NavigationMenuViewport />

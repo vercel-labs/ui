@@ -84,11 +84,11 @@
               <ul>
                 {#each section.links as link, index (link.href)}
                   <li>
-                    <NavigationMenuLink href={link.href} active={index === 0}>
+                    <NavigationMenuLink href={link.href} current={index === 0}>
                       {#snippet children(linkState)}
                         <span>{link.title}</span>
-                        {#if linkState.active}
-                          <span data-slot="hint" data-show="active">You're here</span>
+                        {#if linkState.current}
+                          <span data-slot="hint" data-show="current">You're here</span>
                         {/if}
                       {/snippet}
                     </NavigationMenuLink>

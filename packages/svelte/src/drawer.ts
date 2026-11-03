@@ -28,6 +28,7 @@ export type {
   DrawerPrimitive,
   DrawerSide,
   DrawerSnapPointChangeReason,
+  DrawerTriggerProps,
   SheetPhysics,
   SnapPoint,
 } from "@ui-sdk/core/drawer"

@@ -45,7 +45,7 @@ const value = ref(40)
         <section v-bind="props"><component :is="children" /></section>
       </template>
       <OTPInputSlot v-for="index in 4" :key="index" :index="index - 1" v-slot="{ state }" class="otp-slot">
-        <span :class="{ 'is-active': state.isActive }">{{ state.char ?? "·" }}</span>
+        <span :class="{ 'is-active': state.active }">{{ state.char ?? "·" }}</span>
       </OTPInputSlot>
     </OTPInput>
     <button @click="value = 100">Finish</button>

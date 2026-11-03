@@ -78,10 +78,10 @@ function mount(root: HTMLElement) {
                   .map(
                     (link, index) => `
                 <li>
-                  <ui-navigation-menu-link${index === 0 ? " active" : ""}>
+                  <ui-navigation-menu-link${index === 0 ? " current" : ""}>
                     <a href="${link.href}">
                       <span>${link.title}</span>
-                      <span data-slot="hint" data-show="active">You're here</span>
+                      <span data-slot="hint" data-show="current">You're here</span>
                     </a>
                   </ui-navigation-menu-link>
                 </li>`,

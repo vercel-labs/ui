@@ -63,7 +63,7 @@ function mount(root: HTMLElement) {
     rows = visibleTreeRows(items, expanded)
     render()
   })
-  tree.addEventListener("itemfocus", (event) => {
+  tree.addEventListener("highlight", (event) => {
     const { index } = event.detail
     const top = index * row
     if (top < scroller.scrollTop) scroller.scrollTop = top

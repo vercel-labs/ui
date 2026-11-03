@@ -4,8 +4,8 @@ import {
   type TreeItemProps,
   type TreeItemState,
   type TreeOptions,
-  type TreeRootState,
-  type TreeSelectionMode,
+  type TreeState,
+  type TreeMode,
 } from "@ui-sdk/core/tree"
 import * as React from "react"
 import { hasChild } from "./children"
@@ -23,8 +23,8 @@ type Clashing = "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSe
  * The props of `Tree`.
  * @stable
  */
-type TreeProps<Mode extends TreeSelectionMode = "single"> = Omit<
-  PartProps<"div", TreeRootState>,
+type TreeProps<Mode extends TreeMode = "single"> = Omit<
+  PartProps<"div", TreeState>,
   Clashing | keyof TreeOptions
 > &
   TreeOptions<Mode> & {}
@@ -33,10 +33,10 @@ type TreeProps<Mode extends TreeSelectionMode = "single"> = Omit<
  * A tree of items that expand and collapse, with one tab stop and arrow keys between its items.
  * @stable
  */
-function Tree<Mode extends TreeSelectionMode = "single">({
+function Tree<Mode extends TreeMode = "single">({
   items,
   paths,
-  selectionMode,
+  mode,
   value,
   defaultValue,
   onValueChange,
@@ -51,9 +51,10 @@ function Tree<Mode extends TreeSelectionMode = "single">({
   onCheckedChange,
   checkStrategy,
   onAction,
+  pendingAnnouncement,
   loadChildren,
   current,
-  onItemFocus,
+  onHighlight,
   disabled,
   focusableWhenDisabled,
   keepMounted,
@@ -67,7 +68,7 @@ function Tree<Mode extends TreeSelectionMode = "single">({
   const tree = usePrimitive(treePrimitive, {
     items,
     paths,
-    selectionMode,
+    mode,
     value,
     defaultValue,
     onValueChange,
@@ -82,9 +83,10 @@ function Tree<Mode extends TreeSelectionMode = "single">({
     onCheckedChange,
     checkStrategy,
     onAction,
+    pendingAnnouncement,
     loadChildren,
     current,
-    onItemFocus,
+    onHighlight,
     disabled,
     focusableWhenDisabled,
     keepMounted,
@@ -191,6 +193,7 @@ export {
   visibleTreeRows,
 } from "@ui-sdk/core/tree"
 export type {
+  ListHighlightDetails,
   TreeActionDetails,
   TreeAnnouncement,
   TreeApi,
@@ -210,10 +213,9 @@ export type {
   TreeItemState,
   TreeOptions,
   TreePrimitive,
-  TreeRootState,
-  TreeRow,
-  TreeSelectionMode,
   TreeState,
+  TreeRow,
+  TreeMode,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

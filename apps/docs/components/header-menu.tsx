@@ -17,7 +17,7 @@ import { useMenuLink } from "./section-nav"
 import { useSection } from "./site-preferences"
 
 const itemClassName =
-  "inline-flex items-center rounded-md py-1.5 text-sm text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-active:text-foreground"
+  "inline-flex items-center rounded-md py-1.5 text-sm text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-current:text-foreground"
 
 function HeaderMenu() {
   const section = useSection()
@@ -45,7 +45,7 @@ function HeaderMenu() {
             return (
               <NavigationMenuItem key={item.href} value="frameworks">
                 <NavigationMenuTrigger
-                  data-active={current ? "" : undefined}
+                  data-current={current ? "" : undefined}
                   className={cn("group gap-1 cursor-default", itemClassName)}
                 >
                   {item.title}
@@ -62,9 +62,9 @@ function HeaderMenu() {
                     {frameworkIds.map((framework) => (
                       <li key={framework}>
                         <NavigationMenuLink
-                          active={section === framework && current}
+                          current={section === framework && current}
                           render={<Link href={`/docs/${framework}`} />}
-                          className="flex items-center rounded-full px-3 py-2 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-active:font-medium"
+                          className="flex items-center rounded-full px-3 py-2 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-current:font-medium"
                         >
                           {frameworks[framework].label}
                         </NavigationMenuLink>
@@ -77,7 +77,7 @@ function HeaderMenu() {
           }
           return (
             <NavigationMenuItem key={item.href}>
-              <NavigationMenuLink active={current} render={<Link href={href} />} className={itemClassName}>
+              <NavigationMenuLink current={current} render={<Link href={href} />} className={itemClassName}>
                 {item.title}
               </NavigationMenuLink>
             </NavigationMenuItem>

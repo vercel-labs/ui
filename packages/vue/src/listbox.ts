@@ -4,7 +4,7 @@ import {
   type ListData,
   type ListHighlightDetails,
   type ListboxOptions,
-  type ListboxRootState,
+  type ListboxState,
   type ListboxController,
   type ListboxValueChangeReason,
 } from "@ui-sdk/core/listbox"
@@ -42,14 +42,14 @@ type ListboxProps<T, Multiple extends boolean | undefined> = ListboxOptions<T, M
 type ListboxComponent = {
   new <T = string>(
     props: RootPropsOf<ListboxProps<T, false>, "div">,
-  ): RootInstanceOf<ListboxProps<T, false>, ListboxRootState, "div">
+  ): RootInstanceOf<ListboxProps<T, false>, ListboxState, "div">
   new <T = string>(
     props: RootPropsOf<ListboxProps<T, true>, "div">,
-  ): RootInstanceOf<ListboxProps<T, true>, ListboxRootState, "div">
+  ): RootInstanceOf<ListboxProps<T, true>, ListboxState, "div">
   new <T = string, Multiple extends boolean | undefined = boolean>(
     props: RootPropsOf<ListboxProps<T, Multiple> & { multiple: Multiple }, "div">,
-  ): RootInstanceOf<ListboxProps<T, Multiple>, ListboxRootState, "div">
-} & RenderableWith<ListboxProps<any, boolean | undefined>, ListboxRootState, "div">
+  ): RootInstanceOf<ListboxProps<T, Multiple>, ListboxState, "div">
+} & RenderableWith<ListboxProps<any, boolean | undefined>, ListboxState, "div">
 
 /**
  * An always-visible list to choose one option from, or several with `multiple`.
@@ -194,7 +194,7 @@ export type {
   ListboxItemState,
   ListboxOptions,
   ListboxPrimitive,
-  ListboxRootState,
+  ListboxState,
   ListboxValue,
   ListboxValueChangeReason,
 } from "@ui-sdk/core/listbox"

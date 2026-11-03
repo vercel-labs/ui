@@ -272,12 +272,16 @@ const SelectValue = withElement(
     inheritAttrs: false,
     props: {
       placeholder: String,
-      max: Number,
-      moreLabel: Function as PropType<(count: number) => string>,
+      maxLabels: Number,
+      getMoreLabel: Function as PropType<(count: number) => string>,
     },
     slots: Object as PartSlots<typeof selectPrimitive, "value">,
     setup(props, { slots, attrs }) {
-      const part = () => ({ placeholder: props.placeholder, max: props.max, moreLabel: props.moreLabel })
+      const part = () => ({
+        placeholder: props.placeholder,
+        maxLabels: props.maxLabels,
+        getMoreLabel: props.getMoreLabel,
+      })
       const content = (state: SelectValueState, placeholder?: string) =>
         slotContent(slots.default, { state }) ??
         (state.placeholder ? (props.placeholder ?? placeholder ?? "") : state.label)
@@ -310,6 +314,7 @@ const SelectContent = withElement(
       sideOffset: Number,
       alignOffset: Number,
       collisionPadding: Number,
+      arrowPadding: Number,
       anchor: [Object, String] as PropType<Anchor | string | null>,
       alignItemWithTrigger: optionalBoolean,
       keepMounted: optionalBoolean,

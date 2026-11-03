@@ -31,6 +31,8 @@ Menu
 
 Give items a `value` and handle `onAction` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
+Return a promise from `onAction` or an item’s `onSelect` to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pendingAnnouncement`, “Loading” by default.
+
 ## Usage
 
 Import the parts and put them together:

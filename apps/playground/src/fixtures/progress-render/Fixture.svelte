@@ -51,7 +51,7 @@
     {#each { length: 4 }, index (index)}
       <OTPInputSlot {index} class="otp-slot">
         {#snippet children(state)}
-          <span class={state.isActive ? "is-active" : ""}>{state.char ?? "·"}</span>
+          <span class={state.active ? "is-active" : ""}>{state.char ?? "·"}</span>
         {/snippet}
       </OTPInputSlot>
     {/each}

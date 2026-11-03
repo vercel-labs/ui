@@ -155,7 +155,7 @@ const VariantMenu = defineComponent({
                 {
                   class: classes.topLink,
                   href: href(variant, "pricing"),
-                  active: variant.activeLink !== false,
+                  current: variant.activeLink !== false,
                 },
                 () => "Pricing",
               ),

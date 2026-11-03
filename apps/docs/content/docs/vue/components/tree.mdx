@@ -80,7 +80,7 @@ Add `checkable` and `TreeItemCheckbox` for a checked state separate from selecti
 
 ### Multiple Selection
 
-`selection-mode="multiple"` makes the value an array. Cmd-click or Ctrl-click toggles one item, Shift extends a range, and Cmd+A or Ctrl+A selects the visible items.
+`mode="multiple"` makes the value an array. Cmd-click or Ctrl-click toggles one item, Shift extends a range, and Cmd+A or Ctrl+A selects the visible items.
 
 <ComponentExample
   name="tree/multiple"
@@ -89,7 +89,7 @@ Add `checkable` and `TreeItemCheckbox` for a checked state separate from selecti
 
 ### Links
 
-Set `selection-mode="none"` for a navigation tree, then render labels as links. `current` identifies the current page with `aria-current="page"`, expands its ancestors, and gives it the initial Tab stop. Update it when your route changes.
+Set `mode="none"` for a navigation tree, then render labels as links. `current` identifies the current page with `aria-current="page"`, expands its ancestors, and gives it the initial Tab stop. Update it when your route changes.
 
 <ComponentExample
   name="tree/links"
@@ -111,7 +111,7 @@ Use the supplied `signal` to cancel a request. Trying to expand the branch again
 
 Pass the full `items` hierarchy and use `visibleTreeRows(items, expanded)` to flatten the open branches. Render the nearby rows with their level and position; the tree supplies the correct ARIA hierarchy even though the DOM is flat.
 
-`@item-focus` reports the focused item’s index among visible rows. Use it to scroll before mounting a row that is outside the rendered range. This example indents rows by their level and keeps each row 28 pixels high.
+`@highlight` reports the focused item’s index among visible rows. Use it to scroll before mounting a row that is outside the rendered range. This example indents rows by their level and keeps each row 28 pixels high.
 
 <ComponentExample
   name="tree/virtualized"
@@ -146,7 +146,7 @@ Option is Alt on a Mac. Left and Right swap in right-to-left text.
 
 ### Selection
 
-The default `selection-mode="single"` uses one string value or `null`. Use `"multiple"` for an array, or `"none"` when items should only navigate or perform actions.
+The default `mode="single"` uses one string value or `null`. Use `"multiple"` for an array, or `"none"` when items should only navigate or perform actions.
 
 `activation="automatic"` selects while arrow keys move in single selection mode. Pressing a branch also expands or collapses it; set `expand-on-press` to `false` to leave expansion to the indicator and arrow keys.
 
@@ -276,7 +276,7 @@ What render functions, state-based class names and slots receive, per part.
 
 `Tree`:
 
-<StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeRootState" />
+<StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeState" />
 
 `TreeItem`, and its `TreeItemLabel`, `TreeItemIndicator` and `TreeItemCheckbox`:
 

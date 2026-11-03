@@ -31,7 +31,7 @@ const items: TreeItemData[] = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <ui-tree aria-label="Stack" checkable selection-mode="none" check-strategy="trunk" default-checked="react,postgres" default-expanded="frontend,backend,databases">
+      <ui-tree aria-label="Stack" checkable mode="none" check-strategy="trunk" default-checked="react,postgres" default-expanded="frontend,backend,databases">
         <template>
           <ui-tree-item>
             <ui-tree-item-checkbox></ui-tree-item-checkbox>

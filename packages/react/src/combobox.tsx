@@ -164,6 +164,7 @@ function ComboboxContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   keepMounted,
   container,
@@ -174,7 +175,16 @@ function ComboboxContent({
   usePlaceContent()
   const combobox = useCombobox()
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const content = { side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }
+  const content = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+    keepMounted,
+  }
   const [, setHeader] = React.useContext(SheetHeaderContext)
   // Reading the part's state subscribes, so items that arrive after the
   // combobox rendered still render the list. `combobox.state` doesn't subscribe.
@@ -341,12 +351,12 @@ const ComboboxStatus = parts.Status
 const ComboboxClear = parts.Clear
 
 /**
- * The selected value, as a function of its state, like one chip per value. Without children, the labels joined with commas, or "France, Chile and 2 more" with `max`. Renders no element of its own.
+ * The selected value, as a function of its state, like one chip per value. Without children, the labels joined with commas, or "France, Chile and 2 more" with `maxLabels`. Renders no element of its own.
  * @stable
  */
 function ComboboxValue({
-  max,
-  moreLabel,
+  maxLabels,
+  getMoreLabel,
   children,
 }: ComboboxValueProps & {
   children?: React.ReactNode | ((state: ComboboxValueState) => React.ReactNode)
@@ -355,7 +365,7 @@ function ComboboxValue({
   const value = (_props: unknown, state: ComboboxValueState) => (
     <>{typeof children === "function" ? children(state) : (children ?? state.label)}</>
   )
-  return usePart(comboboxPrimitive, "value", { max, moreLabel }, { render: value })
+  return usePart(comboboxPrimitive, "value", { maxLabels, getMoreLabel }, { render: value })
 }
 
 /**

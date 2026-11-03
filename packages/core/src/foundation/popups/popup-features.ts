@@ -34,7 +34,7 @@ function contentAnchor(
 // What `position` reads on every check, from the content's newest props and
 // the component's defaults. Each component names its own `align`.
 function placementOptions(
-  props: PositionProps & { arrowPadding?: number },
+  props: PositionProps,
   defaults: {
     side?: Side
     align: NonNullable<PositionProps["align"]>

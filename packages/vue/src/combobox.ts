@@ -138,6 +138,7 @@ const Combobox = /* @__PURE__ */ renderless(
       isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
       autoHighlight: { type: [Boolean, String] as PropType<boolean | "always">, default: undefined },
       keepQuery: optionalBoolean,
+      pendingAnnouncement: String,
       allowCustomValue: optionalBoolean,
       status: String as PropType<AsyncOptionsStatus>,
       loop: optionalBoolean,
@@ -308,6 +309,7 @@ const ComboboxContent = withElement(
       sideOffset: Number,
       alignOffset: Number,
       collisionPadding: Number,
+      arrowPadding: Number,
       anchor: [Object, String] as PropType<Anchor | string | null>,
       keepMounted: optionalBoolean,
       container: containerProp,
@@ -484,7 +486,7 @@ const ComboboxCreate = /* @__PURE__ */ (() =>
       inheritAttrs: false,
       props: {
         // A function prop beside the emit, so a returned Promise marks the option pending.
-        onCreate: Function as PropType<(query: string) => void | Promise<unknown>>,
+        onCreate: Function as PropType<(query: string) => unknown>,
         minLength: Number,
       },
       slots: Object as PartSlots<typeof comboboxPrimitive, "create">,
@@ -540,7 +542,7 @@ type ValueState = StateOf<typeof comboboxPrimitive, "value">
 const ComboboxValue = /* @__PURE__ */ renderless(
   defineComponent({
     name: "ComboboxValue",
-    props: { max: Number, moreLabel: Function as PropType<(count: number) => string> },
+    props: { maxLabels: Number, getMoreLabel: Function as PropType<(count: number) => string> },
     slots: Object as SlotsType<{
       /** Renders the value from the part's state, and the value itself as `value`. */
       default?: (scope: { state: ValueState; value: ValueState["value"] }) => VNode[]
@@ -548,8 +550,8 @@ const ComboboxValue = /* @__PURE__ */ renderless(
     setup(props, { slots }) {
       // Only its state: the part renders no element.
       const { state } = usePart(comboboxPrimitive, "value", () => ({
-        max: props.max,
-        moreLabel: props.moreLabel,
+        maxLabels: props.maxLabels,
+        getMoreLabel: props.getMoreLabel,
       }))
       // Nothing selected renders nothing, not an empty text: the server leaves
       // that out, and hydration would match the next node against it.

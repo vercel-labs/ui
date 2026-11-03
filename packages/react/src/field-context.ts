@@ -1,5 +1,5 @@
 import type { field } from "@ui-sdk/core/field"
-import { madeLabel, renderVersion } from "@ui-sdk/core/renderer"
+import { fieldControlId, madeLabel, renderVersion } from "@ui-sdk/core/renderer"
 import * as React from "react"
 import { renderElement, slotIn, type PartProps, type PrimitiveHandle, type RenderProp } from "./use-primitive"
 
@@ -101,6 +101,11 @@ type ButtonControlProps<State> = Omit<
   "value" | "name" | "form" | "defaultChecked" | "defaultValue" | "onChange" | "onSelect"
 >
 
+function useFieldControlId() {
+  const field = React.useContext(FieldContext)
+  return field ? fieldControlId(field.api.id) : undefined
+}
+
 export {
   type ButtonControlProps,
   controlRender,
@@ -108,5 +113,6 @@ export {
   type FieldContextValue,
   ownDescription,
   useFieldControl,
+  useFieldControlId,
   useJoinField,
 }

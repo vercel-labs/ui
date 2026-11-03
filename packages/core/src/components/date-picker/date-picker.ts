@@ -7,8 +7,8 @@
 import type { ISOMonth } from "../calendar/calendar-model"
 import type { CalendarMonthChangeReason, CalendarOptions } from "../calendar/calendar"
 import { type ISODate } from "../../foundation/date/plain-date"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
-import { type PopupFocusTarget } from "../../foundation/popups/popup"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PopupFocusTarget, type PopupResult } from "../../foundation/popups/popup"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
 import { type PresentationSetting } from "../../foundation/popups/presentation"
 import type { ChangeDetails, ChangeOptions, DismissAttemptReason } from "../../foundation/kernel/details"
@@ -85,6 +85,8 @@ function createDatePickerController() {
       value: DatePickerValue,
       options?: DatePickerChangeOptions<DatePickerValueChangeReason>,
     ) => boolean
+    /** Selects nothing, as the Clear part does. Returns false when canceled or unchanged. */
+    clear: (options?: DatePickerChangeOptions<DatePickerValueChangeReason>) => boolean
     /** The first month the calendar shows, like `"2026-10"`. */
     getMonth: () => ISOMonth
     /** Shows a month first. Returns false when canceled or unchanged. */
@@ -97,14 +99,29 @@ function createDatePickerController() {
     focus: (date?: ISODate) => void
     /** Whether the popup is open. */
     isOpen: () => boolean
-    /** Opens or closes the popup. */
-    setOpen: (open: boolean, options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => void
-    /** Opens the popup. */
-    open: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => void
-    /** Closes the popup. */
-    close: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => void
-    /** Opens the popup if it's closed, and closes it if it's open. */
-    toggle: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => void
+    /**
+     * Opens or closes the popup.
+     * Returns false when the change was canceled or it was already open or closed.
+     */
+    setOpen: (open: boolean, options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => boolean
+    /**
+     * Opens the popup, and resolves once it closes, with why and how. Resolves exactly once and never
+     * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
+     * when the date picker leaves the page.
+     */
+    open: (
+      options?: DatePickerChangeOptions<DatePickerOpenChangeReason> & {
+        /** Closes the popup, with reason `"imperative"`, when it aborts. An already aborted signal never opens it. */
+        signal?: AbortSignal
+      },
+    ) => Promise<PopupResult<DatePickerOpenChangeReason, never>>
+    /** Closes the popup. Returns false when the close was canceled or it was already closed. */
+    close: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => boolean
+    /**
+     * Opens the popup if it's closed, and closes it if it's open.
+     * Returns false when the change was canceled.
+     */
+    toggle: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => boolean
   }>()
 }
 
@@ -309,8 +326,6 @@ type DatePickerContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the popup against this instead of the input: an element, a CSS selector, or anything with `getBoundingClientRect()`. */
-    anchor?: Anchor | string | null
     /**
      * Where focus goes when the popup closes while focus is inside it.
      * @defaultValue "trigger"
@@ -382,7 +397,7 @@ const datePickerPrimitive = /* @__PURE__ */ definePrimitive({
   api: datePickerApi,
   // An arrow function, so TypeScript infers the slot names before it checks the parts.
   slots: (slot) => datePickerSlots(slot),
-  agent: { actions: ["setOpen", "setValue", "setMonth", "previous", "next"] },
+  agent: { actions: ["setOpen", "setValue", "clear", "setMonth", "previous", "next"] },
 })
 
 /**

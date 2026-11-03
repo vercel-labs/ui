@@ -17,15 +17,10 @@ import {
   type OTPInputPattern,
   type Selection,
 } from "./otp-input-model"
-import {
-  createDetails,
-  type ChangeDetails,
-  type ChangeOptions,
-  type CommitDetails,
-} from "../../foundation/kernel/details"
+import { type ChangeDetails, type ChangeOptions, type CommitDetails } from "../../foundation/kernel/details"
 import { isComposing, on } from "../../foundation/kernel/events"
 import type { PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
-import { changeSource, createChange } from "../../foundation/kernel/input-source"
+import { createChange, createCommit } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 import type { OTPInputSlotProps } from "./otp-input"
 
@@ -62,7 +57,7 @@ type OTPInputOptions = {
    * Runs when a change fills every slot, with the whole code, like to verify
    * it. A controller filling it counts, so does a code that changes while full.
    */
-  onComplete?: (value: string, details: CommitDetails<OTPInputValueChangeReason>) => void
+  onValueCommit?: (value: string, details: CommitDetails<OTPInputValueChangeReason>) => void
   /**
    * How many characters the code has, one slot each.
    * @defaultValue 6
@@ -83,9 +78,10 @@ type OTPInputOptions = {
   /**
    * Where the invisible input keeps its text and caret. It decides where the
    * browser puts its own popups, like the paste menu on phones.
-   * @defaultValue "left"
+   * `"start"` and `"end"` follow the reading direction.
+   * @defaultValue "start"
    */
-  textAlign?: "left" | "center" | "right"
+  textAlign?: "start" | "center" | "end"
   /**
    * The input's `autocomplete`. `"one-time-code"` lets phones offer a code
    * from a message, and password managers fill it.
@@ -140,7 +136,7 @@ function settings(options: OTPInputOptions) {
     maxLength: finiteLength(options.maxLength),
     pattern: options.pattern ?? ("digits" as const),
     inputMode: options.inputMode,
-    textAlign: options.textAlign ?? ("left" as const),
+    textAlign: options.textAlign ?? ("start" as const),
     autoComplete: options.autoComplete ?? "one-time-code",
     disabled: !!options.disabled,
     readOnly: !!options.readOnly,
@@ -188,6 +184,7 @@ function otpInputApi(
 ) {
   const { store, options, element } = context
   const change = createChange(context)
+  const commit = createCommit(context)
   const input = () => element("control") as HTMLInputElement | undefined
   const isControlled = () => options().value !== undefined
   // The paste or multi-character insert being written, so its change reports it.
@@ -202,7 +199,7 @@ function otpInputApi(
   // A reset or a restored page puts a code back; nobody just entered it.
   function complete(value: string, reason: OTPInputValueChangeReason, event?: Event) {
     if (value.length !== store.get().maxLength || reason === "reset" || reason === "restore") return
-    options().onComplete?.(value, createDetails({ reason, event }, changeSource(reason, event), false))
+    commit("value", value, { reason, event })
   }
 
   // A change asked for from outside the input: a controller, a reset. The
@@ -211,12 +208,13 @@ function otpInputApi(
     const { pattern, maxLength } = store.get()
     const code = cleanCode(value, pattern, maxLength)
     const previous = store.get().value
-    if (!change("value", code, { reason, event })) return
+    if (!change("value", code, { reason, event })) return false
     if (!isControlled()) store.set({ value: code })
     syncElement()
     // A reset may leave the element's value as it was, so the browser's flag is read either way.
     checkLength()
     if (code !== previous) complete(code, reason, event)
+    return true
   }
 
   // Follows whether the browser flags the code as too short. One read per change.

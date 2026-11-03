@@ -13,7 +13,7 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
     type PasswordInputVisibleChangeReason,
   } from "@ui-sdk/core/password-input"
   import { setContext } from "svelte"
-  import { useFieldControl } from "../field/context"
+  import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
@@ -45,6 +45,7 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
 
   const id = $props.id()
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
     id,
     get value() {
@@ -63,6 +64,7 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
     readOnly: readOnlyOf(readOnly, rest),
     controller,
     debug,
+    controlId,
     // The callbacks run first, so canceling there also keeps a bound value as it was.
     onValueChange: (next: string, details: ChangeDetails<InputValueChangeReason>) => {
       onValueChange?.(next, details)

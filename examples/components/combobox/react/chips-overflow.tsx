@@ -67,7 +67,7 @@ function Example() {
           <ComboboxInput placeholder="Add" />
         </ComboboxChips>
         <p data-slot="hint">
-          <ComboboxValue max={2} moreLabel={(count) => `${count} more`} />
+          <ComboboxValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
         </p>
       </div>
       <ComboboxContent>

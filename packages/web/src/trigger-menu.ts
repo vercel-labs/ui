@@ -59,7 +59,7 @@ function defineTriggerMenuElements() {
         }
       },
       state: popupState,
-      api: ["isOpen", "setOpen", "open", "close", "getQuery", "getMatch", "insert"],
+      api: ["isOpen", "setOpen", "open", "close", "getQuery", "getMatch", "insert", "focus"],
       portal: popupPortal,
       // Data items follow the trigger, the level and the query.
       render(el, { api, subscribe }) {

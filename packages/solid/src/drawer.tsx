@@ -1,9 +1,4 @@
-import type {
-  DialogShortcutProps,
-  DialogShortcutState,
-  DialogTriggerProps,
-  DialogTriggerState,
-} from "@ui-sdk/core/dialog"
+import type { DialogShortcutProps, DialogShortcutState, DialogTriggerState } from "@ui-sdk/core/dialog"
 import {
   drawer as drawerPrimitive,
   type DrawerBackdropState,
@@ -12,6 +7,7 @@ import {
   type DrawerController,
   type DrawerOptions,
   type DrawerOutletProps,
+  type DrawerTriggerProps,
   type DrawerOutletState,
 } from "@ui-sdk/core/drawer"
 import type { JSX } from "@solidjs/web"
@@ -37,15 +33,8 @@ import {
 type DrawerContextValue = PrimitiveHandle<typeof drawerPrimitive>
 
 type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "onChange"> &
-  DialogTriggerProps & {
-    /** Connects a trigger outside the drawer, like one per table row, to the drawer with this controller. */
-    controller?: DrawerController<any, any>
-  }
-type OutletPartProps = PartProps<"div", DrawerOutletState> &
-  DrawerOutletProps & {
-    /** Connects an outlet outside the drawer, like the app's shell, to the drawer with this controller. */
-    controller?: DrawerController<any, any>
-  }
+  DrawerTriggerProps
+type OutletPartProps = PartProps<"div", DrawerOutletState> & DrawerOutletProps
 
 const parts = createParts(drawerPrimitive, {
   handle: "button",
@@ -256,6 +245,7 @@ export type {
   DrawerPrimitive,
   DrawerSide,
   DrawerSnapPointChangeReason,
+  DrawerTriggerProps,
   SheetPhysics,
   SnapPoint,
 } from "@ui-sdk/core/drawer"

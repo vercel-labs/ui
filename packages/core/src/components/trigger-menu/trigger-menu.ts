@@ -7,7 +7,7 @@
 // listbox engine and the popup layer Combobox uses.
 import { type AsyncOptionsContext, type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type PopupResult } from "../../foundation/popups/popup"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { type ListData, type ListFilter, type ListGroup, type ListItem } from "../../foundation/lists/listbox"
 import { createController } from "../../foundation/kernel/controller"
@@ -184,8 +184,11 @@ function createTriggerMenuController() {
   return createController<{
     /** Whether the menu is open. */
     isOpen: () => boolean
-    /** Opens or closes the menu. Opening needs a match; see `open()` for one that types the trigger. */
-    setOpen: (open: boolean, options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => void
+    /**
+     * Opens or closes the menu. Opening needs a match; see `open()` for one that types the trigger.
+     * Returns false when the change was canceled or it was already open or closed.
+     */
+    setOpen: (open: boolean, options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => boolean
     /**
      * Opens the menu for `trigger`, typing it at the caret first unless a match for it is already
      * there, and resolves once it closes. Resolves exactly once and never rejects.
@@ -198,14 +201,19 @@ function createTriggerMenuController() {
         signal?: AbortSignal
       },
     ) => Promise<PopupResult<TriggerMenuOpenChangeReason, never>>
-    /** Closes the menu. The match isn't dismissed, so typing in it opens it again. */
-    close: (options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => void
+    /**
+     * Closes the menu. The match isn't dismissed, so typing in it opens it again.
+     * Returns false when the close was canceled or it was already closed.
+     */
+    close: (options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => boolean
     /** The text after the trigger, or after the current argument's start. Empty while closed. */
     getQuery: () => string
     /** The current match, or null. */
     getMatch: () => TriggerMatch | null
     /** Replaces the current match with text or a token, or inserts at the caret without one. */
     insert: (content: string | TokenInsert) => void
+    /** Moves focus to the editor. */
+    focus: () => void
   }>()
 }
 
@@ -246,6 +254,12 @@ type TriggerMenuOptions<T = string> = PortalProps & {
    * updated with what it resolves to and removed if it rejects; the menu closes either way.
    */
   onSelect?: (value: T, details: TriggerMenuSelectDetails<T>) => void | Promise<void | Partial<TokenInsert>>
+  /**
+   * What screen readers hear once an `onSelect` Promise has been pending for a second, so a slow action
+   * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
   /**
    * Whether items that come from outside are loading or failed, for the status and empty parts. Loaders report their own.
    * @defaultValue "idle"
@@ -298,8 +312,6 @@ type TriggerMenuContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the list against this instead of the trigger's place in the text. */
-    anchor?: Anchor | string | null
     /**
      * Whether the list stays in the page, hidden, while closed.
      * @defaultValue false
@@ -430,6 +442,7 @@ const triggerMenuPrimitive = /* @__PURE__ */ definePrimitive({
     onOpenChangeComplete: "callback",
     onQueryChange: "callback",
     onSelect: "action",
+    pendingAnnouncement: "string",
     status: "string",
     autoHighlight: "boolean",
     loop: "boolean",

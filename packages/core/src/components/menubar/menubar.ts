@@ -22,8 +22,11 @@ function createMenubarController() {
     focus: () => void
     /** Whether one of its menus is open. */
     isOpen: () => boolean
-    /** Closes the open menu, if any, and its submenus. */
-    close: (options?: ChangeOptions<MenuOpenChangeReason>) => void
+    /**
+     * Closes the open menu, if any, and its submenus.
+     * Returns false when the close was canceled or it was already closed.
+     */
+    close: (options?: ChangeOptions<MenuOpenChangeReason>) => boolean
   }>()
 }
 
@@ -104,7 +107,7 @@ type MenubarMember = {
     event?: Event
     by?: PopupOpener
   }) => void
-  close: (options: { reason: MenuOpenChangeReason; event?: Event; focus: boolean }) => void
+  close: (options: { reason: MenuOpenChangeReason; event?: Event; focus: boolean }) => boolean
 }
 
 type State = {
@@ -169,9 +172,8 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
   const api = {
     focus: () => roving.focus(),
     isOpen: () => store.get().open !== null,
-    close({ reason = "imperative", event }: ChangeOptions<MenuOpenChangeReason> = {}) {
-      openMember()?.close({ reason, event, focus: true })
-    },
+    close: ({ reason = "imperative", event }: ChangeOptions<MenuOpenChangeReason> = {}) =>
+      openMember()?.close({ reason, event, focus: true }) ?? false,
     internal: {
       orientation,
       disabled: () => store.get().disabled,

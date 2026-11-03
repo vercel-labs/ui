@@ -72,7 +72,7 @@ const VariantOTPInput = defineComponent({
               value.value = variant.controlled === "uppercase" ? next.toUpperCase() : next
             if (variant.verify) invalid.value = false
           },
-          onComplete: (next: string) => {
+          onValueCommit: (next: string) => {
             env.log(`complete "${next}"`)
             if (variant.verify) invalid.value = next !== variant.verify
           },

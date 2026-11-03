@@ -128,23 +128,23 @@ describe("input otp keys", () => {
 describe("input otp slots", () => {
   test("render characters, and the active slot with a caret while empty", () => {
     expect(slotsOf("12", 4, { start: 2, end: 2 })).toEqual([
-      { char: "1", isActive: false, hasFakeCaret: false },
-      { char: "2", isActive: false, hasFakeCaret: false },
-      { char: null, isActive: true, hasFakeCaret: true },
-      { char: null, isActive: false, hasFakeCaret: false },
+      { char: "1", active: false, hasFakeCaret: false },
+      { char: "2", active: false, hasFakeCaret: false },
+      { char: null, active: true, hasFakeCaret: true },
+      { char: null, active: false, hasFakeCaret: false },
     ])
   })
 
   test("a selected character is active without a caret", () => {
     expect(slotsOf("1234", 4, { start: 1, end: 2 })[1]).toEqual({
       char: "2",
-      isActive: true,
+      active: true,
       hasFakeCaret: false,
     })
   })
 
   test("nothing is active without focus", () => {
-    expect(slotsOf("", 2, null).some((slot) => slot.isActive)).toBe(false)
+    expect(slotsOf("", 2, null).some((slot) => slot.active)).toBe(false)
   })
 })
 
@@ -171,13 +171,13 @@ describe("input otp", () => {
   test("a controller sets the code, reports the reason and completes it", () => {
     const controller = createOTPInputController()
     const onValueChange = vi.fn()
-    const onComplete = vi.fn()
-    const otp = kept(otpInput({ id: "o", maxLength: 4, controller, onValueChange, onComplete }))
-    otp.setOptions({ id: "o", maxLength: 4, controller, onValueChange, onComplete })
+    const onValueCommit = vi.fn()
+    const otp = kept(otpInput({ id: "o", maxLength: 4, controller, onValueChange, onValueCommit }))
+    otp.setOptions({ id: "o", maxLength: 4, controller, onValueChange, onValueCommit })
     controller.setValue("12 34")
     expect(controller.getValue()).toBe("1234")
     expect(onValueChange).toHaveBeenCalledWith("1234", expect.objectContaining({ reason: "imperative" }))
-    expect(onComplete).toHaveBeenCalledWith("1234", expect.objectContaining({ reason: "imperative" }))
+    expect(onValueCommit).toHaveBeenCalledWith("1234", expect.objectContaining({ reason: "imperative" }))
     expect(partState(otp.part("root"))).toMatchObject({ complete: true })
   })
 
@@ -190,21 +190,21 @@ describe("input otp", () => {
   })
 
   test("a code echoed back from onValueChange completes once, and a cancel after it still holds", () => {
-    const onComplete = vi.fn()
+    const onValueCommit = vi.fn()
     const otp = otpInput({
       id: "o",
       maxLength: 4,
-      onComplete,
+      onValueCommit,
       onValueChange: (value) => {
         otp.api.setValue(value)
       },
     })
     otp.api.setValue("1234")
-    expect(onComplete).toHaveBeenCalledTimes(1)
+    expect(onValueCommit).toHaveBeenCalledTimes(1)
     const canceling = otpInput({
       id: "c",
       maxLength: 4,
-      onComplete,
+      onValueCommit,
       onValueChange: (value, details) => {
         canceling.api.setValue(value)
         details.cancel()
@@ -212,7 +212,7 @@ describe("input otp", () => {
     })
     canceling.api.setValue("5678")
     expect(canceling.api.getValue()).toBe("")
-    expect(onComplete).toHaveBeenCalledTimes(1)
+    expect(onValueCommit).toHaveBeenCalledTimes(1)
   })
 
   test("a canceled change keeps the code", () => {

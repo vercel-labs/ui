@@ -5,7 +5,7 @@ blur. `end` makes it a range's end. The core writes its text.
 @stable
 -->
 <script lang="ts">
-  import type { DatePickerInputState } from "@ui-sdk/core/date-picker"
+  import type { DatePickerInputProps, DatePickerInputState } from "@ui-sdk/core/date-picker"
   import { untrack } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, wrapPart } from "../use-primitive.svelte"
@@ -15,10 +15,7 @@ blur. `end` makes it a range's end. The core writes its text.
   let {
     end = false,
     ...rest
-  }: TextPartProps<"input", DatePickerInputState> & {
-    /** Whether it's a range's end. The input without it holds the start, or the date. */
-    end?: boolean
-  } = $props()
+  }: TextPartProps<"input", DatePickerInputState> & DatePickerInputProps = $props()
 
   const picker = useDatePicker("DatePickerInput")
   const input = useHandlePart(picker, "input", () => ({ end, id: end ? "end" : "start" }))

@@ -84,12 +84,12 @@ function Example() {
                       <li key={link.href}>
                         <NavigationMenuLink
                           href={link.href}
-                          active={index === 0}
+                          current={index === 0}
                           render={(props, linkState) => (
                             <a {...props}>
                               <span>{link.title}</span>
-                              {linkState.active && (
-                                <span data-slot="hint" data-show="active">
+                              {linkState.current && (
+                                <span data-slot="hint" data-show="current">
                                   You're here
                                 </span>
                               )}

@@ -86,7 +86,7 @@ function mount(root: HTMLElement) {
           )
           .join("")}
         <ui-navigation-menu-item>
-          <ui-navigation-menu-link active><a href="https://example.com/docs">Docs</a></ui-navigation-menu-link>
+          <ui-navigation-menu-link current><a href="https://example.com/docs">Docs</a></ui-navigation-menu-link>
         </ui-navigation-menu-item>
       </ui-navigation-menu-list>
       <ui-navigation-menu-indicator></ui-navigation-menu-indicator>

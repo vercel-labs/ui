@@ -5,7 +5,7 @@ async function mount(root: HTMLElement) {
   root.innerHTML = `
     <div class="fixture">
       <button>Before</button>
-      <ui-tree class="tree" aria-label="${treeLinksFixture.label}" selection-mode="none">
+      <ui-tree class="tree" aria-label="${treeLinksFixture.label}" mode="none">
         <template>
           <ui-tree-item class="tree-item">
             <ui-tree-item-indicator class="tree-indicator">▸</ui-tree-item-indicator>

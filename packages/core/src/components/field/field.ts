@@ -1,5 +1,6 @@
 import {
   claimInvalidFocus,
+  fieldControlId,
   formInternals,
   invalidFocusClaimed,
   isLabelable,
@@ -411,7 +412,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { api }) => fieldState(state, api),
       attrs: (state, { id, props, api }) => ({
         id: props.id ?? `${id}-label`,
-        for: state.labelable ? (state.controlId ?? `${id}-control`) : undefined,
+        for: state.labelable ? (state.controlId ?? fieldControlId(id)) : undefined,
         ...dataAttrs(state, api),
       }),
       // A label that isn't a native one for the control activates it all the same.
@@ -452,7 +453,7 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
     control: slot<FieldControlProps, FieldState>({
       props: { id: "string", describedBy: "string" },
       state: (state, { api }) => fieldState(state, api),
-      attrs: (state, { id, props, api }) => controlAttrs(state, api, props, `${id}-control`),
+      attrs: (state, { id, props, api }) => controlAttrs(state, api, props, fieldControlId(id)),
       bind: (el, { api }) => {
         api.internal.adopt(el)
         return () => {}

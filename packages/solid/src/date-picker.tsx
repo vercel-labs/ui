@@ -3,6 +3,7 @@ import {
   type DatePickerContentProps,
   type DatePickerContentState,
   type DatePickerHintState,
+  type DatePickerInputProps,
   type DatePickerInputState,
   type DatePickerOptions,
   type DatePickerPresetState,
@@ -194,13 +195,8 @@ function DatePicker(
  * @stable
  */
 function DatePickerInput(
-  props: Omit<
-    PartProps<"input", DatePickerInputState>,
-    "value" | "defaultValue" | "children" | "readonly"
-  > & {
-    /** Whether it's a range's end. The input without it holds the start, or the date. */
-    end?: boolean
-  },
+  props: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children" | "readonly"> &
+    DatePickerInputProps,
 ) {
   const picker = useDatePicker("DatePickerInput")
   const part = () => ({ end: props.end, id: props.end ? "end" : "start" })
@@ -240,6 +236,7 @@ function DatePickerContent(props: PartProps<"div", DatePickerContentState> & Dat
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     finalFocus: props.finalFocus,
     keepMounted: props.keepMounted,
@@ -251,6 +248,7 @@ function DatePickerContent(props: PartProps<"div", DatePickerContentState> & Dat
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
     "anchor",
     "finalFocus",
     "keepMounted",

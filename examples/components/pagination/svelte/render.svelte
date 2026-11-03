@@ -30,7 +30,7 @@
               {#snippet render({ props, state: link })}
                 <button {...props}>
                   {link.page}
-                  {#if link.active}
+                  {#if link.current}
                     <span
                       aria-hidden="true"
                     ></span>

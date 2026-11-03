@@ -6,7 +6,6 @@ The button that opens the list: a combobox named by the label. Typing on it sele
 <script lang="ts">
   import {
     select as selectPrimitive,
-    type SelectController,
     type SelectTriggerProps,
     type SelectTriggerState,
   } from "@ui-sdk/core/select"
@@ -22,10 +21,7 @@ The button that opens the list: a combobox named by the label. Typing on it sele
     controller,
     ...rest
   }: PartProps<"button", SelectTriggerState> &
-    SelectTriggerProps & {
-      /** Connects a trigger outside the select to the select with this controller. */
-      controller?: SelectController<any, any>
-    } = $props()
+    SelectTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<SelectContext | undefined>(selectPrimitive))
   const select = $derived(connected())

@@ -1,6 +1,6 @@
 import { triggerKeydown } from "../../foundation/disclosure/disclosure"
 import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { motionOf, type NavigationMenuMotion } from "./navigation-menu-keyboard"
 import {
@@ -157,8 +157,6 @@ type PlacementProps = PositionProps & {
    * @defaultValue 0
    */
   alignOffset?: number
-  /** Positions it against this instead of the open trigger: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. */
-  anchor?: Anchor | string | null
 }
 
 type ContentProps = PlacementProps &
@@ -179,10 +177,10 @@ type ContentProps = PlacementProps &
 
 type LinkProps = {
   /**
-   * Whether the link is the current page. Sets `aria-current="page"` and `data-active`.
+   * Whether the link is the current page. Sets `aria-current="page"` and `data-current`.
    * @defaultValue false
    */
-  active?: boolean
+  current?: boolean
   /** Whether pressing the link closes the menu. Overrides the menu's `closeOnSelect`. */
   closeOnSelect?: boolean
 }
@@ -220,7 +218,7 @@ type NavigationMenuViewportProps = ViewportProps
  * state-based class names.
  * @stable
  */
-type NavigationMenuRootState<T extends string = string> = {
+type NavigationMenuState<T extends string = string> = {
   /** The open item's value, or null. */
   value: T | null
   /** Whether a panel is open. */
@@ -281,7 +279,7 @@ type NavigationMenuContentState = {
  */
 type NavigationMenuLinkState = {
   /** Whether the link is the current page. */
-  active: boolean
+  current: boolean
 }
 /**
  * The props the `link-icon` slot of `navigationMenu` takes.
@@ -358,7 +356,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
   api: navigationMenuApi,
   slots: (slot) => ({
     // A <nav> landmark, or a plain element when nested inside another menu's content.
-    root: slot<{}, NavigationMenuRootState>({
+    root: slot<{}, NavigationMenuState>({
       state: (state) => ({
         value: state.value,
         open: state.value !== null,
@@ -421,6 +419,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         sideOffset: "number",
         alignOffset: "number",
         collisionPadding: "number",
+        arrowPadding: "number",
         anchor: "string",
         container: "value",
         value: { kind: "string", from: "item" },
@@ -464,11 +463,11 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     link: slot<LinkProps, NavigationMenuLinkState>({
-      props: { id: "id", active: "boolean", closeOnSelect: "boolean" },
-      state: (_, { props }) => ({ active: !!props.active }),
+      props: { id: "id", current: "boolean", closeOnSelect: "boolean" },
+      state: (_, { props }) => ({ current: !!props.current }),
       attrs: (_, { props }) => ({
-        "aria-current": props.active ? "page" : undefined,
-        "data-active": props.active ? "" : undefined,
+        "aria-current": props.current ? "page" : undefined,
+        "data-current": props.current ? "" : undefined,
       }),
       bind: (el, { api, key }) => api.internal.bindLink(el, key),
     }),
@@ -489,6 +488,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         sideOffset: "number",
         alignOffset: "number",
         collisionPadding: "number",
+        arrowPadding: "number",
         anchor: "string",
         container: "value",
       },
@@ -552,7 +552,7 @@ export {
   type NavigationMenuOptions,
   type NavigationMenuOrientation,
   type NavigationMenuPrimitive,
-  type NavigationMenuRootState,
+  type NavigationMenuState,
   type NavigationMenuTriggerProps,
   type NavigationMenuTriggerState,
   type NavigationMenuValueChangeReason,

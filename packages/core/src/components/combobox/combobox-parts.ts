@@ -368,7 +368,7 @@ const comboboxSlots = (slot: SlotFactory<ComboboxState, ComboboxApi>) => ({
 
   // The selected value, for rendering chips or a summary. Renders no element of its own.
   value: slot<ComboboxValueProps, ComboboxValueState>({
-    props: { max: "number", moreLabel: "value" },
+    props: { maxLabels: "number", getMoreLabel: "value" },
     state: (state, { api, props }) => {
       const labels = api.internal.selection.labels()
       return { value: state.value, labels, label: formatLabels(labels, props) }

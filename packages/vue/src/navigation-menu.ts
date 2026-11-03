@@ -53,6 +53,7 @@ const placementProps = {
   sideOffset: Number,
   alignOffset: Number,
   collisionPadding: Number,
+  arrowPadding: Number,
   anchor: [Object, String] as PropType<Anchor | string | null>,
   // Renders the popup into this element instead of in place.
   container: containerProp,
@@ -172,7 +173,7 @@ const NavigationMenuContent = withElement(
 )
 
 /**
- * A link. Pressing it closes the menu, and `active` marks the current page with `aria-current="page"`.
+ * A link. Pressing it closes the menu, and `current` marks the current page with `aria-current="page"`.
  * @stable
  */
 const NavigationMenuLink = parts.Link
@@ -211,7 +212,7 @@ const NavigationMenuViewport = withElement(
 )
 
 /**
- * Sits under the open trigger, or under the link with `active` while every panel is closed. Screen readers
+ * Sits under the open trigger, or under the link with `current` while every panel is closed. Screen readers
  * skip it.
  * @stable
  */
@@ -236,7 +237,7 @@ export type {
   NavigationMenuOptions,
   NavigationMenuOrientation,
   NavigationMenuPrimitive,
-  NavigationMenuRootState,
+  NavigationMenuState,
   NavigationMenuTriggerProps,
   NavigationMenuTriggerState,
   NavigationMenuValueChangeReason,

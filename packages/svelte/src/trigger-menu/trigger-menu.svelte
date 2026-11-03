@@ -44,6 +44,7 @@ pass `editor`.
     debug,
     container,
     onSelect,
+    pendingAnnouncement,
     onOpenChange,
     onOpenChangeComplete,
     onQueryChange,
@@ -74,6 +75,8 @@ pass `editor`.
     container?: PopupContainer
     /** Runs when an item, with every required argument, is chosen. Return a Promise and a pending token is inserted at once. */
     onSelect?: (value: any, details: TriggerMenuSelectDetails<any>) => void | Promise<void | Partial<TokenInsert>>
+    /** What screen readers hear once an `onSelect` Promise has been pending for a second. An empty string says nothing. */
+    pendingAnnouncement?: string
     /** Runs when the menu wants to open or close. `details.trigger` says which trigger, and `details.cancel()` stops it. */
     onOpenChange?: (open: boolean, details: OpenDetails) => void
     /** Runs once the menu has finished opening or closing, after any animation. */
@@ -103,6 +106,7 @@ pass `editor`.
     dismissible,
     debug,
     onSelect,
+    pendingAnnouncement,
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)

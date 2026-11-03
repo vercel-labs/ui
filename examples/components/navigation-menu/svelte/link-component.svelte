@@ -49,7 +49,7 @@
               <li>
                 <NavigationMenuLink
                   href={page.href}
-                  active={route === page.href}
+                  current={route === page.href}
                   onclick={(event) => navigate(event, page.href)}
                 >
                   <span>{page.title}</span>
@@ -63,7 +63,7 @@
       <NavigationMenuItem>
         <NavigationMenuLink
           href="#components"
-          active={route === "#components"}
+          current={route === "#components"}
           onclick={(event) => navigate(event, "#components")}
         >
           Components

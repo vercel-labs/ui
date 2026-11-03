@@ -33,6 +33,15 @@ type TokenInputValueChangeReason =
   | "imperative"
 
 /**
+ * What `onSubmit` receives besides the value.
+ * @stable
+ */
+type TokenInputSubmitDetails = {
+  /** The key press, or the trigger menu item's choice, that submitted. */
+  event?: Event
+}
+
+/**
  * What `onValueChange` receives besides the value.
  * @stable
  */
@@ -63,8 +72,11 @@ function createTokenInputController() {
   return createController<{
     /** The value: text and tokens. */
     getValue: () => TokenInputValue
-    /** Replaces the value as one undoable step. */
-    setValue: (value: TokenInputValue, options?: TokenInputChangeOptions) => void
+    /**
+     * Replaces the value as one undoable step.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: TokenInputValue, options?: TokenInputChangeOptions) => boolean
     /** The value as codec text, like `Ask [@Ada](mention:ada)`. */
     getText: (codec?: TokenCodec) => string
     /** The value as people read it, with each token's label. */
@@ -72,6 +84,7 @@ function createTokenInputController() {
     /**
      * Inserts text, a token or a value at the caret, the end or a range, as one undoable step. With
      * `resolve`, a token is pending until it settles: updated with what it resolves to, removed if it rejects.
+     * Returns false when the change was canceled.
      */
     insert: (
       content: string | TokenInsert | TokenInputValue,
@@ -81,21 +94,30 @@ function createTokenInputController() {
         /** Keeps a token pending until this settles. */
         resolve?: PromiseLike<void | Partial<TokenInsert>>
       },
-    ) => void
-    /** Changes a token's status, data or label without an undo step or a caret move. */
-    updateToken: (id: string, patch: Partial<Omit<Token, "id">>) => void
-    /** Removes a token as one undoable step. */
-    removeToken: (id: string, options?: TokenInputChangeOptions) => void
-    /** Undoes the last step. */
-    undo: () => void
-    /** Redoes the last undone step. */
-    redo: () => void
+    ) => boolean
+    /**
+     * Changes a token's status, data or label without an undo step or a caret move.
+     * Returns false when there's no such token or nothing changed.
+     */
+    updateToken: (id: string, patch: Partial<Omit<Token, "id">>) => boolean
+    /**
+     * Removes a token as one undoable step.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    removeToken: (id: string, options?: TokenInputChangeOptions) => boolean
+    /** Undoes the last step. Returns false when there was none or the change was canceled. */
+    undo: () => boolean
+    /** Redoes the last undone step. Returns false when there was none or the change was canceled. */
+    redo: () => boolean
     /** Whether there's a step to undo. */
     canUndo: () => boolean
     /** Whether there's a step to redo. */
     canRedo: () => boolean
-    /** Empties the input as one undoable step. */
-    clear: (options?: TokenInputChangeOptions) => void
+    /**
+     * Empties the input as one undoable step.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: TokenInputChangeOptions) => boolean
     /** Focuses the editor, with the caret at its start or end. */
     focus: (options?: { at?: "start" | "end" }) => void
     /** The editor a TriggerMenu outside the token input reads and writes. A menu inside it finds it on its own. */
@@ -124,7 +146,7 @@ type TokenInputOptions = {
   /**
    * Runs on the submit shortcut, unless an input method is composing or a trigger menu is open. Without it, the shortcut submits the form the input is in.
    */
-  onSubmit?: (value: TokenInputValue) => void
+  onSubmit?: (value: TokenInputValue, details: TokenInputSubmitDetails) => void
   /**
    * Which keys submit: `"enter"`, with Shift+Enter for a new line, or `"mod+enter"`, with Enter for a new line, which many Japanese and Chinese writers prefer.
    * @defaultValue "enter"
@@ -151,7 +173,7 @@ type TokenInputOptions = {
    * What a token says to screen readers besides its label, like its kind and status.
    * @defaultValue the type, and "loading" while pending
    */
-  describeToken?: (token: Token) => string
+  getTokenDescription?: (token: Token) => string
   /** Undo history: how many steps it keeps, and how long a typing pause starts a new step. */
   history?: HistoryOptions
   /** Disables the input: it can't be focused or changed, and isn't submitted. */
@@ -233,7 +255,7 @@ const tokenInputPrimitive = /* @__PURE__ */ definePrimitive({
     tokenDeletion: "string",
     copy: "string",
     codec: "value",
-    describeToken: "value",
+    getTokenDescription: "value",
     history: "value",
     disabled: "boolean",
     readOnly: "boolean",
@@ -277,6 +299,7 @@ export {
   type TokenInputPrimitive,
   type TokenInputTokenProps,
   type TokenInputTokenState,
+  type TokenInputSubmitDetails,
   type TokenInputValueChangeDetails,
   type TokenInputValueChangeReason,
 }

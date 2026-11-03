@@ -21,7 +21,7 @@ import { createValueSelection } from "../../foundation/lists/listbox-value"
 import { orientationOf } from "../../foundation/focus/collection"
 import { createChange } from "../../foundation/kernel/input-source"
 
-type ListboxState = {
+type ListboxStore = {
   value: unknown
   // What a form reset returns to.
   initial: unknown
@@ -50,7 +50,7 @@ type ListboxState = {
 
 type Change = { reason: ListboxValueChangeReason; event?: Event }
 
-function initialListboxState(options: ListboxOptions<any, any>): ListboxState {
+function initialListboxStore(options: ListboxOptions<any, any>): ListboxStore {
   const empty = () => (options.multiple ? [] : null)
   return {
     value: options.value !== undefined ? options.value : (options.defaultValue ?? empty()),
@@ -61,11 +61,11 @@ function initialListboxState(options: ListboxOptions<any, any>): ListboxState {
     icons: 0,
     formDisabled: false,
     groupLabels: [],
-    ...syncListboxState(options),
+    ...syncListboxStore(options),
   }
 }
 
-function syncListboxState(options: ListboxOptions<any, any>) {
+function syncListboxStore(options: ListboxOptions<any, any>) {
   return {
     multiple: !!options.multiple,
     // The APG's models: selection follows focus in a single list, and waits for Space with several.
@@ -81,13 +81,13 @@ function syncListboxState(options: ListboxOptions<any, any>) {
     // Like a native select's default, changing it changes what a reset returns to.
     ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
     ...(options.value === undefined ? {} : { value: options.value }),
-  } satisfies Partial<ListboxState>
+  } satisfies Partial<ListboxStore>
 }
 
 /** For a list nobody types into, like Listbox: every item shows. */
 const noFiltering: ListFiltering = { data: (data) => data, matches: () => true }
 
-function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxState, string>) {
+function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxStore, string>) {
   const { id, store, options, element } = context
   const change = createChange(context)
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
@@ -282,16 +282,14 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
   const api = {
     id,
     getValue: () => store.get().value,
-    setValue(value: unknown, { reason = "imperative", event }: ListboxChangeOptions = {}) {
-      setValue(value, { reason, event })
-    },
-    clear({ reason = "imperative", event }: ListboxChangeOptions = {}) {
-      setValue(selection.empty(), { reason, event })
-    },
+    setValue: (value: unknown, { reason = "imperative", event }: ListboxChangeOptions = {}) =>
+      setValue(value, { reason, event }),
+    clear: ({ reason = "imperative", event }: ListboxChangeOptions = {}) =>
+      setValue(selection.empty(), { reason, event }),
     selectAll({ reason = "imperative", event }: ListboxChangeOptions = {}) {
-      if (!store.get().multiple) return
+      if (!store.get().multiple) return false
       const missing = order().filter((key) => selectable(key) && !selection.isSelected(key))
-      if (missing.length) setKeys([...selection.keys(), ...missing], { reason, event })
+      return missing.length > 0 && setKeys([...selection.keys(), ...missing], { reason, event })
     },
     focus: focusStop,
     // Internal. Used by slots and adapters.
@@ -352,4 +350,4 @@ type ListboxItemMeta = { value: unknown; label?: string; disabled?: boolean; gro
  */
 type ListboxApi = ReturnType<typeof listboxApi>
 
-export { initialListboxState, type ListboxApi, listboxApi, type ListboxState, syncListboxState }
+export { initialListboxStore, type ListboxApi, listboxApi, type ListboxStore, syncListboxStore }

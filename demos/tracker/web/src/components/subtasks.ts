@@ -51,7 +51,7 @@ function subtasks(issue: Issue) {
     <ui-tree
       aria-labelledby="subtasks-label"
       checkable
-      selection-mode="none"
+      mode="none"
       check-strategy="leaf"
       default-expanded=${expanded.join(",")}
       .items=${itemsOf(issue.subtasks)}

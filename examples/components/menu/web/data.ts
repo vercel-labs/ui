@@ -43,7 +43,7 @@ const fileMenu: MenuData = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <ui-menu shortcuts>
+      <ui-menu item-shortcuts>
         <ui-menu-trigger>
           <button>File</button>
         </ui-menu-trigger>

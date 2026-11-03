@@ -3,7 +3,7 @@ import {
   type ToolbarGroupProps,
   type ToolbarGroupState,
   type ToolbarOptions,
-  type ToolbarRootState,
+  type ToolbarState,
 } from "@ui-sdk/core/toolbar"
 import * as React from "react"
 import { ToolbarContext, ToolbarGroupContext } from "./toolbar-context"
@@ -24,7 +24,7 @@ function Toolbar({
   controller,
   debug,
   ...props
-}: ToolbarOptions & PartProps<"div", ToolbarRootState>) {
+}: ToolbarOptions & PartProps<"div", ToolbarState>) {
   const handle = usePrimitive(toolbar, { orientation, loop, disabled, controller, debug })
   // In its own context too, so a toggle can join a toolbar without bundling it.
   return (
@@ -88,7 +88,7 @@ export type {
   ToolbarOptions,
   ToolbarOrientation,
   ToolbarPrimitive,
-  ToolbarRootState,
+  ToolbarState,
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
 

@@ -7,7 +7,6 @@ import {
   type MenuContentState,
   type MenuContextTriggerProps,
   type MenuContextTriggerState,
-  type MenuController,
   type MenuData,
   type MenuDataItem,
   type MenuItemIconProps,
@@ -169,10 +168,7 @@ function appleSignal(menu: MenuContextValue) {
   return apple
 }
 
-type TriggerProps = MenuTriggerProps & {
-  /** Connects a trigger outside the menu, like one per table row, to the menu with this controller. */
-  controller?: MenuController<any>
-}
+type TriggerProps = MenuTriggerProps
 
 /**
  * The button that opens the menu. A trigger outside the menu connects through `controller`.
@@ -214,13 +210,7 @@ function MenuTrigger(props: Omit<PartProps<"button", MenuTriggerState>, Clashing
  * An area that opens the menu at the pointer on a right-click or a long press, and on Shift+F10.
  * @stable
  */
-function MenuContextTrigger(
-  props: PartProps<"div", MenuContextTriggerState> &
-    MenuContextTriggerProps & {
-      /** Connects an area outside the menu to the menu with this controller. */
-      controller?: MenuController<any>
-    },
-) {
+function MenuContextTrigger(props: PartProps<"div", MenuContextTriggerState> & MenuContextTriggerProps) {
   const menu = useControllerTarget(() => props.controller, useContext(MenuContext))
   const rest = omit(props, "disabled", "payload", "controller")
   return (
@@ -275,6 +265,8 @@ function MenuContent<Payload = unknown>(
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
+    anchor: props.anchor,
     keepMounted: props.keepMounted,
   })
   const rest = omit(
@@ -284,6 +276,8 @@ function MenuContent<Payload = unknown>(
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
+    "anchor",
     "keepMounted",
     "container",
   )
@@ -666,6 +660,7 @@ export type {
   MenuApi,
   MenuCheckboxItemProps,
   MenuCheckboxItemState,
+  MenuActionDetails,
   MenuCheckedChangeDetails,
   MenuCheckedChangeReason,
   MenuContentProps,

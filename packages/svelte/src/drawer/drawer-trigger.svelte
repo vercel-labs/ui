@@ -5,8 +5,8 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
 @stable
 -->
 <script lang="ts">
-  import type { DialogTriggerProps, DialogTriggerState } from "@ui-sdk/core/dialog"
-  import type { DrawerController } from "@ui-sdk/core/drawer"
+  import type { DialogTriggerState } from "@ui-sdk/core/dialog"
+  import type { DrawerTriggerProps } from "@ui-sdk/core/drawer"
   import { getContext, setContext } from "svelte"
   import Part from "../part.svelte"
   import { useControllerTarget } from "../popup.svelte"
@@ -21,10 +21,7 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
     controller,
     ...rest
   }: PartProps<"button", DialogTriggerState> &
-    DialogTriggerProps & {
-      /** Connects a trigger outside the drawer to the drawer with this controller. */
-      controller?: DrawerController<any, any>
-    } = $props()
+    DrawerTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<DrawerContext | undefined>(DrawerKey))
   const drawer = $derived(connected())

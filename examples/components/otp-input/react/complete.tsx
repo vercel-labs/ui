@@ -9,7 +9,7 @@ export function Example() {
       <OTPInput
         aria-label="Verification code"
         onValueChange={() => setStatus("")}
-        onComplete={(value, details) => setStatus(`Checking ${value}, from ${details.reason}.`)}
+        onValueCommit={(value, details) => setStatus(`Checking ${value}, from ${details.reason}.`)}
       >
         <OTPInputGroup>
           {[0, 1, 2, 3, 4, 5].map((index) => (

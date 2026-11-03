@@ -7,7 +7,7 @@ import {
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { useControllerEntry, useControllerTarget } from "./controller-target"
-import { ownDescription, useFieldControl } from "./field-context"
+import { ownDescription, useFieldControl, useFieldControlId } from "./field-context"
 import {
   createParts,
   extendHandle,
@@ -62,6 +62,7 @@ function NumberInput({
   ...props
 }: NumberInputOptions & DivProps) {
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const numberInput = usePrimitive(numberInputPrimitive, {
     value,
     defaultValue,
@@ -82,6 +83,7 @@ function NumberInput({
     form,
     controller,
     debug,
+    controlId,
   })
   const context = React.useMemo(() => extendHandle(numberInput, { field }), [numberInput, field])
   useControllerEntry(controller, context)

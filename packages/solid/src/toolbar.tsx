@@ -3,7 +3,7 @@ import {
   type ToolbarGroupProps,
   type ToolbarGroupState,
   type ToolbarOptions,
-  type ToolbarRootState,
+  type ToolbarState,
 } from "@ui-sdk/core/toolbar"
 import type { JSX } from "@solidjs/web"
 import { createUniqueId, merge, omit } from "solid-js"
@@ -23,7 +23,7 @@ const parts = createParts(toolbar, {
  * `ToolbarButton`, and fields through `ToolbarInput`.
  * @stable
  */
-function Toolbar(props: ToolbarOptions & PartProps<"div", ToolbarRootState>) {
+function Toolbar(props: ToolbarOptions & PartProps<"div", ToolbarState>) {
   const handle = usePrimitive(toolbar, () => ({
     orientation: props.orientation,
     loop: props.loop,
@@ -98,7 +98,7 @@ export type {
   ToolbarOptions,
   ToolbarOrientation,
   ToolbarPrimitive,
-  ToolbarRootState,
+  ToolbarState,
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
 

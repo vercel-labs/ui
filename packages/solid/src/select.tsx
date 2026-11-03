@@ -3,7 +3,6 @@ import {
   type ListData,
   type SelectContentProps,
   type SelectContentState,
-  type SelectController,
   type SelectEmptyState,
   type SelectItemIconProps,
   type SelectItemIconState,
@@ -149,11 +148,7 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
  */
 const SelectLabel = parts.Label
 
-type TriggerPartProps = Omit<PartProps<"button", SelectTriggerState>, Clashing> &
-  SelectTriggerProps & {
-    /** Connects a trigger outside the select to the select with this controller. */
-    controller?: SelectController<any, any>
-  }
+type TriggerPartProps = Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps
 
 /**
  * The button that opens the list: a combobox named by the label. Typing on it selects the item that matches.
@@ -215,7 +210,7 @@ const unselected: SelectValueState = { value: null, label: "", labels: [], place
  */
 function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> & SelectValueProps) {
   const context = useContext(SelectContext)
-  const rest = omit(props, "placeholder", "max", "moreLabel")
+  const rest = omit(props, "placeholder", "maxLabels", "getMoreLabel")
   // A trigger outside its select renders before the select it names has mounted.
   if (!context) {
     return renderStatic(
@@ -229,7 +224,11 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
     )
   }
   const placeholder = () => placeholders.get(context)?.() ?? context.state.placeholder
-  const part = () => ({ placeholder: props.placeholder, max: props.max, moreLabel: props.moreLabel })
+  const part = () => ({
+    placeholder: props.placeholder,
+    maxLabels: props.maxLabels,
+    getMoreLabel: props.getMoreLabel,
+  })
   const user = merge(rest, {
     get children() {
       return (
@@ -259,6 +258,7 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     alignItemWithTrigger: props.alignItemWithTrigger,
     keepMounted: props.keepMounted,
@@ -271,6 +271,7 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
       "sideOffset",
       "alignOffset",
       "collisionPadding",
+      "arrowPadding",
       "anchor",
       "alignItemWithTrigger",
       "keepMounted",

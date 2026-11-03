@@ -5,6 +5,7 @@
 // the next step as a function, so the steps can't run out of order.
 import type { createDismissal } from "./dismissal"
 import type { createPopupPayload } from "./popup-payload"
+import { popupResult } from "../kernel/action"
 import { changeSource } from "../kernel/input-source"
 import type { ChangeOptions } from "../kernel/details"
 import type { Store } from "../kernel/store"
@@ -38,7 +39,9 @@ type HideRequest<Reason extends string, Result> = ChangeOptions<Reason> & {
 
 // What `open()` resolves with when nothing opened: refused, or given an aborted signal.
 function unopened<Reason extends string, Result = string>(reason: Reason, event?: Event) {
-  return Promise.resolve<PopupResult<Reason, Result>>({ reason, source: changeSource(reason, event) })
+  return popupResult(
+    Promise.resolve<PopupResult<Reason, Result>>({ reason, source: changeSource(reason, event) }),
+  )
 }
 
 function createOpenSteps<
@@ -110,7 +113,7 @@ function createOpenSteps<
   function result(signal?: AbortSignal) {
     if (!pending) {
       let resolve!: (result: PopupResult<Reason, Result>) => void
-      const promise = new Promise<PopupResult<Reason, Result>>((done) => (resolve = done))
+      const promise = popupResult(new Promise<PopupResult<Reason, Result>>((done) => (resolve = done)))
       pending = { promise, resolve }
     }
     if (signal && !signal.aborted) {
@@ -123,8 +126,12 @@ function createOpenSteps<
 
   // `setOpen` and `toggle` pass their reason as `openReason`.
   function show(request: ShowRequest<PayloadReason, Extra> = {}, openReason?: Reason) {
+    return attempt(request, openReason).result
+  }
+
+  function attempt(request: ShowRequest<PayloadReason, Extra>, openReason?: Reason) {
     const { event, signal } = request
-    if (signal?.aborted) return unopened<Reason, Result>(imperative)
+    if (signal?.aborted) return { opened: false, result: unopened<Reason, Result>(imperative) }
     const payloadReason = request.reason ?? (event ? triggerPress : imperative)
     const reason: Reason = openReason ?? payloadReason
     const settled = { ...request, reason, payloadReason }
@@ -150,18 +157,19 @@ function createOpenSteps<
       )
         openAnchor = request.anchor
       rules.reopen?.(settled, open)
-      return result(signal)
+      return { opened, result: result(signal) }
     }
     if (rules.open) rules.open(settled, open)
     else open()
-    return opened ? result(signal) : unopened<Reason, Result>(reason, event)
+    return { opened, result: opened ? result(signal) : unopened<Reason, Result>(reason, event) }
   }
 
   function hide(request: HideRequest<Reason, Result> = {}) {
-    if (!store.get().open) return
+    if (!store.get().open) return false
     const { event, returnValue } = request
     const reason = request.reason ?? imperative
-    if (config.dismissal && !config.dismissal.allows(reason, event)) return
+    if (config.dismissal && !config.dismissal.allows(reason, event)) return false
+    let closed = false
     const close = () => {
       requested = { reason, source: changeSource(reason, event), returnValue }
       popup.returnFocus(request.focus ?? config.returnFocus ?? true)
@@ -174,10 +182,12 @@ function createOpenSteps<
         popup.returnFocus(true)
         requested = undefined
       }
+      closed = changed
       return changed
     }
     if (rules.close) rules.close({ ...request, reason }, close)
     else close()
+    return closed
   }
 
   // Another trigger takes the open popup over, with its payload. It anchors
@@ -203,27 +213,24 @@ function createOpenSteps<
   // payload, so the payload hears "imperative", event or not. Every field of
   // `Extra` is optional, which a generic `Partial<Extra>` can't show.
   const showFor = (reason?: Reason, event?: Event) =>
-    show({ reason: imperative, event } as ShowRequest<PayloadReason, Extra>, reason)
+    attempt({ reason: imperative, event } as ShowRequest<PayloadReason, Extra>, reason).opened
 
   return {
     // The controller's methods. Components add `focus` and `getPayload` themselves, so lists don't expose a payload.
     api: {
       isOpen: () => store.get().open,
-      setOpen(open: boolean, { reason, event }: ChangeOptions<Reason> = {}) {
-        if (open) showFor(reason, event)
-        else hide({ reason, event })
-      },
+      setOpen: (open: boolean, { reason, event }: ChangeOptions<Reason> = {}) =>
+        open ? showFor(reason, event) : hide({ reason, event }),
       // An app's event is no trigger's, so the reason stays "imperative" unless it names one.
       open: (options: PopupOpenOptions<unknown, PayloadReason> & Partial<Extra> = {}) =>
         show({ ...options, reason: options.reason ?? imperative }),
       close: ({ reason, event, returnValue }: ChangeOptions<Reason> & { returnValue?: Result } = {}) =>
         hide({ reason, event, returnValue }),
-      toggle({ reason, event }: ChangeOptions<Reason> = {}) {
-        if (store.get().open) hide({ reason, event })
-        else showFor(reason, event)
-      },
+      toggle: ({ reason, event }: ChangeOptions<Reason> = {}) =>
+        store.get().open ? hide({ reason, event }) : showFor(reason, event),
     },
     show,
+    attempt,
     hide,
     takeOver,
     // The next close, for an `open()` that opened the popup its own way.

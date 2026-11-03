@@ -91,6 +91,7 @@ function TriggerMenuContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   keepMounted,
   container,
@@ -99,7 +100,16 @@ function TriggerMenuContent({
 }: PartProps<"div", TriggerMenuContentState> & TriggerMenuContentProps) {
   usePlaceContent()
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const content = { side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }
+  const content = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+    keepMounted,
+  }
   const body = children ?? <TriggerMenuList />
   const element = usePart(triggerMenuPrimitive, "content", content, { ...props, children: body })
   return element && renderPopup(element, target)

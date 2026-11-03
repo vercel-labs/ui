@@ -27,7 +27,7 @@ import type {
 } from "./dialog"
 import { onProps } from "../../foundation/kernel/part"
 
-type TriggerProps = DialogTriggerProps
+type TriggerProps = Omit<DialogTriggerProps, "controller">
 type ContentProps = DialogContentProps
 type CloseProps = DialogCloseProps
 

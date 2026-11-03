@@ -12,7 +12,7 @@ export type {
   CollapsiblePanelProps,
   CollapsiblePanelState,
   CollapsiblePrimitive,
-  CollapsibleRootState,
+  CollapsibleState,
   CollapsibleTriggerProps,
   CollapsibleTriggerState,
 } from "@ui-sdk/core/collapsible"

@@ -66,6 +66,7 @@ function createTriggerSelect({
   highlighted,
   itemProps,
   toKey,
+  waiting,
 }: {
   levels: TriggerLevels
   editor: () => TextEditorAdapter | undefined
@@ -77,6 +78,7 @@ function createTriggerSelect({
   highlighted: () => string | null
   itemProps: (key: string) => ItemMeta | undefined
   toKey: (value: unknown) => string
+  waiting: (promise: Pending) => void
 }) {
   let writing = false
   let byKey = itemsByKey(undefined, toKey)
@@ -222,6 +224,7 @@ function createTriggerSelect({
       options().onSelect?.(item.value, selectDetails),
     ]
     const pending = (results.find(isPromise) as Pending | undefined) ?? waited
+    if (pending) waiting(pending)
     if (!selectDetails.defaultPrevented) {
       const content =
         rule.insert?.(item as TriggerMenuDataItem<any>, { match, arguments: level.values }) ??
@@ -247,7 +250,7 @@ function createTriggerSelect({
       )
     }
     levels.end("item-press", event)
-    if (after === "submit" && !tab) editor()?.submit?.()
+    if (after === "submit" && !tab) editor()?.submit?.(event)
   }
 
   return { choose, accept, write, isWriting: () => writing }

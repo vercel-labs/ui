@@ -55,7 +55,7 @@ const checked = ref(["react", "postgres"])
       aria-label="Stack"
       :items="items"
       checkable
-      selection-mode="none"
+      mode="none"
       check-strategy="trunk"
       :default-expanded="['frontend', 'backend', 'databases']"
     >

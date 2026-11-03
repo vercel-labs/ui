@@ -34,8 +34,8 @@
           <PaginationItem>
             <PaginationLink page={item as number}>
               {#snippet render({ props, state: link })}
-                <RouterLink {...props} class={["pagination-link", link.active ? "is-active" : "is-inactive"]}>
-                  {link.page}{#if link.active}<span aria-hidden="true">•</span>{/if}
+                <RouterLink {...props} class={["pagination-link", link.current ? "is-active" : "is-inactive"]}>
+                  {link.page}{#if link.current}<span aria-hidden="true">•</span>{/if}
                 </RouterLink>
               {/snippet}
             </PaginationLink>

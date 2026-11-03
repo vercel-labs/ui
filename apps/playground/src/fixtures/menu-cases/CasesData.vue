@@ -21,7 +21,7 @@ const items = computed(() => casesData({ align: align.value, journal: journal.va
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Menu :items="items" :shortcuts="shortcuts" @action="(value: string) => (action = value)">
+    <Menu :items="items" :item-shortcuts="shortcuts" @action="(value: string) => (action = value)">
       <MenuTrigger>Edit</MenuTrigger>
     </Menu>
     <button @click="align = 'right'">Align right</button>

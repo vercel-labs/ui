@@ -11,7 +11,7 @@ import {
   ListboxItemIndicator,
   ListboxSeparator,
   type ListData,
-  type ListboxRootState,
+  type ListboxState,
 } from "@ui-sdk/vue"
 import type { ChangeDetails } from "@ui-sdk/core"
 import { createApp, defineComponent, h, ref, type PropType, type VNode } from "vue"
@@ -111,7 +111,7 @@ const VariantListbox = defineComponent({
           },
         },
         {
-          default: ({ state }: { state: ListboxRootState }) =>
+          default: ({ state }: { state: ListboxState }) =>
             variant.data ? dataItems(state.items as ListData<any>) : items(variant),
         },
       )

@@ -3,6 +3,7 @@ import type { MenubarApi } from "../menubar/menubar"
 import { isRTL } from "../../foundation/platform/env"
 import { composedClosest, composedContains } from "../../foundation/platform/platform"
 import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
+import { contentAnchor } from "../../foundation/popups/popup-features"
 import { menuPreset } from "../../foundation/popups/popup-presets"
 import {
   deriveOpen,
@@ -15,6 +16,7 @@ import {
 import type { createOpenSteps } from "../../foundation/popups/popup-steps"
 import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { sheetModal } from "../../foundation/popups/presentation"
+import { announcePending } from "../../foundation/kernel/action"
 import { createOrder } from "../../foundation/kernel/order"
 import { createSafeArea } from "../../foundation/popups/safe-area"
 import { sourceOf } from "../../foundation/kernel/modality"
@@ -72,9 +74,9 @@ type ItemProps = {
   /**
    * Runs when the item is selected, by pointer or keyboard, with the event that selected it, or a
    * new `select` Event when no DOM event did. Call `event.preventDefault()` to keep the menu open
-   * and skip `onAction`.
+   * and skip `onAction`. Return a Promise to mark the item pending until it settles, like `onAction`.
    */
-  onSelect?: (event: Event) => void
+  onSelect?: (event: Event) => unknown
 }
 
 type TriggerProps = {
@@ -211,7 +213,7 @@ function eachShortcut(items: MenuData, run: (value: string, shortcut: string) =>
 }
 
 // Registers a data menu's item shortcuts in the trigger's layer, so a modal
-// above it pauses them, and again whenever the items or `shortcuts` change.
+// above it pauses them, and again whenever the items or `itemShortcuts` change.
 function bindItemShortcuts(
   store: Store<MenuState>,
   layer: HTMLElement,
@@ -279,8 +281,8 @@ type MenuNode = {
   options: () => MenuInternalOptions
   getPayload: () => unknown
   show: (options?: Show) => Promise<PopupResult<MenuOpenChangeReason>>
-  hide: (options?: Close) => void
-  runAction: (value: string, event?: Event) => void
+  hide: (options?: Close) => boolean
+  runAction: (value: string, event?: Event) => unknown
   focusTrigger: () => void
   triggerElement: () => HTMLElement | undefined
   modalSetting: () => boolean | "pointer"
@@ -313,6 +315,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   const typeahead = createTypeahead()
   const safeArea = createSafeArea()
   let pendingFocus: Focus = "none"
+  announcePending({ ...context, options: () => root().options() }, () => store.get().pending.length > 0)
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
   // NaN until the pointer first moves, so the first move always counts.
   let pointerX = NaN
@@ -558,7 +561,8 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       sheetModal(store.get().presentation, options().modal ?? bar()?.internal.modal(), "pointer"),
     menubar: bar,
     presentation: () => store.get().presentation,
-    anchor: () => control.anchor() ?? triggerElement(),
+    anchor: (el?: HTMLElement, setting?: Anchor | string | null) =>
+      control.anchor() ?? (el ? contentAnchor(el, setting, triggerElement) : triggerElement()),
     // Runs a plain item and closes the whole tree. Focus returns to the root
     // trigger, unless the item opened something that took it, like a dialog.
     action(value: string | undefined, event?: Event) {
@@ -566,8 +570,21 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       if (value !== undefined) top.runAction(value, event)
       top.hide({ reason: "item-press", event, focus: "unless-moved" })
     },
-    runAction(value: string, event?: Event) {
-      options().onAction?.(value, { event })
+    runAction: (value: string, event?: Event) => options().onAction?.(value, { event }),
+    wait(key: string, pending: PromiseLike<unknown>, done: () => void) {
+      store.set({ pending: [...store.get().pending, key] })
+      const settled = () => store.get().pending.filter((other) => other !== key)
+      pending.then(
+        () => {
+          store.set({ pending: settled() })
+          done()
+        },
+        (reason) => store.set({ pending: settled(), error: { key, reason } }),
+      )
+    },
+    isPending: (key: string) => store.get().pending.includes(key),
+    clearError(key: string) {
+      if (store.get().error?.key === key) store.set({ error: null })
     },
     focusTrigger,
     // Internal. Used by submenus and slots.
@@ -869,8 +886,11 @@ type MenuState = {
   groupLabels: readonly string[]
   // The button triggers in the page, so the content is named only by one that exists.
   triggers: readonly string[]
-  // A data menu's items while `shortcuts` is on, so triggers register their shortcuts again when they change.
+  // A data menu's items while `itemShortcuts` is on, so triggers register their shortcuts again when they change.
   shortcutItems: MenuData | undefined
+  // Items whose `onSelect` or `onAction` Promise hasn't settled, and the last one that failed.
+  pending: string[]
+  error: { key: string; reason: unknown } | null
 }
 
 const triggerDisabled = (state: MenuState, props: TriggerProps) => !!props.disabled || state.barDisabled

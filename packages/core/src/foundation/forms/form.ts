@@ -361,6 +361,8 @@ function bindInternals(el: HTMLElement, options: Parameters<InternalsBinder>[2])
 
 let labelCount = 0
 
+const fieldControlId = (fieldId: string) => `${fieldId}-control`
+
 // Elements a <label> can name and activate.
 function isLabelable(el: HTMLElement) {
   return (
@@ -435,6 +437,7 @@ export {
   claimInvalidFocus,
   dispatchChange,
   elementMoved,
+  fieldControlId,
   fieldsetDisabled,
   focusWith,
   formInternals,

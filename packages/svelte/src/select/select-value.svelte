@@ -16,8 +16,8 @@ The selected item's label, or the placeholder. Renders it for you when it has no
 
   let {
     placeholder,
-    max,
-    moreLabel,
+    maxLabels,
+    getMoreLabel,
     children,
     ...rest
   }: PartProps<"span", SelectValueState> & SelectValueProps = $props()
@@ -25,7 +25,7 @@ The selected item's label, or the placeholder. Renders it for you when it has no
   const select = getContext<SelectContext | undefined>(selectPrimitive)
   // An external trigger renders before its controller's select connects.
   const value = select
-    ? useHandlePart(select, "value", () => ({ placeholder, max, moreLabel }))
+    ? useHandlePart(select, "value", () => ({ placeholder, maxLabels, getMoreLabel }))
     : plainPart<SelectValueState>({ value: null, label: "", labels: [], placeholder: true })
 </script>
 

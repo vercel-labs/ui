@@ -34,7 +34,7 @@ const action = ref("")
           <NavigationMenuContent class="nav-content" aria-label="Guides panel">
             <template #render="{ props }">
               <section v-bind="props">
-                <NavigationMenuLink active>
+                <NavigationMenuLink current>
                   <template #render="{ props }">
                     <RouterLink v-bind="props" to="#intro">Introduction</RouterLink>
                   </template>

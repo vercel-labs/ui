@@ -173,7 +173,7 @@ function Example() {
     <div data-slot="stack">
       <Menu
         items={fileMenu}
-        shortcuts
+        itemShortcuts
         onAction={(value) => setStatus(`Ran ${value}`)}
         onCheckedChange={(checked, details) => setStatus(`${details.value} ${checked ? "on" : "off"}`)}
         onValueChange={(value, details) => setStatus(`${details.group}: ${value}`)}

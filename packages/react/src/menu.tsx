@@ -7,7 +7,6 @@ import {
   type MenuContentState,
   type MenuContextTriggerProps,
   type MenuContextTriggerState,
-  type MenuController,
   type MenuData,
   type MenuDataItem,
   type MenuItemIconProps,
@@ -121,10 +120,7 @@ function Menu({ children, items, container, ...options }: MenuProps) {
   )
 }
 
-type TriggerProps = MenuTriggerProps & {
-  /** Connects a trigger outside the menu, like one per table row, to the menu with this controller. */
-  controller?: MenuController<any>
-}
+type TriggerProps = MenuTriggerProps
 
 /**
  * The button that opens the menu. A trigger outside the menu connects through `controller`.
@@ -155,11 +151,7 @@ function MenuTrigger({
 function MenuContextTrigger({
   controller,
   ...props
-}: PartProps<"div", MenuContextTriggerState> &
-  MenuContextTriggerProps & {
-    /** Connects an area outside the menu to the menu with this controller. */
-    controller?: MenuController<any>
-  }) {
+}: PartProps<"div", MenuContextTriggerState> & MenuContextTriggerProps) {
   const { disabled, payload: _, render, ...rest } = props
   const unconnected = () => renderElement("div", rest, render, { open: false, disabled: !!disabled })
   return (
@@ -189,6 +181,8 @@ function MenuContent<Payload = unknown>({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
+  anchor,
   keepMounted,
   container,
   render,
@@ -197,7 +191,16 @@ function MenuContent<Payload = unknown>({
   usePlaceContent()
   const menu = useMenu()
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const content = { side, align, sideOffset, alignOffset, collisionPadding, keepMounted }
+  const content = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+    keepMounted,
+  }
   // Submenus render inside their parent's popup.
   const nested = menu.api.root() !== menu.api
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
@@ -503,6 +506,7 @@ export type {
   MenuApi,
   MenuCheckboxItemProps,
   MenuCheckboxItemState,
+  MenuActionDetails,
   MenuCheckedChangeDetails,
   MenuCheckedChangeReason,
   MenuContentProps,

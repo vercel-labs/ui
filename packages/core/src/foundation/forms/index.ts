@@ -20,6 +20,7 @@ export {
   bindValueInput,
   claimInvalidFocus,
   dispatchChange,
+  fieldControlId,
   formInternals,
   type FormValue,
   hiddenInputStyle,

@@ -13,7 +13,7 @@ export function mount(root: HTMLElement) {
         Always expanded
       </label>
     </div>
-    <ui-toast-region max="4">
+    <ui-toast-region max-visible="4">
       <template>
         <ui-toast>
           <div data-slot="stack">

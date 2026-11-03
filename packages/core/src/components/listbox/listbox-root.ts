@@ -7,7 +7,7 @@
 import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { type ListData, type ListHighlightDetails } from "../../foundation/lists/listbox"
 import { listboxSlots } from "./listbox-root-parts"
-import { initialListboxState, listboxApi, syncListboxState } from "./listbox-root-api"
+import { initialListboxStore, listboxApi, syncListboxStore } from "./listbox-root-api"
 import type { ListboxGeneric } from "./listbox-root-generic"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
@@ -42,12 +42,21 @@ function createListboxController<T = string, Multiple extends boolean | undefine
   return createController<{
     /** The selected value. */
     getValue: () => ListboxValue<T, Multiple>
-    /** Selects a value, as a user would. A disabled or read-only listbox ignores it. */
-    setValue: (value: ListboxValue<T, Multiple>, options?: ListboxChangeOptions) => void
-    /** Selects nothing: `null`, or an empty list with `multiple`. */
-    clear: (options?: ListboxChangeOptions) => void
-    /** Selects every enabled item, with `multiple`. */
-    selectAll: (options?: ListboxChangeOptions) => void
+    /**
+     * Selects a value, as a user would. A disabled or read-only listbox ignores it.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: ListboxValue<T, Multiple>, options?: ListboxChangeOptions) => boolean
+    /**
+     * Selects nothing: `null`, or an empty list with `multiple`.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: ListboxChangeOptions) => boolean
+    /**
+     * Selects every enabled item, with `multiple`.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    selectAll: (options?: ListboxChangeOptions) => boolean
     /** Moves focus into the list, onto the option that holds its tab stop. */
     focus: () => void
   }>()
@@ -203,7 +212,7 @@ type ListboxItemIndicatorProps = {
  * state-based class names.
  * @stable
  */
-type ListboxRootState = {
+type ListboxState = {
   /**
    * Whether several items can be selected.
    * @defaultValue false
@@ -276,9 +285,9 @@ const listboxPrimitive = /* @__PURE__ */ definePrimitive({
     form: "string",
     controller: "value",
   },
-  state: initialListboxState,
+  state: initialListboxStore,
   live: ["highlighted"],
-  sync: syncListboxState,
+  sync: syncListboxStore,
   api: listboxApi,
   // An arrow function, so TypeScript infers the slot names before it checks the parts.
   slots: (slot) => listboxSlots(slot),
@@ -313,7 +322,7 @@ export {
   type ListboxItemState,
   type ListboxOptions,
   type ListboxPrimitive,
-  type ListboxRootState,
+  type ListboxState,
   type ListboxValue,
   type ListboxValueChangeReason,
 }

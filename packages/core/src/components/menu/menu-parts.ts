@@ -1,5 +1,6 @@
 import { dev, warn } from "#dev"
 import { checkName } from "#name-check"
+import { isPromise } from "../../foundation/kernel/action"
 import { keyWhileBound } from "../../foundation/kernel/bound-keys"
 import { opensElsewhere } from "../../foundation/platform/button"
 import { isRTL } from "../../foundation/platform/env"
@@ -259,7 +260,9 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       sideOffset: "number",
       alignOffset: "number",
       collisionPadding: "number",
+      arrowPadding: "number",
       container: "value",
+      anchor: "string",
       keepMounted: "boolean",
     },
     selects: selects({ values: [] }),
@@ -307,7 +310,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       const props = () => api.itemProps<ContentProps>("content", key) ?? initial
       let firstItem: number | undefined
       return api.internal.presentation.bind(el, {
-        anchor: api.anchor,
+        anchor: () => api.anchor(el, props().anchor),
         position: () => {
           const trigger = api.triggerElement()
           firstItem ??= parentMenu ? firstItemOffset(el) : 0
@@ -350,38 +353,42 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       destructive: "boolean",
       shortcut: "string",
       closeOnSelect: "boolean",
-      onSelect: "callback",
+      onSelect: "action",
     },
-    selects: selects({ highlighted: ({ key }) => [key], values: [] }),
+    selects: selects({ highlighted: ({ key }) => [key], pending: ({ key }) => [key], values: [] }),
     state: (state, { key, props }) => ({
       highlighted: state.highlighted === key,
       disabled: !!props.disabled,
+      pending: state.pending.includes(key),
+      error: state.error?.key === key ? state.error.reason : undefined,
     }),
     attrs: (state, { id, key, props }) => ({
       id: `${id}-item-${key}`,
       role: "menuitem",
       tabindex: "-1",
       "aria-disabled": props.disabled ? "true" : undefined,
+      "aria-busy": state.pending.includes(key) ? "true" : undefined,
       "data-disabled": props.disabled ? "" : undefined,
+      "data-pending": state.pending.includes(key) ? "" : undefined,
       "data-destructive": props.destructive ? "" : undefined,
       "aria-keyshortcuts": props.shortcut ? ariaKeyshortcuts(props.shortcut, state.apple) : undefined,
     }),
     on: {
       pointermove: (event, { api, el }) => api.internal.hoverItem(el!, event),
     },
-    press: ({ api, props }, event) => activateItem(api, props, event),
+    press: ({ api, key, props }, event) => activateItem(api, key, props, event),
     bind(el, { api, key, props, id }) {
       if (dev && !props.label && !labelOf(el).trim())
         warn("An item has no text. Pass a label so typeahead can find it.", { component: "menu", id })
       const current = () => api.itemProps<ItemProps>("item", key) ?? props
       const cleanups = [
-        on(el, "click", (event) => linkClick(api, current, el, event)),
+        on(el, "click", (event) => linkClick(api, key, current, el, event)),
         api.internal.register(el, {
           key,
           kind: "item",
           label: () => current().label ?? labelOf(el),
           disabled: () => el.getAttribute("aria-disabled") === "true",
-          activate: (event) => activateItem(api, current(), event),
+          activate: (event) => activateItem(api, key, current(), event),
         }),
       ]
       return () => cleanups.forEach((cleanup) => cleanup())
@@ -661,27 +668,34 @@ function firstItemOffset(el: HTMLElement) {
 // Clicks an item already took, so its link listener leaves them alone.
 const taken = new WeakSet<Event>()
 
-function activateItem(api: MenuApi, props: ItemProps, event?: Event, selection = event ?? selectEvent()) {
-  if (props.disabled) return
+function activateItem(
+  api: MenuApi,
+  key: string,
+  props: ItemProps,
+  event?: Event,
+  selection = event ?? selectEvent(),
+) {
+  if (props.disabled || api.isPending(key)) return
   if (event) taken.add(event)
-  props.onSelect?.(selection)
+  api.clearError(key)
+  const results: unknown[] = [props.onSelect?.(selection)]
   // Keeps the menu open, whether the item was clicked, pressed or chosen with a key.
-  if (selection.defaultPrevented) return
-  if (props.closeOnSelect === false) {
-    if (props.value !== undefined) api.root().runAction(props.value, event)
-    return
-  }
-  api.action(props.value, event)
+  const prevented = selection.defaultPrevented
+  if (!prevented && props.value !== undefined) results.push(api.root().runAction(props.value, event))
+  const closes = !prevented && props.closeOnSelect !== false
+  const pending = results.filter(isPromise)
+  if (pending.length) api.wait(key, Promise.all(pending), () => closes && api.action(undefined, event))
+  else if (closes) api.action(undefined, event)
 }
 
 // A router can call `preventDefault()` on a link's click before the item's
 // handler, which then skips it. Once the click has reached the window, after
 // React's handlers too, this still selects; `onSelect` gets its own event.
-function linkClick(api: MenuApi, props: () => ItemProps, el: HTMLElement, event: Event) {
+function linkClick(api: MenuApi, key: string, props: () => ItemProps, el: HTMLElement, event: Event) {
   if (!el.matches("a[href]") || opensElsewhere(event, el)) return
   const done = (last: Event) => {
     if (last === event && event.defaultPrevented && !taken.has(event))
-      activateItem(api, props(), event, selectEvent())
+      activateItem(api, key, props(), event, selectEvent())
   }
   el.ownerDocument.defaultView?.addEventListener("click", done, { once: true })
 }

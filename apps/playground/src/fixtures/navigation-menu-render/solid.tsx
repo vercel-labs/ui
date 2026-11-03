@@ -50,7 +50,7 @@ function Fixture() {
               class="nav-content"
               render={(props) => <section {...props} aria-label="Guides panel" />}
             >
-              <NavigationMenuLink render={(props) => <RouterLink {...props} to="#intro" />} active>
+              <NavigationMenuLink render={(props) => <RouterLink {...props} to="#intro" />} current>
                 Introduction
               </NavigationMenuLink>
               <NavigationMenuLink render={(props) => <RouterLink {...props} to="#install" />}>

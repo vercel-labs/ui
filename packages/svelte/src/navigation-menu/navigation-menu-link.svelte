@@ -1,6 +1,6 @@
 <!--
 @component
-A link. Pressing it closes the menu, and `active` marks the current page with `aria-current="page"`.
+A link. Pressing it closes the menu, and `current` marks the current page with `aria-current="page"`.
 @stable
 -->
 <script lang="ts">
@@ -14,13 +14,13 @@ A link. Pressing it closes the menu, and `active` marks the current page with `a
   import type { PartProps } from "../use-primitive.svelte"
 
   let {
-    active,
+    current,
     closeOnSelect,
     ...rest
   }: PartProps<"a", NavigationMenuLinkState> & NavigationMenuLinkProps = $props()
 
   const id = $props.id()
-  const link = usePart(navigationMenu, "link", () => ({ id, active, closeOnSelect }))
+  const link = usePart(navigationMenu, "link", () => ({ id, current, closeOnSelect }))
 </script>
 
 <Part tag="a" part={link} props={rest} />

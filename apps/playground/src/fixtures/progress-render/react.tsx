@@ -30,7 +30,7 @@ function Fixture() {
           <OTPInputSlot
             key={index}
             index={index}
-            className={(state) => `otp-slot${state.isActive ? " is-active" : ""}`}
+            className={(state) => `otp-slot${state.active ? " is-active" : ""}`}
           >
             {(state) => state.char ?? "·"}
           </OTPInputSlot>

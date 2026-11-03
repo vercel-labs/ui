@@ -25,10 +25,16 @@ function createInputController() {
   return createController<{
     /** The current value. */
     getValue: () => string
-    /** Sets the value as if the user typed it, so `input` fires. */
-    setValue: (value: string, options?: ChangeOptions<InputValueChangeReason>) => void
-    /** Empties the field, as if the user deleted the text, so `input` fires. */
-    clear: (options?: ChangeOptions<InputValueChangeReason>) => void
+    /**
+     * Sets the value as if the user typed it, so `input` fires.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: string, options?: ChangeOptions<InputValueChangeReason>) => boolean
+    /**
+     * Empties the field, as if the user deleted the text, so `input` fires.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: ChangeOptions<InputValueChangeReason>) => boolean
     /** Moves focus to the field. */
     focus: () => void
   }>()

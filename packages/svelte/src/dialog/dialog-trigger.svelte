@@ -25,7 +25,7 @@ The button that opens the dialog. A trigger outside the dialog, like one per tab
     controller,
     ...rest
   }: PartProps<"button", DialogTriggerState> &
-    DialogTriggerProps & {
+    Omit<DialogTriggerProps, "controller"> & {
       /** Connects a trigger outside the dialog to the dialog with this controller. */
       controller?: DialogController<any, any> | AlertDialogController<any, any>
     } = $props()

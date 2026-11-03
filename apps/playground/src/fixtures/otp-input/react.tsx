@@ -38,7 +38,7 @@ function Fixture() {
             if (cancel && value.includes(cancel)) return details.cancel()
             setAction(otpInputAction.change(value, details.reason))
           }}
-          onComplete={(value) => setAction(otpInputAction.complete(value))}
+          onValueCommit={(value) => setAction(otpInputAction.complete(value))}
         >
           {code.groups.map((size, group) => (
             <React.Fragment key={group}>

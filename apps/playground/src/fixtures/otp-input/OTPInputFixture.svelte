@@ -22,7 +22,7 @@
     action = otpInputAction.change(value, details.reason)
   }
 
-  function onComplete(value: string) {
+  function onValueCommit(value: string) {
     action = otpInputAction.complete(value)
   }
 
@@ -43,7 +43,7 @@
       {controller}
       {...options}
       {onValueChange}
-      {onComplete}
+      {onValueCommit}
     >
       {#each code.groups as size, group (group)}
         {#if group > 0}

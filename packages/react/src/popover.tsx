@@ -2,7 +2,6 @@ import {
   popover,
   type PopoverContentProps,
   type PopoverContentState,
-  type PopoverController,
   type PopoverOptions,
   type PopoverShortcutProps,
   type PopoverShortcutState,
@@ -71,10 +70,7 @@ function PopoverTrigger({
   controller,
   ...props
 }: Omit<PartProps<"button", PopoverTriggerState>, "value" | "defaultValue" | "onChange"> &
-  PopoverTriggerProps & {
-    /** Connects a trigger outside the popover, like one per table row, to the popover with this controller. */
-    controller?: PopoverController<any>
-  }) {
+  PopoverTriggerProps) {
   const { disabled, payload: _, shortcut, render, ...rest } = props
   // Until the popover it names mounts, a trigger outside the popover is a plain button.
   const unconnected = () =>

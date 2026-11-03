@@ -16,6 +16,7 @@ import type {
   DialogOpenChangeReason,
   DialogPayloadChangeReason,
   DialogSharedOptions,
+  DialogTriggerProps,
 } from "../dialog/dialog"
 import { initialApple } from "../../foundation/platform/platform"
 import { createPopupController, popupContentAttrs, type PopupController } from "../../foundation/popups/popup"
@@ -82,8 +83,11 @@ type DrawerController<Payload = unknown, Result = string> = PopupController<
 > & {
   /** The snap point it rests on, or null before it first opens. */
   getSnapPoint: () => SnapPoint | null
-  /** Moves it to a snap point. While closed, it opens there next. */
-  setSnapPoint: (snapPoint: SnapPoint, options?: ChangeOptions<DrawerSnapPointChangeReason>) => void
+  /**
+   * Moves it to a snap point. While closed, it opens there next.
+   * Returns false when the change was canceled or it was already there.
+   */
+  setSnapPoint: (snapPoint: SnapPoint, options?: ChangeOptions<DrawerSnapPointChangeReason>) => boolean
 }
 
 /**
@@ -188,7 +192,19 @@ type DrawerContentProps = DialogContentProps
  * The props the `outlet` slot of `drawer` takes.
  * @stable
  */
-type DrawerOutletProps = OutletProps
+type DrawerOutletProps = OutletProps & {
+  /** Connects an outlet outside the drawer, like the app's shell, to the drawer with this controller. */
+  controller?: DrawerController<any, any>
+}
+
+/**
+ * The props the `trigger` slot of `drawer` takes.
+ * @stable
+ */
+type DrawerTriggerProps = Omit<DialogTriggerProps, "controller"> & {
+  /** Connects a trigger outside the drawer, like one per table row, to the drawer with this controller. */
+  controller?: DrawerController<any, any>
+}
 
 /**
  * The state the `content` slot of `drawer` hands `render` functions and
@@ -544,6 +560,7 @@ export {
   type DrawerPayloadChangeReason,
   type DrawerPrimitive,
   type DrawerSnapPointChangeReason,
+  type DrawerTriggerProps,
 }
 export type { DrawerApi } from "./drawer-api"
 export { sheetPhysics, type SheetPhysics } from "../../foundation/motion/physics"

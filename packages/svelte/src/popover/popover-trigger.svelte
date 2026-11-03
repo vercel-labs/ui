@@ -6,7 +6,6 @@ The button that opens the popover. A trigger outside the popover connects throug
 <script lang="ts">
   import {
     popover as popoverPrimitive,
-    type PopoverController,
     type PopoverTriggerProps,
     type PopoverTriggerState,
   } from "@ui-sdk/core/popover"
@@ -24,10 +23,7 @@ The button that opens the popover. A trigger outside the popover connects throug
     controller,
     ...rest
   }: PartProps<"button", PopoverTriggerState> &
-    PopoverTriggerProps & {
-      /** Connects a trigger outside the popover to the popover with this controller. */
-      controller?: PopoverController<any>
-    } = $props()
+    PopoverTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<PopoverContext | undefined>(popoverPrimitive))
   const popover = $derived(connected())

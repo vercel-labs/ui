@@ -8,7 +8,7 @@ A stack of items that each open a section of content. One item is open at a time
   import {
     accordion as accordionPrimitive,
     type AccordionController,
-    type AccordionRootState,
+    type AccordionState,
     type AccordionValueChangeReason,
   } from "@ui-sdk/core/accordion"
   import Part from "../part.svelte"
@@ -29,7 +29,7 @@ A stack of items that each open a section of content. One item is open at a time
     debug,
     onValueChange,
     ...rest
-  }: PartProps<"div", AccordionRootState> & {
+  }: PartProps<"div", AccordionState> & {
     /** The open items' values. Bind it with `bind:value` to control the accordion. */
     value?: string[]
     /** The items open at first, when uncontrolled. */

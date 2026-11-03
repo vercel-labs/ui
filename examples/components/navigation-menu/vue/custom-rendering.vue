@@ -82,9 +82,9 @@ const sections = [
               </p>
               <ul>
                 <li v-for="(link, index) in section.links" :key="link.href">
-                  <NavigationMenuLink v-slot="{ state: linkState }" :href="link.href" :active="index === 0">
+                  <NavigationMenuLink v-slot="{ state: linkState }" :href="link.href" :current="index === 0">
                     <span>{{ link.title }}</span>
-                    <span v-if="linkState.active" data-slot="hint" data-show="active">You're here</span>
+                    <span v-if="linkState.current" data-slot="hint" data-show="current">You're here</span>
                   </NavigationMenuLink>
                 </li>
               </ul>

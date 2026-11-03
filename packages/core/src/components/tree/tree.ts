@@ -8,8 +8,9 @@ import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/prim
 import { live } from "../../foundation/kernel/live"
 import { selects } from "../../foundation/kernel/selects"
 import type { TreeCheckStrategy, TreeCheckedState } from "../../foundation/lists/tree-checked"
+import type { ListHighlightDetails } from "../../foundation/lists/listbox"
 import type { TreeItemData } from "../../foundation/lists/tree-collection"
-import { treeApi, type TreeApi } from "./tree-api"
+import { treeApi, type TreeApi, type TreeStore } from "./tree-api"
 import type { TreeGeneric } from "./tree-generic"
 
 /**
@@ -17,13 +18,13 @@ import type { TreeGeneric } from "./tree-generic"
  * Checkboxes are separate, with `checkable`.
  * @stable
  */
-type TreeSelectionMode = "none" | "single" | "multiple"
+type TreeMode = "none" | "single" | "multiple"
 
 /**
- * The selected value: one item's value or `null`, or a list with `selectionMode: "multiple"`.
+ * The selected value: one item's value or `null`, or a list with `mode: "multiple"`.
  * @stable
  */
-type TreeValue<Mode extends TreeSelectionMode = "single"> = Mode extends "multiple" ? string[] : string | null
+type TreeValue<Mode extends TreeMode = "single"> = Mode extends "multiple" ? string[] : string | null
 
 /**
  * Why branches expanded or collapsed: a branch's row was pressed, its
@@ -97,7 +98,7 @@ function createTreeController() {
     expandAll: (options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
     /** Collapses every branch. */
     collapseAll: (options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
-    /** The selected value: a value or `null`, or a list with `selectionMode: "multiple"`. */
+    /** The selected value: a value or `null`, or a list with `mode: "multiple"`. */
     getValue: () => string | string[] | null
     /** Selects these items. */
     setValue: (value: string | string[] | null, options?: TreeChangeOptions<TreeValueChangeReason>) => boolean
@@ -124,7 +125,7 @@ type TreeController = ReturnType<typeof createTreeController>
  * The options `tree` takes. A component takes them as props on its root.
  * @stable
  */
-type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
+type TreeOptions<Mode extends TreeMode = TreeMode> = {
   /** The items as data: each a `value`, a `label` and, for a branch, `children`. Renders them for you, and gives the tree its whole shape even where rows aren't rendered. */
   items?: TreeItemData[]
   /** Items from file paths, like `["src/index.ts", "README.md"]`: each folder becomes a branch, folders first. A path ending in `/` is an empty folder. */
@@ -133,8 +134,8 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
    * How many items can be selected.
    * @defaultValue "single"
    */
-  selectionMode?: Mode
-  /** The selected value. Pass it to control the selection. `null` selects nothing, and with `selectionMode: "multiple"` it's a list. */
+  mode?: Mode
+  /** The selected value. Pass it to control the selection. `null` selects nothing, and with `mode: "multiple"` it's a list. */
   value?: TreeValue<Mode>
   /** The value selected at first, when uncontrolled. */
   defaultValue?: TreeValue<Mode>
@@ -179,7 +180,13 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
    */
   checkStrategy?: TreeCheckStrategy
   /** Runs when an item is pressed or Enter is pressed on it, apart from selecting it, like opening a file. Return a Promise to mark the item pending until it settles. */
-  onAction?: (value: string, details: TreeActionDetails) => void | Promise<unknown>
+  onAction?: (value: string, details: TreeActionDetails) => unknown
+  /**
+   * What screen readers hear once an item's action has been pending for a second, so a slow action
+   * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
   /**
    * Loads a branch's children the first time it expands while it has none.
    * The branch shows `data-loading` and expands once the Promise resolves; a
@@ -194,7 +201,7 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
    * items that show, from 0. A virtualized list scrolls that row into view
    * here, so an item it hasn't rendered can take focus once it does.
    */
-  onItemFocus?: (value: string, details: { index: number }) => void
+  onHighlight?: (value: string, details: ListHighlightDetails) => void
   /**
    * Disables every item. Items stay focusable unless `focusableWhenDisabled` is false.
    * @defaultValue false
@@ -271,9 +278,9 @@ type TreeGroupProps = Omit<GroupProps, "value">
  * What the root's `render` functions and state-based class names receive.
  * @stable
  */
-type TreeRootState = {
+type TreeState = {
   /** How many items can be selected. */
-  selectionMode: TreeSelectionMode
+  mode: TreeMode
   /** Whether items have checkboxes. */
   checkable: boolean
   /** Whether the whole tree is disabled, by its `disabled` option or a disabled fieldset around it. */
@@ -318,50 +325,10 @@ type TreeGroupState = {
   level: number
 }
 
-/**
- * The state `tree` keeps. Parts read it; render functions get each part's own state instead.
- * @stable
- */
-type TreeState = {
-  // The selected value in its public shape, and the same as keys for the selection rules.
-  value: string | string[] | null
-  selected: string[]
-  expanded: string[]
-  // The checked value as reported, and every item's checkbox that isn't unchecked.
-  checked: string[]
-  checks: Record<string, true | "indeterminate">
-  selectionMode: TreeSelectionMode
-  checkable: boolean
-  checkStrategy: TreeCheckStrategy
-  activation: "automatic" | "manual"
-  expandOnPress: boolean
-  disabled: boolean
-  // Disabled by a fieldset around it.
-  formDisabled: boolean
-  focusableWhenDisabled: boolean
-  keepMounted: boolean
-  hiddenUntilFound: boolean
-  current: string | null
-  items: TreeItemData[] | undefined
-  paths: readonly string[] | undefined
-  // The item with the tab stop, null until items bind.
-  active: string | null
-  // Collapsed branches whose group is still animating out.
-  exiting: string[]
-  // Branches loading their children, and the ones whose last load failed.
-  loading: string[]
-  failed: string[]
-  // Items whose `onAction` Promise hasn't settled.
-  pending: string[]
-  // Bumped after items join, leave or move: everywhere, and per parent, by its value or "" at the top.
-  version: number
-  siblings: Record<string, number>
-}
-
 type ItemProps = TreeItemProps
 
 // Every part of an item shares its state.
-function itemState(state: TreeState, key: string, props: ItemProps | undefined, api: TreeApi): TreeItemState {
+function itemState(state: TreeStore, key: string, props: ItemProps | undefined, api: TreeApi): TreeItemState {
   const branch = api.internal.isBranch(key, props)
   return {
     expanded: branch && state.expanded.includes(key),
@@ -432,8 +399,8 @@ const partReads = {
   siblings: [],
 }
 
-const keepsMounted = (state: TreeState, props: GroupProps) => props.keepMounted ?? state.keepMounted
-const findable = (state: TreeState, props: GroupProps) => props.hiddenUntilFound ?? state.hiddenUntilFound
+const keepsMounted = (state: TreeStore, props: GroupProps) => props.keepMounted ?? state.keepMounted
+const findable = (state: TreeStore, props: GroupProps) => props.hiddenUntilFound ?? state.hiddenUntilFound
 
 const treePrimitive = /* @__PURE__ */ definePrimitive({
   name: "tree",
@@ -441,7 +408,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   options: {
     items: "value",
     paths: "value",
-    selectionMode: "string",
+    mode: "string",
     value: "string",
     defaultValue: "string",
     onValueChange: "callback",
@@ -456,9 +423,10 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
     onCheckedChange: "callback",
     checkStrategy: "string",
     onAction: "action",
+    pendingAnnouncement: "string",
     loadChildren: "value",
     current: "string",
-    onItemFocus: "callback",
+    onHighlight: "callback",
     disabled: "boolean",
     focusableWhenDisabled: "boolean",
     keepMounted: "boolean",
@@ -467,13 +435,13 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
     controller: "value",
   },
   controlled: ["value", "expanded", "checked"],
-  state: (options: TreeOptions): TreeState => ({
-    value: options.defaultValue ?? (options.selectionMode === "multiple" ? [] : null),
+  state: (options: TreeOptions): TreeStore => ({
+    value: options.defaultValue ?? (options.mode === "multiple" ? [] : null),
     selected: [],
     expanded: options.defaultExpanded ?? [],
     checked: options.defaultChecked ?? [],
     checks: {},
-    selectionMode: "single",
+    mode: "single",
     checkable: false,
     checkStrategy: "leaf",
     activation: "manual",
@@ -496,7 +464,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   }),
   live: ["version", "siblings"],
   sync: (options) => ({
-    selectionMode: options.selectionMode ?? "single",
+    mode: options.mode ?? "single",
     checkable: options.checkable ?? false,
     checkStrategy: options.checkStrategy ?? "leaf",
     activation: options.activation ?? "manual",
@@ -514,15 +482,15 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
   }),
   api: treeApi,
   slots: (slot) => ({
-    root: slot<{}, TreeRootState>({
+    root: slot<{}, TreeState>({
       state: (state) => ({
-        selectionMode: state.selectionMode,
+        mode: state.mode,
         checkable: state.checkable,
         disabled: isDisabled(state),
       }),
       attrs: (state) => ({
         role: "tree",
-        "aria-multiselectable": state.selectionMode === "multiple" ? "true" : undefined,
+        "aria-multiselectable": state.mode === "multiple" ? "true" : undefined,
         "aria-disabled": isDisabled(state) ? "true" : undefined,
         "data-disabled": flag(isDisabled(state)),
       }),
@@ -560,7 +528,7 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
           "aria-posinset": position && String(position.index),
           "aria-setsize": position && String(position.size),
           "aria-expanded": item.branch ? String(item.expanded) : undefined,
-          "aria-selected": state.selectionMode === "none" ? undefined : String(item.selected),
+          "aria-selected": state.mode === "none" ? undefined : String(item.selected),
           "aria-checked": state.checkable
             ? item.checked === "indeterminate"
               ? "mixed"
@@ -697,9 +665,8 @@ export {
   type TreeItemState,
   type TreeOptions,
   type TreePrimitive,
-  type TreeRootState,
-  type TreeSelectionMode,
   type TreeState,
+  type TreeMode,
   type TreeValue,
   type TreeValueChangeReason,
 }
@@ -717,4 +684,5 @@ export {
   treeFromPaths,
   visibleTreeRows,
 } from "../../foundation/lists/tree-collection"
+export type { ListHighlightDetails } from "../../foundation/lists/listbox"
 export type { TreeApi } from "./tree-api"

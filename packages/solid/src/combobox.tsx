@@ -197,6 +197,7 @@ function ComboboxContent(props: PartProps<"div", ComboboxContentState> & Combobo
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     keepMounted: props.keepMounted,
   })
@@ -208,6 +209,7 @@ function ComboboxContent(props: PartProps<"div", ComboboxContentState> & Combobo
       "sideOffset",
       "alignOffset",
       "collisionPadding",
+      "arrowPadding",
       "anchor",
       "keepMounted",
       "container",
@@ -394,7 +396,7 @@ const ComboboxStatus = parts.Status
 const ComboboxClear = parts.Clear
 
 /**
- * The selected value, as a function of its state, like one chip per value. Without children, the labels joined with commas, or "France, Chile and 2 more" with `max`. Renders no element of its own.
+ * The selected value, as a function of its state, like one chip per value. Without children, the labels joined with commas, or "France, Chile and 2 more" with `maxLabels`. Renders no element of its own.
  * @stable
  */
 function ComboboxValue(
@@ -402,7 +404,7 @@ function ComboboxValue(
     children?: JSX.Element | ((state: ComboboxValueState) => JSX.Element)
   },
 ) {
-  const part = () => ({ max: props.max, moreLabel: props.moreLabel })
+  const part = () => ({ maxLabels: props.maxLabels, getMoreLabel: props.getMoreLabel })
   // Its `render` leaves the props it's handed out, so it renders only its content.
   const render = (_: unknown, state: ComboboxValueState) => {
     const children = props.children

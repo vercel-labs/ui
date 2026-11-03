@@ -148,7 +148,7 @@ function VariantMenu({ variant, env }: { variant: Variant; env: Env }) {
           <NavigationMenuLink
             className={classes.topLink}
             href={href(variant, "pricing")}
-            active={variant.activeLink !== false}
+            current={variant.activeLink !== false}
           >
             Pricing
           </NavigationMenuLink>

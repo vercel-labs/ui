@@ -184,7 +184,8 @@ const meaning: Record<string, string> = {
   "--toast-index": "The toast's place in the stack, 0 for the newest. A closing toast keeps its place.",
   "--toast-offset":
     "The height of the toasts in front of this one, in pixels. Add gaps with `--toast-index` to place an expanded stack.",
-  "--toast-height": "The toast's own height, measured while it's in front or the stack is expanded.",
+  "--toast-height":
+    "The toast's own height with its content laid out freely, whatever height it's given. Set it as the height to animate the stack.",
   "--toast-front-height": "The newest toast's height. Clip the toasts behind it to it in a collapsed stack.",
   "--toast-stack-height": "The toasts' heights added up, for the height of an expanded stack.",
   "--toast-count": "How many toasts show.",

@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
         <ui-select-label>Fruits</ui-select-label>
         <ui-select-trigger>
           <button>
-            <ui-select-value max="2"></ui-select-value>
+            <ui-select-value max-labels="2"></ui-select-value>
             ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-select-trigger>

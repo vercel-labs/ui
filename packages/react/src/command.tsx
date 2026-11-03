@@ -8,7 +8,7 @@ import {
   type CommandListState,
   type CommandOptions,
   type CommandPageProps,
-  type CommandRootState,
+  type CommandState,
   type CommandShortcutProps,
   type CommandShortcutState,
 } from "@ui-sdk/core/command"
@@ -42,7 +42,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Command`.
  * @stable
  */
-type CommandProps = CommandOptions & Omit<PartProps<"div", CommandRootState>, Clashing>
+type CommandProps = CommandOptions & Omit<PartProps<"div", CommandState>, Clashing>
 
 /**
  * A search field over an always-open list of commands. Renders a `div` around them.
@@ -59,6 +59,7 @@ function Command({
   defaultPages,
   onPagesChange,
   onAction,
+  pendingAnnouncement,
   items,
   emptyItems,
   filter,
@@ -83,6 +84,7 @@ function Command({
     defaultPages,
     onPagesChange,
     onAction,
+    pendingAnnouncement,
     items,
     emptyItems,
     filter,
@@ -100,7 +102,7 @@ function Command({
   const found = typeof children !== "function" && hasChild(children, CommandList)
   const [placed, place] = usePlacedContent(typeof children !== "function" && !!items && !found)
   const own = placed || found
-  const content = (state: CommandRootState) =>
+  const content = (state: CommandState) =>
     typeof children === "function" ? (
       <Placed value={place}>{children(state)}</Placed>
     ) : (
@@ -321,7 +323,7 @@ export type {
   CommandPagesChangeReason,
   CommandPrimitive,
   CommandQueryChangeReason,
-  CommandRootState,
+  CommandState,
   CommandShortcutProps,
   CommandShortcutState,
   CommandStatusState,

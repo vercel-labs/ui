@@ -96,7 +96,11 @@ function VariantSelect({ variant, env }: { variant: Variant; env: Env }) {
         <SelectLabel className={classes.label}>{variant.title}</SelectLabel>
         <SelectTrigger className={classes.trigger} disabled={variant.triggerDisabled}>
           {/* SelectValue's own placeholder, unless the variant shows the select's. */}
-          <SelectValue className={classes.value} placeholder={valuePlaceholder(variant)} max={variant.max} />
+          <SelectValue
+            className={classes.value}
+            placeholder={valuePlaceholder(variant)}
+            maxLabels={variant.max}
+          />
           <span className={classes.chevron} aria-hidden="true">
             ▾
           </span>

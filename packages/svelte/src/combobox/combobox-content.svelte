@@ -25,6 +25,7 @@ The popup that holds the list, positioned against the input.
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     keepMounted,
     container,
@@ -55,7 +56,7 @@ The popup that holds the list, positioned against the input.
   const content = useHandlePart(
     combobox,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }),
+    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, keepMounted }),
     portalTo(() => (viewport.present ? false : target())),
   )
 </script>

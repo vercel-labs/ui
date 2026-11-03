@@ -194,7 +194,7 @@ type ResizableHandleState = {
   /** Whether the handle is being dragged. */
   dragging: boolean
   /** Whether the pointer is over the handle or within its hit area. */
-  hovered: boolean
+  hovering: boolean
 }
 
 const orientationAttrs = (state: State) => ({ "data-orientation": state.orientation })
@@ -242,12 +242,12 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
     ids: [],
     constraints: [],
     handles: {},
-    hovered: null,
+    hovering: null,
     dragging: null,
     sizes: {},
     handleValues: {},
   }),
-  live: ["layout", "controlledLayout", "ids", "constraints", "handles", "hovered", "sizes", "handleValues"],
+  live: ["layout", "controlledLayout", "ids", "constraints", "handles", "hovering", "sizes", "handleValues"],
   sync: (options) => ({ ...settings(options), controlledLayout: options.layout }),
   controlled: ["layout"],
   commits: ["layout"],
@@ -290,7 +290,7 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
         controlledLayout: [],
         sizes: ({ key }) => [key],
         handleValues: [],
-        hovered: [],
+        hovering: [],
         dragging: [],
       }),
       state: (state, { key, props }) => {
@@ -337,14 +337,14 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
         controlledLayout: [],
         sizes: [],
         handleValues: ({ key }) => [key],
-        hovered: ({ key }) => [key],
+        hovering: ({ key }) => [key],
         dragging: ({ key }) => [key],
       }),
       state: (state, { key, props }) => ({
         orientation: state.orientation,
         disabled: isDisabled(state) || !!props.disabled,
         dragging: state.dragging === key,
-        hovered: state.hovered === key,
+        hovering: state.hovering === key,
       }),
       attrs: (state, { key, props }) => {
         const disabled = isDisabled(state) || !!props.disabled
@@ -366,7 +366,7 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
           "aria-valuenow": value ? String(Math.round(value.now)) : undefined,
           "aria-valuemin": value ? String(Math.round(value.min)) : undefined,
           "aria-valuemax": value ? String(Math.round(value.max)) : undefined,
-          "data-hovered": state.hovered === key ? "" : undefined,
+          "data-hovering": state.hovering === key ? "" : undefined,
         }
       }),
       on: {

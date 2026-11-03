@@ -12,7 +12,7 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Menu items={casesData({ align, journal })} shortcuts={shortcuts} onAction={setAction}>
+      <Menu items={casesData({ align, journal })} itemShortcuts={shortcuts} onAction={setAction}>
         <MenuTrigger>Edit</MenuTrigger>
       </Menu>
       <button onClick={() => setAlign("right")}>Align right</button>

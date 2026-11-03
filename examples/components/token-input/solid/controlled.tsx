@@ -37,7 +37,7 @@ export function Example() {
           )
         }}
         history={{ limit: 50, groupDelay: 1000 }}
-        describeToken={(token) => (token.type === "file" ? "attached file" : token.type)}
+        getTokenDescription={(token) => (token.type === "file" ? "attached file" : token.type)}
       >
         <TokenInputEditor aria-label="Prompt" />
         <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>

@@ -82,7 +82,7 @@ const sections = [
         </NavigationMenuContent>
       </NavigationMenuItem>
       <NavigationMenuItem>
-        <NavigationMenuLink href="https://example.com/docs" active>Docs</NavigationMenuLink>
+        <NavigationMenuLink href="https://example.com/docs" current>Docs</NavigationMenuLink>
       </NavigationMenuItem>
     </NavigationMenuList>
     <NavigationMenuIndicator />

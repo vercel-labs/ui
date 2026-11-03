@@ -74,7 +74,7 @@ function Example() {
                     <li>
                       <NavigationMenuLink
                         render={(props) => <Link {...props} href={page.href} onNavigate={setRoute} />}
-                        active={route() === page.href}
+                        current={route() === page.href}
                       >
                         <span>{page.title}</span>
                         <span data-slot="hint">{page.description}</span>
@@ -88,7 +88,7 @@ function Example() {
           <NavigationMenuItem>
             <NavigationMenuLink
               render={(props) => <Link {...props} href="#components" onNavigate={setRoute} />}
-              active={route() === "#components"}
+              current={route() === "#components"}
             >
               Components
             </NavigationMenuLink>

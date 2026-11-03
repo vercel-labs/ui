@@ -112,6 +112,7 @@ function TriggerMenuContent(props: PartProps<"div", TriggerMenuContentState> & T
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     keepMounted: props.keepMounted,
   })
@@ -122,6 +123,7 @@ function TriggerMenuContent(props: PartProps<"div", TriggerMenuContentState> & T
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
     "anchor",
     "keepMounted",
     "container",

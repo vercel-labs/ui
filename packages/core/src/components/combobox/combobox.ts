@@ -6,7 +6,7 @@
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import {
   filterAttribute,
@@ -113,8 +113,11 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
   return createController<{
     /** Whether the list is open. */
     isOpen: () => boolean
-    /** Opens or closes the list. */
-    setOpen: (open: boolean, options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => void
+    /**
+     * Opens or closes the list.
+     * Returns false when the change was canceled or it was already open or closed.
+     */
+    setOpen: (open: boolean, options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
     /**
      * Opens the list, and resolves once it closes, with why and how. Resolves exactly once and never
      * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
@@ -126,23 +129,35 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
         signal?: AbortSignal
       },
     ) => Promise<PopupResult<ComboboxOpenChangeReason, never>>
-    /** Closes the list. */
-    close: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => void
-    /** Opens the list when it's closed, and closes it when it's open. */
-    toggle: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => void
+    /** Closes the list. Returns false when the close was canceled or it was already closed. */
+    close: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
+    /**
+     * Opens the list when it's closed, and closes it when it's open.
+     * Returns false when the change was canceled.
+     */
+    toggle: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
     /** The selected value. */
     getValue: () => ComboboxValue<T, Multiple>
-    /** Selects a value, as a user would. A disabled or read-only combobox ignores it. */
+    /**
+     * Selects a value, as a user would. A disabled or read-only combobox ignores it.
+     * Returns false when the change was canceled or nothing changed.
+     */
     setValue: (
       value: ComboboxValue<T, Multiple>,
       options?: ComboboxChangeOptions<ComboboxValueChangeReason>,
-    ) => void
-    /** Selects nothing and empties the input. */
-    clear: (options?: ComboboxChangeOptions<ComboboxValueChangeReason>) => void
+    ) => boolean
+    /**
+     * Selects nothing and empties the input.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    clear: (options?: ComboboxChangeOptions<ComboboxValueChangeReason>) => boolean
     /** The input's text. */
     getQuery: () => string
-    /** Changes the input's text, which filters the list. */
-    setQuery: (query: string, options?: ComboboxChangeOptions<ComboboxQueryChangeReason>) => void
+    /**
+     * Changes the input's text, which filters the list.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setQuery: (query: string, options?: ComboboxChangeOptions<ComboboxQueryChangeReason>) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()
@@ -269,6 +284,12 @@ type ComboboxSharedOptions<T> = PortalProps & {
    */
   keepQuery?: boolean
   /**
+   * What screen readers hear once the Create part's `onCreate` has been pending for a second, so a
+   * slow action doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
+  /**
    * Whether text that matches no item becomes the value, when Enter is pressed with nothing highlighted, or, without `multiple`, when the list closes. The value is the text itself.
    * @defaultValue false
    */
@@ -343,8 +364,6 @@ type ComboboxContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the list against this instead of the input, or the chips around it. */
-    anchor?: Anchor | string | null
     /**
      * Whether the list stays in the page, hidden, while closed.
      * @defaultValue false
@@ -375,7 +394,7 @@ type ComboboxItemProps<T = string> = {
  */
 type ComboboxCreateProps = {
   /** Runs with the input's text when the create option is chosen. It doesn't change the value by itself. Return a Promise to mark the option pending until it settles; the list closes (or the input empties, with `multiple`) once it resolves. */
-  onCreate?: (query: string) => void | Promise<unknown>
+  onCreate?: (query: string) => unknown
   /**
    * How many characters the text needs before the option shows.
    * @defaultValue 1
@@ -410,12 +429,12 @@ type ComboboxClearProps = {
  */
 type ComboboxValueProps = {
   /** With `multiple`, how many labels the `label` in its state shows before the rest are counted, as in "France, Chile and 2 more", joined the way the page's language joins lists. */
-  max?: number
+  maxLabels?: number
   /**
-   * The words for the labels past `max`.
+   * The words for the labels past `maxLabels`.
    * @defaultValue (count) => `${count} more`
    */
-  moreLabel?: (count: number) => string
+  getMoreLabel?: (count: number) => string
 }
 
 /**
@@ -588,7 +607,7 @@ type ComboboxValueState = {
   value: unknown
   /** Each selected item's label, in the order they were selected. */
   labels: string[]
-  /** The labels joined with commas, or with `max`, as a list in the page's language, like "France, Chile and 2 more". An empty string for none. */
+  /** The labels joined with commas, or with `maxLabels`, as a list in the page's language, like "France, Chile and 2 more". An empty string for none. */
   label: string
 }
 /**
@@ -617,6 +636,7 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
     onOpenChangeComplete: "callback",
     multiple: "boolean",
     maxSelected: "number",
+    pendingAnnouncement: "string",
     items: "value",
     emptyItems: "value",
     filter: filterAttribute(["contains", "startsWith"], "contains"),

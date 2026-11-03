@@ -23,10 +23,13 @@ function createOTPInputController() {
   return createController<{
     /** The code. */
     getValue: () => string
-    /** Sets the code, as typing it would. Characters that don't fit the pattern are dropped. */
-    setValue: (value: string, options?: OTPInputChangeOptions) => void
-    /** Empties the code. */
-    clear: (options?: OTPInputChangeOptions) => void
+    /**
+     * Sets the code, as typing it would. Characters that don't fit the pattern are dropped.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: string, options?: OTPInputChangeOptions) => boolean
+    /** Empties the code. Returns false when the change was canceled or nothing changed. */
+    clear: (options?: OTPInputChangeOptions) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()
@@ -169,7 +172,7 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
     value: "string",
     defaultValue: "string",
     onValueChange: "callback",
-    onComplete: "callback",
+    onValueCommit: "callback",
     maxLength: "number",
     pattern: readPattern,
     inputMode: "string",
@@ -252,7 +255,7 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { props }) => {
         const index = props.index ?? 0
         return {
-          ...(slotsFor(state)[index] ?? { char: null, isActive: false, hasFakeCaret: false }),
+          ...(slotsFor(state)[index] ?? { char: null, active: false, hasFakeCaret: false }),
           index,
           focused: state.focused,
           disabled: isDisabled(state),
@@ -262,7 +265,7 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
         const data = slotsFor(state)[props.index ?? 0]
         return {
           "aria-hidden": "true",
-          "data-active": data?.isActive ? "" : undefined,
+          "data-active": data?.active ? "" : undefined,
           "data-filled": data?.char ? "" : undefined,
           "data-fake-caret": data?.hasFakeCaret ? "" : undefined,
           "data-disabled": isDisabled(state) ? "" : undefined,

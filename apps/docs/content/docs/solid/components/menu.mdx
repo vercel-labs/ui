@@ -31,6 +31,8 @@ Menu
 
 Give items a `value` and handle `onAction` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
+Return a promise from `onAction` or an item’s `onSelect` to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pendingAnnouncement`, “Loading” by default.
+
 ## Examples
 
 ### Submenus
@@ -236,7 +238,7 @@ Connect external triggers and one menu to a `createMenuController<File>()`. Each
 
 ### Menus as Data
 
-`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `shortcuts` false to disable that.
+`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `itemShortcuts` to false to turn that off.
 
 `onCheckedChange` reports the checkbox’s value in `details.value`; `onValueChange` reports the radio group’s name in `details.group`. Either change can be canceled. This example renders its own styled parts from the same data while `items` keeps the shortcuts registered. The [lists and menus guide](../lists-and-menus) covers the data shape.
 

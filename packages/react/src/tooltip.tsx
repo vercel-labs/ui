@@ -2,7 +2,6 @@ import {
   tooltip,
   type TooltipContentProps,
   type TooltipContentState,
-  type TooltipController,
   type TooltipOptions,
   type TooltipShortcutProps,
   type TooltipShortcutState,
@@ -65,13 +64,7 @@ type TriggerPartProps = Omit<
  * The element the tooltip names or describes, usually a button.
  * @stable
  */
-function TooltipTrigger({
-  controller,
-  ...props
-}: TriggerPartProps & {
-  /** Connects a trigger outside the tooltip, like one per table row, to the tooltip with this controller. */
-  controller?: TooltipController<any>
-}) {
+function TooltipTrigger({ controller, ...props }: TriggerPartProps) {
   const { payload: _, render, ...rest } = props
   // Until the tooltip it names mounts, a trigger outside the tooltip is a plain button.
   const unconnected = () => renderElement("button", { type: "button", ...rest }, render, { open: false })

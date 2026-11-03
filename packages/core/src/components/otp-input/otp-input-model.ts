@@ -19,7 +19,7 @@ type OTPInputSlotData = {
   /** The character in the slot, or null when it's empty. */
   char: string | null
   /** Whether the slot is where typing goes: the selected character, or the empty slot after the last one. */
-  isActive: boolean
+  active: boolean
   /** Whether the slot should draw a caret: it's active and empty. The real caret is hidden. */
   hasFakeCaret: boolean
 }
@@ -161,12 +161,12 @@ function slotsOf(value: string, maxLength: number, selection: Selection | null) 
   const slots: OTPInputSlotData[] = []
   for (let index = 0; index < maxLength; index++) {
     const char = value[index] ?? null
-    const isActive =
+    const active =
       !!selection &&
       (selection.start === selection.end
         ? index === selection.start
         : index >= selection.start && index < selection.end)
-    slots.push({ char, isActive, hasFakeCaret: isActive && char === null })
+    slots.push({ char, active, hasFakeCaret: active && char === null })
   }
   return slots
 }

@@ -156,7 +156,7 @@ Focus a handle and press the arrow keys along the group's axis to move it by `st
 
 Every part takes a `render` snippet, which receives the props to spread and the
 part's state, like a panel's `size` and whether it's `collapsed`, or whether a handle is `dragging` or
-`hovered`, and the `children` snippet receives the state.
+`hovering`, and the `children` snippet receives the state.
 
 <ComponentExample
   name="resizable/render"
@@ -170,7 +170,7 @@ The primitive writes drag sizes directly to panel styles. Reading `size` or `lay
 Parts are unstyled, apart from the layout they need: the group is a flex row or column, panels take their size as a flex basis, and handles don't shrink and take `touch-action: none`. While a handle is hovered or dragged, its cursor shows over the whole page, and points the only way it can go at a limit.
 
 ```svelte
-<ResizableHandle class="relative flex w-px items-center justify-center bg-neutral-200 outline-none focus-visible:ring-3 focus-visible:ring-neutral-400/50 data-hovered:bg-neutral-400 data-dragging:bg-neutral-400 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full" />
+<ResizableHandle class="relative flex w-px items-center justify-center bg-neutral-200 outline-none focus-visible:ring-3 focus-visible:ring-neutral-400/50 data-hovering:bg-neutral-400 data-dragging:bg-neutral-400 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full" />
 ```
 
 ### ResizablePanel [#styling-resizablepanel]

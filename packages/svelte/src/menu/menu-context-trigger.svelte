@@ -9,7 +9,6 @@ press, and on Shift+F10.
     menu as menuPrimitive,
     type MenuContextTriggerProps,
     type MenuContextTriggerState,
-    type MenuController,
   } from "@ui-sdk/core/menu"
   import { menuContextTrigger } from "@ui-sdk/core/renderer"
   import { getContext } from "svelte"
@@ -25,10 +24,7 @@ press, and on Shift+F10.
     controller,
     ...rest
   }: PartProps<"div", MenuContextTriggerState> &
-    MenuContextTriggerProps & {
-      /** Connects an area outside the menu to the menu with this controller. */
-      controller?: MenuController<any>
-    } = $props()
+    MenuContextTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<MenuContext | undefined>(menuPrimitive))
   const menu = $derived(connected())

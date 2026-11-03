@@ -6,7 +6,6 @@ The button that opens the menu. A trigger outside the menu connects through `con
 <script lang="ts">
   import {
     menu as menuPrimitive,
-    type MenuController,
     type MenuTriggerProps,
     type MenuTriggerState,
   } from "@ui-sdk/core/menu"
@@ -24,10 +23,7 @@ The button that opens the menu. A trigger outside the menu connects through `con
     controller,
     ...rest
   }: PartProps<"button", MenuTriggerState> &
-    MenuTriggerProps & {
-      /** Connects a trigger outside the menu, like one per table row, to the menu with this controller. */
-      controller?: MenuController<any>
-    } = $props()
+    MenuTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<MenuContext | undefined>(menuPrimitive))
   const menu = $derived(connected())

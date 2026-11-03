@@ -8,7 +8,7 @@
   <OTPInput
     aria-label="Verification code"
     onValueChange={() => (status = '')}
-    onComplete={(value, details) => (status = `Checking ${value}, from ${details.reason}.`)}
+    onValueCommit={(value, details) => (status = `Checking ${value}, from ${details.reason}.`)}
   >
     <OTPInputGroup>
       {#each { length: 6 } as _, index}

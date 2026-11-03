@@ -42,7 +42,7 @@
   <TokenInput
     bind:value
     history={{ limit: 50, groupDelay: 1000 }}
-    describeToken={(token: Token) => (token.type === "file" ? "attached file" : token.type)}
+    getTokenDescription={(token: Token) => (token.type === "file" ? "attached file" : token.type)}
     onValueChange={onChange}
   >
     <TokenInputEditor aria-label="Prompt" />

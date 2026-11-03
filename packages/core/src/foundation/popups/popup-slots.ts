@@ -9,7 +9,7 @@ import { openAttrs } from "../kernel/attrs"
 import { onProps } from "../kernel/part"
 import type { Part, SlotFactory } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
-import type { Anchor, PortalProps, PositionProps } from "../platform/position"
+import type { PortalProps, PositionProps } from "../platform/position"
 import { popupContentAttrs, type Modal, type PopupFocusTarget } from "./popup"
 import { ownsEvent, registerPopupElement } from "./popup-elements"
 import type { createPopup, PopupState } from "./create-popup"
@@ -54,13 +54,6 @@ type PopupContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /**
-     * Space to keep between the arrow and the popup's corners, in pixels.
-     * @defaultValue 6
-     */
-    arrowPadding?: number
-    /** Positions the popup against this instead of the trigger: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. */
-    anchor?: Anchor | string | null
     /**
      * Where focus goes when the popup opens. `"auto"` picks the first focusable element, or the
      * popup itself when it has none, `"content"` focuses the popup and `"none"` leaves focus where

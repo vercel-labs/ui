@@ -20,7 +20,7 @@
   const start = $derived(Math.max(0, Math.floor(scrollTop / row) - 4))
   const end = $derived(Math.min(rows.length, Math.ceil((scrollTop + height) / row) + 4))
 
-  function onItemFocus(_value: string, { index }: { index: number }) {
+  function onHighlight(_value: string, { index }: { index: number }) {
     const el = scroller
     if (!el) return
     const top = index * row
@@ -35,7 +35,7 @@
   style="height: {height}px"
   onscroll={(event) => (scrollTop = event.currentTarget.scrollTop)}
 >
-  <Tree aria-label="Archive" {items} bind:expanded {onItemFocus} style="height: {rows.length * row}px">
+  <Tree aria-label="Archive" {items} bind:expanded {onHighlight} style="height: {rows.length * row}px">
     {#each rows.slice(start, end) as { item, level, index } (item.value)}
       <TreeItem
         value={item.value}

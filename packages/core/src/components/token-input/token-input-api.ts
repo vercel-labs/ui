@@ -149,7 +149,7 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
   let messages: string[] = []
 
   const codec = () => options().codec ?? defaultCodec
-  const describe = (token: Token) => options().describeToken?.(token) ?? defaultDescription(token)
+  const describe = (token: Token) => options().getTokenDescription?.(token) ?? defaultDescription(token)
   const editable = () => {
     const state = store.get()
     return !isDisabled(state) && !state.readOnly
@@ -259,9 +259,10 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     const following = offsetText(value)[range.end]
     if (token && (following === undefined || !/\s/.test(following))) inserted.push(" ")
     const end = range.start + valueLength(inserted)
-    if (!commit(replaceRange(value, range, inserted), { reason, event, selection: caretAt(end) })) return
+    if (!commit(replaceRange(value, range, inserted), { reason, event, selection: caretAt(end) }))
+      return false
     if (token) say(`Inserted ${describe(token)} ${token.label}`)
-    if (!token || !pending) return
+    if (!token || !pending) return true
     pending.then(
       (patch) => updateToken(token.id!, { ...(patch ?? {}), status: patch?.status }),
       () => {
@@ -269,6 +270,7 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
         removeToken(token.id!, { reason: "imperative", record: false })
       },
     )
+    return true
   }
 
   // Rewrites one token everywhere, history included, without an undo step or a caret move.
@@ -280,9 +282,10 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     // History first: a token removed while it loads comes back settled on undo.
     history.map((entry) => ({ ...entry, value: update(entry.value) }))
     const before = tokensOf(committed).find((token) => token.id === tokenId)
-    if (!before) return
-    commit(update(committed), { reason: "imperative", record: false })
+    if (!before) return false
+    const changed = commit(update(committed), { reason: "imperative", record: false })
     if (before.status === "pending" && !patch.status) say(`${patch.label ?? before.label} ready`)
+    return changed
   }
 
   function removeToken(
@@ -296,26 +299,30 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     const remove = (value: TokenInputValue) =>
       value.filter((segment) => !(isToken(segment) && segment.id === tokenId))
     if (!record) history.map((entry) => ({ ...entry, value: remove(entry.value) }))
-    commit(remove(committed), { reason, event, record })
+    return commit(remove(committed), { reason, event, record })
   }
 
   function undo(event?: Event) {
     const entry = history.undo()
-    if (entry)
+    return (
+      !!entry &&
       commit(entry.value, { reason: "undo", event, selection: entry.selection ?? undefined, record: false })
+    )
   }
 
   function redo(event?: Event) {
     const entry = history.redo()
-    if (entry)
+    return (
+      !!entry &&
       commit(entry.value, { reason: "redo", event, selection: entry.selection ?? undefined, record: false })
+    )
   }
 
   // The submit shortcut: `onSubmit`, else its form, which `form` can name
   // from outside it, like a native control's.
-  function submit() {
+  function submit(event?: Event) {
     const onSubmit = options().onSubmit
-    if (onSubmit) return onSubmit(store.get().value)
+    if (onSubmit) return onSubmit(store.get().value, { event })
     ownerForm(element("editor"), store.get().form)?.requestSubmit()
   }
 
@@ -346,9 +353,8 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     id,
     editor,
     getValue: () => store.get().value,
-    setValue(value: TokenInputValue, { reason = "imperative", event }: TokenInputChangeOptions = {}) {
-      commit(value, { reason, event, selection: caretAt(valueLength(normalizeValue(value))) })
-    },
+    setValue: (value: TokenInputValue, { reason = "imperative", event }: TokenInputChangeOptions = {}) =>
+      commit(value, { reason, event, selection: caretAt(valueLength(normalizeValue(value))) }),
     getText: (custom?: Parameters<typeof toText>[1]) => toText(store.get().value, custom ?? codec()),
     getLabel: () => toLabel(store.get().value),
     insert(
@@ -365,7 +371,7 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     ) {
       const length = valueLength(committed)
       const range = typeof at === "object" ? at : at === "end" || !selection ? caretAt(length) : selection
-      insertAt(range, content, { reason, event, pending: resolve })
+      return insertAt(range, content, { reason, event, pending: resolve })
     },
     updateToken,
     removeToken: (tokenId: string, { reason, event }: TokenInputChangeOptions = {}) =>

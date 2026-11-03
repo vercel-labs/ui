@@ -263,6 +263,7 @@ const DatePickerContent = withElement(
       sideOffset: Number,
       alignOffset: Number,
       collisionPadding: Number,
+      arrowPadding: Number,
       anchor: [Object, String] as PropType<Anchor | string | null>,
       finalFocus: [String, Object, Function] as PropType<DatePickerContentProps["finalFocus"]>,
       keepMounted: optionalBoolean,

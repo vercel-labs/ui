@@ -9,7 +9,7 @@ renders a <div> and closes with its parent.
   import {
     navigationMenu as navigationMenuPrimitive,
     type NavigationMenuController,
-    type NavigationMenuRootState,
+    type NavigationMenuState,
     type NavigationMenuValueChangeReason,
   } from "@ui-sdk/core/navigation-menu"
   import { getContext, setContext } from "svelte"
@@ -41,7 +41,7 @@ renders a <div> and closes with its parent.
     onValueChange,
     onOpenChangeComplete,
     ...rest
-  }: PartProps<"nav", NavigationMenuRootState> & {
+  }: PartProps<"nav", NavigationMenuState> & {
     /** The open item's value. Bind it with `bind:value` to control the menu. `null` closes every panel. */
     value?: string | null
     /** The item open at first, when uncontrolled. */

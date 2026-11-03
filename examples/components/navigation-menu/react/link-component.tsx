@@ -66,7 +66,7 @@ function Example() {
                   <li key={page.href}>
                     <NavigationMenuLink
                       render={<Link href={page.href} onNavigate={setRoute} />}
-                      active={route === page.href}
+                      current={route === page.href}
                     >
                       <span>{page.title}</span>
                       <span data-slot="hint">{page.description}</span>
@@ -79,7 +79,7 @@ function Example() {
           <NavigationMenuItem>
             <NavigationMenuLink
               render={<Link href="#components" onNavigate={setRoute} />}
-              active={route === "#components"}
+              current={route === "#components"}
             >
               Components
             </NavigationMenuLink>

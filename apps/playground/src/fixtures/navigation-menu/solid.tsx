@@ -82,7 +82,7 @@ function Fixture() {
             )}
           </For>
           <NavigationMenuItem>
-            <NavigationMenuLink class="nav-link" href={fixture.link.href} active>
+            <NavigationMenuLink class="nav-link" href={fixture.link.href} current>
               {fixture.link.label}
             </NavigationMenuLink>
           </NavigationMenuItem>

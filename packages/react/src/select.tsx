@@ -3,7 +3,6 @@ import {
   type ListData,
   type SelectContentProps,
   type SelectContentState,
-  type SelectController,
   type SelectEmptyState,
   type SelectItemIconProps,
   type SelectItemIconState,
@@ -125,11 +124,7 @@ function SelectTrigger({
   controller,
   render,
   ...props
-}: Omit<PartProps<"button", SelectTriggerState>, Clashing> &
-  SelectTriggerProps & {
-    /** Connects a trigger outside the select to the select with this controller. */
-    controller?: SelectController<any, any>
-  }) {
+}: Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps) {
   const unconnected = () =>
     renderElement("button", { type: "button", disabled, ...props }, render, {
       open: false,
@@ -171,8 +166,8 @@ const unselected: SelectValueState = { value: null, label: "", labels: [], place
  */
 function SelectValue({
   placeholder,
-  max,
-  moreLabel,
+  maxLabels,
+  getMoreLabel,
   render,
   children,
   ...props
@@ -181,7 +176,7 @@ function SelectValue({
   if (!useNearest(selectPrimitive))
     return renderElement("span", { ...props, children: children ?? placeholder ?? null }, render, unselected)
   return (
-    <ValuePart part={{ placeholder, max, moreLabel }} render={render} props={props}>
+    <ValuePart part={{ placeholder, maxLabels, getMoreLabel }} render={render} props={props}>
       {children}
     </ValuePart>
   )
@@ -217,6 +212,7 @@ function SelectContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   alignItemWithTrigger,
   keepMounted,
@@ -234,6 +230,7 @@ function SelectContent({
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     alignItemWithTrigger,
     keepMounted,

@@ -36,7 +36,7 @@ import {
 } from "../../foundation/lists/listbox-search"
 import { announce } from "../../foundation/platform/announce"
 import { isSelectAll, optionId } from "../../foundation/lists/listbox-keys"
-import { isPromise } from "../../foundation/kernel/action"
+import { announcePending, isPromise } from "../../foundation/kernel/action"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { type ItemIcons } from "../../foundation/lists/item-icon"
 import { createValueSelection, listOf } from "../../foundation/lists/listbox-value"
@@ -193,6 +193,7 @@ function announceRemoved(
 
 function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, ComboboxState, string>) {
   const { id, store, options, element } = context
+  announcePending(context, () => store.get().pending)
   // A controlled close clears the highlight in the same pass.
   deriveOpen(context, ["highlighted", "focusInList"], (open) =>
     open ? undefined : { highlighted: null, focusInList: false },
@@ -354,7 +355,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     }: { reason?: ComboboxQueryChangeReason; event?: Event; dirty?: boolean } = {},
   ) {
     store.set({ dirty })
-    change("query", query, { reason, event })
+    return change("query", query, { reason, event })
   }
 
   // A label a value from options showed in its own pass is past refusing, so
@@ -598,23 +599,25 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
     id,
     ...kit,
     getValue: () => store.get().value,
-    setValue: (value: unknown, { reason, event }: ComboboxChangeOptions<ComboboxValueChangeReason> = {}) => {
-      setValue(value, { reason, event })
-    },
+    setValue: (value: unknown, { reason, event }: ComboboxChangeOptions<ComboboxValueChangeReason> = {}) =>
+      setValue(value, { reason, event }),
     clear: ({ reason = "imperative", event }: ComboboxChangeOptions<ComboboxValueChangeReason> = {}) => {
-      if (!editable()) return
+      if (!editable()) return false
+      const selected = listOf(store.get().value).length > 0
       // A canceled change keeps the value, and the input keeps its label.
-      if (listOf(store.get().value).length && !setValue(selection.empty(), { reason, event })) return
+      if (selected && !setValue(selection.empty(), { reason, event })) return false
       clearedValue = null
-      setQuery("", { reason: reason === "clear-press" ? "clear-press" : "imperative", event })
+      const emptied = setQuery("", { reason: reason === "clear-press" ? "clear-press" : "imperative", event })
+      return selected || emptied
     },
     getQuery: () => store.get().query,
     setQuery: (
       query: string,
       { reason = "imperative", event }: ComboboxChangeOptions<ComboboxQueryChangeReason> = {},
     ) => {
-      setQuery(query, { reason, event, dirty: true })
+      const changed = setQuery(query, { reason, event, dirty: true })
       settleHighlight()
+      return changed
     },
     focus: () => inputElement()?.focus(),
     // Internal. Used by slots and adapters.

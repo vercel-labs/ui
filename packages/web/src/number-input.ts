@@ -31,6 +31,8 @@ function defineNumberInputElements() {
       tag: owner,
       display: "block",
       formAssociated: true,
+      // The framework adapters pass it, never an attribute or a property.
+      kinds: { controlId: null },
       state: {
         value: {
           get: (api: NumberInputApi) => api.getValue(),

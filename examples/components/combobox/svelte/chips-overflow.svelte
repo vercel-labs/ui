@@ -65,7 +65,7 @@
       <ComboboxInput placeholder="Add" />
     </ComboboxChips>
     <p data-slot="output">
-      <ComboboxValue max={2} moreLabel={(count: number) => `${count} more`} />
+      <ComboboxValue maxLabels={2} getMoreLabel={(count: number) => `${count} more`} />
     </p>
   </div>
   <ComboboxContent>

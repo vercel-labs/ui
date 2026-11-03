@@ -35,7 +35,7 @@ function Example() {
                     {(state) => (
                       <>
                         {state.page}
-                        {state.active && <span aria-hidden />}
+                        {state.current && <span aria-hidden />}
                       </>
                     )}
                   </PaginationLink>

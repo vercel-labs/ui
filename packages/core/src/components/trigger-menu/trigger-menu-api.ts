@@ -38,6 +38,7 @@ import { createTriggerMenuKeyboard } from "./trigger-menu-keyboard"
 import { argumentOf, createTriggerLevels, type TriggerLevel } from "./trigger-menu-levels"
 import { createTriggerSelect } from "./trigger-menu-select"
 import type { TextProps } from "./trigger-menu-parts"
+import { announcePending } from "../../foundation/kernel/action"
 import { elements } from "../../foundation/kernel/elements"
 
 type TriggerMenuState = PopupState & {
@@ -63,6 +64,8 @@ type TriggerMenuState = PopupState & {
   groupLabels: readonly string[]
   // What each item shows from the list as a whole: whether it matches.
   listing: Listing
+  // `onSelect` Promises that haven't settled.
+  pending: number
 }
 
 type ItemMeta = TriggerMenuItemProps<unknown> & { group?: string }
@@ -86,6 +89,7 @@ function initialTriggerMenuState(options: TriggerMenuOptions<any>): TriggerMenuS
     mounts: 0,
     groupLabels: [],
     listing: noListing,
+    pending: 0,
   }
 }
 
@@ -207,11 +211,22 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   }).internal
   context.onDestroy(() => loader.cancel())
 
+  // The controller's writes reach the popup through the match levels, so they read the outcome here.
+  let moved = false
+
   function show(reason: TriggerMenuOpenChangeReason, event?: Event, by: PopupOpener = "keyboard") {
-    if (!store.get().open) control.show({ reason, event, by })
+    if (!store.get().open) moved = control.attempt({ reason, event, by }).opened
   }
 
-  const hide = (reason: TriggerMenuOpenChangeReason, event?: Event) => control.hide({ reason, event })
+  function hide(reason: TriggerMenuOpenChangeReason, event?: Event) {
+    moved = control.hide({ reason, event })
+  }
+
+  function moving(write: () => unknown) {
+    moved = false
+    write()
+    return moved
+  }
 
   function setQuery(query: string, reason: TriggerMenuQueryChangeReason, event?: Event) {
     if (store.get().query === query) return
@@ -286,7 +301,13 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     highlighted: () => (store.get().open ? store.get().highlighted : null),
     itemProps: (key) => context.props<ItemMeta>("item", key),
     toKey,
+    waiting(promise) {
+      store.set({ pending: store.get().pending + 1 })
+      const settled = () => store.set({ pending: store.get().pending - 1 })
+      promise.then(settled, settled)
+    },
   })
+  announcePending(context, () => store.get().pending > 0)
 
   // Whether the list has anything to show. Composed items that never mounted
   // are unknown, so they count as there.
@@ -470,10 +491,11 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       open: boolean,
       { reason = "imperative", event }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {},
     ) {
-      if (!open) return levels.end(reason, event)
+      if (!open) return moving(() => levels.end(reason, event))
       // A match that close() ended is still in the text, so it opens again.
-      if (levels.current()) show(reason, event, "imperative")
-      else levels.reopen(reason, event)
+      return moving(() =>
+        levels.current() ? show(reason, event, "imperative") : levels.reopen(reason, event),
+      )
     },
     open({
       trigger,
@@ -499,7 +521,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       return control.result(signal) as Promise<PopupResult<TriggerMenuOpenChangeReason, never>>
     },
     close: ({ reason = "imperative", event }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {}) =>
-      levels.end(reason, event),
+      moving(() => levels.end(reason, event)),
     getQuery: () => store.get().query,
     getMatch() {
       const level = levels.current()
@@ -514,6 +536,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       select.write({ start: level ? level.match.start : at, end: at }, content)
       if (level) levels.end("item-press")
     },
+    focus: () => editor()?.element?.focus(),
     // Internal. Used by slots and adapters.
     internal: {
       options,

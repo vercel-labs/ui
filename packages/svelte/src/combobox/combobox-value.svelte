@@ -10,15 +10,15 @@ state. Without children, it shows the label. Renders no element.
   import { usePart } from "../instance"
 
   let {
-    max,
-    moreLabel,
+    maxLabels,
+    getMoreLabel,
     children,
   }: ComboboxValueProps & {
     /** Content. Receives the value's state: `value`, `labels` and `label`. */
     children?: Snippet<[ComboboxValueState]>
   } = $props()
 
-  const value = usePart(combobox, "value", () => ({ max, moreLabel }))
+  const value = usePart(combobox, "value", () => ({ maxLabels, getMoreLabel }))
 </script>
 
 {#if children}{@render children(value.state)}{:else}{value.state.label}{/if}

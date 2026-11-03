@@ -26,7 +26,7 @@ const items: TreeItemData[] = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <ui-tree aria-label="Folders" selection-mode="multiple" default-value="updates,website" expand-on-press="false" default-expanded="inbox,projects">
+      <ui-tree aria-label="Folders" mode="multiple" default-value="updates,website" expand-on-press="false" default-expanded="inbox,projects">
         <template>
           <ui-tree-item>
             <ui-tree-item-indicator></ui-tree-item-indicator>

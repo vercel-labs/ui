@@ -25,6 +25,7 @@ The popup that holds the suggestions, positioned against the field.
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     keepMounted,
     container,
@@ -55,7 +56,7 @@ The popup that holds the suggestions, positioned against the field.
   const content = useHandlePart(
     autocomplete,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, anchor, keepMounted }),
+    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, keepMounted }),
     portalTo(() => (viewport.present ? false : target())),
   )
 </script>

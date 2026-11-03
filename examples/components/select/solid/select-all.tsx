@@ -25,7 +25,7 @@ function Example() {
       <div data-slot="stack">
         <SelectLabel>Fruits</SelectLabel>
         <SelectTrigger>
-          <SelectValue max={2} moreLabel={(count) => `${count} more`} />
+          <SelectValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
           <svg
             viewBox="0 0 24 24"
             fill="none"

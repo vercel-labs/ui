@@ -107,20 +107,32 @@ function createCommandController() {
   return createController<{
     /** The highlighted command's value, or `null`. */
     getValue: () => string | null
-    /** Highlights a command, and scrolls it into view. */
-    setValue: (value: string | null, options?: CommandChangeOptions<CommandValueChangeReason>) => void
+    /**
+     * Highlights a command, and scrolls it into view.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: string | null, options?: CommandChangeOptions<CommandValueChangeReason>) => boolean
     /** The search text. */
     getQuery: () => string
-    /** Changes the search text, which filters the commands. */
-    setQuery: (query: string, options?: CommandChangeOptions<CommandQueryChangeReason>) => void
+    /**
+     * Changes the search text, which filters the commands.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setQuery: (query: string, options?: CommandChangeOptions<CommandQueryChangeReason>) => boolean
     /** The stack of open pages, from the first page opened to the current one. Empty on the first page. */
     getPages: () => string[]
-    /** Replaces the stack of pages. */
-    setPages: (pages: string[], options?: CommandChangeOptions<CommandPagesChangeReason>) => void
-    /** Opens a page on top of the current one, by the `value` of a `CommandPage` or a data command. */
-    push: (page: string, options?: CommandChangeOptions<CommandPagesChangeReason>) => void
-    /** Goes back to the previous page, and puts back the search text typed there. */
-    pop: (options?: CommandChangeOptions<CommandPagesChangeReason>) => void
+    /** Replaces the stack of pages. Returns false when the change was canceled or nothing changed. */
+    setPages: (pages: string[], options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
+    /**
+     * Opens a page on top of the current one, by the `value` of a `CommandPage` or a data command.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    push: (page: string, options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
+    /**
+     * Goes back to the previous page, and puts back the search text typed there.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    pop: (options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
     /** Runs a command, as Enter would: the highlighted one, or the one with this value. */
     run: (value?: string) => void
     /** Moves focus to the search field. */
@@ -166,7 +178,13 @@ type CommandOptions = {
    * mark the command pending until it settles: it gets `data-pending` and `aria-busy`, and running
    * it again waits. A rejection puts the reason in its `error` state until the next run.
    */
-  onAction?: (value: string, details: CommandActionDetails) => void | Promise<unknown>
+  onAction?: (value: string, details: CommandActionDetails) => unknown
+  /**
+   * What screen readers hear once a command has been pending for a second, so a slow action
+   * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
   /** The commands as data. Renders them for you, ranked as the user types, with pages for commands that have `items`. */
   items?: CommandData
   /** Commands shown instead of `items` on the first page while the search is empty, like recent or suggested ones. Groups work, like `{ type: "group", label: "Suggestions", items }`. Needs `items`. */
@@ -231,7 +249,7 @@ type CommandItemProps = {
    * skip `onAction` and the page. Return a Promise to mark the command pending until it settles,
    * like `onAction`.
    */
-  onSelect?: (event: Event) => void | Promise<unknown>
+  onSelect?: (event: Event) => unknown
 }
 
 /**
@@ -257,7 +275,7 @@ type CommandShortcutProps = {
  * state-based class names.
  * @stable
  */
-type CommandRootState = {
+type CommandState = {
   /** The current page, or `null` on the first page. */
   page: string | null
   /** Whether results are loading. */
@@ -351,6 +369,7 @@ const commandPrimitive = /* @__PURE__ */ definePrimitive({
     defaultPages: "list",
     onPagesChange: "callback",
     onAction: "action",
+    pendingAnnouncement: "string",
     items: "value",
     emptyItems: "value",
     filter: filterAttribute(["contains", "startsWith", "fuzzy"], "fuzzy"),
@@ -407,7 +426,7 @@ export {
   type CommandPagesChangeReason,
   type CommandPrimitive,
   type CommandQueryChangeReason,
-  type CommandRootState,
+  type CommandState,
   type CommandShortcutProps,
   type CommandShortcutState,
   type CommandStatusState,

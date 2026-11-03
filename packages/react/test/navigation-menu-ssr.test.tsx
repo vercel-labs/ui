@@ -23,7 +23,7 @@ function Menu({ defaultValue, keepMounted }: { defaultValue?: string; keepMounte
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink href="/pricing" active>
+          <NavigationMenuLink href="/pricing" current>
             Pricing
           </NavigationMenuLink>
         </NavigationMenuItem>

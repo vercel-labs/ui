@@ -38,6 +38,8 @@ ui-menu
 
 Give items a `value` and handle the menu’s `action` event to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
+Pass a promise to `event.detail.waitUntil()` in the menu’s `action` listener or an item’s `select` listener to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear the `pending-announcement` attribute, “Loading” by default.
+
 ## Examples
 
 ### Submenus
@@ -243,7 +245,7 @@ Give the menu an `id` and connect external triggers with `for`. Assign their `pa
 
 ### Menus as Data
 
-`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `shortcuts` false to disable that.
+`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `item-shortcuts` to `false` to turn that off.
 
 Listen on each part, or capture its `checkedchange` and `valuechange` events on the content that contains it. The listener then stays with the popup even when it renders in another container. Read the new state from `detail.value` and identify the item’s `value` or group’s `name` on the event target. Either change can be canceled. This example supplies a `<template>` of styled parts. The menu fills it from `items` and registers the shortcuts. The [lists and menus guide](../lists-and-menus) covers the data shape.
 

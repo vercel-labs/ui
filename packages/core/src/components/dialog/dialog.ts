@@ -296,7 +296,10 @@ type ShortcutProps = {
  * The props the `trigger` slot of `dialog` takes.
  * @stable
  */
-type DialogTriggerProps = TriggerProps
+type DialogTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the dialog, like one per table row, to the dialog with this controller. */
+  controller?: DialogController<any, any>
+}
 /**
  * The props the `content` slot of `dialog` takes.
  * @stable
@@ -321,7 +324,10 @@ type DialogShortcutProps = ShortcutProps
  * The props the `trigger` slot of `alertDialog` takes.
  * @stable
  */
-type AlertDialogTriggerProps = TriggerProps
+type AlertDialogTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the alert dialog to the alert dialog with this controller. */
+  controller?: AlertDialogController<any, any>
+}
 /**
  * The props the `content` slot of `alertDialog` takes.
  * @stable

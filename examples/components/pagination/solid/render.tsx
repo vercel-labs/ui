@@ -44,7 +44,7 @@ function Example() {
                       {(state) => (
                         <>
                           {state.page}
-                          {state.active && <span aria-hidden="true" />}
+                          {state.current && <span aria-hidden="true" />}
                         </>
                       )}
                     </PaginationLink>

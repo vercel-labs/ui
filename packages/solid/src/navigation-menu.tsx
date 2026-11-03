@@ -7,7 +7,7 @@ import {
   type NavigationMenuLinkIconProps,
   type NavigationMenuLinkIconState,
   type NavigationMenuOptions,
-  type NavigationMenuRootState,
+  type NavigationMenuState,
   type NavigationMenuViewportProps,
   type NavigationMenuViewportState,
 } from "@ui-sdk/core/navigation-menu"
@@ -43,7 +43,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * @stable
  */
 type NavigationMenuProps<T extends string = string> = NavigationMenuOptions<T> &
-  Omit<PartProps<"nav", NavigationMenuRootState<T>>, Clashing>
+  Omit<PartProps<"nav", NavigationMenuState<T>>, Clashing>
 
 /**
  * A <nav> landmark. Inside another menu's content it's a nested menu, which
@@ -115,6 +115,7 @@ function NavigationMenuContent(
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     keepMounted: props.keepMounted,
     hiddenUntilFound: props.hiddenUntilFound,
@@ -126,6 +127,7 @@ function NavigationMenuContent(
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
     "anchor",
     "keepMounted",
     "hiddenUntilFound",
@@ -157,7 +159,7 @@ function NavigationMenuContent(
 }
 
 /**
- * A link. Pressing it closes the menu, and `active` marks the current page with `aria-current="page"`.
+ * A link. Pressing it closes the menu, and `current` marks the current page with `aria-current="page"`.
  * @stable
  */
 const NavigationMenuLink = parts.Link
@@ -192,6 +194,7 @@ function NavigationMenuViewport(
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
   })
   const rest = omit(
@@ -201,6 +204,7 @@ function NavigationMenuViewport(
     "sideOffset",
     "alignOffset",
     "collisionPadding",
+    "arrowPadding",
     "anchor",
     "container",
   )
@@ -208,7 +212,7 @@ function NavigationMenuViewport(
 }
 
 /**
- * Sits under the open trigger, or under the link with `active` while every panel is closed. Screen readers
+ * Sits under the open trigger, or under the link with `current` while every panel is closed. Screen readers
  * skip it.
  * @stable
  */
@@ -233,7 +237,7 @@ export type {
   NavigationMenuOptions,
   NavigationMenuOrientation,
   NavigationMenuPrimitive,
-  NavigationMenuRootState,
+  NavigationMenuState,
   NavigationMenuTriggerProps,
   NavigationMenuTriggerState,
   NavigationMenuValueChangeReason,

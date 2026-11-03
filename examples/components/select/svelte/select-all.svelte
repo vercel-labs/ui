@@ -25,7 +25,7 @@
   <div data-slot="stack">
     <SelectLabel>Fruits</SelectLabel>
     <SelectTrigger>
-      <SelectValue max={2} moreLabel={(count: number) => `${count} more`} />
+      <SelectValue maxLabels={2} getMoreLabel={(count: number) => `${count} more`} />
       <ChevronDownIcon />
     </SelectTrigger>
   </div>

@@ -24,7 +24,7 @@ onUnmounted(() => {
       Always expanded
     </label>
   </div>
-  <ToastRegion :toaster="toast" :max="4" :expanded="expanded">
+  <ToastRegion :toaster="toast" :max-visible="4" :expanded="expanded">
     <template #default="{ toast: item }">
       <Toast>
         <div data-slot="stack">

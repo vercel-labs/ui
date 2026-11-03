@@ -233,15 +233,16 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
     if (parsed) reveal(parsed, "input-commit", event)
   }
 
-  function pickValue(value: DatePickerValue, reason: "preset-press" | "clear-press", event?: Event) {
+  function pickValue(value: DatePickerValue, reason: DatePickerValueChangeReason, event?: Event) {
     const state = store.get()
-    if (isDisabled(state) || state.readOnly) return
+    if (isDisabled(state) || state.readOnly) return false
     const normalized = normalizeValue(state.mode, value) as DatePickerValue
     store.set({ anchor: null, hover: null })
     clearDrafts()
-    setValue(normalized, reason, event)
+    const changed = setValue(normalized, reason, event)
     const first = Array.isArray(normalized) ? normalized[0] : normalized
     if (first && isISODate(first) && reason === "preset-press") reveal(first, reason, event)
+    return changed
   }
 
   function reset() {
@@ -276,6 +277,8 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
         reveal(first, "imperative")
       return result
     },
+    clear: ({ reason = "imperative", event }: DatePickerChangeOptions<DatePickerValueChangeReason> = {}) =>
+      pickValue(null, reason, event),
     getMonth: calendar.getMonth,
     setMonth: (
       month: ISOMonth,

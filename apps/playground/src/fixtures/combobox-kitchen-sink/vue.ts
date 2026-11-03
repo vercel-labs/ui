@@ -192,7 +192,9 @@ const VariantCombobox = defineComponent({
                 ])
               : input(),
             variant.max &&
-              h("span", { class: "text-xs text-neutral-600" }, [h(ComboboxValue, { max: variant.max })]),
+              h("span", { class: "text-xs text-neutral-600" }, [
+                h(ComboboxValue, { maxLabels: variant.max }),
+              ]),
             variant.trigger &&
               h(ComboboxTrigger, { class: classes.trigger, "aria-label": "Show countries" }, () => "▾"),
             variant.clear &&

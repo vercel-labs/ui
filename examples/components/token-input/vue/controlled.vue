@@ -44,7 +44,7 @@ function onChange(next: TokenInputValue, details: TokenInputValueChangeDetails) 
     <TokenInput
       v-model:value="value"
       :history="{ limit: 50, groupDelay: 1000 }"
-      :describe-token="(token: Token) => (token.type === 'file' ? 'attached file' : token.type)"
+      :get-token-description="(token: Token) => (token.type === 'file' ? 'attached file' : token.type)"
       @value-change="onChange"
     >
       <TokenInputEditor aria-label="Prompt" />

@@ -16,7 +16,7 @@ import type { Frame, Inspection } from "@/lib/inspect"
 
 function Handle() {
   return (
-    <ResizableHandle className="relative w-px shrink-0 bg-border outline-none after:absolute after:inset-y-0 after:-inset-x-1 focus-visible:bg-ring data-dragging:bg-ring data-hovered:bg-ring" />
+    <ResizableHandle className="relative w-px shrink-0 bg-border outline-none after:absolute after:inset-y-0 after:-inset-x-1 focus-visible:bg-ring data-dragging:bg-ring data-hovering:bg-ring" />
   )
 }
 

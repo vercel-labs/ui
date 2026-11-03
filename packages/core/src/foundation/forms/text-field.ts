@@ -72,13 +72,14 @@ function textFieldApi<Slot extends string>(
   // A change the user or a controller asked for. The element follows unless
   // it was canceled. A controlled field waits for its new `value`.
   function write(value: string, reason: InputValueChangeReason, event?: Event) {
-    if (!change("value", value, { reason, event })) return
+    if (!change("value", value, { reason, event })) return false
     if (!isControlled()) read(value)
     const el = control()
-    if (!el || el.value === value) return
+    if (!el || el.value === value) return true
     writing = true
     writeValue(el, value, { asUser: true })
     writing = false
+    return true
   }
 
   // Typing, or an IME finishing its text. A canceled change puts the text back,
@@ -103,12 +104,10 @@ function textFieldApi<Slot extends string>(
 
   const api = {
     getValue: () => store.get().value,
-    setValue(value: string, { reason = "imperative", event }: ChangeOptions<InputValueChangeReason> = {}) {
-      write(value, reason, event)
-    },
-    clear({ reason = "imperative", event }: ChangeOptions<InputValueChangeReason> = {}) {
-      write("", reason, event)
-    },
+    setValue: (value: string, { reason = "imperative", event }: ChangeOptions<InputValueChangeReason> = {}) =>
+      write(value, reason, event),
+    clear: ({ reason = "imperative", event }: ChangeOptions<InputValueChangeReason> = {}) =>
+      write("", reason, event),
     focus: () => control()?.focus(),
     internal: {
       clearPress: (event?: Event) => write("", "clear-press", event),

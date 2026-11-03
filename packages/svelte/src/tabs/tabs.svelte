@@ -8,7 +8,7 @@ Layered sections of content, one shown at a time.
   import {
     tabs as tabsPrimitive,
     type TabsController,
-    type TabsRootState,
+    type TabsState,
     type TabsValueChangeReason,
   } from "@ui-sdk/core/tabs"
   import Part from "../part.svelte"
@@ -28,7 +28,7 @@ Layered sections of content, one shown at a time.
     debug,
     onValueChange,
     ...rest
-  }: PartProps<"div", TabsRootState> & {
+  }: PartProps<"div", TabsState> & {
     /** The selected tab's value. Bind it with `bind:value` to control the tabs. `null` selects nothing. */
     value?: string | null
     /** The tab selected at first, when uncontrolled. Defaults to the first enabled tab. */

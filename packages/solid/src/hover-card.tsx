@@ -2,7 +2,6 @@ import {
   hoverCard as hoverCardPrimitive,
   type HoverCardContentProps,
   type HoverCardContentState,
-  type HoverCardController,
   type HoverCardOptions,
   type HoverCardTriggerProps,
   type HoverCardTriggerState,
@@ -62,11 +61,7 @@ function HoverCard(props: HoverCardProps) {
   ))
 }
 
-type TriggerPartProps = PartProps<"a", HoverCardTriggerState> &
-  HoverCardTriggerProps & {
-    /** Connects a trigger outside the card, like every author link in a feed, to the card with this controller. */
-    controller?: HoverCardController<any>
-  }
+type TriggerPartProps = PartProps<"a", HoverCardTriggerState> & HoverCardTriggerProps
 
 /**
  * A link by default: pressing it follows the link, and hover or focus opens the card.

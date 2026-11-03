@@ -21,7 +21,23 @@ import {
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "../src/otp-input"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../src/password-input"
 import { Separator } from "../src/separator"
+import { Slider, SliderControl, SliderThumb, SliderTrack, SliderValue } from "../src/slider"
 import { Textarea } from "../src/textarea"
+
+// Opening tags, and an attribute of one.
+const tags = (html: string) => html.match(/<[a-z][^>]*>/g) ?? []
+const attribute = (tag: string | undefined, name: string) =>
+  tag?.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1]
+
+// The ids a label or control reference points at that no element has. A
+// control points at its field's description before one renders, so that one
+// isn't checked.
+const dangling = (html: string) => {
+  const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
+  return ["for", "aria-controls", "aria-labelledby"]
+    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .filter((id) => !ids.has(id))
+}
 
 // Runs with no DOM: any access to window or document during render throws.
 // Solid renders boolean attributes bare, like `required`, and marks elements
@@ -58,6 +74,54 @@ describe("server rendering text fields and forms", () => {
     expect(html).toContain("This email bounced.")
     expect(html).toContain('aria-invalid="true"')
     expect(html).not.toContain("data-valid")
+  })
+
+  test.each([
+    [
+      "NumberInput",
+      () => (
+        <NumberInput>
+          <NumberInputDecrement />
+          <NumberInputControl />
+          <NumberInputIncrement />
+        </NumberInput>
+      ),
+    ],
+    [
+      "PasswordInput",
+      () => (
+        <PasswordInput>
+          <PasswordInputControl />
+          <PasswordInputToggle />
+        </PasswordInput>
+      ),
+    ],
+    [
+      "Slider",
+      () => (
+        <Slider>
+          <SliderControl>
+            <SliderTrack>
+              <SliderThumb />
+            </SliderTrack>
+          </SliderControl>
+          <SliderValue />
+        </Slider>
+      ),
+    ],
+  ])("a field ties its label to a %s's control", (_name, control) => {
+    const html = renderToString(() => (
+      <Field>
+        <FieldLabel>Amount</FieldLabel>
+        {control()}
+      </Field>
+    ))
+    const label = attribute(
+      tags(html).find((tag) => tag.includes('data-slot="field-label"')),
+      "for",
+    )
+    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+    expect(dangling(html)).toEqual([])
   })
 
   test.each([

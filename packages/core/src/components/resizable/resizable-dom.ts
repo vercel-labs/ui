@@ -190,8 +190,8 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         cursor: () => cursor(key, el),
         start: (event) => press(event, key, el, () => releaseHandle(target)),
         hover: (hovered) => {
-          if (hovered) store.set({ hovered: key })
-          else if (store.get().hovered === key) store.set({ hovered: null })
+          if (hovered) store.set({ hovering: key })
+          else if (store.get().hovering === key) store.set({ hovering: null })
         },
       }
       const unregister = registerHandle(target)

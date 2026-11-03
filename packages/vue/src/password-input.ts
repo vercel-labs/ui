@@ -7,7 +7,7 @@ import {
   type PasswordInputVisibleChangeReason,
 } from "@ui-sdk/core/password-input"
 import { defineComponent, inject, provide, type InjectionKey, type PropType } from "vue"
-import { useFieldControl } from "./field-context"
+import { useFieldControl, useFieldControlId } from "./field-context"
 import { createParts, withElement } from "./create-parts"
 import { optionalBoolean, orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
 import { readOnlyOf } from "./text-control"
@@ -57,6 +57,7 @@ const PasswordInput = withElement(
     slots: Object as PartSlots<typeof passwordInputPrimitive, "root">,
     setup(props, { attrs, emit }) {
       const field = useFieldControl()
+      const controlId = useFieldControlId()
       const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
         defaultValue: props.defaultValue,
@@ -69,6 +70,7 @@ const PasswordInput = withElement(
         disabled: props.disabled || field?.disabled(),
         readOnly: readOnlyOf(props, attrs),
         controller: props.controller,
+        controlId,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.
         onValueChange: (value: string, details: ChangeDetails<InputValueChangeReason>) => {

@@ -10,7 +10,7 @@ import { isTypeaheadKey } from "../../foundation/text/typeahead"
 import { type Listbox } from "../../foundation/lists/listbox"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
 import type { ListboxValueChangeReason } from "./listbox-root"
-import type { ListboxState } from "./listbox-root-api"
+import type { ListboxStore } from "./listbox-root-api"
 import type { Store } from "../../foundation/kernel/store"
 
 type Change = { reason: ListboxValueChangeReason; event?: Event }
@@ -29,7 +29,7 @@ function createListboxKeyboard({
   toggleAll,
   anchorKey,
 }: {
-  store: Store<ListboxState>
+  store: Store<ListboxStore>
   listbox: Listbox
   choose: (key: string, why: Change) => void
   toggle: (key: string, why: Change) => void

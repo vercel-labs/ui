@@ -5,7 +5,7 @@ import {
   type NavigationMenuItemProps,
   type NavigationMenuItemState,
   type NavigationMenuOptions,
-  type NavigationMenuRootState,
+  type NavigationMenuState,
   type NavigationMenuViewportProps,
   type NavigationMenuViewportState,
 } from "@ui-sdk/core/navigation-menu"
@@ -49,7 +49,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * @stable
  */
 type NavigationMenuProps<T extends string = string> = NavigationMenuOptions<T> &
-  Omit<PartProps<"nav", NavigationMenuRootState<T>>, Clashing>
+  Omit<PartProps<"nav", NavigationMenuState<T>>, Clashing>
 
 /**
  * A <nav> landmark. Inside another menu's content it's a nested menu, which
@@ -91,7 +91,7 @@ function NavigationMenu<T extends string = string>({
   const menu = usePrimitive(navigationMenu, options)
   const tag = parentMenu && parentItem !== null ? "div" : "nav"
   // The state holds only values of type `T`, which the primitive types as strings.
-  const element = usePart(menu, "root", {}, props as PartProps<"nav", NavigationMenuRootState>, tag)
+  const element = usePart(menu, "root", {}, props as PartProps<"nav", NavigationMenuState>, tag)
   return (
     <ItemContext.Provider value={null}>
       <ContainerContext.Provider value={container}>{element}</ContainerContext.Provider>
@@ -140,6 +140,7 @@ function NavigationMenuContent({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   keepMounted,
   hiddenUntilFound,
@@ -156,6 +157,7 @@ function NavigationMenuContent({
     sideOffset,
     alignOffset,
     collisionPadding,
+    arrowPadding,
     anchor,
     keepMounted,
     hiddenUntilFound,
@@ -170,7 +172,7 @@ function NavigationMenuContent({
 }
 
 /**
- * A link. Pressing it closes the menu, and `active` marks the current page with `aria-current="page"`.
+ * A link. Pressing it closes the menu, and `current` marks the current page with `aria-current="page"`.
  * @stable
  */
 const NavigationMenuLink = parts.Link
@@ -192,18 +194,19 @@ function NavigationMenuViewport({
   sideOffset,
   alignOffset,
   collisionPadding,
+  arrowPadding,
   anchor,
   container,
   ...props
 }: PartProps<"div", NavigationMenuViewportState> & NavigationMenuViewportProps) {
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const viewport = { side, align, sideOffset, alignOffset, collisionPadding, anchor }
+  const viewport = { side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }
   const element = usePart(navigationMenu, "viewport", viewport, props)
   return element && renderPopup(element, target)
 }
 
 /**
- * Sits under the open trigger, or under the link with `active` while every panel is closed. Screen readers
+ * Sits under the open trigger, or under the link with `current` while every panel is closed. Screen readers
  * skip it.
  * @stable
  */
@@ -228,7 +231,7 @@ export type {
   NavigationMenuOptions,
   NavigationMenuOrientation,
   NavigationMenuPrimitive,
-  NavigationMenuRootState,
+  NavigationMenuState,
   NavigationMenuTriggerProps,
   NavigationMenuTriggerState,
   NavigationMenuValueChangeReason,

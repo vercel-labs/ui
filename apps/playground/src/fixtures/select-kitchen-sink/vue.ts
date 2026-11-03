@@ -113,7 +113,7 @@ const VariantSelect = defineComponent({
             h(SelectValue, {
               class: classes.value,
               placeholder: valuePlaceholder(variant),
-              max: variant.max,
+              maxLabels: variant.max,
             }),
             h("span", { class: classes.chevron, "aria-hidden": "true" }, "▾"),
           ]),

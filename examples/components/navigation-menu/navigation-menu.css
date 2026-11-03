@@ -60,7 +60,7 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    &[data-active] {
+    &[data-current] {
       background: var(--tint);
       font-weight: 600;
     }
@@ -90,7 +90,7 @@
   }
 
   [data-slot="navigation-menu-trigger"]:not([data-disabled]) [data-show="disabled"],
-  [data-slot="navigation-menu-link"]:not([data-active]) [data-show="active"],
+  [data-slot="navigation-menu-link"]:not([data-current]) [data-show="current"],
   [data-slot="navigation-menu-content"][data-motion] [data-hide="motion"],
   [data-slot="navigation-menu-content"]:not([data-motion="from-end"]) [data-show="from-end"],
   [data-slot="navigation-menu-content"]:not([data-motion="from-start"]) [data-show="from-start"] {
@@ -210,11 +210,11 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    &[data-active]:not(:hover, :focus-visible) {
+    &[data-current]:not(:hover, :focus-visible) {
       background: var(--tint);
     }
 
-    &[data-active] {
+    &[data-current] {
       font-weight: 500;
     }
 

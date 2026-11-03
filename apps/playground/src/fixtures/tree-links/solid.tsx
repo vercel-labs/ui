@@ -17,7 +17,7 @@ function Fixture() {
         class="tree"
         aria-label={treeLinksFixture.label}
         items={treeLinksFixture.items}
-        selectionMode="none"
+        mode="none"
         current={current()}
       >
         <Items items={treeLinksFixture.items} checkable={false} />

@@ -7,7 +7,7 @@ import {
 import { Portal } from "@solidjs/web"
 import { createContext, merge, omit, Show, useContext } from "solid-js"
 import { useControllerEntry, useControllerTarget } from "./controller-target"
-import { joinField, useFieldControl } from "./field-context"
+import { joinField, useFieldControl, useFieldControlId } from "./field-context"
 import { startingText } from "./text-control"
 import {
   createParts,
@@ -40,6 +40,7 @@ type DivProps = Omit<PartProps<"div", NumberInputState>, "defaultValue" | "onCha
  */
 function NumberInput(props: NumberInputOptions & DivProps) {
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const numberInput = usePrimitive(numberInputPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
@@ -60,6 +61,7 @@ function NumberInput(props: NumberInputOptions & DivProps) {
     form: props.form,
     controller: props.controller,
     debug: props.debug,
+    controlId,
   }))
   const rest = omit(
     props,

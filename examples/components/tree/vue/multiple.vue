@@ -49,7 +49,7 @@ const value = ref(["updates", "website"])
       v-model:value="value"
       aria-label="Folders"
       :items="items"
-      selection-mode="multiple"
+      mode="multiple"
       :expand-on-press="false"
       :default-expanded="['inbox', 'projects']"
     >

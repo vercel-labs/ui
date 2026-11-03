@@ -64,7 +64,7 @@ function mount(root: HTMLElement) {
   function navigate(route: string) {
     output.textContent = `Route: ${route}`
     for (const link of root.querySelectorAll("ui-navigation-menu-link")) {
-      link.toggleAttribute("active", link.querySelector("a")!.getAttribute("href") === route)
+      link.toggleAttribute("current", link.querySelector("a")!.getAttribute("href") === route)
     }
   }
   for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-router]")) {

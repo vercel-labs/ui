@@ -13,7 +13,7 @@ The root: a group around the thumbs, and the hidden input the form submits.
     type SliderValueCommitDetails,
   } from "@ui-sdk/core/slider"
   import { setContext, untrack } from "svelte"
-  import { useFieldControl } from "../field/context"
+  import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
   import { SliderKey, type SliderContext } from "./context"
@@ -30,6 +30,8 @@ The root: a group around the thumbs, and the hidden input the form submits.
     minStepsBetweenThumbs,
     orientation,
     disabled,
+    readOnly,
+    required,
     name,
     form,
     format,
@@ -58,6 +60,10 @@ The root: a group around the thumbs, and the hidden input the form submits.
     orientation?: "horizontal" | "vertical"
     /** Disables it like a native control: thumbs can't be focused or moved, and nothing is submitted. */
     disabled?: boolean
+    /** Keeps it focusable and submitted, but stops drags, keys and screen reader adjustments from changing it. */
+    readOnly?: boolean
+    /** Marks it required, with `data-required`. A slider always has a value, so it never blocks a form. */
+    required?: boolean
     /** The name it submits under: the number, or a range as `"start/end"`. Without one, it submits nothing. */
     name?: string
     /** The id of a form to belong to, when it isn't inside that form. */
@@ -82,6 +88,7 @@ The root: a group around the thumbs, and the hidden input the form submits.
 
   const id = $props.id()
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const slider = usePrimitive(sliderPrimitive, () => ({
     id,
     get value() {
@@ -95,12 +102,15 @@ The root: a group around the thumbs, and the hidden input the form submits.
     minStepsBetweenThumbs,
     orientation,
     disabled: disabled || field?.disabled(),
+    readOnly,
+    required,
     name: name ?? field?.name(),
     form,
     format,
     locale,
     controller,
     debug,
+    thumbInputId: controlId,
     onValueChange: (next: Value, details: SliderValueChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)

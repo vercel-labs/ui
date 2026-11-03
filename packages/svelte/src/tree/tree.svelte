@@ -3,10 +3,11 @@
 A tree of items that expand and collapse, with one tab stop and arrow keys between its items.
 @stable
 -->
-<script lang="ts" generics="Mode extends TreeSelectionMode = 'single'">
+<script lang="ts" generics="Mode extends TreeMode = 'single'">
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     tree as treePrimitive,
+    type ListHighlightDetails,
     type TreeActionDetails,
     type TreeAnnouncement,
     type TreeCheckStrategy,
@@ -14,8 +15,8 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     type TreeController,
     type TreeExpandedChangeReason,
     type TreeItemData,
-    type TreeRootState,
-    type TreeSelectionMode,
+    type TreeState,
+    type TreeMode,
     type TreeValue,
     type TreeValueChangeReason,
   } from "@ui-sdk/core/tree"
@@ -29,7 +30,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
   let {
     items,
     paths,
-    selectionMode,
+    mode,
     value = $bindable(),
     defaultValue,
     activation,
@@ -41,6 +42,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     defaultChecked,
     checkStrategy,
     onAction,
+    pendingAnnouncement,
     loadChildren,
     current,
     disabled,
@@ -53,17 +55,17 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     onValueChange,
     onExpandedChange,
     onCheckedChange,
-    onItemFocus,
+    onHighlight,
     children,
     ...rest
-  }: PartProps<"div", TreeRootState> & {
+  }: PartProps<"div", TreeState> & {
     /** The items as data: each a `value`, a `label` and, for a branch, `children`. Renders them for you, and gives the tree its whole shape even where rows aren't rendered. */
     items?: TreeItemData[]
     /** Items from file paths, like `["src/index.ts", "README.md"]`: each folder becomes a branch, folders first. A path ending in `/` is an empty folder. */
     paths?: readonly string[]
     /** How many items can be selected: `"none"`, `"single"` or `"multiple"`. */
-    selectionMode?: Mode
-    /** The selected value. Bind it with `bind:value` to control the selection. `null` selects nothing, and with `selectionMode: "multiple"` it's a list. */
+    mode?: Mode
+    /** The selected value. Bind it with `bind:value` to control the selection. `null` selects nothing, and with `mode: "multiple"` it's a list. */
     value?: TreeValue<Mode>
     /** The value selected at first, when uncontrolled. */
     defaultValue?: TreeValue<Mode>
@@ -84,7 +86,9 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** Which items the checked value lists: `"leaf"`, `"trunk"`, `"branch"` or `"independent"`. */
     checkStrategy?: TreeCheckStrategy
     /** Runs when an item is pressed or Enter is pressed on it, apart from selecting it. Return a Promise to mark the item pending until it settles. */
-    onAction?: (value: string, details: TreeActionDetails) => void | Promise<unknown>
+    onAction?: (value: string, details: TreeActionDetails) => unknown
+    /** What screen readers hear once an item's action has been pending for a second. An empty string says nothing. */
+    pendingAnnouncement?: string
     /** Loads a branch's children the first time it expands while it has none. */
     loadChildren?: (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
     /** The value of the item for the current page. It gets `aria-current="page"`, takes the tab stop first, and its ancestors expand. */
@@ -110,7 +114,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** Runs when checkboxes want to change. `details.reason` says why, and `details.cancel()` stops it. */
     onCheckedChange?: (checked: string[], details: ChangeDetails<TreeCheckedChangeReason>) => void
     /** Runs when the keyboard moves focus to an item, with its row among the items that show, from 0. */
-    onItemFocus?: (value: string, details: { index: number }) => void
+    onHighlight?: (value: string, details: ListHighlightDetails) => void
   } = $props()
 
   const id = $props.id()
@@ -118,7 +122,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     id,
     items,
     paths,
-    selectionMode,
+    mode,
     get value() {
       return value
     },
@@ -136,6 +140,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     defaultChecked,
     checkStrategy,
     onAction,
+    pendingAnnouncement,
     loadChildren,
     current,
     disabled,
@@ -158,7 +163,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
       onCheckedChange?.(next, details)
       if (!details.canceled) checked = next
     },
-    onItemFocus,
+    onHighlight,
   }))
   provideInstance(treePrimitive, tree)
   setContext<DataContext>(DataKey, { checkable: () => checkable ?? false })
@@ -174,7 +179,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
 </script>
 
 <!-- Without content, a data tree renders its items. -->
-{#snippet content(_state: TreeRootState)}
+{#snippet content(_state: TreeState)}
   {#if data}<TreeItems items={data} />{/if}
 {/snippet}
 

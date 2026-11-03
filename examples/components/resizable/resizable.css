@@ -63,7 +63,7 @@
       }
     }
 
-    &:is(:hover, [data-hovered], [data-dragging]) {
+    &:is(:hover, [data-hovering], [data-dragging]) {
       background: var(--ink);
     }
 
@@ -92,7 +92,7 @@
       height: 8px;
     }
 
-    &:is(:hover, [data-hovered], [data-dragging], :focus-visible) > div {
+    &:is(:hover, [data-hovering], [data-dragging], :focus-visible) > div {
       box-shadow: inset 0 0 0 1px var(--ink);
     }
   }

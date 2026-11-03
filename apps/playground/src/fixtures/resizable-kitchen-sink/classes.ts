@@ -6,7 +6,7 @@ const classes = {
   panel:
     "flex items-center justify-center overflow-hidden text-xs text-neutral-600 data-collapsed:bg-neutral-100",
   handle:
-    "relative w-px bg-neutral-200 outline-none after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:bg-blue-500 data-hovered:bg-neutral-400 data-dragging:bg-blue-500 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full data-disabled:bg-neutral-100",
+    "relative w-px bg-neutral-200 outline-none after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:bg-blue-500 data-hovering:bg-neutral-400 data-dragging:bg-blue-500 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full data-disabled:bg-neutral-100",
   row: "flex flex-wrap items-center gap-2",
   button: "rounded border border-neutral-300 px-2 py-0.5 text-xs hover:bg-neutral-50",
   transformed: "origin-left rotate-1 scale-90",

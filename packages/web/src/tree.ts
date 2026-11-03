@@ -49,21 +49,9 @@ function renderItems(
   })
 }
 
-// <ui-tree> and its parts. Markup:
-//
-// <ui-tree aria-label="Files" default-expanded="src">
-//   <ui-tree-item value="src">
-//     <ui-tree-item-indicator></ui-tree-item-indicator>
-//     <ui-tree-item-label>src</ui-tree-item-label>
-//     <ui-tree-group>
-//       <ui-tree-item value="src/index.ts"><ui-tree-item-label>index.ts</ui-tree-item-label></ui-tree-item>
-//     </ui-tree-group>
-//   </ui-tree-item>
-// </ui-tree>
-//
-// Set `items` or `paths` and the element renders its items itself, as copies
-// of the parts in a <template> inside it, when it has one. With
-// `selection-mode="multiple"`, `value` lists values separated by commas.
+// Set `items` or `paths` and the element renders its items, from a <template>
+// inside it when it has one. With `mode="multiple"`, `value` lists values
+// separated by commas.
 function defineTreeElements() {
   createParts(tree, {
     root: {
@@ -73,7 +61,7 @@ function defineTreeElements() {
       // `action` listeners call `event.detail.waitUntil(promise)` to mark the item pending.
       options: (el) => {
         const data = el as TreeElement
-        const multiple = el.getAttribute("selection-mode") === "multiple"
+        const multiple = el.getAttribute("mode") === "multiple"
         const start = el.getAttribute("default-value") ?? el.getAttribute("value")
         return {
           items: data.items,
@@ -86,7 +74,7 @@ function defineTreeElements() {
           get: (api: TreeApi) => api.getValue(),
           // A string lists values separated by commas with multiple selection.
           set: (api: TreeApi, value: string | string[] | null) => {
-            const multiple = api.internal.selectionMode() === "multiple"
+            const multiple = api.internal.mode() === "multiple"
             if (typeof value === "string")
               return api.setValue(multiple ? listAttribute(value) : value || null)
             api.setValue(value ?? (multiple ? [] : null))

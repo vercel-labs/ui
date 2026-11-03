@@ -10,7 +10,7 @@ import { autocompleteSlots } from "./autocomplete-parts"
 import { autocompleteApi, initialAutocompleteState, syncAutocompleteState } from "./autocomplete-api"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import { type SearchFilter } from "../../foundation/lists/autocomplete-core"
 import {
@@ -84,8 +84,11 @@ function createAutocompleteController() {
   return createController<{
     /** Whether the suggestions are open. */
     isOpen: () => boolean
-    /** Opens or closes the suggestions. */
-    setOpen: (open: boolean, options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => void
+    /**
+     * Opens or closes the suggestions.
+     * Returns false when the change was canceled or it was already open or closed.
+     */
+    setOpen: (open: boolean, options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => boolean
     /**
      * Opens the suggestions, and resolves once they close, with why and how. Resolves exactly once
      * and never rejects: on the next close, when `signal` aborts, or with reason `"unmount"`.
@@ -96,14 +99,22 @@ function createAutocompleteController() {
         signal?: AbortSignal
       },
     ) => Promise<PopupResult<AutocompleteOpenChangeReason, never>>
-    /** Closes the suggestions. */
-    close: (options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => void
+    /** Closes the suggestions. Returns false when the close was canceled or it was already closed. */
+    close: (options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => boolean
+    /**
+     * Opens the suggestions when they're closed, and closes them when they're open.
+     * Returns false when the change was canceled.
+     */
+    toggle: (options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => boolean
     /** The text. */
     getValue: () => string
-    /** Changes the text, which filters the suggestions. */
-    setValue: (value: string, options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>) => void
-    /** Empties the field. */
-    clear: (options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>) => void
+    /**
+     * Changes the text, which filters the suggestions.
+     * Returns false when the change was canceled or nothing changed.
+     */
+    setValue: (value: string, options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>) => boolean
+    /** Empties the field. Returns false when the change was canceled or nothing changed. */
+    clear: (options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>) => boolean
     /** Moves focus to the field. */
     focus: () => void
   }>()
@@ -246,8 +257,6 @@ type AutocompleteContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the suggestions against this instead of the field. */
-    anchor?: Anchor | string | null
     /**
      * Whether the suggestions stay in the page, hidden, while closed.
      * @defaultValue false

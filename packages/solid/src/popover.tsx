@@ -2,7 +2,6 @@ import {
   popover as popoverPrimitive,
   type PopoverContentProps,
   type PopoverContentState,
-  type PopoverController,
   type PopoverOptions,
   type PopoverShortcutProps,
   type PopoverShortcutState,
@@ -72,10 +71,7 @@ function Popover(props: PopoverProps) {
 }
 
 type TriggerPartProps = Omit<PartProps<"button", PopoverTriggerState>, "value" | "onChange"> &
-  PopoverTriggerProps & {
-    /** Connects a trigger outside the popover, like one per table row, to the popover with this controller. */
-    controller?: PopoverController<any>
-  }
+  PopoverTriggerProps
 
 /**
  * The button that opens the popover. A trigger outside the popover connects through `controller`.

@@ -13,7 +13,7 @@ The root, and the hidden input that submits the number as is.
   } from "@ui-sdk/core/number-input"
   import { setContext } from "svelte"
   import { useControllerEntry } from "../controller-target.svelte"
-  import { useFieldControl } from "../field/context"
+  import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
@@ -50,6 +50,7 @@ The root, and the hidden input that submits the number as is.
 
   const id = $props.id()
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const numberInput = usePrimitive(numberInputPrimitive, () => ({
     id,
     get value() {
@@ -71,6 +72,7 @@ The root, and the hidden input that submits the number as is.
     form,
     controller,
     debug,
+    controlId,
     onValueChange: (next: Value, details: ChangeDetails<NumberInputValueChangeReason>) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)

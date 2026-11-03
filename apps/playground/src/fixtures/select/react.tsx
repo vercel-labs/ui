@@ -139,7 +139,7 @@ function Fixture({ data = false }: { data?: boolean }) {
           >
             <SelectLabel className="label">{f.label}</SelectLabel>
             <SelectTrigger className="trigger">
-              <SelectValue className="value" max={max} />
+              <SelectValue className="value" maxLabels={max} />
               <span aria-hidden="true">▾</span>
             </SelectTrigger>
             <SelectClear>{f.clear}</SelectClear>

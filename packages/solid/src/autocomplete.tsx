@@ -158,6 +158,7 @@ function AutocompleteContent(props: PartProps<"div", AutocompleteContentState> &
     sideOffset: props.sideOffset,
     alignOffset: props.alignOffset,
     collisionPadding: props.collisionPadding,
+    arrowPadding: props.arrowPadding,
     anchor: props.anchor,
     keepMounted: props.keepMounted,
   })
@@ -169,6 +170,7 @@ function AutocompleteContent(props: PartProps<"div", AutocompleteContentState> &
       "sideOffset",
       "alignOffset",
       "collisionPadding",
+      "arrowPadding",
       "anchor",
       "keepMounted",
       "container",

@@ -41,9 +41,9 @@ function onPageChange(page: number, details: ChangeDetails) {
             <template #render="{ props, state: link }">
               <RouterLink
                 v-bind="props"
-                :class="['pagination-link', link.active ? 'is-active' : 'is-inactive']"
+                :class="['pagination-link', link.current ? 'is-active' : 'is-inactive']"
               >
-                {{ link.page }}<span v-if="link.active" aria-hidden="true">•</span>
+                {{ link.page }}<span v-if="link.current" aria-hidden="true">•</span>
               </RouterLink>
             </template>
           </PaginationLink>

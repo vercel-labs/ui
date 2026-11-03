@@ -28,7 +28,7 @@ import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
           <template #render="{ props, state: link }">
             <button v-bind="props">
               {{ link.page }}
-              <span v-if="link.active" aria-hidden="true"></span>
+              <span v-if="link.current" aria-hidden="true"></span>
             </button>
           </template>
         </PaginationLink>

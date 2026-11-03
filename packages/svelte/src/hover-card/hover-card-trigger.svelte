@@ -6,7 +6,6 @@ A link by default: pressing it follows the link, and hover or focus opens the ca
 <script lang="ts">
   import {
     hoverCard as hoverCardPrimitive,
-    type HoverCardController,
     type HoverCardTriggerProps,
     type HoverCardTriggerState,
   } from "@ui-sdk/core/hover-card"
@@ -22,10 +21,7 @@ A link by default: pressing it follows the link, and hover or focus opens the ca
     controller,
     ...rest
   }: PartProps<"a", HoverCardTriggerState> &
-    HoverCardTriggerProps & {
-      /** Connects a trigger outside the card to the card with this controller. */
-      controller?: HoverCardController<any>
-    } = $props()
+    HoverCardTriggerProps = $props()
 
   const connected = useControllerTarget(() => controller, getContext<HoverCardContext | undefined>(hoverCardPrimitive))
   const hoverCard = $derived(connected())

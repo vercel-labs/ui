@@ -75,6 +75,15 @@ type MenuCheckedChangeReason = "item-press" | "imperative"
 type MenuValueChangeReason = "item-press" | "imperative"
 
 /**
+ * What a menu's `onAction` receives besides the item's value.
+ * @stable
+ */
+type MenuActionDetails = {
+  /** The click or key press that ran the item. Undefined when a shortcut ran it while the menu was closed. */
+  event?: Event
+}
+
+/**
  * What a menu's `onCheckedChange` receives besides the new state: which item changed.
  * @stable
  */
@@ -191,8 +200,19 @@ type MenuOptions = PortalProps & {
    * controller's `open({ payload })` on the open menu. `details.cancel()` keeps the previous payload.
    */
   onPayloadChange?: (payload: unknown, details: ChangeDetails<MenuPayloadChangeReason>) => void
-  /** Runs for every plain item, including items in submenus, with the item's value. */
-  onAction?: (value: string, details: { event?: Event }) => void
+  /**
+   * Runs for every plain item, including items in submenus, with the item's value. Return a Promise
+   * to mark the item pending until it settles: it gets `data-pending` and `aria-busy`, the menu stays
+   * open, and choosing it again waits. It closes once the Promise resolves, and a rejection keeps it
+   * open with the reason in the item's `error` state until the next try.
+   */
+  onAction?: (value: string, details: MenuActionDetails) => unknown
+  /**
+   * What screen readers hear once an item has been pending for a second, so a slow action doesn't
+   * pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
   /** Runs when any checkbox item in the menu or its submenus toggles, with the item's value in `details.value`. Made for data menus. */
   onCheckedChange?: (checked: boolean, details: MenuCheckedChangeDetails) => void
   /** Runs when any radio group in the menu or its submenus changes, with the group in `details.group`. Made for data menus. */
@@ -203,7 +223,7 @@ type MenuOptions = PortalProps & {
    * Whether a data menu runs its items' shortcuts while closed.
    * @defaultValue true
    */
-  shortcuts?: boolean
+  itemShortcuts?: boolean
   /**
    * Whether arrow keys wrap from the last item to the first.
    * @defaultValue true
@@ -233,12 +253,18 @@ type MenuOptions = PortalProps & {
  * The props the `trigger` slot of `menu` takes.
  * @stable
  */
-type MenuTriggerProps = TriggerProps
+type MenuTriggerProps = TriggerProps & {
+  /** Connects a trigger outside the menu, like one per table row, to the menu with this controller. */
+  controller?: MenuController<any>
+}
 /**
  * The props the `context-trigger` slot of `menu` takes.
  * @stable
  */
-type MenuContextTriggerProps = ContextTriggerProps
+type MenuContextTriggerProps = ContextTriggerProps & {
+  /** Connects an area outside the menu to the menu with this controller. */
+  controller?: MenuController<any>
+}
 /**
  * The props the `item` slot of `menu` takes.
  * @stable
@@ -328,13 +354,21 @@ type MenuItemState = {
   highlighted: boolean
   /** Whether the item can't be chosen. */
   disabled: boolean
+  /** Whether its `onSelect` or `onAction` Promise is running. */
+  pending: boolean
+  /** Why its last action failed, until it runs again. */
+  error: unknown
 }
 /**
  * The state the `checkbox-item` slot of `menu` hands `render` functions and
  * state-based class names.
  * @stable
  */
-type MenuCheckboxItemState = MenuItemState & {
+type MenuCheckboxItemState = {
+  /** Whether the item has keyboard focus or is under the pointer. */
+  highlighted: boolean
+  /** Whether the item can't be chosen. */
+  disabled: boolean
   /** Whether the item is on: its `checked` prop when you pass one, otherwise `defaultChecked` until a press changes it. */
   checked: boolean
 }
@@ -343,7 +377,11 @@ type MenuCheckboxItemState = MenuItemState & {
  * state-based class names.
  * @stable
  */
-type MenuRadioItemState = MenuItemState & {
+type MenuRadioItemState = {
+  /** Whether the item has keyboard focus or is under the pointer. */
+  highlighted: boolean
+  /** Whether the item can't be chosen. */
+  disabled: boolean
   /** Whether the item is its group's value. */
   checked: boolean
 }
@@ -383,11 +421,12 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
     onOpenChange: "callback",
     onOpenChangeComplete: "callback",
     onPayloadChange: "callback",
-    onAction: "callback",
+    onAction: "action",
+    pendingAnnouncement: "string",
     onCheckedChange: "callback",
     onValueChange: "callback",
     items: "value",
-    shortcuts: "boolean",
+    itemShortcuts: "boolean",
     loop: "boolean",
     delay: "number",
     presentation: "string",
@@ -414,10 +453,12 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
     groupLabels: [],
     triggers: [],
     shortcutItems: undefined,
+    pending: [],
+    error: null,
   }),
   live: ["highlighted", "shortcutItems"],
   sync: (options) => ({
-    shortcutItems: options.shortcuts === false ? undefined : options.items,
+    shortcutItems: options.itemShortcuts === false ? undefined : options.items,
     ...(options.open === undefined ? {} : { open: options.open }),
   }),
   api: (context) => {
@@ -454,6 +495,7 @@ export {
   menu,
   type MenuCheckboxItemProps,
   type MenuCheckboxItemState,
+  type MenuActionDetails,
   type MenuCheckedChangeDetails,
   type MenuCheckedChangeReason,
   type MenuContentProps,

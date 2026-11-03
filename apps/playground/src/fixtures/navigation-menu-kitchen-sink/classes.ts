@@ -9,7 +9,7 @@ const trigger =
   "group inline-flex h-8 items-center gap-1 rounded-md px-2.5 text-[13px] font-medium text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 disabled:opacity-40 disabled:hover:bg-transparent data-open:bg-neutral-100 data-open:text-neutral-950"
 const chevron = "size-3 text-neutral-400 transition-transform duration-150 group-data-open:rotate-180"
 const topLink =
-  "inline-flex h-8 items-center rounded-md px-2.5 text-[13px] font-medium text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 data-active:text-neutral-950"
+  "inline-flex h-8 items-center rounded-md px-2.5 text-[13px] font-medium text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 data-current:text-neutral-950"
 
 // Covers the open trigger, or the current page's link while closed: a bar
 // under it when horizontal, beside it when vertical.
@@ -85,7 +85,7 @@ const nestedContent = `${popupBase} ${widths.nested} p-2 ${popupAnimation} durat
 
 const links = "m-0 grid list-none gap-0.5 p-0"
 const link =
-  "block rounded-md px-2.5 py-2 text-neutral-950 no-underline outline-none hover:bg-neutral-100 focus-visible:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 data-active:bg-neutral-100"
+  "block rounded-md px-2.5 py-2 text-neutral-950 no-underline outline-none hover:bg-neutral-100 focus-visible:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 data-current:bg-neutral-100"
 const linkTitle = "block font-medium"
 const linkDescription = "block text-xs text-neutral-500"
 const more =

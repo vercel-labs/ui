@@ -53,7 +53,7 @@ function Example() {
       <Tree
         aria-label="Folders"
         items={items}
-        selectionMode="multiple"
+        mode="multiple"
         value={value}
         onValueChange={setValue}
         expandOnPress={false}

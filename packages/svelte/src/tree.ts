@@ -13,6 +13,7 @@ export {
   visibleTreeRows,
 } from "@ui-sdk/core/tree"
 export type {
+  ListHighlightDetails,
   TreeActionDetails,
   TreeAnnouncement,
   TreeApi,
@@ -32,10 +33,9 @@ export type {
   TreeItemState,
   TreeOptions,
   TreePrimitive,
-  TreeRootState,
-  TreeRow,
-  TreeSelectionMode,
   TreeState,
+  TreeRow,
+  TreeMode,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

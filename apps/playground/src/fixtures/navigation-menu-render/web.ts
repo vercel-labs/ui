@@ -8,7 +8,7 @@ async function mount(root: HTMLElement) {
             <ui-navigation-menu-trigger><button class="nav-trigger">Guides</button></ui-navigation-menu-trigger>
             <ui-navigation-menu-content as-child>
               <section class="nav-content" aria-label="Guides panel">
-                <ui-navigation-menu-link active><a href="#intro" data-router>Introduction</a></ui-navigation-menu-link>
+                <ui-navigation-menu-link current><a href="#intro" data-router>Introduction</a></ui-navigation-menu-link>
                 <ui-navigation-menu-link><a href="#install" data-router>Install</a></ui-navigation-menu-link>
               </section>
             </ui-navigation-menu-content>

@@ -25,7 +25,7 @@ export function mount(root: HTMLElement) {
   `
   const input = document.createElement("ui-token-input")
   input.history = { limit: 50, groupDelay: 1000 }
-  input.describeToken = (token: Token) => (token.type === "file" ? "attached file" : token.type)
+  input.getTokenDescription = (token: Token) => (token.type === "file" ? "attached file" : token.type)
   input.defaultValue = draft
   input.innerHTML = `
     <ui-token-input-editor aria-label="Prompt"></ui-token-input-editor>

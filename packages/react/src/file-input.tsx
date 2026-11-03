@@ -1,11 +1,11 @@
 import {
   fileInput,
-  type FileInputController,
   type FileInputItemProps,
   type FileInputItemRemoveState,
   type FileInputItemState,
   type FileInputOptions,
   type FileInputState,
+  type FileInputTriggerProps,
 } from "@ui-sdk/core/file-input"
 import { fileKey } from "@ui-sdk/core/renderer"
 import * as React from "react"
@@ -103,10 +103,7 @@ function FileInputTrigger({
   controller,
   render,
   ...props
-}: ButtonProps<FileInputState> & {
-  /** Connects a trigger outside the file input, like one in a toolbar, to the file input with this controller. */
-  controller?: FileInputController
-}) {
+}: ButtonProps<FileInputState> & FileInputTriggerProps) {
   // Until the file input it names mounts, a trigger outside it is a plain button.
   const unconnected = () => renderElement("button", { type: "button", ...props }, render, unconnectedState)
   return (
@@ -188,6 +185,7 @@ export type {
   FileInputPasteTarget,
   FileInputPrimitive,
   FileInputState,
+  FileInputTriggerProps,
   FileInputValueChangeDetails,
   FileInputValueChangeReason,
   FileLike,

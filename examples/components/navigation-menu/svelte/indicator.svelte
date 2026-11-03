@@ -85,7 +85,7 @@
       </NavigationMenuItem>
     {/each}
     <NavigationMenuItem>
-      <NavigationMenuLink href="https://example.com/docs" active>
+      <NavigationMenuLink href="https://example.com/docs" current>
         Docs
       </NavigationMenuLink>
     </NavigationMenuItem>

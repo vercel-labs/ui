@@ -63,7 +63,7 @@ function onAction(value: string, { event }: TreeActionDetails) {
 </script>
 
 <template>
-  <Tree aria-label="Docs" :items="pages" selection-mode="none" :current="current" :on-action="onAction">
+  <Tree aria-label="Docs" :items="pages" mode="none" :current="current" :on-action="onAction">
     <Items :items="pages" />
   </Tree>
 </template>

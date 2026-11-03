@@ -26,7 +26,7 @@ const fruits = [
     <div data-slot="stack">
       <SelectLabel>Fruits</SelectLabel>
       <SelectTrigger>
-        <SelectValue :max="2" :more-label="(count: number) => `${count} more`" />
+        <SelectValue :max-labels="2" :get-more-label="(count: number) => `${count} more`" />
         <ChevronDownIcon />
       </SelectTrigger>
     </div>

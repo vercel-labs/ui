@@ -1,5 +1,6 @@
 import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
+import FieldControlsApp from "./apps/field-controls-ssr-app.svelte"
 import FieldHintApp from "./apps/field-hint-ssr-app.svelte"
 import FieldApp from "./apps/field-ssr-app.svelte"
 import App from "./apps/forms-app.svelte"
@@ -11,6 +12,16 @@ const html = (which: "checkbox" | "switch" | "radio" | "group" | "field") =>
 const tags = (html: string) => html.match(/<[a-z][^>]*>/g) ?? []
 const attribute = (tag: string | undefined, name: string) =>
   tag?.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1]
+
+// The ids a label or control reference points at that no element has. A
+// control points at its field's description before one renders, so that one
+// isn't checked.
+const dangling = (html: string) => {
+  const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
+  return ["for", "aria-controls", "aria-labelledby"]
+    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .filter((id) => !ids.has(id))
+}
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering form controls", () => {
@@ -47,6 +58,19 @@ describe("server rendering form controls", () => {
     const id = body.match(/<input[^>]*id="([^"]+)"/)![1]
     expect(body).toContain(`for="${id}"`)
   })
+
+  test.each(["number-input", "password-input", "slider"] as const)(
+    "a field ties its label to a %s's control",
+    (kind) => {
+      const body = render(FieldControlsApp, { props: { kind } }).body
+      const label = attribute(
+        tags(body).find((tag) => tag.includes('data-slot="field-label"')),
+        "for",
+      )
+      expect(tags(body).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+      expect(dangling(body)).toEqual([])
+    },
+  )
 
   test.each(["field-control", "input", "textarea", "checkbox", "slider", "date-picker"] as const)(
     "a %s keeps its own description ahead of the field's",

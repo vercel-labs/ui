@@ -68,7 +68,10 @@ type IndicatorProps = SelectItemIndicatorProps & {
 
 const hasValue = (state: SelectState) => listOf(state.value).length > 0
 
-function triggerState(state: SelectState, props: SelectTriggerProps) {
+// What adapters pass on top: whether a Field or the trigger's own `aria-labelledby` names it.
+type TriggerProps = Omit<SelectTriggerProps, "controller"> & { named?: boolean }
+
+function triggerState(state: SelectState, props: TriggerProps) {
   return {
     open: state.open,
     disabled: isDisabled(state) || !!props.disabled,
@@ -147,7 +150,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
     bind: (el, { store }) => flagWhileBound(store, "labeled"),
   }),
 
-  trigger: slot<SelectTriggerProps, SelectTriggerState>({
+  trigger: slot<TriggerProps, SelectTriggerState>({
     props: {
       disabled: "boolean",
       // Internal: passed by renderers. Select has no `field` slot, so no element attribute either.
@@ -213,7 +216,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
 
   value: slot<ValueProps, SelectValueState>({
     // `text` is internal: passed by renderers.
-    props: { placeholder: "string", max: "number", moreLabel: "value", text: "boolean" },
+    props: { placeholder: "string", maxLabels: "number", getMoreLabel: "value", text: "boolean" },
     state: (state, { api, props }) => {
       const labels = api.internal.selection.labels()
       return {
@@ -249,6 +252,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       sideOffset: "number",
       alignOffset: "number",
       collisionPadding: "number",
+      arrowPadding: "number",
       container: "value",
       anchor: "string",
       alignItemWithTrigger: "boolean",

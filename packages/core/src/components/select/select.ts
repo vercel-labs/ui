@@ -6,7 +6,7 @@
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import {
   filterAttribute,
@@ -97,8 +97,8 @@ function createSelectController<T = string, Multiple extends boolean | undefined
   return createController<{
     /** Whether the list is open. */
     isOpen: () => boolean
-    /** Opens or closes the list. */
-    setOpen: (open: boolean, options?: SelectChangeOptions<SelectOpenChangeReason>) => void
+    /** Opens or closes the list. Returns false when the change was canceled or it was already open or closed. */
+    setOpen: (open: boolean, options?: SelectChangeOptions<SelectOpenChangeReason>) => boolean
     /**
      * Opens the list, and resolves once it closes, with why and how. Resolves exactly once and never
      * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
@@ -110,23 +110,26 @@ function createSelectController<T = string, Multiple extends boolean | undefined
         signal?: AbortSignal
       },
     ) => Promise<PopupResult<SelectOpenChangeReason, never>>
-    /** Closes the list. */
-    close: (options?: SelectChangeOptions<SelectOpenChangeReason>) => void
-    /** Opens the list when it's closed, and closes it when it's open. */
-    toggle: (options?: SelectChangeOptions<SelectOpenChangeReason>) => void
+    /** Closes the list. Returns false when the close was canceled or it was already closed. */
+    close: (options?: SelectChangeOptions<SelectOpenChangeReason>) => boolean
+    /** Opens the list when it's closed, and closes it when it's open. Returns false when the change was canceled. */
+    toggle: (options?: SelectChangeOptions<SelectOpenChangeReason>) => boolean
     /** The selected value. */
     getValue: () => SelectValue<T, Multiple>
-    /** Selects a value, as a user would. A disabled or read-only select ignores it. */
+    /**
+     * Selects a value, as a user would. A disabled or read-only select ignores it. Returns false when
+     * the change was canceled, ignored or the value was already selected.
+     */
     setValue: (
       value: SelectValue<T, Multiple>,
       options?: SelectChangeOptions<SelectValueChangeReason>,
-    ) => void
-    /** Selects nothing: `null`, or an empty list with `multiple`. */
-    clear: (options?: SelectChangeOptions<SelectValueChangeReason>) => void
+    ) => boolean
+    /** Selects nothing: `null`, or an empty list with `multiple`. Returns false when nothing changed. */
+    clear: (options?: SelectChangeOptions<SelectValueChangeReason>) => boolean
     /** The text in the search field. */
     getQuery: () => string
-    /** Changes the text in the search field, which filters the list. */
-    setQuery: (query: string, options?: SelectChangeOptions<SelectQueryChangeReason>) => void
+    /** Changes the text in the search field, which filters the list. Returns false when nothing changed. */
+    setQuery: (query: string, options?: SelectChangeOptions<SelectQueryChangeReason>) => boolean
     /** Moves focus to the trigger. */
     focus: () => void
   }>()
@@ -294,8 +297,8 @@ type SelectTriggerProps = {
    * @defaultValue false
    */
   disabled?: boolean
-  /** @internal Whether a Field or its own `aria-labelledby` names the trigger. Set by each framework. */
-  named?: boolean
+  /** Connects a trigger outside the select to the select with this controller. */
+  controller?: SelectController<any, any>
 }
 
 /**
@@ -306,12 +309,12 @@ type SelectValueProps = {
   /** What shows while nothing is selected. Overrides the select's `placeholder`. */
   placeholder?: string
   /** With `multiple`, how many labels show before the rest are counted, as in "Apple, Banana and 2 more", joined the way the page's language joins lists. */
-  max?: number
+  maxLabels?: number
   /**
-   * The words for the labels past `max`.
+   * The words for the labels past `maxLabels`.
    * @defaultValue (count) => `${count} more`
    */
-  moreLabel?: (count: number) => string
+  getMoreLabel?: (count: number) => string
 }
 
 /**
@@ -340,8 +343,6 @@ type SelectContentProps = PositionProps &
      * @defaultValue 0
      */
     alignOffset?: number
-    /** Positions the list against this instead of the trigger. */
-    anchor?: Anchor | string | null
     /**
      * Whether the list overlaps the trigger so the selected item sits on it, like a native select on macOS. Falls back to opening below when there isn't room, and for touch.
      * @defaultValue false
@@ -418,7 +419,7 @@ type SelectTriggerState = {
 type SelectValueState = {
   /** The selected value: one, `null`, or a list with `multiple`. */
   value: unknown
-  /** The selected item's label, the labels joined with commas for several, or with `max`, as a list in the page's language, like "Apple, Banana and 2 more". An empty string for none. */
+  /** The selected item's label, the labels joined with commas for several, or with `maxLabels`, as a list in the page's language, like "Apple, Banana and 2 more". An empty string for none. */
   label: string
   /** Each selected item's label, in the order they were selected. */
   labels: string[]

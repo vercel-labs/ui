@@ -72,6 +72,7 @@ const TriggerMenu = /* @__PURE__ */ renderless(
       container: containerProp,
       // An action handler: a function prop beside the emit, so a returned Promise inserts a pending token.
       onSelect: Function as PropType<SelectHandler>,
+      pendingAnnouncement: String,
     },
     emits: {
       "update:open": (_open: boolean) => true,
@@ -135,6 +136,7 @@ const TriggerMenuContent = withElement(
       sideOffset: Number,
       alignOffset: Number,
       collisionPadding: Number,
+      arrowPadding: Number,
       anchor: [Object, String] as PropType<Anchor | string | null>,
       keepMounted: optionalBoolean,
       container: containerProp,
