@@ -28,6 +28,7 @@ describe("a menu item whose action returns a Promise", () => {
     expect(onAction).toHaveBeenCalledTimes(1)
     save.resolve()
     await save.promise
+    await Promise.resolve()
     expect(partState(item())).toMatchObject({ pending: false })
     expect(instance.get().open).toBe(false)
   })
@@ -72,5 +73,24 @@ describe("a menu item that opens a popup", () => {
     press(instance.part("item", { value: "rename", onSelect: () => rename.api.open() }))?.()
     expect(instance.get().open).toBe(false)
     expect(rename.get().open).toBe(true)
+  })
+})
+
+describe("an item whose onSelect and onAction both return Promises", () => {
+  test("waits for both, and a late rejection keeps the menu open", async () => {
+    const select = deferred()
+    const action = deferred()
+    const instance = menu({ id: "both", onAction: () => action.promise })
+    instance.api.open()
+    const item = () => instance.part("item", { value: "save", onSelect: () => select.promise })
+    press(item())?.()
+    select.resolve()
+    await select.promise
+    expect(instance.get().open).toBe(true)
+    action.reject("offline")
+    await action.promise.catch(() => {})
+    await Promise.resolve()
+    expect(partState(item())).toMatchObject({ pending: false, error: "offline" })
+    expect(instance.get().open).toBe(true)
   })
 })

@@ -683,8 +683,8 @@ function activateItem(
   const prevented = selection.defaultPrevented
   if (!prevented && props.value !== undefined) results.push(api.root().runAction(props.value, event))
   const closes = !prevented && props.closeOnSelect !== false
-  const pending = results.find(isPromise)
-  if (pending) api.wait(key, pending, () => closes && api.action(undefined, event))
+  const pending = results.filter(isPromise)
+  if (pending.length) api.wait(key, Promise.all(pending), () => closes && api.action(undefined, event))
   else if (closes) api.action(undefined, event)
 }
 

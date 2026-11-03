@@ -176,12 +176,12 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
       if (page !== undefined) push(page, reason, event)
       else results.push(options().onAction?.(key, { event }))
     }
-    const pending = results.find(isPromise)
-    if (!pending) return
+    const pending = results.filter(isPromise)
+    if (!pending.length) return
     // Each command is pending on its own, so others that started meanwhile stay pending.
     store.set({ pending: [...store.get().pending, key] })
     const settled = () => store.get().pending.filter((other) => other !== key)
-    Promise.resolve(pending).then(
+    Promise.all(pending).then(
       () => store.set({ pending: settled() }),
       (failure) => store.set({ pending: settled(), error: { key, reason: failure } }),
     )
