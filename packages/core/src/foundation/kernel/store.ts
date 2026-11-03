@@ -54,17 +54,38 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
  * objects, like dates, maps and elements, compare by identity.
  */
 function sameSlotState(a: unknown, b: unknown) {
+  return sameWithin(a, b, undefined)
+}
+
+// `open` holds the pairs being compared further up, two entries per pair. A
+// pair met again is a cycle, the same as long as everything around it is.
+function sameWithin(a: unknown, b: unknown, open: unknown[] | undefined) {
   if (Object.is(a, b)) return true
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length || changedInPlace.has(a) || changedInPlace.has(b)) return false
-    for (let index = 0; index < a.length; index++) if (!sameSlotState(a[index], b[index])) return false
+  const arrays = Array.isArray(a) && Array.isArray(b)
+  if (!arrays && !(isPlainObject(a) && isPlainObject(b))) return false
+  if (open)
+    for (let index = 0; index < open.length; index += 2)
+      if (open[index] === a && open[index + 1] === b) return true
+  const within = open ?? []
+  within.push(a, b)
+  try {
+    if (arrays) {
+      const left = a as unknown[]
+      const right = b as unknown[]
+      if (left.length !== right.length || changedInPlace.has(left) || changedInPlace.has(right)) return false
+      for (let index = 0; index < left.length; index++)
+        if (!sameWithin(left[index], right[index], within)) return false
+      return true
+    }
+    const left = a as Record<string, unknown>
+    const right = b as Record<string, unknown>
+    const keys = Object.keys(left)
+    if (keys.length !== Object.keys(right).length) return false
+    for (const key of keys) if (!(key in right) || !sameWithin(left[key], right[key], within)) return false
     return true
+  } finally {
+    within.length -= 2
   }
-  if (!isPlainObject(a) || !isPlainObject(b)) return false
-  const keys = Object.keys(a)
-  if (keys.length !== Object.keys(b).length) return false
-  for (const key of keys) if (!(key in b) || !sameSlotState(a[key], b[key])) return false
-  return true
 }
 
 // What a listener hears: whether the change touched only live keys, which

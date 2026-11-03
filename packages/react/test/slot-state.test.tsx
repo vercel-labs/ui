@@ -122,3 +122,58 @@ test("state derived as new objects renders once per change to their values", asy
   await React.act(async () => plotHandle!.api.rename("Sprint"))
   expect(markerRenders).toBe(2)
 })
+
+type GraphNode = { x: number; self?: GraphNode }
+
+// A node that points at itself, built anew on every read.
+const graph = definePrimitive({
+  name: "derived-cycles",
+  state: (_options: {}) => ({ x: 0, title: "" }),
+  api: ({ store }) => ({
+    move: (x: number) => store.set({ x }),
+    rename: (title: string) => store.set({ title }),
+  }),
+  slots: (slot) => ({
+    node: slot<{}, { node: GraphNode }>({
+      state: (state) => {
+        const node: GraphNode = { x: state.x }
+        node.self = node
+        return { node }
+      },
+    }),
+  }),
+})
+
+test("state derived as new cyclic objects renders once per change, without overflowing", async () => {
+  let graphHandle: PrimitiveHandle<typeof graph> | undefined
+  let nodeRenders = 0
+  function NodePart() {
+    return usePart(
+      graphHandle!,
+      "node",
+      {},
+      {
+        children: (state) => {
+          nodeRenders++
+          return String(state.node.self!.x)
+        },
+      },
+    )
+  }
+  function Graph() {
+    graphHandle = usePrimitive(graph, {})
+    return <NodePart />
+  }
+  const container = document.body.appendChild(document.createElement("div"))
+  root = createRoot(container)
+  await React.act(async () => root!.render(<Graph />))
+  expect(container.textContent).toBe("0")
+  expect(nodeRenders).toBe(1)
+
+  await React.act(async () => graphHandle!.api.move(3))
+  expect(container.textContent).toBe("3")
+  expect(nodeRenders).toBe(2)
+
+  await React.act(async () => graphHandle!.api.rename("Sprint"))
+  expect(nodeRenders).toBe(2)
+})

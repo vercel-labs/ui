@@ -256,6 +256,30 @@ describe("slot state comparison", () => {
     expect(sameSlotState([item], markChangedInPlace([item]))).toBe(false)
   })
 
+  test("distinct cyclic objects and arrays compare without overflowing, and still see differences", () => {
+    const cyclic = (x: number) => {
+      const node: Record<string, unknown> = { x }
+      node.self = node
+      node.list = [node]
+      return node
+    }
+    expect(sameSlotState(cyclic(1), cyclic(1))).toBe(true)
+    expect(sameSlotState(cyclic(1), cyclic(2))).toBe(false)
+    const ring = (x: number) => {
+      const first: Record<string, unknown> = { x }
+      const second: Record<string, unknown> = { x: x + 1, next: first }
+      first.next = second
+      return first
+    }
+    expect(sameSlotState(ring(1), ring(1))).toBe(true)
+    const list: unknown[] = [1]
+    list.push(list)
+    const other: unknown[] = [1]
+    other.push(other)
+    expect(sameSlotState(list, other)).toBe(true)
+    expect(sameSlotState({ list }, { list: [2, list] })).toBe(false)
+  })
+
   test("other objects compare by identity", () => {
     expect(sameSlotState({ at: new Date(0) }, { at: new Date(0) })).toBe(false)
     expect(sameSlotState(new Map(), new Map())).toBe(false)
