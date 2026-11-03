@@ -1,39 +1,32 @@
+"use client"
+
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
 import { ChevronDownIcon } from "lucide-react"
 
-const details = [
-  { label: "Shipping address", value: "221B Baker Street, London" },
-  { label: "Items", value: "2 × Linen shirt" },
-  { label: "Delivery", value: "Standard, arrives March 7" },
-  { label: "Total", value: "$84.00" },
+const items = [
+  { name: "Linen shirt", price: "$48.00" },
+  { name: "Canvas tote", price: "$18.00" },
+  { name: "Wool socks", price: "$18.00" },
 ]
 
 function Example() {
   return (
-    <Collapsible>
-      <div data-slot="row">
-        <div data-slot="stack">
-          <p>Order #4189</p>
-          <p data-slot="hint">Placed on March 3</p>
-        </div>
-        <span data-slot="row">Shipped</span>
-      </div>
-      <div>
-        <CollapsibleTrigger data-variant="secondary">
-          Order details
-          <ChevronDownIcon />
-        </CollapsibleTrigger>
-        <CollapsiblePanel>
-          <dl>
-            {details.map((detail) => (
-              <div data-slot="row" key={detail.label}>
-                <dt>{detail.label}</dt>
-                <dd>{detail.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </CollapsiblePanel>
-      </div>
+    <Collapsible data-variant="card">
+      <CollapsibleTrigger>
+        <span data-slot="stack">
+          <span>Order #4189</span>
+          <span data-slot="hint">3 items, $84.00</span>
+        </span>
+        <ChevronDownIcon />
+      </CollapsibleTrigger>
+      <CollapsiblePanel>
+        {items.map((item) => (
+          <div data-slot="row" key={item.name}>
+            <span>{item.name}</span>
+            <span>{item.price}</span>
+          </div>
+        ))}
+      </CollapsiblePanel>
     </Collapsible>
   )
 }

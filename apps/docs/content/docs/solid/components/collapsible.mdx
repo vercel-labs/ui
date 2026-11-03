@@ -39,36 +39,9 @@ The root and panel render divs, and the trigger renders a native button. You can
 
 ## Examples
 
-### Settings Panel
-
-Keep the main setting visible and put its extra controls in the panel.
-
-<ComponentExample
-  name="collapsible/settings-panel"
-  caption="Press Edit each axis to reveal the Radius X and Radius Y fields. Tab moves from the trigger into the open panel."
-/>
-
-### File Tree
-
-Nest a collapsible inside another panel to give each folder its own open state. This is a list of disclosures; use [Tree](./tree) when you need arrow-key navigation and selection across the whole hierarchy.
-
-<ComponentExample
-  name="collapsible/file-tree"
-  caption="Open ui inside components, or open hooks. Each folder expands independently."
-/>
-
-<span id="right-to-left" />
-
-The layout follows an ancestor's `dir="rtl"`. Collapsible has no direction-dependent arrow keys.
-
 ### Disabled
 
 Set `disabled` on the root to stop its trigger from opening or closing the panel. The trigger stays in the tab order and reports `aria-disabled="true"`. A disabled `<fieldset>` around the collapsible disables it too.
-
-<ComponentExample
-  name="collapsible/disabled"
-  caption="Shipping details opens normally. Tab to Gift options and try Enter or Space: it stays closed."
-/>
 
 ## Behavior and Options
 

@@ -2,7 +2,7 @@
 
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
 import { ChevronDownIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const notes = [
   "Search now matches file contents, not only names.",
@@ -11,24 +11,27 @@ const notes = [
 ]
 
 function Example() {
-  const [settled, setSettled] = React.useState("")
+  const log = useLog()
   return (
-    <div>
-      <Collapsible onOpenChangeComplete={(open) => setSettled(open ? "opening" : "closing")}>
-        <CollapsibleTrigger data-variant="secondary">
-          Release notes
-          <ChevronDownIcon />
-        </CollapsibleTrigger>
-        <CollapsiblePanel>
-          <ul>
-            {notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </CollapsiblePanel>
-      </Collapsible>
-      <output data-slot="output">{settled ? `Finished ${settled}` : "Not animated yet"}</output>
-    </div>
+    <Collapsible
+      data-variant="card"
+      onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+    >
+      <CollapsibleTrigger>
+        <span data-slot="stack">
+          <span>Release notes</span>
+          <span data-slot="hint">Version 2.4, released October 28</span>
+        </span>
+        <ChevronDownIcon />
+      </CollapsibleTrigger>
+      <CollapsiblePanel>
+        <ul>
+          {notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      </CollapsiblePanel>
+    </Collapsible>
   )
 }
 

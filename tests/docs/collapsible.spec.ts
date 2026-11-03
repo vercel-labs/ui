@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test"
+import { expect, test, type Locator } from "@playwright/test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 
@@ -14,17 +14,22 @@ const examplesIn = (folder: string) =>
 // The order examples appear on the Collapsible page, a closed trigger to open
 // in each, and text its panel shows once open.
 const next: Record<string, { trigger: RegExp; text: string | RegExp }> = {
-  basic: { trigger: /^Order details/, text: "2 × Linen shirt" },
-  "settings-panel": { trigger: /^Edit each axis/, text: "Radius X" },
-  "file-tree": { trigger: /^hooks$/, text: "use-mobile.ts" },
-  disabled: { trigger: /^Shipping details/, text: "Arrives in 3 to 5 business days." },
-  "find-in-page": { trigger: /^Ingredients/, text: "a pinch of cardamom" },
+  basic: { trigger: /^Order #4189/, text: "Canvas tote" },
   "keep-mounted": { trigger: /^Add a delivery note/, text: /^\s*Delivery note\s*$/ },
-  animation: { trigger: /^Release notes/, text: "Uploads resume after the connection drops." },
+  "find-in-page": { trigger: /^Ingredients/, text: "a pinch of cardamom" },
   controlled: { trigger: /^Recovery codes/, text: "7KQ2-M9XD" },
+  animation: { trigger: /^Release notes/, text: "Uploads resume after the connection drops." },
   render: { trigger: /Track parcel/, text: "Out for delivery" },
 }
 const order = Object.keys(next)
+
+// The last line an example logged to its console.
+function lastLog(preview: Locator) {
+  return preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+}
 
 for (const framework of frameworks) {
   test(`every collapsible example works in ${framework}`, async ({ page }) => {
@@ -52,35 +57,13 @@ for (const framework of frameworks) {
       expect.poll(() => locator.evaluate((el) => el === document.activeElement))
 
     // Enter and Space toggle the panel, and focus stays on the trigger.
-    const order4189 = preview("basic").getByRole("button", { name: next.basic.trigger })
-    await order4189.focus()
+    const trigger = preview("basic").getByRole("button", { name: next.basic.trigger })
+    await trigger.focus()
     await page.keyboard.press("Enter")
-    await expect(order4189).toHaveAttribute("aria-expanded", "false")
+    await expect(trigger).toHaveAttribute("aria-expanded", "false")
     await page.keyboard.press(" ")
-    await expect(order4189).toHaveAttribute("aria-expanded", "true")
-    await focused(order4189).toBe(true)
-
-    // Tab moves from the open trigger into the panel's fields.
-    await preview("settings-panel").getByRole("button", { name: next["settings-panel"].trigger }).focus()
-    await page.keyboard.press("Tab")
-    await focused(preview("settings-panel").getByRole("spinbutton", { name: "Radius X" })).toBe(true)
-
-    // Folders nest: components starts open, and opening a folder inside it keeps it open.
-    const tree = preview("file-tree")
-    await tree.getByRole("button", { name: /^ui$/ }).click()
-    await expect(tree.getByText("dialog.tsx")).toBeVisible()
-    await expect(tree.getByRole("button", { name: /^components$/ })).toHaveAttribute("aria-expanded", "true")
-
-    // A disabled collapsible stays in the tab order, says it's disabled, and never opens.
-    const disabled = preview("disabled").getByRole("button", { name: /^Gift options/ })
-    await preview("disabled").getByRole("button", { name: next.disabled.trigger }).focus()
-    await page.keyboard.press("Tab")
-    await focused(disabled).toBe(true)
-    await page.keyboard.press("Enter")
-    await expect(disabled).toHaveAttribute("aria-disabled", "true")
-    await disabled.click({ force: true })
-    await expect(disabled).toHaveAttribute("aria-expanded", "false")
-    await expect(preview("disabled").getByText("Add a gift message")).toBeHidden()
+    await expect(trigger).toHaveAttribute("aria-expanded", "true")
+    await focused(trigger).toBe(true)
 
     // Find in page reveals the closed panel's text at once, without an animation.
     const ingredients = preview("find-in-page").getByRole("button", { name: next["find-in-page"].trigger })
@@ -106,22 +89,22 @@ for (const framework of frameworks) {
 
     // The completion callback reports after the animation, opening and closing.
     const notes = preview("animation").getByRole("button", { name: next.animation.trigger })
-    await expect(preview("animation").getByText("Finished opening")).toBeVisible()
+    await expect(lastLog(preview("animation"))).toHaveText("Finished opening")
     await notes.click()
-    await expect(preview("animation").getByText("Finished closing")).toBeVisible()
+    await expect(lastLog(preview("animation"))).toHaveText("Finished closing")
 
     // The controller outside the collapsible toggles it, with its own reason. A press has another.
     const controlled = preview("controlled")
     const codes = controlled.getByRole("button", { name: next.controlled.trigger })
-    await controlled.getByRole("button", { name: "Toggle from outside" }).click()
+    await controlled.getByRole("button", { name: "Toggle" }).click()
     await expect(codes).toHaveAttribute("aria-expanded", "false")
-    await expect(controlled.getByText("Closed, last change: imperative")).toBeVisible()
+    await expect(lastLog(controlled)).toHaveText("Closed (imperative)")
     await codes.click()
-    await expect(controlled.getByText("Open, last change: trigger-press")).toBeVisible()
+    await expect(lastLog(controlled)).toHaveText("Opened (trigger-press)")
     // Done closes it through the controller, and focus moves from Done to the trigger.
     await controlled.getByRole("button", { name: "Done" }).focus()
     await page.keyboard.press("Enter")
-    await expect(controlled.getByText("Closed, last change: imperative")).toBeVisible()
+    await expect(lastLog(controlled)).toHaveText("Closed (imperative)")
     await focused(codes).toBe(true)
 
     // The render function's state picks the summary, beside a trigger inside a heading.

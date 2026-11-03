@@ -1,33 +1,41 @@
 "use client"
 
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
-import { ChevronRightIcon } from "lucide-react"
+import { ChevronDownIcon } from "lucide-react"
+
+const updates = [
+  { label: "Out for delivery", time: "07:40" },
+  { label: "Arrived at the local depot", time: "05:12" },
+  { label: "Left the sorting center", time: "Wed 21:03" },
+]
 
 function Example() {
   return (
-    <Collapsible>
+    <Collapsible data-variant="card">
       <CollapsibleTrigger
-        data-variant="secondary"
-        render={(props, state) => (
+        render={(props) => (
           <h3>
             <button {...props} />
-            <span data-slot="hint">{state.open ? "3 updates" : "Arrives Thursday"}</span>
           </h3>
         )}
       >
-        <ChevronRightIcon />
-        <span>Track parcel</span>
+        {(state) => (
+          <>
+            <span data-slot="stack">
+              <span>Track parcel</span>
+              <span data-slot="hint">{state.open ? "3 updates" : "Arrives Thursday"}</span>
+            </span>
+            <ChevronDownIcon />
+          </>
+        )}
       </CollapsibleTrigger>
       <CollapsiblePanel render={<ol />}>
-        <li data-slot="row">
-          Out for delivery <span>07:40</span>
-        </li>
-        <li data-slot="row">
-          Arrived at the local depot <span>05:12</span>
-        </li>
-        <li data-slot="row">
-          Left the sorting center <span>Wed 21:03</span>
-        </li>
+        {updates.map((update) => (
+          <li data-slot="row" key={update.label}>
+            <span>{update.label}</span>
+            <span>{update.time}</span>
+          </li>
+        ))}
       </CollapsiblePanel>
     </Collapsible>
   )
