@@ -1,7 +1,6 @@
 import type { Page } from "@playwright/test"
 import {
   dialogNamesAtFocus,
-  entered,
   expect,
   isSheet,
   lastAction,
@@ -18,6 +17,19 @@ import { addScroller, addShadowButton, composingEscape } from "../fixtures/popup
 
 const dialog = (page: Page) => page.getByRole("dialog", { name: "Edit profile" })
 const trigger = (page: Page) => page.getByRole("button", { name: "Profile" })
+
+// Closing during the entrance would reverse it, which CSS shortens to how far
+// it got. A sheet's held script animations never end, so only transitions count.
+const transitionedIn = (page: Page) =>
+  expect
+    .poll(() =>
+      dialog(page).evaluate(
+        (el) =>
+          !el.hasAttribute("data-starting-style") &&
+          !el.getAnimations().some((animation) => "transitionProperty" in animation),
+      ),
+    )
+    .toBe(true)
 const field = (page: Page) => page.getByRole("textbox", { name: "Display name" })
 
 async function openWithKeyboard(page: Page) {
@@ -624,7 +636,7 @@ test.describe("animation", () => {
     await open("popover", { animate: "" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    await entered(page)
+    await transitionedIn(page)
     await trigger(page).click()
     await expect(page.locator('[role="dialog"][data-ending-style]')).toHaveCount(1)
     await expect(page.getByRole("dialog")).toHaveCount(0)
@@ -680,7 +692,7 @@ test.describe("animation", () => {
       })
       await trigger(page).click()
       await expect(dialog(page)).toBeVisible()
-      await entered(page)
+      await transitionedIn(page)
       // A button underneath the popup.
       const point = await dialog(page).evaluate((el) => {
         const rect = el.getBoundingClientRect()
