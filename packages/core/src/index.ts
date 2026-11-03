@@ -31,7 +31,26 @@ export type {
 } from "./foundation/kernel/primitive-types"
 export type { Store } from "./foundation/kernel/store"
 export type { ActionDetails } from "./foundation/kernel/action"
+export { isComposing } from "./foundation/kernel/events"
 export { isRTL } from "./foundation/platform/env"
+export { bindAvoidKeyboard, bindViewport, type ViewportState } from "./foundation/platform/viewport"
+export {
+  type EnterKeyHint,
+  type InputHintKind,
+  type InputHintOptions,
+  type InputHints,
+  inputHints,
+} from "./foundation/forms/input-hints"
+export {
+  type PointerHover,
+  type PointerKind,
+  type PointerKindOptions,
+  type PointerKindState,
+  type PointerKindStore,
+  type PointerPrecision,
+  createPointerKind,
+  pointerKindOf,
+} from "./foundation/preferences/pointer-kind"
 export {
   colorSchemeOf,
   createColorScheme,

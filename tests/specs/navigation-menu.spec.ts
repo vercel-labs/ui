@@ -1,5 +1,5 @@
 import type { Locator, Page } from "@playwright/test"
-import { entered, expect, lastAction, test } from "../fixtures"
+import { entered, expect, lastAction, opacityOf, pageNow, slowTransitions, test } from "../fixtures"
 
 // Site navigation with the APG disclosure navigation pattern: buttons that
 // show panels of links inside a <nav>, not a menu. Tab reaches every trigger
@@ -36,31 +36,56 @@ test.describe("pointer", () => {
 
   test("the panel waits for its delay before opening", async ({ page, open }) => {
     await open("navigation-menu", { delay: "400" })
-    const start = Date.now()
+    const start = await pageNow(page)
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    expect(Date.now() - start).toBeGreaterThanOrEqual(400)
+    expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
   test("moving to another trigger while a panel is open switches at once", async ({ page, open }) => {
     await open("navigation-menu", { delay: "600" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    const start = Date.now()
+    const start = await pageNow(page)
     await pointAt(page, trigger(page, "Resources"))
     await expect(link(page, "Blog")).toBeVisible()
-    expect(Date.now() - start).toBeLessThan(500)
+    expect((await pageNow(page)) - start).toBeLessThan(500)
     await expect(link(page, "Analytics")).toBeHidden()
+  })
+
+  test("crossing another trigger on the way to the open panel keeps the panel", async ({ page }) => {
+    await trigger(page, "Products").hover()
+    await expect(link(page, "Analytics")).toBeVisible()
+    const from = (await trigger(page, "Products").boundingBox())!
+    const to = (await viewport(page).boundingBox())!
+    await page.mouse.move(from.x + from.width - 6, from.y + 6)
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.8, { steps: 12 })
+    await expect(link(page, "Analytics")).toBeVisible()
+    await expect(link(page, "Blog")).toBeHidden()
+  })
+
+  test("resting on another trigger on the way to the open panel switches to it", async ({ page, open }) => {
+    await page.clock.install()
+    await open("navigation-menu")
+    const products = (await trigger(page, "Products").boundingBox())!
+    await page.mouse.move(products.x + products.width - 6, products.y + 6)
+    await page.clock.runFor(100)
+    await expect(link(page, "Analytics")).toBeVisible()
+    const resources = (await trigger(page, "Resources").boundingBox())!
+    await page.mouse.move(resources.x + 12, resources.y + resources.height - 4, { steps: 4 })
+    await expect(link(page, "Analytics")).toBeVisible()
+    await page.clock.runFor(300)
+    await expect(link(page, "Blog")).toBeVisible()
   })
 
   test("moving the pointer away closes the panel after its close delay", async ({ page, open }) => {
     await open("navigation-menu", { closeDelay: "400" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    const start = Date.now()
+    const start = await pageNow(page)
     await moveAway(page)
     await expect(link(page, "Analytics")).toBeHidden()
-    expect(Date.now() - start).toBeGreaterThanOrEqual(400)
+    expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
   test("moving the pointer into the panel keeps it open", async ({ page }) => {
@@ -426,6 +451,15 @@ test.describe("animation", () => {
   // The fixture turns its transitions off for reduced motion, which a machine's setting can ask for.
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "no-preference" })
+  })
+
+  test("the viewport and its content animate in from their starting style", async ({ page, open }) => {
+    await open("navigation-menu", { animate: "" })
+    await slowTransitions(page)
+    await trigger(page, "Products").hover()
+    await expect(link(page, "Analytics")).toBeVisible()
+    expect(await opacityOf(page.locator(".nav-viewport"))).toBeLessThan(0.5)
+    expect(await opacityOf(page.locator(".nav-content", { has: link(page, "Analytics") }))).toBeLessThan(0.5)
   })
 
   test("the viewport stays in the page while it animates out", async ({ page, open }) => {

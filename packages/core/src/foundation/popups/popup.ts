@@ -9,6 +9,7 @@ import type { ChangeOptions, ChangeReason, ChangeSource } from "../kernel/detail
 import { on } from "../kernel/events"
 import type { Store } from "../kernel/store"
 import {
+  activeLayers,
   findLayer,
   lastClosed,
   lastEscape,
@@ -29,7 +30,7 @@ import { resolveBehavior, type PopupBehavior, type PopupBehaviorName } from "./p
 import { registerPopupElement } from "./popup-elements"
 import type { Anchor, position, PositionOptions } from "../platform/position"
 import { animateIn, animateOut, writeOpen } from "../motion/presence"
-import { nextTabbable, tabbables } from "../focus/tabbable"
+import { nextTabbable, positiveTabStops, radioGroup, tabbables } from "../focus/tabbable"
 
 /** How a popup was last opened. Decides where focus goes. */
 type PopupOpener = "pointer" | "touch" | "keyboard" | "hover" | "imperative" | "initial"
@@ -396,6 +397,9 @@ function watchClose(close: (event: Event) => void) {
   return () => watcher?.destroy()
 }
 
+// Each shown layer's own elements, which a parent that turns modal later keeps out of its inert.
+const layerParts = new WeakMap<Layer, HTMLElement[]>()
+
 function createPopupLayer<State extends { open: boolean; mounted: boolean }, Reason extends string = string>(
   options: Partial<PopupBehavior> & {
     // The behavior to start from. Any behavior option passed here overrides it.
@@ -463,6 +467,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   let path: { node: Node; next: Node | null; previous: Node | null }[] = []
   const returnTrigger = options.returnTrigger ?? options.trigger
   let place: (() => void) | undefined
+  let checkPlacement: (() => void) | undefined
   let remodal: (() => void) | undefined
   let observer: ((open: boolean) => PopupClose<Reason> | undefined) | undefined
 
@@ -609,6 +614,20 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
   }
 
   function neighbour(el: HTMLElement | undefined) {
+    const trigger = path[0]?.node
+    // A trigger still in the page that can't take focus, like one disabled while
+    // it was open, hands focus to what follows it, as one that left does. One
+    // inside the popup, like an input a sheet moves into its header, isn't one.
+    if (trigger?.isConnected && !el?.contains(trigger)) {
+      for (const node of [...path.slice(1).map((step) => step.node), trigger.ownerDocument!.body]) {
+        const list = tabbables(node as Element).filter((candidate) => !el?.contains(candidate))
+        const found =
+          list.find((candidate) => isAfter(trigger, candidate) && !trigger.contains(candidate)) ??
+          list.filter((candidate) => isAfter(candidate, trigger)).pop()
+        if (found) return found
+      }
+      return
+    }
     const index = path.findIndex((step, i) => !step.node.isConnected && path[i + 1]?.node.isConnected)
     if (index === -1) return
     const { next, previous } = path[index]
@@ -690,7 +709,8 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     if (config.position && options.position) {
       const placement = options.position(() => config.anchor?.() ?? options.trigger(), el, config.position)
       place = placement.place
-      cleanups.push(placement, () => (place = undefined))
+      checkPlacement = placement.follow
+      cleanups.push(placement, () => (place = checkPlacement = undefined))
       if (config.rendered) cleanups.push(config.rendered(placement.follow))
     }
     if (!supportsTopLayer() && !host.style.zIndex) host.style.zIndex = "2147483000"
@@ -779,6 +799,7 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
                 }),
     }
     layer = own
+    layerParts.set(own, [el, ...(backdrop ? [backdrop] : [])])
     cleanups.push(pushLayer(own))
     for (const onShow of [options.onShow, config.onShow]) {
       const cleanup = onShow?.(own)
@@ -789,6 +810,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const freezePage = () => {
       const keep = [el, ...(shown?.backdrop ? [shown.backdrop] : []), ...(persistent as HTMLElement[])]
       if (trigger && behavior.keepTrigger) keep.push(trigger)
+      // A layer opened from this one before it turned modal stays usable too.
+      for (const layer of activeLayers())
+        for (let up = layer.parent; up; up = up.parent)
+          if (up === own) keep.push(...(layerParts.get(layer) ?? []))
       const inert = inertOutside(keep)
       own.keep = inert.keep
       releaseInert = releaseOwnInert = inert
@@ -919,10 +944,39 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     const active = activeElement()
     const atStart = !first || active === first || active === popup
     const atEnd = !last || active === last
+    // The browser visits every positive tabindex in the page before the rest,
+    // so the trap steps onto and off them itself. Between the others, and into
+    // shadow roots, Tab moves natively.
+    const ahead = mode === "trap" ? positiveTabStops(list, popup) : []
+    if (ahead.length) {
+      const order = [...ahead, ...list.filter((el) => !ahead.includes(el))]
+      const index = order.indexOf(active as HTMLElement)
+      const next =
+        active === popup
+          ? order.at(event.shiftKey ? -1 : 0)
+          : order.at((index + (event.shiftKey ? -1 : 1)) % order.length)
+      const crossing = ahead.includes(active as HTMLElement) || (!!next && ahead.includes(next))
+      const shadow = active?.shadowRoot
+      const entersShadow = !event.shiftKey && !!shadow && tabbables(shadow).length > 0
+      if (active !== popup && (index < 0 || !crossing || entersShadow)) return
+      event.preventDefault()
+      next?.focus({ preventScroll: true })
+      return
+    }
     if (mode === "trap") {
       if (event.shiftKey ? atStart : atEnd) {
         event.preventDefault()
         ;((event.shiftKey ? last : first) ?? popup).focus({ preventScroll: true })
+        return
+      }
+      // WebKit and Firefox skip a radio group whose checked radio is behind
+      // the popup, so the trap steps into such a group itself.
+      const index = list.indexOf(active as HTMLElement)
+      const next = index < 0 ? undefined : list[index + (event.shiftKey ? -1 : 1)]
+      const group = next && !(next as HTMLInputElement).checked ? radioGroup(next) : []
+      if (group.some((radio) => radio.checked) && !group.includes(active as HTMLInputElement)) {
+        event.preventDefault()
+        next?.focus({ preventScroll: true })
       }
       return
     }
@@ -996,6 +1050,9 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
     initialFocus,
     // Places the shown popup again now, without animating, like once its size is known.
     place: () => place?.(),
+    // Checks the shown popup's placement without starting it over, like when
+    // its arrow binds late, so an animation it runs goes on.
+    checkPlacement: () => checkPlacement?.(),
     // Applies `modal` again while shown, after it changed, like a sheet
     // crossing the snap point above which it's modal. Focus doesn't move.
     updateModal: () => remodal?.(),

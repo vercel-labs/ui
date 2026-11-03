@@ -3,7 +3,8 @@
 // bind them. They're free functions, so each adapter bundles only the ones it
 // calls.
 import { dev, warn } from "#dev"
-import { on } from "./events"
+import { enforceHidden } from "../platform/style"
+import { isComposing, on } from "./events"
 import type { AnySlot, Attrs, EventMap, Part } from "./primitive-types"
 import { eachMoved } from "./selects"
 import { renders, sameValue, subscribeSkipping, touch, type Listener } from "./store"
@@ -145,6 +146,7 @@ const authorOwned = new Set([
   "autocorrect",
   "spellcheck",
   "inputmode",
+  "enterkeyhint",
 ])
 
 /** The part's attributes without the ones the author gives, for `given(name)` to say which. */
@@ -309,6 +311,20 @@ function onProps(part: Part, listener: () => void) {
   }
 }
 
+// A slot names `hidden` in its attributes whether it's set or not, so one
+// read per slot says whether its parts can be hidden.
+const hidingSlots = new WeakMap<object, boolean>()
+
+function canHide(part: Part) {
+  const definition = definitionOf(part)
+  let hides = hidingSlots.get(definition)
+  if (hides === undefined) {
+    hides = !!definition.attrs && "hidden" in definition.attrs(part.store.get(), view(part, part.props))
+    hidingSlots.set(definition, hides)
+  }
+  return hides
+}
+
 /** Attaches behavior to an element. Leases the part while bound. Returns the cleanup. */
 function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   const kept = part as PartRecord
@@ -323,6 +339,7 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
   part.el = el
   kept.binding = binding
   const cleanups = [lease(kept)]
+  if (canHide(part)) enforceHidden(el.ownerDocument)
 
   for (const [type, handler] of Object.entries(handlers(part))) {
     if (host.by === "core" || (host.attaches !== "all" && !host.attaches.includes(type)))
@@ -403,6 +420,7 @@ const references = [
   "aria-labelledby",
   "aria-owns",
   "for",
+  "headers",
 ]
 
 // The id the slot makes when the author gives none, which a slot that reads
@@ -524,10 +542,7 @@ function rename(part: PartRecord, id: string | null | undefined) {
 // Keys an input method owns while it composes text, like Enter confirming a
 // Japanese candidate. Components never act on them.
 function composing(event: Event) {
-  return (
-    (event.type === "keydown" || event.type === "keyup") &&
-    ((event as KeyboardEvent).isComposing || (event as KeyboardEvent).keyCode === 229)
-  )
+  return (event.type === "keydown" || event.type === "keyup") && isComposing(event as KeyboardEvent)
 }
 
 export {
@@ -553,6 +568,7 @@ export {
   press,
   propsRendered,
   ref,
+  references,
   selectedKeys,
   subscribe,
   takeOwnId,

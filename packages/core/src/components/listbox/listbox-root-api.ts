@@ -115,6 +115,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
       filter: () => undefined,
       query: () => "",
       loop: () => options().loop ?? true,
+      skipDisabled: true,
       active: () => focusInside,
       container: rootElement,
       onHighlight: (key, index, event) =>
@@ -123,7 +124,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
     },
     noFiltering,
   )
-  const selection = createValueSelection({ store, options, listbox, toKey })
+  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
   const icons = createItemIcons(store)
 
   const order = () => listbox.entries().map((entry) => entry.key)
@@ -133,12 +134,22 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
   }
 
   // The option that holds the tab stop: the one focused last, the first
-  // selected, the first enabled, or the first, as the APG's listbox asks.
+  // selected, the first enabled, or the first, as the APG's listbox asks. A
+  // disabled selected option doesn't hold it, since keys skip disabled ones.
   function stopKey() {
     const list = listbox.entries()
     if (remembered !== null && list.some((entry) => entry.key === remembered)) return remembered
-    const selected = list.find((entry) => selection.isSelected(entry.key, entry.value))
-    return (selected ?? list.find((entry) => !entry.disabled) ?? list[0])?.key ?? null
+    // An option whose value changed while it had focus fires no focus event,
+    // so it's found by its element.
+    const active = remembered === null ? null : rootElement()?.ownerDocument.activeElement
+    const held = active && list.find((entry) => element("item", entry.key) === active)
+    if (held) {
+      if (store.get().highlighted === remembered) store.set({ highlighted: held.key })
+      return (remembered = held.key)
+    }
+    const enabled = list.filter((entry) => !entry.disabled)
+    const selected = enabled.find((entry) => selection.isSelected(entry.key, entry.value))
+    return (selected ?? enabled[0] ?? list[0])?.key ?? null
   }
 
   function check() {
@@ -173,7 +184,8 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
 
   function setValue(value: unknown, { reason, event }: Change) {
     const state = store.get()
-    if (isDisabled(state) || (state.readOnly && reason !== "reset" && reason !== "restore")) return false
+    if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    selection.stopRestoring()
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done
@@ -299,7 +311,7 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
       formElement,
       serialized: selection.keys,
       // The props an item last rendered with, read live by its registration.
-      itemProps: (key: string) => context.props("item", key) as ListboxItemMeta | undefined,
+      itemProps: (key: string) => context.props<ListboxItemMeta>("item", key),
       // Web components read `default-value` as keys when items come later. Once
       // they arrive, a value that still names them takes their values, with no
       // change: it's still the default.
@@ -307,8 +319,9 @@ function listboxApi(context: PrimitiveContext<ListboxOptions<any, any>, ListboxS
       reset() {
         setValue(store.get().initial, { reason: "reset" })
       },
+      // The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
-        setValue(selection.restored(saved), { reason: "restore" })
+        selection.restore(saved, (value) => change("value", value, { reason: "restore" }))
       },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })

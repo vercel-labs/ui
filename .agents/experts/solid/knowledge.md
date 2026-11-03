@@ -39,6 +39,7 @@ Solid 1 habits are the main thing to catch. These changed:
 - `onSettled` runs once the flush that created the component has rendered, which is where DOM measurement goes.
 - `onSettled` called with no owner goes on the global queue and still fires.
 - `onCleanup` inside `onSettled` throws `CLEANUP_IN_FORBIDDEN_SCOPE` and halts reactivity.
+- On the client a component keeps its instance as it renders, so a `controller` attaches during the body, before mount. On the server it never attaches, so a read rendered after the component differs between the two.
 
 ### Async and Loading
 

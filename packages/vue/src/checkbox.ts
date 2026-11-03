@@ -20,6 +20,7 @@ import {
   type PartSlots,
   type PrimitiveHandle,
 } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 const parts = createParts(checkboxPrimitive, { indicator: "span" })
 
@@ -50,7 +51,7 @@ const Checkbox = withElement(
       checkedChange: (_checked: CheckedState, _details: ChangeDetails<CheckboxCheckedChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof checkboxPrimitive, "root">,
-    setup(props, { emit }) {
+    setup(props, { attrs, emit }) {
       const group = inject(CheckboxGroupKey, null)
       // Inside a group, the group is the field's control.
       const field = group ? null : useFieldControl()
@@ -60,7 +61,7 @@ const Checkbox = withElement(
         checked: orModel(props.checked, props.modelValue),
         defaultChecked: props.defaultChecked,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         required: props.required,
         name: props.name ?? field?.name(),
         value: props.value,

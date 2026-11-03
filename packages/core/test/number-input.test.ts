@@ -80,6 +80,40 @@ describe("number input", () => {
     ])
   })
 
+  test("a percent without a step keeps a typed percent and steps by one percent", () => {
+    const instance = numberInput({
+      id: "n",
+      defaultValue: null,
+      locale: "en-US",
+      format: { style: "percent" },
+    })
+    instance.api.internal.type("25%")
+    instance.api.internal.commitText()
+    expect(instance.get().value).toBe(0.25)
+    expect(attrs(instance.part("control")).value).toBe("25%")
+    instance.api.internal.keydown({ key: "ArrowUp", preventDefault() {} } as KeyboardEvent)
+    expect(instance.get().value).toBe(0.26)
+    instance.api.decrement()
+    instance.api.decrement()
+    expect(instance.get().value).toBe(0.24)
+    instance.api.internal.keydown({ key: "PageUp", preventDefault() {} } as KeyboardEvent)
+    expect(instance.get().value).toBe(0.34)
+    expect(attrs(instance.part("control")).value).toBe("34%")
+  })
+
+  test("a percent with fraction digits keeps a typed percent", () => {
+    const instance = numberInput({
+      id: "n",
+      defaultValue: null,
+      locale: "en-US",
+      format: { style: "percent", minimumFractionDigits: 2 },
+    })
+    instance.api.internal.type("3.75%")
+    instance.api.internal.commitText()
+    expect(instance.get().value).toBe(0.0375)
+    expect(attrs(instance.part("control")).value).toBe("3.75%")
+  })
+
   test("steps from empty start at 0, within the bounds", () => {
     const instance = numberInput({ id: "n", defaultValue: null, min: 5 })
     instance.api.increment()

@@ -140,7 +140,7 @@ const ComboboxLabel = parts.Label
 function ComboboxInput({
   render,
   ...props
-}: Omit<PartProps<"input", ComboboxInputState>, "value" | "defaultValue" | "children">) {
+}: Omit<PartProps<"input", ComboboxInputState>, "value" | "defaultValue" | "children" | "readOnly">) {
   const [header] = React.useContext(SheetHeaderContext)
   const element = { ...props, render: controlRender(useFieldControl(props), "input", render) }
   // While the popup presents as a sheet, the input renders in its header.

@@ -362,7 +362,7 @@ const variants: Variant[] = [
     id: "disabled-items",
     section: "Items",
     title: "Disabled items",
-    note: "Durian can be highlighted, not chosen.",
+    note: "Arrow keys skip Durian, and it can't be chosen.",
   },
   { id: "data", section: "Items", title: "Data items", mode: "data" },
   { id: "data-groups", section: "Items", title: "Data groups", mode: "data", list: "grouped" },

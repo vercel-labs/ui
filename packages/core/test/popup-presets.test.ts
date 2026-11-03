@@ -38,9 +38,9 @@ type Options = {
   dismissible?: boolean
 }
 
-const popupOn = (preset: PopupPreset) =>
+const popupOn = (preset: PopupPreset, name = "own") =>
   definePrimitive({
-    name: "own",
+    name,
     options: {
       open: "boolean",
       defaultOpen: "boolean",
@@ -90,6 +90,14 @@ function open(preset: PopupPreset, options: Options = {}, markup = untitled) {
 // Parts bind in a microtask, and a title a microtask after the content.
 const settle = () => new Promise((done) => setTimeout(done))
 
+async function resetOnOpen(preset: PopupPreset, name: string) {
+  const view = mount(popupOn(preset, name), {}, untitled)
+  mounts.push(view)
+  view.api.setOpen(true)
+  await settle()
+  return document.getElementById("ui-sdk-popover-reset")?.textContent ?? ""
+}
+
 const naming = (el: HTMLElement) => ({
   role: el.getAttribute("role"),
   labelledby: el.getAttribute("aria-labelledby"),
@@ -116,6 +124,25 @@ describe("popoverPreset", () => {
     const view = open(popoverPreset)
     await settle()
     expect(view.part("content")!.hasAttribute("data-side")).toBe(true)
+  })
+
+  test("undoes the browser's popover styles, so an arrow outside it isn't clipped", async () => {
+    const reset = await resetOnOpen(popoverPreset, "own-popover")
+    expect(reset).toContain('[data-slot="own-popover-content"][popover]')
+    expect(reset).toContain("overflow: visible")
+  })
+})
+
+// Their content is usually what scrolls, with the browser's `overflow: auto`.
+describe.each([
+  ["selectPreset", selectPreset],
+  ["comboboxPreset", comboboxPreset],
+  ["datePickerPreset", datePickerPreset],
+  ["menuPreset", menuPreset],
+])("%s", (name, preset) => {
+  test("keeps the browser's popover styles", async () => {
+    const slot = `own-${name.toLowerCase()}`
+    expect(await resetOnOpen(preset, slot)).not.toContain(`[data-slot="${slot}-content"]`)
   })
 })
 

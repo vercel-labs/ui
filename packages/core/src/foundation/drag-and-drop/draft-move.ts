@@ -53,7 +53,7 @@ function createDraftMove<State extends object, Draft extends { key: string; poin
       if (!moved) setDraft(null)
       else
         settleDraft(store, value, before, () => {
-          if (draft() === current) setDraft(null)
+          if (draft()?.key === current.key) setDraft(null)
         })
     }
     if (!current.pointer) focusLater(current.key)

@@ -19,20 +19,42 @@ function isTabbable(el: Element): el is HTMLElement {
   if (!(el instanceof HTMLElement) || el.tabIndex < 0) return false
   if (el.matches(":disabled") || el.closest("[inert]")) return false
   // Only one radio button per group takes Tab: the checked one, or the first.
-  if (el instanceof HTMLInputElement && el.type === "radio" && el.name && !el.checked) {
-    const group = el.form?.elements.namedItem(el.name)
-    if (
-      group instanceof RadioNodeList &&
-      Array.from(group).some((radio) => (radio as HTMLInputElement).checked)
-    )
-      return false
-  }
+  // Without a form, a radio's group is the same-named radios outside a form in
+  // its document or shadow root. A checked radio that can't take focus leaves the rest reachable.
+  const group = (el as HTMLInputElement).checked ? [] : radioGroup(el)
+  if (group.some((radio) => radio.checked && isTabbable(radio))) return false
   if (typeof el.checkVisibility === "function") return el.checkVisibility({ visibilityProperty: true })
   return el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden"
 }
 
-function tabbables(root: Element) {
+function radioGroup(el: Element) {
+  if (!(el instanceof HTMLInputElement) || el.type !== "radio" || !el.name) return []
+  const scope = el.form
+    ? Array.from(el.form.elements)
+    : Array.from((el.getRootNode() as ParentNode).querySelectorAll(`input[name="${CSS.escape(el.name)}"]`))
+  return scope.filter(
+    (radio): radio is HTMLInputElement =>
+      radio instanceof HTMLInputElement &&
+      radio.type === "radio" &&
+      radio.name === el.name &&
+      radio.form === el.form,
+  )
+}
+
+function tabbables(root: ParentNode) {
   return Array.from(root.querySelectorAll(candidates)).filter(isTabbable)
+}
+
+// The stops Tab visits before the rest: positive tabindex values, lowest
+// first. One slotted into a custom element orders only within its slot, so it
+// keeps its host's place.
+function positiveTabStops(stops: HTMLElement[], root: Element) {
+  const slotted = (el: Element) => {
+    for (let node: Element | null = el; node && node !== root; node = node.parentElement)
+      if (node.assignedSlot) return true
+    return false
+  }
+  return stops.filter((el) => el.tabIndex > 0 && !slotted(el)).sort((a, b) => a.tabIndex - b.tabIndex)
 }
 
 // The first tabbable element after `node` in the document, skipping anything
@@ -117,4 +139,4 @@ function bindTabStop(
   return { check, stop: () => observer.disconnect() }
 }
 
-export { bindTabStop, isTabbable, nextTabbable, tabbables }
+export { bindTabStop, focusables, isTabbable, nextTabbable, positiveTabStops, radioGroup, tabbables }

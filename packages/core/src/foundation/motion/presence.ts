@@ -12,7 +12,11 @@ import { measured } from "#dev"
  * @stable
  */
 function animateIn(el: HTMLElement, done?: () => void) {
+  // An element already shown would transition to its starting style and back,
+  // so it jumps there, unless a transition is under way. jsdom has no getAnimations.
+  const settled = el.getAnimations?.().every((animation) => !isTransition(animation))
   el.setAttribute("data-starting-style", "")
+  if (settled) for (const animation of el.getAnimations()) if (isTransition(animation)) animation.finish()
   let stopWaiting: (() => void) | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
   const frame = requestAnimationFrame(
@@ -29,6 +33,8 @@ function animateIn(el: HTMLElement, done?: () => void) {
     el.removeAttribute("data-starting-style")
   }
 }
+
+const isTransition = (animation: Animation) => "transitionProperty" in animation
 
 function seconds(value: string) {
   return value.split(",").map((part) => {

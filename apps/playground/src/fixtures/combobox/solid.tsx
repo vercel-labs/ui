@@ -28,6 +28,7 @@ import { render } from "@solidjs/web"
 import type { JSX } from "@solidjs/web"
 import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import {
+  cancelsValue,
   changedItems,
   comboboxFixture as f,
   comboboxOptions,
@@ -94,6 +95,7 @@ function Fixture(props: { data?: boolean }) {
     nostatus,
     summary,
     labelsFromItems,
+    cancel,
     ...options
   } = comboboxOptions()
   const [action, setAction] = createSignal("")
@@ -155,9 +157,10 @@ function Fixture(props: { data?: boolean }) {
             status={async || pages ? remote.status : undefined}
             onLoadMore={pages ? remote.loadMore : undefined}
             itemToLabel={labelsFromItems ? undefined : (value) => labels().get(value) ?? value}
-            onValueChange={(value) =>
+            onValueChange={(value, details) => {
+              if (cancelsValue(value, cancel)) return details.cancel()
               setAction(`value:${Array.isArray(value) ? value.join(",") : String(value)}`)
-            }
+            }}
             onQueryChange={(query) => (async || pages) && remote.setQuery(query)}
           >
             <ComboboxLabel class="label">{f.label}</ComboboxLabel>

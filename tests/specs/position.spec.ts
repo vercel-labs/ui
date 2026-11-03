@@ -172,8 +172,9 @@ test("a turned popup lines up with its anchor as it would unturned", async ({ pa
     const { left, top } = await page
       .locator("#probe-popup")
       .evaluate((el) => ({ left: el.style.left, top: el.style.top }))
-    expect(parseFloat(left)).toBeCloseTo(300)
-    expect(parseFloat(top)).toBeCloseTo(334)
+    // Firefox places it a few thousandths of a pixel off.
+    expect(parseFloat(left)).toBeCloseTo(300, 1)
+    expect(parseFloat(top)).toBeCloseTo(334, 1)
     await page.evaluate(() => {
       ;(window as unknown as { stopProbe: () => void }).stopProbe()
       document.getElementById("probe-stage")!.remove()

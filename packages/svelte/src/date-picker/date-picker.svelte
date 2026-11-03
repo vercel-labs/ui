@@ -21,6 +21,7 @@ renders an input, or two in range mode, the trigger and the popup.
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import type { PopupContainer } from "../popup.svelte"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, DatePickerKey, type DatePickerContext } from "./context"
   import DatePickerContent from "./date-picker-content.svelte"
@@ -125,7 +126,7 @@ renders an input, or two in range mode, the trigger and the popup.
     max,
     unavailable,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     months,
     pageBy,
     locale,

@@ -1,5 +1,4 @@
-import { on } from "../../foundation/kernel/events"
-import { bindDrag } from "../../foundation/drag-and-drop/pointer"
+import type { DragSession } from "../../foundation/drag-and-drop/pointer"
 
 /** A direction a swipe can dismiss toward. */
 type SwipeDirection = "up" | "down" | "left" | "right"
@@ -80,70 +79,52 @@ type SwipeCallbacks = {
 }
 
 /**
- * Follows a press on `el` that may become a swipe toward `directions`. The
- * press stays a press until the pointer moves past a few pixels along an axis
- * with a direction, so clicks on buttons inside keep working. Then the pointer
- * is captured until it lifts. Returns a cleanup.
+ * Follows a press on `el` that may become a swipe toward `directions`, as the
+ * session's one drag. The press stays a press until the pointer moves past a
+ * few pixels along an axis with a direction, so clicks on buttons inside keep
+ * working. Then the pointer is captured until it lifts.
  */
 function trackSwipe(
+  drags: DragSession,
   el: HTMLElement,
   down: PointerEvent,
   directions: SwipeDirection[],
   callbacks: SwipeCallbacks,
 ) {
-  const doc = el.ownerDocument
   const start = { x: down.clientX, y: down.clientY }
   const samples = [{ x: start.x, y: start.y, time: down.timeStamp }]
-  let stopTracking: (() => void) | undefined
-
-  const offWait = on(doc, "pointermove", (event) => {
-    if (event.pointerId !== down.pointerId) return
-    const axis = swipeAxis(event.clientX - start.x, event.clientY - start.y, directions)
-    if (axis === undefined) return
-    stopWaiting()
-    if (axis === null) return
-    callbacks.onStart(axis)
-    stopTracking = bindDrag(el, event, {
-      onMove: ({ x, y, event }) => {
-        samples.push({ x, y, time: event.timeStamp })
-        if (samples.length > 2) samples.shift()
-        callbacks.onMove(swipeOffset(x - start.x, y - start.y, axis, directions))
-      },
-      onEnd: (event, canceled) => {
-        const [from, to] = samples
-        const elapsed = to ? Math.max(1, to.time - from.time) : Infinity
-        const x = event.clientX - start.x
-        const y = event.clientY - start.y
-        const direction = canceled
-          ? null
-          : swipeOutcome({
-              x: axis === "x" ? x : 0,
-              y: axis === "y" ? y : 0,
-              velocityX: to ? (to.x - from.x) / elapsed : 0,
-              velocityY: to ? (to.y - from.y) / elapsed : 0,
-              directions,
-            })
-        callbacks.onEnd(direction, event)
-      },
-    })
+  let axis: "x" | "y" = "x"
+  drags.startOnMove(el, down, {
+    pick(move) {
+      const picked = swipeAxis(move.clientX - start.x, move.clientY - start.y, directions)
+      if (picked === undefined) return undefined
+      if (picked === null) return false
+      axis = picked
+      callbacks.onStart(axis)
+      return true
+    },
+    onMove: ({ x, y, event }) => {
+      samples.push({ x, y, time: event.timeStamp })
+      if (samples.length > 2) samples.shift()
+      callbacks.onMove(swipeOffset(x - start.x, y - start.y, axis, directions))
+    },
+    onEnd: (event, canceled) => {
+      const [from, to] = samples
+      const elapsed = to ? Math.max(1, to.time - from.time) : Infinity
+      const x = event.clientX - start.x
+      const y = event.clientY - start.y
+      const direction = canceled
+        ? null
+        : swipeOutcome({
+            x: axis === "x" ? x : 0,
+            y: axis === "y" ? y : 0,
+            velocityX: to ? (to.x - from.x) / elapsed : 0,
+            velocityY: to ? (to.y - from.y) / elapsed : 0,
+            directions,
+          })
+      callbacks.onEnd(direction, event)
+    },
   })
-  const offUp = on(doc, "pointerup", (event) => {
-    if (event.pointerId === down.pointerId) stopWaiting()
-  })
-  const offCancel = on(doc, "pointercancel", (event) => {
-    if (event.pointerId === down.pointerId) stopWaiting()
-  })
-
-  function stopWaiting() {
-    offWait()
-    offUp()
-    offCancel()
-  }
-
-  return () => {
-    stopWaiting()
-    stopTracking?.()
-  }
 }
 
 export { along, swipeAxis, type SwipeDirection, swipeOffset, swipeOutcome, trackSwipe }

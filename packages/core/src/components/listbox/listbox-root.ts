@@ -180,7 +180,7 @@ type ListboxItemProps<T = string> = {
   value: T
   /** The text typing finds, when the content isn't plain text. Not the accessible name: use `aria-label` for that. */
   label?: string
-  /** Keeps the item from being chosen. It can still be focused, as the listbox pattern asks, and ranges skip it. Sets `data-disabled` and `aria-disabled`. */
+  /** Keeps the item from being chosen. Arrow keys, typing and ranges skip it. Sets `data-disabled` and `aria-disabled`. */
   disabled?: boolean
   /** The item's position among all items, for virtualized lists that render only some. Sets `aria-posinset` and `aria-setsize`. */
   index?: number

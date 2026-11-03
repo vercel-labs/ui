@@ -5,6 +5,7 @@ export { createPopup, type PopupState, popupState } from "./create-popup"
 export { type DismissOptions } from "./dismissal"
 export { createHoverIntent } from "./hover"
 export { measureScrollerEarly } from "./modal"
+export { createSafeArea } from "./safe-area"
 export { modalAttribute, pointerModalAttribute } from "./modal-attribute"
 export {
   createPopupController,

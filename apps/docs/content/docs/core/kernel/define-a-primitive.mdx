@@ -168,7 +168,7 @@ This textarea measures its content after each input and adjusts its height.
 
 <ComponentExample name="core/autosize" />
 
-Keep `attrs` and slot `state` pure: they also run on the server. Read from state and the part's props; do DOM work in `bind`.
+Keep `attrs` and slot `state` pure: they also run on the server. Read from state and the part's props; do DOM work in `bind`. Slot `state` can return new objects and arrays on every call, since parts compare them by value, but other values, like a `Date` or a `Map`, should stay the same object until they change.
 
 `bind` also receives the part as its second argument. Its `props` stay current, and `part.store.subscribe` lets you follow state changes. Use `connect` for work that must stay active while an element remains in the page, even when it isn't present, as with a hidden custom element.
 
@@ -204,7 +204,7 @@ Try leaving a field empty. The button finds it from the current page order, so t
 
 <ComponentExample name="core/first-empty-field" />
 
-For one part, use `context.element(slot, key)`. To read its latest props, use `context.props(slot, key)`. The `key` is the part's `id` prop, or its `value`, as with the stars in [Compose Behaviors](../compose-behaviors#add-a-star).
+For one part, use `context.element(slot, key)`. To read its latest props, use `context.props(slot, key)`, naming them the same way: `context.props<{ title: string }>("window", key)`. The `key` is the part's `id` prop, or its `value`, as with the stars in [Compose Behaviors](../compose-behaviors#add-a-star).
 
 ## What Agents Can Do
 

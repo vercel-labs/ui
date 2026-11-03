@@ -58,4 +58,30 @@ async function moveIntoShadowRoot(el: Locator) {
   })
 }
 
-export { addScroller, addShadowButton, composingEscape, moveIntoShadowRoot }
+// Clips a list's popup to a few items, scrolling either the content or the list
+// inside it, the two ways authors style a scrolling list.
+async function scrollIn(listbox: Locator, part: "content" | "list") {
+  await listbox.evaluate((list, part) => {
+    const content = list.closest<HTMLElement>(".list-popup")!
+    if (part === "list") Object.assign(content.style, { maxHeight: "none", overflowY: "visible" })
+    Object.assign((part === "list" ? list : content).style, { maxHeight: "80px", overflowY: "auto" })
+  }, part)
+}
+
+// Whether an element shows whole inside the ancestor that scrolls it.
+async function scrolledIntoView(el: Locator) {
+  return el.evaluate((el) => {
+    let node = el.parentElement
+    while (
+      node &&
+      !(/(auto|scroll)/.test(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight)
+    )
+      node = node.parentElement
+    if (!node) return false
+    const box = el.getBoundingClientRect()
+    const view = node.getBoundingClientRect()
+    return box.top >= view.top - 1 && box.bottom <= view.bottom + 1
+  })
+}
+
+export { addScroller, addShadowButton, composingEscape, moveIntoShadowRoot, scrollIn, scrolledIntoView }

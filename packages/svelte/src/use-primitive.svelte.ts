@@ -20,7 +20,7 @@ import {
   present as isPresent,
   ref as partRef,
   renderVersion,
-  sameValue,
+  sameSlotState,
   schemaOf,
   selectedKeys,
   subscribe,
@@ -134,10 +134,13 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
       .map((name) => counts[name] ?? 0)
       .join()
   })
-  // Keeps callbacks fresh and hands the options to the instance, for its own
-  // listeners, before the DOM updates. Parts already read what they deliver,
-  // so they skip it.
-  $effect.pre(() => instance.setOptions({ ...resolve(snapshot(options())), id: prefixed }))
+  // Hands the options to the instance before the DOM updates. What they change
+  // is counted first, against the state before them, so parts hear a key
+  // derived from that state too, like a drawer's snap point.
+  $effect.pre(() => {
+    marks
+    instance.setOptions({ ...resolve(snapshot(options())), id: prefixed })
+  })
   const handle: PrimitiveHandle<P> = {
     instance,
     api: instance.api as TypesOf<P>["api"],
@@ -257,7 +260,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       if (read.size && snapshot) {
         const next = partState(current) as Record<string, unknown>
         for (const key of read) {
-          if (sameValue(next[key], snapshot[key])) continue
+          if (sameSlotState(next[key], snapshot[key])) continue
           snapshot = next
           // The render this causes reads its keys again.
           read.clear()
@@ -272,9 +275,14 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       // before Svelte renders, so each removal is waited for once.
       if (!present && shown.present) {
         restore()
+        restored = bound
         if (portal && bound && !removed)
           exits.get(instance)?.push(new Promise((resolve) => (removed = resolve)))
       }
+      // Present again before Svelte removed it, like a navigation menu's
+      // content as its viewport binds again: it goes back where it renders.
+      if (present && restored && restored === bound) back = portal?.(restored)
+      if (present) restored = undefined
       // Present again before Svelte removed it: reopened, that close never
       // completes; still closed, like a select's list kept in the page
       // hidden, the close is done.
@@ -301,6 +309,8 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   }
   // Svelte unbinds a part's element as it removes it, once its outros end.
   let removed: (() => void) | undefined
+  // The element put back in its block while the part wasn't present.
+  let restored: HTMLElement | undefined
 
   // Binds the element: moves a popup into its container first, so the core
   // binds it where it lives, then the core's ref and the merged listeners.

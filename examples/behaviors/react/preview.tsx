@@ -49,7 +49,7 @@ const fonts = definePrimitive({
       attrs: () => ({ role: "radiogroup" }),
       on: {
         focusout: (event, { el, api }) => {
-          if (api.preview.scrubbing() || el?.contains(event.relatedTarget as Node)) return
+          if (api.preview.dragging() || el?.contains(event.relatedTarget as Node)) return
           api.preview.clear({ reason: "focus-out", event })
         },
       },
@@ -67,7 +67,7 @@ const fonts = definePrimitive({
         style: "touch-action:none;user-select:none",
       }),
       on: {
-        pointerdown: (event, { el, api, key }) => api.preview.scrub(event, key, el!.parentElement!),
+        pointerdown: (event, { el, api, key }) => api.preview.pointerdown(event, key, el!.parentElement!),
         keydown: (event, { el, api, key }) => {
           if (api.preview.keydown(event, key)) return
           const moved = api.roving.keydown(event, el!)

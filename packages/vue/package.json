@@ -33,6 +33,7 @@
     "./menubar": "./src/menubar.ts",
     "./meter": "./src/meter.ts",
     "./navigation-menu": "./src/navigation-menu.ts",
+    "./number": "./src/number.ts",
     "./number-input": "./src/number-input.ts",
     "./otp-input": "./src/otp-input.ts",
     "./overlays": "./src/overlays.ts",
@@ -183,6 +184,10 @@
       "./navigation-menu": {
         "types": "./dist/navigation-menu.d.ts",
         "default": "./dist/navigation-menu.js"
+      },
+      "./number": {
+        "types": "./dist/number.d.ts",
+        "default": "./dist/number.js"
       },
       "./number-input": {
         "types": "./dist/number-input.d.ts",

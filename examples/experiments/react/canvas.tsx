@@ -134,7 +134,7 @@ const canvas = /* @__PURE__ */ definePrimitive({
       draft: "moving",
       set: (value, details) => change("positions", value, details),
       group: (key) => (store.get().selected.includes(key) ? store.get().selected : [key]),
-      grid: () => 8,
+      step: () => 8,
       scale: () => viewport.get().zoom,
       label: (key) => node(key)?.label,
     })

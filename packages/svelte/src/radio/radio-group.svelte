@@ -14,6 +14,7 @@ Radios that share one value, with one tab stop and arrow keys between them.
   import { setContext } from "svelte"
   import { useField, useFieldControl } from "../field/context"
   import Part from "../part.svelte"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
   import { GroupFieldKey, RadioGroupKey } from "./context"
 
@@ -67,7 +68,7 @@ Radios that share one value, with one tab stop and arrow keys between them.
     },
     defaultValue,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     required,
     name: name ?? field?.name(),
     form,

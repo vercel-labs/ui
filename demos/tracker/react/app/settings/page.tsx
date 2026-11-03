@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
+import { getSettings } from "@/app/data"
 import { SettingsForm } from "@/components/settings-form"
-import { getSettings } from "tracker-data/store"
 
 const metadata: Metadata = {
   title: "Settings · Tracker",
 }
 
-function Page() {
+async function Page() {
+  const settings = await getSettings()
   return (
     <main className="min-h-0 flex-1 overflow-y-auto">
       <div className="mx-auto grid max-w-xl gap-8 px-4 py-10">
@@ -14,7 +15,7 @@ function Page() {
           <h1 className="text-xl font-semibold">Settings</h1>
           <p className="text-muted-foreground">How the tracker works for the Acme workspace.</p>
         </div>
-        <SettingsForm settings={getSettings()} />
+        <SettingsForm settings={settings} />
       </div>
     </main>
   )

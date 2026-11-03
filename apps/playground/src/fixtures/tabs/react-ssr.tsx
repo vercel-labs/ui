@@ -13,6 +13,8 @@ function mount(root: HTMLElement) {
     </React.StrictMode>
   )
   root.innerHTML = renderToString(app)
+  // What the page shows before hydration.
+  ;(window as unknown as { __serverHtml: string }).__serverHtml = root.innerHTML
   const error = console.error
   console.error = (...args: unknown[]) => {
     errors.push(args.map(String).join(" "))

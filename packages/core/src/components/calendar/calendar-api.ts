@@ -126,6 +126,11 @@ const rangeRules = (state: State) => ({
   allowUnavailable: state.allowUnavailable,
   isUnavailable: (date: ISODate) => unavailableDate(state, date),
 })
+const refusedEnd = (state: State, date: ISODate) =>
+  state.mode === "range" &&
+  state.anchor !== null &&
+  date !== state.anchor &&
+  rangeTo(state.anchor, date, rangeRules(state)) === null
 
 // The month a calendar opens on: the selection's, else today's, within `min` and `max`.
 function initialMonth(options: CalendarOptions, value: CalendarValue) {
@@ -289,7 +294,7 @@ function dayState(state: State, props: CalendarDayProps) {
     selected,
     today: state.today === date,
     outside: isOutside(state, props),
-    disabled: isDisabled(state) || blockedDate(state, date),
+    disabled: isDisabled(state) || blockedDate(state, date) || refusedEnd(state, date),
     unavailable: unavailableDate(state, date),
     rangeStart: !!range && range[0] === date,
     rangeEnd: !!range && range[1] === date,

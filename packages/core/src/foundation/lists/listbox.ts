@@ -39,10 +39,9 @@ function itemMatches<T>(item: ListItem<T>, query: string, filter: ListFilter<T> 
   return itemScore(item, query, filter) > 0
 }
 
-// The data a list shows for a query: items that match, groups that still have
-// some, and separators only between what's left. Ranked, best matches come
-// first, within groups and among them, and separators go, since the order no
-// longer follows the sections they divide.
+// The data a list shows for a query: matching items, groups that still have
+// some, and separators between what's left. Ranking puts the best first, and
+// drops separators once it moves an entry out of the sections they divide.
 function filterData<T>(
   data: ListData<T>,
   query: string,
@@ -74,15 +73,23 @@ function filterData<T>(
   return result
 }
 
-type Ranked<T> = { entry: ListData<T>[number]; score: number }
+type Ranked<T> = { entry: ListData<T>[number]; score: number; separator?: ListData<T>[number] }
 
 // Sorts by score, best first. Equal scores keep their order, since sort is stable.
 const byScore = <T>(a: Ranked<T>, b: Ranked<T>) => b.score - a.score
 
 function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
   const ranked: Ranked<T>[] = []
+  let separator: ListData<T>[number] | undefined
+  const keep = (entry: ListData<T>[number], score: number) => {
+    ranked.push({ entry, score, separator: ranked.length ? separator : undefined })
+    separator = undefined
+  }
   for (const entry of data) {
-    if (isSeparator(entry)) continue
+    if (isSeparator(entry)) {
+      separator = entry
+      continue
+    }
     if (isGroup(entry)) {
       const items: Ranked<T>[] = []
       for (const child of entry.items) {
@@ -91,14 +98,15 @@ function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
       }
       if (!items.length) continue
       items.sort(byScore)
-      const group = { ...entry, items: items.map((item) => item.entry) as ListGroup<T>["items"] }
-      ranked.push({ entry: group, score: items[0].score })
+      keep({ ...entry, items: items.map((item) => item.entry) as ListGroup<T>["items"] }, items[0].score)
       continue
     }
     const score = itemScore(toListItem(entry), query, filter)
-    if (score > 0) ranked.push({ entry, score })
+    if (score > 0) keep(entry, score)
   }
-  return ranked.sort(byScore).map((item) => item.entry)
+  const sorted = [...ranked].sort(byScore)
+  if (sorted.some((item, index) => item !== ranked[index])) return sorted.map((item) => item.entry)
+  return ranked.flatMap((item) => (item.separator ? [item.separator, item.entry] : [item.entry]))
 }
 
 const filtering = { data: filterData, matches: itemMatches }

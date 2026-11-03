@@ -10,7 +10,6 @@ import { onProps } from "../kernel/part"
 import type { Part, SlotFactory } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
 import type { Anchor, PortalProps, PositionProps } from "../platform/position"
-import { enforceHidden } from "../platform/style"
 import { popupContentAttrs, type Modal, type PopupFocusTarget } from "./popup"
 import { ownsEvent, registerPopupElement } from "./popup-elements"
 import type { createPopup, PopupState } from "./create-popup"
@@ -149,8 +148,6 @@ function bindPopupContent(el: HTMLElement, internal: PopupInternal, key?: string
   const { preset, control, contentProps, triggerElement, element, popup, press, rules, presentation } =
     internal
   const { placement } = preset
-  // Content kept in the page while closed stays hidden whatever display its class sets.
-  enforceHidden(el.ownerDocument)
   preset.resetStyles?.bind(el)
   return (presentation ?? popup).bind(el, {
     // What it's placed against: a controller's anchor, the content's, or the trigger.
@@ -319,6 +316,11 @@ function popupArrow<State extends PopupState, Api extends PopupApi>(slot: SlotFa
   return slot<{}, PopupPartState>({
     state: (state) => ({ open: state.open }),
     attrs: (state) => ({ "aria-hidden": "true", ...openAttrs(state.open) }),
+    // An arrow that binds after its popup was placed, like one Svelte binds
+    // after the content, points at the trigger at once.
+    bind(_, { api }) {
+      api.internal.popup.checkPlacement()
+    },
   })
 }
 

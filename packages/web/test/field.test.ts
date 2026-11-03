@@ -135,3 +135,16 @@ test("the invalid property writes the attribute, three ways", async () => {
   await wait()
   expect(document.querySelector("input")!.getAttribute("aria-invalid")).toBe("true")
 })
+
+test("a native input whose id is removed keeps its label", async () => {
+  defineFieldElements()
+  document.body.innerHTML = `<ui-field><ui-field-label as-child><label>Name</label></ui-field-label><input id="name" /></ui-field>`
+  await wait()
+  const input = document.querySelector("input")!
+  const label = document.querySelector("label")!
+  expect(label.control).toBe(input)
+  input.removeAttribute("id")
+  await wait()
+  expect(input.id).not.toBe("")
+  expect(label.control).toBe(input)
+})

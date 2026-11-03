@@ -192,6 +192,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
     rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
+    skipDisabled: true,
     active: () => store.get().open,
     onHighlight: (key, index, event) =>
       options().onHighlight?.(key === null || isSelectAll(key) ? null : (listbox.valueOf(key) ?? null), {
@@ -200,6 +201,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       }),
     onLastReached: loadMore.reached,
     container: () => element("list") ?? contentElement(),
+    scrollRoot: contentElement,
     // Parts that depend on the list, like the empty message and groups, update once per batch of items mounting.
     onRegister() {
       if (mountsQueued) return
@@ -210,7 +212,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       })
     },
   })
-  const selection = createValueSelection({ store, options, listbox, toKey })
+  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
   keepListing(store, listbox, {
     entry: (key, value) => (selection.isSelected(key, value) ? "s" : ""),
     inputs: () => [store.get().value],
@@ -274,9 +276,10 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   }
 
   // Where focus goes once the list opens: the selected item, or the first or
-  // last. With a search field, focus goes there and the item is only highlighted.
+  // last that can be chosen. With a search field, focus goes there and the
+  // item is only highlighted.
   function initialFocus() {
-    const list = listbox.entries().filter((entry) => !entry.pinned)
+    const list = listbox.entries().filter((entry) => !entry.pinned && !listbox.disabled(entry))
     const selected = list.find((entry) => selection.isSelected(entry.key, entry.value))
     const target =
       pendingFocus === "last" ? list.at(-1) : pendingFocus === "first" ? list[0] : (selected ?? list[0])
@@ -308,6 +311,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   ) {
     const state = store.get()
     if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    selection.stopRestoring()
     const done = change("value", value, { reason, event })
     if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
     return done
@@ -437,7 +441,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       // The pointer highlights what it moves onto, focusing it unless focus stays in the search field.
       hover(key: string, event: PointerEvent) {
         const { open, highlighted } = store.get()
-        if (event.pointerType === "touch" || !open) return
+        if (event.pointerType === "touch" || !open || listbox.isItemDisabled(key)) return
         const el = listbox.element(key)
         const focused = searching() || el?.ownerDocument.activeElement === el
         if (highlighted !== key || !focused) listbox.highlight(key, { event })
@@ -469,7 +473,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       serialized: selection.keys,
       arrowElement: () => element("arrow"),
       // The props an item last rendered with, read live by its registration.
-      itemProps: (key: string) => context.props("item", key) as SelectItemMeta | undefined,
+      itemProps: (key: string) => context.props<SelectItemMeta>("item", key),
       contentProps: (key?: string) => kit.internal.contentProps(key) as SelectContentProps,
       // Web components read `default-value` as keys when items come later. Once
       // they arrive, a value that still names them takes their values, with no
@@ -489,8 +493,9 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
           .find((entry) => entry.key.toLowerCase() === lower || entry.label.toLowerCase() === lower)
         if (entry && !store.get().multiple) setValue(entry.value, { reason: "item-press" })
       },
+      // The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
-        setValue(selection.restored(saved), { reason: "restore" })
+        selection.restore(saved, (value) => change("value", value, { reason: "restore" }))
       },
     },
   }

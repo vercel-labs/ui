@@ -28,6 +28,7 @@ import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { longItems, serializeForm } from "tests/fixtures/select.ts"
 import {
+  cancelsValue,
   changedItems,
   comboboxFixture as f,
   comboboxOptions,
@@ -92,6 +93,7 @@ function Fixture({ data = false }: { data?: boolean }) {
     nostatus,
     summary,
     labelsFromItems,
+    cancel,
     ...options
   } = comboboxOptions()
   const [action, setAction] = React.useState("")
@@ -151,9 +153,10 @@ function Fixture({ data = false }: { data?: boolean }) {
             status={async || pages ? remote.status : undefined}
             onLoadMore={pages ? remote.loadMore : undefined}
             itemToLabel={labelsFromItems ? undefined : (value) => labels.get(value) ?? value}
-            onValueChange={(value) =>
+            onValueChange={(value, details) => {
+              if (cancelsValue(value, cancel)) return details.cancel()
               setAction(`value:${Array.isArray(value) ? value.join(",") : String(value)}`)
-            }
+            }}
             onQueryChange={(query) => (async || pages) && remote.setQuery(query)}
           >
             <ComboboxLabel className="label">{f.label}</ComboboxLabel>

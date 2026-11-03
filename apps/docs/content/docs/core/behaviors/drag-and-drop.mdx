@@ -44,6 +44,32 @@ Here `resizeTo`, `restore`, and `commit` are your splitter's own methods. `bindD
 
 `dragThreshold` waits for a few pixels of movement before `onMove` starts. A press can still end below that threshold, so don't assume every `onEnd` follows a move. Give a draggable surface `touch-action: none` when dragging should take precedence over scrolling.
 
+### Collapse Past a Threshold
+
+A sidebar resizes between its minimum and maximum widths, and can collapse, but never rests in between. Below the minimum, let `scrubTo` decide: give it two snap points, collapsed and the minimum, each reaching halfway, and ease toward them:
+
+```ts
+import { scrubTo } from "@ui-sdk/core/number"
+
+const collapse = { min: 0, max: minWidth, step: 1, snap: { points: [0, minWidth], threshold: minWidth / 2 } }
+
+const widthAt = (pointer: number) =>
+  pointer >= minWidth ? { value: Math.min(maxWidth, pointer), point: undefined } : scrubTo(pointer, collapse, { ease: true })
+
+onMove: ({ x }) => {
+  const { value, point } = widthAt(x - root.getBoundingClientRect().left)
+  store.set({ draft: value, landing: point ?? null })
+},
+onEnd: () => commit(store.get().landing ?? store.get().draft),
+```
+
+While the pointer moves below the minimum, the sidebar follows it, picking up speed toward whichever point is closer, so it closes in on collapsing without a sudden jump. `point` says where it will land, so the demo can say so before release; dragging the other way opens it the same way.
+
+<ComponentExample
+  name="behaviors/bind-drag-collapse"
+  caption="Drag the divider below the sidebar's minimum: it eases toward collapsing or back to the minimum, and says which it will do when you let go. Focus the divider for Left, Right and Enter."
+/>
+
 ### Dragging Without Limits
 
 For a scrubber, pointer lock lets the user keep dragging past the edge of the screen. Read the distance moved instead of the pointer's position:

@@ -11,6 +11,7 @@ import { isRTL } from "../../foundation/platform/env"
 import { activeElement, supportsTopLayer } from "../../foundation/platform/platform"
 import { resetPopoverStyles } from "../../foundation/popups/popup"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
+import { createDragSession } from "../../foundation/drag-and-drop/pointer"
 import { trackSwipe } from "./swipe"
 import { tabbables } from "../../foundation/focus/tabbable"
 import { textOf } from "../../foundation/text/typeahead"
@@ -83,6 +84,7 @@ function toastRegionApi(
   context: PrimitiveContext<ToastRegionInternalOptions, ToastRegionStoreState, string>,
 ) {
   const { store, options, onDestroy, element } = context
+  const drags = createDragSession(onDestroy)
   const changeSource = inputSource()
   // The toaster can change, like a web component's property set after it connects.
   const toaster = () => store.get().toaster
@@ -442,14 +444,14 @@ function toastRegionApi(
 
   function startSwipe(el: HTMLElement, toastId: string, down: PointerEvent) {
     const toast = findItem(store.get().items, toastId)?.toast
-    if (!toast || toast.dismissible === false || down.button !== 0) return
+    if (!drags.accepts(down) || !toast || toast.dismissible === false) return
     const target = down.target as Element | null
     if (target?.closest("input, textarea, select, [contenteditable]:not([contenteditable='false'])")) return
     const { side, align } = store.get()
     const directions = swipeDirections(side, align, isRTL(el))
     // A mouse drag that starts on text selects it.
     if (down.pointerType === "mouse" && pressedText(down)) return
-    trackSwipe(el, down, directions, {
+    trackSwipe(drags, el, down, directions, {
       onStart: () => {
         el.ownerDocument.getSelection()?.removeAllRanges()
         el.setAttribute("data-swiping", "")

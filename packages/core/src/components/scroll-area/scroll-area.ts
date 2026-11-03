@@ -259,6 +259,8 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
         : { sticking: synced.stickToEnd },
     )
     let { stickToEnd, type, scrollHideDelay } = store.get()
+    let destroyed = false
+    onDestroy(() => (destroyed = true))
     onDestroy(
       store.subscribe(() => {
         const state = store.get()
@@ -269,7 +271,8 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
         )
           return
         ;({ stickToEnd, type, scrollHideDelay } = state)
-        view.refresh()
+        // Once the options are handed over, so what it measures isn't written beside them.
+        queueMicrotask(() => destroyed || view.refresh())
       }),
     )
     return {

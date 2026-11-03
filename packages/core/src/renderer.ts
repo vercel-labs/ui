@@ -51,7 +51,7 @@ export { writeFromScript } from "./foundation/forms/value"
 export { canceledAction } from "./foundation/kernel/action"
 export { createListSnapshots } from "./foundation/kernel/controlled-lists"
 export { on } from "./foundation/kernel/events"
-export { applyAttrs } from "./foundation/kernel/live"
+export { applyAttrs, markAuthored, releaseAttrs } from "./foundation/kernel/live"
 export { inDocumentOrder } from "./foundation/kernel/order"
 export {
   attrs,
@@ -83,7 +83,7 @@ export type {
   WithFeatures,
   WithGeneric,
 } from "./foundation/kernel/primitive-types"
-export { type Listener, sameValue, writes } from "./foundation/kernel/store"
+export { type Listener, sameSlotState, sameValue, writes } from "./foundation/kernel/store"
 export type { ItemIconProps, ItemIconState } from "./foundation/lists/item-icon"
 export {
   flattenData,
@@ -96,4 +96,4 @@ export { selectAllKey } from "./foundation/lists/listbox-keys"
 export { type ListSelectAllState } from "./foundation/lists/listbox-select-all"
 export { initialApple, isApple, portalTarget } from "./foundation/platform/platform"
 export { writeStyle } from "./foundation/platform/style"
-export { parseRange } from "./foundation/text/number"
+export { parseRange } from "./foundation/number/parse"

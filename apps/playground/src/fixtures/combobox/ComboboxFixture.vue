@@ -24,6 +24,7 @@ import {
   useAsyncOptions,
 } from "@ui-sdk/vue"
 import {
+  cancelsValue,
   changedItems,
   comboboxFixture as f,
   comboboxOptions,
@@ -54,6 +55,7 @@ const {
   nostatus,
   summary,
   labelsFromItems,
+  cancel,
   ...options
 } = comboboxOptions()
 const action = ref("")
@@ -83,7 +85,8 @@ type Entry = { value: string; label: string; keywords?: string[]; disabled?: boo
 type Shown = Entry | { type: "group"; label: string; items: Entry[] }
 const dataMode = props.data || remoteMode || long || recent
 
-function onValueChange(value: unknown) {
+function onValueChange(value: unknown, details: { cancel: () => void }) {
+  if (cancelsValue(value, cancel)) return details.cancel()
   action.value = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
 }
 

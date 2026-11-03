@@ -16,6 +16,7 @@ const helpers = [
   "./observe",
   "./async-options",
   "./date",
+  "./number",
   "./primitive",
   "./shortcuts",
   "./text-match",

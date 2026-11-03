@@ -1,5 +1,16 @@
 import type { Locator } from "@playwright/test"
-import { expect, focusIsWithin, isSheet, lastAction, menuNamed, test, waitForStill } from "../fixtures"
+import {
+  expect,
+  focusIsWithin,
+  isSheet,
+  lastAction,
+  menuNamed,
+  opacityOf,
+  slowTransitions,
+  test,
+  transitionedIn,
+  waitForStill,
+} from "../fixtures"
 import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
 
 // Behavior follows the WAI-ARIA menu button pattern:
@@ -349,6 +360,27 @@ test.describe("submenu with a pointer", () => {
     await expect(page.getByRole("menuitem", { name: "More" })).toHaveAttribute("data-highlighted", "")
   })
 
+  test("resting on a sibling item on the way to the submenu moves to it once the safe area expires", async ({
+    page,
+    open,
+  }) => {
+    await page.clock.install()
+    await open("menu")
+    await page.getByRole("button", { name: "File" }).click()
+    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    await page.mouse.move(share.x + share.width - 12, share.y + share.height / 2)
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeVisible()
+
+    const remove = page.getByRole("menuitem", { name: "Delete" })
+    const box = (await remove.boundingBox())!
+    await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2, { steps: 4 })
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    await page.clock.runFor(300)
+    await expect(menuNamed(page, "Share")).toBeHidden()
+    await expect(remove).toBeFocused()
+  })
+
   test("moving to a sibling item closes the submenu", async ({ page }) => {
     await page.getByRole("button", { name: "File" }).click()
     await page.getByRole("menuitem", { name: "Share" }).hover()
@@ -507,12 +539,22 @@ test.describe("positioning", () => {
 })
 
 test.describe("animation", () => {
+  test("the popup animates in from its starting style", async ({ page, open, fixtureOptions }) => {
+    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    await open("menu", { animate: "" })
+    await slowTransitions(page)
+    await page.getByRole("button", { name: "File" }).click()
+    const menu = menuNamed(page, "File")
+    await expect(menu).toBeVisible()
+    expect(await opacityOf(menu)).toBeLessThan(0.5)
+  })
+
   test("the popup stays mounted while it animates out", async ({ page, open }) => {
     await open("menu", { animate: "" })
     await page.getByRole("button", { name: "File" }).click()
     const menu = menuNamed(page, "File")
     await expect(menu).toBeVisible()
-    await expect(menu).not.toHaveAttribute("data-starting-style")
+    await transitionedIn(menu)
 
     await page.getByRole("button", { name: "File" }).click()
     await expect(page.locator("[data-ending-style]")).toHaveCount(1)

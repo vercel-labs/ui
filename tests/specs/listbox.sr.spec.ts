@@ -25,16 +25,14 @@ async function record(page: Page, steps: () => Promise<void>) {
 // The fixture's status regions add phrases that say nothing about the component.
 const withoutNoise = (log: string[]) => log.filter((phrase) => !phrase.startsWith("polite:"))
 
-// Tabs into a single listbox, where the selection follows focus, down past a
-// disabled option, and out.
+// Tabs into a single listbox, where the selection follows focus, down over a
+// disabled option it skips, and out.
 test("announcements while choosing one option with a keyboard", async ({ page, open, tab }) => {
   await open("listbox", { sr: "", value: "mushroom" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await expect(option(page, "Mushroom")).toBeFocused()
-    await page.keyboard.press("ArrowDown")
-    await expect(option(page, "Olive")).toBeFocused()
     await page.keyboard.press("ArrowDown")
     await expect(option(page, "Onion")).toBeFocused()
     await tab()
@@ -43,7 +41,6 @@ test("announcements while choosing one option with a keyboard", async ({ page, o
     "document",
     "button, Before",
     "option, Mushroom, selected, position 4, set size 8",
-    "option, Olive, not selected, disabled, position 5, set size 8",
     "option, Onion, selected, position 6, set size 8",
     "button, Submit",
   ])

@@ -2,6 +2,7 @@
 // when it opens, what screen readers hear, and the editor it follows. The
 // match and its levels live in trigger-menu-levels.ts, and choosing in
 // trigger-menu-select.ts.
+import { isComposing } from "../../foundation/kernel/events"
 import { createAsyncOptions, type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { createDetails } from "../../foundation/kernel/details"
 import { changeSource } from "../../foundation/kernel/input-source"
@@ -36,6 +37,7 @@ import type {
 import { createTriggerMenuKeyboard } from "./trigger-menu-keyboard"
 import { argumentOf, createTriggerLevels, type TriggerLevel } from "./trigger-menu-levels"
 import { createTriggerSelect } from "./trigger-menu-select"
+import type { TextProps } from "./trigger-menu-parts"
 import { elements } from "../../foundation/kernel/elements"
 
 type TriggerMenuState = PopupState & {
@@ -156,6 +158,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     loop: () => options().loop ?? true,
     active: () => store.get().open,
     container: () => element("list") ?? popup.element() ?? element("content"),
+    scrollRoot: () => popup.element() ?? element("content"),
     onRegister() {
       if (mountsQueued) return
       mountsQueued = true
@@ -281,7 +284,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     items: () => store.get().items,
     find: (key) => listbox.find(key),
     highlighted: () => (store.get().open ? store.get().highlighted : null),
-    itemProps: (key) => context.props("item", key) as ItemMeta | undefined,
+    itemProps: (key) => context.props<ItemMeta>("item", key),
     toKey,
   })
 
@@ -341,7 +344,8 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     const message = statusMessage()
     const region = element("status")
     if (!region) return announce(message)
-    if (!(elements(context, "status")[0]?.props ?? context.props("status"))?.text) return
+    if (!(elements<TextProps>(context, "status")[0]?.props ?? context.props<TextProps>("status"))?.text)
+      return
     clearTimeout(statusTimer)
     statusTimer = setTimeout(() => {
       // The same message again is changed a little, so it's said again.
@@ -361,7 +365,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   })
 
   function onKeyDown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.isComposing || event.keyCode === 229) return
+    if (event.defaultPrevented || isComposing(event)) return
     const shortcut = options().shortcut ?? "ctrl+space"
     if (shortcut && matchesShortcut(event, shortcut)) {
       if (levels.reopen("shortcut", event)) event.preventDefault()
@@ -559,7 +563,7 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
         (options().status ?? state.loading) !== "loading" &&
         (!!state.items || state.settled) &&
         !listbox.entries().length,
-      itemProps: (key: string) => context.props("item", key) as ItemMeta | undefined,
+      itemProps: (key: string) => context.props<ItemMeta>("item", key),
       contentProps: (key?: string) => contentProps(key) as TriggerMenuContentProps,
     },
   }

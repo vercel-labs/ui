@@ -231,7 +231,7 @@ return {
 }
 ```
 
-Create the handle once and pass it to the component's `controller` option. Call its methods after the component has attached it. `controller.start(30)` then forwards to that instance's `start` method. The handle detaches when the instance is destroyed.
+Create the handle once and pass it to the component's `controller` option. `controller.start(30)` forwards to the attached instance's `start` method. Before the component attaches it, a method does nothing and returns `undefined`. The handle detaches when the instance is destroyed.
 
 The methods choose their own change reasons. For example, the countdown's `start` method calls `change("left", seconds, { reason: "imperative" })`; each timer tick uses `"timeout"`.
 

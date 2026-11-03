@@ -80,7 +80,7 @@ function commentsOf(file) {
       if (line.includes(open.closer)) comments.push(close(index))
       return
     }
-    open = commentStartOf(line, index)
+    open = commentStartOf(line, index, lines[index + 1]?.trim())
     if (open?.closer && line.includes(open.closer, 2)) comments.push(close(index))
   })
   if (open) comments.push(close(lines.length - 1))
@@ -97,11 +97,12 @@ function isLineComment(line) {
   return line.startsWith("//") && !toolDirective.test(line)
 }
 
-function commentStartOf(line, index) {
+function commentStartOf(line, index, next) {
   if (isLineComment(line)) return { start: index }
   if (toolDirective.test(line)) return
   if (/^(\{\s*)?\/\*(?!\*)/.test(line)) return { start: index, closer: "*/" }
-  if (line.startsWith("<!--") && !line.startsWith("<!-- @component")) return { start: index, closer: "-->" }
+  if (line.startsWith("<!-- @component") || (line === "<!--" && next?.startsWith("@component"))) return
+  if (line.startsWith("<!--")) return { start: index, closer: "-->" }
 }
 
 // The lines each source file gained since `base`, with untracked files whole.

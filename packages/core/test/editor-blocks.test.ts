@@ -314,6 +314,8 @@ describe("createResize", () => {
         bounds: () => ({ left: 0, top: 0, right: 400, bottom: 300 }),
         aspect: () => context.options().aspect,
         label: () => "Crop",
+        step: () => 10,
+        largeStep: () => 50,
       })
       return { resize, set }
     },
@@ -780,6 +782,20 @@ describe("createSwipeActions", () => {
     expect(instance.get().open).toEqual({ key: "a", side: "end" })
   })
 
+  test("a swipe cut short by its component going away puts the row back", async () => {
+    const { instance, swipe: actions, row } = mount()
+    actions.pointerdown(at("pointerdown", 300, 0), "a", row)
+    document.dispatchEvent(at("pointermove", 260, 50))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(instance.get().swiping).not.toBeNull()
+    instance.destroy()
+    expect(instance.get().swiping).toBeNull()
+    // The pointer no longer reaches it.
+    document.dispatchEvent(at("pointermove", 200, 50))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(instance.get().swiping).toBeNull()
+  })
+
   test("a long swipe runs the first action, and only then", () => {
     const row = mount()
     const { instance } = row
@@ -821,4 +837,40 @@ describe("createSwipeActions", () => {
     document.body.dispatchEvent(pointer("pointerdown", 600, 300))
     expect(instance.get().open).toBeNull()
   })
+})
+
+// `disabled`: "Whether a row can't be swiped", which `show` and a new press already respect.
+test("a row disabled mid-swipe neither opens nor runs its full-swipe action on release", () => {
+  type MailState = { open: SwipeOpen | null; swiping: SwipeDraft | null }
+  let locked = false
+  const archived = vi.fn(() => true)
+  const mail = definePrimitive({
+    name: "mail",
+    state: (_options: {}): MailState => ({ open: null, swiping: null }),
+    live: ["swiping"],
+    api: (context) => ({
+      swipe: createSwipeActions<MailState>(context, {
+        key: "open",
+        draft: "swiping",
+        onFullSwipe: archived,
+        disabled: () => locked,
+      }),
+    }),
+    slots: (slot) => ({ row: slot<{ value: string }>({ props: { value: "string" } }) }),
+  })
+  const instance = mail({ id: "m" })
+  cleanups.push(() => instance.destroy())
+  const row = box(0, 0, 400, 60)
+  const actions = box(240, 0, 160, 60, row)
+  actions.innerHTML = "<button>Delete</button>"
+  const { swipe } = instance.api
+  cleanups.push(swipe.bindRow(row, "a"), swipe.bindActions(actions, "a", "end"))
+  swipe.pointerdown(pointer("pointerdown", 390, 30), "a", row)
+  document.dispatchEvent(pointer("pointermove", 370, 30))
+  document.dispatchEvent(pointer("pointermove", 100, 30))
+  locked = true
+  document.dispatchEvent(pointer("pointerup", 100, 30))
+  expect(archived).not.toHaveBeenCalled()
+  expect(instance.get().open).toBeNull()
+  expect(swipe.show("a", "end")).toBe(false)
 })

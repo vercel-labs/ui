@@ -12,7 +12,6 @@ import { createListbox, type ListData, type ListFilter, type Listbox } from "./l
 import { listStep } from "./listbox-keyboard"
 import { keepListing, type Listing } from "./listbox-listing"
 import { positionAttrs, registerItem } from "./listbox-parts"
-import { enforceHidden } from "../platform/style"
 import { announceResults, createLoadMore, matchMode, type ListAnnouncement } from "./listbox-search"
 import { idPart } from "../kernel/attrs"
 import type { BaseSlotProps, PrimitiveContext, SlotDefinition } from "../kernel/primitive-types"
@@ -97,6 +96,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
     // Notifies a virtualizer which index to reveal.
     onHighlight?: (key: string | null, index: number, event?: Event) => void
     container: () => HTMLElement | undefined
+    scrollRoot?: () => HTMLElement | undefined
     // Whether the component settles the highlight itself once the items mount,
     // like a command page that just opened, with its own reason.
     settlesMount?: () => boolean
@@ -124,10 +124,12 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
     rank: () => config.filter() === "fuzzy" || typeof config.filter() === "function",
     query: config.query,
     loop: () => options().loop ?? true,
+    skipDisabled: true,
     active: () => store.get().open,
     onHighlight: config.onHighlight,
     onLastReached: loadMore.reached,
     container: config.container,
+    scrollRoot: config.scrollRoot,
     onRegister() {
       if (mountsQueued) return
       mountsQueued = true
@@ -139,7 +141,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
   })
   keepListing(store, listbox)
 
-  const itemProps = (key: string) => context.props("item", key) as AutocompleteCoreItem | undefined
+  const itemProps = (key: string) => context.props<AutocompleteCoreItem>("item", key)
 
   // Where the highlight belongs after the list changed. New text highlights
   // its best match; otherwise the same item stays while it's still there,
@@ -176,7 +178,7 @@ function createAutocompleteCore<State extends AutocompleteCoreState, Reason exte
       return true
     }
     event.preventDefault()
-    const key = listbox.stepKey(step, { skipDisabled: true })
+    const key = listbox.stepKey(step)
     if (key !== undefined) config.highlight(key, { reason: "list-navigation", event })
     return true
   }
@@ -351,7 +353,6 @@ function optionPart<State extends AutocompleteCoreState, Api extends CoreApi>() 
     },
     press: ({ api, key }, event) => api.internal.press(key, event),
     bind(el, { api, key, props }) {
-      enforceHidden(el.ownerDocument)
       const unregister = registerItem(el, { api, key, props })
       return () => {
         unregister()

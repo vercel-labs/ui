@@ -375,7 +375,7 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
         focusout: (_, { api }) => api.internal.commitKeys(),
         dblclick: (event, { api, key }) => api.internal.toggle(key, event),
       },
-      bind: (el, { api, key }) => api.internal.bindHandle(el, key),
+      bind: (el, part) => part.api.internal.bindHandle(el, part),
     }),
   }),
   agent: { actions: ["setLayout", "collapse", "expand"] },

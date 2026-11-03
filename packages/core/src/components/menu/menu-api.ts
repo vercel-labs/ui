@@ -16,7 +16,7 @@ import type { createOpenSteps } from "../../foundation/popups/popup-steps"
 import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { sheetModal } from "../../foundation/popups/presentation"
 import { createOrder } from "../../foundation/kernel/order"
-import { createSafeArea } from "./safe-area"
+import { createSafeArea } from "../../foundation/popups/safe-area"
 import { sourceOf } from "../../foundation/kernel/modality"
 import { createTypeahead } from "../../foundation/text/typeahead"
 import { createDetails, type ChangeDetails, withSource } from "../../foundation/kernel/details"
@@ -543,7 +543,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     hide,
     parentMenu: () => parent,
     popupElement: () => popup.element(),
-    itemProps: (slot: string, key: string) => props(slot, key),
+    itemProps: <Props extends object>(slot: string, key: string) => props<Props>(slot, key),
     triggerElement,
     focusTriggerItem,
     checkboxValue,
@@ -592,29 +592,12 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       },
       hoverItem(el: HTMLElement, event: PointerEvent) {
         if (event.pointerType === "touch") return
-        const entry = entryOf(el)
-        if (!entry) return
         // WebKit fires pointermove without movement when content scrolls under the pointer.
         const moved = pointerX !== event.clientX || pointerY !== event.clientY
         pointerX = event.clientX
         pointerY = event.clientY
         if (!moved && store.get().highlighted !== null) return
-        const child = openChild()
-        const point = { x: event.clientX, y: event.clientY }
-        if (child && child.triggerElement() !== el) {
-          // Heading for the open submenu. Leave it open.
-          if (safeArea.contains(point, () => api.internal.hoverItem(el, event))) return
-          safeArea.stop()
-          child.hide({ reason: "submenu-switch", event, focus: false })
-        }
-        if (store.get().highlighted !== entry.key || document.activeElement !== el) highlight(entry.key)
-        clearTimeout(hoverTimer)
-        // In a sheet, a submenu replaces the items, so only a press opens it.
-        if (entry.openSubmenu && !entry.disabled() && store.get().presentation !== "sheet")
-          hoverTimer = setTimeout(
-            () => entry.openSubmenu!("none", "trigger-hover", event),
-            options().delay ?? 100,
-          )
+        hover(el, event)
       },
       cancelHoverOpen: () => clearTimeout(hoverTimer),
       trackPointer(event: PointerEvent) {
@@ -638,6 +621,27 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         return pressed
       },
     },
+  }
+
+  function hover(el: HTMLElement, event: PointerEvent) {
+    const entry = entryOf(el)
+    if (!entry) return
+    const child = openChild()
+    if (child && child.triggerElement() !== el) {
+      // Heading for the open submenu. Leave it open, and once the pointer
+      // rests, apply where it rests, though it hasn't moved since.
+      if (safeArea.contains({ x: event.clientX, y: event.clientY }, () => hover(el, event))) return
+      safeArea.stop()
+      child.hide({ reason: "submenu-switch", event, focus: false })
+    }
+    if (store.get().highlighted !== entry.key || document.activeElement !== el) highlight(entry.key)
+    clearTimeout(hoverTimer)
+    // In a sheet, a submenu replaces the items, so only a press opens it.
+    if (entry.openSubmenu && !entry.disabled() && store.get().presentation !== "sheet")
+      hoverTimer = setTimeout(
+        () => !entry.disabled() && entry.openSubmenu!("none", "trigger-hover", event),
+        options().delay ?? 100,
+      )
   }
 
   let pressClick = false

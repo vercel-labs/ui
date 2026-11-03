@@ -2,7 +2,7 @@
 
 import { cn } from "cn"
 import { CircleDot, Columns3, List, Plus, Search, Settings } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { href, parseQuery } from "tracker-data"
 import { newIssue } from "@/components/new-issue-dialog"
@@ -28,10 +28,10 @@ import {
 
 function CommandPalette({ issues }: { issues: { id: string; title: string }[] }) {
   const router = useRouter()
-  const query = parseQuery(Object.fromEntries(useSearchParams()))
   const [open, setOpen] = useState(false)
 
   function run(value: string) {
+    const query = parseQuery(Object.fromEntries(new URLSearchParams(location.search)))
     setOpen(false)
     if (value === "new-issue") newIssue.open()
     else if (value === "settings") router.push("/settings")

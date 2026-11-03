@@ -22,7 +22,7 @@ type ListItem<T = string> = {
   label: string
   /** More words filtering matches, like `["team"]` for a plan called Pro. */
   keywords?: string[]
-  /** Keeps the item from being chosen. Arrow keys still highlight it, as the listbox pattern asks, except in Command and Autocomplete, which skip it. */
+  /** Keeps the item from being chosen. The keyboard skips it, like in a native select. */
   disabled?: boolean
 }
 
@@ -221,14 +221,19 @@ function createListboxEngine(
     // Whether data items are sorted by how well they match, best first.
     rank?: () => boolean
     loop: () => boolean
+    // Whether keys pass over disabled items, like a native select.
+    skipDisabled?: boolean
     // Whether highlighting may move focus now, like while the popup is open.
     active: () => boolean
     // An item can't be chosen for a reason beyond its own, like a full multiple selection.
     blocked?: (entry: ListEntry) => boolean
     // Tells a virtualizer which index to reveal.
     onHighlight?: (key: string | null, index: number, event?: Event) => void
-    // The element that scrolls, for revealing items without scrolling the page.
+    // The list, which takes focus back when its focused item leaves.
     container?: () => HTMLElement | undefined
+    // The outermost element that may scroll to reveal an item, like the popup
+    // content around the list, so the page never scrolls. Defaults to `container`.
+    scrollRoot?: () => HTMLElement | undefined
     // Runs when an item mounts or unmounts, like a highlighted one a virtualizer
     // just rendered, so parts that depend on the list can update.
     onRegister?: (key: string) => void
@@ -448,7 +453,7 @@ function createListboxEngine(
   // Focuses a mounted item, or only scrolls it into view with virtual focus.
   function reveal(el: HTMLElement, focus: boolean) {
     if (focusMode() === "real" && focus && config.active()) el.focus({ preventScroll: true })
-    revealInList(el, config.container?.())
+    revealInList(el, (config.scrollRoot ?? config.container)?.())
   }
 
   function highlight(key: string | null, { focus = true, event }: { focus?: boolean; event?: Event } = {}) {
@@ -456,28 +461,33 @@ function createListboxEngine(
     const list = entries()
     const index = key === null ? -1 : list.findIndex((entry) => entry.key === key)
     config.onHighlight?.(key, index, event)
-    if (index !== -1 && index === list.length - 1) config.onLastReached?.()
+    // Skipped items at the end can't be reached, so the last one left counts.
+    let last = list.length - 1
+    if (config.skipDisabled) while (last > 0 && list[last].disabled) last--
+    if (index !== -1 && index === last) config.onLastReached?.()
     if (key === null) return
     const el = registry.get(key)?.el
     if (el?.isConnected) reveal(el, focus)
   }
 
   // The key a step from the highlight lands on, or the first or last item's,
-  // without moving there. Undefined for an empty list. Lists like a command
-  // palette's skip items that can't be chosen.
-  function stepKey(step: number | "first" | "last", { skipDisabled = false } = {}) {
-    const list = skipDisabled ? entries().filter((entry) => !disabled(entry)) : entries()
+  // without moving there. Undefined for an empty list, or one where every
+  // item is disabled while it skips them.
+  function stepKey(step: number | "first" | "last", { loop = config.loop() } = {}) {
+    const all = entries()
+    const list = config.skipDisabled ? all.filter((entry) => !entry.disabled) : all
     if (!list.length) return undefined
     const current = store.get().highlighted
     const index = list.findIndex((entry) => entry.key === current)
+    if (index !== -1 || typeof step !== "number") return list[moveIndex(index, step, list.length, loop)].key
+    // From a skipped item, like one a press focused, a step counts from where it sits.
+    const skipped = all.findIndex((entry) => entry.key === current)
+    if (skipped !== -1) {
+      const before = all.slice(0, skipped).filter((entry) => !entry.disabled).length
+      return list[moveIndex(step > 0 ? before - 1 : before, step, list.length, loop)].key
+    }
     // From no highlight, a step forward lands on the first item and a step back on the last.
-    const next =
-      index === -1 && typeof step === "number"
-        ? step > 0
-          ? 0
-          : list.length - 1
-        : moveIndex(index, step, list.length, config.loop())
-    return list[next].key
+    return list[step > 0 ? 0 : list.length - 1].key
   }
 
   function move(step: number | "first" | "last", event?: Event) {
@@ -580,6 +590,9 @@ function createListboxEngine(
     dataItems: () => data()?.flat,
     find,
     disabled,
+    // Whether an item is disabled by itself, which keys and the pointer pass
+    // over. A `blocked` item can't be chosen but stays reachable.
+    isItemDisabled: (key: string) => !!find(key)?.disabled,
     highlight,
     move,
     stepKey,

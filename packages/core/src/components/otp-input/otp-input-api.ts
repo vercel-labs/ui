@@ -23,10 +23,11 @@ import {
   type ChangeOptions,
   type CommitDetails,
 } from "../../foundation/kernel/details"
-import { on } from "../../foundation/kernel/events"
+import { isComposing, on } from "../../foundation/kernel/events"
 import type { PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
 import { changeSource, createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
+import type { OTPInputSlotProps } from "./otp-input"
 
 /**
  * Why the code changed.
@@ -328,7 +329,7 @@ function otpInputApi(
   // found under the point.
   function slotAt(el: HTMLInputElement, event: MouseEvent) {
     const hit = el.ownerDocument.elementsFromPoint?.(event.clientX, event.clientY) ?? []
-    return elements(context, "slot").find((entry) => hit.includes(entry.el))
+    return elements<OTPInputSlotProps>(context, "slot").find((entry) => hit.includes(entry.el))
   }
 
   // A mouse press selects the slot under it. The browser would put the caret
@@ -400,7 +401,7 @@ function otpInputApi(
       on(el, "keydown", (event) => {
         if (event.key !== "Backspace" && event.key !== "Delete") afterDelete = false
         // An input method owns the keys while it composes, like arrows choosing a candidate.
-        if (event.isComposing || event.keyCode === 229) return
+        if (isComposing(event)) return
         if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return
         const { selection, maxLength } = store.get()
         const next = keySelection(event.key, selection, el.value.length, maxLength, isRTL(el))

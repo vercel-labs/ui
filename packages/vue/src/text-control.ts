@@ -51,10 +51,10 @@ const textOptions = (props: TextProps, emit: Emit) => () => ({
   },
 })
 
-// Whether the field is read-only: the `read-only` prop, or else a native
+// Whether a control is read-only: the `read-only` prop, or else a native
 // `readonly` attribute, which Vue keeps in `attrs`.
-const readOnlyOf = (props: TextProps, attrs: Record<string, unknown>) =>
-  props.readOnly ?? (attrs.readonly !== undefined && attrs.readonly !== false)
+const readOnlyOf = (props: { readOnly?: boolean }, attrs: Record<string, unknown>) =>
+  props.readOnly ?? (attrs.readonly != null && attrs.readonly !== false)
 
 // The element's attributes. A controlled value is the DOM property, which Vue
 // sets on every render. A default is the `value` attribute, which is what a

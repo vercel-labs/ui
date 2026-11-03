@@ -1,5 +1,17 @@
+import type { Component } from "svelte"
 import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
+import {
+  Calendar,
+  Checkbox,
+  DatePicker,
+  Listbox,
+  NumberInput,
+  OTPInput,
+  PasswordInput,
+  RadioGroup,
+  Switch,
+} from "../src"
 import App from "./apps/form-app.svelte"
 
 // The body without Svelte's hydration markers, so text content can be matched.
@@ -38,5 +50,27 @@ describe("server rendering text fields and forms", () => {
       expect(body).toMatch(/readonly/)
       expect(body).toContain("data-readonly")
     }
+  })
+
+  test("a native readonly attribute keeps every other read-only control read-only", () => {
+    const controls = [
+      Calendar,
+      Checkbox,
+      DatePicker,
+      Listbox,
+      NumberInput,
+      OTPInput,
+      PasswordInput,
+      RadioGroup,
+      Switch,
+    ]
+    // Where the attribute itself lands differs, the state it sets doesn't.
+    const body = (component: (typeof controls)[number], props: Record<string, unknown>) =>
+      render(component as Component<Record<string, unknown>>, { props }).body.replace(
+        / readonly(="")?(?=[\s>])/g,
+        "",
+      )
+    for (const component of controls)
+      expect(body(component, { readonly: true }), component.name).toBe(body(component, { readOnly: true }))
   })
 })

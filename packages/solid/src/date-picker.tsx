@@ -192,7 +192,10 @@ function DatePicker(
  * @stable
  */
 function DatePickerInput(
-  props: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children"> & {
+  props: Omit<
+    PartProps<"input", DatePickerInputState>,
+    "value" | "defaultValue" | "children" | "readonly"
+  > & {
     /** Whether it's a range's end. The input without it holds the start, or the date. */
     end?: boolean
   },

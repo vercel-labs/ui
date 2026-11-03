@@ -34,7 +34,7 @@ function session() {
     drags.start(el, down, { onStart, onMove: () => {}, onEnd })
     return onEnd
   }
-  return { drags, drag }
+  return { drags, drag, el }
 }
 
 describe("createDragSession", () => {
@@ -82,6 +82,32 @@ describe("createDragSession", () => {
     const next = drag(press("pointerdown", { pointerType: "mouse", pointerId: 2 }))
     expect(stale).toHaveBeenCalledWith(expect.anything(), true)
     expect(next).toBeDefined()
+  })
+
+  test("a press that lifts before startOnMove picks is a tap, and nothing starts", () => {
+    const { drags, el } = session()
+    const onTap = vi.fn()
+    const onEnd = vi.fn()
+    const down = press("pointerdown")
+    drags.accepts(down)
+    drags.startOnMove(el, down, { pick: () => undefined, onTap, onMove: () => {}, onEnd })
+    document.dispatchEvent(press("pointermove", { clientX: 4 }))
+    document.dispatchEvent(press("pointerup"))
+    expect(onTap).toHaveBeenCalledTimes(1)
+    expect(onEnd).not.toHaveBeenCalled()
+    expect(drags.accepts(press("pointerdown", { pointerId: 2 }))).toBe(true)
+  })
+
+  test("a press startOnMove lets go of, like a scroll, leaves the way clear for the next", () => {
+    const { drags, el } = session()
+    const onEnd = vi.fn()
+    const down = press("pointerdown")
+    drags.accepts(down)
+    drags.startOnMove(el, down, { pick: () => false, onMove: () => {}, onEnd })
+    expect(drags.accepts(press("pointerdown", { pointerId: 2, isPrimary: false }))).toBe(false)
+    document.dispatchEvent(press("pointermove", { clientY: 20 }))
+    expect(onEnd).not.toHaveBeenCalled()
+    expect(drags.accepts(press("pointerdown", { pointerId: 2 }))).toBe(true)
   })
 })
 
@@ -327,4 +353,23 @@ test("a new press on a stepper that the old hold's commit disabled steps nothing
   } finally {
     vi.useRealTimers()
   }
+})
+
+// bindDrag's contract: a release after the pointer moved past `dragThreshold` swallows its click.
+test("a swipe startOnMove picks swallows the click its release sends, like any drag", () => {
+  const { drags, el } = session()
+  const button = el.appendChild(document.createElement("button"))
+  const clicked = vi.fn()
+  button.addEventListener("click", clicked)
+  const down = press("pointerdown", { pointerType: "mouse", clientX: 0 })
+  drags.accepts(down)
+  drags.startOnMove(el, down, {
+    pick: (move) => (Math.abs(move.clientX) < 8 ? undefined : true),
+    onMove: () => {},
+    onEnd: () => {},
+  })
+  document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientX: 10 }))
+  document.dispatchEvent(press("pointerup", { pointerType: "mouse", clientX: 11 }))
+  button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+  expect(clicked).not.toHaveBeenCalled()
 })

@@ -1,0 +1,138 @@
+---
+title: Mobile
+description: Lay out around the on-screen keyboard and the safe areas of a phone, and tell a finger from a mouse.
+---
+
+On a phone, the page lays out for a screen people don't fully see: the on-screen keyboard covers its bottom, iOS pans the page to keep a field in view, and a notch or home indicator takes its edges. `bindViewport` measures all of it, and `bindAvoidKeyboard` keeps a bar above the keyboard. `createPointerKind` tells whether people use a finger or a mouse.
+
+These helpers are available from `@ui-sdk/core`. You can use them inside a primitive or on their own.
+
+## The Viewport
+
+### Follow the Viewport
+
+`bindViewport` follows the viewport on an element, often the root, and reports each change:
+
+```ts
+import { bindViewport } from "@ui-sdk/core"
+
+const stop = bindViewport(document.documentElement, {
+  onChange: (viewport) => console.log(viewport.keyboard, viewport.safeArea.bottom),
+})
+```
+
+`onChange` runs once at the start and again whenever something changes. `viewport.keyboard` is the keyboard's height while a field has focus, and `width`, `height`, `offsetTop` and `offsetLeft` describe the part of the page on screen, the visual viewport. Call the cleanup to stop.
+
+The keyboard is measured on screen, against how much of it the page had before the field took focus. That holds while iOS zooms into a field and when the browser shrinks the whole page for the keyboard, where the page alone can't tell. `viewport.keyboardInset` is how much of the page's bottom the keyboard covers, for placing things: less while iOS pans the page, and 0 when the browser resizes the page for the keyboard instead.
+
+<ComponentExample
+  name="behaviors/viewport-bind"
+  caption="Open this page on a phone and tap the field: the keyboard's height shows up, along with how far iOS pans the page. Pinch to zoom to see the scale change."
+/>
+
+For CSS, the element gets these variables, and `data-keyboard` while the keyboard is open:
+
+| Variable                   | What it holds                                                      |
+| -------------------------- | ------------------------------------------------------------------ |
+| `--keyboard-inset`         | How much of the page's bottom the keyboard covers, `keyboardInset` |
+| `--visual-viewport-width`  | The width of the part of the page on screen                        |
+| `--visual-viewport-height` | Its height, which shrinks above the keyboard                       |
+| `--visual-viewport-top`    | How far the page is panned down, like to show a field              |
+
+iOS zooms into a field whose text is smaller than 16 pixels when it takes focus. Give fields at least `font-size: 16px` to keep the page at its size.
+
+### Safe Areas
+
+`viewport.safeArea` holds the insets around a notch, rounded corners or a home indicator, as numbers for script. In CSS, use `env(safe-area-inset-bottom)` directly. Both are 0 unless the page draws under them with `viewport-fit=cover`:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+```
+
+The keyboard covers the home indicator, but iOS still reports its inset while the keyboard is open. Drop bottom padding then:
+
+```css
+.composer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.composer[data-keyboard] {
+  padding-bottom: 0;
+}
+```
+
+## The On-Screen Keyboard
+
+### Keep a Bar Above the Keyboard
+
+When a field takes focus, the browser scrolls that field into view above the keyboard, and nothing else. A status pill under a note, the buttons beside a field, or a toolbar fixed to the bottom of the screen stays where the keyboard covers it. `bindAvoidKeyboard` lifts such an element by as much of it as the keyboard covers:
+
+```ts
+import { bindAvoidKeyboard } from "@ui-sdk/core"
+
+const stop = bindAvoidKeyboard(pill)
+```
+
+While the keyboard is open, a bar fixed to the bottom moves up to just above it. An element higher up moves only as far as the keyboard overlaps it, and one below the screen stays where it is. Where the browser resizes the page for the keyboard, like Android with `interactive-widget=resizes-content`, nothing is covered and nothing moves.
+
+<ComponentExample
+  name="behaviors/viewport-avoid-keyboard"
+  caption="Open this page on a phone and tap the list: the browser keeps the text you're typing in view, and the pill under it rises above the keyboard instead of hiding behind it. Scroll with the keyboard open, and it stays above the keyboard until its card scrolls clear."
+/>
+
+The element's bottom edge meets the keyboard, so for room between them, bind a wrapper with bottom padding, as the example does. The element's `translate` is the helper's, and the cleanup puts back your own. It gets `data-keyboard` while the keyboard is open, to drop safe-area padding or add a shadow. Scrolling moves it once a frame; leave `translate` without a transition, so it doesn't trail behind. The lift doesn't change layout, so give content behind the bar room with `var(--keyboard-inset)` from `bindViewport` if it should stay visible.
+
+## The Right Keyboard
+
+A phone picks its keyboard from the field: `inputmode` chooses the keys, like a number pad for a code, and `enterkeyhint` chooses the Return key, like "next" or "send", which iOS 26 draws as a glyph. [`inputHints`](/docs/core/behaviors/focus#input-hints) in Focus and Keys fills them in for a kind of field, along with autofill and corrections.
+
+## Touch and Mouse
+
+### Pointer Kind
+
+`createPointerKind` reports whether the main pointer is a finger or a mouse and whether it can hover, from the `pointer` and `hover` media features, plus `anyPointer` and `anyHover` for every pointer attached, like a trackpad on a tablet. Read it like a preference, with `usePreference` in each framework:
+
+```tsx
+import { createPointerKind } from "@ui-sdk/core"
+import { usePreference } from "@ui-sdk/react/preferences"
+
+const pointerKind = createPointerKind()
+
+const { hover } = usePreference(pointerKind)
+// "hover" with a mouse, "none" on a phone, "unknown" on the server
+```
+
+It's for behavior and content, like opening on tap where nothing can hover. Style with the media queries themselves, `@media (hover: hover)` or Tailwind's `pointer-coarse:`, which are right from the first paint.
+
+<ComponentExample
+  name="behaviors/pointer-kind"
+  caption="With a mouse, the details open on hover. On a phone, they open on tap, and the button says so."
+/>
+
+### Render on the Server
+
+The server can't know the device, so every field is `"unknown"` in the server render and in the browser's first render, which hydrates against it. Right after hydration, the state catches up, and content that depends on it changes, like the button above gaining "(tap for details)". Styles written with the media queries don't wait: they're right from the first paint.
+
+To render the right content from the start, create the pointer kind for each request with a guess for `initial`. Chromium browsers send a `Sec-CH-UA-Mobile` header, which `pointerKindOf` turns into one:
+
+```ts
+import { createPointerKind, pointerKindOf } from "@ui-sdk/core"
+
+// On the server, for each request.
+const initial = pointerKindOf(request.headers.get("Sec-CH-UA-Mobile"))
+
+// On the server and in the browser, from the same `initial`.
+const pointerKind = createPointerKind({ initial })
+```
+
+Send `initial` to the browser with the rest of the page's data, so its first render shows what the server's did and hydration matches. [Create one for each request](/docs/server-rendering#read-a-cookie-on-the-server), not in a module, so visitors don't share a guess.
+
+Safari and Firefox don't send the header, so `pointerKindOf` returns nothing there and the fields stay `"unknown"` until hydration. Content that changes should read sensibly while `"unknown"`, like the demo's plain "Shipping". If a cache stores the page, send `Vary: Sec-CH-UA-Mobile`, so phones and computers get their own copies.
+
+## API Reference
+
+| Helper                           | Use it to…                                                                         |
+| -------------------------------- | ---------------------------------------------------------------------------------- |
+| `bindViewport(el, { onChange })` | Follow the keyboard, the visual viewport and the safe areas, in CSS and in script. |
+| `bindAvoidKeyboard(el)`          | Keep an element above the on-screen keyboard.                                      |
+| `createPointerKind({ initial })` | Tell a finger from a mouse, and whether anything can hover.                        |
+| `pointerKindOf(header)`          | Guess the pointer on the server from `Sec-CH-UA-Mobile`.                           |

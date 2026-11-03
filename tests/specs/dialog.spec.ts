@@ -1,5 +1,15 @@
 import type { Page } from "@playwright/test"
-import { dialogNamesAtFocus, expect, lastAction, recordDialogNamesAtFocus, test } from "../fixtures"
+import {
+  dialogNamesAtFocus,
+  entered,
+  expect,
+  isSheet,
+  lastAction,
+  opacityOf,
+  recordDialogNamesAtFocus,
+  slowTransitions,
+  test,
+} from "../fixtures"
 
 // A modal dialog and an alert dialog, following the WAI-ARIA patterns:
 // https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/ and
@@ -15,6 +25,33 @@ const alertTrigger = (page: Page) => page.getByRole("button", { name: "Delete pr
 const outside = (page: Page, text: string) => page.locator("button", { hasText: new RegExp(`^${text}$`) })
 
 const nestedDialog = (page: Page) => page.getByRole("dialog", { name: "Advanced settings" })
+
+// Defines a custom element whose open shadow root holds `html`.
+async function defineElement(page: Page, name: string, html: string) {
+  await page.evaluate(
+    ([name, html]) => {
+      if (customElements.get(name)) return
+      customElements.define(
+        name,
+        class extends HTMLElement {
+          constructor() {
+            super()
+            this.attachShadow({ mode: "open" }).innerHTML = html
+          }
+        },
+      )
+    },
+    [name, html],
+  )
+}
+
+// The text of the focused element, inside shadow roots too.
+const focusedText = (page: Page) =>
+  page.evaluate(() => {
+    let el = document.activeElement
+    while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement
+    return el?.textContent?.trim()
+  })
 
 async function openWithKeyboard(page: Page) {
   await trigger(page).focus()
@@ -84,6 +121,147 @@ test.describe("focus", () => {
     await openWithKeyboard(page)
     await tab({ shift: true })
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
+  })
+
+  test("Shift+Tab from the first element wraps to the checked radio of a group outside a form", async ({
+    page,
+    tab,
+  }) => {
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<label><input type="radio" name="speed" checked> Standard</label><label><input type="radio" name="speed"> Express</label>`,
+      ),
+    )
+    await tab({ shift: true })
+    await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
+  })
+
+  test("Tab reaches radios whose group's checked radio is behind the dialog", async ({ page, tab }) => {
+    await outside(page, "After").evaluate((el) =>
+      el.insertAdjacentHTML("afterend", `<input type="radio" name="speed" aria-label="Page speed" checked>`),
+    )
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<label><input type="radio" name="speed"> Standard</label><label><input type="radio" name="speed"> Express</label>`,
+      ),
+    )
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
+  })
+
+  test("Tab visits a positive tabindex first, like the browser", async ({ page, tab }) => {
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("button", { name: "Jump ahead" })).toBeFocused()
+    await tab()
+    await expect(field(page)).toBeFocused()
+  })
+
+  test("a positive tabindex keeps Tab inside a dialog that leaves the page usable", async ({
+    page,
+    open,
+    tab,
+  }) => {
+    await open("dialog", { modal: "trap-focus" })
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    await page.getByRole("button", { name: "Jump ahead" }).focus()
+    await tab()
+    await expect(field(page)).toBeFocused()
+    await tab({ shift: true })
+    await expect(page.getByRole("button", { name: "Jump ahead" })).toBeFocused()
+  })
+
+  test("a positive tabindex slotted into a custom element keeps its host's place", async ({ page, tab }) => {
+    await defineElement(page, "x-card", "<slot></slot>")
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<x-card><button type="button" tabindex="1">Slotted</button></x-card>`,
+      ),
+    )
+    await page.getByRole("button", { name: "Close" }).focus()
+    await tab()
+    await expect(page.getByRole("button", { name: "Slotted" })).toBeFocused()
+    await tab()
+    await expect(field(page)).toBeFocused()
+  })
+
+  test("with a positive tabindex in the dialog, Tab still moves through a shadow root and slots", async ({
+    page,
+    tab,
+  }) => {
+    await defineElement(
+      page,
+      "x-pair",
+      `<button type="button">Inner A</button><button type="button">Inner B</button>`,
+    )
+    await defineElement(page, "x-swap", `<slot name="a"></slot><slot name="b"></slot>`)
+    await openWithKeyboard(page)
+    await field(page).evaluate((el) =>
+      el.insertAdjacentHTML(
+        "afterend",
+        `<x-pair></x-pair><x-swap><button type="button" slot="b">Slot B</button><button type="button" slot="a">Slot A</button></x-swap>`,
+      ),
+    )
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    const visited = []
+    for (let step = 0; step < 4; step++) {
+      await tab()
+      visited.push(await focusedText(page))
+    }
+    expect(visited).toEqual(["Inner A", "Inner B", "Slot A", "Slot B"])
+  })
+
+  test("with a positive tabindex in the dialog, Tab from a focused element outside the tab order goes to the next stop", async ({
+    page,
+    tab,
+  }) => {
+    await openWithKeyboard(page)
+    await field(page).evaluate((el) => el.insertAdjacentHTML("afterend", `<p tabindex="-1">Note</p>`))
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+    )
+    await page.getByText("Note").focus()
+    await tab()
+    await expect(page.getByRole("button", { name: "Save" })).toBeFocused()
+  })
+
+  test("Tab from a custom element with a positive tabindex enters its shadow root", async ({ page, tab }) => {
+    await defineElement(page, "x-panel", `<button type="button">Inside</button>`)
+    await openWithKeyboard(page)
+    await dialog(page).evaluate((el) =>
+      el.insertAdjacentHTML("beforeend", `<x-panel tabindex="1" aria-label="Panel"></x-panel>`),
+    )
+    await page.locator("x-panel").focus()
+    await tab()
+    expect(await focusedText(page)).toBe("Inside")
+    await tab()
+    await expect(field(page)).toBeFocused()
+  })
+
+  test("opening focuses the first field even when a later one has a positive tabindex", async ({ page }) => {
+    await page.evaluate(() => {
+      const raise = () =>
+        document.querySelectorAll("button").forEach((el) => el.textContent === "Save" && (el.tabIndex = 1))
+      raise()
+      new MutationObserver(raise).observe(document.body, { childList: true, subtree: true })
+    })
+    await openWithKeyboard(page)
   })
 
   test("Escape closes the dialog and returns focus to the trigger", async ({ page }) => {
@@ -421,9 +599,32 @@ test.describe("alert dialog", () => {
 })
 
 test.describe("animation", () => {
+  test("the dialog and its backdrop animate in from their starting style", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
+    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    await open("dialog", { animate: "" })
+    await slowTransitions(page)
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
+    expect(await opacityOf(page.locator(".dialog-backdrop:visible"))).toBeLessThan(0.5)
+  })
+
+  test("an alert dialog animates in from its starting style", async ({ page, open }) => {
+    await open("dialog", { animate: "" })
+    await slowTransitions(page)
+    await alertTrigger(page).click()
+    await expect(alert(page)).toBeVisible()
+    expect(await opacityOf(alert(page))).toBeLessThan(0.5)
+  })
+
   test("reopened while it animates out, it takes focus and hides the page again", async ({ page, open }) => {
     await open("dialog", { animate: "" })
     await openWithKeyboard(page)
+    await entered(page)
     await page.keyboard.press("Escape")
     await expect(page.locator(".dialog[data-ending-style]")).toHaveCount(1)
     await page.keyboard.press("Enter")

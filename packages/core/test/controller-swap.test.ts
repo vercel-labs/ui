@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // A controller swapped for another lets go of the instance, so it never
 // drives a component it was taken from.
-import { expect, test } from "vitest"
+import { expect, test, vi } from "vitest"
 import { createController, isControllerAttached } from "../src/foundation/kernel/controller"
 import { keep, release, unwatched } from "../src/foundation/kernel/keep"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
@@ -15,7 +15,7 @@ test("a controller swapped for another detaches, and the new one attaches", () =
   instance.setOptions({ id: "settings", defaultValue: "a", controller: second })
   expect(isControllerAttached(first)).toBe(false)
   expect(isControllerAttached(second)).toBe(true)
-  expect(first.setValue).toBeUndefined()
+  expect(first.setValue("c")).toBeUndefined()
   expect(instance.get().value).toBe("a")
   second.setValue("b")
   expect(instance.get().value).toBe("b")
@@ -97,4 +97,43 @@ test("an instance its framework may throw away connects its controller only once
   expect(controller.count()).toBe(1)
   instance.destroy()
   expect(isControllerAttached(controller)).toBe(false)
+})
+
+test("a controller's methods can be called before it attaches and once it detaches, and return nothing", () => {
+  const controller = createTabsController()
+  expect(controller.getValue()).toBeUndefined()
+  expect(controller.setValue("b")).toBeUndefined()
+  const getValue = controller.getValue
+  const instance = tabs({ id: "early", defaultValue: "a", controller })
+  expect(getValue()).toBe("a")
+  instance.destroy()
+  expect(controller.getValue()).toBeUndefined()
+  expect(getValue).toBe(controller.getValue)
+})
+
+test("a method called before its controller attaches warns once in development, and reads never do", () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+  const controller = createTabsController()
+  controller.getValue()
+  controller.select("b")
+  controller.select("c")
+  expect(warn.mock.calls.map(([message]) => String(message))).toEqual([
+    expect.stringContaining("select() was called before its component attached"),
+  ])
+  const instance = tabs({ id: "warned", defaultValue: "a", controller })
+  controller.setValue("b")
+  instance.destroy()
+  controller.setValue("c")
+  expect(warn).toHaveBeenCalledTimes(1)
+  warn.mockRestore()
+})
+
+test("a controller that isn't attached is never taken for a promise, a ref or a React element", async () => {
+  const controller = createTabsController() as Record<string, unknown>
+  expect(controller.then).toBeUndefined()
+  expect(controller.toJSON).toBeUndefined()
+  expect(controller.__v_isRef).toBeUndefined()
+  expect(controller.$$typeof).toBeUndefined()
+  expect(controller.constructor).toBeUndefined()
+  expect(await Promise.resolve(controller)).toBe(controller)
 })

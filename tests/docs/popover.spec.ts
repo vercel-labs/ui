@@ -76,6 +76,31 @@ for (const framework of frameworks) {
   })
 }
 
+// The arrow sticks out of the popover, so the popover mustn't clip it.
+for (const framework of frameworks) {
+  test(`the arrow shows outside the popover on every side in ${framework}`, async ({ page }) => {
+    await page.goto(`/docs/${framework}/components/popover`)
+    const preview = page.locator("[data-example]").nth(order.indexOf("arrow"))
+    const trigger = preview.getByRole("button", { name: "Help" })
+    await trigger.scrollIntoViewIfNeeded()
+    await trigger.click()
+    const dialog = page.getByRole("dialog", { name: "Keyboard shortcuts" })
+    const arrow = dialog.locator('[data-slot="popover-arrow"]')
+    await expect.poll(() => dialog.evaluate((el) => getComputedStyle(el).overflow)).toBe("visible")
+    for (const side of ["top", "right", "left", "bottom"]) {
+      await preview.getByRole("group", { name: /side/i }).getByRole("button", { name: side }).click()
+      await expect(arrow).toHaveAttribute("data-side", side)
+      const nearTip = async () => {
+        const box = (await arrow.boundingBox())!
+        const x = { left: box.x + box.width - 3, right: box.x + 3 }[side] ?? box.x + box.width / 2
+        const y = { top: box.y + box.height - 3, bottom: box.y + 3 }[side] ?? box.y + box.height / 2
+        return arrow.evaluate((el, point) => el === document.elementFromPoint(point.x, point.y), { x, y })
+      }
+      await expect.poll(nearTip, `the arrow's tip on the ${side}`).toBe(true)
+    }
+  })
+}
+
 // The shortcut example's trigger opens and closes with its keys, which it advertises.
 for (const framework of frameworks) {
   test(`the shortcut example opens the popover in ${framework}`, async ({ page }) => {

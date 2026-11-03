@@ -23,7 +23,7 @@ export {
 } from "./details"
 export { settleDraft } from "./draft"
 export { elements } from "./elements"
-export { on, selectEvent } from "./events"
+export { isComposing, on, selectEvent } from "./events"
 export { createHistory, type HistoryOptions } from "./history"
 export { css } from "./inline-style"
 export { isDestroying, keep, release, unwatched, whenKept } from "./keep"
@@ -62,6 +62,6 @@ export type {
   WithGeneric,
 } from "./primitive-types"
 export { select, selects } from "./selects"
-export { sameValue, type Store, subscribeSkipping } from "./store"
+export { heldState, sameValue, type Store, subscribeSkipping } from "./store"
 export { trusted, trustSent } from "./trusted"
 export { watchEarlier, watchers } from "./watchers"

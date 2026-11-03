@@ -16,8 +16,13 @@ import { dialog } from "../src/components/dialog/dialog"
 import { hoverCard } from "../src/components/hover-card/hover-card"
 import { popover } from "../src/components/popover/popover"
 import { tooltip } from "../src/components/tooltip/tooltip"
-import type { Modal } from "../src/foundation/popups/popup"
+import { select } from "../src/components/select/select"
+import { combobox } from "../src/components/combobox/combobox"
+import { autocomplete } from "../src/components/autocomplete/autocomplete"
+import { findLayer } from "../src/foundation/platform/layers"
+import { type Modal, modalTriple } from "../src/foundation/popups/popup"
 import { checkPattern, checkServer, mount } from "../src/testing"
+import { rerenderOf } from "../src/testing/mount"
 
 const mounts: { unmount: () => void }[] = []
 afterEach(() => {
@@ -172,6 +177,21 @@ const share = definePrimitive({
   slots: (slot) => popupSlots(slot),
 })
 
+// The same popover with no `sync`, as a primitive that hands no state from its options.
+const unsyncedShare = definePrimitive({
+  name: "unsynced-share",
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+    modal: "value",
+    openOnHover: "boolean",
+  },
+  state: (options: ShareOptions) => popupState(options),
+  api: (context) => createPopup(context, { preset: popoverPreset }),
+  slots: (slot) => popupSlots(slot),
+})
+
 const shareMarkup = `<div>
   <trigger>Share</trigger>
   <content><title>Share</title><button>Copy link</button><close>Close</close></content>
@@ -195,6 +215,15 @@ describe("a popover on the popover preset", () => {
     await view.click(view.part("trigger")!)
     expect(view.part("content")!.getAttribute("aria-modal")).toBe("true")
     await checkPattern(view.root, "dialog")
+  })
+
+  test("one with no sync follows a modal option that changes while it's open", async () => {
+    const view = mount(unsyncedShare, { defaultOpen: true, modal: true }, shareMarkup)
+    mounts.push(view)
+    expect(view.part("content")!.getAttribute("aria-modal")).toBe("true")
+    rerenderOf(view).setOptions({ modal: false })
+    expect(view.state.modal).toBe(false)
+    expect(view.part("content")!.hasAttribute("aria-modal")).toBe(false)
   })
 
   test("a non-modal one passes the dialog pattern without aria-modal", async () => {
@@ -614,4 +643,83 @@ describe("our popups on the kit", () => {
       ),
     ).toContain('role="tooltip"')
   })
+})
+
+describe("a shown popup's modal effects", () => {
+  const listMarkup = `<root><input><content><list></list></content></root>`
+  const selectMarkup = `<root><trigger><value></value></trigger><content><list></list></content></root>`
+  const changes = <T>(values: readonly T[]) =>
+    values.flatMap((from) => values.filter((to) => to !== from).map((to) => ({ from, to })))
+  const cases = [
+    ...changes([undefined, false, true, "trap-focus"] as const).flatMap(({ from, to }) => [
+      {
+        name: "a custom popup",
+        from,
+        to,
+        show: () => mount(unsyncedShare, { defaultOpen: true, modal: from }, shareMarkup),
+      },
+      {
+        name: "Dialog",
+        from,
+        to,
+        show: () => mount(dialog, { defaultOpen: true, modal: from }, shareMarkup),
+      },
+      {
+        name: "Popover",
+        from,
+        to,
+        show: () => mount(popover, { defaultOpen: true, modal: from }, shareMarkup),
+      },
+    ]),
+    ...changes([undefined, false, true, "pointer"] as const).flatMap(({ from, to }) => [
+      {
+        name: "Select",
+        from,
+        to,
+        show: () => mount(select, { defaultOpen: true, modal: from }, selectMarkup),
+      },
+      {
+        name: "Combobox",
+        from,
+        to,
+        show: () => mount(combobox, { defaultOpen: true, modal: from }, listMarkup),
+      },
+      {
+        name: "Autocomplete",
+        from,
+        to,
+        show: () => mount(autocomplete, { defaultOpen: true, modal: from }, listMarkup),
+      },
+    ]),
+  ]
+
+  test.each(cases)("$name follows modal from $from to $to while open", ({ show, to }) => {
+    const outside = document.body.appendChild(document.createElement("button"))
+    const view = show()
+    mounts.push(view)
+    const focused = document.activeElement
+    rerenderOf(view).setOptions({ modal: to })
+    const effects = modalTriple(view.state.modal)
+    expect(view.state.open).toBe(true)
+    expect(document.activeElement).toBe(focused)
+    expect(!!outside.inert).toBe(effects.inertAndLock)
+    expect(document.documentElement.style.overflow === "hidden").toBe(effects.inertAndLock)
+    expect(findLayer(view.part("content")!)?.modal).toBe(effects.consumeOutsidePress)
+  })
+
+  test.each([false, true])(
+    "a child shown outside its parent stays usable when the parent turns modal, child modal: %s",
+    (modal) => {
+      const parent = mount(dialog, { defaultOpen: true, modal: false }, shareMarkup)
+      const child = mount(dialog, { modal }, shareMarkup)
+      mounts.push(parent, child)
+      parent.part("content")!.append(child.part("trigger")!)
+      rerenderOf(child).setOptions({ modal, open: true })
+      const content = child.part("content")!
+      expect(findLayer(content)?.parent).toBe(findLayer(parent.part("content")!))
+      rerenderOf(parent).setOptions({ modal: true })
+      const inert = (node: HTMLElement | null): boolean => !!node && (node.inert || inert(node.parentElement))
+      expect(inert(content)).toBe(false)
+    },
+  )
 })

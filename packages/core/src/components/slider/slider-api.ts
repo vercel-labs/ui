@@ -4,17 +4,13 @@ import { orientationOf } from "../../foundation/focus/collection"
 import { createDragSession } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
-import {
-  clamp,
-  displayOptions,
-  formatNumber,
-  parseRange,
-  type NumberFormat,
-} from "../../foundation/text/number"
+import { displayOptions, formatNumber, type NumberFormat } from "../../foundation/number/format"
+import { parseRange } from "../../foundation/number/parse"
+import { clamp } from "../../foundation/number/steps"
 import { localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
-import { sameValue } from "../../foundation/kernel/store"
-import { deriveFromOptions } from "../../foundation/kernel/derive"
+import { heldState, sameValue } from "../../foundation/kernel/store"
+import { deriveFromOptions, deriveState } from "../../foundation/kernel/derive"
 import type { SliderChangeOptions, SliderOptions, SliderValueChangeReason } from "./slider"
 import {
   fractionAlong,
@@ -62,6 +58,13 @@ function thumbValuesOf(value: number | number[]) {
   const record: Record<string, number> = {}
   valuesOf(value).forEach((item, index) => (record[index] = item))
   return record
+}
+function holdsValue(thumbValues: Record<string, number>, value: number | number[]) {
+  if (!Array.isArray(value)) return Object.is(thumbValues[0], value) && thumbValues[1] === undefined
+  return (
+    thumbValues[value.length] === undefined &&
+    value.every((item, index) => Object.is(thumbValues[index], item))
+  )
 }
 // Keeps a single value a number, so `onValueChange` gets back what it was given.
 const shaped = (values: number[], like: number | number[]) => (Array.isArray(like) ? values : values[0])
@@ -333,13 +336,14 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     if (!sameValue(value, state.value)) return { value }
   })
 
-  // Each thumb's value by index follows the value, before any part hears it changed.
-  let valueShown = store.get().value
-  store.subscribe(() => {
-    const { value } = store.get()
-    if (value === valueShown) return
-    valueShown = value
-    store.set({ thumbValues: thumbValuesOf(value) })
+  // The same value makes the same record, so a render and its handover agree. A dropped
+  // preview never replaces the held record, checked held since a value the framework
+  // rendered isn't written yet, and a thumb's input hears only writes.
+  let made = { value: store.get().value, thumbValues: store.get().thumbValues }
+  deriveState(context, ["thumbValues"], ({ value }) => {
+    if (holdsValue(heldState(store).thumbValues, value)) return
+    if (!sameValue(value, made.value)) made = { value, thumbValues: thumbValuesOf(value) }
+    return { thumbValues: made.thumbValues }
   })
   // Disabling mid-drag ends the drag.
   store.subscribe(() => {

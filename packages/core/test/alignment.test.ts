@@ -25,11 +25,11 @@ describe("change details", () => {
 describe("controllers", () => {
   test("expose only the component's methods", () => {
     const controller = createController<TabsController>()
-    expect((controller as Record<string, unknown>).attach).toBeUndefined()
-    expect((controller as Record<string, unknown>).attached).toBeUndefined()
     const instance = kept(tabs({ id: "t", defaultValue: "a", controller }))
     instance.setOptions({ id: "t", defaultValue: "a", controller })
     expect(controller.getValue()).toBe("a")
+    expect((controller as Record<string, unknown>).attach).toBeUndefined()
+    expect((controller as Record<string, unknown>).attached).toBeUndefined()
   })
 })
 

@@ -215,6 +215,18 @@ test.describe("mounting", () => {
     await expect(await panelOf(page, "Shipping")).toBeHidden()
   })
 
+  test("with keepMounted, a class that sets display doesn't show collapsed panels", async ({
+    page,
+    open,
+  }) => {
+    await open("accordion", { "keep-mounted": "" })
+    await page.addStyleTag({ content: ".accordion-panel { display: flex }" })
+    await expect(await panelOf(page, "Returns")).toHaveCSS("display", "none")
+    await triggerNamed(page, "Returns").click()
+    await expect(regionNamed(page, "Returns")).toHaveCSS("display", "flex")
+    await expect(await panelOf(page, "Warranty")).toHaveCSS("display", "none")
+  })
+
   test("with hiddenUntilFound, collapsed panels stay findable", async ({ page, open }) => {
     await open("accordion", { "hidden-until-found": "" })
     await expect(page.locator('[role="region"]')).toHaveCount(4)

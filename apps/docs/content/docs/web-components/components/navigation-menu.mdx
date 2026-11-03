@@ -93,7 +93,7 @@ Resting the pointer on a trigger opens its panel. With `openOnHover` set to fals
 
 ### Delay
 
-`delay` is how long the pointer rests on a trigger before its panel opens, and `closeDelay` how long the panel stays once the pointer leaves the trigger and the panel: 50 milliseconds each by default. The pointer can cross the gap between a trigger and its panel without closing it. Once a panel is open, moving to another trigger switches at once, and coming back right after closing skips the delay.
+`delay` is how long the pointer rests on a trigger before its panel opens, and `closeDelay` how long the panel stays once the pointer leaves the trigger and the panel: 50 milliseconds each by default. The pointer can cross the gap between a trigger and its panel without closing it. Once a panel is open, moving to another trigger switches at once, unless the pointer is only passing over it on the way into the open panel. Coming back right after closing skips the delay.
 
 <ComponentExample
   name="navigation-menu/delay"

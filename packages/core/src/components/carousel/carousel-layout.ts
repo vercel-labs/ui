@@ -1,7 +1,7 @@
 // Where a carousel's pages are, from its slides' measured layout. Pure, so
 // it's unit tested without a DOM. Positions are scroll positions along the
 // carousel's axis, from the start edge: right to left counts from the right.
-import { clamp } from "../../foundation/text/number"
+import { clamp } from "../../foundation/number/steps"
 
 /**
  * Where a page lines up in the viewport.

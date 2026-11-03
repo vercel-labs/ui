@@ -1,10 +1,9 @@
 import type { Metadata } from "next"
-import { connection } from "next/server"
 import type { ReactNode } from "react"
+import { listIssues } from "@/app/data"
 import { Header } from "@/components/header"
 import { Confirmer } from "@/components/ui/alert-dialog"
 import { Toaster } from "@/components/ui/toast"
-import { listIssues } from "tracker-data/store"
 import "./globals.css"
 
 const metadata: Metadata = {
@@ -13,11 +12,11 @@ const metadata: Metadata = {
 }
 
 async function RootLayout({ children }: { children: ReactNode }) {
-  await connection()
+  const issues = await listIssues()
   return (
     <html lang="en">
       <body className="flex h-dvh flex-col overflow-hidden font-sans text-sm">
-        <Header issues={listIssues().map(({ id, title }) => ({ id, title }))} />
+        <Header issues={issues.map(({ id, title }) => ({ id, title }))} />
         {children}
         <Toaster />
         <Confirmer />

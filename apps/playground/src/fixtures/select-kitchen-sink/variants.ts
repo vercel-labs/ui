@@ -296,7 +296,7 @@ const variants: Variant[] = [
     id: "disabled-items",
     section: "Items",
     title: "Disabled items",
-    note: "Durian is disabled. It can be highlighted, not chosen.",
+    note: "Durian is disabled. Arrow keys skip it, and it can't be chosen.",
   },
   {
     id: "data",

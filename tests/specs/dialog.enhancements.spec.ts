@@ -75,6 +75,18 @@ test.describe("focus that always lands somewhere useful", { tag: "@enhancement" 
     await expect(page.getByRole("button", { name: "Delete project" })).toBeFocused()
   })
 
+  test("closing after the trigger is gone skips past a later positive tabindex", async ({ page, open }) => {
+    await open("dialog", { removable: "" })
+    await trigger(page).evaluate((el) =>
+      el.parentElement!.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Help</button>`),
+    )
+    await openWithKeyboard(page)
+    await page.getByRole("button", { name: "Remove trigger" }).click()
+    await page.keyboard.press("Escape")
+    await expect(dialog(page)).toBeHidden()
+    await expect(page.getByRole("button", { name: "Delete project" })).toBeFocused()
+  })
+
   test("a dialog open from the start moves focus inside", async ({ page, open }) => {
     await open("dialog", { open: "" })
     await expect(field(page)).toBeFocused()

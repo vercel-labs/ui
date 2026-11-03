@@ -19,7 +19,7 @@ import {
   present as isPresent,
   ref,
   renderVersion,
-  sameValue,
+  sameSlotState,
   selectedKeys,
   subscribe,
   takeOwnId,
@@ -389,7 +389,7 @@ function trackedState(instance: PrimitiveInstance, name: string, props: () => ob
   const current = () => partState(instance.part(name, props())) as Record<string, unknown>
   // A loop rather than an array, since this runs on every change that reaches the part.
   const changed = (next: Record<string, unknown>) => {
-    for (const key of read) if (!sameValue(next[key], last![key])) return true
+    for (const key of read) if (!sameSlotState(next[key], last![key])) return true
     return false
   }
   const listener = () => {

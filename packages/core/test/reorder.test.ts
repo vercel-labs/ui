@@ -329,6 +329,23 @@ describe("createReorder with the keyboard", () => {
     expect(shownOrder()).toEqual(["a", "b", "c", "d"])
   })
 
+  test("a controlled list whose new value also drops an item lets go of the dropped one", async () => {
+    let instance!: ReturnType<typeof render>["instance"]
+    const onValueChange = (value: string[]) =>
+      queueMicrotask(() => instance.setOptions({ value: value.filter((key) => key !== "d"), onValueChange }))
+    const view = render({ value: ["a", "b", "c", "d"], onValueChange })
+    instance = view.instance
+    await tick()
+    view.els.get("a")!.focus()
+    view.press(" ")
+    view.press("ArrowDown")
+    view.press(" ")
+    await tick()
+    await tick()
+    expect(instance.get().moving).toBeNull()
+    expect(instance.api.reorder.order(instance.get())).toEqual(["b", "a", "c"])
+  })
+
   test("move() commits at once, for a menu item like Move to top", () => {
     const onValueChange = vi.fn()
     const { instance } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
@@ -800,4 +817,37 @@ describe("createReorder after a missed release", () => {
     expect(onValueChange).not.toHaveBeenCalled()
     expect(instance.get().value).toEqual(["a", "b", "c", "d"])
   })
+})
+
+// A drop commits the order the list has now, moved: only `set` changes which items there are.
+test("an item the owner removes mid-drag stays removed when the drag drops", async () => {
+  const onValueChange = vi.fn()
+  const { instance, list, els } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  stackRects(list)
+  await tick()
+  pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
+  pointer("pointermove", { x: 10, y: 65 })
+  await frame()
+  expect(instance.get().moving).toMatchObject({ key: "a", pointer: true })
+  instance.setOptions({ value: ["a", "b", "c"], onValueChange })
+  pointer("pointerup", { x: 10, y: 65 })
+  expect(onValueChange).toHaveBeenCalledTimes(1)
+  expect(onValueChange.mock.calls[0][0]).toEqual(["b", "a", "c"])
+})
+
+// React renders a controlled value before it hands it over.
+test("an item the owner removes mid-drag stays removed when the value renders before it lands", async () => {
+  const onValueChange = vi.fn()
+  const { instance, list, els } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  stackRects(list)
+  await tick()
+  pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
+  pointer("pointermove", { x: 10, y: 65 })
+  await frame()
+  const next = { value: ["a", "b", "c"], onValueChange }
+  instance.preview({ ...next, id: instance.id })
+  instance.setOptions(next)
+  pointer("pointerup", { x: 10, y: 65 })
+  expect(onValueChange).toHaveBeenCalledTimes(1)
+  expect(onValueChange.mock.calls[0][0]).toEqual(["b", "a", "c"])
 })

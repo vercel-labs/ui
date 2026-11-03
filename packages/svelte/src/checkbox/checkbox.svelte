@@ -16,6 +16,7 @@ The control and the hidden native input that takes part in the form.
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import type { ToggleProps } from "../toggle-props"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
   import { CheckboxKey, useCheckboxGroup } from "./context"
 
@@ -62,7 +63,7 @@ The control and the hidden native input that takes part in the form.
     },
     defaultChecked,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     required,
     name: name ?? field?.name(),
     value,

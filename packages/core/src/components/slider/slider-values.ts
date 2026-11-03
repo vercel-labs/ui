@@ -1,7 +1,8 @@
 // The decisions a slider makes, as pure functions of its values and bounds:
 // where each thumb may go, what a key does, and which thumb a press moves.
 // slider.ts wires them to the DOM. Unit tested in test/slider.test.ts.
-import { clamp, maxOnGrid, snapToStep, stepValue, type StepRange } from "../../foundation/text/number"
+import { stepFromKey } from "../../foundation/number/keys"
+import { clamp, maxOnGrid, snapToStep, type StepRange, stepOnGrid } from "../../foundation/number/steps"
 
 type SliderRange = StepRange & {
   // How far apart neighbouring thumbs stay, in steps.
@@ -42,7 +43,7 @@ function normalizeValues(values: readonly number[], range: StepRange) {
   return values.map((value) => clamp(value, range.min, range.max)).sort((a, b) => a - b)
 }
 
-/** What a key does to a thumb's value, or null for keys a slider ignores. */
+/** What a key does to a thumb's value, or null for keys a slider ignores. Home and End go to the thumb's own bounds. */
 function keyTarget(
   key: string,
   { shiftKey = false, rtl = false, orientation = "horizontal" as "horizontal" | "vertical" } = {},
@@ -50,28 +51,10 @@ function keyTarget(
   bounds: { lower: number; upper: number },
   range: SliderRange,
 ) {
-  // Right and Up increase on both axes, as the APG says. Only a horizontal
-  // slider flips Left and Right right to left, since only it lays out that way.
-  const flip = rtl && orientation === "horizontal" ? -1 : 1
-  const directions: Record<string, number> = {
-    ArrowRight: flip,
-    ArrowUp: 1,
-    ArrowLeft: -flip,
-    ArrowDown: -1,
-  }
-  if (key === "Home") return bounds.lower
-  if (key === "End") return bounds.upper
-  if (key === "PageUp" || key === "PageDown") {
-    const direction = key === "PageUp" ? 1 : -1
-    return largeStepValue(value, direction, range)
-  }
-  const direction = directions[key]
-  if (direction === undefined) return null
-  return shiftKey ? largeStepValue(value, direction, range) : stepValue(value, direction, range)
-}
-
-function largeStepValue(value: number, direction: number, range: SliderRange) {
-  return snapToStep(clamp(value + direction * range.largeStep, range.min, range.max), range)
+  const move = stepFromKey({ key, shiftKey }, { orientation, dir: rtl ? "rtl" : "ltr" })
+  if (!move) return null
+  if ("bound" in move) return move.bound === "min" ? bounds.lower : bounds.upper
+  return stepOnGrid(value, move, range)
 }
 
 /**

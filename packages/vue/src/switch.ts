@@ -5,6 +5,7 @@ import { useFieldControl } from "./field-context"
 import { toggleProps } from "./toggle-props"
 import { createParts, withElement } from "./create-parts"
 import { optionalBoolean, orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import { readOnlyOf } from "./text-control"
 
 const parts = createParts(switchPrimitive, { thumb: "span" })
 
@@ -30,13 +31,13 @@ const Switch = withElement(
       checkedChange: (_checked: boolean, _details: ChangeDetails<SwitchCheckedChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof switchPrimitive, "root">,
-    setup(props, { emit }) {
+    setup(props, { attrs, emit }) {
       const field = useFieldControl()
       const control = usePrimitive(switchPrimitive, () => ({
         checked: orModel(props.checked, props.modelValue),
         defaultChecked: props.defaultChecked,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         required: props.required,
         name: props.name ?? field?.name(),
         value: props.value,

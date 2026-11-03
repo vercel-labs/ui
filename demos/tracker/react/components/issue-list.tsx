@@ -57,6 +57,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
   const pageCount = Math.max(1, Math.ceil(issues.length / pageSize))
   const page = Math.min(query.page, pageCount)
   const rows = issues.slice((page - 1) * pageSize, page * pageSize)
+  const latest = (payload: Issue) => issues.find((issue) => issue.id === payload.id) ?? payload
   const checked = selected.filter((id) => rows.some((issue) => issue.id === id))
 
   function update(ids: string[], patch: IssuePatch, message?: string) {
@@ -242,7 +243,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     <MenuSubTrigger>Status</MenuSubTrigger>
                     <MenuSubContent>
                       <MenuRadioGroup
-                        value={payload.status}
+                        value={latest(payload).status}
                         onValueChange={(status) => setStatus([payload.id], status as Status)}
                       >
                         {statuses.map((status) => (
@@ -257,7 +258,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     <MenuSubTrigger>Priority</MenuSubTrigger>
                     <MenuSubContent>
                       <MenuRadioGroup
-                        value={payload.priority}
+                        value={latest(payload).priority}
                         onValueChange={(priority) => setPriority([payload.id], priority as Priority)}
                       >
                         {priorities.map((priority) => (
@@ -283,4 +284,19 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
   )
 }
 
-export { IssueList }
+function IssueListSkeleton({ rows }: { rows: number }) {
+  return (
+    <div aria-busy="true" className="flex min-h-0 flex-1 flex-col">
+      <div className="h-11 shrink-0 border-b border-border" />
+      <div aria-hidden="true" className="min-h-0 flex-1 overflow-hidden">
+        {Array.from({ length: rows }, (_, index) => (
+          <div key={index} className="flex h-11 items-center border-b border-border ps-4 pe-2">
+            <span className="h-3 w-1/2 rounded-full bg-muted" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export { IssueList, IssueListSkeleton }

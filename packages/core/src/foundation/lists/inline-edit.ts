@@ -3,6 +3,8 @@
 // a character starts over with it, like a spreadsheet; Enter or leaving
 // saves, Escape puts the text back, and focus goes back to where editing
 // started either way.
+import { focusables } from "../focus/tabbable"
+import { isComposing } from "../kernel/events"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 
 /**
@@ -56,20 +58,24 @@ function createInlineEdit<State extends object>(
   // Where focus was when editing started, to go back to, and the text the input starts with.
   let origin: HTMLElement | undefined
   let start: { text: string; typed: boolean } = { text: "", typed: false }
+  // The Rename button or menu item that started editing may be gone by the
+  // end, so focus can fall back to the focusable element around the input.
+  let inputHolder: HTMLElement | null = null
   const set = (id: string | null) => store.set({ [options.key]: id } as Partial<State>)
 
   function finish(refocus: boolean) {
     set(null)
-    const back = origin
+    const targets = [origin, inputHolder]
     origin = undefined
+    inputHolder = null
     input = undefined
     // Only when focus was lost with the input: code that moved it on, like a
     // grid going to the next cell after Tab, keeps its place.
-    if (refocus && back)
+    if (refocus)
       queueMicrotask(() => {
-        const active = back.ownerDocument.activeElement
-        if (back.isConnected && (!active || active === back.ownerDocument.body || !active.isConnected))
-          back.focus()
+        const back = targets.find((el) => el?.isConnected)
+        const active = back?.ownerDocument.activeElement
+        if (back && (!active || active === back.ownerDocument.body || !active.isConnected)) back.focus()
       })
   }
 
@@ -117,6 +123,7 @@ function createInlineEdit<State extends object>(
     /** Fills and focuses the input once it renders. Return its cleanup from the input slot's `bind`. */
     bindInput(el: HTMLInputElement | HTMLTextAreaElement) {
       input = el
+      inputHolder = el.parentElement?.closest<HTMLElement>(focusables) ?? null
       el.value = start.text
       el.focus()
       // Typing replaces, so the caret goes after the typed character; Enter keeps the text selected.
@@ -128,7 +135,7 @@ function createInlineEdit<State extends object>(
     },
     /** Handles a key in the input: Enter and Tab save, Escape puts the text back. Returns whether it handled the key. */
     inputKeydown(event: KeyboardEvent) {
-      if (event.isComposing) return false
+      if (isComposing(event)) return false
       if (event.key === "Enter" && !(event.target instanceof HTMLTextAreaElement && event.shiftKey)) {
         event.preventDefault()
         return api.end("enter-key", event)

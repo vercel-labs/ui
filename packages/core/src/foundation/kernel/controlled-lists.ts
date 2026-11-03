@@ -5,7 +5,7 @@
 import { callbackName, defaultName } from "./option-names"
 import { schemaOf } from "./primitive"
 import type { Primitive } from "./primitive-types"
-import { markChangedInPlace, sameValue } from "./store"
+import { isPlainObject, markChangedInPlace, sameValue } from "./store"
 
 /**
  * A framework's cached derivation, like a Vue `computed`, a Svelte
@@ -38,11 +38,6 @@ function keysOf(primitive: Primitive) {
   return keys
 }
 
-const isPlainObject = (value: object) => {
-  const prototype = Object.getPrototypeOf(value)
-  return prototype === Object.prototype || prototype === null
-}
-
 // Reads every item of a list, and every field of each through arrays and
 // plain objects, so the framework tracks a change anywhere in it, like a
 // child pushed into a tree's branch. Other objects, like dates, stay unread.
@@ -55,7 +50,7 @@ function readAll(value: unknown, path: object[]) {
   if (Array.isArray(value)) {
     for (let index = 0; index < value.length; index++) readAll(value[index], path)
   } else if (isPlainObject(value)) {
-    for (const key in value) readAll((value as Record<string, unknown>)[key], path)
+    for (const key in value) readAll(value[key], path)
   }
   path.pop()
 }

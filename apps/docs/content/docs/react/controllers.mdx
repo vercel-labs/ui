@@ -33,6 +33,8 @@ Controller methods go through the component's change callbacks. They follow the 
 
 Each component lists the methods it supports, such as `open()`, `close()`, `setValue()`, or `focus()`. Methods that change state accept an optional reason for the callback.
 
+A read like `toggle.isPressed()` answers when you call it, so call it from an event handler or async code. It returns `undefined` until the component mounts, and a render doesn't update when the state changes. To render the state, keep it in state with `pressed` and `onPressedChange`.
+
 ## Share a Popup
 
 A trigger outside a popup can use its controller. Pass a `payload` to tell the content which item was opened:

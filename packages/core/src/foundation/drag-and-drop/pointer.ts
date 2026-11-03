@@ -1,5 +1,6 @@
 // Pointer gestures that sliders, scrubbers and steppers share: following one
 // pointer until it lifts, and repeating an action while a press is held.
+import { on } from "../kernel/events"
 
 /**
  * Where the pointer is, and how far it moved since the last report. The same object every report, so read it, don't keep it.
@@ -185,7 +186,7 @@ const isSecondary = (event: PointerEvent) =>
 function createDragSession(onDestroy?: (cleanup: () => void) => void) {
   let running: { down: PointerEvent; cancel: () => void } | undefined
   onDestroy?.(() => running?.cancel())
-  return {
+  const session = {
     /**
      * Whether a press can start a drag now. Check it first, before the
      * component's own guards: ending a stale drag can change what they read.
@@ -229,10 +230,65 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
       }
       running = drag
     },
+    /**
+     * Waits for the press to move until `pick` decides: `undefined` to keep
+     * waiting, `false` to let it go, like a scroll, or `true` to follow it from
+     * that move, like `start`. The pointer isn't captured while it waits, so
+     * a press that lifts first stays a click, and `onTap` hears it.
+     */
+    startOnMove(
+      el: HTMLElement,
+      down: PointerEvent,
+      {
+        pick,
+        onTap,
+        ...options
+      }: BindDragOptions & {
+        pick: (move: PointerEvent) => boolean | undefined
+        onTap?: (up: PointerEvent) => void
+      },
+    ) {
+      const doc = el.ownerDocument
+      const ours = (event: PointerEvent) => event.pointerId === down.pointerId
+      const stopWaiting = () => {
+        offs.forEach((off) => off())
+        if (running === waiting) running = undefined
+      }
+      const offs = [
+        on(doc, "pointermove", (move) => {
+          if (!ours(move)) return
+          const picked = pick(move)
+          if (picked === undefined) return
+          stopWaiting()
+          if (!picked) return
+          // The swipe follows from the move that picked it, but counts as a drag from the press.
+          session.start(el, move, {
+            ...options,
+            onEnd(up, canceled) {
+              const from = (event: PointerEvent) =>
+                isDrag(up.clientX - event.clientX, up.clientY - event.clientY)
+              if (!canceled && from(down) && !from(move)) swallowNextClick(doc)
+              options.onEnd(up, canceled)
+            },
+          })
+        }),
+        on(doc, "pointerup", (up) => {
+          if (!ours(up)) return
+          stopWaiting()
+          onTap?.(up)
+        }),
+        on(doc, "pointercancel", (cancel) => ours(cancel) && stopWaiting()),
+      ]
+      const waiting = { down, cancel: stopWaiting }
+      running = waiting
+    },
     /** Ends the running drag, if any, as canceled. */
     cancel: () => running?.cancel(),
   }
+  return session
 }
+
+type DragSession = ReturnType<typeof createDragSession>
 
 /**
  * How far a press moves, in CSS pixels, before it counts as a drag rather than a click.
@@ -309,4 +365,5 @@ export {
   repeatWhileHeld,
   swallowNextClick,
   type BindDragOptions,
+  type DragSession,
 }

@@ -14,7 +14,7 @@ async function press(page: Page, target: Locator, dx: number, dy: number, at = {
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "direct-manipulation")
-  await expect(page.locator("[data-example]")).toHaveCount(15)
+  await expect(page.locator("[data-example]")).toHaveCount(17)
   expect(errors).toEqual([])
 })
 
@@ -27,7 +27,7 @@ test("move: a drag commits once on drop, and Alt with an arrow nudges", async ({
   await expect(page.getByText("🍋 at 160, 60")).toBeVisible()
   await lemon.focus()
   await page.keyboard.press("Alt+ArrowDown")
-  await expect(page.getByText("🍋 at 160, 70")).toBeVisible()
+  await expect(page.getByText("🍋 at 160, 64")).toBeVisible()
 })
 
 test("resize: a corner drag resizes the box, and Escape puts it back", async ({ page }) => {
@@ -146,7 +146,7 @@ test("move zoom: a drag follows the pointer at any zoom, and the buttons move fr
   await expect(page.getByText("Circle at 110, 60")).toBeVisible()
 })
 
-test("resize ratio: corners and edges keep 16:9 within the limits, and arrows move 16 pixels", async ({
+test("resize ratio: corners and edges keep 16:9 within the limits, and Shift with an arrow moves 16 pixels", async ({
   page,
 }) => {
   await openBehaviors(page, "direct-manipulation")
@@ -158,11 +158,11 @@ test("resize ratio: corners and edges keep 16:9 within the limits, and arrows mo
   await page.mouse.up()
   await expect(page.getByText("256 × 144")).toBeVisible()
   await corner.focus()
-  await page.keyboard.press("ArrowLeft")
+  await page.keyboard.press("Shift+ArrowLeft")
   await expect(page.getByText("240 × 135")).toBeVisible()
   await page.getByLabel("Keep 16:9").uncheck()
   await corner.focus()
-  await page.keyboard.press("ArrowUp")
+  await page.keyboard.press("Shift+ArrowUp")
   await expect(page.getByText("240 × 119")).toBeVisible()
 })
 
@@ -316,6 +316,70 @@ test("preview themes: hovering previews, Contrast previews as nothing, and arrow
   )
   await page.keyboard.press("Escape")
   await expect(page.getByText("Showing Sepia")).toBeVisible()
+})
+
+test("swipe dismiss: past a third of the width it shows it will dismiss, and letting go dismisses", async ({
+  page,
+}) => {
+  await openBehaviors(page, "direct-manipulation")
+  const list = page.getByRole("list", { name: "Notifications" })
+  const toast = list.getByRole("listitem").filter({ hasText: "Event created" })
+  await toast.scrollIntoViewIfNeeded()
+  const box = (await toast.boundingBox())!
+  const y = box.y + box.height / 2
+  const start = box.x + box.width / 2
+  await page.mouse.move(start, y)
+  await page.mouse.down()
+  await page.mouse.move(start + 60, y, { steps: 8 })
+  await expect(toast.getByText("Dismiss", { exact: true })).toBeVisible()
+  await page.mouse.move(start + 120, y, { steps: 8 })
+  await expect(toast.getByText("Release to dismiss")).toBeVisible()
+  await page.mouse.move(start + 60, y, { steps: 8 })
+  await expect(toast.getByText("Dismiss", { exact: true })).toBeVisible()
+  await page.mouse.up()
+  await expect(list.getByRole("listitem")).toHaveCount(3)
+  // 120 pixels is under half of the 320-pixel toast, and past its threshold.
+  await page.mouse.move(start, y)
+  await page.mouse.down()
+  await page.mouse.move(start + 120, y, { steps: 8 })
+  await page.mouse.up()
+  await expect(list.getByRole("listitem")).toHaveCount(2)
+  await list.getByRole("button", { name: "Dismiss Invite sent" }).click()
+  await expect(list.getByRole("listitem")).toHaveCount(1)
+  await page.getByRole("button", { name: "Show all again" }).click()
+  await expect(list.getByRole("listitem")).toHaveCount(3)
+})
+
+test("preview tabs: dragging a tab moves it into the nearest place, Escape cancels, and Alt with an arrow moves it", async ({
+  page,
+}) => {
+  await openBehaviors(page, "direct-manipulation")
+  const tablist = page.getByRole("tablist", { name: "Mailboxes" })
+  const names = () => tablist.getByRole("tab").allTextContents()
+  await tablist.scrollIntoViewIfNeeded()
+  const inbox = (await tablist.getByRole("tab", { name: "Inbox" }).boundingBox())!
+  const scheduled = (await tablist.getByRole("tab", { name: "Scheduled sends" }).boundingBox())!
+  const y = inbox.y + inbox.height / 2
+  await page.mouse.move(inbox.x + 10, y)
+  await page.mouse.down()
+  await page.mouse.move(scheduled.x + scheduled.width / 2, y, { steps: 12 })
+  await page.keyboard.press("Escape")
+  await page.mouse.up()
+  expect(await names()).toEqual(["Inbox", "Drafts", "Sent mail", "Scheduled sends", "Spam"])
+  await page.mouse.move(inbox.x + 10, y)
+  await page.mouse.down()
+  await page.mouse.move(scheduled.x + scheduled.width / 2, y, { steps: 12 })
+  await page.mouse.up()
+  expect(await names()).toEqual(["Drafts", "Sent mail", "Scheduled sends", "Inbox", "Spam"])
+  const spam = tablist.getByRole("tab", { name: "Spam" })
+  await spam.click()
+  await page.keyboard.press("Alt+Home")
+  expect(await names()).toEqual(["Spam", "Drafts", "Sent mail", "Scheduled sends", "Inbox"])
+  await expect(spam).toBeFocused()
+  await page.keyboard.press("Alt+ArrowRight")
+  expect(await names()).toEqual(["Drafts", "Spam", "Sent mail", "Scheduled sends", "Inbox"])
+  await page.keyboard.press("ArrowRight")
+  await expect(tablist.getByRole("tab", { name: "Sent mail" })).toHaveAttribute("aria-selected", "true")
 })
 
 test("every option links to the example that shows it", async ({ page }) => {

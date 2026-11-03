@@ -64,7 +64,7 @@ describe("state", () => {
     ).toBe("true")
     expect(
       partAttrs(popover({ id: "p", defaultOpen: true, modal: "trap-focus" }).part("content"))["aria-modal"],
-    ).toBe("true")
+    ).toBeUndefined()
   })
 
   test("a cancelled change keeps the popover closed", () => {

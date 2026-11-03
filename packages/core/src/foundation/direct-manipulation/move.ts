@@ -56,10 +56,10 @@ type MoveOptions<State extends object> = {
   set: (value: Record<string, MovePoint>, details: { reason: MoveReason; event?: Event }) => boolean
   /** The keys that move together with the one pressed, like the selection when it holds it. Defaults to that one key. */
   group?: (key: string) => string[]
-  /** How far Alt with an arrow nudges. Shift moves five times as far. Defaults to 10. */
+  /** The grid a dropped position lands on, and how far Alt with an arrow nudges. Defaults to 1. */
   step?: () => number
-  /** Rounds positions to a grid of this size on drop. Defaults to 1. */
-  grid?: () => number
+  /** How far Alt with Shift and an arrow nudges. Defaults to ten steps. */
+  largeStep?: () => number
   /**
    * How many screen pixels one unit of position takes, like a canvas's zoom,
    * so a drag follows the pointer when the items are scaled. Defaults to 1.
@@ -142,7 +142,7 @@ function createMove<State extends object>(
     ) {
       const current = positions()
       const next = { ...current }
-      const round = details.reason === "drag" ? (options.grid?.() ?? 1) : 1
+      const round = details.reason === "drag" ? (options.step?.() ?? 1) : 1
       for (const key of keys) {
         const at = current[key] ?? { x: 0, y: 0 }
         next[key] = place(key, at.x + dx, at.y + dy, round)
@@ -172,7 +172,8 @@ function createMove<State extends object>(
       const direction = arrows[event.key]
       if (!direction || !event.altKey || options.disabled?.(key)) return false
       event.preventDefault()
-      const by = (options.step?.() ?? 10) * (event.shiftKey ? 5 : 1)
+      const step = options.step?.() ?? 1
+      const by = event.shiftKey ? (options.largeStep?.() ?? step * 10) : step
       api.moveBy(group(key), direction[0] * by, direction[1] * by, { reason: "move-key", event })
       return true
     },

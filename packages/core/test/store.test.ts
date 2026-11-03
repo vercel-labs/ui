@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest"
 import { definePrimitive, renderVersion } from "../src/foundation/kernel/primitive"
-import { createStore, subscribeSkipping } from "../src/foundation/kernel/store"
+import {
+  createStore,
+  markChangedInPlace,
+  sameSlotState,
+  subscribeSkipping,
+} from "../src/foundation/kernel/store"
 import { select } from "../src/foundation/kernel/selects"
 
 describe("the store", () => {
@@ -232,5 +237,53 @@ describe("the render version", () => {
     expect(renderVersion(instance)).toBe(before)
     instance.api.set({ open: true })
     expect(renderVersion(instance)).toBeGreaterThan(before)
+  })
+})
+
+describe("slot state comparison", () => {
+  test("plain objects and arrays with the same values are the same, however deep", () => {
+    expect(
+      sameSlotState({ point: { x: 1 }, points: [{ x: 1 }] }, { point: { x: 1 }, points: [{ x: 1 }] }),
+    ).toBe(true)
+    expect(sameSlotState({ point: { x: 1 } }, { point: { x: 2 } })).toBe(false)
+    expect(sameSlotState([{ x: 1 }], [{ x: 1 }, { x: 2 }])).toBe(false)
+    expect(sameSlotState({ x: 1 }, { x: 1, y: undefined })).toBe(false)
+    expect(sameSlotState([], {})).toBe(false)
+  })
+
+  test("a list changed in place is never the same as another", () => {
+    const item = { x: 1 }
+    expect(sameSlotState([item], markChangedInPlace([item]))).toBe(false)
+  })
+
+  test("distinct cyclic objects and arrays compare without overflowing, and still see differences", () => {
+    const cyclic = (x: number) => {
+      const node: Record<string, unknown> = { x }
+      node.self = node
+      node.list = [node]
+      return node
+    }
+    expect(sameSlotState(cyclic(1), cyclic(1))).toBe(true)
+    expect(sameSlotState(cyclic(1), cyclic(2))).toBe(false)
+    const ring = (x: number) => {
+      const first: Record<string, unknown> = { x }
+      const second: Record<string, unknown> = { x: x + 1, next: first }
+      first.next = second
+      return first
+    }
+    expect(sameSlotState(ring(1), ring(1))).toBe(true)
+    const list: unknown[] = [1]
+    list.push(list)
+    const other: unknown[] = [1]
+    other.push(other)
+    expect(sameSlotState(list, other)).toBe(true)
+    expect(sameSlotState({ list }, { list: [2, list] })).toBe(false)
+  })
+
+  test("other objects compare by identity", () => {
+    expect(sameSlotState({ at: new Date(0) }, { at: new Date(0) })).toBe(false)
+    expect(sameSlotState(new Map(), new Map())).toBe(false)
+    const date = new Date(0)
+    expect(sameSlotState({ at: date }, { at: date })).toBe(true)
   })
 })

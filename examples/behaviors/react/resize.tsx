@@ -33,7 +33,7 @@ const frame = definePrimitive({
         set: (value, details) => change("boxes", value, details),
         min: () => ({ width: 60, height: 40 }),
         bounds: () => ({ left: 0, top: 0, right: 320, bottom: 200 }),
-        grid: () => 4,
+        step: () => 4,
       }),
     }
   },

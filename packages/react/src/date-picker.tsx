@@ -177,7 +177,7 @@ function DatePickerInput({
   end,
   render,
   ...props
-}: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children"> & {
+}: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children" | "readOnly"> & {
   end?: boolean
 }) {
   const picker = useDatePicker("DatePickerInput")

@@ -4,6 +4,7 @@
 // pattern needs and the code for it: placement, hover and focus opening, the
 // sheet. This file imports none of that, so a popup bundles only what its
 // preset names.
+import { deriveFromOptions } from "../kernel/derive"
 import { createChange } from "../kernel/input-source"
 import { elements } from "../kernel/elements"
 import type { ChangeDetails } from "../kernel/details"
@@ -92,6 +93,7 @@ type PopupCore = {
   control: ReturnType<typeof createOpenSteps<string>>
   triggerElement: () => HTMLElement | undefined
   triggerSlot: string
+  triggerDisabled: (key: string) => boolean
   contentProps: (key?: string) => PopupContentProps
   rules?: PopupRules
 }
@@ -314,6 +316,7 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     },
     triggerElement,
     triggerSlot,
+    triggerDisabled: (key) => !!context.props<{ disabled?: boolean }>(triggerSlot, key)?.disabled,
     contentProps,
   }
   const rules = (core.rules = config.rules?.(core))
@@ -330,10 +333,13 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
   // sheets, else the preset's. A preset without one leaves `modal` to the
   // primitive, like Dialog's, or is never modal, like hover content, which
   // WCAG 1.4.13 needs dismissible without trapping anyone.
-  function updateModal() {
+  function modalOf(arriving: PopupOptions, state: PopupState) {
     if (preset.modal === undefined) return
-    const sheet = store.get().presentation === "sheet"
-    store.set({ modal: options().modal ?? (sheet ? true : preset.modal) })
+    return { modal: arriving.modal ?? (state.presentation === "sheet" ? true : preset.modal) }
+  }
+  function updateModal() {
+    const patch = modalOf(options(), store.get())
+    if (patch) store.set(patch)
   }
   // A dismissal the popup layer saw, like Escape or an outside press.
   function dismiss(
@@ -412,7 +418,18 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
   })
 
   updateModal()
-  context.onOptions(updateModal)
+  deriveFromOptions(context, ["modal"], (synced, state, arriving) =>
+    modalOf(arriving as PopupOptions, { ...state, ...synced }),
+  )
+  // Whatever changes `modal` while the popup shows, its option, a sheet's
+  // snap point or the primitive's own state, applies to the page at once.
+  let modalShown = store.get().modal
+  store.subscribe(() => {
+    const { modal } = store.get()
+    if (modal === modalShown) return
+    modalShown = modal
+    popup.updateModal()
+  })
 
   // Typed as there when the preset names it, which TypeScript can't tell from the calls.
   const features = { dismissal, presentation, press, group, hover, focus, triggerName, rules } as {

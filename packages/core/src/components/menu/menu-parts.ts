@@ -119,17 +119,19 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         // Mouse and pen open on press, like native menus. The click that follows is ignored.
         api.internal.pointerPress(el!, event, key, props.payload)
       },
-      pointermove(event, { api, el }) {
+      pointermove(event, { api, el, id }) {
         api.parentMenu()?.internal.hoverItem(el!, event)
+        api.menubar()?.internal.hoverMove(id, event)
       },
       pointerenter(event, { api, id }) {
         api.menubar()?.internal.hover(id, event)
       },
-      pointerleave(event, { api }) {
+      pointerleave(event, { api, id }) {
         if (event.pointerType === "touch") return
-        const submenu = api.popupElement()
-        if (api.isOpen() && submenu)
-          api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, submenu)
+        const popup = api.popupElement()
+        api.menubar()?.internal.leave(id, event, popup)
+        if (api.isOpen() && popup)
+          api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, popup)
         else api.parentMenu()?.internal.cancelHoverOpen()
       },
     },
@@ -178,7 +180,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
             kind: "submenu",
             label: () => labelOf(el),
             disabled: () =>
-              !!(api.itemProps("trigger", key) as SubTriggerProps | undefined)?.disabled ||
+              !!api.itemProps<SubTriggerProps>("trigger", key)?.disabled ||
               el.getAttribute("aria-disabled") === "true",
             activate: (event) => api.show({ focus: "first", event, reason: "trigger-press" }),
             openSubmenu: (focus, reason, event) => api.show({ focus, reason, event }),
@@ -190,7 +192,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       if (!parentMenu) cleanups.push(keyWhileBound(store, "triggers", key))
       const menubar = api.menubar()
       if (menubar) {
-        const latest = () => (api.itemProps("trigger", key) ?? {}) as TriggerProps
+        const latest = () => api.itemProps<TriggerProps>("trigger", key) ?? {}
         // The menubar's tab stop and disabled state render on this trigger.
         const follow = () => {
           const stop = menubar.internal.stop()
@@ -214,9 +216,9 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       if (!parentMenu)
         cleanups.push(
           shortcutManager.register(
-            () => (api.itemProps("trigger", key) as TriggerProps | undefined)?.shortcut,
+            () => api.itemProps<TriggerProps>("trigger", key)?.shortcut,
             (event) => {
-              const props = (api.itemProps("trigger", key) ?? {}) as TriggerProps
+              const props = api.itemProps<TriggerProps>("trigger", key) ?? {}
               // A disabled menubar disables its triggers' shortcuts too.
               if (triggerDisabled(store.get(), props)) return
               if (api.isOpen()) api.hide({ reason: "shortcut", event })
@@ -236,6 +238,12 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       if (!parentMenu) {
         cleanups.push(bindItemShortcuts(store, el, api.runAction), () => {
           if (store.get().trigger === key && !store.get().open) store.set({ trigger: null })
+          // The trigger that opened the menu left, like a row a filter hid, so nothing updates its
+          // payload anymore. A task later, so a rebind an adapter queues as a microtask lands first.
+          setTimeout(() => {
+            if (store.get().trigger === key && api.isOpen() && api.popupElement() && !api.triggerElement())
+              api.hide({ reason: "imperative" })
+          })
         })
       }
       return () => cleanups.forEach((cleanup) => cleanup())
@@ -281,6 +289,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       pointermove: (event, { api }) => api.internal.trackPointer(event),
       pointerenter(event, { api }) {
         api.parentMenu()?.internal.safeArea.stop()
+        api.menubar()?.internal.enterMenu()
       },
       pointerleave(event, { api, store, el }) {
         if (event.pointerType === "touch") return
@@ -295,7 +304,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       const { api, key, props: initial } = part
       const parentMenu = api.parentMenu()
       // Read on every check, so the popup follows prop changes while open.
-      const props = () => (api.itemProps("content", key) as ContentProps | undefined) ?? initial
+      const props = () => api.itemProps<ContentProps>("content", key) ?? initial
       let firstItem: number | undefined
       return api.internal.presentation.bind(el, {
         anchor: api.anchor,
@@ -364,7 +373,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     bind(el, { api, key, props, id }) {
       if (dev && !props.label && !labelOf(el).trim())
         warn("An item has no text. Pass a label so typeahead can find it.", { component: "menu", id })
-      const current = () => (api.itemProps("item", key) ?? props) as ItemProps
+      const current = () => api.itemProps<ItemProps>("item", key) ?? props
       const cleanups = [
         on(el, "click", (event) => linkClick(api, current, el, event)),
         api.internal.register(el, {
@@ -518,9 +527,10 @@ const menuCheckable = /* @__PURE__ */ (() => ({
         return api.internal.register(el, {
           key,
           kind: "checkbox",
-          label: () => ((api.itemProps("checkbox-item", key) ?? props) as CheckboxProps).label ?? labelOf(el),
+          label: () => (api.itemProps<CheckboxProps>("checkbox-item", key) ?? props).label ?? labelOf(el),
           disabled: () => el.getAttribute("aria-disabled") === "true",
-          activate: (event) => toggleCheckbox(api, api.itemProps("checkbox-item", key) ?? props, event),
+          activate: (event) =>
+            toggleCheckbox(api, api.itemProps<CheckboxProps>("checkbox-item", key) ?? props, event),
         })
       },
     }),
@@ -574,9 +584,9 @@ const menuCheckable = /* @__PURE__ */ (() => ({
         return api.internal.register(el, {
           key: `${props.group}:${key}`,
           kind: "radio",
-          label: () => ((api.itemProps("radio-item", key) ?? props) as RadioProps).label ?? labelOf(el),
+          label: () => (api.itemProps<RadioProps>("radio-item", key) ?? props).label ?? labelOf(el),
           disabled: () => el.getAttribute("aria-disabled") === "true",
-          activate: (event) => selectRadio(api, api.itemProps("radio-item", key) ?? props, event),
+          activate: (event) => selectRadio(api, api.itemProps<RadioProps>("radio-item", key) ?? props, event),
         })
       },
     }),

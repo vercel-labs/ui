@@ -202,6 +202,45 @@ describe("createGridFocus", () => {
     expect(instance.get().active).toEqual({ row: 0, col: 0 })
   })
 
+  test("before the grid is entered, the first cell that isn't disabled has the tab stop and keys start there", () => {
+    const instance = grid({ id: "g", disabled: (cell) => cell.row === 0 && cell.col === 0 })
+    cleanups.push(() => instance.destroy())
+    const { focus } = instance.api
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 0 })).toBe("-1")
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 1 })).toBe("0")
+    expect(focus.keydown(key("ArrowLeft"))).toBe(true)
+    expect(instance.get().active).toEqual({ row: 0, col: 1 })
+    const fresh = grid({ id: "h", disabled: (cell) => cell.row === 0 && cell.col === 0 })
+    cleanups.push(() => fresh.destroy())
+    expect(fresh.api.focus.keydown(key("ArrowRight"))).toBe(true)
+    expect(fresh.get().active).toEqual({ row: 0, col: 2 })
+  })
+
+  test("a first row of disabled cells passes the tab stop to the next row, and follows new options", () => {
+    const instance = grid({ id: "g", disabled: (cell) => cell.row === 0 })
+    cleanups.push(() => instance.destroy())
+    const { focus } = instance.api
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 0 })).toBe("-1")
+    expect(focus.tabIndex(instance.get(), { row: 1, col: 0 })).toBe("0")
+    instance.setOptions({ id: "g", disabled: (cell) => cell.row < 2 && cell.col < 3 })
+    expect(focus.tabIndex(instance.get(), { row: 1, col: 0 })).toBe("-1")
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 3 })).toBe("0")
+    expect(focus.keydown(key("ArrowDown"))).toBe(true)
+    expect(instance.get().active).toEqual({ row: 1, col: 3 })
+  })
+
+  test("the tab stop is found once for all the cells, not once per cell", () => {
+    const disabled = vi.fn((cell: GridCell) => cell.row < 50)
+    const instance = grid({ id: "g", disabled })
+    cleanups.push(() => instance.destroy())
+    const stops: string[] = []
+    for (let row = 0; row < 100; row++)
+      for (let col = 0; col < 4; col++)
+        if (instance.api.focus.tabIndex(instance.get(), { row, col }) === "0") stops.push(`${row}:${col}`)
+    expect(stops).toEqual(["50:0"])
+    expect(disabled.mock.calls.length).toBeLessThanOrEqual(400)
+  })
+
   test("skips disabled cells, reveals the target and reports Shift", () => {
     const instance = grid({ id: "g", disabled: (cell) => cell.row === 1 })
     cleanups.push(() => instance.destroy())
@@ -279,6 +318,20 @@ describe("createInlineEdit", () => {
     expect(document.activeElement).toBe(cell)
   })
 
+  test("an Enter that confirms an input method's text doesn't save, even Safari's", () => {
+    const { instance, input } = mount()
+    const { edit } = instance.api
+    edit.keydown(key("Enter"), "a")
+    edit.bindInput(input)
+    input.value = "東京"
+    expect(edit.inputKeydown(key("Enter", { isComposing: true }))).toBe(false)
+    // Safari ends the composition first, so its Enter says it isn't composing and has key code 229.
+    expect(edit.inputKeydown(key("Enter", { keyCode: 229 }))).toBe(false)
+    expect(instance.get().editing).toBe("a")
+    edit.inputKeydown(key("Enter"))
+    expect(instance.get().values.a).toBe("東京")
+  })
+
   test("typing starts over with the character, and Escape puts the text back", () => {
     const { instance, input } = mount()
     const { edit } = instance.api
@@ -298,6 +351,52 @@ describe("createInlineEdit", () => {
     input.value = ""
     expect(edit.end("enter-key")).toBe(false)
     expect(instance.get().editing).toBe("a")
+  })
+
+  // A row whose Rename button is swapped for the input, as a menu item that closes would be.
+  function renameFromRow() {
+    const instance = table({ id: "t" })
+    cleanups.push(() => instance.destroy())
+    const row = document.createElement("div")
+    row.tabIndex = -1
+    const rename = document.createElement("button")
+    row.append(rename)
+    document.body.append(row)
+    const start = () => {
+      rename.focus()
+      instance.api.edit.start("a")
+      const input = document.createElement("input")
+      row.replaceChildren(input)
+      instance.api.edit.bindInput(input)
+      return input
+    }
+    return { instance, row, start }
+  }
+
+  test.each(["Enter", "Escape"])(
+    "%s after the button that started editing left goes to the focusable element around the input",
+    async (pressed) => {
+      const { instance, row, start } = renameFromRow()
+      const input = start()
+      input.value = "Alpha 2"
+      instance.api.edit.inputKeydown(key(pressed))
+      expect(instance.get().editing).toBeNull()
+      input.remove()
+      await Promise.resolve()
+      expect(document.activeElement).toBe(row)
+    },
+  )
+
+  test("focus moved on purpose stays put when the button that started editing left", async () => {
+    const { instance, start } = renameFromRow()
+    const next = document.createElement("button")
+    document.body.append(next)
+    const input = start()
+    expect(instance.api.edit.inputKeydown(key("Tab"))).toBe(true)
+    next.focus()
+    input.remove()
+    await Promise.resolve()
+    expect(document.activeElement).toBe(next)
   })
 })
 

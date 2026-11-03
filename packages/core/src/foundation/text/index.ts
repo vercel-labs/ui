@@ -7,20 +7,6 @@ export { fuzzyFilter } from "./fuzzy"
 export { bindPageLocale, localeOf, pageLocale } from "./locale"
 export { foldText, leadingSpaces, matchRanges, type MatchSegment, matchSegments } from "./match"
 export {
-  clamp,
-  decimalsOf,
-  displayOptions,
-  formatNumber,
-  maxOnGrid,
-  type NumberFormat,
-  numberFormatter,
-  parseRange,
-  roundTo,
-  snapToStep,
-  type StepRange,
-  stepValue,
-} from "./number"
-export {
   type EditorChange,
   type EditorReplaceOptions,
   type TextEditorAdapter,

@@ -24,10 +24,12 @@ const filtered = definePrimitive({
 
 // The attribute methods core calls on an element. Adapters that render through
 // a framework bind it as `{ by: "framework" }`, since they attach handlers themselves.
+// Its document has no head, so the rule that keeps hidden parts hidden isn't written.
 function element(initial: Record<string, string> = {}) {
   const attributes = new Map(Object.entries(initial))
   return {
     isConnected: true,
+    ownerDocument: {},
     attributes,
     getAttribute: (name: string) => attributes.get(name) ?? null,
     setAttribute: (name: string, value: string) => attributes.set(name, value),

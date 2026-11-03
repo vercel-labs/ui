@@ -1,4 +1,13 @@
-import { coversTab, expect, lastAction, panelNamed, tabNamed, test } from "../fixtures"
+import {
+  coversTab,
+  expect,
+  lastAction,
+  opacityOf,
+  panelNamed,
+  slowTransitions,
+  tabNamed,
+  test,
+} from "../fixtures"
 
 // Behavior follows the WAI-ARIA tabs pattern:
 // https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
@@ -51,6 +60,42 @@ test.describe("selection", () => {
     await open("tabs", { default: "none" })
     await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
     await expect(panelNamed(page, "Account")).toBeVisible()
+  })
+
+  test("without a default value, the first render already selects the first enabled tab", async ({
+    page,
+    open,
+  }) => {
+    await page.addInitScript(() => {
+      const changes: string[] = []
+      ;(window as unknown as { __tabChanges: string[] }).__tabChanges = changes
+      new MutationObserver((records) => {
+        for (const record of records) {
+          const el = record.target as Element
+          const role = el.getAttribute("role")
+          // An attribute set for the first time is the first render's, like a custom element's.
+          if (
+            record.type === "attributes" &&
+            record.oldValue !== null &&
+            (role === "tab" || role === "tabpanel")
+          )
+            changes.push(`${el.textContent?.trim()} ${record.attributeName} was ${record.oldValue}`)
+          for (const node of record.addedNodes)
+            if (node instanceof Element && node.getAttribute("role") === "tabpanel")
+              changes.push(`${node.textContent?.trim()} added`)
+        }
+      }).observe(document, {
+        subtree: true,
+        childList: true,
+        attributeOldValue: true,
+        attributeFilter: ["aria-selected", "hidden"],
+      })
+    })
+    await open("tabs", { default: "none" })
+    await expect(panelNamed(page, "Account")).toBeVisible()
+    expect(await page.evaluate(() => (window as unknown as { __tabChanges: string[] }).__tabChanges)).toEqual(
+      [],
+    )
   })
 })
 
@@ -244,6 +289,16 @@ test.describe("panels", () => {
       await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!)
     }
   })
+
+  test("with keepMounted, a class that sets display doesn't show hidden panels", async ({ page, open }) => {
+    await open("tabs", { "keep-mounted": "" })
+    await page.addStyleTag({ content: ".panel { display: flex }" })
+    const displays = () =>
+      page.locator(".panel").evaluateAll((panels) => panels.map((el) => getComputedStyle(el).display))
+    await expect.poll(displays).toEqual(["flex", "none", "none", "none"])
+    await tabNamed(page, "Notifications").click()
+    await expect.poll(displays).toEqual(["none", "none", "none", "flex"])
+  })
 })
 
 test.describe("indicator", () => {
@@ -294,6 +349,15 @@ test.describe("activation direction", () => {
 })
 
 test.describe("animation", () => {
+  test("the next panel animates in from its starting style", async ({ page, open }) => {
+    await open("tabs", { animate: "" })
+    await slowTransitions(page)
+    await expect(panelNamed(page, "Account")).toBeVisible()
+    await tabNamed(page, "Password").click()
+    await expect(panelNamed(page, "Password")).toBeVisible()
+    expect(await opacityOf(panelNamed(page, "Password"))).toBeLessThan(0.5)
+  })
+
   test("the previous panel stays mounted while it animates out", async ({ page, open }) => {
     await open("tabs", { animate: "" })
     await expect(panelNamed(page, "Account")).toBeVisible()

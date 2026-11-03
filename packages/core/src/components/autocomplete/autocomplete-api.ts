@@ -151,6 +151,7 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     },
     onHighlight: (key, index, event) => options().onHighlight?.(key, { index, event }),
     container: () => element("list") ?? contentElement(),
+    scrollRoot: contentElement,
   })
   // Data that drops the highlighted suggestion settles the highlight in the
   // same pass, so it never points at a suggestion that left.
@@ -397,7 +398,7 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       contentElement,
       arrowElement: () => element("arrow"),
       text: (state: AutocompleteState) => state.value,
-      itemProps: (key: string) => context.props("item", key) as AutocompleteItemMeta | undefined,
+      itemProps: (key: string) => context.props<AutocompleteItemMeta>("item", key),
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
       // Where focus goes once the list opens: it stays in the field, unless a
       // screen reader's tap moved it into the list, to the first suggestion.
@@ -412,7 +413,7 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
         }
         // Typing that opened the list highlights its best match, arrow keys the first or last.
         if (target === "first" && store.get().query) core.settle(true, null)
-        else if (target) core.listbox.highlight(core.listbox.stepKey(target, { skipDisabled: true }) ?? null)
+        else if (target) core.listbox.highlight(core.listbox.stepKey(target) ?? null)
         // In a sheet the field moved into its header, and loses focus on the
         // way if the sheet showed later. It takes focus back here.
         return store.get().presentation === "sheet" ? inputElement() : undefined
@@ -435,6 +436,11 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
   }
 
   // A value from outside, like a controlled prop or a controller, also becomes what filters.
+  deriveFromOptions(context, ["query"], (synced, state) =>
+    "value" in synced && synced.value !== state.value && synced.value !== requested
+      ? { query: synced.value }
+      : undefined,
+  )
   let previousValue = store.get().value
   store.subscribe(() => {
     const { value } = store.get()

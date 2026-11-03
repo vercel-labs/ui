@@ -3,7 +3,7 @@ import { openBehaviors } from "./helpers"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "focus")
-  await expect(page.locator("[data-example]")).toHaveCount(16)
+  await expect(page.locator("[data-example]")).toHaveCount(17)
   expect(errors).toEqual([])
 })
 
@@ -274,4 +274,18 @@ test("grid focus: each option links to its explanation", async ({ page }) => {
       await expect(page.locator(`[id="${id}"]`)).toHaveCount(1)
     }
   }
+})
+
+test("input hints: each field gets its keyboard and Return key", async ({ page }) => {
+  await openBehaviors(page, "focus")
+  const form = page.locator("form").filter({ has: page.getByRole("textbox", { name: "Verification code" }) })
+  const email = form.getByRole("textbox", { name: "Email" })
+  await expect(email).toHaveAttribute("inputmode", "email")
+  await expect(email).toHaveAttribute("enterkeyhint", "next")
+  await expect(email).toHaveAttribute("autocapitalize", "none")
+  await expect(form.getByRole("textbox", { name: "Verification code" })).toHaveAttribute(
+    "autocomplete",
+    "one-time-code",
+  )
+  await expect(form.getByRole("textbox", { name: "Message" })).toHaveAttribute("enterkeyhint", "send")
 })

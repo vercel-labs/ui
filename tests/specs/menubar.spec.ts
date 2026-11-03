@@ -92,6 +92,46 @@ test("while a menu is open, pointing at another trigger opens its menu instead",
   await expectFocus(page, "Show bookmarks")
 })
 
+test("crossing another trigger on the way to the open menu keeps the menu", async ({ page }) => {
+  await trigger(page, "File").click()
+  const from = (await trigger(page, "File").boundingBox())!
+  const to = (await page.getByRole("menuitem", { name: "Print…" }).boundingBox())!
+  await page.mouse.move(from.x + from.width - 6, from.y + 6)
+  await page.mouse.move(to.x + to.width - 20, to.y + to.height / 2, { steps: 20 })
+  await expect(menuNamed(page, "File")).toBeVisible()
+  await expect(menuNamed(page, "Edit")).toHaveCount(0)
+})
+
+test("resting on another trigger on the way to the open menu switches to it", async ({ page, open }) => {
+  await page.clock.install()
+  await open("menubar")
+  await trigger(page, "File").click()
+  const file = (await trigger(page, "File").boundingBox())!
+  await page.mouse.move(file.x + file.width - 6, file.y + 6)
+  const edit = (await trigger(page, "Edit").boundingBox())!
+  await page.mouse.move(edit.x + 8, edit.y + edit.height - 4, { steps: 4 })
+  await expect(menuNamed(page, "File")).toBeVisible()
+  await page.clock.runFor(300)
+  await expect(menuNamed(page, "Edit")).toBeVisible()
+})
+
+test("while a menu is open, pointing at a disabled trigger closes it and opens nothing", async ({ page }) => {
+  await trigger(page, "File").click()
+  await expect(menuNamed(page, "File")).toBeVisible()
+  await trigger(page, "Help").hover()
+  await expect(page.getByRole("menu")).toHaveCount(0)
+  await expectFocus(page, "Help")
+})
+
+test("after pointing at a disabled trigger, pointing at another trigger opens its menu", async ({ page }) => {
+  await trigger(page, "File").click()
+  await expect(menuNamed(page, "File")).toBeVisible()
+  await trigger(page, "Help").hover()
+  await expect(page.getByRole("menu")).toHaveCount(0)
+  await trigger(page, "View").hover()
+  await expect(menuNamed(page, "View")).toBeVisible()
+})
+
 test("pointing at a trigger while every menu is closed opens nothing", async ({ page }) => {
   await trigger(page, "File").hover()
   await trigger(page, "Edit").hover()

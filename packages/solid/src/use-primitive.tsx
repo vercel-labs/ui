@@ -19,6 +19,7 @@ import {
   present as isPresent,
   ref,
   schemaOf,
+  sameSlotState,
   sameValue,
   selectedKeys,
   subscribe,
@@ -506,7 +507,7 @@ function slotState(instance: PrimitiveInstance, name: string, props: () => unkno
       const part = instance.part(name, props() as never)
       return readPart(instance, part, "state", () => partState(part, part.props)) as Record<string, unknown>
     },
-    { equals: sameRecord, name: `${name} state` },
+    { equals: sameSlotState, name: `${name} state` },
   )
   const keys = new Map<string, () => unknown>()
   return new Proxy({} as Record<string, unknown>, {
@@ -517,7 +518,7 @@ function slotState(instance: PrimitiveInstance, name: string, props: () => unkno
         // Owned by the part's root, not by whatever memo reads the key first.
         memo = runWithOwner(owner, () =>
           // A list rebuilt with the same items, like a calendar's weekdays, is the same value.
-          createMemo(() => all()[key], { equals: sameValue, name: `${name} state.${key}` }),
+          createMemo(() => all()[key], { equals: sameSlotState, name: `${name} state.${key}` }),
         )!
         keys.set(key, memo)
       }
