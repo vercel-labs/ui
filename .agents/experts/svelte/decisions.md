@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), 175 to 186 (2026-11-02, the pre-launch audit fixes), and 214 (2026-11-03, the toast motion fix).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix).
 
 
 ## Settled
@@ -29,6 +29,9 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Data lists key separators and groups by index** (`command-items.svelte`, `listbox-items.svelte`), so a separator that comes back shifts the keys and a `CommandGroup` instance can be reused for another group.
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **Select, Combobox, Autocomplete and TokenInput take no `readonly`**: they render no element and have no `...rest`, so `svelte-check` reports it. `readOnly` is the prop.
+- **An author id on a control in a Field** (`NumberInputControl id`, `PasswordInputControl id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
+- **A range Slider in a Field** renders the label's `for` at the root `div[role=group]` on the server, which a label can't target. The client drops it once bound; the group keeps `aria-labelledby`.
+- **`NumberInputControl` drops an author `id` inside a Field**: it passes `control.attrs.id` to `field.control()` (`number-input-control.svelte`), while `PasswordInputControl` keeps it.
 
 ## Revisit
 

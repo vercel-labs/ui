@@ -1,5 +1,5 @@
 import type { field } from "@ui-sdk/core/field"
-import { madeLabel } from "@ui-sdk/core/renderer"
+import { fieldControlId, madeLabel } from "@ui-sdk/core/renderer"
 import { inject, type InjectionKey } from "vue"
 import type { PrimitiveHandle } from "./use-primitive"
 
@@ -49,4 +49,9 @@ function useFieldControl(own?: Record<string, unknown>) {
   }
 }
 
-export { type FieldContext, FieldKey, useFieldControl }
+function useFieldControlId() {
+  const field = inject(FieldKey, null)
+  return field ? fieldControlId(field.api.id) : undefined
+}
+
+export { type FieldContext, FieldKey, useFieldControl, useFieldControlId }

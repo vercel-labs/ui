@@ -7,7 +7,7 @@ import {
 } from "@ui-sdk/core/slider"
 import type { JSX } from "@solidjs/web"
 import { createContext, merge, omit, Show, untrack, useContext, type ComponentProps } from "solid-js"
-import { joinField, useFieldControl } from "./field-context"
+import { joinField, useFieldControl, useFieldControlId } from "./field-context"
 import { createParts, usePart, type PartProps } from "./use-primitive"
 
 const parts = createParts(slider, {
@@ -43,6 +43,7 @@ function Slider<Value extends number | number[] = number | number[]>(
   props: ComponentProps<typeof parts.Root<Value>>,
 ) {
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   // A range is a group the field's label names. A single thumb is the control itself.
   const range = () => {
     const shape = props.value ?? props.defaultValue
@@ -60,6 +61,7 @@ function Slider<Value extends number | number[] = number | number[]>(
       get children() {
         return withAfter(props.children, <SliderInput />)
       },
+      thumbInputId: controlId,
     },
     field ? { render: joinRange(props, field, range) } : {},
   )

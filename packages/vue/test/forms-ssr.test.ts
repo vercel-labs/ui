@@ -10,10 +10,22 @@ import {
   FieldDescription,
   FieldLabel,
   Input,
+  NumberInput,
+  NumberInputControl,
+  NumberInputDecrement,
+  NumberInputIncrement,
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
   Radio,
   RadioGroup,
   Select,
   SelectTrigger,
+  Slider,
+  SliderControl,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
   Switch,
 } from "../src"
 
@@ -23,6 +35,16 @@ const render = (node: () => unknown) => renderToString(createSSRApp(() => node()
 const tags = (html: string) => html.match(/<[a-z][^>]*>/g) ?? []
 const attribute = (tag: string | undefined, name: string) =>
   tag?.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1]
+
+// The ids a label or control reference points at that no element has. A
+// control points at its field's description before one renders, so that one
+// isn't checked.
+const dangling = (html: string) => {
+  const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
+  return ["for", "aria-controls", "aria-labelledby"]
+    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .filter((id) => !ids.has(id))
+}
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering form controls", () => {
@@ -78,6 +100,31 @@ describe("server rendering form controls", () => {
     )
     const id = html.match(/<input[^>]*id="([^"]+)"/)![1]
     expect(html).toContain(`for="${id}"`)
+  })
+
+  test.each([
+    [
+      "NumberInput",
+      () =>
+        h(NumberInput, null, () => [h(NumberInputDecrement), h(NumberInputControl), h(NumberInputIncrement)]),
+    ],
+    ["PasswordInput", () => h(PasswordInput, null, () => [h(PasswordInputControl), h(PasswordInputToggle)])],
+    [
+      "Slider",
+      () =>
+        h(Slider, null, () => [
+          h(SliderControl, null, () => h(SliderTrack, null, () => h(SliderThumb))),
+          h(SliderValue),
+        ]),
+    ],
+  ])("a field ties its label to a %s's control", async (_name, control) => {
+    const html = await render(() => h(Field, null, () => [h(FieldLabel, null, () => "Amount"), control()]))
+    const label = attribute(
+      tags(html).find((tag) => tag.includes('data-slot="field-label"')),
+      "for",
+    )
+    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+    expect(dangling(html)).toEqual([])
   })
 
   test.each([

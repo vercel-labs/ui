@@ -147,6 +147,9 @@ type SliderOptions<Value extends number | number[] = number | number[]> = {
   controller?: SliderController<Value>
 } & PrimitiveOptions
 
+/** What adapters pass on top: the id the field around a single thumb gives its input. */
+type SliderInternalOptions = SliderOptions & { thumbInputId?: string }
+
 // Reads a `value` or `default-value` attribute: "50" is one thumb, "20/80" a
 // range, like the value the form submits.
 function valueAttribute(attribute: string | null) {
@@ -282,7 +285,9 @@ const rangeInputStyle = css({
   "pointer-events": "none",
 })
 
-const thumbInputId = (id: string, index: number) => `${id}-thumb-${index}`
+// A range is the field's control itself, so only a single thumb's input takes the field's id.
+const thumbInputId = (state: State, id: string, index: number) =>
+  (valuesOf(state.value).length === 1 && state.thumbInputId) || `${id}-thumb-${index}`
 
 const sliderPrimitive = /* @__PURE__ */ definePrimitive({
   name: "slider",
@@ -303,8 +308,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     format: "value",
     locale: "string",
     controller: "value",
+    // Internal: passed by renderers.
+    thumbInputId: "string",
   },
-  state: (options: SliderOptions): State => {
+  state: (options: SliderInternalOptions): State => {
     const initial = normalized(options.value ?? options.defaultValue ?? options.min ?? 0, options)
     return {
       ...settings(options),
@@ -315,6 +322,7 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
       active: null,
       last: null,
       thumbValues: thumbValuesOf(initial),
+      thumbInputId: options.thumbInputId ?? null,
     }
   },
   sync: (options) => ({
@@ -322,6 +330,7 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     // Like `defaultChecked`, changing it changes what a reset returns to.
     ...(options.defaultValue === undefined ? {} : { initial: normalized(options.defaultValue, options) }),
     ...(options.value === undefined ? {} : { value: normalized(options.value, options) }),
+    ...(options.thumbInputId === undefined ? {} : { thumbInputId: options.thumbInputId }),
   }),
   commits: ["value"],
   api: sliderApi,
@@ -413,7 +422,7 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
         )
         return {
           type: "range",
-          id: thumbInputId(id, index),
+          id: thumbInputId(state, id, index),
           min: String(lower),
           max: String(upper),
           step: String(state.step),
@@ -458,7 +467,7 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
       }),
       attrs: (state, { id }) => ({
         for: valuesOf(state.value)
-          .map((_, index) => thumbInputId(id, index))
+          .map((_, index) => thumbInputId(state, id, index))
           .join(" "),
         // An <output> is a status already. Other elements, like a custom element, say so.
         role: "status",

@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test"
-import { expect, lastAction, pageNow, test } from "../fixtures"
+import { expect, lastAction, opacityOf, pageNow, slowTransitions, test, transitionedIn } from "../fixtures"
 
 // A hover card previews what a link leads to, like a profile, while the
 // pointer rests on the link or keyboard focus stays on it. The pointer can
@@ -114,10 +114,19 @@ test.describe("positioning", () => {
 })
 
 test.describe("animation", () => {
+  test("the card animates in from its starting style", async ({ page, open }) => {
+    await open("hover-card", { animate: "" })
+    await slowTransitions(page)
+    await link(page).hover()
+    await expect(card(page)).toBeVisible()
+    expect(await opacityOf(page.locator(".hover-card"))).toBeLessThan(0.5)
+  })
+
   test("the card stays in the page while it animates out", async ({ page, open }) => {
     await open("hover-card", { animate: "", closeDelay: "0" })
     await link(page).hover()
     await expect(card(page)).toBeVisible()
+    await transitionedIn(page.locator(".hover-card"))
     await moveAway(page)
     await expect(page.locator("[data-ending-style]")).toHaveCount(1)
     await expect(card(page)).toBeHidden()

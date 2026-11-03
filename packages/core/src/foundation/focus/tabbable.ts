@@ -139,4 +139,4 @@ function bindTabStop(
   return { check, stop: () => observer.disconnect() }
 }
 
-export { bindTabStop, isTabbable, nextTabbable, positiveTabStops, radioGroup, tabbables }
+export { bindTabStop, focusables, isTabbable, nextTabbable, positiveTabStops, radioGroup, tabbables }

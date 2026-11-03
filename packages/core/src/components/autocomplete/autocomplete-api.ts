@@ -151,6 +151,7 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     },
     onHighlight: (key, index, event) => options().onHighlight?.(key, { index, event }),
     container: () => element("list") ?? contentElement(),
+    scrollRoot: contentElement,
   })
   // Data that drops the highlighted suggestion settles the highlight in the
   // same pass, so it never points at a suggestion that left.

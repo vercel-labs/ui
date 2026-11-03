@@ -341,7 +341,7 @@ if (event.key === "Tab" && edit.inputKeydown(event)) {
 }
 ```
 
-Keep validation in `commit`. Use `disabled(id)` for values that can't be edited, and `edit.start(id)` to begin from a separate button or menu.
+Keep validation in `commit`. Use `disabled(id)` for values that can't be edited, and `edit.start(id)` to begin from a separate button or menu. If that button or menu is gone when editing ends, focus goes to the closest focusable element around the input instead, such as its row.
 
 <ComponentExample
   name="behaviors/inline-edit-fields"

@@ -121,6 +121,7 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandState, stri
     autoHighlight: () => (options().autoHighlight === false ? false : "always"),
     highlight,
     container: () => element("list"),
+    scrollRoot: () => element("root"),
     // A composed page that just changed highlights its best match once its
     // commands mount, for the page change's reason, not for the commands that left.
     settlesMount: () => awaiting !== null,

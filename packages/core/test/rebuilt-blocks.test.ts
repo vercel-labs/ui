@@ -352,6 +352,52 @@ describe("createInlineEdit", () => {
     expect(edit.end("enter-key")).toBe(false)
     expect(instance.get().editing).toBe("a")
   })
+
+  // A row whose Rename button is swapped for the input, as a menu item that closes would be.
+  function renameFromRow() {
+    const instance = table({ id: "t" })
+    cleanups.push(() => instance.destroy())
+    const row = document.createElement("div")
+    row.tabIndex = -1
+    const rename = document.createElement("button")
+    row.append(rename)
+    document.body.append(row)
+    const start = () => {
+      rename.focus()
+      instance.api.edit.start("a")
+      const input = document.createElement("input")
+      row.replaceChildren(input)
+      instance.api.edit.bindInput(input)
+      return input
+    }
+    return { instance, row, start }
+  }
+
+  test.each(["Enter", "Escape"])(
+    "%s after the button that started editing left goes to the focusable element around the input",
+    async (pressed) => {
+      const { instance, row, start } = renameFromRow()
+      const input = start()
+      input.value = "Alpha 2"
+      instance.api.edit.inputKeydown(key(pressed))
+      expect(instance.get().editing).toBeNull()
+      input.remove()
+      await Promise.resolve()
+      expect(document.activeElement).toBe(row)
+    },
+  )
+
+  test("focus moved on purpose stays put when the button that started editing left", async () => {
+    const { instance, start } = renameFromRow()
+    const next = document.createElement("button")
+    document.body.append(next)
+    const input = start()
+    expect(instance.api.edit.inputKeydown(key("Tab"))).toBe(true)
+    next.focus()
+    input.remove()
+    await Promise.resolve()
+    expect(document.activeElement).toBe(next)
+  })
 })
 
 describe("createStickToBottom", () => {

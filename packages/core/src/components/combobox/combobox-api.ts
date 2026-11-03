@@ -280,6 +280,7 @@ function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, Combob
       ),
     onLastReached: loadMore.reached,
     container: () => element("list") ?? contentElement(),
+    scrollRoot: contentElement,
     // Parts that depend on the list, like the empty message, groups and
     // aria-activedescendant, update once per batch of items mounting.
     onRegister() {

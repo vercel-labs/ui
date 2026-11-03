@@ -191,6 +191,7 @@ const cases: Case[] = [
       name: ["volume", "level"],
       form: ["one", "two"],
       locale: ["en-US", "de-DE"],
+      thumbInputId: ["volume", "level"],
     },
     skip: {
       format: "A function's change shows in the text it formats, which the format tests cover.",
@@ -392,6 +393,7 @@ const cases: Case[] = [
       wheel: [false, true],
       name: ["quantity", "count"],
       form: ["one", "two"],
+      controlId: ["quantity", "count"],
       "scrub-area.pixelsPerStep": [4, 8],
     },
     skip: { format: "A formatter, called for the text it shows." },

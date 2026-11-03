@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/vue`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), 175 to 186 (2026-11-02, the pre-launch audit fixes), and 214 (2026-11-03, the toast motion fix).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix).
 
 
 ## Settled
@@ -30,6 +30,9 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **A radio group with no focusable checked radio at the end of a trap** lets Tab leave it: the trap counts every radio as a stop, where the browser gives the group one.
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **A native `readonly` also lands on the root element** of Switch, Checkbox (`<button>`), RadioGroup and Listbox (`<div>`), where it means nothing. Harmless to assistive technology; an HTML validator flags it on a button.
+- **An author id on a control in a Field** (`NumberInputControl id`, `PasswordInputControl id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
+- **A range Slider in a Field** renders the label's `for` at the root `div[role=group]` on the server, which a label can't target. The client drops it once bound; the group keeps `aria-labelledby`.
+- **A Slider switched from a range back to one thumb** in a Field leaves the label with no `for` after the switch, while the thumb input takes the field's id again.
 
 ## Revisit
 

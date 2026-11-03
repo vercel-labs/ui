@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test"
-import { entered, expect, lastAction, pageNow, test } from "../fixtures"
+import { entered, expect, lastAction, opacityOf, pageNow, slowTransitions, test } from "../fixtures"
 
 // A tooltip shows a short text about its trigger while the pointer rests on
 // it or keyboard focus is on it, following the WAI-ARIA tooltip pattern:
@@ -280,6 +280,14 @@ test.describe("disabled buttons", () => {
 })
 
 test.describe("animation", () => {
+  test("the tooltip animates in from its starting style", async ({ page, open }) => {
+    await open("tooltip", { animate: "" })
+    await slowTransitions(page)
+    await hover(page, "Save")
+    await expect(saveTip(page)).toBeVisible()
+    expect(await opacityOf(page.locator(".tooltip:visible"))).toBeLessThan(0.5)
+  })
+
   test("the tooltip stays in the page while it animates out", async ({ page, open }) => {
     await open("tooltip", { animate: "" })
     await hover(page, "Save")

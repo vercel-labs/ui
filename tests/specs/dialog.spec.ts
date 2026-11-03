@@ -1,5 +1,15 @@
 import type { Page } from "@playwright/test"
-import { dialogNamesAtFocus, expect, lastAction, recordDialogNamesAtFocus, test } from "../fixtures"
+import {
+  dialogNamesAtFocus,
+  entered,
+  expect,
+  isSheet,
+  lastAction,
+  opacityOf,
+  recordDialogNamesAtFocus,
+  slowTransitions,
+  test,
+} from "../fixtures"
 
 // A modal dialog and an alert dialog, following the WAI-ARIA patterns:
 // https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/ and
@@ -589,9 +599,32 @@ test.describe("alert dialog", () => {
 })
 
 test.describe("animation", () => {
+  test("the dialog and its backdrop animate in from their starting style", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
+    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    await open("dialog", { animate: "" })
+    await slowTransitions(page)
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
+    expect(await opacityOf(page.locator(".dialog-backdrop:visible"))).toBeLessThan(0.5)
+  })
+
+  test("an alert dialog animates in from its starting style", async ({ page, open }) => {
+    await open("dialog", { animate: "" })
+    await slowTransitions(page)
+    await alertTrigger(page).click()
+    await expect(alert(page)).toBeVisible()
+    expect(await opacityOf(alert(page))).toBeLessThan(0.5)
+  })
+
   test("reopened while it animates out, it takes focus and hides the page again", async ({ page, open }) => {
     await open("dialog", { animate: "" })
     await openWithKeyboard(page)
+    await entered(page)
     await page.keyboard.press("Escape")
     await expect(page.locator(".dialog[data-ending-style]")).toHaveCount(1)
     await page.keyboard.press("Enter")

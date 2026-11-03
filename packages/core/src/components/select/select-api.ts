@@ -201,6 +201,7 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       }),
     onLastReached: loadMore.reached,
     container: () => element("list") ?? contentElement(),
+    scrollRoot: contentElement,
     // Parts that depend on the list, like the empty message and groups, update once per batch of items mounting.
     onRegister() {
       if (mountsQueued) return

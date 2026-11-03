@@ -4,7 +4,7 @@ import {
   type PasswordInputState,
 } from "@ui-sdk/core/password-input"
 import { createContext, merge, omit, useContext } from "solid-js"
-import { joinField, useFieldControl } from "./field-context"
+import { joinField, useFieldControl, useFieldControlId } from "./field-context"
 import { valueProps } from "./text-control"
 import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
 
@@ -34,6 +34,7 @@ function PasswordInput(
     Omit<PartProps<"div", PasswordInputState>, "defaultValue" | "onChange" | "onSelect">,
 ) {
   const field = useFieldControl()
+  const controlId = useFieldControlId()
   const passwordInput = usePrimitive(passwordInputPrimitive, () => ({
     value: props.value,
     defaultValue: props.defaultValue,
@@ -49,6 +50,7 @@ function PasswordInput(
     readOnly: props.readOnly,
     controller: props.controller,
     debug: props.debug,
+    controlId,
   }))
   const rest = omit(
     props,
