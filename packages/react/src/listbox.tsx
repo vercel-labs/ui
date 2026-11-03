@@ -4,7 +4,7 @@ import {
   type ListboxItemProps,
   type ListboxItemState,
   type ListboxOptions,
-  type ListboxRootState,
+  type ListboxState,
 } from "@ui-sdk/core/listbox"
 import * as React from "react"
 import { controlRender, useFieldControl } from "./field-context"
@@ -33,7 +33,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * @stable
  */
 type ListboxProps<T = string, Multiple extends boolean | undefined = false> = Omit<
-  PartProps<"div", ListboxRootState>,
+  PartProps<"div", ListboxState>,
   Clashing | keyof ListboxOptions
 > &
   ListboxOptions<T, Multiple> & {}
@@ -91,12 +91,12 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>({
     disabled: disabled || field?.disabled,
   } as ListboxOptions<any, any>)
   // Without children, a data listbox renders its items.
-  const content = (state: ListboxRootState) =>
+  const content = (state: ListboxState) =>
     typeof children === "function"
       ? children(state)
       : (children ?? (items && <ListboxItems items={state.items} />))
   // The props left once the options are taken out, which TypeScript can't see for every `Multiple`.
-  const element = props as PartProps<"div", ListboxRootState>
+  const element = props as PartProps<"div", ListboxState>
   const root = { ...element, children: content, render: controlRender(field, "div", render) }
   return (
     <>
@@ -178,7 +178,7 @@ export type {
   ListboxItemState,
   ListboxOptions,
   ListboxPrimitive,
-  ListboxRootState,
+  ListboxState,
   ListboxValue,
   ListboxValueChangeReason,
 } from "@ui-sdk/core/listbox"

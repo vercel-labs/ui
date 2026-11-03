@@ -28,7 +28,7 @@ import { shortcuts } from "../../foundation/shortcuts/shortcuts"
 import { createChange } from "../../foundation/kernel/input-source"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 
-type CommandState = Omit<AutocompleteCoreState, "items"> & {
+type CommandStore = Omit<AutocompleteCoreState, "items"> & {
   items: CommandData | undefined
   // The highlighted command's value, which is its key. The highlight follows it.
   value: string | null
@@ -53,7 +53,7 @@ type CommandItemMeta = CommandItemProps & {
   data?: boolean
 }
 
-function initialCommandState(options: CommandOptions): CommandState {
+function initialCommandState(options: CommandOptions): CommandStore {
   return {
     // Inline, so always open.
     open: true,
@@ -89,7 +89,7 @@ function syncCommandState(options: CommandOptions) {
 // The page on top of the stack, or `null` on the first page.
 const currentPage = (state: { pages: string[] }) => state.pages.at(-1) ?? null
 
-function commandApi(context: PrimitiveContext<CommandOptions, CommandState, string>) {
+function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, string>) {
   const { id, store, options, element } = context
   const change = createChange(context)
   const itemProps = (key: string) => context.props<CommandItemMeta>("item", key)
@@ -324,11 +324,11 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandState, stri
       itemProps,
       run,
       press: (key: string, event?: Event) => run(key, { event }),
-      text: (state: CommandState) => state.query,
+      text: (state: CommandStore) => state.query,
       typed: (el: HTMLInputElement, event?: Event) => setQuery(el.value, "input-change", event),
       onInputKeyDown,
       // Whether a command is on the page shown: outside any page, or on the current one.
-      onCurrentPage: (state: CommandState, page: string | null | undefined) =>
+      onCurrentPage: (state: CommandStore, page: string | null | undefined) =>
         page === undefined || page === currentPage(state),
       // The shortcut of the command an element sits in.
       shortcutOf: (el: HTMLElement) => shortcutOf(context, "item", el),
@@ -357,7 +357,7 @@ export {
   type CommandApi,
   type CommandItemMeta,
   commandApi,
-  type CommandState,
+  type CommandStore,
   currentPage,
   initialCommandState,
   syncCommandState,

@@ -8,7 +8,7 @@ import {
   type CommandListState,
   type CommandOptions,
   type CommandPageProps,
-  type CommandRootState,
+  type CommandState,
   type CommandShortcutState,
 } from "@ui-sdk/core/command"
 import type { JSX } from "@solidjs/web"
@@ -68,7 +68,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Command`.
  * @stable
  */
-type CommandProps = CommandOptions & Omit<PartProps<"div", CommandRootState>, Clashing> & {}
+type CommandProps = CommandOptions & Omit<PartProps<"div", CommandState>, Clashing> & {}
 
 const optionKeys = [
   "value",
@@ -131,12 +131,12 @@ function Command(props: CommandProps) {
     // is a function too, of no parameters, on the server (a lazy memo) and in
     // a client memo, so the arity tells them apart, as Solid's `Show` does.
     get children() {
-      return (state: CommandRootState) => (
+      return (state: CommandState) => (
         <OwnListContext value={setHasList}>
           {(() => {
             const children = props.children
             if (typeof children === "function" && children.length > 0)
-              return (children as (state: CommandRootState) => JSX.Element)(state)
+              return (children as (state: CommandState) => JSX.Element)(state)
             return (
               <>
                 {children}
@@ -358,7 +358,7 @@ export type {
   CommandPagesChangeReason,
   CommandPrimitive,
   CommandQueryChangeReason,
-  CommandRootState,
+  CommandState,
   CommandShortcutProps,
   CommandShortcutState,
   CommandStatusState,

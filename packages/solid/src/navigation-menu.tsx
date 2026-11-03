@@ -7,7 +7,7 @@ import {
   type NavigationMenuLinkIconProps,
   type NavigationMenuLinkIconState,
   type NavigationMenuOptions,
-  type NavigationMenuRootState,
+  type NavigationMenuState,
   type NavigationMenuViewportProps,
   type NavigationMenuViewportState,
 } from "@ui-sdk/core/navigation-menu"
@@ -43,7 +43,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * @stable
  */
 type NavigationMenuProps<T extends string = string> = NavigationMenuOptions<T> &
-  Omit<PartProps<"nav", NavigationMenuRootState<T>>, Clashing>
+  Omit<PartProps<"nav", NavigationMenuState<T>>, Clashing>
 
 /**
  * A <nav> landmark. Inside another menu's content it's a nested menu, which
@@ -233,7 +233,7 @@ export type {
   NavigationMenuOptions,
   NavigationMenuOrientation,
   NavigationMenuPrimitive,
-  NavigationMenuRootState,
+  NavigationMenuState,
   NavigationMenuTriggerProps,
   NavigationMenuTriggerState,
   NavigationMenuValueChangeReason,

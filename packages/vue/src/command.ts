@@ -407,7 +407,7 @@ export type {
   CommandPagesChangeReason,
   CommandPrimitive,
   CommandQueryChangeReason,
-  CommandRootState,
+  CommandState,
   CommandShortcutProps,
   CommandShortcutState,
   CommandStatusState,

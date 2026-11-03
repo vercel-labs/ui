@@ -5,7 +5,7 @@ import {
   type NavigationMenuItemProps,
   type NavigationMenuItemState,
   type NavigationMenuOptions,
-  type NavigationMenuRootState,
+  type NavigationMenuState,
   type NavigationMenuViewportProps,
   type NavigationMenuViewportState,
 } from "@ui-sdk/core/navigation-menu"
@@ -49,7 +49,7 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * @stable
  */
 type NavigationMenuProps<T extends string = string> = NavigationMenuOptions<T> &
-  Omit<PartProps<"nav", NavigationMenuRootState<T>>, Clashing>
+  Omit<PartProps<"nav", NavigationMenuState<T>>, Clashing>
 
 /**
  * A <nav> landmark. Inside another menu's content it's a nested menu, which
@@ -91,7 +91,7 @@ function NavigationMenu<T extends string = string>({
   const menu = usePrimitive(navigationMenu, options)
   const tag = parentMenu && parentItem !== null ? "div" : "nav"
   // The state holds only values of type `T`, which the primitive types as strings.
-  const element = usePart(menu, "root", {}, props as PartProps<"nav", NavigationMenuRootState>, tag)
+  const element = usePart(menu, "root", {}, props as PartProps<"nav", NavigationMenuState>, tag)
   return (
     <ItemContext.Provider value={null}>
       <ContainerContext.Provider value={container}>{element}</ContainerContext.Provider>
@@ -228,7 +228,7 @@ export type {
   NavigationMenuOptions,
   NavigationMenuOrientation,
   NavigationMenuPrimitive,
-  NavigationMenuRootState,
+  NavigationMenuState,
   NavigationMenuTriggerProps,
   NavigationMenuTriggerState,
   NavigationMenuValueChangeReason,

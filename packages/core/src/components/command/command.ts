@@ -257,7 +257,7 @@ type CommandShortcutProps = {
  * state-based class names.
  * @stable
  */
-type CommandRootState = {
+type CommandState = {
   /** The current page, or `null` on the first page. */
   page: string | null
   /** Whether results are loading. */
@@ -407,7 +407,7 @@ export {
   type CommandPagesChangeReason,
   type CommandPrimitive,
   type CommandQueryChangeReason,
-  type CommandRootState,
+  type CommandState,
   type CommandShortcutProps,
   type CommandShortcutState,
   type CommandStatusState,

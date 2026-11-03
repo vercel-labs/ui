@@ -4,7 +4,7 @@ import {
   type TreeItemProps,
   type TreeItemState,
   type TreeOptions,
-  type TreeRootState,
+  type TreeState,
   type TreeSelectionMode,
 } from "@ui-sdk/core/tree"
 import * as React from "react"
@@ -24,7 +24,7 @@ type Clashing = "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSe
  * @stable
  */
 type TreeProps<Mode extends TreeSelectionMode = "single"> = Omit<
-  PartProps<"div", TreeRootState>,
+  PartProps<"div", TreeState>,
   Clashing | keyof TreeOptions
 > &
   TreeOptions<Mode> & {}
@@ -210,10 +210,9 @@ export type {
   TreeItemState,
   TreeOptions,
   TreePrimitive,
-  TreeRootState,
+  TreeState,
   TreeRow,
   TreeSelectionMode,
-  TreeState,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

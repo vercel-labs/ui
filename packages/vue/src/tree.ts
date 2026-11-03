@@ -250,10 +250,9 @@ export type {
   TreeItemState,
   TreeOptions,
   TreePrimitive,
-  TreeRootState,
+  TreeState,
   TreeRow,
   TreeSelectionMode,
-  TreeState,
   TreeValue,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"

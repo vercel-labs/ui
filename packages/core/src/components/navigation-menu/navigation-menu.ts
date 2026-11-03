@@ -220,7 +220,7 @@ type NavigationMenuViewportProps = ViewportProps
  * state-based class names.
  * @stable
  */
-type NavigationMenuRootState<T extends string = string> = {
+type NavigationMenuState<T extends string = string> = {
   /** The open item's value, or null. */
   value: T | null
   /** Whether a panel is open. */
@@ -358,7 +358,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
   api: navigationMenuApi,
   slots: (slot) => ({
     // A <nav> landmark, or a plain element when nested inside another menu's content.
-    root: slot<{}, NavigationMenuRootState>({
+    root: slot<{}, NavigationMenuState>({
       state: (state) => ({
         value: state.value,
         open: state.value !== null,
@@ -552,7 +552,7 @@ export {
   type NavigationMenuOptions,
   type NavigationMenuOrientation,
   type NavigationMenuPrimitive,
-  type NavigationMenuRootState,
+  type NavigationMenuState,
   type NavigationMenuTriggerProps,
   type NavigationMenuTriggerState,
   type NavigationMenuValueChangeReason,

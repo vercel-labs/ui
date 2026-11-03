@@ -295,7 +295,7 @@ type FeatureSlots<Features> = (
  *   options: TabsOptions<this["T"] & string>
  *   state: TabsStates<this["T"] & string>
  * }
- * type TabsStates<T extends string> = { root: TabsRootState<T> }
+ * type TabsStates<T extends string> = { root: TabsState<T> }
  */
 interface PrimitiveGeneric {
   T: unknown

@@ -21,7 +21,7 @@ export type {
   NavigationMenuOptions,
   NavigationMenuOrientation,
   NavigationMenuPrimitive,
-  NavigationMenuRootState,
+  NavigationMenuState,
   NavigationMenuTriggerProps,
   NavigationMenuTriggerState,
   NavigationMenuValueChangeReason,

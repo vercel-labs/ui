@@ -17,7 +17,7 @@ export type {
   TabsPanelProps,
   TabsPanelState,
   TabsPrimitive,
-  TabsRootState,
+  TabsState,
   TabsTabIconProps,
   TabsTabIconState,
   TabsTabProps,

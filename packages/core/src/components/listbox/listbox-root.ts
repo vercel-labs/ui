@@ -7,7 +7,7 @@
 import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { type ListData, type ListHighlightDetails } from "../../foundation/lists/listbox"
 import { listboxSlots } from "./listbox-root-parts"
-import { initialListboxState, listboxApi, syncListboxState } from "./listbox-root-api"
+import { initialListboxStore, listboxApi, syncListboxStore } from "./listbox-root-api"
 import type { ListboxGeneric } from "./listbox-root-generic"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
@@ -203,7 +203,7 @@ type ListboxItemIndicatorProps = {
  * state-based class names.
  * @stable
  */
-type ListboxRootState = {
+type ListboxState = {
   /**
    * Whether several items can be selected.
    * @defaultValue false
@@ -276,9 +276,9 @@ const listboxPrimitive = /* @__PURE__ */ definePrimitive({
     form: "string",
     controller: "value",
   },
-  state: initialListboxState,
+  state: initialListboxStore,
   live: ["highlighted"],
-  sync: syncListboxState,
+  sync: syncListboxStore,
   api: listboxApi,
   // An arrow function, so TypeScript infers the slot names before it checks the parts.
   slots: (slot) => listboxSlots(slot),
@@ -313,7 +313,7 @@ export {
   type ListboxItemState,
   type ListboxOptions,
   type ListboxPrimitive,
-  type ListboxRootState,
+  type ListboxState,
   type ListboxValue,
   type ListboxValueChangeReason,
 }

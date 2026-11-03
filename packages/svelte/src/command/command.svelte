@@ -13,7 +13,7 @@ A search field over an always-open list of commands. Renders a `div` around them
     type CommandData,
     type CommandPagesChangeReason,
     type CommandQueryChangeReason,
-    type CommandRootState,
+    type CommandState,
     type CommandValueChangeDetails,
     type ListAnnouncement,
     type SearchFilter,
@@ -52,7 +52,7 @@ A search field over an always-open list of commands. Renders a `div` around them
     onLoadMore,
     children,
     ...rest
-  }: PartProps<"div", CommandRootState> & {
+  }: PartProps<"div", CommandState> & {
     /** The highlighted command's value. Bind it with `bind:value` to control the highlight. `null` highlights nothing. */
     value?: string | null
     /** The command highlighted at first, when uncontrolled. Without it, the first command is, with `autoHighlight`. */
@@ -142,7 +142,7 @@ A search field over an always-open list of commands. Renders a `div` around them
   const root = useHandlePart(command, "root")
 </script>
 
-{#snippet content(state: CommandRootState)}
+{#snippet content(state: CommandState)}
   {@render children?.(state)}
   {#if items && !own()}<CommandList fromRoot />{/if}
 {/snippet}

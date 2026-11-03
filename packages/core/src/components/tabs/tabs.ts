@@ -140,7 +140,7 @@ type TabsPanelProps = PanelProps
  * class names.
  * @stable
  */
-type TabsRootState<T extends string = string> = {
+type TabsState<T extends string = string> = {
   /** The selected tab's value. */
   value: T | null
   /** The tabs' `orientation` option, or `"horizontal"` when it's unset or invalid. */
@@ -200,7 +200,7 @@ type TabsIndicatorState = {
   direction: TabsDirection
 }
 
-type TabsState = {
+type TabsStore = {
   value: string | null
   // Kept in state, not read from options, so changing it renders the parts again.
   orientation: TabsOrientation
@@ -233,7 +233,7 @@ function writeIndicator(el: HTMLElement, rect: ReturnType<typeof layoutBox> | un
  */
 type TabsApi = ReturnType<typeof tabsApi>
 
-function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
+function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
   const { id, store, options, element, props } = context
   const change = createChange(context)
   const panels = new Set<string>()
@@ -250,7 +250,7 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
   // Disabled tabs stay focusable, as the tabs pattern asks. Tab lands on the
   // selected one. Before tabs bind, the selected tab holds the stop, or with
   // nothing selected, the first enabled one claims it.
-  const roving = createRovingFocus<TabsState, TabProps>(context, {
+  const roving = createRovingFocus<TabsStore, TabProps>(context, {
     slot: "tab",
     key: "stop",
     orientation,
@@ -289,7 +289,7 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
   // Until tabs bind, like on the server, uncontrolled tabs with nothing
   // selected show the tab that claims the stop as selected, which is the one
   // `check` selects, so the first render already shows its panel.
-  function shows(state: TabsState, key: string) {
+  function shows(state: TabsStore, key: string) {
     if (checked || state.value !== null || controlled()) return state.value === key
     const tab = props<TabProps>("tab", key)
     return !!tab && roving.tabIndex(state, { key, props: tab }) === "0"
@@ -309,7 +309,7 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
 
   // What selecting `value` brings with it from `state`: the direction the
   // selection moves, and the panel it leaves animating out.
-  function selecting(state: TabsState, value: string | null) {
+  function selecting(state: TabsStore, value: string | null) {
     const from = state.value
     const rect = (key: string | null) =>
       key === null ? undefined : element("tab", key)?.getBoundingClientRect()
@@ -432,7 +432,7 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsState, string>) {
   return api
 }
 
-const findable = (state: TabsState, props: PanelProps) => props.hiddenUntilFound ?? state.hiddenUntilFound
+const findable = (state: TabsStore, props: PanelProps) => props.hiddenUntilFound ?? state.hiddenUntilFound
 
 const tabsPrimitive = /* @__PURE__ */ definePrimitive({
   name: "tabs",
@@ -446,7 +446,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
     hiddenUntilFound: "boolean",
     controller: "value",
   },
-  state: (options: TabsOptions): TabsState => ({
+  state: (options: TabsOptions): TabsStore => ({
     value: options.defaultValue ?? null,
     orientation: orientationOf(options.orientation, "horizontal"),
     hiddenUntilFound: options.hiddenUntilFound ?? false,
@@ -464,7 +464,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
   }),
   api: tabsApi,
   slots: (slot) => ({
-    root: slot<{}, TabsRootState>({
+    root: slot<{}, TabsState>({
       state: (state, { api }) => ({
         value: state.value,
         orientation: api.internal.orientation(),
@@ -544,7 +544,7 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     "tab-icon": slot(
-      itemIconPart<TabsState, TabsApi>({ component: "tabs", item: '[role="tab"]', list: '[role="tablist"]' }),
+      itemIconPart<TabsStore, TabsApi>({ component: "tabs", item: '[role="tab"]', list: '[role="tablist"]' }),
     ),
 
     indicator: slot<{}, TabsIndicatorState>({
@@ -702,7 +702,7 @@ export {
   type TabsPanelProps,
   type TabsPanelState,
   type TabsPrimitive,
-  type TabsRootState,
+  type TabsState,
   type TabsTabIconProps,
   type TabsTabIconState,
   type TabsTabProps,

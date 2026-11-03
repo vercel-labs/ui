@@ -183,7 +183,7 @@ type AccordionPanelProps = Omit<PanelProps, "value">
  * state-based class names.
  * @stable
  */
-type AccordionRootState<T extends string = string> = {
+type AccordionState<T extends string = string> = {
   /** The open items' values. */
   value: T[]
   /** Whether the whole accordion is disabled, by its `disabled` option or a disabled fieldset around it. */
@@ -223,7 +223,7 @@ type AccordionTriggerState = AccordionItemState
  */
 type AccordionPanelState = AccordionItemState
 
-type AccordionState = {
+type AccordionStore = {
   value: string[]
   // Options that change rendering live in state, so changing them renders again.
   multiple: boolean
@@ -248,7 +248,7 @@ function nextValue(value: string[], key: string, open: boolean, multiple: boolea
 }
 
 // Whether the open item must stay open: only one may be open and it can't collapse.
-function locked(state: AccordionState, key: string) {
+function locked(state: AccordionStore, key: string) {
   return !state.multiple && !state.collapsible && state.value.includes(key)
 }
 
@@ -261,7 +261,7 @@ type Cause = AccordionChangeOptions
  */
 type AccordionApi = ReturnType<typeof accordionApi>
 
-function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionState, string>) {
+function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore, string>) {
   const { id, store, options, element, props } = context
   const change = createChange(context)
   const panels = new Set<string>()
@@ -436,15 +436,15 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionState
   return api
 }
 
-const disabledOf = (state: AccordionState, key: string, api: AccordionApi, own?: boolean) =>
+const disabledOf = (state: AccordionStore, key: string, api: AccordionApi, own?: boolean) =>
   !!own || isDisabled(state) || api.internal.itemDisabled(key)
 
-const keepsMounted = (state: AccordionState, props: PanelProps) => props.keepMounted ?? state.keepMounted
-const findable = (state: AccordionState, props: PanelProps) =>
+const keepsMounted = (state: AccordionStore, props: PanelProps) => props.keepMounted ?? state.keepMounted
+const findable = (state: AccordionStore, props: PanelProps) =>
   props.hiddenUntilFound ?? state.hiddenUntilFound
 
 // The state every part of an item shares.
-const itemState = (state: AccordionState, key: string, api: AccordionApi, own?: boolean) => ({
+const itemState = (state: AccordionStore, key: string, api: AccordionApi, own?: boolean) => ({
   open: state.value.includes(key),
   disabled: disabledOf(state, key, api, own),
   index: state.items.indexOf(key),
@@ -463,7 +463,7 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
     hiddenUntilFound: "boolean",
     controller: "value",
   },
-  state: (options: AccordionOptions): AccordionState => ({
+  state: (options: AccordionOptions): AccordionStore => ({
     value: options.defaultValue ?? [],
     multiple: false,
     collapsible: true,
@@ -486,7 +486,7 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
   }),
   api: accordionApi,
   slots: (slot) => ({
-    root: slot<{}, AccordionRootState>({
+    root: slot<{}, AccordionState>({
       state: (state) => ({ value: state.value, disabled: isDisabled(state), multiple: state.multiple }),
       attrs: (state) => ({ "data-disabled": isDisabled(state) ? "" : undefined }),
       bind(el, { api, store }) {
@@ -644,7 +644,7 @@ export {
   type AccordionPanelProps,
   type AccordionPanelState,
   type AccordionPrimitive,
-  type AccordionRootState,
+  type AccordionState,
   type AccordionTriggerProps,
   type AccordionTriggerState,
   type AccordionValueChangeReason,

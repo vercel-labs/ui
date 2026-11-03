@@ -20,9 +20,9 @@ import type {
   ListboxItemIndicatorState,
   ListboxItemProps,
   ListboxItemState,
-  ListboxRootState,
+  ListboxState,
 } from "./listbox-root"
-import type { ListboxApi, ListboxState } from "./listbox-root-api"
+import type { ListboxApi, ListboxStore } from "./listbox-root-api"
 import { idPart } from "../../foundation/kernel/attrs"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
@@ -38,7 +38,7 @@ type IndicatorProps = ListboxItemIndicatorProps & {
   item?: string
 }
 
-function rootState(state: ListboxState, api: ListboxApi) {
+function rootState(state: ListboxStore, api: ListboxApi) {
   return {
     multiple: state.multiple,
     orientation: state.orientation,
@@ -56,7 +56,7 @@ function valueOfItem(key: string, props: ItemProps, api: ListboxApi) {
   return listbox.dataItems() ? (listbox.valueOf(key) ?? props.value) : props.value
 }
 
-function itemState(state: ListboxState, key: string, props: ItemProps, api: ListboxApi) {
+function itemState(state: ListboxStore, key: string, props: ItemProps, api: ListboxApi) {
   return {
     highlighted: state.highlighted === key,
     selected: api.internal.selection.isSelected(key, valueOfItem(key, props, api)),
@@ -67,7 +67,7 @@ function itemState(state: ListboxState, key: string, props: ItemProps, api: List
 // Whether an item holds the list's one tab stop. Before items bind, like on
 // the server, the first selected item claims it, or with nothing selected,
 // the first enabled one.
-function isStop(state: ListboxState, key: string, props: ItemProps, api: ListboxApi) {
+function isStop(state: ListboxStore, key: string, props: ItemProps, api: ListboxApi) {
   if (state.stop !== null) return state.stop === key
   const eligible = api.internal.selection.keys().length
     ? api.internal.selection.isSelected(key, valueOfItem(key, props, api))
@@ -75,9 +75,9 @@ function isStop(state: ListboxState, key: string, props: ItemProps, api: Listbox
   return api.internal.claim(key, eligible)
 }
 
-const listboxSlots = (slot: SlotFactory<ListboxState, ListboxApi>) => ({
+const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
   // The listbox itself. It takes focus only to hand it to the option that holds the tab stop.
-  root: slot<{}, ListboxRootState>({
+  root: slot<{}, ListboxState>({
     state: (state, { api }) => rootState(state, api),
     attrs: (state, { id }) => {
       const disabled = isDisabled(state)
@@ -158,11 +158,11 @@ const listboxSlots = (slot: SlotFactory<ListboxState, ListboxApi>) => ({
   }),
 
   "item-indicator": slot<IndicatorProps, ListboxItemIndicatorState>(
-    itemIndicatorPart<ListboxState, ListboxApi>(),
+    itemIndicatorPart<ListboxStore, ListboxApi>(),
   ),
 
   // An icon inside an item. Screen readers and typeahead skip it.
-  "item-icon": slot(itemIconPart<ListboxState, ListboxApi>({ component: "listbox", ...optionIcon })),
+  "item-icon": slot(itemIconPart<ListboxStore, ListboxApi>({ component: "listbox", ...optionIcon })),
 
   // A group of items, named by its label. Nothing filters a listbox, so it never hides.
   group: slot({
@@ -171,16 +171,16 @@ const listboxSlots = (slot: SlotFactory<ListboxState, ListboxApi>) => ({
     attrs: (state, { id, key }) => ({ role: "group", "aria-labelledby": groupLabelledBy(state, id, key) }),
   }),
 
-  "group-label": slot(groupLabelPart<ListboxState, ListboxApi>()),
+  "group-label": slot(groupLabelPart<ListboxStore, ListboxApi>()),
 
   // A listbox may only hold options and groups, so separators are hidden from assistive technology.
   separator: slot({
     attrs: () => ({ role: "none", "aria-hidden": "true" }),
   }),
 
-  "form-input": slot(hiddenInputPart<ListboxState, ListboxApi>("form-input")),
+  "form-input": slot(hiddenInputPart<ListboxStore, ListboxApi>("form-input")),
 
-  "value-input": slot(valueInputPart<ListboxState, ListboxApi>()),
+  "value-input": slot(valueInputPart<ListboxStore, ListboxApi>()),
 })
 
 export { listboxSlots }

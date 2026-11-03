@@ -112,7 +112,7 @@ type CollapsibleTriggerProps = {}
  * What `render` functions and state-based class names receive on every part.
  * @stable
  */
-type CollapsibleRootState = {
+type CollapsibleState = {
   /** Whether the panel is open. */
   open: boolean
   /** Whether the trigger ignores presses, by its own `disabled` or a disabled fieldset around it. The `open` option and the controller can still open and close it. */
@@ -123,13 +123,13 @@ type CollapsibleRootState = {
  * state-based class names.
  * @stable
  */
-type CollapsibleTriggerState = CollapsibleRootState
+type CollapsibleTriggerState = CollapsibleState
 /**
  * The state the `panel` slot of `collapsible` hands `render` functions and
  * state-based class names.
  * @stable
  */
-type CollapsiblePanelState = CollapsibleRootState
+type CollapsiblePanelState = CollapsibleState
 
 type Cause = { reason?: CollapsibleOpenChangeReason; event?: Event }
 
@@ -228,7 +228,7 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
     }
   },
   slots: (slot) => ({
-    root: slot<{}, CollapsibleRootState>({
+    root: slot<{}, CollapsibleState>({
       state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
       attrs: (state) => ({ ...openAttrs(state.open), "data-disabled": isDisabled(state) ? "" : undefined }),
       bind: (el, { store }) => watchFormDisabled(el, store),
@@ -322,7 +322,7 @@ export {
   type CollapsiblePanelProps,
   type CollapsiblePanelState,
   type CollapsiblePrimitive,
-  type CollapsibleRootState,
+  type CollapsibleState,
   type CollapsibleTriggerProps,
   type CollapsibleTriggerState,
   createCollapsibleController,

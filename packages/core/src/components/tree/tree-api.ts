@@ -18,7 +18,7 @@ import { isPromise } from "../../foundation/kernel/action"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createSelection } from "../../foundation/selection/selection-model"
-import { toggleTreeChecked, treeCheckedStates } from "../../foundation/lists/tree-checked"
+import { toggleTreeChecked, treeCheckedStates, type TreeCheckStrategy } from "../../foundation/lists/tree-checked"
 import {
   createTreeCollection,
   treeDataNodes,
@@ -33,9 +33,45 @@ import type {
   TreeExpandedChangeReason,
   TreeItemProps,
   TreeOptions,
-  TreeState,
+  TreeSelectionMode,
   TreeValueChangeReason,
 } from "./tree"
+
+type TreeStore = {
+  // The selected value in its public shape, and the same as keys for the selection rules.
+  value: string | string[] | null
+  selected: string[]
+  expanded: string[]
+  // The checked value as reported, and every item's checkbox that isn't unchecked.
+  checked: string[]
+  checks: Record<string, true | "indeterminate">
+  selectionMode: TreeSelectionMode
+  checkable: boolean
+  checkStrategy: TreeCheckStrategy
+  activation: "automatic" | "manual"
+  expandOnPress: boolean
+  disabled: boolean
+  // Disabled by a fieldset around it.
+  formDisabled: boolean
+  focusableWhenDisabled: boolean
+  keepMounted: boolean
+  hiddenUntilFound: boolean
+  current: string | null
+  items: TreeItemData[] | undefined
+  paths: readonly string[] | undefined
+  // The item with the tab stop, null until items bind.
+  active: string | null
+  // Collapsed branches whose group is still animating out.
+  exiting: string[]
+  // Branches loading their children, and the ones whose last load failed.
+  loading: string[]
+  failed: string[]
+  // Items whose `onAction` Promise hasn't settled.
+  pending: string[]
+  // Bumped after items join, leave or move: everywhere, and per parent, by its value or "" at the top.
+  version: number
+  siblings: Record<string, number>
+}
 
 type Why<Reason> = { reason: Reason; event?: Event }
 type Item = { key: string; props: TreeItemProps }
@@ -45,7 +81,7 @@ const sameChecks = (a: Record<string, unknown>, b: Record<string, unknown>) => {
   return keys.length === Object.keys(b).length && keys.every((key) => a[key] === b[key])
 }
 
-const toKeys = (value: TreeState["value"]) => (Array.isArray(value) ? value : value == null ? [] : [value])
+const toKeys = (value: TreeStore["value"]) => (Array.isArray(value) ? value : value == null ? [] : [value])
 
 // Labels that aren't plain text name the item with `label`; a branch's own
 // text never includes its children's, which sit outside its label.
@@ -65,7 +101,7 @@ const defaultAnnouncement = ({ type, label }: TreeAnnouncement) =>
  */
 type TreeApi = ReturnType<typeof treeApi>
 
-function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
+function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
   const { id, store, options } = context
   const change = createChange(context)
   const typeahead = createTypeahead()
@@ -131,7 +167,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
   const isBranch = (key: string, props = itemProps(key)) =>
     props?.branch ?? fromData()?.tree.isBranch(key) ?? false
 
-  function isDisabled(state: TreeState, key: string, props = itemProps(key)) {
+  function isDisabled(state: TreeStore, key: string, props = itemProps(key)) {
     return state.disabled || state.formDisabled || !!props?.disabled || !!fromData()?.byKey.get(key)?.disabled
   }
 
@@ -143,14 +179,14 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     return ancestors(key).every((ancestor) => open.has(ancestor))
   }
 
-  const focusable = (state: TreeState, item: Item) =>
+  const focusable = (state: TreeStore, item: Item) =>
     shows(item.key, state.expanded) &&
     (state.focusableWhenDisabled || !isDisabled(state, item.key, item.props))
 
   // The item that takes the tab stop first: the current page's, else the first selected.
-  const preferredKey = (state: TreeState) => state.current ?? state.selected[0] ?? null
+  const preferredKey = (state: TreeStore) => state.current ?? state.selected[0] ?? null
 
-  const roving = createRovingFocus<TreeState, TreeItemProps>(context, {
+  const roving = createRovingFocus<TreeStore, TreeItemProps>(context, {
     slot: "item",
     key: "active",
     disabled: (item) => isDisabled(store.get(), item.key, item.props),
@@ -197,7 +233,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     if (event.key === "End") return keys.at(-1)
   }
 
-  const selection = createSelection<TreeOptions, TreeState, "selected", TreeValueChangeReason>(context, {
+  const selection = createSelection<TreeOptions, TreeStore, "selected", TreeValueChangeReason>(context, {
     key: "selected",
     set: (keys, details) =>
       setValue(store.get().selectionMode === "multiple" ? keys : (keys[0] ?? null), details),
@@ -206,7 +242,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
     selectable: (key) => store.get().selectionMode !== "none" && !isDisabled(store.get(), key),
   })
 
-  function setValue(value: TreeState["value"], why: Why<TreeValueChangeReason>) {
+  function setValue(value: TreeStore["value"], why: Why<TreeValueChangeReason>) {
     return change("value", value, why)
   }
 
@@ -222,7 +258,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
   })
 
   // Every item's checkbox that isn't unchecked, from the checked value and the shape.
-  function checksFor(state: TreeState) {
+  function checksFor(state: TreeStore) {
     if (!state.checkable) return {}
     const known = fromData()
     const tree = known?.tree ?? fromParts(state.version)
@@ -239,8 +275,8 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
 
   // Derived state, kept in step with what it's derived from: the selection's
   // keys, the checkboxes, and the groups still animating out.
-  function followUp(before: TreeState, state: TreeState) {
-    const patch: Partial<TreeState> = {}
+  function followUp(before: TreeStore, state: TreeStore) {
+    const patch: Partial<TreeStore> = {}
     if (state.value !== before.value) patch.selected = toKeys(state.value)
     if (
       (state.checkable || before.checkable) &&
@@ -302,7 +338,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
   // current item's ancestors expanded.
   {
     const state = store.get()
-    const first: Partial<TreeState> = { selected: toKeys(state.value) }
+    const first: Partial<TreeStore> = { selected: toKeys(state.value) }
     const known = fromData()
     if (known && state.current !== null && options().expanded === undefined && known.tree.has(state.current))
       first.expanded = [...new Set([...state.expanded, ...known.tree.ancestors(state.current)])]
@@ -751,7 +787,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
         const index = order.index.get(key)
         return index === undefined ? undefined : { index, size: order.size }
       },
-      tabIndex: (state: TreeState, part: Item) =>
+      tabIndex: (state: TreeStore, part: Item) =>
         !state.focusableWhenDisabled && isDisabled(state, part.key, part.props)
           ? "-1"
           : roving.tabIndex(state, part),
@@ -846,4 +882,4 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeState, string>) {
   return api
 }
 
-export { type TreeApi, treeApi }
+export { type TreeApi, treeApi, type TreeStore }

@@ -10,7 +10,7 @@ and toggle groups inside join it. Render menu and select triggers through
     toolbar as toolbarPrimitive,
     type ToolbarController,
     type ToolbarOrientation,
-    type ToolbarRootState,
+    type ToolbarState,
   } from "@ui-sdk/core/toolbar"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
@@ -24,7 +24,7 @@ and toggle groups inside join it. Render menu and select triggers through
     controller,
     debug,
     ...rest
-  }: PartProps<"div", ToolbarRootState> & {
+  }: PartProps<"div", ToolbarState> & {
     /** Which arrow keys move between items: left and right, or up and down. */
     orientation?: ToolbarOrientation
     /** Whether arrow keys wrap from the last item to the first. */

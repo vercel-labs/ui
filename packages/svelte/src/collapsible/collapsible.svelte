@@ -9,7 +9,7 @@ A panel of content that a button shows and hides. Put its trigger and panel insi
     collapsible as collapsiblePrimitive,
     type CollapsibleController,
     type CollapsibleOpenChangeReason,
-    type CollapsibleRootState,
+    type CollapsibleState,
   } from "@ui-sdk/core/collapsible"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
@@ -26,7 +26,7 @@ A panel of content that a button shows and hides. Put its trigger and panel insi
     onOpenChange,
     onOpenChangeComplete,
     ...rest
-  }: PartProps<"div", CollapsibleRootState> & {
+  }: PartProps<"div", CollapsibleState> & {
     /** Whether the panel is open. Bind it with `bind:open` to control the collapsible. */
     open?: boolean
     /** Whether the panel is open at first, when uncontrolled. */

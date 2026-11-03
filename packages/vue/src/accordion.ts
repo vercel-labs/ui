@@ -52,7 +52,7 @@ export type {
   AccordionPanelProps,
   AccordionPanelState,
   AccordionPrimitive,
-  AccordionRootState,
+  AccordionState,
   AccordionTriggerProps,
   AccordionTriggerState,
   AccordionValueChangeReason,

@@ -4,7 +4,7 @@ import {
   type ListboxItemProps,
   type ListboxItemState,
   type ListboxOptions,
-  type ListboxRootState,
+  type ListboxState,
 } from "@ui-sdk/core/listbox"
 import type { JSX } from "@solidjs/web"
 import { merge, omit } from "solid-js"
@@ -30,7 +30,7 @@ type Clashing = "value" | "onChange" | "onSelect"
  * @stable
  */
 type ListboxProps<T = string, Multiple extends boolean | undefined = false> = Omit<
-  PartProps<"div", ListboxRootState>,
+  PartProps<"div", ListboxState>,
   Clashing | keyof ListboxOptions
 > &
   ListboxOptions<T, Multiple> & {}
@@ -77,7 +77,7 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>(props
     // Without content, a data listbox renders its items.
     get children() {
       return (
-        props.children ?? ((state: ListboxRootState) => props.items && <ListboxItems items={state.items} />)
+        props.children ?? ((state: ListboxState) => props.items && <ListboxItems items={state.items} />)
       )
     },
   })
@@ -160,7 +160,7 @@ export type {
   ListboxItemState,
   ListboxOptions,
   ListboxPrimitive,
-  ListboxRootState,
+  ListboxState,
   ListboxValue,
   ListboxValueChangeReason,
 } from "@ui-sdk/core/listbox"

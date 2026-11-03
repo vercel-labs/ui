@@ -7,12 +7,12 @@ import type {
   CommandItemTextState,
   CommandListState,
   CommandPageProps,
-  CommandRootState,
+  CommandState,
   CommandShortcutProps,
   CommandShortcutState,
 } from "./command"
 import { fieldPart, optionPart } from "../../foundation/lists/autocomplete-core"
-import { currentPage, type CommandApi, type CommandItemMeta, type CommandState } from "./command-api"
+import { currentPage, type CommandApi, type CommandItemMeta, type CommandStore } from "./command-api"
 import { ariaKeyshortcuts, formatShortcut } from "../../foundation/platform/platform"
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
 import {
@@ -32,7 +32,7 @@ import { onProps } from "../../foundation/kernel/part"
 // The data list a part shows while there are none, one array so its identity never changes.
 const noCommands: CommandData = []
 
-function itemState(state: CommandState, key: string, props: CommandItemMeta) {
+function itemState(state: CommandStore, key: string, props: CommandItemMeta) {
   return {
     highlighted: state.highlighted === key,
     disabled: !!props.disabled,
@@ -57,18 +57,18 @@ const unreadByItems = {
   groupLabels: [],
 } satisfies Record<
   Exclude<
-    keyof CommandState,
+    keyof CommandStore,
     "highlighted" | "listing" | "pending" | "error" | "pages" | "apple" | "focusInList"
   >,
   readonly never[]
 >
 
-const field = fieldPart<CommandState, CommandApi>()
-const option = optionPart<CommandState, CommandApi>()
+const field = fieldPart<CommandStore, CommandApi>()
+const option = optionPart<CommandStore, CommandApi>()
 
-const commandSlots = (slot: SlotFactory<CommandState, CommandApi>) => ({
+const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
   // The element around the field and the list.
-  root: slot<{}, CommandRootState>({
+  root: slot<{}, CommandState>({
     state: (state) => ({ page: currentPage(state), loading: state.status === "loading" }),
     attrs: (state) => ({ "data-loading": state.status === "loading" ? "" : undefined }),
     bind(el, { api }) {
@@ -171,20 +171,20 @@ const commandSlots = (slot: SlotFactory<CommandState, CommandApi>) => ({
   }),
 
   // The command's text, with what the search matched in `<mark>`.
-  "item-text": slot<ListItemTextProps, CommandItemTextState>(itemTextPart<CommandState, CommandApi>()),
+  "item-text": slot<ListItemTextProps, CommandItemTextState>(itemTextPart<CommandStore, CommandApi>()),
 
   // An icon inside a command.
-  "item-icon": slot(itemIconPart<CommandState, CommandApi>({ component: "command", ...optionIcon })),
+  "item-icon": slot(itemIconPart<CommandStore, CommandApi>({ component: "command", ...optionIcon })),
 
-  group: slot(optionGroupPart<CommandState, CommandApi>()),
+  group: slot(optionGroupPart<CommandStore, CommandApi>()),
 
-  "group-label": slot(groupLabelPart<CommandState, CommandApi>()),
+  "group-label": slot(groupLabelPart<CommandStore, CommandApi>()),
 
-  separator: slot(optionSeparatorPart<CommandState, CommandApi>()),
+  separator: slot(optionSeparatorPart<CommandStore, CommandApi>()),
 
-  empty: slot(emptyPart<CommandState, CommandApi>()),
+  empty: slot(emptyPart<CommandStore, CommandApi>()),
 
-  status: slot(statusPart<CommandState, CommandApi>()),
+  status: slot(statusPart<CommandStore, CommandApi>()),
 
   // A page of commands, shown while it's on top of the stack. It renders no
   // element of its own, except on web components, where it wraps its commands.

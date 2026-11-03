@@ -10,7 +10,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     type ListData,
     type ListHighlightDetails,
     type ListboxController,
-    type ListboxRootState,
+    type ListboxState,
     type ListboxValueChangeReason,
   } from "@ui-sdk/core/listbox"
   import { useFieldControl } from "../field/context"
@@ -45,7 +45,7 @@ An always-visible list to choose one option from, or several with `multiple`.
     onHighlight,
     children,
     ...rest
-  }: PartProps<"div", ListboxRootState> & {
+  }: PartProps<"div", ListboxState> & {
     /** The selected value. Bind it with `bind:value` to control the listbox. `null` selects nothing, and with `multiple` it's a list. */
     value?: unknown
     /** The value selected at first, when uncontrolled. A form reset returns to it. */
@@ -132,7 +132,7 @@ An always-visible list to choose one option from, or several with `multiple`.
 </script>
 
 <!-- Without content, a data listbox renders its items. -->
-{#snippet data(state: ListboxRootState)}
+{#snippet data(state: ListboxState)}
   {#if items}<ListboxItems items={state.items} />{/if}
 {/snippet}
 

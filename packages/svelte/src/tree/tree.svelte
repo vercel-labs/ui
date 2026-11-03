@@ -14,7 +14,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     type TreeController,
     type TreeExpandedChangeReason,
     type TreeItemData,
-    type TreeRootState,
+    type TreeState,
     type TreeSelectionMode,
     type TreeValue,
     type TreeValueChangeReason,
@@ -56,7 +56,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     onItemFocus,
     children,
     ...rest
-  }: PartProps<"div", TreeRootState> & {
+  }: PartProps<"div", TreeState> & {
     /** The items as data: each a `value`, a `label` and, for a branch, `children`. Renders them for you, and gives the tree its whole shape even where rows aren't rendered. */
     items?: TreeItemData[]
     /** Items from file paths, like `["src/index.ts", "README.md"]`: each folder becomes a branch, folders first. A path ending in `/` is an empty folder. */
@@ -174,7 +174,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
 </script>
 
 <!-- Without content, a data tree renders its items. -->
-{#snippet content(_state: TreeRootState)}
+{#snippet content(_state: TreeState)}
   {#if data}<TreeItems items={data} />{/if}
 {/snippet}
 

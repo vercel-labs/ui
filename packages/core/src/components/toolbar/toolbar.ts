@@ -121,7 +121,7 @@ type ToolbarGroupProps = GroupProps
  * state-based class names.
  * @stable
  */
-type ToolbarRootState = {
+type ToolbarState = {
   /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
   /** Whether the whole toolbar is disabled, by its `disabled` option or a disabled fieldset around it. */
@@ -353,7 +353,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
   sync: fromOptions,
   api: toolbarApi,
   slots: (slot) => ({
-    root: slot<{}, ToolbarRootState>({
+    root: slot<{}, ToolbarState>({
       state: (state) => ({ orientation: state.orientation, disabled: isToolbarDisabled(state) }),
       attrs: (state) => ({
         role: "toolbar",
@@ -492,6 +492,6 @@ export {
   type ToolbarOptions,
   type ToolbarOrientation,
   type ToolbarPrimitive,
-  type ToolbarRootState,
+  type ToolbarState,
   type ToolbarSeparatorState,
 }

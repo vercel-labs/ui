@@ -18,6 +18,6 @@ export type {
   ToolbarOptions,
   ToolbarOrientation,
   ToolbarPrimitive,
-  ToolbarRootState,
+  ToolbarState,
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
