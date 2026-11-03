@@ -17,9 +17,9 @@ import {
 import { Menubar } from "@ui-sdk/vue/menubar"
 
 const profiles = [
-  { value: "andy", label: "Andy" },
-  { value: "benoit", label: "Benoit" },
-  { value: "luis", label: "Luis" },
+  { value: "hollis", label: "Hollis" },
+  { value: "ines", label: "Inès" },
+  { value: "kofi", label: "Kofi" },
 ]
 </script>
 
@@ -81,7 +81,7 @@ const profiles = [
     <Menu>
       <MenuTrigger>Profiles</MenuTrigger>
       <MenuContent>
-        <MenuRadioGroup default-value="benoit">
+        <MenuRadioGroup default-value="ines">
           <MenuRadioItem v-for="profile in profiles" :key="profile.value" :value="profile.value">
             <MenuItemIndicator />
             {{ profile.label }}

@@ -37,11 +37,11 @@ const menubarFixture = {
   },
   profiles: {
     trigger: "Profiles",
-    defaultValue: "benoit",
+    defaultValue: "ines",
     items: [
-      { value: "andy", label: "Andy" },
-      { value: "benoit", label: "Benoit" },
-      { value: "luis", label: "Luis" },
+      { value: "hollis", label: "Hollis" },
+      { value: "ines", label: "Inès" },
+      { value: "kofi", label: "Kofi" },
     ],
   },
   // A menu whose trigger is disabled.

@@ -162,9 +162,9 @@ test("checkbox and radio items work in a menubar's menus", async ({ page }) => {
   await page.keyboard.press("Escape")
   await closed(page, "View")
   await trigger(page, "Profiles").click()
-  await expect(page.getByRole("menuitemradio", { name: "Benoit" })).toHaveAttribute("aria-checked", "true")
-  await page.getByRole("menuitemradio", { name: "Luis" }).click()
-  expect(await lastAction(page)).toBe("profile: luis")
+  await expect(page.getByRole("menuitemradio", { name: "Inès" })).toHaveAttribute("aria-checked", "true")
+  await page.getByRole("menuitemradio", { name: "Kofi" }).click()
+  expect(await lastAction(page)).toBe("profile: kofi")
 })
 
 test("a disabled item in a menubar's menu is focusable and does nothing", async ({ page, tab }) => {

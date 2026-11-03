@@ -59,8 +59,8 @@ test("accessibility tree", async ({ page, open }) => {
   await expect(menuNamed(page, "Profiles")).toMatchAriaSnapshot(`
     - menu "Profiles":
       - group:
-        - menuitemradio "Andy" [checked=false]
-        - menuitemradio "Benoit" [checked]
-        - menuitemradio "Luis" [checked=false]
+        - menuitemradio "Hollis" [checked=false]
+        - menuitemradio "Inès" [checked]
+        - menuitemradio "Kofi" [checked=false]
   `)
 })

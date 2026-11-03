@@ -10,9 +10,9 @@ import { Menubar } from "@ui-sdk/solid/menubar"
 import { createSignal, For } from "solid-js"
 
 const profiles = [
-  { value: "andy", label: "Andy" },
-  { value: "benoit", label: "Benoit" },
-  { value: "luis", label: "Luis" },
+  { value: "hollis", label: "Hollis" },
+  { value: "ines", label: "Inès" },
+  { value: "kofi", label: "Kofi" },
 ]
 
 const themes = [
@@ -29,7 +29,7 @@ export function Example() {
         <Menu>
           <MenuTrigger>Profiles</MenuTrigger>
           <MenuContent>
-            <MenuRadioGroup defaultValue="benoit">
+            <MenuRadioGroup defaultValue="ines">
               <For each={profiles}>
                 {(profile) => (
                   <MenuRadioItem value={profile.value}>

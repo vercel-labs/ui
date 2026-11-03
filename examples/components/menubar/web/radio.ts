@@ -2,9 +2,9 @@ import "@ui-sdk/web/menubar"
 import "@ui-sdk/web/menu"
 
 const profiles = [
-  { value: "andy", label: "Andy" },
-  { value: "benoit", label: "Benoit" },
-  { value: "luis", label: "Luis" },
+  { value: "hollis", label: "Hollis" },
+  { value: "ines", label: "Inès" },
+  { value: "kofi", label: "Kofi" },
 ]
 
 const themes = [
@@ -22,7 +22,7 @@ export function mount(root: HTMLElement) {
             <button>Profiles</button>
           </ui-menu-trigger>
           <ui-menu-content>
-            <ui-menu-radio-group default-value="benoit">
+            <ui-menu-radio-group default-value="ines">
               ${profiles
                 .map(
                   (profile) => `

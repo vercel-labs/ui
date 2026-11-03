@@ -17,9 +17,9 @@
   import { Menubar } from "@ui-sdk/svelte/menubar"
 
   const profiles = [
-    { value: "andy", label: "Andy" },
-    { value: "benoit", label: "Benoit" },
-    { value: "luis", label: "Luis" },
+    { value: "hollis", label: "Hollis" },
+    { value: "ines", label: "Inès" },
+    { value: "kofi", label: "Kofi" },
   ]
 </script>
 
@@ -80,7 +80,7 @@
   <Menu>
     <MenuTrigger>Profiles</MenuTrigger>
     <MenuContent>
-      <MenuRadioGroup defaultValue="benoit">
+      <MenuRadioGroup defaultValue="ines">
         {#each profiles as profile (profile.value)}
           <MenuRadioItem value={profile.value}>
             <MenuItemIndicator />
