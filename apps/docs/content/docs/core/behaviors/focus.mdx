@@ -346,7 +346,7 @@ Pass `disabled` to skip unavailable cells:
 disabled: (cell) => context.options().taken.includes(`${cell.row}:${cell.col}`),
 ```
 
-Unlike roving focus's `disabled` option, this skips the cell during navigation.
+Unlike roving focus's `disabled` option, this skips the cell during navigation. Before the grid is entered, Tab lands on the first cell that isn't disabled, row by row.
 
 <ComponentExample
   name="behaviors/grid-focus-disabled"

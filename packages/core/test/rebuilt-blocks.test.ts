@@ -202,6 +202,45 @@ describe("createGridFocus", () => {
     expect(instance.get().active).toEqual({ row: 0, col: 0 })
   })
 
+  test("before the grid is entered, the first cell that isn't disabled has the tab stop and keys start there", () => {
+    const instance = grid({ id: "g", disabled: (cell) => cell.row === 0 && cell.col === 0 })
+    cleanups.push(() => instance.destroy())
+    const { focus } = instance.api
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 0 })).toBe("-1")
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 1 })).toBe("0")
+    expect(focus.keydown(key("ArrowLeft"))).toBe(true)
+    expect(instance.get().active).toEqual({ row: 0, col: 1 })
+    const fresh = grid({ id: "h", disabled: (cell) => cell.row === 0 && cell.col === 0 })
+    cleanups.push(() => fresh.destroy())
+    expect(fresh.api.focus.keydown(key("ArrowRight"))).toBe(true)
+    expect(fresh.get().active).toEqual({ row: 0, col: 2 })
+  })
+
+  test("a first row of disabled cells passes the tab stop to the next row, and follows new options", () => {
+    const instance = grid({ id: "g", disabled: (cell) => cell.row === 0 })
+    cleanups.push(() => instance.destroy())
+    const { focus } = instance.api
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 0 })).toBe("-1")
+    expect(focus.tabIndex(instance.get(), { row: 1, col: 0 })).toBe("0")
+    instance.setOptions({ id: "g", disabled: (cell) => cell.row < 2 && cell.col < 3 })
+    expect(focus.tabIndex(instance.get(), { row: 1, col: 0 })).toBe("-1")
+    expect(focus.tabIndex(instance.get(), { row: 0, col: 3 })).toBe("0")
+    expect(focus.keydown(key("ArrowDown"))).toBe(true)
+    expect(instance.get().active).toEqual({ row: 1, col: 3 })
+  })
+
+  test("the tab stop is found once for all the cells, not once per cell", () => {
+    const disabled = vi.fn((cell: GridCell) => cell.row < 50)
+    const instance = grid({ id: "g", disabled })
+    cleanups.push(() => instance.destroy())
+    const stops: string[] = []
+    for (let row = 0; row < 100; row++)
+      for (let col = 0; col < 4; col++)
+        if (instance.api.focus.tabIndex(instance.get(), { row, col }) === "0") stops.push(`${row}:${col}`)
+    expect(stops).toEqual(["50:0"])
+    expect(disabled.mock.calls.length).toBeLessThanOrEqual(400)
+  })
+
   test("skips disabled cells, reveals the target and reports Shift", () => {
     const instance = grid({ id: "g", disabled: (cell) => cell.row === 1 })
     cleanups.push(() => instance.destroy())

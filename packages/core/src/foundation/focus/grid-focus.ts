@@ -32,7 +32,7 @@ type GridFocusOptions<State extends object> = {
   cols: () => number
   /** How many rows Page Up and Page Down move, usually how many show. @defaultValue 10 */
   pageSize?: () => number
-  /** Cells that can't take focus, skipped by the arrows. */
+  /** Cells that can't take focus, skipped by the arrows and by the tab stop before the grid is entered. */
   disabled?: (cell: GridCell) => boolean
   /**
    * Shows a cell that may not be rendered, like `virtualizer.scrollToIndex(cell.row)`,
@@ -69,7 +69,7 @@ const sameCell = (a: GridCell | null | undefined, b: GridCell | null | undefined
  * @experimental
  */
 function createGridFocus<State extends object>(
-  context: Pick<PrimitiveContext<any, State, any>, "store">,
+  context: Pick<PrimitiveContext<any, State, any>, "store" | "options">,
   options: GridFocusOptions<State>,
 ) {
   const { store } = context
@@ -78,6 +78,8 @@ function createGridFocus<State extends object>(
   const active = () => store.get()[options.key] as GridCell | null
   // The cell to focus once it binds, when it wasn't rendered as focus moved to it.
   let pending: GridCell | null = null
+  // Kept until state or options change, so rendering every cell scans the grid once.
+  let first: { state: State; options: object; rows: number; cols: number; cell: GridCell | null } | undefined
 
   const allowed = (cell: GridCell) =>
     cell.row >= 0 &&
@@ -85,6 +87,19 @@ function createGridFocus<State extends object>(
     cell.row < options.rows() &&
     cell.col < options.cols() &&
     !options.disabled?.(cell)
+
+  function firstAllowed(state: State) {
+    const rows = options.rows()
+    const cols = options.cols()
+    const current = context.options()
+    if (first?.state === state && first.options === current && first.rows === rows && first.cols === cols)
+      return first.cell
+    let cell: GridCell | null = null
+    for (let row = 0; row < rows && !cell; row++)
+      for (let col = 0; col < cols && !cell; col++) if (allowed({ row, col })) cell = { row, col }
+    first = { state, options: current, rows, cols, cell }
+    return cell
+  }
 
   // The nearest allowed cell from `cell` going by `dr`, `dc`, or `cell` itself.
   function step(cell: GridCell, dr: number, dc: number) {
@@ -107,10 +122,12 @@ function createGridFocus<State extends object>(
   const api = {
     /** The active cell, which has the tab stop. */
     active,
-    /** `"0"` for the active cell, else `"-1"`, for a `tabindex` attribute. Before the grid is entered, the first cell has it. */
+    /**
+     * `"0"` for the active cell, else `"-1"`, for a `tabindex` attribute. Before
+     * the grid is entered, the first cell that isn't disabled has it, row by row.
+     */
     tabIndex(state: State, cell: GridCell) {
-      const current = state[options.key] as GridCell | null
-      return (current ? sameCell(current, cell) : cell.row === 0 && cell.col === 0) ? "0" : "-1"
+      return sameCell((state[options.key] as GridCell | null) ?? firstAllowed(state), cell) ? "0" : "-1"
     },
     /** Whether a cell is the active one. */
     isActive(state: State, cell: GridCell) {
@@ -148,7 +165,8 @@ function createGridFocus<State extends object>(
      */
     keydown(event: KeyboardEvent) {
       if (event.defaultPrevented || event.altKey || event.metaKey) return false
-      const from = active() ?? { row: 0, col: 0 }
+      const from = active() ?? firstAllowed(store.get())
+      if (!from) return false
       const rtl = event.target instanceof Element && isRTL(event.target)
       const page = options.pageSize?.() ?? 10
       const last = { row: options.rows() - 1, col: options.cols() - 1 }
