@@ -11,7 +11,7 @@ import {
   CommandShortcut,
 } from "@ui-sdk/react/command"
 import { CreditCardIcon, SettingsIcon, UserIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const settings = [
   { value: "profile", label: "Profile", icon: UserIcon, shortcut: "mod+p" },
@@ -20,10 +20,10 @@ const settings = [
 ]
 
 function Example() {
-  const [ran, setRan] = React.useState("")
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <Command onAction={setRan}>
+      <Command onAction={(value) => log(`Ran ${value}`)}>
         <CommandInput aria-label="Search settings" placeholder="Search settings..." />
         <CommandList>
           <CommandGroup>
@@ -40,7 +40,6 @@ function Example() {
           </CommandGroup>
         </CommandList>
       </Command>
-      <output data-slot="output">{ran ? `Ran ${ran}` : "Try a shortcut"}</output>
     </div>
   )
 }

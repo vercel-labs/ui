@@ -2,12 +2,12 @@
 
 import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/react/command"
 import { LoaderCircleIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 function Example() {
-  const [log, setLog] = React.useState("")
+  const log = useLog()
   return (
     <div data-slot="stack">
       <Command>
@@ -17,7 +17,7 @@ function Example() {
             value="deploy"
             onSelect={async () => {
               await wait(1200)
-              setLog("Deployed")
+              log("Deployed to production")
             }}
           >
             {(state) => (
@@ -31,6 +31,7 @@ function Example() {
             value="sync"
             onSelect={async () => {
               await wait(600)
+              log("Couldn't sync: offline")
               throw new Error("Offline")
             }}
           >
@@ -47,7 +48,6 @@ function Example() {
           </CommandItem>
         </CommandList>
       </Command>
-      <output data-slot="output">{log || "Run a command"}</output>
     </div>
   )
 }

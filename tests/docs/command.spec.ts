@@ -11,45 +11,38 @@ const examplesIn = (folder: string) =>
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name.replace(/\.\w+$/, ""))
 
-// The examples in the order they appear on the Command page.
+// Every example on disk: the page's, plus rtl.
 const fixtureNames = [
   "demo",
   "dialog",
   "shortcuts",
-  "groups",
-  "scrollable",
-  "rtl",
   "highlight",
-  "suggestions",
+  "filter",
   "pages",
   "data",
   "async",
   "pending",
-  "filter",
-  "keywords",
-  "auto-highlight",
+  "virtualized",
   "controlled",
   "controller",
-  "virtualized",
   "custom-rendering",
+  "rtl",
 ]
 
+// The examples in the order they appear on the Command page.
 const order = [
   "demo",
   "dialog",
   "shortcuts",
-  "groups",
-  "scrollable",
   "highlight",
-  "suggestions",
+  "filter",
   "pages",
   "data",
   "async",
   "pending",
-  "filter",
-  "keywords",
-  "auto-highlight",
   "virtualized",
+  "controlled",
+  "controller",
   "custom-rendering",
 ]
 
@@ -78,7 +71,7 @@ for (const framework of frameworks) {
         continue
       }
       await expect(preview.getByRole("option").first(), `${name} commands`).toBeVisible()
-      const input = preview.getByRole("combobox").first()
+      const input = preview.locator('[data-slot="command-input"]').first()
       await input.focus()
       await page.keyboard.press("ArrowDown")
       await expect(input, `${name} highlights`).toHaveAttribute("aria-activedescendant", /.+/)
@@ -115,7 +108,12 @@ for (const framework of frameworks) {
     await expect(inbox).toHaveAttribute("aria-keyshortcuts", /I/)
     await preview.getByRole("combobox").focus()
     await page.keyboard.press("ControlOrMeta+i")
-    await expect(preview.locator("output")).toHaveText("Ran inbox")
+    await expect(
+      preview
+        .locator("xpath=ancestor::figure[1]")
+        .locator('section[aria-label="Console"] li:not([aria-hidden])')
+        .last(),
+    ).toHaveText("Ran inbox")
     await preview.getByRole("option", { name: /Change theme/ }).click()
     await expect(preview.getByRole("option", { name: "Light" })).toBeVisible()
     expect(warnings.filter((text) => text.includes("registered twice"))).toEqual([])

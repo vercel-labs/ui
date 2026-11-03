@@ -6,7 +6,7 @@ import {
   CommandPage,
   createCommandController,
 } from "@ui-sdk/react/command"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const themes = [
   { value: "light", label: "Light" },
@@ -16,13 +16,13 @@ const themes = [
 
 const palette = createCommandController()
 
-export function Example() {
-  const [ran, setRan] = React.useState("")
+function Example() {
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" onClick={() => palette.push("theme")}>
-          Open themes
+          Open Themes
         </button>
         <button type="button" onClick={() => palette.pop()}>
           Back
@@ -34,13 +34,13 @@ export function Example() {
           Search “li”
         </button>
         <button type="button" onClick={() => palette.run()}>
-          Run highlighted
+          Run Highlighted
         </button>
         <button type="button" onClick={() => palette.focus()}>
           Focus
         </button>
       </div>
-      <Command controller={palette} onAction={setRan}>
+      <Command controller={palette} onAction={(value) => log(`Ran ${value}`)}>
         <CommandInput aria-label="Search commands" />
         <CommandList>
           <CommandPage>
@@ -57,7 +57,8 @@ export function Example() {
           </CommandPage>
         </CommandList>
       </Command>
-      <output data-slot="output">{ran ? `Ran ${ran}` : "Nothing run yet"}</output>
     </div>
   )
 }
+
+export { Example }

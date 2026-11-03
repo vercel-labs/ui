@@ -12,7 +12,15 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@ui-sdk/react/command"
-import { CalculatorIcon, CalendarIcon, CreditCardIcon, SearchIcon, SettingsIcon, SmileIcon, UserIcon } from "lucide-react"
+import {
+  CalculatorIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  SearchIcon,
+  SettingsIcon,
+  SmileIcon,
+  UserIcon,
+} from "lucide-react"
 
 const suggestions = [
   { value: "calendar", label: "Calendar", icon: CalendarIcon },

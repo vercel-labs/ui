@@ -13,7 +13,7 @@ import {
   type CommandData,
   type CommandDataItem,
 } from "@ui-sdk/react/command"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const commands: CommandData = [
   {
@@ -45,15 +45,14 @@ const commands: CommandData = [
 ]
 
 function Example() {
-  const [ran, setRan] = React.useState("")
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <Command items={commands} onAction={setRan}>
+      <Command items={commands} onAction={(value) => log(`Ran ${value}`)}>
         <CommandInput aria-label="Search commands" placeholder="Type a command..." />
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandList>{(state) => <Commands items={state.items} />}</CommandList>
       </Command>
-      <output data-slot="output">{ran ? `Ran ${ran}` : "Nothing run yet"}</output>
     </div>
   )
 }

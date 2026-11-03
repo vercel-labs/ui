@@ -57,19 +57,9 @@ An item’s `shortcut` can run it while the command list is mounted, even when t
 
 Use `CommandGroup` and `CommandGroupLabel` to name related commands. Groups and separators disappear when filtering leaves them empty.
 
-<ComponentExample
-  name="command/groups"
-  caption="Search across the groups. Groups with no matching commands disappear along with their separators."
-/>
-
 ### Scrollable
 
 Give the list a height limit and `overflow-y-auto`. Keyboard navigation scrolls the highlighted command into view. Keep the input outside the scrolling area so it stays available.
-
-<ComponentExample
-  name="command/scrollable"
-  caption="Move down through the commands. The highlighted command scrolls into view inside the list."
-/>
 
 ### Highlight Matches
 
@@ -89,11 +79,6 @@ When mixing commands with and without icons, `data-has-icons` on the list and `d
 ### Suggestions
 
 Pass `emptyItems` alongside `items` to show suggested or recent commands while the first page’s search is empty. Once someone types, the full collection is searched.
-
-<ComponentExample
-  name="command/suggestions"
-  caption="Start with Suggested commands. Type to search the full collection, then clear the search to return to suggestions."
-/>
 
 ### Pages
 
@@ -154,19 +139,9 @@ Data commands are sorted by score. Commands written directly in markup keep thei
 
 `keywords` adds search terms without changing the command’s label. Use it for synonyms or names someone might type instead.
 
-<ComponentExample
-  name="command/keywords"
-  caption="Type “smiley” or “face”. Search Emoji matches through a keyword without changing its label."
-/>
-
 ### Auto Highlight
 
 By default, Command highlights the first available command and the best match while typing. Set `autoHighlight` to `false` to wait for an arrow key or pointer movement. `loop` independently controls whether arrow keys wrap.
-
-<ComponentExample
-  name="command/auto-highlight"
-  caption="Type a search, then press Down Arrow to highlight a command. Arrow keys stop at the ends in this example."
-/>
 
 ### Virtualized
 

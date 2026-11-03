@@ -9,7 +9,15 @@ import {
   CommandItemText,
   CommandList,
 } from "@ui-sdk/react/command"
-import { CalculatorIcon, CalendarIcon, CreditCardIcon, SearchIcon, SettingsIcon, SmileIcon, UserIcon } from "lucide-react"
+import {
+  CalculatorIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  SearchIcon,
+  SettingsIcon,
+  SmileIcon,
+  UserIcon,
+} from "lucide-react"
 
 const commands = [
   { value: "calendar", label: "Calendar", icon: CalendarIcon },

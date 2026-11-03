@@ -18,7 +18,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
-import { CalculatorIcon, CalendarIcon, CreditCardIcon, SearchIcon, SettingsIcon, SmileIcon, UserIcon } from "lucide-react"
+import {
+  CalculatorIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  SearchIcon,
+  SettingsIcon,
+  SmileIcon,
+  UserIcon,
+} from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 import * as React from "react"
 
 const commands = [
@@ -32,7 +41,7 @@ const commands = [
 
 function Example() {
   const [open, setOpen] = React.useState(false)
-  const [ran, setRan] = React.useState("")
+  const log = useLog()
   return (
     <div data-slot="stack">
       <Dialog open={open} onOpenChange={setOpen}>
@@ -45,7 +54,7 @@ function Example() {
           <DialogTitle>Command palette</DialogTitle>
           <Command
             onAction={(value) => {
-              setRan(value)
+              log(`Ran ${value}`)
               setOpen(false)
             }}
           >
@@ -70,7 +79,6 @@ function Example() {
           </Command>
         </DialogContent>
       </Dialog>
-      <output data-slot="output">{ran ? `Ran ${ran}` : "Press ⌘K or Ctrl+K"}</output>
     </div>
   )
 }
