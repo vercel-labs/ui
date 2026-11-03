@@ -305,7 +305,6 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
             selection = [el.selectionStart, el.selectionEnd, el.selectionDirection ?? "none"]
         },
         bindControl(el: HTMLInputElement) {
-          store.set({ controlId: el.id || null })
           let shown = store.get().visible
           if (el.type !== typeOf(shown)) showText(el, shown)
           const view = el.ownerDocument.defaultView

@@ -354,7 +354,6 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       },
       bind: (el, { api, store }) => {
         const input = el as HTMLInputElement
-        store.set({ controlId: input.id || null })
         api.internal.readPlatform()
         // The text is written here, so the framework never fights the caret.
         const write = () => {
