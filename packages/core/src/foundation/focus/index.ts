@@ -25,4 +25,12 @@ export {
   type RovingScope,
 } from "./roving-scope"
 export { nearestInDirection } from "./spatial"
-export { bindTabStop, isTabbable, nextTabbable, positiveTabStops, radioGroup, tabbables } from "./tabbable"
+export {
+  bindTabStop,
+  focusables,
+  isTabbable,
+  nextTabbable,
+  positiveTabStops,
+  radioGroup,
+  tabbables,
+} from "./tabbable"
