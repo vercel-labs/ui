@@ -8,7 +8,17 @@ import {
   CarouselPrevious,
   CarouselViewport,
 } from "@ui-sdk/react/carousel"
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+import { CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import * as React from "react"
 
 const photos = [
   { name: "Dunes" },
@@ -18,28 +28,60 @@ const photos = [
   { name: "Meadow" },
   { name: "Harbor" },
 ]
+const alignments = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
 
 function Example() {
+  const [align, setAlign] = React.useState<"start" | "center" | "end">("center")
+
   return (
-    <Carousel aria-label="Photos" align="center">
-      <CarouselViewport>
-        <CarouselContent>
-          {photos.map((photo) => (
-            <CarouselItem key={photo.name}>
-              <div data-slot="tile">{photo.name}</div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </CarouselViewport>
-      <div data-slot="row">
-        <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
-          <ChevronLeftIcon />
-        </CarouselPrevious>
-        <CarouselNext data-variant="secondary" aria-label="Next slide">
-          <ChevronRightIcon />
-        </CarouselNext>
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <Select
+          items={alignments}
+          value={align}
+          onValueChange={(next) => next && setAlign(next as typeof align)}
+        >
+          <SelectLabel>Align</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon />
+          </SelectTrigger>
+          <SelectContent>
+            {alignments.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-    </Carousel>
+      <Carousel aria-label="Photos" align={align} defaultPage={2}>
+        <div data-slot="row">
+          <CarouselPrevious aria-label="Previous slide">
+            <ChevronLeftIcon />
+          </CarouselPrevious>
+          <CarouselViewport>
+            <CarouselContent>
+              {photos.map((photo) => (
+                <CarouselItem key={photo.name}>
+                  <div data-slot="tile">{photo.name}</div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </CarouselViewport>
+          <CarouselNext aria-label="Next slide">
+            <ChevronRightIcon />
+          </CarouselNext>
+        </div>
+      </Carousel>
+    </div>
   )
 }
 

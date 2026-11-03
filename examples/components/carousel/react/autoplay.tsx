@@ -3,14 +3,14 @@
 import {
   Carousel,
   CarouselContent,
-  CarouselIndicator,
-  CarouselIndicatorGroup,
   CarouselItem,
+  CarouselNext,
   CarouselPlayToggle,
+  CarouselPrevious,
   CarouselViewport,
 } from "@ui-sdk/react/carousel"
-import { PauseIcon, PlayIcon } from "lucide-react"
-import * as React from "react"
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 const photos = [
   { name: "Dunes" },
@@ -22,50 +22,34 @@ const photos = [
 ]
 
 function Example() {
-  const [log, setLog] = React.useState("")
+  const log = useLog()
   return (
     <Carousel
       aria-label="Photos"
       defaultPlaying
       interval={4000}
-      onPlayingChange={(playing, details) => setLog(`${playing ? "Playing" : "Stopped"} (${details.reason})`)}
+      onPlayingChange={(playing, details) => log(`${playing ? "Playing" : "Stopped"} (${details.reason})`)}
     >
-      <CarouselViewport>
-        <CarouselContent>
-          {photos.map((photo) => (
-            <CarouselItem key={photo.name}>
-              <div data-slot="tile">{photo.name}</div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </CarouselViewport>
-      <div data-slot="row">
-        <CarouselPlayToggle data-variant="secondary">
-          {(state) =>
-            state.playing ? (
-              <>
-                <PauseIcon />
-                <span data-slot="visually-hidden">Stop slide rotation</span>
-              </>
-            ) : (
-              <>
-                <PlayIcon />
-                <span data-slot="visually-hidden">Start slide rotation</span>
-              </>
-            )
-          }
-        </CarouselPlayToggle>
-        <CarouselIndicatorGroup aria-label="Choose a photo">
-          {photos.map((photo, index) => (
-            <CarouselIndicator key={photo.name} page={index + 1} aria-label={photo.name}>
-              <span />
-            </CarouselIndicator>
-          ))}
-        </CarouselIndicatorGroup>
+      <div data-slot="controls">
+        <CarouselPlayToggle>{(state) => (state.playing ? "Pause" : "Play")}</CarouselPlayToggle>
       </div>
-      <p data-slot="hint" aria-live="polite">
-        {log}
-      </p>
+      <div data-slot="row">
+        <CarouselPrevious aria-label="Previous slide">
+          <ChevronLeftIcon />
+        </CarouselPrevious>
+        <CarouselViewport>
+          <CarouselContent>
+            {photos.map((photo) => (
+              <CarouselItem key={photo.name}>
+                <div data-slot="tile">{photo.name}</div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </CarouselViewport>
+        <CarouselNext aria-label="Next slide">
+          <ChevronRightIcon />
+        </CarouselNext>
+      </div>
     </Carousel>
   )
 }

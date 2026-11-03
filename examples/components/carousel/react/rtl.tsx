@@ -28,7 +28,7 @@ function Example() {
           </CarouselContent>
         </CarouselViewport>
         <div data-slot="row">
-          <CarouselPrevious data-variant="secondary" aria-label="الشريحة السابقة">
+          <CarouselPrevious aria-label="الشريحة السابقة">
             <ChevronLeftIcon />
           </CarouselPrevious>
           <CarouselIndicatorGroup aria-label="اختر شريحة">
@@ -36,7 +36,7 @@ function Example() {
               <CarouselIndicator key={slide} page={slide} aria-label={`الشريحة ${slide}`} />
             ))}
           </CarouselIndicatorGroup>
-          <CarouselNext data-variant="secondary" aria-label="الشريحة التالية">
+          <CarouselNext aria-label="الشريحة التالية">
             <ChevronRightIcon />
           </CarouselNext>
         </div>

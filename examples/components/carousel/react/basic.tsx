@@ -15,20 +15,20 @@ const slides = [1, 2, 3, 4, 5]
 function Example() {
   return (
     <Carousel aria-label="Featured">
-      <CarouselViewport>
-        <CarouselContent>
-          {slides.map((slide) => (
-            <CarouselItem key={slide}>
-              <div data-slot="tile">{slide}</div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </CarouselViewport>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+        <CarouselPrevious aria-label="Previous slide">
           <ChevronLeftIcon />
         </CarouselPrevious>
-        <CarouselNext data-variant="secondary" aria-label="Next slide">
+        <CarouselViewport>
+          <CarouselContent>
+            {slides.map((slide) => (
+              <CarouselItem key={slide}>
+                <div data-slot="tile">{slide}</div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </CarouselViewport>
+        <CarouselNext aria-label="Next slide">
           <ChevronRightIcon />
         </CarouselNext>
       </div>

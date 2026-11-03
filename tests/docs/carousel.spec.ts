@@ -14,19 +14,16 @@ const examplesIn = (folder: string) =>
 // The examples in the order they appear on the Carousel page.
 const order = [
   "basic",
-  "sizes",
-  "spacing",
   "vertical",
-  "indicators",
-  "autoplay",
   "loop",
   "align",
+  "default-page",
+  "indicators",
   "pages",
   "thumbnails",
-  "rtl",
-  "controlled",
+  "autoplay",
   "progress",
-  "default-page",
+  "controlled",
   "controller",
   "render",
 ]
@@ -64,7 +61,7 @@ for (const framework of frameworks) {
     await page.goto(`/docs/${framework}/components/carousel`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order].sort())
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order, "rtl"].sort())
 
     for (const [index, name] of order.entries()) {
       const preview = previews.nth(index)
@@ -87,7 +84,9 @@ for (const framework of frameworks) {
     // The progress example rested on the slide Next showed, and its bar
     // follows --carousel-progress.
     const progress = previews.nth(order.indexOf("progress"))
-    await expect(progress.getByText("Rested on slide 2")).toBeVisible()
+    await expect(
+      progress.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])').last(),
+    ).toHaveText("Rested on slide 2")
     const root = progress.locator("[aria-roledescription='carousel']")
     await expect
       .poll(() => root.evaluate((el) => getComputedStyle(el).getPropertyValue("--carousel-progress")))

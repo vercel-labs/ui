@@ -43,12 +43,11 @@ function Example() {
         </CarouselContent>
       </CarouselViewport>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary">
+        <CarouselPrevious>
           <ChevronLeftIcon />
           Previous
         </CarouselPrevious>
         <CarouselNext
-          data-variant="secondary"
           render={(props, state) =>
             state.disabled ? (
               <a href="https://example.com/gallery" ref={nextFocused() ? (link) => link?.focus() : undefined}>

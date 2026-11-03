@@ -10,46 +10,39 @@ import {
 } from "@ui-sdk/react/carousel"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const slides = [1, 2, 3, 4, 5]
 
 function Example() {
   const [page, setPage] = React.useState(1)
-  const [reason, setReason] = React.useState("")
+  const log = useLog()
   return (
     <Carousel
       aria-label="Featured"
       page={page}
       onPageChange={(next, details) => {
         setPage(next)
-        setReason(details.reason)
+        log(`Page ${next} (${details.reason})`)
       }}
     >
-      {(state) => (
-        <>
-          <CarouselViewport>
-            <CarouselContent>
-              {slides.map((slide) => (
-                <CarouselItem key={slide}>
-                  <div data-slot="tile">{slide}</div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </CarouselViewport>
-          <div data-slot="row">
-            <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
-              <ChevronLeftIcon />
-            </CarouselPrevious>
-            <CarouselNext data-variant="secondary" aria-label="Next slide">
-              <ChevronRightIcon />
-            </CarouselNext>
-          </div>
-          <p data-slot="hint">
-            Slide {state.page} of {state.pageCount ?? slides.length}
-            {reason && ` · ${reason}`}
-          </p>
-        </>
-      )}
+      <div data-slot="row">
+        <CarouselPrevious aria-label="Previous slide">
+          <ChevronLeftIcon />
+        </CarouselPrevious>
+        <CarouselViewport>
+          <CarouselContent>
+            {slides.map((slide) => (
+              <CarouselItem key={slide}>
+                <div data-slot="tile">{slide}</div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </CarouselViewport>
+        <CarouselNext aria-label="Next slide">
+          <ChevronRightIcon />
+        </CarouselNext>
+      </div>
     </Carousel>
   )
 }

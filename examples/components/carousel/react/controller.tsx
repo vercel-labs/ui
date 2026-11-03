@@ -18,16 +18,16 @@ function Example() {
   const [carousel] = useState(createCarouselController)
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        <span>Featured</span>
-        <div data-slot="row">
-          <CarouselPrevious data-variant="secondary" controller={carousel} aria-label="Previous slide">
-            <ChevronLeftIcon />
-          </CarouselPrevious>
-          <CarouselNext data-variant="secondary" controller={carousel} aria-label="Next slide">
-            <ChevronRightIcon />
-          </CarouselNext>
-        </div>
+      <div data-slot="controls">
+        <CarouselPrevious controller={carousel} aria-label="Previous slide">
+          <ChevronLeftIcon />
+        </CarouselPrevious>
+        <CarouselNext controller={carousel} aria-label="Next slide">
+          <ChevronRightIcon />
+        </CarouselNext>
+        <button type="button" onClick={() => carousel.setPage(5)}>
+          Show the Last Slide
+        </button>
       </div>
       <Carousel aria-label="Featured" controller={carousel} drag={false}>
         <CarouselViewport>
@@ -40,9 +40,6 @@ function Example() {
           </CarouselContent>
         </CarouselViewport>
       </Carousel>
-      <button data-variant="secondary" type="button" onClick={() => carousel.setPage(5)}>
-        Show the last slide
-      </button>
     </div>
   )
 }

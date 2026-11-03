@@ -9,35 +9,36 @@ import {
   CarouselViewport,
 } from "@ui-sdk/react/carousel"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const slides = [1, 2, 3, 4, 5]
 
 function Example() {
-  const [rested, setRested] = React.useState(1)
+  const log = useLog()
   return (
-    <Carousel aria-label="Featured" onPageChangeComplete={setRested}>
-      <CarouselViewport>
-        <CarouselContent>
-          {slides.map((slide) => (
-            <CarouselItem key={slide}>
-              <div data-slot="tile">{slide}</div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </CarouselViewport>
+    <Carousel aria-label="Featured" onPageChangeComplete={(page) => log(`Rested on slide ${page}`)}>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+        <CarouselPrevious aria-label="Previous slide">
           <ChevronLeftIcon />
         </CarouselPrevious>
-        <div data-slot="bar">
-          <div />
-        </div>
-        <CarouselNext data-variant="secondary" aria-label="Next slide">
+        <CarouselViewport>
+          <CarouselContent>
+            {slides.map((slide) => (
+              <CarouselItem key={slide}>
+                <div data-slot="tile">{slide}</div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </CarouselViewport>
+        <CarouselNext aria-label="Next slide">
           <ChevronRightIcon />
         </CarouselNext>
       </div>
-      <p data-slot="hint">Rested on slide {rested}</p>
+      <div data-slot="row">
+        <div data-slot="bar">
+          <div />
+        </div>
+      </div>
     </Carousel>
   )
 }
