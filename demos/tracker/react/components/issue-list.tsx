@@ -284,4 +284,19 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
   )
 }
 
-export { IssueList }
+function IssueListSkeleton({ rows }: { rows: number }) {
+  return (
+    <div aria-busy="true" className="flex min-h-0 flex-1 flex-col">
+      <div className="h-11 shrink-0 border-b border-border" />
+      <div aria-hidden="true" className="min-h-0 flex-1 overflow-hidden">
+        {Array.from({ length: rows }, (_, index) => (
+          <div key={index} className="flex h-11 items-center border-b border-border ps-4 pe-2">
+            <span className="h-3 w-1/2 rounded-full bg-muted" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export { IssueList, IssueListSkeleton }
