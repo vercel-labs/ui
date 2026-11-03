@@ -53,6 +53,31 @@ test.describe("pointer", () => {
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
+  test("crossing another trigger on the way to the open panel keeps the panel", async ({ page }) => {
+    await trigger(page, "Products").hover()
+    await expect(link(page, "Analytics")).toBeVisible()
+    const from = (await trigger(page, "Products").boundingBox())!
+    const to = (await viewport(page).boundingBox())!
+    await page.mouse.move(from.x + from.width - 6, from.y + 6)
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.8, { steps: 12 })
+    await expect(link(page, "Analytics")).toBeVisible()
+    await expect(link(page, "Blog")).toBeHidden()
+  })
+
+  test("resting on another trigger on the way to the open panel switches to it", async ({ page, open }) => {
+    await page.clock.install()
+    await open("navigation-menu")
+    const products = (await trigger(page, "Products").boundingBox())!
+    await page.mouse.move(products.x + products.width - 6, products.y + 6)
+    await page.clock.runFor(100)
+    await expect(link(page, "Analytics")).toBeVisible()
+    const resources = (await trigger(page, "Resources").boundingBox())!
+    await page.mouse.move(resources.x + 12, resources.y + resources.height - 4, { steps: 4 })
+    await expect(link(page, "Analytics")).toBeVisible()
+    await page.clock.runFor(300)
+    await expect(link(page, "Blog")).toBeVisible()
+  })
+
   test("moving the pointer away closes the panel after its close delay", async ({ page, open }) => {
     await open("navigation-menu", { closeDelay: "400" })
     await trigger(page, "Products").hover()

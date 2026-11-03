@@ -2,6 +2,7 @@ import { moveIndex, orientationOf } from "../../foundation/focus/collection"
 import { isRTL } from "../../foundation/platform/env"
 import type { PopupOpener } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
+import { createSafeArea } from "../../foundation/popups/safe-area"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { createTypeahead, isTypeaheadKey, labelOf } from "../../foundation/text/typeahead"
 import type { MenuOpenChangeReason, MenuPayloadChangeReason } from "../menu/menu"
@@ -143,6 +144,10 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
     if (event.target === held) held = null
   }
 
+  // Crossing other triggers on the way to the open menu doesn't switch to them.
+  const aim = createSafeArea()
+  let pointerOn: string | null = null
+
   const openMember = () => {
     const open = store.get().open
     return open === null ? undefined : members.get(open)
@@ -194,6 +199,7 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
             member.close({ reason: "submenu-switch", event, focus: false })
       },
       openChanged(key: string, open: boolean) {
+        aim.stop()
         if (open) {
           held = null
           store.set({ open: key })
@@ -260,6 +266,10 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
         const open = store.get().open
         const member = members.get(key)
         if ((open === null && !held) || open === key || !member || event.pointerType === "touch") return
+        pointerOn = key
+        const rested = () => pointerOn === key && api.internal.hover(key, event)
+        if (aim.contains({ x: event.clientX, y: event.clientY }, rested)) return
+        aim.stop()
         if (member.disabled()) {
           const next = roving.items().find((item) => item.key === key)
           if (!next) return
@@ -271,6 +281,15 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
         roving.remember(key)
         member.open({ focus: "popup", reason: "trigger-hover", event, by: "pointer" })
       },
+      hoverMove(key: string, event: PointerEvent) {
+        if (aim.active()) api.internal.hover(key, event)
+      },
+      leave(key: string, event: PointerEvent, menu: HTMLElement | undefined) {
+        if (pointerOn === key) pointerOn = null
+        if (store.get().open !== key || !menu) return
+        aim.start({ x: event.clientX, y: event.clientY }, menu, orientation() === "vertical" ? "x" : "y")
+      },
+      enterMenu: () => aim.stop(),
     },
   }
   return api

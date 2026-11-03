@@ -400,7 +400,8 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
       }),
       on: {
         pointerenter: (event, { api, key, props }) => api.internal.hoverEnter(event, key, props.disabled),
-        pointerleave: (event, { api }) => api.internal.intent.leave(event),
+        pointermove: (event, { api, key, props }) => api.internal.hoverMove(event, key, props.disabled),
+        pointerleave: (event, { api, key }) => api.internal.leaveTrigger(event, key),
         keydown(event, { api, el, key, store }) {
           triggerKeydown(event, el)
           // Tab from the open trigger moves into its panel, wherever it renders.
@@ -453,7 +454,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
           if (ownsEvent(el!, event) && !store.get().viewport) api.internal.surface().keydown(event)
         },
         pointerenter(event, { api, store }) {
-          if (!store.get().viewport) api.internal.intent.enter(event)
+          if (!store.get().viewport) api.internal.enterPanel(event)
         },
         pointerleave(event, { api, store }) {
           if (!store.get().viewport) api.internal.leavePanel(event)

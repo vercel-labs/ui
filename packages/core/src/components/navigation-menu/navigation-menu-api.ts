@@ -5,6 +5,7 @@
 // focus return and Tab flow come from the layer for both.
 import { bindFindable, focusPressedTrigger } from "../../foundation/disclosure/disclosure"
 import { createHoverIntent } from "../../foundation/popups/hover"
+import { createSafeArea } from "../../foundation/popups/safe-area"
 import { ownsEvent } from "../../foundation/popups/popup-elements"
 import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
 import { restoreFocus } from "../../foundation/kernel/modality"
@@ -190,7 +191,7 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         // moving between its items never dismisses the open one.
         contains: (target) => !!element("root")?.contains(target),
         onOpenChange(open) {
-          if (!open) intent.clear()
+          if (!open) stopHover()
         },
         onOpenChangeComplete(open) {
           if (key === null && !open) detachViewport()
@@ -264,12 +265,20 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       close({ reason: "trigger-hover", event, focus: false })
     },
   })
-  context.onDestroy(intent.clear)
+  // Crossing other triggers on the way to the open panel doesn't switch to them.
+  const aim = createSafeArea()
+  let pointerOn: string | null = null
+  context.onDestroy(stopHover)
+
+  function stopHover() {
+    intent.clear()
+    aim.stop()
+  }
 
   // Opening the open item again keeps it open, and a press on a panel the
   // pointer opened keeps it open from now on.
   function open(key: string, { reason = "imperative", event, by = "imperative" }: OpenOptions = {}) {
-    intent.clear()
+    stopHover()
     ensureSurface(key)
     asked = key
     changed = store.get().value === key
@@ -292,12 +301,32 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     intent.leave(event)
   }
 
+  function enterPanel(event: PointerEvent) {
+    aim.stop()
+    intent.enter(event)
+  }
+
+  function leaveTrigger(event: PointerEvent, key: string) {
+    if (pointerOn === key) pointerOn = null
+    const panel = surface().element()
+    if (store.get().value === key && panel && event.pointerType !== "touch") {
+      const along = store.get().orientation === "horizontal" ? "y" : "x"
+      aim.start({ x: event.clientX, y: event.clientY }, panel, along)
+    }
+    intent.leave(event)
+  }
+
   function hoverEnter(event: PointerEvent, key: string, disabled?: boolean) {
     if (options().openOnHover === false || disabled) return
+    pointerOn = key
     if (store.get().value !== null) {
       intent.enter(event)
-      // Another trigger takes the open menu over at once.
-      if (store.get().value !== key) open(key, { reason: "trigger-hover", event, by: "hover" })
+      if (store.get().value === key) return
+      const switchTo = () => open(key, { reason: "trigger-hover", event, by: "hover" })
+      // Another trigger takes the open menu over at once, unless the pointer
+      // is only crossing it on its way to the open panel.
+      if (aim.contains({ x: event.clientX, y: event.clientY }, () => pointerOn === key && switchTo())) return
+      switchTo()
       return
     }
     // Still animating out, or just closed: the delay is skipped.
@@ -440,7 +469,7 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         // Keys from a nested menu's viewport are its own.
         if (ownsEvent(el, event) && !event.defaultPrevented && !isComposing(event)) viewport.keydown(event)
       }),
-      on(el, "pointerenter", (event) => intent.enter(event)),
+      on(el, "pointerenter", enterPanel),
       on(el, "pointerleave", leavePanel),
     ]
     return () => {
@@ -576,8 +605,12 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       surface,
       ensureSurface,
       surfaces,
-      intent,
       hoverEnter,
+      hoverMove(event: PointerEvent, key: string, disabled?: boolean) {
+        if (aim.active() && store.get().value !== key) hoverEnter(event, key, disabled)
+      },
+      leaveTrigger,
+      enterPanel,
       triggerPress,
       listKeydown: keys.listKeydown,
       panelKeydown: keys.panelKeydown,

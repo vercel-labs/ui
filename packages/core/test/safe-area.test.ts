@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { createSafeArea } from "../src/components/menu/safe-area"
+import { createSafeArea } from "../src/foundation/popups/safe-area"
 
 // A submenu to the right of a trigger that ends at x = 200.
 const submenu = {
@@ -51,5 +51,17 @@ describe("safe area", () => {
     const area = createSafeArea()
     area.start({ x: 110, y: 120 }, left)
     expect(area.contains({ x: 105, y: 140 }, () => {})).toBe(true)
+  })
+
+  test("along y, moves toward a panel below cross other triggers, and moves sideways don't", () => {
+    const panel = {
+      getBoundingClientRect: () => ({ left: 80, right: 400, top: 60, bottom: 160 }),
+    } as HTMLElement
+    const crossing = createSafeArea()
+    crossing.start({ x: 170, y: 40 }, panel, "y")
+    expect(crossing.contains({ x: 180, y: 50 }, () => {})).toBe(true)
+    const sideways = createSafeArea()
+    sideways.start({ x: 170, y: 40 }, panel, "y")
+    expect(sideways.contains({ x: 200, y: 41 }, () => {})).toBe(false)
   })
 })

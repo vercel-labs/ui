@@ -119,17 +119,19 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
         // Mouse and pen open on press, like native menus. The click that follows is ignored.
         api.internal.pointerPress(el!, event, key, props.payload)
       },
-      pointermove(event, { api, el }) {
+      pointermove(event, { api, el, id }) {
         api.parentMenu()?.internal.hoverItem(el!, event)
+        api.menubar()?.internal.hoverMove(id, event)
       },
       pointerenter(event, { api, id }) {
         api.menubar()?.internal.hover(id, event)
       },
-      pointerleave(event, { api }) {
+      pointerleave(event, { api, id }) {
         if (event.pointerType === "touch") return
-        const submenu = api.popupElement()
-        if (api.isOpen() && submenu)
-          api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, submenu)
+        const popup = api.popupElement()
+        api.menubar()?.internal.leave(id, event, popup)
+        if (api.isOpen() && popup)
+          api.parentMenu()?.internal.safeArea.start({ x: event.clientX, y: event.clientY }, popup)
         else api.parentMenu()?.internal.cancelHoverOpen()
       },
     },
@@ -287,6 +289,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       pointermove: (event, { api }) => api.internal.trackPointer(event),
       pointerenter(event, { api }) {
         api.parentMenu()?.internal.safeArea.stop()
+        api.menubar()?.internal.enterMenu()
       },
       pointerleave(event, { api, store, el }) {
         if (event.pointerType === "touch") return
