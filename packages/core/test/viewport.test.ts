@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, test, vi } from "vitest"
+import { trackKeyboard } from "../src/foundation/platform/keyboard"
 import { bindAvoidKeyboard, bindViewport } from "../src/index"
 
 type FakeViewport = EventTarget & {
@@ -41,6 +42,29 @@ function type() {
 function box(el: HTMLElement, top: number, bottom: number) {
   el.getBoundingClientRect = () =>
     ({ top, bottom, left: 0, right: 400, width: 400, height: bottom - top }) as DOMRect
+}
+
+// Focus moving between buttons, which open no keyboard.
+function tabThroughButtons(count: number) {
+  const buttons = Array.from({ length: count }, () => document.createElement("button"))
+  document.body.append(...buttons)
+  for (const button of buttons) button.focus()
+}
+
+// Each measurement of the visual viewport reads its height once.
+function countHeightReads(visual: FakeViewport) {
+  let height = visual.height
+  const reads = { count: 0 }
+  Object.defineProperty(visual, "height", {
+    get: () => {
+      reads.count++
+      return height
+    },
+    set: (value: number) => {
+      height = value
+    },
+  })
+  return reads
 }
 
 // What a test started and didn't stop, so nothing listens into the next one.
@@ -165,6 +189,29 @@ describe("bindViewport", () => {
     const onChange = vi.fn()
     cleanups.push(bindViewport(document.createElement("div"), { onChange }))
     expect(onChange.mock.calls[0][0].safeArea).toEqual({ top: 47, right: 0, bottom: 34, left: 0 })
+  })
+
+  test("reads the safe areas again on a resize, not on a focus change", () => {
+    const { move } = phone()
+    const styles = vi.spyOn(window, "getComputedStyle")
+    cleanups.push(bindViewport(document.createElement("div")))
+    expect(styles).toHaveBeenCalledTimes(1)
+    tabThroughButtons(20)
+    expect(styles).toHaveBeenCalledTimes(1)
+    move({ width: 800, height: 400, layoutHeight: 400 })
+    expect(styles).toHaveBeenCalledTimes(2)
+  })
+
+  test("writes nothing on a focus change that changes nothing", () => {
+    phone()
+    const root = document.createElement("div")
+    const onChange = vi.fn()
+    cleanups.push(bindViewport(root, { onChange }))
+    const writes = vi.spyOn(root.style, "setProperty")
+    tabThroughButtons(20)
+    expect(writes).not.toHaveBeenCalled()
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(root.style.getPropertyValue("--visual-viewport-height")).toBe("800px")
   })
 })
 
@@ -300,10 +347,71 @@ describe("bindAvoidKeyboard", () => {
     vi.unstubAllGlobals()
   })
 
+  test("doesn't measure itself on a focus change while the keyboard is closed", () => {
+    phone()
+    const styles = vi.spyOn(window, "getComputedStyle")
+    const bar = document.createElement("div")
+    const measure = vi.fn(
+      () => ({ top: 740, bottom: 800, left: 0, right: 400, width: 400, height: 60 }) as DOMRect,
+    )
+    bar.getBoundingClientRect = measure
+    cleanups.push(bindAvoidKeyboard(bar))
+    styles.mockClear()
+    tabThroughButtons(20)
+    expect(measure).not.toHaveBeenCalled()
+    expect(styles).not.toHaveBeenCalled()
+    expect(bar.hasAttribute("data-keyboard")).toBe(false)
+  })
+
   test("does nothing without a visual viewport", () => {
     Object.defineProperty(window, "visualViewport", { value: undefined, configurable: true })
     const el = document.createElement("div")
     bindAvoidKeyboard(el)()
     expect(el.style.translate).toBe("")
+  })
+})
+
+describe("trackKeyboard", () => {
+  test("writes the covered part and the visual viewport's height on each element", () => {
+    const { move } = phone()
+    const dialog = document.createElement("div")
+    const region = document.createElement("div")
+    const stops = [trackKeyboard(dialog), trackKeyboard(region)]
+    move({ height: 500 })
+    for (const el of [dialog, region]) {
+      expect(el.style.getPropertyValue("--keyboard-inset")).toBe("300px")
+      expect(el.style.getPropertyValue("--visual-viewport-height")).toBe("500px")
+      expect(el.hasAttribute("data-keyboard")).toBe(true)
+    }
+    stops[0]()
+    move({ height: 800 })
+    expect(dialog.style.getPropertyValue("--keyboard-inset")).toBe("")
+    expect(region.style.getPropertyValue("--keyboard-inset")).toBe("0px")
+    stops[1]()
+  })
+})
+
+describe("the shared viewport", () => {
+  test("measures the visual viewport once per event for everything following it", () => {
+    const { visual } = phone()
+    cleanups.push(
+      bindViewport(document.createElement("div")),
+      trackKeyboard(document.createElement("div")),
+      trackKeyboard(document.createElement("div")),
+    )
+    const reads = countHeightReads(visual)
+    visual.dispatchEvent(new Event("scroll"))
+    expect(reads.count).toBe(1)
+  })
+
+  test("stops listening once the last element stops following it", () => {
+    const { visual } = phone()
+    const stops = [bindViewport(document.createElement("div")), trackKeyboard(document.createElement("div"))]
+    const reads = countHeightReads(visual)
+    for (const stop of stops) stop()
+    visual.dispatchEvent(new Event("scroll"))
+    window.dispatchEvent(new Event("resize"))
+    tabThroughButtons(2)
+    expect(reads.count).toBe(0)
   })
 })

@@ -79,13 +79,10 @@ function trackKeyboard(el: HTMLElement, onChange?: { before: () => void; after: 
     else el.removeAttribute("data-keyboard")
     if (changed) onChange?.after()
   }
-  const update = () => apply(measureViewport(view, viewport))
   apply(early.get(view) ?? measureViewport(view, viewport))
-  viewport.addEventListener("resize", update)
-  viewport.addEventListener("scroll", update)
+  const stop = followViewport(view, viewport, apply)
   return () => {
-    viewport.removeEventListener("resize", update)
-    viewport.removeEventListener("scroll", update)
+    stop()
     el.style.removeProperty("--keyboard-inset")
     el.style.removeProperty("--visual-viewport-height")
     el.removeAttribute("data-keyboard")
@@ -104,6 +101,39 @@ function measureViewport(view: Window, viewport: VisualViewport) {
   }
 }
 
+type ViewportFollower = (size: ViewportSize, event: Event) => void
+
+const followersByViewport = new WeakMap<
+  VisualViewport,
+  { followers: Set<ViewportFollower>; stop: () => void }
+>()
+
+// A toast region, a dialog and a sheet follow the same visual viewport, so they
+// share its listeners and one measurement per event instead of one each.
+function followViewport(view: Window, viewport: VisualViewport, follower: ViewportFollower) {
+  let shared = followersByViewport.get(viewport)
+  if (!shared?.followers.size) {
+    const followers = new Set<ViewportFollower>()
+    const measure = (event: Event) => {
+      const size = measureViewport(view, viewport)
+      for (const follow of followers) follow(size, event)
+    }
+    viewport.addEventListener("resize", measure)
+    viewport.addEventListener("scroll", measure)
+    const stop = () => {
+      viewport.removeEventListener("resize", measure)
+      viewport.removeEventListener("scroll", measure)
+    }
+    shared = { followers, stop }
+    followersByViewport.set(viewport, shared)
+  }
+  const { followers, stop } = shared
+  followers.add(follower)
+  return () => {
+    if (followers.delete(follower) && !followers.size) stop()
+  }
+}
+
 const early = new WeakMap<Window, ViewportSize>()
 
 /**
@@ -119,6 +149,7 @@ function measureViewportEarly(view: Window | null | undefined) {
 }
 
 export {
+  followViewport,
   keyboardHeight,
   keyboardInset,
   measureViewport,
