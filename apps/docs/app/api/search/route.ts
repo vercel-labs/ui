@@ -9,7 +9,7 @@ const server = createFromSource(source, {
     return {
       id: page.url,
       url: page.url,
-      title: page.data.title ?? page.url,
+      title: page.data.title,
       description: page.data.description,
       structuredData: page.data.structuredData,
       tag: isFramework(section) ? section : frameworkIds,
