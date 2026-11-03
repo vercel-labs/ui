@@ -1,6 +1,7 @@
 import type { field, fieldSet } from "@ui-sdk/core/field"
 import {
   checkFieldOutside,
+  fieldControlId,
   fieldOutsideAttrs,
   fieldOutsideState,
   type FieldOutsideSlot,
@@ -83,6 +84,11 @@ function useFieldControl() {
   }
 }
 
+function useFieldControlId() {
+  const field = useField()
+  return field ? fieldControlId(field.api.id) : undefined
+}
+
 export {
   DescribedKey,
   type FieldContext,
@@ -92,4 +98,5 @@ export {
   outsidePart,
   useField,
   useFieldControl,
+  useFieldControlId,
 }

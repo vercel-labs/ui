@@ -51,6 +51,7 @@ type State = {
   // Each thumb's value by its index. Thumbs select on their own entry and
   // their neighbours', so a move reaches only the thumbs it changes.
   thumbValues: Record<string, number>
+  thumbInputId: string | null
 }
 
 const valuesOf = (value: number | number[]) => (Array.isArray(value) ? value : [value])

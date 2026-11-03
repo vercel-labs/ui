@@ -41,6 +41,8 @@ function defineSliderElements() {
       tag: owner,
       display: "block",
       formAssociated: true,
+      // The framework adapters pass it, never an attribute or a property.
+      kinds: { thumbInputId: null },
       state: {
         value: {
           get: (api: SliderApi) => api.getValue(),

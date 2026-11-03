@@ -141,6 +141,9 @@ type NumberInputOptions = {
   controller?: NumberInputController
 } & PrimitiveOptions
 
+/** What adapters pass on top: the id the field around it gives its control. */
+type NumberInputInternalOptions = NumberInputOptions & { controlId?: string }
+
 /**
  * The props the `scrub-area` slot of `numberInput` takes.
  * @stable
@@ -221,7 +224,7 @@ function dataAttrs(state: State) {
   }
 }
 
-const controlId = (id: string) => `${id}-control`
+const controlIdOf = (state: State, id: string) => state.controlId ?? `${id}-control`
 
 // Whether a step button can't step: it's disabled itself, or the field can't step that way.
 function isBlocked(state: State, props: NumberInputButtonProps, direction: number) {
@@ -240,7 +243,7 @@ function button(direction: number) {
       return {
         type: "button",
         tabindex: "-1",
-        "aria-controls": controlId(id),
+        "aria-controls": controlIdOf(state, id),
         // Read-only buttons stay in the page as they were, but do nothing.
         disabled: props.disabled || (blocked && !state.readOnly) ? "" : undefined,
         "aria-disabled": blocked ? "true" : undefined,
@@ -274,8 +277,10 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
     name: "string",
     form: "string",
     controller: "value",
+    // Internal: passed by renderers.
+    controlId: "string",
   },
-  state: (options: NumberInputOptions): State => {
+  state: (options: NumberInputInternalOptions): State => {
     const value = options.value !== undefined ? options.value : (options.defaultValue ?? null)
     const base = { ...settings(options), pageLocale: null }
     return {
@@ -284,6 +289,7 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       initial: options.defaultValue ?? value,
       text: display(value, base),
       formDisabled: false,
+      controlId: options.controlId ?? null,
       scrubbing: false,
       platform: "other",
       cursor: null,
@@ -294,6 +300,7 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
     ...settings(options),
     ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
     ...(options.value === undefined ? {} : { value: options.value }),
+    ...(options.controlId === undefined ? {} : { controlId: options.controlId }),
   }),
   commits: ["value"],
   api: numberInputApi,
@@ -328,7 +335,7 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       state: fieldState,
       attrs: (state, { id }) => ({
         type: "text",
-        id: controlId(id),
+        id: controlIdOf(state, id),
         value: state.text,
         inputmode: inputMode(state),
         autocomplete: "off",
@@ -347,6 +354,7 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       },
       bind: (el, { api, store }) => {
         const input = el as HTMLInputElement
+        store.set({ controlId: input.id || null })
         api.internal.readPlatform()
         // The text is written here, so the framework never fights the caret.
         const write = () => {
