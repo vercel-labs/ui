@@ -13,7 +13,7 @@ function Example() {
       {tasks.map((task) => (
         <label data-slot="label" key={task.label}>
           <Checkbox defaultChecked={task.done}>
-            <CheckboxIndicator keepMounted>
+            <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />
             </CheckboxIndicator>
           </Checkbox>

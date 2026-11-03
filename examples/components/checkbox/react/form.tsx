@@ -1,49 +1,49 @@
 "use client"
 
-import * as React from "react"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import { CheckIcon } from "lucide-react"
-
-const formId = "checkbox-signup"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [submitted, setSubmitted] = React.useState("")
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <form
-        data-slot="stack"
-        id={formId}
-        onSubmit={(event) => {
-          event.preventDefault()
-          const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(entries.join(", ") || "nothing")
-        }}
-        onReset={() => setSubmitted("")}
-      >
-        <label data-slot="label">
-          <Checkbox name="terms" value="yes" required>
-            <CheckboxIndicator>
-              <CheckIcon aria-hidden="true" />
-            </CheckboxIndicator>
-          </Checkbox>
-          I agree to the terms
-        </label>
-        <div data-slot="row">
-          <button type="submit">Submit</button>
-          <button type="reset">Reset</button>
-        </div>
-      </form>
-      <label data-slot="label">
-        <Checkbox form={formId} name="newsletter" value="weekly" defaultChecked>
+    <form
+      data-slot="stack"
+      onSubmit={(event) => {
+        event.preventDefault()
+        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
+      }}
+    >
+      <Field>
+        <Checkbox name="terms" value="yes" required>
           <CheckboxIndicator>
             <CheckIcon aria-hidden="true" />
           </CheckboxIndicator>
         </Checkbox>
-        Send me the weekly newsletter
-      </label>
-      <output data-slot="output">{submitted && `Submitted: ${submitted}`}</output>
-    </div>
+        <div data-slot="stack">
+          <FieldLabel>Accept terms and conditions</FieldLabel>
+          <FieldDescription>You agree to our Terms of Service and Privacy Policy.</FieldDescription>
+        </div>
+      </Field>
+      <Field>
+        <Checkbox name="newsletter" value="weekly" defaultChecked>
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
+        <div data-slot="stack">
+          <FieldLabel>Send me the weekly newsletter</FieldLabel>
+          <FieldDescription>Product news and tips, once a week. Unsubscribe anytime.</FieldDescription>
+        </div>
+      </Field>
+      <div data-slot="row">
+        <button type="submit">Create Account</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
   )
 }
 

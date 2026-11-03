@@ -1,9 +1,9 @@
 "use client"
 
-import * as React from "react"
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/react/checkbox"
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
 import { CheckIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 const channels = [
   { value: "email", label: "Email" },
@@ -12,14 +12,15 @@ const channels = [
 ]
 
 function Example() {
-  const [saved, setSaved] = React.useState<string | null>(null)
+  const log = useLog()
 
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setSaved(new FormData(event.currentTarget).getAll("notifications").join(", "))
+        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        log(`Saved ${entries.join("&")}`)
       }}
     >
       <Field>
@@ -42,7 +43,6 @@ function Example() {
         </div>
       </Field>
       <button type="submit">Save</button>
-      <output data-slot="output">{saved !== null ? `notifications: ${saved}` : ""}</output>
     </form>
   )
 }

@@ -57,11 +57,6 @@ An indeterminate checkbox represents a partly checked set. It has `aria-checked=
 
 Start with `defaultChecked="indeterminate"`, or pass `"indeterminate"` as the controlled value. The indicator's state tells it which icon to show. A [parent checkbox](#parent-checkbox) derives this state from a group for you.
 
-<ComponentExample
-  name="checkbox/indeterminate"
-  caption="All notifications starts mixed. Press it to check it; later presses toggle between checked and unchecked."
-/>
-
 ### Controlled
 
 Use `bind:checked` to own the value. A `createCheckboxController()` lets another button change it. [State and Events](../state-and-events) covers canceling changes and choosing who owns the value.
@@ -89,15 +84,6 @@ Set `name` and `value` to include a checked checkbox in a native form. Unchecked
 <ComponentExample
   name="checkbox/form"
   caption="Submit with the terms unchecked to see native validation. Accept the terms and submit; Reset restores the defaults and clears the result. The newsletter checkbox belongs to the same form from outside it."
-/>
-
-### List
-
-Independent checkboxes can share a fieldset and legend. Give each one its own name, or use the same name to submit several values. Use a [group](#group) when your app also needs one shared list of checked values.
-
-<ComponentExample
-  name="checkbox/list"
-  caption="Choose which items appear on the desktop. Each checkbox keeps its own value."
 />
 
 ## Group
@@ -145,15 +131,6 @@ Use `bind:value` to own the selected values. The controller can replace that lis
 <ComponentExample
   name="checkbox/group-controlled"
   caption="Choose working days, then try Select weekdays and Clear. The readout shows the group value and the reason it changed."
-/>
-
-### Group in a Form
-
-Set `name` on the group to submit every checked value under that name. `required` requires at least one selection; Reset restores `defaultValue`. The same `disabled` and `form` options apply as on an individual checkbox.
-
-<ComponentExample
-  name="checkbox/group-form"
-  caption="Submit to see all checked toppings. Clear them to try required validation; Reset restores Cheese. The group belongs to the form below it."
 />
 
 ### Group in a Field
