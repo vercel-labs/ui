@@ -51,14 +51,14 @@ function Example() {
                       class={(state) =>
                         [
                           "relative inline-flex cursor-default size-8 items-center justify-center rounded-2xl border border-transparent text-sm font-medium outline-none transition-colors motion-reduce:transition-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30",
-                          state.active ? "border-border bg-background hover:bg-muted" : "hover:bg-muted",
+                          state.current ? "border-border bg-background hover:bg-muted" : "hover:bg-muted",
                         ].join(" ")
                       }
                     >
                       {(state) => (
                         <>
                           {state.page}
-                          {state.active && (
+                          {state.current && (
                             <span
                               aria-hidden="true"
                               class="absolute bottom-1 size-1 rounded-full bg-current"

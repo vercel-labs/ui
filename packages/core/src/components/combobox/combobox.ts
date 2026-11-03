@@ -284,6 +284,12 @@ type ComboboxSharedOptions<T> = PortalProps & {
    */
   keepQuery?: boolean
   /**
+   * What screen readers hear once the Create part's `onCreate` has been pending for a second, so a
+   * slow action doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
+  /**
    * Whether text that matches no item becomes the value, when Enter is pressed with nothing highlighted, or, without `multiple`, when the list closes. The value is the text itself.
    * @defaultValue false
    */
@@ -390,7 +396,7 @@ type ComboboxItemProps<T = string> = {
  */
 type ComboboxCreateProps = {
   /** Runs with the input's text when the create option is chosen. It doesn't change the value by itself. Return a Promise to mark the option pending until it settles; the list closes (or the input empties, with `multiple`) once it resolves. */
-  onCreate?: (query: string) => void | Promise<unknown>
+  onCreate?: (query: string) => unknown
   /**
    * How many characters the text needs before the option shows.
    * @defaultValue 1
@@ -425,12 +431,12 @@ type ComboboxClearProps = {
  */
 type ComboboxValueProps = {
   /** With `multiple`, how many labels the `label` in its state shows before the rest are counted, as in "France, Chile and 2 more", joined the way the page's language joins lists. */
-  max?: number
+  maxLabels?: number
   /**
-   * The words for the labels past `max`.
+   * The words for the labels past `maxLabels`.
    * @defaultValue (count) => `${count} more`
    */
-  moreLabel?: (count: number) => string
+  getMoreLabel?: (count: number) => string
 }
 
 /**
@@ -603,7 +609,7 @@ type ComboboxValueState = {
   value: unknown
   /** Each selected item's label, in the order they were selected. */
   labels: string[]
-  /** The labels joined with commas, or with `max`, as a list in the page's language, like "France, Chile and 2 more". An empty string for none. */
+  /** The labels joined with commas, or with `maxLabels`, as a list in the page's language, like "France, Chile and 2 more". An empty string for none. */
   label: string
 }
 /**
@@ -632,6 +638,7 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
     onOpenChangeComplete: "callback",
     multiple: "boolean",
     maxSelected: "number",
+    pendingAnnouncement: "string",
     items: "value",
     emptyItems: "value",
     filter: filterAttribute(["contains", "startsWith"], "contains"),

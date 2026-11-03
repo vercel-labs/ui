@@ -9,7 +9,7 @@
     aria-label="Verification code"
     class="flex items-center gap-2 text-foreground data-disabled:opacity-50"
     onValueChange={() => (status = '')}
-    onComplete={(value, details) => (status = `Checking ${value}, from ${details.reason}.`)}
+    onValueCommit={(value, details) => (status = `Checking ${value}, from ${details.reason}.`)}
   >
     <OTPInputGroup class="flex items-center">
       {#each { length: 6 } as _, index}

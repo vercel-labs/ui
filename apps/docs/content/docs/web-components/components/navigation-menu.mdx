@@ -50,9 +50,9 @@ The viewport holds the open panel and follows its size and position. The sizing 
 
 ### Link Component
 
-Render your router's link for client-side navigation. `active` marks the link for the current page with `aria-current="page"` and `data-active`.
+Render your router's link for client-side navigation. `current` marks the link for the current page with `aria-current="page"` and `data-current`.
 
-The link wraps your own `<a>`, so your router's click handling stays on it. Toggle the `active` attribute as the route changes.
+The link wraps your own `<a>`, so your router's click handling stays on it. Toggle the `current` attribute as the route changes.
 
 <ComponentExample
   name="navigation-menu/link-component"
@@ -109,7 +109,7 @@ Resting the pointer on a trigger opens its panel. With `openOnHover` set to fals
 
 ### Indicator
 
-`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#css-variables), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
+`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `current` while every panel is closed. Its box comes from the `--active-item-*` [variables](#css-variables), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
 
 <ComponentExample
   name="navigation-menu/indicator"

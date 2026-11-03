@@ -121,7 +121,7 @@ const listSkips = {
   "item.index": "The renderer's count of where the item is.",
   "item-text.write": "Set once by the web components adapter.",
   "empty.stash": "Set once by the web components adapter.",
-  "value.moreLabel": "A function, called for the text it shows.",
+  "value.getMoreLabel": "A function, called for the text it shows.",
   "value-input.value": "Set by the form input, never by people.",
 }
 // What every calendar takes.
@@ -406,7 +406,7 @@ const cases: Case[] = [
       maxLength: [4, 6],
       pattern: ["digits", "alphanumeric"],
       inputMode: ["numeric", "text"],
-      textAlign: ["left", "center"],
+      textAlign: ["start", "center"],
       autoComplete: ["one-time-code", "off"],
       name: ["code", "pin"],
       form: ["one", "two"],
@@ -520,6 +520,7 @@ const cases: Case[] = [
     // Counts of the times items came and went.
     history: ["stop", "version", "siblings"],
     values: {
+      pendingAnnouncement: ["Loading", "Saving"],
       selectionMode: ["single", "multiple"],
       value: ["docs", "index"],
       expanded: [[], ["src"]],
@@ -670,6 +671,7 @@ const cases: Case[] = [
     parts: { trigger: { "": {} }, content: { "": {} }, item: { cut: {} } },
     history: ["stop", "titled"],
     values: {
+      pendingAnnouncement: ["Loading", "Saving"],
       ...popups,
       ...placed,
       shortcuts: [true, false],
@@ -717,7 +719,7 @@ const cases: Case[] = [
       placeholder: ["Pick one", "Choose"],
       autoComplete: ["off", "country"],
       "value.placeholder": ["Pick one", "Choose"],
-      "value.max": [1, 2],
+      "value.maxLabels": [1, 2],
       "value.text": [false, true],
       "content.alignItemWithTrigger": [true, false],
       ...placed,
@@ -750,6 +752,7 @@ const cases: Case[] = [
     </root>`,
     parts: { content: { "": {} }, item: { Banana: {} }, "item-text": { "": {} }, clear: { "": {} } },
     values: {
+      pendingAnnouncement: ["Loading", "Saving"],
       ...lists,
       open: [true, false],
       value: ["Apple", "Banana"],
@@ -802,6 +805,7 @@ const cases: Case[] = [
     </root>`,
     parts: { item: { open: {} }, "item-text": { "": {} } },
     values: {
+      pendingAnnouncement: ["Loading", "Saving"],
       ...lists,
       value: ["new", "open"],
       pages: [[], ["settings"]],
@@ -831,7 +835,7 @@ const cases: Case[] = [
       closeDelay: [0, 300],
       openOnHover: [true, false],
       closeOnSelect: [true, false],
-      "link.active": [false, true],
+      "link.current": [false, true],
       "link.closeOnSelect": [true, false],
       ...placed,
     },
@@ -956,7 +960,7 @@ const cases: Case[] = [
     values: {
       side: ["bottom", "top"],
       align: ["end", "start"],
-      max: [3, 5],
+      maxVisible: [3, 5],
       expanded: [false, true],
       shortcut: ["F6", "alt+t"],
       pendingAnnouncement: ["Loading", "Saving"],

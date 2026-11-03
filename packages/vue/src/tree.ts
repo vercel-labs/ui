@@ -1,5 +1,6 @@
 import {
   tree as treePrimitive,
+  type ListHighlightDetails,
   type TreeActionDetails,
   type TreeAnnouncement,
   type TreeCheckStrategy,
@@ -55,7 +56,8 @@ const Tree = withElement(
       defaultChecked: { type: Array as PropType<string[]>, default: undefined },
       checkStrategy: String as PropType<TreeCheckStrategy>,
       // A function prop beside the emit, so a returned Promise marks the item pending.
-      onAction: Function as PropType<(value: string, details: TreeActionDetails) => void | Promise<unknown>>,
+      onAction: Function as PropType<(value: string, details: TreeActionDetails) => unknown>,
+      pendingAnnouncement: String,
       loadChildren: Function as PropType<
         (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
       >,
@@ -76,7 +78,7 @@ const Tree = withElement(
       expandedChange: (_expanded: string[], _details: ChangeDetails<TreeExpandedChangeReason>) => true,
       "update:checked": (_checked: string[]) => true,
       checkedChange: (_checked: string[], _details: ChangeDetails<TreeCheckedChangeReason>) => true,
-      itemFocus: (_value: string, _details: { index: number }) => true,
+      highlight: (_value: string, _details: ListHighlightDetails) => true,
     },
     slots: Object as PartSlots<typeof treePrimitive, "root">,
     setup(props, { slots, emit }) {
@@ -98,7 +100,7 @@ const Tree = withElement(
           emit("checkedChange", checked, details)
           if (!details.canceled) emit("update:checked", checked)
         },
-        onItemFocus: (value: string, details: { index: number }) => emit("itemFocus", value, details),
+        onHighlight: (value: string, details: ListHighlightDetails) => emit("highlight", value, details),
       }))
       return usePart(tree, "root", undefined, undefined, {
         tag: "div",
@@ -231,6 +233,7 @@ export {
 export { Tree, TreeGroup, TreeItem, TreeItemCheckbox, TreeItemIndicator, TreeItemLabel, TreeItems }
 
 export type {
+  ListHighlightDetails,
   TreeActionDetails,
   TreeAnnouncement,
   TreeApi,

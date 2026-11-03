@@ -7,6 +7,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
   import type { ChangeDetails } from "@ui-sdk/core"
   import {
     tree as treePrimitive,
+    type ListHighlightDetails,
     type TreeActionDetails,
     type TreeAnnouncement,
     type TreeCheckStrategy,
@@ -41,6 +42,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     defaultChecked,
     checkStrategy,
     onAction,
+    pendingAnnouncement,
     loadChildren,
     current,
     disabled,
@@ -53,7 +55,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     onValueChange,
     onExpandedChange,
     onCheckedChange,
-    onItemFocus,
+    onHighlight,
     children,
     ...rest
   }: PartProps<"div", TreeState> & {
@@ -84,7 +86,9 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** Which items the checked value lists: `"leaf"`, `"trunk"`, `"branch"` or `"independent"`. */
     checkStrategy?: TreeCheckStrategy
     /** Runs when an item is pressed or Enter is pressed on it, apart from selecting it. Return a Promise to mark the item pending until it settles. */
-    onAction?: (value: string, details: TreeActionDetails) => void | Promise<unknown>
+    onAction?: (value: string, details: TreeActionDetails) => unknown
+    /** What screen readers hear once an item's action has been pending for a second. An empty string says nothing. */
+    pendingAnnouncement?: string
     /** Loads a branch's children the first time it expands while it has none. */
     loadChildren?: (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
     /** The value of the item for the current page. It gets `aria-current="page"`, takes the tab stop first, and its ancestors expand. */
@@ -110,7 +114,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** Runs when checkboxes want to change. `details.reason` says why, and `details.cancel()` stops it. */
     onCheckedChange?: (checked: string[], details: ChangeDetails<TreeCheckedChangeReason>) => void
     /** Runs when the keyboard moves focus to an item, with its row among the items that show, from 0. */
-    onItemFocus?: (value: string, details: { index: number }) => void
+    onHighlight?: (value: string, details: ListHighlightDetails) => void
   } = $props()
 
   const id = $props.id()
@@ -136,6 +140,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     defaultChecked,
     checkStrategy,
     onAction,
+    pendingAnnouncement,
     loadChildren,
     current,
     disabled,
@@ -158,7 +163,7 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
       onCheckedChange?.(next, details)
       if (!details.canceled) checked = next
     },
-    onItemFocus,
+    onHighlight,
   }))
   provideInstance(treePrimitive, tree)
   setContext<DataContext>(DataKey, { checkable: () => checkable ?? false })

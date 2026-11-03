@@ -63,7 +63,7 @@ const regionProps = {
   toaster: Function as unknown as PropType<Toaster<any>>,
   side: String as PropType<"top" | "bottom">,
   align: String as PropType<"start" | "center" | "end">,
-  max: Number,
+  maxVisible: Number,
   expanded: optionalBoolean,
   // `null` turns the shortcut off.
   shortcut: { type: String as PropType<string | null>, default: undefined },
@@ -98,7 +98,7 @@ function createRegion(placed: boolean) {
               toaster: props.toaster,
               side: props.side,
               align: props.align,
-              max: props.max,
+              maxVisible: props.maxVisible,
               expanded: props.expanded,
               shortcut: props.shortcut,
               pendingAnnouncement: props.pendingAnnouncement,

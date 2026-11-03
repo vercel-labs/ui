@@ -32,7 +32,7 @@ type ToastRegionOptions = {
    * How many toasts show at once. Older ones wait, with their timers stopped, until there's room.
    * @defaultValue 3
    */
-  max?: number
+  maxVisible?: number
   /**
    * Whether the stack is always expanded. Otherwise it expands while the pointer or focus is in it.
    * @defaultValue false
@@ -60,7 +60,7 @@ type ToastItem<Content = unknown> = {
   toast: Toast<Content>
   /** Its place in the stack, 0 for the newest. A closing toast keeps the place it had. */
   index: number
-  /** Whether it's animating out, closed or pushed past `max`. */
+  /** Whether it's animating out, closed or pushed past `maxVisible`. */
   leaving: boolean
 }
 
@@ -119,7 +119,7 @@ const toastRegionPrimitive = /* @__PURE__ */ definePrimitive({
     toaster: "value",
     side: "string",
     align: "string",
-    max: "number",
+    maxVisible: "number",
     expanded: "boolean",
     shortcut: shortcutAttribute,
     pendingAnnouncement: "string",

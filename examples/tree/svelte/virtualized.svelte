@@ -20,7 +20,7 @@
   const start = $derived(Math.max(0, Math.floor(scrollTop / row) - 4))
   const end = $derived(Math.min(rows.length, Math.ceil((scrollTop + height) / row) + 4))
 
-  function onItemFocus(_value: string, { index }: { index: number }) {
+  function onHighlight(_value: string, { index }: { index: number }) {
     const el = scroller
     if (!el) return
     const top = index * row
@@ -40,7 +40,7 @@
     aria-label="Archive"
     {items}
     bind:expanded
-    {onItemFocus}
+    {onHighlight}
     style="height: {rows.length * row}px"
     class="relative"
   >

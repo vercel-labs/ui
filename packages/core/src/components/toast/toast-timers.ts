@@ -64,7 +64,7 @@ function createToastTimers(expire: (id: string) => unknown, now = () => Date.now
   function apply() {
     const ids = new Set(shown.map((toast) => toast.id))
     for (const [id, countdown] of countdowns) {
-      // Toasts that are no longer shown, like ones pushed past `max`, wait with the time they have left.
+      // Toasts that are no longer shown, like ones pushed past `maxVisible`, wait with the time they have left.
       if (!ids.has(id)) stop(countdown)
     }
     for (const toast of shown) {

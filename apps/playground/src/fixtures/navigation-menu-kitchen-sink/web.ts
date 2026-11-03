@@ -87,7 +87,7 @@ function markup(variant: Variant, env: Env) {
           )
           .join("")}
         <ui-navigation-menu-item>
-          <ui-navigation-menu-link ${variant.activeLink !== false ? "active" : ""}><a class="${classes.topLink}" href="${href(variant, "pricing")}">Pricing</a></ui-navigation-menu-link>
+          <ui-navigation-menu-link ${variant.activeLink !== false ? "current" : ""}><a class="${classes.topLink}" href="${href(variant, "pricing")}">Pricing</a></ui-navigation-menu-link>
         </ui-navigation-menu-item>
       </ui-navigation-menu-list>
       <ui-navigation-menu-indicator class="${classes.indicator}"></ui-navigation-menu-indicator>

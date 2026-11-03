@@ -131,7 +131,7 @@ function onSubmit(event: Event) {
         >
           <SelectLabel class="label">{{ f.label }}</SelectLabel>
           <SelectTrigger class="trigger">
-            <SelectValue class="value" :max="max" />
+            <SelectValue class="value" :max-labels="max" />
             <span aria-hidden="true">▾</span>
           </SelectTrigger>
           <SelectClear>{{ f.clear }}</SelectClear>

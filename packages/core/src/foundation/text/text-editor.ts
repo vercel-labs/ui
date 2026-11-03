@@ -88,7 +88,7 @@ type TextEditorAdapter = {
   /** Whether `replace` accepts tokens. */
   tokens?: boolean
   /** Sends what's typed, like a form submit, for items that end with `after: "submit"`. */
-  submit?: () => void
+  submit?: (event?: Event) => void
 }
 
 export {

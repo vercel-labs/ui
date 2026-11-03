@@ -213,7 +213,7 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
 
   value: slot<ValueProps, SelectValueState>({
     // `text` is internal: passed by renderers.
-    props: { placeholder: "string", max: "number", moreLabel: "value", text: "boolean" },
+    props: { placeholder: "string", maxLabels: "number", getMoreLabel: "value", text: "boolean" },
     state: (state, { api, props }) => {
       const labels = api.internal.selection.labels()
       return {

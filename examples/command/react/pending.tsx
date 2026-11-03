@@ -10,7 +10,10 @@ function Example() {
   const [log, setLog] = React.useState("")
   return (
     <div className="flex w-full max-w-sm flex-col gap-3">
-      <Command className="flex min-h-40 w-full max-w-sm flex-col overflow-hidden rounded-3xl bg-popover p-1 text-popover-foreground ring-1 ring-foreground/5">
+      <Command
+        pendingAnnouncement="Deploying"
+        className="flex min-h-40 w-full max-w-sm flex-col overflow-hidden rounded-3xl bg-popover p-1 text-popover-foreground ring-1 ring-foreground/5"
+      >
         <div className="shrink-0 p-1 pb-0">
           <CommandInput
             aria-label="Search actions"

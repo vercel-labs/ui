@@ -25,7 +25,7 @@ import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizabl
           :class="
             state.dragging
               ? 'w-1 bg-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/30'
-              : state.hovered
+              : state.hovering
                 ? 'w-1 bg-ring outline-none focus-visible:ring-3 focus-visible:ring-ring/30'
                 : 'w-1 bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30'
           "

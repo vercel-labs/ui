@@ -4,6 +4,7 @@ import { defineTreeElements } from "../tree"
 defineTreeElements()
 
 export type {
+  ListHighlightDetails,
   TreeActionDetails,
   TreeAnnouncement,
   TreeApi,

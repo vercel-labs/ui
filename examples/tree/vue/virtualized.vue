@@ -25,7 +25,7 @@ const visible = computed(() => {
   return rows.value.slice(start, end)
 })
 
-function onItemFocus(_value: string, { index }: { index: number }) {
+function onHighlight(_value: string, { index }: { index: number }) {
   const el = scroller.value
   if (!el) return
   const top = index * row
@@ -48,7 +48,7 @@ function onItemFocus(_value: string, { index }: { index: number }) {
       :items="items"
       :style="{ height: `${rows.length * row}px` }"
       class="relative"
-      @item-focus="onItemFocus"
+      @highlight="onHighlight"
     >
       <TreeItem
         v-for="{ item, level, index } in visible"

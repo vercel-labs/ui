@@ -56,7 +56,7 @@ const OTPInput = withElement(
       "update:value": (_value: string) => true,
       "update:modelValue": (_value: string) => true,
       valueChange: (_value: string, _details: ChangeDetails<OTPInputValueChangeReason>) => true,
-      complete: (_value: string, _details: CommitDetails<OTPInputValueChangeReason>) => true,
+      valueCommit: (_value: string, _details: CommitDetails<OTPInputValueChangeReason>) => true,
     },
     slots: Object as PartSlots<typeof otpInputPrimitive, "root">,
     setup(props, { slots, attrs, emit }) {
@@ -83,8 +83,8 @@ const OTPInput = withElement(
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onComplete: (value: string, details: CommitDetails<OTPInputValueChangeReason>) =>
-          emit("complete", value, details),
+        onValueCommit: (value: string, details: CommitDetails<OTPInputValueChangeReason>) =>
+          emit("valueCommit", value, details),
       }))
       // The input's attributes go to it, and the rest to the root.
       let named: Record<string, unknown> = {}

@@ -57,7 +57,7 @@ const initialToastState = (options: ToastRegionInternalOptions) => ({
   toaster: (options.toaster ?? sharedToaster) as Toaster,
   side: options.side ?? "bottom",
   align: options.align ?? "end",
-  max: options.max ?? 3,
+  maxVisible: options.maxVisible ?? 3,
   alwaysExpanded: !!options.expanded,
   shortcut: options.shortcut === undefined ? "F6" : options.shortcut,
   label: options.label,
@@ -71,7 +71,7 @@ const syncToastState = (options: ToastRegionInternalOptions) => ({
   toaster: (options.toaster ?? sharedToaster) as Toaster,
   side: options.side ?? "bottom",
   align: options.align ?? "end",
-  max: options.max ?? 3,
+  maxVisible: options.maxVisible ?? 3,
   alwaysExpanded: !!options.expanded,
   shortcut: options.shortcut === undefined ? "F6" : options.shortcut,
   label: options.label,
@@ -119,9 +119,9 @@ function toastRegionApi(
   announcePending(context, anyPending)
 
   function refresh() {
-    const { items: previous, max } = store.get()
+    const { items: previous, maxVisible } = store.get()
     const queued = toaster().toasts()
-    const visible = queued.slice(0, Math.max(0, max))
+    const visible = queued.slice(0, Math.max(0, maxVisible))
     const shown = new Set(visible.map((toast) => toast.id))
     // Toasts that were on screen and no longer are animate out where they were.
     const leaving = previous
@@ -521,15 +521,15 @@ function toastRegionApi(
     if (connections++ === 0) {
       let followed = toaster()
       let unfollow = follow(followed)
-      let max = store.get().max
+      let maxVisible = store.get().maxVisible
       const offStore = store.subscribe(() => {
-        const { max: nextMax, toaster: next } = store.get()
-        if (next !== followed || nextMax !== max) {
+        const { maxVisible: nextMax, toaster: next } = store.get()
+        if (next !== followed || nextMax !== maxVisible) {
           if (next !== followed) {
             unfollow()
             unfollow = follow((followed = next))
           }
-          max = nextMax
+          maxVisible = nextMax
           refresh()
         }
         syncPresence()

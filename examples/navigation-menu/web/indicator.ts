@@ -86,7 +86,7 @@ function mount(root: HTMLElement) {
           )
           .join("")}
         <ui-navigation-menu-item>
-          <ui-navigation-menu-link active><a href="https://example.com/docs" class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted cursor-default motion-reduce:transition-none">Docs</a></ui-navigation-menu-link>
+          <ui-navigation-menu-link current><a href="https://example.com/docs" class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted cursor-default motion-reduce:transition-none">Docs</a></ui-navigation-menu-link>
         </ui-navigation-menu-item>
       </ui-navigation-menu-list>
       <ui-navigation-menu-indicator class="absolute bottom-(--active-item-bottom) left-(--active-item-left) h-0.5 w-(--active-item-width) rounded-full bg-foreground opacity-0 transition-[left,width,opacity] duration-200 ease-out data-visible:opacity-100 motion-reduce:transition-none"></ui-navigation-menu-indicator>

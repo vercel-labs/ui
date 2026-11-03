@@ -6,6 +6,7 @@ import {
   type TokenCodec,
   type TokenDeletion,
   type TokenInputController,
+  type TokenInputSubmitDetails,
   type TokenInputValue,
   type TokenInputValueChangeReason,
 } from "@ui-sdk/core/token-input"
@@ -77,7 +78,7 @@ const TokenInput = /* @__PURE__ */ renderless(
       controller: Object as PropType<TokenInputController>,
       debug: optionalBoolean,
       // A function prop, so `@submit` binds to it, and without one the shortcut submits the form.
-      onSubmit: Function as PropType<(value: TokenInputValue) => void>,
+      onSubmit: Function as PropType<(value: TokenInputValue, details: TokenInputSubmitDetails) => void>,
     },
     emits: {
       "update:value": (_value: TokenInputValue) => true,
@@ -229,6 +230,7 @@ export type {
   TokenInputTokenProps,
   TokenInputTokenState,
   TokenInputValue,
+  TokenInputSubmitDetails,
   TokenInputValueChangeDetails,
   TokenInputValueChangeReason,
   TokenInsert,

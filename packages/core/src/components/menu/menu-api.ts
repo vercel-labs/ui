@@ -15,6 +15,7 @@ import {
 import type { createOpenSteps } from "../../foundation/popups/popup-steps"
 import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
 import { sheetModal } from "../../foundation/popups/presentation"
+import { announcePending } from "../../foundation/kernel/action"
 import { createOrder } from "../../foundation/kernel/order"
 import { createSafeArea } from "../../foundation/popups/safe-area"
 import { sourceOf } from "../../foundation/kernel/modality"
@@ -72,9 +73,9 @@ type ItemProps = {
   /**
    * Runs when the item is selected, by pointer or keyboard, with the event that selected it, or a
    * new `select` Event when no DOM event did. Call `event.preventDefault()` to keep the menu open
-   * and skip `onAction`.
+   * and skip `onAction`. Return a Promise to mark the item pending until it settles, like `onAction`.
    */
-  onSelect?: (event: Event) => void
+  onSelect?: (event: Event) => unknown
 }
 
 type TriggerProps = {
@@ -280,7 +281,7 @@ type MenuNode = {
   getPayload: () => unknown
   show: (options?: Show) => Promise<PopupResult<MenuOpenChangeReason>>
   hide: (options?: Close) => boolean
-  runAction: (value: string, event?: Event) => void
+  runAction: (value: string, event?: Event) => unknown
   focusTrigger: () => void
   triggerElement: () => HTMLElement | undefined
   modalSetting: () => boolean | "pointer"
@@ -313,6 +314,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   const typeahead = createTypeahead()
   const safeArea = createSafeArea()
   let pendingFocus: Focus = "none"
+  announcePending({ ...context, options: () => root().options() }, () => store.get().pending.length > 0)
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
   // NaN until the pointer first moves, so the first move always counts.
   let pointerX = NaN
@@ -566,8 +568,22 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       if (value !== undefined) top.runAction(value, event)
       top.hide({ reason: "item-press", event, focus: "unless-moved" })
     },
-    runAction(value: string, event?: Event) {
-      options().onAction?.(value, { event })
+    runAction: (value: string, event?: Event) => options().onAction?.(value, { event }),
+    // An item's Promise keeps it pending until it settles. `done` runs once it resolves.
+    wait(key: string, pending: PromiseLike<unknown>, done: () => void) {
+      store.set({ pending: [...store.get().pending, key] })
+      const settled = () => store.get().pending.filter((other) => other !== key)
+      pending.then(
+        () => {
+          store.set({ pending: settled() })
+          done()
+        },
+        (reason) => store.set({ pending: settled(), error: { key, reason } }),
+      )
+    },
+    isPending: (key: string) => store.get().pending.includes(key),
+    clearError(key: string) {
+      if (store.get().error?.key === key) store.set({ error: null })
     },
     focusTrigger,
     // Internal. Used by submenus and slots.
@@ -871,6 +887,9 @@ type MenuState = {
   triggers: readonly string[]
   // A data menu's items while `shortcuts` is on, so triggers register their shortcuts again when they change.
   shortcutItems: MenuData | undefined
+  // Items whose `onSelect` or `onAction` Promise hasn't settled, and the last one that failed.
+  pending: string[]
+  error: { key: string; reason: unknown } | null
 }
 
 const triggerDisabled = (state: MenuState, props: TriggerProps) => !!props.disabled || state.barDisabled

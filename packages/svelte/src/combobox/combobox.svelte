@@ -86,6 +86,7 @@ list are its parts.
     isItemEqualToValue,
     autoHighlight,
     keepQuery,
+    pendingAnnouncement,
     allowCustomValue,
     status,
     loop,
@@ -137,6 +138,8 @@ list are its parts.
     autoHighlight?: boolean | "always"
     /** With `multiple`, whether the input keeps its text after an item is chosen. */
     keepQuery?: boolean
+    /** What screen readers hear once the Create part's action has been pending for a second. An empty string says nothing. */
+    pendingAnnouncement?: string
     /** Whether text that matches no item becomes the value, when Enter is pressed with nothing highlighted, or, without `multiple`, when the list closes. */
     allowCustomValue?: boolean
     /** Whether results are loading or failed, for the status and empty parts. */
@@ -208,6 +211,7 @@ list are its parts.
     isItemEqualToValue,
     autoHighlight,
     keepQuery,
+    pendingAnnouncement,
     allowCustomValue,
     status,
     loop,

@@ -25,6 +25,7 @@ each checkbox, sits in a field.
     defaultValue,
     allValues,
     disabled,
+    readOnly,
     required,
     name,
     form,
@@ -41,6 +42,8 @@ each checkbox, sits in a field.
     allValues?: string[]
     /** Disables every checkbox in the group. */
     disabled?: boolean
+    /** Makes every checkbox in the group read-only: focusable and submitted, but presses don't change it. */
+    readOnly?: boolean
     /** Blocks form submission until a value is checked. */
     required?: boolean
     /** The name the values submit under. */
@@ -65,6 +68,7 @@ each checkbox, sits in a field.
     defaultValue,
     allValues,
     disabled: disabled || field?.disabled(),
+    readOnly,
     required,
     name: name ?? field?.name(),
     form,

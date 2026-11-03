@@ -37,6 +37,7 @@ A search field over an always-open list of commands. Renders a `div` around them
     pages = $bindable(),
     defaultPages,
     onAction,
+    pendingAnnouncement,
     items,
     emptyItems,
     filter,
@@ -66,7 +67,9 @@ A search field over an always-open list of commands. Renders a `div` around them
     /** The pages open at first, when uncontrolled. */
     defaultPages?: string[]
     /** Runs when a command runs, with its value: Enter, a click, or its shortcut. Return a Promise to mark the command pending until it settles. */
-    onAction?: (value: string, details: CommandActionDetails) => void | Promise<unknown>
+    onAction?: (value: string, details: CommandActionDetails) => unknown
+    /** What screen readers hear once a command has been pending for a second. An empty string says nothing. */
+    pendingAnnouncement?: string
     /** The commands as data. Renders them for you, ranked as the user types, with pages for commands that have `items`. */
     items?: CommandData
     /** Commands shown instead of `items` on the first page while the search is empty, like recent ones. Needs `items`. */
@@ -111,6 +114,7 @@ A search field over an always-open list of commands. Renders a `div` around them
     },
     defaultPages,
     onAction,
+    pendingAnnouncement,
     items,
     emptyItems,
     filter,

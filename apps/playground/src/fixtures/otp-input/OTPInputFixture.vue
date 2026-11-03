@@ -23,7 +23,7 @@ function onValueChange(value: string, details: ChangeDetails) {
   action.value = otpInputAction.change(value, details.reason)
 }
 
-function onComplete(value: string) {
+function onValueCommit(value: string) {
   action.value = otpInputAction.complete(value)
 }
 
@@ -44,7 +44,7 @@ function onSubmit(event: SubmitEvent) {
         :controller="controller"
         v-bind="options"
         @value-change="onValueChange"
-        @complete="onComplete"
+        @value-commit="onValueCommit"
       >
         <template v-for="(size, group) in code.groups" :key="group">
           <OTPInputSeparator v-if="group > 0" class="otp-separator">-</OTPInputSeparator>

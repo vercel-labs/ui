@@ -10,19 +10,22 @@ import { type Store, sameValue } from "../kernel/store"
 const listFormats = new Map<string | undefined, Intl.ListFormat>()
 
 /**
- * Labels as one text. Without `max`, joined with commas. With it, the first
- * `max` and a count of the rest, joined the way the page's language joins a
+ * Labels as one text. Without `maxLabels`, joined with commas. With it, the first
+ * `maxLabels` and a count of the rest, joined the way the page's language joins a
  * list: "Apple, Banana and 2 more".
  */
 function formatLabels(
   labels: readonly string[],
   {
-    max,
-    moreLabel = (count) => `${count} more`,
-  }: { max?: number; moreLabel?: (count: number) => string } = {},
+    maxLabels,
+    getMoreLabel = (count) => `${count} more`,
+  }: { maxLabels?: number; getMoreLabel?: (count: number) => string } = {},
 ) {
-  if (max === undefined) return labels.join(", ")
-  const shown = labels.length > max ? [...labels.slice(0, max), moreLabel(labels.length - max)] : labels
+  if (maxLabels === undefined) return labels.join(", ")
+  const shown =
+    labels.length > maxLabels
+      ? [...labels.slice(0, maxLabels), getMoreLabel(labels.length - maxLabels)]
+      : labels
   if (typeof Intl.ListFormat !== "function") return shown.join(", ")
   const locale = pageLocale()
   let format = listFormats.get(locale)

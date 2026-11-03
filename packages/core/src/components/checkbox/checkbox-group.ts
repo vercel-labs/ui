@@ -89,6 +89,8 @@ type CheckboxGroupOptions<T extends string = string> = {
   allValues?: T[]
   /** Disables every checkbox in the group, and leaves them out of the form. */
   disabled?: boolean
+  /** Makes every checkbox in the group read-only: focusable and submitted, but presses don't change it. */
+  readOnly?: boolean
   /** Blocks form submission until at least one checkbox is checked, with the browser's own message. */
   required?: boolean
   /** The name every checkbox in the group submits under. */
@@ -108,6 +110,8 @@ type CheckboxGroupState = {
   value: string[]
   /** Whether the group is disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
+  /** Whether the group is read-only: its checkboxes stay focusable and submitted, but presses don't change them. */
+  readOnly: boolean
   /** Whether a form won't submit until at least one of its checkboxes is checked. */
   required: boolean
 }
@@ -118,6 +122,7 @@ type GroupState = {
   initial: string[]
   allValues: string[] | undefined
   disabled: boolean
+  readOnly: boolean
   required: boolean
   name: string | undefined
   form: string | undefined
@@ -173,6 +178,7 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
     name: () => store.get().name,
     form: () => store.get().form,
     disabled,
+    readOnly: () => store.get().readOnly,
     checked: (value: string) => store.get().value.includes(value),
     // A parent checkbox: checked when all are, indeterminate when some are.
     parentChecked: () => groupChecked(store.get().value, all()),
@@ -275,6 +281,7 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
     onValueChange: "callback",
     allValues: "list",
     disabled: "boolean",
+    readOnly: "boolean",
     required: "boolean",
     name: "string",
     form: "string",
@@ -287,6 +294,7 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
       initial: value,
       allValues: options.allValues,
       disabled: !!options.disabled,
+      readOnly: !!options.readOnly,
       required: !!options.required,
       name: options.name,
       form: options.form,
@@ -298,6 +306,7 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
   sync: (options) => ({
     allValues: options.allValues,
     disabled: !!options.disabled,
+    readOnly: !!options.readOnly,
     required: !!options.required,
     name: options.name,
     form: options.form,
@@ -312,12 +321,14 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state) => ({
         value: state.value,
         disabled: isDisabled(state),
+        readOnly: state.readOnly,
         required: state.required,
       }),
       attrs: (state) => ({
         role: "group",
         "aria-disabled": isDisabled(state) ? "true" : undefined,
         "data-disabled": isDisabled(state) ? "" : undefined,
+        "data-readonly": state.readOnly ? "" : undefined,
         "data-required": state.required ? "" : undefined,
       }),
       bind: (el, { api, store }) =>

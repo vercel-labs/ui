@@ -61,7 +61,7 @@ function VariantOTPInput({ variant, env }: { variant: Variant; env: Env }) {
         if (variant.controlled) setValue(variant.controlled === "uppercase" ? next.toUpperCase() : next)
         if (variant.verify) setInvalid(false)
       }}
-      onComplete={(next) => {
+      onValueCommit={(next) => {
         env.log(`complete "${next}"`)
         if (variant.verify) setInvalid(next !== variant.verify)
       }}

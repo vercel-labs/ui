@@ -195,6 +195,7 @@ export type {
   TokenInputTokenProps,
   TokenInputTokenState,
   TokenInputValue,
+  TokenInputSubmitDetails,
   TokenInputValueChangeDetails,
   TokenInputValueChangeReason,
   TokenInsert,

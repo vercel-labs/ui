@@ -38,7 +38,7 @@ function mount(root: HTMLElement) {
                     (page) => `
                 <li>
                   <ui-navigation-menu-link>
-                    <a href="${page.href}" data-router class="flex flex-col gap-1 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted motion-reduce:transition-none">
+                    <a href="${page.href}" data-router class="flex flex-col gap-1 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted motion-reduce:transition-none">
                       <span class="leading-none font-medium">${page.title}</span>
                       <span class="line-clamp-2 leading-snug text-muted-foreground">${page.description}</span>
                     </a>
@@ -51,7 +51,7 @@ function mount(root: HTMLElement) {
           </ui-navigation-menu-item>
           <ui-navigation-menu-item>
             <ui-navigation-menu-link>
-              <a href="#components" data-router class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted cursor-default motion-reduce:transition-none">Components</a>
+              <a href="#components" data-router class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted cursor-default motion-reduce:transition-none">Components</a>
             </ui-navigation-menu-link>
           </ui-navigation-menu-item>
         </ui-navigation-menu-list>
@@ -64,7 +64,7 @@ function mount(root: HTMLElement) {
   function navigate(route: string) {
     output.textContent = `Route: ${route}`
     for (const link of root.querySelectorAll("ui-navigation-menu-link")) {
-      link.toggleAttribute("active", link.querySelector("a")!.getAttribute("href") === route)
+      link.toggleAttribute("current", link.querySelector("a")!.getAttribute("href") === route)
     }
   }
   for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-router]")) {

@@ -172,7 +172,7 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
     value: "string",
     defaultValue: "string",
     onValueChange: "callback",
-    onComplete: "callback",
+    onValueCommit: "callback",
     maxLength: "number",
     pattern: readPattern,
     inputMode: "string",
@@ -255,7 +255,7 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { props }) => {
         const index = props.index ?? 0
         return {
-          ...(slotsFor(state)[index] ?? { char: null, isActive: false, hasFakeCaret: false }),
+          ...(slotsFor(state)[index] ?? { char: null, active: false, hasFakeCaret: false }),
           index,
           focused: state.focused,
           disabled: isDisabled(state),
@@ -265,7 +265,7 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
         const data = slotsFor(state)[props.index ?? 0]
         return {
           "aria-hidden": "true",
-          "data-active": data?.isActive ? "" : undefined,
+          "data-active": data?.active ? "" : undefined,
           "data-filled": data?.char ? "" : undefined,
           "data-fake-caret": data?.hasFakeCaret ? "" : undefined,
           "data-disabled": isDisabled(state) ? "" : undefined,

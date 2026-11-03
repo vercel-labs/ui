@@ -13,6 +13,7 @@ it. The `token` snippet renders each token's content.
     type TokenCodec,
     type TokenDeletion,
     type TokenInputController,
+    type TokenInputSubmitDetails,
     type TokenInputValue,
     type TokenInputValueChangeReason,
   } from "@ui-sdk/core/token-input"
@@ -79,7 +80,7 @@ it. The `token` snippet renders each token's content.
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs on the submit shortcut. Without it, the shortcut submits the form the input is in. */
-    onSubmit?: (value: TokenInputValue) => void
+    onSubmit?: (value: TokenInputValue, details: TokenInputSubmitDetails) => void
     /** Runs when typing, pasting, a menu, undo or a controller wants to change the value. `details.cancel()` stops it. */
     onValueChange?: (value: TokenInputValue, details: ValueDetails) => void
     children?: Snippet

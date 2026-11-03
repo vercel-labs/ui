@@ -178,7 +178,13 @@ type CommandOptions = {
    * mark the command pending until it settles: it gets `data-pending` and `aria-busy`, and running
    * it again waits. A rejection puts the reason in its `error` state until the next run.
    */
-  onAction?: (value: string, details: CommandActionDetails) => void | Promise<unknown>
+  onAction?: (value: string, details: CommandActionDetails) => unknown
+  /**
+   * What screen readers hear once a command has been pending for a second, so a slow action
+   * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
   /** The commands as data. Renders them for you, ranked as the user types, with pages for commands that have `items`. */
   items?: CommandData
   /** Commands shown instead of `items` on the first page while the search is empty, like recent or suggested ones. Groups work, like `{ type: "group", label: "Suggestions", items }`. Needs `items`. */
@@ -243,7 +249,7 @@ type CommandItemProps = {
    * skip `onAction` and the page. Return a Promise to mark the command pending until it settles,
    * like `onAction`.
    */
-  onSelect?: (event: Event) => void | Promise<unknown>
+  onSelect?: (event: Event) => unknown
 }
 
 /**
@@ -363,6 +369,7 @@ const commandPrimitive = /* @__PURE__ */ definePrimitive({
     defaultPages: "list",
     onPagesChange: "callback",
     onAction: "action",
+    pendingAnnouncement: "string",
     items: "value",
     emptyItems: "value",
     filter: filterAttribute(["contains", "startsWith", "fuzzy"], "fuzzy"),

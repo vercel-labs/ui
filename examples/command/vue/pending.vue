@@ -21,6 +21,7 @@ async function sync() {
 <template>
   <div class="flex w-full max-w-sm flex-col gap-3">
     <Command
+      pending-announcement="Deploying"
       class="flex min-h-40 w-full max-w-sm flex-col overflow-hidden rounded-3xl bg-popover p-1 text-popover-foreground ring-1 ring-foreground/5"
     >
       <div class="shrink-0 p-1 pb-0">

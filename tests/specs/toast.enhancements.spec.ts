@@ -36,8 +36,8 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     expect(updated).toBe(false)
   })
 
-  test("a toast beyond max never expires unseen", async ({ page, open }) => {
-    await open("toast", { max: "1", duration: "1500" })
+  test("a toast beyond maxVisible never expires unseen", async ({ page, open }) => {
+    await open("toast", { "max-visible": "1", duration: "1500" })
     await show(page, { title: "First" })
     await show(page, { title: "Second" })
     await expect(toastNamed(page, "First")).toHaveCount(0)

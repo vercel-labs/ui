@@ -87,7 +87,7 @@ function mount(root: HTMLElement) {
     select.innerHTML = `
       <ui-select-label class="${classes.label}">${variant.title}</ui-select-label>
       <ui-select-trigger${variant.triggerDisabled ? " disabled" : ""}>
-        <button class="${classes.trigger}"><ui-select-value class="${classes.value}" ${attributes({ placeholder: valuePlaceholder(variant), max: variant.max })}></ui-select-value><span class="${classes.chevron}" aria-hidden="true">▾</span></button>
+        <button class="${classes.trigger}"><ui-select-value class="${classes.value}" ${attributes({ placeholder: valuePlaceholder(variant), maxLabels: variant.max })}></ui-select-value><span class="${classes.chevron}" aria-hidden="true">▾</span></button>
       </ui-select-trigger>
       ${variant.clear ? `<ui-select-clear${variant.clear === "keep-mounted" ? " keep-mounted" : ""}><button class="${classes.clear}">Clear</button></ui-select-clear>` : ""}
       ${

@@ -69,8 +69,8 @@ const RouterLink = defineComponent({
             <ul class="grid gap-1">
               <li v-for="page in gettingStarted" :key="page.href">
                 <NavigationMenuLink
-                  :active="route === page.href"
-                  class="flex flex-col gap-1 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted motion-reduce:transition-none"
+                  :current="route === page.href"
+                  class="flex flex-col gap-1 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted motion-reduce:transition-none"
                 >
                   <template #render="{ props }">
                     <RouterLink v-bind="props" :to="page.href">
@@ -87,8 +87,8 @@ const RouterLink = defineComponent({
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink
-            :active="route === '#components'"
-            class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted cursor-default motion-reduce:transition-none"
+            :current="route === '#components'"
+            class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted cursor-default motion-reduce:transition-none"
           >
             <template #render="{ props }">
               <RouterLink v-bind="props" to="#components"> Components </RouterLink>

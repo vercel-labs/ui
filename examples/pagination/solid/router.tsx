@@ -63,7 +63,7 @@ function Example() {
                       <PaginationLink
                         page={item}
                         render={(props) => <Link {...props} onNavigate={setRoute} />}
-                        class="inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium whitespace-nowrap text-foreground select-none outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none hover:bg-muted data-active:border-border data-active:bg-background"
+                        class="inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium whitespace-nowrap text-foreground select-none outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none hover:bg-muted data-current:border-border data-current:bg-background"
                       />
                     ) : (
                       <PaginationEllipsis class="flex size-8 items-center justify-center">

@@ -38,6 +38,7 @@ import { createTriggerMenuKeyboard } from "./trigger-menu-keyboard"
 import { argumentOf, createTriggerLevels, type TriggerLevel } from "./trigger-menu-levels"
 import { createTriggerSelect } from "./trigger-menu-select"
 import type { TextProps } from "./trigger-menu-parts"
+import { announcePending } from "../../foundation/kernel/action"
 import { elements } from "../../foundation/kernel/elements"
 
 type TriggerMenuState = PopupState & {
@@ -63,6 +64,8 @@ type TriggerMenuState = PopupState & {
   groupLabels: readonly string[]
   // What each item shows from the list as a whole: whether it matches.
   listing: Listing
+  // `onSelect` Promises that haven't settled.
+  pending: number
 }
 
 type ItemMeta = TriggerMenuItemProps<unknown> & { group?: string }
@@ -86,6 +89,7 @@ function initialTriggerMenuState(options: TriggerMenuOptions<any>): TriggerMenuS
     mounts: 0,
     groupLabels: [],
     listing: noListing,
+    pending: 0,
   }
 }
 
@@ -298,7 +302,13 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     highlighted: () => (store.get().open ? store.get().highlighted : null),
     itemProps: (key) => context.props<ItemMeta>("item", key),
     toKey,
+    waiting(promise) {
+      store.set({ pending: store.get().pending + 1 })
+      const settled = () => store.set({ pending: store.get().pending - 1 })
+      promise.then(settled, settled)
+    },
   })
+  announcePending(context, () => store.get().pending > 0)
 
   // Whether the list has anything to show. Composed items that never mounted
   // are unknown, so they count as there.

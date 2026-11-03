@@ -41,7 +41,7 @@ type FixtureToast = {
 }
 
 // Region options a spec can set through the URL:
-// ?side=top&align=start&max=2&duration=1000&expanded&shortcut=alt+t|none&host.
+// ?side=top&align=start&max-visible=2&duration=1000&expanded&shortcut=alt+t|none&host.
 // ?host renders the overlay host, with toasts from data, instead of a placed region.
 function toastOptions() {
   const params = new URLSearchParams(location.search)
@@ -51,7 +51,7 @@ function toastOptions() {
   return {
     ...(side && { side }),
     ...(align && { align }),
-    ...(params.has("max") && { max: Number(params.get("max")) }),
+    ...(params.has("max-visible") && { maxVisible: Number(params.get("max-visible")) }),
     ...(params.has("expanded") && { expanded: true }),
     ...(shortcut && { shortcut: shortcut === "none" ? null : shortcut }),
   }

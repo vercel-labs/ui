@@ -48,8 +48,8 @@ function listen(otp: UiOTPInputElement, variant: Variant, env: Env) {
     if (variant.controlled === "uppercase" && value !== value.toUpperCase())
       queueMicrotask(() => (otp.value = value.toUpperCase()))
   })
-  otp.addEventListener("complete", (event) => {
-    const { value } = (event as OTPInputEvents["complete"]).detail
+  otp.addEventListener("valuecommit", (event) => {
+    const { value } = (event as OTPInputEvents["valuecommit"]).detail
     env.log(`complete "${value}"`)
     if (variant.verify && value !== variant.verify) inputOf(otp)?.setAttribute("aria-invalid", "true")
   })

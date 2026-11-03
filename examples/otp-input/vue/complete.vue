@@ -11,7 +11,7 @@ const status = ref("")
       aria-label="Verification code"
       class="flex items-center gap-2 text-foreground data-disabled:opacity-50"
       @value-change="status = ''"
-      @complete="(value, details) => (status = `Checking ${value}, from ${details.reason}.`)"
+      @value-commit="(value, details) => (status = `Checking ${value}, from ${details.reason}.`)"
     >
       <OTPInputGroup class="flex items-center">
         <OTPInputSlot

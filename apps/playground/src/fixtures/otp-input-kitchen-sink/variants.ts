@@ -10,7 +10,7 @@ type Variant = {
     disabled?: boolean
     readOnly?: boolean
     required?: boolean
-    textAlign?: "left" | "center" | "right"
+    textAlign?: "start" | "center" | "end"
     inputMode?: "numeric" | "text" | "decimal" | "tel" | "none"
     name?: string
   }
@@ -329,9 +329,9 @@ const variants: Variant[] = [
   {
     id: "align-left",
     section: "Layout",
-    title: 'textAlign="left"',
+    title: 'textAlign="start"',
     groups: [6],
-    options: { textAlign: "left" },
+    options: { textAlign: "start" },
     type: "123456",
     expect: "123456",
   },
@@ -347,9 +347,9 @@ const variants: Variant[] = [
   {
     id: "align-right",
     section: "Layout",
-    title: 'textAlign="right"',
+    title: 'textAlign="end"',
     groups: [6],
-    options: { textAlign: "right" },
+    options: { textAlign: "end" },
     type: "123456",
     expect: "123456",
   },

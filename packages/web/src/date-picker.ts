@@ -62,6 +62,7 @@ function defineDatePickerElements() {
       api: [
         "getValue",
         "setValue",
+        "clear",
         "getMonth",
         "setMonth",
         "previous",

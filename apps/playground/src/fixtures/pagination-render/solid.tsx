@@ -50,12 +50,12 @@ function Fixture() {
                     <PaginationLink
                       page={item as number}
                       render={(props) => <RouterLink {...props} />}
-                      class={(state) => `pagination-link ${state.active ? "is-active" : "is-inactive"}`}
+                      class={(state) => `pagination-link ${state.current ? "is-active" : "is-inactive"}`}
                     >
                       {(state) => (
                         <>
                           {state.page}
-                          {state.active && <span aria-hidden="true">•</span>}
+                          {state.current && <span aria-hidden="true">•</span>}
                         </>
                       )}
                     </PaginationLink>

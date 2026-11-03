@@ -135,7 +135,7 @@ function onSubmit(event: Event) {
             <ComboboxInput class="input" />
           </ComboboxChips>
           <ComboboxInput v-else class="input" />
-          <output v-if="summary" :aria-label="f.summary"><ComboboxValue :max="summary" /></output>
+          <output v-if="summary" :aria-label="f.summary"><ComboboxValue :max-labels="summary" /></output>
           <ComboboxTrigger :aria-label="f.trigger">▾</ComboboxTrigger>
           <ComboboxClear>{{ f.clear }}</ComboboxClear>
           <ComboboxContent :class="pages ? 'popup list-popup list-short' : 'popup list-popup'">

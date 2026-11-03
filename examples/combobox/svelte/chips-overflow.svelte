@@ -80,7 +80,7 @@
       />
     </ComboboxChips>
     <p class="m-0 min-h-5 text-sm leading-5 text-muted-foreground">
-      <ComboboxValue max={2} moreLabel={(count: number) => `${count} more`} />
+      <ComboboxValue maxLabels={2} getMoreLabel={(count: number) => `${count} more`} />
     </p>
   </div>
   <ComboboxContent

@@ -32,7 +32,7 @@ function Example() {
         items={items}
         expanded={expanded()}
         onExpandedChange={setExpanded}
-        onItemFocus={(_value, { index }) => {
+        onHighlight={(_value, { index }) => {
           const el = scroller
           if (!el) return
           const top = index * row

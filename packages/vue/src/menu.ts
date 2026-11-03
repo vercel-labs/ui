@@ -1,6 +1,7 @@
 import { formatShortcut, type ChangeDetails, type DismissAttemptDetails } from "@ui-sdk/core"
 import {
   menu as menuPrimitive,
+  type MenuActionDetails,
   type MenuCheckedChangeDetails,
   type MenuCheckedChangeReason,
   type MenuController,
@@ -81,8 +82,11 @@ const Menu = /* @__PURE__ */ renderless(
       modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
       controller: Object as PropType<MenuController<any>>,
       dismissible: optionalBoolean,
+      pendingAnnouncement: String,
       debug: optionalBoolean,
       container: containerProp,
+      // A function prop beside the emits, so a returned Promise marks the item pending.
+      onAction: Function as PropType<(value: string, details: MenuActionDetails) => unknown>,
     },
     emits: {
       "update:open": (_open: boolean) => true,
@@ -91,7 +95,6 @@ const Menu = /* @__PURE__ */ renderless(
       openChangeComplete: (_open: boolean) => true,
       dismissAttempt: (_details: DismissAttemptDetails<MenuDismissReason>) => true,
       payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
-      action: (_value: string, _details: { event?: Event }) => true,
       checkedChange: (_checked: boolean, _details: MenuCheckedChangeDetails) => true,
       valueChange: (_value: string, _details: MenuValueChangeDetails) => true,
     },
@@ -117,7 +120,6 @@ const Menu = /* @__PURE__ */ renderless(
           emit("dismissAttempt", details),
         onPayloadChange: (payload: unknown, details: PayloadDetails) =>
           emit("payloadChange", payload, details),
-        onAction: (value: string, details: { event?: Event }) => emit("action", value, details),
         onCheckedChange: (checked: boolean, details: MenuCheckedChangeDetails) =>
           emit("checkedChange", checked, details),
         onValueChange: (value: string, details: MenuValueChangeDetails) =>
@@ -256,7 +258,8 @@ const MenuContent = withPayload(
 const MenuShortcut = parts.Shortcut
 
 /**
- * An action. Pressing it emits `select` and closes the menu, unless `closeOnSelect` is false.
+ * An action. Pressing it runs `@select` and closes the menu, unless `closeOnSelect` is false.
+ * A Promise from `@select` keeps it pending, and the menu open, until it settles.
  * @stable
  */
 const MenuItem = withElement(
@@ -271,13 +274,14 @@ const MenuItem = withElement(
       shortcut: String,
       closeOnSelect: optionalBoolean,
       destructive: optionalBoolean,
+      // A function prop beside the emit, so a returned Promise marks the item pending.
+      onSelect: Function as PropType<(event: Event) => unknown>,
     },
-    emits: { select: (_event: Event) => true },
     slots: Object as PartSlots<typeof menuPrimitive, "item">,
-    setup(props, { slots, emit }) {
+    setup(props, { slots }) {
       const menu = useMenu()
       const id = useId()
-      const item = () => ({ ...props, id, onSelect: (event: Event) => emit("select", event) })
+      const item = () => ({ ...props, id })
       return usePart(menu, "item", item, undefined, {
         tag: "div",
         children: (state) => [
@@ -632,6 +636,7 @@ export type {
   MenuApi,
   MenuCheckboxItemProps,
   MenuCheckboxItemState,
+  MenuActionDetails,
   MenuCheckedChangeDetails,
   MenuCheckedChangeReason,
   MenuContentProps,

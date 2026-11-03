@@ -20,7 +20,7 @@ import {
 import { commandShortcuts, findCommand, pageItems } from "./command-data"
 import { initialApple } from "../../foundation/platform/platform"
 import { noListing } from "../../foundation/lists/listbox-listing"
-import { isPromise } from "../../foundation/kernel/action"
+import { announcePending, isPromise } from "../../foundation/kernel/action"
 import { selectEvent } from "../../foundation/kernel/events"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { adoptPlatform, bindPartShortcut, shortcutOf } from "../../foundation/shortcuts/shortcut-slot"
@@ -91,6 +91,7 @@ const currentPage = (state: { pages: string[] }) => state.pages.at(-1) ?? null
 
 function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, string>) {
   const { id, store, options, element } = context
+  announcePending(context, () => store.get().pending.length > 0)
   const change = createChange(context)
   const itemProps = (key: string) => context.props<CommandItemMeta>("item", key)
   // The current page's data commands, or undefined for a page only parts compose.

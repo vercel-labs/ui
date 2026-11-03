@@ -93,8 +93,8 @@ const sections = [
       <NavigationMenuItem>
         <NavigationMenuLink
           href="https://example.com/docs"
-          active
-          class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted cursor-default motion-reduce:transition-none"
+          current
+          class="inline-flex h-8 items-center rounded-2xl px-2.5 text-sm font-medium outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted cursor-default motion-reduce:transition-none"
           >Docs</NavigationMenuLink
         >
       </NavigationMenuItem>

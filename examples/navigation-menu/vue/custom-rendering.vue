@@ -94,11 +94,11 @@ const sections = [
                   <NavigationMenuLink
                     v-slot="{ state: linkState }"
                     :href="link.href"
-                    :active="index === 0"
-                    class="flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted motion-reduce:transition-none"
+                    :current="index === 0"
+                    class="flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted motion-reduce:transition-none"
                   >
                     <span class="leading-none font-medium">{{ link.title }}</span>
-                    <span v-if="linkState.active" class="text-xs text-muted-foreground">You're here</span>
+                    <span v-if="linkState.current" class="text-xs text-muted-foreground">You're here</span>
                   </NavigationMenuLink>
                 </li>
               </ul>

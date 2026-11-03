@@ -36,6 +36,8 @@ type State = {
   minStepsBetweenThumbs: number
   orientation: "horizontal" | "vertical"
   disabled: boolean
+  readOnly: boolean
+  required: boolean
   // Disabled by an ancestor fieldset.
   formDisabled: boolean
   name: string | undefined
@@ -53,6 +55,7 @@ type State = {
   thumbValues: Record<string, number>
 }
 
+const isLocked = (state: State) => isDisabled(state) || state.readOnly
 const valuesOf = (value: number | number[]) => (Array.isArray(value) ? value : [value])
 function thumbValuesOf(value: number | number[]) {
   const record: Record<string, number> = {}
@@ -100,6 +103,8 @@ function settings(options: SliderOptions) {
     minStepsBetweenThumbs: options.minStepsBetweenThumbs ?? 0,
     orientation: orientationOf(options.orientation, "horizontal"),
     disabled: !!options.disabled,
+    readOnly: !!options.readOnly,
+    required: !!options.required,
     name: options.name,
     form: options.form,
     format: options.format,
@@ -204,7 +209,7 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     internal: {
       // A press on the web: the track's box is read once, so moves never read layout.
       press(event: PointerEvent, control: HTMLElement) {
-        if (!drags.accepts(event) || isDisabled(store.get()) || gesture) return
+        if (!drags.accepts(event) || isLocked(store.get()) || gesture) return
         const rect = (element("track") ?? control).getBoundingClientRect()
         const rtl = isRTL(control)
         const vertical = store.get().orientation === "vertical"
@@ -271,6 +276,7 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
       // A screen reader's adjustment through the thumb's native range input,
       // like a swipe on iOS. It commits at once.
       adjust(index: number, target: number, event: Event) {
+        if (store.get().readOnly) return
         const start = store.get().value
         // The thumb's range input fired `input`, and fires `change`, which
         // bubble to the form already, so the slider adds none of its own.
@@ -290,6 +296,7 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
         )
         if (target === null) return
         event.preventDefault()
+        if (state.readOnly) return
         keys ??= { start: state.value, thumb: index }
         keys.event = event
         setValues(moveThumb(values(), index, target, range()), "step-key", event, index)

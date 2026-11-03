@@ -23,7 +23,7 @@ async function mount(root: HTMLElement) {
     const options = shell.options()
     region.setAttribute("side", options.side)
     region.setAttribute("align", options.align)
-    region.setAttribute("max", String(options.max))
+    region.setAttribute("max-visible", String(options.maxVisible))
     region.toggleAttribute("expanded", options.expanded)
     region.setAttribute("shortcut", options.shortcut ?? "none")
   }

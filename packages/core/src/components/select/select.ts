@@ -309,12 +309,12 @@ type SelectValueProps = {
   /** What shows while nothing is selected. Overrides the select's `placeholder`. */
   placeholder?: string
   /** With `multiple`, how many labels show before the rest are counted, as in "Apple, Banana and 2 more", joined the way the page's language joins lists. */
-  max?: number
+  maxLabels?: number
   /**
-   * The words for the labels past `max`.
+   * The words for the labels past `maxLabels`.
    * @defaultValue (count) => `${count} more`
    */
-  moreLabel?: (count: number) => string
+  getMoreLabel?: (count: number) => string
 }
 
 /**
@@ -421,7 +421,7 @@ type SelectTriggerState = {
 type SelectValueState = {
   /** The selected value: one, `null`, or a list with `multiple`. */
   value: unknown
-  /** The selected item's label, the labels joined with commas for several, or with `max`, as a list in the page's language, like "Apple, Banana and 2 more". An empty string for none. */
+  /** The selected item's label, the labels joined with commas for several, or with `maxLabels`, as a list in the page's language, like "Apple, Banana and 2 more". An empty string for none. */
   label: string
   /** Each selected item's label, in the order they were selected. */
   labels: string[]

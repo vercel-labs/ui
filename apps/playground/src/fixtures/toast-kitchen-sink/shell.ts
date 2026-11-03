@@ -5,7 +5,7 @@ import { variants } from "./variants"
 type RegionOptions = {
   side: "top" | "bottom"
   align: "start" | "center" | "end"
-  max: number
+  maxVisible: number
   expanded: boolean
   shortcut: string | null
 }
@@ -18,7 +18,13 @@ const button =
 // renders again when the options change.
 function createShell(root: HTMLElement) {
   const toast = createToaster<unknown>()
-  const options: RegionOptions = { side: "bottom", align: "end", max: 3, expanded: false, shortcut: "F6" }
+  const options: RegionOptions = {
+    side: "bottom",
+    align: "end",
+    maxVisible: 3,
+    expanded: false,
+    shortcut: "F6",
+  }
   const listeners = new Set<() => void>()
   root.innerHTML = `
     <div class="grid gap-6 p-6 text-sm">
@@ -26,7 +32,7 @@ function createShell(root: HTMLElement) {
       <div class="flex flex-wrap items-center gap-3" data-controls>
         <label>Side <select name="side"><option>bottom</option><option>top</option></select></label>
         <label>Align <select name="align"><option>end</option><option>center</option><option>start</option></select></label>
-        <label>Max <input name="max" type="number" min="1" max="10" value="3" class="w-14 border" /></label>
+        <label>Max <input name="maxVisible" type="number" min="1" max="10" value="3" class="w-14 border" /></label>
         <label><input name="expanded" type="checkbox" /> Expanded</label>
         <label>Shortcut <select name="shortcut"><option>F6</option><option>alt+t</option><option value="">none</option></select></label>
       </div>
@@ -57,7 +63,7 @@ function createShell(root: HTMLElement) {
   root.querySelector("[data-controls]")!.addEventListener("change", (event) => {
     const input = event.target as HTMLInputElement
     if (input.name === "expanded") options.expanded = input.checked
-    else if (input.name === "max") options.max = Number(input.value)
+    else if (input.name === "maxVisible") options.maxVisible = Number(input.value)
     else if (input.name === "shortcut") options.shortcut = input.value || null
     else (options as Record<string, unknown>)[input.name] = input.value
     log(`option: ${input.name}`)

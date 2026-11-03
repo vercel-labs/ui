@@ -401,7 +401,7 @@ test.describe("pages around a group", () => {
     await page.mouse.move(point.x, point.y)
     const cursor = () => page.evaluate(() => getComputedStyle(document.body).cursor)
     await expect.poll(cursor).toBe("w-resize")
-    await expect(sidebarHandle(page)).toHaveAttribute("data-hovered")
+    await expect(sidebarHandle(page)).toHaveAttribute("data-hovering")
   })
 
   test("a saved layout is there on the first paint", async ({ page, open, framework }) => {

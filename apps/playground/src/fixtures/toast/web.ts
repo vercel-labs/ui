@@ -2,7 +2,7 @@ import { confirm, type ToastContent } from "@ui-sdk/web"
 import { toastFixture, toastOptions, usesHost } from "tests/fixtures/toast.ts"
 import { createFixtureToasts } from "./shared"
 
-// Region options as attributes: side="top", max="2", shortcut="none".
+// Region options as attributes: side="top", max-visible="2", shortcut="none".
 function regionAttributes() {
   const attributes: Record<string, string> = { class: "toast-region" }
   for (const [name, value] of Object.entries(toastOptions()))

@@ -28,7 +28,7 @@ function Fixture() {
       <OTPInput aria-label="PIN" maxLength={4} class="otp" render={(props) => <section {...props} />}>
         <For each={[0, 1, 2, 3]}>
           {(index) => (
-            <OTPInputSlot index={index} class={(state) => `otp-slot${state.isActive ? " is-active" : ""}`}>
+            <OTPInputSlot index={index} class={(state) => `otp-slot${state.active ? " is-active" : ""}`}>
               {(state) => state.char ?? "·"}
             </OTPInputSlot>
           )}

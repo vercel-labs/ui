@@ -8,7 +8,7 @@ function mount(root: HTMLElement) {
         <span data-size class="text-xs text-muted-foreground tabular-nums group-data-collapsed:hidden">35%</span>
         <span class="hidden text-xs text-muted-foreground tabular-nums group-data-collapsed:inline">Collapsed</span>
       </ui-resizable-panel>
-      <ui-resizable-handle aria-label="Resize files" class="w-1 bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovered:bg-ring data-dragging:bg-primary"></ui-resizable-handle>
+      <ui-resizable-handle aria-label="Resize files" class="w-1 bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovering:bg-ring data-dragging:bg-primary"></ui-resizable-handle>
       <ui-resizable-panel class="flex items-center justify-center p-6 text-sm font-medium">Editor, horizontal</ui-resizable-panel>
     </ui-resizable>
   `

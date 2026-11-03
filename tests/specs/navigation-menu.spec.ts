@@ -383,7 +383,7 @@ test.describe("links", () => {
 
   test("the current page's link says so", async ({ page }) => {
     await expect(link(page, "Pricing")).toHaveAttribute("aria-current", "page")
-    await expect(link(page, "Pricing")).toHaveAttribute("data-active", "")
+    await expect(link(page, "Pricing")).toHaveAttribute("data-current", "")
   })
 })
 

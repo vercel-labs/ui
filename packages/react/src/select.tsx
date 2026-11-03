@@ -171,8 +171,8 @@ const unselected: SelectValueState = { value: null, label: "", labels: [], place
  */
 function SelectValue({
   placeholder,
-  max,
-  moreLabel,
+  maxLabels,
+  getMoreLabel,
   render,
   children,
   ...props
@@ -181,7 +181,7 @@ function SelectValue({
   if (!useNearest(selectPrimitive))
     return renderElement("span", { ...props, children: children ?? placeholder ?? null }, render, unselected)
   return (
-    <ValuePart part={{ placeholder, max, moreLabel }} render={render} props={props}>
+    <ValuePart part={{ placeholder, maxLabels, getMoreLabel }} render={render} props={props}>
       {children}
     </ValuePart>
   )

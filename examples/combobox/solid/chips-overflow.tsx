@@ -89,7 +89,7 @@ function Example() {
           />
         </ComboboxChips>
         <p class="m-0 min-h-5 text-sm leading-5 text-muted-foreground">
-          <ComboboxValue max={2} moreLabel={(count) => `${count} more`} />
+          <ComboboxValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
         </p>
       </div>
       <ComboboxContent class="max-h-[min(18rem,var(--available-height))] scroll-py-1 overflow-x-hidden overflow-y-auto box-border w-(--anchor-width) min-w-36 rounded-2xl border-0 bg-popover p-1 text-sm leading-5 text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none origin-(--transform-origin) transition-[opacity,scale] duration-100 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0">

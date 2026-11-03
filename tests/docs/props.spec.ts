@@ -337,6 +337,8 @@ const components: Record<string, Component> = {
       // The dismissal policy every popup shares. Popover's draft example shows it.
       dismissible: "ComboboxOptions",
       onDismissAttempt: "ComboboxOptions",
+      // Only changes the words of the polite pending announcement. Button's pending examples show it.
+      pendingAnnouncement: "ComboboxOptions",
     },
   },
   command: {
@@ -412,6 +414,8 @@ const components: Record<string, Component> = {
       // The dismissal policy every popup shares. Popover's draft example shows it.
       dismissible: "TriggerMenuOptions",
       onDismissAttempt: "TriggerMenuOptions",
+      // Only changes the words of the polite pending announcement. Button's pending examples show it.
+      pendingAnnouncement: "TriggerMenuOptions",
     },
   },
   "token-input": {
@@ -540,6 +544,8 @@ const components: Record<string, Component> = {
       debug: "TreeOptions",
       // The tree reads a row's parent from `items`. It's there for a renderer's own use, like indent guides.
       parent: "TreeRow",
+      // Only changes the words of the polite pending announcement. Button's pending examples show it.
+      pendingAnnouncement: "TreeOptions",
     },
   },
   menubar: {

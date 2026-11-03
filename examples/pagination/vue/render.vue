@@ -37,12 +37,12 @@ import { ChevronLeft, ChevronRight, Ellipsis } from "@lucide/vue"
               v-bind="props"
               :class="[
                 'relative inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium whitespace-nowrap text-foreground select-none outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 motion-reduce:transition-none',
-                link.active ? 'border-border bg-background hover:bg-muted' : 'hover:bg-muted',
+                link.current ? 'border-border bg-background hover:bg-muted' : 'hover:bg-muted',
               ]"
             >
               {{ link.page }}
               <span
-                v-if="link.active"
+                v-if="link.current"
                 aria-hidden="true"
                 class="absolute bottom-1 size-1 rounded-full bg-current"
               ></span>

@@ -331,11 +331,13 @@ type ArgumentsDetail<Value, Rest extends unknown[]> = Rest extends []
     ? UiChangeDetail<Value, Details>
     : DistributiveOmit<NonNullable<Rest[0]>, "cancel" | "canceled"> & { value: Value }
 
-// An action, a callback that may return a Promise, hands listeners `waitUntil()` too.
+// An action, a callback that returns `unknown` or may return a Promise, hands listeners `waitUntil()` too.
 type CallbackDetail<Callback> = Callback extends (value: infer Value, ...rest: infer Rest) => infer Result
-  ? [Extract<Result, PromiseLike<unknown>>] extends [never]
-    ? ArgumentsDetail<Value, Rest>
-    : ArgumentsDetail<Value, Rest> & Pick<UiActionDetail, "waitUntil">
+  ? unknown extends Result
+    ? ArgumentsDetail<Value, Rest> & Pick<UiActionDetail, "waitUntil">
+    : [Extract<Result, PromiseLike<unknown>>] extends [never]
+      ? ArgumentsDetail<Value, Rest>
+      : ArgumentsDetail<Value, Rest> & Pick<UiActionDetail, "waitUntil">
   : never
 
 /**
@@ -510,7 +512,8 @@ interface UiHoverCardElement<Payload = unknown>
  */
 type MenuEvents<Payload = unknown> = OpenEvents<MenuOpenChangeReason> & {
   payloadchange: UiChangeEvent<Payload | undefined, MenuPayloadChangeReason>
-  action: CustomEvent<{ value: string; event?: Event }>
+  /** An item ran, with its value. Pass a Promise to `waitUntil()` to keep it pending, and the menu open, until it settles. */
+  action: CustomEvent<{ value: string; event?: Event; waitUntil: (promise: Promise<unknown>) => void }>
   checkedchange: UiDetailedChangeEvent<boolean, MenuCheckedChangeDetails>
   valuechange: UiDetailedChangeEvent<string, MenuValueChangeDetails>
   dismissattempt: UiDismissAttemptEvent<MenuDismissReason>
@@ -947,7 +950,7 @@ interface UiDatePickerElement
  */
 type OTPInputEvents = {
   valuechange: UiChangeEvent<string, OTPInputValueChangeReason>
-  complete: UiDetailedChangeEvent<string, CommitDetails<OTPInputValueChangeReason>>
+  valuecommit: UiDetailedChangeEvent<string, CommitDetails<OTPInputValueChangeReason>>
 }
 /**
  * `<ui-otp-input>`: `value`, the controller's methods on `api`, and typed events.
@@ -1416,7 +1419,7 @@ type TreeEvents = {
   expandedchange: UiChangeEvent<string[], TreeExpandedChangeReason>
   checkedchange: UiChangeEvent<string[], TreeCheckedChangeReason>
   /** The keyboard moved focus to an item, with its row among the items that show, from 0. */
-  itemfocus: CustomEvent<{ value: string; index: number }>
+  highlight: CustomEvent<{ value: string; index: number; event?: Event }>
   /** An item was pressed, or Enter was pressed on it, with its value and the event behind it. Pass a Promise to `waitUntil()` to keep it pending until it settles. */
   action: CustomEvent<{ value: string; event?: Event; waitUntil: (promise: Promise<unknown>) => void }>
 }
@@ -1772,7 +1775,7 @@ declare global {
       | "keepMounted"
       | "hiddenUntilFound"
     >
-    "ui-navigation-menu-link": UiPartElement<typeof navigationMenu, "link", "active" | "closeOnSelect">
+    "ui-navigation-menu-link": UiPartElement<typeof navigationMenu, "link", "current" | "closeOnSelect">
     "ui-navigation-menu-link-icon": UiPartElement<typeof navigationMenu, "link-icon", "mirror">
     "ui-navigation-menu-viewport": UiPartElement<
       typeof navigationMenu,
@@ -1848,7 +1851,7 @@ declare global {
     "ui-scroll-area-scroll-to-end": UiPartElement<typeof scrollArea, "scroll-to-end">
     "ui-select-label": UiPartElement<typeof select, "label">
     "ui-select-trigger": UiPartElement<typeof select, "trigger", "disabled">
-    "ui-select-value": UiPartElement<typeof select, "value", "placeholder" | "max", "moreLabel">
+    "ui-select-value": UiPartElement<typeof select, "value", "placeholder" | "maxLabels", "getMoreLabel">
     "ui-select-clear": UiPartElement<typeof select, "clear", "keepMounted">
     "ui-select-content": UiPartElement<
       typeof select,

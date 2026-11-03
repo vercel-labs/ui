@@ -179,10 +179,10 @@ type ContentProps = PlacementProps &
 
 type LinkProps = {
   /**
-   * Whether the link is the current page. Sets `aria-current="page"` and `data-active`.
+   * Whether the link is the current page. Sets `aria-current="page"` and `data-current`.
    * @defaultValue false
    */
-  active?: boolean
+  current?: boolean
   /** Whether pressing the link closes the menu. Overrides the menu's `closeOnSelect`. */
   closeOnSelect?: boolean
 }
@@ -281,7 +281,7 @@ type NavigationMenuContentState = {
  */
 type NavigationMenuLinkState = {
   /** Whether the link is the current page. */
-  active: boolean
+  current: boolean
 }
 /**
  * The props the `link-icon` slot of `navigationMenu` takes.
@@ -464,11 +464,11 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     link: slot<LinkProps, NavigationMenuLinkState>({
-      props: { id: "id", active: "boolean", closeOnSelect: "boolean" },
-      state: (_, { props }) => ({ active: !!props.active }),
+      props: { id: "id", current: "boolean", closeOnSelect: "boolean" },
+      state: (_, { props }) => ({ current: !!props.current }),
       attrs: (_, { props }) => ({
-        "aria-current": props.active ? "page" : undefined,
-        "data-active": props.active ? "" : undefined,
+        "aria-current": props.current ? "page" : undefined,
+        "data-current": props.current ? "" : undefined,
       }),
       bind: (el, { api, key }) => api.internal.bindLink(el, key),
     }),

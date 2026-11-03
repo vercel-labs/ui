@@ -171,7 +171,7 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
         )}
         {variant.max && (
           <span className="text-xs text-neutral-600">
-            <ComboboxValue max={variant.max} />
+            <ComboboxValue maxLabels={variant.max} />
           </span>
         )}
         {variant.trigger && (

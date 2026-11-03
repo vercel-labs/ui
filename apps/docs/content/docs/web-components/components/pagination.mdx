@@ -51,7 +51,7 @@ Name the navigation with `aria-label`, then put the page links and steps in a li
 
 A list with a `<template>` renders the range from it: one copy for each page, with the page number in an empty button, and the `<template data-ellipsis>` for each gap. Without the ellipsis template, gaps get a plain `<ui-pagination-ellipsis>`. Links and steps wrap your own `<button>`, or an `<a>` with [`getHref`](#links), so style those. Links written out by hand, like a server's, take a `page` attribute.
 
-The template keeps page entries keyed as the range moves. The current page's wrapped button gets `aria-current="page"` and `data-active`; an ellipsis is hidden from screen readers.
+The template keeps page entries keyed as the range moves. The current page's wrapped button gets `aria-current="page"` and `data-current`; an ellipsis is hidden from screen readers.
 
 Give each step text or an `aria-label` on its wrapped button. At an end, the button gets `aria-disabled="true"` and `data-disabled` and stops changing the page, while staying in the tab order.
 
@@ -178,11 +178,11 @@ Steps rendered as buttons stay focusable at the ends. A clicked page link keeps 
 
 ## Styling
 
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-active` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
+Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-current` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
 
 ```html
 <ui-pagination-link>
-  <button class="aria-[current=page]:border data-active:font-medium"></button>
+  <button class="aria-[current=page]:border data-current:font-medium"></button>
 </ui-pagination-link>
 <ui-pagination-next>
   <button class="aria-disabled:opacity-50">Next</button>

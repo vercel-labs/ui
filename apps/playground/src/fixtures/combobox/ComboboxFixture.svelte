@@ -169,7 +169,7 @@
         {:else}
           <ComboboxInput class="input" />
         {/if}
-        {#if summary}<output aria-label={f.summary}><ComboboxValue max={summary} /></output>{/if}
+        {#if summary}<output aria-label={f.summary}><ComboboxValue maxLabels={summary} /></output>{/if}
         <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>
         <ComboboxClear>{f.clear}</ComboboxClear>
         <ComboboxContent class={pages ? "popup list-popup list-short" : "popup list-popup"}>

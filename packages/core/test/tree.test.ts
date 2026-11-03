@@ -597,13 +597,13 @@ describe("loading children", () => {
 
 describe("virtualized rows", () => {
   test("a key that moves past the rendered rows reports the row, and focus lands once it renders", async () => {
-    const onItemFocus = vi.fn()
+    const onHighlight = vi.fn()
     // Only the first row renders, as a virtualized list would.
-    const { instance, els, key, focused } = render({ items: data, onItemFocus }, [{ value: "src" }])
+    const { instance, els, key, focused } = render({ items: data, onHighlight }, [{ value: "src" }])
     await tick()
     els.get("src")!.focus()
     key("End")
-    expect(onItemFocus).toHaveBeenCalledWith("README.md", { index: 2 })
+    expect(onHighlight).toHaveBeenCalledWith("README.md", { index: 2, event: expect.any(KeyboardEvent) })
     const readme = document.createElement("div")
     readme.innerHTML = "<span>README.md</span>"
     document.querySelector('[role="tree"]')!.append(readme)

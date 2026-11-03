@@ -42,8 +42,8 @@ function mount(root: HTMLElement) {
     if (cancel && value.includes(cancel)) return event.preventDefault()
     status.textContent = otpInputAction.change(value, reason)
   })
-  otp.addEventListener("complete", (event) => {
-    status.textContent = otpInputAction.complete((event as OTPInputEvents["complete"]).detail.value)
+  otp.addEventListener("valuecommit", (event) => {
+    status.textContent = otpInputAction.complete((event as OTPInputEvents["valuecommit"]).detail.value)
   })
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()

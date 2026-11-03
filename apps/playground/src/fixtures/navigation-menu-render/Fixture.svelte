@@ -32,7 +32,7 @@
         <NavigationMenuContent class="nav-content" aria-label="Guides panel">
           {#snippet render({ props })}
             <section {...props}>
-              <NavigationMenuLink active>
+              <NavigationMenuLink current>
                 {#snippet render({ props })}
                   <RouterLink {...props} to="#intro">Introduction</RouterLink>
                 {/snippet}

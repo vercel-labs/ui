@@ -118,7 +118,7 @@ See [State and Events](../state-and-events) for the shared state conventions. Th
 
 ### On Complete
 
-`onComplete` runs when a change fills every slot, including typing, paste, autofill, and controller writes. Changing an already-full code runs it again. Form resets and page restoration do not.
+`onValueCommit` runs when a change fills every slot, including typing, paste, autofill, and controller writes. Changing an already-full code runs it again. Form resets and page restoration do not.
 
 <ComponentExample
   name="otp-input/complete"
@@ -154,7 +154,7 @@ Draw the active slot and caret with `data-active` and `data-fake-caret`. The exa
 <span id="render-functions" />
 <span id="custom-rendering" />
 
-The root's state exposes all `slots`. Each slot exposes `char`, `isActive`, and `hasFakeCaret` if you want to draw its contents yourself. See [Parts and Composition](../parts-and-composition) for the rendering conventions.
+The root's state exposes all `slots`. Each slot exposes `char`, `active`, and `hasFakeCaret` if you want to draw its contents yourself. See [Parts and Composition](../parts-and-composition) for the rendering conventions.
 
 <DataAttributes component="otp-input" />
 
@@ -171,7 +171,7 @@ Callbacks get the code first, then the details. A bound `value` only updates whe
 | --------------- | ---------- | --------------------------------------------------------------- |
 | `bind:value`    | `OTPInput` | The code                                                        |
 | `onValueChange` | `OTPInput` | `(value, details)`: the new code and the [reason](#reasons)     |
-| `onComplete`    | `OTPInput` | `(value, details)`: the full code and the reason that filled it |
+| `onValueCommit` | `OTPInput` | `(value, details)`: the full code and the reason that filled it |
 
 ### Reasons
 

@@ -126,7 +126,7 @@ Use the supplied `signal` to cancel a request. Trying to expand the branch again
 
 Pass the full `items` hierarchy and use `visibleTreeRows(items, expanded)` to flatten the open branches. Render the nearby rows with their level and position; the tree supplies the correct ARIA hierarchy even though the DOM is flat.
 
-`onItemFocus` reports the focused item’s index among visible rows. Use it to scroll before mounting a row that is outside the rendered range. This example indents rows by their level and keeps each row 28 pixels high.
+`onHighlight` reports the focused item’s index among visible rows. Use it to scroll before mounting a row that is outside the rendered range. This example indents rows by their level and keeps each row 28 pixels high.
 
 <ComponentExample
   name="tree/virtualized"

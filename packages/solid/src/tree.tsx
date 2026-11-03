@@ -182,6 +182,7 @@ export {
   visibleTreeRows,
 } from "@ui-sdk/core/tree"
 export type {
+  ListHighlightDetails,
   TreeActionDetails,
   TreeAnnouncement,
   TreeApi,

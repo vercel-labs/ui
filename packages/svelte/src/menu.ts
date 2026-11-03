@@ -22,6 +22,7 @@ export type {
   MenuApi,
   MenuCheckboxItemProps,
   MenuCheckboxItemState,
+  MenuActionDetails,
   MenuCheckedChangeDetails,
   MenuCheckedChangeReason,
   MenuContentProps,

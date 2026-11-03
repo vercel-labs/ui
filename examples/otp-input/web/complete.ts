@@ -20,8 +20,8 @@ export function mount(root: HTMLElement) {
   const otp = root.querySelector("ui-otp-input")!
   const status = root.querySelector("output")!
   otp.addEventListener("valuechange", () => (status.textContent = ""))
-  otp.addEventListener("complete", (event) => {
-    const { value, reason } = (event as OTPInputEvents["complete"]).detail
+  otp.addEventListener("valuecommit", (event) => {
+    const { value, reason } = (event as OTPInputEvents["valuecommit"]).detail
     status.textContent = `Checking ${value}, from ${reason}.`
   })
 }

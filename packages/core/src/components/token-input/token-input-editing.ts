@@ -227,7 +227,7 @@ function bindTokenEditing(el: HTMLElement, view: TokenView, api: TokenInputApi) 
       const submits = shortcut === "enter" ? !event.shiftKey && !mod && !event.altKey : mod && !event.shiftKey
       if (!submits) return
       event.preventDefault()
-      internal.submit()
+      internal.submit(event)
     }
   }
 

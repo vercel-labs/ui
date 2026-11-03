@@ -35,7 +35,7 @@ and the `aria-*` naming attributes go to that input.
     controller,
     debug,
     onValueChange,
-    onComplete,
+    onValueCommit,
     children,
     ...rest
   }: PartProps<"div", OTPInputState> &
@@ -69,7 +69,7 @@ and the `aria-*` naming attributes go to that input.
       onValueChange?.(next, details)
       if (!details.canceled) value = next
     },
-    onComplete,
+    onValueCommit,
   }))
   provideInstance(otpInputPrimitive, otp)
   const root = useHandlePart(otp, "root")

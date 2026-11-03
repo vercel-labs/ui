@@ -146,7 +146,7 @@ function defineSelectElements() {
     },
     value: {
       tag: "ui-select-value",
-      rebind: ["placeholder", "max", "moreLabel"],
+      rebind: ["placeholder", "maxLabels", "getMoreLabel"],
       render(el) {
         if (!el.childNodes.length && !el.hasAttribute("as-child")) automatic.add(el)
       },

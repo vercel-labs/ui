@@ -52,12 +52,12 @@ function Fixture() {
                   <PaginationLink
                     page={item as number}
                     render={<RouterLink />}
-                    className={(state) => `pagination-link ${state.active ? "is-active" : "is-inactive"}`}
+                    className={(state) => `pagination-link ${state.current ? "is-active" : "is-inactive"}`}
                   >
                     {(state) => (
                       <>
                         {state.page}
-                        {state.active && <span aria-hidden="true">•</span>}
+                        {state.current && <span aria-hidden="true">•</span>}
                       </>
                     )}
                   </PaginationLink>

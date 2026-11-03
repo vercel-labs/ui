@@ -255,6 +255,12 @@ type TriggerMenuOptions<T = string> = PortalProps & {
    */
   onSelect?: (value: T, details: TriggerMenuSelectDetails<T>) => void | Promise<void | Partial<TokenInsert>>
   /**
+   * What screen readers hear once an `onSelect` Promise has been pending for a second, so a slow action
+   * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
+  /**
    * Whether items that come from outside are loading or failed, for the status and empty parts. Loaders report their own.
    * @defaultValue "idle"
    */
@@ -438,6 +444,7 @@ const triggerMenuPrimitive = /* @__PURE__ */ definePrimitive({
     onOpenChangeComplete: "callback",
     onQueryChange: "callback",
     onSelect: "action",
+    pendingAnnouncement: "string",
     status: "string",
     autoHighlight: "boolean",
     loop: "boolean",

@@ -33,6 +33,15 @@ type TokenInputValueChangeReason =
   | "imperative"
 
 /**
+ * What `onSubmit` receives besides the value.
+ * @stable
+ */
+type TokenInputSubmitDetails = {
+  /** The key press, or the trigger menu item's choice, that submitted. */
+  event?: Event
+}
+
+/**
  * What `onValueChange` receives besides the value.
  * @stable
  */
@@ -137,7 +146,7 @@ type TokenInputOptions = {
   /**
    * Runs on the submit shortcut, unless an input method is composing or a trigger menu is open. Without it, the shortcut submits the form the input is in.
    */
-  onSubmit?: (value: TokenInputValue) => void
+  onSubmit?: (value: TokenInputValue, details: TokenInputSubmitDetails) => void
   /**
    * Which keys submit: `"enter"`, with Shift+Enter for a new line, or `"mod+enter"`, with Enter for a new line, which many Japanese and Chinese writers prefer.
    * @defaultValue "enter"
@@ -290,6 +299,7 @@ export {
   type TokenInputPrimitive,
   type TokenInputTokenProps,
   type TokenInputTokenState,
+  type TokenInputSubmitDetails,
   type TokenInputValueChangeDetails,
   type TokenInputValueChangeReason,
 }

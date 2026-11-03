@@ -1,6 +1,6 @@
 <!--
 @component
-Sits under the open trigger, or under the link with `active` while every panel is closed. Screen readers
+Sits under the open trigger, or under the link with `current` while every panel is closed. Screen readers
 skip it.
 @stable
 -->

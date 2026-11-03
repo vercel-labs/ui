@@ -97,12 +97,12 @@
                   <li>
                     <NavigationMenuLink
                       href={link.href}
-                      active={index === 0}
-                      class="flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted motion-reduce:transition-none"
+                      current={index === 0}
+                      class="flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted motion-reduce:transition-none"
                     >
                       {#snippet children(linkState)}
                         <span class="leading-none font-medium">{link.title}</span>
-                        {#if linkState.active}
+                        {#if linkState.current}
                           <span class="text-xs text-muted-foreground">You're here</span>
                         {/if}
                       {/snippet}

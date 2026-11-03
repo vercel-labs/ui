@@ -239,15 +239,19 @@ test.describe("keyboard", () => {
 })
 
 test.describe("stacking", () => {
-  test("only max toasts show; the rest wait for room", { tag: "@enhancement" }, async ({ page, open }) => {
-    await open("toast", { max: "2" })
-    for (const title of ["One", "Two", "Three"])
-      await show(page, { title, duration: Infinity as unknown as number })
-    await expect(region(page).getByRole(role())).toHaveCount(2)
-    await expect(toastNamed(page, "One")).toHaveCount(0)
-    await toastNamed(page, "Three").getByRole("button", { name: toastFixture.dismiss }).click()
-    await expect(toastNamed(page, "One")).toBeVisible()
-  })
+  test(
+    "only maxVisible toasts show; the rest wait for room",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("toast", { "max-visible": "2" })
+      for (const title of ["One", "Two", "Three"])
+        await show(page, { title, duration: Infinity as unknown as number })
+      await expect(region(page).getByRole(role())).toHaveCount(2)
+      await expect(toastNamed(page, "One")).toHaveCount(0)
+      await toastNamed(page, "Three").getByRole("button", { name: toastFixture.dismiss }).click()
+      await expect(toastNamed(page, "One")).toBeVisible()
+    },
+  )
 
   test("the stack expands while hovered or focused", { tag: "@enhancement" }, async ({ page, open }) => {
     await open("toast")

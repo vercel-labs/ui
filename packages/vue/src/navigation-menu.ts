@@ -172,7 +172,7 @@ const NavigationMenuContent = withElement(
 )
 
 /**
- * A link. Pressing it closes the menu, and `active` marks the current page with `aria-current="page"`.
+ * A link. Pressing it closes the menu, and `current` marks the current page with `aria-current="page"`.
  * @stable
  */
 const NavigationMenuLink = parts.Link
@@ -211,7 +211,7 @@ const NavigationMenuViewport = withElement(
 )
 
 /**
- * Sits under the open trigger, or under the link with `active` while every panel is closed. Screen readers
+ * Sits under the open trigger, or under the link with `current` while every panel is closed. Screen readers
  * skip it.
  * @stable
  */

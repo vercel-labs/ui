@@ -8,6 +8,7 @@ import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/prim
 import { live } from "../../foundation/kernel/live"
 import { selects } from "../../foundation/kernel/selects"
 import type { TreeCheckStrategy, TreeCheckedState } from "../../foundation/lists/tree-checked"
+import type { ListHighlightDetails } from "../../foundation/lists/listbox"
 import type { TreeItemData } from "../../foundation/lists/tree-collection"
 import { treeApi, type TreeApi, type TreeStore } from "./tree-api"
 import type { TreeGeneric } from "./tree-generic"
@@ -179,7 +180,13 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
    */
   checkStrategy?: TreeCheckStrategy
   /** Runs when an item is pressed or Enter is pressed on it, apart from selecting it, like opening a file. Return a Promise to mark the item pending until it settles. */
-  onAction?: (value: string, details: TreeActionDetails) => void | Promise<unknown>
+  onAction?: (value: string, details: TreeActionDetails) => unknown
+  /**
+   * What screen readers hear once an item's action has been pending for a second, so a slow action
+   * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
+   * @defaultValue "Loading"
+   */
+  pendingAnnouncement?: string
   /**
    * Loads a branch's children the first time it expands while it has none.
    * The branch shows `data-loading` and expands once the Promise resolves; a
@@ -194,7 +201,7 @@ type TreeOptions<Mode extends TreeSelectionMode = TreeSelectionMode> = {
    * items that show, from 0. A virtualized list scrolls that row into view
    * here, so an item it hasn't rendered can take focus once it does.
    */
-  onItemFocus?: (value: string, details: { index: number }) => void
+  onHighlight?: (value: string, details: ListHighlightDetails) => void
   /**
    * Disables every item. Items stay focusable unless `focusableWhenDisabled` is false.
    * @defaultValue false
@@ -416,9 +423,10 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
     onCheckedChange: "callback",
     checkStrategy: "string",
     onAction: "action",
+    pendingAnnouncement: "string",
     loadChildren: "value",
     current: "string",
-    onItemFocus: "callback",
+    onHighlight: "callback",
     disabled: "boolean",
     focusableWhenDisabled: "boolean",
     keepMounted: "boolean",
@@ -676,4 +684,5 @@ export {
   treeFromPaths,
   visibleTreeRows,
 } from "../../foundation/lists/tree-collection"
+export type { ListHighlightDetails } from "../../foundation/lists/listbox"
 export type { TreeApi } from "./tree-api"

@@ -171,7 +171,7 @@ function Fixture({ data = false }: { data?: boolean }) {
             )}
             {summary && (
               <output aria-label={f.summary}>
-                <ComboboxValue max={summary} />
+                <ComboboxValue maxLabels={summary} />
               </output>
             )}
             <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>

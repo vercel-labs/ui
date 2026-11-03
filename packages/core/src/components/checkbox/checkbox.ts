@@ -104,6 +104,7 @@ function fromGroup(options: CheckboxInternalOptions) {
     // A parent stands for the others, so it submits nothing.
     name: parent ? undefined : (options.name ?? group.name()),
     disabled: !!options.disabled || group.disabled(),
+    readOnly: !!options.readOnly || group.readOnly(),
     form: options.form ?? group.form(),
   }
 }
@@ -113,7 +114,6 @@ function checkboxSync(options: CheckboxInternalOptions) {
   if (!group) return syncToggle(options)
   return {
     ...group,
-    readOnly: !!options.readOnly,
     required: !!options.required,
     value: options.value ?? "on",
   }
@@ -173,12 +173,13 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
         const owner = group()
         if (!owner) return () => {}
         const follow = () => {
-          const { name, disabled, form } = fromGroup(options())!
+          const { name, disabled, readOnly, form } = fromGroup(options())!
           store.set({
             checked: isParent() ? owner.parentChecked() : owner.checked(store.get().value),
             controls: isParent() ? owner.childIds() || undefined : undefined,
             name,
             disabled,
+            readOnly,
             form,
           })
         }

@@ -31,7 +31,7 @@ export function Example() {
       </div>
       <ToastRegion
         toaster={toast}
-        max={4}
+        maxVisible={4}
         expanded={expanded()}
         class="m-4 w-[356px] max-w-[calc(100vw-2rem)] h-(--toast-front-height) outline-none [--dir:-1] data-[side=top]:[--dir:1] data-expanded:h-[calc(var(--toast-stack-height)+(var(--toast-count)-1)*0.75rem)]"
       >

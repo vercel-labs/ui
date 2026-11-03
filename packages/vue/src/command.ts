@@ -80,10 +80,9 @@ const Command = withElement(
       defaultQuery: { type: String, default: undefined },
       pages: { type: Array as PropType<string[]>, default: undefined },
       defaultPages: { type: Array as PropType<string[]>, default: undefined },
+      pendingAnnouncement: String,
       // A function prop beside the emit, so a returned Promise marks the command pending.
-      onAction: Function as PropType<
-        (value: string, details: CommandActionDetails) => void | Promise<unknown>
-      >,
+      onAction: Function as PropType<(value: string, details: CommandActionDetails) => unknown>,
       items: Array as PropType<CommandData>,
       emptyItems: Array as PropType<CommandData>,
       filter: { type: [String, Boolean, Function] as PropType<SearchFilter<string>>, default: undefined },
@@ -190,7 +189,7 @@ const CommandItem = withElement(
       page: String,
       index: Number,
       // A function prop beside the emit, so a returned Promise marks the command pending.
-      onSelect: Function as PropType<(event: Event) => void | Promise<unknown>>,
+      onSelect: Function as PropType<(event: Event) => unknown>,
     },
     slots: Object as PartSlots<typeof commandPrimitive, "item">,
     setup(props) {

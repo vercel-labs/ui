@@ -21,7 +21,7 @@ export function Example() {
               index={index}
               render={<span />}
               className={(slot) =>
-                slot.isActive
+                slot.active
                   ? "flex size-10 items-center justify-center rounded-2xl border border-ring bg-input/50 text-lg font-medium ring-3 ring-ring/30 transition-[color,box-shadow] duration-200"
                   : "flex size-10 items-center justify-center rounded-2xl border border-transparent bg-input/50 text-lg font-medium transition-[color,box-shadow] duration-200"
               }

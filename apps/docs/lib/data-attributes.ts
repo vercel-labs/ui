@@ -941,7 +941,7 @@ const components: Record<
     },
     interactive: [],
     // Written as the layout changes and the pointer moves, without a render.
-    extra: { panel: ["data-collapsed"], handle: ["data-hovered"] },
+    extra: { panel: ["data-collapsed"], handle: ["data-hovering"] },
     descriptions: {
       "data-orientation": {
         text: "The group's direction, on every part. A handle's own `aria-orientation` is the other one, since it runs across the group.",
@@ -951,7 +951,7 @@ const components: Record<
       "data-dragging": { text: "Present while a handle of the group is being dragged." },
       "handle:data-dragging": { text: "Present while this handle is being dragged." },
       "data-collapsed": { text: "Present while a collapsible panel is collapsed." },
-      "data-hovered": {
+      "data-hovering": {
         text: "Present while the pointer is over the handle or within its hit area, which reaches past the handle itself.",
       },
     },
@@ -1333,7 +1333,7 @@ const components: Record<
     },
     interactive: [],
     descriptions: {
-      "link:data-active": { text: 'Present on the current page\'s link, beside `aria-current="page"`.' },
+      "link:data-current": { text: 'Present on the current page\'s link, beside `aria-current="page"`.' },
       "data-disabled": {
         text: "Present on a step at the end it goes to, beside `aria-disabled`. It stays focusable and does nothing.",
       },
@@ -1807,7 +1807,7 @@ const components: Record<
         text: "Present while there's a trigger or a current page's link to sit under.",
       },
       "trigger:data-disabled": { text: "Present when the trigger is disabled." },
-      "data-active": { text: "Present on the link for the current page, which also gets aria-current." },
+      "data-current": { text: "Present on the link for the current page, which also gets aria-current." },
       "data-motion": {
         text: "Which way the content moves while another item takes over. Order is logical, so in right-to-left layouts the end is on the left.",
         values: ["from-start", "from-end", "to-start", "to-end"],

@@ -139,13 +139,14 @@ test.describe("chips that collapse", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText("Apple, Banana, and 2 more")
   })
 
-  test("a web select value takes moreLabel as a property", async ({ page, open, framework }) => {
-    test.skip(!framework.startsWith("web"), "React and Vue pass moreLabel as a prop.")
+  test("a web select value takes getMoreLabel as a property", async ({ page, open, framework }) => {
+    test.skip(!framework.startsWith("web"), "React and Vue pass getMoreLabel as a prop.")
     await open("select", { multiple: "", max: "2", value: "apple,banana,cherry,lemon" })
     await page
       .locator("ui-select-value")
       .evaluate(
-        (el: HTMLElement & { moreLabel?: unknown }) => (el.moreLabel = (count: number) => `${count} others`),
+        (el: HTMLElement & { getMoreLabel?: unknown }) =>
+          (el.getMoreLabel = (count: number) => `${count} others`),
       )
     await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText("Apple, Banana, and 2 others")
   })

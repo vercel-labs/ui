@@ -320,9 +320,9 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
 
   // The submit shortcut: `onSubmit`, else its form, which `form` can name
   // from outside it, like a native control's.
-  function submit() {
+  function submit(event?: Event) {
     const onSubmit = options().onSubmit
-    if (onSubmit) return onSubmit(store.get().value)
+    if (onSubmit) return onSubmit(store.get().value, { event })
     ownerForm(element("editor"), store.get().form)?.requestSubmit()
   }
 

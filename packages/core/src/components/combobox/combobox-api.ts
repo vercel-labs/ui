@@ -36,7 +36,7 @@ import {
 } from "../../foundation/lists/listbox-search"
 import { announce } from "../../foundation/platform/announce"
 import { isSelectAll, optionId } from "../../foundation/lists/listbox-keys"
-import { isPromise } from "../../foundation/kernel/action"
+import { announcePending, isPromise } from "../../foundation/kernel/action"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { type ItemIcons } from "../../foundation/lists/item-icon"
 import { createValueSelection, listOf } from "../../foundation/lists/listbox-value"
@@ -193,6 +193,7 @@ function announceRemoved(
 
 function comboboxApi(context: PrimitiveContext<ComboboxOptions<any, any>, ComboboxState, string>) {
   const { id, store, options, element } = context
+  announcePending(context, () => store.get().pending)
   // A controlled close clears the highlight in the same pass.
   deriveOpen(context, ["highlighted", "focusInList"], (open) =>
     open ? undefined : { highlighted: null, focusInList: false },

@@ -38,6 +38,8 @@ import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
 
 Give items a `value` and handle `@action` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
+Return a promise from `@action` or an item’s `@select` to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pendingAnnouncement`, “Loading” by default.
+
 ## Examples
 
 ### Submenus
@@ -281,19 +283,19 @@ Props are the same as below, and callbacks are events.
 
 Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-| Binding                 | On                 | Receives                                                                       |
-| ----------------------- | ------------------ | ------------------------------------------------------------------------------ |
-| `v-model:open`          | `Menu`             | Whether the menu is open                                                       |
-| `@open-change`          | `Menu`             | `(open, details)`: the new state, and the [reason](#reasons)                   |
-| `@open-change-complete` | `Menu`             | `(open)`, after the animation                                                  |
-| `@payload-change`       | `Menu`             | `(payload, details)`: the content's new payload, and the [reason](#reasons)    |
-| `@action`               | `Menu`             | `(value, { event })` for every plain item, including items in submenus         |
-| `@checked-change`       | `Menu`             | `(checked, details)`, with the item's value in `details.value`. For data menus |
-| `@value-change`         | `Menu`             | `(value, details)`, with the group's name in `details.group`. For data menus   |
-| `@dismiss-attempt`      | `Menu`             | `({ reason, event })`, when a dismissal was refused                            |
-| `@select`               | `MenuItem`         | `(event)`, before the menu closes. `event.preventDefault()` keeps it open      |
-| `v-model:checked`       | `MenuCheckboxItem` | Whether the item is checked. `@checked-change` has the details                 |
-| `v-model:value`         | `MenuRadioGroup`   | The selected value. `@value-change` has the details                            |
+| Binding                 | On                 | Receives                                                                                                 |
+| ----------------------- | ------------------ | -------------------------------------------------------------------------------------------------------- |
+| `v-model:open`          | `Menu`             | Whether the menu is open                                                                                 |
+| `@open-change`          | `Menu`             | `(open, details)`: the new state, and the [reason](#reasons)                                             |
+| `@open-change-complete` | `Menu`             | `(open)`, after the animation                                                                            |
+| `@payload-change`       | `Menu`             | `(payload, details)`: the content's new payload, and the [reason](#reasons)                              |
+| `@action`               | `Menu`             | `(value, { event })` for every plain item, a function prop. A Promise marks it pending                   |
+| `@checked-change`       | `Menu`             | `(checked, details)`, with the item's value in `details.value`. For data menus                           |
+| `@value-change`         | `Menu`             | `(value, details)`, with the group's name in `details.group`. For data menus                             |
+| `@dismiss-attempt`      | `Menu`             | `({ reason, event })`, when a dismissal was refused                                                      |
+| `@select`               | `MenuItem`         | `(event)`, a function prop. `event.preventDefault()` keeps the menu open, and a Promise marks it pending |
+| `v-model:checked`       | `MenuCheckboxItem` | Whether the item is checked. `@checked-change` has the details                                           |
+| `v-model:value`         | `MenuRadioGroup`   | The selected value. `@value-change` has the details                                                      |
 
 ### Reasons
 

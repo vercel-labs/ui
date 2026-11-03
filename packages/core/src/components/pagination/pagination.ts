@@ -117,7 +117,7 @@ type PaginationLinkState = {
   /** The page it goes to, from its `page` prop. */
   page: number
   /** Whether it's the current page. */
-  active: boolean
+  current: boolean
 }
 
 /**
@@ -338,13 +338,13 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
       item: slot({ attrs: () => ({ role: "listitem" }) }),
       link: slot<PaginationLinkProps, PaginationLinkState>({
         props: { page: "number" },
-        state: (state, { props }) => ({ page: props.page, active: props.page === currentPage(state) }),
+        state: (state, { props }) => ({ page: props.page, current: props.page === currentPage(state) }),
         attrs: (state, { props }) => {
-          const active = props.page === currentPage(state)
+          const current = props.page === currentPage(state)
           return {
             ...partAttrs(state, props.page, false),
-            "aria-current": active ? "page" : undefined,
-            "data-active": active ? "" : undefined,
+            "aria-current": current ? "page" : undefined,
+            "data-current": current ? "" : undefined,
           }
         },
         press: ({ api, props, el }, event) => api.internal.press("link", props, event, el),

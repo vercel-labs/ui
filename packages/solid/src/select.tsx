@@ -215,7 +215,7 @@ const unselected: SelectValueState = { value: null, label: "", labels: [], place
  */
 function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> & SelectValueProps) {
   const context = useContext(SelectContext)
-  const rest = omit(props, "placeholder", "max", "moreLabel")
+  const rest = omit(props, "placeholder", "maxLabels", "getMoreLabel")
   // A trigger outside its select renders before the select it names has mounted.
   if (!context) {
     return renderStatic(
@@ -229,7 +229,11 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
     )
   }
   const placeholder = () => placeholders.get(context)?.() ?? context.state.placeholder
-  const part = () => ({ placeholder: props.placeholder, max: props.max, moreLabel: props.moreLabel })
+  const part = () => ({
+    placeholder: props.placeholder,
+    maxLabels: props.maxLabels,
+    getMoreLabel: props.getMoreLabel,
+  })
   const user = merge(rest, {
     get children() {
       return (

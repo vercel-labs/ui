@@ -124,16 +124,16 @@ function Example() {
                           <li>
                             <NavigationMenuLink
                               href={link.href}
-                              active={index() === 0}
+                              current={index() === 0}
                               render={(props, linkState) => (
                                 <a {...props}>
                                   <span class="leading-none font-medium">{link.title}</span>
-                                  {linkState.active && (
+                                  {linkState.current && (
                                     <span class="text-xs text-muted-foreground">You're here</span>
                                   )}
                                 </a>
                               )}
-                              class="flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted motion-reduce:transition-none"
+                              class="flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted motion-reduce:transition-none"
                             />
                           </li>
                         )}

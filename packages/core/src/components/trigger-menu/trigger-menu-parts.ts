@@ -75,6 +75,7 @@ const unreadByItems = {
   mounts: [],
   groupLabels: [],
   payload: [],
+  pending: [],
   titled: [],
   described: [],
   modal: [],

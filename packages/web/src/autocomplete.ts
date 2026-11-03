@@ -56,7 +56,7 @@ function defineAutocompleteElements() {
         },
         ...popupState,
       },
-      api: ["isOpen", "setOpen", "open", "close", "getValue", "setValue", "clear", "focus"],
+      api: ["isOpen", "setOpen", "open", "close", "toggle", "getValue", "setValue", "clear", "focus"],
       // container="#id" renders the suggestions there. As a sheet, they sit in a
       // viewport there and the field moves into its header.
       portal: sheetInputPortal("ui-autocomplete-viewport"),

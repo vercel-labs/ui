@@ -54,12 +54,12 @@ The viewport holds the open panel and follows its size and position. The sizing 
 
 ### Link Component
 
-Render your router's link for client-side navigation. `active` marks the link for the current page with `aria-current="page"` and `data-active`.
+Render your router's link for client-side navigation. `current` marks the link for the current page with `aria-current="page"` and `data-current`.
 
 Render the router's link with the `render` slot. With Vue Router, use `RouterLink`'s `custom` form and bind the part's props to your own `<a>`, then its `navigate` after them, so the menu's `aria-current` is the one the link gets.
 
 ```vue
-<NavigationMenuLink :active="route.path === '/docs'">
+<NavigationMenuLink :current="route.path === '/docs'">
   <template #render="{ props }">
     <RouterLink to="/docs" custom v-slot="{ href, navigate }">
       <a v-bind="props" :href="href" @click="navigate">Introduction</a>
@@ -123,7 +123,7 @@ Resting the pointer on a trigger opens its panel. With `openOnHover` set to fals
 
 ### Indicator
 
-`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#css-variables), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
+`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `current` while every panel is closed. Its box comes from the `--active-item-*` [variables](#css-variables), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
 
 <ComponentExample
   name="navigation-menu/indicator"

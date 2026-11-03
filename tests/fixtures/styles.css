@@ -845,7 +845,7 @@
   }
 
   .resizable-handle:focus-visible,
-  .resizable-handle[data-hovered],
+  .resizable-handle[data-hovering],
   .resizable-handle[data-dragging] {
     background: #2563eb;
   }

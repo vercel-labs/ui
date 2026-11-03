@@ -7,6 +7,7 @@ A list of actions and options, opened from a button or a right-click. Put its tr
   import type { ChangeDetails, DismissAttemptDetails } from "@ui-sdk/core"
   import {
     menu as menuPrimitive,
+    type MenuActionDetails,
     type MenuCheckedChangeDetails,
     type MenuController,
     type MenuData,
@@ -45,6 +46,7 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     onOpenChangeComplete,
     onPayloadChange,
     onAction,
+    pendingAnnouncement,
     onCheckedChange,
     onValueChange,
     onDismissAttempt,
@@ -80,8 +82,10 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     onOpenChangeComplete?: (open: boolean) => void
     /** Runs when the payload the content shows changes. `details.cancel()` keeps the previous one. */
     onPayloadChange?: (payload: unknown, details: PayloadDetails) => void
-    /** Runs for every plain item, including items in submenus, with the item's value. */
-    onAction?: (value: string, details: { event?: Event }) => void
+    /** Runs for every plain item, including items in submenus, with the item's value. Return a Promise to keep the item pending, and the menu open, until it settles. */
+    onAction?: (value: string, details: MenuActionDetails) => unknown
+    /** What screen readers hear once an item has been pending for a second. An empty string says nothing. */
+    pendingAnnouncement?: string
     /** Runs when any checkbox item in the menu or its submenus toggles, with the item's value in `details.value`. */
     onCheckedChange?: (checked: boolean, details: MenuCheckedChangeDetails) => void
     /** Runs when any radio group in the menu or its submenus changes, with the group in `details.group`. */
@@ -120,6 +124,7 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     onOpenChangeComplete,
     onPayloadChange,
     onAction,
+    pendingAnnouncement,
     onCheckedChange,
     onValueChange,
     onDismissAttempt,

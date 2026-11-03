@@ -14,7 +14,7 @@ import { createTypeahead, isTypeaheadKey, labelOf } from "../../foundation/text/
 import { inDocumentOrder } from "../../foundation/kernel/order"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
-import { isPromise } from "../../foundation/kernel/action"
+import { announcePending, isPromise } from "../../foundation/kernel/action"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { createSelection } from "../../foundation/selection/selection-model"
@@ -107,6 +107,7 @@ type TreeApi = ReturnType<typeof treeApi>
 
 function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
   const { id, store, options } = context
+  announcePending(context, () => store.get().pending.length > 0)
   const change = createChange(context)
   const typeahead = createTypeahead()
   const itemProps = (key: string) => context.props<TreeItemProps>("item", key)
@@ -621,7 +622,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
         roving.focus(target)
       }
       const index = visibleKeys().indexOf(target)
-      options().onItemFocus?.(target, { index })
+      options().onHighlight?.(target, { index, event })
       const homeOrEnd = event.key === "Home" || event.key === "End"
       const why = { reason: "list-navigation" as const, event }
       if (state.selectionMode === "multiple" && event.shiftKey && (!homeOrEnd || mod))
@@ -652,7 +653,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
         const first = child?.key ?? fromData()?.tree.children(key)[0]
         if (child) {
           child.el.focus()
-          options().onItemFocus?.(child.key, { index: visibleKeys().indexOf(child.key) })
+          options().onHighlight?.(child.key, { index: visibleKeys().indexOf(child.key), event })
         } else if (first !== undefined) roving.focus(first)
         if (first !== undefined) follow(first, event)
       }
@@ -664,7 +665,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
         if (parent === null) return
         if (itemElement(parent)) itemElement(parent)!.focus()
         else roving.focus(parent)
-        options().onItemFocus?.(parent, { index: visibleKeys().indexOf(parent) })
+        options().onHighlight?.(parent, { index: visibleKeys().indexOf(parent), event })
         follow(parent, event)
       }
     } else if (event.key === "*") {
@@ -695,7 +696,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
       const to = keys[found]
       if (itemElement(to)) itemElement(to)!.focus()
       else roving.focus(to)
-      options().onItemFocus?.(to, { index: found })
+      options().onHighlight?.(to, { index: found, event })
       follow(to, event)
     } else return
     event.preventDefault()
@@ -742,7 +743,7 @@ function treeApi(context: PrimitiveContext<TreeOptions, TreeStore, string>) {
     reveal(value: string) {
       const land = () => {
         const index = visibleKeys().indexOf(value)
-        if (index !== -1) options().onItemFocus?.(value, { index })
+        if (index !== -1) options().onHighlight?.(value, { index })
         roving.focus(value)
         queueMicrotask(() => itemElement(value)?.scrollIntoView?.({ block: "nearest" }))
       }

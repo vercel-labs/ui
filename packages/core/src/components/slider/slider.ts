@@ -128,6 +128,10 @@ type SliderOptions<Value extends number | number[] = number | number[]> = {
   orientation?: "horizontal" | "vertical"
   /** Disables it like a native control: thumbs can't be focused or moved, and nothing is submitted. */
   disabled?: boolean
+  /** Keeps it focusable and submitted, but stops drags, keys and screen reader adjustments from changing it. */
+  readOnly?: boolean
+  /** Marks it required, with `data-required`. A slider always has a value, so it never blocks a form. */
+  required?: boolean
   /** The name it submits under: the number, or a range as `"start/end"`. Without one, it submits nothing. */
   name?: string
   /** The id of a form to belong to, when it isn't inside that form. */
@@ -176,6 +180,10 @@ type SliderState = {
   value: number | number[]
   /** Whether it's disabled, by itself or by a `<fieldset>`. */
   disabled: boolean
+  /** Whether it's read-only: it stays focusable and submitted, but drags and keys don't change it. */
+  readOnly: boolean
+  /** Whether it's marked required. */
+  required: boolean
   /** Whether a thumb is being dragged. */
   dragging: boolean
   /** The slider's axis. */
@@ -210,7 +218,13 @@ function sliderState(state: State) {
 }
 
 function sharedState(state: State) {
-  return { disabled: isDisabled(state), dragging: state.active !== null, orientation: state.orientation }
+  return {
+    disabled: isDisabled(state),
+    readOnly: state.readOnly,
+    required: state.required,
+    dragging: state.active !== null,
+    orientation: state.orientation,
+  }
 }
 
 const thumbValue = (state: State, index: number) => state.thumbValues[index] ?? state.min
@@ -219,6 +233,8 @@ function dataAttrs(state: State) {
   return {
     "data-orientation": state.orientation,
     "data-disabled": isDisabled(state) ? "" : undefined,
+    "data-readonly": state.readOnly ? "" : undefined,
+    "data-required": state.required ? "" : undefined,
     "data-dragging": state.active !== null ? "" : undefined,
   }
 }
@@ -298,6 +314,8 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     minStepsBetweenThumbs: "number",
     orientation: "string",
     disabled: "boolean",
+    readOnly: "boolean",
+    required: "boolean",
     name: "string",
     form: "string",
     format: "value",
@@ -421,7 +439,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
           "aria-valuetext": formatValue(value, state),
           "aria-orientation": state.orientation,
           disabled: isDisabled(state) ? "" : undefined,
+          // A native range ignores `readonly`, so only its role says it.
+          "aria-readonly": state.readOnly ? "true" : undefined,
           "data-disabled": isDisabled(state) ? "" : undefined,
+          "data-readonly": state.readOnly ? "" : undefined,
           style: rangeInputStyle,
         }
       },

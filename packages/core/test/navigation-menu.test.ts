@@ -159,7 +159,7 @@ describe("state", () => {
 
   test("the current page's link says so", () => {
     const menu = navigationMenu({ id: "nav" })
-    expect(attrs(menu.part("link", { id: "a", active: true }))["aria-current"]).toBe("page")
+    expect(attrs(menu.part("link", { id: "a", current: true }))["aria-current"]).toBe("page")
     expect(attrs(menu.part("link", { id: "b" }))["aria-current"]).toBeUndefined()
   })
 })

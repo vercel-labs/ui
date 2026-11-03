@@ -78,10 +78,10 @@ function mount(root: HTMLElement) {
                   .map(
                     (link, index) => `
                 <li>
-                  <ui-navigation-menu-link${index === 0 ? " active" : ""}>
-                    <a href="${link.href}" class="group/link flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-active:bg-muted/50 data-active:hover:bg-muted motion-reduce:transition-none">
+                  <ui-navigation-menu-link${index === 0 ? " current" : ""}>
+                    <a href="${link.href}" class="group/link flex flex-col gap-0.5 rounded-xl p-2 text-sm outline-none transition-[color,background-color,box-shadow] hover:bg-muted focus-visible:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-current:bg-muted/50 data-current:hover:bg-muted motion-reduce:transition-none">
                       <span class="leading-none font-medium">${link.title}</span>
-                      <span class="hidden text-xs text-muted-foreground group-data-active/link:inline">You're here</span>
+                      <span class="hidden text-xs text-muted-foreground group-data-current/link:inline">You're here</span>
                     </a>
                   </ui-navigation-menu-link>
                 </li>`,

@@ -14,7 +14,7 @@ function mount(root: HTMLElement) {
           <span class="truncate group-data-collapsed:hidden">Search</span>
         </span>
       </ui-resizable-panel>
-      <ui-resizable-handle aria-label="Resize sidebar" class="relative flex w-px items-center justify-center bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovered:bg-ring data-dragging:bg-ring aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full [&[aria-orientation=horizontal]>div]:rotate-90"><div class="z-10 h-6 w-1 shrink-0 rounded-lg bg-border"></div></ui-resizable-handle>
+      <ui-resizable-handle aria-label="Resize sidebar" class="relative flex w-px items-center justify-center bg-border outline-none focus-visible:ring-3 focus-visible:ring-ring/30 data-hovering:bg-ring data-dragging:bg-ring aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full [&[aria-orientation=horizontal]>div]:rotate-90"><div class="z-10 h-6 w-1 shrink-0 rounded-lg bg-border"></div></ui-resizable-handle>
       <ui-resizable-panel class="flex items-center justify-center p-6 text-sm font-medium">Editor</ui-resizable-panel>
     </ui-resizable>
   `

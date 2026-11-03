@@ -101,11 +101,13 @@ describe("select all", () => {
 })
 
 describe("labels as a list", () => {
-  test("joins with commas without max, and counts the rest in the page's language with it", () => {
+  test("joins with commas without maxLabels, and counts the rest in the page's language with it", () => {
     expect(formatLabels(["Apple", "Banana", "Orange"])).toBe("Apple, Banana, Orange")
-    expect(formatLabels(["Apple", "Banana", "Orange", "Pear"], { max: 2 })).toBe("Apple, Banana, and 2 more")
-    expect(formatLabels(["Apple", "Banana"], { max: 2 })).toBe("Apple and Banana")
-    expect(formatLabels(["Apple", "Banana", "Pear"], { max: 1, moreLabel: (n) => `+${n}` })).toBe(
+    expect(formatLabels(["Apple", "Banana", "Orange", "Pear"], { maxLabels: 2 })).toBe(
+      "Apple, Banana, and 2 more",
+    )
+    expect(formatLabels(["Apple", "Banana"], { maxLabels: 2 })).toBe("Apple and Banana")
+    expect(formatLabels(["Apple", "Banana", "Pear"], { maxLabels: 1, getMoreLabel: (n) => `+${n}` })).toBe(
       "Apple and +2",
     )
   })

@@ -54,7 +54,7 @@ type State = {
   // Which panel each handle follows, by the handle's key.
   handles: Record<string, number>
   // The handle under the pointer, or within its hit area.
-  hovered: string | null
+  hovering: string | null
   // The handle being dragged.
   dragging: string | null
   // Each panel's size by its id, and what each handle's separator says by
@@ -118,7 +118,7 @@ function shownValues(state: State, locked: readonly boolean[]) {
 
 // What the shown values are worked out from, and the interactions that read
 // the handles' props again.
-const shownKeys = ["layout", "ids", "constraints", "handles", "hovered", "dragging"] as const
+const shownKeys = ["layout", "ids", "constraints", "handles", "hovering", "dragging"] as const
 
 const sameHandleValue = (a: HandleValue, b: HandleValue) =>
   a.panel === b.panel && sameSize(a.now, b.now) && sameSize(a.min, b.min) && sameSize(a.max, b.max)
