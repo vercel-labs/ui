@@ -632,6 +632,23 @@ test.describe("animation", () => {
     expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
   })
 
+  test("the popup transitions in alongside an entrance keyframe animation", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
+    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    await open("popover", { animate: "" })
+    await slowTransitions(page)
+    await page.addStyleTag({
+      content:
+        '@keyframes nudge { from { translate: 0 1px } } [data-slot="popover-content"], .popup { animation: nudge 10s }',
+    })
+    await trigger(page).click()
+    await expect(dialog(page)).toBeVisible()
+    expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
+  })
+
   test("the popup stays mounted while it animates out", async ({ page, open }) => {
     await open("popover", { animate: "" })
     await trigger(page).click()
