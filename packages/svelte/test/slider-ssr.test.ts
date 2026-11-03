@@ -1,6 +1,6 @@
 import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
-import RenderExample from "../../../examples/slider/svelte/render.svelte"
+import RenderExample from "../../../examples/components/slider/svelte/render.svelte"
 import App from "./apps/slider-ssr-app.svelte"
 
 // Runs with no DOM: any access to window or document during render throws.

@@ -135,6 +135,7 @@ const dates = {
   locale: ["en-US", "de-DE"],
   weekStartsOn: [0, 1],
   weekdayFormat: ["short", "narrow"],
+  monthFormat: ["short", "narrow"],
   fixedWeeks: [false, true],
   showOutsideDays: [true, false],
   today: ["2026-10-16", "2026-10-20"],

@@ -347,6 +347,7 @@ const datePickerPrimitive = /* @__PURE__ */ definePrimitive({
     locale: "string",
     weekStartsOn: "number",
     weekdayFormat: "string",
+    monthFormat: "string",
     fixedWeeks: "boolean",
     showOutsideDays: "boolean",
     today: "string",

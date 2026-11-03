@@ -76,6 +76,7 @@ type CalendarModelState = {
   locale: string | null
   weekStartsOn: number | null
   weekdayFormat: "narrow" | "short" | "long"
+  monthFormat: "narrow" | "short" | "long"
   fixedWeeks: boolean
   showOutsideDays: boolean
   minDays: number | undefined
@@ -102,6 +103,7 @@ const calendarSettings = (options: CalendarOptions) => ({
   locale: options.locale ?? null,
   weekStartsOn: options.weekStartsOn === undefined ? null : ((options.weekStartsOn % 7) + 7) % 7,
   weekdayFormat: options.weekdayFormat ?? "short",
+  monthFormat: options.monthFormat ?? "long",
   fixedWeeks: options.fixedWeeks ?? false,
   showOutsideDays: options.showOutsideDays ?? true,
   minDays: options.minDays,
@@ -178,7 +180,7 @@ function preferredDate(state: State) {
 
 function headingLabel(state: State) {
   const locale = localeOf(state)
-  const options = { month: "long", year: "numeric" } as const
+  const options = { month: state.monthFormat, year: "numeric" } as const
   const first = `${state.month}-01`
   if (state.months === 1) return formatDate(first, locale, options)
   return formatDateRange(first, `${addMonthsTo(state.month, state.months - 1)}-01`, locale, options)
@@ -190,7 +192,7 @@ function headingLabel(state: State) {
 const selectCache = new Map<string, CalendarSelectState>()
 function selectState(state: State, kind: "month" | "year") {
   const locale = localeOf(state)
-  const key = `${kind}|${state.month}|${locale}|${state.min}|${state.max}|${isDisabled(state)}`
+  const key = `${kind}|${state.month}|${locale}|${state.monthFormat}|${state.min}|${state.max}|${isDisabled(state)}`
   let cached = selectCache.get(key)
   if (!cached) {
     if (selectCache.size > 50) selectCache.clear()
@@ -206,7 +208,7 @@ function buildSelectState(state: State, kind: "month" | "year", locale: string) 
   const months = kind === "month"
   const from = months ? 1 : Math.min(year, first ? Number(first.slice(0, 4)) : year - 10)
   const to = months ? 12 : Math.max(year, last ? Number(last.slice(0, 4)) : year + 10)
-  const names = monthNames(locale)
+  const names = monthNames(locale, state.monthFormat)
   const format = dateFormatter(locale, { year: "numeric" })
   const select: CalendarSelectState = {
     value: months ? Number(state.month.slice(5, 7)) : year,
@@ -257,13 +259,13 @@ function gridState(state: State, offset: number) {
   const locale = localeOf(state)
   const first = offset === 0
   const last = offset === state.months - 1
-  const key = `${month}|${locale}|${weekStartsOn}|${state.fixedWeeks}|${state.showOutsideDays}|${first}|${last}`
+  const key = `${month}|${locale}|${state.monthFormat}|${weekStartsOn}|${state.fixedWeeks}|${state.showOutsideDays}|${first}|${last}`
   let grid = grids.get(key)
   if (!grid) {
     if (grids.size > 50) grids.clear()
     grid = {
       month,
-      label: formatDate(`${month}-01`, locale, { month: "long", year: "numeric" }),
+      label: formatDate(`${month}-01`, locale, { month: state.monthFormat, year: "numeric" }),
       weekdays: Array.from({ length: 7 }, (_, index) => (weekStartsOn + index) % 7),
       weeks: gridWeeks(month, {
         weekStartsOn,
@@ -610,7 +612,7 @@ function selectSlot<S extends State, A extends Pick<CalendarApi, "internal">>(
 function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>(slot: SlotFactory<S, A>) {
   return {
     heading: slot<{}, CalendarHeadingState>({
-      state: (state) => ({ label: headingLabel(state) }),
+      state: (state) => ({ month: state.month, label: headingLabel(state) }),
       // Screen readers hear the month change after Previous, Next or a key turns it.
       attrs: (state, { id }) => ({ id: `${id}-heading`, "aria-live": "polite" }),
     }),

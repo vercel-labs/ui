@@ -148,6 +148,11 @@ type CalendarOptions = {
    */
   weekdayFormat?: "narrow" | "short" | "long"
   /**
+   * How month names are written, in the heading and the month select.
+   * @defaultValue "long"
+   */
+  monthFormat?: "narrow" | "short" | "long"
+  /**
    * Whether every month shows six weeks, so the calendar doesn't change height.
    * @defaultValue false
    */
@@ -197,7 +202,9 @@ type CalendarState = {
  * @stable
  */
 type CalendarHeadingState = {
-  /** The months shown, like "October 2026", or "October – November 2026". */
+  /** The first month shown, to format the heading yourself. */
+  month: ISOMonth
+  /** The months shown in `monthFormat`, like "October 2026", or "October – November 2026". */
   label: string
 }
 
@@ -259,7 +266,7 @@ type CalendarGridCell = {
 type CalendarGridState = {
   /** The month it shows: the first month shown, plus its `offset`. */
   month: ISOMonth
-  /** The month's name and year, like "October 2026". */
+  /** The month's name and year in `monthFormat`, like "October 2026". */
   label: string
   /** The weekday of each column, 0 for Sunday, in the order they show. */
   weekdays: number[]
@@ -371,6 +378,7 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
     locale: "string",
     weekStartsOn: "number",
     weekdayFormat: "string",
+    monthFormat: "string",
     fixedWeeks: "boolean",
     showOutsideDays: "boolean",
     today: "string",

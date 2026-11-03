@@ -59,7 +59,9 @@ function mount(options: CalendarOptions = {}, { lang, dir }: { lang?: string; di
     seen = new Set()
     const root = el("root", "root", {}, "div", container).el
     const heading = el("heading", "heading", {}, "h2", root)
-    heading.el.textContent = (partState(heading.part) as { label: string }).label
+    const headingState = partState(heading.part) as { label: string; month: string }
+    heading.el.textContent = headingState.label
+    heading.el.dataset.month = headingState.month
     el("previous", "previous", {}, "button", root)
     el("next", "next", {}, "button", root)
     const { months } = instance.get() as { months: number }
@@ -225,6 +227,18 @@ describe("calendar", () => {
     expect(day("2026-10-16").getAttribute("aria-current")).toBe("date")
     expect(container.querySelector('[data-value="2026-09-27"]')!.hasAttribute("data-outside")).toBe(true)
     expect(container.querySelector('[data-value="2026-09-27"]')!.hasAttribute("tabindex")).toBe(false)
+  })
+
+  test("monthFormat writes the heading's month names, while the grid keeps the full name", () => {
+    const { container, heading } = mount({ defaultMonth: "2026-10", monthFormat: "short" })
+    expect(heading()).toBe("Oct 2026")
+    expect(container.querySelector("table")!.getAttribute("aria-label")).toBe("October 2026")
+    expect(mount({ defaultMonth: "2026-10", months: 2, monthFormat: "short" }).heading()).toMatch(/^Oct . Nov 2026$/)
+  })
+
+  test("the heading's state has the first month shown, to format it yourself", () => {
+    const { container } = mount({ defaultMonth: "2026-10", months: 2 })
+    expect(container.querySelector("h2")!.dataset.month).toBe("2026-10")
   })
 
   test("the page's language sets the names and the first day of the week", async () => {
