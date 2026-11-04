@@ -94,7 +94,9 @@ describe("server rendering a slider and a number input", () => {
     const bindings = compileScript(descriptor, { id: "render" }).bindings
     expect(Object.keys(bindings ?? {}).sort()).toEqual(Object.keys(components).sort())
     const html = await renderToString(createSSRApp({ components, template: descriptor.template?.content }))
-    expect(html).toMatch(/<input[^>]*type="range"/)
-    expect(html).toContain("Brightness")
+    const [label, labelId] = html.match(/<label[^>]*\sid="([^"]+)"[^>]*>.*?Brightness/)!
+    const [input, inputId] = html.match(/<input[^>]*type="range"[^>]*\sid="([^"]+)"[^>]*>/)!
+    expect(input).toContain(`aria-labelledby="${labelId}"`)
+    expect(label).toContain(`for="${inputId}"`)
   })
 })

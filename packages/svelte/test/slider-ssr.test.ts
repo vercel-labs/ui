@@ -19,7 +19,9 @@ describe("server rendering a slider", () => {
   // The range input reaches a custom thumb as `children`, and is the only thing that takes focus.
   test("the docs' render example keeps its thumb's range input", () => {
     const html = render(RenderExample).body
-    expect(html).toMatch(/<input[^>]*type="range"/)
-    expect(html).toContain("Brightness")
+    const [label, labelId] = html.match(/<label[^>]*\sid="([^"]+)"[^>]*>.*?Brightness/)!
+    const [input, inputId] = html.match(/<input[^>]*type="range"[^>]*\sid="([^"]+)"[^>]*>/)!
+    expect(input).toContain(`aria-labelledby="${labelId}"`)
+    expect(label).toContain(`for="${inputId}"`)
   })
 })
