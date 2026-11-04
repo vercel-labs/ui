@@ -1909,7 +1909,7 @@ declare global {
     "ui-select-status": UiPartElement<typeof select, "status">
     "ui-select-item-text": UiPartElement<typeof select, "item-text">
     "ui-select-select-all": UiPartElement<typeof select, "select-all">
-    "ui-select-item": UiPartElement<typeof select, "item", "label" | "disabled" | "index" | "value">
+    "ui-select-item": UiPartElement<typeof select, "item", "label" | "disabled" | "index", "value">
     "ui-select-item-indicator": UiPartElement<typeof select, "item-indicator", "keepMounted">
     "ui-select-item-icon": UiPartElement<typeof select, "item-icon", "mirror">
     "ui-select-value-icon": UiPartElement<typeof select, "value-icon">

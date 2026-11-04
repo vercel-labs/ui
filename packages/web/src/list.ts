@@ -143,10 +143,9 @@ const renderedData = new WeakMap<Element, unknown>()
 /** Whether a part was rendered from data, rather than written in the markup. */
 const isGenerated = (el: Element) => generatedItems.has(el)
 
-// Renders data items into a list part, replacing the ones rendered before, as
-// copies of the template's parts. A list with items of its own in the markup
-// keeps them, and data is skipped.
-// Select-all options in the markup stay first, and anything else after.
+// Renders data items into a list part as copies of the template's parts. A list
+// with items of its own anywhere in it, like a virtualized list's rows, skips
+// data. Select-all options in the markup stay first, and anything else after.
 function renderData(
   list: Element,
   prefix: "ui-select" | "ui-autocomplete" | "ui-command",
@@ -154,13 +153,14 @@ function renderData(
   template: HTMLTemplateElement | null,
   toKey?: (value: unknown) => string,
 ) {
-  const own = Array.from(list.children).some(
-    (child) => child.localName === `${prefix}-item` && !generatedItems.has(child),
-  )
-  const last = renderedData.get(list)
-  if (own || last === visible) return
-  renderedData.set(list, visible)
+  const own = Array.from(list.querySelectorAll(`${prefix}-item`)).some((item) => !generatedItems.has(item))
+  if (!own && renderedData.get(list) === visible) return
   for (const child of Array.from(list.children)) if (generatedItems.has(child)) child.remove()
+  if (own) {
+    renderedData.delete(list)
+    return
+  }
+  renderedData.set(list, visible)
   const fresh = renderListItems(prefix, visible, toKey, template)
   for (const el of fresh) {
     generatedItems.add(el)

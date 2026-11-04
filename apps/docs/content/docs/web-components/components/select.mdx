@@ -215,14 +215,13 @@ This example uses [Async Options](../utilities/async-options) to replace stale r
 
 ## Object Values
 
-A value can be an object. Set the select's `items` with the objects as values, and tell it how to identify and display one:
+A value can be an object. Set it as a `ui-select-item`'s `value` property, since attributes only hold text, and tell the select how to identify it, display it, and compare it with another copy:
 
-| Property      | What It Does                                              |
-| ------------- | --------------------------------------------------------- |
-| `itemToValue` | Returns the string used to identify and submit the value. |
-| `itemToLabel` | Returns the text shown in the trigger.                    |
-
-A `ui-select-item` holds that string as its `value`, so a copy of an object, like the initial value here, matches its item through `itemToValue`.
+| Property             | What It Does                                                          |
+| -------------------- | --------------------------------------------------------------------- |
+| `itemToValue`        | Returns the string used to identify and submit the value.             |
+| `itemToLabel`        | Returns the text shown in the trigger.                                |
+| `isItemEqualToValue` | Matches an item with a selected value that may be a different object. |
 
 <ComponentExample
   name="select/object-values"

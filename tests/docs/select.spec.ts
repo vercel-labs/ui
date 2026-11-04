@@ -83,8 +83,10 @@ for (const framework of frameworks) {
 
     for (const name of order) {
       // The last trigger that can open: Disabled shows a disabled and a read-only one first.
+      // A closed web select keeps its search field, hidden, in the page.
       const trigger = example(page, name)
         .locator('[role="combobox"]:not([disabled]):not([aria-disabled="true"]):not([aria-readonly="true"])')
+        .filter({ visible: true })
         .last()
       await trigger.scrollIntoViewIfNeeded()
       await trigger.click()

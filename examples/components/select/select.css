@@ -52,11 +52,11 @@
       grid-template-columns: auto auto;
       gap: var(--space-2) var(--space-3);
 
-      & > [data-slot="select-label"] {
+      & [data-slot="select-label"] {
         justify-self: end;
       }
 
-      & > [data-slot="select-trigger"] {
+      & [data-slot="select-trigger"] {
         min-width: 8rem;
       }
 
@@ -342,16 +342,16 @@
   }
 
   /* The clear button sits inside the trigger's end, before the chevron. */
-  [data-slot="row"]:has(> [data-slot="select-clear"]) {
+  [data-slot="row"]:has([data-slot="select-clear"]) {
     position: relative;
     flex-wrap: nowrap;
 
-    & > [data-slot="select-trigger"] {
+    & [data-slot="select-trigger"] {
       flex: 1;
       padding-inline-end: 8px;
     }
 
-    & > [data-slot="select-trigger"] > [data-slot="select-value"] {
+    & [data-slot="select-trigger"] > [data-slot="select-value"] {
       padding-inline-end: 28px;
     }
   }
