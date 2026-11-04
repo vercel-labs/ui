@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   TriggerMenu,
   TriggerMenuContent,
@@ -14,12 +15,11 @@ import {
 import { UsersIcon } from "lucide-react"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik", disabled: true },
 ]
 
 function Example() {
@@ -36,7 +36,10 @@ function Example() {
         },
       ]}
     >
-      <TriggerMenuInput aria-label="Message" placeholder="Type @ and a first name" />
+      <Field>
+        <FieldLabel>Message</FieldLabel>
+        <FieldControl render={<TriggerMenuInput placeholder="Type @ and a first name" />} />
+      </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           <TriggerMenuGroup>
@@ -46,13 +49,10 @@ function Example() {
                 key={person.value}
                 value={person.value}
                 label={person.label}
-                keywords={person.keywords}
                 disabled={person.disabled}
               >
-                <span aria-hidden="true" data-slot="badge">
-                  {person.label[0]}
-                </span>
                 {person.label}
+                <span data-slot="hint">{person.disabled ? "Deactivated" : `@${person.value}`}</span>
               </TriggerMenuItem>
             ))}
           </TriggerMenuGroup>

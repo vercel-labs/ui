@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -10,28 +11,27 @@ import {
 } from "@ui-sdk/react/trigger-menu"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function Example() {
   return (
-    <TriggerMenu triggers={[{ char: "@", items: people }]}>
-      <TriggerMenuInput render={<input />} aria-label="Assign to" placeholder="Assign with @" />
+    <TriggerMenu triggers={[{ char: "@", items: people }]} autoHighlight={false} loop={false}>
+      <Field>
+        <FieldLabel>Task</FieldLabel>
+        <FieldControl
+          render={<TriggerMenuInput render={<input />} placeholder="Type @ to assign someone" />}
+        />
+      </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           {(state) =>
             (state.items as TriggerMenuDataItem[]).map((item) => (
-              <TriggerMenuItem
-                key={item.value}
-                value={item.value}
-                label={item.label}
-                disabled={item.disabled}
-              >
+              <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
                 {item.label}
               </TriggerMenuItem>
             ))

@@ -1,10 +1,26 @@
 @scope ([data-example]) {
+  /* Room below the field for the open list, above the console. */
+  :scope:is([data-example="trigger-menu/controlled"], [data-example="trigger-menu/controller"]) {
+    min-height: 24rem;
+  }
+
+  /* Room below the field for the grouped list. */
+  :scope[data-example="trigger-menu/custom-items"] {
+    min-height: 32rem;
+  }
+
+  /* A comment box at the bottom, like a chat composer, with room above it for the list. */
+  :scope[data-example="trigger-menu/positioning"] {
+    justify-content: flex-end;
+  }
+
   [data-slot="trigger-menu-input"] {
     box-sizing: border-box;
     width: 20rem;
     max-width: 100%;
     min-height: 80px;
-    padding: 8px 10px;
+    max-height: 12rem;
+    padding: var(--space-2) 10px;
     border: 0;
     border-radius: var(--radius-control);
     background: var(--surface-1);
@@ -17,11 +33,12 @@
       color: var(--muted);
     }
 
-    &:hover {
+    &:hover:not(:focus-visible, :disabled, [readonly]) {
       box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:focus-visible {
+      outline: 3px solid var(--halo);
       outline-offset: 0;
       box-shadow: inset 0 0 0 1px var(--ink);
     }
@@ -57,7 +74,7 @@
       color: var(--muted);
     }
 
-    & > [data-slot="badge"] {
+    & > :is([data-slot="badge"], [data-slot="hint"]) {
       margin-inline-start: auto;
     }
 
@@ -84,5 +101,13 @@
 
   [data-slot="trigger-menu-hint"] {
     font-variant-numeric: tabular-nums;
+  }
+
+  [data-slot="trigger-menu-content"] > [data-slot="trigger-menu-status"] {
+    padding: 6px 10px;
+
+    &:empty {
+      display: none;
+    }
   }
 }

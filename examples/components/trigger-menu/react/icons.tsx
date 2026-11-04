@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   TriggerMenu,
   TriggerMenuContent,
@@ -21,7 +22,10 @@ const commands = [
 function Example() {
   return (
     <TriggerMenu triggers={[{ char: "/", boundary: "start", type: "command" }]}>
-      <TriggerMenuInput aria-label="Message" placeholder="Type / for commands" />
+      <Field>
+        <FieldLabel>Message</FieldLabel>
+        <FieldControl render={<TriggerMenuInput placeholder="Type / for commands" />} />
+      </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           {commands.map((command) => (

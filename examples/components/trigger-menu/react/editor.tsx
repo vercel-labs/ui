@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   type TextEditorAdapter,
   type TriggerMenuDataItem,
@@ -12,37 +13,35 @@ import {
 import * as React from "react"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function Example() {
   const [editor, setEditor] = React.useState<TextEditorAdapter>()
   return (
     <TriggerMenu editor={editor} triggers={[{ char: "@", items: people }]}>
-      <textarea
-        ref={(field) => {
-          if (field && editor?.element !== field) {
-            setEditor(textFieldAdapter(field))
+      <Field>
+        <FieldLabel>Notes</FieldLabel>
+        <FieldControl
+          render={
+            <textarea
+              ref={(field) => {
+                if (field && editor?.element !== field) setEditor(textFieldAdapter(field))
+              }}
+              placeholder="Type @ to mention someone"
+            />
           }
-        }}
-        aria-label="Notes"
-        placeholder="A textarea you render yourself"
-      />
+        />
+      </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           {(state) =>
             (state.items as TriggerMenuDataItem[]).map((item) => (
-              <TriggerMenuItem
-                key={item.value}
-                value={item.value}
-                label={item.label}
-                disabled={item.disabled}
-              >
+              <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
                 {item.label}
               </TriggerMenuItem>
             ))

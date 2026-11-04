@@ -432,6 +432,10 @@ const components: Record<string, Component> = {
       onDismissAttempt: "TriggerMenuOptions",
       // Only changes the words of the polite pending announcement. Button's pending examples show it.
       pendingAnnouncement: "TriggerMenuOptions",
+      // Loaders report their own status, as Loading Items shows; this is for items an app loads itself.
+      status: "TriggerMenuOptions",
+      // Logs every change to the console, which no example should do.
+      debug: "TriggerMenuOptions",
     },
   },
   "token-input": {
