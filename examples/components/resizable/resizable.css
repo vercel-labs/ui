@@ -128,5 +128,27 @@
     &:is(:hover, [data-hovering], [data-dragging], :focus-visible) > div {
       box-shadow: inset 0 0 0 1px var(--ink);
     }
+
+    /* A finger needs a wider target than a pointer. */
+    @media (pointer: coarse), (max-width: 40rem) {
+      &::before {
+        inset: 0 -12px;
+      }
+
+      &[aria-orientation="horizontal"]::before {
+        inset: -12px 0;
+      }
+
+      & > div {
+        width: 10px;
+        height: 28px;
+        border-radius: 5px;
+      }
+
+      &[aria-orientation="horizontal"] > div {
+        width: 28px;
+        height: 10px;
+      }
+    }
   }
 }
