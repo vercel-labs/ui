@@ -23,7 +23,7 @@ function Toggle({
   return (
     <TogglePrimitive
       className={cn(
-        "inline-flex size-7 items-center justify-center rounded-[14px] text-subtle outline-none transition-[color,background-color,box-shadow] select-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs dark:data-pressed:bg-foreground/10 [&_svg:not([class*='size-'])]:size-3.5",
+        "hit-area inline-flex size-7 items-center justify-center rounded-[14px] text-subtle outline-none transition-[color,background-color,box-shadow] select-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-pressed:bg-background data-pressed:text-foreground data-pressed:shadow-xs dark:data-pressed:bg-foreground/10 [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
       {...props}

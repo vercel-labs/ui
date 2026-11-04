@@ -8,7 +8,7 @@ function SiteFooter() {
         <a
           href="https://vercel.com"
           aria-label="Vercel"
-          className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+          className="hit-area rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
         >
           <VercelLogo className="h-4 w-auto" />
         </a>
