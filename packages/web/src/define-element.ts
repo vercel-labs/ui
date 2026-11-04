@@ -483,6 +483,8 @@ type Part = {
   version?: number
   // Whether it was present when it last synced.
   shown?: boolean
+  // The `data-slot` it last wrote, which a part around it on the same element writes too.
+  dataSlot?: string
   // Reads its props again, for parts whose props come from their surroundings.
   reread?: () => Record<string, unknown>
   // Watches a native child's attributes that its props follow.
@@ -534,6 +536,17 @@ const partOwners = new WeakMap<Element, OwnerElement>()
 
 // Each part element's part, so a part inside it can take its props.
 const slotParts = new WeakMap<Element, Part>()
+
+// Another component's part between `part`'s own element and the element both
+// bind, like a number input's control inside a toolbar input. Its `data-slot`
+// wins, as the element passed to `render` wins in the other frameworks.
+function innerPart(part: Part, owner: HTMLElement) {
+  for (let node: HTMLElement | null = part.el; node && node !== owner; node = node.parentElement) {
+    const other = slotParts.get(node)
+    if (other === part) return
+    if (other?.el === part.el) return other
+  }
+}
 
 // A part its owner let go of when it left the page registers again once the owner is back.
 const registered = new WeakSet<Part>()
@@ -1253,6 +1266,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // An attribute the owner writes on itself is state, not an option, like a
       // grouped checkbox's `disabled` from its group, so it never disables it for good.
       #apply(part: Part, attrs: Record<string, string | undefined>) {
+        const inner = innerPart(part, this)
+        if (inner?.dataSlot) attrs = { ...attrs, "data-slot": inner.dataSlot }
+        part.dataSlot = attrs["data-slot"]
         const rendering = this.#rendering
         this.#rendering = part.el === this
         this.#applying.add(part)
