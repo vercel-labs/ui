@@ -68,7 +68,7 @@ function MobileNav({
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             aria-label="Menu"
-            className="group -me-2 inline-flex size-10 touch-manipulation items-center justify-center rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+            className="group -me-3 inline-flex size-10 touch-manipulation items-center justify-center rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
           >
             <span className="relative size-4">
               <span className="absolute start-0 top-1 h-0.5 w-4 bg-foreground transition-all duration-100 group-aria-expanded:top-[0.4375rem] group-aria-expanded:-rotate-45 motion-reduce:transition-none" />
