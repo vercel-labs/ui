@@ -303,7 +303,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-package.mjs --use-client --server primitive.ts --server render-element.ts",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "typecheck": "node ../../scripts/tsgo.mjs --noEmit && node ../../scripts/tsgo.mjs --noEmit -p tsconfig.test.json",
     "test": "vitest run"
   },
   "peerDependencies": {

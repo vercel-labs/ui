@@ -7,7 +7,7 @@
     "dev": "next dev --port ${REVIEW_PORT:-5610}",
     "build": "next build",
     "start": "next start --port ${REVIEW_PORT:-5610}",
-    "typecheck": "next typegen && tsc --noEmit"
+    "typecheck": "next typegen && node ../../../scripts/tsgo.mjs --noEmit"
   },
   "dependencies": {
     "@ui-sdk/core": "workspace:*",

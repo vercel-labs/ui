@@ -6,7 +6,7 @@
     "dev": "vite --port ${PLAYGROUND_PORT:-5300} --strictPort",
     "build": "NODE_ENV=development vite build && NODE_ENV=development vite build --ssr src/ssr.ts --outDir dist-ssr && NODE_ENV=development vite build --ssr src/ssr/vue.ts --outDir dist-ssr --emptyOutDir false",
     "preview": "vite preview --port ${PLAYGROUND_PORT:-5300} --strictPort",
-    "typecheck": "vue-tsc --noEmit && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings && tsc --noEmit -p tsconfig.solid.json"
+    "typecheck": "vue-tsc --noEmit && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings && node ../../scripts/tsgo.mjs --noEmit -p tsconfig.solid.json"
   },
   "dependencies": {
     "@guidepup/virtual-screen-reader": "^0.33.0",

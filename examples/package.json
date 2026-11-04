@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.vue.json && tsc --noEmit -p tsconfig.react.json && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings && tsc --noEmit -p tsconfig.solid.json"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.vue.json && node ../scripts/tsgo.mjs --noEmit -p tsconfig.react.json && svelte-check --tsconfig ./tsconfig.svelte.json --fail-on-warnings && node ../scripts/tsgo.mjs --noEmit -p tsconfig.solid.json"
   },
   "dependencies": {
     "@lucide/svelte": "1.54.0",

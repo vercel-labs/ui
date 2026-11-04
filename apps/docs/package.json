@@ -6,7 +6,7 @@
     "dev": "next dev --port ${DOCS_PORT:-5400}",
     "build": "node scripts/web-releases.mjs && next build",
     "start": "next start --port ${DOCS_PORT:-5400}",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "next typegen && node ../../scripts/tsgo.mjs --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

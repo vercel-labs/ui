@@ -7,7 +7,7 @@
     "dev": "vite --port ${TRACKER_PORT:-5604}",
     "build": "vite build",
     "preview": "vite preview --port ${TRACKER_PORT:-5604}",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "node ../../../scripts/tsgo.mjs --noEmit"
   },
   "dependencies": {
     "@ui-sdk/core": "workspace:*",

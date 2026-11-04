@@ -6,7 +6,7 @@
     "dev": "next dev --port ${REGISTRY_PORT:-5500}",
     "build": "next build",
     "start": "next start --port ${REGISTRY_PORT:-5500}",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "next typegen && node ../../scripts/tsgo.mjs --noEmit",
     "test": "vitest run",
     "release": "node scripts/release.mjs",
     "invite": "node scripts/invite.mjs"
