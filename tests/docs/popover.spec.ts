@@ -188,6 +188,10 @@ for (const framework of frameworks) {
       await expect(dialog).toHaveAttribute("data-side", side.toLowerCase())
       await expect(arrow).toHaveAttribute("data-side", side.toLowerCase())
     }
+    // Escape still closes it while focus is on a Side button.
+    await expect(preview.getByRole("button", { name: "Bottom" })).toBeFocused()
+    await page.keyboard.press("Escape")
+    await expect(dialog).toHaveCount(0)
   })
 }
 
@@ -252,6 +256,16 @@ for (const framework of frameworks) {
     await expect(popover).toHaveCount(0)
     await expect(checkbox).not.toBeChecked()
     await expect(lastLog(preview)).toHaveText("Closed (escape-key)")
+    // Pressing the label while it's open closes it once, not as an outside press the click then undoes.
+    const label = preview.locator("label", { hasText: "Open" })
+    await label.click()
+    await expect(popover).toBeVisible()
+    await label.click()
+    await expect(popover).toHaveCount(0)
+    await expect(checkbox).not.toBeChecked()
+    await page.waitForTimeout(300)
+    await expect(popover).toHaveCount(0)
+    await expect(lastLog(preview)).toHaveText("Closed (escape-key)")
   })
 }
 
@@ -298,9 +312,10 @@ test("every popover prop appears in an example", () => {
   // A type's own fields, after any types it extends, like `PortalProps & {`.
   const block = (name: string) =>
     source.slice(source.search(new RegExp(`type ${name} = [^{]*\\{`))).split(/\n\s*\}\n/)[0]
-  const props = [...`${block("PopoverOptions")}${block("ContentProps")}`.matchAll(/^ +(\w+)\?:/gm)].map(
-    (match) => match[1],
-  )
+  // A popover that starts open would cover the docs page as it loads.
+  const props = [...`${block("PopoverOptions")}${block("ContentProps")}`.matchAll(/^ +(\w+)\?:/gm)]
+    .map((match) => match[1])
+    .filter((prop) => prop !== "defaultOpen")
   expect(props.length).toBeGreaterThan(10)
   const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
   for (const folder of folders) {
@@ -309,11 +324,13 @@ test("every popover prop appears in an example", () => {
       .map((file) => readFileSync(path.join(root, folder, file.name), "utf8"))
       .join("\n")
     // Callbacks are events in Vue (@open-change) and web components (openchange).
+    // A web component's controller is its `api` property.
     const spellings = (prop: string) => [
       prop,
       kebab(prop),
       kebab(prop.replace(/^on(\w)/, (_, char: string) => char.toLowerCase())),
       prop.replace(/^on/, "").toLowerCase(),
+      ...(prop === "controller" ? [".api."] : []),
     ]
     const missing = props.filter((prop) => !spellings(prop).some((spelling) => code.includes(spelling)))
     expect(missing, folder).toEqual([])

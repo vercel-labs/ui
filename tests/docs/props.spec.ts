@@ -858,7 +858,8 @@ function publicNames(component: Component) {
   return names
 }
 
-// A framework's examples, and the local modules they import, without comments.
+// A framework's examples, the local modules they import and the code snippets on
+// its component pages, without comments.
 function exampleSource(folders: string | string[], framework: "react" | "solid") {
   const seen = new Set<string>()
   const read = (file: string) => {
@@ -873,13 +874,19 @@ function exampleSource(folders: string | string[], framework: "react" | "solid")
       if (resolved) read(resolved)
     }
   }
+  const snippets: string[] = []
   for (const folder of [folders].flat()) {
     const examples = path.join(exampleFolder(folder), framework)
     for (const file of readdirSync(examples)) read(path.join(examples, file))
+    const page = path.join(repo, "apps/docs/content/docs", framework, "components", `${folder}.mdx`)
+    if (existsSync(page))
+      for (const [, block] of readFileSync(page, "utf8").matchAll(
+        /```(?:tsx|jsx|ts|js)\b[^\n]*\n([\s\S]*?)```/g,
+      ))
+        snippets.push(block)
   }
   return (
-    [...seen]
-      .map((file) => readFileSync(file, "utf8"))
+    [...[...seen].map((file) => readFileSync(file, "utf8")), ...snippets]
       .join("\n")
       // A block comment never follows a word character, unlike `"image/*"`.
       .replace(/(^|\W)\{?\/\*[\s\S]*?\*\/\}?/g, "$1")
