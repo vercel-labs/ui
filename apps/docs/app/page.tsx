@@ -37,15 +37,17 @@ export default function HomePage() {
               component we haven’t thought of yet.
             </p>
             <p className="flex items-center gap-2">
-              That’s{" "}
-              <Logo
-                role="img"
-                aria-hidden={false}
-                aria-label="UI SDK"
-                focusable="false"
-                className="inline-block h-[0.875rem] w-auto"
-              />
-              .
+              That’s
+              <span className="flex items-center">
+                <Logo
+                  role="img"
+                  aria-hidden={false}
+                  aria-label="UI SDK"
+                  focusable="false"
+                  className="inline-block h-[0.875rem] w-auto"
+                />
+                .
+              </span>
             </p>
             <p>
               We abstracted the complex interactions of user interfaces into reusable behaviors. And we taught
