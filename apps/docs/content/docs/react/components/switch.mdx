@@ -3,17 +3,17 @@ title: Switch
 description: Turn a setting on or off.
 ---
 
-A switch changes a setting between on and off. Keep its label the same in both states: “Airplane Mode” tells you what changes; the switch tells you whether it is on.
+Use a switch for a setting that takes effect as soon as it changes, like Airplane mode or a notification preference. Keep its label the same in both states: the label says what the setting is, and the switch shows whether it's on.
 
 <ComponentExample
   name="switch/basic"
-  caption="Click Airplane Mode, or focus it and press Space, to turn it on and off."
+  caption="Click Airplane mode, or focus the switch and press Space, to turn it on and off."
 />
 
 ## Installation
 
-```package-install
-npm install @ui-sdk/react
+```bash
+npm install @ui-sdk/react @ui-sdk/core
 ```
 
 ## Composition
@@ -25,7 +25,7 @@ Switch
 └── SwitchThumb
 ```
 
-`Switch` renders a button with `role="switch"`. `SwitchThumb` stays mounted and reflects the checked state, so CSS can slide it. The switch adds a hidden native checkbox for form submission, validation, and reset.
+Wrap the switch and its text in a label. The thumb stays mounted and gets the switch's state, so CSS can slide it from one end to the other.
 
 ## Usage
 
@@ -37,10 +37,10 @@ import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 function Example() {
   return (
     <label>
+      Airplane mode
       <Switch>
         <SwitchThumb />
       </Switch>
-      Airplane Mode
     </label>
   )
 }
@@ -48,102 +48,105 @@ function Example() {
 export { Example }
 ```
 
-## Examples
+## Description
 
-### Description
-
-Wrap the switch in `Field` to connect `FieldLabel` and `FieldDescription` automatically.
+Use `FieldLabel` and `FieldDescription` when a setting needs more explanation. The field connects both to the switch.
 
 <ComponentExample
   name="switch/description"
-  caption="Click the label or switch. The description stays connected to the control for screen readers."
+  caption="Click Weekly digest. The field connects the label and description to the switch."
 />
 
-### Choice Card
+## Choice Card
 
-A setting can fill a whole row. Here, the label’s pseudo-element covers the card, so clicking its empty space toggles the switch too.
+A setting can fill a whole card. Here the label's `::after` covers the card, so a click anywhere on it toggles the switch, and `:has([data-checked])` marks the cards that are on.
 
 <ComponentExample
   name="switch/choice-card"
-  caption="Click either card to change its setting. Each switch has its own value."
+  caption="Click anywhere on the Public profile card to turn it on. Each card's switch keeps its own value."
 />
 
-### Disabled
+## Disabled
 
-`disabled` prevents interaction and removes the switch from the Tab order. A disabled switch does not submit a value.
+`disabled` prevents focus and changes, and leaves the switch out of form submissions. A disabled `fieldset` does the same.
 
 <ComponentExample
   name="switch/disabled"
-  caption="Try clicking Disabled. Its value stays off, and Tab skips it."
+  caption="Security alerts are always on, so that switch is disabled. Clicking it leaves it on, and Tab skips it."
 />
 
-### Invalid
+## Read-Only
 
-A `required` switch must be on before its form can submit. `FieldError` displays the validation message and connects it to the switch.
+`readOnly` keeps the switch focusable and included in form submissions, while preventing the user from changing it. Use it for a setting managed somewhere else.
 
-<ComponentExample
-  name="switch/invalid"
-  caption="Press Continue with the switch off to show the error. Accept the terms, then submit again."
-/>
+<ComponentExample name="switch/read-only" caption="Tab to Encrypt backups. Space and clicks leave it on." />
 
-<span id="behavior-and-options" />
+## Controlled
 
-### Controlled
-
-Pass `checked` and update it in `onCheckedChange`. Use `defaultChecked` when the switch should own its state. Pass a controller from `createSwitchController()` when another control needs to toggle it. The [state and events guide](../state-and-events) covers the shared change callback contract.
+Pass `checked` and `onCheckedChange` to own the value. A [controller](#controller) from `createSwitchController()` changes it from anywhere, like the Toggle button below. See [State and Events](../state-and-events) for the shared change callback.
 
 <ComponentExample
   name="switch/controlled"
-  caption="Change Wi-Fi directly or press Toggle from outside. The readout shows the value and what caused the change."
+  caption="Turn Wi-Fi off, or press Toggle. The console logs each change and its reason."
 />
 
-### Read Only
+## Form
 
-`readOnly` keeps the switch focusable and included in form submissions, while preventing changes. It works well for a setting managed elsewhere.
-
-<ComponentExample
-  name="switch/read-only"
-  caption="Focus or click Encrypt backups. It stays on because the organization manages this setting."
-/>
-
-<span id="forms" />
-
-### Form
-
-Give each switch a `name`. An on switch submits its `value`, which defaults to `"on"`; an off switch submits nothing. Use `form` to connect a switch outside the form, and Reset to restore the defaults. See [forms](../forms) for the shared validation and reset behavior.
+Set `name` to include the switch in a native form. A switch that's on submits its `value`, which defaults to `"on"`; a switch that's off submits nothing. Reset returns it to `defaultChecked`. Set `form` to a form's id to join it from elsewhere on the page.
 
 <ComponentExample
   name="switch/form"
-  caption="Change the email settings and Join the beta, then press Save to inspect the submitted values. Reset restores the defaults and clears the result."
+  caption="Turn on Product updates and press Save. The console logs the submitted values, and Reset restores the defaults."
 />
 
-### Saving on Toggle
+## Validation
 
-Call `details.cancel()` synchronously in the change callback to keep the current value while a save runs. On success, call `controller.setChecked(next, { reason: "imperative" })`. Let that reason through in the callback so the saved value can commit.
+`required` blocks submission until the switch is on. In a [Field](./field), `FieldError` shows the message under the switch and connects it to the switch. [Forms and Validation](../forms) covers the shared field behavior.
 
-This example blocks repeated changes while saving and announces the result. `aria-busy` describes the pending work; the callback is what prevents another change.
+<ComponentExample
+  name="switch/invalid"
+  caption="Press Continue with the switch off to see the error. Turn on Two-factor authentication and continue; the console logs the submitted value."
+/>
+
+## Saving on Toggle
+
+To save a change before it shows, call `details.cancel()` in the change callback to keep the current value while the save runs. When it finishes, call `controller.setChecked(next, { reason: "imperative" })`, and let that reason through in the callback so the saved value commits.
+
+The example ignores presses while a save is running, and shows a spinner in the thumb. `aria-busy` tells assistive technology the switch is busy; the callback is what blocks another change.
 
 <ComponentExample
   name="switch/async"
-  caption="Toggle Automatic backups. The switch keeps its value while Saving… is shown, then changes after the save finishes."
+  caption="Turn on Automatic backups. The thumb shows a spinner while it saves, then the switch turns on."
+/>
+
+## Custom Rendering
+
+The switch and thumb take `render`. Pass an element and its props merge with the part's, or a function that receives the props and the part's state. Keep the part's props on the element so its role, label and keyboard behavior stay connected. See [Parts and Composition](../parts-and-composition) for the rendering contract.
+
+<ComponentExample
+  name="switch/render"
+  caption="Turn on Dark mode. The thumb renders a sun or a moon from its state."
 />
 
 ## Styling
 
-<span id="size" />
-<span id="right-to-left" />
+Style the switch and its thumb with `data-checked` and `data-unchecked`, and use `data-disabled`, `data-readonly` and `data-required` for the rest. In an invalid field, the switch also gets `data-invalid` and `aria-invalid`; the thumb doesn't. Slide the thumb with `translate` on `data-checked`, and reverse it under `dir="rtl"`.
 
-Style the track and thumb with `data-checked`, `data-unchecked`, `data-disabled`, and `data-readonly`. Validation adds `data-invalid` and `aria-invalid` to the control. The thumb receives the switch state, not the field’s validation state.
+Each part has a `data-slot`, such as `switch-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
-The examples reverse the thumb’s translation under `dir="rtl"` and disable transitions for reduced motion. See [styling and animation](../styling-and-animation) for the shared styling contract.
+## Data Attributes
 
-## Custom Rendering
+### Switch [#data-attributes-switch]
 
-<span id="render-functions" />
+<DataAttributes component="switch" part="root" />
 
-The [composition guide](../parts-and-composition) explains how to forward part props when you change the rendered element.
+### SwitchThumb [#data-attributes-switchthumb]
+
+<DataAttributes component="switch" part="thumb" />
 
 ## API Reference
+
+Props and callbacks are the same as below, as React props.
 
 ### Switch
 
@@ -151,8 +154,7 @@ The [composition guide](../parts-and-composition) explains how to forward part p
 
 ### State
 
-What render functions, state-based class names and slots receive. The thumb's state, `SwitchThumbState`, is
-the same.
+What render functions, state-based class names and slots receive. The thumb's state, `SwitchThumbState`, is the same.
 
 <StateTable path="../../packages/core/src/components/switch/switch.ts" name="SwitchState" />
 
@@ -180,6 +182,30 @@ Callbacks get the new state first, then the details.
 
 ## Accessibility
 
-The switch follows the [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). Every line below is an automated test.
+The switch follows the [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). `Switch` renders a button with the `switch` role, and a hidden native checkbox that takes part in forms.
+
+### Keyboard
+
+| Key   | Does                                   |
+| ----- | -------------------------------------- |
+| Tab   | Moves to the next switch               |
+| Space | Turns it on or off                     |
+| Enter | Submits its form, and never toggles it |
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="switch" />
+
+In forms:
+
+<SpecList spec="forms.form" />
+
+Beyond the pattern's baseline:
+
+<SpecList spec="forms.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="forms.sr" />

@@ -2,12 +2,20 @@ import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 
 function Example() {
   return (
-    <label data-slot="label">
-      <Switch disabled>
-        <SwitchThumb />
-      </Switch>
-      Disabled
-    </label>
+    <div data-slot="stack">
+      <label data-slot="label">
+        Product updates
+        <Switch>
+          <SwitchThumb />
+        </Switch>
+      </label>
+      <label data-slot="label">
+        Security alerts
+        <Switch defaultChecked disabled>
+          <SwitchThumb />
+        </Switch>
+      </label>
+    </div>
   )
 }
 

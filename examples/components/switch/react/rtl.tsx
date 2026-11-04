@@ -1,14 +1,16 @@
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <label data-slot="label">
+        وضع الطيران
         <Switch>
           <SwitchThumb />
         </Switch>
-        وضع الطيران
       </label>
     </div>
   )
 }
+
+export { Example }

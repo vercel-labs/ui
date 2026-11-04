@@ -1,85 +1,107 @@
-import { expect, test } from "@playwright/test"
-import { readdirSync } from "node:fs"
-import path from "node:path"
+import { expect, type Locator } from "@playwright/test"
+import { testExamples, type Check } from "./docs-helpers"
 
-const frameworks = ["react", "vue", "web-components", "svelte", "solid"]
-// Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/components/switch")
-const folders = ["react", "vue", "web", "svelte", "solid"]
-const examplesIn = (folder: string) =>
-  readdirSync(path.join(root, folder), { withFileTypes: true })
-    .filter((file) => file.isFile())
-    .map((file) => file.name.replace(/\.\w+$/, ""))
+// The newest line in an example's console.
+const lastLog = (preview: Locator) =>
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
-// The order examples appear on the Switch page, the switch to press in each,
-// and whether it's on before and after the press.
-const press: Record<string, { name: RegExp; from: boolean; to: boolean }> = {
-  basic: { name: /^Airplane Mode$/, from: false, to: true },
-  description: { name: /^Share across devices$/, from: false, to: true },
-  "choice-card": { name: /^Share across devices$/, from: false, to: true },
-  disabled: { name: /^Disabled$/, from: false, to: false },
-  invalid: { name: /^I agree to the terms$/, from: false, to: true },
-  controlled: { name: /^Wi-Fi$/, from: true, to: false },
-  "read-only": { name: /^Encrypt backups$/, from: true, to: true },
-  form: { name: /^Marketing emails$/, from: false, to: true },
-  async: { name: /^Automatic backups$/, from: false, to: true },
+const switchNamed = (preview: Locator, name: string) => preview.getByRole("switch", { name, exact: true })
+
+// Clicks a switch, then presses Space on it, and checks each turns it over.
+const toggles =
+  (name: string, from = false): Check =>
+  async (preview) => {
+    const control = switchNamed(preview, name)
+    await expect(control).toHaveAttribute("aria-checked", String(from))
+    await control.click()
+    await expect(control).toHaveAttribute("aria-checked", String(!from))
+    await control.press("Space")
+    await expect(control).toHaveAttribute("aria-checked", String(from))
+  }
+
+// Each example's check, in the order they appear on the Switch page.
+const checks: Record<string, Check> = {
+  basic: toggles("Airplane mode"),
+  description: async (preview) => {
+    await expect(switchNamed(preview, "Weekly digest")).toHaveAccessibleDescription(
+      "A summary of your week, every Monday.",
+    )
+    await toggles("Weekly digest")(preview, "")
+  },
+  "choice-card": async (preview) => {
+    const profile = switchNamed(preview, "Public profile")
+    await expect(profile).toHaveAttribute("aria-checked", "false")
+    // The label covers its card, so a click anywhere on the card toggles the switch.
+    await preview.locator('[data-variant="card"]').filter({ hasText: "Public profile" }).click()
+    await expect(profile).toHaveAttribute("aria-checked", "true")
+    await expect(switchNamed(preview, "Show activity status")).toHaveAttribute("aria-checked", "true")
+  },
+  disabled: async (preview) => {
+    await toggles("Product updates")(preview, "")
+    const alerts = switchNamed(preview, "Security alerts")
+    await expect(alerts).toBeDisabled()
+    await alerts.click({ force: true })
+    await expect(alerts).toHaveAttribute("aria-checked", "true")
+  },
+  "read-only": async (preview) => {
+    const encrypt = switchNamed(preview, "Encrypt backups")
+    await encrypt.click()
+    await expect(encrypt).toBeFocused()
+    await encrypt.press("Space")
+    await expect(encrypt).toHaveAttribute("aria-checked", "true")
+  },
+  controlled: async (preview) => {
+    const wifi = switchNamed(preview, "Wi-Fi")
+    await wifi.click()
+    await expect(wifi).toHaveAttribute("aria-checked", "false")
+    await expect(lastLog(preview)).toHaveText("Off (press)")
+    await preview.getByRole("button", { name: "Toggle", exact: true }).click()
+    await expect(wifi).toHaveAttribute("aria-checked", "true")
+    await expect(lastLog(preview)).toHaveText("On (imperative)")
+  },
+  form: async (preview) => {
+    await switchNamed(preview, "Product updates").click()
+    await preview.getByRole("button", { name: "Save" }).click()
+    await expect(lastLog(preview)).toHaveText("Submitted updates=on&security=on&digest=weekly")
+    await preview.getByRole("button", { name: "Reset" }).click()
+    await expect(switchNamed(preview, "Product updates")).toHaveAttribute("aria-checked", "false")
+    await expect(switchNamed(preview, "Weekly digest")).toHaveAttribute("aria-checked", "true")
+  },
+  invalid: async (preview) => {
+    const twoFactor = switchNamed(preview, "Two-factor authentication")
+    await preview.getByRole("button", { name: "Continue" }).click()
+    await expect(preview.getByText("Turn this on to continue.")).toBeVisible()
+    await expect(twoFactor).toHaveAttribute("aria-invalid", "true")
+    await twoFactor.click()
+    await expect(preview.getByText("Turn this on to continue.")).toBeHidden()
+    await preview.getByRole("button", { name: "Continue" }).click()
+    await expect(lastLog(preview)).toHaveText("Submitted two-factor=on")
+  },
+  async: async (preview) => {
+    const backups = switchNamed(preview, "Automatic backups")
+    await backups.click()
+    // The switch keeps its value while the save runs.
+    await expect(backups).toHaveAttribute("aria-busy", "true")
+    await expect(backups).toHaveAttribute("aria-checked", "false")
+    await expect(lastLog(preview)).toHaveText("Saving…")
+    await expect(backups).toHaveAttribute("aria-checked", "true")
+    await expect(lastLog(preview)).toHaveText("Saved: on")
+  },
+  render: async (preview) => {
+    await toggles("Dark mode")(preview, "")
+    await expect(preview.locator('[data-slot="switch-thumb"] svg')).toHaveCount(1)
+  },
 }
-const order = Object.keys(press)
 
-for (const framework of frameworks) {
-  test(`every switch example works in ${framework}`, async ({ page }) => {
-    const errors: string[] = []
-    page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
-    await page.goto(`/docs/${framework}/components/switch`)
-    const previews = page.locator("[data-example]")
-    await expect(previews).toHaveCount(order.length)
-    for (const folder of folders)
-      expect(examplesIn(folder).sort(), folder).toEqual([...order, "size", "rtl", "render"].sort())
+// Every check reads its own example, since each example's Code panel stays mounted.
+const scoped = Object.fromEntries(
+  Object.entries(checks).map(([name, check]): [string, Check] => [
+    name,
+    (preview, framework) => check(preview.page().locator(`[data-example="switch/${name}"]`), framework),
+  ]),
+)
 
-    for (const [index, name] of order.entries()) {
-      const { name: label, from, to } = press[name]
-      const control = previews.nth(index).getByRole("switch", { name: label })
-      await expect(control, `${name} starts`).toHaveAttribute("aria-checked", String(from))
-      await control.click({ force: name === "disabled" })
-      // The async example waits for a fake save before it turns on.
-      await expect(control, `${name} after a press`).toHaveAttribute("aria-checked", String(to))
-    }
-
-    // Submitting without the required switch shows the error.
-    const invalid = previews.nth(order.indexOf("invalid"))
-    const terms = invalid.getByRole("switch", { name: /^I agree to the terms$/ })
-    await terms.click()
-    await expect(terms).toHaveAttribute("aria-checked", "false")
-    await invalid.getByRole("button", { name: "Continue" }).click()
-    await expect(invalid.getByText("You must agree to the terms to continue.")).toBeVisible()
-    await expect(terms).toHaveAttribute("aria-invalid", "true")
-
-    // The controller toggles the switch from outside.
-    const controlled = previews.nth(order.indexOf("controlled"))
-    await controlled.getByRole("button", { name: "Toggle from outside" }).click()
-    await expect(controlled.getByRole("switch", { name: /^Wi-Fi$/ })).toHaveAttribute("aria-checked", "true")
-    await expect(controlled.getByText(/last change: imperative/)).toBeVisible()
-
-    // Saving submits the switches that are on, with the one outside the form, and Reset restores them.
-    const form = previews.nth(order.indexOf("form"))
-    await form.getByRole("switch", { name: /^Join the beta$/ }).click()
-    await form.getByRole("button", { name: "Save" }).click()
-    await expect(form.getByText("Submitted: marketing=on, security=on, digest=weekly, beta=on")).toBeVisible()
-    await form.getByRole("button", { name: "Reset" }).click()
-    await expect(form.getByRole("switch", { name: /^Marketing emails$/ })).toHaveAttribute(
-      "aria-checked",
-      "false",
-    )
-    await expect(form.getByRole("switch", { name: /^Join the beta$/ })).toHaveAttribute(
-      "aria-checked",
-      "false",
-    )
-    await expect(form.getByRole("switch", { name: /^Weekly digest$/ })).toHaveAttribute(
-      "aria-checked",
-      "true",
-    )
-
-    expect(errors).toEqual([])
-  })
-}
+testExamples("switch", scoped, "components", [...Object.keys(checks), "rtl", "size"])
