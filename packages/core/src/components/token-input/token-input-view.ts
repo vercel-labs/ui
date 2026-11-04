@@ -64,10 +64,8 @@ function createTokenView(
   },
 ) {
   const doc = el.ownerDocument
-  const hosts = new Map<
-    string,
-    { host: HTMLElement; content: HTMLElement; label: HTMLElement; token: Token }
-  >()
+  type Entry = { host: HTMLElement; content: HTMLElement; label: HTMLElement; labelText: Text; token: Token }
+  const hosts = new Map<string, Entry>()
   let hostCount = 0
 
   function hostFor(token: Token) {
@@ -83,15 +81,23 @@ function createTokenView(
       label.style.cssText = visuallyHidden
       label.setAttribute("data-slot", "token-input-token-label")
       host.append(content, label)
-      entry = { host, content, label, token }
+      entry = { host, content, label, labelText: doc.createTextNode(""), token }
       hosts.set(token.id!, entry)
     }
     entry.token = token
     const description = ` ${describe(token)}`
     if (entry.label.textContent !== description) entry.label.textContent = description
-    if (!customContent() && entry.content.textContent !== token.label) entry.content.textContent = token.label
+    showLabel(entry)
     host(entry.host, token)
     return entry.host
+  }
+
+  // A host shows its token's label until a framework renders its content. Only
+  // the label's own node moves, so content a framework is still removing stays.
+  function showLabel({ content, labelText, token }: Entry) {
+    if (customContent()) return labelText.remove()
+    if (labelText.data !== token.label) labelText.data = token.label
+    if (labelText.parentNode !== content) content.prepend(labelText)
   }
 
   // State attributes on a host, for styling chips without a framework part.
@@ -302,6 +308,7 @@ function createTokenView(
     inHost: (node: Node | null) => !!hostOf(node),
     hosts: () => [...hosts].map(([id, { token, content }]) => ({ id, token, host: content })),
     hostElement: (id: string) => hosts.get(id)?.host,
+    showLabels: () => hosts.forEach(showLabel),
     destroy() {
       hosts.clear()
       onHosts()

@@ -111,7 +111,17 @@ const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => (
         for (const token of tokensOf(state.value))
           view.hostElement(token.id!)?.toggleAttribute("data-selected", isSelected(state, token.id!))
       }
-      const unsubscribe = store.subscribe(writeSelected)
+      // A framework can turn custom content on after the hosts exist, or off.
+      let custom = store.get().custom
+      const writeLabels = () => {
+        if (store.get().custom === custom) return
+        custom = store.get().custom
+        view.showLabels()
+      }
+      const unsubscribe = store.subscribe(() => {
+        writeSelected()
+        writeLabels()
+      })
       return () => {
         unsubscribe()
         unbind()

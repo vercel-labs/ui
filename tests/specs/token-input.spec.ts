@@ -8,6 +8,7 @@ import { expect, lastAction, test } from "../fixtures"
 const editor = (page: Page) => page.getByRole("textbox", { name: "Prompt" })
 const listbox = (page: Page) => page.getByRole("listbox", { name: "Prompt" })
 const chips = (page: Page) => page.locator("[data-slot='token-input-token']")
+const hosts = (page: Page) => page.locator("[data-slot='token-input-host']")
 const submitted = (page: Page) => page.getByRole("status", { name: "Submitted" })
 const announcer = (page: Page) => page.locator("[data-ui-sdk-announcer]")
 const startValue = "Summarize [@a.ts](file:src/a.ts) please"
@@ -34,6 +35,17 @@ test.describe("value", () => {
     await expect(chips(page)).toHaveText(["a.ts ×"])
     await expect(editor(page)).toContainText("Summarize")
     expect(await text(page)).toBe(startValue)
+  })
+
+  test("tokens it starts with show their rendered content once, and read as their label and kind", async ({
+    page,
+    open,
+  }) => {
+    await open("token-input", { value: "[@a.ts](file:src/a.ts) and [@b.ts](file:src/b.ts)" })
+    await expect(hosts(page)).toHaveText(["a.ts × file", "b.ts × file"])
+    await expect(hosts(page).first()).toMatchAriaSnapshot("- text: a.ts file")
+    await expect(hosts(page).last()).toMatchAriaSnapshot("- text: b.ts file")
+    expect(await text(page)).toBe("[@a.ts](file:src/a.ts) and [@b.ts](file:src/b.ts)")
   })
 
   test("tokens and their remove parts mark a read-only or disabled input", async ({ page, open }) => {
