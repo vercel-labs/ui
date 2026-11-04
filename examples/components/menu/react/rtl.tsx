@@ -8,7 +8,15 @@ import {
   MenuSubTrigger,
   MenuTrigger,
 } from "@ui-sdk/react/menu"
-import { ChevronRightIcon, FileIcon, FolderIcon, LinkIcon, MailIcon, ShareIcon, TrashIcon } from "lucide-react"
+import {
+  ChevronRightIcon,
+  FileIcon,
+  FolderIcon,
+  LinkIcon,
+  MailIcon,
+  ShareIcon,
+  TrashIcon,
+} from "lucide-react"
 import * as React from "react"
 
 export function Example() {

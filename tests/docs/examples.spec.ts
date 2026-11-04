@@ -14,35 +14,21 @@ const examples = examplesIn("react")
 // of the trigger to open. The page opens with the basic example. The context
 // menu opens from an area, with a right-click.
 const triggers: Record<string, string | RegExp> = {
-  basic: "Project",
+  basic: "Open Menu",
   submenu: "Edit",
   shortcuts: "File",
   icons: "Share",
   checkboxes: "View",
-  "checkbox-icons": "Notifications",
   "radio-group": "Panel",
-  "radio-icons": "Payment method",
-  destructive: "Actions",
-  avatar: "Account",
-  complex: "Workspace",
   "context-menu": /long-press here$/i,
-  rtl: "ملف",
-  placement: "Placement",
-  offsets: "Inter",
-  modal: "Default",
-  "hover-delay": "Default",
-  keyboard: "Online",
   disabled: "Document",
-  "close-on-select": "Zoom 100%",
-  container: "Open",
   animation: "Animated",
   presentation: "Options",
-  controlled: "Actions",
   payload: "Actions for Budget.xlsx",
-  data: "File",
-  links: "Links",
 }
 const order = Object.keys(triggers)
+// Right-to-left stays in every folder, off the page for now.
+const fixtures = [...order, "rtl"]
 
 async function errorsOn(page: Page) {
   const errors: string[] = []
@@ -59,8 +45,8 @@ for (const framework of frameworks) {
     await page.goto(`/docs/${framework}/components/menu`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    expect(examples.sort()).toEqual([...order].sort())
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order].sort())
+    expect(examples.sort()).toEqual([...fixtures].sort())
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
 
     for (const [index, name] of order.entries()) {
       const preview = previews.nth(index)

@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import {
   Menu,
   MenuCheckboxItem,
@@ -12,50 +11,45 @@ import {
   MenuTrigger,
 } from "@ui-sdk/react/menu"
 import { CheckIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [statusBar, setStatusBar] = React.useState(true)
-  const [minimap, setMinimap] = React.useState(false)
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Menu>
-        <MenuTrigger>View</MenuTrigger>
-        <MenuContent>
-          <MenuGroup>
-            <MenuGroupLabel>Appearance</MenuGroupLabel>
-            <MenuCheckboxItem value="status-bar" checked={statusBar} onCheckedChange={setStatusBar}>
-              <MenuItemIndicator keepMounted>
-                <CheckIcon aria-hidden="true" />
-              </MenuItemIndicator>
-              Status bar
-            </MenuCheckboxItem>
-            <MenuCheckboxItem value="minimap" checked={minimap} onCheckedChange={setMinimap}>
-              <MenuItemIndicator keepMounted>
-                <CheckIcon aria-hidden="true" />
-              </MenuItemIndicator>
-              Minimap
-            </MenuCheckboxItem>
-          </MenuGroup>
-          <MenuSeparator />
-          <MenuCheckboxItem value="line-numbers" defaultChecked>
+    <Menu onCheckedChange={(checked, details) => log(`${details.value} ${checked ? "on" : "off"}`)}>
+      <MenuTrigger>View</MenuTrigger>
+      <MenuContent>
+        <MenuGroup>
+          <MenuGroupLabel>Appearance</MenuGroupLabel>
+          <MenuCheckboxItem value="status-bar" defaultChecked>
             <MenuItemIndicator keepMounted>
               <CheckIcon aria-hidden="true" />
             </MenuItemIndicator>
-            Line numbers
+            Status bar
           </MenuCheckboxItem>
-          <MenuCheckboxItem value="word-wrap">
+          <MenuCheckboxItem value="minimap">
             <MenuItemIndicator keepMounted>
               <CheckIcon aria-hidden="true" />
             </MenuItemIndicator>
-            Word wrap
+            Minimap
           </MenuCheckboxItem>
-        </MenuContent>
-      </Menu>
-      <output data-slot="output">
-        Status bar {statusBar ? "shown" : "hidden"}, minimap {minimap ? "shown" : "hidden"}
-      </output>
-    </div>
+        </MenuGroup>
+        <MenuSeparator />
+        <MenuCheckboxItem value="line-numbers" defaultChecked>
+          <MenuItemIndicator keepMounted>
+            <CheckIcon aria-hidden="true" />
+          </MenuItemIndicator>
+          Line numbers
+        </MenuCheckboxItem>
+        <MenuCheckboxItem value="word-wrap">
+          <MenuItemIndicator keepMounted>
+            <CheckIcon aria-hidden="true" />
+          </MenuItemIndicator>
+          Word wrap
+        </MenuCheckboxItem>
+      </MenuContent>
+    </Menu>
   )
 }
 

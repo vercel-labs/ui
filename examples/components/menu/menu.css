@@ -1,4 +1,23 @@
 @scope ([data-example]) {
+  /* The trigger sits near the top, centered, with room below for the open menu inside the preview. */
+  :scope:is(
+    [data-example="menu/basic"],
+    [data-example="menu/submenu"],
+    [data-example="menu/shortcuts"],
+    [data-example="menu/icons"],
+    [data-example="menu/checkboxes"],
+    [data-example="menu/radio-group"],
+    [data-example="menu/disabled"],
+    [data-example="menu/animation"]
+  ) {
+    justify-content: flex-start;
+    min-height: 20rem;
+  }
+
+  :scope[data-example="menu/disabled"] {
+    min-height: 24rem;
+  }
+
   [data-slot="menu-content"] [data-slot="menu-trigger"] {
     &[data-open]:not([data-highlighted]) {
       background: var(--tint);
