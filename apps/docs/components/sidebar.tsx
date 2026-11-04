@@ -20,7 +20,7 @@ function Sidebar({
   const active = useActiveTree(tree, componentsTree) ?? tree
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pt-6 pe-4 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-6 pe-4 pb-8 scrollbar-none">
         <nav aria-label="Docs">
           <Nodes nodes={active.children} tocs={tocs} />
         </nav>
@@ -92,7 +92,7 @@ function PageLink({ page, toc }: { page: PageTree.Item; toc?: TableOfContents })
         aria-current={active ? "page" : undefined}
         className={cn(
           "block rounded-md py-1 text-sm outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-          active ? "text-brand" : "text-subtle hover:text-foreground",
+          active ? "text-foreground font-medium" : "text-subtle hover:text-foreground",
         )}
       >
         {page.name}
