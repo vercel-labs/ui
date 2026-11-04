@@ -10,7 +10,9 @@ export function Example() {
         <PasswordInputControl />
         <PasswordInputToggle
           aria-label="Show password"
-          render={(props, state) => <button {...props}>{state.visible ? <EyeOffIcon /> : <EyeIcon />}</button>}
+          render={(props, state) => (
+            <button {...props}>{state.visible ? <EyeOffIcon /> : <EyeIcon />}</button>
+          )}
         />
       </PasswordInput>
     </Field>

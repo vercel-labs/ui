@@ -123,9 +123,7 @@ function Toc({ items }: { items: TableOfContents }) {
               aria-current={current ? "location" : undefined}
               className={cn(
                 "relative -ms-px block border-s py-[3px] ps-3 text-[13px] leading-5 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-                current
-                  ? "border-brand text-brand"
-                  : "border-transparent text-subtle hover:text-foreground",
+                current ? "border-brand text-brand" : "border-transparent text-subtle hover:text-foreground",
               )}
             >
               {item.title}

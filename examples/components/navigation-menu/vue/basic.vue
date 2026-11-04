@@ -9,7 +9,13 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@ui-sdk/vue/navigation-menu"
-import { ArrowRightIcon, ChevronDownIcon, CircleIcon, CircleCheckIcon, CircleQuestionMarkIcon } from "@lucide/vue"
+import {
+  ArrowRightIcon,
+  ChevronDownIcon,
+  CircleIcon,
+  CircleCheckIcon,
+  CircleQuestionMarkIcon,
+} from "@lucide/vue"
 
 const gettingStarted = [
   {

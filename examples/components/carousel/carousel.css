@@ -41,7 +41,10 @@
     }
   }
 
-  :scope [data-slot="stack"]:has(> [data-slot="carousel-root"] > [data-slot="row"] > [data-slot="carousel-viewport"]) {
+  :scope
+    [data-slot="stack"]:has(
+      > [data-slot="carousel-root"] > [data-slot="row"] > [data-slot="carousel-viewport"]
+    ) {
     width: 24rem;
   }
 

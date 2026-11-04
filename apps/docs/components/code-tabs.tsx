@@ -44,7 +44,10 @@ function CodeBlockTabsList({
 
 function CodeBlockTabsTrigger({ value, children }: { value: string; children: React.ReactNode }) {
   return (
-    <TabsTab value={value} className={value === "css" || value === "tailwind" ? undefined : "font-mono text-xs"}>
+    <TabsTab
+      value={value}
+      className={value === "css" || value === "tailwind" ? undefined : "font-mono text-xs"}
+    >
       {children}
     </TabsTab>
   )
@@ -113,7 +116,10 @@ function FrameworkTabs({ children }: { children: React.ReactNode }) {
               </TabsTab>
             ))}
           </TabsList>
-          <CopyButton label="Copy prompt" className="ms-auto shrink-0 rounded-[8px] max-sm:[&>span]:sr-only" />
+          <CopyButton
+            label="Copy prompt"
+            className="ms-auto shrink-0 rounded-[8px] max-sm:[&>span]:sr-only"
+          />
         </TabBar>
         {children}
       </Tabs>
@@ -121,4 +127,12 @@ function FrameworkTabs({ children }: { children: React.ReactNode }) {
   )
 }
 
-export { CodeBlockTab, CodeBlockTabs, CodeBlockTabsList, CodeBlockTabsTrigger, FrameworkTabs, StyleTabs, TabBar }
+export {
+  CodeBlockTab,
+  CodeBlockTabs,
+  CodeBlockTabsList,
+  CodeBlockTabsTrigger,
+  FrameworkTabs,
+  StyleTabs,
+  TabBar,
+}

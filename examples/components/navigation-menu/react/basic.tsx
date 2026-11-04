@@ -10,7 +10,13 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@ui-sdk/react/navigation-menu"
-import { ArrowRightIcon, ChevronDownIcon, CircleIcon, CircleCheckIcon, CircleQuestionMarkIcon } from "lucide-react"
+import {
+  ArrowRightIcon,
+  ChevronDownIcon,
+  CircleIcon,
+  CircleCheckIcon,
+  CircleQuestionMarkIcon,
+} from "lucide-react"
 
 const gettingStarted = [
   {

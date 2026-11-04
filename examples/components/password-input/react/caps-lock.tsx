@@ -12,7 +12,9 @@ export function Example() {
             <PasswordInputControl />
             <span>{state.capsLock && <LockIcon aria-hidden="true" />}</span>
             <PasswordInputToggle aria-label="Show password">
-              {(toggle) => (toggle.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
+              {(toggle) =>
+                toggle.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />
+              }
             </PasswordInputToggle>
           </>
         )}

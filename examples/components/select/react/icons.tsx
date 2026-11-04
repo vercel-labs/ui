@@ -11,7 +11,13 @@ import {
   SelectValue,
   SelectValueIcon,
 } from "@ui-sdk/react/select"
-import { CheckIcon, ChevronDownIcon, TextAlignCenterIcon, TextAlignEndIcon, TextAlignStartIcon } from "lucide-react"
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  TextAlignCenterIcon,
+  TextAlignEndIcon,
+  TextAlignStartIcon,
+} from "lucide-react"
 
 function Example() {
   return (

@@ -20,7 +20,10 @@ export default defineConfig(({ mode }) => {
   const { ext, config = {} } = builds[framework]
   const entries = Object.fromEntries(
     globSync([`*/${framework}/*.${ext}`, `components/*/${framework}/*.${ext}`])
-      .map((file) => [file.replace(/^components\//, "").replace(new RegExp(`/${framework}/(.+)\\.${ext}$`), "/$1"), file])
+      .map((file) => [
+        file.replace(/^components\//, "").replace(new RegExp(`/${framework}/(.+)\\.${ext}$`), "/$1"),
+        file,
+      ])
       .filter(([name]) => !only || only.includes(name.split("/")[0])),
   )
 

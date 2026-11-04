@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ArrowRightIcon, CheckIcon, ChevronDownIcon, CircleIcon, CircleCheckIcon, CircleXIcon } from "@lucide/vue"
+import {
+  ArrowRightIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  CircleIcon,
+  CircleCheckIcon,
+  CircleXIcon,
+} from "@lucide/vue"
 import {
   Combobox,
   ComboboxContent,

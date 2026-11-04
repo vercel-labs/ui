@@ -8,7 +8,12 @@ import { ssrFixtures } from "./ssr-plugin"
 import { solidSsr } from "./solid-ssr.ts"
 
 // Solid and React both compile .tsx, so each plugin takes its own files.
-const solidFiles = ["**/packages/solid/**", "**/fixtures/*/solid*.tsx", "**/examples/*/solid/**", "**/examples/components/*/solid/**"]
+const solidFiles = [
+  "**/packages/solid/**",
+  "**/fixtures/*/solid*.tsx",
+  "**/examples/*/solid/**",
+  "**/examples/components/*/solid/**",
+]
 
 export default defineConfig({
   plugins: [

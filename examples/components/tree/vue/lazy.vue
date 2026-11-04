@@ -38,7 +38,11 @@ const Items: FunctionalComponent<{ items: Node[]; loaded: Record<string, Node[]>
               {},
               {
                 default: ({ state }: { state: TreeItemState }) =>
-                  state.loading ? h(LoaderCircleIcon, {}) : state.failed ? h(RotateCwIcon, {}) : h(ChevronRightIcon, {}),
+                  state.loading
+                    ? h(LoaderCircleIcon, {})
+                    : state.failed
+                      ? h(RotateCwIcon, {})
+                      : h(ChevronRightIcon, {}),
               },
             )
           : h("span", {}),

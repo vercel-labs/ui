@@ -10,7 +10,13 @@ import {
   SelectValue,
   SelectValueIcon,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon, TextAlignCenterIcon, TextAlignEndIcon, TextAlignStartIcon } from "@lucide/vue"
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  TextAlignCenterIcon,
+  TextAlignEndIcon,
+  TextAlignStartIcon,
+} from "@lucide/vue"
 </script>
 
 <template>

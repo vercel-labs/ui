@@ -36,7 +36,11 @@ const Items: FunctionalComponent<{ items: Node[] }> = ({ items }) =>
     h(TreeItem, { key: value, value }, () => [
       h(TreeItemLabel, {}, () => [
         ...(children
-          ? [h(TreeItemIndicator, {}, () => h(ChevronRightIcon, {})), h(FolderIcon, {}), h(FolderOpenIcon, {})]
+          ? [
+              h(TreeItemIndicator, {}, () => h(ChevronRightIcon, {})),
+              h(FolderIcon, {}),
+              h(FolderOpenIcon, {}),
+            ]
           : [h("span", {}), h(FileIcon, {})]),
         h("span", {}, label),
       ]),

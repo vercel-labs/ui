@@ -233,7 +233,9 @@ describe("calendar", () => {
     const { container, heading } = mount({ defaultMonth: "2026-10", monthFormat: "short" })
     expect(heading()).toBe("Oct 2026")
     expect(container.querySelector("table")!.getAttribute("aria-label")).toBe("October 2026")
-    expect(mount({ defaultMonth: "2026-10", months: 2, monthFormat: "short" }).heading()).toMatch(/^Oct . Nov 2026$/)
+    expect(mount({ defaultMonth: "2026-10", months: 2, monthFormat: "short" }).heading()).toMatch(
+      /^Oct . Nov 2026$/,
+    )
   })
 
   test("the heading's state has the first month shown, to format it yourself", () => {

@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { CalculatorIcon, CalendarIcon, CreditCardIcon, SearchIcon, SettingsIcon, SmileIcon, UserIcon } from "@lucide/vue"
+import {
+  CalculatorIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  SearchIcon,
+  SettingsIcon,
+  SmileIcon,
+  UserIcon,
+} from "@lucide/vue"
 import {
   Command,
   CommandEmpty,

@@ -9,7 +9,6 @@ import {
 } from "@ui-sdk/react/calendar"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
-// The ISO week number: weeks start on Monday, and week 1 holds the year's first Thursday.
 function isoWeek(date: string) {
   const day = new Date(`${date}T00:00:00Z`)
   day.setUTCDate(day.getUTCDate() + 3 - ((day.getUTCDay() + 6) % 7))

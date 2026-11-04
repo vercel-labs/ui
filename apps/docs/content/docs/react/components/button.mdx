@@ -23,7 +23,7 @@ Use `onClick` to run an action. Button renders a native `<button>` with `type="b
 ```tsx
 import { Button } from "@ui-sdk/react/button"
 
-<Button onClick={() => save()}>Save</Button>
+;<Button onClick={() => save()}>Save</Button>
 ```
 
 ## Pending
@@ -37,7 +37,6 @@ Return a Promise from `onClick` to keep the button pending until it settles. The
 ```
 
 After one second, it announces "Loading" to screen readers. Set `pendingAnnouncement` to change that message, as above, or use an empty string to silence it.
-
 
 <ComponentExample
   name="button/pending"

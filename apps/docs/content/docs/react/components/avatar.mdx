@@ -139,9 +139,7 @@ Use [Parts and Composition](../parts-and-composition) to replace an element or r
 ```tsx
 <Avatar>
   <AvatarImage src={user.image} alt={user.name} />
-  <AvatarFallback>
-    {(state) => (state.loadingStatus === "error" ? "?" : user.initials)}
-  </AvatarFallback>
+  <AvatarFallback>{(state) => (state.loadingStatus === "error" ? "?" : user.initials)}</AvatarFallback>
 </Avatar>
 ```
 
