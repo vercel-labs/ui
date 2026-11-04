@@ -13,41 +13,15 @@ const opens =
     await expect(page.getByRole("menu")).toHaveCount(0)
   }
 
-// The menubar is there, with one tab stop.
-const shows =
-  (trigger: string): Check =>
-  async (preview) => {
-    await expect(preview.getByRole("menuitem", { name: trigger, exact: true }).first()).toBeVisible()
-    await expect(preview.getByRole("menubar").first().locator('[tabindex="0"]')).toHaveCount(1)
-  }
-
 testExamples(
   "menubar",
   {
-    demo: opens("File", "New Tab"),
+    demo: opens("File", "New Document"),
     submenu: opens("File", "New File"),
-    data: opens("File", "New File"),
     vertical: opens("Inbox", "Open Inbox"),
-    disabled: opens("File", "New File"),
-    modal: opens("File", "File settings"),
-    loop: shows("File"),
-    controller: opens("Edit", "Close from the controller"),
   },
   undefined,
-  [
-    "demo",
-    "checkbox",
-    "radio",
-    "submenu",
-    "icons",
-    "rtl",
-    "data",
-    "vertical",
-    "disabled",
-    "modal",
-    "loop",
-    "controller",
-  ],
+  ["demo", "checkbox", "radio", "submenu", "icons", "rtl", "vertical"],
 )
 
 // A press on another trigger while a menu is open switches menus.
@@ -58,9 +32,9 @@ for (const framework of frameworks) {
     const preview = page.locator("[data-example]").first()
     const edit = await preview.getByRole("menuitem", { name: "Edit", exact: true }).boundingBox()
     await preview.getByRole("menuitem", { name: "File", exact: true }).click()
-    await expect(page.getByRole("menu").getByText("New Tab")).toBeVisible()
+    await expect(page.getByRole("menu").getByText("New Document")).toBeVisible()
     await page.mouse.click(edit!.x + edit!.width / 2, edit!.y + edit!.height / 2)
     await expect(page.getByRole("menu").getByText("Undo")).toBeVisible()
-    await expect(page.getByRole("menu").getByText("New Tab")).toHaveCount(0)
+    await expect(page.getByRole("menu").getByText("New Document")).toHaveCount(0)
   })
 }

@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { CircleHelpIcon, FileIcon, FolderIcon, RedoIcon, SaveIcon, SettingsIcon, TrashIcon, UndoIcon } from "@lucide/vue"
+import {
+  CircleHelpIcon,
+  FileIcon,
+  FolderIcon,
+  RedoIcon,
+  SaveIcon,
+  SettingsIcon,
+  TrashIcon,
+  UndoIcon,
+} from "@lucide/vue"
 import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/vue/menu"
 import { Menubar } from "@ui-sdk/vue/menubar"
 </script>

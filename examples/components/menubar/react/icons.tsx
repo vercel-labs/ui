@@ -1,6 +1,15 @@
 import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu"
 import { Menubar } from "@ui-sdk/react/menubar"
-import { CircleHelpIcon, FileIcon, FolderIcon, RedoIcon, SaveIcon, SettingsIcon, TrashIcon, UndoIcon } from "lucide-react"
+import {
+  CircleHelpIcon,
+  FileIcon,
+  FolderIcon,
+  RedoIcon,
+  SaveIcon,
+  SettingsIcon,
+  TrashIcon,
+  UndoIcon,
+} from "lucide-react"
 
 export function Example() {
   return (

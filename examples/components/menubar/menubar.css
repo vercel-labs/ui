@@ -1,4 +1,10 @@
 @scope ([data-example]) {
+  /* The bar sits near the top, centered, with room below for its open menus inside the preview. */
+  :scope[data-example="menubar/demo"] {
+    justify-content: flex-start;
+    min-height: 22rem;
+  }
+
   [data-slot="menubar-root"] {
     display: flex;
     align-items: center;

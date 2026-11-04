@@ -7,13 +7,13 @@ Wrap a few [Menus](./menu) in a Menubar to connect their triggers. Tab enters th
 
 <ComponentExample
   name="menubar/demo"
-  caption="Tab into the bar, then use Left and Right to choose a menu. Open one with Down or Enter; View has checkbox settings and Profiles has a radio choice."
+  caption="Tab into the bar and use Left and Right to choose a menu, or point at another trigger once one is open. File has submenus, Edit has shortcuts, and View has checkboxes and an appearance choice. The console logs each one."
 />
 
 ## Installation
 
-```package-install
-npm install @ui-sdk/react
+```bash
+npm install @ui-sdk/react @ui-sdk/core
 ```
 
 ## Composition
@@ -68,9 +68,7 @@ function Example() {
 export { Example }
 ```
 
-## Examples
-
-### Submenu
+## Submenu
 
 A submenu still uses Menu’s Sub, SubTrigger, and SubContent. The arrow toward it enters that level. On an ordinary item, the same arrow can move to the next top-level menu instead.
 
@@ -79,16 +77,7 @@ A submenu still uses Menu’s Sub, SubTrigger, and SubContent. The arrow toward 
   caption="Open File and enter Share with the arrow key. Go back to File, then move to Edit without leaving the menubar."
 />
 
-### Menus as Data
-
-Each Menu can take `items` and register its shortcuts while closed. This example renders styled parts from those data arrays. The [Menu data example](./menu#menus-as-data) explains the item shapes and callbacks.
-
-<ComponentExample
-  name="menubar/data"
-  caption="Open File or View and choose an action or checkbox. Close the menus and press the New File shortcut; the readout still updates."
-/>
-
-### Vertical
+## Vertical
 
 Set `orientation="vertical"` to move between triggers with Up and Down. The arrow toward the popup opens it; the arrow back closes it and returns to the trigger.
 
@@ -97,68 +86,70 @@ Set `orientation="vertical"` to move between triggers with Up and Down. The arro
   caption="Use Up and Down to choose Inbox, Drafts, or Archive. Right opens its menu in left-to-right text; Left returns to its trigger."
 />
 
-### Disabled
+## Menus as Data
+
+Each Menu can take `items` and register its shortcuts while closed. The [Menu data example](./menu#menus-as-data) explains the item shapes and callbacks.
+
+```tsx
+const file: MenuData = [
+  { value: "new", label: "New File", shortcut: "mod+alt+n" },
+  { value: "open", label: "Open…" },
+  { type: "separator" },
+  { type: "submenu", label: "Share", items: [{ value: "email", label: "Email link" }] },
+]
+
+<Menubar>
+  <Menu items={file} onAction={(value) => run(value)}>
+    <MenuTrigger>File</MenuTrigger>
+    <MenuContent />
+  </Menu>
+</Menubar>
+```
+
+## Disabled
 
 A disabled trigger stays focusable with `aria-disabled`, so people can discover it, but cannot open its menu. Set `disabled` on the bar to disable all its triggers while preserving the tab stop.
 
-<ComponentExample
-  name="menubar/disabled"
-  caption="Move through the triggers with the arrow keys. Disabled triggers can receive focus but do not open; enabled ones work normally."
-/>
+```tsx
+<Menubar>
+  <Menu>
+    <MenuTrigger disabled>Share</MenuTrigger>
+    <MenuContent />
+  </Menu>
+</Menubar>
 
-### Modal
+<Menubar disabled />
+```
+
+## Modal
 
 The bar supplies `modal` to menus that do not set their own value. The default, `"pointer"`, consumes an outside press while closing. With `true`, the page also becomes inert and stops scrolling, but the menubar stays usable so you can switch menus.
 
-<ComponentExample
-  name="menubar/modal"
-  caption="Open File, then point at Edit or View. The page behind is inert, but the other triggers in this modal bar still switch menus."
-/>
+```tsx
+<Menubar modal />
+```
 
-### Loop
+## Loop
 
 Arrow keys wrap between triggers and open menus by default. Set `loop` false to stop at the ends.
 
-<ComponentExample
-  name="menubar/loop"
-  caption="Use Left and Right between File, Edit, and View. This bar stops at either end instead of wrapping."
-/>
+```tsx
+<Menubar loop={false} />
+```
 
-### Controller
+## Controller
 
-Create a `createMenubarController()` and pass it to the bar. `focus()` moves focus to it; `close()` closes its active menu. Each menu still owns its own open state and controller. This example connects Alt+M to the bar, like an application command that moves focus into its menus.
+Create a `createMenubarController()` and pass it to the bar. `focus()` moves focus to it; `close()` closes its active menu. Each menu still owns its own open state and controller. Connect a shortcut like Alt+M to `focus()`, like an application command that moves focus into its menus.
 
-<ComponentExample
-  name="menubar/controller"
-  caption="Press Focus menubar or Alt+M, then open a menu. Close from the controller uses the bar’s controller to close whichever menu is active."
-/>
+```tsx
+const [menubar] = React.useState(() => createMenubarController())
+useShortcut("alt+m", () => menubar.focus())
 
-## Behavior and Options
+<Menubar controller={menubar} />
+<button onClick={() => menubar.focus()}>Focus Menubar</button>
+```
 
-### Keyboard
-
-<span id="right-to-left" />
-
-Tab first lands on the first trigger, then remembers the last one used. While a menu is open, moving the pointer onto another enabled trigger opens its menu, unless the pointer is only passing over it on the way into the open menu. Pressing that trigger keeps it open. Moving to a disabled trigger closes the current menu without opening another.
-
-| Key             | On a Trigger              | In an Open Menu                                  |
-| --------------- | ------------------------- | ------------------------------------------------ |
-| Left / Right    | Previous or next trigger. | Previous or next menu, or enter/leave a submenu. |
-| Down            | Open at the first item.   | Next item.                                       |
-| Up              | Open at the last item.    | Previous item.                                   |
-| Enter / Space   | Open at the first item.   | Choose the focused item.                         |
-| Home / End      | First or last trigger.    | First or last item.                              |
-| A letter        | Find a trigger by name.   | Find an item by name.                            |
-| Escape          | —                         | Close and return to the trigger.                 |
-| Tab / Shift+Tab | Leave the bar.            | Close and leave the bar.                         |
-
-These directions describe a horizontal bar in left-to-right text. Right-to-left text reverses the horizontal keys and submenu side; vertical bars use Up and Down between triggers.
-
-### Shared Menu Features
-
-<span id="checkbox" />
-<span id="radio" />
-<span id="icons" />
+## Shared Menu Features
 
 [Checkboxes](./menu#checkboxes), [radio groups](./menu#radio-group), [icons](./menu#icons), [shortcuts](./menu#shortcuts), and [links](./menu#links-and-custom-rendering) work as they do in Menu. The first example combines settings and actions in one bar. Menus inside a menubar always use the popover presentation.
 
@@ -166,7 +157,13 @@ These directions describe a horizontal bar in left-to-right text. Right-to-left 
 
 The bar gets `data-open` while any menu is open; a trigger gets it only for its own menu. Use `data-orientation` for row or column layout. Style the popups and their items through the same [Menu attributes and CSS variables](./menu#styling).
 
-<DataAttributes component="menubar" />
+Each part has a `data-slot`, such as `menubar-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Menubar [#data-attributes-menubar]
+
+<DataAttributes component="menubar" part="root" />
 
 ## API Reference
 
@@ -190,6 +187,27 @@ A menu that another menu in the menubar takes over closes with `submenu-switch`,
 
 ## Accessibility
 
-The menubar follows the [WAI-ARIA menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/). Every line below is an automated test.
+The menubar follows the [WAI-ARIA menubar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/).
+
+### Keyboard
+
+Tab first lands on the first trigger, then remembers the last one used. While a menu is open, moving the pointer onto another enabled trigger opens its menu, unless the pointer is only passing over it on the way into the open menu. Pressing that trigger keeps it open. Moving to a disabled trigger closes the current menu without opening another.
+
+| Key             | On a Trigger              | In an Open Menu                                  |
+| --------------- | ------------------------- | ------------------------------------------------ |
+| Left / Right    | Previous or next trigger. | Previous or next menu, or enter/leave a submenu. |
+| Down            | Open at the first item.   | Next item.                                       |
+| Up              | Open at the last item.    | Previous item.                                   |
+| Enter / Space   | Open at the first item.   | Choose the focused item.                         |
+| Home / End      | First or last trigger.    | First or last item.                              |
+| A letter        | Find a trigger by name.   | Find an item by name.                            |
+| Escape          | —                         | Close and return to the trigger.                 |
+| Tab / Shift+Tab | Leave the bar.            | Close and leave the bar.                         |
+
+These directions describe a horizontal bar in left-to-right text. Right-to-left text reverses the horizontal keys and submenu side; vertical bars use Up and Down between triggers.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="menubar" />
