@@ -14,7 +14,6 @@ const cases = {
     "Property 'focus' is missing",
   ],
   unhandled: ['slot({ role: "listbox", keys: ["ArrowDown"] })', "Property 'on' is missing"],
-  unhandledGroup: ['slot({ role: "group", keys: ["Enter"] })', "Property 'on' is missing"],
   noAttrs: ['slot({ role: "checkbox", focus: "native", press })', "Property 'attrs' is missing"],
   unchecked: [
     'slot({ role: "checkbox", focus: "native", press, attrs: () => ({ type: "button" }) })',
@@ -26,7 +25,9 @@ const cases = {
   ],
   named: [
     'slot({ role: "none", attrs: () => ({ "aria-label": "Divider" as const }) })',
-    `"aria-label isn't allowed on a none"`,
+    // `none` shares its checks with other roles that can't be named, so the
+    // message says "this role", and the error shows which.
+    `"aria-label isn't allowed on this role"`,
   ],
 } as const
 

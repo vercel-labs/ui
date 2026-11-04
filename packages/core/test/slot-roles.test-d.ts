@@ -35,7 +35,8 @@ definePrimitive({
     inputKeys: slot({ role: "listbox", keys: { none: "The combobox's input handles them." } }),
     // @ts-expect-error Keys with no keydown handler to press them.
     unhandled: slot({ role: "listbox", keys: ["ArrowDown"] }),
-    // @ts-expect-error The same on a slot whose role doesn't ask for keys.
+    // On a role that doesn't ask for keys, development builds check it instead,
+    // which keeps checking every slot cheap.
     unhandledGroup: slot({ role: "group", keys: ["Enter"] }),
     // @ts-expect-error Not a WAI-ARIA role.
     typo: slot({ role: "lisbox" }),

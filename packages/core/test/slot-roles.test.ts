@@ -75,6 +75,21 @@ test("warns once per need a role's slot doesn't meet", () => {
   ])
 })
 
+test("warns about keys no keydown handles, on a role the types don't ask for keys", () => {
+  const read = warnings()
+  definePrimitive({
+    name: "keyed",
+    state: () => ({}),
+    api: () => ({}),
+    slots: (slot) => ({ group: slot({ role: "group", keys: ["Enter"] }) }),
+  })
+  expect(read()).toEqual([
+    expect.stringContaining(
+      'the "group" part is a group, which lists `keys`, so its slot needs an `on.keydown`',
+    ),
+  ])
+})
+
 test("warns when a role picked from state isn't one the slot lists", () => {
   const read = warnings()
   const pick = definePrimitive({

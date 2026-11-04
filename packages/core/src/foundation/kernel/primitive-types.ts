@@ -178,35 +178,30 @@ type SlotDefinition<State extends object, Api, Props, Public = {}> = SlotFields<
 
 type Keys<State> = readonly HandledKey[] | ((state: State) => readonly HandledKey[])
 
-// What a role asks of its slot. Each is one required field, so a missing one
-// is named in the error, and opting out takes a reason: `{ none: "why" }`.
-type Needs<R, State extends object, Api, Props> = (R extends FocusableRole
-  ? {
-      focus:
-        | Focus
-        | Unneeded
-        | ((state: State, context: { id: string; key: string; props: Props; api: Api }) => Focus | Unneeded)
-    }
-  : unknown) &
-  (R extends PressableRole
-    ? { press: ((context: SlotContext<State, Api, Props>, event?: Event) => void) | Unneeded }
-    : unknown) &
-  (R extends KeyedRole ? { keys: Keys<State> | Unneeded } : unknown)
+// What a role asks of its slot and which ARIA it takes: whether it takes
+// focus, activates, moves with keys or can't be named, its role-specific
+// attributes and its required states. Roles alike share one member.
+type ProfileOf<R> = [
+  R extends FocusableRole ? 1 : 0,
+  R extends PressableRole ? 1 : 0,
+  R extends KeyedRole ? 1 : 0,
+  R extends NamelessRole ? 1 : 0,
+  AriaOf<R>,
+  RequiredAria<R>,
+]
 
-// Keys a slot lists are handled by its own `on.keydown`, so listing them asks for one.
-type KeysDeclaration<State extends object, Api, Props> =
-  | {
-      keys: Keys<State>
-      on: { keydown: (event: KeyboardEvent, context: SlotContext<State, Api, Props>) => void }
-    }
-  | { keys: Unneeded }
-  // Only `undefined`, which makes `keys` pick the member a slot is checked
-  // against. Generic, so it's created last: errors report a slot without
-  // keys against it, and name what's missing, like `focus`, not keys.
-  | {
-      keys?: undefined
-      on?: { keydown?: (event: KeyboardEvent, context: SlotContext<State, Api, Props>) => void }
-    }
+type Profile = [0 | 1, 0 | 1, 0 | 1, 0 | 1, RoleAria, RoleAria]
+
+type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
+
+type RolesLike<P extends Profile> = { [R in Role]: Same<ProfileOf<R>, P> extends true ? R : never }[Role]
+
+// One required field per need, so the error names a missing one. Presence
+// only: the definition types each field, so one is built per profile. Listed
+// keys ask for an `on.keydown`, last so a list without one is told so.
+type Needs<P extends Profile> = (P[0] extends 1 ? { focus: {} } : unknown) &
+  (P[1] extends 1 ? { press: {} } : unknown) &
+  (P[2] extends 1 ? { keys: Unneeded } | { keys: {}; on: { keydown: {} } } : unknown)
 
 /**
  * A slot's role and what the role asks of it. Core reads these from the
@@ -241,29 +236,43 @@ type RoleFields<State extends object, Api, Props> = {
 }
 
 // An attribute the role doesn't take, typed as the sentence that says so, so
-// the error names it: "aria-orientation isn't allowed on a group".
-type NotAllowed<
-  K extends string,
-  R extends string,
-> = `${K} isn't allowed on ${R extends `${"a" | "e" | "i" | "o" | "u"}${string}` ? "an" : "a"} ${R}`
+// the error names it: "aria-orientation isn't allowed on a group". Roles that
+// share a member are "this role"; the error shows which one.
+type NotAllowed<K extends string, P extends Profile> = `${K} isn't allowed on ${Label<RolesLike<P>>}`
 
-type RoleAttrs<R extends string> = Attrs & {
-  [
-    K in Exclude<RoleAria, AriaOf<R>> | (R extends NamelessRole ? "aria-label" | "aria-labelledby" : never)
-  ]?: NotAllowed<K, R>
+type Label<R extends string> = [R] extends [UnionToIntersection<R>]
+  ? `${R extends `${"a" | "e" | "i" | "o" | "u"}${string}` ? "an" : "a"} ${R}`
+  : "this role"
+
+type UnionToIntersection<U> = (U extends unknown ? (union: U) => void : never) extends (
+  union: infer I,
+) => void
+  ? I
+  : never
+
+type RoleAttrs<P extends Profile> = Attrs & {
+  [K in Exclude<RoleAria, P[4]> | (P[3] extends 1 ? "aria-label" | "aria-labelledby" : never)]?: NotAllowed<
+    K,
+    P
+  >
 }
 
 // A role's required states are keys its `attrs` always returns, so leaving
 // one out is a build error. One that `live` keeps current is `undefined` here.
 // One field, not a union, so the error names the missing state.
-type AttrsFor<R extends string, State extends object, Api, Props> = [RequiredAria<R>] extends [never]
-  ? { attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => RoleAttrs<R> }
+type AttrsFor<P extends Profile, State extends object, Api, Props> = [P[5]] extends [never]
+  ? { attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => RoleAttrs<P> }
   : {
       attrs: (
         state: State,
         context: { id: string; key: string; props: Props; api: Api },
-      ) => RoleAttrs<R> & { [K in RequiredAria<R>]: string | undefined }
+      ) => RoleAttrs<P> & { [K in P[5]]: string | undefined }
     }
+
+// One member per profile: TypeScript reuses an alias's instantiation for the
+// same arguments, so roles alike collapse into one, which keeps checking cheap.
+type RoleMember<P extends Profile, State extends object, Api, Props> = { role: RolesLike<P> } & Needs<P> &
+  AttrsFor<P, State, Api, Props>
 
 // Without a literal role, the role's attributes aren't known here, so development builds check them.
 type UnroledAttrs<State extends object, Api, Props> = {
@@ -273,16 +282,15 @@ type UnroledAttrs<State extends object, Api, Props> = {
 // The role's literal picks the member, so TypeScript asks for exactly what that role needs.
 type RoleDeclaration<State extends object, Api, Props> = Omit<
   RoleFields<State, Api, Props>,
-  "role" | "roles" | "keys"
+  "role" | "roles"
 > &
-  KeysDeclaration<State, Api, Props> &
   (
     | ({ role?: undefined } & UnroledAttrs<State, Api, Props>)
     | ({
         role: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Role | undefined
         roles: readonly Role[]
       } & UnroledAttrs<State, Api, Props>)
-    | { [R in Role]: { role: R } & Needs<R, State, Api, Props> & AttrsFor<R, State, Api, Props> }[Role]
+    | { [R in Role]: RoleMember<ProfileOf<R>, State, Api, Props> }[Role]
   )
 
 /**
