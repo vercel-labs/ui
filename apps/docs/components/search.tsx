@@ -10,11 +10,11 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { isFramework } from "@/lib/frameworks"
+import { type Framework, isFramework } from "@/lib/frameworks"
 import { useFramework } from "@/lib/preferences"
+import { createSearchIndex, type SearchPage, searchIndex } from "@/lib/search"
 import type { Section } from "@/lib/sections"
 import { createDialogController, DialogShortcut } from "@ui-sdk/react/dialog"
-import { useDocsSearch } from "fumadocs-core/search/client"
 import { FileTextIcon, HashIcon, SearchIcon, TextIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import * as React from "react"
@@ -40,6 +40,41 @@ function Highlighted({ text }: { text: string }) {
 const icons = { page: FileTextIcon, heading: HashIcon, text: TextIcon }
 
 const searchDialog = createDialogController()
+
+const indexes = new Map<Framework, Promise<ReturnType<typeof createSearchIndex>>>()
+
+function loadIndex(framework: Framework) {
+  let index = indexes.get(framework)
+  if (!index) {
+    index = fetch(`/api/search/${framework}`).then(async (response) => {
+      if (!response.ok) throw new Error(`Search index responded ${response.status}`)
+      return createSearchIndex((await response.json()) as SearchPage[])
+    })
+    index.catch(() => indexes.delete(framework))
+    indexes.set(framework, index)
+  }
+  return index
+}
+
+function useSearchIndex(framework: Framework, enabled: boolean) {
+  const [loaded, setLoaded] = React.useState<{
+    framework: Framework
+    index?: Awaited<ReturnType<typeof loadIndex>>
+    error?: unknown
+  }>()
+  React.useEffect(() => {
+    if (!enabled) return
+    let current = true
+    loadIndex(framework).then(
+      (index) => current && setLoaded({ framework, index }),
+      (error: unknown) => current && setLoaded({ framework, error }),
+    )
+    return () => {
+      current = false
+    }
+  }, [framework, enabled])
+  return loaded?.framework === framework ? loaded : undefined
+}
 
 function SearchTrigger({
   label = "Search",
@@ -70,20 +105,14 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
   const [preferredFramework] = useFramework()
   const router = useRouter()
 
-  const { search, setSearch, query } = useDocsSearch({ type: "fetch", api: "/api/search", delayMs: 100 })
-  const searching = search !== "" && (query.isLoading || (query.data === "empty" && !query.error))
+  const [search, setSearch] = React.useState("")
   const framework = section && isFramework(section) ? section : preferredFramework
-  const results =
-    query.data && query.data !== "empty"
-      ? query.data.filter((result) =>
-          ["core", "agents", framework].some(
-            (shown) =>
-              result.url === `/docs/${shown}` ||
-              result.url.startsWith(`/docs/${shown}/`) ||
-              result.url.startsWith(`/docs/${shown}#`),
-          ),
-        )
-      : []
+  const loaded = useSearchIndex(framework, open)
+  const searching = search !== "" && !loaded
+  const results = React.useMemo(
+    () => (loaded?.index ? searchIndex(loaded.index, search) : []),
+    [loaded, search],
+  )
 
   return (
     <Dialog
@@ -111,7 +140,7 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
           <CommandEmpty>
             {searching
               ? "Searching…"
-              : query.error
+              : loaded?.error
                 ? "Search isn’t available right now."
                 : search && `Nothing found for “${search}”.`}
           </CommandEmpty>
