@@ -16,10 +16,7 @@
   margin-inline: auto;
   width: 100%;
   max-width: 1448px;
-  padding-inline: --spacing(4);
-  @variant sm {
-    padding-inline: --spacing(8);
-  }
+  padding-inline: --spacing(8);
   @variant lg {
     padding-inline: --spacing(10);
   }
