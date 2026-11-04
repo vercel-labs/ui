@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -7,7 +8,6 @@ import {
   SelectGroupLabel,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
@@ -34,37 +34,37 @@ const items: ListData = [
 
 function Example() {
   return (
-    <Select items={items} defaultValue="pro">
-      <div data-slot="stack">
-        <SelectLabel>Plan</SelectLabel>
+    <Field>
+      <FieldLabel>Plan</FieldLabel>
+      <Select items={items} defaultValue="pro">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        {plans.map((plan) => (
-          <SelectItem key={plan.value} value={plan.value}>
-            {plan.label}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        ))}
-        <SelectSeparator />
-        <SelectGroup>
-          <SelectGroupLabel>Contact sales</SelectGroupLabel>
-          {sales.map((plan) => (
-            <SelectItem key={plan.value} value={plan.value} disabled={plan.disabled}>
+        <SelectContent>
+          {plans.map((plan) => (
+            <SelectItem key={plan.value} value={plan.value}>
               {plan.label}
               <SelectItemIndicator>
                 <CheckIcon />
               </SelectItemIndicator>
             </SelectItem>
           ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+          <SelectSeparator />
+          <SelectGroup>
+            <SelectGroupLabel>Contact sales</SelectGroupLabel>
+            {sales.map((plan) => (
+              <SelectItem key={plan.value} value={plan.value} disabled={plan.disabled}>
+                {plan.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

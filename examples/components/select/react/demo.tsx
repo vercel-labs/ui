@@ -1,45 +1,44 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const roles = [
+  { value: "viewer", label: "Viewer" },
+  { value: "commenter", label: "Commenter" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
 ]
 
 function Example() {
   return (
-    <Select placeholder="Select a fruit">
-      <div data-slot="stack">
-        <SelectLabel>Fruit</SelectLabel>
+    <Field>
+      <FieldLabel>Role</FieldLabel>
+      <Select placeholder="Select a role">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        {fruits.map((fruit) => (
-          <SelectItem key={fruit.value} value={fruit.value}>
-            {fruit.label}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          {roles.map((role) => (
+            <SelectItem key={role.value} value={role.value}>
+              {role.label}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

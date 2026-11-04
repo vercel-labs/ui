@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -60,27 +61,30 @@ const timezones = [
 
 function Example() {
   return (
-    <Select placeholder="Select a timezone">
-      <SelectTrigger aria-label="Timezone">
-        <SelectValue />
-        <ChevronDownIcon />
-      </SelectTrigger>
-      <SelectContent>
-        {timezones.map((group) => (
-          <SelectGroup key={group.label}>
-            <SelectGroupLabel>{group.label}</SelectGroupLabel>
-            {group.items.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-                <SelectItemIndicator>
-                  <CheckIcon />
-                </SelectItemIndicator>
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        ))}
-      </SelectContent>
-    </Select>
+    <Field>
+      <FieldLabel>Time zone</FieldLabel>
+      <Select placeholder="Select a time zone">
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectContent>
+          {timezones.map((group) => (
+            <SelectGroup key={group.label}>
+              <SelectGroupLabel>{group.label}</SelectGroupLabel>
+              {group.items.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                  <SelectItemIndicator>
+                    <CheckIcon />
+                  </SelectItemIndicator>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

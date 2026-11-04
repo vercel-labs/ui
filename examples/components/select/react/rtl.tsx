@@ -1,9 +1,11 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
@@ -17,28 +19,30 @@ const languages = [
   { value: "de", label: "الألمانية" },
 ]
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
-      <Select placeholder="اختر لغة">
-        <div data-slot="stack">
-          <SelectLabel>اللغة</SelectLabel>
+      <Field>
+        <FieldLabel>اللغة</FieldLabel>
+        <Select placeholder="اختر لغة">
           <SelectTrigger>
             <SelectValue />
             <ChevronDownIcon />
           </SelectTrigger>
-        </div>
-        <SelectContent>
-          {languages.map((language) => (
-            <SelectItem key={language.value} value={language.value}>
-              {language.label}
-              <SelectItemIndicator>
-                <CheckIcon />
-              </SelectItemIndicator>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <SelectContent>
+            {languages.map((language) => (
+              <SelectItem key={language.value} value={language.value}>
+                {language.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
     </div>
   )
 }
+
+export { Example }

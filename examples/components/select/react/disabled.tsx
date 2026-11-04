@@ -1,55 +1,59 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const countries = [
+  { value: "ca", label: "Canada" },
+  { value: "dk", label: "Denmark" },
+  { value: "fr", label: "France" },
+  { value: "de", label: "Germany" },
+  { value: "jp", label: "Japan" },
+  { value: "es", label: "Spain" },
+]
+
+const fields = [
+  { label: "Billing country", disabled: true },
+  { label: "Shipping from", readOnly: true },
+  { label: "Shipping to" },
 ]
 
 function Example() {
   return (
     <div data-slot="stack">
-      {(["disabled", "readOnly", "item"] as const).map((variant) => (
-        <Select
-          key={variant}
-          defaultValue={variant === "item" ? null : "banana"}
-          placeholder="Select a fruit"
-          disabled={variant === "disabled"}
-          readOnly={variant === "readOnly"}
-        >
-          <div data-slot="stack">
-            <SelectLabel>
-              {variant === "disabled" ? "Disabled" : variant === "readOnly" ? "Read-only" : "Disabled item"}
-            </SelectLabel>
+      {fields.map((field) => (
+        <Field key={field.label}>
+          <FieldLabel>{field.label}</FieldLabel>
+          <Select
+            defaultValue={field.disabled || field.readOnly ? "fr" : null}
+            placeholder="Select a country"
+            disabled={field.disabled}
+            readOnly={field.readOnly}
+          >
             <SelectTrigger>
               <SelectValue />
               <ChevronDownIcon />
             </SelectTrigger>
-          </div>
-          <SelectContent>
-            {fruits.map((fruit) => (
-              <SelectItem key={fruit.value} value={fruit.value} disabled={fruit.value === "grapes"}>
-                {fruit.label}
-                <SelectItemIndicator>
-                  <CheckIcon />
-                </SelectItemIndicator>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <SelectContent>
+              {countries.map((country) => (
+                <SelectItem key={country.value} value={country.value} disabled={country.value === "dk"}>
+                  {country.label}
+                  <SelectItemIndicator>
+                    <CheckIcon />
+                  </SelectItemIndicator>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
       ))}
     </div>
   )

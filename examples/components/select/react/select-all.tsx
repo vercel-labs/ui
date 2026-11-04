@@ -1,11 +1,11 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectSelectAll,
   SelectSeparator,
   SelectTrigger,
@@ -13,45 +13,45 @@ import {
 } from "@ui-sdk/react/select"
 import { CheckIcon, ChevronDownIcon, MinusIcon } from "lucide-react"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const regions = [
+  { value: "us-east", label: "US East" },
+  { value: "us-west", label: "US West" },
+  { value: "europe", label: "Europe" },
+  { value: "asia-pacific", label: "Asia Pacific" },
+  { value: "south-america", label: "South America" },
 ]
 
 function Example() {
   return (
-    <Select multiple defaultValue={["apple", "banana", "grapes"]} placeholder="Select fruits">
-      <div data-slot="stack">
-        <SelectLabel>Fruits</SelectLabel>
+    <Field>
+      <FieldLabel>Regions</FieldLabel>
+      <Select multiple defaultValue={["us-east", "europe", "asia-pacific"]} placeholder="Select regions">
         <SelectTrigger>
           <SelectValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectSelectAll>
-          {(state) => (
-            <>
-              Select all
-              {state.checked && <CheckIcon />}
-              {state.indeterminate && <MinusIcon />}
-            </>
-          )}
-        </SelectSelectAll>
-        <SelectSeparator />
-        {fruits.map((fruit) => (
-          <SelectItem key={fruit.value} value={fruit.value}>
-            {fruit.label}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectSelectAll>
+            {(state) => (
+              <>
+                Select all
+                {state.checked && <CheckIcon />}
+                {state.indeterminate && <MinusIcon />}
+              </>
+            )}
+          </SelectSelectAll>
+          <SelectSeparator />
+          {regions.map((region) => (
+            <SelectItem key={region.value} value={region.value}>
+              {region.label}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

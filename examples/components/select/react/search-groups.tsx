@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -10,68 +11,75 @@ import {
   SelectItem,
   SelectItemIndicator,
   SelectItemText,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
-const produce = [
+const regions = [
   {
-    label: "Fruits",
+    label: "Americas",
     items: [
-      { value: "apple", label: "Apple" },
-      { value: "banana", label: "Banana" },
-      { value: "orange", label: "Orange" },
+      { value: "br", label: "Brazil" },
+      { value: "ca", label: "Canada" },
+      { value: "mx", label: "Mexico" },
     ],
   },
   {
-    label: "Vegetables",
+    label: "Europe",
     items: [
-      { value: "carrot", label: "Carrot" },
-      { value: "broccoli", label: "Broccoli" },
-      { value: "spinach", label: "Spinach" },
+      { value: "fr", label: "France" },
+      { value: "de", label: "Germany" },
+      { value: "es", label: "Spain" },
+    ],
+  },
+  {
+    label: "Asia Pacific",
+    items: [
+      { value: "au", label: "Australia" },
+      { value: "jp", label: "Japan" },
+      { value: "sg", label: "Singapore" },
     ],
   },
 ]
 
 function Example() {
   return (
-    <Select placeholder="Select produce">
-      <div data-slot="stack">
-        <SelectLabel>Produce</SelectLabel>
+    <Field>
+      <FieldLabel>Country</FieldLabel>
+      <Select placeholder="Select a country">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectInput aria-label="Search produce" placeholder="Search…" />
-        <SelectEmpty>Nothing found.</SelectEmpty>
-        <SelectList>
-          {produce.map((group) => (
-            <SelectGroup key={group.label}>
-              <SelectGroupLabel>{group.label}</SelectGroupLabel>
-              {group.items.map((item) => (
-                <SelectItem key={item.value} value={item.value} label={item.label}>
-                  <SelectItemText>
-                    {(state) =>
-                      state.segments.map((segment, index) =>
-                        segment.match ? <b key={index}>{segment.text}</b> : segment.text,
-                      )
-                    }
-                  </SelectItemText>
-                  <SelectItemIndicator>
-                    <CheckIcon />
-                  </SelectItemIndicator>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </SelectList>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectEmpty>No countries found.</SelectEmpty>
+          <SelectList>
+            {regions.map((group) => (
+              <SelectGroup key={group.label}>
+                <SelectGroupLabel>{group.label}</SelectGroupLabel>
+                {group.items.map((item) => (
+                  <SelectItem key={item.value} value={item.value} label={item.label}>
+                    <SelectItemText>
+                      {(state) =>
+                        state.segments.map((segment, index) =>
+                          segment.match ? <b key={index}>{segment.text}</b> : segment.text,
+                        )
+                      }
+                    </SelectItemText>
+                    <SelectItemIndicator>
+                      <CheckIcon />
+                    </SelectItemIndicator>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))}
+          </SelectList>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

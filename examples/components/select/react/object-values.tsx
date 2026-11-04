@@ -1,52 +1,52 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 type Member = { id: number; name: string; email: string }
 
 const members: Member[] = [
-  { id: 1, name: "Ada Lovelace", email: "ada@example.com" },
-  { id: 2, name: "Grace Hopper", email: "grace@example.com" },
-  { id: 3, name: "Alan Turing", email: "alan@example.com" },
-  { id: 4, name: "Margaret Hamilton", email: "margaret@example.com" },
+  { id: 1, name: "Hollis Grant", email: "hollis@example.com" },
+  { id: 2, name: "Inès Moreau", email: "ines@example.com" },
+  { id: 3, name: "Kofi Mensah", email: "kofi@example.com" },
+  { id: 4, name: "Wren Takahashi", email: "wren@example.com" },
 ]
 
 function Example() {
-  const [assignee, setAssignee] = React.useState<Member | null>({ ...members[1] })
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
+    <Field>
+      <FieldLabel>Assignee</FieldLabel>
       <Select
-        value={assignee}
-        onValueChange={setAssignee}
+        defaultValue={{ ...members[1] }}
+        onValueChange={(member) => log(`Submits assignee=${member ? member.id : ""}`)}
         name="assignee"
         itemToValue={(member) => String(member.id)}
         itemToLabel={(member) => member.name}
         isItemEqualToValue={(item, value) => item.id === value.id}
         placeholder="Unassigned"
       >
-        <div data-slot="stack">
-          <SelectLabel>Assignee</SelectLabel>
-          <SelectTrigger>
-            <SelectValue />
-            <ChevronDownIcon />
-          </SelectTrigger>
-        </div>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
         <SelectContent>
           {members.map((member) => (
             <SelectItem key={member.id} value={member}>
-              <span>{member.name}</span>
-              <span data-slot="hint">{member.email}</span>
+              <span data-slot="stack">
+                {member.name}
+                <span data-slot="hint">{member.email}</span>
+              </span>
               <SelectItemIndicator>
                 <CheckIcon />
               </SelectItemIndicator>
@@ -54,8 +54,7 @@ function Example() {
           ))}
         </SelectContent>
       </Select>
-      <output data-slot="output">Submits assignee={assignee ? assignee.id : ""}</output>
-    </div>
+    </Field>
   )
 }
 

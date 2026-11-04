@@ -1,10 +1,10 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
@@ -38,51 +38,51 @@ function Example() {
   const [scrollTop, setScrollTop] = React.useState(0)
 
   return (
-    <Select
-      items={manyItems}
-      placeholder="Select an item"
-      onHighlight={(value, { index }) => {
-        const el = scroller.current
-        if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
-      }}
-    >
-      <div data-slot="stack">
-        <SelectLabel>Item</SelectLabel>
+    <Field>
+      <FieldLabel>Item</FieldLabel>
+      <Select
+        items={manyItems}
+        placeholder="Select an item"
+        onHighlight={(value, { index }) => {
+          const el = scroller.current
+          if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
+        }}
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <div
-          ref={scroller}
-          style={{ height }}
-          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-        >
-          <SelectList>
-            {(state) => {
-              const items = state.items as { value: string; label: string }[]
-              const { start, end } = visibleRows(scrollTop, height, items.length, row)
-              return (
-                <div style={{ height: items.length * row }}>
-                  {items.slice(start, end).map((item, offset) => (
-                    <SelectItem
-                      key={item.value}
-                      value={item.value}
-                      label={item.label}
-                      index={start + offset}
-                      style={{ top: (start + offset) * row, height: row }}
-                    >
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </div>
-              )
-            }}
-          </SelectList>
-        </div>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <div
+            ref={scroller}
+            style={{ height }}
+            onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+          >
+            <SelectList>
+              {(state) => {
+                const items = state.items as { value: string; label: string }[]
+                const { start, end } = visibleRows(scrollTop, height, items.length, row)
+                return (
+                  <div style={{ height: items.length * row }}>
+                    {items.slice(start, end).map((item, offset) => (
+                      <SelectItem
+                        key={item.value}
+                        value={item.value}
+                        label={item.label}
+                        index={start + offset}
+                        style={{ top: (start + offset) * row, height: row }}
+                      >
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </div>
+                )
+              }}
+            </SelectList>
+          </div>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

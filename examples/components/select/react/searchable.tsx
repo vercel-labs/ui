@@ -1,3 +1,6 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -8,12 +11,11 @@ import {
   SelectItem,
   SelectItemIndicator,
   SelectItemText,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import { CheckIcon, ChevronDownIcon, SearchIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
 const countries = [
   { value: "ar", label: "Argentina", code: "+54" },
@@ -46,51 +48,48 @@ const popularCountries = [
   { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
 ]
 
-export function Example() {
+function Example() {
   return (
-    <Select
-      items={countries}
-      emptyItems={popularCountries}
-      placeholder="Select a country"
-      filter="contains"
-      announcement={(change) =>
-        change.type === "results"
-          ? `${change.count} ${change.count === 1 ? "country" : "countries"} found`
-          : null
-      }
-    >
-      <div data-slot="stack">
-        <SelectLabel>Country</SelectLabel>
+    <Field>
+      <FieldLabel>Country</FieldLabel>
+      <Select
+        items={countries}
+        emptyItems={popularCountries}
+        placeholder="Select a country"
+        filter="contains"
+        announcement={(change) =>
+          change.type === "results"
+            ? `${change.count} ${change.count === 1 ? "country" : "countries"} found`
+            : null
+        }
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <div data-slot="row">
-          <SearchIcon />
+        <SelectContent>
           <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-        </div>
-        <SelectEmpty>No countries found.</SelectEmpty>
-        <SelectList>
-          {(state) =>
-            (state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]).map(
-              (entry) =>
-                "items" in entry ? (
-                  <SelectGroup key={entry.label}>
-                    <SelectGroupLabel>{entry.label}</SelectGroupLabel>
-                    {entry.items.map((country) => (
-                      <CountryItem key={country.value} country={country} />
-                    ))}
-                  </SelectGroup>
-                ) : (
-                  <CountryItem key={entry.value} country={entry} />
-                ),
-            )
-          }
-        </SelectList>
-      </SelectContent>
-    </Select>
+          <SelectEmpty>No countries found.</SelectEmpty>
+          <SelectList>
+            {(state) =>
+              (state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]).map(
+                (entry) =>
+                  "items" in entry ? (
+                    <SelectGroup key={entry.label}>
+                      <SelectGroupLabel>{entry.label}</SelectGroupLabel>
+                      {entry.items.map((country) => (
+                        <CountryItem key={country.value} country={country} />
+                      ))}
+                    </SelectGroup>
+                  ) : (
+                    <CountryItem key={entry.value} country={entry} />
+                  ),
+              )
+            }
+          </SelectList>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 
@@ -104,3 +103,5 @@ function CountryItem({ country }: { country: { value: string; label: string } })
     </SelectItem>
   )
 }
+
+export { Example }

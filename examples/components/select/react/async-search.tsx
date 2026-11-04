@@ -1,6 +1,7 @@
 "use client"
 
 import { useAsyncOptions } from "@ui-sdk/react/async-options"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -8,7 +9,6 @@ import {
   SelectInput,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectList,
   SelectStatus,
   SelectTrigger,
@@ -63,53 +63,53 @@ function Example() {
   const results = useAsyncOptions(searchCountries, { immediate: true })
 
   return (
-    <Select
-      items={results.items}
-      filter={false}
-      status={results.status}
-      query={query}
-      onQueryChange={(next) => {
-        setQuery(next)
-        results.setQuery(next)
-      }}
-      onLoadMore={results.loadMore}
-      placeholder="Select a country"
-    >
-      <div data-slot="stack">
-        <SelectLabel>Country</SelectLabel>
+    <Field>
+      <FieldLabel>Country</FieldLabel>
+      <Select
+        items={results.items}
+        filter={false}
+        status={results.status}
+        query={query}
+        onQueryChange={(next) => {
+          setQuery(next)
+          results.setQuery(next)
+        }}
+        onLoadMore={results.loadMore}
+        placeholder="Select a country"
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-        <SelectEmpty>
-          {(state) => (state.empty && !state.loading ? `No countries match “${state.query}”.` : null)}
-        </SelectEmpty>
-        <SelectList>
-          {(state) =>
-            (state.items as { value: string; label: string; disabled?: boolean }[]).map((item) => (
-              <SelectItem key={item.value} value={item.value} label={item.label} disabled={item.disabled}>
-                {item.label}
-                <SelectItemIndicator>
-                  <CheckIcon />
-                </SelectItemIndicator>
-              </SelectItem>
-            ))
-          }
-        </SelectList>
-        <SelectStatus>
-          {(state) =>
-            state.loading
-              ? "Loading…"
-              : state.status === "error"
-                ? "Couldn't load countries."
-                : `${state.count} shown`
-          }
-        </SelectStatus>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectEmpty>
+            {(state) => (state.empty && !state.loading ? `No countries match “${state.query}”.` : null)}
+          </SelectEmpty>
+          <SelectList>
+            {(state) =>
+              (state.items as { value: string; label: string; disabled?: boolean }[]).map((item) => (
+                <SelectItem key={item.value} value={item.value} label={item.label} disabled={item.disabled}>
+                  {item.label}
+                  <SelectItemIndicator>
+                    <CheckIcon />
+                  </SelectItemIndicator>
+                </SelectItem>
+              ))
+            }
+          </SelectList>
+          <SelectStatus>
+            {(state) =>
+              state.loading
+                ? "Loading…"
+                : state.status === "error"
+                  ? "Couldn't load countries."
+                  : `${state.count} shown`
+            }
+          </SelectStatus>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

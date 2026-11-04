@@ -1,3 +1,6 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -6,42 +9,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import * as React from "react"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const fonts = [
+  { value: "inter", label: "Inter" },
+  { value: "geist", label: "Geist" },
+  { value: "source-serif", label: "Source Serif" },
+  { value: "geist-mono", label: "Geist Mono" },
 ]
 
-export function Example() {
+function Example() {
   const [container, setContainer] = React.useState<HTMLDivElement | null>(null)
 
   return (
     <div data-slot="stack">
-      <Select container={container} defaultValue="apple">
-        <SelectTrigger aria-label="Fruit">
-          <SelectValue />
-          <ChevronDownIcon />
-        </SelectTrigger>
-        <SelectContent>
-          {fruits.map((fruit) => (
-            <SelectItem key={fruit.value} value={fruit.value}>
-              {fruit.label}
-              <SelectItemIndicator>
-                <CheckIcon />
-              </SelectItemIndicator>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <div data-slot="card">
-        Container
-        <div ref={setContainer} />
-      </div>
+      <Field>
+        <FieldLabel>Font</FieldLabel>
+        <Select container={container} defaultValue="inter">
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon />
+          </SelectTrigger>
+          <SelectContent>
+            {fonts.map((font) => (
+              <SelectItem key={font.value} value={font.value}>
+                {font.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
+      <div ref={setContainer} data-slot="card" />
     </div>
   )
 }
+
+export { Example }

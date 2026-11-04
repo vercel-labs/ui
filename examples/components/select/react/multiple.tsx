@@ -1,50 +1,54 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const languages = [
+  { value: "en", label: "English" },
+  { value: "fr", label: "French" },
+  { value: "de", label: "German" },
+  { value: "ja", label: "Japanese" },
+  { value: "pt", label: "Portuguese" },
+  { value: "es", label: "Spanish" },
 ]
 
 function Example() {
-  const [value, setValue] = React.useState<string[]>(["apple", "grapes"])
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Select multiple value={value} onValueChange={setValue} placeholder="Select fruits">
-        <div data-slot="stack">
-          <SelectLabel>Fruits</SelectLabel>
-          <SelectTrigger>
-            <SelectValue>
-              {(state) =>
-                state.placeholder
-                  ? "Select fruits"
-                  : state.labels.length > 2
-                    ? `${state.labels[0]} and ${state.labels.length - 1} more`
-                    : state.label
-              }
-            </SelectValue>
-            <ChevronDownIcon />
-          </SelectTrigger>
-        </div>
+    <Field>
+      <FieldLabel>Languages</FieldLabel>
+      <Select
+        multiple
+        defaultValue={["en", "ja"]}
+        placeholder="Select languages"
+        onValueChange={(value) => log(`value: ${JSON.stringify(value)}`)}
+      >
+        <SelectTrigger>
+          <SelectValue>
+            {(state) =>
+              state.placeholder
+                ? "Select languages"
+                : state.labels.length > 2
+                  ? `${state.labels[0]} and ${state.labels.length - 1} more`
+                  : state.label
+            }
+          </SelectValue>
+          <ChevronDownIcon />
+        </SelectTrigger>
         <SelectContent>
-          {fruits.map((fruit) => (
-            <SelectItem key={fruit.value} value={fruit.value}>
-              {fruit.label}
+          {languages.map((language) => (
+            <SelectItem key={language.value} value={language.value}>
+              {language.label}
               <SelectItemIndicator>
                 <CheckIcon />
               </SelectItemIndicator>
@@ -52,8 +56,7 @@ function Example() {
           ))}
         </SelectContent>
       </Select>
-      <output data-slot="output">Value: {JSON.stringify(value)}</output>
-    </div>
+    </Field>
   )
 }
 

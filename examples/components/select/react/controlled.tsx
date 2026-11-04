@@ -1,75 +1,78 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const roles = [
+  { value: "viewer", label: "Viewer" },
+  { value: "commenter", label: "Commenter" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
+  { value: "owner", label: "Owner" },
 ]
 
-export function Example() {
-  const [value, setValue] = React.useState<string | null>("apple")
+function Example() {
+  const [value, setValue] = React.useState<string | null>("viewer")
   const [open, setOpen] = React.useState(false)
-  const [log, setLog] = React.useState("")
+  const log = useLog()
 
   return (
     <div data-slot="stack">
-      <Select
-        value={value}
-        onValueChange={(next, details) => {
-          if (next === "pineapple") {
-            details.cancel()
-            setLog("Pineapple is sold out")
-            return
-          }
-          setValue(next)
-          setLog(`value: ${next} (${details.reason})`)
-        }}
-        open={open}
-        onOpenChange={(next, details) => {
-          setOpen(next)
-          setLog(`open: ${next} (${details.reason})`)
-        }}
-        debug
-      >
-        <div data-slot="stack">
-          <SelectLabel>Fruit</SelectLabel>
-          <SelectTrigger>
-            <SelectValue />
-            <ChevronDownIcon />
-          </SelectTrigger>
-        </div>
-        <SelectContent>
-          {fruits.map((fruit) => (
-            <SelectItem key={fruit.value} value={fruit.value}>
-              {fruit.label}
-              <SelectItemIndicator>
-                <CheckIcon />
-              </SelectItemIndicator>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <div data-slot="row">
-        <button type="button" onClick={() => setValue("blueberry")}>
-          Blueberry
+      <div data-slot="controls">
+        <button type="button" onClick={() => setValue("editor")}>
+          Make Editor
         </button>
         <button type="button" onClick={() => setOpen(true)}>
           Open
         </button>
       </div>
-      <output data-slot="output">{log || "Change something"}</output>
+      <Field>
+        <FieldLabel>Role</FieldLabel>
+        <Select
+          value={value}
+          onValueChange={(next, details) => {
+            if (next === "owner") {
+              details.cancel()
+              log("Only the owner can transfer ownership")
+              return
+            }
+            setValue(next)
+            log(`value: ${next} (${details.reason})`)
+          }}
+          open={open}
+          onOpenChange={(next, details) => {
+            setOpen(next)
+            log(`open: ${next} (${details.reason})`)
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon />
+          </SelectTrigger>
+          <SelectContent>
+            {roles.map((role) => (
+              <SelectItem key={role.value} value={role.value}>
+                {role.label}
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
     </div>
   )
 }
+
+export { Example }

@@ -1,4 +1,71 @@
 @scope ([data-example]) {
+  /* The field sits near the top and centered, with room below for the open list inside the preview. */
+  :scope[data-example^="select/"] {
+    justify-content: flex-start;
+    min-height: 20rem;
+
+    & > * > * {
+      align-self: center;
+      max-width: 100%;
+    }
+  }
+
+  :scope:is(
+    [data-example="select/controlled"],
+    [data-example="select/modal"],
+    [data-example="select/align-item"]
+  ) {
+    min-height: 24rem;
+  }
+
+  :scope:is(
+    [data-example="select/groups"],
+    [data-example="select/scrollable"],
+    [data-example="select/typeahead"],
+    [data-example="select/search-groups"],
+    [data-example="select/searchable"],
+    [data-example="select/async-search"],
+    [data-example="select/virtualized"],
+    [data-example="select/controller"],
+    [data-example="select/disabled"],
+    [data-example="select/form"]
+  ) {
+    min-height: 31rem;
+  }
+
+  /* The selected item's text lands on the trigger's: the popup's padding plus the item's. */
+  :scope[data-example="select/align-item"] [data-slot="select-trigger"] {
+    padding-inline-start: 15px;
+  }
+
+  /* The controls sit wider than the field, so they wrap only on a phone. */
+  :scope[data-example="select/controller"] [data-slot="stack"]:has(> [data-slot="controls"]) {
+    width: auto;
+  }
+
+  /* Each select beside its label, one per line, so the controls fit a phone. */
+  :scope[data-example="select/positioning"] {
+    min-height: 30rem;
+
+    & [data-slot="controls"] {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: var(--space-2) var(--space-3);
+
+      & > [data-slot="select-label"] {
+        justify-self: end;
+      }
+
+      & > [data-slot="select-trigger"] {
+        min-width: 8rem;
+      }
+
+      & > [data-slot="label"] {
+        grid-column: 2;
+      }
+    }
+  }
+
   [data-slot="select-label"] {
     font-weight: 500;
 
@@ -75,6 +142,11 @@
     color: var(--muted);
   }
 
+  /* A row the keyboard reveals keeps a row of room from the scroller's edges. */
+  :is([data-slot="select-content"], [data-slot="select-list"]) {
+    scroll-padding-block: var(--space-8);
+  }
+
   [data-slot="select-content"] {
     min-width: max(10rem, var(--anchor-width));
     max-height: min(20rem, var(--available-height));
@@ -87,9 +159,14 @@
     }
 
     &[data-presentation="sheet"] {
+      --sheet-backdrop: var(--backdrop);
+      width: min(36rem, 100%);
       min-width: 0;
+      max-width: none;
       max-height: 70dvh;
-      padding-bottom: max(env(safe-area-inset-bottom), var(--space-3));
+      margin: 0 auto;
+      padding: var(--space-2) var(--space-2) max(env(safe-area-inset-bottom), var(--space-4));
+      border-radius: var(--radius-popup) var(--radius-popup) 0 0;
 
       & [data-slot="select-item"] {
         min-height: 40px;
@@ -264,24 +341,44 @@
     }
   }
 
-  [data-slot="row"]:has([data-slot="select-clear"]) {
+  /* The clear button sits inside the trigger's end, before the chevron. */
+  [data-slot="row"]:has(> [data-slot="select-clear"]) {
+    position: relative;
     flex-wrap: nowrap;
-    gap: var(--space-1);
 
-    & [data-slot="select-trigger"],
-    & > :has(> [data-slot="select-trigger"]) {
-      display: flex;
+    & > [data-slot="select-trigger"] {
       flex: 1;
+      padding-inline-end: 8px;
+    }
+
+    & > [data-slot="select-trigger"] > [data-slot="select-value"] {
+      padding-inline-end: 28px;
     }
   }
 
   [data-slot="select-clear"] {
-    width: var(--size);
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 32px;
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    min-width: 0;
+    height: 24px;
+    margin-block: auto;
     padding: 0;
+    border-radius: calc(var(--radius-control) - 3px);
+    background: transparent;
+    box-shadow: none;
     color: var(--muted);
 
     &:hover:not([data-disabled], :disabled) {
+      background: var(--tint);
       color: var(--ink);
+    }
+
+    &:active:not([data-disabled], :disabled) {
+      scale: 1;
     }
   }
 

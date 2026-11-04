@@ -1,48 +1,50 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectClear,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon, XIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const people = [
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function Example() {
-  const [value, setValue] = React.useState<string | null>("banana")
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Select value={value} onValueChange={setValue} placeholder="Select a fruit">
-        <div data-slot="stack">
-          <SelectLabel>Fruit</SelectLabel>
-          <div data-slot="row">
-            <SelectTrigger>
-              <SelectValue />
-              <ChevronDownIcon />
-            </SelectTrigger>
-            <SelectClear aria-label="Clear fruit">
-              <XIcon />
-            </SelectClear>
-          </div>
+    <Field>
+      <FieldLabel>Assignee</FieldLabel>
+      <Select
+        defaultValue="ines"
+        placeholder="Unassigned"
+        onValueChange={(value, details) => log(`value: ${JSON.stringify(value)} (${details.reason})`)}
+      >
+        <div data-slot="row">
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon />
+          </SelectTrigger>
+          <SelectClear aria-label="Clear assignee">
+            <XIcon />
+          </SelectClear>
         </div>
         <SelectContent>
-          {fruits.map((fruit) => (
-            <SelectItem key={fruit.value} value={fruit.value}>
-              {fruit.label}
+          {people.map((person) => (
+            <SelectItem key={person.value} value={person.value}>
+              {person.label}
               <SelectItemIndicator>
                 <CheckIcon />
               </SelectItemIndicator>
@@ -50,8 +52,7 @@ function Example() {
           ))}
         </SelectContent>
       </Select>
-      <output data-slot="output">Value: {JSON.stringify(value)}</output>
-    </div>
+    </Field>
   )
 }
 

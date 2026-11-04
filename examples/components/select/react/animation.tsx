@@ -1,50 +1,51 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const roles = [
+  { value: "viewer", label: "Viewer" },
+  { value: "commenter", label: "Commenter" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
 ]
 
-export function Example() {
-  const [status, setStatus] = React.useState("Closed")
+function Example() {
+  const log = useLog()
 
   return (
-    <Select
-      defaultValue="banana"
-      onOpenChange={(open) => setStatus(open ? "Opening…" : "Closing…")}
-      onOpenChangeComplete={(open) => setStatus(open ? "Open" : "Closed")}
-    >
-      <div data-slot="stack">
-        <SelectLabel>Fruit</SelectLabel>
+    <Field>
+      <FieldLabel>Role</FieldLabel>
+      <Select
+        defaultValue="editor"
+        onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-        <output data-slot="output">{status}</output>
-      </div>
-      <SelectContent>
-        {fruits.map((fruit) => (
-          <SelectItem key={fruit.value} value={fruit.value}>
-            {fruit.label}
-            <SelectItemIndicator keepMounted>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          {roles.map((role) => (
+            <SelectItem key={role.value} value={role.value}>
+              {role.label}
+              <SelectItemIndicator keepMounted>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
+
+export { Example }

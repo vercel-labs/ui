@@ -1,3 +1,6 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -5,7 +8,6 @@ import {
   SelectGroupLabel,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
   type ListData,
@@ -17,31 +19,33 @@ const sizeGroups = [
   { type: "group", label: "Extended", items: ["Extra small", "Extra large"] },
 ] satisfies ListData
 
-export function Example() {
+function Example() {
   return (
-    <Select items={sizeGroups} name="size" defaultValue="Medium">
-      <div data-slot="stack">
-        <SelectLabel>Size</SelectLabel>
+    <Field>
+      <FieldLabel>Size</FieldLabel>
+      <Select items={sizeGroups} name="size" defaultValue="Medium">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        {sizeGroups.map((group) => (
-          <SelectGroup key={group.label}>
-            <SelectGroupLabel>{group.label}</SelectGroupLabel>
-            {group.items.map((size) => (
-              <SelectItem key={size} value={size}>
-                {size}
-                <SelectItemIndicator>
-                  <CheckIcon />
-                </SelectItemIndicator>
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          {sizeGroups.map((group) => (
+            <SelectGroup key={group.label}>
+              <SelectGroupLabel>{group.label}</SelectGroupLabel>
+              {group.items.map((size) => (
+                <SelectItem key={size} value={size}>
+                  {size}
+                  <SelectItemIndicator>
+                    <CheckIcon />
+                  </SelectItemIndicator>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
+
+export { Example }

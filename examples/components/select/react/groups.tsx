@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -11,54 +12,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import * as React from "react"
 import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import * as React from "react"
 
-const produce = [
+const fonts = [
   {
-    label: "Fruits",
+    label: "Sans serif",
     items: [
-      { value: "apple", label: "Apple" },
-      { value: "banana", label: "Banana" },
-      { value: "orange", label: "Orange" },
+      { value: "inter", label: "Inter" },
+      { value: "geist", label: "Geist" },
     ],
   },
   {
-    label: "Vegetables",
+    label: "Serif",
     items: [
-      { value: "carrot", label: "Carrot" },
-      { value: "broccoli", label: "Broccoli" },
-      { value: "spinach", label: "Spinach" },
+      { value: "source-serif", label: "Source Serif" },
+      { value: "lora", label: "Lora" },
+    ],
+  },
+  {
+    label: "Monospace",
+    items: [
+      { value: "geist-mono", label: "Geist Mono" },
+      { value: "jetbrains-mono", label: "JetBrains Mono" },
     ],
   },
 ]
 
 function Example() {
   return (
-    <Select placeholder="Select produce">
-      <SelectTrigger aria-label="Produce">
-        <SelectValue />
-        <ChevronDownIcon />
-      </SelectTrigger>
-      <SelectContent>
-        {produce.map((group, index) => (
-          <React.Fragment key={group.label}>
-            {index > 0 && <SelectSeparator />}
-            <SelectGroup>
-              <SelectGroupLabel>{group.label}</SelectGroupLabel>
-              {group.items.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                  <SelectItemIndicator>
-                    <CheckIcon />
-                  </SelectItemIndicator>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </React.Fragment>
-        ))}
-      </SelectContent>
-    </Select>
+    <Field>
+      <FieldLabel>Font</FieldLabel>
+      <Select placeholder="Select a font">
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectContent>
+          {fonts.map((group, index) => (
+            <React.Fragment key={group.label}>
+              {index > 0 && <SelectSeparator />}
+              <SelectGroup>
+                <SelectGroupLabel>{group.label}</SelectGroupLabel>
+                {group.items.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                    <SelectItemIndicator>
+                      <CheckIcon />
+                    </SelectItemIndicator>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </React.Fragment>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

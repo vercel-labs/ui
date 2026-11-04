@@ -1,36 +1,62 @@
-import { CheckIcon } from "lucide-react"
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
   SelectTrigger,
+  SelectValue,
   createSelectController,
 } from "@ui-sdk/react/select"
-import * as React from "react"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const statuses = [
+  { value: "backlog", label: "Backlog" },
+  { value: "todo", label: "Todo" },
+  { value: "in-progress", label: "In Progress" },
+  { value: "done", label: "Done" },
 ]
 
-const fruit = createSelectController<string>()
+const status = createSelectController<string>()
 
-export function Example() {
-  const [log, setLog] = React.useState("")
+function Example() {
+  const log = useLog()
 
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        <span data-slot="hint">Toolbar</span>
-        <SelectTrigger controller={fruit} aria-label="Fruit" />
+      <div data-slot="controls">
+        <button
+          type="button"
+          onClick={async () => {
+            const { reason } = await status.open()
+            log(`Closed by ${reason}, with ${status.getValue() ?? "nothing"}`)
+          }}
+        >
+          Open and Wait
+        </button>
+        <button type="button" onClick={() => status.setValue("done")}>
+          Mark Done
+        </button>
+        <button type="button" onClick={() => status.clear()}>
+          Clear
+        </button>
+        <button type="button" onClick={() => status.focus()}>
+          Focus
+        </button>
       </div>
-      <Select controller={fruit} items={fruits} placeholder="Fruit">
+      <Field>
+        <FieldLabel>Status</FieldLabel>
+        <SelectTrigger controller={status}>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+      </Field>
+      <Select controller={status} items={statuses} placeholder="Select a status">
         <SelectContent>
-          {fruits.map((item) => (
+          {statuses.map((item) => (
             <SelectItem key={item.value} value={item.value}>
               {item.label}
               <SelectItemIndicator>
@@ -40,27 +66,8 @@ export function Example() {
           ))}
         </SelectContent>
       </Select>
-      <div data-slot="row">
-        <button
-          type="button"
-          onClick={async () => {
-            const { reason } = await fruit.open()
-            setLog(`Closed by ${reason}, with ${fruit.getValue() ?? "nothing"}`)
-          }}
-        >
-          Open
-        </button>
-        <button type="button" onClick={() => fruit.setValue("banana")}>
-          Banana
-        </button>
-        <button type="button" onClick={() => fruit.clear()}>
-          Clear
-        </button>
-        <button type="button" onClick={() => fruit.focus()}>
-          Focus
-        </button>
-      </div>
-      <output data-slot="output">{log || "Use the buttons"}</output>
     </div>
   )
 }
+
+export { Example }
