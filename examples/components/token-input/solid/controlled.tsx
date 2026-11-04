@@ -1,3 +1,4 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { toText, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/solid/token-input"
 import {
   type TriggerMenuDataItem,
@@ -6,7 +7,8 @@ import {
   TriggerMenuItem,
   TriggerMenuList,
 } from "@ui-sdk/solid/trigger-menu"
-import { For, createSignal } from "solid-js"
+import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const files = [
   { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -22,31 +24,31 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [value, setValue] = createSignal<TokenInputValue>(draft)
-  const [last, setLast] = createSignal("")
+
   return (
-    <div data-slot="stack">
+    <Field>
+      <FieldLabel>Prompt</FieldLabel>
       <TokenInput
         value={value()}
         onValueChange={(next, details) => {
           setValue(next)
           const removed = details.removed.map((token) => token.label).join(", ")
-          setLast(
-            `${details.reason}${details.inputType ? ` (${details.inputType})` : ""}${removed ? `, removed ${removed}` : ""}`,
-          )
+          log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
         }}
         history={{ limit: 50, groupDelay: 1000 }}
         getTokenDescription={(token) => (token.type === "file" ? "attached file" : token.type)}
       >
-        <TokenInputEditor aria-label="Prompt" />
+        <TokenInputEditor />
         <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
           <TriggerMenuContent>
             <TriggerMenuList>
               {(state) => (
                 <For each={state.items as TriggerMenuDataItem[]}>
                   {(item) => (
-                    <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+                    <TriggerMenuItem value={item.value} label={item.label}>
                       {item.label}
                     </TriggerMenuItem>
                   )}
@@ -56,8 +58,8 @@ export function Example() {
           </TriggerMenuContent>
         </TriggerMenu>
       </TokenInput>
-      <p data-slot="output">{last() || "Type, paste or press Cmd+Z."}</p>
-      <p data-slot="output">{toText(value())}</p>
-    </div>
+    </Field>
   )
 }
+
+export { Example }

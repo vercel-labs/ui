@@ -1,12 +1,6 @@
 <script lang="ts">
-  import {
-    type Token,
-    TokenInput,
-    TokenInputEditor,
-    type TokenInputValue,
-    type TokenInputValueChangeDetails,
-    toText,
-  } from "@ui-sdk/svelte/token-input"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { toText, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/svelte/token-input"
   import {
     type TriggerMenuDataItem,
     TriggerMenu,
@@ -14,6 +8,7 @@
     TriggerMenuItem,
     TriggerMenuList,
   } from "@ui-sdk/svelte/trigger-menu"
+  import { useLog } from "../../../shared/svelte/log"
 
   const files = [
     { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -29,29 +24,28 @@
     " in two sentences.",
   ]
 
+  const log = useLog()
   let value = $state<TokenInputValue>(draft)
-  let last = $state("")
-
-  function onChange(next: TokenInputValue, details: TokenInputValueChangeDetails) {
-    const removed = details.removed.map((token) => token.label).join(", ")
-    last = `${details.reason}${details.inputType ? ` (${details.inputType})` : ""}${removed ? `, removed ${removed}` : ""}`
-  }
 </script>
 
-<div data-slot="stack">
+<Field>
+  <FieldLabel>Prompt</FieldLabel>
   <TokenInput
     bind:value
+    onValueChange={(next, details) => {
+      const removed = details.removed.map((token) => token.label).join(", ")
+      log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
+    }}
     history={{ limit: 50, groupDelay: 1000 }}
-    getTokenDescription={(token: Token) => (token.type === "file" ? "attached file" : token.type)}
-    onValueChange={onChange}
+    getTokenDescription={(token) => (token.type === "file" ? "attached file" : token.type)}
   >
-    <TokenInputEditor aria-label="Prompt" />
+    <TokenInputEditor />
     <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
       <TriggerMenuContent>
         <TriggerMenuList>
           {#snippet children(state)}
             {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-              <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+              <TriggerMenuItem value={item.value} label={item.label}>
                 {item.label}
               </TriggerMenuItem>
             {/each}
@@ -60,6 +54,4 @@
       </TriggerMenuContent>
     </TriggerMenu>
   </TokenInput>
-  <p data-slot="output">{last || "Type, paste or press Cmd+Z."}</p>
-  <p data-slot="output">{toText(value)}</p>
-</div>
+</Field>

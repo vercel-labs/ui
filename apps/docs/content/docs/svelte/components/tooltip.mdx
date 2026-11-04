@@ -3,9 +3,11 @@ title: Tooltip
 description: Name a control or add a short hint on hover and keyboard focus.
 ---
 
+A tooltip names a control or adds a short hint when the pointer rests on it or keyboard focus reaches it. Keep it to a few words of plain text.
+
 <ComponentExample
   name="tooltip/basic"
-  caption="Hover the button or reach it with Tab. Escape closes the tooltip and keeps focus on the button."
+  caption="The tooltip starts open. Hover the button or reach it with Tab to show it again, and Escape closes it while focus stays on the button."
 />
 
 ## Installation
@@ -22,32 +24,57 @@ Use the following composition to build a `Tooltip`:
 Tooltip
 ├── TooltipTrigger
 └── TooltipContent
+    ├── TooltipArrow
+    └── TooltipShortcut
 ```
 
-Wrap the trigger and its hint in a tooltip.
+Wrap the trigger and its hint in a tooltip. The arrow and the shortcut are optional.
 
-The content has the `tooltip` role. It names its trigger when the trigger has no name of its own, like an icon button, and describes it otherwise, as shown in [Icon Buttons](#icon-buttons). Keep it to plain text: a tooltip can't be focused, so links or buttons inside it can't be reached. For anything interactive, use a [Popover](./popover) or a [Hover Card](./hover-card).
+The content has the `tooltip` role, and it's in the page from the start, hidden, so it names or describes its trigger before focus reaches it. It names a trigger without a name of its own, like a button with only an icon, and describes any other: one with text, an `aria-label` or a `title`. `type="label"` or `type="description"` overrides the guess. Keep it to plain text: a tooltip can't be focused, so links or buttons inside it can't be reached. For anything interactive, use a [Popover](./popover) or a [Hover Card](./hover-card).
 
-## Examples
+## Usage
 
-### Side
+Import the parts and put them together:
 
-`side` picks where the tooltip opens: `top` by default. It flips to the other side when there isn't room, and shifts along the trigger to stay on screen.
+```svelte
+<script lang="ts">
+  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+</script>
 
-<ComponentExample name="tooltip/side" caption="Hover each trigger to compare the four preferred sides." />
+<Tooltip>
+  <TooltipTrigger>Share</TooltipTrigger>
+  <TooltipContent>Anyone with the link can view</TooltipContent>
+</Tooltip>
+```
 
-### Icon Buttons
+## Side
 
-A trigger without a name of its own, like a button with only an icon, gets its name from the tooltip, so screen readers hear "Bold, button". A trigger with text, an `aria-label` or a `title` is described by the tooltip instead: "Share, button, Anyone with the link can view". The tooltip's text is in the page from the start, hidden, so the name is there before focus reaches the trigger.
-
-`type` overrides the guess. `type="label"` names a trigger whose text isn't a real name, like a symbol, and `type="description"` describes one that's named some other way.
+`side` picks where the tooltip opens: `top` by default. It flips to the other side when there isn't room, and shifts along the trigger to stay on screen. `data-side` says where it landed.
 
 <ComponentExample
-  name="tooltip/icon-button"
-  caption="Tab through the icons to hear their names, or hover to read the hints."
+  name="tooltip/side"
+  caption="Hover Top, Left, Right and Bottom. Each tooltip opens on that side of its button, or flips into the middle when there isn't room."
 />
 
-### Keyboard Shortcut
+Add a `TooltipArrow` to point at the trigger. It follows the side the tooltip lands on, including after a flip.
+
+```svelte
+<TooltipContent>
+  <TooltipArrow />
+  Add to library
+</TooltipContent>
+```
+
+## Anchor
+
+Position the tooltip against something other than the trigger with `anchor`: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. Here a small help button inside a field shows its tooltip along the whole field.
+
+<ComponentExample
+  name="tooltip/anchor"
+  caption="Hover the help button. The tooltip opens below the Webhook URL field and lines up with its start, not with the button."
+/>
+
+## Keyboard Shortcut
 
 `shortcut` on the tooltip, like `"mod+s"`, is a hint for what the trigger's action is bound to, where `mod` is Command on Apple platforms and Control elsewhere. `TooltipShortcut` shows the keys for the platform, `⌘S` or `Ctrl+S`, hidden from screen readers, and the trigger gets `aria-keyshortcuts` so they hear it instead. A `TooltipShortcut` can show other keys with its own `shortcut`.
 
@@ -55,183 +82,176 @@ The tooltip doesn't bind the keys. Register the shortcut yourself with [`registe
 
 <ComponentExample
   name="tooltip/shortcut"
-  caption="Use the Save or Share button, or its displayed keyboard shortcut."
+  caption="Hover Save or Share to read its shortcut, then press the button or the keys. The console logs Saved or Shared."
 />
 
-### Disabled Buttons
+## Disabled Buttons
 
-A natively disabled button cannot receive focus, and some browsers send it no pointer events. Use a focusable disabled control when the tooltip explains why an action is unavailable.
-
-Use `aria-disabled="true"` instead, and ignore the button's presses yourself. The button stays in the Tab order, screen readers announce it as dimmed, and the tooltip explains what's missing. `disabled` on the tooltip turns the explanation off once the button works.
-
-Style the dimmed state with `aria-disabled:` variants.
+A natively disabled button can't receive focus, and some browsers send it no pointer events, so its tooltip never shows. When the tooltip explains why an action is unavailable, use `aria-disabled="true"` instead and ignore the button's presses yourself. The button stays in the Tab order, screen readers announce it as dimmed, and the tooltip explains what's missing. `disabled` on the tooltip turns the explanation off once the button works.
 
 <ComponentExample
   name="tooltip/disabled-button"
-  caption="Focus Publish to learn what is missing. Add a title to enable the action."
+  caption="Hover or focus Publish to learn what's missing. Type a title, and Publish works and its tooltip goes away."
 />
 
-### Touch
+## Touch
 
-Touch screens have no hover. A tap on a plain tooltip's trigger only presses it, and the tooltip stays closed. Don't hide anything important in a tooltip.
+Touch screens have no hover. A tap on a plain tooltip's trigger only presses it, and the tooltip stays closed, so don't hide anything important in a tooltip.
 
 For an info button whose only job is the tip, add `toggleable`: pressing the trigger opens and closes the tooltip, with a finger, a mouse or the keyboard, and its text is announced when a press opens it. An outside press or Escape closes it too.
 
 <ComponentExample
   name="tooltip/toggleable"
-  caption="Press the info button to open the tip, including on a touch screen. Press again to close it."
+  caption="Press the info button to open the tip, including on a touch screen. Press it again or anywhere else to close it."
 />
 
-### Keep Open on Press
+## Keep Open on Press
 
 Pressing the trigger closes the tooltip, so it doesn't cover what the press changed, and it stays closed until the pointer leaves. `closeOnPress={false}` keeps it open, like for a copy button whose tooltip turns into "Copied".
 
-<ComponentExample name="tooltip/copy" caption="Press Copy to change the hint to Copied without closing it." />
-
-### Delay and Grouping
-
-`delay` is how long the pointer rests on the trigger before the tooltip opens, 600 milliseconds by default. `closeDelay` is how long it stays once the pointer leaves the trigger and the tooltip, 0 by default. Keyboard focus opens it at once.
-
-Tooltips group without a provider. Once one is open, or was a moment ago, hovering the next opens it at once, and only one is open at a time, so moving along a toolbar reads like one tooltip that follows the pointer. A tooltip that opened at once gets `data-instant`, so it can skip its animation with `data-instant:transition-none`.
-
-`disabled` stops a tooltip from opening, while its trigger keeps working.
-
 <ComponentExample
-  name="tooltip/delay"
-  caption="Change the delays, then move the pointer between the triggers to compare grouped opening."
+  name="tooltip/copy"
+  caption="Hover the copy button and press it. The tooltip stays open and changes to Copied."
 />
 
-### Truncated Text
+## Truncated Text
 
-To show a tooltip only when text is cut off, cancel the open in `onOpenChange` when the text fits. Compare `scrollWidth` with `clientWidth` in the callback. The name stays the same, so `type="label"` avoids repeating it to screen readers.
+To show a tooltip only when text is cut off, cancel the open in `onOpenChange` when the text fits. Compare `scrollWidth` with `clientWidth` in the callback. The tooltip repeats the name, so `type="label"` keeps screen readers from hearing it twice.
 
 <ComponentExample
   name="tooltip/truncated"
-  caption="Hover or focus each filename. Only names that are cut off open a tooltip."
+  caption="Hover or focus each file. Only names that are cut off open a tooltip."
 />
 
-### Offsets
+## Controlled
 
-`sideOffset` is the gap to the trigger, 4 pixels by default. `alignOffset` shifts along it, `align` lines it up with the start, center or end of the trigger, and `collisionPadding` is the space kept from the edges of the window.
-
-<ComponentExample
-  name="tooltip/offsets"
-  caption="Change the placement controls, then hover the trigger to see the offsets."
-/>
-
-### Arrow
-
-The arrow follows the side the tooltip actually lands on, including after it flips away from an edge, and gets the same `data-side`. It points at the middle of the trigger, even after the tooltip shifts, and keeps `arrowPadding` away from the corners. Check "Keep open" and change the side to watch it move.
-
-<ComponentExample
-  name="tooltip/arrow"
-  caption="Keep the tooltip open and change its side to watch the arrow follow its placement."
-/>
-
-Without an Arrow part, the content's `::before` can be the arrow, positioned with `--arrow-offset`, the same way as a [Popover's](./popover#arrow).
-
-### Anchor
-
-Position the tooltip against something other than the trigger with `anchor`: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. Here a small help button inside a field shows its tooltip along the whole field.
-
-<ComponentExample
-  name="tooltip/anchor"
-  caption="Hover the help button. The tooltip aligns with the whole Webhook URL field."
-/>
-
-### Controlled
-
-Bind `open` with `bind:open` to control the tooltip. `open={x}` without `bind:` is a starting value the
-tooltip may change until `x` changes. Bind it with `bind:open={x}` to keep them together, or with a
-function binding, `bind:open={() => x, (next) => (x = next)}`, to decide.
-
-Every change carries a [reason](#reasons), like `trigger-hover`, `trigger-focus`, `trigger-press`, `escape-key` or `outside-press`. Call `details.cancel()` to stop it. A [controller](#controller), from `createTooltipController()`, opens the tooltip from anywhere, like a step in a guided tour.
+Bind `open` with `bind:open`, and read each change in `onOpenChange`. Every change carries a [reason](#reasons), like `trigger-hover`, `trigger-focus`, `trigger-press`, `escape-key` or `outside-press`. Call `details.cancel()` to stop it. To open the tooltip from anywhere, like a step in a guided tour, use a [controller](#controller).
 
 <ComponentExample
   name="tooltip/controlled"
-  caption="Open Export from its trigger or use Show from elsewhere. The output records the change reason."
+  caption="Check Open, or hover Export. The console logs each change and its reason."
 />
 
-### One Tooltip for Many Triggers
+## Shared
 
-A grid of days, a chart or a long list can share one tooltip instead of rendering one per item. Put the triggers anywhere on the page and connect them to the tooltip with its controller. Each trigger passes a `payload`, like its day, and the content reads it from its state. Only the trigger that opened the tooltip is described by it. The content renders before the first open, so handle an `undefined` payload before reading its fields.
+A toolbar, a chart or a long list can share one tooltip instead of rendering one per item. Connect the triggers and the tooltip to one `createTooltipController<Payload>()`, and the triggers can sit anywhere on the page. Each trigger passes a `payload`, here its label, and the content reads it from its state, since every part's `children` snippet receives its state. Typing it as `TooltipContentState<string>` types the payload. The content renders before the first open, so handle an `undefined` payload.
 
-Every part's `children` snippet receives the part's state. Typing it as `TooltipContentState<Day>` types the payload.
-
-The controller's `open()` takes a payload too, and an `anchor`. On an open tooltip, `open({ payload })` replaces the payload, like another trigger taking it over, and `onPayloadChange` fires with the reason `imperative`.
+Only the trigger that opened the tooltip is described by it, so give each trigger a name of its own, like an `aria-label`. The controller's `open()` takes a payload and an `anchor` too, and on an open tooltip, `open({ payload })` replaces the payload, like another trigger taking it over. `onPayloadChange` reports each change.
 
 <ComponentExample
-  name="tooltip/payload"
-  caption="Move between days. One tooltip updates to describe the active day."
+  name="tooltip/shared"
+  caption="Move along Bold, Italic and Underline. One tooltip follows the pointer and shows each button's label."
 />
 
-### Container
+## Animation
 
-Tooltips render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the tooltip somewhere else, for iframes, shadow roots or a specific stacking context.
-
-<ComponentExample
-  name="tooltip/container"
-  caption="Open the tooltip to render its content inside the specified container."
-/>
-
-### Animation
-
-`onOpenChangeComplete` runs once the tooltip has finished opening or closing, after any
-animation, with the new open state. Skip the animation for tooltips that open at once, as the next one in a
-group does, with `data-instant`. See [Styling](#styling) for the attributes to animate.
-
-<ComponentExample
-  name="tooltip/animation"
-  caption="Open and close the tooltip, then watch the completion callback update the output."
-/>
-
-## Styling
-
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework. The trigger gets no state attributes of its own, since it's often another component's trigger too, like a menu's, and those are that component's.
-
-<DataAttributes component="tooltip" />
-
-The content also gets `data-instant` when it opened without its delay, because another tooltip was open a moment ago.
-
-Open tooltips also set CSS variables for sizing and animation, listed under [TooltipContent](#tooltipcontent).
-
-Animate with `data-starting-style` and `data-ending-style`. The tooltip stays mounted until its exit animation finishes.
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the tooltip stays mounted until its exit finishes. Put `transform-origin: var(--transform-origin)` on the content so it grows out of its trigger. A tooltip that opens at once, as the next one in a group does, gets `data-instant`, so skip the transition there.
 
 ```css
 [data-slot="tooltip-content"] {
-  transition:
-    opacity 150ms,
-    scale 150ms;
   transform-origin: var(--transform-origin);
-}
+  transition:
+    opacity 150ms ease-out,
+    scale 150ms ease-out;
 
-[data-slot="tooltip-content"]:is([data-starting-style], [data-ending-style]) {
-  opacity: 0;
-  scale: 0.96;
-}
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    scale: 0.9;
+  }
 
-[data-slot="tooltip-content"][data-instant] {
-  transition: none;
+  &[data-instant] {
+    transition: none;
+  }
 }
+```
+
+For people who ask for less motion, drop the scale in a `prefers-reduced-motion` query and keep the fade. `onOpenChangeComplete` runs once the tooltip has finished opening or closing, after any animation, with the new open state.
+
+<ComponentExample
+  name="tooltip/animation"
+  caption="Hover Archive, then move away. The tooltip grows out of the button and fades, and the console logs Opening, Open, Closing and Closed."
+/>
+
+## Delay and Grouping
+
+`delay` is how long the pointer rests on the trigger before the tooltip opens, 600 milliseconds by default. `closeDelay` is how long it stays once the pointer leaves the trigger and the tooltip, 0 by default. Keyboard focus opens it at once.
+
+Tooltips group without a provider. Once one is open, or was a moment ago, hovering the next opens it at once, and only one is open at a time, so moving along a toolbar reads like one tooltip that follows the pointer. A tooltip that opened at once gets `data-instant`, so it can skip its animation.
+
+`disabled` stops a tooltip from opening, while its trigger keeps working.
+
+```svelte
+<Tooltip delay={300} closeDelay={150} disabled={!showHints}>
+```
+
+## Offset
+
+`sideOffset` is the gap to the trigger, 4 pixels by default. `alignOffset` shifts along it, `align` lines it up with the start, center or end of the trigger, and `collisionPadding` is the space kept from the edges of the window.
+
+```svelte
+<TooltipContent align="start" sideOffset={8} alignOffset={4} collisionPadding={16} />
+```
+
+## Container
+
+Tooltips render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the tooltip somewhere else, for iframes, shadow roots or a specific stacking context. See the shared [popup guide](../popups).
+
+```svelte
+<TooltipContent container={shadowRoot} />
 ```
 
 ## Custom Rendering
 
+Every part takes a `render` snippet, which receives the props to spread and the part's state. See [Parts and Composition](../parts-and-composition) for prop merging and state-based rendering.
+
 <ComponentExample
   name="tooltip/custom-rendering"
-  caption="Hover Notifications to read its tooltip, then press it to open the popover."
+  caption="Hover Changelog. The trigger renders as a link, and its tooltip says where it goes."
 />
 
-A button can be a tooltip's trigger and another component's trigger at once, like the bell above, which opens a popover and is named by its tooltip.
+A button can be a tooltip's trigger and another component's trigger at once. Render the tooltip's trigger as a `PopoverTrigger`, and the button opens the popover and is named by the tooltip:
 
-Every part takes a `render` snippet, which receives the props to spread and the part's state, and the `children` snippet receives
-the state.
+```svelte
+<Popover>
+  <Tooltip>
+    <TooltipTrigger>
+      {#snippet render({ props })}
+        <PopoverTrigger {...props}>
+          <BellIcon aria-hidden="true" />
+        </PopoverTrigger>
+      {/snippet}
+    </TooltipTrigger>
+    <TooltipContent>Notifications</TooltipContent>
+  </Tooltip>
+  <PopoverContent>...</PopoverContent>
+</Popover>
+```
 
-Each part's state is listed under [State](#state).
+## Styling
+
+Use `data-side` and `data-align` to style the content and arrow for where they landed, and `data-instant` to skip the animation of a tooltip that opened at once. The trigger gets no state attributes of its own, since it's often another component's trigger too, like a menu's. Put `transform-origin: var(--transform-origin)` on the content so it scales from the trigger.
+
+Each part has a `data-slot`, such as `tooltip-content`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### TooltipContent [#styling-tooltipcontent]
+
+<CssVariables component="tooltip" part="content" />
+
+## Data Attributes
+
+`TooltipTrigger` and `TooltipShortcut` have no state attributes.
+
+### TooltipContent [#data-attributes-tooltipcontent]
+
+<DataAttributes component="tooltip" part="content" />
+
+### TooltipArrow [#data-attributes-tooltiparrow]
+
+<DataAttributes component="tooltip" part="arrow" />
 
 ## API Reference
 
-Props and callbacks are the same as below, as Svelte props.
+Props and callbacks are the same as below, as Svelte props. `open` can be bound with `bind:open`.
 
 ### Tooltip
 
@@ -247,7 +267,9 @@ A trigger outside the tooltip also takes `controller`.
 
 <TypeTable path="../../packages/core/src/components/tooltip/tooltip.ts" name="TooltipContentProps" />
 
-<CssVariables component="tooltip" part="content" />
+### TooltipArrow
+
+Points at the trigger from the side the tooltip landed on. Renders a `div`.
 
 ### TooltipShortcut
 
@@ -305,7 +327,19 @@ Callbacks get the new state first, then the details. A bound `open` only updates
 
 ## Accessibility
 
-The trigger is named or described by the tooltip, following the [WAI-ARIA tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/). It opens on hover and on keyboard focus, stays open while the pointer moves onto it, and Escape closes only the tooltip, not a dialog or menu around it. Every line below is an automated test.
+The trigger is named or described by the tooltip, following the [WAI-ARIA tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/). It opens on hover and on keyboard focus, and stays open while the pointer moves onto it.
+
+### Keyboard
+
+| Key          | Does                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| Tab          | Focus on the trigger opens the tooltip at once; focus leaving it closes the tooltip            |
+| Escape       | Closes the tooltip and leaves focus on the trigger, without closing a dialog or menu around it |
+| Enter, Space | Presses the trigger and closes the tooltip; on a `toggleable` trigger, opens and closes it     |
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="tooltip" />
 

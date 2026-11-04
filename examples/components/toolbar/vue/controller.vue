@@ -1,30 +1,35 @@
 <script setup lang="ts">
-import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/vue/toolbar"
+import { BoldIcon, ItalicIcon, LinkIcon } from "@lucide/vue"
 import { useShortcut } from "@ui-sdk/vue/shortcuts"
-import { ref } from "vue"
+import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/vue/toolbar"
+import { useLog } from "../../../shared/vue/log"
 
+const actions = [
+  { label: "Bold", icon: BoldIcon },
+  { label: "Italic", icon: ItalicIcon },
+  { label: "Insert link", icon: LinkIcon },
+]
+
+const log = useLog()
 const toolbar = createToolbarController()
-
-const action = ref("nothing yet")
 useShortcut("alt+f10", () => toolbar.focus(), { allowInInput: true })
 </script>
 
 <template>
   <div data-slot="stack">
-    <textarea aria-label="Notes" placeholder="Type, then press Alt+F10" />
-    <Toolbar :controller="toolbar" aria-label="Notes">
+    <div data-slot="controls">
+      <button type="button" @click="toolbar.focus()">Focus Toolbar</button>
+    </div>
+    <Toolbar :controller="toolbar" aria-label="Notes formatting">
       <ToolbarButton
-        data-variant="secondary"
-        v-for="label in ['Bold', 'Italic', 'Link']"
-        :key="label"
-        @click="action = label.toLowerCase()"
+        v-for="action in actions"
+        :key="action.label"
+        :aria-label="action.label"
+        @click="log(action.label)"
       >
-        {{ label }}
+        <component :is="action.icon" aria-hidden="true" />
       </ToolbarButton>
     </Toolbar>
-    <div data-slot="row">
-      <button data-variant="secondary" type="button" @click="toolbar.focus()">Focus toolbar</button>
-      <output data-slot="output">Last: {{ action }}</output>
-    </div>
+    <textarea aria-label="Notes" placeholder="Type, then press Alt+F10" />
   </div>
 </template>

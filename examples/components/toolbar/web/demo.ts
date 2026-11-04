@@ -1,44 +1,43 @@
 import "@ui-sdk/web/toolbar"
 import "@ui-sdk/web/toggle"
-import "@ui-sdk/web/menu"
-import { Bold, ChevronDown, createElement, Italic, Underline } from "lucide"
+import { Bold, createElement, Italic, Link, Underline } from "lucide"
+import { log } from "../../../shared/web/log"
+
+const styles = [
+  { label: "Bold", icon: Bold },
+  { label: "Italic", icon: Italic },
+  { label: "Underline", icon: Underline },
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-toolbar aria-label="Formatting">
-      <ui-toggle-group multiple aria-label="Text style">
-        <ui-toggle value="bold">
-          <button data-variant="ghost" aria-label="Bold">
-            ${createElement(Bold, { "aria-hidden": "true" }).outerHTML}
-          </button>
-        </ui-toggle>
-        <ui-toggle value="italic">
-          <button data-variant="ghost" aria-label="Italic">
-            ${createElement(Italic, { "aria-hidden": "true" }).outerHTML}
-          </button>
-        </ui-toggle>
-        <ui-toggle value="underline">
-          <button data-variant="ghost" aria-label="Underline">
-            ${createElement(Underline, { "aria-hidden": "true" }).outerHTML}
-          </button>
-        </ui-toggle>
-      </ui-toggle-group>
+      ${styles
+        .map(
+          (style) => `
+            <ui-toggle>
+              <button aria-label="${style.label}">
+                <ui-toggle-icon>${createElement(style.icon, { "aria-hidden": "true" }).outerHTML}</ui-toggle-icon>
+              </button>
+            </ui-toggle>
+          `,
+        )
+        .join("")}
       <ui-toolbar-separator></ui-toolbar-separator>
-      <ui-menu>
-        <ui-toolbar-button>
-          <ui-menu-trigger>
-            <button data-variant="secondary">
-              Sans
-              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
-            </button>
-          </ui-menu-trigger>
-        </ui-toolbar-button>
-        <ui-menu-content>
-          ${["Sans", "Serif", "Mono"].map((font) => `<ui-menu-item>${font}</ui-menu-item>`).join("")}
-        </ui-menu-content>
-      </ui-menu>
+      <ui-toolbar-button>
+        <button aria-label="Insert link">
+          ${createElement(Link, { "aria-hidden": "true" }).outerHTML}
+        </button>
+      </ui-toolbar-button>
     </ui-toolbar>
   `
+  root.querySelectorAll("ui-toggle").forEach((toggle, index) => {
+    const { label } = styles[index]
+    toggle.addEventListener("pressedchange", (event) =>
+      log(root, `${label} ${event.detail.value ? "on" : "off"}`),
+    )
+  })
+  root.querySelector('[aria-label="Insert link"]')!.addEventListener("click", () => log(root, "Insert link"))
 }
 
 export { mount }

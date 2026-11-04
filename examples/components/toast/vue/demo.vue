@@ -1,41 +1,38 @@
 <script setup lang="ts">
-import { onUnmounted } from "vue"
 import {
   Toast,
-  ToastClose,
+  ToastAction,
   ToastDescription,
   ToastRegion,
   ToastTitle,
   createToaster,
 } from "@ui-sdk/vue/toast"
+import { onUnmounted } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const toast = createToaster()
-
-function show() {
-  toast("Event has been created", {
-    description: "Your event is ready to share.",
-    cancel: { label: "Dismiss" },
-  })
-}
 onUnmounted(() => {
   toast.dismiss()
 })
+
+function createEvent() {
+  toast("Event created", {
+    description: "Friday, June 12 at 10:00 AM",
+    action: { label: "Undo", onAction: () => log("Event removed") },
+  })
+}
 </script>
 
 <template>
-  <button @click="show">Show toast</button>
+  <button @click="createEvent">Create Event</button>
   <ToastRegion :toaster="toast">
-    <template #default="{ toast: item }">
-      <Toast>
-        <div data-slot="stack">
-          <ToastTitle />
-          <ToastDescription />
-        </div>
-
-        <ToastClose v-if="item.cancel" :action="item.cancel.onCancel">
-          {{ item.cancel.label }}
-        </ToastClose>
-      </Toast>
-    </template>
+    <Toast>
+      <div data-slot="stack">
+        <ToastTitle />
+        <ToastDescription />
+      </div>
+      <ToastAction data-variant="solid" />
+    </Toast>
   </ToastRegion>
 </template>

@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { toLabel, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/vue/token-input"
-import { ref } from "vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { toLabel, TokenInput, TokenInputEditor } from "@ui-sdk/vue/token-input"
+import { useLog } from "../../../shared/vue/log"
 
-const sent = ref("")
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <TokenInput submit-shortcut="mod+enter" @submit="(value: TokenInputValue) => (sent = toLabel(value))">
-      <TokenInputEditor aria-label="Message" placeholder="Enter adds a line, Cmd/Ctrl+Enter sends" />
+  <Field>
+    <FieldLabel>Message</FieldLabel>
+    <TokenInput submit-shortcut="mod+enter" @submit="(value) => log(`Sent ${toLabel(value)}`)">
+      <TokenInputEditor placeholder="Write a message" />
     </TokenInput>
-    <p data-slot="output">
-      {{ sent ? `Sent:\n${sent}` : "Nothing sent yet." }}
-    </p>
-  </div>
+  </Field>
 </template>

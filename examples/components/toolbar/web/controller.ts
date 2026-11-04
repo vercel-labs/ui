@@ -1,37 +1,42 @@
 import "@ui-sdk/web/toolbar"
 import { registerShortcut } from "@ui-sdk/web"
+import { Bold, createElement, Italic, Link } from "lucide"
+import { log } from "../../../shared/web/log"
+
+const actions = [
+  { label: "Bold", icon: Bold },
+  { label: "Italic", icon: Italic },
+  { label: "Insert link", icon: Link },
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <textarea aria-label="Notes" placeholder="Type, then press Alt+F10"></textarea>
-      <ui-toolbar aria-label="Notes">
-        ${["Bold", "Italic", "Link"]
+      <div data-slot="controls">
+        <button type="button">Focus Toolbar</button>
+      </div>
+      <ui-toolbar aria-label="Notes formatting">
+        ${actions
           .map(
-            (label) => `
+            (action) => `
               <ui-toolbar-button>
-                <button data-variant="secondary" value="${label.toLowerCase()}">${label}</button>
+                <button aria-label="${action.label}">
+                  ${createElement(action.icon, { "aria-hidden": "true" }).outerHTML}
+                </button>
               </ui-toolbar-button>
             `,
           )
           .join("")}
       </ui-toolbar>
-      <div data-slot="row">
-        <button data-variant="secondary" type="button" data-action="focus">
-          Focus toolbar
-        </button>
-        <output data-slot="output">Last: nothing yet</output>
-      </div>
+      <textarea aria-label="Notes" placeholder="Type, then press Alt+F10"></textarea>
     </div>
   `
   const toolbar = root.querySelector("ui-toolbar")!
-  const output = root.querySelector("output")!
-  const off = registerShortcut("alt+f10", () => toolbar.api.focus(), { allowInInput: true })
-  root.querySelector("[data-action=focus]")!.addEventListener("click", () => toolbar.api.focus())
-  toolbar.querySelectorAll("button").forEach((button) => {
-    button.addEventListener("click", () => (output.textContent = `Last: ${button.value}`))
+  root.querySelector('[data-slot="controls"] button')!.addEventListener("click", () => toolbar.api.focus())
+  toolbar.querySelectorAll("button").forEach((button, index) => {
+    button.addEventListener("click", () => log(root, actions[index].label))
   })
-  return off
+  return registerShortcut("alt+f10", () => toolbar.api.focus(), { allowInInput: true })
 }
 
 export { mount }

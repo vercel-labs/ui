@@ -1,22 +1,22 @@
 <script lang="ts">
   import { InfoIcon } from "@lucide/svelte"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
 
-  const id = $props.id()
   let field: HTMLDivElement | undefined = $state()
 </script>
 
-<div data-slot="stack">
-  <label data-slot="label" for={id}>Webhook URL</label>
+<Field>
+  <FieldLabel>Webhook URL</FieldLabel>
   <div data-slot="row" bind:this={field}>
-    <input {id} placeholder="https://" />
+    <FieldControl placeholder="https://" />
     <Tooltip>
       <TooltipTrigger aria-label="About webhooks">
-        <InfoIcon />
+        <InfoIcon aria-hidden="true" />
       </TooltipTrigger>
-      <TooltipContent anchor={field} align="start">
-        We send a POST request to this URL for every new order.
+      <TooltipContent anchor={field} side="bottom" align="start">
+        We send a POST request here for every new order.
       </TooltipContent>
     </Tooltip>
   </div>
-</div>
+</Field>

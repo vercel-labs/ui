@@ -3,131 +3,172 @@ title: Token Input
 description: Mix editable text with tokens for files, people, tags, and other references.
 ---
 
+A token input is a text field that holds tokens alongside the text, like the people mentioned in a message or the files attached to a prompt. Each token moves, deletes and copies as one piece.
+
 <ComponentExample
   name="token-input/demo"
-  caption="Type @ and choose a file with the arrow keys and Enter. Press Backspace after a token to remove it."
+  caption="Type @ and choose a person with the arrow keys and Enter. Remove a token with Backspace, or press its remove button."
 />
-
-## Token Input or Trigger Menu
-
-Token Input holds the text and tokens. [Trigger Menu](./trigger-menu) suggests what to insert when someone types `@`, `/`, or another trigger.
-
-Use Token Input on its own when your code supplies the tokens. Add a Trigger Menu for suggestions, as in the demo above. Trigger Menu also works with ordinary inputs and textareas.
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/web @ui-sdk/core
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
-<span id="composition" />
-
-## Usage
-
-A value is an array of text and tokens. Each token has a type, a value for your app, and a label for the reader:
+Importing the component defines its elements. Import the trigger menu and the field too if you use them. On the server the import does nothing.
 
 ```ts
 import "@ui-sdk/web/token-input"
+import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
 ```
 
+## Composition
+
+Use the following composition to build a `ui-token-input`:
+
+```text
+ui-token-input
+├── ui-token-input-editor
+└── ui-trigger-menu
+```
+
+And for each token, inside a `<template>`:
+
+```text
+ui-token-input-token
+└── ui-token-input-token-remove
+```
+
+`ui-token-input` holds the value, and `ui-token-input-editor` is the text people edit. A [Trigger Menu](./trigger-menu) inside it suggests tokens when someone types `@`, `/`, or another trigger. Put a `<template>` inside it, or set its `renderToken` property, to give each token your own markup.
+
+## Usage
+
+Import the parts and put them together:
+
 ```html
+<script type="module">
+  import "@ui-sdk/web/token-input"
+</script>
+
 <ui-token-input value="Explain [@routes.ts](file:src/routes.ts)">
   <ui-token-input-editor aria-label="Prompt"></ui-token-input-editor>
 </ui-token-input>
 ```
 
-The `value` attribute uses the text format. Set the element's `value` property to pass an array of text and tokens instead.
+A value is an array of text and tokens. Each token has a type, a value for your app, and a label for the reader. The `value` attribute writes it as codec text; set the `defaultValue` property before the element connects to pass an array instead. The editor manages its own content, including tokens, selection, and undo, so let it render that content and use a `<template>` or `renderToken` for custom token markup.
 
-The editor manages its content, including tokens, selection, and undo. Let it render that content; use the token renderer when you want custom markup for a token. A child `<template>` can provide token markup, with `data-token-label` marking where its label goes. Use `renderToken(token, host)` for rendering from code.
+## Token Input or Trigger Menu
 
-## Examples
+Token Input holds the text and tokens. [Trigger Menu](./trigger-menu) suggests what to insert when someone types a trigger character.
 
-### Prompt Input
+Use Token Input on its own when your code supplies the tokens. Add a Trigger Menu for suggestions, as in the demo above. Trigger Menu also works with ordinary inputs and textareas.
 
-Combine file suggestions, skills, and a send action. This example marks files as pending while they load, then uses `updateToken()` to show a skill running. Enter sends; Shift+Enter adds a line. An open suggestion menu or an active input method takes precedence over sending.
+## Prompt Input
+
+Combine file suggestions, skills, and a send action. This example marks files as pending while they load, then uses `updateToken()` to show a skill running. Enter sends; Shift+Enter adds a line. An open suggestion menu or an active input method takes precedence over sending. Enter submits the form the input is in, so the send button is that form's submit button.
 
 <ComponentExample
   name="token-input/prompt-input"
-  caption="Type @ for files or / at the start for skills. For /search, enter a query and press Enter to insert the command. Press Enter again to send."
+  caption="Type @ for files or / at the start for skills. For /search, enter a query and press Enter to insert the command. Press Enter again to send, and the console logs the message."
 />
 
-### Deleting Tokens
+## Deleting Tokens
 
-Choose what Backspace does at a token with `tokenDeletion`:
+Choose what Backspace does at a token with `token-deletion`:
 
 - `whole` removes the token in one press.
 - `select` selects it first, then removes it on the next press.
-- `revert` turns it back into editable text.
+- `revert` turns it back into editable text, so the trigger menu opens on it again.
 
 <ComponentExample
   name="token-input/deletion"
-  caption="Choose a Backspace behavior, place the caret just after routes.ts, and press Backspace. Undo to try another mode."
+  caption="Choose a Backspace behavior, click just after routes.ts, and press Backspace. Undo to try another behavior."
 />
 
-### Codec
+## Codec
 
 A codec converts tokens to text for the clipboard, forms, and saved drafts. The default writes `[@label](type:value)`. Copy that text into another app and paste it back to restore the token.
 
-Use `toText`, `fromText`, and `toLabel` to convert values yourself. Supply a custom codec for another format, as this example does for `<@ada>`. The default parser accepts letters, digits, `_`, and `-` in token types; other types need a custom codec.
+Use `toText`, `fromText`, and `toLabel` to convert values yourself. Set the `codec` property for another format, as this example does for `<@hollis>`. With `copy="label"`, copying writes what people read, and pasting back into a token input still restores the tokens. The default parser accepts letters, digits, `_`, and `-` in token types; other types need a custom codec. The `value` attribute reads with the default codec, so set `codec` and `defaultValue` before the element connects.
 
 <ComponentExample
   name="token-input/codec"
-  caption="Edit the message to compare its custom format, default format, and readable label below."
+  caption="Edit the message. The console logs it in the custom format, with each mention as <@id>."
 />
 
-### Form
+## Form
 
-Give the input a `name` to submit its serialized text. `required`, `disabled`, and `readOnly` control form behavior. The `form` option associates it with a form elsewhere on the page, as shown here.
+Give the input a `name` to submit its serialized text. `required`, `disabled`, and `read-only` control form behavior. The `form` attribute associates it with a form elsewhere on the page, as shown here.
 
 <ComponentExample
   name="token-input/form"
-  caption="Edit the prompt and submit to see its serialized value. Try Disabled and Read-only, then Reset."
+  caption="Press Submit to log the prompt's serialized value. Try Disabled and Read-only, then Reset."
 />
 
-### Controlled
+## Controlled
 
-Set the `value` property and listen for `value-change`. The change details include the reason, input type, and removed tokens. The input still manages its editing history.
+Set the `value` attribute or property, and listen for `valuechange`. The event's detail includes the reason, input type, and removed tokens. The input still manages its editing history.
 
 <ComponentExample
   name="token-input/controlled"
-  caption="Type, add a file with @, or remove a token. The text below shows the change reason and current value."
+  caption="Type, add a file with @, or remove a token. The console logs the value and the reason for each change."
 />
 
-### Controller
+## Controller
 
-Use the element’s `api` to insert, update, or remove tokens from code. Pass a promise as `resolve` to mark an inserted token as pending until its data is ready.
+Use the element's `api` to insert, update, or remove tokens from code. Pass a promise as `resolve` to mark an inserted token as pending until its data is ready. Updating a token doesn't add an undo step.
 
 <ComponentExample
   name="token-input/controller"
-  caption="Attach a file, rename or remove the first token, and use Undo or Clear to change the value from code."
+  caption="Attach a file and watch it load. Show the first token's full path or remove it, then use Undo or Clear."
 />
 
-### Submit Shortcut
+## Submit Shortcut
 
-Set `submitShortcut` to `mod+enter` for a multiline message. Enter then inserts a line, and Command or Control+Enter submits.
+Set `submit-shortcut` to `mod+enter` for a multiline message. Enter then inserts a line, and Command or Control+Enter submits the form the input is in.
 
 <ComponentExample
   name="token-input/submit-shortcut"
-  caption="Write a message. Enter adds a line; Command+Enter on a Mac or Control+Enter elsewhere sends it."
+  caption="Write a message. Enter adds a line; Command+Enter on a Mac or Control+Enter elsewhere sends it to the console."
 />
 
-## Editing
+## Custom Rendering
 
-Tokens are edited as a unit: the caret never stops inside one. Typing keeps the browser's spelling, autocorrect, and input-method support. Undo and redo belong to this input; typing is grouped, while pastes and token changes create their own history steps. Updating a token's status does not add a step.
+Put a `<template>` inside `ui-token-input` to render each token's content, usually a `ui-token-input-token` with a `ui-token-input-token-remove` inside. An element with `data-token-label` in it gets the token's label. To choose an icon by the token's type or show its `data`, set the `renderToken` property instead: it receives the token and the element that holds it. Without either, each token shows its label.
 
-The remove part is a pointer shortcut. Keep its default non-focusable element; keyboard users remove tokens with Backspace. Token labels, types, and changes are announced to screen readers.
+Elements have no render functions. See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
 
 ## Styling
 
-Apply Tailwind classes directly to the editor and token parts. Token hosts expose `data-token-type`, `data-pending`, `data-unresolved`, and `data-selected`, even without a custom token renderer.
+Style the editor, the tokens and their remove buttons. The editor shows `data-empty` while it holds nothing; show the placeholder with `content: attr(aria-placeholder)` on its `::before`. Tokens show `data-token-type`, `data-pending`, `data-unresolved` and `data-selected`. Without a template or `renderToken`, the element that holds each token, `token-input-host`, carries the same attributes, so you can style tokens without custom markup.
 
-<DataAttributes component="token-input" />
+Each part has a `data-slot`, such as `token-input-token`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### `<ui-token-input-editor>` [#data-attributes-tokeninputeditor]
+
+<DataAttributes component="token-input" part="editor" />
+
+### `<ui-token-input-token>` [#data-attributes-tokeninputtoken]
+
+<DataAttributes component="token-input" part="token" />
+
+### `<ui-token-input-token-remove>` [#data-attributes-tokeninputtokenremove]
+
+<DataAttributes component="token-input" part="token-remove" />
 
 ## API Reference
+
+Props are attributes in kebab case, like `submit-shortcut` and `token-deletion`. `codec`, `defaultValue`, `getTokenDescription`, `history`, `controller` and `renderToken` are properties. Callbacks are DOM events.
 
 ### TokenInput
 
 <TypeTable path="../../packages/core/src/components/token-input/token-input.ts" name="TokenInputOptions" />
+
+`renderToken(token, host)` renders each token's content into `host`. Without it, a `<template>` inside the element is copied for each token.
 
 ### TokenInputEditor
 
@@ -135,6 +176,14 @@ Apply Tailwind classes directly to the editor and token parts. Token hosts expos
   path="../../packages/core/src/components/token-input/token-input.ts"
   name="TokenInputEditorProps"
 />
+
+### TokenInputToken
+
+A token's content, inside the template or `renderToken`, with its state for styling.
+
+### TokenInputTokenRemove
+
+Removes its token when pressed and keeps focus in the editor. It's hidden from assistive technology, since keyboard users remove tokens with Backspace.
 
 ### Token
 
@@ -169,27 +218,43 @@ Apply Tailwind classes directly to the editor and token parts. Token hosts expos
 
 ### Controller
 
+The element's `api` property has the same methods. Or create one with `createTokenInputController()` and set it as the `controller` property.
+
 <ControllerTable
   path="../../packages/core/src/components/token-input/token-input.ts"
   name="TokenInputController"
 />
 
-### Callbacks
+### Events
 
 Events fire on their own element and don't bubble, with the new state in `event.detail.value`.
 
-| Member              | On               | Description                                          |
-| ------------------- | ---------------- | ---------------------------------------------------- |
-| `value` property    | `ui-token-input` | The value. Setting a string parses it with the codec |
-| `api` property      | `ui-token-input` | The [controller](#controller-1)                      |
-| `valuechange` event | `ui-token-input` | `detail: { value, reason, inputType, removed }`      |
+| Member                      | On               | Description                                                                 |
+| --------------------------- | ---------------- | --------------------------------------------------------------------------- |
+| `value` property, attribute | `ui-token-input` | The value. The attribute and a string property are read as codec text       |
+| `api` property              | `ui-token-input` | The [controller](#controller-1)                                             |
+| `valuechange` event         | `ui-token-input` | `detail: { value, reason, inputType, removed }`: the [reason](#reasons) too |
 
-The submit shortcut submits the form the element is in, so the form's own `submit` event hears it.
-
-Setting the `value` property is one undoable step, like `setValue()`. For the first value, use the `value` attribute with codec text, or set `defaultValue` and `codec` before the element connects: the `value` attribute reads with the default codec. `history` applies from the next edit whenever you set it.
+There's no submit event: the submit shortcut submits the form the input is in, so the form's own `submit` event hears it. Setting the `value` property is one undoable step, like `setValue()`.
 
 ## Accessibility
 
-The tests cover token editing, keyboard input, clipboard handling, and announcements.
+The editor is a multiline text box: it has the `textbox` role with `aria-multiline`, and a Trigger Menu inside it adds `aria-autocomplete` and `aria-haspopup` for its suggestions. Give it a visible label through a [Field](./field), or an `aria-label`. Each token reads as its label and its kind, like "routes.ts file", and inserting or removing one is announced. Typing keeps the browser's spelling, autocorrect, and input method support.
+
+### Keyboard
+
+| Key                          | Does                                                                          |
+| ---------------------------- | ----------------------------------------------------------------------------- |
+| Backspace, Delete            | Removes the token before or after the caret, as `token-deletion` says         |
+| ArrowLeft, ArrowRight        | Moves the caret past a token in one press; the caret never stops inside one   |
+| Enter                        | Submits. While a trigger menu is open, chooses the highlighted suggestion     |
+| Shift+Enter                  | Starts a new line                                                             |
+| Command+Enter, Control+Enter | Submits when `submit-shortcut` is `"mod+enter"`; Enter then starts a new line |
+| Command+Z, Control+Z         | Undoes the last step. Typing is grouped; pastes and token changes are steps   |
+| Shift+Command+Z, Control+Y   | Redoes the last undone step                                                   |
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="token-input" />

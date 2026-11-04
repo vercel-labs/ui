@@ -1,5 +1,9 @@
 <script lang="ts">
+  import { CheckIcon } from "@lucide/svelte"
+  import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/svelte/token-input"
+  import { useLog } from "../../../shared/svelte/log"
 
   const draft: TokenInputValue = [
     "Explain ",
@@ -7,38 +11,46 @@
     " in two sentences.",
   ]
 
-  let submitted = $state("")
+  const log = useLog()
   let disabled = $state(false)
   let readOnly = $state(false)
   const formId = $props.id()
 
-  function submit(event: Event) {
+  function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    submitted = String(new FormData(event.currentTarget as HTMLFormElement).get("prompt") ?? "")
+    log(`Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`)
   }
 </script>
 
 <div data-slot="stack">
-  <div data-slot="row">
+  <div data-slot="controls">
     <label data-slot="label">
-      <input bind:checked={disabled} type="checkbox" />
+      <Checkbox checked={disabled} onCheckedChange={(next) => (disabled = next === true)}>
+        <CheckboxIndicator>
+          <CheckIcon aria-hidden="true" />
+        </CheckboxIndicator>
+      </Checkbox>
       Disabled
     </label>
     <label data-slot="label">
-      <input bind:checked={readOnly} type="checkbox" />
+      <Checkbox checked={readOnly} onCheckedChange={(next) => (readOnly = next === true)}>
+        <CheckboxIndicator>
+          <CheckIcon aria-hidden="true" />
+        </CheckboxIndicator>
+      </Checkbox>
       Read-only
     </label>
   </div>
-  <TokenInput form={formId} name="prompt" required defaultValue={draft} {disabled} {readOnly}>
-    <!-- svelte-ignore a11y_label_has_associated_control -->
-    <label id={`${formId}-label`} data-slot="label">Prompt</label>
-    <TokenInputEditor aria-labelledby={`${formId}-label`} />
-  </TokenInput>
-  <form onreset={() => submitted = ""} id={formId} data-slot="stack" onsubmit={submit}>
-    <div data-slot="row">
-      <button type="submit">Submit</button>
+  <div data-slot="stack">
+    <Field {disabled}>
+      <FieldLabel>Prompt</FieldLabel>
+      <TokenInput form={formId} name="prompt" required defaultValue={draft} {readOnly}>
+        <TokenInputEditor />
+      </TokenInput>
+    </Field>
+    <form id={formId} data-slot="row" onsubmit={onSubmit}>
+      <button type="submit" data-variant="solid">Submit</button>
       <button type="reset">Reset</button>
-    </div>
-    <p data-slot="output">{submitted}</p>
-  </form>
+    </form>
+  </div>
 </div>

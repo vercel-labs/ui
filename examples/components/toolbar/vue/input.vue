@@ -1,24 +1,33 @@
 <script setup lang="ts">
-import { BoldIcon, SearchIcon } from "@lucide/vue"
-import { NumberInput, NumberInputControl } from "@ui-sdk/vue/number-input"
-import { Toolbar, ToolbarButton, ToolbarInput } from "@ui-sdk/vue/toolbar"
+import { MinusIcon, PlusIcon } from "@lucide/vue"
+import {
+  NumberInput,
+  NumberInputControl,
+  NumberInputDecrement,
+  NumberInputGroup,
+  NumberInputIncrement,
+} from "@ui-sdk/vue/number-input"
+import { Toolbar, ToolbarInput, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
 </script>
 
 <template>
   <Toolbar aria-label="Text">
-    <ToolbarButton data-variant="secondary" aria-label="Bold">
-      <BoldIcon />
-    </ToolbarButton>
     <NumberInput :default-value="14" :min="8" :max="72">
-      <ToolbarInput aria-label="Font size">
-        <template #render="{ props }">
-          <NumberInputControl v-bind="props" />
-        </template>
-      </ToolbarInput>
+      <NumberInputGroup>
+        <NumberInputDecrement aria-label="Decrease font size">
+          <MinusIcon aria-hidden="true" />
+        </NumberInputDecrement>
+        <ToolbarInput>
+          <template #render="{ props }">
+            <NumberInputControl v-bind="props" aria-label="Font size" />
+          </template>
+        </ToolbarInput>
+        <NumberInputIncrement aria-label="Increase font size">
+          <PlusIcon aria-hidden="true" />
+        </NumberInputIncrement>
+      </NumberInputGroup>
     </NumberInput>
+    <ToolbarSeparator />
     <ToolbarInput aria-label="Find" placeholder="Find…" />
-    <ToolbarButton data-variant="secondary" aria-label="Search">
-      <SearchIcon />
-    </ToolbarButton>
   </Toolbar>
 </template>

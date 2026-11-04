@@ -1,22 +1,24 @@
 <script lang="ts">
-  import { BoldIcon, ItalicIcon } from "@lucide/svelte"
-  import { Toggle, ToggleGroup } from "@ui-sdk/svelte/toggle"
+  import { BoldIcon, ItalicIcon, LinkIcon } from "@lucide/svelte"
+  import { Toggle, ToggleIcon } from "@ui-sdk/svelte/toggle"
   import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
 </script>
 
 <div dir="rtl">
   <Toolbar aria-label="تنسيق">
-    <ToggleGroup multiple aria-label="نمط النص">
-      <Toggle data-variant="ghost" value="bold" aria-label="غامق">
+    <Toggle aria-label="غامق">
+      <ToggleIcon>
         <BoldIcon />
-      </Toggle>
-      <Toggle data-variant="ghost" value="italic" aria-label="مائل">
+      </ToggleIcon>
+    </Toggle>
+    <Toggle aria-label="مائل">
+      <ToggleIcon>
         <ItalicIcon />
-      </Toggle>
-    </ToggleGroup>
+      </ToggleIcon>
+    </Toggle>
     <ToolbarSeparator />
-    <ToolbarButton data-variant="secondary">
-      حفظ
+    <ToolbarButton aria-label="إدراج رابط">
+      <LinkIcon aria-hidden="true" />
     </ToolbarButton>
   </Toolbar>
 </div>

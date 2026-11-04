@@ -1,43 +1,36 @@
 <script lang="ts">
-  import { SaveIcon, Share2Icon } from "@lucide/svelte"
+  import { SaveIcon } from "@lucide/svelte"
   import { registerShortcut } from "@ui-sdk/core/shortcuts"
   import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let status = $state("Nothing yet")
-  const save = () => (status = "Saved")
-  const share = () => (status = "Shared")
+  const log = useLog()
 
   $effect(() => {
-    const offs = [registerShortcut("mod+s", save), registerShortcut("mod+shift+e", share)]
-    return () => offs.forEach((off) => off())
+    const offSave = registerShortcut("mod+s", () => log("Saved"))
+    const offShare = registerShortcut("mod+shift+e", () => log("Shared"))
+    return () => {
+      offSave()
+      offShare()
+    }
   })
 </script>
 
-<div data-slot="stack">
-  <div data-slot="row">
-    <Tooltip shortcut="mod+s">
-      <TooltipTrigger onclick={save}>
-        <SaveIcon />
-      </TooltipTrigger>
-      <TooltipContent>
-        Save
-        <TooltipShortcut />
-      </TooltipContent>
-    </Tooltip>
-    <Tooltip shortcut="mod+shift+e">
-      <TooltipTrigger onclick={share}>
-        <Share2Icon />
-        Share
-      </TooltipTrigger>
-      <TooltipContent>
-        Share with your team
-        <TooltipShortcut>
-          {#snippet render({ props })}
-            <kbd {...props}></kbd>
-          {/snippet}
-        </TooltipShortcut>
-      </TooltipContent>
-    </Tooltip>
-  </div>
-  <output data-slot="output">{status}</output>
+<div data-slot="row">
+  <Tooltip shortcut="mod+s">
+    <TooltipTrigger aria-label="Save" onclick={() => log("Saved")}>
+      <SaveIcon aria-hidden="true" />
+    </TooltipTrigger>
+    <TooltipContent>
+      Save
+      <TooltipShortcut />
+    </TooltipContent>
+  </Tooltip>
+  <Tooltip shortcut="mod+shift+e">
+    <TooltipTrigger onclick={() => log("Shared")}>Share</TooltipTrigger>
+    <TooltipContent>
+      Share with your team
+      <TooltipShortcut />
+    </TooltipContent>
+  </Tooltip>
 </div>

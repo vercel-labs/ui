@@ -1,47 +1,30 @@
 <script setup lang="ts">
+import { BoldIcon, ItalicIcon, UnderlineIcon } from "@lucide/vue"
 import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 
-const days = [
-  { date: "Mon, Oct 5", count: 0 },
-  { date: "Tue, Oct 6", count: 3 },
-  { date: "Wed, Oct 7", count: 7 },
-  { date: "Thu, Oct 8", count: 1 },
-  { date: "Fri, Oct 9", count: 12 },
-  { date: "Sat, Oct 10", count: 0 },
-  { date: "Sun, Oct 11", count: 2 },
-  { date: "Mon, Oct 12", count: 5 },
-  { date: "Tue, Oct 13", count: 9 },
-  { date: "Wed, Oct 14", count: 4 },
-  { date: "Thu, Oct 15", count: 0 },
-  { date: "Fri, Oct 16", count: 6 },
-  { date: "Sat, Oct 17", count: 1 },
-  { date: "Sun, Oct 18", count: 0 },
-].map((day) => ({ ...day, level: day.count === 0 ? 0 : day.count < 3 ? 1 : day.count < 7 ? 2 : 3 }))
+const formats = [
+  { icon: BoldIcon, label: "Bold" },
+  { icon: ItalicIcon, label: "Italic" },
+  { icon: UnderlineIcon, label: "Underline" },
+]
 
-type Day = (typeof days)[number]
-
-const contributions = (day: Day | undefined) =>
-  !day ? "" : day.count === 0 ? "No contributions" : `${day.count} contribution${day.count === 1 ? "" : "s"}`
-
-const tooltip = createTooltipController<Day>()
-const DayTooltipContent = TooltipContent<Day>
+const tooltip = createTooltipController<string>()
+const LabelTooltipContent = TooltipContent<string>
 </script>
 
 <template>
-  <div data-slot="stack">
-    <div data-slot="grid">
-      <TooltipTrigger
-        v-for="day in days"
-        :key="day.date"
-        :controller="tooltip"
-        :payload="day"
-        :aria-label="day.date"
-        :data-level="day.level"
-      />
-    </div>
-    <p data-slot="hint">Two weeks of contributions</p>
-    <Tooltip :controller="tooltip" :delay="300">
-      <DayTooltipContent v-slot="{ state }">{{ contributions(state.payload) }}</DayTooltipContent>
+  <div data-slot="row" role="group" aria-label="Formatting">
+    <TooltipTrigger
+      v-for="format in formats"
+      :key="format.label"
+      :controller="tooltip"
+      :payload="format.label"
+      :aria-label="format.label"
+    >
+      <component :is="format.icon" aria-hidden="true" />
+    </TooltipTrigger>
+    <Tooltip :controller="tooltip">
+      <LabelTooltipContent v-slot="{ state }">{{ state.payload }}</LabelTooltipContent>
     </Tooltip>
   </div>
 </template>

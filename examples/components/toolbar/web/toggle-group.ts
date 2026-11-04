@@ -1,50 +1,50 @@
 import "@ui-sdk/web/toolbar"
 import "@ui-sdk/web/toggle"
-import { Bold, Code, createElement, Italic, Strikethrough } from "lucide"
+import { AlignCenter, AlignLeft, AlignRight, createElement, List, ListOrdered } from "lucide"
+import { log } from "../../../shared/web/log"
 
-const formats = [
-  { value: "bold", label: "Bold", icon: Bold },
-  { value: "italic", label: "Italic", icon: Italic },
-  { value: "strikethrough", label: "Strikethrough", icon: Strikethrough },
+const alignments = [
+  { value: "left", label: "Align left", icon: AlignLeft },
+  { value: "center", label: "Align center", icon: AlignCenter },
+  { value: "right", label: "Align right", icon: AlignRight },
 ]
+
+const lists = [
+  { value: "bulleted", label: "Bulleted list", icon: List },
+  { value: "numbered", label: "Numbered list", icon: ListOrdered },
+]
+
+const toggles = (items: typeof alignments) =>
+  items
+    .map(
+      (item) => `
+        <ui-toggle value="${item.value}">
+          <button aria-label="${item.label}">
+            <ui-toggle-icon>${createElement(item.icon, { "aria-hidden": "true" }).outerHTML}</ui-toggle-icon>
+          </button>
+        </ui-toggle>
+      `,
+    )
+    .join("")
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-toolbar aria-label="Text">
-        <ui-toggle-group multiple value="bold" aria-label="Text style">
-          ${formats
-            .map(
-              (format) => `
-                <ui-toggle value="${format.value}">
-                  <button data-variant="ghost" aria-label="${format.label}">
-                    ${createElement(format.icon, { "aria-hidden": "true" }).outerHTML}
-                  </button>
-                </ui-toggle>
-              `,
-            )
-            .join("")}
-        </ui-toggle-group>
-        <ui-toolbar-separator></ui-toolbar-separator>
-        <ui-toggle>
-          <button data-variant="ghost" aria-label="Code">
-            ${createElement(Code, { "aria-hidden": "true" }).outerHTML}
-          </button>
-        </ui-toggle>
-        <ui-toolbar-button>
-          <button data-variant="secondary" data-action="clear">Clear</button>
-        </ui-toolbar-button>
-      </ui-toolbar>
-      <output data-slot="output">Style: bold</output>
-    </div>
+    <ui-toolbar aria-label="Paragraph">
+      <ui-toggle-group default-value="left" deselectable="false" aria-label="Alignment">
+        ${toggles(alignments)}
+      </ui-toggle-group>
+      <ui-toolbar-separator></ui-toolbar-separator>
+      <ui-toggle-group aria-label="List">
+        ${toggles(lists)}
+      </ui-toggle-group>
+    </ui-toolbar>
   `
-  const group = root.querySelector("ui-toggle-group")!
-  const setStyle = (style: string[]) => {
-    group.setAttribute("value", style.join(","))
-    root.querySelector("output")!.textContent = `Style: ${style.join(", ") || "none"}`
-  }
-  group.addEventListener("valuechange", (event) => setStyle(event.detail.value))
-  root.querySelector("[data-action=clear]")!.addEventListener("click", () => setStyle([]))
+  const [alignment, list] = root.querySelectorAll("ui-toggle-group")
+  alignment.addEventListener("valuechange", (event) => log(root, `Align ${event.detail.value[0]}`))
+  list.addEventListener("valuechange", (event) => {
+    const [value] = event.detail.value
+    log(root, lists.find((list) => list.value === value)?.label ?? "No list")
+  })
 }
 
 export { mount }

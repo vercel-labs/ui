@@ -1,40 +1,28 @@
 <script lang="ts">
-  import { BoldIcon, ChevronDownIcon, ItalicIcon, UnderlineIcon } from "@lucide/svelte"
-  import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/svelte/menu"
-  import { Toggle, ToggleGroup } from "@ui-sdk/svelte/toggle"
+  import { BoldIcon, ItalicIcon, LinkIcon, UnderlineIcon } from "@lucide/svelte"
+  import { Toggle, ToggleIcon } from "@ui-sdk/svelte/toggle"
   import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const formatting = [
-    { value: "bold", label: "Bold", icon: BoldIcon },
-    { value: "italic", label: "Italic", icon: ItalicIcon },
-    { value: "underline", label: "Underline", icon: UnderlineIcon },
+  const styles = [
+    { label: "Bold", icon: BoldIcon },
+    { label: "Italic", icon: ItalicIcon },
+    { label: "Underline", icon: UnderlineIcon },
   ]
+
+  const log = useLog()
 </script>
 
 <Toolbar aria-label="Formatting">
-  <ToggleGroup multiple aria-label="Text style">
-    {#each formatting as item (item.value)}
-      <Toggle data-variant="ghost" value={item.value} aria-label={item.label}>
-        <item.icon />
-      </Toggle>
-    {/each}
-  </ToggleGroup>
+  {#each styles as { label, icon: Icon } (label)}
+    <Toggle aria-label={label} onPressedChange={(pressed) => log(`${label} ${pressed ? "on" : "off"}`)}>
+      <ToggleIcon>
+        <Icon />
+      </ToggleIcon>
+    </Toggle>
+  {/each}
   <ToolbarSeparator />
-  <Menu>
-    <ToolbarButton data-variant="secondary">
-      {#snippet render({ props })}
-        <MenuTrigger {...props}>
-          Sans
-          <ChevronDownIcon />
-        </MenuTrigger>
-      {/snippet}
-    </ToolbarButton>
-    <MenuContent>
-      {#each ["Sans", "Serif", "Mono"] as font (font)}
-        <MenuItem>
-          {font}
-        </MenuItem>
-      {/each}
-    </MenuContent>
-  </Menu>
+  <ToolbarButton aria-label="Insert link" onclick={() => log("Insert link")}>
+    <LinkIcon aria-hidden="true" />
+  </ToolbarButton>
 </Toolbar>

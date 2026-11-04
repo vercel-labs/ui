@@ -1,47 +1,55 @@
+import {
+  Toast,
+  ToastAction,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
-import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
 
-export function Example() {
+function Example() {
   const toast = createToaster()
-
-  let requests = 0
-
-  function save() {
-    const succeeds = ++requests % 2 === 1
-    return new Promise<{ name: string }>((resolve, reject) =>
-      setTimeout(
-        () => (succeeds ? resolve({ name: "report.pdf" }) : reject(new Error("Network error"))),
-        1500,
-      ),
-    )
-  }
+  let attempts = 0
   onCleanup(() => {
     toast.dismiss()
   })
 
+  function save() {
+    const succeeds = ++attempts % 2 === 1
+    return new Promise<void>((resolve, reject) =>
+      setTimeout(() => (succeeds ? resolve() : reject(new Error("Network error"))), 1500),
+    )
+  }
+
+  function saveChanges() {
+    toast.promise(save, {
+      loading: "Saving changes…",
+      success: "Changes saved",
+      error: {
+        title: "Couldn't save changes",
+        description: "Check your connection and try again.",
+        action: { label: "Retry", onAction: saveChanges },
+      },
+    })
+  }
+
   return (
     <>
-      <button
-        onClick={() =>
-          toast.promise(save, {
-            loading: "Saving…",
-            success: (file) => ({ title: "Saved", description: file.name }),
-            error: (error) => ({ title: "Could not save", description: (error as Error).message }),
-          })
-        }
-      >
-        Save
-      </button>
+      <button onClick={saveChanges}>Save Changes</button>
       <ToastRegion toaster={toast}>
-        {(item) => (
+        {() => (
           <Toast>
             <div data-slot="stack">
               <ToastTitle />
               <ToastDescription />
             </div>
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

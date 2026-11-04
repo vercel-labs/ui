@@ -1,19 +1,18 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { toLabel, TokenInput, TokenInputEditor } from "@ui-sdk/solid/token-input"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
-  const [sent, setSent] = createSignal("")
+function Example() {
+  const log = useLog()
+
   return (
-    <div data-slot="stack">
-      <TokenInput
-        submitShortcut="mod+enter"
-        onSubmit={(value) => {
-          setSent(toLabel(value))
-        }}
-      >
-        <TokenInputEditor aria-label="Message" placeholder="Enter adds a line, Cmd/Ctrl+Enter sends" />
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <TokenInput submitShortcut="mod+enter" onSubmit={(value) => log(`Sent ${toLabel(value)}`)}>
+        <TokenInputEditor placeholder="Write a message" />
       </TokenInput>
-      <p data-slot="output">{sent() ? `Sent:\n${sent()}` : "Nothing sent yet."}</p>
-    </div>
+    </Field>
   )
 }
+
+export { Example }

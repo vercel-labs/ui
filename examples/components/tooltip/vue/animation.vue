@@ -1,29 +1,19 @@
 <script setup lang="ts">
+import { ArchiveIcon } from "@lucide/vue"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const items = ["Inbox", "Drafts", "Sent"]
-const status = ref("Closed")
-
-function complete(item: string, open: boolean) {
-  if (open) status.value = `${item} open`
-  else if (status.value === `${item} closing`) status.value = `${item} closed`
-}
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <div data-slot="row">
-      <Tooltip
-        v-for="item in items"
-        :key="item"
-        @open-change="(open) => (status = open ? `${item} opening` : `${item} closing`)"
-        @open-change-complete="(open) => complete(item, open)"
-      >
-        <TooltipTrigger>{{ item }}</TooltipTrigger>
-        <TooltipContent>Open {{ item.toLowerCase() }}</TooltipContent>
-      </Tooltip>
-    </div>
-    <output data-slot="output">{{ status }}</output>
-  </div>
+  <Tooltip
+    @open-change="(open) => log(open ? 'Opening' : 'Closing')"
+    @open-change-complete="(open) => log(open ? 'Open' : 'Closed')"
+  >
+    <TooltipTrigger aria-label="Archive">
+      <ArchiveIcon aria-hidden="true" />
+    </TooltipTrigger>
+    <TooltipContent>Archive</TooltipContent>
+  </Tooltip>
 </template>

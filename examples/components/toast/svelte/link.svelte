@@ -10,27 +10,26 @@
   } from "@ui-sdk/svelte/toast"
 
   const toast = createToaster()
-
-  function create() {
-    toast("Invoice created", {
-      description: "INV-1042",
-      action: { label: "View", href: "#invoice-1042" },
-    })
-  }
-  onDestroy(() => { toast.dismiss() })
+  onDestroy(() => {
+    toast.dismiss()
+  })
 </script>
 
-<button onclick={create}>
-  Create invoice
+<button
+  onclick={() =>
+    toast("Invoice sent", {
+      description: "Hollis Grant · $240.00",
+      action: { label: "View", href: "#" },
+    })}
+>
+  Send Invoice
 </button>
 <ToastRegion toaster={toast}>
-  {#snippet children(item)}
-    <Toast>
-      <div data-slot="stack">
-        <ToastTitle />
-        <ToastDescription />
-      </div>
-      <ToastAction />
-    </Toast>
-  {/snippet}
+  <Toast>
+    <div data-slot="stack">
+      <ToastTitle />
+      <ToastDescription />
+    </div>
+    <ToastAction data-variant="solid" />
+  </Toast>
 </ToastRegion>

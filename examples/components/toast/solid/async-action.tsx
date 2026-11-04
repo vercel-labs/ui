@@ -1,25 +1,52 @@
+import {
+  Toast,
+  ToastAction,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
-import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
-  const toast = createToaster({ duration: 4000 })
+function restore() {
+  return new Promise((resolve) => setTimeout(resolve, 1500))
+}
 
-  const restore = () => new Promise((resolve) => setTimeout(resolve, 1500))
+function Example() {
+  const log = useLog()
+  const toast = createToaster({ duration: 6000 })
   onCleanup(() => {
     toast.dismiss()
   })
 
   return (
     <>
-      <button onClick={() => toast("File deleted", { action: { label: "Undo", onAction: restore } })}>
-        Delete file
+      <button
+        onClick={() =>
+          toast("File deleted", {
+            description: "Q3 report.pdf",
+            action: {
+              label: "Undo",
+              onAction: async () => {
+                await restore()
+                log("Q3 report.pdf restored")
+              },
+            },
+          })
+        }
+      >
+        Delete File
       </button>
       <ToastRegion toaster={toast}>
         {() => (
           <Toast>
-            <ToastTitle />
-            <ToastAction>
-              {(state) => (state.pending ? "Restoring…" : state.error ? "Try again" : "Undo")}
+            <div data-slot="stack">
+              <ToastTitle />
+              <ToastDescription />
+            </div>
+            <ToastAction data-variant="solid">
+              {(state) => (state.pending ? "Restoring…" : state.error ? "Retry" : "Undo")}
             </ToastAction>
           </Toast>
         )}
@@ -27,3 +54,5 @@ export function Example() {
     </>
   )
 }
+
+export { Example }

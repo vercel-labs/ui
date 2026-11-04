@@ -1,33 +1,30 @@
 <script lang="ts">
+  import { BoldIcon, ItalicIcon, LinkIcon } from "@lucide/svelte"
+  import { useShortcut } from "@ui-sdk/svelte/shortcuts"
   import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/svelte/toolbar"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const actions = [
+    { label: "Bold", icon: BoldIcon },
+    { label: "Italic", icon: ItalicIcon },
+    { label: "Insert link", icon: LinkIcon },
+  ]
+
+  const log = useLog()
   const toolbar = createToolbarController()
-
-  let action = $state("nothing yet")
-
-  function onKeydown(event: KeyboardEvent) {
-    if (event.altKey && event.key === "F10") toolbar.focus()
-  }
+  useShortcut("alt+f10", () => toolbar.focus(), { allowInInput: true })
 </script>
 
-<svelte:window onkeydown={onKeydown} />
-
 <div data-slot="stack">
-  <textarea
-    aria-label="Notes"
-    placeholder="Type, then press Alt+F10"
-  ></textarea>
-  <Toolbar controller={toolbar} aria-label="Notes">
-    {#each ["Bold", "Italic", "Link"] as label (label)}
-      <ToolbarButton data-variant="secondary" onclick={() => (action = label.toLowerCase())}>
-        {label}
+  <div data-slot="controls">
+    <button type="button" onclick={() => toolbar.focus()}>Focus Toolbar</button>
+  </div>
+  <Toolbar controller={toolbar} aria-label="Notes formatting">
+    {#each actions as { label, icon: Icon } (label)}
+      <ToolbarButton aria-label={label} onclick={() => log(label)}>
+        <Icon aria-hidden="true" />
       </ToolbarButton>
     {/each}
   </Toolbar>
-  <div data-slot="row">
-    <button data-variant="secondary" type="button" onclick={() => toolbar.focus()}>
-      Focus toolbar
-    </button>
-    <output data-slot="output">Last: {action}</output>
-  </div>
+  <textarea aria-label="Notes" placeholder="Type, then press Alt+F10"></textarea>
 </div>

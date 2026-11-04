@@ -1,9 +1,20 @@
 <script lang="ts">
+  import { CheckIcon, ChevronDownIcon, FileIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
-    type TokenDeletion,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectItemIndicator,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
+  import {
     TokenInput,
     TokenInputEditor,
     TokenInputToken,
+    type TokenDeletion,
     type TokenInputValue,
   } from "@ui-sdk/svelte/token-input"
   import {
@@ -13,6 +24,13 @@
     TriggerMenuItem,
     TriggerMenuList,
   } from "@ui-sdk/svelte/trigger-menu"
+  import { useLog } from "../../../shared/svelte/log"
+
+  const modes = [
+    { value: "whole", label: "Whole" },
+    { value: "select", label: "Select" },
+    { value: "revert", label: "Revert" },
+  ]
 
   const files = [
     { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -28,36 +46,59 @@
     " in two sentences.",
   ]
 
+  const log = useLog()
   let deletion = $state<TokenDeletion>("whole")
-  const options = ["whole", "select", "revert"] as const
 </script>
 
 <div data-slot="stack">
-  <div role="radiogroup" aria-label="Backspace" data-slot="row">
-    {#each options as option (option)}
-      <label data-slot="label">
-        <input bind:group={deletion} type="radio" name="token-deletion" value={option} data-slot="visually-hidden" />
-        {option}
-      </label>
-    {/each}
+  <div data-slot="controls">
+    <Select items={modes} value={deletion} onValueChange={(next) => next && (deletion = next as TokenDeletion)}>
+      <SelectLabel>Backspace</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon aria-hidden="true" />
+      </SelectTrigger>
+      <SelectContent>
+        {#each modes as mode (mode.value)}
+          <SelectItem value={mode.value}>
+            {mode.label}
+            <SelectItemIndicator>
+              <CheckIcon aria-hidden="true" />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
   </div>
-  <TokenInput tokenDeletion={deletion} defaultValue={draft}>
-    <TokenInputEditor aria-label="Prompt" />
-    <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
-      <TriggerMenuContent>
-        <TriggerMenuList>
-          {#snippet children(state)}
-            {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-              <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
-                {item.label}
-              </TriggerMenuItem>
-            {/each}
-          {/snippet}
-        </TriggerMenuList>
-      </TriggerMenuContent>
-    </TriggerMenu>
-    {#snippet token(token)}
-      <TokenInputToken>@{token.label}</TokenInputToken>
-    {/snippet}
-  </TokenInput>
+  <Field>
+    <FieldLabel>Prompt</FieldLabel>
+    <TokenInput
+      tokenDeletion={deletion}
+      defaultValue={draft}
+      onValueChange={(value, details) => {
+        for (const token of details.removed) log(`Removed ${token.label} (${deletion})`)
+      }}
+    >
+      {#snippet token(token)}
+        <TokenInputToken>
+          <FileIcon aria-hidden="true" />
+          {token.label}
+        </TokenInputToken>
+      {/snippet}
+      <TokenInputEditor />
+      <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
+        <TriggerMenuContent>
+          <TriggerMenuList>
+            {#snippet children(state)}
+              {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+                <TriggerMenuItem value={item.value} label={item.label}>
+                  {item.label}
+                </TriggerMenuItem>
+              {/each}
+            {/snippet}
+          </TriggerMenuList>
+        </TriggerMenuContent>
+      </TriggerMenu>
+    </TokenInput>
+  </Field>
 </div>

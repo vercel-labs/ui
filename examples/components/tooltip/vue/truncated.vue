@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { FileIcon } from "@lucide/vue"
-import type { ChangeDetails } from "@ui-sdk/core"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 
 const files = [
@@ -10,22 +9,21 @@ const files = [
   "Budget.xlsx",
 ]
 
-function onlyTruncated(open: boolean, details: ChangeDetails<string>) {
-  const target = details.event?.target
-  const name = target instanceof Element ? target.closest("button")?.querySelector("span") : null
-  if (open && name && name.scrollWidth <= name.clientWidth) {
-    details.cancel()
-  }
+const names = new Map<string, HTMLElement>()
+
+function fits(file: string) {
+  const span = names.get(file)
+  return !!span && span.scrollWidth <= span.clientWidth
 }
 </script>
 
 <template>
   <ul>
     <li v-for="file in files" :key="file">
-      <Tooltip type="label" @open-change="onlyTruncated">
+      <Tooltip type="label" @open-change="(open, details) => open && fits(file) && details.cancel()">
         <TooltipTrigger>
-          <FileIcon />
-          <span>{{ file }}</span>
+          <FileIcon aria-hidden="true" />
+          <span :ref="(el) => el && names.set(file, el as HTMLElement)">{{ file }}</span>
         </TooltipTrigger>
         <TooltipContent>{{ file }}</TooltipContent>
       </Tooltip>

@@ -1,26 +1,14 @@
 <script setup lang="ts">
-import { ArchiveIcon, MailIcon, TrashIcon } from "@lucide/vue"
-import { Toolbar, ToolbarButton, ToolbarInput } from "@ui-sdk/vue/toolbar"
+import { Toolbar, ToolbarButton } from "@ui-sdk/vue/toolbar"
+import { useLog } from "../../../shared/vue/log"
+
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Toolbar aria-label="Message">
-      <ToolbarButton data-variant="secondary">
-        <MailIcon />
-        Reply
-      </ToolbarButton>
-      <ToolbarButton data-variant="secondary" disabled>
-        <ArchiveIcon />
-        Archive
-      </ToolbarButton>
-      <ToolbarButton data-variant="secondary" aria-label="Delete" disabled :focusable-when-disabled="false">
-        <TrashIcon />
-      </ToolbarButton>
-    </Toolbar>
-    <Toolbar disabled aria-label="Comment">
-      <ToolbarInput aria-label="Comment" value="Read only for now" />
-      <ToolbarButton data-variant="secondary">Send</ToolbarButton>
-    </Toolbar>
-  </div>
+  <Toolbar aria-label="Message">
+    <ToolbarButton @click="log('Reply')">Reply</ToolbarButton>
+    <ToolbarButton disabled @click="log('Archive')">Archive</ToolbarButton>
+    <ToolbarButton disabled :focusable-when-disabled="false" @click="log('Delete')">Delete</ToolbarButton>
+  </Toolbar>
 </template>

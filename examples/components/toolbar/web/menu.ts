@@ -1,51 +1,38 @@
 import "@ui-sdk/web/toolbar"
 import "@ui-sdk/web/menu"
-import { createElement, Link, Mail, Save, Share } from "lucide"
+import { ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-toolbar aria-label="Document">
+    <ui-toolbar aria-label="Document">
+      <ui-toolbar-button>
+        <button data-action="save">Save</button>
+      </ui-toolbar-button>
+      <ui-menu>
         <ui-toolbar-button>
-          <button data-variant="secondary" value="save">
-            ${createElement(Save, { "aria-hidden": "true" }).outerHTML}
-            Save
-          </button>
+          <ui-menu-trigger>
+            <button>
+              Share
+              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-menu-trigger>
         </ui-toolbar-button>
-        <ui-menu>
-          <ui-toolbar-button>
-            <ui-menu-trigger>
-              <button data-variant="secondary">
-                ${createElement(Share, { "aria-hidden": "true" }).outerHTML}
-                Share
-              </button>
-            </ui-menu-trigger>
-          </ui-toolbar-button>
-          <ui-menu-content>
-            <ui-menu-item value="email">
-              <ui-menu-item-icon>${createElement(Mail, { "aria-hidden": "true" }).outerHTML}</ui-menu-item-icon>
-              Email
-            </ui-menu-item>
-            <ui-menu-item value="link">
-              <ui-menu-item-icon>${createElement(Link, { "aria-hidden": "true" }).outerHTML}</ui-menu-item-icon>
-              Copy link
-            </ui-menu-item>
-          </ui-menu-content>
-        </ui-menu>
-        <ui-toolbar-button>
-          <button data-variant="secondary" value="print">Print</button>
-        </ui-toolbar-button>
-      </ui-toolbar>
-      <output data-slot="output">Last: nothing yet</output>
-    </div>
+        <ui-menu-content>
+          <ui-menu-item value="email">Email</ui-menu-item>
+          <ui-menu-item value="link">Copy Link</ui-menu-item>
+        </ui-menu-content>
+      </ui-menu>
+      <ui-toolbar-button>
+        <button data-action="print">Print</button>
+      </ui-toolbar-button>
+    </ui-toolbar>
   `
-  const output = root.querySelector("output")!
-  root.querySelectorAll<HTMLButtonElement>("button[value]").forEach((button) => {
-    button.addEventListener("click", () => (output.textContent = `Last: ${button.value}`))
-  })
-  root.querySelector("ui-menu")!.addEventListener("action", (event) => {
-    output.textContent = `Last: ${event.detail.value}`
-  })
+  root.querySelector("[data-action=save]")!.addEventListener("click", () => log(root, "Saved"))
+  root
+    .querySelector("ui-menu")!
+    .addEventListener("action", (event) => log(root, `Shared by ${event.detail.value}`))
+  root.querySelector("[data-action=print]")!.addEventListener("click", () => log(root, "Printed"))
 }
 
 export { mount }

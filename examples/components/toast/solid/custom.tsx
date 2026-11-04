@@ -1,4 +1,3 @@
-import { onCleanup } from "solid-js"
 import {
   Toast,
   ToastAction,
@@ -8,8 +7,11 @@ import {
   ToastTitle,
   createToaster,
 } from "@ui-sdk/solid/toast"
+import { onCleanup } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const toast = createToaster()
   onCleanup(() => {
     toast.dismiss()
@@ -20,14 +22,14 @@ export function Example() {
       <button
         onClick={() =>
           toast({
-            title: "Ada Lovelace",
-            description: "Can you look at the draft?",
-            data: { initials: "AL" },
-            action: { label: "Reply", onAction: () => toast("Reply opened") },
+            title: "Hollis Grant",
+            description: "Can you review the draft?",
+            data: { initials: "HG" },
+            action: { label: "Reply", onAction: () => log("Replying to Hollis Grant") },
           })
         }
       >
-        New message
+        New Message
       </button>
       <ToastRegion toaster={toast} aria-label="Messages">
         {(item) => (
@@ -41,7 +43,7 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastAction />
+            <ToastAction data-variant="solid" />
             <ToastClose aria-label="Close">
               <svg
                 viewBox="0 0 24 24"
@@ -62,3 +64,5 @@ export function Example() {
     </>
   )
 }
+
+export { Example }

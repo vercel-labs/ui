@@ -1,11 +1,11 @@
 import "@ui-sdk/web/toast"
 import { createToaster } from "@ui-sdk/web"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   const toast = createToaster()
-
   root.innerHTML = `
-    <button>Show toast</button>
+    <button>Create Event</button>
     <ui-toast-region>
       <template>
         <ui-toast>
@@ -13,22 +13,21 @@ export function mount(root: HTMLElement) {
             <ui-toast-title></ui-toast-title>
             <ui-toast-description></ui-toast-description>
           </div>
-
-          <ui-toast-close><button></button></ui-toast-close>
+          <ui-toast-action><button data-variant="solid"></button></ui-toast-action>
         </ui-toast>
       </template>
     </ui-toast-region>
   `
-  Object.assign(root.querySelector("ui-toast-region")!, {
-    toaster: toast,
-  })
+  root.querySelector("ui-toast-region")!.toaster = toast
   root.querySelector("button")!.addEventListener("click", () =>
-    toast("Event has been created", {
-      description: "Your event is ready to share.",
-      cancel: { label: "Dismiss" },
+    toast("Event created", {
+      description: "Friday, June 12 at 10:00 AM",
+      action: { label: "Undo", onAction: () => log(root, "Event removed") },
     }),
   )
   return () => {
     toast.dismiss()
   }
 }
+
+export { mount }

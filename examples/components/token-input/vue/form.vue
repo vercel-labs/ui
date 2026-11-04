@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { CheckIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/vue/token-input"
 import { ref, useId } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const draft: TokenInputValue = [
   "Explain ",
@@ -8,45 +12,47 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
-const submitted = ref("")
+const log = useLog()
 const disabled = ref(false)
 const readOnly = ref(false)
 const formId = useId()
 
-function submit(event: Event) {
-  submitted.value = String(new FormData(event.currentTarget as HTMLFormElement).get("prompt") ?? "")
+function onSubmit(event: Event) {
+  log(`Submitted ${new FormData(event.currentTarget as HTMLFormElement).get("prompt") ?? ""}`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
+    <div data-slot="controls">
       <label data-slot="label">
-        <input v-model="disabled" type="checkbox" />
+        <Checkbox :checked="disabled" @checked-change="(next) => (disabled = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
         Disabled
       </label>
       <label data-slot="label">
-        <input v-model="readOnly" type="checkbox" />
+        <Checkbox :checked="readOnly" @checked-change="(next) => (readOnly = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
         Read-only
       </label>
     </div>
-    <TokenInput
-      :form="formId"
-      name="prompt"
-      required
-      :default-value="draft"
-      :disabled="disabled"
-      :read-only="readOnly"
-    >
-      <label :id="`${formId}-label`" data-slot="label">Prompt</label>
-      <TokenInputEditor :aria-labelledby="`${formId}-label`" />
-    </TokenInput>
-    <form @reset="submitted = ''" :id="formId" data-slot="stack" @submit.prevent="submit">
-      <div data-slot="row">
-        <button type="submit">Submit</button>
+    <div data-slot="stack">
+      <Field :disabled="disabled">
+        <FieldLabel>Prompt</FieldLabel>
+        <TokenInput :form="formId" name="prompt" required :default-value="draft" :read-only="readOnly">
+          <TokenInputEditor />
+        </TokenInput>
+      </Field>
+      <form :id="formId" data-slot="row" @submit.prevent="onSubmit">
+        <button type="submit" data-variant="solid">Submit</button>
         <button type="reset">Reset</button>
-      </div>
-      <p data-slot="output">{{ submitted }}</p>
-    </form>
+      </form>
+    </div>
   </div>
 </template>

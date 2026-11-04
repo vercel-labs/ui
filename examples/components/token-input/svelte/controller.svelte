@@ -1,56 +1,58 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     createTokenInputController,
     TokenInput,
     TokenInputEditor,
+    type Token,
     type TokenInputValue,
   } from "@ui-sdk/svelte/token-input"
 
   const draft: TokenInputValue = [
-    "Explain ",
+    "Compare ",
     { type: "file", value: "src/routes.ts", label: "routes.ts" },
-    " in two sentences.",
+    " with ",
   ]
 
   const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
 
   const prompt = createTokenInputController()
+  const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
+  const keepFocus = (event: MouseEvent) => event.preventDefault()
 
-  const first = () => prompt.getValue().find((segment) => typeof segment !== "string")
-
-  function rename() {
-    const token = first()
-    if (typeof token === "object") prompt.updateToken(token.id!, { label: token.label.toUpperCase() })
+  function showPath() {
+    const token = firstToken()
+    if (token) prompt.updateToken(token.id!, { label: token.value })
   }
 
-  function remove() {
-    const token = first()
-    if (typeof token === "object") prompt.removeToken(token.id!)
+  function removeFirst() {
+    const token = firstToken()
+    if (token) prompt.removeToken(token.id!)
   }
-
 </script>
 
 <div data-slot="stack">
-  <TokenInput controller={prompt} defaultValue={draft}>
-    <TokenInputEditor aria-label="Prompt" />
-  </TokenInput>
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div data-slot="row" onmousedown={(event) => event.preventDefault()}>
+  <div data-slot="controls">
     <button
       type="button"
+      onmousedown={keepFocus}
       onclick={() =>
         prompt.insert(
           { type: "file", value: "package.json", label: "package.json" },
           { at: "end", resolve: loadFile() },
         )}
     >
-      Attach package.json
+      Attach File
     </button>
-    <button type="button" onclick={rename}>Rename first</button>
-    <button type="button" onclick={remove}>Remove first</button>
-    <button type="button" onclick={() => prompt.canUndo() && prompt.undo()}>Undo</button>
-
-    <button type="button" onclick={() => prompt.clear()}>Clear</button>
-
+    <button type="button" onmousedown={keepFocus} onclick={showPath}>Show Path</button>
+    <button type="button" onmousedown={keepFocus} onclick={removeFirst}>Remove First</button>
+    <button type="button" onmousedown={keepFocus} onclick={() => prompt.undo()}>Undo</button>
+    <button type="button" onmousedown={keepFocus} onclick={() => prompt.clear()}>Clear</button>
   </div>
+  <Field>
+    <FieldLabel>Prompt</FieldLabel>
+    <TokenInput controller={prompt} defaultValue={draft}>
+      <TokenInputEditor />
+    </TokenInput>
+  </Field>
 </div>

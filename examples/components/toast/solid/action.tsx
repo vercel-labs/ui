@@ -1,48 +1,38 @@
+import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
-import {
-  Toast,
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/solid/toast"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const toast = createToaster()
   onCleanup(() => {
     toast.dismiss()
   })
 
-  const [status, setStatus] = createSignal("")
   return (
     <>
       <button
         onClick={() =>
           toast("Message archived", {
-            action: { label: "Undo", onAction: () => setStatus("Restored"), dismiss: true },
-            cancel: { label: "Dismiss", onCancel: () => setStatus("Kept archived") },
-            onDismiss: ({ reason }) => reason === "timeout" && setStatus("Timed out"),
+            action: { label: "Undo", onAction: () => log("Message restored") },
+            cancel: { label: "Dismiss", onCancel: () => log("Kept archived") },
+            onDismiss: ({ reason }) => log(`Closed (${reason})`),
           })
         }
       >
-        Archive message
+        Archive Message
       </button>
-      <output data-slot="output">{status()}</output>
       <ToastRegion toaster={toast}>
         {(item) => (
           <Toast>
-            <div data-slot="stack">
-              <ToastTitle />
-              <ToastDescription />
-            </div>
-            <ToastAction />
+            <ToastTitle />
             {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

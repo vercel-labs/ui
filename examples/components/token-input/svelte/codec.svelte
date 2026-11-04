@@ -1,36 +1,25 @@
 <script lang="ts">
-  import {
-    fromText,
-    toLabel,
-    toText,
-    TokenInput,
-    TokenInputEditor,
-    type Token,
-    type TokenCodec,
-    type TokenInputValue,
-  } from "@ui-sdk/svelte/token-input"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { fromText, toText, TokenInput, TokenInputEditor, type TokenCodec } from "@ui-sdk/svelte/token-input"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const slack: TokenCodec = {
-    format: (token: Token) => `<@${token.value}>`,
-    parse: (text: string) =>
+  const chat: TokenCodec = {
+    format: (token) => `<@${token.value}>`,
+    parse: (text) =>
       text.split(/(<@[\w.-]+>)/).map((part) => {
         const id = /^<@([\w.-]+)>$/.exec(part)?.[1]
         return id ? { type: "mention", value: id, label: `@${id}` } : part
       }),
   }
-  let value = $state<TokenInputValue>(fromText("Ping <@ada> and <@grace>", slack))
+
+  const draft = fromText("Ping <@hollis> and <@ines> about the launch", chat)
+
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <TokenInput bind:value codec={slack} copy="label">
-    <TokenInputEditor aria-label="Message" />
+<Field>
+  <FieldLabel>Message</FieldLabel>
+  <TokenInput codec={chat} copy="label" defaultValue={draft} onValueChange={(value) => log(toText(value, chat))}>
+    <TokenInputEditor />
   </TokenInput>
-  <dl>
-    <dt>Codec</dt>
-    <dd>{toText(value, slack)}</dd>
-    <dt>Default</dt>
-    <dd>{toText(value)}</dd>
-    <dt>Label</dt>
-    <dd>{toLabel(value)}</dd>
-  </dl>
-</div>
+</Field>

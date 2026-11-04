@@ -4,7 +4,6 @@ function Example() {
   return (
     <Toggle
       aria-label="Favorite"
-      defaultPressed
       render={(props, state) => (
         <button {...props}>
           <ToggleIcon>

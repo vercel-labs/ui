@@ -3,7 +3,7 @@ import { CheckIcon, CopyIcon } from "@lucide/vue"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 import { ref } from "vue"
 
-const command = "pnpm add @ui-sdk/vue"
+const command = "npm install @ui-sdk/vue"
 const copied = ref(false)
 
 function copy() {
@@ -16,9 +16,9 @@ function copy() {
   <div data-slot="row">
     <code>{{ command }}</code>
     <Tooltip :close-on-press="false" @open-change-complete="(open) => !open && (copied = false)">
-      <TooltipTrigger @click="copy">
-        <CheckIcon v-if="copied" />
-        <CopyIcon v-else />
+      <TooltipTrigger :aria-label="copied ? 'Copied' : 'Copy'" @click="copy">
+        <CheckIcon v-if="copied" aria-hidden="true" />
+        <CopyIcon v-else aria-hidden="true" />
       </TooltipTrigger>
       <TooltipContent>{{ copied ? "Copied" : "Copy" }}</TooltipContent>
     </Tooltip>

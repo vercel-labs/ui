@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { toLabel, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/svelte/token-input"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { toLabel, TokenInput, TokenInputEditor } from "@ui-sdk/svelte/token-input"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let sent = $state("")
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <TokenInput submitShortcut="mod+enter" onSubmit={(value: TokenInputValue) => (sent = toLabel(value))}>
-    <TokenInputEditor aria-label="Message" placeholder="Enter adds a line, Cmd/Ctrl+Enter sends" />
+<Field>
+  <FieldLabel>Message</FieldLabel>
+  <TokenInput submitShortcut="mod+enter" onSubmit={(value) => log(`Sent ${toLabel(value)}`)}>
+    <TokenInputEditor placeholder="Write a message" />
   </TokenInput>
-  <p data-slot="output">{sent ? `Sent:\n${sent}` : "Nothing sent yet."}</p>
-</div>
+</Field>

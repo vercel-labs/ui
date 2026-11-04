@@ -1,33 +1,44 @@
-import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
-  const tooltip = createTooltipController()
+  const log = useLog()
   const [open, setOpen] = createSignal(false)
-  const [reason, setReason] = createSignal("")
 
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        <Tooltip
-          open={open()}
-          onOpenChange={(next, details) => {
-            setOpen(next)
-            setReason(details.reason)
-          }}
-          controller={tooltip}
-        >
-          <TooltipTrigger>Export</TooltipTrigger>
-          <TooltipContent>Download a CSV of this table</TooltipContent>
-        </Tooltip>
-        <button type="button" onClick={() => tooltip.open()}>
-          Show from elsewhere
-        </button>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Checkbox checked={open()} onCheckedChange={(next) => setOpen(next === true)}>
+            <CheckboxIndicator>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </CheckboxIndicator>
+          </Checkbox>
+          Open
+        </label>
       </div>
-      <output data-slot="output">
-        {open() ? "Open" : "Closed"}
-        {reason() && `, last change: ${reason()}`}
-      </output>
+      <Tooltip
+        open={open()}
+        onOpenChange={(next, details) => {
+          setOpen(next)
+          log(`${next ? "Opened" : "Closed"} (${details.reason})`)
+        }}
+      >
+        <TooltipTrigger>Export</TooltipTrigger>
+        <TooltipContent>Download as CSV</TooltipContent>
+      </Tooltip>
     </div>
   )
 }

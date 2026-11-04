@@ -1,17 +1,15 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
-import { createSignal, createUniqueId } from "solid-js"
+import { createSignal } from "solid-js"
 
 function Example() {
-  const id = createUniqueId()
   const [field, setField] = createSignal<HTMLDivElement | null>(null)
 
   return (
-    <div data-slot="stack">
-      <label data-slot="label" for={id}>
-        Webhook URL
-      </label>
+    <Field>
+      <FieldLabel>Webhook URL</FieldLabel>
       <div data-slot="row" ref={setField}>
-        <input id={id} placeholder="https://" />
+        <FieldControl placeholder="https://" />
         <Tooltip>
           <TooltipTrigger aria-label="About webhooks">
             <svg
@@ -28,12 +26,12 @@ function Example() {
               <path d="M12 8h.01" />
             </svg>
           </TooltipTrigger>
-          <TooltipContent anchor={field()} align="start">
-            We send a POST request to this URL for every new order.
+          <TooltipContent anchor={field()} side="bottom" align="start">
+            We send a POST request here for every new order.
           </TooltipContent>
         </Tooltip>
       </div>
-    </div>
+    </Field>
   )
 }
 

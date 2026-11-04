@@ -1,8 +1,9 @@
-import { Toggle, ToggleGroup } from "@ui-sdk/solid/toggle"
-import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/solid/toolbar"
-import { createSignal, For } from "solid-js"
+import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/solid/toggle"
+import { Toolbar, ToolbarSeparator } from "@ui-sdk/solid/toolbar"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-const icon = (markup: string) => (props: { class?: string }) => (
+const icon = (markup: string) => () => (
   <svg
     viewBox="0 0 24 24"
     fill="none"
@@ -14,55 +15,63 @@ const icon = (markup: string) => (props: { class?: string }) => (
     innerHTML={markup}
   />
 )
-const Bold = icon('<path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />')
-const Italic = icon(
-  '<line x1="19" x2="10" y1="4" y2="4" /><line x1="14" x2="5" y1="20" y2="20" /><line x1="15" x2="9" y1="4" y2="20" />',
+const AlignLeft = icon('<path d="M21 5H3" /><path d="M15 12H3" /><path d="M17 19H3" />')
+const AlignCenter = icon('<path d="M21 5H3" /><path d="M17 12H7" /><path d="M19 19H5" />')
+const AlignRight = icon('<path d="M21 5H3" /><path d="M21 12H9" /><path d="M21 19H7" />')
+const List = icon(
+  '<path d="M3 5h.01" /><path d="M3 12h.01" /><path d="M3 19h.01" /><path d="M8 5h13" /><path d="M8 12h13" /><path d="M8 19h13" />',
 )
-const Strikethrough = icon(
-  '<path d="M16 4H9a3 3 0 0 0-2.83 4" /><path d="M14 12a4 4 0 0 1 0 8H6" /><line x1="4" x2="20" y1="12" y2="12" />',
+const ListOrdered = icon(
+  '<path d="M11 5h10" /><path d="M11 12h10" /><path d="M11 19h10" /><path d="M4 4h1v5" /><path d="M4 9h2" /><path d="M6.5 20H3.4c0-1 2.6-1.925 2.6-3.5a1.5 1.5 0 0 0-2.6-1.02" />',
 )
 
-const formats = [
-  { value: "bold", label: "Bold", icon: Bold },
-  { value: "italic", label: "Italic", icon: Italic },
-  { value: "strikethrough", label: "Strikethrough", icon: Strikethrough },
+const alignments = [
+  { value: "left", label: "Align left", icon: AlignLeft },
+  { value: "center", label: "Align center", icon: AlignCenter },
+  { value: "right", label: "Align right", icon: AlignRight },
+]
+
+const lists = [
+  { value: "bulleted", label: "Bulleted list", icon: List },
+  { value: "numbered", label: "Numbered list", icon: ListOrdered },
 ]
 
 function Example() {
-  const [style, setStyle] = createSignal<string[]>(["bold"])
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Toolbar aria-label="Text">
-        <ToggleGroup multiple value={style()} onValueChange={setStyle} aria-label="Text style">
-          <For each={formats}>
-            {({ value, label, icon: Icon }) => (
-              <Toggle data-variant="ghost" value={value} aria-label={label}>
-                <Icon />
-              </Toggle>
-            )}
-          </For>
-        </ToggleGroup>
-        <ToolbarSeparator />
-        <Toggle data-variant="ghost" aria-label="Code">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m16 18 6-6-6-6" />
-            <path d="m8 6-6 6 6 6" />
-          </svg>
-        </Toggle>
-        <ToolbarButton data-variant="secondary" onClick={() => setStyle([])}>
-          Clear
-        </ToolbarButton>
-      </Toolbar>
-      <output data-slot="output">Style: {style().join(", ") || "none"}</output>
-    </div>
+    <Toolbar aria-label="Paragraph">
+      <ToggleGroup
+        defaultValue={["left"]}
+        deselectable={false}
+        aria-label="Alignment"
+        onValueChange={([value]) => log(`Align ${value}`)}
+      >
+        <For each={alignments}>
+          {(alignment) => (
+            <Toggle value={alignment.value} aria-label={alignment.label}>
+              <ToggleIcon>
+                <alignment.icon />
+              </ToggleIcon>
+            </Toggle>
+          )}
+        </For>
+      </ToggleGroup>
+      <ToolbarSeparator />
+      <ToggleGroup
+        aria-label="List"
+        onValueChange={([value]) => log(lists.find((list) => list.value === value)?.label ?? "No list")}
+      >
+        <For each={lists}>
+          {(list) => (
+            <Toggle value={list.value} aria-label={list.label}>
+              <ToggleIcon>
+                <list.icon />
+              </ToggleIcon>
+            </Toggle>
+          )}
+        </For>
+      </ToggleGroup>
+    </Toolbar>
   )
 }
 

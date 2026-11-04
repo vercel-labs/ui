@@ -1,6 +1,5 @@
 <script lang="ts">
   import { FileIcon } from "@lucide/svelte"
-  import type { ChangeDetails } from "@ui-sdk/core"
   import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
 
   const files = [
@@ -10,22 +9,24 @@
     "Budget.xlsx",
   ]
 
-  function onlyTruncated(open: boolean, details: ChangeDetails<string>) {
-    const target = details.event?.target
-    const name = target instanceof Element ? target.closest("button")?.querySelector("span") : null
-    if (open && name && name.scrollWidth <= name.clientWidth) {
-      details.cancel()
-    }
-  }
+  const names: HTMLSpanElement[] = []
 </script>
 
 <ul>
-  {#each files as file (file)}
+  {#each files as file, index (file)}
     <li>
-      <Tooltip type="label" onOpenChange={onlyTruncated}>
+      <Tooltip
+        type="label"
+        onOpenChange={(open, details) => {
+          const span = names[index]
+          if (open && span && span.scrollWidth <= span.clientWidth) {
+            details.cancel()
+          }
+        }}
+      >
         <TooltipTrigger>
-          <FileIcon />
-          <span>{file}</span>
+          <FileIcon aria-hidden="true" />
+          <span bind:this={names[index]}>{file}</span>
         </TooltipTrigger>
         <TooltipContent>{file}</TooltipContent>
       </Tooltip>

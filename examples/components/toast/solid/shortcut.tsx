@@ -1,35 +1,33 @@
+import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/solid/toast"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
-  const toast = createToaster()
+function Example() {
+  const log = useLog()
+  const toast = createToaster({ duration: 10000 })
   onCleanup(() => {
     toast.dismiss()
   })
 
   return (
     <>
-      <button onClick={() => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } })}>
-        Show toast
+      <button
+        onClick={() =>
+          toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })
+        }
+      >
+        Send Message
       </button>
       <ToastRegion toaster={toast} shortcut="alt+t" aria-label="Alerts">
-        {(item) => (
+        {() => (
           <Toast>
-            <div data-slot="stack">
-              <ToastTitle />
-              <ToastDescription />
-            </div>
-            <ToastClose />
+            <ToastTitle />
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

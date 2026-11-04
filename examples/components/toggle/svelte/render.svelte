@@ -3,7 +3,7 @@
   import { Toggle, ToggleIcon } from "@ui-sdk/svelte/toggle"
 </script>
 
-<Toggle aria-label="Favorite" defaultPressed>
+<Toggle aria-label="Favorite">
   {#snippet render({ props, state })}
     <button {...props}>
       <ToggleIcon>

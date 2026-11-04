@@ -3,43 +3,31 @@
   import { CircleCheckIcon, InfoIcon, LoaderCircleIcon, OctagonXIcon, TriangleAlertIcon } from "@lucide/svelte"
   import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
 
-  const toast = createToaster()
-
-  function promise() {
-    toast.promise(
-      new Promise<{ name: string }>((resolve) => setTimeout(() => resolve({ name: "Event" }), 2000)),
-      {
-        loading: "Loading...",
-        success: (data) => `${data.name} has been created`,
-        error: "Error",
-      },
-    )
+  function upload() {
+    return new Promise((resolve) => setTimeout(resolve, 2000))
   }
-  onDestroy(() => { toast.dismiss() })
+
+  const toast = createToaster()
+  onDestroy(() => {
+    toast.dismiss()
+  })
 </script>
 
 <div data-slot="row">
-  <button onclick={() => toast("Event has been created")}>
-    Default
-  </button>
-  <button onclick={() => toast.success("Event has been created")}>
-    Success
-  </button>
+  <button onclick={() => toast("Event created")}>Default</button>
+  <button onclick={() => toast.success("Changes saved")}>Success</button>
+  <button onclick={() => toast.info("A new version is available")}>Info</button>
+  <button onclick={() => toast.warning("Storage is almost full")}>Warning</button>
+  <button onclick={() => toast.error("Couldn't save changes")}>Error</button>
   <button
-    onclick={() => toast.info("Be at the area 10 minutes before the event time")}
+    onclick={() =>
+      toast.promise(upload, {
+        loading: "Uploading photos…",
+        success: "Photos uploaded",
+        error: "Upload failed",
+      })}
   >
-    Info
-  </button>
-  <button
-    onclick={() => toast.warning("Event start time cannot be earlier than 8am")}
-  >
-    Warning
-  </button>
-  <button onclick={() => toast.error("Event has not been created")}>
-    Error
-  </button>
-  <button onclick={promise}>
-    Promise
+    Loading
   </button>
 </div>
 <ToastRegion toaster={toast}>

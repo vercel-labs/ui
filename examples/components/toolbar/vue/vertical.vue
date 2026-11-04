@@ -1,25 +1,37 @@
 <script setup lang="ts">
-import { ImageIcon, MoveHorizontalIcon, PencilIcon, TrashIcon } from "@lucide/vue"
-import { Toggle, ToggleGroup } from "@ui-sdk/vue/toggle"
+import { MousePointer2Icon, PencilIcon, SquareIcon, Trash2Icon, TypeIcon } from "@lucide/vue"
+import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/vue/toggle"
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
+import { useLog } from "../../../shared/vue/log"
+
+const tools = [
+  { value: "select", label: "Select", icon: MousePointer2Icon },
+  { value: "draw", label: "Draw", icon: PencilIcon },
+  { value: "shape", label: "Shape", icon: SquareIcon },
+  { value: "text", label: "Text", icon: TypeIcon },
+]
+
+const log = useLog()
 </script>
 
 <template>
-  <Toolbar orientation="vertical" aria-label="Tools">
-    <ToggleGroup :default-value="['pencil']" aria-label="Tool" orientation="vertical">
-      <Toggle data-variant="ghost" value="pencil" aria-label="Pencil">
-        <PencilIcon />
-      </Toggle>
-      <Toggle data-variant="ghost" value="image" aria-label="Image">
-        <ImageIcon />
-      </Toggle>
-      <Toggle data-variant="ghost" value="move" aria-label="Move">
-        <MoveHorizontalIcon />
+  <Toolbar orientation="vertical" aria-label="Canvas">
+    <ToggleGroup
+      :default-value="['select']"
+      :deselectable="false"
+      orientation="vertical"
+      aria-label="Tool"
+      @value-change="([value]) => log(`${tools.find((tool) => tool.value === value)?.label} tool`)"
+    >
+      <Toggle v-for="tool in tools" :key="tool.value" :value="tool.value" :aria-label="tool.label">
+        <ToggleIcon>
+          <component :is="tool.icon" />
+        </ToggleIcon>
       </Toggle>
     </ToggleGroup>
     <ToolbarSeparator />
-    <ToolbarButton data-variant="secondary" aria-label="Delete">
-      <TrashIcon />
+    <ToolbarButton aria-label="Delete" @click="log('Deleted selection')">
+      <Trash2Icon aria-hidden="true" />
     </ToolbarButton>
   </Toolbar>
 </template>

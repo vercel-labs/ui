@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { FileIcon, XIcon } from "@lucide/vue"
+import { XIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { TokenInput, TokenInputEditor, TokenInputToken, TokenInputTokenRemove } from "@ui-sdk/vue/token-input"
 import {
   type TriggerMenuDataItem,
@@ -9,41 +10,42 @@ import {
   TriggerMenuList,
 } from "@ui-sdk/vue/trigger-menu"
 
-const files = [
-  { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
-  { value: "src/routes.ts", label: "routes.ts", keywords: ["src"] },
-  { value: "src/styles.css", label: "styles.css", keywords: ["src"] },
-  { value: "README.md", label: "README.md" },
-  { value: "package.json", label: "package.json" },
+const people = [
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 </script>
 
 <template>
-  <TokenInput>
-    <TokenInputEditor aria-label="Prompt" placeholder="Ask about a file, type @ to add one" />
-    <TriggerMenu :triggers="[{ char: '@', type: 'file', items: files }]">
-      <TriggerMenuContent>
-        <TriggerMenuList v-slot="{ state }">
-          <TriggerMenuItem
-            v-for="item in state.items as TriggerMenuDataItem[]"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-            :disabled="item.disabled"
-          >
-            {{ item.label }}
-          </TriggerMenuItem>
-        </TriggerMenuList>
-      </TriggerMenuContent>
-    </TriggerMenu>
-    <template #token="{ token }">
-      <TokenInputToken>
-        <FileIcon aria-hidden="true" />
-        {{ token.label }}
-        <TokenInputTokenRemove>
-          <XIcon aria-hidden="true" />
-        </TokenInputTokenRemove>
-      </TokenInputToken>
-    </template>
-  </TokenInput>
+  <Field>
+    <FieldLabel>Message</FieldLabel>
+    <TokenInput>
+      <TokenInputEditor placeholder="Type @ to mention someone" />
+      <TriggerMenu :triggers="[{ char: '@', type: 'mention', items: people }]">
+        <TriggerMenuContent>
+          <TriggerMenuList v-slot="{ state }">
+            <TriggerMenuItem
+              v-for="item in state.items as TriggerMenuDataItem[]"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            >
+              {{ item.label }}
+            </TriggerMenuItem>
+          </TriggerMenuList>
+        </TriggerMenuContent>
+      </TriggerMenu>
+      <template #token="{ token }">
+        <TokenInputToken>
+          {{ token.label }}
+          <TokenInputTokenRemove>
+            <XIcon aria-hidden="true" />
+          </TokenInputTokenRemove>
+        </TokenInputToken>
+      </template>
+    </TokenInput>
+  </Field>
 </template>

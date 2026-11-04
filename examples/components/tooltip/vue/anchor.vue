@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { InfoIcon } from "@lucide/vue"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
-import { ref, useId } from "vue"
+import { useTemplateRef } from "vue"
 
-const id = useId()
-const field = ref<HTMLDivElement | null>(null)
+const field = useTemplateRef<HTMLDivElement>("field")
 </script>
 
 <template>
-  <div data-slot="stack">
-    <label data-slot="label" :for="id">Webhook URL</label>
+  <Field>
+    <FieldLabel>Webhook URL</FieldLabel>
     <div ref="field" data-slot="row">
-      <input :id="id" placeholder="https://" />
+      <FieldControl placeholder="https://" />
       <Tooltip>
         <TooltipTrigger aria-label="About webhooks">
-          <InfoIcon />
+          <InfoIcon aria-hidden="true" />
         </TooltipTrigger>
-        <TooltipContent :anchor="field" align="start"
-          >We send a POST request to this URL for every new order.</TooltipContent
-        >
+        <TooltipContent :anchor="field" side="bottom" align="start">
+          We send a POST request here for every new order.
+        </TooltipContent>
       </Tooltip>
     </div>
-  </div>
+  </Field>
 </template>

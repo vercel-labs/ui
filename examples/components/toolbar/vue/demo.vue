@@ -1,38 +1,33 @@
 <script setup lang="ts">
-import { BoldIcon, ChevronDownIcon, ItalicIcon, UnderlineIcon } from "@lucide/vue"
-import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
-import { Toggle, ToggleGroup } from "@ui-sdk/vue/toggle"
+import { BoldIcon, ItalicIcon, LinkIcon, UnderlineIcon } from "@lucide/vue"
+import { Toggle, ToggleIcon } from "@ui-sdk/vue/toggle"
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
+import { useLog } from "../../../shared/vue/log"
+
+const styles = [
+  { label: "Bold", icon: BoldIcon },
+  { label: "Italic", icon: ItalicIcon },
+  { label: "Underline", icon: UnderlineIcon },
+]
+
+const log = useLog()
 </script>
 
 <template>
   <Toolbar aria-label="Formatting">
-    <ToggleGroup multiple aria-label="Text style">
-      <Toggle data-variant="ghost" value="bold" aria-label="Bold">
-        <BoldIcon />
-      </Toggle>
-      <Toggle data-variant="ghost" value="italic" aria-label="Italic">
-        <ItalicIcon />
-      </Toggle>
-      <Toggle data-variant="ghost" value="underline" aria-label="Underline">
-        <UnderlineIcon />
-      </Toggle>
-    </ToggleGroup>
+    <Toggle
+      v-for="style in styles"
+      :key="style.label"
+      :aria-label="style.label"
+      @pressed-change="(pressed) => log(`${style.label} ${pressed ? 'on' : 'off'}`)"
+    >
+      <ToggleIcon>
+        <component :is="style.icon" />
+      </ToggleIcon>
+    </Toggle>
     <ToolbarSeparator />
-    <Menu>
-      <ToolbarButton data-variant="secondary">
-        <template #render="{ props }">
-          <MenuTrigger v-bind="props">
-            Sans
-            <ChevronDownIcon />
-          </MenuTrigger>
-        </template>
-      </ToolbarButton>
-      <MenuContent>
-        <MenuItem v-for="font in ['Sans', 'Serif', 'Mono']" :key="font">
-          {{ font }}
-        </MenuItem>
-      </MenuContent>
-    </Menu>
+    <ToolbarButton aria-label="Insert link" @click="log('Insert link')">
+      <LinkIcon aria-hidden="true" />
+    </ToolbarButton>
   </Toolbar>
 </template>

@@ -1,27 +1,33 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 import { computed, ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const title = ref("")
-const status = ref("Draft")
 const blocked = computed(() => !title.value.trim())
 
+function onTitle(event: Event) {
+  title.value = (event.target as HTMLInputElement).value
+}
+
 function publish() {
-  if (!blocked.value) {
-    status.value = `Published “${title.value.trim()}”`
-  }
+  if (!blocked.value) log(`Published “${title.value.trim()}”`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <input v-model="title" placeholder="Post title" aria-label="Post title" />
-    <div data-slot="row">
-      <Tooltip :disabled="!blocked">
-        <TooltipTrigger :aria-disabled="blocked || undefined" @click="publish">Publish</TooltipTrigger>
-        <TooltipContent>Add a title to publish</TooltipContent>
-      </Tooltip>
-      <output data-slot="output">{{ status }}</output>
-    </div>
+    <Field>
+      <FieldLabel>Post title</FieldLabel>
+      <FieldControl :value="title" @input="onTitle" />
+    </Field>
+    <Tooltip :disabled="!blocked">
+      <TooltipTrigger data-variant="solid" :aria-disabled="blocked || undefined" @click="publish">
+        Publish
+      </TooltipTrigger>
+      <TooltipContent side="right">Add a title to publish</TooltipContent>
+    </Tooltip>
   </div>
 </template>

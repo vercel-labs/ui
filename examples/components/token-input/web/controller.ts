@@ -1,48 +1,55 @@
-import { toText, type TokenInputValue } from "@ui-sdk/core/token-input"
-import "@ui-sdk/web/token-input"
+import "@ui-sdk/web/field"
+import { toText, type Token, type TokenInputValue } from "@ui-sdk/web/token-input"
 
 const draft: TokenInputValue = [
-  "Explain ",
+  "Compare ",
   { type: "file", value: "src/routes.ts", label: "routes.ts" },
-  " in two sentences.",
+  " with ",
 ]
 
 const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
 
-export function mount(root: HTMLElement) {
-  const actions = ["Attach package.json", "Rename first", "Remove first", "Undo", "Clear"]
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <ui-token-input value="${toText(draft).replaceAll('"', "&quot;")}">
-        <ui-token-input-editor aria-label="Prompt"></ui-token-input-editor>
-      </ui-token-input>
-      <div data-slot="row">
-        ${actions.map((action) => `<button type="button">${action}</button>`).join("")}
+      <div data-slot="controls">
+        <button type="button" data-action="attach">Attach File</button>
+        <button type="button" data-action="path">Show Path</button>
+        <button type="button" data-action="remove">Remove First</button>
+        <button type="button" data-action="undo">Undo</button>
+        <button type="button" data-action="clear">Clear</button>
       </div>
+      <ui-field>
+        <ui-field-label>Prompt</ui-field-label>
+        <ui-token-input value="${toText(draft)}">
+          <ui-token-input-editor></ui-token-input-editor>
+        </ui-token-input>
+      </ui-field>
     </div>
   `
-  const input = root.querySelector("ui-token-input")!
-  const { api } = input
-  const first = () => api.getValue().find((segment) => typeof segment !== "string")
-  const run: Record<string, () => void> = {
-    "Attach package.json": () =>
-      api.insert(
+  const prompt = root.querySelector("ui-token-input")!.api
+  const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
+  const actions: Record<string, () => void> = {
+    attach: () =>
+      prompt.insert(
         { type: "file", value: "package.json", label: "package.json" },
         { at: "end", resolve: loadFile() },
       ),
-    "Rename first": () => {
-      const token = first()
-      if (typeof token === "object") api.updateToken(token.id!, { label: token.label.toUpperCase() })
+    path: () => {
+      const token = firstToken()
+      if (token) prompt.updateToken(token.id!, { label: token.value })
     },
-    "Remove first": () => {
-      const token = first()
-      if (typeof token === "object") api.removeToken(token.id!)
+    remove: () => {
+      const token = firstToken()
+      if (token) prompt.removeToken(token.id!)
     },
-    Undo: () => api.canUndo() && api.undo(),
-    Clear: () => api.clear(),
+    undo: () => prompt.undo(),
+    clear: () => prompt.clear(),
   }
-  for (const button of root.querySelectorAll("button")) {
-    button.addEventListener("mousedown", (event) => event.preventDefault())
-    button.addEventListener("click", () => run[button.textContent!]())
-  }
+  root.querySelector("[data-slot=controls]")!.addEventListener("mousedown", (event) => event.preventDefault())
+  root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
+    button.addEventListener("click", () => actions[button.dataset.action!]())
+  })
 }
+
+export { mount }

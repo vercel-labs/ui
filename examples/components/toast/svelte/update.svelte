@@ -1,46 +1,43 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import { CircleCheckIcon, LoaderCircleIcon } from "@lucide/svelte"
+  import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   const toast = createToaster()
-
   let timer: ReturnType<typeof setInterval> | undefined
+  onDestroy(() => {
+    clearInterval(timer)
+    toast.dismiss()
+  })
 
   function upload() {
     clearInterval(timer)
-    const id = toast.loading("Uploading… 0%", { id: "upload" })
+    const id = toast.loading("Uploading report.pdf… 0%", { id: "upload" })
     let progress = 0
     timer = setInterval(() => {
-      progress += 25
+      progress += 20
       const done = progress >= 100
       const open = toast.update(
         id,
-        done ? { title: "Upload complete", type: "success" } : { title: `Uploading… ${progress}%` },
+        done ? { title: "Report uploaded", type: "success" } : { title: `Uploading report.pdf… ${progress}%` },
       )
+      if (!open) log("Upload canceled")
       if (done || !open) clearInterval(timer)
-    }, 600)
+    }, 700)
   }
-  onDestroy(() => { clearInterval(timer); toast.dismiss() })
 </script>
 
 <div data-slot="row">
-  <button onclick={upload}>
-    Upload
-  </button>
-  <button onclick={() => toast.dismiss("upload")}>
-    Cancel upload
-  </button>
-  <button onclick={() => toast.dismiss()}>
-    Dismiss all
-  </button>
+  <button onclick={upload}>Upload Report</button>
+  <button onclick={() => toast.dismiss("upload")}>Cancel Upload</button>
+  <button onclick={() => toast.dismiss()}>Dismiss All</button>
 </div>
 <ToastRegion toaster={toast}>
-  {#snippet children(item)}
-    <Toast>
-      <div data-slot="stack">
-        <ToastTitle />
-        <ToastDescription />
-      </div>
-    </Toast>
-  {/snippet}
+  <Toast>
+    <CircleCheckIcon data-show="success" aria-hidden="true" />
+    <LoaderCircleIcon data-show="loading" aria-hidden="true" />
+    <ToastTitle />
+  </Toast>
 </ToastRegion>

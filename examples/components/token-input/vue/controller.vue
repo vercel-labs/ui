@@ -1,56 +1,56 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   createTokenInputController,
   TokenInput,
   TokenInputEditor,
+  type Token,
   type TokenInputValue,
 } from "@ui-sdk/vue/token-input"
 
 const draft: TokenInputValue = [
-  "Explain ",
+  "Compare ",
   { type: "file", value: "src/routes.ts", label: "routes.ts" },
-  " in two sentences.",
+  " with ",
 ]
 
 const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
 
 const prompt = createTokenInputController()
+const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
 
-const first = () => prompt.getValue().find((segment) => typeof segment !== "string")
-
-function rename() {
-  const token = first()
-  if (typeof token === "object") prompt.updateToken(token.id!, { label: token.label.toUpperCase() })
+function attachFile() {
+  prompt.insert(
+    { type: "file", value: "package.json", label: "package.json" },
+    { at: "end", resolve: loadFile() },
+  )
 }
 
-function remove() {
-  const token = first()
-  if (typeof token === "object") prompt.removeToken(token.id!)
+function showPath() {
+  const token = firstToken()
+  if (token) prompt.updateToken(token.id!, { label: token.value })
+}
+
+function removeFirst() {
+  const token = firstToken()
+  if (token) prompt.removeToken(token.id!)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <TokenInput :controller="prompt" :default-value="draft">
-      <TokenInputEditor aria-label="Prompt" />
-    </TokenInput>
-    <div data-slot="row" @mousedown.prevent>
-      <button
-        type="button"
-        @click="
-          prompt.insert(
-            { type: 'file', value: 'package.json', label: 'package.json' },
-            { at: 'end', resolve: loadFile() },
-          )
-        "
-      >
-        Attach package.json
-      </button>
-      <button type="button" @click="rename">Rename first</button>
-      <button type="button" @click="remove">Remove first</button>
-      <button type="button" @click="prompt.canUndo() && prompt.undo()">Undo</button>
-
+    <div data-slot="controls" @mousedown.prevent>
+      <button type="button" @click="attachFile">Attach File</button>
+      <button type="button" @click="showPath">Show Path</button>
+      <button type="button" @click="removeFirst">Remove First</button>
+      <button type="button" @click="prompt.undo()">Undo</button>
       <button type="button" @click="prompt.clear()">Clear</button>
     </div>
+    <Field>
+      <FieldLabel>Prompt</FieldLabel>
+      <TokenInput :controller="prompt" :default-value="draft">
+        <TokenInputEditor />
+      </TokenInput>
+    </Field>
   </div>
 </template>

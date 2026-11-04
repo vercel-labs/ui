@@ -1,30 +1,29 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   createTokenInputController,
   TokenInput,
   TokenInputEditor,
+  type Token,
   type TokenInputValue,
 } from "@ui-sdk/solid/token-input"
 
 const draft: TokenInputValue = [
-  "Explain ",
+  "Compare ",
   { type: "file", value: "src/routes.ts", label: "routes.ts" },
-  " in two sentences.",
+  " with ",
 ]
 
 const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
 
-export function Example() {
+function Example() {
   const prompt = createTokenInputController()
+  const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
 
   return (
     <div data-slot="stack">
-      <TokenInput controller={prompt} defaultValue={draft}>
-        <TokenInputEditor aria-label="Prompt" />
-      </TokenInput>
-      <div data-slot="row" onMouseDown={(event) => event.preventDefault()}>
+      <div data-slot="controls" onMouseDown={(event) => event.preventDefault()}>
         <button
           type="button"
-
           onClick={() =>
             prompt.insert(
               { type: "file", value: "package.json", label: "package.json" },
@@ -32,44 +31,41 @@ export function Example() {
             )
           }
         >
-          Attach package.json
+          Attach File
         </button>
         <button
           type="button"
-
           onClick={() => {
-            const token = prompt.getValue().find((segment) => typeof segment !== "string")
-            if (typeof token === "object") prompt.updateToken(token.id!, { label: token.label.toUpperCase() })
+            const token = firstToken()
+            if (token) prompt.updateToken(token.id!, { label: token.value })
           }}
         >
-          Rename first
+          Show Path
         </button>
         <button
           type="button"
-
           onClick={() => {
-            const token = prompt.getValue().find((segment) => typeof segment !== "string")
-            if (typeof token === "object") prompt.removeToken(token.id!)
+            const token = firstToken()
+            if (token) prompt.removeToken(token.id!)
           }}
         >
-          Remove first
+          Remove First
         </button>
-        <button
-          type="button"
-
-          onClick={() => prompt.canUndo() && prompt.undo()}
-        >
+        <button type="button" onClick={() => prompt.undo()}>
           Undo
         </button>
-
-        <button
-          type="button"
-
-          onClick={() => prompt.clear()}
-        >
+        <button type="button" onClick={() => prompt.clear()}>
           Clear
         </button>
       </div>
+      <Field>
+        <FieldLabel>Prompt</FieldLabel>
+        <TokenInput controller={prompt} defaultValue={draft}>
+          <TokenInputEditor />
+        </TokenInput>
+      </Field>
     </div>
   )
 }
+
+export { Example }

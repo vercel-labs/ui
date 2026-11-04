@@ -18,18 +18,18 @@ const TextAlignEnd = icon('<path d="M21 5H3" /><path d="M21 12H9" /><path d="M21
 const TextAlignStart = icon('<path d="M21 5H3" /><path d="M15 12H3" /><path d="M17 19H3" />')
 
 const alignments = [
-  { value: "left", label: "Align left", icon: TextAlignStart },
-  { value: "center", label: "Align center", icon: TextAlignCenter },
-  { value: "right", label: "Align right", icon: TextAlignEnd },
+  { value: "start", label: "Align start", icon: TextAlignStart, mirror: true },
+  { value: "center", label: "Align center", icon: TextAlignCenter, mirror: false },
+  { value: "end", label: "Align end", icon: TextAlignEnd, mirror: true },
 ]
 
 function Example() {
   return (
-    <ToggleGroup defaultValue={["left"]} aria-label="Text alignment">
+    <ToggleGroup defaultValue={["start"]} deselectable={false} aria-label="Text alignment">
       <For each={alignments}>
         {(item) => (
           <Toggle value={item.value} aria-label={item.label}>
-            <ToggleIcon>
+            <ToggleIcon mirror={item.mirror}>
               <item.icon />
             </ToggleIcon>
           </Toggle>

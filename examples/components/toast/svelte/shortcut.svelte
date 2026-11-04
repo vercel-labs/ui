@@ -1,32 +1,21 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import {
-    Toast,
-    ToastClose,
-    ToastDescription,
-    ToastRegion,
-    ToastTitle,
-    createToaster,
-  } from "@ui-sdk/svelte/toast"
+  import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const toast = createToaster()
-
-  onDestroy(() => { toast.dismiss() })
+  const log = useLog()
+  const toast = createToaster({ duration: 10000 })
+  onDestroy(() => {
+    toast.dismiss()
+  })
 </script>
 
-<button
-  onclick={() => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } })}
->
-  Show toast
+<button onclick={() => toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })}>
+  Send Message
 </button>
 <ToastRegion toaster={toast} shortcut="alt+t" aria-label="Alerts">
-  {#snippet children(item)}
-    <Toast>
-      <div data-slot="stack">
-        <ToastTitle />
-        <ToastDescription />
-      </div>
-      <ToastClose />
-    </Toast>
-  {/snippet}
+  <Toast>
+    <ToastTitle />
+    <ToastAction data-variant="solid" />
+  </Toast>
 </ToastRegion>

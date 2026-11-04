@@ -1,46 +1,33 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import {
-    Toast,
-    ToastAction,
-    ToastClose,
-    ToastDescription,
-    ToastRegion,
-    ToastTitle,
-    createToaster,
-  } from "@ui-sdk/svelte/toast"
+  import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   const toast = createToaster()
-
-  let status = $state("")
-
-  function archive() {
-    toast("Message archived", {
-      action: { label: "Undo", onAction: () => (status = "Restored"), dismiss: true },
-      cancel: { label: "Dismiss", onCancel: () => (status = "Kept archived") },
-      onDismiss: ({ reason }) => reason === "timeout" && (status = "Timed out"),
-    })
-  }
-  onDestroy(() => { toast.dismiss() })
+  onDestroy(() => {
+    toast.dismiss()
+  })
 </script>
 
-<button onclick={archive}>
-  Archive message
+<button
+  onclick={() =>
+    toast("Message archived", {
+      action: { label: "Undo", onAction: () => log("Message restored") },
+      cancel: { label: "Dismiss", onCancel: () => log("Kept archived") },
+      onDismiss: ({ reason }) => log(`Closed (${reason})`),
+    })}
+>
+  Archive Message
 </button>
-<output data-slot="output">{status}</output>
 <ToastRegion toaster={toast}>
   {#snippet children(item)}
     <Toast>
-      <div data-slot="stack">
-        <ToastTitle />
-        <ToastDescription />
-      </div>
-      <ToastAction />
+      <ToastTitle />
       {#if item.cancel}
-        <ToastClose action={item.cancel.onCancel}>
-          {item.cancel.label}
-        </ToastClose>
+        <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>
       {/if}
+      <ToastAction data-variant="solid" />
     </Toast>
   {/snippet}
 </ToastRegion>

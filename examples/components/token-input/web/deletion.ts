@@ -1,6 +1,16 @@
-import type { TokenInputValue } from "@ui-sdk/core/token-input"
 import "@ui-sdk/web/token-input"
+import "@ui-sdk/web/select"
 import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
+import type { TokenDeletion, TokenInputValue } from "@ui-sdk/web/token-input"
+import { Check, ChevronDown, createElement, File } from "lucide"
+import { log } from "../../../shared/web/log"
+
+const modes = [
+  { value: "whole", label: "Whole" },
+  { value: "select", label: "Select" },
+  { value: "revert", label: "Revert" },
+]
 
 const files = [
   { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -16,37 +26,62 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div role="radiogroup" aria-label="Backspace" data-slot="row">
-        ${["whole", "select", "revert"]
-          .map(
-            (option) =>
-              `<label data-slot="label"><input type="radio" name="token-deletion" value="${option}" ${option === "whole" ? "checked" : ""} data-slot="visually-hidden" />${option}</label>`,
-          )
-          .join("")}
+      <div data-slot="controls">
+        <ui-select default-value="whole">
+          <ui-select-label>Backspace</ui-select-label>
+          <ui-select-trigger>
+            <button>
+              <ui-select-value></ui-select-value>
+              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-select-trigger>
+          <ui-select-content>
+            ${modes
+              .map(
+                (mode) => `
+                  <ui-select-item value="${mode.value}">
+                    ${mode.label}
+                    <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
+                  </ui-select-item>
+                `,
+              )
+              .join("")}
+          </ui-select-content>
+        </ui-select>
       </div>
+      <ui-field>
+        <ui-field-label>Prompt</ui-field-label>
+      </ui-field>
     </div>
   `
-  const input = document.createElement("ui-token-input")
-  input.setAttribute("token-deletion", "whole")
-  input.defaultValue = draft
-  input.innerHTML = `
-    <ui-token-input-editor aria-label="Prompt"></ui-token-input-editor>
-    <template><ui-token-input-token>@<span data-token-label></span></ui-token-input-token></template>
+  const prompt = document.createElement("ui-token-input")
+  prompt.tokenDeletion = "whole"
+  prompt.defaultValue = draft
+  prompt.innerHTML = `
+    <ui-token-input-editor></ui-token-input-editor>
+    <template>
+      <ui-token-input-token>
+        ${createElement(File, { "aria-hidden": "true" }).outerHTML}
+        <span data-token-label></span>
+      </ui-token-input-token>
+    </template>
     <ui-trigger-menu>
-      <template>
-        <ui-trigger-menu-content>
-          <ui-trigger-menu-item>
-          </ui-trigger-menu-item>
-        </ui-trigger-menu-content>
-      </template>
+      <ui-trigger-menu-content>
+        <ui-trigger-menu-list></ui-trigger-menu-list>
+      </ui-trigger-menu-content>
     </ui-trigger-menu>
   `
-  root.firstElementChild!.append(input)
-  const menu = input.querySelector("ui-trigger-menu")!
-  menu.triggers = [{ char: "@", type: "file", items: files }]
-  for (const radio of root.querySelectorAll<HTMLInputElement>('input[type="radio"]'))
-    radio.addEventListener("change", () => input.setAttribute("token-deletion", radio.value))
+  root.querySelector("ui-field")!.append(prompt)
+  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "@", type: "file", items: files }]
+  root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
+    if (event.detail.value) prompt.tokenDeletion = event.detail.value as TokenDeletion
+  })
+  prompt.addEventListener("valuechange", (event) => {
+    for (const token of event.detail.removed) log(root, `Removed ${token.label} (${prompt.tokenDeletion})`)
+  })
 }
+
+export { mount }

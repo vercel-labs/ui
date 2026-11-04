@@ -1,10 +1,22 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon, FileIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
-  type TokenDeletion,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue/select"
+import {
   TokenInput,
   TokenInputEditor,
   TokenInputToken,
+  type TokenDeletion,
   type TokenInputValue,
+  type TokenInputValueChangeDetails,
 } from "@ui-sdk/vue/token-input"
 import {
   type TriggerMenuDataItem,
@@ -14,6 +26,13 @@ import {
   TriggerMenuList,
 } from "@ui-sdk/vue/trigger-menu"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
+
+const modes = [
+  { value: "whole", label: "Whole" },
+  { value: "select", label: "Select" },
+  { value: "revert", label: "Revert" },
+]
 
 const files = [
   { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -29,44 +48,62 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
+const log = useLog()
 const deletion = ref<TokenDeletion>("whole")
-const options = ["whole", "select", "revert"] as const
+
+function onValueChange(value: TokenInputValue, details: TokenInputValueChangeDetails) {
+  for (const token of details.removed) log(`Removed ${token.label} (${deletion.value})`)
+}
 </script>
 
 <template>
   <div data-slot="stack">
-    <div role="radiogroup" aria-label="Backspace" data-slot="row">
-      <label v-for="option in options" :key="option" data-slot="label">
-        <input
-          v-model="deletion"
-          type="radio"
-          name="token-deletion"
-          :value="option"
-          data-slot="visually-hidden"
-        />
-        {{ option }}
-      </label>
+    <div data-slot="controls">
+      <Select
+        :items="modes"
+        :value="deletion"
+        @value-change="(next) => next && (deletion = next as TokenDeletion)"
+      >
+        <SelectLabel>Backspace</SelectLabel>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon aria-hidden="true" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="mode in modes" :key="mode.value" :value="mode.value">
+            {{ mode.label }}
+            <SelectItemIndicator>
+              <CheckIcon aria-hidden="true" />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
     </div>
-    <TokenInput :token-deletion="deletion" :default-value="draft">
-      <TokenInputEditor aria-label="Prompt" />
-      <TriggerMenu :triggers="[{ char: '@', type: 'file', items: files }]">
-        <TriggerMenuContent>
-          <TriggerMenuList v-slot="{ state }">
-            <TriggerMenuItem
-              v-for="item in state.items as TriggerMenuDataItem[]"
-              :key="item.value"
-              :value="item.value"
-              :label="item.label"
-              :disabled="item.disabled"
-            >
-              {{ item.label }}
-            </TriggerMenuItem>
-          </TriggerMenuList>
-        </TriggerMenuContent>
-      </TriggerMenu>
-      <template #token="{ token }">
-        <TokenInputToken>@{{ token.label }}</TokenInputToken>
-      </template>
-    </TokenInput>
+    <Field>
+      <FieldLabel>Prompt</FieldLabel>
+      <TokenInput :token-deletion="deletion" :default-value="draft" @value-change="onValueChange">
+        <TokenInputEditor />
+        <TriggerMenu :triggers="[{ char: '@', type: 'file', items: files }]">
+          <TriggerMenuContent>
+            <TriggerMenuList v-slot="{ state }">
+              <TriggerMenuItem
+                v-for="item in state.items as TriggerMenuDataItem[]"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"
+              >
+                {{ item.label }}
+              </TriggerMenuItem>
+            </TriggerMenuList>
+          </TriggerMenuContent>
+        </TriggerMenu>
+        <template #token="{ token }">
+          <TokenInputToken>
+            <FileIcon aria-hidden="true" />
+            {{ token.label }}
+          </TokenInputToken>
+        </template>
+      </TokenInput>
+    </Field>
   </div>
 </template>

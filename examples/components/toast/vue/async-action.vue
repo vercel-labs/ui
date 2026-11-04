@@ -1,27 +1,50 @@
 <script setup lang="ts">
+import {
+  Toast,
+  ToastAction,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
-import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
+import { useLog } from "../../../shared/vue/log"
 
-const toast = createToaster({ duration: 4000 })
-
-const restore = () => new Promise((resolve) => setTimeout(resolve, 1500))
+const log = useLog()
+const toast = createToaster({ duration: 6000 })
 onUnmounted(() => {
   toast.dismiss()
 })
+
+function restore() {
+  return new Promise((resolve) => setTimeout(resolve, 1500))
+}
+
+function deleteFile() {
+  toast("File deleted", {
+    description: "Q3 report.pdf",
+    action: {
+      label: "Undo",
+      onAction: async () => {
+        await restore()
+        log("Q3 report.pdf restored")
+      },
+    },
+  })
+}
 </script>
 
 <template>
-  <button @click="toast('File deleted', { action: { label: 'Undo', onAction: restore } })">
-    Delete file
-  </button>
+  <button @click="deleteFile">Delete File</button>
   <ToastRegion :toaster="toast">
-    <template #default>
-      <Toast>
+    <Toast>
+      <div data-slot="stack">
         <ToastTitle />
-        <ToastAction v-slot="{ state }">
-          {{ state.pending ? "Restoring…" : state.error ? "Try again" : "Undo" }}
-        </ToastAction>
-      </Toast>
-    </template>
+        <ToastDescription />
+      </div>
+      <ToastAction v-slot="{ state }" data-variant="solid">
+        {{ state.pending ? "Restoring…" : state.error ? "Retry" : "Undo" }}
+      </ToastAction>
+    </Toast>
   </ToastRegion>
 </template>

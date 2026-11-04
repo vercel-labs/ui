@@ -1,30 +1,32 @@
 import "@ui-sdk/web/tooltip"
+import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <input placeholder="Post title" aria-label="Post title" />
-      <div data-slot="row">
-        <ui-tooltip>
-          <ui-tooltip-trigger><button aria-disabled="true">Publish</button></ui-tooltip-trigger>
-          <ui-tooltip-content>Add a title to publish</ui-tooltip-content>
-        </ui-tooltip>
-        <output data-slot="output">Draft</output>
-      </div>
+      <ui-field>
+        <ui-field-label>Post title</ui-field-label>
+        <input />
+      </ui-field>
+      <ui-tooltip>
+        <ui-tooltip-trigger><button data-variant="solid" aria-disabled="true">Publish</button></ui-tooltip-trigger>
+        <ui-tooltip-content side="right">Add a title to publish</ui-tooltip-content>
+      </ui-tooltip>
     </div>
   `
   const input = root.querySelector("input")!
-  const button = root.querySelector("button")!
   const tooltip = root.querySelector("ui-tooltip")!
+  const publish = root.querySelector("button")!
+  const title = () => input.value.trim()
   input.addEventListener("input", () => {
-    const blocked = !input.value.trim()
-    if (blocked) button.setAttribute("aria-disabled", "true")
-    else button.removeAttribute("aria-disabled")
-    tooltip.toggleAttribute("disabled", !blocked)
+    const blocked = !title()
+    if (blocked) publish.setAttribute("aria-disabled", "true")
+    else publish.removeAttribute("aria-disabled")
+    tooltip.disabled = !blocked
   })
-  button.addEventListener("click", () => {
-    if (button.getAttribute("aria-disabled") === "true") return
-    root.querySelector("output")!.textContent = `Published “${input.value.trim()}”`
+  publish.addEventListener("click", () => {
+    if (title()) log(root, `Published “${title()}”`)
   })
 }
 

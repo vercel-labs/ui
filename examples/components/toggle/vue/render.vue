@@ -4,7 +4,7 @@ import { Toggle, ToggleIcon } from "@ui-sdk/vue/toggle"
 </script>
 
 <template>
-  <Toggle aria-label="Favorite" default-pressed>
+  <Toggle aria-label="Favorite">
     <template #render="{ props, state }">
       <button v-bind="props">
         <ToggleIcon>

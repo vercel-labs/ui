@@ -2,15 +2,15 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 
 const sides = [
-  { side: "left", label: "Left" },
   { side: "top", label: "Top" },
-  { side: "bottom", label: "Bottom" },
+  { side: "left", label: "Left" },
   { side: "right", label: "Right" },
+  { side: "bottom", label: "Bottom" },
 ] as const
 </script>
 
 <template>
-  <div data-slot="row">
+  <div data-slot="grid">
     <Tooltip v-for="{ side, label } in sides" :key="side">
       <TooltipTrigger>{{ label }}</TooltipTrigger>
       <TooltipContent :side="side">Add to library</TooltipContent>

@@ -1,33 +1,49 @@
 <script lang="ts">
-  import { BoldIcon, CodeIcon, ItalicIcon, StrikethroughIcon } from "@lucide/svelte"
-  import { Toggle, ToggleGroup } from "@ui-sdk/svelte/toggle"
-  import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, ListIcon, ListOrderedIcon } from "@lucide/svelte"
+  import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/svelte/toggle"
+  import { Toolbar, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const formats = [
-    { value: "bold", label: "Bold", icon: BoldIcon },
-    { value: "italic", label: "Italic", icon: ItalicIcon },
-    { value: "strikethrough", label: "Strikethrough", icon: StrikethroughIcon },
+  const alignments = [
+    { value: "left", label: "Align left", icon: AlignLeftIcon },
+    { value: "center", label: "Align center", icon: AlignCenterIcon },
+    { value: "right", label: "Align right", icon: AlignRightIcon },
   ]
 
-  let style = $state<string[]>(["bold"])
+  const lists = [
+    { value: "bulleted", label: "Bulleted list", icon: ListIcon },
+    { value: "numbered", label: "Numbered list", icon: ListOrderedIcon },
+  ]
+
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <Toolbar aria-label="Text">
-    <ToggleGroup bind:value={style} multiple aria-label="Text style">
-      {#each formats as format (format.value)}
-        <Toggle data-variant="ghost" value={format.value} aria-label={format.label}>
-          <format.icon />
-        </Toggle>
-      {/each}
-    </ToggleGroup>
-    <ToolbarSeparator />
-    <Toggle data-variant="ghost" aria-label="Code">
-      <CodeIcon />
-    </Toggle>
-    <ToolbarButton data-variant="secondary" onclick={() => (style = [])}>
-      Clear
-    </ToolbarButton>
-  </Toolbar>
-  <output data-slot="output">Style: {style.join(", ") || "none"}</output>
-</div>
+<Toolbar aria-label="Paragraph">
+  <ToggleGroup
+    defaultValue={["left"]}
+    deselectable={false}
+    aria-label="Alignment"
+    onValueChange={([value]) => log(`Align ${value}`)}
+  >
+    {#each alignments as { value, label, icon: Icon } (value)}
+      <Toggle {value} aria-label={label}>
+        <ToggleIcon>
+          <Icon />
+        </ToggleIcon>
+      </Toggle>
+    {/each}
+  </ToggleGroup>
+  <ToolbarSeparator />
+  <ToggleGroup
+    aria-label="List"
+    onValueChange={([value]) => log(lists.find((list) => list.value === value)?.label ?? "No list")}
+  >
+    {#each lists as { value, label, icon: Icon } (value)}
+      <Toggle {value} aria-label={label}>
+        <ToggleIcon>
+          <Icon />
+        </ToggleIcon>
+      </Toggle>
+    {/each}
+  </ToggleGroup>
+</Toolbar>

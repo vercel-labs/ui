@@ -1,24 +1,28 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let title = $state("")
-  let status = $state("Draft")
   const blocked = $derived(!title.trim())
-
-  function publish() {
-    if (!blocked) {
-      status = `Published “${title.trim()}”`
-    }
-  }
 </script>
 
 <div data-slot="stack">
-  <input bind:value={title} placeholder="Post title" aria-label="Post title" />
-  <div data-slot="row">
-    <Tooltip disabled={!blocked}>
-      <TooltipTrigger aria-disabled={blocked || undefined} onclick={publish}>Publish</TooltipTrigger>
-      <TooltipContent>Add a title to publish</TooltipContent>
-    </Tooltip>
-    <output data-slot="output">{status}</output>
-  </div>
+  <Field>
+    <FieldLabel>Post title</FieldLabel>
+    <FieldControl value={title} oninput={(event) => (title = event.currentTarget.value)} />
+  </Field>
+  <Tooltip disabled={!blocked}>
+    <TooltipTrigger
+      data-variant="solid"
+      aria-disabled={blocked || undefined}
+      onclick={() => {
+        if (!blocked) log(`Published “${title.trim()}”`)
+      }}
+    >
+      Publish
+    </TooltipTrigger>
+    <TooltipContent side="right">Add a title to publish</TooltipContent>
+  </Tooltip>
 </div>

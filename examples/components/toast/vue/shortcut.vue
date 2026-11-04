@@ -1,31 +1,25 @@
 <script setup lang="ts">
+import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/vue/toast"
+import { useLog } from "../../../shared/vue/log"
 
-const toast = createToaster()
+const log = useLog()
+const toast = createToaster({ duration: 10000 })
 onUnmounted(() => {
   toast.dismiss()
 })
+
+function sendMessage() {
+  toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })
+}
 </script>
 
 <template>
-  <button @click="toast('Press Alt+T to reach this toast', { action: { label: 'Open' } })">Show toast</button>
+  <button @click="sendMessage">Send Message</button>
   <ToastRegion :toaster="toast" shortcut="alt+t" aria-label="Alerts">
-    <template #default="{ toast: item }">
-      <Toast>
-        <div data-slot="stack">
-          <ToastTitle />
-          <ToastDescription />
-        </div>
-        <ToastClose />
-      </Toast>
-    </template>
+    <Toast>
+      <ToastTitle />
+      <ToastAction data-variant="solid" />
+    </Toast>
   </ToastRegion>
 </template>

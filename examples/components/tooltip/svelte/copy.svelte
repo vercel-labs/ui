@@ -2,13 +2,8 @@
   import { CheckIcon, CopyIcon } from "@lucide/svelte"
   import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
 
-  const command = "pnpm add @ui-sdk/svelte"
+  const command = "npm install @ui-sdk/svelte"
   let copied = $state(false)
-
-  function copy() {
-    navigator.clipboard?.writeText(command).catch(() => {})
-    copied = true
-  }
 </script>
 
 <div data-slot="row">
@@ -19,11 +14,17 @@
       if (!open) copied = false
     }}
   >
-    <TooltipTrigger onclick={copy}>
+    <TooltipTrigger
+      aria-label={copied ? "Copied" : "Copy"}
+      onclick={() => {
+        navigator.clipboard?.writeText(command).catch(() => {})
+        copied = true
+      }}
+    >
       {#if copied}
-        <CheckIcon />
+        <CheckIcon aria-hidden="true" />
       {:else}
-        <CopyIcon />
+        <CopyIcon aria-hidden="true" />
       {/if}
     </TooltipTrigger>
     <TooltipContent>{copied ? "Copied" : "Copy"}</TooltipContent>

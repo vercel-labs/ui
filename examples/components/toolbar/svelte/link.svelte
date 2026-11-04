@@ -1,34 +1,27 @@
 <script lang="ts">
-  import { CheckIcon, ExternalLinkIcon, FileIcon, MessageCircleIcon } from "@lucide/svelte"
+  import { CheckIcon, MessageSquareIcon } from "@lucide/svelte"
   import { Toolbar, ToolbarButton, ToolbarLink, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let page = $state("conversation")
+  const log = useLog()
 
-  function follow(event: MouseEvent) {
+  function follow(event: MouseEvent & { currentTarget: HTMLAnchorElement }) {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
       return
     }
     event.preventDefault()
-    page = (event.currentTarget as HTMLAnchorElement).hash.slice(1)
+    log(`Opened ${event.currentTarget.textContent}`)
   }
 </script>
 
-<div data-slot="stack">
-  <Toolbar aria-label="Pull request">
-    <ToolbarButton data-variant="secondary" aria-label="Approve">
-      <CheckIcon />
-    </ToolbarButton>
-    <ToolbarButton data-variant="secondary" aria-label="Comment">
-      <MessageCircleIcon />
-    </ToolbarButton>
-    <ToolbarSeparator />
-    <ToolbarLink href="#files" onclick={follow}>
-      <FileIcon />
-      Files changed
-    </ToolbarLink>
-    <ToolbarLink aria-label="Checks" href="#checks" onclick={follow}>
-      <ExternalLinkIcon />
-    </ToolbarLink>
-  </Toolbar>
-  <p data-slot="hint">Showing: {page}</p>
-</div>
+<Toolbar aria-label="Pull request">
+  <ToolbarButton aria-label="Approve" onclick={() => log("Approved")}>
+    <CheckIcon aria-hidden="true" />
+  </ToolbarButton>
+  <ToolbarButton aria-label="Comment" onclick={() => log("Comment")}>
+    <MessageSquareIcon aria-hidden="true" />
+  </ToolbarButton>
+  <ToolbarSeparator />
+  <ToolbarLink href="#files" onclick={follow}>Files Changed</ToolbarLink>
+  <ToolbarLink href="#checks" onclick={follow}>Checks</ToolbarLink>
+</Toolbar>

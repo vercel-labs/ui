@@ -1,22 +1,23 @@
 import "@ui-sdk/web/tooltip"
 
 const sides = [
-  { side: "left", label: "Left" },
   { side: "top", label: "Top" },
-  { side: "bottom", label: "Bottom" },
+  { side: "left", label: "Left" },
   { side: "right", label: "Right" },
+  { side: "bottom", label: "Bottom" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="row">
+    <div data-slot="grid">
       ${sides
         .map(
           ({ side, label }) => `
-        <ui-tooltip>
-          <ui-tooltip-trigger><button>${label}</button></ui-tooltip-trigger>
-          <ui-tooltip-content side="${side}">Add to library</ui-tooltip-content>
-        </ui-tooltip>`,
+            <ui-tooltip>
+              <ui-tooltip-trigger><button>${label}</button></ui-tooltip-trigger>
+              <ui-tooltip-content side="${side}">Add to library</ui-tooltip-content>
+            </ui-tooltip>
+          `,
         )
         .join("")}
     </div>

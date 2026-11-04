@@ -1,27 +1,32 @@
 <script setup lang="ts">
-import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
+import { CheckIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const tooltip = createTooltipController()
+const log = useLog()
 const open = ref(false)
-const reason = ref("")
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
-      <Tooltip
-        v-model:open="open"
-        :controller="tooltip"
-        @open-change="(_, details) => (reason = details.reason)"
-      >
-        <TooltipTrigger>Export</TooltipTrigger>
-        <TooltipContent>Download a CSV of this table</TooltipContent>
-      </Tooltip>
-      <button type="button" @click="tooltip.open()">Show from elsewhere</button>
+    <div data-slot="controls">
+      <label data-slot="label">
+        <Checkbox v-model:checked="open">
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
+        Open
+      </label>
     </div>
-    <output data-slot="output"
-      >{{ open ? "Open" : "Closed" }}{{ reason && `, last change: ${reason}` }}</output
+    <Tooltip
+      v-model:open="open"
+      @open-change="(next, details) => log(`${next ? 'Opened' : 'Closed'} (${details.reason})`)"
     >
+      <TooltipTrigger>Export</TooltipTrigger>
+      <TooltipContent>Download as CSV</TooltipContent>
+    </Tooltip>
   </div>
 </template>

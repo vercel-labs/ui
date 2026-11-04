@@ -1,5 +1,8 @@
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/solid/token-input"
 import { createSignal, createUniqueId } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const draft: TokenInputValue = [
   "Explain ",
@@ -7,59 +10,75 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
-export function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+function Example() {
+  const log = useLog()
   const [disabled, setDisabled] = createSignal(false)
   const [readOnly, setReadOnly] = createSignal(false)
   const formId = createUniqueId()
+
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <label data-slot="label">
-          <input
-            type="checkbox"
-            checked={disabled()}
-            onChange={(event) => setDisabled(event.currentTarget.checked)}
-          />
+          <Checkbox checked={disabled()} onCheckedChange={(next) => setDisabled(next === true)}>
+            <CheckboxIndicator>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </CheckboxIndicator>
+          </Checkbox>
           Disabled
         </label>
         <label data-slot="label">
-          <input
-            type="checkbox"
-            checked={readOnly()}
-            onChange={(event) => setReadOnly(event.currentTarget.checked)}
-          />
+          <Checkbox checked={readOnly()} onCheckedChange={(next) => setReadOnly(next === true)}>
+            <CheckboxIndicator>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </CheckboxIndicator>
+          </Checkbox>
           Read-only
         </label>
       </div>
-      <TokenInput
-        form={formId}
-        name="prompt"
-        required
-        defaultValue={draft}
-        disabled={disabled()}
-        readOnly={readOnly()}
-      >
-        <label id={`${formId}-label`} data-slot="label">
-          Prompt
-        </label>
-        <TokenInputEditor aria-labelledby={`${formId}-label`} />
-      </TokenInput>
-      <form
-        onReset={() => setSubmitted("")}
-        id={formId}
-        data-slot="stack"
-        onSubmit={(event) => {
-          event.preventDefault()
-          setSubmitted(String(new FormData(event.currentTarget).get("prompt") ?? ""))
-        }}
-      >
-        <div data-slot="row">
-          <button type="submit">Submit</button>
+      <div data-slot="stack">
+        <Field disabled={disabled()}>
+          <FieldLabel>Prompt</FieldLabel>
+          <TokenInput form={formId} name="prompt" required defaultValue={draft} readOnly={readOnly()}>
+            <TokenInputEditor />
+          </TokenInput>
+        </Field>
+        <form
+          id={formId}
+          data-slot="row"
+          onSubmit={(event) => {
+            event.preventDefault()
+            log(`Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`)
+          }}
+        >
+          <button type="submit" data-variant="solid">
+            Submit
+          </button>
           <button type="reset">Reset</button>
-        </div>
-        <p data-slot="output">{submitted()}</p>
-      </form>
+        </form>
+      </div>
     </div>
   )
 }
+
+export { Example }

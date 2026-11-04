@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckIcon, ChevronsUpDownIcon, MonitorIcon, ZoomInIcon, ZoomOutIcon } from "@lucide/vue"
+import { CheckIcon, ChevronsUpDownIcon, ZoomInIcon, ZoomOutIcon } from "@lucide/vue"
 import {
   Select,
   SelectContent,
@@ -8,31 +8,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
+import { Toolbar, ToolbarButton } from "@ui-sdk/vue/toolbar"
 import { computed, ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const zooms = ["50%", "75%", "100%", "150%", "200%"]
 
+const log = useLog()
 const zoom = ref("100%")
 const index = computed(() => zooms.indexOf(zoom.value))
+
+function change(value: string) {
+  zoom.value = value
+  log(`Zoom ${value}`)
+}
 </script>
 
 <template>
   <Toolbar aria-label="View">
-    <ToolbarButton
-      data-variant="secondary"
-      aria-label="Zoom out"
-      :disabled="index === 0"
-      @click="zoom = zooms[index - 1]"
-    >
-      <ZoomOutIcon />
+    <ToolbarButton aria-label="Zoom out" :disabled="index === 0" @click="change(zooms[index - 1])">
+      <ZoomOutIcon aria-hidden="true" />
     </ToolbarButton>
-    <Select :value="zoom" @value-change="(value: unknown) => typeof value === 'string' && (zoom = value)">
-      <ToolbarButton data-variant="secondary" aria-label="Zoom">
+    <Select :value="zoom" @value-change="(value) => value && change(value)">
+      <ToolbarButton aria-label="Zoom">
         <template #render="{ props }">
           <SelectTrigger v-bind="props">
             <SelectValue />
-            <ChevronsUpDownIcon />
+            <ChevronsUpDownIcon aria-hidden="true" />
           </SelectTrigger>
         </template>
       </ToolbarButton>
@@ -40,22 +42,17 @@ const index = computed(() => zooms.indexOf(zoom.value))
         <SelectItem v-for="zoom in zooms" :key="zoom" :value="zoom">
           {{ zoom }}
           <SelectItemIndicator>
-            <CheckIcon />
+            <CheckIcon aria-hidden="true" />
           </SelectItemIndicator>
         </SelectItem>
       </SelectContent>
     </Select>
     <ToolbarButton
-      data-variant="secondary"
       aria-label="Zoom in"
       :disabled="index === zooms.length - 1"
-      @click="zoom = zooms[index + 1]"
+      @click="change(zooms[index + 1])"
     >
-      <ZoomInIcon />
-    </ToolbarButton>
-    <ToolbarSeparator />
-    <ToolbarButton data-variant="secondary" aria-label="Fit to screen" @click="zoom = '100%'">
-      <MonitorIcon />
+      <ZoomInIcon aria-hidden="true" />
     </ToolbarButton>
   </Toolbar>
 </template>

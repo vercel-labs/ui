@@ -1,7 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { createSignal } from "solid-js"
 
-const command = "pnpm add @ui-sdk/react"
+const command = "npm install @ui-sdk/solid"
 
 function Example() {
   const [copied, setCopied] = createSignal(false)
@@ -11,6 +11,7 @@ function Example() {
       <code>{command}</code>
       <Tooltip closeOnPress={false} onOpenChangeComplete={(open) => !open && setCopied(false)}>
         <TooltipTrigger
+          aria-label={copied() ? "Copied" : "Copy"}
           onClick={() => {
             navigator.clipboard?.writeText(command).catch(() => {})
             setCopied(true)

@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
-  type Token,
+  toText,
   TokenInput,
   TokenInputEditor,
+  type Token,
   type TokenInputValue,
   type TokenInputValueChangeDetails,
-  toText,
 } from "@ui-sdk/vue/token-input"
 import {
   type TriggerMenuDataItem,
@@ -15,6 +16,7 @@ import {
   TriggerMenuList,
 } from "@ui-sdk/vue/trigger-menu"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const files = [
   { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -30,24 +32,25 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
+const log = useLog()
 const value = ref<TokenInputValue>(draft)
-const last = ref("")
 
-function onChange(next: TokenInputValue, details: TokenInputValueChangeDetails) {
+function onValueChange(next: TokenInputValue, details: TokenInputValueChangeDetails) {
   const removed = details.removed.map((token) => token.label).join(", ")
-  last.value = `${details.reason}${details.inputType ? ` (${details.inputType})` : ""}${removed ? `, removed ${removed}` : ""}`
+  log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
 }
 </script>
 
 <template>
-  <div data-slot="stack">
+  <Field>
+    <FieldLabel>Prompt</FieldLabel>
     <TokenInput
       v-model:value="value"
       :history="{ limit: 50, groupDelay: 1000 }"
       :get-token-description="(token: Token) => (token.type === 'file' ? 'attached file' : token.type)"
-      @value-change="onChange"
+      @value-change="onValueChange"
     >
-      <TokenInputEditor aria-label="Prompt" />
+      <TokenInputEditor />
       <TriggerMenu :triggers="[{ char: '@', type: 'file', items: files }]">
         <TriggerMenuContent>
           <TriggerMenuList v-slot="{ state }">
@@ -56,7 +59,6 @@ function onChange(next: TokenInputValue, details: TokenInputValueChangeDetails) 
               :key="item.value"
               :value="item.value"
               :label="item.label"
-              :disabled="item.disabled"
             >
               {{ item.label }}
             </TriggerMenuItem>
@@ -64,9 +66,5 @@ function onChange(next: TokenInputValue, details: TokenInputValueChangeDetails) 
         </TriggerMenuContent>
       </TriggerMenu>
     </TokenInput>
-    <p data-slot="output">
-      {{ last || "Type, paste or press Cmd+Z." }}
-    </p>
-    <p data-slot="output">{{ toText(value) }}</p>
-  </div>
+  </Field>
 </template>

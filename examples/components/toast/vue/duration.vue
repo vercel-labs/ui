@@ -1,42 +1,32 @@
 <script setup lang="ts">
+import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/vue/toast"
 
-const toast = createToaster({ duration: 3000 })
-
-function untilDismissed() {
-  toast("Your session expires soon", {
-    duration: Infinity,
-    dismissible: false,
-    cancel: { label: "Got it" },
-  })
-}
+const toast = createToaster()
 onUnmounted(() => {
   toast.dismiss()
 })
+
+function untilDismissed() {
+  toast("Your session expires in 5 minutes", {
+    duration: Infinity,
+    dismissible: false,
+    cancel: { label: "Got It" },
+  })
+}
 </script>
 
 <template>
   <div data-slot="row">
-    <button @click="toast('Copied', { duration: 1000 })">1 second</button>
-    <button @click="toast('Saved')">3 seconds</button>
-    <button @click="untilDismissed">Until dismissed</button>
+    <button @click="toast('Link copied', { duration: 1000 })">1 Second</button>
+    <button @click="toast('Changes saved')">5 Seconds</button>
+    <button @click="untilDismissed">Until Dismissed</button>
   </div>
   <ToastRegion :toaster="toast">
     <template #default="{ toast: item }">
       <Toast>
-        <div data-slot="stack">
-          <ToastTitle />
-          <ToastDescription />
-        </div>
-        <ToastClose v-if="item.cancel" :action="item.cancel.onCancel">
+        <ToastTitle />
+        <ToastClose v-if="item.cancel" data-variant="solid" :action="item.cancel.onCancel">
           {{ item.cancel.label }}
         </ToastClose>
       </Toast>

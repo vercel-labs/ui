@@ -1,46 +1,33 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import {
-    Toast,
-    ToastClose,
-    ToastDescription,
-    ToastRegion,
-    ToastTitle,
-    createToaster,
-  } from "@ui-sdk/svelte/toast"
+  import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
 
-  const toast = createToaster({ duration: 3000 })
-
-  function untilDismissed() {
-    toast("Your session expires soon", {
-      duration: Infinity,
-      dismissible: false,
-      cancel: { label: "Got it" },
-    })
-  }
-  onDestroy(() => { toast.dismiss() })
+  const toast = createToaster()
+  onDestroy(() => {
+    toast.dismiss()
+  })
 </script>
 
 <div data-slot="row">
-  <button onclick={() => toast("Copied", { duration: 1000 })}>
-    1 second
-  </button>
-  <button onclick={() => toast("Saved")}>
-    3 seconds
-  </button>
-  <button onclick={untilDismissed}>
-    Until dismissed
+  <button onclick={() => toast("Link copied", { duration: 1000 })}>1 Second</button>
+  <button onclick={() => toast("Changes saved")}>5 Seconds</button>
+  <button
+    onclick={() =>
+      toast("Your session expires in 5 minutes", {
+        duration: Infinity,
+        dismissible: false,
+        cancel: { label: "Got It" },
+      })}
+  >
+    Until Dismissed
   </button>
 </div>
 <ToastRegion toaster={toast}>
   {#snippet children(item)}
     <Toast>
-      <div data-slot="stack">
-        <ToastTitle />
-        <ToastDescription />
-      </div>
+      <ToastTitle />
       {#if item.cancel}
-        <ToastClose action={item.cancel.onCancel}>
+        <ToastClose data-variant="solid" action={item.cancel.onCancel}>
           {item.cancel.label}
         </ToastClose>
       {/if}

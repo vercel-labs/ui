@@ -1,30 +1,29 @@
 import "@ui-sdk/web/toast"
 import { createToaster } from "@ui-sdk/web"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
-  const toast = createToaster()
-
+function mount(root: HTMLElement) {
+  const toast = createToaster({ duration: 10000 })
   root.innerHTML = `
-    <button>Show toast</button>
+    <button>Send Message</button>
     <ui-toast-region shortcut="alt+t" aria-label="Alerts">
       <template>
         <ui-toast>
-          <div data-slot="stack">
-            <ui-toast-title></ui-toast-title>
-            <ui-toast-description></ui-toast-description>
-          </div>
-          <ui-toast-close><button></button></ui-toast-close>
+          <ui-toast-title></ui-toast-title>
+          <ui-toast-action><button data-variant="solid"></button></ui-toast-action>
         </ui-toast>
       </template>
     </ui-toast-region>
   `
-  Object.assign(root.querySelector("ui-toast-region")!, {
-    toaster: toast,
-  })
+  root.querySelector("ui-toast-region")!.toaster = toast
   root
     .querySelector("button")!
-    .addEventListener("click", () => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } }))
+    .addEventListener("click", () =>
+      toast("Message sent", { action: { label: "Undo", onAction: () => log(root, "Message unsent") } }),
+    )
   return () => {
     toast.dismiss()
   }
 }
+
+export { mount }

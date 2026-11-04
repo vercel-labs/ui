@@ -1,42 +1,44 @@
 import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { For } from "solid-js"
 
-const days = [
-  { date: "Mon, Oct 5", count: 0 },
-  { date: "Tue, Oct 6", count: 3 },
-  { date: "Wed, Oct 7", count: 7 },
-  { date: "Thu, Oct 8", count: 1 },
-  { date: "Fri, Oct 9", count: 12 },
-  { date: "Sat, Oct 10", count: 0 },
-  { date: "Sun, Oct 11", count: 2 },
-  { date: "Mon, Oct 12", count: 5 },
-  { date: "Tue, Oct 13", count: 9 },
-  { date: "Wed, Oct 14", count: 4 },
-  { date: "Thu, Oct 15", count: 0 },
-  { date: "Fri, Oct 16", count: 6 },
-  { date: "Sat, Oct 17", count: 1 },
-  { date: "Sun, Oct 18", count: 0 },
-].map((day) => ({ ...day, level: day.count === 0 ? 0 : day.count < 3 ? 1 : day.count < 7 ? 2 : 3 }))
+const icon = (markup: string) => () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    innerHTML={markup}
+  />
+)
+const Bold = icon('<path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8" />')
+const Italic = icon(
+  '<line x1="19" x2="10" y1="4" y2="4" /><line x1="14" x2="5" y1="20" y2="20" /><line x1="15" x2="9" y1="4" y2="20" />',
+)
+const Underline = icon('<path d="M6 4v6a6 6 0 0 0 12 0V4" /><line x1="4" x2="20" y1="20" y2="20" />')
 
-type Day = (typeof days)[number]
-
-const contributions = (day: Day | undefined) =>
-  !day ? "" : day.count === 0 ? "No contributions" : `${day.count} contribution${day.count === 1 ? "" : "s"}`
+const formats = [
+  { icon: Bold, label: "Bold" },
+  { icon: Italic, label: "Italic" },
+  { icon: Underline, label: "Underline" },
+]
 
 function Example() {
-  const tooltip = createTooltipController<Day>()
+  const tooltip = createTooltipController<string>()
+
   return (
-    <div data-slot="stack">
-      <div data-slot="grid">
-        <For each={days}>
-          {(day) => (
-            <TooltipTrigger controller={tooltip} payload={day} aria-label={day.date} data-level={day.level} />
-          )}
-        </For>
-      </div>
-      <p data-slot="hint">Two weeks of contributions</p>
-      <Tooltip controller={tooltip} delay={300}>
-        <TooltipContent<Day>>{(state) => contributions(state.payload)}</TooltipContent>
+    <div data-slot="row" role="group" aria-label="Formatting">
+      <For each={formats}>
+        {(format) => (
+          <TooltipTrigger controller={tooltip} payload={format.label} aria-label={format.label}>
+            <format.icon />
+          </TooltipTrigger>
+        )}
+      </For>
+      <Tooltip controller={tooltip}>
+        <TooltipContent<string>>{(state) => state.payload}</TooltipContent>
       </Tooltip>
     </div>
   )

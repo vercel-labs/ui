@@ -1,41 +1,83 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
+  import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectItemIndicator,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
   import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
 
+  const sides = [
+    { value: "top", label: "Top" },
+    { value: "bottom", label: "Bottom" },
+  ]
+  const aligns = [
+    { value: "start", label: "Start" },
+    { value: "center", label: "Center" },
+    { value: "end", label: "End" },
+  ]
+  type Side = "top" | "bottom"
+  type Align = "start" | "center" | "end"
+
   const toast = createToaster()
-
-  const placements = [
-    { side: "top", align: "start", label: "Top Left" },
-    { side: "top", align: "center", label: "Top Center" },
-    { side: "top", align: "end", label: "Top Right" },
-    { side: "bottom", align: "start", label: "Bottom Left" },
-    { side: "bottom", align: "center", label: "Bottom Center" },
-    { side: "bottom", align: "end", label: "Bottom Right" },
-  ] as const
-
-  let placement = $state<(typeof placements)[number]>(placements[5])
-
-  function place(item: (typeof placements)[number]) {
-    placement = item
-    toast("Event has been created", { description: item.label })
-  }
-  onDestroy(() => { toast.dismiss() })
+  let side = $state<Side>("bottom")
+  let align = $state<Align>("end")
+  onDestroy(() => {
+    toast.dismiss()
+  })
 </script>
 
-<div data-slot="row">
-  {#each placements as item (item.label)}
-    <button onclick={() => place(item)}>
-      {item.label}
-    </button>
-  {/each}
-</div>
-<ToastRegion toaster={toast} side={placement.side} align={placement.align}>
-  {#snippet children(item)}
+<div data-slot="stack">
+  <div data-slot="controls">
+    <Select items={sides} value={side} onValueChange={(next) => next && (side = next as Side)}>
+      <SelectLabel>Side</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon aria-hidden="true" />
+      </SelectTrigger>
+      <SelectContent>
+        {#each sides as option (option.value)}
+          <SelectItem value={option.value}>
+            {option.label}
+            <SelectItemIndicator>
+              <CheckIcon aria-hidden="true" />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
+    <Select items={aligns} value={align} onValueChange={(next) => next && (align = next as Align)}>
+      <SelectLabel>Align</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon aria-hidden="true" />
+      </SelectTrigger>
+      <SelectContent>
+        {#each aligns as option (option.value)}
+          <SelectItem value={option.value}>
+            {option.label}
+            <SelectItemIndicator>
+              <CheckIcon aria-hidden="true" />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
+  </div>
+  <button onclick={() => toast("Event created", { description: "Friday, June 12 at 10:00 AM" })}>
+    Create Event
+  </button>
+  <ToastRegion toaster={toast} {side} {align}>
     <Toast>
       <div data-slot="stack">
         <ToastTitle />
         <ToastDescription />
       </div>
     </Toast>
-  {/snippet}
-</ToastRegion>
+  </ToastRegion>
+</div>

@@ -2,15 +2,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { For } from "solid-js"
 
 const sides = [
-  { side: "left", label: "Left" },
   { side: "top", label: "Top" },
-  { side: "bottom", label: "Bottom" },
+  { side: "left", label: "Left" },
   { side: "right", label: "Right" },
+  { side: "bottom", label: "Bottom" },
 ] as const
 
 function Example() {
   return (
-    <div data-slot="row">
+    <div data-slot="grid">
       <For each={sides}>
         {({ side, label }) => (
           <Tooltip>

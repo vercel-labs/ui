@@ -1,45 +1,39 @@
 <script setup lang="ts">
-import { SaveIcon, Share2Icon } from "@lucide/vue"
+import { SaveIcon } from "@lucide/vue"
 import { registerShortcut } from "@ui-sdk/core/shortcuts"
 import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/vue/tooltip"
-import { onMounted, onUnmounted, ref } from "vue"
+import { onMounted, onUnmounted } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const status = ref("Nothing yet")
-const save = () => (status.value = "Saved")
-const share = () => (status.value = "Shared")
-
+const log = useLog()
 const offs: (() => void)[] = []
-onMounted(() => offs.push(registerShortcut("mod+s", save), registerShortcut("mod+shift+e", share)))
+
+onMounted(() => {
+  offs.push(
+    registerShortcut("mod+s", () => log("Saved")),
+    registerShortcut("mod+shift+e", () => log("Shared")),
+  )
+})
 onUnmounted(() => offs.forEach((off) => off()))
 </script>
 
 <template>
-  <div data-slot="stack">
-    <div data-slot="row">
-      <Tooltip shortcut="mod+s">
-        <TooltipTrigger @click="save">
-          <SaveIcon />
-        </TooltipTrigger>
-        <TooltipContent>
-          Save
-          <TooltipShortcut />
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip shortcut="mod+shift+e">
-        <TooltipTrigger @click="share">
-          <Share2Icon />
-          Share
-        </TooltipTrigger>
-        <TooltipContent>
-          Share with your team
-          <TooltipShortcut>
-            <template #render="{ props }">
-              <kbd v-bind="props" />
-            </template>
-          </TooltipShortcut>
-        </TooltipContent>
-      </Tooltip>
-    </div>
-    <output data-slot="output">{{ status }}</output>
+  <div data-slot="row">
+    <Tooltip shortcut="mod+s">
+      <TooltipTrigger aria-label="Save" @click="log('Saved')">
+        <SaveIcon aria-hidden="true" />
+      </TooltipTrigger>
+      <TooltipContent>
+        Save
+        <TooltipShortcut />
+      </TooltipContent>
+    </Tooltip>
+    <Tooltip shortcut="mod+shift+e">
+      <TooltipTrigger @click="log('Shared')">Share</TooltipTrigger>
+      <TooltipContent>
+        Share with your team
+        <TooltipShortcut />
+      </TooltipContent>
+    </Tooltip>
   </div>
 </template>
