@@ -356,7 +356,9 @@ const web: Record<string, Check> = {
     })
     await close(field, page)
     expect(await watch.evaluate((seen) => seen.ending)).toBe(true)
-    await expect.poll(() => watch.evaluate((seen) => !seen.el.isConnected || seen.el.hidden)).toBe(true)
+    await expect
+      .poll(() => watch.evaluate((seen) => !seen.el.isConnected || (seen.el as HTMLElement).hidden))
+      .toBe(true)
   },
 
   async presentation(preview, page) {

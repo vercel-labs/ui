@@ -225,9 +225,7 @@ const value = ref<string | null>(null)
 </script>
 
 <template>
-  <NavigationMenu v-model:value="value" aria-label="Main">
-    ...
-  </NavigationMenu>
+  <NavigationMenu v-model:value="value" aria-label="Main"> ... </NavigationMenu>
 </template>
 ```
 
@@ -242,9 +240,7 @@ const menu = createNavigationMenuController()
 
 <template>
   <button @click="menu.setValue('components')">Browse Components</button>
-  <NavigationMenu aria-label="Main" :controller="menu">
-    ...
-  </NavigationMenu>
+  <NavigationMenu aria-label="Main" :controller="menu"> ... </NavigationMenu>
 </template>
 ```
 

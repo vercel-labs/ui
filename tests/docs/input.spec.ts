@@ -1,5 +1,5 @@
 import { expect, type Locator } from "@playwright/test"
-import { fill, testExamples } from "./docs-helpers"
+import { testExamples } from "./docs-helpers"
 
 // The newest line in an example's console.
 const lastLog = (preview: Locator) =>

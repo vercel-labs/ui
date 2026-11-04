@@ -136,9 +136,7 @@ The menu waits for whatever animations run, and only those. Turn them off for pe
 `delay` is how long the pointer rests on a trigger before its panel opens, and `closeDelay` how long the panel stays once the pointer leaves the trigger and the panel: 50 milliseconds each by default. The pointer can cross the gap between a trigger and its panel without closing it. Once a panel is open, moving to another trigger switches at once, unless the pointer is only passing over it on the way into the open panel. Coming back right after closing skips the delay.
 
 ```html
-<ui-navigation-menu aria-label="Main" delay="400" close-delay="600">
-  ...
-</ui-navigation-menu>
+<ui-navigation-menu aria-label="Main" delay="400" close-delay="600"> ... </ui-navigation-menu>
 ```
 
 ## Indicator
@@ -212,9 +210,7 @@ The element's `value` property is live: read it, set it to an item's `value` to 
 Items take a `value`, which is generated when left out. Every change carries a [reason](#reasons) in `event.detail.reason`, like `trigger-hover`, `trigger-press`, `link-press` or `outside-press`. Call `event.preventDefault()` to stop it.
 
 ```html
-<ui-navigation-menu aria-label="Main">
-  ...
-</ui-navigation-menu>
+<ui-navigation-menu aria-label="Main"> ... </ui-navigation-menu>
 
 <script type="module">
   const menu = document.querySelector("ui-navigation-menu")
@@ -229,9 +225,7 @@ The element's `api` property is its [controller](#controller): it opens, closes 
 
 ```html
 <button type="button">Browse Components</button>
-<ui-navigation-menu aria-label="Main">
-  ...
-</ui-navigation-menu>
+<ui-navigation-menu aria-label="Main"> ... </ui-navigation-menu>
 
 <script type="module">
   const { api: menu } = document.querySelector("ui-navigation-menu")
@@ -267,9 +261,7 @@ Pressing a link closes the menu by default, like after a route change. With `clo
 Panels render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the viewport, or each content without one, somewhere else, named by a CSS selector, for iframes, shadow roots or a specific stacking context. Set it on the menu, or on the viewport or a content.
 
 ```html
-<ui-navigation-menu aria-label="Main" container="#menu-host">
-  ...
-</ui-navigation-menu>
+<ui-navigation-menu aria-label="Main" container="#menu-host"> ... </ui-navigation-menu>
 ```
 
 ## Custom Rendering
