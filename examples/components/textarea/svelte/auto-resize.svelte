@@ -5,6 +5,6 @@
 
 <Field name="notes">
   <FieldLabel>Notes</FieldLabel>
-  <Textarea autoResize placeholder="Type a few lines…" />
-  <FieldDescription>Grows as you type, then scrolls.</FieldDescription>
+  <Textarea autoResize placeholder="Add notes for the delivery driver." />
+  <FieldDescription>Your driver sees these notes.</FieldDescription>
 </Field>

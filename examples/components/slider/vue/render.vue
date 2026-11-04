@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Slider,
   SliderControl,
@@ -10,20 +11,25 @@ import {
 </script>
 
 <template>
-  <Slider :default-value="60" aria-label="Brightness">
-    <SliderValue v-slot="{ state }">Brightness {{ state.text }}%</SliderValue>
-    <SliderControl>
-      <SliderTrack>
-        <SliderIndicator />
-        <SliderThumb aria-label="Brightness">
-          <template #render="{ props, state, children }">
-            <span v-bind="props">
+  <Field>
+    <Slider :default-value="60">
+      <div data-slot="row">
+        <FieldLabel>Brightness</FieldLabel>
+        <SliderValue v-slot="{ state }">{{ state.text }}%</SliderValue>
+      </div>
+      <SliderControl>
+        <SliderTrack>
+          <SliderIndicator />
+          <SliderThumb>
+            <template #render="{ props, children }">
+              <span v-bind="props"><component :is="children" /></span>
+            </template>
+            <template #default="{ state }">
               <span data-slot="output">{{ state.thumbValue }}</span>
-              <component :is="children" />
-            </span>
-          </template>
-        </SliderThumb>
-      </SliderTrack>
-    </SliderControl>
-  </Slider>
+            </template>
+          </SliderThumb>
+        </SliderTrack>
+      </SliderControl>
+    </Slider>
+  </Field>
 </template>

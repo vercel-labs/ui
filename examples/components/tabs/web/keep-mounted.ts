@@ -1,3 +1,4 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/tabs"
 
 function mount(root: HTMLElement) {
@@ -13,10 +14,14 @@ function mount(root: HTMLElement) {
         <ui-tabs-indicator></ui-tabs-indicator>
       </ui-tabs-list>
       <ui-tabs-panel value="reply" keep-mounted>
-        <textarea aria-label="Reply" placeholder="Write a reply…"></textarea>
+        <ui-field>
+          <ui-field-label>Message</ui-field-label>
+          <textarea rows="3" placeholder="Write a reply…"></textarea>
+        </ui-field>
       </ui-tabs-panel>
       <ui-tabs-panel value="formatting">
-        Use **bold**, _italics_ and \`code\`. Paste a link to embed it.
+        <p>Use **bold**, _italics_ and \`code\` to format your reply.</p>
+        <p>Paste a link on its own line to show a preview.</p>
       </ui-tabs-panel>
     </ui-tabs>
   `

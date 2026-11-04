@@ -4,9 +4,9 @@
 
 <div dir="rtl">
   <label data-slot="label">
+    وضع الطيران
     <Switch>
       <SwitchThumb />
     </Switch>
-    وضع الطيران
   </label>
 </div>

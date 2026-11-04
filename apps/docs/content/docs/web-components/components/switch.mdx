@@ -3,23 +3,24 @@ title: Switch
 description: Turn a setting on or off.
 ---
 
-A switch changes a setting between on and off. Keep its label the same in both states: “Airplane Mode” tells you what changes; the switch tells you whether it is on.
+Use a switch for a setting that takes effect as soon as it changes, like Airplane mode or a notification preference. Keep its label the same in both states: the label says what the setting is, and the switch shows whether it's on.
 
 <ComponentExample
   name="switch/basic"
-  caption="Click Airplane Mode, or focus it and press Space, to turn it on and off."
+  caption="Click Airplane mode, or focus the switch and press Space, to turn it on and off."
 />
 
 ## Installation
 
-```package-install
-npm install @ui-sdk/web
+```bash
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
-Import the component to register its elements. The import is safe on the server.
+Importing the component defines its elements. Import the field too if you use it. On the server the import does nothing.
 
 ```ts
 import "@ui-sdk/web/switch"
+import "@ui-sdk/web/field"
 ```
 
 ## Composition
@@ -31,107 +32,124 @@ ui-switch
 └── ui-switch-thumb
 ```
 
-`ui-switch` is the focusable control. `ui-switch-thumb` stays mounted and reflects the checked state, so CSS can slide it. The custom element participates in forms through `ElementInternals`; it does not add a hidden input.
+Wrap the switch and its text in a label. The thumb stays mounted and gets the switch's state, so CSS can slide it from one end to the other.
 
-## Examples
+## Usage
 
-### Description
+Import the parts and put them together:
 
-Wrap the switch in `ui-field` to connect `ui-field-label` and `ui-field-description` automatically.
+```html
+<script type="module">
+  import "@ui-sdk/web/switch"
+</script>
+
+<label>
+  Airplane mode
+  <ui-switch>
+    <ui-switch-thumb></ui-switch-thumb>
+  </ui-switch>
+</label>
+```
+
+## Description
+
+Use `ui-field-label` and `ui-field-description` inside a `ui-field` when a setting needs more explanation. The field connects both to the switch.
 
 <ComponentExample
   name="switch/description"
-  caption="Click the label or switch. The description stays connected to the control for screen readers."
+  caption="Click Weekly digest. The field connects the label and description to the switch."
 />
 
-### Choice Card
+## Choice Card
 
-A setting can fill a whole row. Here, the label’s pseudo-element covers the card, so clicking its empty space toggles the switch too.
+A setting can fill a whole card. Here the label's `::after` covers the card, so a click anywhere on it toggles the switch, and `:has([data-checked])` marks the cards that are on.
 
 <ComponentExample
   name="switch/choice-card"
-  caption="Click either card to change its setting. Each switch has its own value."
+  caption="Click anywhere on the Public profile card to turn it on. Each card's switch keeps its own value."
 />
 
-### Disabled
+## Disabled
 
-`disabled` prevents interaction and removes the switch from the Tab order. A disabled switch does not submit a value.
+`disabled` prevents focus and changes, and leaves the switch out of form submissions. A disabled `fieldset` does the same.
 
 <ComponentExample
   name="switch/disabled"
-  caption="Try clicking Disabled. Its value stays off, and Tab skips it."
+  caption="Security alerts are always on, so that switch is disabled. Clicking it leaves it on, and Tab skips it."
 />
 
-### Invalid
+## Read-Only
 
-A `required` switch must be on before its form can submit. `ui-field-error` displays the validation message and connects it to the switch.
+`read-only` keeps the switch focusable and included in form submissions, while preventing the user from changing it. Use it for a setting managed somewhere else.
 
-<ComponentExample
-  name="switch/invalid"
-  caption="Press Continue with the switch off to show the error. Accept the terms, then submit again."
-/>
+<ComponentExample name="switch/read-only" caption="Tab to Encrypt backups. Space and clicks leave it on." />
 
-<span id="behavior-and-options" />
+## Controlled
 
-### Controlled
-
-Set the `checked` property to change the value, and listen for `checkedchange` to observe changes. Use `default-checked` for the initial value and the value a form reset restores. The element’s `api` lets another control toggle it. The [state and events guide](../state-and-events) covers the shared change callback contract.
+Listen for `checkedchange` to follow the value, and set the element's `checked` property to change it. The element's [`api`](#controller) changes it from anywhere, like the Toggle button below. See [State and Events](../state-and-events) for the shared change callback.
 
 <ComponentExample
   name="switch/controlled"
-  caption="Change Wi-Fi directly or press Toggle from outside. The readout shows the value and what caused the change."
+  caption="Turn Wi-Fi off, or press Toggle. The console logs each change and its reason."
 />
 
-### Read Only
+## Form
 
-`read-only` keeps the switch focusable and included in form submissions, while preventing changes. It works well for a setting managed elsewhere.
-
-<ComponentExample
-  name="switch/read-only"
-  caption="Focus or click Encrypt backups. It stays on because the organization manages this setting."
-/>
-
-<span id="forms" />
-
-### Form
-
-Give each switch a `name`. An on switch submits its `value`, which defaults to `"on"`; an off switch submits nothing. Use `form` to connect a switch outside the form, and Reset to restore the defaults. See [forms](../forms) for the shared validation and reset behavior.
+Set `name` to include the switch in a native form. A switch that's on submits its `value`, which defaults to `"on"`; a switch that's off submits nothing. Reset returns it to `default-checked`. Set `form` to a form's id to join it from elsewhere on the page.
 
 <ComponentExample
   name="switch/form"
-  caption="Change the email settings and Join the beta, then press Save to inspect the submitted values. Reset restores the defaults and clears the result."
+  caption="Turn on Product updates and press Save. The console logs the submitted values, and Reset restores the defaults."
 />
 
-### Saving on Toggle
+## Validation
 
-Call `event.preventDefault()` synchronously in `checkedchange` to keep the current value while a save runs. On success, call `api.setChecked(next, { reason: "imperative" })`. Let that reason through in the handler so the saved value can commit.
+`required` blocks submission until the switch is on. In a [Field](./field), `ui-field-error` shows the message under the switch and connects it to the switch. [Forms and Validation](../forms) covers the shared field behavior.
 
-This example blocks repeated changes while saving and announces the result. `aria-busy` describes the pending work; the callback is what prevents another change.
+<ComponentExample
+  name="switch/invalid"
+  caption="Press Continue with the switch off to see the error. Turn on Two-factor authentication and continue; the console logs the submitted value."
+/>
+
+## Saving on Toggle
+
+To save a change before it shows, call `event.preventDefault()` in `checkedchange` to keep the current value while the save runs. When it finishes, call `api.setChecked(next, { reason: "imperative" })`, and let that reason through in the listener so the saved value commits.
+
+The example ignores presses while a save is running, and shows a spinner in the thumb. `aria-busy` tells assistive technology the switch is busy; the listener is what blocks another change.
 
 <ComponentExample
   name="switch/async"
-  caption="Toggle Automatic backups. The switch keeps its value while Saving… is shown, then changes after the save finishes."
+  caption="Turn on Automatic backups. The thumb shows a spinner while it saves, then the switch turns on."
+/>
+
+## Custom Rendering
+
+Elements have no render functions. `ui-switch` is the focusable control and `ui-switch-thumb` holds whatever you put inside it. Here a `checkedchange` listener puts a sun or a moon in the thumb, and the stylesheet can read `data-checked` on either part. See [Parts and Composition](../parts-and-composition) for the rendering contract.
+
+<ComponentExample
+  name="switch/render"
+  caption="Turn on Dark mode. The thumb renders a sun or a moon from its state."
 />
 
 ## Styling
 
-<span id="size" />
-<span id="right-to-left" />
+Style the switch and its thumb with `data-checked` and `data-unchecked`, and use `data-disabled`, `data-readonly` and `data-required` for the rest. In an invalid field, the switch also gets `data-invalid` and `aria-invalid`; the thumb doesn't. Slide the thumb with `translate` on `data-checked`, and reverse it under `dir="rtl"`.
 
-Style the track and thumb with `data-checked`, `data-unchecked`, `data-disabled`, and `data-readonly`. Validation adds `data-invalid` and `aria-invalid` to the control. The thumb receives the switch state, not the field’s validation state.
+Each part has a `data-slot`, such as `switch-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
-The examples reverse the thumb’s translation under `dir="rtl"` and disable transitions for reduced motion. See [styling and animation](../styling-and-animation) for the shared styling contract.
+## Data Attributes
 
-## Custom Rendering
+### `<ui-switch>` [#data-attributes-switch]
 
-<span id="render-functions" />
+<DataAttributes component="switch" part="root" />
 
-The switch itself is the interactive element. Put its visual children inside it and give it an accessible label.
+### `<ui-switch-thumb>` [#data-attributes-switchthumb]
+
+<DataAttributes component="switch" part="thumb" />
 
 ## API Reference
 
-Props are attributes in kebab case, like `default-checked` and `read-only`: `"false"` is false. `checked` is
-a live property and attribute. Callbacks are DOM events.
+Props are attributes in kebab case, like `default-checked` and `read-only`: `"false"` is false. `checked` is a live property and attribute. Callbacks are DOM events.
 
 ### Switch
 
@@ -159,7 +177,7 @@ Every write method takes an optional `{ reason, event }`, fires the change event
 
 ### Events
 
-Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` cancels the change.
+Events fire on their own element and don't bubble, with the new state in `event.detail.value` and the `reason`, `event` and `source` beside it. Calling `preventDefault()` cancels the change.
 
 | Member                        | On          | Description                                                               |
 | ----------------------------- | ----------- | ------------------------------------------------------------------------- |
@@ -169,6 +187,30 @@ Events fire on their own element and don't bubble, with the new state in `event.
 
 ## Accessibility
 
-The switch follows the [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). Every line below is an automated test.
+The switch follows the [WAI-ARIA switch pattern](https://www.w3.org/WAI/ARIA/apg/patterns/switch/). `ui-switch` takes the `switch` role itself and takes part in forms through `ElementInternals`, with no hidden input.
+
+### Keyboard
+
+| Key   | Does                                   |
+| ----- | -------------------------------------- |
+| Tab   | Moves to the next switch               |
+| Space | Turns it on or off                     |
+| Enter | Submits its form, and never toggles it |
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="switch" />
+
+In forms:
+
+<SpecList spec="forms.form" />
+
+Beyond the pattern's baseline:
+
+<SpecList spec="forms.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="forms.sr" />

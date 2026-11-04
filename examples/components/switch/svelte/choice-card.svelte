@@ -2,30 +2,28 @@
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
   import { Switch, SwitchThumb } from "@ui-sdk/svelte/switch"
 
-  const options = [
+  const settings = [
     {
-      label: "Share across devices",
-      description: "Focus is shared across devices, and turns off when you leave the app.",
+      label: "Public profile",
+      description: "Anyone can see your name and photo.",
       defaultChecked: false,
     },
     {
-      label: "Enable notifications",
-      description: "Receive notifications when focus mode is enabled or disabled.",
+      label: "Show activity status",
+      description: "Teammates can see when you're online.",
       defaultChecked: true,
     },
   ]
 </script>
 
 <div data-slot="stack">
-  {#each options as option (option.label)}
+  {#each settings as setting (setting.label)}
     <Field data-variant="card">
       <div data-slot="stack">
-        <FieldLabel>
-          {option.label}
-        </FieldLabel>
-        <FieldDescription>{option.description}</FieldDescription>
+        <FieldLabel>{setting.label}</FieldLabel>
+        <FieldDescription>{setting.description}</FieldDescription>
       </div>
-      <Switch defaultChecked={option.defaultChecked}>
+      <Switch defaultChecked={setting.defaultChecked}>
         <SwitchThumb />
       </Switch>
     </Field>

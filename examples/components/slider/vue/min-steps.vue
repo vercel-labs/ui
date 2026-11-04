@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Slider,
   SliderControl,
@@ -12,25 +13,26 @@ const time = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes 
 </script>
 
 <template>
-  <Slider
-    :default-value="[540, 1020]"
-    :min="0"
-    :max="1440"
-    :step="15"
-    :min-steps-between-thumbs="4"
-    :format="time"
-    aria-label="Opening hours"
-  >
-    <div data-slot="row">
-      <span data-slot="label">Opening hours</span>
-      <SliderValue />
-    </div>
-    <SliderControl>
-      <SliderTrack>
-        <SliderIndicator />
-        <SliderThumb :index="0" aria-label="Opens" />
-        <SliderThumb :index="1" aria-label="Closes" />
-      </SliderTrack>
-    </SliderControl>
-  </Slider>
+  <Field>
+    <Slider
+      :default-value="[540, 1020]"
+      :min="0"
+      :max="1440"
+      :step="15"
+      :min-steps-between-thumbs="16"
+      :format="time"
+    >
+      <div data-slot="row">
+        <FieldLabel>Opening hours</FieldLabel>
+        <SliderValue />
+      </div>
+      <SliderControl>
+        <SliderTrack>
+          <SliderIndicator />
+          <SliderThumb :index="0" aria-label="Opens" />
+          <SliderThumb :index="1" aria-label="Closes" />
+        </SliderTrack>
+      </SliderControl>
+    </Slider>
+  </Field>
 </template>

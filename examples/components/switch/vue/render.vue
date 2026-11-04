@@ -5,20 +5,16 @@ import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
 
 <template>
   <label data-slot="label">
-    <Switch>
-      <template #render="{ props, state }">
-        <button v-bind="props">
-          <SwitchThumb>
-            <template #render="{ props, state: thumbState }">
-              <span v-bind="props">
-                <MoonIcon v-if="thumbState.checked" />
-                <SunIcon v-else />
-              </span>
-            </template>
-          </SwitchThumb>
-        </button>
-      </template>
-    </Switch>
     Dark mode
+    <Switch>
+      <SwitchThumb>
+        <template #render="{ props, state }">
+          <span v-bind="props">
+            <MoonIcon v-if="state.checked" aria-hidden="true" />
+            <SunIcon v-else aria-hidden="true" />
+          </span>
+        </template>
+      </SwitchThumb>
+    </Switch>
   </label>
 </template>

@@ -4,7 +4,7 @@
 </script>
 
 <Field invalid>
-  <FieldLabel>Message</FieldLabel>
-  <Textarea defaultValue="hi" />
+  <FieldLabel>Review</FieldLabel>
+  <Textarea defaultValue="Great." />
   <FieldError match>Write at least 20 characters.</FieldError>
 </Field>

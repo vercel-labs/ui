@@ -6,10 +6,8 @@ import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
 <template>
   <Field>
     <div data-slot="stack">
-      <FieldLabel>Share across devices</FieldLabel>
-      <FieldDescription>
-        Focus is shared across devices, and turns off when you leave the app.
-      </FieldDescription>
+      <FieldLabel>Weekly digest</FieldLabel>
+      <FieldDescription>A summary of your week, every Monday.</FieldDescription>
     </div>
     <Switch>
       <SwitchThumb />

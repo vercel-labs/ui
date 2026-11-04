@@ -1,15 +1,29 @@
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/solid/slider"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+} from "@ui-sdk/solid/slider"
 
 function Example() {
   return (
-    <Slider defaultValue={75}>
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb aria-label="Volume" />
-        </SliderTrack>
-      </SliderControl>
-    </Slider>
+    <Field>
+      <Slider defaultValue={75}>
+        <div data-slot="row">
+          <FieldLabel>Volume</FieldLabel>
+          <SliderValue />
+        </div>
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+      </Slider>
+    </Field>
   )
 }
 

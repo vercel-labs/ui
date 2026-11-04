@@ -1,28 +1,32 @@
 import "@ui-sdk/web/switch"
 import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <form data-slot="stack">
       <ui-field>
         <div data-slot="row">
-          <ui-switch name="terms" required>
+          <div data-slot="stack">
+            <ui-field-label>Two-factor authentication</ui-field-label>
+            <ui-field-description>Required for admins of this workspace.</ui-field-description>
+          </div>
+          <ui-switch name="two-factor" required>
             <ui-switch-thumb></ui-switch-thumb>
           </ui-switch>
-          <ui-field-label>I agree to the terms</ui-field-label>
         </div>
-        <div><ui-field-error match="valueMissing">You must agree to the terms to continue.</ui-field-error></div>
+        <ui-field-error match="valueMissing">Turn this on to continue.</ui-field-error>
       </ui-field>
-      <button type="submit">Continue</button>
-      <output data-slot="output"></output>
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">Continue</button>
+      </div>
     </form>
   `
-  const thanks = root.querySelector("output")!
-  root.querySelector("form")!.addEventListener("submit", (event) => {
+  const form = root.querySelector("form")!
+  form.addEventListener("submit", (event) => {
     event.preventDefault()
-    thanks.textContent = "Thanks, you're all set."
+    log(root, `Submitted two-factor=${new FormData(form).get("two-factor")}`)
   })
-  root.querySelector("ui-switch")!.addEventListener("checkedchange", () => (thanks.textContent = ""))
 }
 
 export { mount }

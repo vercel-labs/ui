@@ -5,7 +5,7 @@ import { Textarea } from "@ui-sdk/vue/textarea"
 
 <template>
   <Field disabled>
-    <FieldLabel>Message</FieldLabel>
+    <FieldLabel>Reply</FieldLabel>
     <Textarea default-value="Replies are closed for this thread." />
   </Field>
 </template>

@@ -1,5 +1,5 @@
-import type { NumberFormat } from "@ui-sdk/core/slider"
 import "@ui-sdk/web/slider"
+import "@ui-sdk/web/field"
 
 const sliders = [
   {
@@ -41,24 +41,31 @@ function mount(root: HTMLElement) {
       ${sliders
         .map(
           (slider) => `
-            <ui-slider default-value="${slider.defaultValue}" max="${slider.max}" step="${slider.step}"${"locale" in slider ? ` locale="${slider.locale}"` : ""}>
-              <div data-slot="row">
-                <span data-slot="label">${slider.label}</span>
-                <ui-slider-value></ui-slider-value>
-              </div>
-              <ui-slider-control>
-                <ui-slider-track>
-                  <ui-slider-indicator></ui-slider-indicator>
-                  <ui-slider-thumb aria-label="${slider.label}"></ui-slider-thumb>
-                </ui-slider-track>
-              </ui-slider-control>
-            </ui-slider>`,
+            <ui-field>
+              <ui-slider
+                default-value="${slider.defaultValue}"
+                max="${slider.max}"
+                step="${slider.step}"${"locale" in slider ? ` locale="${slider.locale}"` : ""}
+              >
+                <div data-slot="row">
+                  <ui-field-label>${slider.label}</ui-field-label>
+                  <ui-slider-value></ui-slider-value>
+                </div>
+                <ui-slider-control>
+                  <ui-slider-track>
+                    <ui-slider-indicator></ui-slider-indicator>
+                    <ui-slider-thumb></ui-slider-thumb>
+                  </ui-slider-track>
+                </ui-slider-control>
+              </ui-slider>
+            </ui-field>
+          `,
         )
         .join("")}
     </div>
   `
-  root.querySelectorAll<HTMLElement & { format: NumberFormat }>("ui-slider").forEach((el, index) => {
-    el.format = sliders[index].format
+  root.querySelectorAll("ui-slider").forEach((slider, index) => {
+    slider.format = sliders[index].format
   })
 }
 

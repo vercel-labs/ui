@@ -14,7 +14,7 @@ const policies = [
   {
     value: "warranty",
     label: "Warranty",
-    text: "Every product has a two year warranty. Batteries are covered for one year.",
+    text: "Every product has a two-year warranty. Batteries are covered for one year from delivery.",
   },
 ]
 
@@ -33,11 +33,8 @@ function mount(root: HTMLElement) {
       </ui-tabs-list>
       ${policies
         .map(
-          (policy, index) => `
-            <ui-tabs-panel value="${policy.value}"${index > 0 ? ' hidden="until-found"' : ""}>
-              <h3>${policy.label}</h3>
-              <p data-slot="hint">${policy.text}</p>
-            </ui-tabs-panel>`,
+          (policy, index) =>
+            `<ui-tabs-panel value="${policy.value}"${index > 0 ? ' hidden="until-found"' : ""}>${policy.text}</ui-tabs-panel>`,
         )
         .join("")}
     </ui-tabs>

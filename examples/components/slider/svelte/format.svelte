@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Slider,
     SliderControl,
@@ -45,23 +46,25 @@
 
 <div data-slot="stack">
   {#each sliders as slider (slider.label)}
-    <Slider
-      defaultValue={slider.defaultValue}
-      max={slider.max}
-      step={slider.step}
-      format={slider.format}
-      locale={"locale" in slider ? slider.locale : undefined}
-    >
-      <div data-slot="row">
-        <span data-slot="label">{slider.label}</span>
-        <SliderValue />
-      </div>
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb aria-label={slider.label} />
-        </SliderTrack>
-      </SliderControl>
-    </Slider>
+    <Field>
+      <Slider
+        defaultValue={slider.defaultValue}
+        max={slider.max}
+        step={slider.step}
+        format={slider.format}
+        locale={"locale" in slider ? slider.locale : undefined}
+      >
+        <div data-slot="row">
+          <FieldLabel>{slider.label}</FieldLabel>
+          <SliderValue />
+        </div>
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+      </Slider>
+    </Field>
   {/each}
 </div>

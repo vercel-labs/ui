@@ -1,8 +1,9 @@
 import { Switch, SwitchThumb } from "@ui-sdk/solid/switch"
 
-export function Example() {
+function Example() {
   return (
     <label data-slot="label">
+      Dark mode
       <Switch>
         <SwitchThumb
           render={(props, state) => (
@@ -44,7 +45,8 @@ export function Example() {
           )}
         />
       </Switch>
-      Dark mode
     </label>
   )
 }
+
+export { Example }

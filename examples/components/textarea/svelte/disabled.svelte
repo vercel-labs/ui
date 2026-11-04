@@ -4,6 +4,6 @@
 </script>
 
 <Field disabled>
-  <FieldLabel>Message</FieldLabel>
+  <FieldLabel>Reply</FieldLabel>
   <Textarea defaultValue="Replies are closed for this thread." />
 </Field>

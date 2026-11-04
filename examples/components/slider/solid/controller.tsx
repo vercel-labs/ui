@@ -8,16 +8,34 @@ import {
   SliderTrack,
   SliderValue,
 } from "@ui-sdk/solid/slider"
-import { createSignal, Show } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
+  const log = useLog()
   const volume = createSliderController<number>()
-  const [reading, setReading] = createSignal("")
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => volume.setValue(0)}>
+          Mute
+        </button>
+        <button type="button" onClick={() => volume.setValue(volume.getValue() + 10)}>
+          Louder
+        </button>
+        <button type="button" onClick={() => log(`Volume is ${volume.getValue()}`)}>
+          Read
+        </button>
+        <button type="button" onClick={() => volume.focus()}>
+          Focus
+        </button>
+      </div>
       <Field>
-        <Slider defaultValue={40} controller={volume}>
+        <Slider
+          defaultValue={40}
+          controller={volume}
+          onValueChange={(value, details) => log(`Volume ${value} (${details.reason})`)}
+        >
           <div data-slot="row">
             <FieldLabel>Volume</FieldLabel>
             <SliderValue />
@@ -30,23 +48,6 @@ function Example() {
           </SliderControl>
         </Slider>
       </Field>
-      <div data-slot="row">
-        <button type="button" onClick={() => volume.setValue(0)}>
-          Mute
-        </button>
-        <button type="button" onClick={() => volume.setValue(volume.getValue() + 10)}>
-          Louder
-        </button>
-        <button type="button" onClick={() => setReading(`Volume is ${volume.getValue()}.`)}>
-          Read
-        </button>
-        <button type="button" onClick={() => volume.focus()}>
-          Focus
-        </button>
-      </div>
-      <Show when={reading()}>
-        <output data-slot="output">{reading()}</output>
-      </Show>
     </div>
   )
 }

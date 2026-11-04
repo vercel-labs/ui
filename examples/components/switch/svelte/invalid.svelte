@@ -1,31 +1,31 @@
 <script lang="ts">
-  import { Field, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
   import { Switch, SwitchThumb } from "@ui-sdk/svelte/switch"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let submitted = $state(false)
-
-  function onSubmit(event: SubmitEvent) {
-    event.preventDefault()
-    submitted = true
-  }
+  const log = useLog()
 </script>
 
-<form data-slot="stack" onsubmit={onSubmit}>
+<form
+  data-slot="stack"
+  onsubmit={(event) => {
+    event.preventDefault()
+    log(`Submitted two-factor=${new FormData(event.currentTarget).get("two-factor")}`)
+  }}
+>
   <Field>
     <div data-slot="row">
-      <Switch name="terms" required onCheckedChange={() => (submitted = false)}>
+      <div data-slot="stack">
+        <FieldLabel>Two-factor authentication</FieldLabel>
+        <FieldDescription>Required for admins of this workspace.</FieldDescription>
+      </div>
+      <Switch name="two-factor" required>
         <SwitchThumb />
       </Switch>
-      <FieldLabel>I agree to the terms</FieldLabel>
     </div>
-    <div>
-      <FieldError match="valueMissing">
-        You must agree to the terms to continue.
-      </FieldError>
-    </div>
+    <FieldError match="valueMissing">Turn this on to continue.</FieldError>
   </Field>
-  <button type="submit">
-    Continue
-  </button>
-  <output data-slot="output">{submitted ? "Thanks, you're all set." : ""}</output>
+  <div data-slot="row">
+    <button type="submit" data-variant="solid">Continue</button>
+  </div>
 </form>

@@ -24,13 +24,7 @@
       Archive
     </TabsTab>
   </TabsList>
-  <TabsPanel value="inbox">
-    Messages sent to you.
-  </TabsPanel>
-  <TabsPanel value="replies">
-    Replies to your messages.
-  </TabsPanel>
-  <TabsPanel value="archive">
-    Messages you put away.
-  </TabsPanel>
+  <TabsPanel value="inbox">3 new messages from Inès Moreau and Kofi Mensah.</TabsPanel>
+  <TabsPanel value="replies">Wren Takahashi replied to your message about the launch.</TabsPanel>
+  <TabsPanel value="archive">Messages you archived stay here and in search.</TabsPanel>
 </Tabs>

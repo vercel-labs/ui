@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Slider,
     SliderControl,
@@ -9,21 +10,26 @@
   } from "@ui-sdk/svelte/slider"
 </script>
 
-<Slider defaultValue={60} aria-label="Brightness">
-  <SliderValue>
-    {#snippet children(state)}Brightness {state.text}%{/snippet}
-  </SliderValue>
-  <SliderControl>
-    <SliderTrack>
-      <SliderIndicator />
-      <SliderThumb aria-label="Brightness">
-        {#snippet render({ props, state, children })}
-          <span {...props}>
+<Field>
+  <Slider defaultValue={60}>
+    <div data-slot="row">
+      <FieldLabel>Brightness</FieldLabel>
+      <SliderValue>
+        {#snippet children(state)}{state.text}%{/snippet}
+      </SliderValue>
+    </div>
+    <SliderControl>
+      <SliderTrack>
+        <SliderIndicator />
+        <SliderThumb>
+          {#snippet render({ props, state, children })}
+            <span {...props}>{@render children?.(state)}</span>
+          {/snippet}
+          {#snippet children(state)}
             <span data-slot="output">{state.thumbValue}</span>
-            {@render children?.(state)}
-          </span>
-        {/snippet}
-      </SliderThumb>
-    </SliderTrack>
-  </SliderControl>
-</Slider>
+          {/snippet}
+        </SliderThumb>
+      </SliderTrack>
+    </SliderControl>
+  </Slider>
+</Field>

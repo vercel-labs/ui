@@ -3,8 +3,8 @@
 </script>
 
 <label data-slot="label">
+  Airplane mode
   <Switch>
     <SwitchThumb />
   </Switch>
-  Airplane Mode
 </label>

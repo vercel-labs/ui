@@ -4,9 +4,9 @@ import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
 
 <template>
   <label data-slot="label">
+    Airplane mode
     <Switch>
       <SwitchThumb />
     </Switch>
-    Airplane Mode
   </label>
 </template>

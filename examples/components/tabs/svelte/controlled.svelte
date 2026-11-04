@@ -7,42 +7,30 @@
     TabsTab,
     createTabsController,
   } from "@ui-sdk/svelte/tabs"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   const tabs = createTabsController()
   let value = $state<string | null>("inbox")
-  let reason = $state("")
 </script>
 
-<div data-slot="stack">
-  <Tabs bind:value controller={tabs} onValueChange={(_, details) => (reason = details.reason)}>
+<div>
+  <div data-slot="controls">
+    <button type="button" onclick={() => tabs.select("sent")}>Show Sent Mail</button>
+  </div>
+  <Tabs
+    bind:value
+    onValueChange={(next, details) => log(`value: ${next} (${details.reason})`)}
+    controller={tabs}
+  >
     <TabsList aria-label="Mail">
-      <TabsTab value="inbox">
-        Inbox
-      </TabsTab>
-      <TabsTab value="drafts">
-        Drafts
-      </TabsTab>
-      <TabsTab value="sent">
-        Sent
-      </TabsTab>
+      <TabsTab value="inbox">Inbox</TabsTab>
+      <TabsTab value="drafts">Drafts</TabsTab>
+      <TabsTab value="sent">Sent</TabsTab>
       <TabsIndicator />
     </TabsList>
-    <TabsPanel value="inbox">
-      No new mail.
-    </TabsPanel>
-    <TabsPanel value="drafts">
-      Two drafts.
-    </TabsPanel>
-    <TabsPanel value="sent">
-      Sent this week: 12.
-    </TabsPanel>
+    <TabsPanel value="inbox">3 unread messages from Hollis Grant and Inès Moreau.</TabsPanel>
+    <TabsPanel value="drafts">2 drafts, the last one edited yesterday at 4:12 PM.</TabsPanel>
+    <TabsPanel value="sent">12 messages sent this week, all delivered.</TabsPanel>
   </Tabs>
-  <div data-slot="row">
-    <button type="button" onclick={() => tabs.select("sent")}>
-      Show sent mail
-    </button>
-  </div>
-  <output data-slot="output">
-    Selected: {value}{reason ? `, last change: ${reason}` : ""}
-  </output>
 </div>

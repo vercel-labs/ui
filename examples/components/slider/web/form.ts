@@ -1,11 +1,13 @@
 import "@ui-sdk/web/slider"
 import "@ui-sdk/web/field"
+import type { UiSliderElement } from "@ui-sdk/web/slider"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
-  const formId = `slider-form-${crypto.randomUUID()}`
+  const form = crypto.randomUUID()
   root.innerHTML = `
     <div data-slot="stack">
-      <form id="${formId}" data-slot="stack">
+      <form id="${form}" data-slot="stack">
         <ui-field>
           <ui-slider name="price" default-value="200/800" max="1000" step="10">
             <div data-slot="row">
@@ -35,13 +37,9 @@ function mount(root: HTMLElement) {
             </ui-slider-control>
           </ui-slider>
         </ui-field>
-        <div data-slot="row">
-          <button type="submit">Save</button>
-          <button type="reset">Reset</button>
-        </div>
       </form>
       <ui-field>
-        <ui-slider name="distance" form="${formId}" default-value="25" max="100" step="5">
+        <ui-slider name="distance" form="${form}" default-value="25" max="100" step="5">
           <div data-slot="row">
             <ui-field-label>Distance</ui-field-label>
             <ui-slider-value></ui-slider-value>
@@ -54,22 +52,23 @@ function mount(root: HTMLElement) {
           </ui-slider-control>
         </ui-slider>
       </ui-field>
-      <output data-slot="output" hidden></output>
+      <div data-slot="row">
+        <button type="submit" form="${form}" data-variant="solid">Save</button>
+        <button type="reset" form="${form}">Reset</button>
+      </div>
     </div>
   `
-  const distance = root.querySelector('ui-slider[name="distance"]') as HTMLElement & {
-    format: Intl.NumberFormatOptions
+  root.querySelector<UiSliderElement>('ui-slider[name="distance"]')!.format = {
+    style: "unit",
+    unit: "kilometer",
   }
-  distance.format = { style: "unit", unit: "kilometer" }
-  const form = root.querySelector("form")!
-  const submitted = root.querySelector("output")!
-  form.addEventListener("submit", (event) => {
+  root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
-    const data = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
-    submitted.textContent = `Submitted: ${data.join(", ")}`
-    submitted.hidden = false
+    const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
+      ([name, value]) => `${name}=${value}`,
+    )
+    log(root, `Submitted ${data.join(", ")}`)
   })
-  form.addEventListener("reset", () => (submitted.hidden = true))
 }
 
 export { mount }

@@ -3,8 +3,8 @@
   import { Textarea } from "@ui-sdk/svelte/textarea"
 </script>
 
-<Field name="message">
-  <FieldLabel>Message</FieldLabel>
-  <Textarea placeholder="Type your message here." />
-  <FieldDescription>Your message will be copied to the support team.</FieldDescription>
+<Field name="feedback">
+  <FieldLabel>Feedback</FieldLabel>
+  <Textarea placeholder="What could we do better?" />
+  <FieldDescription>Only the product team can see this.</FieldDescription>
 </Field>

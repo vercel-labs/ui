@@ -19,7 +19,7 @@ function mount(root: HTMLElement) {
       <ui-field-description>How loud notifications play.</ui-field-description>
     </ui-field>
   `
-  const slider = root.querySelector("ui-slider") as HTMLElement & { format: Intl.NumberFormatOptions }
+  const slider = root.querySelector("ui-slider")!
   slider.format = { style: "percent" }
 }
 

@@ -8,21 +8,22 @@
     SliderTrack,
     SliderValue,
   } from "@ui-sdk/svelte/slider"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const formId = $props.id()
-  let submitted = $state("")
-
-  function onSubmit(event: SubmitEvent) {
-    event.preventDefault()
-    const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-      ([name, value]) => `${name}=${value}`,
-    )
-    submitted = data.join(", ")
-  }
+  const log = useLog()
+  const form = $props.id()
 </script>
 
 <div data-slot="stack">
-  <form id={formId} data-slot="stack" onsubmit={onSubmit} onreset={() => (submitted = "")}>
+  <form
+    id={form}
+    data-slot="stack"
+    onsubmit={(event) => {
+      event.preventDefault()
+      const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+      log(`Submitted ${data.join(", ")}`)
+    }}
+  >
     <Field>
       <Slider name="price" defaultValue={[200, 800]} max={1000} step={10}>
         <div data-slot="row">
@@ -52,19 +53,11 @@
         </SliderControl>
       </Slider>
     </Field>
-    <div data-slot="row">
-      <button type="submit">
-        Save
-      </button>
-      <button type="reset">
-        Reset
-      </button>
-    </div>
   </form>
   <Field>
     <Slider
       name="distance"
-      form={formId}
+      form={form}
       defaultValue={25}
       max={100}
       step={5}
@@ -82,7 +75,8 @@
       </SliderControl>
     </Slider>
   </Field>
-  {#if submitted}
-    <output data-slot="output">Submitted: {submitted}</output>
-  {/if}
+  <div data-slot="row">
+    <button type="submit" {form} data-variant="solid">Save</button>
+    <button type="reset" {form}>Reset</button>
+  </div>
 </div>

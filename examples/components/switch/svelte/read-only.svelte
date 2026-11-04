@@ -6,9 +6,9 @@
 <Field>
   <div data-slot="stack">
     <FieldLabel>Encrypt backups</FieldLabel>
-    <FieldDescription>Managed by your organization.</FieldDescription>
+    <FieldDescription>Your organization manages this setting.</FieldDescription>
   </div>
-  <Switch defaultChecked readOnly>
+  <Switch name="encrypt" defaultChecked readOnly>
     <SwitchThumb />
   </Switch>
 </Field>

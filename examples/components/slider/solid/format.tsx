@@ -1,3 +1,4 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Slider,
   SliderControl,
@@ -47,18 +48,20 @@ function Example() {
     <div data-slot="stack">
       <For each={sliders}>
         {({ label, ...options }) => (
-          <Slider {...options}>
-            <div data-slot="row">
-              <span data-slot="label">{label}</span>
-              <SliderValue />
-            </div>
-            <SliderControl>
-              <SliderTrack>
-                <SliderIndicator />
-                <SliderThumb aria-label={label} />
-              </SliderTrack>
-            </SliderControl>
-          </Slider>
+          <Field>
+            <Slider {...options}>
+              <div data-slot="row">
+                <FieldLabel>{label}</FieldLabel>
+                <SliderValue />
+              </div>
+              <SliderControl>
+                <SliderTrack>
+                  <SliderIndicator />
+                  <SliderThumb />
+                </SliderTrack>
+              </SliderControl>
+            </Slider>
+          </Field>
         )}
       </For>
     </div>

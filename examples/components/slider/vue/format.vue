@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Slider,
   SliderControl,
@@ -45,25 +46,25 @@ const sliders = [
 
 <template>
   <div data-slot="stack">
-    <Slider
-      v-for="slider in sliders"
-      :key="slider.label"
-      :default-value="slider.defaultValue"
-      :max="slider.max"
-      :step="slider.step"
-      :format="slider.format"
-      :locale="'locale' in slider ? slider.locale : undefined"
-    >
-      <div data-slot="row">
-        <span data-slot="label">{{ slider.label }}</span>
-        <SliderValue />
-      </div>
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb :aria-label="slider.label" />
-        </SliderTrack>
-      </SliderControl>
-    </Slider>
+    <Field v-for="slider in sliders" :key="slider.label">
+      <Slider
+        :default-value="slider.defaultValue"
+        :max="slider.max"
+        :step="slider.step"
+        :format="slider.format"
+        :locale="'locale' in slider ? slider.locale : undefined"
+      >
+        <div data-slot="row">
+          <FieldLabel>{{ slider.label }}</FieldLabel>
+          <SliderValue />
+        </div>
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+      </Slider>
+    </Field>
   </div>
 </template>

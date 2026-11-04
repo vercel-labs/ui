@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/vue/slider"
 
 const channels = [
@@ -9,18 +10,16 @@ const channels = [
 
 <template>
   <div data-slot="row">
-    <Slider
-      v-for="channel in channels"
-      :key="channel.label"
-      orientation="vertical"
-      :default-value="channel.value"
-    >
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb :aria-label="channel.label" />
-        </SliderTrack>
-      </SliderControl>
-    </Slider>
+    <Field v-for="channel in channels" :key="channel.label">
+      <Slider orientation="vertical" :default-value="channel.value">
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+      </Slider>
+      <FieldLabel>{{ channel.label }}</FieldLabel>
+    </Field>
   </div>
 </template>

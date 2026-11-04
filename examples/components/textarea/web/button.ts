@@ -1,25 +1,28 @@
 import "@ui-sdk/web/field"
 import "@ui-sdk/web/textarea"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <form data-slot="stack">
       <ui-field name="message">
         <ui-field-label>Message</ui-field-label>
-        <ui-textarea auto-resize>
-          <textarea required></textarea>
+        <ui-textarea>
+          <textarea required placeholder="Write a reply to Hollis Grant."></textarea>
         </ui-textarea>
       </ui-field>
-      <button type="submit">Send message</button>
-      <p data-slot="output">Nothing sent yet.</p>
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">Send Message</button>
+      </div>
     </form>
   `
+  const form = root.querySelector("form")!
   const message = root.querySelector("ui-textarea")!
-  const sent: string[] = []
-  root.querySelector("form")!.addEventListener("submit", (event) => {
+  form.addEventListener("submit", (event) => {
     event.preventDefault()
-    sent.push(String(new FormData(event.currentTarget as HTMLFormElement).get("message")))
-    root.querySelector("p")!.textContent = `Sent: ${sent.at(-1)}`
+    log(root, `Sent “${new FormData(form).get("message")}”`)
     message.api.clear()
   })
 }
+
+export { mount }

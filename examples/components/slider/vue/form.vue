@@ -8,22 +8,23 @@ import {
   SliderTrack,
   SliderValue,
 } from "@ui-sdk/vue/slider"
-import { ref, useId } from "vue"
+import { useId } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const formId = useId()
-const submitted = ref("")
+const log = useLog()
+const form = useId()
 
 function onSubmit(event: Event) {
   const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
     ([name, value]) => `${name}=${value}`,
   )
-  submitted.value = data.join(", ")
+  log(`Submitted ${data.join(", ")}`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <form :id="formId" data-slot="stack" @submit.prevent="onSubmit" @reset="submitted = ''">
+    <form :id="form" data-slot="stack" @submit.prevent="onSubmit">
       <Field>
         <Slider name="price" :default-value="[200, 800]" :max="1000" :step="10">
           <div data-slot="row">
@@ -53,15 +54,11 @@ function onSubmit(event: Event) {
           </SliderControl>
         </Slider>
       </Field>
-      <div data-slot="row">
-        <button type="submit">Save</button>
-        <button type="reset">Reset</button>
-      </div>
     </form>
     <Field>
       <Slider
         name="distance"
-        :form="formId"
+        :form="form"
         :default-value="25"
         :max="100"
         :step="5"
@@ -79,6 +76,9 @@ function onSubmit(event: Event) {
         </SliderControl>
       </Slider>
     </Field>
-    <output v-if="submitted" data-slot="output">Submitted: {{ submitted }}</output>
+    <div data-slot="row">
+      <button type="submit" :form="form" data-variant="solid">Save</button>
+      <button type="reset" :form="form">Reset</button>
+    </div>
   </div>
 </template>

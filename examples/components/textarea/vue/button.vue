@@ -1,27 +1,26 @@
 <script setup lang="ts">
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Textarea, createInputController } from "@ui-sdk/vue/textarea"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const message = createInputController()
-const sent = ref<string[]>([])
 
-function send(event: SubmitEvent) {
+function onSubmit(event: Event) {
   const data = new FormData(event.currentTarget as HTMLFormElement)
-  sent.value = [...sent.value, String(data.get("message"))]
+  log(`Sent “${data.get("message")}”`)
   message.clear()
 }
 </script>
 
 <template>
-  <form data-slot="stack" @submit.prevent="send">
+  <form data-slot="stack" @submit.prevent="onSubmit">
     <Field name="message">
       <FieldLabel>Message</FieldLabel>
-      <Textarea :controller="message" required auto-resize />
+      <Textarea :controller="message" required placeholder="Write a reply to Hollis Grant." />
     </Field>
-    <button type="submit">Send message</button>
-    <p data-slot="output">
-      {{ sent.length ? `Sent: ${sent.at(-1)}` : "Nothing sent yet." }}
-    </p>
+    <div data-slot="row">
+      <button type="submit" data-variant="solid">Send Message</button>
+    </div>
   </form>
 </template>

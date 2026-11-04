@@ -6,7 +6,7 @@ import { Textarea } from "@ui-sdk/vue/textarea"
 <template>
   <Field name="notes">
     <FieldLabel>Notes</FieldLabel>
-    <Textarea auto-resize placeholder="Type a few lines…" />
-    <FieldDescription>Grows as you type, then scrolls.</FieldDescription>
+    <Textarea auto-resize placeholder="Add notes for the delivery driver." />
+    <FieldDescription>Your driver sees these notes.</FieldDescription>
   </Field>
 </template>

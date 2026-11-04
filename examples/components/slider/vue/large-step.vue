@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Slider,
   SliderControl,
@@ -10,23 +11,24 @@ import {
 </script>
 
 <template>
-  <Slider
-    :default-value="100"
-    :min="25"
-    :max="400"
-    :large-step="25"
-    :format="{ style: 'unit', unit: 'percent' }"
-  >
-    <div data-slot="row">
-      <span data-slot="label">Zoom</span>
-      <SliderValue />
-    </div>
-    <SliderControl>
-      <SliderTrack>
-        <SliderIndicator />
-        <SliderThumb aria-label="Zoom" />
-      </SliderTrack>
-    </SliderControl>
-    <p data-slot="hint">Focus the thumb and press Page Up to zoom by 25%.</p>
-  </Slider>
+  <Field>
+    <Slider
+      :default-value="100"
+      :min="25"
+      :max="400"
+      :large-step="25"
+      :format="{ style: 'unit', unit: 'percent' }"
+    >
+      <div data-slot="row">
+        <FieldLabel>Zoom</FieldLabel>
+        <SliderValue />
+      </div>
+      <SliderControl>
+        <SliderTrack>
+          <SliderIndicator />
+          <SliderThumb />
+        </SliderTrack>
+      </SliderControl>
+    </Slider>
+  </Field>
 </template>

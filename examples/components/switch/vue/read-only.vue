@@ -7,9 +7,9 @@ import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
   <Field>
     <div data-slot="stack">
       <FieldLabel>Encrypt backups</FieldLabel>
-      <FieldDescription>Managed by your organization.</FieldDescription>
+      <FieldDescription>Your organization manages this setting.</FieldDescription>
     </div>
-    <Switch default-checked read-only>
+    <Switch name="encrypt" default-checked read-only>
       <SwitchThumb />
     </Switch>
   </Field>

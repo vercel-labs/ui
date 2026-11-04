@@ -1,15 +1,15 @@
 import "@ui-sdk/web/switch"
 import "@ui-sdk/web/field"
 
-const options = [
+const settings = [
   {
-    label: "Share across devices",
-    description: "Focus is shared across devices, and turns off when you leave the app.",
+    label: "Public profile",
+    description: "Anyone can see your name and photo.",
     defaultChecked: false,
   },
   {
-    label: "Enable notifications",
-    description: "Receive notifications when focus mode is enabled or disabled.",
+    label: "Show activity status",
+    description: "Teammates can see when you're online.",
     defaultChecked: true,
   },
 ]
@@ -17,15 +17,15 @@ const options = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      ${options
+      ${settings
         .map(
-          (option) => `
+          (setting) => `
             <ui-field data-variant="card">
               <div data-slot="stack">
-                <ui-field-label>${option.label}</ui-field-label>
-                <ui-field-description>${option.description}</ui-field-description>
+                <ui-field-label>${setting.label}</ui-field-label>
+                <ui-field-description>${setting.description}</ui-field-description>
               </div>
-              <ui-switch${option.defaultChecked ? " default-checked" : ""}>
+              <ui-switch${setting.defaultChecked ? " default-checked" : ""}>
                 <ui-switch-thumb></ui-switch-thumb>
               </ui-switch>
             </ui-field>

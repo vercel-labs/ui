@@ -4,18 +4,14 @@
 </script>
 
 <label data-slot="label">
-  <Switch>
-    {#snippet render({ props, state })}
-      <button {...props}>
-        <SwitchThumb>
-          {#snippet render({ props, state: thumbState })}
-            <span {...props}>
-              {#if thumbState.checked}<MoonIcon />{:else}<SunIcon />{/if}
-            </span>
-          {/snippet}
-        </SwitchThumb>
-      </button>
-    {/snippet}
-  </Switch>
   Dark mode
+  <Switch>
+    <SwitchThumb>
+      {#snippet render({ props, state })}
+        <span {...props}>
+          {#if state.checked}<MoonIcon aria-hidden="true" />{:else}<SunIcon aria-hidden="true" />{/if}
+        </span>
+      {/snippet}
+    </SwitchThumb>
+  </Switch>
 </label>

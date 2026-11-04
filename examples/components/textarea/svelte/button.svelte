@@ -1,27 +1,26 @@
 <script lang="ts">
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Textarea, createInputController } from "@ui-sdk/svelte/textarea"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   const message = createInputController()
-  let sent = $state<string[]>([])
-
-  function send(event: SubmitEvent) {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget as HTMLFormElement)
-    sent = [...sent, String(data.get("message"))]
-    message.clear()
-  }
 </script>
 
-<form data-slot="stack" onsubmit={send}>
+<form
+  data-slot="stack"
+  onsubmit={(event) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    log(`Sent “${data.get("message")}”`)
+    message.clear()
+  }}
+>
   <Field name="message">
     <FieldLabel>Message</FieldLabel>
-    <Textarea controller={message} required autoResize />
+    <Textarea controller={message} required placeholder="Write a reply to Hollis Grant." />
   </Field>
-  <button type="submit">
-    Send message
-  </button>
-  <p data-slot="output">
-    {sent.length ? `Sent: ${sent.at(-1)}` : "Nothing sent yet."}
-  </p>
+  <div data-slot="row">
+    <button type="submit" data-variant="solid">Send Message</button>
+  </div>
 </form>

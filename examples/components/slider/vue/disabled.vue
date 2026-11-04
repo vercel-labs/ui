@@ -1,14 +1,29 @@
 <script setup lang="ts">
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/vue/slider"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+} from "@ui-sdk/vue/slider"
 </script>
 
 <template>
-  <Slider :default-value="50" disabled>
-    <SliderControl>
-      <SliderTrack>
-        <SliderIndicator />
-        <SliderThumb aria-label="Disabled" />
-      </SliderTrack>
-    </SliderControl>
-  </Slider>
+  <Field>
+    <Slider :default-value="50" disabled>
+      <div data-slot="row">
+        <FieldLabel>Brightness</FieldLabel>
+        <SliderValue />
+      </div>
+      <SliderControl>
+        <SliderTrack>
+          <SliderIndicator />
+          <SliderThumb />
+        </SliderTrack>
+      </SliderControl>
+    </Slider>
+    <FieldDescription>Managed by your organization.</FieldDescription>
+  </Field>
 </template>

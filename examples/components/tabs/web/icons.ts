@@ -24,9 +24,9 @@ function mount(root: HTMLElement) {
           </button>
         </ui-tabs-tab>
       </ui-tabs-list>
-      <ui-tabs-panel value="inbox">Messages sent to you.</ui-tabs-panel>
-      <ui-tabs-panel value="replies">Replies to your messages.</ui-tabs-panel>
-      <ui-tabs-panel value="archive">Messages you put away.</ui-tabs-panel>
+      <ui-tabs-panel value="inbox">3 new messages from Inès Moreau and Kofi Mensah.</ui-tabs-panel>
+      <ui-tabs-panel value="replies">Wren Takahashi replied to your message about the launch.</ui-tabs-panel>
+      <ui-tabs-panel value="archive">Messages you archived stay here and in search.</ui-tabs-panel>
     </ui-tabs>
   `
 }

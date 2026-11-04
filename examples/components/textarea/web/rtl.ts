@@ -1,7 +1,7 @@
 import "@ui-sdk/web/field"
 import "@ui-sdk/web/textarea"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field dir="rtl" name="feedback">
       <ui-field-label>ملاحظاتك</ui-field-label>
@@ -12,3 +12,5 @@ export function mount(root: HTMLElement) {
     </ui-field>
   `
 }
+
+export { mount }

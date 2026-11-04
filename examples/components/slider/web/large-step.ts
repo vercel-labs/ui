@@ -1,22 +1,24 @@
 import "@ui-sdk/web/slider"
+import "@ui-sdk/web/field"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-slider default-value="100" min="25" max="400" large-step="25">
-      <div data-slot="row">
-        <span data-slot="label">Zoom</span>
-        <ui-slider-value></ui-slider-value>
-      </div>
-      <ui-slider-control>
-        <ui-slider-track>
-          <ui-slider-indicator></ui-slider-indicator>
-          <ui-slider-thumb aria-label="Zoom"></ui-slider-thumb>
-        </ui-slider-track>
-      </ui-slider-control>
-      <p data-slot="hint">Focus the thumb and press Page Up to zoom by 25%.</p>
-    </ui-slider>
+    <ui-field>
+      <ui-slider default-value="100" min="25" max="400" large-step="25">
+        <div data-slot="row">
+          <ui-field-label>Zoom</ui-field-label>
+          <ui-slider-value></ui-slider-value>
+        </div>
+        <ui-slider-control>
+          <ui-slider-track>
+            <ui-slider-indicator></ui-slider-indicator>
+            <ui-slider-thumb></ui-slider-thumb>
+          </ui-slider-track>
+        </ui-slider-control>
+      </ui-slider>
+    </ui-field>
   `
-  const slider = root.querySelector("ui-slider") as HTMLElement & { format: Intl.NumberFormatOptions }
+  const slider = root.querySelector("ui-slider")!
   slider.format = { style: "unit", unit: "percent" }
 }
 

@@ -15,7 +15,7 @@ const policies = [
   {
     value: "warranty",
     label: "Warranty",
-    text: "Every product has a two year warranty. Batteries are covered for one year.",
+    text: "Every product has a two-year warranty. Batteries are covered for one year from delivery.",
   },
 ]
 </script>
@@ -28,8 +28,7 @@ const policies = [
       </TabsTab>
     </TabsList>
     <TabsPanel v-for="policy in policies" :key="policy.value" :value="policy.value">
-      <h3>{{ policy.label }}</h3>
-      <p data-slot="hint">{{ policy.text }}</p>
+      {{ policy.text }}
     </TabsPanel>
   </Tabs>
 </template>

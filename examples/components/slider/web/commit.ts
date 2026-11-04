@@ -1,7 +1,6 @@
 import "@ui-sdk/web/slider"
 import "@ui-sdk/web/field"
-
-const save = () => new Promise((resolve) => setTimeout(resolve, 600))
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -18,21 +17,11 @@ function mount(root: HTMLElement) {
           </ui-slider-track>
         </ui-slider-control>
       </ui-slider>
-      <output data-slot="output">
-        <span>Changes: 0</span>
-        <span>Drag to change the brightness.</span>
-      </output>
     </ui-field>
   `
-  const slider = root.querySelector("ui-slider")!
-  const [changes, status] = root.querySelectorAll("output span")
-  let count = 0
-  slider.addEventListener("valuechange", () => (changes.textContent = `Changes: ${++count}`))
-  slider.addEventListener("valuecommit", async (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: number; reason: string }>).detail
-    status.textContent = "Saving…"
-    await save()
-    status.textContent = `Saved ${value} (${reason}).`
+  root.querySelector("ui-slider")!.addEventListener("valuecommit", (event) => {
+    const { value, reason } = event.detail
+    log(root, `Saved ${value} (${reason})`)
   })
 }
 

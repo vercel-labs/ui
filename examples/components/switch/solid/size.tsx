@@ -1,20 +1,22 @@
 import { Switch, SwitchThumb } from "@ui-sdk/solid/switch"
 
-export function Example() {
+function Example() {
   return (
-    <div data-slot="row">
+    <div data-slot="stack">
       <label data-slot="label">
+        Small
         <Switch data-size="sm">
           <SwitchThumb />
         </Switch>
-        Small
       </label>
       <label data-slot="label">
+        Default
         <Switch>
           <SwitchThumb />
         </Switch>
-        Default
       </label>
     </div>
   )
 }
+
+export { Example }

@@ -7,23 +7,17 @@
     SliderThumb,
     SliderTrack,
     SliderValue,
-    type SliderValueCommitDetails,
   } from "@ui-sdk/svelte/slider"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const save = () => new Promise((resolve) => setTimeout(resolve, 600))
-
-  let changes = $state(0)
-  let status = $state("Drag to change the brightness.")
-
-  async function onCommit(value: number | number[], details: SliderValueCommitDetails) {
-    status = "Saving…"
-    await save()
-    status = `Saved ${value} (${details.reason}).`
-  }
+  const log = useLog()
 </script>
 
 <Field>
-  <Slider defaultValue={50} onValueChange={() => changes++} onValueCommit={onCommit}>
+  <Slider
+    onValueCommit={(value, details) => log(`Saved ${value} (${details.reason})`)}
+    defaultValue={50}
+  >
     <div data-slot="row">
       <FieldLabel>Brightness</FieldLabel>
       <SliderValue />
@@ -35,8 +29,4 @@
       </SliderTrack>
     </SliderControl>
   </Slider>
-  <output data-slot="output">
-    <span>Changes: {changes}</span>
-    <span>{status}</span>
-  </output>
 </Field>

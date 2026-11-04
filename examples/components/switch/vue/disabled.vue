@@ -3,10 +3,18 @@ import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
 </script>
 
 <template>
-  <label data-slot="label">
-    <Switch disabled>
-      <SwitchThumb />
-    </Switch>
-    Disabled
-  </label>
+  <div data-slot="stack">
+    <label data-slot="label">
+      Product updates
+      <Switch>
+        <SwitchThumb />
+      </Switch>
+    </label>
+    <label data-slot="label">
+      Security alerts
+      <Switch default-checked disabled>
+        <SwitchThumb />
+      </Switch>
+    </label>
+  </div>
 </template>

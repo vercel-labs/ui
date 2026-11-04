@@ -1,20 +1,22 @@
 import "@ui-sdk/web/switch"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="row">
+    <div data-slot="stack">
       <label data-slot="label">
+        Small
         <ui-switch data-size="sm">
           <ui-switch-thumb></ui-switch-thumb>
         </ui-switch>
-        Small
       </label>
       <label data-slot="label">
+        Default
         <ui-switch>
           <ui-switch-thumb></ui-switch-thumb>
         </ui-switch>
-        Default
       </label>
     </div>
   `
 }
+
+export { mount }

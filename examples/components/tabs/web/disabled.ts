@@ -15,8 +15,8 @@ function mount(root: HTMLElement) {
         </ui-tabs-tab>
       </ui-tabs-list>
       <ui-tabs-panel value="overview">Revenue, visitors and sign-ups for the last 30 days.</ui-tabs-panel>
-      <ui-tabs-panel value="analytics">Where visitors come from and what they do.</ui-tabs-panel>
-      <ui-tabs-panel value="reports">Reports are available on the Pro plan.</ui-tabs-panel>
+      <ui-tabs-panel value="analytics">Where your visitors come from and the pages they read most.</ui-tabs-panel>
+      <ui-tabs-panel value="reports">Monthly reports are available on the Pro plan.</ui-tabs-panel>
     </ui-tabs>
   `
 }

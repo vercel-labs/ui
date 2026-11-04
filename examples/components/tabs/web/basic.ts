@@ -11,8 +11,12 @@ function mount(root: HTMLElement) {
           <button type="button">Password</button>
         </ui-tabs-tab>
       </ui-tabs-list>
-      <ui-tabs-panel value="account">Manage your name, email address, and profile.</ui-tabs-panel>
-      <ui-tabs-panel value="password">Choose a new password for your account.</ui-tabs-panel>
+      <ui-tabs-panel value="account">
+        Update your name, email address and profile photo. Your team sees changes right away.
+      </ui-tabs-panel>
+      <ui-tabs-panel value="password">
+        Choose a new password for hollis@example.com. You stay signed in on this device.
+      </ui-tabs-panel>
     </ui-tabs>
   `
 }

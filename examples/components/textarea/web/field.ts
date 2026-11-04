@@ -1,14 +1,16 @@
 import "@ui-sdk/web/field"
 import "@ui-sdk/web/textarea"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-field name="message">
-      <ui-field-label>Message</ui-field-label>
+    <ui-field name="feedback">
+      <ui-field-label>Feedback</ui-field-label>
       <ui-textarea>
-        <textarea placeholder="Type your message here."></textarea>
+        <textarea placeholder="What could we do better?"></textarea>
       </ui-textarea>
-      <ui-field-description>Your message will be copied to the support team.</ui-field-description>
+      <ui-field-description>Only the product team can see this.</ui-field-description>
     </ui-field>
   `
 }
+
+export { mount }

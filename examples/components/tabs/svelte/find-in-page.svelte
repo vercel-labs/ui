@@ -15,7 +15,7 @@
     {
       value: "warranty",
       label: "Warranty",
-      text: "Every product has a two year warranty. Batteries are covered for one year.",
+      text: "Every product has a two-year warranty. Batteries are covered for one year from delivery.",
     },
   ]
 </script>
@@ -23,15 +23,10 @@
 <Tabs defaultValue="shipping" hiddenUntilFound>
   <TabsList aria-label="Policies">
     {#each policies as policy (policy.value)}
-      <TabsTab value={policy.value}>
-        {policy.label}
-      </TabsTab>
+      <TabsTab value={policy.value}>{policy.label}</TabsTab>
     {/each}
   </TabsList>
   {#each policies as policy (policy.value)}
-    <TabsPanel value={policy.value}>
-      <h3>{policy.label}</h3>
-      <p data-slot="hint">{policy.text}</p>
-    </TabsPanel>
+    <TabsPanel value={policy.value}>{policy.text}</TabsPanel>
   {/each}
 </Tabs>

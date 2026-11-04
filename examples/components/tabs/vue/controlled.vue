@@ -2,18 +2,22 @@
 import { createTabsController } from "@ui-sdk/core/tabs"
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const tabs = createTabsController()
 const value = ref<string | null>("inbox")
-const reason = ref("")
 </script>
 
 <template>
-  <div data-slot="stack">
+  <div>
+    <div data-slot="controls">
+      <button type="button" @click="tabs.select('sent')">Show Sent Mail</button>
+    </div>
     <Tabs
       v-model:value="value"
+      @value-change="(next, details) => log(`value: ${next} (${details.reason})`)"
       :controller="tabs"
-      @value-change="(_: string | null, details: { reason: string }) => (reason = details.reason)"
     >
       <TabsList aria-label="Mail">
         <TabsTab value="inbox">Inbox</TabsTab>
@@ -21,13 +25,9 @@ const reason = ref("")
         <TabsTab value="sent">Sent</TabsTab>
         <TabsIndicator />
       </TabsList>
-      <TabsPanel value="inbox">No new mail.</TabsPanel>
-      <TabsPanel value="drafts">Two drafts.</TabsPanel>
-      <TabsPanel value="sent">Sent this week: 12.</TabsPanel>
+      <TabsPanel value="inbox">3 unread messages from Hollis Grant and Inès Moreau.</TabsPanel>
+      <TabsPanel value="drafts">2 drafts, the last one edited yesterday at 4:12 PM.</TabsPanel>
+      <TabsPanel value="sent">12 messages sent this week, all delivered.</TabsPanel>
     </Tabs>
-    <div data-slot="row">
-      <button type="button" @click="tabs.select('sent')">Show sent mail</button>
-    </div>
-    <output data-slot="output">Selected: {{ value }}{{ reason && `, last change: ${reason}` }}</output>
   </div>
 </template>

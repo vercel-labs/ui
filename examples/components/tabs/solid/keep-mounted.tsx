@@ -1,3 +1,4 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
 
 function Example() {
@@ -9,9 +10,15 @@ function Example() {
         <TabsIndicator />
       </TabsList>
       <TabsPanel value="reply" keepMounted>
-        <textarea aria-label="Reply" placeholder="Write a reply…" />
+        <Field>
+          <FieldLabel>Message</FieldLabel>
+          <FieldControl render={(props) => <textarea {...props} rows={3} />} placeholder="Write a reply…" />
+        </Field>
       </TabsPanel>
-      <TabsPanel value="formatting">Use **bold**, _italics_ and `code`. Paste a link to embed it.</TabsPanel>
+      <TabsPanel value="formatting">
+        <p>Use **bold**, _italics_ and `code` to format your reply.</p>
+        <p>Paste a link on its own line to show a preview.</p>
+      </TabsPanel>
     </Tabs>
   )
 }

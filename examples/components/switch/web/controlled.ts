@@ -1,24 +1,25 @@
 import "@ui-sdk/web/switch"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button">Toggle</button>
+      </div>
       <label data-slot="label">
+        Wi-Fi
         <ui-switch default-checked>
           <ui-switch-thumb></ui-switch-thumb>
         </ui-switch>
-        Wi-Fi
       </label>
-      <button type="button">Toggle from outside</button>
-      <output data-slot="output">Wi-Fi: on</output>
     </div>
   `
   const wifi = root.querySelector("ui-switch")!
   root.querySelector("button")!.addEventListener("click", () => wifi.api.toggle())
-
   wifi.addEventListener("checkedchange", (event) => {
     const { value, reason } = event.detail
-    root.querySelector("output")!.textContent = `Wi-Fi: ${value ? "on" : "off"}, last change: ${reason}`
+    log(root, `${value ? "On" : "Off"} (${reason})`)
   })
 }
 

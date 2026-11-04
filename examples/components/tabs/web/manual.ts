@@ -1,3 +1,4 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/tabs"
 
 function mount(root: HTMLElement) {
@@ -10,14 +11,13 @@ function mount(root: HTMLElement) {
         <ui-tabs-tab value="code">
           <button type="button">Code</button>
         </ui-tabs-tab>
-        <ui-tabs-tab value="tests" disabled>
-          <button type="button">Tests</button>
-        </ui-tabs-tab>
       </ui-tabs-list>
-      <ui-tabs-panel value="preview">The rendered snippet.</ui-tabs-panel>
+      <ui-tabs-panel value="preview">Welcome back, Hollis. You have 3 unread messages.</ui-tabs-panel>
       <ui-tabs-panel value="code">
-        Edit the snippet's source.
-        <input aria-label="Source" value="&lt;Tabs /&gt;" />
+        <ui-field>
+          <ui-field-label>Source</ui-field-label>
+          <input value='&lt;Welcome name="Hollis" unread={3} /&gt;' />
+        </ui-field>
       </ui-tabs-panel>
     </ui-tabs>
   `

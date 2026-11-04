@@ -5,8 +5,8 @@ import { Textarea } from "@ui-sdk/vue/textarea"
 
 <template>
   <Field invalid>
-    <FieldLabel>Message</FieldLabel>
-    <Textarea default-value="hi" />
+    <FieldLabel>Review</FieldLabel>
+    <Textarea default-value="Great." />
     <FieldError match>Write at least 20 characters.</FieldError>
   </Field>
 </template>

@@ -16,9 +16,9 @@ function mount(root: HTMLElement) {
         <ui-tabs-indicator></ui-tabs-indicator>
       </ui-tabs-list>
       <div data-slot="stack">
-        <ui-tabs-panel value="overview">Everything about the project at a glance.</ui-tabs-panel>
-        <ui-tabs-panel value="activity">Deploys, comments and reviews from the last week.</ui-tabs-panel>
-        <ui-tabs-panel value="settings">Rename, transfer or archive the project.</ui-tabs-panel>
+        <ui-tabs-panel value="overview">The launch is on track for Friday, with 4 of 6 tasks done.</ui-tabs-panel>
+        <ui-tabs-panel value="activity">Inès Moreau deployed to production and Kofi Mensah left a review.</ui-tabs-panel>
+        <ui-tabs-panel value="settings">Rename the project, transfer it to another team or archive it.</ui-tabs-panel>
       </div>
     </ui-tabs>
   `

@@ -32,24 +32,70 @@ Tabs
 
 Give each tab and its panel the same unique `value`. Give the list an accessible name. Set `defaultValue` to choose the initial tab; otherwise, the first enabled tab is selected.
 
-Tab enters the list at the selected tab. Left and Right Arrow move between tabs and select them. Home and End move to the first and last tabs.
+## Usage
 
-<span id="right-to-left" />
+Import the parts and put them together:
 
-The list reads `dir="rtl"` from the page or any ancestor. Arrow directions follow the reading direction, with no provider.
+```tsx
+import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
 
-## Examples
+function Example() {
+  return (
+    <Tabs defaultValue="account">
+      <TabsList aria-label="Settings">
+        <TabsTab value="account">Account</TabsTab>
+        <TabsTab value="password">Password</TabsTab>
+      </TabsList>
+      <TabsPanel value="account">Manage your profile.</TabsPanel>
+      <TabsPanel value="password">Choose a new password.</TabsPanel>
+    </Tabs>
+  )
+}
 
-### Vertical
+export { Example }
+```
 
-Set `orientation="vertical"` to use Up and Down Arrow instead. Style the list as a column to match.
+## Build Your Own
+
+`@ui-sdk/solid/tabs` comes with ready-made Tabs. If you'd like to build your own, with your own names, start from the `tabs` primitive in `@ui-sdk/core`:
+
+```ts title="segments.ts"
+import { tabs } from "@ui-sdk/core/tabs"
+import { createParts } from "@ui-sdk/solid/primitive"
+
+const {
+  Root: Segments,
+  List: SegmentList,
+  Tab: Segment,
+  Panel: SegmentPanel,
+} = createParts(tabs, { root: "div", list: "div", tab: "button", panel: "div" })
+
+export { Segment, SegmentList, SegmentPanel, Segments }
+```
+
+```tsx
+<Segments defaultValue="day">
+  <SegmentList aria-label="Range">
+    <Segment value="day">Day</Segment>
+    <Segment value="week">Week</Segment>
+  </SegmentList>
+  <SegmentPanel value="day">128 visitors today.</SegmentPanel>
+  <SegmentPanel value="week">1,024 visitors this week.</SegmentPanel>
+</Segments>
+```
+
+Add `"tab-icon": "span"` and `indicator: "span"` to the elements to get the `TabIcon` and `Indicator` parts too. Each part keeps the behavior, state and data attributes of its ready-made counterpart. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Vertical
+
+Set `orientation="vertical"` to use Up and Down Arrow instead. Style the list as a column beside the panels to match.
 
 <ComponentExample
   name="tabs/vertical"
   caption="Focus General, then press Down Arrow to choose Security. Up Arrow moves back through the vertical list."
 />
 
-### Disabled
+## Disabled
 
 Add `disabled` to a tab to prevent selection. Arrow keys can still focus it so people can discover it.
 
@@ -58,7 +104,7 @@ Add `disabled` to a tab to prevent selection. Arrow keys can still focus it so p
   caption="Use the arrow keys to reach Reports. It can receive focus, but pressing it leaves the current panel selected."
 />
 
-### Icons
+## Icons
 
 Put decorative icons in `TabsTabIcon` so they stay out of the tab’s accessible name. Add `mirror` to directional icons, such as Reply, to flip them in right-to-left text. An icon-only tab still needs an `aria-label`.
 
@@ -67,9 +113,7 @@ Put decorative icons in `TabsTabIcon` so they stay out of the tab’s accessible
   caption="Choose Replies. Its directional icon mirrors when the surrounding page uses right-to-left text."
 />
 
-<span id="behavior-and-options" />
-
-### Manual Activation
+## Manual Activation
 
 Set `activation="manual"` when opening a panel takes time, such as a view that fetches data. Arrow keys move focus; Enter or Space selects the focused tab.
 
@@ -84,7 +128,7 @@ A panel becomes a tab stop only when it has no focusable content. A panel with a
   caption="Focus Preview, then press Right Arrow. Code receives focus; press Enter or Space to show its panel. Tab then moves into the Source field."
 />
 
-### Loop
+## Loop
 
 Arrow keys normally wrap around at either end. Set `loop={false}` to stop there instead.
 
@@ -93,33 +137,47 @@ Arrow keys normally wrap around at either end. Set `loop={false}` to stop there 
   caption="Focus Year and press Right Arrow. Focus stays at the end because looping is off."
 />
 
-<span id="line" />
+## Indicator
 
-### Indicator
+`TabsIndicator` measures the selected tab. Position it inside a relative tab list and use its [CSS variables](#styling-tabsindicator) to make a marker that follows the selection. It measures again when a tab or the list changes size.
 
-`TabsIndicator` measures the selected tab. Position it inside a relative tab list and use its CSS variables to make a marker that follows the selection. It measures again when a tab or the list changes size.
+```css
+[data-slot="tabs-list"] {
+  position: relative;
+}
 
-```tsx
-<TabsIndicator class="absolute top-(--active-tab-top) left-(--active-tab-left) h-(--active-tab-height) w-(--active-tab-width)" />
+[data-slot="tabs-indicator"] {
+  position: absolute;
+  top: var(--active-tab-top);
+  left: var(--active-tab-left);
+  width: var(--active-tab-width);
+  height: var(--active-tab-height);
+  transition-property: top, left, width, height;
+  transition-duration: 200ms;
+
+  &[data-activation-direction="none"] {
+    transition: none;
+  }
+}
 ```
 
 Add transitions for the properties you animate. Skip them while `data-activation-direction="none"` to avoid animating the first placement.
 
 <ComponentExample
   name="tabs/indicator"
-  caption="Choose Podcasts, then turn on Vertical. The same indicator measures and follows the selected tab in either layout."
+  caption="Choose Podcasts, then choose Vertical. The same indicator measures and follows the selected tab in either layout."
 />
 
-### Keep Mounted
+## Keep Mounted
 
 Panels normally unmount when another tab is selected. Add `keepMounted` to a panel to keep its content hidden in the page, preserving local state such as a draft.
 
 <ComponentExample
   name="tabs/keep-mounted"
-  caption="Write a reply, switch to Formatting, then return to Reply. Your draft is still there."
+  caption="Write a message, switch to Formatting, then return to Reply. Your draft is still there."
 />
 
-### Find in Page
+## Find in Page
 
 Add `hiddenUntilFound` to the tabs or a panel to keep closed content available to the browser’s Find command. A match selects its tab with the reason `find-in-page`. This also keeps the panel mounted.
 
@@ -130,18 +188,18 @@ Server-rendered panels retain `hidden="until-found"`, so their content is availa
   caption="Use your browser’s Find command to search for “restocking fee”. Returns opens to reveal the match."
 />
 
-### Animation
+## Animation
 
 Panels expose `data-starting-style` as they enter and `data-ending-style` as they leave. The previous panel stays mounted through its exit animation, then unmounts or hides if it is kept mounted.
 
-Use `data-activation-direction` to choose a slide direction. Put both panels in the same grid cell so they overlap during the transition, as this example does.
+Use `data-activation-direction` to choose a slide direction. Put the panels in the same grid cell so they overlap during the transition, as this example does.
 
 <ComponentExample
   name="tabs/animation"
-  caption="Move between Overview, Activity, and Settings. The panels slide in the direction you moved."
+  caption="Move between Overview, Activity and Settings. The panels slide in the direction you moved."
 />
 
-### Controlled
+## Controlled
 
 Use `value` and `onValueChange` to own the selected tab. [State and Events](../state-and-events) covers the shared pattern. Call `details.cancel()` in the change callback to reject a change.
 
@@ -149,10 +207,10 @@ Use `value` and `onValueChange` to own the selected tab. [State and Events](../s
 
 <ComponentExample
   name="tabs/controlled"
-  caption="Choose Drafts, then press Show sent mail. The selected value and the reason for each change appear below."
+  caption="Choose Drafts, then press Show Sent Mail. The console logs each new value with its reason."
 />
 
-### Links
+## Links
 
 Render a tab as a link when selection should navigate. It keeps its tab role; arrow keys follow the link when they select it. Modified clicks, such as Cmd-click, keep their normal browser behavior without selecting the tab.
 
@@ -167,15 +225,9 @@ Render a tab as a link when selection should navigate. It keeps its tab role; ar
   caption="Choose Activity. Its panel opens and the URL hash changes. Modified clicks keep the link’s usual browser behavior."
 />
 
-## Patterns
+## Query String
 
-### Sync with the URL
-
-Use the URL as the source of the selected value, and validate it against your tab values. The approach depends on what the URL represents.
-
-#### Query Parameter
-
-Read the parameter on the server when possible, then pass it as the controlled value. Write changes through your router so browser navigation and the rendered page stay in sync. For a plain client page, preserve the rest of the URL when updating it:
+Use the URL as the source of the selected value, and validate it against your tab values. Read the parameter on the server when possible, then pass it as the controlled value. Write changes through your router so browser navigation and the rendered page stay in sync. For a plain client page, keep the rest of the URL when updating it:
 
 ```ts
 function saveSelectedTab(value: string | null) {
@@ -191,31 +243,64 @@ function saveSelectedTab(value: string | null) {
 
 Call this from `onValueChange` after accepting the value. Read it again on `popstate` if your page uses browser history directly; remove that listener when the view unmounts.
 
-#### Hash
+## URL Hash
 
 A hash such as `#activity` works on a client-rendered page. Read it after mount and on `hashchange`, then select the matching tab. Setting `location.hash` adds a history entry. The server cannot read the hash, so give the page an initial tab while it loads.
 
-#### Route Tabs
+## Route Tabs
 
-When each tab is a route, render links and derive the controlled value from the current path. Let navigation update the value. You do not also need a change handler that navigates to the same route.
+When each tab is a route, render [links](#links) and derive the controlled value from the current path. Let navigation update the value. You do not also need a change handler that navigates to the same route.
 
-### Scrolling the Selected Tab into View
+## Scroll into View
 
 If the list scrolls, selecting a tab through a controller or the URL scrolls it into view inside that list. Pointer and arrow-key selection focus the tab, so the browser reveals it as part of focusing it.
 
-## Styling
-
-Use `data-selected` and `data-disabled` to style a tab. Icon parts also provide `data-has-icon` on the tab and `data-has-icons` on the list, which can help align mixed text and icon tabs.
-
-<DataAttributes component="tabs" />
-
-The indicator’s position and size are measured from the tab list into the [TabsIndicator](#tabsindicator) variables. Use them for an underline, a background, or a marker beside a vertical list.
-
 ## Custom Rendering
 
-<span id="render-functions" />
+Use `render` to change a part’s element or add to its content, as in the [links](#links) example. [Parts and Composition](../parts-and-composition) covers the shared rendering API. Each part’s state is listed under [State](#state).
 
-Use the framework’s `render` prop or slot to change a part’s element, as in the link example. [Parts and Composition](../parts-and-composition) covers the shared rendering API. Each part’s state is listed [below](#state).
+<ComponentExample
+  name="tabs/render"
+  caption="Each tab renders its own button with an unread count after the label. Choose Unread to see who wrote to you."
+/>
+
+## Styling
+
+Parts are unstyled. Use `data-selected` and `data-disabled` to style a tab, and `data-selected` on a panel that shows. `data-orientation` on every part lets one stylesheet lay out horizontal and vertical tabs. Icon parts also set `data-has-icon` on the tab and `data-has-icons` on the list, which can help align mixed text and icon tabs.
+
+The indicator’s position and size are measured from the tab list into the variables below. Use them for an underline, a background, or a marker beside a vertical list.
+
+Each part has a `data-slot`, such as `tabs-tab`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### TabsIndicator [#styling-tabsindicator]
+
+<CssVariables component="tabs" part="indicator" />
+
+## Data Attributes
+
+### Tabs [#data-attributes-tabs]
+
+<DataAttributes component="tabs" part="root" />
+
+### TabsList [#data-attributes-tabslist]
+
+<DataAttributes component="tabs" part="list" />
+
+### TabsTab [#data-attributes-tabstab]
+
+<DataAttributes component="tabs" part="tab" />
+
+### TabsTabIcon [#data-attributes-tabstabicon]
+
+<DataAttributes component="tabs" part="tab-icon" />
+
+### TabsIndicator [#data-attributes-tabsindicator]
+
+<DataAttributes component="tabs" part="indicator" />
+
+### TabsPanel [#data-attributes-tabspanel]
+
+<DataAttributes component="tabs" part="panel" />
 
 ## API Reference
 
@@ -224,6 +309,10 @@ Props and callbacks are the same as below, as Solid props.
 ### Tabs
 
 <TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsOptions" />
+
+### TabsList
+
+The list takes no options of its own, only the props of the element it renders.
 
 ### TabsTab
 
@@ -235,9 +324,7 @@ Props and callbacks are the same as below, as Solid props.
 
 ### TabsIndicator
 
-The indicator takes no props of its own.
-
-<CssVariables component="tabs" part="indicator" />
+The indicator takes no props of its own. Its [CSS variables](#styling-tabsindicator) hold the selected tab's box.
 
 ### TabsPanel
 
@@ -295,7 +382,15 @@ Callbacks get the new value first, then the details. `onValueChange` never runs 
 
 ## Accessibility
 
-Tabs follow the [WAI-ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/). Every line below is an automated test.
+Tabs follow the [WAI-ARIA tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/). The list is a `tablist`, each tab controls its panel, and each panel is labelled by its tab.
+
+### Keyboard
+
+Tab enters the list at the selected tab and leaves it on the next Tab. Left and Right Arrow move between tabs and select them, or only move focus with `activation="manual"`, where Enter or Space selects. Up and Down Arrow do the same in a vertical list. Home and End move to the first and last tabs. The list reads `dir="rtl"` from the page or any ancestor, and Left and Right follow the reading direction, with no provider.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList
   spec="tabs"

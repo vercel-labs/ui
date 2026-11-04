@@ -1,14 +1,16 @@
 import "@ui-sdk/web/switch"
+import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <form data-slot="stack" id="email-preferences">
-        <fieldset data-slot="stack">
+    <form data-slot="stack">
+      <ui-field-set>
+        <fieldset>
           <legend>Email notifications</legend>
           <label data-slot="label">
-            Marketing emails
-            <ui-switch name="marketing">
+            Product updates
+            <ui-switch name="updates">
               <ui-switch-thumb></ui-switch-thumb>
             </ui-switch>
           </label>
@@ -25,30 +27,19 @@ function mount(root: HTMLElement) {
             </ui-switch>
           </label>
         </fieldset>
-        <div data-slot="row">
-          <button type="submit">Save</button>
-          <button type="reset">Reset</button>
-        </div>
-      </form>
-      <div>
-        <label data-slot="label">
-          Join the beta
-          <ui-switch name="beta" form="email-preferences">
-            <ui-switch-thumb></ui-switch-thumb>
-          </ui-switch>
-        </label>
+      </ui-field-set>
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">Save</button>
+        <button type="reset">Reset</button>
       </div>
-      <output data-slot="output"></output>
-    </div>
+    </form>
   `
-  const preferences = root.querySelector("form")!
-  const submitted = root.querySelector("output")!
-  preferences.addEventListener("submit", (event) => {
+  const form = root.querySelector("form")!
+  form.addEventListener("submit", (event) => {
     event.preventDefault()
-    const data = [...new FormData(preferences)].map(([name, value]) => `${name}=${value}`)
-    submitted.textContent = `Submitted: ${data.join(", ") || "nothing"}`
+    const entries = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
+    log(root, entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
   })
-  preferences.addEventListener("reset", () => (submitted.textContent = ""))
 }
 
 export { mount }

@@ -1,10 +1,16 @@
-import type { SliderController } from "@ui-sdk/core/slider"
 import "@ui-sdk/web/slider"
 import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" data-action="mute">Mute</button>
+        <button type="button" data-action="louder">Louder</button>
+        <button type="button" data-action="read">Read</button>
+        <button type="button" data-action="focus">Focus</button>
+      </div>
       <ui-field>
         <ui-slider default-value="40">
           <div data-slot="row">
@@ -19,29 +25,22 @@ function mount(root: HTMLElement) {
           </ui-slider-control>
         </ui-slider>
       </ui-field>
-      <div data-slot="row">
-        <button type="button" data-action="mute">Mute</button>
-        <button type="button" data-action="louder">Louder</button>
-        <button type="button" data-action="read">Read</button>
-        <button type="button" data-action="focus">Focus</button>
-      </div>
-      <output data-slot="output" hidden></output>
     </div>
   `
-  const slider = root.querySelector("ui-slider") as HTMLElement & { api: SliderController<number> }
+  const slider = root.querySelector("ui-slider")!
   const volume = slider.api
-  const reading = root.querySelector("output")!
   const actions: Record<string, () => void> = {
     mute: () => volume.setValue(0),
-    louder: () => volume.setValue(volume.getValue() + 10),
-    read: () => {
-      reading.textContent = `Volume is ${volume.getValue()}.`
-      reading.hidden = false
-    },
+    louder: () => volume.setValue(Number(volume.getValue()) + 10),
+    read: () => log(root, `Volume is ${volume.getValue()}`),
     focus: () => volume.focus(),
   }
   root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
     button.addEventListener("click", () => actions[button.dataset.action!]())
+  })
+  slider.addEventListener("valuechange", (event) => {
+    const { value, reason } = event.detail
+    log(root, `Volume ${value} (${reason})`)
   })
 }
 
