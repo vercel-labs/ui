@@ -91,3 +91,48 @@ test("tokens changed, removed and added after mount show only what renderToken r
   act(() => controller.insert({ type: "file", value: "app.ts", label: "app.ts" }))
   expect(hosts()).toEqual(["router.ts file", "app.ts file"])
 })
+
+const pressEnter = () => {
+  const editor = document.querySelector<HTMLElement>("[data-slot='token-input-editor']")!
+  const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+  act(() => void editor.dispatchEvent(event))
+  return event
+}
+
+test("with nothing to submit, Enter is left to start a new line", () => {
+  mount(
+    <TokenInput defaultValue={fromText("Ask Hollis")}>
+      <TokenInputEditor aria-label="Message" />
+    </TokenInput>,
+  )
+  expect(pressEnter().defaultPrevented).toBe(false)
+})
+
+test("Enter calls onSubmit with the value", () => {
+  const submitted: unknown[] = []
+  mount(
+    <TokenInput defaultValue={fromText("Ask Hollis")} onSubmit={(value) => submitted.push(value)}>
+      <TokenInputEditor aria-label="Message" />
+    </TokenInput>,
+  )
+  expect(pressEnter().defaultPrevented).toBe(true)
+  expect(submitted).toEqual([fromText("Ask Hollis")])
+})
+
+test("Enter submits the form a token input is in", () => {
+  let submits = 0
+  mount(
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        submits++
+      }}
+    >
+      <TokenInput defaultValue={fromText("Ask Hollis")} name="message">
+        <TokenInputEditor aria-label="Message" />
+      </TokenInput>
+    </form>,
+  )
+  expect(pressEnter().defaultPrevented).toBe(true)
+  expect(submits).toBe(1)
+})

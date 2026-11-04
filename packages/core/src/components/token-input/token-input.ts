@@ -144,7 +144,7 @@ type TokenInputOptions = {
   /** Runs when typing, pasting, a menu, undo or a controller wants to change the value. `details.reason` says why, `details.removed` lists removed tokens, and `details.cancel()` stops it. */
   onValueChange?: (value: TokenInputValue, details: TokenInputValueChangeDetails) => void
   /**
-   * Runs on the submit shortcut, unless an input method is composing or a trigger menu is open. Without it, the shortcut submits the form the input is in.
+   * Runs on the submit shortcut, unless an input method is composing or a trigger menu is open. Without it, the shortcut submits the form the input is in. With neither, the key is left alone, so Enter starts a new line.
    */
   onSubmit?: (value: TokenInputValue, details: TokenInputSubmitDetails) => void
   /**

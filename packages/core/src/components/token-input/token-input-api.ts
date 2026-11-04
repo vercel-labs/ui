@@ -326,6 +326,8 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     ownerForm(element("editor"), store.get().form)?.requestSubmit()
   }
 
+  const canSubmit = () => !!options().onSubmit || !!ownerForm(element("editor"), store.get().form)
+
   const editor: TextEditorAdapter = {
     get element() {
       return element("editor")
@@ -398,6 +400,7 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       undo,
       redo,
       submit,
+      canSubmit,
       say,
       seal: history.seal,
       // The latest value, which a controlled owner may not have passed back yet.

@@ -225,7 +225,8 @@ function bindTokenEditing(el: HTMLElement, view: TokenView, api: TokenInputApi) 
     if (event.key === "Enter") {
       const shortcut = internal.options().submitShortcut ?? "enter"
       const submits = shortcut === "enter" ? !event.shiftKey && !mod && !event.altKey : mod && !event.shiftKey
-      if (!submits) return
+      // With nothing to submit, Enter is left to start a new line.
+      if (!submits || !internal.canSubmit()) return
       event.preventDefault()
       internal.submit(event)
     }
