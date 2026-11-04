@@ -9,34 +9,36 @@
     MenuSeparator,
     MenuTrigger,
   } from "@ui-sdk/svelte/menu"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let position = $state("bottom")
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <Menu>
-    <MenuTrigger>Panel</MenuTrigger>
-    <MenuContent>
-      <MenuRadioGroup bind:value={position} name="position">
-        <MenuGroupLabel>Position</MenuGroupLabel>
-        {#each ["Top", "Bottom", "Right"] as option (option)}
-          <MenuRadioItem value={option.toLowerCase()}>
-              <MenuItemIndicator />
-            {option}
-          </MenuRadioItem>
-        {/each}
-      </MenuRadioGroup>
-      <MenuSeparator />
-      <MenuRadioGroup defaultValue="comfortable">
-        <MenuGroupLabel>Density</MenuGroupLabel>
-        {#each ["Compact", "Comfortable"] as option (option)}
-          <MenuRadioItem value={option.toLowerCase()}>
-              <MenuItemIndicator />
-            {option}
-          </MenuRadioItem>
-        {/each}
-      </MenuRadioGroup>
-    </MenuContent>
-  </Menu>
-  <output data-slot="output">Panel at the {position}</output>
-</div>
+<Menu>
+  <MenuTrigger>Panel</MenuTrigger>
+  <MenuContent>
+    <MenuRadioGroup
+      name="position"
+      defaultValue="bottom"
+      onValueChange={(value) => log(`Panel at the ${value}`)}
+    >
+      <MenuGroupLabel>Position</MenuGroupLabel>
+      {#each ["Top", "Bottom", "Right"] as option (option)}
+        <MenuRadioItem value={option.toLowerCase()}>
+          <MenuItemIndicator />
+          {option}
+        </MenuRadioItem>
+      {/each}
+    </MenuRadioGroup>
+    <MenuSeparator />
+    <MenuRadioGroup defaultValue="comfortable" onValueChange={(value) => log(`${value} density`)}>
+      <MenuGroupLabel>Density</MenuGroupLabel>
+      {#each ["Compact", "Comfortable"] as option (option)}
+        <MenuRadioItem value={option.toLowerCase()}>
+          <MenuItemIndicator />
+          {option}
+        </MenuRadioItem>
+      {/each}
+    </MenuRadioGroup>
+  </MenuContent>
+</Menu>

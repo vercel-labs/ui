@@ -11,6 +11,7 @@
     MenuSeparator,
     MenuTrigger,
   } from "@ui-sdk/svelte/menu"
+  import { useLog } from "../../../shared/svelte/log"
 
   type File = { name: string; size: string }
 
@@ -21,16 +22,19 @@
   ]
 
   const menu = createMenuController<File>()
-  let status = $state("")
+  const log = useLog()
 
   async function openFirst(event: MouseEvent) {
     const result = await menu.open({ payload: files[0], anchor: event.currentTarget as HTMLElement })
-    status = `Closed with ${result.reason}`
+    log(`Closed with ${result.reason}`)
   }
 </script>
 
 <div data-slot="stack">
-  <ul>
+  <div data-slot="controls">
+    <button onclick={openFirst}>Open {files[0].name} Actions</button>
+  </div>
+  <ul data-slot="list">
     {#each files as file (file.name)}
       <li data-slot="row">
         {file.name}
@@ -47,7 +51,7 @@
       </li>
     {/each}
   </ul>
-  <Menu controller={menu} onAction={(action: string) => (status = `${action} ${menu.getPayload()?.name}`)}>
+  <Menu controller={menu} onAction={(action) => log(`${action} ${menu.getPayload()?.name}`)}>
     <MenuContent align="end">
       {#snippet children(state: MenuContentState<File>)}
         <MenuGroup>
@@ -61,6 +65,4 @@
       {/snippet}
     </MenuContent>
   </Menu>
-  <button data-variant="ghost" onclick={openFirst}>Open for {files[0].name}</button>
-  <output data-slot="output">{status || "Pick a file's actions"}</output>
 </div>

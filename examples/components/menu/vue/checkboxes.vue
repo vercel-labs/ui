@@ -10,49 +10,43 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@ui-sdk/vue/menu"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const statusBar = ref(true)
-const minimap = ref(false)
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Menu>
-      <MenuTrigger>View</MenuTrigger>
-      <MenuContent>
-        <MenuGroup>
-          <MenuGroupLabel>Appearance</MenuGroupLabel>
-          <MenuCheckboxItem v-model:checked="statusBar" value="status-bar">
-            <MenuItemIndicator keep-mounted>
-              <CheckIcon aria-hidden="true" />
-            </MenuItemIndicator>
-            Status bar
-          </MenuCheckboxItem>
-          <MenuCheckboxItem v-model:checked="minimap" value="minimap">
-            <MenuItemIndicator keep-mounted>
-              <CheckIcon aria-hidden="true" />
-            </MenuItemIndicator>
-            Minimap
-          </MenuCheckboxItem>
-        </MenuGroup>
-        <MenuSeparator />
-        <MenuCheckboxItem value="line-numbers" default-checked>
+  <Menu @checked-change="(checked, details) => log(`${details.value} ${checked ? 'on' : 'off'}`)">
+    <MenuTrigger>View</MenuTrigger>
+    <MenuContent>
+      <MenuGroup>
+        <MenuGroupLabel>Appearance</MenuGroupLabel>
+        <MenuCheckboxItem value="status-bar" default-checked>
           <MenuItemIndicator keep-mounted>
             <CheckIcon aria-hidden="true" />
           </MenuItemIndicator>
-          Line numbers
+          Status bar
         </MenuCheckboxItem>
-        <MenuCheckboxItem value="word-wrap">
+        <MenuCheckboxItem value="minimap">
           <MenuItemIndicator keep-mounted>
             <CheckIcon aria-hidden="true" />
           </MenuItemIndicator>
-          Word wrap
+          Minimap
         </MenuCheckboxItem>
-      </MenuContent>
-    </Menu>
-    <output data-slot="output">
-      Status bar {{ statusBar ? "shown" : "hidden" }}, minimap {{ minimap ? "shown" : "hidden" }}
-    </output>
-  </div>
+      </MenuGroup>
+      <MenuSeparator />
+      <MenuCheckboxItem value="line-numbers" default-checked>
+        <MenuItemIndicator keep-mounted>
+          <CheckIcon aria-hidden="true" />
+        </MenuItemIndicator>
+        Line numbers
+      </MenuCheckboxItem>
+      <MenuCheckboxItem value="word-wrap">
+        <MenuItemIndicator keep-mounted>
+          <CheckIcon aria-hidden="true" />
+        </MenuItemIndicator>
+        Word wrap
+      </MenuCheckboxItem>
+    </MenuContent>
+  </Menu>
 </template>

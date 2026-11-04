@@ -1,6 +1,7 @@
 <script lang="ts">
   import { FileIcon } from "@lucide/svelte"
   import { Listbox, ListboxItem, ListboxItemIcon } from "@ui-sdk/svelte/listbox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const files = [
     { value: "readme", label: "README.md" },
@@ -11,19 +12,22 @@
     { value: "logo", label: "logo.svg" },
   ]
 
-  let value = $state<string[]>(["readme"])
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <Listbox bind:value multiple activation="automatic" aria-label="Files">
-    {#each files as file (file.value)}
-      <ListboxItem value={file.value}>
-        <ListboxItemIcon>
-          <FileIcon aria-hidden="true" />
-        </ListboxItemIcon>
-        {file.label}
-      </ListboxItem>
-    {/each}
-  </Listbox>
-  <output data-slot="output">{value.length} selected</output>
-</div>
+<Listbox
+  multiple
+  activation="automatic"
+  defaultValue={["readme"]}
+  onValueChange={(value, details) => log(`${value.length} selected (${details.reason})`)}
+  aria-label="Files"
+>
+  {#each files as file (file.value)}
+    <ListboxItem value={file.value}>
+      <ListboxItemIcon>
+        <FileIcon aria-hidden="true" />
+      </ListboxItemIcon>
+      {file.label}
+    </ListboxItem>
+  {/each}
+</Listbox>

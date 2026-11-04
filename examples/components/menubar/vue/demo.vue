@@ -4,6 +4,7 @@ import {
   Menu,
   MenuCheckboxItem,
   MenuContent,
+  MenuGroupLabel,
   MenuItem,
   MenuItemIndicator,
   MenuRadioGroup,
@@ -15,81 +16,86 @@ import {
   MenuTrigger,
 } from "@ui-sdk/vue/menu"
 import { Menubar } from "@ui-sdk/vue/menubar"
+import { useLog } from "../../../shared/vue/log"
 
-const profiles = [
-  { value: "hollis", label: "Hollis" },
-  { value: "ines", label: "Inès" },
-  { value: "kofi", label: "Kofi" },
-]
+const recent = ["Q3 roadmap", "Launch checklist", "Offsite notes"]
+const formats = ["PDF", "Markdown", "HTML"]
+const appearances = ["Light", "Dark", "System"]
+
+const log = useLog()
+const chose = (value: string) => log(`Chose ${value}`)
 </script>
 
 <template>
   <Menubar>
-    <Menu>
+    <Menu @action="chose">
       <MenuTrigger>File</MenuTrigger>
       <MenuContent>
-        <MenuItem shortcut="mod+t">New Tab</MenuItem>
-        <MenuItem shortcut="mod+n">New Window</MenuItem>
-        <MenuItem disabled>New Incognito Window</MenuItem>
-        <MenuSeparator />
+        <MenuItem value="New document" shortcut="mod+n">New Document</MenuItem>
+        <MenuItem value="Open" shortcut="mod+o">Open…</MenuItem>
         <MenuSub>
           <MenuSubTrigger>
-            Share
+            Open Recent
             <ChevronRightIcon aria-hidden="true" />
           </MenuSubTrigger>
           <MenuSubContent>
-            <MenuItem>Email link</MenuItem>
-            <MenuItem>Messages</MenuItem>
-            <MenuItem>Notes</MenuItem>
+            <MenuItem v-for="name in recent" :key="name" :value="name">{{ name }}</MenuItem>
           </MenuSubContent>
         </MenuSub>
         <MenuSeparator />
-        <MenuItem shortcut="mod+p">Print…</MenuItem>
+        <MenuSub>
+          <MenuSubTrigger>
+            Export
+            <ChevronRightIcon aria-hidden="true" />
+          </MenuSubTrigger>
+          <MenuSubContent>
+            <MenuItem v-for="format in formats" :key="format" :value="`Export as ${format}`">
+              {{ format }}
+            </MenuItem>
+          </MenuSubContent>
+        </MenuSub>
+        <MenuItem value="Print" shortcut="mod+p">Print…</MenuItem>
       </MenuContent>
     </Menu>
-    <Menu>
+    <Menu @action="chose">
       <MenuTrigger>Edit</MenuTrigger>
       <MenuContent>
-        <MenuItem shortcut="mod+z">Undo</MenuItem>
-        <MenuItem shortcut="mod+shift+z">Redo</MenuItem>
+        <MenuItem value="Undo" shortcut="mod+z" disabled>Undo</MenuItem>
+        <MenuItem value="Redo" shortcut="mod+shift+z">Redo</MenuItem>
         <MenuSeparator />
-        <MenuItem>Cut</MenuItem>
-        <MenuItem>Copy</MenuItem>
-        <MenuItem>Paste</MenuItem>
+        <MenuItem value="Cut" shortcut="mod+x">Cut</MenuItem>
+        <MenuItem value="Copy" shortcut="mod+c">Copy</MenuItem>
+        <MenuItem value="Paste" shortcut="mod+v">Paste</MenuItem>
+        <MenuSeparator />
+        <MenuItem value="Find" shortcut="mod+f">Find…</MenuItem>
       </MenuContent>
     </Menu>
-    <Menu>
+    <Menu
+      @checked-change="(checked, details) => log(`${details.value} ${checked ? 'on' : 'off'}`)"
+      @value-change="(value) => log(`${value} appearance`)"
+    >
       <MenuTrigger>View</MenuTrigger>
       <MenuContent>
-        <MenuCheckboxItem value="bookmarks">
+        <MenuCheckboxItem value="Ruler">
           <MenuItemIndicator>
             <CheckIcon aria-hidden="true" />
           </MenuItemIndicator>
-          Always Show Bookmarks Bar
+          Show Ruler
         </MenuCheckboxItem>
-        <MenuCheckboxItem value="urls" default-checked>
+        <MenuCheckboxItem value="Word count" default-checked>
           <MenuItemIndicator>
             <CheckIcon aria-hidden="true" />
           </MenuItemIndicator>
-          Always Show Full URLs
+          Show Word Count
         </MenuCheckboxItem>
         <MenuSeparator />
-        <MenuItem shortcut="mod+r">Reload</MenuItem>
-        <MenuItem>Toggle Fullscreen</MenuItem>
-      </MenuContent>
-    </Menu>
-    <Menu>
-      <MenuTrigger>Profiles</MenuTrigger>
-      <MenuContent>
-        <MenuRadioGroup default-value="ines">
-          <MenuRadioItem v-for="profile in profiles" :key="profile.value" :value="profile.value">
+        <MenuRadioGroup default-value="System">
+          <MenuGroupLabel>Appearance</MenuGroupLabel>
+          <MenuRadioItem v-for="appearance in appearances" :key="appearance" :value="appearance">
             <MenuItemIndicator />
-            {{ profile.label }}
+            {{ appearance }}
           </MenuRadioItem>
         </MenuRadioGroup>
-        <MenuSeparator />
-        <MenuItem>Edit…</MenuItem>
-        <MenuItem>Add Profile…</MenuItem>
       </MenuContent>
     </Menu>
   </Menubar>

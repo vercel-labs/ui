@@ -8,7 +8,8 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@ui-sdk/solid/menu"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 type File = { name: string; size: string }
 
@@ -20,11 +21,21 @@ const files: File[] = [
 
 function Example() {
   const menu = createMenuController<File>()
-  const [status, setStatus] = createSignal("")
+  const log = useLog()
 
   return (
     <div data-slot="stack">
-      <ul>
+      <div data-slot="controls">
+        <button
+          onClick={async (event) => {
+            const result = await menu.open({ payload: files[0], anchor: event.currentTarget })
+            log(`Closed with ${result.reason}`)
+          }}
+        >
+          Open {files[0].name} Actions
+        </button>
+      </div>
+      <ul data-slot="list">
         <For each={files}>
           {(file) => (
             <li data-slot="row">
@@ -55,7 +66,7 @@ function Example() {
           )}
         </For>
       </ul>
-      <Menu controller={menu} onAction={(action) => setStatus(`${action} ${menu.getPayload()?.name}`)}>
+      <Menu controller={menu} onAction={(action) => log(`${action} ${menu.getPayload()?.name}`)}>
         <MenuContent<File> align="end">
           {(state) => (
             <>
@@ -71,16 +82,6 @@ function Example() {
           )}
         </MenuContent>
       </Menu>
-      <button
-        data-variant="ghost"
-        onClick={async (event) => {
-          const result = await menu.open({ payload: files[0], anchor: event.currentTarget })
-          setStatus(`Closed with ${result.reason}`)
-        }}
-      >
-        Open for {files[0].name}
-      </button>
-      <output data-slot="output">{status() || "Pick a file's actions"}</output>
     </div>
   )
 }

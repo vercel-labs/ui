@@ -9,41 +9,42 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@ui-sdk/vue/menu"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const position = ref("bottom")
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Menu>
-      <MenuTrigger>Panel</MenuTrigger>
-      <MenuContent>
-        <MenuRadioGroup v-model:value="position" name="position">
-          <MenuGroupLabel>Position</MenuGroupLabel>
-          <MenuRadioItem
-            v-for="option in ['Top', 'Bottom', 'Right']"
-            :key="option"
-            :value="option.toLowerCase()"
-          >
-            <MenuItemIndicator />
-            {{ option }}
-          </MenuRadioItem>
-        </MenuRadioGroup>
-        <MenuSeparator />
-        <MenuRadioGroup default-value="comfortable">
-          <MenuGroupLabel>Density</MenuGroupLabel>
-          <MenuRadioItem
-            v-for="option in ['Compact', 'Comfortable']"
-            :key="option"
-            :value="option.toLowerCase()"
-          >
-            <MenuItemIndicator />
-            {{ option }}
-          </MenuRadioItem>
-        </MenuRadioGroup>
-      </MenuContent>
-    </Menu>
-    <output data-slot="output">Panel at the {{ position }}</output>
-  </div>
+  <Menu>
+    <MenuTrigger>Panel</MenuTrigger>
+    <MenuContent>
+      <MenuRadioGroup
+        name="position"
+        default-value="bottom"
+        @value-change="(value) => log(`Panel at the ${value}`)"
+      >
+        <MenuGroupLabel>Position</MenuGroupLabel>
+        <MenuRadioItem
+          v-for="option in ['Top', 'Bottom', 'Right']"
+          :key="option"
+          :value="option.toLowerCase()"
+        >
+          <MenuItemIndicator />
+          {{ option }}
+        </MenuRadioItem>
+      </MenuRadioGroup>
+      <MenuSeparator />
+      <MenuRadioGroup default-value="comfortable" @value-change="(value) => log(`${value} density`)">
+        <MenuGroupLabel>Density</MenuGroupLabel>
+        <MenuRadioItem
+          v-for="option in ['Compact', 'Comfortable']"
+          :key="option"
+          :value="option.toLowerCase()"
+        >
+          <MenuItemIndicator />
+          {{ option }}
+        </MenuRadioItem>
+      </MenuRadioGroup>
+    </MenuContent>
+  </Menu>
 </template>

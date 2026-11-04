@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/vue/listbox"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const timezones = Array.from({ length: 27 }, (_, index) => {
   const offset = index - 12
@@ -9,19 +9,20 @@ const timezones = Array.from({ length: 27 }, (_, index) => {
   return { value: `utc${offset}`, label }
 })
 
-const highlighted = ref<unknown>(null)
+const log = useLog()
+
+function onHighlight(value: unknown, details: { index: number }) {
+  if (value) log(`Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`)
+}
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Listbox default-value="utc9" aria-label="Time zone" @highlight="(value) => (highlighted = value)">
-      <ListboxItem v-for="(zone, index) in timezones" :key="zone.value" :value="zone.value" :index="index">
-        {{ zone.label }}
-        <ListboxItemIndicator>
-          <CheckIcon aria-hidden="true" />
-        </ListboxItemIndicator>
-      </ListboxItem>
-    </Listbox>
-    <output data-slot="output">Focused: {{ highlighted ?? "none" }}</output>
-  </div>
+  <Listbox default-value="utc9" aria-label="Time zone" @highlight="onHighlight">
+    <ListboxItem v-for="(zone, index) in timezones" :key="zone.value" :value="zone.value" :index="index">
+      {{ zone.label }}
+      <ListboxItemIndicator>
+        <CheckIcon aria-hidden="true" />
+      </ListboxItemIndicator>
+    </ListboxItem>
+  </Listbox>
 </template>

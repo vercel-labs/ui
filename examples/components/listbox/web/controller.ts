@@ -1,6 +1,6 @@
 import "@ui-sdk/web/listbox"
-import type { UiListboxElement } from "@ui-sdk/web"
 import { Check, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -14,8 +14,8 @@ const toppings = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div data-slot="row">
-        <button type="button" data-run="selectAll">Select all</button>
+      <div data-slot="controls">
+        <button type="button" data-run="selectAll">Select All</button>
         <button type="button" data-run="clear">Clear</button>
         <button type="button" data-run="focus">Focus</button>
       </div>
@@ -32,11 +32,14 @@ function mount(root: HTMLElement) {
       </ui-listbox>
     </div>
   `
-  const listbox = root.querySelector<UiListboxElement>("ui-listbox")!
+  const listbox = root.querySelector("ui-listbox")!
   for (const button of root.querySelectorAll<HTMLButtonElement>("[data-run]"))
     button.addEventListener("click", () =>
       listbox.api[button.dataset.run as "selectAll" | "clear" | "focus"](),
     )
+  listbox.addEventListener("valuechange", (event) => {
+    log(root, `${(event.detail.value as string[]).length} selected (${event.detail.reason})`)
+  })
 }
 
 export { mount }

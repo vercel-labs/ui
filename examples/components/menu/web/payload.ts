@@ -1,6 +1,7 @@
 import type { UiMenuElement } from "@ui-sdk/web/menu"
 import "@ui-sdk/web/menu"
 import { createElement, Ellipsis } from "lucide"
+import { log } from "../../../shared/web/log"
 
 type File = { name: string; size: string }
 
@@ -16,7 +17,10 @@ function mount(root: HTMLElement) {
   const id = `file-actions-${++count}`
   root.innerHTML = `
     <div data-slot="stack">
-      <ul></ul>
+      <div data-slot="controls">
+        <button>Open ${files[0].name} Actions</button>
+      </div>
+      <ul data-slot="list"></ul>
       <ui-menu id="${id}">
         <ui-menu-content align="end">
           <ui-menu-group>
@@ -29,13 +33,10 @@ function mount(root: HTMLElement) {
           <ui-menu-item value="delete">Delete</ui-menu-item>
         </ui-menu-content>
       </ui-menu>
-      <button data-variant="ghost">Open for ${files[0].name}</button>
-      <output data-slot="output">Pick a file's actions</output>
     </div>
   `
   const menu = root.querySelector<UiMenuElement<File>>("ui-menu")!
   const label = root.querySelector("ui-menu-group-label")!
-  const status = root.querySelector("output")!
 
   for (const file of files) {
     const row = document.createElement("li")
@@ -58,13 +59,13 @@ function mount(root: HTMLElement) {
   })
   menu.addEventListener("action", (event) => {
     const { value } = event.detail
-    status.textContent = `${value} ${menu.api.getPayload()?.name}`
+    log(root, `${value} ${menu.api.getPayload()?.name}`)
   })
 
-  const opener = root.querySelector<HTMLButtonElement>(':scope > [data-slot="stack"] > button')!
+  const opener = root.querySelector<HTMLButtonElement>('[data-slot="controls"] button')!
   opener.addEventListener("click", async () => {
     const result = await menu.api.open({ payload: files[0], anchor: opener })
-    status.textContent = `Closed with ${result.reason}`
+    log(root, `Closed with ${result.reason}`)
   })
 }
 

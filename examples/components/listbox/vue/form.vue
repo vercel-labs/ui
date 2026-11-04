@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/vue/listbox"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -12,19 +12,15 @@ const toppings = [
   { value: "pepper", label: "Pepper" },
 ]
 
-const submitted = ref("")
+const log = useLog()
 
 function onSubmit(event: Event) {
-  submitted.value = new FormData(event.target as HTMLFormElement).getAll("toppings").join(", ")
+  log(`Ordered ${new FormData(event.currentTarget as HTMLFormElement).getAll("toppings").join(", ")}`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <form id="pizza-order" data-slot="row" @submit.prevent="onSubmit">
-      <button>Order</button>
-      <button type="reset">Reset</button>
-    </form>
     <Listbox
       multiple
       name="toppings"
@@ -40,6 +36,9 @@ function onSubmit(event: Event) {
         </ListboxItemIndicator>
       </ListboxItem>
     </Listbox>
-    <output data-slot="output">Submitted: {{ submitted || "nothing yet" }}</output>
+    <form id="pizza-order" data-slot="row" @submit.prevent="onSubmit">
+      <button type="reset">Reset</button>
+      <button data-variant="solid">Order</button>
+    </form>
   </div>
 </template>

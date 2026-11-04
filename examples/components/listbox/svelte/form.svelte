@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
   import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const toppings = [
     { value: "basil", label: "Basil" },
@@ -11,23 +12,10 @@
     { value: "pepper", label: "Pepper" },
   ]
 
-  let submitted = $state("")
-
-  function onSubmit(event: SubmitEvent) {
-    event.preventDefault()
-    submitted = new FormData(event.target as HTMLFormElement).getAll("toppings").join(", ")
-  }
+  const log = useLog()
 </script>
 
 <div data-slot="stack">
-  <form id="pizza-order" data-slot="row" onsubmit={onSubmit}>
-    <button>
-      Order
-    </button>
-    <button type="reset">
-      Reset
-    </button>
-  </form>
   <Listbox
     multiple
     name="toppings"
@@ -45,5 +33,15 @@
       </ListboxItem>
     {/each}
   </Listbox>
-  <output data-slot="output">Submitted: {submitted || "nothing yet"}</output>
+  <form
+    id="pizza-order"
+    data-slot="row"
+    onsubmit={(event) => {
+      event.preventDefault()
+      log(`Ordered ${new FormData(event.currentTarget).getAll("toppings").join(", ")}`)
+    }}
+  >
+    <button type="reset">Reset</button>
+    <button data-variant="solid">Order</button>
+  </form>
 </div>

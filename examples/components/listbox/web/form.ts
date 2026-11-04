@@ -1,5 +1,6 @@
 import "@ui-sdk/web/listbox"
 import { Check, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -13,11 +14,7 @@ const toppings = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <form id="pizza-order-web" data-slot="row">
-        <button>Order</button>
-        <button type="reset">Reset</button>
-      </form>
-      <ui-listbox multiple name="toppings" form="pizza-order-web" required default-value="cheese" aria-label="Toppings">
+      <ui-listbox multiple name="toppings" form="pizza-order" required default-value="cheese" aria-label="Toppings">
         ${toppings
           .map(
             (topping) => `
@@ -28,14 +25,16 @@ function mount(root: HTMLElement) {
           )
           .join("")}
       </ui-listbox>
-      <output data-slot="output">Submitted: nothing yet</output>
+      <form id="pizza-order" data-slot="row">
+        <button type="reset">Reset</button>
+        <button data-variant="solid">Order</button>
+      </form>
     </div>
   `
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    root.querySelector("output")!.textContent =
-      `Submitted: ${new FormData(form).getAll("toppings").join(", ")}`
+    log(root, `Ordered ${new FormData(form).getAll("toppings").join(", ")}`)
   })
 }
 

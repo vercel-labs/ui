@@ -16,14 +16,13 @@ const frameworks = [
     <ListboxItem
       v-for="framework in frameworks"
       :key="framework.value"
-      :href="`#${framework.value}`"
       :value="framework.value"
       :label="framework.label"
     >
       <template #render="{ props, state }">
-        <a v-bind="props">
+        <a v-bind="props" :href="`#${framework.value}`">
           <span>{{ framework.label }}</span>
-          <ExternalLinkIcon aria-hidden="true" v-if="state.selected" />
+          <ExternalLinkIcon v-if="state.selected" aria-hidden="true" />
         </a>
       </template>
     </ListboxItem>

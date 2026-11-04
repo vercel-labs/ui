@@ -1,24 +1,24 @@
-import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
 
-const frameworks = [
-  { value: "next", label: "Next.js" },
-  { value: "remix", label: "Remix" },
-  { value: "astro", label: "Astro" },
-  { value: "nuxt", label: "Nuxt" },
-  { value: "sveltekit", label: "SvelteKit" },
+const topics = [
+  { value: "comments", label: "Comments" },
+  { value: "mentions", label: "Mentions" },
+  { value: "reactions", label: "Reactions" },
+  { value: "sign-ins", label: "New sign-ins" },
+  { value: "billing", label: "Billing" },
 ]
 
 function Example() {
   return (
     <Field>
-      <FieldLabel>Framework</FieldLabel>
-      <Listbox defaultValue="next">
-        <For each={frameworks}>
-          {(framework) => (
-            <ListboxItem value={framework.value}>
-              {framework.label}
+      <FieldLabel>Email me about</FieldLabel>
+      <Listbox multiple activation="automatic" defaultValue={["mentions"]}>
+        <For each={topics}>
+          {(topic) => (
+            <ListboxItem value={topic.value}>
+              {topic.label}
               <ListboxItemIndicator>
                 <svg
                   viewBox="0 0 24 24"
@@ -36,6 +36,7 @@ function Example() {
           )}
         </For>
       </Listbox>
+      <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
     </Field>
   )
 }

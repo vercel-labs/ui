@@ -1,5 +1,6 @@
 import { createListboxController, Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -11,13 +12,14 @@ const toppings = [
 ]
 
 function Example() {
+  const log = useLog()
   const controller = createListboxController<string, true>()
 
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" onClick={() => controller.selectAll()}>
-          Select all
+          Select All
         </button>
         <button type="button" onClick={() => controller.clear()}>
           Clear
@@ -26,7 +28,12 @@ function Example() {
           Focus
         </button>
       </div>
-      <Listbox multiple controller={controller} aria-label="Toppings">
+      <Listbox
+        multiple
+        controller={controller}
+        onValueChange={(value, details) => log(`${value.length} selected (${details.reason})`)}
+        aria-label="Toppings"
+      >
         <For each={toppings}>
           {(topping) => (
             <ListboxItem value={topping.value}>

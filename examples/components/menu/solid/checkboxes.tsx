@@ -8,54 +8,18 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@ui-sdk/solid/menu"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
-  const [statusBar, setStatusBar] = createSignal(true)
-  const [minimap, setMinimap] = createSignal(false)
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Menu>
-        <MenuTrigger>View</MenuTrigger>
-        <MenuContent>
-          <MenuGroup>
-            <MenuGroupLabel>Appearance</MenuGroupLabel>
-            <MenuCheckboxItem value="status-bar" checked={statusBar()} onCheckedChange={setStatusBar}>
-              <MenuItemIndicator keepMounted>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              </MenuItemIndicator>
-              Status bar
-            </MenuCheckboxItem>
-            <MenuCheckboxItem value="minimap" checked={minimap()} onCheckedChange={setMinimap}>
-              <MenuItemIndicator keepMounted>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              </MenuItemIndicator>
-              Minimap
-            </MenuCheckboxItem>
-          </MenuGroup>
-          <MenuSeparator />
-          <MenuCheckboxItem value="line-numbers" defaultChecked>
+    <Menu onCheckedChange={(checked, details) => log(`${details.value} ${checked ? "on" : "off"}`)}>
+      <MenuTrigger>View</MenuTrigger>
+      <MenuContent>
+        <MenuGroup>
+          <MenuGroupLabel>Appearance</MenuGroupLabel>
+          <MenuCheckboxItem value="status-bar" defaultChecked>
             <MenuItemIndicator keepMounted>
               <svg
                 viewBox="0 0 24 24"
@@ -69,9 +33,9 @@ function Example() {
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             </MenuItemIndicator>
-            Line numbers
+            Status bar
           </MenuCheckboxItem>
-          <MenuCheckboxItem value="word-wrap">
+          <MenuCheckboxItem value="minimap">
             <MenuItemIndicator keepMounted>
               <svg
                 viewBox="0 0 24 24"
@@ -85,14 +49,44 @@ function Example() {
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             </MenuItemIndicator>
-            Word wrap
+            Minimap
           </MenuCheckboxItem>
-        </MenuContent>
-      </Menu>
-      <output data-slot="output">
-        Status bar {statusBar() ? "shown" : "hidden"}, minimap {minimap() ? "shown" : "hidden"}
-      </output>
-    </div>
+        </MenuGroup>
+        <MenuSeparator />
+        <MenuCheckboxItem value="line-numbers" defaultChecked>
+          <MenuItemIndicator keepMounted>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </MenuItemIndicator>
+          Line numbers
+        </MenuCheckboxItem>
+        <MenuCheckboxItem value="word-wrap">
+          <MenuItemIndicator keepMounted>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </MenuItemIndicator>
+          Word wrap
+        </MenuCheckboxItem>
+      </MenuContent>
+    </Menu>
   )
 }
 

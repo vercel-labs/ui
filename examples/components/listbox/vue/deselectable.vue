@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/vue/listbox"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -11,19 +11,21 @@ const frameworks = [
   { value: "sveltekit", label: "SvelteKit" },
 ]
 
-const value = ref<string | null>("astro")
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Listbox v-model:value="value" deselectable aria-label="Framework">
-      <ListboxItem v-for="framework in frameworks" :key="framework.value" :value="framework.value">
-        {{ framework.label }}
-        <ListboxItemIndicator>
-          <CheckIcon aria-hidden="true" />
-        </ListboxItemIndicator>
-      </ListboxItem>
-    </Listbox>
-    <output data-slot="output">Value: {{ value ?? "none" }}</output>
-  </div>
+  <Listbox
+    deselectable
+    default-value="astro"
+    aria-label="Framework"
+    @value-change="(value, details) => log(`${value ?? 'Nothing'} (${details.reason})`)"
+  >
+    <ListboxItem v-for="framework in frameworks" :key="framework.value" :value="framework.value">
+      {{ framework.label }}
+      <ListboxItemIndicator>
+        <CheckIcon aria-hidden="true" />
+      </ListboxItemIndicator>
+    </ListboxItem>
+  </Listbox>
 </template>

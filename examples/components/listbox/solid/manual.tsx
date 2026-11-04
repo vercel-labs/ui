@@ -1,5 +1,6 @@
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -10,34 +11,35 @@ const frameworks = [
 ]
 
 function Example() {
-  const [value, setValue] = createSignal<string | null>(null)
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Listbox activation="manual" value={value()} onValueChange={setValue} aria-label="Framework">
-        <For each={frameworks}>
-          {(framework) => (
-            <ListboxItem value={framework.value}>
-              {framework.label}
-              <ListboxItemIndicator>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              </ListboxItemIndicator>
-            </ListboxItem>
-          )}
-        </For>
-      </Listbox>
-      <output data-slot="output">Value: {value() ?? "none"}</output>
-    </div>
+    <Listbox
+      activation="manual"
+      onValueChange={(value, details) => log(`${value ?? "Nothing"} (${details.reason})`)}
+      aria-label="Framework"
+    >
+      <For each={frameworks}>
+        {(framework) => (
+          <ListboxItem value={framework.value}>
+            {framework.label}
+            <ListboxItemIndicator>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </ListboxItemIndicator>
+          </ListboxItem>
+        )}
+      </For>
+    </Listbox>
   )
 }
 

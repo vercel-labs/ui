@@ -1,5 +1,6 @@
 import "@ui-sdk/web/listbox"
 import { Check, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -12,24 +13,20 @@ const toppings = [
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-listbox multiple default-value="cheese,onion" aria-label="Toppings">
-        ${toppings
-          .map(
-            (topping) => `
-              <ui-listbox-item value="${topping.value}">
-                <ui-listbox-item-indicator keep-mounted>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
-                ${topping.label}
-              </ui-listbox-item>`,
-          )
-          .join("")}
-      </ui-listbox>
-      <output data-slot="output">Value: ["cheese","onion"]</output>
-    </div>
+    <ui-listbox multiple default-value="cheese,onion" aria-label="Toppings">
+      ${toppings
+        .map(
+          (topping) => `
+            <ui-listbox-item value="${topping.value}">
+              ${topping.label}
+              <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
+            </ui-listbox-item>`,
+        )
+        .join("")}
+    </ui-listbox>
   `
-  const output = root.querySelector("output")!
   root.querySelector("ui-listbox")!.addEventListener("valuechange", (event) => {
-    output.textContent = `Value: ${JSON.stringify(event.detail.value)}`
+    log(root, `${(event.detail.value as string[]).join(", ") || "Nothing"} (${event.detail.reason})`)
   })
 }
 

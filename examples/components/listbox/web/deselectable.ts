@@ -1,5 +1,6 @@
 import "@ui-sdk/web/listbox"
 import { Check, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -11,24 +12,20 @@ const frameworks = [
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-listbox deselectable default-value="astro" aria-label="Framework">
-        ${frameworks
-          .map(
-            (framework) => `
-              <ui-listbox-item value="${framework.value}">
-                ${framework.label}
-                <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
-              </ui-listbox-item>`,
-          )
-          .join("")}
-      </ui-listbox>
-      <output data-slot="output">Value: astro</output>
-    </div>
+    <ui-listbox deselectable default-value="astro" aria-label="Framework">
+      ${frameworks
+        .map(
+          (framework) => `
+            <ui-listbox-item value="${framework.value}">
+              ${framework.label}
+              <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
+            </ui-listbox-item>`,
+        )
+        .join("")}
+    </ui-listbox>
   `
-  const output = root.querySelector("output")!
   root.querySelector("ui-listbox")!.addEventListener("valuechange", (event) => {
-    output.textContent = `Value: ${event.detail.value ?? "none"}`
+    log(root, `${event.detail.value ?? "Nothing"} (${event.detail.reason})`)
   })
 }
 

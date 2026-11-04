@@ -13,6 +13,9 @@ const toppings = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button">Disable the List</button>
+      </div>
       <ui-listbox multiple default-value="basil" aria-label="Toppings">
         ${toppings
           .map(
@@ -24,14 +27,13 @@ function mount(root: HTMLElement) {
           )
           .join("")}
       </ui-listbox>
-      <button type="button">Disable the list</button>
     </div>
   `
   const listbox = root.querySelector("ui-listbox")!
   const button = root.querySelector("button")!
   button.addEventListener("click", () => {
     const disabled = listbox.toggleAttribute("disabled")
-    button.textContent = `${disabled ? "Enable" : "Disable"} the list`
+    button.textContent = disabled ? "Enable the List" : "Disable the List"
   })
 }
 

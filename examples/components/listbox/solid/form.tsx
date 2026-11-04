@@ -1,5 +1,6 @@
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -11,22 +12,10 @@ const toppings = [
 ]
 
 function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+  const log = useLog()
 
   return (
     <div data-slot="stack">
-      <form
-        id="pizza-order"
-        data-slot="row"
-        onSubmit={(event) => {
-          event.preventDefault()
-          const data = new FormData(event.currentTarget)
-          setSubmitted(data.getAll("toppings").join(", "))
-        }}
-      >
-        <button>Order</button>
-        <button type="reset">Reset</button>
-      </form>
       <Listbox
         multiple
         name="toppings"
@@ -56,7 +45,17 @@ function Example() {
           )}
         </For>
       </Listbox>
-      <output data-slot="output">Submitted: {submitted() || "nothing yet"}</output>
+      <form
+        id="pizza-order"
+        data-slot="row"
+        onSubmit={(event) => {
+          event.preventDefault()
+          log(`Ordered ${new FormData(event.currentTarget).getAll("toppings").join(", ")}`)
+        }}
+      >
+        <button type="reset">Reset</button>
+        <button data-variant="solid">Order</button>
+      </form>
     </div>
   )
 }

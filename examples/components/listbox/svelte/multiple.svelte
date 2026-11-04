@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
   import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const toppings = [
     { value: "basil", label: "Basil" },
@@ -11,19 +12,21 @@
     { value: "pepper", label: "Pepper" },
   ]
 
-  let value = $state<string[]>(["cheese", "onion"])
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <Listbox bind:value multiple aria-label="Toppings">
-    {#each toppings as topping (topping.value)}
-      <ListboxItem value={topping.value}>
-        <ListboxItemIndicator keepMounted>
-          <CheckIcon aria-hidden="true" />
-        </ListboxItemIndicator>
-        {topping.label}
-      </ListboxItem>
-    {/each}
-  </Listbox>
-  <output data-slot="output">Value: {JSON.stringify(value)}</output>
-</div>
+<Listbox
+  multiple
+  defaultValue={["cheese", "onion"]}
+  onValueChange={(value, details) => log(`${value.join(", ") || "Nothing"} (${details.reason})`)}
+  aria-label="Toppings"
+>
+  {#each toppings as topping (topping.value)}
+    <ListboxItem value={topping.value}>
+      {topping.label}
+      <ListboxItemIndicator>
+        <CheckIcon aria-hidden="true" />
+      </ListboxItemIndicator>
+    </ListboxItem>
+  {/each}
+</Listbox>

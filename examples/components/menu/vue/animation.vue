@@ -10,35 +10,32 @@ import {
   MenuSubTrigger,
   MenuTrigger,
 } from "@ui-sdk/vue/menu"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const status = ref("Closed")
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Menu
-      @open-change="(open: boolean) => (status = open ? 'Opening' : 'Closing')"
-      @open-change-complete="(open: boolean) => (status = open ? 'Open' : 'Closed')"
-    >
-      <MenuTrigger>Animated</MenuTrigger>
-      <MenuContent keep-mounted>
-        <MenuItem>Back</MenuItem>
-        <MenuItem>Forward</MenuItem>
-        <MenuItem>Reload</MenuItem>
-        <MenuSeparator />
-        <MenuSub>
-          <MenuSubTrigger>
-            More tools
-            <ChevronRightIcon aria-hidden="true" />
-          </MenuSubTrigger>
-          <MenuSubContent>
-            <MenuItem>Save page as…</MenuItem>
-            <MenuItem>Developer tools</MenuItem>
-          </MenuSubContent>
-        </MenuSub>
-      </MenuContent>
-    </Menu>
-    <output data-slot="output">{{ status }}</output>
-  </div>
+  <Menu
+    @open-change="(open) => log(open ? 'Opening' : 'Closing')"
+    @open-change-complete="(open) => log(open ? 'Finished opening' : 'Finished closing')"
+  >
+    <MenuTrigger>Animated</MenuTrigger>
+    <MenuContent keep-mounted>
+      <MenuItem>Back</MenuItem>
+      <MenuItem>Forward</MenuItem>
+      <MenuItem>Reload</MenuItem>
+      <MenuSeparator />
+      <MenuSub>
+        <MenuSubTrigger>
+          More tools
+          <ChevronRightIcon aria-hidden="true" />
+        </MenuSubTrigger>
+        <MenuSubContent>
+          <MenuItem>Save page as…</MenuItem>
+          <MenuItem>Developer tools</MenuItem>
+        </MenuSubContent>
+      </MenuSub>
+    </MenuContent>
+  </Menu>
 </template>

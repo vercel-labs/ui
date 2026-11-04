@@ -15,6 +15,11 @@ function Example() {
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => setDisabled(!disabled())}>
+          {disabled() ? "Enable the List" : "Disable the List"}
+        </button>
+      </div>
       <Listbox multiple disabled={disabled()} defaultValue={["basil"]} aria-label="Toppings">
         <For each={toppings}>
           {(topping) => (
@@ -37,9 +42,6 @@ function Example() {
           )}
         </For>
       </Listbox>
-      <button type="button" onClick={() => setDisabled(!disabled())}>
-        {disabled() ? "Enable" : "Disable"} the list
-      </button>
     </div>
   )
 }

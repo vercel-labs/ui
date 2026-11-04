@@ -8,13 +8,13 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 <ComponentExample
   name="menu/basic"
   inspect
-  caption="Open Project and choose an item. The menu closes and the readout shows its value. You can also use the arrow keys and Enter."
+  caption="Press Open Menu and choose an item, with the pointer or the arrow keys and Enter. The menu closes and the console logs your choice."
 />
 
 ## Installation
 
 ```package-install
-npm install @ui-sdk/vue
+npm install @ui-sdk/vue @ui-sdk/core
 ```
 
 ## Composition
@@ -31,11 +31,29 @@ Menu
 
 Give items a `value` and handle `@action` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
-Return a promise from `@action` or an item’s `@select` to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pendingAnnouncement`, “Loading” by default.
+Return a promise from `@action` or an item’s `@select` to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pending-announcement`, “Loading” by default.
 
-## Examples
+## Usage
 
-### Submenus
+Import the parts and put them together:
+
+```vue
+<script setup lang="ts">
+import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
+</script>
+
+<template>
+  <Menu>
+    <MenuTrigger>Actions</MenuTrigger>
+    <MenuContent>
+      <MenuItem value="rename">Rename</MenuItem>
+      <MenuItem value="duplicate">Duplicate</MenuItem>
+    </MenuContent>
+  </Menu>
+</template>
+```
+
+## Submenus
 
 Nest a Sub, SubTrigger, and SubContent to add another level. Hover or press the arrow key toward a submenu to open it. The menu lets a pointer travel diagonally into the submenu without accidentally choosing an item it passes over.
 
@@ -44,7 +62,7 @@ Nest a Sub, SubTrigger, and SubContent to add another level. Hover or press the 
   caption="Open Edit, then Find or Transform. Use the arrows to enter and leave each level; choosing an action closes the menu tree."
 />
 
-### Shortcuts
+## Shortcuts
 
 An item’s `shortcut` displays a platform-specific hint and sets `aria-keyshortcuts`. `mod+s` reads as Command+S on Apple platforms and Control+S elsewhere.
 
@@ -55,7 +73,7 @@ In markup, this is a hint: your app owns the key handler. [Data menus](#menus-as
   caption="Open File to see shortcut hints for your platform. Choose an item to report its action; this markup example does not register global shortcuts."
 />
 
-### Icons
+## Icons
 
 Put decorative icons in ItemIcon so screen readers and typeahead ignore them. `mirror` flips a directional icon in right-to-left text. An icon-only item still needs an `aria-label`.
 
@@ -63,55 +81,28 @@ Put decorative icons in ItemIcon so screen readers and typeahead ignore them. `m
 
 <ComponentExample
   name="menu/icons"
-  caption="Open Share and type an item’s name. The icons do not become part of the typeahead text; Embed lines up with the items that have icons."
+  caption="Open Share and type an item’s name. The icons aren’t part of the item’s accessible name or the text typeahead matches."
 />
 
-### Checkboxes
+## Checkboxes
 
-<span id="checkbox-icons" />
-
-Checkbox items toggle independently and stay open by default. Use `v-model:checked`, or `default-checked` for an uncontrolled item. An ItemIndicator renders the check; `keepMounted` preserves its space while unchecked. Style `data-checked` and `data-unchecked` for each state.
+Checkbox items toggle independently and stay open by default. Use `v-model:checked`, or `default-checked` for an uncontrolled item. An ItemIndicator renders the check; `keep-mounted` preserves its space while unchecked. Style `data-checked` and `data-unchecked` for each state.
 
 <ComponentExample
   name="menu/checkboxes"
-  caption="Open View and toggle Status bar or Minimap. The menu stays open so you can change several settings, and the readout follows the controlled items."
+  caption="Open View and toggle Status bar or Minimap. The menu stays open so you can change several settings, and the console logs each one."
 />
 
-### Radio Group
-
-<span id="radio-icons" />
+## Radio Group
 
 Radio items choose one value in their group and stay open by default. Use `v-model:value`, or `default-value` for an uncontrolled group. Give the group a `name` when it should identify itself in the menu’s value-change callback.
 
 <ComponentExample
   name="menu/radio-group"
-  caption="Open Panel and choose its position. Only one item in each group is checked; the position readout updates while the menu remains open."
+  caption="Open Panel and choose a position. Only one item in each group is checked, the menu stays open, and the console logs the change."
 />
 
-### Account Switcher
-
-<span id="avatar" />
-
-A radio group can also switch accounts. These items set `closeOnSelect` so choosing an account finishes the task. The trigger’s accessible name stays Account while its initials reflect the current account.
-
-<ComponentExample
-  name="menu/avatar"
-  caption="Open Account and switch between the personal and studio accounts. The menu closes and the trigger shows the selected account’s initials."
-/>
-
-### Application Menu
-
-<span id="complex" />
-<span id="destructive" />
-
-Combine the same parts for a workspace menu: actions, an independent sidebar setting, and submenus for invitations and a theme choice. `destructive` adds `data-destructive` for apps that distinguish irreversible actions; these examples keep one neutral appearance.
-
-<ComponentExample
-  name="menu/complex"
-  caption="Open Workspace, toggle the sidebar, choose a theme in its submenu, or run an action. Checkbox and radio choices stay open; ordinary actions close the menu."
-/>
-
-### Context Menu
+## Context Menu
 
 A ContextTrigger opens at a right-click or long press. Give the area a tab stop so Shift+F10 and the context-menu key can open it from the keyboard. Right-clicking elsewhere in the same area repositions an open menu.
 
@@ -119,59 +110,69 @@ Set `disabled` to leave that area’s native browser menu available. Context tri
 
 <ComponentExample
   name="menu/context-menu"
-  caption="Right-click or long-press the area, or focus it and press Shift+F10. Choose an action to see its value."
+  caption="Right-click or long-press the area, or focus it and press Shift+F10. Choose an action and the console logs it."
 />
 
-## Behavior and Options
-
-### Placement
-
-<span id="right-to-left" />
+## Placement
 
 `side` and `align` choose the starting position. The menu flips or shifts when it does not fit; `data-side` reports where it ended up. Logical alignment and submenu keys follow the surrounding text direction. See the shared [popup guide](../popups) for the positioning contract.
 
-<ComponentExample
-  name="menu/placement"
-  caption="Choose a side and alignment, then open Placement. Move near a window edge to see the menu adjust when the requested position does not fit."
-/>
+```vue
+<MenuContent side="right" align="start" />
+```
 
-### Offsets and Collision Padding
+## Offsets and Collision Padding
 
-`sideOffset` sets the gap, `alignOffset` shifts along the anchor, and `collisionPadding` leaves room around the viewport. This font picker also uses `--anchor-width` to match its trigger and `--available-height` to scroll a long list.
+`side-offset` sets the gap, `align-offset` shifts along the anchor, and `collision-padding` leaves room around the viewport. Use `--anchor-width` to match the trigger's width and `--available-height` to scroll a long list.
 
-<ComponentExample
-  name="menu/offsets"
-  caption="Open the font picker and scroll its options. Choose a font to update the trigger; the menu’s width and available height follow its anchor and viewport."
-/>
+```vue
+<MenuContent :side-offset="8" :align-offset="-4" :collision-padding="24" />
+```
 
-### Modal
+## Modal
 
 The default `modal="pointer"` consumes an outside press while closing the menu. `true` also locks scrolling and makes the page inert. `false` lets the outside press reach its target after closing.
 
-<ComponentExample
-  name="menu/modal"
-  caption="Open each menu, then press the counter. Non-modal lets that same press increment it; the other modes consume the press."
-/>
+```vue
+<Menu :modal="false">
+  <MenuTrigger>Actions</MenuTrigger>
+  <MenuContent />
+</Menu>
+```
 
-### Submenu Delay
+## Submenu Delay
 
 `delay` is the hover wait in milliseconds, 100 by default. It applies to the submenus directly inside that menu. Set it on a Sub to change the delay for the next level.
 
-<ComponentExample
-  name="menu/hover-delay"
-  caption="Open Instant, Default, or Slow and hover Open recent or Share. Keyboard navigation opens a submenu without waiting for the hover delay."
-/>
+```vue
+<Menu :delay="300">
+  <MenuTrigger>File</MenuTrigger>
+  <MenuContent>
+    <MenuSub :delay="0">
+      <MenuSubTrigger>Open recent</MenuSubTrigger>
+      <MenuSubContent />
+    </MenuSub>
+  </MenuContent>
+</Menu>
+```
 
-### Keyboard Navigation
+## Keyboard Navigation
 
 Arrow keys wrap by default; `loop` false stops at the ends. Typing finds an item by name. If an item has extra descriptive text, set `label` to the text typeahead should match. `label` does not replace its accessible name; use `aria-label` for that.
 
-<ComponentExample
-  name="menu/keyboard"
-  caption="Open the status menu and use Up or Down to reach either end without wrapping. Type a status name to jump to it, then press Enter to choose it."
-/>
+```vue
+<Menu :loop="false">
+  <MenuTrigger>Status</MenuTrigger>
+  <MenuContent>
+    <MenuItem value="busy" label="Do not disturb">
+      Do not disturb
+      <span>Notifications are muted</span>
+    </MenuItem>
+  </MenuContent>
+</Menu>
+```
 
-### Disabled Items
+## Disabled Items
 
 Disabled items remain focusable so people can discover them, but cannot run or open a submenu. A disabled Trigger is a native disabled button and cannot receive focus.
 
@@ -180,34 +181,33 @@ Disabled items remain focusable so people can discover them, but cannot run or o
   caption="Open Document and move through its items with the arrow keys. Disabled actions remain discoverable but cannot run; Locked cannot open a menu."
 />
 
-### Keeping the Menu Open
+## Keeping the Menu Open
 
-Plain items close when selected; checkbox and radio items stay open. `closeOnSelect` changes either default. A selection handler can also prevent the default event to keep it open for one action.
+Plain items close when selected; checkbox and radio items stay open. `close-on-select` changes either default. A selection handler can also prevent the default event to keep it open for one action.
 
-<ComponentExample
-  name="menu/close-on-select"
-  caption="Open the zoom menu and press Zoom in or Zoom out repeatedly. Reset closes it, and Fit to window is a checkbox that also closes after selection."
-/>
+```vue
+<MenuItem :close-on-select="false" @select="zoom += 10">Zoom in</MenuItem>
+<MenuCheckboxItem value="fit" close-on-select>Fit to window</MenuCheckboxItem>
+```
 
-### Container
+## Container
 
 Menus render in place and use the top layer. `container` moves the popup to another element; submenus remain inside their parent popup. Pass the actual element after it exists, as the [popup guide](../popups) explains.
 
-<ComponentExample
-  name="menu/container"
-  caption="Open the menu in its chosen container and choose an action, or press Escape to close it."
-/>
+```vue
+<MenuContent :container="panel" />
+```
 
-### Animation
+## Animation
 
-The menu stays mounted through an exit animation. `data-starting-style`, `data-ending-style`, `data-side`, and `--transform-origin` describe the transition. `keepMounted` leaves the closed content hidden afterward; `onOpenChangeComplete` reports when it finishes.
+The menu stays mounted through an exit animation. `data-starting-style`, `data-ending-style`, `data-side`, and `--transform-origin` describe the transition. `keep-mounted` leaves the closed content hidden afterward; `@open-change-complete` reports when it finishes.
 
 <ComponentExample
   name="menu/animation"
-  caption="Open Animated, then its More tools submenu. Close them and watch the readout move from Opening or Closing to the completed state."
+  caption="Open Animated, then its More tools submenu, and close them. The console logs Opening or Closing, then when the animation finishes."
 />
 
-### Presentation
+## Presentation
 
 `presentation="auto"` uses a sheet on small touch screens and a popover elsewhere; `"sheet"` always requests a sheet. The sheet keeps menu roles and keys. Submenus replace the current level, and Escape or the arrow toward the parent goes back. Context menus and menus in a menubar remain popovers.
 
@@ -218,16 +218,24 @@ Use `data-presentation` or the content’s `presentation` state for the two layo
   caption="Open Options as a sheet, enter Move to, then go back or choose a destination. You can drag downward to dismiss the sheet."
 />
 
-### Controlled
+## Controlled
 
-Use `v-model:open`. A change carries a reason, and `details.cancel()` can refuse it. A controller can open the menu from another control; see [state and events](../state-and-events) and [controllers](../controllers) for that shared pattern.
+Use `v-model:open`, or pass `open` and listen for `@open-change`. A change carries a reason, and `details.cancel()` can refuse it. A controller can open the menu from another control; see [state and events](../state-and-events) and [controllers](../controllers) for that shared pattern.
 
-<ComponentExample
-  name="menu/controlled"
-  caption="Open Actions directly, with state, or with the controller. The readout shows whether it is open and what caused the last change."
-/>
+```vue
+<script setup lang="ts">
+const open = ref(false)
+</script>
 
-### Triggers Outside the Menu
+<template>
+  <Menu v-model:open="open">
+    <MenuTrigger>Actions</MenuTrigger>
+    <MenuContent />
+  </Menu>
+</template>
+```
+
+## Triggers Outside the Menu
 
 Connect external triggers and one menu to a `createMenuController<File>()`. Each trigger passes its row as `payload`, which the content reads from its state. Only the active trigger is expanded and receives focus back. Code can also open with a `payload` and `anchor`; the Promise resolves when the menu closes.
 
@@ -236,35 +244,105 @@ Connect external triggers and one menu to a `createMenuController<File>()`. Each
   caption="Open the actions for different files. One menu shows the active row; opening from code uses the same payload and reports the closing reason."
 />
 
-### Menus as Data
+## Menus as Data
 
-`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `shortcuts` false to disable that.
+`items` accepts `MenuData`: actions, groups, checkboxes, radio groups, and submenus. A string is shorthand for an item whose label and value match. Data menus register their shortcuts even while closed; set `item-shortcuts` to false to turn that off.
 
-`@checked-change` reports the checkbox’s value in `details.value`; `@value-change` reports the radio group’s name in `details.group`. Either change can be canceled. This example renders its own styled parts from the same data while `items` keeps the shortcuts registered. The [lists and menus guide](../lists-and-menus) covers the data shape.
+`@checked-change` reports the checkbox’s value in `details.value`; `@value-change` reports the radio group’s name in `details.group`. Either change can be canceled. You can also render your own parts from the same data while `items` keeps the shortcuts registered. The [lists and menus guide](../lists-and-menus) covers the data shape.
 
-<ComponentExample
-  name="menu/data"
-  caption="Open File and try actions, checkboxes, a radio group, and the Share submenu. Close it and press the Open shortcut; the same action still runs."
-/>
+```vue
+<script setup lang="ts">
+const fileMenu: MenuData = [
+  { value: "open", label: "Open…", shortcut: "mod+o" },
+  { type: "separator" },
+  { type: "checkbox", value: "toolbar", label: "Toolbar", defaultChecked: true },
+  {
+    type: "radio-group",
+    name: "sort",
+    label: "Sort by",
+    defaultValue: "name",
+    items: [
+      { value: "name", label: "Name" },
+      { value: "date", label: "Date modified" },
+    ],
+  },
+  { type: "submenu", label: "Share", items: ["Copy link", "Email"] },
+]
+</script>
 
-### Links and Custom Rendering
+<template>
+  <Menu :items="fileMenu" @action="(value) => run(value)">
+    <MenuTrigger>File</MenuTrigger>
+    <MenuContent />
+  </Menu>
+</template>
+```
 
-Render an item as a native link using the shared [composition API](../parts-and-composition). Enter follows the link like a click, preserving its target and modifier-key behavior. The example reserves the arrow’s space so highlighting does not move the label.
+## Links and Custom Rendering
 
-<ComponentExample
-  name="menu/links"
-  caption="Open Links and choose a section with the keyboard or pointer. Each item is a native anchor and moves to that heading on this page."
-/>
+Render an item as a native link using the shared [composition API](../parts-and-composition). Enter follows the link like a click, preserving its target and modifier-key behavior.
 
-## Styling
-
-<DataAttributes />
-
-Use `data-highlighted` for the active item, `data-disabled` for unavailable actions, and `data-checked` for selected settings. Popup sizing and motion hooks are shared with the [styling guide](../styling-and-animation).
+```vue
+<MenuItem>
+  <template #render="{ props }">
+    <a v-bind="props" href="#composition">Composition</a>
+  </template>
+</MenuItem>
+```
 
 ## Custom Rendering
 
-See [Links and Custom Rendering](#links-and-custom-rendering) for a native-link example. The shared [composition guide](../parts-and-composition) covers element replacement and state-based rendering.
+See [Links and Custom Rendering](#links-and-custom-rendering) for a native link. The shared [composition guide](../parts-and-composition) covers element replacement and state-based rendering.
+
+## Styling
+
+Use `data-highlighted` for the active item, `data-disabled` for unavailable actions, and `data-checked` for selected settings. Popup sizing and motion hooks are shared with the [styling guide](../styling-and-animation).
+
+Each part has a `data-slot`, such as `menu-item`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### MenuContent [#styling-menucontent]
+
+<CssVariables component="menu" part="content" />
+
+### Viewport [#styling-viewport]
+
+<CssVariables component="menu" part="viewport" />
+
+## Data Attributes
+
+`MenuRadioGroup`, `MenuGroup`, `MenuGroupLabel`, `MenuSeparator` and `MenuShortcut` have no state attributes.
+
+### MenuTrigger [#data-attributes-menutrigger]
+
+<DataAttributes component="menu" part="trigger" />
+
+### MenuContextTrigger [#data-attributes-menucontexttrigger]
+
+<DataAttributes component="menu" part="context-trigger" />
+
+### MenuContent [#data-attributes-menucontent]
+
+<DataAttributes component="menu" part="content" />
+
+### MenuItem [#data-attributes-menuitem]
+
+<DataAttributes component="menu" part="item" />
+
+### MenuCheckboxItem [#data-attributes-menucheckboxitem]
+
+<DataAttributes component="menu" part="checkbox-item" />
+
+### MenuItemIndicator [#data-attributes-menuitemindicator]
+
+<DataAttributes component="menu" part="item-indicator" />
+
+### MenuRadioItem [#data-attributes-menuradioitem]
+
+<DataAttributes component="menu" part="radio-item" />
+
+### MenuItemIcon [#data-attributes-menuitemicon]
+
+<DataAttributes component="menu" part="item-icon" />
 
 ## API Reference
 
@@ -287,8 +365,6 @@ A trigger outside the menu also takes `controller`.
 ### MenuContent
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuContentProps" />
-
-<CssVariables component="menu" part="content" />
 
 ### MenuItem
 
@@ -401,7 +477,11 @@ Events get the new state first, then the details. `v-model` only updates when th
 
 ## Accessibility
 
-The menu follows the [WAI-ARIA menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/). Every line below is an automated test.
+The menu follows the [WAI-ARIA menu button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/).
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="menu" only={["trigger", "keyboard navigation", "activation", "dismissal", "submenu"]} />
 

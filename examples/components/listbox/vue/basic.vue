@@ -1,27 +1,28 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
-import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/vue/listbox"
 
-const frameworks = [
-  { value: "next", label: "Next.js" },
-  { value: "remix", label: "Remix" },
-  { value: "astro", label: "Astro" },
-  { value: "nuxt", label: "Nuxt" },
-  { value: "sveltekit", label: "SvelteKit" },
+const topics = [
+  { value: "comments", label: "Comments" },
+  { value: "mentions", label: "Mentions" },
+  { value: "reactions", label: "Reactions" },
+  { value: "sign-ins", label: "New sign-ins" },
+  { value: "billing", label: "Billing" },
 ]
 </script>
 
 <template>
   <Field>
-    <FieldLabel>Framework</FieldLabel>
-    <Listbox default-value="next">
-      <ListboxItem v-for="framework in frameworks" :key="framework.value" :value="framework.value">
-        {{ framework.label }}
+    <FieldLabel>Email me about</FieldLabel>
+    <Listbox multiple activation="automatic" :default-value="['mentions']">
+      <ListboxItem v-for="topic in topics" :key="topic.value" :value="topic.value">
+        {{ topic.label }}
         <ListboxItemIndicator>
           <CheckIcon aria-hidden="true" />
         </ListboxItemIndicator>
       </ListboxItem>
     </Listbox>
+    <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
   </Field>
 </template>

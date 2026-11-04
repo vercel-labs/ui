@@ -17,6 +17,11 @@ const disabled = ref(false)
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="disabled = !disabled">
+        {{ disabled ? "Enable the List" : "Disable the List" }}
+      </button>
+    </div>
     <Listbox multiple :disabled="disabled" :default-value="['basil']" aria-label="Toppings">
       <ListboxItem
         v-for="topping in toppings"
@@ -30,8 +35,5 @@ const disabled = ref(false)
         </ListboxItemIndicator>
       </ListboxItem>
     </Listbox>
-    <button type="button" @click="disabled = !disabled">
-      {{ disabled ? "Enable" : "Disable" }} the list
-    </button>
   </div>
 </template>

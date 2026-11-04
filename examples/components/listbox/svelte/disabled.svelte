@@ -15,6 +15,11 @@
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={() => (disabled = !disabled)}>
+      {disabled ? "Enable the List" : "Disable the List"}
+    </button>
+  </div>
   <Listbox multiple {disabled} defaultValue={["basil"]} aria-label="Toppings">
     {#each toppings as topping (topping.value)}
       <ListboxItem value={topping.value} disabled={topping.value === "olive"}>
@@ -25,7 +30,4 @@
       </ListboxItem>
     {/each}
   </Listbox>
-  <button type="button" onclick={() => (disabled = !disabled)}>
-    {disabled ? "Enable" : "Disable"} the list
-  </button>
 </div>

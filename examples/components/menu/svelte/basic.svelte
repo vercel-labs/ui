@@ -8,27 +8,25 @@
     MenuSeparator,
     MenuTrigger,
   } from "@ui-sdk/svelte/menu"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let action = $state("")
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <Menu onAction={(value: string) => (action = value)}>
-    <MenuTrigger>Project</MenuTrigger>
-    <MenuContent>
-      <MenuGroup>
-        <MenuGroupLabel>Project</MenuGroupLabel>
-        <MenuItem value="overview">Overview</MenuItem>
-        <MenuItem value="members">Members</MenuItem>
-        <MenuItem value="settings">Settings</MenuItem>
-      </MenuGroup>
-      <MenuSeparator />
-      <MenuGroup>
-        <MenuGroupLabel>Help</MenuGroupLabel>
-        <MenuItem value="docs">Documentation</MenuItem>
-        <MenuItem value="feedback">Send feedback</MenuItem>
-      </MenuGroup>
-    </MenuContent>
-  </Menu>
-  <output data-slot="output">{action ? `Ran ${action}` : "Pick an item"}</output>
-</div>
+<Menu onAction={(value) => log(`Chose ${value}`)}>
+  <MenuTrigger>Open Menu</MenuTrigger>
+  <MenuContent>
+    <MenuGroup>
+      <MenuGroupLabel>Project</MenuGroupLabel>
+      <MenuItem value="overview">Overview</MenuItem>
+      <MenuItem value="members">Members</MenuItem>
+      <MenuItem value="settings">Settings</MenuItem>
+    </MenuGroup>
+    <MenuSeparator />
+    <MenuGroup>
+      <MenuGroupLabel>Help</MenuGroupLabel>
+      <MenuItem value="docs">Documentation</MenuItem>
+      <MenuItem value="feedback">Send feedback</MenuItem>
+    </MenuGroup>
+  </MenuContent>
+</Menu>

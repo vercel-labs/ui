@@ -4,6 +4,7 @@
     Menu,
     MenuCheckboxItem,
     MenuContent,
+    MenuGroupLabel,
     MenuItem,
     MenuItemIndicator,
     MenuRadioGroup,
@@ -15,82 +16,89 @@
     MenuTrigger,
   } from "@ui-sdk/svelte/menu"
   import { Menubar } from "@ui-sdk/svelte/menubar"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const profiles = [
-    { value: "hollis", label: "Hollis" },
-    { value: "ines", label: "Inès" },
-    { value: "kofi", label: "Kofi" },
-  ]
+  const recent = ["Q3 roadmap", "Launch checklist", "Offsite notes"]
+  const formats = ["PDF", "Markdown", "HTML"]
+  const appearances = ["Light", "Dark", "System"]
+
+  const log = useLog()
+  const chose = (value: string) => log(`Chose ${value}`)
 </script>
 
 <Menubar>
-  <Menu>
+  <Menu onAction={chose}>
     <MenuTrigger>File</MenuTrigger>
     <MenuContent>
-      <MenuItem shortcut="mod+t">New Tab</MenuItem>
-      <MenuItem shortcut="mod+n">New Window</MenuItem>
-      <MenuItem disabled>New Incognito Window</MenuItem>
-      <MenuSeparator />
+      <MenuItem value="New document" shortcut="mod+n">New Document</MenuItem>
+      <MenuItem value="Open" shortcut="mod+o">Open…</MenuItem>
       <MenuSub>
         <MenuSubTrigger>
-          Share
+          Open Recent
           <ChevronRightIcon aria-hidden="true" />
         </MenuSubTrigger>
         <MenuSubContent>
-          <MenuItem>Email link</MenuItem>
-          <MenuItem>Messages</MenuItem>
-          <MenuItem>Notes</MenuItem>
+          {#each recent as name (name)}
+            <MenuItem value={name}>{name}</MenuItem>
+          {/each}
         </MenuSubContent>
       </MenuSub>
       <MenuSeparator />
-      <MenuItem shortcut="mod+p">Print…</MenuItem>
+      <MenuSub>
+        <MenuSubTrigger>
+          Export
+          <ChevronRightIcon aria-hidden="true" />
+        </MenuSubTrigger>
+        <MenuSubContent>
+          {#each formats as format (format)}
+            <MenuItem value={`Export as ${format}`}>{format}</MenuItem>
+          {/each}
+        </MenuSubContent>
+      </MenuSub>
+      <MenuItem value="Print" shortcut="mod+p">Print…</MenuItem>
     </MenuContent>
   </Menu>
-  <Menu>
+  <Menu onAction={chose}>
     <MenuTrigger>Edit</MenuTrigger>
     <MenuContent>
-      <MenuItem shortcut="mod+z">Undo</MenuItem>
-      <MenuItem shortcut="mod+shift+z">Redo</MenuItem>
+      <MenuItem value="Undo" shortcut="mod+z" disabled>Undo</MenuItem>
+      <MenuItem value="Redo" shortcut="mod+shift+z">Redo</MenuItem>
       <MenuSeparator />
-      <MenuItem>Cut</MenuItem>
-      <MenuItem>Copy</MenuItem>
-      <MenuItem>Paste</MenuItem>
+      <MenuItem value="Cut" shortcut="mod+x">Cut</MenuItem>
+      <MenuItem value="Copy" shortcut="mod+c">Copy</MenuItem>
+      <MenuItem value="Paste" shortcut="mod+v">Paste</MenuItem>
+      <MenuSeparator />
+      <MenuItem value="Find" shortcut="mod+f">Find…</MenuItem>
     </MenuContent>
   </Menu>
-  <Menu>
+  <Menu
+    onCheckedChange={(checked, details) => log(`${details.value} ${checked ? "on" : "off"}`)}
+    onValueChange={(value) => log(`${value} appearance`)}
+  >
     <MenuTrigger>View</MenuTrigger>
     <MenuContent>
-      <MenuCheckboxItem value="bookmarks">
+      <MenuCheckboxItem value="Ruler">
         <MenuItemIndicator>
           <CheckIcon aria-hidden="true" />
         </MenuItemIndicator>
-        Always Show Bookmarks Bar
+        Show Ruler
       </MenuCheckboxItem>
-      <MenuCheckboxItem value="urls" defaultChecked>
+      <MenuCheckboxItem value="Word count" defaultChecked>
         <MenuItemIndicator>
           <CheckIcon aria-hidden="true" />
         </MenuItemIndicator>
-        Always Show Full URLs
+        Show Word Count
       </MenuCheckboxItem>
       <MenuSeparator />
-      <MenuItem shortcut="mod+r">Reload</MenuItem>
-      <MenuItem>Toggle Fullscreen</MenuItem>
-    </MenuContent>
-  </Menu>
-  <Menu>
-    <MenuTrigger>Profiles</MenuTrigger>
-    <MenuContent>
-      <MenuRadioGroup defaultValue="ines">
-        {#each profiles as profile (profile.value)}
-          <MenuRadioItem value={profile.value}>
+      <MenuRadioGroup defaultValue="System">
+        <MenuGroupLabel>Appearance</MenuGroupLabel>
+        {#each appearances as appearance (appearance)}
+          <MenuRadioItem value={appearance}>
             <MenuItemIndicator />
-            {profile.label}
+            {appearance}
           </MenuRadioItem>
         {/each}
       </MenuRadioGroup>
-      <MenuSeparator />
-      <MenuItem>Edit…</MenuItem>
-      <MenuItem>Add Profile…</MenuItem>
     </MenuContent>
   </Menu>
 </Menubar>

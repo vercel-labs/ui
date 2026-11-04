@@ -7,19 +7,13 @@ Use a Listbox when the choices should stay in view. It works like a native selec
 
 <ComponentExample
   name="listbox/basic"
-  caption="Choose Astro, or focus the list and type its name. Arrow keys move focus and select an option."
+  caption="Choose Comments, then hold Shift and choose New sign-ins to select the range. A click replaces the selection; Ctrl or ⌘ adds one option."
 />
 
 ## Installation
 
 ```bash
 npm install @ui-sdk/web @ui-sdk/core
-```
-
-Import the element definitions once in your application:
-
-```ts
-import "@ui-sdk/web/listbox"
 ```
 
 ## Composition
@@ -38,9 +32,28 @@ Give the list an accessible name and each option a unique value. `ui-listbox-ite
 
 You can also name the list with a [Field label](./field) or `aria-labelledby`. Keep buttons, search fields, and empty messages outside the list: its contents should be options, groups, and separators.
 
-## Examples
+## Usage
 
-### Multiple
+Import the parts and put them together:
+
+```html
+<script type="module">
+  import "@ui-sdk/web/listbox"
+</script>
+
+<ui-listbox aria-label="Toppings" default-value="basil">
+  <ui-listbox-item value="basil">
+    Basil
+    <ui-listbox-item-indicator>✓</ui-listbox-item-indicator>
+  </ui-listbox-item>
+  <ui-listbox-item value="olive">
+    Olive
+    <ui-listbox-item-indicator>✓</ui-listbox-item-indicator>
+  </ui-listbox-item>
+</ui-listbox>
+```
+
+## Multiple
 
 Add `multiple` to select several options. The value becomes an array; a single list uses one value or `null`. By default, arrow keys move focus without changing a multiple selection.
 
@@ -55,10 +68,10 @@ Changing a Shift range preserves the options selected before that range began.
 
 <ComponentExample
   name="listbox/multiple"
-  caption="Choose Basil, then hold Shift and choose Pepper to select a range. Use Ctrl+A or Cmd+A to select every enabled option, then clear them."
+  caption="Choose Basil, then hold Shift and choose Pepper to select a range. Use Ctrl+A or ⌘A to select every option, then again to clear. The console logs each change."
 />
 
-### Selection That Follows Focus
+## Selection That Follows Focus
 
 A single list selects as arrow keys, Home, End, or typing move focus. A multiple list can do the same with `activation="automatic"`, like a file list: a press or arrow replaces the selection, Ctrl or Cmd adds to it, and Ctrl or Cmd with an arrow moves focus without selecting.
 
@@ -73,25 +86,25 @@ Taps and screen-reader presses toggle an option instead, since they do not have 
   caption="Choose index.ts to replace the selection. Hold Ctrl or Cmd while choosing another file to add it; Shift selects a range."
 />
 
-### Manual Activation
+## Manual Activation
 
 Set `activation="manual"` on a single list to browse without selecting. Space, Enter, or a press chooses the focused option.
 
 <ComponentExample
   name="listbox/manual"
-  caption="Move through the options with the arrow keys. The value stays unchanged until you press Space or Enter."
+  caption="Move through the options with the arrow keys. Nothing is selected until you press Space or Enter, and the console logs the choice."
 />
 
-### Deselectable
+## Deselectable
 
 Add `deselectable` to let pressing the selected option clear a single selection. Without it, the selection stays as it is.
 
 <ComponentExample
   name="listbox/deselectable"
-  caption="Press Astro again to clear the selection. Choose another framework to select it."
+  caption="Press Astro again to clear the selection, or choose another framework. The console logs each change."
 />
 
-### Groups
+## Groups
 
 Use `ui-listbox-group` and `ui-listbox-group-label` to name a group. Arrow keys and ranges continue across groups. Separators stay out of the accessibility tree.
 
@@ -100,7 +113,7 @@ Use `ui-listbox-group` and `ui-listbox-group-label` to name a group. Arrow keys 
   caption="Move from Apple through the list with Down Arrow. Navigation continues into the Vegetables group."
 />
 
-### Icons
+## Icons
 
 Wrap an icon in `ui-listbox-item-icon` so screen readers and typeahead skip it. Add `mirror` to a directional icon to flip it in right-to-left text.
 
@@ -109,11 +122,9 @@ Wrap an icon in `ui-listbox-item-icon` so screen readers and typeahead skip it. 
   caption="Choose Drafts. The icon stays out of the option’s accessible name and the text used for typeahead."
 />
 
-### Horizontal
+## Horizontal
 
 Set `orientation="horizontal"` to move with Left and Right Arrow. Arrow keys normally wrap; set `loop="false"` to stop at the ends, as this example does. Shift ranges never wrap.
-
-<span id="right-to-left" />
 
 The list reads `dir="rtl"` from the page or an ancestor, so Left Arrow moves to the next option in right-to-left text.
 
@@ -122,16 +133,16 @@ The list reads `dir="rtl"` from the page or an ancestor, so Left Arrow moves to 
   caption="Focus M, then use Left and Right Arrow to choose a size. The list stops at its ends; XL cannot be selected."
 />
 
-### Disabled
+## Disabled
 
 A disabled option cannot be selected. Arrow keys, typeahead and ranges skip it. Disabling the whole list removes its tab stop, prevents changes, and excludes its value from the form.
 
 <ComponentExample
   name="listbox/disabled"
-  caption="Try choosing Olive. Then press Disable the list to make every option unavailable until you enable it again."
+  caption="Try choosing Olive. Then press Disable the List to make every option unavailable until you enable it again."
 />
 
-### Read-Only
+## Read-Only
 
 Use `read-only` when people should be able to browse the list without changing its value. The list remains focusable and its value still submits.
 
@@ -140,7 +151,7 @@ Use `read-only` when people should be able to browse the list without changing i
   caption="Move focus through the frameworks. Nuxt stays selected because the list is read-only."
 />
 
-### Form
+## Form
 
 Add `name` to submit the selection. Multiple selections submit one entry per value. Reset restores `default-value`, and `required` prevents submission when nothing is selected.
 
@@ -150,57 +161,41 @@ The list can live outside its form: set `form` to the form’s ID, as this examp
 
 <ComponentExample
   name="listbox/form"
-  caption="Choose Basil and press Order. Both selections submit. Reset restores Extra cheese; clearing every option makes the required field block submission."
+  caption="Choose Basil and press Order: the console logs both toppings. Reset restores Extra cheese; clearing every option makes the required list block the order."
 />
 
-<span id="data" />
-
-### Object Values
+## Object Values
 
 Pass objects as item values when the selection should carry more than an ID. `itemToValue` provides the string used for identity and form submission; `isItemEqualToValue` matches objects that represent the same option but are different instances.
 
 <ComponentExample
   name="listbox/data"
-  caption="Choose Team. The displayed price comes from the selected object, rather than its string ID."
+  caption="Choose Team. The console logs the price from the selected object, not from its string ID."
 />
 
 `items` supplies the collection as a property and can render the options for you. Add a `<template>` to style the generated parts, as the example does. Use `ListData<T>` to type object-valued data. [Lists and Menus](../lists-and-menus) covers the shared data format.
 
-### Controller
+## Controller
 
 A controller can select all options, clear the selection, or focus the list from another control. Use the element’s `api` property. [Controllers](../controllers) covers setup and lifetime.
 
 <ComponentExample
   name="listbox/controller"
-  caption="Press Select all, Clear, and Focus. Each button uses the same list’s controller."
+  caption="Press Select All, Clear and Focus. Each button drives the same list through its controller, and the console logs the change."
 />
 
-### Scrollable
+## Scrollable
 
 Give a long list a maximum height and `overflow-y: auto`. It starts scrolled to the selected option without taking focus. Keyboard navigation reveals the focused option without scrolling the page.
 
 <ComponentExample
   name="listbox/scrollable"
-  caption="Focus the list and use the arrow keys. Options scroll into view, and the focused value appears below."
+  caption="Focus the list and use the arrow keys. Options scroll into view, and the console logs the focused time zone."
 />
 
 For a virtualized list, supply `items` so typeahead knows about unmounted options. The `highlight` event reports the focused value and index; each rendered item’s `index` places it in the full collection for screen readers. The [Select virtualization example](./select#virtualized) shows the same data and scrolling approach.
 
-## Focus
-
-The list is one tab stop. Tab returns to the last focused option, then falls back to the first selected or enabled option. Options receive real DOM focus, so `focus-visible` works directly.
-
-The root forwards focus into the options, including when you press a Field label or the list’s padding. Escape stays available to an enclosing dialog.
-
-## Styling
-
-Use `data-selected` for the selection and `data-highlighted` for focus. They can describe different options when selection does not follow focus. Disabled and read-only states have their own attributes.
-
-<DataAttributes component="listbox" />
-
 ## Custom Rendering
-
-### Links
 
 Render an option as a link when choosing it should navigate. A press or Enter follows the link and selects the option. This example uses manual activation so arrow keys only browse.
 
@@ -217,11 +212,35 @@ Render an option as a link when choosing it should navigate. A press or Enter fo
 
 [Parts and Composition](../parts-and-composition) covers the shared rendering API. Each part’s state is listed [below](#state).
 
+## Styling
+
+Use `data-selected` for the selection and `data-highlighted` for focus. They can describe different options when selection does not follow focus. Disabled and read-only states have their own attributes.
+
+Each part has a `data-slot`, such as `listbox-item`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+`<ui-listbox-group>`, `<ui-listbox-group-label>` and `<ui-listbox-separator>` have no state attributes.
+
+### `<ui-listbox>` [#data-attributes-listbox]
+
+<DataAttributes component="listbox" part="root" />
+
+### `<ui-listbox-item>` [#data-attributes-listboxitem]
+
+<DataAttributes component="listbox" part="item" />
+
+### `<ui-listbox-item-indicator>` [#data-attributes-listboxitemindicator]
+
+<DataAttributes component="listbox" part="item-indicator" />
+
+### `<ui-listbox-item-icon>` [#data-attributes-listboxitemicon]
+
+<DataAttributes component="listbox" part="item-icon" />
+
 ## API Reference
 
-Props are attributes in kebab case, like `default-value` and `read-only`. A `default-value` names items by
-their keys, comma-separated with `multiple`. `items`, `itemToValue`, `isItemEqualToValue` and
-`controller` are properties, and `value` is a live property. Callbacks are DOM events.
+Props are attributes in kebab case, like `default-value` and `read-only`. A `default-value` names items by their keys, comma-separated with `multiple`. `items`, `itemToValue`, `isItemEqualToValue` and `controller` are properties, and `value` is a live property. Callbacks are DOM events.
 
 ### Listbox
 
@@ -246,7 +265,7 @@ their keys, comma-separated with `multiple`. `items`, `itemToValue`, `isItemEqua
 
 ### State
 
-The same state shows as attributes on each part.
+The same state shows as data attributes on each element.
 
 `Listbox`:
 
@@ -294,7 +313,17 @@ Events fire on their own element and don't bubble, with the new value in `event.
 
 ## Accessibility
 
-Follows the [WAI-ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/), with both of its keyboard models for several options. Options take real focus with one roving tab stop. Every option says whether it's selected. Every line below is an automated test.
+Follows the [WAI-ARIA listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/), with both of its keyboard models for several options. Options take real focus with one roving tab stop. Every option says whether it's selected.
+
+### Focus
+
+The list is one tab stop. Tab returns to the last focused option, then falls back to the first selected or enabled option. Options receive real DOM focus, so `focus-visible` works directly.
+
+The root forwards focus into the options, including when you press a Field label or the list’s padding. Escape stays available to an enclosing dialog.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="listbox" />
 

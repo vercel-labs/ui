@@ -13,9 +13,9 @@
 
 <Listbox defaultValue="next" activation="manual" aria-label="Framework docs">
   {#each frameworks as framework (framework.value)}
-    <ListboxItem href={`#${framework.value}`} value={framework.value} label={framework.label}>
+    <ListboxItem value={framework.value} label={framework.label}>
       {#snippet render({ props, state })}
-        <a {...props}>
+        <a {...props} href={`#${framework.value}`}>
           <span>{framework.label}</span>
           {#if state.selected}
             <ExternalLinkIcon aria-hidden="true" />
