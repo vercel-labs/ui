@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Progress,
   ProgressIndicator,
@@ -6,32 +8,44 @@ import {
   ProgressValue,
 } from "@ui-sdk/react/progress"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [value, setValue] = React.useState(20)
+const total = 5
+
+function Example() {
+  const log = useLog()
+  const [uploaded, setUploaded] = React.useState(1)
+
+  function uploadNext() {
+    if (uploaded >= total) return
+    setUploaded(uploaded + 1)
+    log(`Uploaded ${uploaded + 1} of ${total} photos`)
+  }
+
+  function reset() {
+    setUploaded(0)
+    log("Reset to 0 photos")
+  }
 
   return (
     <div data-slot="stack">
-      <Progress value={value}>
-        <ProgressLabel>Uploading files</ProgressLabel>
+      <div data-slot="controls">
+        <button type="button" aria-disabled={uploaded >= total} onClick={uploadNext}>
+          Upload Next
+        </button>
+        <button type="button" onClick={reset}>
+          Reset
+        </button>
+      </div>
+      <Progress value={(uploaded / total) * 100}>
+        <ProgressLabel>Uploading photos</ProgressLabel>
         <ProgressValue />
         <ProgressTrack>
           <ProgressIndicator />
         </ProgressTrack>
       </Progress>
-      <div data-slot="row">
-        <button
-          data-variant="secondary"
-          type="button"
-          aria-disabled={value >= 100}
-          onClick={() => setValue((current) => Math.min(100, current + 20))}
-        >
-          Upload more
-        </button>
-        <button data-variant="secondary" type="button" onClick={() => setValue(0)}>
-          Reset
-        </button>
-      </div>
     </div>
   )
 }
+
+export { Example }

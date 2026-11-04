@@ -7,10 +7,10 @@ import {
 } from "@ui-sdk/react/progress"
 
 const bars = [
-  { label: "Transferred", value: 120, max: 250, format: { style: "unit", unit: "gigabyte" } },
-  { label: "Processing", value: 87.25, format: { style: "percent", maximumFractionDigits: 1 } },
-  { label: "Time left", value: 45, max: 60, format: (minutes: number) => `${60 - minutes} min left` },
-  { label: "Fortschritt", value: 40, locale: "de-DE" },
+  { label: "Download", value: 120, max: 250, format: { style: "unit", unit: "gigabyte" } },
+  { label: "Video render", value: 87.25, format: { style: "percent", maximumFractionDigits: 1 } },
+  { label: "Backup", value: 45, max: 60, format: (minutes: number) => `${60 - minutes} min left` },
+  { label: "Synchronisierung", value: 40, locale: "de-DE" },
 ] satisfies {
   label: string
   value: number
@@ -19,7 +19,7 @@ const bars = [
   locale?: string
 }[]
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       {bars.map(({ label, ...options }) => (
@@ -34,3 +34,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

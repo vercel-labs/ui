@@ -6,7 +6,7 @@ import {
   ProgressValue,
 } from "@ui-sdk/react/progress"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Progress value={56} locale="ar-EG">
@@ -19,3 +19,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

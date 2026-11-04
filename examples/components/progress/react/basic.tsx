@@ -6,10 +6,10 @@ import {
   ProgressValue,
 } from "@ui-sdk/react/progress"
 
-export function Example() {
+function Example() {
   return (
     <Progress value={60}>
-      <ProgressLabel>Loading</ProgressLabel>
+      <ProgressLabel>Exporting video</ProgressLabel>
       <ProgressValue />
       <ProgressTrack>
         <ProgressIndicator />
@@ -17,3 +17,5 @@ export function Example() {
     </Progress>
   )
 }
+
+export { Example }
