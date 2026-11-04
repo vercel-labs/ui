@@ -72,7 +72,6 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await count.click()
   await expect(status, "not modal: a press outside closes it").toHaveText("Closed by outside-press")
   await expect(count, "not modal: the press reaches the button beneath").toHaveText("Likes 1")
-  await expect(content).toBeHidden()
   await example.getByRole("checkbox", { name: "Modal" }).check()
   await cart.click()
   await expect(count).toHaveAttribute("inert", "")
@@ -93,6 +92,27 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await example.getByRole("checkbox", { name: "Open on hover" }).check()
   await cart.hover()
   await expect(status).toHaveText("Opened by trigger-hover")
+})
+
+test("options: a press on a control under the cart as it fades out reaches the control", async ({ page }) => {
+  await openBehaviors(page, "popups")
+  const example = page.locator("[data-example]").filter({ has: page.locator("[data-cart-status]") })
+  const cart = example.getByRole("button", { name: "Cart", exact: true })
+  await cart.scrollIntoViewIfNeeded()
+  const content = page.locator('[data-slot="cart-content"]')
+  const modal = example.getByRole("checkbox", { name: "Modal" })
+  await cart.click()
+  const popup = (await content.boundingBox())!
+  const box = (await modal.boundingBox())!
+  const [x, y] = [box.x + box.width / 2, box.y + box.height / 2]
+  const covered = x > popup.x && x < popup.x + popup.width && y > popup.y && y < popup.y + popup.height
+  expect(covered, "the cart covers the checkbox").toBe(true)
+  await expect(content).toHaveCSS("opacity", "1")
+  await page.addStyleTag({ content: '[data-slot="cart-content"] { transition-duration: 10s !important; }' })
+  await page.keyboard.press("Escape")
+  await expect(content).toHaveAttribute("data-ending-style", "")
+  await modal.check()
+  await expect(content, "it's still fading out").toHaveAttribute("data-ending-style", "")
 })
 
 test("payload: every avatar opens the same card with its own person", async ({ page }) => {

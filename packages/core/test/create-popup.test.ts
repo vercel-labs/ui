@@ -3,7 +3,7 @@
 // `hoverCardPreset`, a popover on `popoverPreset`, tooltips on
 // `tooltipPreset`, and our Popover, Hover Card and Tooltip on them, driven
 // the way a person would, with the testing kit.
-import { afterEach, describe, expect, test, vi } from "vitest"
+import { afterEach, describe, expect, onTestFinished, test, vi } from "vitest"
 import { linkPreview, type LinkPreviewOptions } from "../../../examples/experiments/link-preview"
 import type { ChangeDetails } from "../src/foundation/kernel/details"
 import { bind } from "../src/foundation/kernel/part"
@@ -198,6 +198,13 @@ const shareMarkup = `<div>
   <button>After</button>
 </div>`
 
+const backdropMarkup = `<div>
+  <trigger>Share</trigger>
+  <backdrop></backdrop>
+  <content><title>Share</title><close>Close</close></content>
+  <button>After</button>
+</div>`
+
 function sharing(options: ShareOptions = {}) {
   const reasons: string[] = []
   const view = mount(
@@ -208,6 +215,73 @@ function sharing(options: ShareOptions = {}) {
   mounts.push(view)
   return Object.assign(view, { reasons })
 }
+
+const outsideButton = (root: Element) =>
+  [...root.querySelectorAll("button")].find((el) => el.textContent === "After")!
+
+// Lays an element out at a box, since jsdom lays nothing out.
+const place = (el: Element, box: DOMRect) => Object.assign(el, { getBoundingClientRect: () => box })
+
+// Keeps elements animating out for the rest of the test.
+function holdExit(...els: Element[]) {
+  const computed = window.getComputedStyle
+  const fading = {
+    transitionDuration: "10s",
+    transitionDelay: "0s",
+    animationDuration: "0s",
+    animationDelay: "0s",
+  }
+  vi.spyOn(window, "getComputedStyle").mockImplementation((el, pseudo) =>
+    els.includes(el) ? (fading as CSSStyleDeclaration) : computed(el, pseudo),
+  )
+  for (const el of els)
+    Object.assign(el, { getAnimations: () => [{ finished: new Promise(() => {}), effect: null }] })
+  onTestFinished(() => {
+    vi.restoreAllMocks()
+  })
+}
+
+// What reached an element pressed with the mouse: its pointerdown, said
+// prevented when it was, and its click.
+async function pressOn(view: { click: (el: Element) => Promise<void> }, el: Element) {
+  const heard: string[] = []
+  const hear = (event: Event) => heard.push(`${event.type}${event.defaultPrevented ? " prevented" : ""}`)
+  for (const type of ["pointerdown", "click"]) el.addEventListener(type, hear)
+  await view.click(el)
+  for (const type of ["pointerdown", "click"]) el.removeEventListener(type, hear)
+  return heard
+}
+
+describe("a popup animating out", () => {
+  test.each([false, true])("lets a press on its content through to the page, modal: %s", async (modal) => {
+    const view = sharing({ modal })
+    await view.click(view.part("trigger")!)
+    const content = view.part("content")!
+    holdExit(content)
+    place(content, new DOMRect(0, 0, 200, 200))
+    await view.keys("Escape")
+    expect(view.state).toMatchObject({ open: false, mounted: true })
+    const after = place(outsideButton(view.root), new DOMRect(50, 50, 20, 20))
+    expect(await pressOn(view, after)).toEqual(["pointerdown", "click"])
+    expect(view.state.mounted).toBe(true)
+  })
+
+  test("a modal dialog swallows a press on its backdrop, so it never reaches the page", async () => {
+    const view = mount(dialog, { modal: true }, backdropMarkup)
+    mounts.push(view)
+    await view.click(view.part("trigger")!)
+    const [backdrop, content] = [view.part("backdrop")!, view.part("content")!]
+    holdExit(backdrop, content)
+    place(backdrop, new DOMRect(0, 0, 1000, 1000))
+    place(content, new DOMRect(300, 300, 200, 200))
+    await view.keys("Escape")
+    expect(view.state).toMatchObject({ open: false, mounted: true })
+    const after = outsideButton(view.root)
+    expect(await pressOn(view, place(after, new DOMRect(50, 50, 20, 20)))).toEqual(["pointerdown prevented"])
+    expect(await pressOn(view, place(after, new DOMRect(350, 350, 20, 20)))).toEqual(["pointerdown", "click"])
+    expect(view.state.mounted).toBe(true)
+  })
+})
 
 describe("a popover on the popover preset", () => {
   test("a modal one passes the dialog pattern", async () => {
