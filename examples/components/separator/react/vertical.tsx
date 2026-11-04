@@ -1,13 +1,15 @@
 import { Separator } from "@ui-sdk/react/separator"
 
-export function Example() {
+function Example() {
   return (
-    <div data-slot="row">
-      <span>Profile</span>
+    <nav aria-label="Legal" data-slot="row">
+      <a href="#">Privacy</a>
       <Separator orientation="vertical" />
-      <span>Billing</span>
+      <a href="#">Terms</a>
       <Separator orientation="vertical" />
-      <span>Settings</span>
-    </div>
+      <a href="#">Cookies</a>
+    </nav>
   )
 }
+
+export { Example }

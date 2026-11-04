@@ -1,22 +1,24 @@
 import { Separator } from "@ui-sdk/react/separator"
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       <dl>
-        <dt>Item 1</dt>
-        <dd>Value 1</dd>
+        <dt>Plan</dt>
+        <dd>Pro</dd>
       </dl>
       <Separator />
       <dl>
-        <dt>Item 2</dt>
-        <dd>Value 2</dd>
+        <dt>Seats</dt>
+        <dd>8 of 10</dd>
       </dl>
       <Separator />
       <dl>
-        <dt>Item 3</dt>
-        <dd>Value 3</dd>
+        <dt>Renews</dt>
+        <dd>December 1, 2026</dd>
       </dl>
     </div>
   )
 }
+
+export { Example }
