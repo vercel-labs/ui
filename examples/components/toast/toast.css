@@ -34,10 +34,28 @@
     background: var(--surface-3);
     box-shadow: var(--shadow-3);
     color: var(--ink);
+    height: var(--toast-height);
     font-size: var(--text-md);
     outline-offset: 2px;
-    translate: var(--toast-swipe-x, 0px) calc(var(--y) + var(--toast-swipe-y, 0px));
+    translate: calc(var(--toast-swipe-x, 0px) + var(--exit-x, 0px))
+      calc(var(--y) + var(--toast-swipe-y, 0px) + var(--exit-y, 0px) * var(--slide, 1));
     scale: calc(1 - var(--toast-index) * 0.05);
+    transition-property: translate, scale, opacity, height, box-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+    -webkit-user-select: none;
+    user-select: none;
+
+    /* Covers the content of the toasts behind a collapsed stack, so only the front one reads. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      opacity: 0;
+      pointer-events: none;
+      transition: inherit;
+    }
 
     [data-side="bottom"] & {
       bottom: 0;
@@ -49,11 +67,65 @@
 
     &:not([data-front], [data-expanded]) {
       height: var(--toast-front-height);
+
+      &::before {
+        opacity: 1;
+      }
     }
 
     &[data-expanded] {
       --y: calc(var(--dir) * (var(--toast-offset) + var(--toast-index) * var(--space-3)));
       scale: 1;
+      transition-duration: 200ms;
+      transition-timing-function: ease-out;
+    }
+
+    /* The newest toast slides in from the edge; the ones behind it fade in where they are. */
+    &[data-starting-style] {
+      transition: none;
+
+      &:not([data-front]) {
+        opacity: 0;
+      }
+
+      &[data-front] {
+        --y: calc(var(--dir) * -100%);
+      }
+    }
+
+    /* A closing toast slides back out the way it came, or off to the side it was swiped toward. */
+    &[data-ending-style] {
+      opacity: 0;
+      transition-duration: 200ms;
+      transition-timing-function: ease-out;
+
+      @media (prefers-reduced-motion: no-preference) {
+        --exit-y: calc(var(--dir) * -100%);
+
+        &[data-swipe-direction="left"] {
+          --exit-x: -100%;
+        }
+
+        &[data-swipe-direction="right"] {
+          --exit-x: 100%;
+        }
+      }
+
+      &:not([data-front], [data-expanded]) {
+        --exit-y: 0px;
+      }
+    }
+
+    &:is([data-swipe-direction="left"], [data-swipe-direction="right"]) {
+      --slide: 0;
+    }
+
+    &[data-swiping] {
+      transition: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition-property: opacity;
     }
 
     &[data-type="error"] {
