@@ -1,6 +1,6 @@
 import { Meter, MeterIndicator, MeterLabel, MeterTrack, MeterValue } from "@ui-sdk/solid/meter"
 
-export function Example() {
+function Example() {
   return (
     <Meter value={720} min={300} max={850} format={{ style: "decimal" }}>
       <MeterLabel>Credit score</MeterLabel>
@@ -11,3 +11,5 @@ export function Example() {
     </Meter>
   )
 }
+
+export { Example }

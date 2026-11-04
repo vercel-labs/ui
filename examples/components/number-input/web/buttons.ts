@@ -1,7 +1,7 @@
 import "@ui-sdk/web/number-input"
 import { createElement, Minus, Plus } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-number-input default-value="1" min="0">
       <ui-number-input-group>
@@ -22,3 +22,5 @@ export function mount(root: HTMLElement) {
     </ui-number-input>
   `
 }
+
+export { mount }

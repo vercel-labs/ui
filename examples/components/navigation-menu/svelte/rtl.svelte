@@ -17,17 +17,17 @@
       links: [
         {
           title: "مقدمة",
-          href: "https://example.com/docs",
+          href: "#",
           description: "مكونات بلا أنماط بنواة واحدة لكل إطار عمل.",
         },
         {
           title: "التثبيت",
-          href: "https://example.com/docs/installation",
+          href: "#",
           description: "أضف الحزمة لإطار عملك واعرض أول جزء.",
         },
         {
           title: "التنسيق",
-          href: "https://example.com/docs/styling",
+          href: "#",
           description: "نسّق الأجزاء بسمات البيانات ومتغيرات CSS.",
         },
       ],
@@ -38,17 +38,17 @@
       links: [
         {
           title: "مربع تنبيه",
-          href: "https://example.com/docs/components/alert-dialog",
+          href: "#",
           description: "يطلب قرارًا قبل استخدام أي شيء آخر في الصفحة.",
         },
         {
           title: "بطاقة التمرير",
-          href: "https://example.com/docs/components/hover-card",
+          href: "#",
           description: "معاينة لما يشير إليه الرابط.",
         },
         {
           title: "علامات التبويب",
-          href: "https://example.com/docs/components/tabs",
+          href: "#",
           description: "تعرض لوحة واحدة من المحتوى في كل مرة.",
         },
       ],
@@ -67,7 +67,7 @@
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul>
-              {#each section.links as link (link.href)}
+              {#each section.links as link (link.title)}
                 <li>
                   <NavigationMenuLink href={link.href}>
                     <span>{link.title}</span>
@@ -80,11 +80,11 @@
         </NavigationMenuItem>
       {/each}
       <NavigationMenuItem>
-        <NavigationMenuLink href="https://example.com/docs">
+        <NavigationMenuLink href="#">
           المستندات
         </NavigationMenuLink>
       </NavigationMenuItem>
     </NavigationMenuList>
-    <NavigationMenuViewport />
+    <NavigationMenuViewport sideOffset={8} />
   </NavigationMenu>
 </div>

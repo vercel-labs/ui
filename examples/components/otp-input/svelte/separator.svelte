@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
   import { MinusIcon } from "@lucide/svelte"
-
+  import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
 </script>
 
 <OTPInput maxLength={6} aria-label="Verification code">
@@ -10,14 +9,14 @@
     <OTPInputSlot index={1} />
   </OTPInputGroup>
   <OTPInputSeparator>
-    <MinusIcon />
+    <MinusIcon aria-hidden="true" />
   </OTPInputSeparator>
   <OTPInputGroup>
     <OTPInputSlot index={2} />
     <OTPInputSlot index={3} />
   </OTPInputGroup>
   <OTPInputSeparator>
-    <MinusIcon />
+    <MinusIcon aria-hidden="true" />
   </OTPInputSeparator>
   <OTPInputGroup>
     <OTPInputSlot index={4} />

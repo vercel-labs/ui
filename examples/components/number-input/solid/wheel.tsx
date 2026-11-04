@@ -1,13 +1,13 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 
-export function Example() {
+function Example() {
   return (
     <Field>
       <FieldLabel>Font size</FieldLabel>
@@ -47,3 +47,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

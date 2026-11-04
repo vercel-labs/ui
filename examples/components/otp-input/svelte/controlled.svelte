@@ -1,17 +1,19 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let value = $state("")
 </script>
 
-<div data-slot="stack">
-  <label for="one-time-password" data-slot="label"> One-time password </label>
-  <OTPInput id="one-time-password" bind:value={value}>
+<Field>
+  <FieldLabel>One-time password</FieldLabel>
+  <OTPInput bind:value onValueChange={(next, details) => log(`${next || "Empty"} (${details.reason})`)}>
     <OTPInputGroup>
-      {#each { length: 6 } as _, index}
-        <OTPInputSlot index={index} />
+      {#each [0, 1, 2, 3, 4, 5] as index (index)}
+        <OTPInputSlot {index} />
       {/each}
     </OTPInputGroup>
   </OTPInput>
-  <p data-slot="output">{value ? `You entered: ${value}` : "Enter your one-time password."}</p>
-</div>
+</Field>

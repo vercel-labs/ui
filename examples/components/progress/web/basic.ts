@@ -1,9 +1,9 @@
 import "@ui-sdk/web/progress"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-progress value="60">
-      <ui-progress-label>Loading</ui-progress-label>
+      <ui-progress-label>Exporting video</ui-progress-label>
       <ui-progress-value></ui-progress-value>
       <ui-progress-track>
         <ui-progress-indicator></ui-progress-indicator>
@@ -11,3 +11,5 @@ export function mount(root: HTMLElement) {
     </ui-progress>
   `
 }
+
+export { mount }

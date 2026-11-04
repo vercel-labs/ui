@@ -3,10 +3,10 @@ import { MinusIcon, PlusIcon } from "@lucide/vue"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/vue/number-input"
 </script>
 

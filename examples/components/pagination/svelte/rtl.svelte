@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
   import {
     Pagination,
     PaginationEllipsis,
@@ -8,7 +9,6 @@
     PaginationNext,
     PaginationPrevious,
   } from "@ui-sdk/svelte/pagination"
-  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
 </script>
 
 <div dir="rtl">

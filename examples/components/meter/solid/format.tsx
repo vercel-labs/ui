@@ -19,7 +19,7 @@ const meters = [
   locale?: string
 }[]
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       <For each={meters}>
@@ -36,3 +36,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

@@ -8,10 +8,17 @@ import {
   PaginationPrevious,
 } from "@ui-sdk/solid/pagination"
 import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
+  const log = useLog()
+
   return (
-    <Pagination aria-label="Pagination" pageCount={10}>
+    <Pagination
+      aria-label="Pagination"
+      pageCount={10}
+      onPageChange={(page, details) => log(`Page ${page} (${details.reason})`)}
+    >
       <PaginationList>
         {({ items }) => (
           <>

@@ -8,23 +8,23 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@ui-sdk/vue/navigation-menu"
-import { ref } from "vue"
 import { ChevronDownIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
 const gettingStarted = [
   {
     title: "Introduction",
-    href: "https://example.com/docs",
+    href: "#",
     description: "Unstyled components with one core for every framework.",
   },
   {
     title: "Installation",
-    href: "https://example.com/docs/installation",
+    href: "#",
     description: "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
-    href: "https://example.com/docs/styling",
+    href: "#",
     description: "Style parts with data attributes, CSS variables and any CSS.",
   },
 ]
@@ -32,81 +32,79 @@ const gettingStarted = [
 const components = [
   {
     title: "Alert Dialog",
-    href: "https://example.com/docs/components/alert-dialog",
+    href: "#",
     description: "Asks for a decision before anything else on the page can be used.",
   },
   {
     title: "Hover Card",
-    href: "https://example.com/docs/components/hover-card",
+    href: "#",
     description: "A preview of what a link points to, for people who pause on it.",
   },
   {
     title: "Progress",
-    href: "https://example.com/docs/components/progress",
+    href: "#",
     description: "Shows how far along a task is, like an upload.",
   },
   {
     title: "Scroll Area",
-    href: "https://example.com/docs/components/scroll-area",
+    href: "#",
     description: "Scrolls its content with scrollbars you can style.",
   },
   {
     title: "Tabs",
-    href: "https://example.com/docs/components/tabs",
+    href: "#",
     description: "Shows one panel of content at a time, picked from a list of tabs.",
   },
   {
     title: "Tooltip",
-    href: "https://example.com/docs/components/tooltip",
+    href: "#",
     description: "A short label for a control, shown on hover or keyboard focus.",
   },
 ]
-const status = ref("Closed")
+
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <NavigationMenu
-      aria-label="Main"
-      @value-change="(value) => (status = value ? `Showing ${value}` : 'Closing')"
-      @open-change-complete="(open) => (status = open ? 'Open' : 'Closed')"
-    >
-      <NavigationMenuList>
-        <NavigationMenuItem value="guides">
-          <NavigationMenuTrigger>
-            Guides
-            <ChevronDownIcon />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul>
-              <li v-for="page in gettingStarted" :key="page.href">
-                <NavigationMenuLink :href="page.href">
-                  <span>{{ page.title }}</span>
-                  <span data-slot="hint">{{ page.description }}</span>
-                </NavigationMenuLink>
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem value="components">
-          <NavigationMenuTrigger>
-            Components
-            <ChevronDownIcon />
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul data-slot="grid">
-              <li v-for="page in components" :key="page.href">
-                <NavigationMenuLink :href="page.href">
-                  <span>{{ page.title }}</span>
-                  <span data-slot="hint">{{ page.description }}</span>
-                </NavigationMenuLink>
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-      <NavigationMenuViewport data-variant="slide" />
-    </NavigationMenu>
-    <output data-slot="output">{{ status }}</output>
-  </div>
+  <NavigationMenu
+    aria-label="Main"
+    @value-change="(value) => log(value ? `Showing ${value}` : 'Closing')"
+    @open-change-complete="(open) => log(open ? 'Finished opening' : 'Finished closing')"
+  >
+    <NavigationMenuList>
+      <NavigationMenuItem value="guides">
+        <NavigationMenuTrigger>
+          Guides
+          <ChevronDownIcon />
+        </NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul>
+            <li v-for="page in gettingStarted" :key="page.title">
+              <NavigationMenuLink :href="page.href">
+                <span>{{ page.title }}</span>
+                <span data-slot="hint">{{ page.description }}</span>
+              </NavigationMenuLink>
+            </li>
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+      <NavigationMenuItem value="components">
+        <NavigationMenuTrigger>
+          Components
+          <ChevronDownIcon />
+        </NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul data-slot="grid">
+            <li v-for="page in components" :key="page.title">
+              <NavigationMenuLink :href="page.href">
+                <span>{{ page.title }}</span>
+                <span data-slot="hint">{{ page.description }}</span>
+              </NavigationMenuLink>
+            </li>
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+    <NavigationMenuViewport :side-offset="8" data-variant="slide" />
+  </NavigationMenu>
 </template>

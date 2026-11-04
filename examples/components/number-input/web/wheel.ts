@@ -2,7 +2,7 @@ import "@ui-sdk/web/number-input"
 import "@ui-sdk/web/field"
 import { createElement, Minus, Plus } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>Font size</ui-field-label>
@@ -27,3 +27,5 @@ export function mount(root: HTMLElement) {
     </ui-field>
   `
 }
+
+export { mount }

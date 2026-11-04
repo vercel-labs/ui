@@ -5,7 +5,7 @@ description: Navigate pages with buttons, links, or your router.
 
 <ComponentExample
   name="pagination/basic"
-  caption="Choose a page, or use Previous and Next. The step at either end stays focusable as a button."
+  caption="Choose a page, or use Previous and Next. The console logs each page and its reason, and the step at either end stays focusable as a button."
 />
 
 ## Installation
@@ -46,162 +46,233 @@ Name the navigation with `aria-label`, then put the page links and steps in a li
 
 A list with a `<template>` renders the range from it: one copy for each page, with the page number in an empty button, and the `<template data-ellipsis>` for each gap. Without the ellipsis template, gaps get a plain `<ui-pagination-ellipsis>`. Links and steps wrap your own `<button>`, or an `<a>` with [`getHref`](#links), so style those. Links written out by hand, like a server's, take a `page` attribute.
 
-The template keeps page entries keyed as the range moves. The current page's wrapped button gets `aria-current="page"` and `data-current`; an ellipsis is hidden from screen readers.
+The template keeps page entries keyed as the range moves. The current page's wrapped button gets `aria-current="page"` and `data-current`; an ellipsis shows “…” and is hidden from screen readers.
 
-Give each step text or an `aria-label` on its wrapped button. At an end, the button gets `aria-disabled="true"` and `data-disabled` and stops changing the page, while staying in the tab order.
+Give each step text or an `aria-label` on its wrapped button. At an end, the button gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order.
 
-## Examples
+## Usage
 
-### Simple
+Import the parts and put them together:
 
-Pages only, with no steps. With five pages, the range has no gaps, so the links can be written out.
+```html
+<script type="module">
+  import "@ui-sdk/web/pagination"
+</script>
 
-Links written by hand take a `page` attribute and need their own number.
+<ui-pagination aria-label="Pagination" page-count="10">
+  <ui-pagination-list>
+    <ui-pagination-item>
+      <ui-pagination-previous><button>Previous</button></ui-pagination-previous>
+    </ui-pagination-item>
+    <template>
+      <ui-pagination-item>
+        <ui-pagination-link><button></button></ui-pagination-link>
+      </ui-pagination-item>
+    </template>
+    <ui-pagination-item>
+      <ui-pagination-next><button>Next</button></ui-pagination-next>
+    </ui-pagination-item>
+  </ui-pagination-list>
+</ui-pagination>
+```
 
-<ComponentExample
-  name="pagination/simple"
-  caption="Choose one of five pages without Previous or Next controls."
-/>
+## Total and Page Size
 
-### Icons Only
-
-First, Previous, Next and Last as icon buttons, each named with `aria-label`, around a line that says where you are. With no page links, that line is a live region, so screen readers hear the new page after a step.
-
-The line follows the `pagechange` event.
-
-<ComponentExample
-  name="pagination/icons-only"
-  caption="Use the named icon buttons. The live page count announces each change."
-/>
-
-### Links
-
-Set the `getHref` property, a function from a page to its URL, and wrap `<a>` elements instead of buttons.
-
-Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
-
-A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
-
-<ComponentExample
-  name="pagination/links"
-  caption="Choose a page and watch the URL hash change. These controls are real links."
-/>
-
-### Router Links
-
-Render your router's link to page on the client. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
-
-Parts bind whatever `<a>` they wrap, so a router that listens for clicks on links keeps working. Check
-`event.defaultPrevented` before navigating. The element owns its page, so the route follows the
-pagination here.
-
-<ComponentExample
-  name="pagination/router"
-  caption="Choose a page. The example updates the URL and current page without reloading."
-/>
-
-## Behavior and Options
-
-### Controlled
-
-The element owns its page. Listen for `pagechange`, and call `preventDefault()` on it to keep the current
-page. The `page` property reads the page, and setting it goes there.
-
-Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). A canceled change, like one while a form has unsaved changes, also stops a link from navigating.
-
-<ComponentExample
-  name="pagination/controlled"
-  caption="Choose a page to see the value and change reason kept by the application."
-/>
-
-### Default Page
-
-`default-page` is the page it starts on, when uncontrolled. It's 1 by default.
-
-<ComponentExample name="pagination/default-page" caption="Start on page 5, then choose another page." />
-
-### Siblings
-
-`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
-
-<ComponentExample
-  name="pagination/siblings"
-  caption="Start on page 10 with two neighboring pages on either side."
-/>
-
-### Boundaries
-
-`boundaries` is how many pages always show at each end, 1 by default.
-
-<ComponentExample
-  name="pagination/boundaries"
-  caption="Keep two page links visible at each end of the range."
-/>
-
-### Total and Page Size
-
-Instead of `page-count`, pass `total`, how many items there are, and `page-size`, how many fit on a page (10
-by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
+Instead of `page-count`, pass `total`, how many items there are, and `page-size`, how many fit on a page (10 by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
 
 A page past the end, like after the count shrinks, reads as the last page.
 
 <ComponentExample
   name="pagination/total"
-  caption="Choose a page, then change Rows per page. This example resets to page 1 when the size changes."
+  caption="Choose a page, then change Rows per page. The console logs each change, and a new size starts again at page 1."
 />
 
-### Paging from Anywhere
+## Simple
 
-The element's `api` property is its [controller](#controller): it pages the pagination from anywhere. Or
-create one with `createPaginationController()` from `@ui-sdk/web/pagination` and set the `controller`
-property.
+With only a few pages, the range has no gaps, so you can write the links out and leave the steps off. Links written by hand take a `page` attribute and need their own number.
+
+```html
+<ui-pagination aria-label="Pagination" page-count="5">
+  <ui-pagination-list>
+    <ui-pagination-item
+      ><ui-pagination-link page="1"><button>1</button></ui-pagination-link></ui-pagination-item
+    >
+    <ui-pagination-item
+      ><ui-pagination-link page="2"><button>2</button></ui-pagination-link></ui-pagination-item
+    >
+    <ui-pagination-item
+      ><ui-pagination-link page="3"><button>3</button></ui-pagination-link></ui-pagination-item
+    >
+    <ui-pagination-item
+      ><ui-pagination-link page="4"><button>4</button></ui-pagination-link></ui-pagination-item
+    >
+    <ui-pagination-item
+      ><ui-pagination-link page="5"><button>5</button></ui-pagination-link></ui-pagination-item
+    >
+  </ui-pagination-list>
+</ui-pagination>
+```
+
+## Links
+
+Set the `getHref` property to map each page to a URL, and wrap `<a>` elements instead of buttons.
+
+```html
+<ui-pagination aria-label="Pagination" page-count="10">
+  <ui-pagination-list>
+    <ui-pagination-item>
+      <ui-pagination-previous><a>Previous</a></ui-pagination-previous>
+    </ui-pagination-item>
+    <template>
+      <ui-pagination-item>
+        <ui-pagination-link><a></a></ui-pagination-link>
+      </ui-pagination-item>
+    </template>
+    <ui-pagination-item>
+      <ui-pagination-next><a>Next</a></ui-pagination-next>
+    </ui-pagination-item>
+  </ui-pagination-list>
+</ui-pagination>
+```
+
+```ts
+document.querySelector("ui-pagination")!.getHref = (page) => `/posts?page=${page}`
+```
+
+Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
+
+A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
+
+## Router Links
+
+Render your router's link to page on the client. Parts bind whatever `<a>` they wrap, so a router that listens for clicks on links keeps working. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`. Check `event.defaultPrevented` before navigating.
+
+Read the page from the URL, like your router's search params, and set the [`page` property](#controlled) from it.
+
+```ts
+const pagination = document.querySelector("ui-pagination")!
+pagination.getHref = (page) => `?page=${page}`
+pagination.page = Number(new URL(location.href).searchParams.get("page") ?? 1)
+```
+
+## Controlled
+
+The element owns its page. Listen for `pagechange`, and call `preventDefault()` on it to keep the current page. The `page` property reads the page, and setting it goes there.
+
+```ts
+const pagination = document.querySelector("ui-pagination")!
+pagination.addEventListener("pagechange", (event) => console.log(event.detail.value, event.detail.reason))
+pagination.page = 1
+```
+
+Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `event.preventDefault()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
+
+## Default Page
+
+`default-page` is the page it starts on, when uncontrolled. It's 1 by default.
+
+```html
+<ui-pagination aria-label="Pagination" page-count="10" default-page="5"> ... </ui-pagination>
+```
+
+## Siblings
+
+`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
+
+```html
+<ui-pagination aria-label="Pagination" page-count="20" default-page="10" siblings="2"> ... </ui-pagination>
+```
+
+## Boundaries
+
+`boundaries` is how many pages always show at each end, 1 by default.
+
+```html
+<ui-pagination aria-label="Pagination" page-count="20" default-page="10" boundaries="2"> ... </ui-pagination>
+```
+
+## Paging from Anywhere
+
+The element's `api` property is its [controller](#controller): it pages the pagination from anywhere, like buttons elsewhere on the page or a keyboard shortcut. Or create one with `createPaginationController()` and set the `controller` property.
+
+```html
+<button type="button" data-action="next">Next Page</button>
+<ui-pagination aria-label="Pagination" page-count="10"> ... </ui-pagination>
+```
+
+```ts
+const pagination = document.querySelector("ui-pagination")!.api
+document.querySelector('[data-action="next"]')!.addEventListener("click", () => pagination.next())
+```
+
+## Your Own Markup
+
+`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Import it from `@ui-sdk/core/pagination`. Here it keeps a strip of slide dots the same length however many slides there are.
+
+```html
+<div role="group" aria-label="Slides"></div>
+```
+
+```ts
+import { paginationRange } from "@ui-sdk/core/pagination"
+
+function renderDots(group: HTMLElement, slide: number) {
+  const items = paginationRange({ page: slide, pageCount: 20, siblings: 2, boundaries: 1 })
+  group.replaceChildren(
+    ...items.map((item) => {
+      if (typeof item !== "number") {
+        const gap = document.createElement("span")
+        gap.setAttribute("aria-hidden", "true")
+        return gap
+      }
+      const dot = document.createElement("button")
+      dot.setAttribute("aria-label", `Slide ${item}`)
+      if (item === slide) dot.setAttribute("aria-current", "true")
+      dot.addEventListener("click", () => renderDots(group, item))
+      return dot
+    }),
+  )
+}
+```
+
+## Custom Rendering
+
+Elements have no render functions. Links and steps wrap your own elements, so change them directly, and read state from their attributes, the `page` property or the `pagechange` event: whether a link is current, and for a step, the page it goes to and whether it's disabled. Here a `pagechange` listener writes Page 3 into the current link, and gives each arrow the page it goes to and a title.
 
 <ComponentExample
-  name="pagination/controller"
-  caption="Use the buttons below the pagination to move it through a controller."
+  name="pagination/render"
+  caption="Choose a page. The current page widens to say Page 3, and each arrow shows the page it goes to."
 />
-
-## Focus
-
-Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
 
 ## Styling
 
 Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-current` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
 
-```html
-<ui-pagination-link>
-  <button class="aria-[current=page]:border data-current:font-medium"></button>
-</ui-pagination-link>
-<ui-pagination-next>
-  <button class="aria-disabled:opacity-50">Next</button>
-</ui-pagination-next>
-```
+Each part has a `data-slot`, such as `pagination-link`, and its state attributes are listed under [Data Attributes](#data-attributes). The root, list, items and ellipsis have none.
 
 The list and its items are `<ui-pagination-list>` and `<ui-pagination-item>`, which display as blocks. Give the list `flex` to lay the pages out in a row.
 
-<DataAttributes component="pagination" />
+## Data Attributes
 
-## Custom Rendering
+### `<ui-pagination-link>` [#data-attributes-paginationlink]
 
-Elements have no render functions. Links and steps wrap your own elements, so style them, and what's inside
-them, from their attributes.
+<DataAttributes component="pagination" part="link" />
 
-<ComponentExample
-  name="pagination/render"
-  caption="Choose a page. A CSS pseudo-element marks the current page inside your wrapped button."
-/>
+### `<ui-pagination-previous>` [#data-attributes-paginationprevious]
 
-### Your Own Markup
+<DataAttributes component="pagination" part="previous" />
 
-`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Here it keeps a strip of slide dots the same length however many slides there are.
+### `<ui-pagination-next>` [#data-attributes-paginationnext]
 
-Import it from `@ui-sdk/web`.
+<DataAttributes component="pagination" part="next" />
 
-<ComponentExample
-  name="pagination/range"
-  caption="Choose a slide using the same range calculation without pagination parts."
-/>
+### `<ui-pagination-first>` [#data-attributes-paginationfirst]
+
+<DataAttributes component="pagination" part="first" />
+
+### `<ui-pagination-last>` [#data-attributes-paginationlast]
+
+<DataAttributes component="pagination" part="last" />
 
 ## API Reference
 
@@ -268,7 +339,15 @@ Events fire on their own element and don't bubble, with the new page in `event.d
 
 ## Accessibility
 
-There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop. Every line below is an automated test.
+There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop.
+
+### Focus
+
+Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="pagination" />
 

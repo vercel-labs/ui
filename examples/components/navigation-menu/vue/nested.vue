@@ -13,17 +13,17 @@ import { ChevronDownIcon, ChevronRightIcon } from "@lucide/vue"
 const gettingStarted = [
   {
     title: "Introduction",
-    href: "https://example.com/docs",
+    href: "#",
     description: "Unstyled components with one core for every framework.",
   },
   {
     title: "Installation",
-    href: "https://example.com/docs/installation",
+    href: "#",
     description: "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
-    href: "https://example.com/docs/styling",
+    href: "#",
     description: "Style parts with data attributes, CSS variables and any CSS.",
   },
 ]
@@ -33,18 +33,18 @@ const groups = [
     value: "overlays",
     label: "Overlays",
     links: [
-      { title: "Dialog", href: "https://example.com/docs/components/dialog" },
-      { title: "Popover", href: "https://example.com/docs/components/popover" },
-      { title: "Tooltip", href: "https://example.com/docs/components/tooltip" },
+      { title: "Dialog", href: "#" },
+      { title: "Popover", href: "#" },
+      { title: "Tooltip", href: "#" },
     ],
   },
   {
     value: "forms",
     label: "Forms",
     links: [
-      { title: "Input", href: "https://example.com/docs/components/input" },
-      { title: "Select", href: "https://example.com/docs/components/select" },
-      { title: "Checkbox", href: "https://example.com/docs/components/checkbox" },
+      { title: "Input", href: "#" },
+      { title: "Select", href: "#" },
+      { title: "Checkbox", href: "#" },
     ],
   },
 ]
@@ -60,7 +60,7 @@ const groups = [
         </NavigationMenuTrigger>
         <NavigationMenuContent>
           <ul>
-            <li v-for="link in gettingStarted" :key="link.href">
+            <li v-for="link in gettingStarted" :key="link.title">
               <NavigationMenuLink :href="link.href">
                 <span>{{ link.title }}</span>
                 <span data-slot="hint">{{ link.description }}</span>
@@ -82,9 +82,9 @@ const groups = [
                   {{ group.label }}
                   <ChevronRightIcon />
                 </NavigationMenuTrigger>
-                <NavigationMenuContent :side-offset="12">
+                <NavigationMenuContent :side-offset="9" :align-offset="-5">
                   <ul>
-                    <li v-for="link in group.links" :key="link.href">
+                    <li v-for="link in group.links" :key="link.title">
                       <NavigationMenuLink :href="link.href">
                         {{ link.title }}
                       </NavigationMenuLink>
@@ -97,6 +97,6 @@ const groups = [
         </NavigationMenuContent>
       </NavigationMenuItem>
     </NavigationMenuList>
-    <NavigationMenuViewport />
+    <NavigationMenuViewport :side-offset="8" />
   </NavigationMenu>
 </template>

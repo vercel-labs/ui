@@ -1,6 +1,6 @@
 import "@ui-sdk/web/progress"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-progress value="56">
       <ui-progress-label>Upload progress</ui-progress-label>
@@ -11,3 +11,5 @@ export function mount(root: HTMLElement) {
     </ui-progress>
   `
 }
+
+export { mount }

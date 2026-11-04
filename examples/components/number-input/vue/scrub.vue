@@ -1,42 +1,47 @@
 <script setup lang="ts">
-import { MoveHorizontalIcon, MoveVerticalIcon } from "@lucide/vue"
-import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { MoveHorizontalIcon } from "@lucide/vue"
 import {
   NumberInput,
-  NumberInputGroup,
   NumberInputControl,
+  NumberInputGroup,
   NumberInputScrubArea,
   NumberInputScrubAreaCursor,
 } from "@ui-sdk/vue/number-input"
+import { useId } from "vue"
+import { useLog } from "../../../shared/vue/log"
+
+const fields = [
+  { label: "X position", handle: "X", defaultValue: 120 },
+  { label: "Y position", handle: "Y", defaultValue: 48 },
+  { label: "Width", handle: "W", defaultValue: 320, min: 0 },
+  { label: "Height", handle: "H", defaultValue: 240, min: 0 },
+]
+
+const log = useLog()
+const title = useId()
 </script>
 
 <template>
-  <div data-slot="row">
-    <Field>
-      <NumberInput :default-value="320" :min="0">
-        <NumberInputScrubArea :pixels-per-step="2">
-          <FieldLabel>Width</FieldLabel>
-          <NumberInputScrubAreaCursor>
-            <MoveHorizontalIcon aria-hidden="true" />
-          </NumberInputScrubAreaCursor>
-        </NumberInputScrubArea>
+  <div data-slot="card" role="group" :aria-labelledby="title">
+    <h3 :id="title">Frame</h3>
+    <div data-slot="grid">
+      <NumberInput
+        v-for="field in fields"
+        :key="field.label"
+        :default-value="field.defaultValue"
+        :min="field.min"
+        @value-commit="(value) => log(`${field.label} ${value ?? 'empty'}`)"
+      >
         <NumberInputGroup>
-          <NumberInputControl />
+          <NumberInputScrubArea :pixels-per-step="1">
+            <span aria-hidden="true">{{ field.handle }}</span>
+            <NumberInputScrubAreaCursor>
+              <MoveHorizontalIcon aria-hidden="true" />
+            </NumberInputScrubAreaCursor>
+          </NumberInputScrubArea>
+          <NumberInputControl :aria-label="field.label" />
         </NumberInputGroup>
       </NumberInput>
-    </Field>
-    <Field>
-      <NumberInput :default-value="240" :min="0">
-        <NumberInputScrubArea orientation="vertical" :pixels-per-step="2">
-          <FieldLabel>Height</FieldLabel>
-          <NumberInputScrubAreaCursor>
-            <MoveVerticalIcon aria-hidden="true" />
-          </NumberInputScrubAreaCursor>
-        </NumberInputScrubArea>
-        <NumberInputGroup>
-          <NumberInputControl />
-        </NumberInputGroup>
-      </NumberInput>
-    </Field>
+    </div>
   </div>
 </template>

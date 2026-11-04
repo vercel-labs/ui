@@ -1,10 +1,12 @@
 import "@ui-sdk/web/otp-input"
-import type { OTPInputEvents } from "@ui-sdk/web"
+import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-otp-input aria-label="Verification code">
+    <ui-field>
+      <ui-field-label>Verification code</ui-field-label>
+      <ui-otp-input>
         <ui-otp-input-group>
           <ui-otp-input-slot></ui-otp-input-slot>
           <ui-otp-input-slot></ui-otp-input-slot>
@@ -14,14 +16,12 @@ export function mount(root: HTMLElement) {
           <ui-otp-input-slot></ui-otp-input-slot>
         </ui-otp-input-group>
       </ui-otp-input>
-      <output data-slot="output"></output>
-    </div>
+    </ui-field>
   `
-  const otp = root.querySelector("ui-otp-input")!
-  const status = root.querySelector("output")!
-  otp.addEventListener("valuechange", () => (status.textContent = ""))
-  otp.addEventListener("valuecommit", (event) => {
-    const { value, reason } = (event as OTPInputEvents["valuecommit"]).detail
-    status.textContent = `Checking ${value}, from ${reason}.`
+  root.querySelector("ui-otp-input")!.addEventListener("valuecommit", (event) => {
+    const { value, reason } = event.detail
+    log(root, `Checking ${value} (${reason})`)
   })
 }
+
+export { mount }

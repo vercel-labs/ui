@@ -1,5 +1,6 @@
 import "@ui-sdk/web/pagination"
 import { ChevronLeft, ChevronRight, createElement, Ellipsis } from "lucide"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -36,6 +37,10 @@ function mount(root: HTMLElement) {
       </ui-pagination-list>
     </ui-pagination>
   `
+  root.querySelector("ui-pagination")!.addEventListener("pagechange", (event) => {
+    const { value, reason } = event.detail
+    log(root, `Page ${value} (${reason})`)
+  })
 }
 
 export { mount }

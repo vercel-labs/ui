@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
 import {
   Pagination,
   PaginationEllipsis,
@@ -8,12 +9,20 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@ui-sdk/vue/pagination"
-import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const page = ref(2)
 const pageSize = ref(20)
 const total = 95
+
+function onPageSizeChange(event: Event) {
+  const { value } = event.target as HTMLSelectElement
+  pageSize.value = Number(value)
+  page.value = 1
+  log(`${value} rows per page`)
+}
 </script>
 
 <template>
@@ -22,14 +31,20 @@ const total = 95
       <p>Showing {{ (page - 1) * pageSize + 1 }}–{{ Math.min(page * pageSize, total) }} of {{ total }}</p>
       <label data-slot="label">
         Rows per page
-        <select v-model.number="pageSize" @change="page = 1">
+        <select :value="pageSize" @change="onPageSizeChange">
           <option :value="10">10</option>
           <option :value="20">20</option>
           <option :value="50">50</option>
         </select>
       </label>
     </div>
-    <Pagination v-model:page="page" aria-label="Pagination" :total="total" :page-size="pageSize">
+    <Pagination
+      v-model:page="page"
+      aria-label="Pagination"
+      :total="total"
+      :page-size="pageSize"
+      @page-change="(next) => log(`Page ${next}`)"
+    >
       <PaginationList v-slot="{ state }">
         <PaginationItem>
           <PaginationPrevious data-variant="ghost">
@@ -38,7 +53,7 @@ const total = 95
           </PaginationPrevious>
         </PaginationItem>
         <PaginationItem v-for="item in state.items" :key="item">
-          <PaginationLink data-variant="ghost" v-if="typeof item === 'number'" :page="item" />
+          <PaginationLink v-if="typeof item === 'number'" data-variant="ghost" :page="item" />
           <PaginationEllipsis v-else>
             <EllipsisIcon />
           </PaginationEllipsis>

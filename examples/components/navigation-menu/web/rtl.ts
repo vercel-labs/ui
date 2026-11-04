@@ -8,17 +8,17 @@ const sections = [
     links: [
       {
         title: "مقدمة",
-        href: "https://example.com/docs",
+        href: "#",
         description: "مكونات بلا أنماط بنواة واحدة لكل إطار عمل.",
       },
       {
         title: "التثبيت",
-        href: "https://example.com/docs/installation",
+        href: "#",
         description: "أضف الحزمة لإطار عملك واعرض أول جزء.",
       },
       {
         title: "التنسيق",
-        href: "https://example.com/docs/styling",
+        href: "#",
         description: "نسّق الأجزاء بسمات البيانات ومتغيرات CSS.",
       },
     ],
@@ -29,17 +29,17 @@ const sections = [
     links: [
       {
         title: "مربع تنبيه",
-        href: "https://example.com/docs/components/alert-dialog",
+        href: "#",
         description: "يطلب قرارًا قبل استخدام أي شيء آخر في الصفحة.",
       },
       {
         title: "بطاقة التمرير",
-        href: "https://example.com/docs/components/hover-card",
+        href: "#",
         description: "معاينة لما يشير إليه الرابط.",
       },
       {
         title: "علامات التبويب",
-        href: "https://example.com/docs/components/tabs",
+        href: "#",
         description: "تعرض لوحة واحدة من المحتوى في كل مرة.",
       },
     ],
@@ -82,10 +82,10 @@ function mount(root: HTMLElement) {
             )
             .join("")}
           <ui-navigation-menu-item>
-            <ui-navigation-menu-link><a href="https://example.com/docs">المستندات</a></ui-navigation-menu-link>
+            <ui-navigation-menu-link><a href="#">المستندات</a></ui-navigation-menu-link>
           </ui-navigation-menu-item>
         </ui-navigation-menu-list>
-        <ui-navigation-menu-viewport></ui-navigation-menu-viewport>
+        <ui-navigation-menu-viewport side-offset="8"></ui-navigation-menu-viewport>
       </ui-navigation-menu>
     </div>
   `

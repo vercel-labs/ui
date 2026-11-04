@@ -5,7 +5,7 @@ description: Navigate pages with buttons, links, or your router.
 
 <ComponentExample
   name="pagination/basic"
-  caption="Choose a page, or use Previous and Next. The step at either end stays focusable as a button."
+  caption="Choose a page, or use Previous and Next. The console logs each page and its reason, and the step at either end stays focusable as a button."
 />
 
 ## Installation
@@ -35,162 +35,238 @@ Pagination
 
 Name the navigation with `aria-label`, then put the page links and steps in a list.
 
-`items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
+The list's `children` snippet receives its state, whose `items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
 
 `PaginationLink` shows its page number unless you supply children. The current link gets `aria-current="page"` and `data-current`. `PaginationEllipsis` shows “…” and is hidden from screen readers.
 
 Give Previous, Next, First, and Last text or an `aria-label`. At an end, a step gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order.
 
-## Examples
+## Usage
 
-### Simple
+Import the parts and put them together:
 
-Pages only, with no steps. With five pages, the range has no gaps, so the links can be written out.
+```svelte
+<script lang="ts">
+  import {
+    Pagination,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationList,
+    PaginationNext,
+    PaginationPrevious,
+  } from "@ui-sdk/svelte/pagination"
+</script>
 
-<ComponentExample
-  name="pagination/simple"
-  caption="Choose one of five pages without Previous or Next controls."
-/>
+<Pagination aria-label="Pagination" pageCount={10}>
+  <PaginationList>
+    {#snippet children({ items })}
+      <PaginationItem>
+        <PaginationPrevious>Previous</PaginationPrevious>
+      </PaginationItem>
+      {#each items as item (item)}
+        <PaginationItem>
+          {#if typeof item === "number"}
+            <PaginationLink page={item} />
+          {:else}
+            <PaginationEllipsis />
+          {/if}
+        </PaginationItem>
+      {/each}
+      <PaginationItem>
+        <PaginationNext>Next</PaginationNext>
+      </PaginationItem>
+    {/snippet}
+  </PaginationList>
+</Pagination>
+```
 
-### Icons Only
+## Total and Page Size
 
-First, Previous, Next and Last as icon buttons, each named with `aria-label`, around a line that says where you are. With no page links, that line is a live region, so screen readers hear the new page after a step.
-
-The list's `children` snippet receives its state, which has `page` and `pageCount`.
-
-<ComponentExample
-  name="pagination/icons-only"
-  caption="Use the named icon buttons. The live page count announces each change."
-/>
-
-### Links
-
-Pass `getHref` to map each page to a URL. Page links and steps then render as anchors.
-
-Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
-
-A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
-
-<ComponentExample
-  name="pagination/links"
-  caption="Choose a page and watch the URL hash change. These controls are real links."
-/>
-
-### Router Links
-
-Render your router's link to page on the client. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
-
-Here the page comes from the URL, like your router's search params, so the pagination is
-[controlled](#controlled) by the route.
-
-Parts are `<a>` elements with [`getHref`](#links), so a router that listens for clicks on links, like
-SvelteKit's, pages on the client as it is. Check `event.defaultPrevented` before navigating. A router's link
-component goes in the `render` snippet, with `{...props}`. It receives the part's props, `href` included.
-
-<ComponentExample
-  name="pagination/router"
-  caption="Choose a page. The example updates the URL and current page without reloading."
-/>
-
-## Behavior and Options
-
-### Controlled
-
-Bind `page` with `bind:page` to control the pagination. `page={x}` without `bind:` is a starting value the
-pagination may change until `x` changes. Bind it with `bind:page={x}` to keep them together, or with a
-function binding, `bind:page={() => x, (next) => (x = next)}`, to decide.
-
-Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `details.cancel()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
-
-<ComponentExample
-  name="pagination/controlled"
-  caption="Choose a page to see the value and change reason kept by the application."
-/>
-
-### Default Page
-
-`defaultPage` is the page it starts on, when uncontrolled. It's 1 by default.
-
-<ComponentExample name="pagination/default-page" caption="Start on page 5, then choose another page." />
-
-### Siblings
-
-`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
-
-<ComponentExample
-  name="pagination/siblings"
-  caption="Start on page 10 with two neighboring pages on either side."
-/>
-
-### Boundaries
-
-`boundaries` is how many pages always show at each end, 1 by default.
-
-<ComponentExample
-  name="pagination/boundaries"
-  caption="Keep two page links visible at each end of the range."
-/>
-
-### Total and Page Size
-
-Instead of `pageCount`, pass `total`, how many items there are, and `pageSize`, how many fit on a page (10
-by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
+Instead of `pageCount`, pass `total`, how many items there are, and `pageSize`, how many fit on a page (10 by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
 
 A page past the end, like after the count shrinks, reads as the last page.
 
 <ComponentExample
   name="pagination/total"
-  caption="Choose a page, then change Rows per page. This example resets to page 1 when the size changes."
+  caption="Choose a page, then change Rows per page. The console logs each change, and a new size starts again at page 1."
 />
 
-### Paging from Anywhere
+## Simple
 
-A [controller](#controller), from `createPaginationController()`, pages the pagination from anywhere, like
-buttons elsewhere on the page or a keyboard shortcut, without controlling it. Pass it as `controller`.
+With only a few pages, the range has no gaps, so you can write the links out and leave the steps off.
+
+```svelte
+<Pagination aria-label="Pagination" pageCount={5}>
+  <PaginationList>
+    {#each [1, 2, 3, 4, 5] as page (page)}
+      <PaginationItem>
+        <PaginationLink {page} />
+      </PaginationItem>
+    {/each}
+  </PaginationList>
+</Pagination>
+```
+
+## Links
+
+Pass `getHref` to map each page to a URL. Page links and steps then render as anchors.
+
+```svelte
+<Pagination aria-label="Pagination" pageCount={10} getHref={(page) => `/posts?page=${page}`}>
+  ...
+</Pagination>
+```
+
+Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
+
+A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
+
+## Router Links
+
+Render your router's link to page on the client. Parts render `<a>` elements with `getHref`, so a router that listens for clicks on links, like SvelteKit's, pages on the client as they are. A router's link component goes in the `render` snippet, with `{...props}`; it receives the part's props, `href` included. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
+
+Read the page from the URL, like your router's search params, so the route [controls](#controlled) the pagination.
+
+```svelte
+<script lang="ts">
+  import { page as route } from "$app/state"
+
+  const page = $derived(Number(route.url.searchParams.get("page") ?? 1))
+</script>
+
+<Pagination aria-label="Pagination" pageCount={10} {page} getHref={(page) => `?page=${page}`}>
+  ...
+</Pagination>
+```
+
+## Controlled
+
+Bind `page` with `bind:page` to control the pagination, and use `onPageChange` for the reason.
+
+```svelte
+<script lang="ts">
+  let page = $state(1)
+</script>
+
+<Pagination bind:page aria-label="Pagination" pageCount={10}>
+  ...
+</Pagination>
+```
+
+Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `details.cancel()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
+
+## Default Page
+
+`defaultPage` is the page it starts on, when uncontrolled. It's 1 by default.
+
+```svelte
+<Pagination aria-label="Pagination" pageCount={10} defaultPage={5}>
+  ...
+</Pagination>
+```
+
+## Siblings
+
+`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
+
+```svelte
+<Pagination aria-label="Pagination" pageCount={20} defaultPage={10} siblings={2}>
+  ...
+</Pagination>
+```
+
+## Boundaries
+
+`boundaries` is how many pages always show at each end, 1 by default.
+
+```svelte
+<Pagination aria-label="Pagination" pageCount={20} defaultPage={10} boundaries={2}>
+  ...
+</Pagination>
+```
+
+## Paging from Anywhere
+
+A [controller](#controller), from `createPaginationController()`, pages the pagination from anywhere, like buttons elsewhere on the page or a keyboard shortcut, without controlling it. Pass it as `controller`.
+
+```svelte
+<script lang="ts">
+  const pagination = createPaginationController()
+</script>
+
+<button onclick={() => pagination.next()}>Next Page</button>
+<Pagination aria-label="Pagination" pageCount={10} controller={pagination}>
+  ...
+</Pagination>
+```
+
+## Your Own Markup
+
+`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Import it from `@ui-sdk/core/pagination`. Here it keeps a strip of slide dots the same length however many slides there are.
+
+```svelte
+<script lang="ts">
+  import { paginationRange } from "@ui-sdk/core/pagination"
+
+  const items = $derived(paginationRange({ page: slide, pageCount: 20, siblings: 2, boundaries: 1 }))
+</script>
+
+<div role="group" aria-label="Slides">
+  {#each items as item (item)}
+    {#if typeof item === "number"}
+      <button
+        aria-label={`Slide ${item}`}
+        aria-current={item === slide ? "true" : undefined}
+        onclick={() => (slide = item)}
+      ></button>
+    {:else}
+      <span aria-hidden="true"></span>
+    {/if}
+  {/each}
+</div>
+```
+
+## Custom Rendering
+
+Every part takes a `render` snippet, which receives the props to spread and the part's state: whether a link is `current`, and for a step, the `page` it goes to and whether it's `disabled`. The `children` snippet receives the state too.
 
 <ComponentExample
-  name="pagination/controller"
-  caption="Use the buttons below the pagination to move it through a controller."
+  name="pagination/render"
+  caption="Choose a page. The current page widens to say Page 3, and each arrow shows the page it goes to."
 />
-
-## Focus
-
-Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
 
 ## Styling
 
 Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-current` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
 
-```svelte
-<PaginationLink page={3} class="aria-[current=page]:border data-current:font-medium" />
-<PaginationNext class="aria-disabled:opacity-50">Next</PaginationNext>
-```
+Each part has a `data-slot`, such as `pagination-link`, and its state attributes are listed under [Data Attributes](#data-attributes). The root, list, items and ellipsis have none.
 
-<DataAttributes component="pagination" />
+## Data Attributes
 
-## Custom Rendering
+### PaginationLink [#data-attributes-paginationlink]
 
-Every part takes a `render` snippet, which receives the
-props to spread and the part's state: whether a link is `current`, and for a step, the `page` it goes to and
-whether it's `disabled`. The `children` snippet receives the state too.
+<DataAttributes component="pagination" part="link" />
 
-<ComponentExample
-  name="pagination/render"
-  caption="Choose a page. The current page shows a dot, and step titles show their destination."
-/>
+### PaginationPrevious [#data-attributes-paginationprevious]
 
-### Your Own Markup
+<DataAttributes component="pagination" part="previous" />
 
-`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Here it keeps a strip of slide dots the same length however many slides there are.
+### PaginationNext [#data-attributes-paginationnext]
 
-<ComponentExample
-  name="pagination/range"
-  caption="Choose a slide using the same range calculation without pagination parts."
-/>
+<DataAttributes component="pagination" part="next" />
+
+### PaginationFirst [#data-attributes-paginationfirst]
+
+<DataAttributes component="pagination" part="first" />
+
+### PaginationLast [#data-attributes-paginationlast]
+
+<DataAttributes component="pagination" part="last" />
 
 ## API Reference
 
-Props and callbacks are the same as below, as Svelte props.
+Props and callbacks are the same as below, as Svelte props. `page` can be bound with `bind:page`.
 
 ### Pagination
 
@@ -249,7 +325,15 @@ Callbacks get the new page first, then the details. A bound `page` only updates 
 
 ## Accessibility
 
-There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop. Every line below is an automated test.
+There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop.
+
+### Focus
+
+Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="pagination" />
 

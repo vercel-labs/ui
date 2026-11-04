@@ -1,6 +1,6 @@
 import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/solid/otp-input"
 
-export function Example() {
+function Example() {
   return (
     <OTPInput maxLength={6} aria-label="Verification code">
       <OTPInputGroup>
@@ -44,3 +44,5 @@ export function Example() {
     </OTPInput>
   )
 }
+
+export { Example }

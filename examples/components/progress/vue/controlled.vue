@@ -7,29 +7,37 @@ import {
   ProgressValue,
 } from "@ui-sdk/vue/progress"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const value = ref(20)
+const total = 5
+
+const log = useLog()
+const uploaded = ref(1)
+
+function uploadNext() {
+  if (uploaded.value >= total) return
+  uploaded.value++
+  log(`Uploaded ${uploaded.value} of ${total} photos`)
+}
+
+function reset() {
+  uploaded.value = 0
+  log("Reset to 0 photos")
+}
 </script>
 
 <template>
   <div data-slot="stack">
-    <Progress :value="value">
-      <ProgressLabel>Uploading files</ProgressLabel>
+    <div data-slot="controls">
+      <button type="button" :aria-disabled="uploaded >= total" @click="uploadNext">Upload Next</button>
+      <button type="button" @click="reset">Reset</button>
+    </div>
+    <Progress :value="(uploaded / total) * 100">
+      <ProgressLabel>Uploading photos</ProgressLabel>
       <ProgressValue />
       <ProgressTrack>
         <ProgressIndicator />
       </ProgressTrack>
     </Progress>
-    <div data-slot="row">
-      <button
-        data-variant="secondary"
-        type="button"
-        :aria-disabled="value >= 100"
-        @click="value = Math.min(100, value + 20)"
-      >
-        Upload more
-      </button>
-      <button data-variant="secondary" type="button" @click="value = 0">Reset</button>
-    </div>
   </div>
 </template>

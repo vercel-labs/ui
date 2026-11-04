@@ -1,5 +1,6 @@
 import "@ui-sdk/web/navigation-menu"
 import { ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const gettingStarted = [
   {
@@ -21,48 +22,43 @@ const gettingStarted = [
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-navigation-menu aria-label="Docs">
-        <ui-navigation-menu-list>
-          <ui-navigation-menu-item value="guides">
-            <ui-navigation-menu-trigger>
-              <button>
-                Guides
-                ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
-              </button>
-            </ui-navigation-menu-trigger>
-            <ui-navigation-menu-content>
-              <ul>
-                ${gettingStarted
-                  .map(
-                    (page) => `
-                <li>
-                  <ui-navigation-menu-link>
-                    <a href="${page.href}" data-router>
-                      <span>${page.title}</span>
-                      <span data-slot="hint">${page.description}</span>
-                    </a>
-                  </ui-navigation-menu-link>
-                </li>`,
-                  )
-                  .join("")}
-              </ul>
-            </ui-navigation-menu-content>
-          </ui-navigation-menu-item>
-          <ui-navigation-menu-item>
-            <ui-navigation-menu-link>
-              <a href="#components" data-router>Components</a>
-            </ui-navigation-menu-link>
-          </ui-navigation-menu-item>
-        </ui-navigation-menu-list>
-        <ui-navigation-menu-viewport></ui-navigation-menu-viewport>
-      </ui-navigation-menu>
-      <output data-slot="output"></output>
-    </div>
+    <ui-navigation-menu aria-label="Docs">
+      <ui-navigation-menu-list>
+        <ui-navigation-menu-item value="guides">
+          <ui-navigation-menu-trigger>
+            <button>
+              Guides
+              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-navigation-menu-trigger>
+          <ui-navigation-menu-content>
+            <ul>
+              ${gettingStarted
+                .map(
+                  (page) => `
+              <li>
+                <ui-navigation-menu-link>
+                  <a href="${page.href}" data-router>
+                    <span>${page.title}</span>
+                    <span data-slot="hint">${page.description}</span>
+                  </a>
+                </ui-navigation-menu-link>
+              </li>`,
+                )
+                .join("")}
+            </ul>
+          </ui-navigation-menu-content>
+        </ui-navigation-menu-item>
+        <ui-navigation-menu-item>
+          <ui-navigation-menu-link>
+            <a href="#components" data-router>Components</a>
+          </ui-navigation-menu-link>
+        </ui-navigation-menu-item>
+      </ui-navigation-menu-list>
+      <ui-navigation-menu-viewport side-offset="8"></ui-navigation-menu-viewport>
+    </ui-navigation-menu>
   `
-  const output = root.querySelector("output")!
-  function navigate(route: string) {
-    output.textContent = `Route: ${route}`
+  function setRoute(route: string) {
     for (const link of root.querySelectorAll("ui-navigation-menu-link")) {
       link.toggleAttribute("current", link.querySelector("a")!.getAttribute("href") === route)
     }
@@ -70,10 +66,12 @@ function mount(root: HTMLElement) {
   for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-router]")) {
     link.addEventListener("click", (event) => {
       event.preventDefault()
-      navigate(link.getAttribute("href")!)
+      const href = link.getAttribute("href")!
+      setRoute(href)
+      log(root, `Navigated to ${href}`)
     })
   }
-  navigate("#introduction")
+  setRoute("#introduction")
 }
 
 export { mount }

@@ -3,15 +3,17 @@ title: Number Input
 description: Enter numbers, step through values, and format them for a locale.
 ---
 
+Use a Number Input for quantities, prices and measurements. It keeps a numeric value while showing formatted text, and steps it with the keyboard, the step buttons, or a drag on its label.
+
 <ComponentExample
   name="number-input/basic"
-  caption="Type a quantity, press ArrowUp or ArrowDown, or use the step buttons. Hold a button to keep stepping. Press Enter or leave the input to commit typed text."
+  caption="Drag the Quantity label sideways to scrub the value, or click it to focus the input. Type a number, press ArrowUp or ArrowDown, or hold a step button. The console logs the value once each change is committed."
 />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/solid @ui-sdk/core
+npm install @ui-sdk/solid @ui-sdk/core
 ```
 
 ## Composition
@@ -20,57 +22,74 @@ Use the following composition to build a `NumberInput`:
 
 ```text
 NumberInput
+├── NumberInputScrubArea
+│   └── NumberInputScrubAreaCursor
 └── NumberInputGroup
     ├── NumberInputDecrement
     ├── NumberInputControl
     └── NumberInputIncrement
 ```
 
-`NumberInput` holds the numeric value. `NumberInputGroup` wraps the text input and optional step buttons. `NumberInputControl` renders the input; `NumberInputDecrement` and `NumberInputIncrement` change its value.
+`NumberInput` holds the numeric value. `NumberInputGroup` wraps the text input and the optional step buttons. `NumberInputControl` renders the input; `NumberInputDecrement` and `NumberInputIncrement` change its value and repeat while held. `NumberInputScrubArea` is optional and changes the value as you drag it.
 
-### Buttons
+Typing updates the value when the text is valid and within bounds. Enter or blur commits it: the text is parsed, clamped, snapped to the step, and formatted. An empty input has the value `null`.
 
-The step buttons repeat while held. They stay out of the Tab order because the focused input provides the same stepping actions through its arrow keys. Give each button an accessible name.
+## Usage
 
-Typing updates the numeric value when the text is valid and within bounds. Enter or blur commits it: the text is parsed, clamped, snapped to the step, and formatted. An empty input has the value `null`.
+Import the parts and put them together:
 
-## Examples
+```tsx
+import {
+  NumberInput,
+  NumberInputGroup,
+  NumberInputControl,
+  NumberInputDecrement,
+  NumberInputIncrement,
+} from "@ui-sdk/solid/number-input"
 
-### Field
+function Example() {
+  return (
+    <NumberInput defaultValue={1} min={0}>
+      <NumberInputGroup>
+        <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
+        <NumberInputControl aria-label="Quantity" />
+        <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
+      </NumberInputGroup>
+    </NumberInput>
+  )
+}
 
-Wrap the number input in [Field](./field) to associate a visible label and description.
+export { Example }
+```
+
+## Field
+
+Wrap the number input in [Field](./field) to give it a visible label and a description.
 
 <ComponentExample
   name="number-input/field"
-  caption="Click Quantity to focus the input, then type or step its value. The description stays associated with the field."
+  caption="Click Tickets to focus the input, then type or step its value. Screen readers read the description with the field."
 />
 
-### Min and Max
+## Min and Max
 
 Use `min` and `max` to set bounds. A step button disables at its bound. Typed values outside the bounds are clamped when committed.
 
 <ComponentExample
   name="number-input/min-max"
-  caption="Change Guests between 1 and 8. Type 20 and press Enter to clamp it to 8. At either bound, the corresponding step button is disabled."
+  caption="Change Guests between 1 and 8. Type 20 and press Enter to clamp it to 8. At either bound, that direction's step button is disabled."
 />
 
-### Step and Large Step
+## Step and Large Step
 
-`step` sets the usual increment. Steps are measured from `min`, or from zero when no minimum is set.
-
-| Input                                               | Increment                                         |
-| --------------------------------------------------- | ------------------------------------------------- |
-| ArrowUp, ArrowDown, or a step button                | `step`, which defaults to 1.                      |
-| Shift with an arrow or button; Page Up or Page Down | `largeStep`, which defaults to ten steps.         |
-| Alt (Option) with an arrow key                      | `smallStep`, which defaults to a tenth of a step. |
-| Home or End                                         | The minimum or maximum, when set.                 |
+`step` sets the usual increment, and defaults to 1. Steps are measured from `min`, or from zero when no minimum is set. Shift, Page Up and Page Down use `largeStep`, ten steps by default, and Alt (Option) with an arrow key uses `smallStep`, a tenth of a step. [Keyboard](#keyboard) lists every key.
 
 <ComponentExample
   name="number-input/step"
   caption="Step Hours by 0.25. Hold Shift to move by 1, or hold Alt (Option) with an arrow key to move by 0.05. Home and End go to 0 and 24."
 />
 
-### Format
+## Format
 
 Pass `Intl.NumberFormat` options through `format`. The input displays and parses that format while keeping a numeric value. For percentages, `0.15` is displayed as `15%`, and `step` defaults to the smallest percent the format shows: `0.01` for whole percents, `0.0001` with two fraction digits.
 
@@ -79,7 +98,7 @@ Pass `Intl.NumberFormat` options through `format`. The input displays and parses
   caption="Edit Price, Discount, or Weight and leave the field to format it. Try entering 5 in Price or 25% in Discount, then use the step buttons."
 />
 
-### Locale
+## Locale
 
 Set `locale` to choose separators, currency symbols, and grouping. Without it, the input follows the page's language or the browser's language after mounting. Server markup uses English when no locale is provided; set a locale explicitly when that first render matters.
 
@@ -88,7 +107,7 @@ Set `locale` to choose separators, currency symbols, and grouping. Without it, t
   caption="Edit Preis using a comma for decimals, or step Budget to see Indian digit grouping. The displayed and accepted formats follow each field's locale."
 />
 
-### Mouse Wheel
+## Mouse Wheel
 
 Set `wheel` to step with the mouse wheel while the input is focused. It is off by default.
 
@@ -97,101 +116,157 @@ Set `wheel` to step with the mouse wheel while the input is focused. It is off b
   caption="Focus Font size and scroll over it to change the value. Move focus away and scroll again; the value stays unchanged."
 />
 
-### Scrub Area
+## Scrub Area
 
-`NumberInputScrubArea` changes the value while you drag. Right and up increase it. `orientation` chooses an axis, and `pixelsPerStep` controls how far the pointer moves per step. Shift and Alt (Option) use the large and small increments.
+`NumberInputScrubArea` changes the value while you drag it. The handle can be any element inside the number input: the label, as in the first example, or a letter or icon inside the group, as in a design tool. Right and up increase the value. `orientation` chooses an axis, and `pixelsPerStep` controls how far the pointer moves per step. Shift and Alt (Option) use the large and small increments.
 
 <ComponentExample
   name="number-input/scrub"
-  caption="Drag Width horizontally or Height vertically. Hold Shift for larger steps or Alt (Option) for smaller ones. Click either label without dragging to select its input text."
+  caption="Drag the X, Y, W or H letter sideways to change that value. Hold Shift for larger steps or Alt (Option) for smaller ones. The console logs each value when the drag ends."
 />
 
 Where pointer lock is available, the drag can continue past the edge of the screen. `NumberInputScrubAreaCursor` draws a replacement cursor while it is locked. The cursor is placed in the document body with an inline translation; center your icon with negative margins.
 
-### Scrub Area Outside the Input
+To place a scrub area outside its number input, such as on an icon in a toolbar, pass the same [controller](#controller) to both. More than one scrub area can control the same field.
 
-Pass the same controller to a scrub area and its number input to connect them. More than one scrub area can control the same field.
-
-<ComponentExample
-  name="number-input/toolbar"
-  caption="Drag the arrow icon to adjust Letter spacing. You can also focus the input and use the keyboard or type a value."
-/>
-
-### Disabled
+## Disabled
 
 Set `disabled` on the component or its enclosing fieldset to prevent focus, changes, and form submission.
 
-<ComponentExample
-  name="number-input/disabled"
-  caption="Try to focus Quantity or use its step buttons. The disabled field stays at 3."
-/>
+```tsx
+<Field>
+  <FieldLabel>Quantity</FieldLabel>
+  <NumberInput defaultValue={3} disabled>
+    <NumberInputGroup>
+      <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
+      <NumberInputControl />
+      <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
+    </NumberInputGroup>
+  </NumberInput>
+  <FieldDescription>Sold out. You can't change the quantity.</FieldDescription>
+</Field>
+```
 
 Set `disabled` on one step button to turn off only that direction. The other button still steps.
 
-### Read Only
+## Read-Only
 
 Set `readOnly` to keep the value focusable and included in form data while preventing edits and steps.
 
-<ComponentExample
-  name="number-input/read-only"
-  caption="Focus Seats included and try typing or using its arrows and buttons. It stays at 5."
-/>
+```tsx
+<Field>
+  <FieldLabel>Seats included</FieldLabel>
+  <NumberInput defaultValue={5} readOnly>
+    <NumberInputGroup>
+      <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
+      <NumberInputControl />
+      <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
+    </NumberInputGroup>
+  </NumberInput>
+  <FieldDescription>Set by your plan.</FieldDescription>
+</Field>
+```
 
-### Invalid
+## Validation
 
-Use `required` to block an empty value. Field associates its error with the input and marks it invalid after an unsuccessful submit.
+Use `required` to block an empty value. Field associates its error with the input and marks it invalid after an unsuccessful submit. Here, choosing **Continue** while Age is empty shows "Enter your age."
 
-<ComponentExample
-  name="number-input/invalid"
-  caption="Choose Continue while Age is empty to show the error. Enter an age and submit again to read the value."
-/>
+```tsx
+<form>
+  <Field>
+    <FieldLabel>Age</FieldLabel>
+    <NumberInput name="age" required min={18} max={120}>
+      <NumberInputGroup>
+        <NumberInputDecrement aria-label="Decrease">−</NumberInputDecrement>
+        <NumberInputControl />
+        <NumberInputIncrement aria-label="Increase">+</NumberInputIncrement>
+      </NumberInputGroup>
+    </NumberInput>
+    <FieldError match="valueMissing">Enter your age.</FieldError>
+  </Field>
+  <button type="submit">Continue</button>
+</form>
+```
 
-## Behavior and Options
+## Controlled
 
-### Controlled
-
-Pass a reactive `value` and update it in `onValueChange`. `onValueChange` reports valid changes while an interaction is in progress. `onValueCommit` runs when typing is committed, a step key or button is released, or a scrub ends. Use the commit event for work that should happen after the interaction.
+Pass `value` and update it in `onValueChange`. `onValueChange` reports valid changes while an interaction is in progress. `onValueCommit` runs when typing is committed, a step key or button is released, or a scrub ends. Use the commit event for work that should happen after the interaction.
 
 <ComponentExample
   name="number-input/controlled"
-  caption="Edit Servings or hold a step button. Value updates as it changes; Committed updates when the interaction ends. Clear sets the value to null, and Reset to 4 restores it."
+  caption="Hold a Servings step button. The console logs each value as it changes, then one Committed line when you let go. Clear sets the value to null, and Reset to 4 restores it."
 />
 
 See [State and Events](../state-and-events) for the shared state conventions and [Reasons](#reasons) for the events specific to Number Input.
 
-### Controller
+## Controller
 
 Create a `createNumberInputController()` and pass it as `controller` to change or focus the input from other controls. `increment()` and `decrement()` step the value; pass `{ large: true }` for a large step. `setValue()`, `getValue()`, and `focus()` cover direct updates and inspection.
 
 <ComponentExample
   name="number-input/controller"
-  caption="Try Zoom in and Zoom out, then Actual size to restore 100. Read reports the current value, and Focus moves into the field."
+  caption="Press Zoom In and Zoom Out to move by 100%, then Actual Size to restore 100%. Read logs the current value, and Focus moves into the field."
 />
 
 [Controllers](../controllers) covers creating and sharing a controller.
 
-## Forms
+## Form
 
-A hidden input submits the plain numeric value under `name`. Formatting does not change form data: a displayed currency amount still submits a value such as `1234.5`. Empty values submit an empty string.
+A hidden input submits the plain numeric value under `name`. Formatting does not change form data: a displayed amount of $4.50 still submits `4.5`. Empty values submit an empty string.
 
 <ComponentExample
   name="number-input/form"
-  caption="Change Quantity or Tip and choose Save to read the plain numeric values. Gift cards belongs to the same form through its form ID. Reset restores the defaults."
+  caption="Change Quantity or Tip and press Save: the console logs the plain numeric values. Gift cards belongs to the same form through its form ID. Reset restores the defaults."
 />
 
 Set `form` to associate the input with a form elsewhere in the page. A form reset restores the default value and reports the `reset` reason.
 
+## Custom Rendering
+
+Use [render functions](../parts-and-composition) to change a part's element or read its state. Here the decrement button adds a tooltip, and the increment button shows Max once the value reaches its bound.
+
+<ComponentExample
+  name="number-input/render"
+  caption="Press End in Temperature to jump to 40°C. The increment button reads Max; hover the decrement button to see its tooltip."
+/>
+
+Each part's state is listed under [State](#state).
+
 ## Styling
 
-<span id="right-to-left" />
-<span id="render-functions" />
-<span id="custom-rendering" />
+Style the group as the field's box, and the input and step buttons inside it. `data-disabled` on a step button also means it has reached its bound, and `data-scrubbing` marks every part while a drag changes the value. Inside Field, the native input receives validation attributes such as `data-invalid`. Use logical spacing so the layout follows the surrounding direction.
 
-Style the input and buttons with their state attributes. `data-disabled` on a step button also indicates that it has reached its bound. Inside Field, the native input receives validation attributes such as `data-invalid`.
+Each part has a `data-slot`, such as `number-input-group`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
-Use logical spacing so the layout follows the surrounding direction. [Parts and Composition](../parts-and-composition) covers using custom markup and reading a part's state.
+## Data Attributes
 
-<DataAttributes component="number-input" />
+### NumberInput [#data-attributes-numberinput]
+
+<DataAttributes component="number-input" part="root" />
+
+### NumberInputScrubArea [#data-attributes-numberinputscrubarea]
+
+<DataAttributes component="number-input" part="scrub-area" />
+
+### NumberInputScrubAreaCursor [#data-attributes-numberinputscrubareacursor]
+
+<DataAttributes component="number-input" part="scrub-area-cursor" />
+
+### NumberInputGroup [#data-attributes-numberinputgroup]
+
+<DataAttributes component="number-input" part="group" />
+
+### NumberInputDecrement [#data-attributes-numberinputdecrement]
+
+<DataAttributes component="number-input" part="decrement" />
+
+### NumberInputControl [#data-attributes-numberinputcontrol]
+
+<DataAttributes component="number-input" part="control" />
+
+### NumberInputIncrement [#data-attributes-numberinputincrement]
+
+<DataAttributes component="number-input" part="increment" />
 
 ## API Reference
 
@@ -259,6 +334,29 @@ Callbacks get the new value first, then the details.
 
 ## Accessibility
 
-Give the input a FieldLabel or `aria-label`, and name both step buttons. The native text input supports ordinary text editing plus the stepping keys. Each button points to the input with `aria-controls`.
+Follows the keyboard model of the [WAI-ARIA spinbutton pattern](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/) on a native text input, so ordinary text editing works too. Give the input a FieldLabel or `aria-label`, and name both step buttons. Each button points to the input with `aria-controls`.
+
+### Keyboard
+
+| Input                                               | Increment                                         |
+| --------------------------------------------------- | ------------------------------------------------- |
+| ArrowUp, ArrowDown, or a step button                | `step`, which defaults to 1.                      |
+| Shift with an arrow or button; Page Up or Page Down | `largeStep`, which defaults to ten steps.         |
+| Alt (Option) with an arrow key                      | `smallStep`, which defaults to a tenth of a step. |
+| Home or End                                         | The minimum or maximum, when set.                 |
+
+Enter commits typed text. The step buttons stay out of the Tab order, because the focused input gives the same steps through its arrow keys.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="number-input" />
+
+Beyond the pattern:
+
+<SpecList spec="number-input.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="number-input.sr" />

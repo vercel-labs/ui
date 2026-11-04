@@ -3,25 +3,25 @@
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let submitted = $state("")
+  const log = useLog()
   const form = $props.id()
 
-  function onSubmit(event: Event) {
-    const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-      ([name, value]) => `${name}=${value}`,
-    )
-    submitted = data.join(", ")
+  function onsubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
+    event.preventDefault()
+    const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+    log(`Submitted ${data.join(", ")}`)
   }
 </script>
 
 <div data-slot="stack">
-  <form data-slot="stack" id={form} onsubmit={(event) => { event.preventDefault(); onSubmit(event) }} onreset={() => (submitted = '')}>
+  <form data-slot="stack" id={form} {onsubmit}>
     <Field>
       <FieldLabel>Quantity</FieldLabel>
       <NumberInput name="quantity" defaultValue={2} min={1}>
@@ -38,13 +38,7 @@
     </Field>
     <Field>
       <FieldLabel>Tip</FieldLabel>
-      <NumberInput
-        name="tip"
-        defaultValue={1234.5}
-        min={0}
-        step={0.01}
-        format={{ style: 'currency', currency: 'USD' }}
-      >
+      <NumberInput name="tip" defaultValue={4.5} min={0} step={0.5} format={{ style: "currency", currency: "USD" }}>
         <NumberInputGroup>
           <NumberInputDecrement aria-label="Decrease">
             <MinusIcon aria-hidden="true" />
@@ -56,18 +50,10 @@
         </NumberInputGroup>
       </NumberInput>
     </Field>
-    <div data-slot="row">
-      <button type="submit">
-        Save
-      </button>
-      <button type="reset">
-        Reset
-      </button>
-    </div>
   </form>
   <Field>
     <FieldLabel>Gift cards</FieldLabel>
-    <NumberInput name="gift-cards" form={form} defaultValue={0} min={0}>
+    <NumberInput name="gift-cards" {form} defaultValue={0} min={0}>
       <NumberInputGroup>
         <NumberInputDecrement aria-label="Decrease">
           <MinusIcon aria-hidden="true" />
@@ -79,5 +65,8 @@
       </NumberInputGroup>
     </NumberInput>
   </Field>
-  <output data-slot="output">{submitted ? `Submitted: ${submitted}` : ""}</output>
+  <div data-slot="row">
+    <button type="reset" {form}>Reset</button>
+    <button type="submit" {form} data-variant="solid">Save</button>
+  </div>
 </div>

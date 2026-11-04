@@ -1,12 +1,11 @@
 <script lang="ts">
   import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
-
 </script>
 
 <OTPInput maxLength={5} aria-label="Invite code">
   {#snippet children(state)}
     <OTPInputGroup>
-      {#each { length: state.slots.length } as _, index}
+      {#each state.slots as _, index (index)}
         <OTPInputSlot {index}>
           {#snippet render({ props, state: slot })}
             <span {...props}>

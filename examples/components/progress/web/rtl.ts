@@ -1,6 +1,6 @@
 import "@ui-sdk/web/progress"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div dir="rtl">
       <ui-progress value="56" locale="ar-EG">
@@ -13,3 +13,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

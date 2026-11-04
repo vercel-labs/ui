@@ -10,7 +10,7 @@ import {
 
 <template>
   <Progress :value="60">
-    <ProgressLabel>Loading</ProgressLabel>
+    <ProgressLabel>Exporting video</ProgressLabel>
     <ProgressValue />
     <ProgressTrack>
       <ProgressIndicator />

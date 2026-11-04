@@ -1,10 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 import { For } from "solid-js"
 
@@ -19,7 +19,7 @@ const fields = [
   { label: "Weight", defaultValue: 2.5, step: 0.1, format: { style: "unit", unit: "kilogram" } },
 ] satisfies { label: string; defaultValue: number; step: number; format: Intl.NumberFormatOptions }[]
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       <For each={fields}>
@@ -64,3 +64,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

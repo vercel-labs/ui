@@ -1,20 +1,23 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/vue/otp-input"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const value = ref("")
 </script>
 
 <template>
-  <div data-slot="stack">
-    <label for="one-time-password" data-slot="label"> One-time password </label>
-    <OTPInput id="one-time-password" v-model:value="value">
+  <Field>
+    <FieldLabel>One-time password</FieldLabel>
+    <OTPInput
+      v-model:value="value"
+      @value-change="(next, details) => log(`${next || 'Empty'} (${details.reason})`)"
+    >
       <OTPInputGroup>
-        <OTPInputSlot v-for="index in 6" :key="index" :index="index - 1" />
+        <OTPInputSlot v-for="index in [0, 1, 2, 3, 4, 5]" :key="index" :index="index" />
       </OTPInputGroup>
     </OTPInput>
-    <p data-slot="output">
-      {{ value ? `You entered: ${value}` : "Enter your one-time password." }}
-    </p>
-  </div>
+  </Field>
 </template>

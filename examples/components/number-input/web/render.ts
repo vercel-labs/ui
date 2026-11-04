@@ -2,14 +2,14 @@ import "@ui-sdk/web/number-input"
 import "@ui-sdk/web/field"
 import { createElement, Minus, Plus } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>Temperature</ui-field-label>
       <ui-number-input default-value="-2" min="-20" max="40">
         <ui-number-input-group>
           <ui-number-input-decrement>
-            <button aria-label="Colder" title="Colder">
+            <button aria-label="Colder">
               ${createElement(Minus, { "aria-hidden": "true" }).outerHTML}
             </button>
           </ui-number-input-decrement>
@@ -17,24 +17,23 @@ export function mount(root: HTMLElement) {
             <input />
           </ui-number-input-control>
           <ui-number-input-increment>
-            <button aria-label="Warmer">
-              ${createElement(Plus, { "aria-hidden": "true" }).outerHTML}
-              <span>Max</span>
-            </button>
+            <button aria-label="Warmer"></button>
           </ui-number-input-increment>
         </ui-number-input-group>
       </ui-number-input>
     </ui-field>
   `
-  const field = root.querySelector("ui-number-input") as HTMLElement & {
-    format: Intl.NumberFormatOptions
-    value: number | null
-  }
+  const field = root.querySelector("ui-number-input")!
   field.format = { style: "unit", unit: "celsius" }
-  const input = root.querySelector("input")!
-  const mark = (value: number | null) => input.toggleAttribute("data-negative", value !== null && value < 0)
-  field.addEventListener("valuechange", (event) =>
-    mark((event as CustomEvent<{ value: number | null }>).detail.value),
-  )
-  mark(field.value)
+  const colder = root.querySelector<HTMLButtonElement>('[aria-label="Colder"]')!
+  const warmer = root.querySelector<HTMLButtonElement>('[aria-label="Warmer"]')!
+  const plus = createElement(Plus, { "aria-hidden": "true" }).outerHTML
+  const show = (value: number | null) => {
+    colder.title = value === -20 ? "As cold as it goes" : "Colder"
+    warmer.innerHTML = value === 40 ? "<span>Max</span>" : plus
+  }
+  field.addEventListener("valuechange", (event) => show(event.detail.value))
+  show(field.value)
 }
+
+export { mount }

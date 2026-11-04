@@ -3,12 +3,11 @@
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
-
 </script>
 
 <Field>
@@ -24,8 +23,5 @@
       </NumberInputIncrement>
     </NumberInputGroup>
   </NumberInput>
-  <FieldDescription
-    >Steps by a quarter hour. Hold Shift to step by an hour, or Alt (Option) for three
-    minutes.</FieldDescription
-  >
+  <FieldDescription>Logged in quarter hours.</FieldDescription>
 </Field>

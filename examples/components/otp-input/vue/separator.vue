@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/vue/otp-input"
 import { MinusIcon } from "@lucide/vue"
+import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/vue/otp-input"
 </script>
 
 <template>
@@ -10,14 +10,14 @@ import { MinusIcon } from "@lucide/vue"
       <OTPInputSlot :index="1" />
     </OTPInputGroup>
     <OTPInputSeparator>
-      <MinusIcon />
+      <MinusIcon aria-hidden="true" />
     </OTPInputSeparator>
     <OTPInputGroup>
       <OTPInputSlot :index="2" />
       <OTPInputSlot :index="3" />
     </OTPInputGroup>
     <OTPInputSeparator>
-      <MinusIcon />
+      <MinusIcon aria-hidden="true" />
     </OTPInputSeparator>
     <OTPInputGroup>
       <OTPInputSlot :index="4" />

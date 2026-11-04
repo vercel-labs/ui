@@ -17,17 +17,17 @@ const sections = [
     links: [
       {
         title: "Introduction",
-        href: "https://example.com/docs",
+        href: "#",
         description: "Unstyled components with one core for every framework.",
       },
       {
         title: "Installation",
-        href: "https://example.com/docs/installation",
+        href: "#",
         description: "Add the package for your framework and render your first part.",
       },
       {
         title: "Styling",
-        href: "https://example.com/docs/styling",
+        href: "#",
         description: "Style parts with data attributes, CSS variables and any CSS.",
       },
     ],
@@ -38,22 +38,22 @@ const sections = [
     links: [
       {
         title: "Alert Dialog",
-        href: "https://example.com/docs/components/alert-dialog",
+        href: "#",
         description: "Asks for a decision before anything else on the page can be used.",
       },
       {
         title: "Hover Card",
-        href: "https://example.com/docs/components/hover-card",
+        href: "#",
         description: "A preview of what a link points to, for people who pause on it.",
       },
       {
         title: "Progress",
-        href: "https://example.com/docs/components/progress",
+        href: "#",
         description: "Shows how far along a task is, like an upload.",
       },
       {
         title: "Scroll Area",
-        href: "https://example.com/docs/components/scroll-area",
+        href: "#",
         description: "Scrolls its content with scrollbars you can style.",
       },
     ],
@@ -81,7 +81,7 @@ const sections = [
                 {{ state.motion ? `Moved in ${state.motion}` : "Opened" }}
               </p>
               <ul>
-                <li v-for="(link, index) in section.links" :key="link.href">
+                <li v-for="(link, index) in section.links" :key="link.title">
                   <NavigationMenuLink v-slot="{ state: linkState }" :href="link.href" :current="index === 0">
                     <span>{{ link.title }}</span>
                     <span v-if="linkState.current" data-slot="hint" data-show="current">You're here</span>

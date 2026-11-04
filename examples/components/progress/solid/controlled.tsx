@@ -6,32 +6,45 @@ import {
   ProgressValue,
 } from "@ui-sdk/solid/progress"
 import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
-  const [value, setValue] = createSignal(20)
+const total = 5
+
+function Example() {
+  const log = useLog()
+  const [uploaded, setUploaded] = createSignal(1)
+
+  function uploadNext() {
+    if (uploaded() >= total) return
+    const next = uploaded() + 1
+    setUploaded(next)
+    log(`Uploaded ${next} of ${total} photos`)
+  }
+
+  function reset() {
+    setUploaded(0)
+    log("Reset to 0 photos")
+  }
 
   return (
     <div data-slot="stack">
-      <Progress value={value()}>
-        <ProgressLabel>Uploading files</ProgressLabel>
+      <div data-slot="controls">
+        <button type="button" aria-disabled={uploaded() >= total ? "true" : "false"} onClick={uploadNext}>
+          Upload Next
+        </button>
+        <button type="button" onClick={reset}>
+          Reset
+        </button>
+      </div>
+      <Progress value={(uploaded() / total) * 100}>
+        <ProgressLabel>Uploading photos</ProgressLabel>
         <ProgressValue />
         <ProgressTrack>
           <ProgressIndicator />
         </ProgressTrack>
       </Progress>
-      <div data-slot="row">
-        <button
-          data-variant="secondary"
-          type="button"
-          aria-disabled={value() >= 100 ? "true" : "false"}
-          onClick={() => setValue((current) => Math.min(100, current + 20))}
-        >
-          Upload more
-        </button>
-        <button data-variant="secondary" type="button" onClick={() => setValue(0)}>
-          Reset
-        </button>
-      </div>
     </div>
   )
 }
+
+export { Example }

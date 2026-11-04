@@ -19,7 +19,7 @@ const meters = [
   locale?: string
 }[]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   const items = meters.map(
     (meter) => `
       <ui-meter value="${meter.value}" ${"max" in meter ? `max="${meter.max}"` : ""} ${"locale" in meter ? `locale="${meter.locale}"` : ""}>
@@ -36,3 +36,5 @@ export function mount(root: HTMLElement) {
     if ("format" in meter) element.format = meter.format
   })
 }
+
+export { mount }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
   import {
     Pagination,
     PaginationEllipsis,
@@ -8,10 +9,16 @@
     PaginationNext,
     PaginationPrevious,
   } from "@ui-sdk/svelte/pagination"
-  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
+  import { useLog } from "../../../shared/svelte/log"
+
+  const log = useLog()
 </script>
 
-<Pagination aria-label="Pagination" pageCount={10}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={10}
+  onPageChange={(page, details) => log(`Page ${page} (${details.reason})`)}
+>
   <PaginationList>
     {#snippet children(state)}
       <PaginationItem>

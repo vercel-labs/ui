@@ -1,7 +1,7 @@
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/solid/otp-input"
 import { For } from "solid-js"
 
-export function Example() {
+function Example() {
   return (
     <OTPInput maxLength={5} aria-label="Invite code">
       {(state) => (
@@ -18,3 +18,5 @@ export function Example() {
     </OTPInput>
   )
 }
+
+export { Example }

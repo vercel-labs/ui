@@ -1,17 +1,17 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 
-export function Example() {
+function Example() {
   return (
     <Field>
-      <FieldLabel>Quantity</FieldLabel>
-      <NumberInput defaultValue={1} min={1}>
+      <FieldLabel>Tickets</FieldLabel>
+      <NumberInput defaultValue={2} min={1}>
         <NumberInputGroup>
           <NumberInputDecrement aria-label="Decrease">
             <svg
@@ -43,7 +43,9 @@ export function Example() {
           </NumberInputIncrement>
         </NumberInputGroup>
       </NumberInput>
-      <FieldDescription>How many seats to book.</FieldDescription>
+      <FieldDescription>Each ticket admits one person to the workshop.</FieldDescription>
     </Field>
   )
 }
+
+export { Example }

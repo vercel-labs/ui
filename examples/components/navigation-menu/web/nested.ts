@@ -4,17 +4,17 @@ import { ChevronDown, ChevronRight, createElement } from "lucide"
 const gettingStarted = [
   {
     title: "Introduction",
-    href: "https://example.com/docs",
+    href: "#",
     description: "Unstyled components with one core for every framework.",
   },
   {
     title: "Installation",
-    href: "https://example.com/docs/installation",
+    href: "#",
     description: "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
-    href: "https://example.com/docs/styling",
+    href: "#",
     description: "Style parts with data attributes, CSS variables and any CSS.",
   },
 ]
@@ -24,18 +24,18 @@ const groups = [
     value: "overlays",
     label: "Overlays",
     links: [
-      { title: "Dialog", href: "https://example.com/docs/components/dialog" },
-      { title: "Popover", href: "https://example.com/docs/components/popover" },
-      { title: "Tooltip", href: "https://example.com/docs/components/tooltip" },
+      { title: "Dialog", href: "#" },
+      { title: "Popover", href: "#" },
+      { title: "Tooltip", href: "#" },
     ],
   },
   {
     value: "forms",
     label: "Forms",
     links: [
-      { title: "Input", href: "https://example.com/docs/components/input" },
-      { title: "Select", href: "https://example.com/docs/components/select" },
-      { title: "Checkbox", href: "https://example.com/docs/components/checkbox" },
+      { title: "Input", href: "#" },
+      { title: "Select", href: "#" },
+      { title: "Checkbox", href: "#" },
     ],
   },
 ]
@@ -89,7 +89,7 @@ function mount(root: HTMLElement) {
                       ${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}
                     </button>
                   </ui-navigation-menu-trigger>
-                  <ui-navigation-menu-content side-offset="12">
+                  <ui-navigation-menu-content side-offset="9" align-offset="-5">
                     <ul>
                       ${group.links
                         .map(
@@ -111,7 +111,7 @@ function mount(root: HTMLElement) {
           </ui-navigation-menu-content>
         </ui-navigation-menu-item>
       </ui-navigation-menu-list>
-      <ui-navigation-menu-viewport></ui-navigation-menu-viewport>
+      <ui-navigation-menu-viewport side-offset="8"></ui-navigation-menu-viewport>
     </ui-navigation-menu>
   `
 }

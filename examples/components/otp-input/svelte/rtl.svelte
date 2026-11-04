@@ -1,15 +1,15 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
-
 </script>
 
-<div dir="rtl" data-slot="stack">
-  <span id="otp-rtl-label" data-slot="label">رمز التحقق</span>
-  <OTPInput maxLength={6} aria-labelledby="otp-rtl-label">
+<Field dir="rtl">
+  <FieldLabel>رمز التحقق</FieldLabel>
+  <OTPInput maxLength={6}>
     <OTPInputGroup>
-      {#each { length: 6 } as _, index}
-        <OTPInputSlot index={index} />
+      {#each [0, 1, 2, 3, 4, 5] as index (index)}
+        <OTPInputSlot {index} />
       {/each}
     </OTPInputGroup>
   </OTPInput>
-</div>
+</Field>

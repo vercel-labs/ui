@@ -3,10 +3,10 @@
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
 
   const fields = [
@@ -19,7 +19,6 @@
     { label: "Discount", defaultValue: 0.15, step: 0.01, format: { style: "percent" } },
     { label: "Weight", defaultValue: 2.5, step: 0.1, format: { style: "unit", unit: "kilogram" } },
   ] satisfies { label: string; defaultValue: number; step: number; format: Intl.NumberFormatOptions }[]
-
 </script>
 
 <div data-slot="stack">

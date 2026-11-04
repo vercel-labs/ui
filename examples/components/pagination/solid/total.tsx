@@ -8,8 +8,10 @@ import {
   PaginationPrevious,
 } from "@ui-sdk/solid/pagination"
 import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
+  const log = useLog()
   const [page, setPage] = createSignal(2)
   const [pageSize, setPageSize] = createSignal(20)
   const total = 95
@@ -27,6 +29,7 @@ function Example() {
             onChange={(event) => {
               setPageSize(Number(event.currentTarget.value))
               setPage(1)
+              log(`${event.currentTarget.value} rows per page`)
             }}
           >
             <option value={10}>10</option>
@@ -40,7 +43,10 @@ function Example() {
         total={total}
         pageSize={pageSize()}
         page={page()}
-        onPageChange={(next) => setPage(next)}
+        onPageChange={(next) => {
+          setPage(next)
+          log(`Page ${next}`)
+        }}
       >
         <PaginationList>
           {({ items }) => (

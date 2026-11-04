@@ -1,50 +1,48 @@
 <script lang="ts">
-  import { ZoomInIcon, ZoomOutIcon } from "@lucide/svelte"
+  import { MinusIcon, PlusIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     createNumberInputController,
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
-  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   const zoom = createNumberInputController()
-  let reading = $state("")
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={() => zoom.decrement({ large: true })}>Zoom Out</button>
+    <button type="button" onclick={() => zoom.increment({ large: true })}>Zoom In</button>
+    <button type="button" onclick={() => zoom.setValue(100)}>Actual Size</button>
+    <button type="button" onclick={() => log(`Zoom is ${zoom.getValue()}%`)}>Read</button>
+    <button type="button" onclick={() => zoom.focus()}>Focus</button>
+  </div>
   <Field>
     <FieldLabel>Zoom</FieldLabel>
-    <NumberInput defaultValue={100} min={10} max={400} step={10} controller={zoom}>
+    <NumberInput
+      defaultValue={100}
+      min={10}
+      max={400}
+      step={10}
+      format={{ style: "unit", unit: "percent" }}
+      controller={zoom}
+      onValueChange={(value, details) => log(`Zoom ${value ?? "empty"}% (${details.reason})`)}
+    >
       <NumberInputGroup>
-        <NumberInputDecrement aria-label="Zoom out">
-          <ZoomOutIcon aria-hidden="true" />
+        <NumberInputDecrement aria-label="Decrease">
+          <MinusIcon aria-hidden="true" />
         </NumberInputDecrement>
         <NumberInputControl />
-        <NumberInputIncrement aria-label="Zoom in">
-          <ZoomInIcon aria-hidden="true" />
+        <NumberInputIncrement aria-label="Increase">
+          <PlusIcon aria-hidden="true" />
         </NumberInputIncrement>
       </NumberInputGroup>
     </NumberInput>
   </Field>
-  <div data-slot="row">
-    <button type="button" onclick={() => (zoom.decrement({ large: true }))}>
-      −100
-    </button>
-    <button type="button" onclick={() => (zoom.increment())}>
-      +10
-    </button>
-    <button type="button" onclick={() => (zoom.setValue(100))}>
-      Actual size
-    </button>
-    <button type="button" onclick={() => (reading = `Zoom is ${zoom.getValue()}.`)}>
-      Read
-    </button>
-    <button type="button" onclick={() => (zoom.focus())}>
-      Focus
-    </button>
-  </div>
-  <output data-slot="output">{reading}</output>
 </div>

@@ -1,7 +1,7 @@
 import type { UiMeterElement } from "@ui-sdk/web"
 import "@ui-sdk/web/meter"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-meter value="750" max="1000">
       <ui-meter-label>API requests</ui-meter-label>
@@ -14,3 +14,5 @@ export function mount(root: HTMLElement) {
   const meter = root.querySelector("ui-meter") as UiMeterElement
   meter.getValueLabel = (value, details) => `${value} of ${details.max} requests, ${details.formatted}`
 }
+
+export { mount }

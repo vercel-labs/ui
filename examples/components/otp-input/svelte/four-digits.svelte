@@ -1,12 +1,15 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
-
 </script>
 
-<OTPInput maxLength={4} textAlign="center" aria-label="PIN">
-  <OTPInputGroup>
-    {#each { length: 4 } as _, index}
-      <OTPInputSlot index={index} />
-    {/each}
-  </OTPInputGroup>
-</OTPInput>
+<Field>
+  <FieldLabel>PIN</FieldLabel>
+  <OTPInput maxLength={4} textAlign="center">
+    <OTPInputGroup>
+      {#each [0, 1, 2, 3] as index (index)}
+        <OTPInputSlot {index} />
+      {/each}
+    </OTPInputGroup>
+  </OTPInput>
+</Field>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ArrowLeftIcon, ArrowRightIcon } from "@lucide/svelte"
   import {
     Pagination,
     PaginationEllipsis,
@@ -8,7 +9,6 @@
     PaginationNext,
     PaginationPrevious,
   } from "@ui-sdk/svelte/pagination"
-  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
 </script>
 
 <Pagination aria-label="Pagination" pageCount={10}>
@@ -17,8 +17,11 @@
       <PaginationItem>
         <PaginationPrevious aria-label="Previous page">
           {#snippet render({ props, state: step })}
-            <button data-variant="ghost" {...props} title={step.disabled ? undefined : `Page ${step.page}`}>
-              <ChevronLeftIcon />
+            <button {...props} title={step.disabled ? undefined : `Go to page ${step.page}`}>
+              <ArrowLeftIcon aria-hidden="true" />
+              {#if !step.disabled}
+                <span aria-hidden="true">{step.page}</span>
+              {/if}
             </button>
           {/snippet}
         </PaginationPrevious>
@@ -27,29 +30,23 @@
         <PaginationItem>
           {#if typeof item === "number"}
             <PaginationLink page={item}>
-              {#snippet render({ props, state: link })}
-                <button {...props}>
-                  {link.page}
-                  {#if link.current}
-                    <span
-                      aria-hidden="true"
-                    ></span>
-                  {/if}
-                </button>
+              {#snippet children(link)}
+                {link.current ? `Page ${link.page}` : link.page}
               {/snippet}
             </PaginationLink>
           {:else}
-            <PaginationEllipsis>
-              <EllipsisIcon />
-            </PaginationEllipsis>
+            <PaginationEllipsis />
           {/if}
         </PaginationItem>
       {/each}
       <PaginationItem>
         <PaginationNext aria-label="Next page">
           {#snippet render({ props, state: step })}
-            <button data-variant="ghost" {...props} title={step.disabled ? undefined : `Page ${step.page}`}>
-              <ChevronRightIcon />
+            <button {...props} title={step.disabled ? undefined : `Go to page ${step.page}`}>
+              {#if !step.disabled}
+                <span aria-hidden="true">{step.page}</span>
+              {/if}
+              <ArrowRightIcon aria-hidden="true" />
             </button>
           {/snippet}
         </PaginationNext>

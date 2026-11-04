@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
   import {
     Pagination,
     PaginationEllipsis,
@@ -8,11 +9,18 @@
     PaginationNext,
     PaginationPrevious,
   } from "@ui-sdk/svelte/pagination"
-  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let page = $state(2)
   let pageSize = $state(20)
   const total = 95
+
+  function onchange(event: Event & { currentTarget: HTMLSelectElement }) {
+    pageSize = Number(event.currentTarget.value)
+    page = 1
+    log(`${event.currentTarget.value} rows per page`)
+  }
 </script>
 
 <div data-slot="stack">
@@ -22,14 +30,14 @@
     </p>
     <label data-slot="label">
       Rows per page
-      <select bind:value={pageSize} onchange={() => (page = 1)}>
+      <select value={pageSize} {onchange}>
         <option value={10}>10</option>
         <option value={20}>20</option>
         <option value={50}>50</option>
       </select>
     </label>
   </div>
-  <Pagination bind:page aria-label="Pagination" {total} {pageSize}>
+  <Pagination bind:page aria-label="Pagination" {total} {pageSize} onPageChange={(next) => log(`Page ${next}`)}>
     <PaginationList>
       {#snippet children(state)}
         <PaginationItem>

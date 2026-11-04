@@ -6,7 +6,7 @@ import {
   ProgressValue,
 } from "@ui-sdk/solid/progress"
 
-export function Example() {
+function Example() {
   return (
     <Progress
       value={3}
@@ -21,3 +21,5 @@ export function Example() {
     </Progress>
   )
 }
+
+export { Example }

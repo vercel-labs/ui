@@ -13,7 +13,7 @@ const fields = [
   { label: "Weight", defaultValue: 2.5, step: 0.1, format: { style: "unit", unit: "kilogram" } },
 ] satisfies { label: string; defaultValue: number; step: number; format: Intl.NumberFormatOptions }[]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
       ${fields
@@ -49,3 +49,5 @@ export function mount(root: HTMLElement) {
       el.format = fields[index].format
     })
 }
+
+export { mount }

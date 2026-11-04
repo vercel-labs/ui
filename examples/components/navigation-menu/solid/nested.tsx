@@ -12,17 +12,17 @@ import { For } from "solid-js"
 const gettingStarted = [
   {
     title: "Introduction",
-    href: "https://example.com/docs",
+    href: "#",
     description: "Unstyled components with one core for every framework.",
   },
   {
     title: "Installation",
-    href: "https://example.com/docs/installation",
+    href: "#",
     description: "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
-    href: "https://example.com/docs/styling",
+    href: "#",
     description: "Style parts with data attributes, CSS variables and any CSS.",
   },
 ]
@@ -32,18 +32,18 @@ const groups = [
     value: "overlays",
     label: "Overlays",
     links: [
-      { title: "Dialog", href: "https://example.com/docs/components/dialog" },
-      { title: "Popover", href: "https://example.com/docs/components/popover" },
-      { title: "Tooltip", href: "https://example.com/docs/components/tooltip" },
+      { title: "Dialog", href: "#" },
+      { title: "Popover", href: "#" },
+      { title: "Tooltip", href: "#" },
     ],
   },
   {
     value: "forms",
     label: "Forms",
     links: [
-      { title: "Input", href: "https://example.com/docs/components/input" },
-      { title: "Select", href: "https://example.com/docs/components/select" },
-      { title: "Checkbox", href: "https://example.com/docs/components/checkbox" },
+      { title: "Input", href: "#" },
+      { title: "Select", href: "#" },
+      { title: "Checkbox", href: "#" },
     ],
   },
 ]
@@ -117,7 +117,7 @@ function Example() {
                           <path d="m9 18 6-6-6-6" />
                         </svg>
                       </NavigationMenuTrigger>
-                      <NavigationMenuContent sideOffset={12}>
+                      <NavigationMenuContent sideOffset={9} alignOffset={-5}>
                         <ul>
                           <For each={group.links}>
                             {(link) => (
@@ -136,7 +136,7 @@ function Example() {
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>
-      <NavigationMenuViewport />
+      <NavigationMenuViewport sideOffset={8} />
     </NavigationMenu>
   )
 }

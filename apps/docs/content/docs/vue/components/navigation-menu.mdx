@@ -34,18 +34,48 @@ NavigationMenu
 
 Give the navigation an `aria-label`. Each item holds a trigger and its panel, or a plain link. This follows the [disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/): buttons show groups of ordinary links. Use a [Menu](./menu) for actions instead.
 
-The viewport holds the open panel and follows its size and position. Give it `h-(--viewport-height) w-(--viewport-width) overflow-hidden` when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
+The viewport holds the open panel and follows its size and position. Size it with `--viewport-width` and `--viewport-height` and clip its overflow when you use one; [Contents in the Viewport](#contents-in-the-viewport) explains the geometry. You can also [leave the viewport out](#without-a-viewport) and position each panel separately.
 
-## Examples
+## Usage
 
-### Link Component
+Import the parts and put them together:
 
-Render your router's link for client-side navigation. `active` marks the link for the current page with `aria-current="page"` and `data-active`.
+```vue
+<script setup lang="ts">
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+  NavigationMenuViewport,
+} from "@ui-sdk/vue/navigation-menu"
+</script>
+
+<template>
+  <NavigationMenu aria-label="Main">
+    <NavigationMenuList>
+      <NavigationMenuItem value="guides">
+        <NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <NavigationMenuLink href="/docs">Introduction</NavigationMenuLink>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    </NavigationMenuList>
+    <NavigationMenuViewport />
+  </NavigationMenu>
+</template>
+```
+
+## Link Component
+
+Render your router's link for client-side navigation. `current` marks the link for the current page with `aria-current="page"` and `data-current`.
 
 Render the router's link with the `render` slot. With Vue Router, use `RouterLink`'s `custom` form and bind the part's props to your own `<a>`, then its `navigate` after them, so the menu's `aria-current` is the one the link gets.
 
 ```vue
-<NavigationMenuLink :active="route.path === '/docs'">
+<NavigationMenuLink :current="route.path === '/docs'">
   <template #render="{ props }">
     <RouterLink to="/docs" custom v-slot="{ href, navigate }">
       <a v-bind="props" :href="href" @click="navigate">Introduction</a>
@@ -59,19 +89,17 @@ Render the router's link with the `render` slot. With Vue Router, use `RouterLin
   caption="Choose a link to update the current page without reloading the example."
 />
 
-#### Router Links
-
 Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `closeOnSelect` to false to keep it open on every press, see [Close on Select](#close-on-select).
 
-### Icons
+## Icons
 
 Put a link's icon in a `NavigationMenuLinkIcon`, before its text, like the With Icon panel in the menu at the top of the page. Screen readers skip it, so an SVG's `<title>`, an icon font's glyph or an emoji never joins the link's name.
 
 - **Icons that point a way**, like the arrow on All issues, flip in right-to-left text with `mirror`.
 - **Links with only an icon** need an `aria-label`. In development, one with no name warns.
-- **Lining up links.** Links with an icon get `data-has-icon`, and the content or list around them gets `data-has-icons` while any link has one, so links without an icon can leave its space: `in-data-has-icons:not-data-has-icon:ps-8`.
+- **Lining up links.** Links with an icon get `data-has-icon`, and the content or list around them gets `data-has-icons` while any link has one, so links without an icon can leave its space: `[data-has-icons] [data-slot="navigation-menu-link"]:not([data-has-icon])`.
 
-### Vertical
+## Vertical
 
 `orientation="vertical"` is for a sidebar: Up and Down move between the items, and panels open beside the menu, at the inline end, unless `side` says otherwise.
 
@@ -80,7 +108,7 @@ Put a link's icon in a `NavigationMenuLinkIcon`, before its text, like the With 
   caption="Use Up and Down between the sidebar items, then open a panel beside its trigger."
 />
 
-### Click Only
+## Click Only
 
 Resting the pointer on a trigger opens its panel. With `openOnHover` set to false, the menu opens on click only: pressing a trigger opens and closes its panel, and moving the pointer does nothing. Keyboard and touch work the same either way.
 
@@ -89,131 +117,184 @@ Resting the pointer on a trigger opens its panel. With `openOnHover` set to fals
   caption="Click a trigger to open it. Moving the pointer between triggers does not open another panel."
 />
 
-### Delay
-
-`delay` is how long the pointer rests on a trigger before its panel opens, and `closeDelay` how long the panel stays once the pointer leaves the trigger and the panel: 50 milliseconds each by default. The pointer can cross the gap between a trigger and its panel without closing it. Once a panel is open, moving to another trigger switches at once, unless the pointer is only passing over it on the way into the open panel. Coming back right after closing skips the delay.
-
-<ComponentExample
-  name="navigation-menu/delay"
-  caption="Choose an opening delay, then rest the pointer on a trigger."
-/>
-
-### Indicator
-
-`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#navigationmenuindicator), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
-
-<ComponentExample
-  name="navigation-menu/indicator"
-  caption="Open a section to move the indicator. Close it to return the indicator to the active page."
-/>
-
-### Viewport Placement
-
-The viewport opens below the open trigger, lined up with its start, or beside it in a vertical menu. `side` and `align` change that, `sideOffset` is the gap (4 pixels by default), `alignOffset` shifts it along the trigger, and `collisionPadding` is the space kept from the window's edges. It flips and shifts to stay on screen. `anchor` positions it against something else: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. Anchoring to the whole bar gives one dropdown that stays put while its contents change.
-
-<ComponentExample
-  name="navigation-menu/viewport-placement"
-  caption="Change the placement or anchor the popup to the whole navigation bar."
-/>
-
-### Without a Viewport
-
-Leave the viewport out and each content is its own popup, placed against its trigger. Contents then take the same placement props as the viewport: `side`, `align`, `sideOffset`, `alignOffset`, `collisionPadding` and `anchor`. Style each content as a popup rather than positioning it inside one.
-
-<ComponentExample
-  name="navigation-menu/without-viewport"
-  caption="Open a section. Each panel positions itself beside its own trigger."
-/>
-
-### Nested
+## Nested
 
 A navigation menu inside another menu's content is a submenu. It renders a plain element instead of a second `<nav>` landmark, gets `data-nested`, and closes with its parent when the parent moves on to another item. Without a viewport of its own, its panels open beside its triggers. Pressing a link in it closes every menu.
 
 <ComponentExample
   name="navigation-menu/nested"
-  caption="Open Components, then open a nested section. Escape closes the inner panel first."
+  caption="Open Components, then open Overlays or Forms. Escape closes the inner panel first."
 />
 
-### Controlled
-
-Bind `v-model:value` to control which item is open. It's the open item's `value`, or `null` while every
-panel is closed. Use `default-value` to start with a panel open without controlling it.
-
-Items take a `value`, which is generated when left out. Every change carries a [reason](#reasons), like `trigger-hover`, `trigger-press`, `link-press` or `outside-press`. Call `details.cancel()` to stop it.
-
-<ComponentExample
-  name="navigation-menu/controlled"
-  caption="Open or close a panel with the buttons and read the last change reason below."
-/>
-
-### Opening from Anywhere
-
-A [controller](#controller), from `createNavigationMenuController()`, opens, closes and focuses the menu
-from anywhere, without controlling it. Pass it as `controller`.
-
-<ComponentExample
-  name="navigation-menu/controller"
-  caption="Use the buttons to toggle a panel, focus a trigger, or read the current state."
-/>
-
-### Keep Mounted
-
-Closed contents leave the page by default. `keepMounted` keeps them in it, hidden, so the server's HTML and crawlers have every link. `hiddenUntilFound` also lets find in page reach them: closed content gets `hidden="until-found"`, and a match opens its item with the `find-in-page` reason. It implies `keepMounted`.
-
-Closed content stays in its item, with its own classes, and moves into the viewport when it opens. Put padding on an element inside it rather than on the content, so the hidden box has no size where it sits.
-
-<ComponentExample
-  name="navigation-menu/keep-mounted"
-  caption="Use your browser’s find command to search for Scroll Area inside the closed Components section."
-/>
-
-### Close on Select
-
-Pressing a link closes the menu by default, like after a route change. With `closeOnSelect` set to false on the menu, it stays open, and a link's own `closeOnSelect` wins over the menu's, like the "Browse all" link here.
-
-<ComponentExample
-  name="navigation-menu/close-on-select"
-  caption="Choose a link to keep the panel open, or Browse all to close the whole menu."
-/>
-
-### Animation
+## Animation
 
 The viewport and contents get `data-starting-style` for their first frame and `data-ending-style` while they animate out, and stay mounted until their animation finishes. Contents also get `data-motion` while another item takes over: `from-end` or `from-start` on the one coming in, and `to-start` or `to-end` on the one giving way. Order is logical, so in right-to-left layouts the end is on the left. The viewport can transition `width`, `height`, `left` and `top` as it follows the open item.
 
-`@open-change-complete` runs once the menu has finished opening or closing, after any
-animation, with the new open state. Switching between items doesn't count.
+`@open-change-complete` runs once the menu has finished opening or closing, after any animation, with the new open state. Switching between items doesn't count.
 
 <ComponentExample
   name="navigation-menu/animation"
   caption="Switch between Guides and Components to see the viewport resize and the panels slide."
 />
 
-#### Reduced Motion
+The menu waits for whatever animations run, and only those. Turn them off for people who ask for less motion with a `prefers-reduced-motion` media query, and panels switch and close at once.
 
-The menu waits for whatever animations run, and only those. Turn them off for people who ask for less motion, with `motion-reduce:transition-none` and `motion-reduce:animate-none` in Tailwind or a `prefers-reduced-motion` media query, and panels switch and close at once. Every example here does.
+## Delay
 
-### Container
+`delay` is how long the pointer rests on a trigger before its panel opens, and `closeDelay` how long the panel stays once the pointer leaves the trigger and the panel: 50 milliseconds each by default. The pointer can cross the gap between a trigger and its panel without closing it. Once a panel is open, moving to another trigger switches at once, unless the pointer is only passing over it on the way into the open panel. Coming back right after closing skips the delay.
+
+```vue
+<NavigationMenu aria-label="Main" :delay="400" :close-delay="600">
+  ...
+</NavigationMenu>
+```
+
+## Indicator
+
+`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `current` while every panel is closed. Its box comes from the `--active-item-*` [variables](#styling-navigationmenuindicator), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
+
+```vue
+<NavigationMenu aria-label="Main">
+  <NavigationMenuList>...</NavigationMenuList>
+  <NavigationMenuIndicator />
+  <NavigationMenuViewport />
+</NavigationMenu>
+```
+
+```css
+[data-slot="navigation-menu-root"] {
+  position: relative;
+}
+
+[data-slot="navigation-menu-indicator"] {
+  position: absolute;
+  left: var(--active-item-left);
+  bottom: var(--active-item-bottom);
+  width: var(--active-item-width);
+  height: 2px;
+  opacity: 0;
+}
+
+[data-slot="navigation-menu-indicator"][data-visible] {
+  opacity: 1;
+}
+```
+
+## Viewport Placement
+
+The viewport opens below the open trigger, lined up with its start, or beside it in a vertical menu. `side` and `align` change that, `sideOffset` is the gap (4 pixels by default), `alignOffset` shifts it along the trigger, and `collisionPadding` is the space kept from the window's edges. It flips and shifts to stay on screen.
+
+`anchor` positions it against something else: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. Anchoring to the whole bar gives one dropdown that stays put while its contents change.
+
+```vue
+<NavigationMenuViewport
+  side="bottom"
+  align="center"
+  :side-offset="8"
+  :collision-padding="16"
+  anchor="#site-header"
+/>
+```
+
+## Without a Viewport
+
+Leave the viewport out and each content is its own popup, placed against its trigger. Contents then take the same placement props as the viewport: `side`, `align`, `sideOffset`, `alignOffset`, `collisionPadding` and `anchor`. Style each content as a popup rather than positioning it inside one.
+
+```vue
+<NavigationMenu aria-label="Main">
+  <NavigationMenuList>
+    <NavigationMenuItem value="guides">
+      <NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+      <NavigationMenuContent side="bottom" align="start" :side-offset="8">
+        ...
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+## Controlled
+
+Bind `v-model:value` to control which item is open. It's the open item's `value`, or `null` while every panel is closed. Use `default-value` to start with a panel open without controlling it.
+
+Items take a `value`, which is generated when left out. Every change carries a [reason](#reasons) in `@value-change`, like `trigger-hover`, `trigger-press`, `link-press` or `outside-press`. Call `details.cancel()` to stop it.
+
+```vue
+<script setup lang="ts">
+const value = ref<string | null>(null)
+</script>
+
+<template>
+  <NavigationMenu v-model:value="value" aria-label="Main">
+    ...
+  </NavigationMenu>
+</template>
+```
+
+## Opening from Anywhere
+
+A [controller](#controller), from `createNavigationMenuController()`, opens, closes and focuses the menu from anywhere, without controlling it. Pass it as `controller`.
+
+```vue
+<script setup lang="ts">
+const menu = createNavigationMenuController()
+</script>
+
+<template>
+  <button @click="menu.setValue('components')">Browse Components</button>
+  <NavigationMenu aria-label="Main" :controller="menu">
+    ...
+  </NavigationMenu>
+</template>
+```
+
+## Keep Mounted
+
+Closed contents leave the page by default. `keepMounted` keeps them in it, hidden, so the server's HTML and crawlers have every link. `hiddenUntilFound` also lets find in page reach them: closed content gets `hidden="until-found"`, and a match opens its item with the `find-in-page` reason. It implies `keepMounted`.
+
+Closed content stays in its item, with its own classes, and moves into the viewport when it opens. Put padding on an element inside it rather than on the content, so the hidden box has no size where it sits.
+
+```vue
+<NavigationMenuContent hidden-until-found>...</NavigationMenuContent>
+```
+
+## Close on Select
+
+Pressing a link closes the menu by default, like after a route change. With `closeOnSelect` set to false on the menu, it stays open, and a link's own `closeOnSelect` wins over the menu's.
+
+```vue
+<NavigationMenu aria-label="Main" :close-on-select="false">
+  ...
+  <NavigationMenuLink href="/docs/components" close-on-select>
+    Browse All
+  </NavigationMenuLink>
+</NavigationMenu>
+```
+
+## Container
 
 Panels render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the viewport, or each content without one, somewhere else, for iframes, shadow roots or a specific stacking context. Set it on the menu, or on the viewport or a content.
 
+```vue
+<NavigationMenu aria-label="Main" :container="container">
+  ...
+</NavigationMenu>
+```
+
+## Custom Rendering
+
 <ComponentExample
-  name="navigation-menu/container"
-  caption="Open a section. Its popup renders in the marked container while staying anchored to the trigger."
+  name="navigation-menu/custom-rendering"
+  caption="Open Guides to see its render state, then compare the current link and disabled trigger."
 />
 
-## Keyboard and Touch
+Every part takes a `render` slot, which receives the props to bind and the part's state, and the default slot receives the state. Here the content reads `motion`, and a disabled trigger shows a badge.
 
-Tab moves through the triggers and top-level links in order, like any links on a page. Enter or Space on a trigger opens its panel and leaves focus on the trigger, and Tab from an open trigger moves into its panel, wherever the panel renders. Tab past the panel's last link moves on to the next item, and Shift+Tab from its first link returns to the trigger. Escape closes the panel and returns focus to its trigger, and focus leaving the navigation closes it.
-
-The arrow keys add to Tab, as the pattern allows: Left and Right move between the top-level items (Up and Down in a vertical menu), Home and End go to the first and last, Down (the inline end in a vertical menu) opens a trigger's panel and moves into it, and in a panel Up and Down, or Left and Right, move between the links and Home and End go to the first and last. Nothing wraps, and keys pressed with a modifier, like Alt+Left for Back, are left to the browser.
-
-Touch screens have no hover: a tap on a trigger opens its panel and another tap closes it.
+`disabled` on a trigger stops it from opening its panel. Each part's state is listed under [State](#state).
 
 ## Styling
 
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework.
-
-<DataAttributes component="navigation-menu" />
+Parts are unstyled. Style them through the attributes they render, which are the same in every framework. Each part has a `data-slot`, such as `navigation-menu-trigger`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### Contents in the Viewport
 
@@ -276,16 +357,55 @@ In plain CSS:
 }
 ```
 
-## Custom Rendering
+### NavigationMenuContent [#styling-navigationmenucontent]
 
-<ComponentExample
-  name="navigation-menu/custom-rendering"
-  caption="Open Guides to see its render state, then compare the active link and disabled trigger."
-/>
+<CssVariables component="navigation-menu" part="content" />
 
-Every part takes a `render` slot, which receives the props to bind and the part's state, and the default slot receives the state.
+### NavigationMenuViewport [#styling-navigationmenuviewport]
 
-`disabled` on a trigger stops it from opening its panel. Each part's state is listed under [State](#state).
+<CssVariables component="navigation-menu" part="viewport" />
+
+### NavigationMenuIndicator [#styling-navigationmenuindicator]
+
+<CssVariables component="navigation-menu" part="indicator" />
+
+## Data Attributes
+
+### NavigationMenu [#data-attributes-navigationmenu]
+
+<DataAttributes component="navigation-menu" part="root" />
+
+### NavigationMenuList [#data-attributes-navigationmenulist]
+
+<DataAttributes component="navigation-menu" part="list" />
+
+### NavigationMenuItem [#data-attributes-navigationmenuitem]
+
+<DataAttributes component="navigation-menu" part="item" />
+
+### NavigationMenuTrigger [#data-attributes-navigationmenutrigger]
+
+<DataAttributes component="navigation-menu" part="trigger" />
+
+### NavigationMenuContent [#data-attributes-navigationmenucontent]
+
+<DataAttributes component="navigation-menu" part="content" />
+
+### NavigationMenuLink [#data-attributes-navigationmenulink]
+
+<DataAttributes component="navigation-menu" part="link" />
+
+### NavigationMenuLinkIcon [#data-attributes-navigationmenulinkicon]
+
+<DataAttributes component="navigation-menu" part="link-icon" />
+
+### NavigationMenuViewport [#data-attributes-navigationmenuviewport]
+
+<DataAttributes component="navigation-menu" part="viewport" />
+
+### NavigationMenuIndicator [#data-attributes-navigationmenuindicator]
+
+<DataAttributes component="navigation-menu" part="indicator" />
 
 ## API Reference
 
@@ -319,8 +439,6 @@ Props are the same as below, and callbacks are events.
   name="NavigationMenuContentProps"
 />
 
-<CssVariables component="navigation-menu" part="content" />
-
 ### NavigationMenuLink
 
 <TypeTable
@@ -342,15 +460,11 @@ Props are the same as below, and callbacks are events.
   name="NavigationMenuViewportProps"
 />
 
-<CssVariables component="navigation-menu" part="viewport" />
-
 `NavigationMenuList` takes no props of its own.
 
 ### NavigationMenuIndicator
 
 The indicator takes no props of its own.
-
-<CssVariables component="navigation-menu" part="indicator" />
 
 ### State
 
@@ -451,7 +565,19 @@ Events get the new state first, then the details. `v-model` only updates when `@
 
 ## Accessibility
 
-The menu follows the [disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/): a landmark with a list of buttons that show and hide groups of links. Every line below is an automated test.
+The menu follows the [disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/): a landmark with a list of buttons that show and hide groups of links.
+
+### Keyboard
+
+Tab moves through the triggers and top-level links in order, like any links on a page. Enter or Space on a trigger opens its panel and leaves focus on the trigger, and Tab from an open trigger moves into its panel, wherever the panel renders. Tab past the panel's last link moves on to the next item, and Shift+Tab from its first link returns to the trigger. Escape closes the panel and returns focus to its trigger, and focus leaving the navigation closes it.
+
+The arrow keys add to Tab, as the pattern allows: Left and Right move between the top-level items (Up and Down in a vertical menu), Home and End go to the first and last, Down (the inline end in a vertical menu) opens a trigger's panel and moves into it, and in a panel Up and Down, or Left and Right, move between the links and Home and End go to the first and last. Nothing wraps, and keys pressed with a modifier, like Alt+Left for Back, are left to the browser.
+
+Touch screens have no hover: a tap on a trigger opens its panel and another tap closes it.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="navigation-menu" />
 

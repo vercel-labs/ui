@@ -1,7 +1,7 @@
 import type { UiMeterElement } from "@ui-sdk/web"
 import "@ui-sdk/web/meter"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-meter value="720" min="300" max="850">
       <ui-meter-label>Credit score</ui-meter-label>
@@ -14,3 +14,5 @@ export function mount(root: HTMLElement) {
   const meter = root.querySelector("ui-meter") as UiMeterElement
   meter.format = { style: "decimal" }
 }
+
+export { mount }

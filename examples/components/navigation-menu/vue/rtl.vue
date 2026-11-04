@@ -17,17 +17,17 @@ const sections = [
     links: [
       {
         title: "مقدمة",
-        href: "https://example.com/docs",
+        href: "#",
         description: "مكونات بلا أنماط بنواة واحدة لكل إطار عمل.",
       },
       {
         title: "التثبيت",
-        href: "https://example.com/docs/installation",
+        href: "#",
         description: "أضف الحزمة لإطار عملك واعرض أول جزء.",
       },
       {
         title: "التنسيق",
-        href: "https://example.com/docs/styling",
+        href: "#",
         description: "نسّق الأجزاء بسمات البيانات ومتغيرات CSS.",
       },
     ],
@@ -38,17 +38,17 @@ const sections = [
     links: [
       {
         title: "مربع تنبيه",
-        href: "https://example.com/docs/components/alert-dialog",
+        href: "#",
         description: "يطلب قرارًا قبل استخدام أي شيء آخر في الصفحة.",
       },
       {
         title: "بطاقة التمرير",
-        href: "https://example.com/docs/components/hover-card",
+        href: "#",
         description: "معاينة لما يشير إليه الرابط.",
       },
       {
         title: "علامات التبويب",
-        href: "https://example.com/docs/components/tabs",
+        href: "#",
         description: "تعرض لوحة واحدة من المحتوى في كل مرة.",
       },
     ],
@@ -67,7 +67,7 @@ const sections = [
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul>
-              <li v-for="link in section.links" :key="link.href">
+              <li v-for="link in section.links" :key="link.title">
                 <NavigationMenuLink :href="link.href">
                   <span>{{ link.title }}</span>
                   <span data-slot="hint">{{ link.description }}</span>
@@ -77,10 +77,10 @@ const sections = [
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink href="https://example.com/docs">المستندات</NavigationMenuLink>
+          <NavigationMenuLink href="#">المستندات</NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
-      <NavigationMenuViewport />
+      <NavigationMenuViewport :side-offset="8" />
     </NavigationMenu>
   </div>
 </template>

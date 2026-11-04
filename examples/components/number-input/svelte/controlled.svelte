@@ -1,27 +1,33 @@
 <script lang="ts">
   import { MinusIcon, PlusIcon } from "@lucide/svelte"
-  import type { NumberInputValueChangeReason } from "@ui-sdk/core/number-input"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let value = $state<number | null>(4)
-  let committed = $state("")
-
-  function onCommit(next: number | null, details: { reason: NumberInputValueChangeReason }) {
-    committed = `${next ?? "empty"}, after ${details.reason}`
-  }
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={() => (value = 4)}>Reset to 4</button>
+    <button type="button" onclick={() => (value = null)}>Clear</button>
+  </div>
   <Field>
     <FieldLabel>Servings</FieldLabel>
-    <NumberInput bind:value={value} min={1} max={12} onValueCommit={onCommit}>
+    <NumberInput
+      bind:value
+      onValueChange={(next, details) => log(`Value ${next ?? "empty"} (${details.reason})`)}
+      onValueCommit={(next, details) => log(`Committed ${next ?? "empty"} (${details.reason})`)}
+      min={1}
+      max={12}
+    >
       <NumberInputGroup>
         <NumberInputDecrement aria-label="Decrease">
           <MinusIcon aria-hidden="true" />
@@ -33,16 +39,4 @@
       </NumberInputGroup>
     </NumberInput>
   </Field>
-  <div data-slot="row">
-    <button type="button" onclick={() => (value = 4)}>
-      Reset to 4
-    </button>
-    <button type="button" onclick={() => (value = null)}>
-      Clear
-    </button>
-  </div>
-  <output data-slot="output">
-    <span>Value: {value ?? "empty"}</span>
-    <span>Committed: {committed || "nothing yet"}</span>
-  </output>
 </div>

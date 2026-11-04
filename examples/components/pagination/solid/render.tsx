@@ -17,23 +17,28 @@ function Example() {
           <>
             <PaginationItem>
               <PaginationPrevious
-                data-variant="ghost"
                 aria-label="Previous page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : ["Page", state.page].join(" ")} />
+                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
                 )}
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m15 18-6-6 6-6" />
-                </svg>
+                {(state) => (
+                  <>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m12 19-7-7 7-7" />
+                      <path d="M19 12H5" />
+                    </svg>
+                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                  </>
+                )}
               </PaginationPrevious>
             </PaginationItem>
             <For each={items}>
@@ -41,52 +46,38 @@ function Example() {
                 <PaginationItem>
                   {typeof item === "number" ? (
                     <PaginationLink page={item}>
-                      {(state) => (
-                        <>
-                          {state.page}
-                          {state.current && <span aria-hidden="true" />}
-                        </>
-                      )}
+                      {(state) => (state.current ? `Page ${state.page}` : state.page)}
                     </PaginationLink>
                   ) : (
-                    <PaginationEllipsis>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <circle cx="12" cy="12" r="1" />
-                        <circle cx="19" cy="12" r="1" />
-                        <circle cx="5" cy="12" r="1" />
-                      </svg>
-                    </PaginationEllipsis>
+                    <PaginationEllipsis />
                   )}
                 </PaginationItem>
               )}
             </For>
             <PaginationItem>
               <PaginationNext
-                data-variant="ghost"
                 aria-label="Next page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : ["Page", state.page].join(" ")} />
+                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
                 )}
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m9 18 6-6-6-6" />
-                </svg>
+                {(state) => (
+                  <>
+                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </>
+                )}
               </PaginationNext>
             </PaginationItem>
           </>

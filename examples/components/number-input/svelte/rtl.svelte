@@ -3,12 +3,11 @@
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
-
 </script>
 
 <div dir="rtl">
@@ -17,11 +16,11 @@
     <NumberInput defaultValue={1} min={0}>
       <NumberInputGroup>
         <NumberInputDecrement aria-label="إنقاص">
-          <MinusIcon />
+          <MinusIcon aria-hidden="true" />
         </NumberInputDecrement>
         <NumberInputControl />
         <NumberInputIncrement aria-label="زيادة">
-          <PlusIcon />
+          <PlusIcon aria-hidden="true" />
         </NumberInputIncrement>
       </NumberInputGroup>
     </NumberInput>

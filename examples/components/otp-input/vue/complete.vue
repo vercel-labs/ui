@@ -1,21 +1,18 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/vue/otp-input"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const status = ref("")
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <OTPInput
-      aria-label="Verification code"
-      @value-change="status = ''"
-      @value-commit="(value, details) => (status = `Checking ${value}, from ${details.reason}.`)"
-    >
+  <Field>
+    <FieldLabel>Verification code</FieldLabel>
+    <OTPInput @value-commit="(value, details) => log(`Checking ${value} (${details.reason})`)">
       <OTPInputGroup>
-        <OTPInputSlot v-for="index in 6" :key="index" :index="index - 1" />
+        <OTPInputSlot v-for="index in [0, 1, 2, 3, 4, 5]" :key="index" :index="index" />
       </OTPInputGroup>
     </OTPInput>
-    <output data-slot="output">{{ status }}</output>
-  </div>
+  </Field>
 </template>

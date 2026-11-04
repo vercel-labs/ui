@@ -25,7 +25,7 @@ const fields = [
   format: Intl.NumberFormatOptions
 }[]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
       ${fields
@@ -62,3 +62,5 @@ export function mount(root: HTMLElement) {
       el.format = fields[index].format
     })
 }
+
+export { mount }

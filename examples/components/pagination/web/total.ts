@@ -1,5 +1,6 @@
 import "@ui-sdk/web/pagination"
 import { ChevronLeft, ChevronRight, createElement, Ellipsis } from "lucide"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -56,11 +57,15 @@ function mount(root: HTMLElement) {
     root.querySelector("p")!.textContent =
       `Showing ${(page - 1) * size + 1}–${Math.min(page * size, 95)} of 95`
   }
-  pagination.addEventListener("pagechange", (event) => showing(event.detail.value))
+  pagination.addEventListener("pagechange", (event) => {
+    showing(event.detail.value)
+    log(root, `Page ${event.detail.value}`)
+  })
   select.addEventListener("change", () => {
     pagination.setAttribute("page-size", select.value)
     pagination.page = 1
     showing(1)
+    log(root, `${select.value} rows per page`)
   })
 }
 

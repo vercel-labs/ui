@@ -1,6 +1,6 @@
 import "@ui-sdk/web/meter"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-meter value="68">
       <ui-meter-label>Storage used</ui-meter-label>
@@ -11,3 +11,5 @@ export function mount(root: HTMLElement) {
     </ui-meter>
   `
 }
+
+export { mount }

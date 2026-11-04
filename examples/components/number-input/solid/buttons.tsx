@@ -1,12 +1,12 @@
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 
-export function Example() {
+function Example() {
   return (
     <NumberInput defaultValue={1} min={0}>
       <NumberInputGroup>
@@ -42,3 +42,5 @@ export function Example() {
     </NumberInput>
   )
 }
+
+export { Example }

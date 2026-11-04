@@ -18,7 +18,6 @@
     format?: Intl.NumberFormatOptions | ((value: number) => string)
     locale?: string
   }[]
-
 </script>
 
 <div data-slot="stack">

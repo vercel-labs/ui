@@ -1,27 +1,43 @@
 import "@ui-sdk/web/progress"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+const total = 5
+
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <ui-progress value="20">
-        <ui-progress-label>Uploading files</ui-progress-label>
+      <div data-slot="controls">
+        <button type="button">Upload Next</button>
+        <button type="button">Reset</button>
+      </div>
+      <ui-progress>
+        <ui-progress-label>Uploading photos</ui-progress-label>
         <ui-progress-value></ui-progress-value>
         <ui-progress-track>
           <ui-progress-indicator></ui-progress-indicator>
         </ui-progress-track>
       </ui-progress>
-      <div data-slot="row">
-        <button data-variant="secondary" type="button" aria-disabled="false">Upload more</button>
-        <button data-variant="secondary" type="button">Reset</button>
-      </div>
     </div>
   `
   const progress = root.querySelector("ui-progress")!
-  const [more, reset] = root.querySelectorAll("button")
-  const set = (value: number) => {
-    progress.setAttribute("value", String(value))
-    more.setAttribute("aria-disabled", String(value >= 100))
+  const [next, reset] = root.querySelectorAll("button")
+  let uploaded = 1
+  const show = () => {
+    progress.setAttribute("value", String((uploaded / total) * 100))
+    next.setAttribute("aria-disabled", String(uploaded >= total))
   }
-  more.addEventListener("click", () => set(Math.min(100, Number(progress.getAttribute("value")) + 20)))
-  reset.addEventListener("click", () => set(0))
+  next.addEventListener("click", () => {
+    if (uploaded >= total) return
+    uploaded++
+    show()
+    log(root, `Uploaded ${uploaded} of ${total} photos`)
+  })
+  reset.addEventListener("click", () => {
+    uploaded = 0
+    show()
+    log(root, "Reset to 0 photos")
+  })
+  show()
 }
+
+export { mount }

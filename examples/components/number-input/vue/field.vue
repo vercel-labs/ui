@@ -3,17 +3,17 @@ import { MinusIcon, PlusIcon } from "@lucide/vue"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/vue/number-input"
 </script>
 
 <template>
   <Field>
-    <FieldLabel>Quantity</FieldLabel>
-    <NumberInput :default-value="1" :min="1">
+    <FieldLabel>Tickets</FieldLabel>
+    <NumberInput :default-value="2" :min="1">
       <NumberInputGroup>
         <NumberInputDecrement aria-label="Decrease">
           <MinusIcon aria-hidden="true" />
@@ -24,6 +24,6 @@ import {
         </NumberInputIncrement>
       </NumberInputGroup>
     </NumberInput>
-    <FieldDescription>How many seats to book.</FieldDescription>
+    <FieldDescription>Each ticket admits one person to the workshop.</FieldDescription>
   </Field>
 </template>

@@ -4,7 +4,7 @@ import { Progress, ProgressIndicator, ProgressLabel, ProgressTrack } from "@ui-s
 
 <template>
   <Progress :value="null">
-    <ProgressLabel>Connecting</ProgressLabel>
+    <ProgressLabel>Connecting to server</ProgressLabel>
     <ProgressTrack>
       <ProgressIndicator />
     </ProgressTrack>

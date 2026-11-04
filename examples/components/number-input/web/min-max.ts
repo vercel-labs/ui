@@ -2,7 +2,7 @@ import "@ui-sdk/web/number-input"
 import "@ui-sdk/web/field"
 import { createElement, Minus, Plus } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>Guests</ui-field-label>
@@ -23,7 +23,9 @@ export function mount(root: HTMLElement) {
           </ui-number-input-increment>
         </ui-number-input-group>
       </ui-number-input>
-      <ui-field-description>Between 1 and 8 guests.</ui-field-description>
+      <ui-field-description>Tables seat between 1 and 8 guests.</ui-field-description>
     </ui-field>
   `
 }
+
+export { mount }

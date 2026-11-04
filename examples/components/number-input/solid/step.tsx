@@ -1,13 +1,13 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 
-export function Example() {
+function Example() {
   return (
     <Field>
       <FieldLabel>Hours</FieldLabel>
@@ -43,9 +43,9 @@ export function Example() {
           </NumberInputIncrement>
         </NumberInputGroup>
       </NumberInput>
-      <FieldDescription>
-        Steps by a quarter hour. Hold Shift to step by an hour, or Alt (Option) for three minutes.
-      </FieldDescription>
+      <FieldDescription>Logged in quarter hours.</FieldDescription>
     </Field>
   )
 }
+
+export { Example }

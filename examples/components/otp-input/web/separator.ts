@@ -1,7 +1,7 @@
 import "@ui-sdk/web/otp-input"
 import { createElement, Minus } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-otp-input max-length="6" aria-label="Verification code">
       <ui-otp-input-group>
@@ -21,3 +21,5 @@ export function mount(root: HTMLElement) {
     </ui-otp-input>
   `
 }
+
+export { mount }

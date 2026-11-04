@@ -1,7 +1,7 @@
 import type { GaugeLabelDetails } from "@ui-sdk/core/progress"
 import "@ui-sdk/web/progress"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-progress value="3" max="12">
       <ui-progress-label>Copying files</ui-progress-label>
@@ -16,3 +16,5 @@ export function mount(root: HTMLElement) {
   }
   progress.getValueLabel = (value, details) => `${value} of ${details.max} files, ${details.formatted}`
 }
+
+export { mount }

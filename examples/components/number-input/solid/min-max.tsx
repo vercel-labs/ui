@@ -1,13 +1,13 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 
-export function Example() {
+function Example() {
   return (
     <Field>
       <FieldLabel>Guests</FieldLabel>
@@ -43,7 +43,9 @@ export function Example() {
           </NumberInputIncrement>
         </NumberInputGroup>
       </NumberInput>
-      <FieldDescription>Between 1 and 8 guests.</FieldDescription>
+      <FieldDescription>Tables seat between 1 and 8 guests.</FieldDescription>
     </Field>
   )
 }
+
+export { Example }

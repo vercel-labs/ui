@@ -1,20 +1,18 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let status = $state("")
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <OTPInput
-    aria-label="Verification code"
-    onValueChange={() => (status = '')}
-    onValueCommit={(value, details) => (status = `Checking ${value}, from ${details.reason}.`)}
-  >
+<Field>
+  <FieldLabel>Verification code</FieldLabel>
+  <OTPInput onValueCommit={(value, details) => log(`Checking ${value} (${details.reason})`)}>
     <OTPInputGroup>
-      {#each { length: 6 } as _, index}
-        <OTPInputSlot index={index} />
+      {#each [0, 1, 2, 3, 4, 5] as index (index)}
+        <OTPInputSlot {index} />
       {/each}
     </OTPInputGroup>
   </OTPInput>
-  <output data-slot="output">{status}</output>
-</div>
+</Field>

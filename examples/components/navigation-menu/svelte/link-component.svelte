@@ -9,6 +9,7 @@
     NavigationMenuTrigger,
     NavigationMenuViewport,
   } from "@ui-sdk/svelte/navigation-menu"
+  import { useLog } from "../../../shared/svelte/log"
 
   const gettingStarted = [
     {
@@ -27,50 +28,50 @@
       description: "Style parts with data attributes, CSS variables and any CSS.",
     },
   ]
+
+  const log = useLog()
   let route = $state("#introduction")
 
-  function navigate(event: MouseEvent, to: string) {
+  function navigate(event: MouseEvent, href: string) {
     event.preventDefault()
-    route = to
+    route = href
+    log(`Navigated to ${href}`)
   }
 </script>
 
-<div data-slot="stack">
-  <NavigationMenu aria-label="Docs">
-    <NavigationMenuList>
-      <NavigationMenuItem value="guides">
-        <NavigationMenuTrigger>
-          Guides
-          <ChevronDownIcon />
-        </NavigationMenuTrigger>
-        <NavigationMenuContent>
-          <ul>
-            {#each gettingStarted as page (page.href)}
-              <li>
-                <NavigationMenuLink
-                  href={page.href}
-                  current={route === page.href}
-                  onclick={(event) => navigate(event, page.href)}
-                >
-                  <span>{page.title}</span>
-                  <span data-slot="hint">{page.description}</span>
-                </NavigationMenuLink>
-              </li>
-            {/each}
-          </ul>
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-      <NavigationMenuItem>
-        <NavigationMenuLink
-          href="#components"
-          current={route === "#components"}
-          onclick={(event) => navigate(event, "#components")}
-        >
-          Components
-        </NavigationMenuLink>
-      </NavigationMenuItem>
-    </NavigationMenuList>
-    <NavigationMenuViewport />
-  </NavigationMenu>
-  <output data-slot="output">Route: {route}</output>
-</div>
+<NavigationMenu aria-label="Docs">
+  <NavigationMenuList>
+    <NavigationMenuItem value="guides">
+      <NavigationMenuTrigger>
+        Guides
+        <ChevronDownIcon />
+      </NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul>
+          {#each gettingStarted as page (page.title)}
+            <li>
+              <NavigationMenuLink
+                href={page.href}
+                current={route === page.href}
+                onclick={(event) => navigate(event, page.href)}
+              >
+                <span>{page.title}</span>
+                <span data-slot="hint">{page.description}</span>
+              </NavigationMenuLink>
+            </li>
+          {/each}
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+    <NavigationMenuItem>
+      <NavigationMenuLink
+        href="#components"
+        current={route === "#components"}
+        onclick={(event) => navigate(event, "#components")}
+      >
+        Components
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+  <NavigationMenuViewport sideOffset={8} />
+</NavigationMenu>

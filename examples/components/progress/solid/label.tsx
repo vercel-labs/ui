@@ -6,7 +6,7 @@ import {
   ProgressValue,
 } from "@ui-sdk/solid/progress"
 
-export function Example() {
+function Example() {
   return (
     <Progress value={56}>
       <ProgressLabel>Upload progress</ProgressLabel>
@@ -17,3 +17,5 @@ export function Example() {
     </Progress>
   )
 }
+
+export { Example }

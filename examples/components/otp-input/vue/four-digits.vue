@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/vue/otp-input"
 </script>
 
 <template>
-  <OTPInput :max-length="4" text-align="center" aria-label="PIN">
-    <OTPInputGroup>
-      <OTPInputSlot v-for="index in 4" :key="index" :index="index - 1" />
-    </OTPInputGroup>
-  </OTPInput>
+  <Field>
+    <FieldLabel>PIN</FieldLabel>
+    <OTPInput :max-length="4" text-align="center">
+      <OTPInputGroup>
+        <OTPInputSlot v-for="index in [0, 1, 2, 3]" :key="index" :index="index" />
+      </OTPInputGroup>
+    </OTPInput>
+  </Field>
 </template>

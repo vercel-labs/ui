@@ -6,11 +6,10 @@
     ProgressTrack,
     ProgressValue,
   } from "@ui-sdk/svelte/progress"
-
 </script>
 
 <Progress value={60}>
-  <ProgressLabel>Loading</ProgressLabel>
+  <ProgressLabel>Exporting video</ProgressLabel>
   <ProgressValue />
   <ProgressTrack>
     <ProgressIndicator />

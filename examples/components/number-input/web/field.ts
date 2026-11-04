@@ -2,11 +2,11 @@ import "@ui-sdk/web/number-input"
 import "@ui-sdk/web/field"
 import { createElement, Minus, Plus } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
-      <ui-field-label>Quantity</ui-field-label>
-      <ui-number-input default-value="1" min="1">
+      <ui-field-label>Tickets</ui-field-label>
+      <ui-number-input default-value="2" min="1">
         <ui-number-input-group>
           <ui-number-input-decrement>
             <button aria-label="Decrease">
@@ -23,7 +23,9 @@ export function mount(root: HTMLElement) {
           </ui-number-input-increment>
         </ui-number-input-group>
       </ui-number-input>
-      <ui-field-description>How many seats to book.</ui-field-description>
+      <ui-field-description>Each ticket admits one person to the workshop.</ui-field-description>
     </ui-field>
   `
 }
+
+export { mount }

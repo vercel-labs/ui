@@ -3,27 +3,28 @@ import { MinusIcon, PlusIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/vue/number-input"
-import { ref, useId } from "vue"
+import { useId } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const submitted = ref("")
+const log = useLog()
 const form = useId()
 
 function onSubmit(event: Event) {
   const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
     ([name, value]) => `${name}=${value}`,
   )
-  submitted.value = data.join(", ")
+  log(`Submitted ${data.join(", ")}`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <form data-slot="stack" :id="form" @submit.prevent="onSubmit" @reset="submitted = ''">
+    <form :id="form" data-slot="stack" @submit.prevent="onSubmit">
       <Field>
         <FieldLabel>Quantity</FieldLabel>
         <NumberInput name="quantity" :default-value="2" :min="1">
@@ -42,9 +43,9 @@ function onSubmit(event: Event) {
         <FieldLabel>Tip</FieldLabel>
         <NumberInput
           name="tip"
-          :default-value="1234.5"
+          :default-value="4.5"
           :min="0"
-          :step="0.01"
+          :step="0.5"
           :format="{ style: 'currency', currency: 'USD' }"
         >
           <NumberInputGroup>
@@ -58,10 +59,6 @@ function onSubmit(event: Event) {
           </NumberInputGroup>
         </NumberInput>
       </Field>
-      <div data-slot="row">
-        <button type="submit">Save</button>
-        <button type="reset">Reset</button>
-      </div>
     </form>
     <Field>
       <FieldLabel>Gift cards</FieldLabel>
@@ -77,6 +74,9 @@ function onSubmit(event: Event) {
         </NumberInputGroup>
       </NumberInput>
     </Field>
-    <output data-slot="output">{{ submitted ? `Submitted: ${submitted}` : "" }}</output>
+    <div data-slot="row">
+      <button type="reset" :form="form">Reset</button>
+      <button type="submit" :form="form" data-variant="solid">Save</button>
+    </div>
   </div>
 </template>

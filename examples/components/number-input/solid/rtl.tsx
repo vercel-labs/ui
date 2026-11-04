@@ -1,13 +1,13 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Field>
@@ -48,3 +48,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

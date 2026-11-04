@@ -1,25 +1,37 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
 import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [value, setValue] = createSignal<number | null>(4)
-  const [committed, setCommitted] = createSignal("")
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => setValue(4)}>
+          Reset to 4
+        </button>
+        <button type="button" onClick={() => setValue(null)}>
+          Clear
+        </button>
+      </div>
       <Field>
         <FieldLabel>Servings</FieldLabel>
         <NumberInput
           value={value()}
-          onValueChange={(next) => setValue(next)}
-          onValueCommit={(next, details) => setCommitted(`${next ?? "empty"}, after ${details.reason}`)}
+          onValueChange={(next, details) => {
+            setValue(next)
+            log(`Value ${next ?? "empty"} (${details.reason})`)
+          }}
+          onValueCommit={(next, details) => log(`Committed ${next ?? "empty"} (${details.reason})`)}
           min={1}
           max={12}
         >
@@ -55,18 +67,8 @@ export function Example() {
           </NumberInputGroup>
         </NumberInput>
       </Field>
-      <div data-slot="row">
-        <button type="button" onClick={() => setValue(4)}>
-          Reset to 4
-        </button>
-        <button type="button" onClick={() => setValue(null)}>
-          Clear
-        </button>
-      </div>
-      <output data-slot="output">
-        <span>Value: {value() ?? "empty"}</span>
-        <span>Committed: {committed() || "nothing yet"}</span>
-      </output>
     </div>
   )
 }
+
+export { Example }

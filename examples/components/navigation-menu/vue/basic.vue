@@ -20,17 +20,17 @@ import {
 const gettingStarted = [
   {
     title: "Introduction",
-    href: "https://example.com/docs",
+    href: "#",
     description: "Unstyled components with one core for every framework.",
   },
   {
     title: "Installation",
-    href: "https://example.com/docs/installation",
+    href: "#",
     description: "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
-    href: "https://example.com/docs/styling",
+    href: "#",
     description: "Style parts with data attributes, CSS variables and any CSS.",
   },
 ]
@@ -38,41 +38,41 @@ const gettingStarted = [
 const components = [
   {
     title: "Alert Dialog",
-    href: "https://example.com/docs/components/alert-dialog",
+    href: "#",
     description: "Asks for a decision before anything else on the page can be used.",
   },
   {
     title: "Hover Card",
-    href: "https://example.com/docs/components/hover-card",
+    href: "#",
     description: "A preview of what a link points to, for people who pause on it.",
   },
   {
     title: "Progress",
-    href: "https://example.com/docs/components/progress",
+    href: "#",
     description: "Shows how far along a task is, like an upload.",
   },
   {
     title: "Scroll Area",
-    href: "https://example.com/docs/components/scroll-area",
+    href: "#",
     description: "Scrolls its content with scrollbars you can style.",
   },
   {
     title: "Tabs",
-    href: "https://example.com/docs/components/tabs",
+    href: "#",
     description: "Shows one panel of content at a time, picked from a list of tabs.",
   },
   {
     title: "Tooltip",
-    href: "https://example.com/docs/components/tooltip",
+    href: "#",
     description: "A short label for a control, shown on hover or keyboard focus.",
   },
 ]
 
 const statuses = [
-  { title: "Backlog", href: "https://example.com/issues/backlog", icon: CircleQuestionMarkIcon },
-  { title: "To do", href: "https://example.com/issues/to-do", icon: CircleIcon },
-  { title: "Done", href: "https://example.com/issues/done", icon: CircleCheckIcon },
-  { title: "All issues", href: "https://example.com/issues", icon: ArrowRightIcon, mirror: true },
+  { title: "Backlog", href: "#", icon: CircleQuestionMarkIcon },
+  { title: "To do", href: "#", icon: CircleIcon },
+  { title: "Done", href: "#", icon: CircleCheckIcon },
+  { title: "All issues", href: "#", icon: ArrowRightIcon, mirror: true },
 ]
 </script>
 
@@ -87,14 +87,14 @@ const statuses = [
         <NavigationMenuContent>
           <ul data-slot="grid">
             <li>
-              <NavigationMenuLink href="https://example.com" data-variant="featured">
+              <NavigationMenuLink href="#" data-variant="featured">
                 <span>ui-sdk</span>
                 <span data-slot="hint">
                   Accessible components for React, Vue, Svelte, Solid and Web Components.
                 </span>
               </NavigationMenuLink>
             </li>
-            <li v-for="page in gettingStarted" :key="page.href">
+            <li v-for="page in gettingStarted" :key="page.title">
               <NavigationMenuLink :href="page.href">
                 <span>{{ page.title }}</span>
                 <span data-slot="hint">{{ page.description }}</span>
@@ -110,7 +110,7 @@ const statuses = [
         </NavigationMenuTrigger>
         <NavigationMenuContent>
           <ul data-slot="grid">
-            <li v-for="page in components" :key="page.href">
+            <li v-for="page in components" :key="page.title">
               <NavigationMenuLink :href="page.href">
                 <span>{{ page.title }}</span>
                 <span data-slot="hint">{{ page.description }}</span>
@@ -126,7 +126,7 @@ const statuses = [
         </NavigationMenuTrigger>
         <NavigationMenuContent>
           <ul>
-            <li v-for="status in statuses" :key="status.href">
+            <li v-for="status in statuses" :key="status.title">
               <NavigationMenuLink :href="status.href">
                 <NavigationMenuLinkIcon :mirror="status.mirror">
                   <component :is="status.icon" />
@@ -138,9 +138,9 @@ const statuses = [
         </NavigationMenuContent>
       </NavigationMenuItem>
       <NavigationMenuItem>
-        <NavigationMenuLink href="https://example.com/docs">Docs</NavigationMenuLink>
+        <NavigationMenuLink href="#">Docs</NavigationMenuLink>
       </NavigationMenuItem>
     </NavigationMenuList>
-    <NavigationMenuViewport />
+    <NavigationMenuViewport :side-offset="8" />
   </NavigationMenu>
 </template>

@@ -17,17 +17,17 @@
       links: [
         {
           title: "Introduction",
-          href: "https://example.com/docs",
+          href: "#",
           description: "Unstyled components with one core for every framework.",
         },
         {
           title: "Installation",
-          href: "https://example.com/docs/installation",
+          href: "#",
           description: "Add the package for your framework and render your first part.",
         },
         {
           title: "Styling",
-          href: "https://example.com/docs/styling",
+          href: "#",
           description: "Style parts with data attributes, CSS variables and any CSS.",
         },
       ],
@@ -38,22 +38,22 @@
       links: [
         {
           title: "Alert Dialog",
-          href: "https://example.com/docs/components/alert-dialog",
+          href: "#",
           description: "Asks for a decision before anything else on the page can be used.",
         },
         {
           title: "Hover Card",
-          href: "https://example.com/docs/components/hover-card",
+          href: "#",
           description: "A preview of what a link points to, for people who pause on it.",
         },
         {
           title: "Progress",
-          href: "https://example.com/docs/components/progress",
+          href: "#",
           description: "Shows how far along a task is, like an upload.",
         },
         {
           title: "Scroll Area",
-          href: "https://example.com/docs/components/scroll-area",
+          href: "#",
           description: "Scrolls its content with scrollbars you can style.",
         },
       ],
@@ -71,7 +71,7 @@
         </NavigationMenuTrigger>
         <NavigationMenuContent>
           <ul>
-            {#each section.links as link (link.href)}
+            {#each section.links as link (link.title)}
               <li>
                 <NavigationMenuLink href={link.href}>
                   <span>{link.title}</span>
@@ -84,10 +84,10 @@
       </NavigationMenuItem>
     {/each}
     <NavigationMenuItem>
-      <NavigationMenuLink href="https://example.com/docs">
+      <NavigationMenuLink href="#">
         Docs
       </NavigationMenuLink>
     </NavigationMenuItem>
   </NavigationMenuList>
-  <NavigationMenuViewport />
+  <NavigationMenuViewport sideOffset={8} />
 </NavigationMenu>

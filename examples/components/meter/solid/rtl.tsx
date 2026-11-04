@@ -1,6 +1,6 @@
 import { Meter, MeterIndicator, MeterLabel, MeterTrack, MeterValue } from "@ui-sdk/solid/meter"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Meter value={68} locale="ar-EG">
@@ -13,3 +13,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

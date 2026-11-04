@@ -1,15 +1,16 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/solid/number-input"
-import { createSignal, createUniqueId } from "solid-js"
+import { createUniqueId } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+function Example() {
+  const log = useLog()
   const form = createUniqueId()
 
   return (
@@ -20,9 +21,8 @@ export function Example() {
         onSubmit={(event) => {
           event.preventDefault()
           const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(data.join(", "))
+          log(`Submitted ${data.join(", ")}`)
         }}
-        onReset={() => setSubmitted("")}
       >
         <Field>
           <FieldLabel>Quantity</FieldLabel>
@@ -63,9 +63,9 @@ export function Example() {
           <FieldLabel>Tip</FieldLabel>
           <NumberInput
             name="tip"
-            defaultValue={1234.5}
+            defaultValue={4.5}
             min={0}
-            step={0.01}
+            step={0.5}
             format={{ style: "currency", currency: "USD" }}
           >
             <NumberInputGroup>
@@ -100,10 +100,6 @@ export function Example() {
             </NumberInputGroup>
           </NumberInput>
         </Field>
-        <div data-slot="row">
-          <button type="submit">Save</button>
-          <button type="reset">Reset</button>
-        </div>
       </form>
       <Field>
         <FieldLabel>Gift cards</FieldLabel>
@@ -140,7 +136,16 @@ export function Example() {
           </NumberInputGroup>
         </NumberInput>
       </Field>
-      <output data-slot="output">{submitted() ? `Submitted: ${submitted()}` : ""}</output>
+      <div data-slot="row">
+        <button type="reset" form={form}>
+          Reset
+        </button>
+        <button type="submit" form={form} data-variant="solid">
+          Save
+        </button>
+      </div>
     </div>
   )
 }
+
+export { Example }

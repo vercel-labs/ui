@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
 import {
   Pagination,
   PaginationEllipsis,
@@ -8,11 +9,17 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@ui-sdk/vue/pagination"
-import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
+
+const log = useLog()
 </script>
 
 <template>
-  <Pagination aria-label="Pagination" :page-count="10">
+  <Pagination
+    aria-label="Pagination"
+    :page-count="10"
+    @page-change="(page, details) => log(`Page ${page} (${details.reason})`)"
+  >
     <PaginationList v-slot="{ state }">
       <PaginationItem>
         <PaginationPrevious data-variant="ghost">
@@ -21,7 +28,7 @@ import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
         </PaginationPrevious>
       </PaginationItem>
       <PaginationItem v-for="item in state.items" :key="item">
-        <PaginationLink data-variant="ghost" v-if="typeof item === 'number'" :page="item" />
+        <PaginationLink v-if="typeof item === 'number'" data-variant="ghost" :page="item" />
         <PaginationEllipsis v-else>
           <EllipsisIcon />
         </PaginationEllipsis>

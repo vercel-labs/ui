@@ -6,28 +6,35 @@
     ProgressTrack,
     ProgressValue,
   } from "@ui-sdk/svelte/progress"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let value = $state(20)
+  const total = 5
+
+  const log = useLog()
+  let uploaded = $state(1)
+
+  function uploadNext() {
+    if (uploaded >= total) return
+    uploaded++
+    log(`Uploaded ${uploaded} of ${total} photos`)
+  }
+
+  function reset() {
+    uploaded = 0
+    log("Reset to 0 photos")
+  }
 </script>
 
 <div data-slot="stack">
-  <Progress {value}>
-    <ProgressLabel>Uploading files</ProgressLabel>
+  <div data-slot="controls">
+    <button type="button" aria-disabled={uploaded >= total} onclick={uploadNext}>Upload Next</button>
+    <button type="button" onclick={reset}>Reset</button>
+  </div>
+  <Progress value={(uploaded / total) * 100}>
+    <ProgressLabel>Uploading photos</ProgressLabel>
     <ProgressValue />
     <ProgressTrack>
       <ProgressIndicator />
     </ProgressTrack>
   </Progress>
-  <div data-slot="row">
-    <button data-variant="secondary"
-      type="button"
-      aria-disabled={value >= 100}
-      onclick={() => (value = Math.min(100, value + 20))}
-    >
-      Upload more
-    </button>
-    <button data-variant="secondary" type="button" onclick={() => (value = 0)}>
-      Reset
-    </button>
-  </div>
 </div>

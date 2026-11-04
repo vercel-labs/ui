@@ -3,10 +3,10 @@ import { MinusIcon, PlusIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/vue/number-input"
 </script>
 
@@ -18,18 +18,14 @@ import {
         <NumberInputDecrement aria-label="Colder">
           <template #render="{ props, state }">
             <button v-bind="props" :title="state.atBound ? 'As cold as it goes' : 'Colder'">
-              <MinusIcon />
+              <MinusIcon aria-hidden="true" />
             </button>
           </template>
         </NumberInputDecrement>
-        <NumberInputControl>
-          <template #render="{ props, state }">
-            <input v-bind="props" />
-          </template>
-        </NumberInputControl>
+        <NumberInputControl />
         <NumberInputIncrement v-slot="{ state }" aria-label="Warmer">
           <span v-if="state.atBound">Max</span>
-          <PlusIcon v-else />
+          <PlusIcon v-else aria-hidden="true" />
         </NumberInputIncrement>
       </NumberInputGroup>
     </NumberInput>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowLeftIcon, ArrowRightIcon } from "@lucide/vue"
 import {
   Pagination,
   PaginationEllipsis,
@@ -8,7 +9,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@ui-sdk/vue/pagination"
-import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
 </script>
 
 <template>
@@ -17,30 +17,25 @@ import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/vue"
       <PaginationItem>
         <PaginationPrevious aria-label="Previous page">
           <template #render="{ props, state: step }">
-            <button v-bind="props" :title="step.disabled ? undefined : `Page ${step.page}`">
-              <ChevronLeftIcon />
+            <button v-bind="props" :title="step.disabled ? undefined : `Go to page ${step.page}`">
+              <ArrowLeftIcon aria-hidden="true" />
+              <span v-if="!step.disabled" aria-hidden="true">{{ step.page }}</span>
             </button>
           </template>
         </PaginationPrevious>
       </PaginationItem>
       <PaginationItem v-for="item in state.items" :key="item">
-        <PaginationLink v-if="typeof item === 'number'" :page="item">
-          <template #render="{ props, state: link }">
-            <button v-bind="props">
-              {{ link.page }}
-              <span v-if="link.current" aria-hidden="true"></span>
-            </button>
-          </template>
+        <PaginationLink v-if="typeof item === 'number'" v-slot="{ state: link }" :page="item">
+          {{ link.current ? `Page ${link.page}` : link.page }}
         </PaginationLink>
-        <PaginationEllipsis v-else>
-          <EllipsisIcon />
-        </PaginationEllipsis>
+        <PaginationEllipsis v-else />
       </PaginationItem>
       <PaginationItem>
         <PaginationNext aria-label="Next page">
           <template #render="{ props, state: step }">
-            <button v-bind="props" :title="step.disabled ? undefined : `Page ${step.page}`">
-              <ChevronRightIcon />
+            <button v-bind="props" :title="step.disabled ? undefined : `Go to page ${step.page}`">
+              <span v-if="!step.disabled" aria-hidden="true">{{ step.page }}</span>
+              <ArrowRightIcon aria-hidden="true" />
             </button>
           </template>
         </PaginationNext>

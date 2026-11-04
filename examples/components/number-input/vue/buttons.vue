@@ -2,10 +2,10 @@
 import { MinusIcon, PlusIcon } from "@lucide/vue"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/vue/number-input"
 </script>
 
@@ -13,11 +13,11 @@ import {
   <NumberInput :default-value="1" :min="0">
     <NumberInputGroup>
       <NumberInputDecrement aria-label="Decrease">
-        <MinusIcon />
+        <MinusIcon aria-hidden="true" />
       </NumberInputDecrement>
       <NumberInputControl aria-label="Quantity" />
       <NumberInputIncrement aria-label="Increase">
-        <PlusIcon />
+        <PlusIcon aria-hidden="true" />
       </NumberInputIncrement>
     </NumberInputGroup>
   </NumberInput>

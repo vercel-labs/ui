@@ -3,12 +3,11 @@
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     NumberInput,
+    NumberInputControl,
     NumberInputDecrement,
     NumberInputGroup,
     NumberInputIncrement,
-    NumberInputControl,
   } from "@ui-sdk/svelte/number-input"
-
 </script>
 
 <Field>
@@ -24,5 +23,5 @@
       </NumberInputIncrement>
     </NumberInputGroup>
   </NumberInput>
-  <FieldDescription>Between 1 and 8 guests.</FieldDescription>
+  <FieldDescription>Tables seat between 1 and 8 guests.</FieldDescription>
 </Field>

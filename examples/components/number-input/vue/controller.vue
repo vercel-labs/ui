@@ -1,43 +1,50 @@
 <script setup lang="ts">
-import { ZoomInIcon, ZoomOutIcon } from "@lucide/vue"
+import { MinusIcon, PlusIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   createNumberInputController,
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/vue/number-input"
-import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const zoom = createNumberInputController()
-const reading = ref("")
 </script>
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="zoom.decrement({ large: true })">Zoom Out</button>
+      <button type="button" @click="zoom.increment({ large: true })">Zoom In</button>
+      <button type="button" @click="zoom.setValue(100)">Actual Size</button>
+      <button type="button" @click="log(`Zoom is ${zoom.getValue()}%`)">Read</button>
+      <button type="button" @click="zoom.focus()">Focus</button>
+    </div>
     <Field>
       <FieldLabel>Zoom</FieldLabel>
-      <NumberInput :default-value="100" :min="10" :max="400" :step="10" :controller="zoom">
+      <NumberInput
+        :default-value="100"
+        :min="10"
+        :max="400"
+        :step="10"
+        :format="{ style: 'unit', unit: 'percent' }"
+        :controller="zoom"
+        @value-change="(value, details) => log(`Zoom ${value ?? 'empty'}% (${details.reason})`)"
+      >
         <NumberInputGroup>
-          <NumberInputDecrement aria-label="Zoom out">
-            <ZoomOutIcon aria-hidden="true" />
+          <NumberInputDecrement aria-label="Decrease">
+            <MinusIcon aria-hidden="true" />
           </NumberInputDecrement>
           <NumberInputControl />
-          <NumberInputIncrement aria-label="Zoom in">
-            <ZoomInIcon aria-hidden="true" />
+          <NumberInputIncrement aria-label="Increase">
+            <PlusIcon aria-hidden="true" />
           </NumberInputIncrement>
         </NumberInputGroup>
       </NumberInput>
     </Field>
-    <div data-slot="row">
-      <button type="button" @click="zoom.decrement({ large: true })">−100</button>
-      <button type="button" @click="zoom.increment()">+10</button>
-      <button type="button" @click="zoom.setValue(100)">Actual size</button>
-      <button type="button" @click="reading = `Zoom is ${zoom.getValue()}.`">Read</button>
-      <button type="button" @click="zoom.focus()">Focus</button>
-    </div>
-    <output data-slot="output">{{ reading }}</output>
   </div>
 </template>

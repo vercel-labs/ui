@@ -5,7 +5,7 @@ description: Navigate pages with buttons, links, or your router.
 
 <ComponentExample
   name="pagination/basic"
-  caption="Choose a page, or use Previous and Next. The step at either end stays focusable as a button."
+  caption="Choose a page, or use Previous and Next. The console logs each page and its reason, and the step at either end stays focusable as a button."
 />
 
 ## Installation
@@ -35,164 +35,241 @@ Pagination
 
 Name the navigation with `aria-label`, then put the page links and steps in a list.
 
-`items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
+The list's default slot receives its state, whose `items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
 
 `PaginationLink` shows its page number unless you supply children. The current link gets `aria-current="page"` and `data-current`. `PaginationEllipsis` shows “…” and is hidden from screen readers.
 
 Give Previous, Next, First, and Last text or an `aria-label`. At an end, a step gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order.
 
-## Examples
+## Usage
 
-### Simple
-
-Pages only, with no steps. With five pages, the range has no gaps, so the links can be written out.
-
-<ComponentExample
-  name="pagination/simple"
-  caption="Choose one of five pages without Previous or Next controls."
-/>
-
-### Icons Only
-
-First, Previous, Next and Last as icon buttons, each named with `aria-label`, around a line that says where you are. With no page links, that line is a live region, so screen readers hear the new page after a step.
-
-The list's default slot receives its state, which has `page` and `pageCount`.
-
-<ComponentExample
-  name="pagination/icons-only"
-  caption="Use the named icon buttons. The live page count announces each change."
-/>
-
-### Links
-
-Pass `get-href`, a function from a page to its URL, and every part becomes a link.
-
-Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
-
-A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
-
-<ComponentExample
-  name="pagination/links"
-  caption="Choose a page and watch the URL hash change. These controls are real links."
-/>
-
-### Router Links
-
-Render your router's link to page on the client. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
-
-Here the page comes from the URL, like your router's search params, so the pagination is
-[controlled](#controlled) by the route.
-
-Render the router's link with the `render` slot. With Vue Router, use `RouterLink`'s `custom` form and bind the part's props to your own `<a>`, then its `navigate` after them. The pagination's click handler then runs first, and the link only marks the current page.
+Import the parts and put them together:
 
 ```vue
-<PaginationLink :page="item">
-  <template #render="{ props, children }">
-    <RouterLink :to="props.href" custom v-slot="{ href, navigate }">
-      <a v-bind="props" :href="href" @click="navigate"><component :is="children" /></a>
-    </RouterLink>
-  </template>
-</PaginationLink>
+<script setup lang="ts">
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationList,
+  PaginationNext,
+  PaginationPrevious,
+} from "@ui-sdk/vue/pagination"
+</script>
+
+<template>
+  <Pagination aria-label="Pagination" :page-count="10">
+    <PaginationList v-slot="{ state }">
+      <PaginationItem>
+        <PaginationPrevious>Previous</PaginationPrevious>
+      </PaginationItem>
+      <PaginationItem v-for="item in state.items" :key="item">
+        <PaginationLink v-if="typeof item === 'number'" :page="item" />
+        <PaginationEllipsis v-else />
+      </PaginationItem>
+      <PaginationItem>
+        <PaginationNext>Next</PaginationNext>
+      </PaginationItem>
+    </PaginationList>
+  </Pagination>
+</template>
 ```
 
-<ComponentExample
-  name="pagination/router"
-  caption="Choose a page. The example updates the URL and current page without reloading."
-/>
+## Total and Page Size
 
-## Behavior and Options
-
-### Controlled
-
-Bind `v-model:page` to control the pagination, and listen to `@page-change` for the reason.
-
-Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `details.cancel()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
-
-<ComponentExample
-  name="pagination/controlled"
-  caption="Choose a page to see the value and change reason kept by the application."
-/>
-
-### Default Page
-
-`default-page` is the page it starts on, when uncontrolled. It's 1 by default.
-
-<ComponentExample name="pagination/default-page" caption="Start on page 5, then choose another page." />
-
-### Siblings
-
-`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
-
-<ComponentExample
-  name="pagination/siblings"
-  caption="Start on page 10 with two neighboring pages on either side."
-/>
-
-### Boundaries
-
-`boundaries` is how many pages always show at each end, 1 by default.
-
-<ComponentExample
-  name="pagination/boundaries"
-  caption="Keep two page links visible at each end of the range."
-/>
-
-### Total and Page Size
-
-Instead of `page-count`, pass `total`, how many items there are, and `page-size`, how many fit on a page (10
-by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
+Instead of `page-count`, pass `total`, how many items there are, and `page-size`, how many fit on a page (10 by default). Pagination calculates the page count, with a minimum of one. This example resets to page 1 when the page size changes.
 
 A page past the end, like after the count shrinks, reads as the last page.
 
 <ComponentExample
   name="pagination/total"
-  caption="Choose a page, then change Rows per page. This example resets to page 1 when the size changes."
+  caption="Choose a page, then change Rows per page. The console logs each change, and a new size starts again at page 1."
 />
 
-### Paging from Anywhere
+## Simple
 
-A [controller](#controller), from `createPaginationController()`, pages the pagination from anywhere, like
-buttons elsewhere on the page or a keyboard shortcut, without controlling it. Pass it as `controller`.
+With only a few pages, the range has no gaps, so you can write the links out and leave the steps off.
+
+```vue
+<Pagination aria-label="Pagination" :page-count="5">
+  <PaginationList>
+    <PaginationItem v-for="page in [1, 2, 3, 4, 5]" :key="page">
+      <PaginationLink :page="page" />
+    </PaginationItem>
+  </PaginationList>
+</Pagination>
+```
+
+## Links
+
+Pass `get-href` to map each page to a URL. Page links and steps then render as anchors.
+
+```vue
+<Pagination aria-label="Pagination" :page-count="10" :get-href="(page) => `/posts?page=${page}`">
+  ...
+</Pagination>
+```
+
+Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
+
+A step at its end loses its `href` and leaves the tab order, but keeps focus if it already had it. During navigation, its original `href` stays in place so Next cannot accidentally follow the next page's URL.
+
+## Router Links
+
+Render your router's link to page on the client, in the `render` slot. With Vue Router, use `RouterLink`'s `custom` form and bind the part's props to your own `<a>`, then its `navigate` after them. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
+
+Read the page from the URL, like your router's search params, so the route [controls](#controlled) the pagination.
+
+```vue
+<script setup lang="ts">
+const route = useRoute()
+const page = computed(() => Number(route.query.page ?? 1))
+</script>
+
+<template>
+  <Pagination aria-label="Pagination" :page-count="10" :page="page" :get-href="(page) => `?page=${page}`">
+    <PaginationList v-slot="{ state }">
+      <PaginationItem v-for="item in state.items" :key="item">
+        <PaginationLink v-if="typeof item === 'number'" :page="item">
+          <template #render="{ props, children }">
+            <RouterLink v-slot="{ href, navigate }" :to="props.href" custom>
+              <a v-bind="props" :href="href" @click="navigate"><component :is="children" /></a>
+            </RouterLink>
+          </template>
+        </PaginationLink>
+        <PaginationEllipsis v-else />
+      </PaginationItem>
+    </PaginationList>
+  </Pagination>
+</template>
+```
+
+## Controlled
+
+Bind `v-model:page` to control the pagination, and listen to `@page-change` for the reason.
+
+```vue
+<script setup lang="ts">
+const page = ref(1)
+</script>
+
+<template>
+  <Pagination v-model:page="page" aria-label="Pagination" :page-count="10"> ... </Pagination>
+</template>
+```
+
+Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `details.cancel()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
+
+## Default Page
+
+`default-page` is the page it starts on, when uncontrolled. It's 1 by default.
+
+```vue
+<Pagination aria-label="Pagination" :page-count="10" :default-page="5">
+  ...
+</Pagination>
+```
+
+## Siblings
+
+`siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
+
+```vue
+<Pagination aria-label="Pagination" :page-count="20" :default-page="10" :siblings="2">
+  ...
+</Pagination>
+```
+
+## Boundaries
+
+`boundaries` is how many pages always show at each end, 1 by default.
+
+```vue
+<Pagination aria-label="Pagination" :page-count="20" :default-page="10" :boundaries="2">
+  ...
+</Pagination>
+```
+
+## Paging from Anywhere
+
+A [controller](#controller), from `createPaginationController()`, pages the pagination from anywhere, like buttons elsewhere on the page or a keyboard shortcut, without controlling it. Pass it as `controller`.
+
+```vue
+<script setup lang="ts">
+const pagination = createPaginationController()
+</script>
+
+<template>
+  <button @click="pagination.next()">Next Page</button>
+  <Pagination aria-label="Pagination" :page-count="10" :controller="pagination"> ... </Pagination>
+</template>
+```
+
+## Your Own Markup
+
+`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Import it from `@ui-sdk/core/pagination`. Here it keeps a strip of slide dots the same length however many slides there are.
+
+```vue
+<script setup lang="ts">
+import { paginationRange } from "@ui-sdk/core/pagination"
+
+const items = computed(() =>
+  paginationRange({ page: slide.value, pageCount: 20, siblings: 2, boundaries: 1 }),
+)
+</script>
+
+<template>
+  <div role="group" aria-label="Slides">
+    <template v-for="item in items" :key="item">
+      <button
+        v-if="typeof item === 'number'"
+        :aria-label="`Slide ${item}`"
+        :aria-current="item === slide ? 'true' : undefined"
+        @click="slide = item"
+      />
+      <span v-else aria-hidden="true" />
+    </template>
+  </div>
+</template>
+```
+
+## Custom Rendering
+
+Every part takes a `render` slot, which receives the props to bind and the part's state: whether a link is `current`, and for a step, the `page` it goes to and whether it's `disabled`. The default slot receives the state too.
 
 <ComponentExample
-  name="pagination/controller"
-  caption="Use the buttons below the pagination to move it through a controller."
+  name="pagination/render"
+  caption="Choose a page. The current page widens to say Page 3, and each arrow shows the page it goes to."
 />
-
-## Focus
-
-Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
 
 ## Styling
 
 Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-current` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
 
-```vue
-<PaginationLink :page="3" class="aria-[current=page]:border data-current:font-medium" />
-<PaginationNext class="aria-disabled:opacity-50">Next</PaginationNext>
-```
+Each part has a `data-slot`, such as `pagination-link`, and its state attributes are listed under [Data Attributes](#data-attributes). The root, list, items and ellipsis have none.
 
-<DataAttributes component="pagination" />
+## Data Attributes
 
-## Custom Rendering
+### PaginationLink [#data-attributes-paginationlink]
 
-Every part takes a `render` slot, which receives the props to bind
-and the part's state: whether a link is `current`, and for a step, the `page` it goes to and whether it's
-`disabled`. The default slot receives the state too.
+<DataAttributes component="pagination" part="link" />
 
-<ComponentExample
-  name="pagination/render"
-  caption="Choose a page. The current page shows a dot, and step titles show their destination."
-/>
+### PaginationPrevious [#data-attributes-paginationprevious]
 
-### Your Own Markup
+<DataAttributes component="pagination" part="previous" />
 
-`paginationRange({ page, pageCount, siblings, boundaries })` is the range the parts use, as a pure function. It runs anywhere, like on the server, in an email or for a UI that isn't a list of pages. Here it keeps a strip of slide dots the same length however many slides there are.
+### PaginationNext [#data-attributes-paginationnext]
 
-<ComponentExample
-  name="pagination/range"
-  caption="Choose a slide using the same range calculation without pagination parts."
-/>
+<DataAttributes component="pagination" part="next" />
+
+### PaginationFirst [#data-attributes-paginationfirst]
+
+<DataAttributes component="pagination" part="first" />
+
+### PaginationLast [#data-attributes-paginationlast]
+
+<DataAttributes component="pagination" part="last" />
 
 ## API Reference
 
@@ -255,7 +332,15 @@ Events get the new page first, then the details. `v-model` only updates when `@p
 
 ## Accessibility
 
-There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop. Every line below is an automated test.
+There's no WAI-ARIA pattern for pagination. It follows the common practice: a `navigation` landmark named with `aria-label`, a list of links or buttons, and `aria-current="page"` on the current one. The list keeps the `list` role even when styled without bullets, which Safari would otherwise drop.
+
+### Focus
+
+Steps rendered as buttons stay focusable at the ends. A clicked page link keeps focus as the range moves; the primitive also tries to restore focus to that page or step if rendering replaces its element. Key range entries by their value rather than their index.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="pagination" />
 

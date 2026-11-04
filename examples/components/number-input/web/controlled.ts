@@ -1,10 +1,15 @@
 import "@ui-sdk/web/number-input"
 import "@ui-sdk/web/field"
 import { createElement, Minus, Plus } from "lucide"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" data-value="4">Reset to 4</button>
+        <button type="button" data-value="">Clear</button>
+      </div>
       <ui-field>
         <ui-field-label>Servings</ui-field-label>
         <ui-number-input default-value="4" min="1" max="12">
@@ -25,30 +30,20 @@ export function mount(root: HTMLElement) {
           </ui-number-input-group>
         </ui-number-input>
       </ui-field>
-      <div data-slot="row">
-        <button type="button" data-value="4">Reset to 4</button>
-        <button type="button" data-value="">Clear</button>
-      </div>
-      <output data-slot="output">
-        <span>Value: 4</span>
-        <span>Committed: nothing yet</span>
-      </output>
     </div>
   `
-  const field = root.querySelector("ui-number-input") as HTMLElement & { value: number | null }
-  const [shown, committed] = root.querySelectorAll("output span")
-  const show = (value: number | null) => (shown.textContent = `Value: ${value ?? "empty"}`)
-  field.addEventListener("valuechange", (event) =>
-    show((event as CustomEvent<{ value: number | null }>).detail.value),
-  )
+  const field = root.querySelector("ui-number-input")!
+  field.addEventListener("valuechange", (event) => {
+    log(root, `Value ${event.detail.value ?? "empty"} (${event.detail.reason})`)
+  })
   field.addEventListener("valuecommit", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: number | null; reason: string }>).detail
-    committed.textContent = `Committed: ${value ?? "empty"}, after ${reason}`
+    log(root, `Committed ${event.detail.value ?? "empty"} (${event.detail.reason})`)
   })
   root.querySelectorAll<HTMLButtonElement>("[data-value]").forEach((button) => {
     button.addEventListener("click", () => {
       field.value = button.dataset.value ? Number(button.dataset.value) : null
-      show(field.value)
     })
   })
 }
+
+export { mount }
