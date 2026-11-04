@@ -12,7 +12,7 @@ const td = "border-b border-border/60 px-4 py-2.5 align-top"
 function Table({ columns, rows }: { columns: string[]; rows: { key: string; cells: ReactNode[] }[] }) {
   return (
     <Frame variant="flat" className="my-6 overflow-x-auto">
-      <table className="w-full border-collapse text-start text-sm [&_tr:last-child>td]:border-0">
+      <table className="w-full border-collapse text-start text-[15px] sm:text-sm [&_tr:last-child>td]:border-0">
         <thead>
           <tr>
             {columns.map((column) => (
@@ -65,7 +65,7 @@ async function DataAttributes({
   return (
     <>
       <p className="mt-4 text-[15px] text-foreground/75">
-        <code className="rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.1em] font-mono text-[0.85em] text-foreground">
+        <code className="rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.1em] font-mono text-[0.875em] text-foreground">
           [data-slot="{found.dataSlot}"]
         </code>
       </p>

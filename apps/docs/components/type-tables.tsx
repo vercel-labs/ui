@@ -10,7 +10,7 @@ function Text({ children }: { children: string }) {
     part.startsWith("`") ? (
       <code
         key={index}
-        className="rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.1em] font-mono text-[0.85em] text-foreground"
+        className="rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.1em] font-mono text-[0.875em] text-foreground"
       >
         {part.slice(1, -1)}
       </code>
@@ -28,7 +28,9 @@ function Rows({ rows, label }: { rows: Row[]; label: string }) {
         {rows.map((row) => (
           <div key={row.name} className="flex flex-col gap-1.5 px-4 py-3">
             <dt className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <code className="font-mono text-[13px] font-medium text-foreground">{row.name}</code>
+              <code className="font-mono text-[14px] font-medium text-foreground sm:text-[13px]">
+                {row.name}
+              </code>
               {row.status === "experimental" && (
                 <span className="rounded-md bg-foreground/[0.055] px-1.5 py-0.5 text-xs text-subtle">
                   Experimental
@@ -40,12 +42,12 @@ function Rows({ rows, label }: { rows: Row[]; label: string }) {
               {row.detail && <span className="ms-auto text-xs text-subtle">{row.detail}</span>}
             </dt>
             {row.text && (
-              <dd className="text-[14px] leading-relaxed text-foreground/75">
+              <dd className="text-base leading-relaxed text-foreground/75 sm:text-[14px]">
                 <Text>{row.text}</Text>
               </dd>
             )}
             {row.example && (
-              <dd className="text-[13px] text-subtle">
+              <dd className="text-[14px] text-subtle sm:text-[13px]">
                 Example:{" "}
                 <a
                   href={row.example.href}
@@ -57,7 +59,7 @@ function Rows({ rows, label }: { rows: Row[]; label: string }) {
             )}
             {row.members?.length ? (
               <dd>
-                <ul className="mt-1 flex flex-col gap-1.5 border-s border-border/70 ps-3 text-[13px] leading-relaxed">
+                <ul className="mt-1 flex flex-col gap-1.5 border-s border-border/70 ps-3 text-[14px] leading-relaxed sm:text-[13px]">
                   {row.members.map((member) => (
                     <li key={member.name}>
                       <code className="font-mono font-medium text-foreground">{member.name}</code>{" "}
