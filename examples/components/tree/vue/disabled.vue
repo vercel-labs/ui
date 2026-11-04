@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronRightIcon } from "@lucide/vue"
 import { Switch, SwitchThumb } from "@ui-sdk/vue/switch"
 import {
   Tree,
@@ -32,8 +33,10 @@ const items: TreeItemData[] = [
 const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, disabled, children }) =>
     h(TreeItem, { key: value, value, disabled }, () => [
-      children && h(TreeItemIndicator, {}),
-      h(TreeItemLabel, {}, () => label),
+      h(TreeItemLabel, {}, () => [
+        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        label,
+      ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
     ]),
   )
@@ -43,6 +46,14 @@ const focusable = ref(true)
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <label data-slot="label">
+        <Switch v-model:checked="focusable">
+          <SwitchThumb />
+        </Switch>
+        Focusable when disabled
+      </label>
+    </div>
     <Tree
       aria-label="Plans"
       :items="items"
@@ -51,11 +62,5 @@ const focusable = ref(true)
     >
       <Items :items="items" />
     </Tree>
-    <label data-slot="label">
-      <Switch v-model:checked="focusable">
-        <SwitchThumb />
-      </Switch>
-      Focusable when disabled
-    </label>
   </div>
 </template>

@@ -1,3 +1,4 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -6,45 +7,42 @@ import {
   TriggerMenuItem,
   TriggerMenuList,
 } from "@ui-sdk/solid/trigger-menu"
-import { For, createSignal } from "solid-js"
+import { createSignal, For } from "solid-js"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function Example() {
-  const [field, setField] = createSignal<HTMLTextAreaElement>()
-  const [box, setBox] = createSignal<HTMLDivElement>()
+  const [field, setField] = createSignal<HTMLDivElement>()
+
   return (
     <TriggerMenu triggers={[{ char: "@", items: people }]}>
-      <div data-slot="stack">
-        <TriggerMenuInput
-          ref={setField}
-          aria-label="Comment"
-          placeholder="The list opens above, at the field's start"
+      <Field ref={setField}>
+        <FieldLabel>Comment</FieldLabel>
+        <FieldControl
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ to mention someone" />}
         />
-        <div ref={setBox} />
-      </div>
+      </Field>
       <TriggerMenuContent
         side="top"
         align="start"
         sideOffset={8}
-        alignOffset={-4}
+        alignOffset={-5}
         collisionPadding={16}
         anchor={field()}
+        container={field()}
         keepMounted
-        container={box()}
       >
         <TriggerMenuList>
           {(state) => (
             <For each={state.items as TriggerMenuDataItem[]}>
               {(item) => (
-                <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+                <TriggerMenuItem value={item.value} label={item.label}>
                   {item.label}
                 </TriggerMenuItem>
               )}

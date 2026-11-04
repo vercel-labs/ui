@@ -1,8 +1,17 @@
 <script setup lang="ts">
-import type { TreeItemData, TreeItemState } from "@ui-sdk/core/tree"
 import { ChevronRightIcon, LoaderCircleIcon } from "@lucide/vue"
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel, treeFromPaths } from "@ui-sdk/vue/tree"
-import { h, ref, type FunctionalComponent } from "vue"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+  treeFromPaths,
+  type TreeItemData,
+  type TreeItemState,
+} from "@ui-sdk/vue/tree"
+import { h, type FunctionalComponent } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const paths = [
   "src/index.ts",
@@ -26,9 +35,9 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
         {},
         {
           default: ({ state }: { state: TreeItemState }) => [
-            children ? h(TreeItemIndicator, {}, () => h(ChevronRightIcon, {})) : h("span", {}),
+            children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
             h("span", {}, label),
-            state.pending && h(LoaderCircleIcon, {}),
+            state.pending && h(LoaderCircleIcon, { "aria-hidden": "true" }),
           ],
         },
       ),
@@ -36,31 +45,24 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
     ]),
   )
 
-const selected = ref<string | null>("src/index.ts")
-const opened = ref<string | null>(null)
+const log = useLog()
 
 async function open(value: string) {
   if (!files.has(value)) return
   await new Promise((resolve) => setTimeout(resolve, 600))
-  opened.value = value
+  log(`Opened ${value}`)
 }
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Tree
-      v-model:value="selected"
-      aria-label="Project"
-      :paths="paths"
-      :default-expanded="['src']"
-      activation="automatic"
-      :on-action="open"
-    >
-      <Items :items="items" />
-    </Tree>
-    <div data-slot="stack">
-      <span data-slot="hint">{{ selected ?? "Nothing selected" }}</span>
-      <span>{{ opened ? `Opened ${opened}` : "Press Enter to open a file." }}</span>
-    </div>
-  </div>
+  <Tree
+    aria-label="Project"
+    :paths="paths"
+    :default-expanded="['src']"
+    default-value="src/index.ts"
+    activation="automatic"
+    @action="open"
+  >
+    <Items :items="items" />
+  </Tree>
 </template>

@@ -5,9 +5,11 @@ import {
   TreeItemIndicator,
   TreeItemLabel,
   treeFromPaths,
+  type TreeItemData,
 } from "@ui-sdk/solid/tree"
-import type { TreeItemData } from "@ui-sdk/solid/tree"
-import { createSignal, For, Show } from "solid-js"
+import type { JSX } from "@solidjs/web"
+import { For, Show } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const paths = [
   "src/index.ts",
@@ -23,42 +25,50 @@ const paths = [
 const items = treeFromPaths(paths)
 const files = new Set(paths.filter((path) => !path.endsWith("/")))
 
+function Icon(props: { children: JSX.Element }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      {props.children}
+    </svg>
+  )
+}
+
+const ChevronRight = () => (
+  <Icon>
+    <path d="m9 18 6-6-6-6" />
+  </Icon>
+)
+
+const LoaderCircle = () => (
+  <Icon>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </Icon>
+)
+
 function Items(props: { items: TreeItemData[] }) {
   return (
     <For each={props.items}>
       {(item) => (
-        <TreeItem value={item.value} branch={item.children !== undefined}>
+        <TreeItem value={item.value}>
           <TreeItemLabel>
             {(state) => (
               <>
-                <Show when={item.children} fallback={<span />}>
+                <Show when={item.children}>
                   <TreeItemIndicator>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="m9 18 6-6-6-6" />
-                    </svg>
+                    <ChevronRight />
                   </TreeItemIndicator>
                 </Show>
                 <span>{item.label}</span>
                 <Show when={state.pending}>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                  </svg>
+                  <LoaderCircle />
                 </Show>
               </>
             )}
@@ -77,30 +87,22 @@ function Items(props: { items: TreeItemData[] }) {
 }
 
 function Example() {
-  const [selected, setSelected] = createSignal<string | null>("src/index.ts")
-  const [opened, setOpened] = createSignal<string | null>(null)
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Tree
-        aria-label="Project"
-        paths={paths}
-        defaultExpanded={["src"]}
-        value={selected()}
-        onValueChange={setSelected}
-        activation="automatic"
-        onAction={async (value) => {
-          if (!files.has(value)) return
-          await new Promise((resolve) => setTimeout(resolve, 600))
-          setOpened(value)
-        }}
-      >
-        <Items items={items} />
-      </Tree>
-      <div data-slot="stack">
-        <span data-slot="hint">{selected() ?? "Nothing selected"}</span>
-        <span>{opened() ? `Opened ${opened()}` : "Press Enter to open a file."}</span>
-      </div>
-    </div>
+    <Tree
+      aria-label="Project"
+      paths={paths}
+      defaultExpanded={["src"]}
+      defaultValue="src/index.ts"
+      activation="automatic"
+      onAction={async (value) => {
+        if (!files.has(value)) return
+        await new Promise((resolve) => setTimeout(resolve, 600))
+        log(`Opened ${value}`)
+      }}
+    >
+      <Items items={items} />
+    </Tree>
   )
 }
 

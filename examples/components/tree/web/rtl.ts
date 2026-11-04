@@ -1,5 +1,5 @@
 import "@ui-sdk/web/tree"
-import { ChevronLeft, createElement } from "lucide"
+import { ChevronRight, createElement } from "lucide"
 
 type Node = { value: string; label: string; children?: Node[] }
 
@@ -23,16 +23,16 @@ const folders: Node[] = [
   { value: "downloads", label: "التنزيلات" },
 ]
 
-function markup(list: Node[]) {
+function markup(items: Node[]) {
   let html = ""
-  for (const item of list)
+  for (const item of items)
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
           ${
             item.children
-              ? `<ui-tree-item-indicator>${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
-              : `<span></span>`
+              ? `<ui-tree-item-indicator>${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
+              : ""
           }
           ${item.label}
         </ui-tree-item-label>
@@ -41,7 +41,7 @@ function markup(list: Node[]) {
   return html
 }
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div dir="rtl">
       <ui-tree aria-label="الملفات" default-expanded="documents">
@@ -50,3 +50,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

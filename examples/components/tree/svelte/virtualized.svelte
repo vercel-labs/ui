@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { Tree, TreeItem, TreeItemLabel, visibleTreeRows, type TreeItemData } from "@ui-sdk/svelte/tree"
+  import { ChevronRightIcon } from "@lucide/svelte"
+  import {
+    Tree,
+    TreeItem,
+    TreeItemIndicator,
+    TreeItemLabel,
+    visibleTreeRows,
+    type TreeItemData,
+  } from "@ui-sdk/svelte/tree"
 
   const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
     value: `folder-${folder + 1}`,
@@ -10,8 +18,8 @@
     })),
   }))
 
-  const row = 28
-  const height = 280
+  const row = 32
+  const height = 288
 
   let scroller: HTMLDivElement | undefined = $state()
   let scrollTop = $state(0)
@@ -25,26 +33,21 @@
     if (!el) return
     const top = index * row
     if (top < el.scrollTop) el.scrollTop = top
-    else if (top + row > el.scrollTop + el.clientHeight - 8) el.scrollTop = top + row - el.clientHeight + 8
+    else if (top + row > el.scrollTop + el.clientHeight - 10) el.scrollTop = top + row - el.clientHeight + 10
     scrollTop = el.scrollTop
   }
 </script>
 
-<div data-slot="scroll"
-  bind:this={scroller}
-  style="height: {height}px"
-  onscroll={(event) => (scrollTop = event.currentTarget.scrollTop)}
->
+<div data-slot="scroll" bind:this={scroller} onscroll={(event) => (scrollTop = event.currentTarget.scrollTop)}>
   <Tree aria-label="Archive" {items} bind:expanded {onHighlight} style="height: {rows.length * row}px">
-    {#each rows.slice(start, end) as { item, level, index } (item.value)}
-      <TreeItem
-        value={item.value}
-        style="top: {index * row}px; height: {row}px; padding-inline-start: {(level - 1) * 16}px"
-      >
+    {#each rows.slice(start, end) as { item, index } (item.value)}
+      <TreeItem value={item.value} style="top: {index * row}px">
         <TreeItemLabel>
-          <span data-slot="hint" aria-hidden="true">
-            {#if item.children}{expanded.includes(item.value) ? "▾" : "▸"}{/if}
-          </span>
+          {#if item.children}
+            <TreeItemIndicator>
+              <ChevronRightIcon aria-hidden="true" />
+            </TreeItemIndicator>
+          {/if}
           {item.label}
         </TreeItemLabel>
       </TreeItem>

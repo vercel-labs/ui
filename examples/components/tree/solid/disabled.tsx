@@ -32,11 +32,25 @@ function Items(props: { items: TreeItemData[] }) {
   return (
     <For each={props.items}>
       {(item) => (
-        <TreeItem value={item.value} branch={item.children !== undefined} disabled={item.disabled}>
-          <Show when={item.children}>
-            <TreeItemIndicator />
-          </Show>
-          <TreeItemLabel>{item.label}</TreeItemLabel>
+        <TreeItem value={item.value} disabled={item.disabled}>
+          <TreeItemLabel>
+            <Show when={item.children}>
+              <TreeItemIndicator>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </TreeItemIndicator>
+            </Show>
+            {item.label}
+          </TreeItemLabel>
           <Show when={item.children}>
             {(children) => (
               <TreeGroup>
@@ -54,15 +68,17 @@ function Example() {
   const [focusable, setFocusable] = createSignal(true)
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Switch checked={focusable()} onCheckedChange={setFocusable}>
+            <SwitchThumb />
+          </Switch>
+          Focusable when disabled
+        </label>
+      </div>
       <Tree aria-label="Plans" items={items} defaultExpanded={["plans"]} focusableWhenDisabled={focusable()}>
         <Items items={items} />
       </Tree>
-      <label data-slot="label">
-        <Switch checked={focusable()} onCheckedChange={setFocusable}>
-          <SwitchThumb />
-        </Switch>
-        Focusable when disabled
-      </label>
     </div>
   )
 }

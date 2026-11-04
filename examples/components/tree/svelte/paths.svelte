@@ -9,6 +9,7 @@
     treeFromPaths,
     type TreeItemData,
   } from "@ui-sdk/svelte/tree"
+  import { useLog } from "../../../shared/svelte/log"
 
   const paths = [
     "src/index.ts",
@@ -24,27 +25,24 @@
   const items = treeFromPaths(paths)
   const files = new Set(paths.filter((path) => !path.endsWith("/")))
 
-  let selected: string | null = $state("src/index.ts")
-  let opened: string | null = $state(null)
+  const log = useLog()
 
   async function onAction(value: string) {
     if (!files.has(value)) return
     await new Promise((resolve) => setTimeout(resolve, 600))
-    opened = value
+    log(`Opened ${value}`)
   }
 </script>
 
 {#snippet treeItems(nodes: TreeItemData[])}
   {#each nodes as item (item.value)}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
+    <TreeItem value={item.value}>
       <TreeItemLabel>
         {#snippet children(state)}
           {#if item.children}
             <TreeItemIndicator>
               <ChevronRightIcon aria-hidden="true" />
             </TreeItemIndicator>
-          {:else}
-            <span></span>
           {/if}
           <span>{item.label}</span>
           {#if state.pending}
@@ -61,19 +59,13 @@
   {/each}
 {/snippet}
 
-<div data-slot="stack">
-  <Tree
-    aria-label="Project"
-    {paths}
-    defaultExpanded={["src"]}
-    bind:value={selected}
-    activation="automatic"
-    {onAction}
-  >
-    {@render treeItems(items)}
-  </Tree>
-  <div data-slot="stack">
-    <span data-slot="hint">{selected ?? "Nothing selected"}</span>
-    <span>{opened ? `Opened ${opened}` : "Press Enter to open a file."}</span>
-  </div>
-</div>
+<Tree
+  aria-label="Project"
+  {paths}
+  defaultExpanded={["src"]}
+  defaultValue="src/index.ts"
+  activation="automatic"
+  {onAction}
+>
+  {@render treeItems(items)}
+</Tree>

@@ -1,26 +1,25 @@
 import "@ui-sdk/web/trigger-menu"
-import { textFieldAdapter } from "@ui-sdk/web"
+import "@ui-sdk/web/field"
+import { textFieldAdapter } from "@ui-sdk/web/trigger-menu"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-trigger-menu>
-      <textarea aria-label="Notes" placeholder="A textarea you render yourself"></textarea>
+      <ui-field>
+        <ui-field-label>Notes</ui-field-label>
+        <textarea placeholder="Type @ to mention someone"></textarea>
+      </ui-field>
       <ui-trigger-menu-content>
         <ui-trigger-menu-list></ui-trigger-menu-list>
       </ui-trigger-menu-content>
-      <template>
-        <ui-trigger-menu-item>
-        </ui-trigger-menu-item>
-      </template>
     </ui-trigger-menu>
   `
   const menu = root.querySelector("ui-trigger-menu")!

@@ -25,15 +25,16 @@ const files: Node[] = [
       { value: "components/card.tsx", label: "card.tsx" },
     ],
   },
+  { value: "components.json", label: "components.json" },
   { value: "package.json", label: "package.json" },
   { value: "README.md", label: "README.md" },
 ]
 
 const icon = (node: IconNode) => createElement(node, { "aria-hidden": "true" }).outerHTML
 
-function items(list: Node[]) {
+function markup(items: Node[]) {
   let html = ""
-  for (const item of list)
+  for (const item of items)
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
@@ -42,12 +43,11 @@ function items(list: Node[]) {
               ? `<ui-tree-item-indicator>${icon(ChevronRight)}</ui-tree-item-indicator>
                 ${icon(Folder)}
                 ${icon(FolderOpen)}`
-              : `<span></span>
-                ${icon(File)}`
+              : icon(File)
           }
           <span>${item.label}</span>
         </ui-tree-item-label>
-        ${item.children ? `<ui-tree-group>${items(item.children)}</ui-tree-group>` : ""}
+        ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
       </ui-tree-item>`
   return html
 }
@@ -55,7 +55,7 @@ function items(list: Node[]) {
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-tree aria-label="Files" default-expanded="app" default-value="app/page.tsx">
-      ${items(files)}
+      ${markup(files)}
     </ui-tree>
   `
 }

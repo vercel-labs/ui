@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronLeftIcon } from "@lucide/svelte"
+  import { ChevronRightIcon } from "@lucide/svelte"
   import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/svelte/tree"
 
   type Node = { value: string; label: string; children?: Node[] }
@@ -23,19 +23,16 @@
     },
     { value: "downloads", label: "التنزيلات" },
   ]
-
 </script>
 
 {#snippet items(nodes: Node[])}
   {#each nodes as item (item.value)}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
+    <TreeItem value={item.value}>
       <TreeItemLabel>
         {#if item.children}
           <TreeItemIndicator>
-            <ChevronLeftIcon />
+            <ChevronRightIcon aria-hidden="true" />
           </TreeItemIndicator>
-        {:else}
-          <span></span>
         {/if}
         {item.label}
       </TreeItemLabel>

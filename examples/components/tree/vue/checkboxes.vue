@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { ChevronRightIcon } from "@lucide/vue"
 import {
   Tree,
   TreeGroup,
   TreeItem,
   TreeItemCheckbox,
+  TreeItemIndicator,
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/vue/tree"
-import { h, ref, type FunctionalComponent } from "vue"
+import { h, type FunctionalComponent } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const items: TreeItemData[] = [
   {
@@ -39,28 +42,29 @@ const items: TreeItemData[] = [
 const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
-      h(TreeItemCheckbox, {}),
-      h(TreeItemLabel, {}, () => label),
+      h(TreeItemLabel, {}, () => [
+        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        h(TreeItemCheckbox, {}),
+        label,
+      ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
     ]),
   )
 
-const checked = ref(["react", "postgres"])
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Tree
-      v-model:checked="checked"
-      aria-label="Stack"
-      :items="items"
-      checkable
-      mode="none"
-      check-strategy="trunk"
-      :default-expanded="['frontend', 'backend', 'databases']"
-    >
-      <Items :items="items" />
-    </Tree>
-    <p data-slot="hint">Checked: {{ checked.join(", ") || "nothing" }}</p>
-  </div>
+  <Tree
+    aria-label="Stack"
+    :items="items"
+    checkable
+    mode="none"
+    check-strategy="trunk"
+    :default-checked="['react', 'postgres']"
+    @checked-change="(checked) => log(`Checked ${checked.join(', ') || 'nothing'}`)"
+    :default-expanded="['frontend', 'backend', 'databases']"
+  >
+    <Items :items="items" />
+  </Tree>
 </template>

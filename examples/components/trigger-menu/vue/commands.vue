@@ -1,62 +1,53 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
-  type TriggerMenuDataItem,
+  type TriggerMenuSelectDetails,
   TriggerMenu,
-  TriggerMenuContent,
   TriggerMenuHint,
   TriggerMenuInput,
-  TriggerMenuItem,
-  TriggerMenuList,
 } from "@ui-sdk/vue/trigger-menu"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const commands = [
   {
-    value: "model",
-    label: "model",
+    value: "status",
+    label: "status",
     arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
+      { name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] },
+      { name: "until", hint: "[until]", items: ["30m", "1h", "4h", "today"], allowCustomValue: false },
     ],
   },
   { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  { value: "away", label: "away", after: "submit" as const },
   { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
 ]
 
-const last = ref("")
+const log = useLog()
 
-function onSelect(value: string, details: { arguments: Record<string, string> }) {
-  last.value = `/${value} ${JSON.stringify(details.arguments)}`
+function onSubmit(event: Event) {
+  log(`Sent ${new FormData(event.currentTarget as HTMLFormElement).get("message")}`)
 }
 
-function send(event: Event) {
-  last.value = `Sent: ${new FormData(event.currentTarget as HTMLFormElement).get("prompt")}`
+function onSelect(value: string, details: TriggerMenuSelectDetails<string>) {
+  log(["Chose", `/${value}`, ...Object.values(details.arguments)].join(" "))
 }
 </script>
 
 <template>
-  <form data-slot="stack" @submit.prevent="send">
+  <form data-slot="stack" @submit.prevent="onSubmit">
     <TriggerMenu
       :triggers="[{ char: '/', boundary: 'start', type: 'command', items: commands }]"
-      :on-select="onSelect"
+      @select="onSelect"
     >
-      <TriggerMenuInput name="prompt" aria-label="Prompt" placeholder="Try /model or /search" />
+      <Field name="message">
+        <FieldLabel>Message</FieldLabel>
+        <FieldControl>
+          <template #render="{ props }">
+            <TriggerMenuInput v-bind="props" placeholder="Type / for commands" />
+          </template>
+        </FieldControl>
+      </Field>
       <TriggerMenuHint />
-      <TriggerMenuContent>
-        <TriggerMenuList v-slot="{ state }">
-          <TriggerMenuItem
-            v-for="item in state.items as TriggerMenuDataItem[]"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-            :disabled="item.disabled"
-          >
-            {{ item.label }}
-          </TriggerMenuItem>
-        </TriggerMenuList>
-      </TriggerMenuContent>
     </TriggerMenu>
-    <p data-slot="hint">{{ last || "/send submits the form." }}</p>
   </form>
 </template>

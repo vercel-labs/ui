@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import type { TreeAnnouncement, TreeItemState } from "@ui-sdk/core/tree"
 import { ChevronRightIcon, LoaderCircleIcon, RotateCwIcon } from "@lucide/vue"
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/vue/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+  type TreeAnnouncement,
+  type TreeItemState,
+} from "@ui-sdk/vue/tree"
 import { h, ref, type FunctionalComponent } from "vue"
 
 type Node = { value: string; label: string; branch?: boolean }
@@ -32,20 +39,19 @@ const Items: FunctionalComponent<{ items: Node[]; loaded: Record<string, Node[]>
   items.map(({ value, label, branch }) =>
     h(TreeItem, { key: value, value, branch }, () => [
       h(TreeItemLabel, {}, () => [
-        branch
-          ? h(
-              TreeItemIndicator,
-              {},
-              {
-                default: ({ state }: { state: TreeItemState }) =>
-                  state.loading
-                    ? h(LoaderCircleIcon, {})
-                    : state.failed
-                      ? h(RotateCwIcon, {})
-                      : h(ChevronRightIcon, {}),
-              },
-            )
-          : h("span", {}),
+        branch &&
+          h(
+            TreeItemIndicator,
+            {},
+            {
+              default: ({ state }: { state: TreeItemState }) =>
+                state.loading
+                  ? h(LoaderCircleIcon, { "aria-hidden": "true" })
+                  : state.failed
+                    ? h(RotateCwIcon, { "aria-hidden": "true" })
+                    : h(ChevronRightIcon, { "aria-hidden": "true" }),
+            },
+          ),
         label,
       ]),
       loaded[value] && h(TreeGroup, {}, () => h(Items, { items: loaded[value], loaded })),

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronRightIcon } from "@lucide/vue"
 import {
   Tree,
   TreeGroup,
@@ -7,7 +8,8 @@ import {
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/vue/tree"
-import { h, ref, type FunctionalComponent } from "vue"
+import { h, type FunctionalComponent } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const items: TreeItemData[] = [
   {
@@ -34,27 +36,27 @@ const items: TreeItemData[] = [
 const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
-      children && h(TreeItemIndicator, {}),
-      h(TreeItemLabel, {}, () => label),
+      h(TreeItemLabel, {}, () => [
+        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        label,
+      ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
     ]),
   )
 
-const value = ref(["updates", "website"])
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Tree
-      v-model:value="value"
-      aria-label="Folders"
-      :items="items"
-      mode="multiple"
-      :expand-on-press="false"
-      :default-expanded="['inbox', 'projects']"
-    >
-      <Items :items="items" />
-    </Tree>
-    <p data-slot="hint">{{ value.length }} selected</p>
-  </div>
+  <Tree
+    aria-label="Folders"
+    :items="items"
+    mode="multiple"
+    :default-value="['updates', 'website']"
+    @value-change="(value) => Array.isArray(value) && log(`${value.length} selected: ${value.join(', ')}`)"
+    :expand-on-press="false"
+    :default-expanded="['inbox', 'projects']"
+  >
+    <Items :items="items" />
+  </Tree>
 </template>

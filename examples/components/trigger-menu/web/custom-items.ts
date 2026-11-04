@@ -1,21 +1,24 @@
 import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
 import { createElement, Users } from "lucide"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik", disabled: true },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-trigger-menu>
-      <ui-trigger-menu-input>
-        <textarea aria-label="Message" placeholder="Type @ and a first name"></textarea>
-      </ui-trigger-menu-input>
+      <ui-field>
+        <ui-field-label>Message</ui-field-label>
+        <ui-trigger-menu-input>
+          <textarea placeholder="Type @ and a first name"></textarea>
+        </ui-trigger-menu-input>
+      </ui-field>
       <ui-trigger-menu-content>
         <ui-trigger-menu-list>
           <ui-trigger-menu-group>
@@ -23,16 +26,18 @@ function mount(root: HTMLElement) {
             ${people
               .map(
                 (person) => `
-                  <ui-trigger-menu-item value="${person.value}" label="${person.label}"${person.keywords ? ` keywords="${person.keywords.join(",")}"` : ""}${person.disabled ? " disabled" : ""}>
-                    <span aria-hidden="true" data-slot="badge">${person.label[0]}</span>
+                  <ui-trigger-menu-item value="${person.value}" label="${person.label}"${person.disabled ? " disabled" : ""}>
                     ${person.label}
+                    <span data-slot="hint">${person.disabled ? "Deactivated" : `@${person.value}`}</span>
                   </ui-trigger-menu-item>`,
               )
               .join("")}
           </ui-trigger-menu-group>
           <ui-trigger-menu-separator></ui-trigger-menu-separator>
           <ui-trigger-menu-item value="here" label="here" keywords="everyone,channel">
-            <ui-trigger-menu-item-icon>${createElement(Users, { "aria-hidden": "true" }).outerHTML}</ui-trigger-menu-item-icon>
+            <ui-trigger-menu-item-icon>
+              ${createElement(Users, { "aria-hidden": "true" }).outerHTML}
+            </ui-trigger-menu-item-icon>
             Notify everyone here
           </ui-trigger-menu-item>
         </ui-trigger-menu-list>
@@ -51,9 +56,7 @@ function mount(root: HTMLElement) {
     },
   ]
   menu.addEventListener("select", (event) => {
-    if (event.detail.value === "here") {
-      event.detail.insert("@here ")
-    }
+    if (event.target === menu && event.detail.value === "here") event.detail.insert("@here ")
   })
 }
 

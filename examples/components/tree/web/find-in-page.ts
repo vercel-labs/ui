@@ -1,5 +1,6 @@
 import type { TreeItemData } from "@ui-sdk/core/tree"
 import "@ui-sdk/web/tree"
+import { ChevronRight, createElement } from "lucide"
 
 const items: TreeItemData[] = [
   {
@@ -29,20 +30,31 @@ const items: TreeItemData[] = [
   },
 ]
 
+function markup(items: TreeItemData[]) {
+  let html = ""
+  for (const item of items)
+    html += `
+      <ui-tree-item value="${item.value}">
+        <ui-tree-item-label>
+          ${
+            item.children
+              ? `<ui-tree-item-indicator>${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
+              : ""
+          }
+          ${item.label}
+        </ui-tree-item-label>
+        ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
+      </ui-tree-item>`
+  return html
+}
+
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-tree aria-label="Solar system" hidden-until-found>
-      <template>
-        <ui-tree-item>
-          <ui-tree-item-indicator></ui-tree-item-indicator>
-          <ui-tree-item-label></ui-tree-item-label>
-          <ui-tree-group></ui-tree-group>
-        </ui-tree-item>
-      </template>
+      ${markup(items)}
     </ui-tree>
   `
-  const tree = root.querySelector("ui-tree")!
-  tree.items = items
+  root.querySelector("ui-tree")!.items = items
 }
 
 export { mount }

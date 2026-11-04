@@ -41,7 +41,7 @@ const markup = (items: Node[]) =>
                     ${icon(RotateCw, "failed")}
                     ${icon(ChevronRight, "idle")}
                   </ui-tree-item-indicator>`
-                : `<span></span>`
+                : ""
             }
             ${item.label}
           </ui-tree-item-label>

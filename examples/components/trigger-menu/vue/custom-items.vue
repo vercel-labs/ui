@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { UsersIcon } from "@lucide/vue"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
+  type TriggerDefinition,
   TriggerMenu,
   TriggerMenuContent,
   TriggerMenuGroup,
@@ -10,35 +12,38 @@ import {
   TriggerMenuItemIcon,
   TriggerMenuList,
   TriggerMenuSeparator,
-  type TriggerMenuSelectDetails,
 } from "@ui-sdk/vue/trigger-menu"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik", disabled: true },
 ]
 
-const triggers = [
+const triggers: TriggerDefinition[] = [
   {
     char: "@",
     spaces: 2,
     maxLength: 30,
     pattern: /[\p{L}.'-]/u,
-    filter: "startsWith" as const,
-    insert: (item: { label: string }) => `@${item.label.split(" ")[0]} `,
+    filter: "startsWith",
+    insert: (item) => `@${item.label.split(" ")[0]} `,
   },
 ]
-
-const here = (value: string, details: TriggerMenuSelectDetails<string>) => details.insert("@here ")
 </script>
 
 <template>
   <TriggerMenu :triggers="triggers">
-    <TriggerMenuInput aria-label="Message" placeholder="Type @ and a first name" />
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <FieldControl>
+        <template #render="{ props }">
+          <TriggerMenuInput v-bind="props" placeholder="Type @ and a first name" />
+        </template>
+      </FieldControl>
+    </Field>
     <TriggerMenuContent>
       <TriggerMenuList>
         <TriggerMenuGroup>
@@ -48,15 +53,19 @@ const here = (value: string, details: TriggerMenuSelectDetails<string>) => detai
             :key="person.value"
             :value="person.value"
             :label="person.label"
-            :keywords="person.keywords"
             :disabled="person.disabled"
           >
-            <span aria-hidden="true" data-slot="badge">{{ person.label[0] }}</span>
             {{ person.label }}
+            <span data-slot="hint">{{ person.disabled ? "Deactivated" : `@${person.value}` }}</span>
           </TriggerMenuItem>
         </TriggerMenuGroup>
         <TriggerMenuSeparator />
-        <TriggerMenuItem value="here" label="here" :keywords="['everyone', 'channel']" :on-select="here">
+        <TriggerMenuItem
+          value="here"
+          label="here"
+          :keywords="['everyone', 'channel']"
+          @select="(value, details) => details.insert('@here ')"
+        >
           <TriggerMenuItemIcon>
             <UsersIcon />
           </TriggerMenuItemIcon>

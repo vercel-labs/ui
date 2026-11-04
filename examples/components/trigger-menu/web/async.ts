@@ -1,6 +1,15 @@
 import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
 
-const channels = ["general", "random", "design", "engineering", "marketing", "support"]
+const channels = [
+  "announcements",
+  "design",
+  "design-reviews",
+  "engineering",
+  "general",
+  "launches",
+  "support",
+]
 
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
   return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
@@ -11,7 +20,7 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
             .filter((channel) => channel.includes(query.toLowerCase()))
             .map((channel) => ({ value: channel, label: channel })),
         ),
-      400,
+      600,
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -23,24 +32,45 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-trigger-menu>
-      <div data-slot="stack">
+      <ui-field>
+        <ui-field-label>Message</ui-field-label>
         <ui-trigger-menu-input>
-          <textarea aria-label="Message" placeholder="Type # to link a channel"></textarea>
+          <textarea placeholder="Type # to link a channel"></textarea>
         </ui-trigger-menu-input>
-        <ui-trigger-menu-status></ui-trigger-menu-status>
-      </div>
+      </ui-field>
       <ui-trigger-menu-content>
-        <ui-trigger-menu-empty>No channels found.</ui-trigger-menu-empty>
+        <ui-trigger-menu-status>Loading channels…</ui-trigger-menu-status>
+        <ui-trigger-menu-empty>No channels match “<span></span>”</ui-trigger-menu-empty>
         <ui-trigger-menu-list></ui-trigger-menu-list>
       </ui-trigger-menu-content>
-      <template>
-        <ui-trigger-menu-item>
-        </ui-trigger-menu-item>
-      </template>
     </ui-trigger-menu>
   `
   const menu = root.querySelector("ui-trigger-menu")!
-  menu.triggers = [{ char: "#", type: "channel", items: searchChannels }]
+  const status = root.querySelector("ui-trigger-menu-status")!
+  const query = root.querySelector("ui-trigger-menu-empty span")!
+  const loading = () => {
+    status.textContent = "Loading channels…"
+  }
+  menu.triggers = [
+    {
+      char: "#",
+      type: "channel",
+      items: async (text, context) => {
+        const items = await searchChannels(text, context)
+        status.textContent = items.length
+          ? `${items.length} ${items.length === 1 ? "channel" : "channels"}`
+          : ""
+        return items
+      },
+    },
+  ]
+  menu.addEventListener("openchange", (event) => {
+    if (event.detail.value) loading()
+  })
+  menu.addEventListener("querychange", (event) => {
+    query.textContent = event.detail.value
+    loading()
+  })
 }
 
 export { mount }

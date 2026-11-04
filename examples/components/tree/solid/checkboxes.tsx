@@ -3,10 +3,12 @@ import {
   TreeGroup,
   TreeItem,
   TreeItemCheckbox,
+  TreeItemIndicator,
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/solid/tree"
-import { createSignal, For, Show } from "solid-js"
+import { For, Show } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const items: TreeItemData[] = [
   {
@@ -35,15 +37,30 @@ const items: TreeItemData[] = [
   },
 ]
 
-const initial = ["react", "postgres"]
-
 function Items(props: { items: TreeItemData[] }) {
   return (
     <For each={props.items}>
       {(item) => (
-        <TreeItem value={item.value} branch={item.children !== undefined}>
-          <TreeItemCheckbox />
-          <TreeItemLabel>{item.label}</TreeItemLabel>
+        <TreeItem value={item.value}>
+          <TreeItemLabel>
+            <Show when={item.children}>
+              <TreeItemIndicator>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </TreeItemIndicator>
+            </Show>
+            <TreeItemCheckbox />
+            {item.label}
+          </TreeItemLabel>
           <Show when={item.children}>
             {(children) => (
               <TreeGroup>
@@ -58,23 +75,20 @@ function Items(props: { items: TreeItemData[] }) {
 }
 
 function Example() {
-  const [checked, setChecked] = createSignal(initial)
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Tree
-        aria-label="Stack"
-        items={items}
-        checkable
-        mode="none"
-        checkStrategy="trunk"
-        defaultChecked={initial}
-        onCheckedChange={setChecked}
-        defaultExpanded={["frontend", "backend", "databases"]}
-      >
-        <Items items={items} />
-      </Tree>
-      <p data-slot="hint">Checked: {checked().join(", ") || "nothing"}</p>
-    </div>
+    <Tree
+      aria-label="Stack"
+      items={items}
+      checkable
+      mode="none"
+      checkStrategy="trunk"
+      defaultChecked={["react", "postgres"]}
+      onCheckedChange={(checked) => log(`Checked ${checked.join(", ") || "nothing"}`)}
+      defaultExpanded={["frontend", "backend", "databases"]}
+    >
+      <Items items={items} />
+    </Tree>
   )
 }
 

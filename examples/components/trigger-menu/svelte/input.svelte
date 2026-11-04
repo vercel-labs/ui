@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     type TriggerMenuDataItem,
     TriggerMenu,
@@ -9,26 +10,32 @@
   } from "@ui-sdk/svelte/trigger-menu"
 
   const people = [
-    { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-    { value: "alan", label: "Alan Turing" },
-    { value: "grace", label: "Grace Hopper" },
-    { value: "katherine", label: "Katherine Johnson" },
-    { value: "linus", label: "Linus Torvalds", disabled: true },
-    { value: "margaret", label: "Margaret Hamilton" },
+    { value: "hollis", label: "Hollis Grant" },
+    { value: "ines", label: "Inès Moreau" },
+    { value: "kofi", label: "Kofi Mensah" },
+    { value: "wren", label: "Wren Takahashi" },
+    { value: "tomasz", label: "Tomasz Wójcik" },
   ]
 </script>
 
-<TriggerMenu triggers={[{ char: "@", items: people }]}>
-  <TriggerMenuInput aria-label="Assign to" placeholder="Assign with @">
-    {#snippet render({ props })}
-      <input {...props} />
-    {/snippet}
-  </TriggerMenuInput>
+<TriggerMenu triggers={[{ char: "@", items: people }]} autoHighlight={false} loop={false}>
+  <Field>
+    <FieldLabel>Task</FieldLabel>
+    <FieldControl>
+      {#snippet render({ props })}
+        <TriggerMenuInput {...props} placeholder="Type @ to assign someone">
+          {#snippet render({ props })}
+            <input {...props} />
+          {/snippet}
+        </TriggerMenuInput>
+      {/snippet}
+    </FieldControl>
+  </Field>
   <TriggerMenuContent>
     <TriggerMenuList>
       {#snippet children(state)}
         {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+          <TriggerMenuItem value={item.value} label={item.label}>
             {item.label}
           </TriggerMenuItem>
         {/each}

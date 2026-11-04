@@ -1,34 +1,38 @@
 import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function mount(root: HTMLElement) {
+  const id = `comment-${crypto.randomUUID()}`
   root.innerHTML = `
-    <ui-trigger-menu container="#positioning-box-web">
-      <div data-slot="stack">
+    <ui-trigger-menu>
+      <ui-field id="${id}">
+        <ui-field-label>Comment</ui-field-label>
         <ui-trigger-menu-input>
-          <textarea id="positioning-field-web" aria-label="Comment" placeholder="The list opens above, at the field's start"></textarea>
+          <textarea placeholder="Type @ to mention someone"></textarea>
         </ui-trigger-menu-input>
-        <div id="positioning-box-web"></div>
-      </div>
-      <ui-trigger-menu-content side="top" align="start" side-offset="8" align-offset="-4" collision-padding="16" anchor="#positioning-field-web" keep-mounted>
+      </ui-field>
+      <ui-trigger-menu-content
+        side="top"
+        align="start"
+        side-offset="8"
+        align-offset="-5"
+        collision-padding="16"
+        anchor="#${id}"
+        keep-mounted
+      >
         <ui-trigger-menu-list></ui-trigger-menu-list>
       </ui-trigger-menu-content>
-      <template>
-        <ui-trigger-menu-item>
-        </ui-trigger-menu-item>
-      </template>
     </ui-trigger-menu>
   `
-  const menu = root.querySelector("ui-trigger-menu")!
-  menu.triggers = [{ char: "@", items: people }]
+  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "@", items: people }]
 }
 
 export { mount }

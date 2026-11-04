@@ -29,7 +29,7 @@ function Items(props: { items: Node[] }) {
       {(item) => (
         <TreeItem value={item.value} branch={item.children !== undefined}>
           <TreeItemLabel>
-            <Show when={item.children} fallback={<span />}>
+            <Show when={item.children}>
               <TreeItemIndicator>
                 <svg
                   viewBox="0 0 24 24"
@@ -40,7 +40,7 @@ function Items(props: { items: Node[] }) {
                   stroke-linejoin="round"
                   aria-hidden="true"
                 >
-                  <path d="m15 18-6-6 6-6" />
+                  <path d="m9 18 6-6-6-6" />
                 </svg>
               </TreeItemIndicator>
             </Show>
@@ -59,7 +59,7 @@ function Items(props: { items: Node[] }) {
   )
 }
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Tree aria-label="الملفات" defaultExpanded={["documents"]}>
@@ -68,3 +68,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

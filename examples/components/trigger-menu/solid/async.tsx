@@ -1,3 +1,4 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -10,7 +11,15 @@ import {
 } from "@ui-sdk/solid/trigger-menu"
 import { For } from "solid-js"
 
-const channels = ["general", "random", "design", "engineering", "marketing", "support"]
+const channels = [
+  "announcements",
+  "design",
+  "design-reviews",
+  "engineering",
+  "general",
+  "launches",
+  "support",
+]
 
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
   return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
@@ -21,7 +30,7 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
             .filter((channel) => channel.includes(query.toLowerCase()))
             .map((channel) => ({ value: channel, label: channel })),
         ),
-      400,
+      600,
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -33,27 +42,30 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
 function Example() {
   return (
     <TriggerMenu triggers={[{ char: "#", type: "channel", items: searchChannels }]}>
-      <div data-slot="stack">
-        <TriggerMenuInput aria-label="Message" placeholder="Type # to link a channel" />
+      <Field>
+        <FieldLabel>Message</FieldLabel>
+        <FieldControl
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type # to link a channel" />}
+        />
+      </Field>
+      <TriggerMenuContent>
         <TriggerMenuStatus>
           {(state) =>
             state.loading
               ? "Loading channels…"
-              : state.open
-                ? `${state.count} channels`
-                : state.status === "error"
-                  ? "Couldn't load channels."
-                  : ""
+              : state.count
+                ? `${state.count} ${state.count === 1 ? "channel" : "channels"}`
+                : ""
           }
         </TriggerMenuStatus>
-      </div>
-      <TriggerMenuContent>
-        <TriggerMenuEmpty>No channels found.</TriggerMenuEmpty>
+        <TriggerMenuEmpty>
+          {(state) => (state.empty && !state.loading ? `No channels match “${state.query}”` : null)}
+        </TriggerMenuEmpty>
         <TriggerMenuList>
           {(state) => (
             <For each={state.items as TriggerMenuDataItem[]}>
               {(item) => (
-                <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+                <TriggerMenuItem value={item.value} label={item.label}>
                   {item.label}
                 </TriggerMenuItem>
               )}

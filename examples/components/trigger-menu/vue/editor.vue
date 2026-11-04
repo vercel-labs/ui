@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   type TextEditorAdapter,
   type TriggerMenuDataItem,
@@ -8,29 +9,32 @@ import {
   TriggerMenuList,
   textFieldAdapter,
 } from "@ui-sdk/vue/trigger-menu"
-import { onMounted, ref, shallowRef } from "vue"
+import { type Directive, shallowRef } from "vue"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
-const field = ref<HTMLTextAreaElement | null>(null)
 const editor = shallowRef<TextEditorAdapter>()
-onMounted(() => {
-  if (field.value) {
-    editor.value = textFieldAdapter(field.value)
-  }
-})
+const vEditor: Directive<HTMLTextAreaElement> = {
+  mounted: (field) => (editor.value = textFieldAdapter(field)),
+}
 </script>
 
 <template>
   <TriggerMenu :editor="editor" :triggers="[{ char: '@', items: people }]">
-    <textarea ref="field" aria-label="Notes" placeholder="A textarea you render yourself" />
+    <Field>
+      <FieldLabel>Notes</FieldLabel>
+      <FieldControl>
+        <template #render="{ props }">
+          <textarea v-bind="props" v-editor placeholder="Type @ to mention someone" />
+        </template>
+      </FieldControl>
+    </Field>
     <TriggerMenuContent>
       <TriggerMenuList v-slot="{ state }">
         <TriggerMenuItem
@@ -38,7 +42,6 @@ onMounted(() => {
           :key="item.value"
           :value="item.value"
           :label="item.label"
-          :disabled="item.disabled"
         >
           {{ item.label }}
         </TriggerMenuItem>

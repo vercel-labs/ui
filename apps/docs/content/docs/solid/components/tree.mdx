@@ -32,24 +32,93 @@ Tree
     └── TreeItemLabel
 ```
 
-Give the tree an accessible name and every item a unique `value`. An item with a `TreeGroup` inside it is a branch. The group holds its children; the label names the item.
+Give the tree an accessible name and every item a unique `value`. An item with a `TreeGroup` inside it is a branch. The group holds its children; the label names the item. The indicator and checkbox are optional, and they belong to the item around them, so put them inside its label to make them part of the row.
 
-The tree has one Tab stop. Arrow keys move between visible items, open branches, and return to their parents. The indicator and checkbox are optional; they belong to the item around them, so you can put them inside or beside its label.
+## Usage
 
-## Examples
+Import the parts and put them together:
 
-### Items as Data
+```tsx
+import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/solid/tree"
 
-Pass `items` to give the tree its full hierarchy, including collapsed branches. Each `TreeItemData` has a `value`, a `label`, and optional `children`.
+function Example() {
+  return (
+    <Tree aria-label="Project files">
+      <TreeItem value="src">
+        <TreeItemLabel>
+          <TreeItemIndicator>›</TreeItemIndicator>
+          src
+        </TreeItemLabel>
+        <TreeGroup>
+          <TreeItem value="src/index.ts">
+            <TreeItemLabel>index.ts</TreeItemLabel>
+          </TreeItem>
+        </TreeGroup>
+      </TreeItem>
+      <TreeItem value="package.json">
+        <TreeItemLabel>package.json</TreeItemLabel>
+      </TreeItem>
+    </Tree>
+  )
+}
 
-The tree can render bare parts from the data, or you can render them yourself with a recursive component. Keep `items` on the tree when rendering your own rows so keyboard navigation, item counts, and controllers know the whole hierarchy.
+export { Example }
+```
 
-<ComponentExample
-  name="tree/data"
-  caption="Expand a grocery group and choose an item. The data supplies the hierarchy while the example supplies the markup."
-/>
+## Items as Data
 
-### File Paths
+Pass `items` to give the tree its full hierarchy, including collapsed branches. Each `TreeItemData` has a `value`, a `label`, and optional `children`. With no children of its own, the tree renders bare parts from the data:
+
+```tsx
+const items: TreeItemData[] = [
+  {
+    value: "fruit",
+    label: "Fruit",
+    children: [
+      { value: "apple", label: "Apple" },
+      { value: "banana", label: "Banana" },
+    ],
+  },
+  { value: "bread", label: "Bread" },
+]
+
+function Example() {
+  return <Tree aria-label="Groceries" items={items} />
+}
+```
+
+To render the rows yourself, keep `items` on the tree and map them with a recursive component, so keyboard navigation, item counts, and controllers still know the whole hierarchy:
+
+```tsx
+function Items(props: { items: TreeItemData[] }) {
+  return (
+    <For each={props.items}>
+      {(item) => (
+        <TreeItem value={item.value}>
+          <TreeItemLabel>{item.label}</TreeItemLabel>
+          <Show when={item.children}>
+            {(children) => (
+              <TreeGroup>
+                <Items items={children()} />
+              </TreeGroup>
+            )}
+          </Show>
+        </TreeItem>
+      )}
+    </For>
+  )
+}
+
+function Example() {
+  return (
+    <Tree aria-label="Groceries" items={items}>
+      <Items items={items} />
+    </Tree>
+  )
+}
+```
+
+## File Paths
 
 Pass `paths` for a file explorer. Folders become branches and sort before files; a path ending in `/` represents an empty folder. `treeFromPaths()` returns the same data when you want to render the rows yourself.
 
@@ -57,10 +126,25 @@ Selection and activation are separate. This example uses `activation="automatic"
 
 <ComponentExample
   name="tree/paths"
-  caption="Move through the files with arrow keys, then press Enter to open one. Selection changes immediately; opening shows a pending state."
+  caption="Arrow down to package.json, then press Enter. It shows a spinner while it opens, then the console logs Opened package.json."
 />
 
-### Checkboxes
+## Selection
+
+The default `mode="single"` uses one string value or `null`. Use `"multiple"` for an array, or `"none"` when items should only navigate or perform actions.
+
+`activation="automatic"` selects while arrow keys move in single selection mode. Pressing a branch also expands or collapses it; set `expandOnPress` to `false` to leave expansion to the indicator and arrow keys.
+
+## Multiple Selection
+
+`mode="multiple"` makes the value an array. Cmd-click or Ctrl-click toggles one item, Shift extends a range, and Cmd+A or Ctrl+A selects the visible items. This example sets `expandOnPress` to `false`, so clicking Inbox or Projects selects the folder without closing it.
+
+<ComponentExample
+  name="tree/multiple"
+  caption="Cmd-click or Ctrl-click Archive to add it to the selection. Shift-click or Shift+Arrow extends a range, and the console logs what's selected."
+/>
+
+## Checkboxes
 
 Add `checkable` and `TreeItemCheckbox` for a checked state separate from selection. Space checks the focused item. Checking a branch checks its descendants, and a partly checked branch reports a mixed state.
 
@@ -75,28 +159,28 @@ Add `checkable` and `TreeItemCheckbox` for a checked state separate from selecti
 
 <ComponentExample
   name="tree/checkboxes"
-  caption="Press Space on Vue, then on Frontend. A branch is mixed while some of its descendants are checked."
+  caption="Press Space on Vue, then on Frontend. Frontend is mixed while only some of its items are checked, and the console logs the trunk strategy's values."
 />
 
-### Multiple Selection
-
-`mode="multiple"` makes the value an array. Cmd-click or Ctrl-click toggles one item, Shift extends a range, and Cmd+A or Ctrl+A selects the visible items.
-
-<ComponentExample
-  name="tree/multiple"
-  caption="Use Cmd-click / Ctrl-click to add Archive to the selection. Shift-click or Shift+Arrow extends a range."
-/>
-
-### Links
+## Links
 
 Set `mode="none"` for a navigation tree, then render labels as links. `current` identifies the current page with `aria-current="page"`, expands its ancestors, and gives it the initial Tab stop. Update it when your route changes.
 
 <ComponentExample
   name="tree/links"
-  caption="Choose Dialog. The example updates the current-page marker and keeps you on this docs page."
+  caption="Choose Dialog. The current-page marker moves to it, and you stay on this docs page."
 />
 
-### Loading Children
+## Disabled
+
+Disabled items can't be selected, checked, expanded, or run. They stay focusable so screen readers can find them. Set `focusableWhenDisabled` to `false` to skip them, or `disabled` on the root to disable the whole tree. A disabled `<fieldset>` around the tree disables it too.
+
+<ComponentExample
+  name="tree/disabled"
+  caption="Arrow through Enterprise while Focusable when disabled is on. Turn it off and the same arrow keys skip disabled items."
+/>
+
+## Loading Children
 
 Mark an item as a `branch` before its children exist. `loadChildren` runs the first time that branch expands while empty. Load and render its children, then let the promise resolve; the tree expands the branch once they are ready.
 
@@ -104,81 +188,48 @@ Use the supplied `signal` to cancel a request. Trying to expand the branch again
 
 <ComponentExample
   name="tree/lazy"
-  caption="Expand users to load its files. Archive fails on its first attempt; expand it again to retry."
+  caption="Expand users to load its files. Archive fails on its first attempt and shows a retry icon; expand it again to load it."
 />
 
-### Virtualized
+## Virtualized
 
-Pass the full `items` hierarchy and use `visibleTreeRows(items, expanded)` to flatten the open branches. Render the nearby rows with their level and position; the tree supplies the correct ARIA hierarchy even though the DOM is flat.
+Pass the full `items` hierarchy and use `visibleTreeRows(items, expanded)` to flatten the open branches. Render the nearby rows with their position; the tree supplies the correct ARIA hierarchy even though the DOM is flat.
 
-`onHighlight` reports the focused item’s index among visible rows. Use it to scroll before mounting a row that is outside the rendered range. This example indents rows by their level and keeps each row 28 pixels high.
+`onHighlight` reports the focused item's index among visible rows. Use it to scroll before mounting a row that is outside the rendered range. Every item sets `--tree-level`, so the stylesheet indents the flat rows by their level.
 
 <ComponentExample
   name="tree/virtualized"
   caption="Expand folders or press End to focus Folder 100. The tree has 10,100 items, but only nearby rows render."
 />
 
-### Right to Left
-
-Set `dir="rtl"` on an ancestor. Left and Right Arrow swap their expand/collapse roles, and logical padding keeps nested rows indented from the correct side. No provider is needed.
-
-## Behavior and Options
-
-### Keyboard
-
-Tab enters at the current page, selected item, or first item, then remembers the last focused item. From there:
-
-| Key                         | Action                                                 |
-| --------------------------- | ------------------------------------------------------ |
-| Down / Up Arrow             | Focus the next or previous visible item.               |
-| Right Arrow                 | Expand a branch, or enter its first child.             |
-| Left Arrow                  | Collapse a branch, or focus its parent.                |
-| Home / End                  | Focus the first or last visible item.                  |
-| Alt+Right / Alt+Left Arrow  | Expand or collapse a branch and its descendants.       |
-| `*`                         | Expand sibling branches.                               |
-| Enter                       | Select and run the item’s action, or follow its link.  |
-| Space                       | Check the item when checkable, otherwise select it.    |
-| Shift+Down / Shift+Up Arrow | Extend a multiple selection.                           |
-| Cmd+A / Ctrl+A              | Select visible items in multiple selection mode.       |
-| Typing                      | Focus the next item whose label starts with that text. |
-
-Option is Alt on a Mac. Left and Right swap in right-to-left text.
-
-### Selection
-
-The default `mode="single"` uses one string value or `null`. Use `"multiple"` for an array, or `"none"` when items should only navigate or perform actions.
-
-`activation="automatic"` selects while arrow keys move in single selection mode. Pressing a branch also expands or collapses it; set `expandOnPress` to `false` to leave expansion to the indicator and arrow keys.
-
-### Disabled
-
-Disabled items cannot be selected, checked, expanded, or run. They remain focusable so screen readers can find them. Set `focusableWhenDisabled` to `false` to skip them, or `disabled` on the root to disable the whole tree. A disabled `<fieldset>` around the tree disables it too.
-
-<ComponentExample
-  name="tree/disabled"
-  caption="Arrow through Enterprise while Focusable when disabled is on. Turn it off and the same arrow keys skip disabled items."
-/>
-
-### Find in Page
+## Find in Page
 
 `hiddenUntilFound` keeps collapsed groups in the DOM with `hidden="until-found"`. In browsers that support it, Find in Page can match a hidden item and open its ancestors. Use `keepMounted` when you only need collapsed content to stay mounted, without browser search.
 
 <ComponentExample
   name="tree/find-in-page"
-  caption="Use your browser’s Find command to look for a hidden moon under Mars. Matching branches open to reveal the item."
+  caption="Use your browser's Find command to look for Phobos, a moon of Mars. The matching branches open to reveal it."
 />
 
-### Animation
+## Animation
 
-A group exposes its measured height as `--tree-group-height`. Animate between that height and zero using its starting and ending attributes:
+A group exposes its measured height as `--tree-group-height`. Transition between that height and zero from `data-starting-style` and `data-ending-style`:
 
-```tsx
-<TreeGroup class="h-(--tree-group-height) overflow-hidden transition-[height] data-starting-style:h-0 data-ending-style:h-0" />
+```css
+[data-slot="tree-group"] {
+  height: var(--tree-group-height);
+  overflow: hidden;
+  transition: height 150ms ease-out;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    height: 0;
+  }
+}
 ```
 
-The group stays mounted until its closing animation ends. Groups open on the first render, or revealed by Find in Page, do not animate.
+The group stays mounted until its closing animation ends. Groups open on the first render, or revealed by Find in Page, don't animate.
 
-### Controlled
+## Controlled
 
 Selection, expanded branches, and checkboxes are independent:
 
@@ -190,26 +241,24 @@ Selection, expanded branches, and checkboxes are independent:
 
 Supply a value and its change callback to control it, or use `defaultValue`, `defaultExpanded`, and `defaultChecked` for starting state. Call `details.cancel()` in a change callback to reject a change. [State and Events](../state-and-events) covers the shared binding pattern.
 
-### Reveal an Item
+## Controller
 
-A `createTreeController()` instance can expand or collapse branches, change selection and checkboxes, or focus an item. `reveal(value)` opens an item’s ancestors, scrolls it into view, and focuses it. Supply the hierarchy through `items` or keep collapsed groups mounted so their descendants are known. See [Controllers](../controllers) for setup and lifecycle.
+A `createTreeController()` instance can expand or collapse branches, change selection and checkboxes, or focus an item. `reveal(value)` opens an item's ancestors, scrolls it into view, and focuses it. Supply the hierarchy through `items`, as this example does, or keep collapsed groups mounted so their descendants are known. See [Controllers](../controllers) for setup and lifecycle.
 
 <ComponentExample
   name="tree/controller"
-  caption="Press Find two-factor to expand its ancestors and focus the item. Collapse all closes every branch."
+  caption="Press Find Two-Factor to open Account and Security, then select and focus Two-factor authentication. Collapse All closes every branch."
 />
+
+## Custom Rendering
+
+Every part takes `render`. The Links example renders `TreeItemLabel` as an `a`; a link in a label leaves the tab order to its item. `TreeItemLabel` and `TreeItemIndicator` also take a function of the item's state, which the File Paths and Loading Children examples use for their spinners. See [Parts and Composition](../parts-and-composition) for prop merging and state-based rendering.
 
 ## Styling
 
-Style each row through `TreeItemLabel`, which carries its item’s data attributes. Styling a nested item’s background would also cover its children. The focused item remains the parent, so use `[:focus-visible>&]` on its label:
+Style each row through `TreeItemLabel`, which carries its item's `data-selected`, `data-expanded`, `data-branch`, `data-current`, `data-disabled`, `data-loading`, `data-failed` and `data-pending`. An item's own background would also cover its children. Focus stays on the item, so style a focused row as a label inside an item with `:focus-visible`. Turn the indicator with its `data-expanded`, and indent rows with `--tree-level` or padding on each group.
 
-```tsx
-<TreeItem value="example" class="outline-none">
-  <TreeItemLabel class="rounded-xl px-2 data-selected:bg-neutral-100 [:focus-visible>&]:ring-3 [:focus-visible>&]:ring-neutral-400/50">
-    Label
-  </TreeItemLabel>
-</TreeItem>
-```
+Each part has a `data-slot`, such as `tree-label`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### TreeItem [#styling-treeitem]
 
@@ -242,8 +291,6 @@ Style each row through `TreeItemLabel`, which carries its item’s data attribut
 <DataAttributes component="tree" part="group" />
 
 ## API Reference
-
-Props and callbacks are the same as below, as Solid props.
 
 ### Tree
 
@@ -305,7 +352,31 @@ Create one with `createTreeController()` and pass it as `controller`.
 
 ## Accessibility
 
-The tree follows the [WAI-ARIA tree view pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/). Every line below is an automated test.
+The tree follows the [WAI-ARIA tree view pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/). Items have the `treeitem` role with `aria-level`, `aria-expanded` on branches, and `aria-checked` when the tree is checkable.
+
+### Keyboard
+
+The tree has one tab stop. Tab enters at the current page, the selected item, or the first item, then returns to the item focused last.
+
+| Key                         | Action                                                 |
+| --------------------------- | ------------------------------------------------------ |
+| Down / Up Arrow             | Focus the next or previous visible item.               |
+| Right Arrow                 | Expand a branch, or enter its first child.             |
+| Left Arrow                  | Collapse a branch, or focus its parent.                |
+| Home / End                  | Focus the first or last visible item.                  |
+| Alt+Right / Alt+Left Arrow  | Expand or collapse a branch and its descendants.       |
+| `*`                         | Expand sibling branches.                               |
+| Enter                       | Select and run the item's action, or follow its link.  |
+| Space                       | Check the item when checkable, otherwise select it.    |
+| Shift+Down / Shift+Up Arrow | Extend a multiple selection.                           |
+| Cmd+A / Ctrl+A              | Select visible items in multiple selection mode.       |
+| Typing                      | Focus the next item whose label starts with that text. |
+
+Option is Alt on a Mac. In right-to-left text, Left and Right swap.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="tree" />
 

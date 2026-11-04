@@ -1,3 +1,4 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -9,28 +10,34 @@ import {
 import { For } from "solid-js"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function Example() {
   return (
-    <TriggerMenu triggers={[{ char: "@", items: people }]}>
-      <TriggerMenuInput
-        render={(props) => <input {...props} />}
-        aria-label="Assign to"
-        placeholder="Assign with @"
-      />
+    <TriggerMenu triggers={[{ char: "@", items: people }]} autoHighlight={false} loop={false}>
+      <Field>
+        <FieldLabel>Task</FieldLabel>
+        <FieldControl
+          render={(props) => (
+            <TriggerMenuInput
+              {...props}
+              render={(inputProps) => <input {...inputProps} />}
+              placeholder="Type @ to assign someone"
+            />
+          )}
+        />
+      </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           {(state) => (
             <For each={state.items as TriggerMenuDataItem[]}>
               {(item) => (
-                <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+                <TriggerMenuItem value={item.value} label={item.label}>
                   {item.label}
                 </TriggerMenuItem>
               )}

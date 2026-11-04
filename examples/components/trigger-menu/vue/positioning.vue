@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -7,40 +8,38 @@ import {
   TriggerMenuItem,
   TriggerMenuList,
 } from "@ui-sdk/vue/trigger-menu"
-import { ref } from "vue"
+import { useTemplateRef } from "vue"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
-const field = ref<{ $el: HTMLTextAreaElement } | null>(null)
-const box = ref<HTMLDivElement | null>(null)
+const field = useTemplateRef<{ $el: HTMLDivElement }>("field")
 </script>
 
 <template>
   <TriggerMenu :triggers="[{ char: '@', items: people }]">
-    <div data-slot="stack">
-      <TriggerMenuInput
-        ref="field"
-        aria-label="Comment"
-        placeholder="The list opens above, at the field's start"
-      />
-      <div ref="box" />
-    </div>
+    <Field ref="field">
+      <FieldLabel>Comment</FieldLabel>
+      <FieldControl>
+        <template #render="{ props }">
+          <TriggerMenuInput v-bind="props" placeholder="Type @ to mention someone" />
+        </template>
+      </FieldControl>
+    </Field>
     <TriggerMenuContent
       side="top"
       align="start"
       :side-offset="8"
-      :align-offset="-4"
+      :align-offset="-5"
       :collision-padding="16"
-      :anchor="field?.$el ?? null"
+      :anchor="field?.$el"
+      :container="field?.$el"
       keep-mounted
-      :container="box"
     >
       <TriggerMenuList v-slot="{ state }">
         <TriggerMenuItem
@@ -48,7 +47,6 @@ const box = ref<HTMLDivElement | null>(null)
           :key="item.value"
           :value="item.value"
           :label="item.label"
-          :disabled="item.disabled"
         >
           {{ item.label }}
         </TriggerMenuItem>

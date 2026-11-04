@@ -1,70 +1,48 @@
 import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 const commands = [
   {
-    value: "model",
-    label: "model",
-    arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
-    ],
+    value: "status",
+    label: "status",
+    arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
   },
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
-  { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-trigger-menu auto-highlight="false" loop="false" shortcut="ctrl+j" status="idle">
-      <div data-slot="stack">
+    <ui-trigger-menu shortcut="ctrl+j">
+      <ui-field>
+        <ui-field-label>Message</ui-field-label>
         <ui-trigger-menu-input>
-          <textarea aria-label="Message" placeholder="Type @ or /"></textarea>
+          <textarea placeholder="Type @ or /"></textarea>
         </ui-trigger-menu-input>
-        <ul data-slot="output"></ul>
-      </div>
-      <ui-trigger-menu-content>
-        <ui-trigger-menu-list></ui-trigger-menu-list>
-      </ui-trigger-menu-content>
-      <template>
-        <ui-trigger-menu-item>
-        </ui-trigger-menu-item>
-      </template>
+      </ui-field>
     </ui-trigger-menu>
   `
   const menu = root.querySelector("ui-trigger-menu")!
-  const list = root.querySelector("ul")!
-  const note = (line: string) => {
-    const item = document.createElement("li")
-    item.textContent = line
-    list.prepend(item)
-    while (list.children.length > 4) {
-      list.lastElementChild!.remove()
-    }
-  }
   menu.triggers = [
     { char: "@", items: people },
     { char: "/", boundary: "start", items: commands },
   ]
   menu.addEventListener("openchange", (event) => {
-    const { value, reason, trigger } = event.detail as typeof event.detail & { trigger: string | null }
-    note(`${value ? "opened" : "closed"} ${trigger ?? ""} (${reason})`)
+    const { value, reason } = event.detail
+    log(root, `${value ? "Opening" : "Closing"} (${reason})`)
   })
-  menu.addEventListener("openchangecomplete", (event) =>
-    note(event.detail.value ? "finished opening" : "finished closing"),
-  )
-  menu.addEventListener("querychange", (event) =>
-    note(`query “${event.detail.value}”${event.detail.argument ? ` for ${event.detail.argument}` : ""}`),
-  )
+  menu.addEventListener("openchangecomplete", (event) => log(root, event.detail.value ? "Open" : "Closed"))
+  menu.addEventListener("querychange", (event) => {
+    const { value, argument } = event.detail
+    log(root, `Query “${value}”${argument ? ` for ${argument}` : ""}`)
+  })
 }
 
 export { mount }

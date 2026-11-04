@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ClockIcon, ReplyIcon, SearchIcon, ShareIcon, TrashIcon } from "@lucide/vue"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   TriggerMenu,
   TriggerMenuContent,
@@ -20,13 +21,22 @@ const commands = [
 
 <template>
   <TriggerMenu :triggers="[{ char: '/', boundary: 'start', type: 'command' }]">
-    <TriggerMenuInput aria-label="Message" placeholder="Type / for commands" />
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <FieldControl>
+        <template #render="{ props }">
+          <TriggerMenuInput v-bind="props" placeholder="Type / for commands" />
+        </template>
+      </FieldControl>
+    </Field>
     <TriggerMenuContent>
       <TriggerMenuList>
-        <TriggerMenuItem v-for="command in commands" :key="command.value" :value="command.value"
-          ><TriggerMenuItemIcon :mirror="command.mirror"><component :is="command.icon" /></TriggerMenuItemIcon
-          >{{ command.value }}</TriggerMenuItem
-        >
+        <TriggerMenuItem v-for="command in commands" :key="command.value" :value="command.value">
+          <TriggerMenuItemIcon :mirror="command.mirror">
+            <component :is="command.icon" />
+          </TriggerMenuItemIcon>
+          {{ command.value }}
+        </TriggerMenuItem>
       </TriggerMenuList>
     </TriggerMenuContent>
   </TriggerMenu>

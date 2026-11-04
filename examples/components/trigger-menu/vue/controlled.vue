@@ -1,82 +1,50 @@
 <script setup lang="ts">
-import {
-  type TriggerMenuDataItem,
-  TriggerMenu,
-  TriggerMenuContent,
-  TriggerMenuInput,
-  TriggerMenuItem,
-  TriggerMenuList,
-} from "@ui-sdk/vue/trigger-menu"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { TriggerMenu, TriggerMenuInput } from "@ui-sdk/vue/trigger-menu"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 const commands = [
   {
-    value: "model",
-    label: "model",
-    arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
-    ],
+    value: "status",
+    label: "status",
+    arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
   },
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
-  { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
 ]
 
+const log = useLog()
 const open = ref(false)
-const log = ref<string[]>([])
-const note = (line: string) => (log.value = [line, ...log.value].slice(0, 4))
-const triggers = [
-  { char: "@", items: people },
-  { char: "/", boundary: "start" as const, items: commands },
-]
 </script>
 
 <template>
   <TriggerMenu
     v-model:open="open"
-    :triggers="triggers"
-    :auto-highlight="false"
-    :loop="false"
+    :triggers="[
+      { char: '@', items: people },
+      { char: '/', boundary: 'start', items: commands },
+    ]"
     shortcut="ctrl+j"
-    status="idle"
-    @open-change="
-      (next: boolean, details: { reason: string; trigger: string | null }) =>
-        note(`${next ? 'opened' : 'closed'} ${details.trigger ?? ''} (${details.reason})`)
-    "
-    @open-change-complete="(next: boolean) => note(next ? 'finished opening' : 'finished closing')"
+    @open-change="(next, details) => log(`${next ? 'Opening' : 'Closing'} (${details.reason})`)"
+    @open-change-complete="(next) => log(next ? 'Open' : 'Closed')"
     @query-change="
-      (query: string, details: { argument?: string }) =>
-        note(`query “${query}”${details.argument ? ` for ${details.argument}` : ''}`)
+      (query, details) => log(`Query “${query}”${details.argument ? ` for ${details.argument}` : ''}`)
     "
   >
-    <div data-slot="stack">
-      <TriggerMenuInput aria-label="Message" placeholder="Type @ or /" />
-      <ul data-slot="output">
-        <li v-for="(line, index) in log" :key="index">{{ line }}</li>
-      </ul>
-    </div>
-    <TriggerMenuContent>
-      <TriggerMenuList v-slot="{ state }">
-        <TriggerMenuItem
-          v-for="item in state.items as TriggerMenuDataItem[]"
-          :key="item.value"
-          :value="item.value"
-          :label="item.label"
-          :disabled="item.disabled"
-        >
-          {{ item.label }}
-        </TriggerMenuItem>
-      </TriggerMenuList>
-    </TriggerMenuContent>
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <FieldControl>
+        <template #render="{ props }">
+          <TriggerMenuInput v-bind="props" placeholder="Type @ or /" />
+        </template>
+      </FieldControl>
+    </Field>
   </TriggerMenu>
 </template>

@@ -1,5 +1,6 @@
 import { visibleTreeRows, type TreeItemData } from "@ui-sdk/core/tree"
 import "@ui-sdk/web/tree"
+import { ChevronRight, createElement } from "lucide"
 
 const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
   value: `folder-${folder + 1}`,
@@ -10,20 +11,19 @@ const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
   })),
 }))
 
-const row = 28
-const height = 280
+const row = 32
+const height = 288
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="scroll" style="height: ${height}px">
+    <div data-slot="scroll">
       <ui-tree aria-label="Archive" default-expanded="folder-1"></ui-tree>
     </div>
   `
   const scroller = root.querySelector("div")!
   const tree = root.querySelector("ui-tree")!
 
-  let expanded = ["folder-1"]
-  let rows = visibleTreeRows(items, expanded)
+  let rows = visibleTreeRows(items, ["folder-1"])
 
   const rendered = new Map<string, HTMLElement>()
   const render = () => {
@@ -36,14 +36,18 @@ function mount(root: HTMLElement) {
       el.remove()
       rendered.delete(value)
     }
-    for (const [value, { item, level, index }] of visible) {
+    for (const [value, { item, index }] of visible) {
       let el = rendered.get(value)
       if (!el) {
         tree.insertAdjacentHTML(
           "beforeend",
           `<ui-tree-item value="${item.value}">
             <ui-tree-item-label>
-              <span data-slot="hint" aria-hidden="true"></span>
+              ${
+                item.children
+                  ? `<ui-tree-item-indicator>${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
+                  : ""
+              }
               ${item.label}
             </ui-tree-item-label>
           </ui-tree-item>`,
@@ -51,24 +55,22 @@ function mount(root: HTMLElement) {
         el = tree.lastElementChild as HTMLElement
         rendered.set(value, el)
       }
-      el.style.cssText = `top: ${index * row}px; height: ${row}px; padding-inline-start: ${(level - 1) * 16}px`
-      el.querySelector("span")!.textContent = item.children ? (expanded.includes(value) ? "▾" : "▸") : ""
+      el.style.top = `${index * row}px`
     }
   }
   render()
   tree.items = items
   scroller.addEventListener("scroll", render)
   tree.addEventListener("expandedchange", (event) => {
-    expanded = event.detail.value
-    rows = visibleTreeRows(items, expanded)
+    rows = visibleTreeRows(items, event.detail.value)
     render()
   })
   tree.addEventListener("highlight", (event) => {
     const { index } = event.detail
     const top = index * row
     if (top < scroller.scrollTop) scroller.scrollTop = top
-    else if (top + row > scroller.scrollTop + scroller.clientHeight - 8)
-      scroller.scrollTop = top + row - scroller.clientHeight + 8
+    else if (top + row > scroller.scrollTop + scroller.clientHeight - 10)
+      scroller.scrollTop = top + row - scroller.clientHeight + 10
     render()
   })
 }

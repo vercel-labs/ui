@@ -1,6 +1,7 @@
 import { treeFromPaths, type TreeItemData } from "@ui-sdk/core/tree"
 import "@ui-sdk/web/tree"
-import { ChevronRight, createElement, LoaderCircle, type IconNode } from "lucide"
+import { ChevronRight, createElement, LoaderCircle } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const paths = [
   "src/index.ts",
@@ -16,18 +17,16 @@ const paths = [
 const items = treeFromPaths(paths)
 const files = new Set(paths.filter((path) => !path.endsWith("/")))
 
-const icon = (node: IconNode) => createElement(node, { "aria-hidden": "true" }).outerHTML
-
-function markup(list: TreeItemData[]) {
+function markup(items: TreeItemData[]) {
   let html = ""
-  for (const item of list)
+  for (const item of items)
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
           ${
             item.children
-              ? `<ui-tree-item-indicator>${icon(ChevronRight)}</ui-tree-item-indicator>`
-              : `<span></span>`
+              ? `<ui-tree-item-indicator>${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
+              : ""
           }
           <span>${item.label}</span>
           ${createElement(LoaderCircle, { "aria-hidden": "true", "data-show": "pending" }).outerHTML}
@@ -39,30 +38,16 @@ function markup(list: TreeItemData[]) {
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-tree aria-label="Project" default-expanded="src" default-value="src/index.ts" activation="automatic">
-        ${markup(items)}
-      </ui-tree>
-      <div data-slot="stack">
-        <span data-slot="hint">src/index.ts</span>
-        <span>Press Enter to open a file.</span>
-      </div>
-    </div>
+    <ui-tree aria-label="Project" default-expanded="src" default-value="src/index.ts" activation="automatic">
+      ${markup(items)}
+    </ui-tree>
   `
   const tree = root.querySelector("ui-tree")!
-  const [selected, opened] = root.querySelectorAll("div > div > span")
   tree.paths = paths
-  tree.addEventListener("valuechange", (event) => {
-    selected.textContent = (event.detail.value as string | null) ?? "Nothing selected"
-  })
   tree.addEventListener("action", (event) => {
     const { value, waitUntil } = event.detail
     if (!files.has(value)) return
-    waitUntil(
-      new Promise((resolve) => setTimeout(resolve, 600)).then(() => {
-        opened.textContent = `Opened ${value}`
-      }),
-    )
+    waitUntil(new Promise((resolve) => setTimeout(resolve, 600)).then(() => log(root, `Opened ${value}`)))
   })
 }
 

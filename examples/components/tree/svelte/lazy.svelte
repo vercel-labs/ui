@@ -64,8 +64,6 @@
               {/if}
             {/snippet}
           </TreeItemIndicator>
-        {:else}
-          <span></span>
         {/if}
         {item.label}
       </TreeItemLabel>

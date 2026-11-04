@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     type TriggerMenuDataItem,
     TriggerMenu,
@@ -9,41 +10,43 @@
   } from "@ui-sdk/svelte/trigger-menu"
 
   const people = [
-    { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-    { value: "alan", label: "Alan Turing" },
-    { value: "grace", label: "Grace Hopper" },
-    { value: "katherine", label: "Katherine Johnson" },
-    { value: "linus", label: "Linus Torvalds", disabled: true },
-    { value: "margaret", label: "Margaret Hamilton" },
+    { value: "hollis", label: "Hollis Grant" },
+    { value: "ines", label: "Inès Moreau" },
+    { value: "kofi", label: "Kofi Mensah" },
+    { value: "wren", label: "Wren Takahashi" },
+    { value: "tomasz", label: "Tomasz Wójcik" },
   ]
 
-  let field: HTMLTextAreaElement | undefined = $state()
-  let box: HTMLDivElement | undefined = $state()
+  let field: HTMLElement | undefined = $state()
 </script>
 
 <TriggerMenu triggers={[{ char: "@", items: people }]}>
-  <div data-slot="stack">
-    <TriggerMenuInput aria-label="Comment" placeholder="The list opens above, at the field's start">
+  <Field
+    {@attach (element) => {
+      field = element
+    }}
+  >
+    <FieldLabel>Comment</FieldLabel>
+    <FieldControl>
       {#snippet render({ props })}
-        <textarea {...props} bind:this={field} ></textarea>
+        <TriggerMenuInput {...props} placeholder="Type @ to mention someone" />
       {/snippet}
-    </TriggerMenuInput>
-    <div bind:this={box}></div>
-  </div>
+    </FieldControl>
+  </Field>
   <TriggerMenuContent
     side="top"
     align="start"
     sideOffset={8}
-    alignOffset={-4}
+    alignOffset={-5}
     collisionPadding={16}
-    anchor={field ?? null}
+    anchor={field}
+    container={field}
     keepMounted
-    container={box}
   >
     <TriggerMenuList>
       {#snippet children(state)}
         {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+          <TriggerMenuItem value={item.value} label={item.label}>
             {item.label}
           </TriggerMenuItem>
         {/each}

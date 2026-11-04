@@ -7,11 +7,10 @@
     TreeItem,
     TreeItemIndicator,
     TreeItemLabel,
+    type TreeItemData,
   } from "@ui-sdk/svelte/tree"
 
-  type Node = { value: string; label: string; children?: Node[] }
-
-  const sections: Node[] = [
+  const sections: TreeItemData[] = [
     {
       value: "account",
       label: "Account",
@@ -38,23 +37,16 @@
   ]
 
   const settings = createTreeController()
-
-  const button =
-    "h-8 rounded-xl border border-input bg-background px-3 text-sm outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30"
-
-  let expanded: string[] = $state([])
 </script>
 
-{#snippet items(nodes: Node[])}
+{#snippet items(nodes: TreeItemData[])}
   {#each nodes as item (item.value)}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
+    <TreeItem value={item.value}>
       <TreeItemLabel>
         {#if item.children}
           <TreeItemIndicator>
             <ChevronRightIcon aria-hidden="true" />
           </TreeItemIndicator>
-        {:else}
-          <span></span>
         {/if}
         {item.label}
       </TreeItemLabel>
@@ -68,13 +60,20 @@
 {/snippet}
 
 <div data-slot="stack">
-  <div data-slot="row">
-    <button type="button" onclick={() => settings.expandAll()}>Expand all</button>
-    <button type="button" onclick={() => settings.collapseAll()}>Collapse all</button>
-    <button type="button" onclick={() => settings.reveal("two-factor")}>Find two-factor</button>
+  <div data-slot="controls">
+    <button type="button" onclick={() => settings.expandAll()}>Expand All</button>
+    <button type="button" onclick={() => settings.collapseAll()}>Collapse All</button>
+    <button
+      type="button"
+      onclick={() => {
+        settings.setValue("two-factor")
+        settings.reveal("two-factor")
+      }}
+    >
+      Find Two-Factor
+    </button>
   </div>
-  <Tree aria-label="Settings" controller={settings} keepMounted bind:expanded>
+  <Tree aria-label="Settings" items={sections} controller={settings}>
     {@render items(sections)}
   </Tree>
-  <p data-slot="hint">Expanded: {expanded.join(", ") || "none"}</p>
 </div>

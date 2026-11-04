@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChevronRightIcon } from "@lucide/svelte"
   import {
     Tree,
     TreeGroup,
@@ -7,6 +8,7 @@
     TreeItemLabel,
     type TreeItemData,
   } from "@ui-sdk/svelte/tree"
+  import { useLog } from "../../../shared/svelte/log"
 
   const items: TreeItemData[] = [
     {
@@ -30,16 +32,18 @@
     { value: "trash", label: "Trash" },
   ]
 
-  let value = $state(["updates", "website"])
+  const log = useLog()
 </script>
 
 {#snippet treeItems(nodes: TreeItemData[])}
   {#each nodes as item (item.value)}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
-      {#if item.children}
-        <TreeItemIndicator />
-      {/if}
+    <TreeItem value={item.value}>
       <TreeItemLabel>
+        {#if item.children}
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        {/if}
         {item.label}
       </TreeItemLabel>
       {#if item.children}
@@ -51,16 +55,14 @@
   {/each}
 {/snippet}
 
-<div data-slot="stack">
-  <Tree
-    aria-label="Folders"
-    {items}
-    mode="multiple"
-    bind:value
-    expandOnPress={false}
-    defaultExpanded={["inbox", "projects"]}
-  >
-    {@render treeItems(items)}
-  </Tree>
-  <p data-slot="hint">{value.length} selected</p>
-</div>
+<Tree
+  aria-label="Folders"
+  {items}
+  mode="multiple"
+  defaultValue={["updates", "website"]}
+  onValueChange={(value) => log(`${value.length} selected: ${value.join(", ")}`)}
+  expandOnPress={false}
+  defaultExpanded={["inbox", "projects"]}
+>
+  {@render treeItems(items)}
+</Tree>

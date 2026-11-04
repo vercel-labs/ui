@@ -1,59 +1,47 @@
 import "@ui-sdk/web/trigger-menu"
+import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button">Mention</button>
+        <button type="button">Insert Date</button>
+      </div>
       <ui-trigger-menu>
-        <ui-trigger-menu-input>
-          <textarea aria-label="Message"></textarea>
-        </ui-trigger-menu-input>
+        <ui-field>
+          <ui-field-label>Message</ui-field-label>
+          <ui-trigger-menu-input>
+            <textarea placeholder="Write a message"></textarea>
+          </ui-trigger-menu-input>
+        </ui-field>
         <ui-trigger-menu-content>
           <ui-trigger-menu-list></ui-trigger-menu-list>
         </ui-trigger-menu-content>
-        <template>
-          <ui-trigger-menu-item>
-          </ui-trigger-menu-item>
-        </template>
       </ui-trigger-menu>
-      <div data-slot="row">
-        <button type="button" value="mention" data-variant="secondary">Mention</button>
-        <button type="button" value="date" data-variant="secondary">Insert date</button>
-        <button type="button" value="toggle" data-variant="secondary">Toggle</button>
-      </div>
-      <p data-slot="hint"></p>
     </div>
   `
-  const menu = root.querySelector("ui-trigger-menu")!
-  const result = root.querySelector("p")!
-  menu.triggers = [{ char: "@", items: people }]
-  for (const button of root.querySelectorAll("button")) {
-    button.addEventListener("mousedown", (event) => event.preventDefault())
-    button.addEventListener("click", async () => {
-      if (button.value === "mention") {
-        const closed = await menu.api.open({ trigger: "@" })
-        result.textContent = `Closed with ${closed.reason}`
-      } else if (button.value === "date") {
-        const match = menu.api.getMatch()
-        result.textContent = match
-          ? `Query “${menu.api.getQuery()}” at ${match.start}`
-          : `Open: ${menu.api.isOpen()}`
-        menu.api.insert(new Date().toLocaleDateString())
-      } else if (menu.api.isOpen()) {
-        menu.api.close()
-      } else {
-        menu.api.setOpen(true)
-      }
-    })
-  }
+  const element = root.querySelector("ui-trigger-menu")!
+  const menu = element.api
+  element.triggers = [{ char: "@", items: people }]
+  const [mention, date] = root.querySelectorAll("button")
+  root.querySelector("[data-slot=controls]")!.addEventListener("mousedown", (event) => event.preventDefault())
+  mention.addEventListener("click", async () => {
+    const closed = await menu.open({ trigger: "@" })
+    log(root, `Closed (${closed.reason})`)
+  })
+  date.addEventListener("click", () =>
+    menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" })),
+  )
 }
 
 export { mount }

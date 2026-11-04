@@ -7,12 +7,11 @@ import {
   TreeItem,
   TreeItemIndicator,
   TreeItemLabel,
+  type TreeItemData,
 } from "@ui-sdk/vue/tree"
-import { h, ref, type FunctionalComponent } from "vue"
+import { h, type FunctionalComponent } from "vue"
 
-type Node = { value: string; label: string; children?: Node[] }
-
-const sections: Node[] = [
+const sections: TreeItemData[] = [
   {
     value: "account",
     label: "Account",
@@ -38,32 +37,34 @@ const sections: Node[] = [
   },
 ]
 
-const settings = createTreeController()
-
-const Items: FunctionalComponent<{ items: Node[] }> = ({ items }) =>
+const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
       h(TreeItemLabel, {}, () => [
-        children ? h(TreeItemIndicator, {}, () => h(ChevronRightIcon, {})) : h("span", {}),
+        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
         label,
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
     ]),
   )
 
-const expanded = ref<string[]>([])
+const settings = createTreeController()
+
+function findTwoFactor() {
+  settings.setValue("two-factor")
+  settings.reveal("two-factor")
+}
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
-      <button type="button" @click="settings.expandAll()">Expand all</button>
-      <button type="button" @click="settings.collapseAll()">Collapse all</button>
-      <button type="button" @click="settings.reveal('two-factor')">Find two-factor</button>
+    <div data-slot="controls">
+      <button type="button" @click="settings.expandAll()">Expand All</button>
+      <button type="button" @click="settings.collapseAll()">Collapse All</button>
+      <button type="button" @click="findTwoFactor">Find Two-Factor</button>
     </div>
-    <Tree v-model:expanded="expanded" aria-label="Settings" :controller="settings" keep-mounted>
+    <Tree aria-label="Settings" :items="sections" :controller="settings">
       <Items :items="sections" />
     </Tree>
-    <p data-slot="hint">Expanded: {{ expanded.join(", ") || "none" }}</p>
   </div>
 </template>

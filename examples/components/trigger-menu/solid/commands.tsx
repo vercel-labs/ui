@@ -1,61 +1,46 @@
-import {
-  type TriggerMenuDataItem,
-  TriggerMenu,
-  TriggerMenuContent,
-  TriggerMenuHint,
-  TriggerMenuInput,
-  TriggerMenuItem,
-  TriggerMenuList,
-} from "@ui-sdk/solid/trigger-menu"
-import { For, createSignal } from "solid-js"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { TriggerMenu, TriggerMenuHint, TriggerMenuInput } from "@ui-sdk/solid/trigger-menu"
+import { useLog } from "../../../shared/solid/log"
 
 const commands = [
   {
-    value: "model",
-    label: "model",
+    value: "status",
+    label: "status",
     arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
+      { name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] },
+      { name: "until", hint: "[until]", items: ["30m", "1h", "4h", "today"], allowCustomValue: false },
     ],
   },
   { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  { value: "away", label: "away", after: "submit" as const },
   { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
 ]
 
 function Example() {
-  const [last, setLast] = createSignal("")
+  const log = useLog()
+
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setLast(`Sent: ${new FormData(event.currentTarget).get("prompt")}`)
+        log(`Sent ${new FormData(event.currentTarget).get("message")}`)
       }}
     >
       <TriggerMenu
         triggers={[{ char: "/", boundary: "start", type: "command", items: commands }]}
-        onSelect={(value, details) => {
-          setLast(`/${value} ${JSON.stringify(details.arguments)}`)
-        }}
+        onSelect={(value, details) =>
+          log(["Chose", `/${value}`, ...Object.values(details.arguments)].join(" "))
+        }
       >
-        <TriggerMenuInput name="prompt" aria-label="Prompt" placeholder="Try /model or /search" />
+        <Field name="message">
+          <FieldLabel>Message</FieldLabel>
+          <FieldControl
+            render={(props) => <TriggerMenuInput {...props} placeholder="Type / for commands" />}
+          />
+        </Field>
         <TriggerMenuHint />
-        <TriggerMenuContent>
-          <TriggerMenuList>
-            {(state) => (
-              <For each={state.items as TriggerMenuDataItem[]}>
-                {(item) => (
-                  <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
-                    {item.label}
-                  </TriggerMenuItem>
-                )}
-              </For>
-            )}
-          </TriggerMenuList>
-        </TriggerMenuContent>
       </TriggerMenu>
-      <p data-slot="hint">{last() || "/send submits the form."}</p>
     </form>
   )
 }

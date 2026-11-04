@@ -1,40 +1,28 @@
-import {
-  type TriggerMenuDataItem,
-  TriggerMenu,
-  TriggerMenuContent,
-  TriggerMenuInput,
-  TriggerMenuItem,
-  TriggerMenuList,
-} from "@ui-sdk/solid/trigger-menu"
-import { createSignal, For } from "solid-js"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { TriggerMenu, TriggerMenuInput } from "@ui-sdk/solid/trigger-menu"
+import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 const commands = [
   {
-    value: "model",
-    label: "model",
-    arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
-    ],
+    value: "status",
+    label: "status",
+    arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
   },
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
-  { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
 ]
 
 function Example() {
+  const log = useLog()
   const [open, setOpen] = createSignal(false)
-  const [log, setLog] = createSignal<string[]>([])
-  const note = (line: string) => setLog((lines) => [line, ...lines].slice(0, 4))
+
   return (
     <TriggerMenu
       triggers={[
@@ -44,36 +32,18 @@ function Example() {
       open={open()}
       onOpenChange={(next, details) => {
         setOpen(next)
-        note(`${next ? "opened" : "closed"} ${details.trigger ?? ""} (${details.reason})`)
+        log(`${next ? "Opening" : "Closing"} (${details.reason})`)
       }}
-      onOpenChangeComplete={(next) => note(next ? "finished opening" : "finished closing")}
+      onOpenChangeComplete={(next) => log(next ? "Open" : "Closed")}
       onQueryChange={(query, details) =>
-        note(`query “${query}”${details.argument ? ` for ${details.argument}` : ""}`)
+        log(`Query “${query}”${details.argument ? ` for ${details.argument}` : ""}`)
       }
-      autoHighlight={false}
-      loop={false}
       shortcut="ctrl+j"
-      status="idle"
     >
-      <div data-slot="stack">
-        <TriggerMenuInput aria-label="Message" placeholder="Type @ or /" />
-        <ul data-slot="output">
-          <For each={log()}>{(line) => <li>{line}</li>}</For>
-        </ul>
-      </div>
-      <TriggerMenuContent>
-        <TriggerMenuList>
-          {(state) => (
-            <For each={state.items as TriggerMenuDataItem[]}>
-              {(item) => (
-                <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
-                  {item.label}
-                </TriggerMenuItem>
-              )}
-            </For>
-          )}
-        </TriggerMenuList>
-      </TriggerMenuContent>
+      <Field>
+        <FieldLabel>Message</FieldLabel>
+        <FieldControl render={(props) => <TriggerMenuInput {...props} placeholder="Type @ or /" />} />
+      </Field>
     </TriggerMenu>
   )
 }

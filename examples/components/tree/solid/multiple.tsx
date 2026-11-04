@@ -6,7 +6,8 @@ import {
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/solid/tree"
-import { createSignal, For, Show } from "solid-js"
+import { For, Show } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const items: TreeItemData[] = [
   {
@@ -34,11 +35,25 @@ function Items(props: { items: TreeItemData[] }) {
   return (
     <For each={props.items}>
       {(item) => (
-        <TreeItem value={item.value} branch={item.children !== undefined}>
-          <Show when={item.children}>
-            <TreeItemIndicator />
-          </Show>
-          <TreeItemLabel>{item.label}</TreeItemLabel>
+        <TreeItem value={item.value}>
+          <TreeItemLabel>
+            <Show when={item.children}>
+              <TreeItemIndicator>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </TreeItemIndicator>
+            </Show>
+            {item.label}
+          </TreeItemLabel>
           <Show when={item.children}>
             {(children) => (
               <TreeGroup>
@@ -53,22 +68,19 @@ function Items(props: { items: TreeItemData[] }) {
 }
 
 function Example() {
-  const [value, setValue] = createSignal(["updates", "website"])
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Tree
-        aria-label="Folders"
-        items={items}
-        mode="multiple"
-        value={value()}
-        onValueChange={setValue}
-        expandOnPress={false}
-        defaultExpanded={["inbox", "projects"]}
-      >
-        <Items items={items} />
-      </Tree>
-      <p data-slot="hint">{value().length} selected</p>
-    </div>
+    <Tree
+      aria-label="Folders"
+      items={items}
+      mode="multiple"
+      defaultValue={["updates", "website"]}
+      onValueChange={(value) => log(`${value.length} selected: ${value.join(", ")}`)}
+      expandOnPress={false}
+      defaultExpanded={["inbox", "projects"]}
+    >
+      <Items items={items} />
+    </Tree>
   )
 }
 

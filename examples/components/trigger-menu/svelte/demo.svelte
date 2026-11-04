@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     type TriggerMenuDataItem,
     TriggerMenu,
@@ -10,32 +11,33 @@
     TriggerMenuStatus,
   } from "@ui-sdk/svelte/trigger-menu"
 
-  const id = $props.id()
-
   const people = [
-    { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-    { value: "alan", label: "Alan Turing" },
-    { value: "grace", label: "Grace Hopper" },
-    { value: "katherine", label: "Katherine Johnson" },
-    { value: "linus", label: "Linus Torvalds", disabled: true },
-    { value: "margaret", label: "Margaret Hamilton" },
+    { value: "hollis", label: "Hollis Grant" },
+    { value: "ines", label: "Inès Moreau" },
+    { value: "kofi", label: "Kofi Mensah" },
+    { value: "wren", label: "Wren Takahashi" },
+    { value: "tomasz", label: "Tomasz Wójcik" },
   ]
 </script>
 
-<TriggerMenu triggers={[{ char: "@", items: people }]}>
-  <div data-slot="stack">
-    <label for={id} data-slot="label" >Message</label>
-    <TriggerMenuInput id={id} placeholder="Type @ to mention someone" />
-    <div data-slot="visually-hidden">
-      <TriggerMenuStatus />
-    </div>
+<TriggerMenu triggers={[{ char: "@", type: "mention", items: people }]}>
+  <Field>
+    <FieldLabel>Message</FieldLabel>
+    <FieldControl>
+      {#snippet render({ props })}
+        <TriggerMenuInput {...props} placeholder="Type @ to mention someone" />
+      {/snippet}
+    </FieldControl>
+  </Field>
+  <div data-slot="visually-hidden">
+    <TriggerMenuStatus />
   </div>
   <TriggerMenuContent>
-    <TriggerMenuEmpty>No one found.</TriggerMenuEmpty>
+    <TriggerMenuEmpty>No one found</TriggerMenuEmpty>
     <TriggerMenuList>
       {#snippet children(state)}
         {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+          <TriggerMenuItem value={item.value} label={item.label}>
             {item.label}
           </TriggerMenuItem>
         {/each}

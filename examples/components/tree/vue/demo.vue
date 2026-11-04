@@ -27,6 +27,7 @@ const files: Node[] = [
       { value: "components/card.tsx", label: "card.tsx" },
     ],
   },
+  { value: "components.json", label: "components.json" },
   { value: "package.json", label: "package.json" },
   { value: "README.md", label: "README.md" },
 ]
@@ -37,11 +38,11 @@ const Items: FunctionalComponent<{ items: Node[] }> = ({ items }) =>
       h(TreeItemLabel, {}, () => [
         ...(children
           ? [
-              h(TreeItemIndicator, {}, () => h(ChevronRightIcon, {})),
-              h(FolderIcon, {}),
-              h(FolderOpenIcon, {}),
+              h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+              h(FolderIcon, { "aria-hidden": "true" }),
+              h(FolderOpenIcon, { "aria-hidden": "true" }),
             ]
-          : [h("span", {}), h(FileIcon, {})]),
+          : [h(FileIcon, { "aria-hidden": "true" })]),
         h("span", {}, label),
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),

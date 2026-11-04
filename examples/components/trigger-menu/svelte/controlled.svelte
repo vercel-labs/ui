@@ -1,73 +1,45 @@
 <script lang="ts">
-  import {
-    type TriggerMenuDataItem,
-    TriggerMenu,
-    TriggerMenuContent,
-    TriggerMenuInput,
-    TriggerMenuItem,
-    TriggerMenuList,
-  } from "@ui-sdk/svelte/trigger-menu"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { TriggerMenu, TriggerMenuInput } from "@ui-sdk/svelte/trigger-menu"
+  import { useLog } from "../../../shared/svelte/log"
 
   const people = [
-    { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-    { value: "alan", label: "Alan Turing" },
-    { value: "grace", label: "Grace Hopper" },
-    { value: "katherine", label: "Katherine Johnson" },
-    { value: "linus", label: "Linus Torvalds", disabled: true },
-    { value: "margaret", label: "Margaret Hamilton" },
+    { value: "hollis", label: "Hollis Grant" },
+    { value: "ines", label: "Inès Moreau" },
+    { value: "kofi", label: "Kofi Mensah" },
+    { value: "wren", label: "Wren Takahashi" },
+    { value: "tomasz", label: "Tomasz Wójcik" },
   ]
 
   const commands = [
     {
-      value: "model",
-      label: "model",
-      arguments: [
-        { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-        { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
-      ],
+      value: "status",
+      label: "status",
+      arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
     },
-    { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
-    { value: "clear", label: "clear" },
-    { value: "send", label: "send", after: "submit" as const },
   ]
 
+  const log = useLog()
   let open = $state(false)
-  let log = $state<string[]>([])
-  const note = (line: string) => (log = [line, ...log].slice(0, 4))
-  const triggers = [
-    { char: "@", items: people },
-    { char: "/", boundary: "start" as const, items: commands },
-  ]
 </script>
 
 <TriggerMenu
+  triggers={[
+    { char: "@", items: people },
+    { char: "/", boundary: "start", items: commands },
+  ]}
   bind:open
-  {triggers}
-  autoHighlight={false}
-  loop={false}
+  onOpenChange={(next, details) => log(`${next ? "Opening" : "Closing"} (${details.reason})`)}
+  onOpenChangeComplete={(next) => log(next ? "Open" : "Closed")}
+  onQueryChange={(query, details) => log(`Query “${query}”${details.argument ? ` for ${details.argument}` : ""}`)}
   shortcut="ctrl+j"
-  status="idle"
-  onOpenChange={(next, details) => note(`${next ? "opened" : "closed"} ${details.trigger ?? ""} (${details.reason})`)}
-  onOpenChangeComplete={(next) => note(next ? "finished opening" : "finished closing")}
-  onQueryChange={(query, details) => note(`query “${query}”${details.argument ? ` for ${details.argument}` : ""}`)}
 >
-  <div data-slot="stack">
-    <TriggerMenuInput aria-label="Message" placeholder="Type @ or /" />
-    <ul data-slot="output">
-      {#each log as line, index (index)}
-        <li>{line}</li>
-      {/each}
-    </ul>
-  </div>
-  <TriggerMenuContent>
-    <TriggerMenuList>
-      {#snippet children(state)}
-        {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
-            {item.label}
-          </TriggerMenuItem>
-        {/each}
+  <Field>
+    <FieldLabel>Message</FieldLabel>
+    <FieldControl>
+      {#snippet render({ props })}
+        <TriggerMenuInput {...props} placeholder="Type @ or /" />
       {/snippet}
-    </TriggerMenuList>
-  </TriggerMenuContent>
+    </FieldControl>
+  </Field>
 </TriggerMenu>

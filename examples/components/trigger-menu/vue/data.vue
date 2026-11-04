@@ -1,48 +1,31 @@
 <script setup lang="ts">
-import {
-  type TriggerDefinition,
-  type TriggerMenuDataItem,
-  TriggerMenu,
-  TriggerMenuContent,
-  TriggerMenuInput,
-  TriggerMenuItem,
-  TriggerMenuList,
-} from "@ui-sdk/vue/trigger-menu"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { type TriggerDefinition, TriggerMenu, TriggerMenuInput } from "@ui-sdk/vue/trigger-menu"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
-const commands = [
-  {
-    value: "model",
-    label: "model",
-    arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
-    ],
-  },
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
-  { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
-]
+const commands = ["away", "remind", "search", "status"]
 
-const channels = ["general", "random", "design", "engineering", "marketing", "support"]
+const channels = [
+  "announcements",
+  "design",
+  "design-reviews",
+  "engineering",
+  "general",
+  "launches",
+  "support",
+]
 
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
-  return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+  return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(
-      () =>
-        resolve(
-          channels
-            .filter((channel) => channel.includes(query.toLowerCase()))
-            .map((channel) => ({ value: channel, label: channel })),
-        ),
+      () => resolve(channels.filter((channel) => channel.includes(query.toLowerCase()))),
       400,
     )
     signal.addEventListener("abort", () => {
@@ -61,19 +44,13 @@ const triggers: TriggerDefinition[] = [
 
 <template>
   <TriggerMenu :triggers="triggers">
-    <TriggerMenuInput aria-label="Message" placeholder="Type @, / or #" />
-    <TriggerMenuContent>
-      <TriggerMenuList v-slot="{ state }">
-        <TriggerMenuItem
-          v-for="item in state.items as TriggerMenuDataItem[]"
-          :key="item.value"
-          :value="item.value"
-          :label="item.label"
-          :disabled="item.disabled"
-        >
-          {{ item.label }}
-        </TriggerMenuItem>
-      </TriggerMenuList>
-    </TriggerMenuContent>
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <FieldControl>
+        <template #render="{ props }">
+          <TriggerMenuInput v-bind="props" placeholder="Type @, / or #" />
+        </template>
+      </FieldControl>
+    </Field>
   </TriggerMenu>
 </template>

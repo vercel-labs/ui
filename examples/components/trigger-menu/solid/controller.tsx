@@ -1,3 +1,4 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -7,73 +8,64 @@ import {
   TriggerMenuList,
   createTriggerMenuController,
 } from "@ui-sdk/solid/trigger-menu"
-import { For, createSignal } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function Example() {
+  const log = useLog()
   const menu = createTriggerMenuController()
-  const [result, setResult] = createSignal("")
+
   return (
-    <TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
-      <div data-slot="stack">
-        <TriggerMenuInput aria-label="Message" />
-        <div data-slot="row">
-          <button
-            type="button"
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={async () => {
-              const closed = await menu.open({ trigger: "@" })
-              setResult(`Closed with ${closed.reason}`)
-            }}
-            data-variant="secondary"
-          >
-            Mention
-          </button>
-          <button
-            type="button"
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => {
-              const match = menu.getMatch()
-              setResult(match ? `Query “${menu.getQuery()}” at ${match.start}` : `Open: ${menu.isOpen()}`)
-              menu.insert(new Date().toLocaleDateString())
-            }}
-            data-variant="secondary"
-          >
-            Insert date
-          </button>
-          <button
-            type="button"
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => (menu.isOpen() ? menu.close() : menu.setOpen(true))}
-            data-variant="secondary"
-          >
-            Toggle
-          </button>
-        </div>
-        <p data-slot="hint">{result()}</p>
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={async () => {
+            const closed = await menu.open({ trigger: "@" })
+            log(`Closed (${closed.reason})`)
+          }}
+        >
+          Mention
+        </button>
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() =>
+            menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" }))
+          }
+        >
+          Insert Date
+        </button>
       </div>
-      <TriggerMenuContent>
-        <TriggerMenuList>
-          {(state) => (
-            <For each={state.items as TriggerMenuDataItem[]}>
-              {(item) => (
-                <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
-                  {item.label}
-                </TriggerMenuItem>
-              )}
-            </For>
-          )}
-        </TriggerMenuList>
-      </TriggerMenuContent>
-    </TriggerMenu>
+      <TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
+        <Field>
+          <FieldLabel>Message</FieldLabel>
+          <FieldControl render={(props) => <TriggerMenuInput {...props} placeholder="Write a message" />} />
+        </Field>
+        <TriggerMenuContent>
+          <TriggerMenuList>
+            {(state) => (
+              <For each={state.items as TriggerMenuDataItem[]}>
+                {(item) => (
+                  <TriggerMenuItem value={item.value} label={item.label}>
+                    {item.label}
+                  </TriggerMenuItem>
+                )}
+              </For>
+            )}
+          </TriggerMenuList>
+        </TriggerMenuContent>
+      </TriggerMenu>
+    </div>
   )
 }
 

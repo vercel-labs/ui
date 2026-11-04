@@ -26,6 +26,7 @@
         { value: "components/card.tsx", label: "card.tsx" },
       ],
     },
+    { value: "components.json", label: "components.json" },
     { value: "package.json", label: "package.json" },
     { value: "README.md", label: "README.md" },
   ]
@@ -33,7 +34,7 @@
 
 {#snippet items(nodes: Node[])}
   {#each nodes as item (item.value)}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
+    <TreeItem value={item.value}>
       <TreeItemLabel>
         {#if item.children}
           <TreeItemIndicator>
@@ -42,7 +43,6 @@
           <FolderIcon aria-hidden="true" />
           <FolderOpenIcon aria-hidden="true" />
         {:else}
-          <span></span>
           <FileIcon aria-hidden="true" />
         {/if}
         <span>{item.label}</span>

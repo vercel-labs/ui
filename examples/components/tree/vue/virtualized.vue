@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import type { TreeItemData } from "@ui-sdk/core/tree"
-import { Tree, TreeItem, TreeItemLabel, visibleTreeRows } from "@ui-sdk/vue/tree"
+import { ChevronRightIcon } from "@lucide/vue"
+import {
+  Tree,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+  visibleTreeRows,
+  type ListHighlightDetails,
+  type TreeItemData,
+} from "@ui-sdk/vue/tree"
 import { computed, ref } from "vue"
 
 const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
@@ -12,8 +20,8 @@ const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
   })),
 }))
 
-const row = 28
-const height = 280
+const row = 32
+const height = 288
 
 const scroller = ref<HTMLDivElement | null>(null)
 const scrollTop = ref(0)
@@ -25,12 +33,12 @@ const visible = computed(() => {
   return rows.value.slice(start, end)
 })
 
-function onHighlight(_value: string, { index }: { index: number }) {
+function onHighlight(_value: string, { index }: ListHighlightDetails) {
   const el = scroller.value
   if (!el) return
   const top = index * row
   if (top < el.scrollTop) el.scrollTop = top
-  else if (top + row > el.scrollTop + el.clientHeight - 8) el.scrollTop = top + row - el.clientHeight + 8
+  else if (top + row > el.scrollTop + el.clientHeight - 10) el.scrollTop = top + row - el.clientHeight + 10
   scrollTop.value = el.scrollTop
 }
 </script>
@@ -39,26 +47,25 @@ function onHighlight(_value: string, { index }: { index: number }) {
   <div
     data-slot="scroll"
     ref="scroller"
-    :style="{ height: `${height}px` }"
     @scroll="scrollTop = ($event.currentTarget as HTMLDivElement).scrollTop"
   >
     <Tree
       v-model:expanded="expanded"
       aria-label="Archive"
       :items="items"
-      :style="{ height: `${rows.length * row}px` }"
       @highlight="onHighlight"
+      :style="{ height: `${rows.length * row}px` }"
     >
       <TreeItem
-        v-for="{ item, level, index } in visible"
+        v-for="{ item, index } in visible"
         :key="item.value"
         :value="item.value"
-        :style="{ top: `${index * row}px`, height: `${row}px`, paddingInlineStart: `${(level - 1) * 16}px` }"
+        :style="{ top: `${index * row}px` }"
       >
         <TreeItemLabel>
-          <span data-slot="hint" aria-hidden="true">
-            {{ item.children ? (expanded.includes(item.value) ? "▾" : "▸") : "" }}
-          </span>
+          <TreeItemIndicator v-if="item.children">
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
           {{ item.label }}
         </TreeItemLabel>
       </TreeItem>

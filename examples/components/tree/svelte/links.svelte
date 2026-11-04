@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ChevronRightIcon } from "@lucide/svelte"
   import {
     Tree,
     TreeGroup,
@@ -44,11 +45,13 @@
     {#snippet link({ props }: { props: Record<string, unknown> })}
       <a {...props} href={item.href}>{item.label}</a>
     {/snippet}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
-      {#if item.children}
-        <TreeItemIndicator />
-      {/if}
+    <TreeItem value={item.value}>
       <TreeItemLabel render={item.href ? link : undefined}>
+        {#if item.children}
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        {/if}
         {item.label}
       </TreeItemLabel>
       {#if item.children}

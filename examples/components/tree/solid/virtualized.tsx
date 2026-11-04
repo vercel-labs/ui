@@ -1,5 +1,12 @@
-import { Tree, TreeItem, TreeItemLabel, visibleTreeRows, type TreeItemData } from "@ui-sdk/solid/tree"
-import { createMemo, createSignal, For } from "solid-js"
+import {
+  Tree,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+  visibleTreeRows,
+  type TreeItemData,
+} from "@ui-sdk/solid/tree"
+import { createMemo, createSignal, For, Show } from "solid-js"
 
 const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
   value: `folder-${folder + 1}`,
@@ -10,8 +17,8 @@ const items: TreeItemData[] = Array.from({ length: 100 }, (_, folder) => ({
   })),
 }))
 
-const row = 28
-const height = 280
+const row = 32
+const height = 288
 
 function Example() {
   let scroller: HTMLDivElement | undefined
@@ -21,12 +28,7 @@ function Example() {
   const start = () => Math.max(0, Math.floor(scrollTop() / row) - 4)
   const end = () => Math.min(rows().length, Math.ceil((scrollTop() + height) / row) + 4)
   return (
-    <div
-      data-slot="scroll"
-      ref={scroller}
-      style={{ height: `${height}px` }}
-      onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-    >
+    <div data-slot="scroll" ref={scroller} onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
       <Tree
         aria-label="Archive"
         items={items}
@@ -37,26 +39,31 @@ function Example() {
           if (!el) return
           const top = index * row
           if (top < el.scrollTop) el.scrollTop = top
-          else if (top + row > el.scrollTop + el.clientHeight - 8)
-            el.scrollTop = top + row - el.clientHeight + 8
+          else if (top + row > el.scrollTop + el.clientHeight - 10)
+            el.scrollTop = top + row - el.clientHeight + 10
           setScrollTop(el.scrollTop)
         }}
         style={{ height: `${rows().length * row}px` }}
       >
         <For each={rows().slice(start(), end())} keyed={(visible) => visible.item.value}>
           {(visible) => (
-            <TreeItem
-              value={visible().item.value}
-              style={{
-                top: `${visible().index * row}px`,
-                height: `${row}px`,
-                "padding-inline-start": `${(visible().level - 1) * 16}px`,
-              }}
-            >
+            <TreeItem value={visible().item.value} style={{ top: `${visible().index * row}px` }}>
               <TreeItemLabel>
-                <span data-slot="hint" aria-hidden="true">
-                  {visible().item.children && (expanded().includes(visible().item.value) ? "▾" : "▸")}
-                </span>
+                <Show when={visible().item.children}>
+                  <TreeItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </TreeItemIndicator>
+                </Show>
                 {visible().item.label}
               </TreeItemLabel>
             </TreeItem>

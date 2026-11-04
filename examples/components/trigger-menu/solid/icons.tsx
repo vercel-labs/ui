@@ -1,3 +1,4 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   TriggerMenu,
   TriggerMenuContent,
@@ -41,7 +42,10 @@ const commands = [
 function Example() {
   return (
     <TriggerMenu triggers={[{ char: "/", boundary: "start", type: "command" }]}>
-      <TriggerMenuInput aria-label="Message" placeholder="Type / for commands" />
+      <Field>
+        <FieldLabel>Message</FieldLabel>
+        <FieldControl render={(props) => <TriggerMenuInput {...props} placeholder="Type / for commands" />} />
+      </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           <For each={commands}>

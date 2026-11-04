@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     type TriggerMenuDataItem,
     TriggerMenu,
@@ -8,79 +9,55 @@
     TriggerMenuList,
     createTriggerMenuController,
   } from "@ui-sdk/svelte/trigger-menu"
+  import { useLog } from "../../../shared/svelte/log"
 
   const people = [
-    { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-    { value: "alan", label: "Alan Turing" },
-    { value: "grace", label: "Grace Hopper" },
-    { value: "katherine", label: "Katherine Johnson" },
-    { value: "linus", label: "Linus Torvalds", disabled: true },
-    { value: "margaret", label: "Margaret Hamilton" },
+    { value: "hollis", label: "Hollis Grant" },
+    { value: "ines", label: "Inès Moreau" },
+    { value: "kofi", label: "Kofi Mensah" },
+    { value: "wren", label: "Wren Takahashi" },
+    { value: "tomasz", label: "Tomasz Wójcik" },
   ]
 
+  const log = useLog()
   const menu = createTriggerMenuController()
-  let result = $state("")
 
   async function mention() {
     const closed = await menu.open({ trigger: "@" })
-    result = `Closed with ${closed.reason}`
-  }
-
-  function insertDate() {
-    const match = menu.getMatch()
-    result = match ? `Query “${menu.getQuery()}” at ${match.start}` : `Open: ${menu.isOpen()}`
-    menu.insert(new Date().toLocaleDateString())
-  }
-
-  function toggle() {
-    if (menu.isOpen()) {
-      menu.close()
-    } else {
-      menu.setOpen(true)
-    }
+    log(`Closed (${closed.reason})`)
   }
 </script>
 
-<TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
-  <div data-slot="stack">
-    <TriggerMenuInput aria-label="Message" />
-    <div data-slot="row">
-      <button
-        type="button"
-        data-variant="secondary"
-        onmousedown={(event) => event.preventDefault()}
-        onclick={mention}
-      >
-        Mention
-      </button>
-      <button
-        type="button"
-        data-variant="secondary"
-        onmousedown={(event) => event.preventDefault()}
-        onclick={insertDate}
-      >
-        Insert date
-      </button>
-      <button
-        type="button"
-        data-variant="secondary"
-        onmousedown={(event) => event.preventDefault()}
-        onclick={toggle}
-      >
-        Toggle
-      </button>
-    </div>
-    <p data-slot="hint">{result}</p>
+<div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onmousedown={(event) => event.preventDefault()} onclick={mention}>Mention</button>
+    <button
+      type="button"
+      onmousedown={(event) => event.preventDefault()}
+      onclick={() => menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" }))}
+    >
+      Insert Date
+    </button>
   </div>
-  <TriggerMenuContent>
-    <TriggerMenuList>
-      {#snippet children(state)}
-        {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
-            {item.label}
-          </TriggerMenuItem>
-        {/each}
-      {/snippet}
-    </TriggerMenuList>
-  </TriggerMenuContent>
-</TriggerMenu>
+  <TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <FieldControl>
+        {#snippet render({ props })}
+          <TriggerMenuInput {...props} placeholder="Write a message" />
+        {/snippet}
+      </FieldControl>
+    </Field>
+    <TriggerMenuContent>
+      <TriggerMenuList>
+        {#snippet children(state)}
+          {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+            <TriggerMenuItem value={item.value} label={item.label}>
+              {item.label}
+            </TriggerMenuItem>
+          {/each}
+        {/snippet}
+      </TriggerMenuList>
+    </TriggerMenuContent>
+  </TriggerMenu>
+</div>

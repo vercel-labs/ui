@@ -5,12 +5,11 @@ import {
   TreeItem,
   TreeItemIndicator,
   TreeItemLabel,
+  type TreeItemData,
 } from "@ui-sdk/solid/tree"
-import { createSignal, For, Show } from "solid-js"
+import { For, Show } from "solid-js"
 
-type Node = { value: string; label: string; children?: Node[] }
-
-const sections: Node[] = [
+const sections: TreeItemData[] = [
   {
     value: "account",
     label: "Account",
@@ -36,13 +35,13 @@ const sections: Node[] = [
   },
 ]
 
-function Items(props: { items: Node[] }) {
+function Items(props: { items: TreeItemData[] }) {
   return (
     <For each={props.items}>
       {(item) => (
-        <TreeItem value={item.value} branch={item.children !== undefined}>
+        <TreeItem value={item.value}>
           <TreeItemLabel>
-            <Show when={item.children} fallback={<span />}>
+            <Show when={item.children}>
               <TreeItemIndicator>
                 <svg
                   viewBox="0 0 24 24"
@@ -74,30 +73,28 @@ function Items(props: { items: Node[] }) {
 
 function Example() {
   const settings = createTreeController()
-  const [expanded, setExpanded] = createSignal<string[]>([])
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" onClick={() => settings.expandAll()}>
-          Expand all
+          Expand All
         </button>
         <button type="button" onClick={() => settings.collapseAll()}>
-          Collapse all
+          Collapse All
         </button>
-        <button type="button" onClick={() => settings.reveal("two-factor")}>
-          Find two-factor
+        <button
+          type="button"
+          onClick={() => {
+            settings.setValue("two-factor")
+            settings.reveal("two-factor")
+          }}
+        >
+          Find Two-Factor
         </button>
       </div>
-      <Tree
-        aria-label="Settings"
-        controller={settings}
-        keepMounted
-        expanded={expanded()}
-        onExpandedChange={setExpanded}
-      >
+      <Tree aria-label="Settings" items={sections} controller={settings}>
         <Items items={sections} />
       </Tree>
-      <p data-slot="hint">Expanded: {expanded().join(", ") || "none"}</p>
     </div>
   )
 }

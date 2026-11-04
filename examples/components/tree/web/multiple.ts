@@ -1,5 +1,7 @@
 import type { TreeItemData } from "@ui-sdk/core/tree"
 import "@ui-sdk/web/tree"
+import { ChevronRight, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const items: TreeItemData[] = [
   {
@@ -23,26 +25,35 @@ const items: TreeItemData[] = [
   { value: "trash", label: "Trash" },
 ]
 
+function markup(items: TreeItemData[]) {
+  let html = ""
+  for (const item of items)
+    html += `
+      <ui-tree-item value="${item.value}">
+        <ui-tree-item-label>
+          ${
+            item.children
+              ? `<ui-tree-item-indicator>${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
+              : ""
+          }
+          ${item.label}
+        </ui-tree-item-label>
+        ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
+      </ui-tree-item>`
+  return html
+}
+
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-tree aria-label="Folders" mode="multiple" default-value="updates,website" expand-on-press="false" default-expanded="inbox,projects">
-        <template>
-          <ui-tree-item>
-            <ui-tree-item-indicator></ui-tree-item-indicator>
-            <ui-tree-item-label></ui-tree-item-label>
-            <ui-tree-group></ui-tree-group>
-          </ui-tree-item>
-        </template>
-      </ui-tree>
-      <p data-slot="hint">2 selected</p>
-    </div>
+    <ui-tree aria-label="Folders" mode="multiple" default-value="updates,website" expand-on-press="false" default-expanded="inbox,projects">
+      ${markup(items)}
+    </ui-tree>
   `
   const tree = root.querySelector("ui-tree")!
-  const output = root.querySelector("p")!
   tree.items = items
   tree.addEventListener("valuechange", (event) => {
-    output.textContent = `${(event.detail.value as string[]).length} selected`
+    const value = event.detail.value as string[]
+    log(root, `${value.length} selected: ${value.join(", ")}`)
   })
 }
 

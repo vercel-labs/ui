@@ -1,12 +1,15 @@
 <script lang="ts">
+  import { ChevronRightIcon } from "@lucide/svelte"
   import {
     Tree,
     TreeGroup,
     TreeItem,
     TreeItemCheckbox,
+    TreeItemIndicator,
     TreeItemLabel,
     type TreeItemData,
   } from "@ui-sdk/svelte/tree"
+  import { useLog } from "../../../shared/svelte/log"
 
   const items: TreeItemData[] = [
     {
@@ -35,16 +38,19 @@
     },
   ]
 
-  const initial = ["react", "postgres"]
-
-  let checked = $state(initial)
+  const log = useLog()
 </script>
 
 {#snippet treeItems(nodes: TreeItemData[])}
   {#each nodes as item (item.value)}
-    <TreeItem value={item.value} branch={item.children !== undefined}>
-      <TreeItemCheckbox />
+    <TreeItem value={item.value}>
       <TreeItemLabel>
+        {#if item.children}
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        {/if}
+        <TreeItemCheckbox />
         {item.label}
       </TreeItemLabel>
       {#if item.children}
@@ -56,18 +62,15 @@
   {/each}
 {/snippet}
 
-<div data-slot="stack">
-  <Tree
-    aria-label="Stack"
-    {items}
-    checkable
-    mode="none"
-    checkStrategy="trunk"
-    defaultChecked={initial}
-    onCheckedChange={(next) => (checked = next)}
-    defaultExpanded={["frontend", "backend", "databases"]}
-  >
-    {@render treeItems(items)}
-  </Tree>
-  <p data-slot="hint">Checked: {checked.join(", ") || "nothing"}</p>
-</div>
+<Tree
+  aria-label="Stack"
+  {items}
+  checkable
+  mode="none"
+  checkStrategy="trunk"
+  defaultChecked={["react", "postgres"]}
+  onCheckedChange={(checked) => log(`Checked ${checked.join(", ") || "nothing"}`)}
+  defaultExpanded={["frontend", "backend", "databases"]}
+>
+  {@render treeItems(items)}
+</Tree>

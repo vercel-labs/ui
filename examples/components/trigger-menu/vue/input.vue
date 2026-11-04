@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -9,22 +10,24 @@ import {
 } from "@ui-sdk/vue/trigger-menu"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 </script>
 
 <template>
-  <TriggerMenu :triggers="[{ char: '@', items: people }]">
-    <TriggerMenuInput aria-label="Assign to" placeholder="Assign with @">
-      <template #render="{ props }">
-        <input v-bind="props" />
-      </template>
-    </TriggerMenuInput>
+  <TriggerMenu :triggers="[{ char: '@', items: people }]" :auto-highlight="false" :loop="false">
+    <Field>
+      <FieldLabel>Task</FieldLabel>
+      <TriggerMenuInput placeholder="Type @ to assign someone">
+        <template #render="{ props }">
+          <input v-bind="props" />
+        </template>
+      </TriggerMenuInput>
+    </Field>
     <TriggerMenuContent>
       <TriggerMenuList v-slot="{ state }">
         <TriggerMenuItem
@@ -32,7 +35,6 @@ const people = [
           :key="item.value"
           :value="item.value"
           :label="item.label"
-          :disabled="item.disabled"
         >
           {{ item.label }}
         </TriggerMenuItem>

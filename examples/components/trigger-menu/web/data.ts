@@ -1,40 +1,31 @@
 import "@ui-sdk/web/trigger-menu"
-import type { TriggerDefinition } from "@ui-sdk/web"
+import "@ui-sdk/web/field"
+import type { TriggerDefinition } from "@ui-sdk/web/trigger-menu"
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", keywords: ["ada"] },
-  { value: "alan", label: "Alan Turing" },
-  { value: "grace", label: "Grace Hopper" },
-  { value: "katherine", label: "Katherine Johnson" },
-  { value: "linus", label: "Linus Torvalds", disabled: true },
-  { value: "margaret", label: "Margaret Hamilton" },
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
-const commands = [
-  {
-    value: "model",
-    label: "model",
-    arguments: [
-      { name: "model", hint: "<model>", required: true, items: ["opus", "sonnet", "haiku"] },
-      { name: "effort", hint: "[effort]", items: ["low", "medium", "high"], allowCustomValue: false },
-    ],
-  },
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
-  { value: "clear", label: "clear" },
-  { value: "send", label: "send", after: "submit" as const },
-]
+const commands = ["away", "remind", "search", "status"]
 
-const channels = ["general", "random", "design", "engineering", "marketing", "support"]
+const channels = [
+  "announcements",
+  "design",
+  "design-reviews",
+  "engineering",
+  "general",
+  "launches",
+  "support",
+]
 
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
-  return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
+  return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(
-      () =>
-        resolve(
-          channels
-            .filter((channel) => channel.includes(query.toLowerCase()))
-            .map((channel) => ({ value: channel, label: channel })),
-        ),
+      () => resolve(channels.filter((channel) => channel.includes(query.toLowerCase()))),
       400,
     )
     signal.addEventListener("abort", () => {
@@ -44,7 +35,7 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
   })
 }
 
-const triggers: TriggerDefinition[] = [
+const triggers: TriggerDefinition<string>[] = [
   { char: "@", items: people },
   { char: "/", boundary: "start", items: commands },
   { char: "#", items: searchChannels },
@@ -53,25 +44,15 @@ const triggers: TriggerDefinition[] = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-trigger-menu>
-      <ui-trigger-menu-input>
-        <textarea aria-label="Message" placeholder="Type @, / or #"></textarea>
-      </ui-trigger-menu-input>
-      <template>
-        <ui-trigger-menu-content>
-          <ui-trigger-menu-list>
-            <ui-trigger-menu-group>
-              <ui-trigger-menu-group-label></ui-trigger-menu-group-label>
-              <ui-trigger-menu-item>
-              </ui-trigger-menu-item>
-            </ui-trigger-menu-group>
-            <ui-trigger-menu-separator></ui-trigger-menu-separator>
-          </ui-trigger-menu-list>
-        </ui-trigger-menu-content>
-      </template>
+      <ui-field>
+        <ui-field-label>Message</ui-field-label>
+        <ui-trigger-menu-input>
+          <textarea placeholder="Type @, / or #"></textarea>
+        </ui-trigger-menu-input>
+      </ui-field>
     </ui-trigger-menu>
   `
-  const menu = root.querySelector("ui-trigger-menu")!
-  menu.triggers = triggers
+  root.querySelector("ui-trigger-menu")!.triggers = triggers
 }
 
 export { mount }

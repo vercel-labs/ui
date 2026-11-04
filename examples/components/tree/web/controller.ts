@@ -1,10 +1,8 @@
-import type { TreeController } from "@ui-sdk/core/tree"
+import type { TreeItemData } from "@ui-sdk/core/tree"
 import "@ui-sdk/web/tree"
 import { ChevronRight, createElement } from "lucide"
 
-type Node = { value: string; label: string; children?: Node[] }
-
-const sections: Node[] = [
+const sections: TreeItemData[] = [
   {
     value: "account",
     label: "Account",
@@ -30,16 +28,16 @@ const sections: Node[] = [
   },
 ]
 
-function markup(list: Node[]) {
+function markup(items: TreeItemData[]) {
   let html = ""
-  for (const item of list)
+  for (const item of items)
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
           ${
             item.children
               ? `<ui-tree-item-indicator>${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</ui-tree-item-indicator>`
-              : `<span></span>`
+              : ""
           }
           ${item.label}
         </ui-tree-item-label>
@@ -51,25 +49,24 @@ function markup(list: Node[]) {
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div data-slot="row">
-        <button type="button">Expand all</button>
-        <button type="button">Collapse all</button>
-        <button type="button">Find two-factor</button>
+      <div data-slot="controls">
+        <button type="button">Expand All</button>
+        <button type="button">Collapse All</button>
+        <button type="button">Find Two-Factor</button>
       </div>
-      <ui-tree aria-label="Settings" keep-mounted>
+      <ui-tree aria-label="Settings">
         ${markup(sections)}
       </ui-tree>
-      <p data-slot="hint">Expanded: none</p>
     </div>
   `
   const tree = root.querySelector("ui-tree")!
-  const output = root.querySelector("p")!
   const [expand, collapse, find] = root.querySelectorAll("button")
+  tree.items = sections
   expand.addEventListener("click", () => tree.api.expandAll())
   collapse.addEventListener("click", () => tree.api.collapseAll())
-  find.addEventListener("click", () => tree.api.reveal("two-factor"))
-  tree.addEventListener("expandedchange", (event) => {
-    output.textContent = `Expanded: ${event.detail.value.join(", ") || "none"}`
+  find.addEventListener("click", () => {
+    tree.api.setValue("two-factor")
+    tree.api.reveal("two-factor")
   })
 }
 
