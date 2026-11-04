@@ -74,7 +74,10 @@
     }
   }
 
-  [data-slot="stack"]:has(> [data-slot="select-label"]) {
+  [data-slot="stack"]:has(
+    > [data-slot="select-label"],
+    > [data-slot="select-root"] > [data-slot="select-label"]
+  ) {
     align-items: stretch;
     gap: var(--space-2);
   }
