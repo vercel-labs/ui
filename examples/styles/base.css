@@ -732,6 +732,28 @@
     }
   }
 
+  /* iOS zooms into a field with text under 16px, so on touch screens every field gets 16px text. */
+  @media (pointer: coarse) {
+    :is(
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"],
+        [type="file"],
+        [type="color"],
+        [type="hidden"],
+        [type="button"],
+        [type="submit"],
+        [type="reset"]
+      ),
+      textarea,
+      select,
+      [contenteditable]:not([contenteditable="false"])
+    ) {
+      font-size: max(16px, 1em) !important;
+    }
+  }
+
   /* ─── Buttons ─── */
 
   :is(
