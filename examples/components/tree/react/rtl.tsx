@@ -1,5 +1,7 @@
+"use client"
+
 import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/react/tree"
-import { ChevronLeftIcon } from "lucide-react"
+import { ChevronRightIcon } from "lucide-react"
 
 type Node = { value: string; label: string; children?: Node[] }
 
@@ -27,12 +29,10 @@ function Items({ items }: { items: Node[] }) {
   return items.map((item) => (
     <TreeItem key={item.value} value={item.value}>
       <TreeItemLabel>
-        {item.children ? (
+        {item.children && (
           <TreeItemIndicator>
-            <ChevronLeftIcon />
+            <ChevronRightIcon aria-hidden="true" />
           </TreeItemIndicator>
-        ) : (
-          <span />
         )}
         {item.label}
       </TreeItemLabel>
@@ -45,7 +45,7 @@ function Items({ items }: { items: Node[] }) {
   ))
 }
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Tree aria-label="الملفات" defaultExpanded={["documents"]}>
@@ -54,3 +54,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

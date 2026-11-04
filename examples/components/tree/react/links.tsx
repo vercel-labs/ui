@@ -8,6 +8,7 @@ import {
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/react/tree"
+import { ChevronRightIcon } from "lucide-react"
 import * as React from "react"
 
 const pages: TreeItemData[] = [
@@ -41,8 +42,14 @@ const links = new Set(
 function Items({ items }: { items: TreeItemData[] }) {
   return items.map((item) => (
     <TreeItem key={item.value} value={item.value}>
-      {item.children && <TreeItemIndicator />}
-      <TreeItemLabel render={item.href ? <a href={item.href} /> : undefined}>{item.label}</TreeItemLabel>
+      <TreeItemLabel render={item.href ? <a href={item.href} /> : undefined}>
+        {item.children && (
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        )}
+        {item.label}
+      </TreeItemLabel>
       {item.children && (
         <TreeGroup>
           <Items items={item.children} />

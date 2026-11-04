@@ -27,6 +27,7 @@ const files: Node[] = [
       { value: "components/card.tsx", label: "card.tsx" },
     ],
   },
+  { value: "components.json", label: "components.json" },
   { value: "package.json", label: "package.json" },
   { value: "README.md", label: "README.md" },
 ]
@@ -44,10 +45,7 @@ function Items({ items }: { items: Node[] }) {
             <FolderOpenIcon aria-hidden="true" />
           </>
         ) : (
-          <>
-            <span />
-            <FileIcon aria-hidden="true" />
-          </>
+          <FileIcon aria-hidden="true" />
         )}
         <span>{item.label}</span>
       </TreeItemLabel>

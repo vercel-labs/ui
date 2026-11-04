@@ -32,7 +32,7 @@ function Items({ items, loaded }: { items: Node[]; loaded: Record<string, Node[]
   return items.map((item) => (
     <TreeItem key={item.value} value={item.value} branch={item.branch}>
       <TreeItemLabel>
-        {item.branch ? (
+        {item.branch && (
           <TreeItemIndicator>
             {(state) =>
               state.loading ? (
@@ -44,8 +44,6 @@ function Items({ items, loaded }: { items: Node[]; loaded: Record<string, Node[]
               )
             }
           </TreeItemIndicator>
-        ) : (
-          <span />
         )}
         {item.label}
       </TreeItemLabel>

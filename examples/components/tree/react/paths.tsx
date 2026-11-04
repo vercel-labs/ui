@@ -7,10 +7,10 @@ import {
   TreeItemIndicator,
   TreeItemLabel,
   treeFromPaths,
+  type TreeItemData,
 } from "@ui-sdk/react/tree"
-import type { TreeItemData } from "@ui-sdk/react/tree"
 import { ChevronRightIcon, LoaderCircleIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const paths = [
   "src/index.ts",
@@ -32,12 +32,10 @@ function Items({ items }: { items: TreeItemData[] }) {
       <TreeItemLabel>
         {(state) => (
           <>
-            {item.children ? (
+            {item.children && (
               <TreeItemIndicator>
                 <ChevronRightIcon aria-hidden="true" />
               </TreeItemIndicator>
-            ) : (
-              <span />
             )}
             <span>{item.label}</span>
             {state.pending && <LoaderCircleIcon aria-hidden="true" />}
@@ -54,30 +52,22 @@ function Items({ items }: { items: TreeItemData[] }) {
 }
 
 function Example() {
-  const [selected, setSelected] = React.useState<string | null>("src/index.ts")
-  const [opened, setOpened] = React.useState<string | null>(null)
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Tree
-        aria-label="Project"
-        paths={paths}
-        defaultExpanded={["src"]}
-        value={selected}
-        onValueChange={setSelected}
-        activation="automatic"
-        onAction={async (value) => {
-          if (!files.has(value)) return
-          await new Promise((resolve) => setTimeout(resolve, 600))
-          setOpened(value)
-        }}
-      >
-        <Items items={items} />
-      </Tree>
-      <div data-slot="stack">
-        <span data-slot="hint">{selected ?? "Nothing selected"}</span>
-        <span>{opened ? `Opened ${opened}` : "Press Enter to open a file."}</span>
-      </div>
-    </div>
+    <Tree
+      aria-label="Project"
+      paths={paths}
+      defaultExpanded={["src"]}
+      defaultValue="src/index.ts"
+      activation="automatic"
+      onAction={async (value) => {
+        if (!files.has(value)) return
+        await new Promise((resolve) => setTimeout(resolve, 600))
+        log(`Opened ${value}`)
+      }}
+    >
+      <Items items={items} />
+    </Tree>
   )
 }
 

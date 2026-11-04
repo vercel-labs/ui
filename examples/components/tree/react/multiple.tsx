@@ -8,7 +8,8 @@ import {
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/react/tree"
-import * as React from "react"
+import { ChevronRightIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 const items: TreeItemData[] = [
   {
@@ -35,8 +36,14 @@ const items: TreeItemData[] = [
 function Items({ items }: { items: TreeItemData[] }) {
   return items.map((item) => (
     <TreeItem key={item.value} value={item.value}>
-      {item.children && <TreeItemIndicator />}
-      <TreeItemLabel>{item.label}</TreeItemLabel>
+      <TreeItemLabel>
+        {item.children && (
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        )}
+        {item.label}
+      </TreeItemLabel>
       {item.children && (
         <TreeGroup>
           <Items items={item.children} />
@@ -47,22 +54,19 @@ function Items({ items }: { items: TreeItemData[] }) {
 }
 
 function Example() {
-  const [value, setValue] = React.useState(["updates", "website"])
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Tree
-        aria-label="Folders"
-        items={items}
-        mode="multiple"
-        value={value}
-        onValueChange={setValue}
-        expandOnPress={false}
-        defaultExpanded={["inbox", "projects"]}
-      >
-        <Items items={items} />
-      </Tree>
-      <p data-slot="hint">{value.length} selected</p>
-    </div>
+    <Tree
+      aria-label="Folders"
+      items={items}
+      mode="multiple"
+      defaultValue={["updates", "website"]}
+      onValueChange={(value) => log(`${value.length} selected: ${value.join(", ")}`)}
+      expandOnPress={false}
+      defaultExpanded={["inbox", "projects"]}
+    >
+      <Items items={items} />
+    </Tree>
   )
 }
 

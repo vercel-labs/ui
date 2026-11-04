@@ -1,6 +1,14 @@
 import { expect, type Locator } from "@playwright/test"
 import { testExamples, type Check } from "./docs-helpers"
 
+// The last line an example logged to its console.
+function lastLog(preview: Locator) {
+  return preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+}
+
 const item = (preview: Locator, name: string) => preview.getByRole("treeitem", { name, exact: true })
 
 // The tree is there, named, with one tab stop, and Down moves focus from it.
@@ -24,20 +32,14 @@ const checks: Record<string, Check> = {
     await item(preview, "components").click()
     await expect(item(preview, "components")).toHaveAttribute("aria-expanded", "true")
     await expect(item(preview, "card.tsx")).toBeVisible()
+    await expect(item(preview, "components.json")).toBeVisible()
   },
-  data: roves("Groceries"),
   paths: async (preview) => {
     await item(preview, "tests").focus()
     await preview.page().keyboard.press("ArrowDown")
     await expect(item(preview, "package.json")).toHaveAttribute("aria-selected", "true")
     await preview.page().keyboard.press("Enter")
-    await expect(preview.getByText("Opened package.json")).toBeVisible()
-  },
-  checkboxes: async (preview) => {
-    await item(preview, "Vue").focus()
-    await preview.page().keyboard.press("Space")
-    await expect(preview.getByText("Checked: react, vue, postgres")).toBeVisible()
-    await expect(item(preview, "Frontend")).toHaveAttribute("aria-checked", "mixed")
+    await expect(lastLog(preview)).toHaveText("Opened package.json")
   },
   multiple: async (preview) => {
     await expect(preview.getByRole("tree", { name: "Folders" })).toHaveAttribute(
@@ -45,7 +47,13 @@ const checks: Record<string, Check> = {
       "true",
     )
     await item(preview, "Archive").click({ modifiers: ["ControlOrMeta"] })
-    await expect(preview.getByText("3 selected")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("3 selected: updates, website, archive")
+  },
+  checkboxes: async (preview) => {
+    await item(preview, "Vue").focus()
+    await preview.page().keyboard.press("Space")
+    await expect(lastLog(preview)).toHaveText("Checked react, vue, postgres")
+    await expect(item(preview, "Frontend")).toHaveAttribute("aria-checked", "mixed")
   },
   links: async (preview) => {
     // A press moves the current page in the example, and leaves the docs' URL alone.
@@ -53,6 +61,10 @@ const checks: Record<string, Check> = {
     await item(preview, "Dialog").click()
     await expect(item(preview, "Dialog")).toHaveAttribute("aria-current", "page")
     expect(preview.page().url()).toBe(url)
+  },
+  disabled: async (preview, framework) => {
+    await roves("Plans")(preview, framework)
+    await expect(item(preview, "Enterprise")).toHaveAttribute("aria-disabled", "true")
   },
   lazy: async (preview) => {
     await item(preview, "users").click()
@@ -65,20 +77,16 @@ const checks: Record<string, Check> = {
     await expect(item(preview, "Folder 100")).toBeFocused()
     await expect(item(preview, "Folder 100")).toHaveAttribute("aria-posinset", "100")
   },
-  disabled: async (preview, framework) => {
-    await roves("Plans")(preview, framework)
-    await expect(item(preview, "Enterprise")).toHaveAttribute("aria-disabled", "true")
-  },
   "find-in-page": async (preview) => {
     await expect(
       preview.getByRole("tree", { name: "Solar system" }).locator('[hidden="until-found"]'),
     ).toHaveCount(5)
   },
   controller: async (preview) => {
-    await preview.getByRole("button", { name: "Find two-factor" }).click()
+    await preview.getByRole("button", { name: "Find Two-Factor" }).click()
     await expect(item(preview, "Two-factor authentication")).toBeFocused()
-    await preview.getByRole("button", { name: "Collapse all" }).click()
-    await expect(preview.getByText("Expanded: none")).toBeVisible()
+    await preview.getByRole("button", { name: "Collapse All" }).click()
+    await expect(item(preview, "Account")).toHaveAttribute("aria-expanded", "false")
   },
 }
 

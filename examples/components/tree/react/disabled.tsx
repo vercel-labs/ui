@@ -9,6 +9,7 @@ import {
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/react/tree"
+import { ChevronRightIcon } from "lucide-react"
 import * as React from "react"
 
 const items: TreeItemData[] = [
@@ -33,8 +34,14 @@ const items: TreeItemData[] = [
 function Items({ items }: { items: TreeItemData[] }) {
   return items.map((item) => (
     <TreeItem key={item.value} value={item.value} disabled={item.disabled}>
-      {item.children && <TreeItemIndicator />}
-      <TreeItemLabel>{item.label}</TreeItemLabel>
+      <TreeItemLabel>
+        {item.children && (
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        )}
+        {item.label}
+      </TreeItemLabel>
       {item.children && (
         <TreeGroup>
           <Items items={item.children} />
@@ -48,15 +55,17 @@ function Example() {
   const [focusable, setFocusable] = React.useState(true)
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Switch checked={focusable} onCheckedChange={setFocusable}>
+            <SwitchThumb />
+          </Switch>
+          Focusable when disabled
+        </label>
+      </div>
       <Tree aria-label="Plans" items={items} defaultExpanded={["plans"]} focusableWhenDisabled={focusable}>
         <Items items={items} />
       </Tree>
-      <label data-slot="label">
-        <Switch checked={focusable} onCheckedChange={setFocusable}>
-          <SwitchThumb />
-        </Switch>
-        Focusable when disabled
-      </label>
     </div>
   )
 }

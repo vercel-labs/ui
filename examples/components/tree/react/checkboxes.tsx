@@ -5,10 +5,12 @@ import {
   TreeGroup,
   TreeItem,
   TreeItemCheckbox,
+  TreeItemIndicator,
   TreeItemLabel,
   type TreeItemData,
 } from "@ui-sdk/react/tree"
-import * as React from "react"
+import { ChevronRightIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 const items: TreeItemData[] = [
   {
@@ -37,13 +39,18 @@ const items: TreeItemData[] = [
   },
 ]
 
-const initial = ["react", "postgres"]
-
 function Items({ items }: { items: TreeItemData[] }) {
   return items.map((item) => (
     <TreeItem key={item.value} value={item.value}>
-      <TreeItemCheckbox />
-      <TreeItemLabel>{item.label}</TreeItemLabel>
+      <TreeItemLabel>
+        {item.children && (
+          <TreeItemIndicator>
+            <ChevronRightIcon aria-hidden="true" />
+          </TreeItemIndicator>
+        )}
+        <TreeItemCheckbox />
+        {item.label}
+      </TreeItemLabel>
       {item.children && (
         <TreeGroup>
           <Items items={item.children} />
@@ -54,23 +61,20 @@ function Items({ items }: { items: TreeItemData[] }) {
 }
 
 function Example() {
-  const [checked, setChecked] = React.useState(initial)
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Tree
-        aria-label="Stack"
-        items={items}
-        checkable
-        mode="none"
-        checkStrategy="trunk"
-        defaultChecked={initial}
-        onCheckedChange={setChecked}
-        defaultExpanded={["frontend", "backend", "databases"]}
-      >
-        <Items items={items} />
-      </Tree>
-      <p data-slot="hint">Checked: {checked.join(", ") || "nothing"}</p>
-    </div>
+    <Tree
+      aria-label="Stack"
+      items={items}
+      checkable
+      mode="none"
+      checkStrategy="trunk"
+      defaultChecked={["react", "postgres"]}
+      onCheckedChange={(checked) => log(`Checked ${checked.join(", ") || "nothing"}`)}
+      defaultExpanded={["frontend", "backend", "databases"]}
+    >
+      <Items items={items} />
+    </Tree>
   )
 }
 
