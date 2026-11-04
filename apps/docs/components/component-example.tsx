@@ -85,7 +85,7 @@ async function ComponentExample({
               <ResetButton className="ms-auto group-has-[[data-code-tab][data-selected]]/example:hidden" />
               <CopyButton className="hidden size-7.5 shrink-0 rounded-[8px] hover:bg-muted group-has-[[data-code-tab][data-selected]]/example:inline-flex" />
             </TabBar>
-            <div className="grid [&>*]:[grid-area:1/1] [&>[data-inactive]]:invisible">
+            <div className="grid [&>*]:min-w-0 [&>*]:[grid-area:1/1] [&>[data-inactive]]:invisible">
               <TabsStackedPanel
                 value="preview"
                 keepMounted

@@ -77,7 +77,7 @@ function ExamplePreview({
     <div
       data-example={name}
       className={cn(
-        "flex flex-1 flex-col items-center justify-center px-6 text-foreground sm:px-10",
+        "flex min-w-0 flex-1 flex-col items-center justify-center px-6 text-foreground sm:px-10",
         compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
       )}
     >
@@ -87,7 +87,7 @@ function ExamplePreview({
   if (!log) return preview
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-w-0 flex-col">
       {preview}
       <ExampleConsole entries={entries} />
     </div>
