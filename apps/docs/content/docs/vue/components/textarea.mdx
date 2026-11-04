@@ -107,7 +107,7 @@ import { Textarea } from "@ui-sdk/vue/textarea"
 </template>
 ```
 
-The shortcut submits like the Send button, so `required` and the form's `@submit` still apply. Listen for `@submit` on the textarea to handle the shortcut yourself instead: `@submit="(value) => …"` receives the value, and the form doesn't submit.
+The shortcut submits like the Send button, so `required` and the form's `@submit` still apply. Listen for `@submit` on the textarea to handle the shortcut yourself instead: `@submit="(value) => …"` receives the value, and the form doesn't submit. Its first argument is the value, not an event, so there's nothing to prevent, and modifiers like `.prevent` don't apply.
 
 ## Styling
 
