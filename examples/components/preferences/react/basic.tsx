@@ -1,38 +1,52 @@
-import * as React from "react"
+"use client"
+
 import { createLocalStorage, createPreference } from "@ui-sdk/core"
 import { Button } from "@ui-sdk/react/button"
 import { Preferences, usePreference } from "@ui-sdk/react/preferences"
+import { useLog } from "../../../shared/react/log"
 
-const density = createPreference({
-  values: ["comfortable", "compact"],
-  defaultValue: "comfortable",
-  attribute: "data-density",
-  storage: createLocalStorage("ui-sdk-preferences-density"),
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+  storage: createLocalStorage("ui-sdk-preferences-view"),
 })
 
+const files = [
+  { name: "Q3 roadmap.pdf", detail: "2.4 MB" },
+  { name: "Launch checklist.md", detail: "12 KB" },
+  { name: "Offsite photos", detail: "24 items" },
+  { name: "Brand assets.zip", detail: "18 MB" },
+]
+
 function Example() {
-  const { value } = usePreference(density)
+  const log = useLog()
+  const { value } = usePreference(view)
+
+  const choose = (next: "list" | "grid", event: React.MouseEvent) => {
+    view.set(next, { reason: "press", event: event.nativeEvent })
+    log(`Saved the ${next} view`)
+  }
 
   return (
-    <Preferences preferences={[density]}>
-      <div data-slot="card">
-        <Button
-          aria-pressed={value === "compact"}
-          onClick={(event) =>
-            density.set(value === "compact" ? "comfortable" : "compact", {
-              reason: "press",
-              event: event.nativeEvent,
-            })
-          }
-        >
-          Compact layout
-        </Button>
-        <ul data-slot="list" aria-label="Documents">
-          {["Project notes", "Meeting notes", "Release notes"].map((name) => (
-            <li key={name}>{name}</li>
+    <Preferences preferences={[view]}>
+      <div data-slot="stack">
+        <div data-slot="controls" role="group" aria-label="View">
+          <Button aria-pressed={value === "list"} onClick={(event) => choose("list", event)}>
+            List
+          </Button>
+          <Button aria-pressed={value === "grid"} onClick={(event) => choose("grid", event)}>
+            Grid
+          </Button>
+        </div>
+        <ul data-slot="files" aria-label="Files">
+          {files.map((file) => (
+            <li key={file.name}>
+              <span>{file.name}</span>
+              <span data-slot="hint">{file.detail}</span>
+            </li>
           ))}
         </ul>
-        <span data-slot="hint">Density: {value}</span>
       </div>
     </Preferences>
   )
