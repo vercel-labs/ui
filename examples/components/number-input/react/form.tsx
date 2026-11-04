@@ -1,16 +1,19 @@
+"use client"
+
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/react/number-input"
 import { MinusIcon, PlusIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [submitted, setSubmitted] = React.useState("")
+function Example() {
+  const log = useLog()
   const form = React.useId()
 
   return (
@@ -21,9 +24,8 @@ export function Example() {
         onSubmit={(event) => {
           event.preventDefault()
           const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(data.join(", "))
+          log(`Submitted ${data.join(", ")}`)
         }}
-        onReset={() => setSubmitted("")}
       >
         <Field>
           <FieldLabel>Quantity</FieldLabel>
@@ -43,9 +45,9 @@ export function Example() {
           <FieldLabel>Tip</FieldLabel>
           <NumberInput
             name="tip"
-            defaultValue={1234.5}
+            defaultValue={4.5}
             min={0}
-            step={0.01}
+            step={0.5}
             format={{ style: "currency", currency: "USD" }}
           >
             <NumberInputGroup>
@@ -59,10 +61,6 @@ export function Example() {
             </NumberInputGroup>
           </NumberInput>
         </Field>
-        <div data-slot="row">
-          <button type="submit">Save</button>
-          <button type="reset">Reset</button>
-        </div>
       </form>
       <Field>
         <FieldLabel>Gift cards</FieldLabel>
@@ -78,7 +76,16 @@ export function Example() {
           </NumberInputGroup>
         </NumberInput>
       </Field>
-      <output data-slot="output">{submitted ? `Submitted: ${submitted}` : ""}</output>
+      <div data-slot="row">
+        <button type="reset" form={form}>
+          Reset
+        </button>
+        <button type="submit" form={form} data-variant="solid">
+          Save
+        </button>
+      </div>
     </div>
   )
 }
+
+export { Example }

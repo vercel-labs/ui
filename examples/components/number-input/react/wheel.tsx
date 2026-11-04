@@ -1,14 +1,16 @@
+"use client"
+
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/react/number-input"
 import { MinusIcon, PlusIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <Field>
       <FieldLabel>Font size</FieldLabel>
@@ -27,3 +29,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

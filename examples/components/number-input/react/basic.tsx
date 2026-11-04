@@ -1,24 +1,42 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
+  NumberInputScrubArea,
+  NumberInputScrubAreaCursor,
 } from "@ui-sdk/react/number-input"
-import { MinusIcon, PlusIcon } from "lucide-react"
+import { MinusIcon, MoveHorizontalIcon, PlusIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
+
   return (
-    <NumberInput defaultValue={1} min={0}>
-      <NumberInputGroup>
-        <NumberInputDecrement aria-label="Decrease">
-          <MinusIcon aria-hidden="true" />
-        </NumberInputDecrement>
-        <NumberInputControl aria-label="Quantity" />
-        <NumberInputIncrement aria-label="Increase">
-          <PlusIcon aria-hidden="true" />
-        </NumberInputIncrement>
-      </NumberInputGroup>
-    </NumberInput>
+    <Field>
+      <NumberInput defaultValue={1} min={1} onValueCommit={(value) => log(`Quantity ${value ?? "empty"}`)}>
+        <NumberInputScrubArea pixelsPerStep={4}>
+          <FieldLabel>Quantity</FieldLabel>
+          <NumberInputScrubAreaCursor>
+            <MoveHorizontalIcon aria-hidden="true" />
+          </NumberInputScrubAreaCursor>
+        </NumberInputScrubArea>
+        <NumberInputGroup>
+          <NumberInputDecrement aria-label="Decrease">
+            <MinusIcon aria-hidden="true" />
+          </NumberInputDecrement>
+          <NumberInputControl />
+          <NumberInputIncrement aria-label="Increase">
+            <PlusIcon aria-hidden="true" />
+          </NumberInputIncrement>
+        </NumberInputGroup>
+      </NumberInput>
+    </Field>
   )
 }
+
+export { Example }

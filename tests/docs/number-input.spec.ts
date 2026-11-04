@@ -1,100 +1,85 @@
-import { expect, test } from "@playwright/test"
-import { readdirSync } from "node:fs"
-import path from "node:path"
+import { expect, type Locator } from "@playwright/test"
+import { testExamples, type Check } from "./docs-helpers"
 
-const frameworks = ["react", "vue", "svelte", "solid", "web-components"]
-// Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/components/number-input")
-const folders = ["react", "vue", "svelte", "solid", "web"]
-const examplesIn = (folder: string) =>
-  readdirSync(path.join(root, folder), { withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name.replace(/\.\w+$/, ""))
+// The newest line in an example's console.
+const lastLog = (preview: Locator) =>
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
-// The order examples appear on the Number Input page, the input in each, the
-// button that steps it, and the text before and after a press.
-const fields: Record<string, { name: RegExp; button?: string; from: string | RegExp; to: string | RegExp }> =
-  {
-    basic: { name: /^Quantity$/, button: "Increase", from: "1", to: "2" },
-    field: { name: /^Quantity$/, button: "Increase", from: "1", to: "2" },
-    "min-max": { name: /^Guests$/, button: "Increase", from: "2", to: "3" },
-    step: { name: /^Hours$/, button: "Increase", from: "1.5", to: "1.75" },
-    format: { name: /^Price$/, button: "Increase", from: "$19.99", to: "$20.00" },
-    locale: { name: /^Preis$/, button: "Increase", from: /^1\.234,50\s€$/, to: /^1\.234,51\s€$/ },
-    wheel: { name: /^Font size$/, button: "Increase", from: "16", to: "17" },
-    scrub: { name: /^Width$/, from: "320", to: "320" },
-    toolbar: { name: /^Letter spacing$/, from: "0", to: "0" },
-    disabled: { name: /^Quantity$/, button: "Increase", from: "3", to: "3" },
-    "read-only": { name: /^Seats included$/, button: "Increase", from: "5", to: "5" },
-    invalid: { name: /^Age$/, from: "", to: "" },
-    controlled: { name: /^Servings$/, button: "Increase", from: "4", to: "5" },
-    controller: { name: /^Zoom$/, button: "Zoom in", from: "100", to: "110" },
-    form: { name: /^Quantity$/, button: "Increase", from: "2", to: "3" },
+const input = (preview: Locator, name: string) => preview.getByRole("textbox", { name, exact: true })
+const button = (preview: Locator, name: string) => preview.getByRole("button", { name, exact: true })
+
+// Checks a field's starting text, then presses its first Increase button and checks the new text.
+const steps =
+  (name: string, from: string | RegExp, to: string | RegExp): Check =>
+  async (preview) => {
+    await expect(input(preview, name)).toHaveValue(from)
+    await button(preview, "Increase").first().click()
+    await expect(input(preview, name)).toHaveValue(to)
   }
-const order = Object.keys(fields)
-const fixtures = [...order, "buttons", "rtl", "render"]
 
-// Examples whose buttons never step.
-const locked = new Set(["disabled", "read-only"])
-
-for (const framework of frameworks) {
-  test(`every number input example works in ${framework}`, async ({ page }) => {
-    const errors: string[] = []
-    page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
-    await page.goto(`/docs/${framework}/components/number-input`)
-    const previews = page.locator("[data-example]")
-    await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
-
-    for (const name of order) {
-      const { name: label, button, from, to } = fields[name]
-      const preview = page.locator(`[data-example="number-input/${name}"]`)
-      const input = preview.getByRole("textbox", { name: label })
-      await expect(input, `${name} starts`).toHaveValue(from)
-      if (!button) continue
-      // The first field's button, in examples with several.
-      await preview
-        .getByRole("button", { name: button, exact: true })
-        .first()
-        .click({ force: locked.has(name) })
-      await expect(input, `${name} after a press`).toHaveValue(to)
-    }
-
-    // Submitting while empty shows the error.
-    const invalid = page.locator('[data-example="number-input/invalid"]')
-    await invalid.getByRole("button", { name: "Continue" }).click()
-    await expect(invalid.getByText("Enter your age.")).toBeVisible()
-
-    // The controller steps the field from outside.
-    const controller = page.locator('[data-example="number-input/controller"]')
-    await controller.getByRole("button", { name: "Actual size" }).click()
-    await expect(controller.getByRole("textbox", { name: /^Zoom$/ })).toHaveValue("100")
-
-    // Saving submits the plain numbers, with the field outside the form, and Reset restores them.
-    const form = page.locator('[data-example="number-input/form"]')
-    await form.getByRole("button", { name: "Save" }).click()
-    await expect(form.getByText("Submitted: quantity=3, tip=1234.5, gift-cards=0")).toBeVisible()
-    await form.getByRole("button", { name: "Reset" }).click()
-    await expect(form.getByRole("textbox", { name: /^Quantity$/ })).toHaveValue("2")
-
-    expect(errors).toEqual([])
-  })
+// Each example's check, in the order they appear on the Number Input page.
+const checks: Record<string, Check> = {
+  basic: async (preview) => {
+    await steps("Quantity", "1", "2")(preview, "")
+    await expect(lastLog(preview)).toHaveText("Quantity 2")
+  },
+  field: steps("Tickets", "2", "3"),
+  "min-max": async (preview) => {
+    const guests = input(preview, "Guests")
+    await guests.focus()
+    await guests.press("ArrowUp")
+    await expect(guests).toHaveValue("3")
+    await guests.press("ArrowDown")
+    await guests.press("ArrowDown")
+    await expect(guests).toHaveValue("1")
+    await expect(button(preview, "Decrease")).toBeDisabled()
+  },
+  step: steps("Hours", "1.5", "1.75"),
+  format: steps("Price", "$19.99", "$20.00"),
+  locale: steps("Preis", /^1\.234,50\s€$/, /^1\.234,51\s€$/),
+  wheel: steps("Font size", "16", "17"),
+  scrub: async (preview) => {
+    await expect(preview.getByRole("group", { name: "Frame" })).toBeVisible()
+    await expect(input(preview, "X position")).toHaveValue("120")
+    await expect(input(preview, "Height")).toHaveValue("240")
+    await expect(preview.getByText("W", { exact: true })).toHaveAttribute("aria-hidden", "true")
+  },
+  controlled: async (preview) => {
+    await steps("Servings", "4", "5")(preview, "")
+    await expect(lastLog(preview)).toHaveText("Committed 5 (increment-press)")
+    await button(preview, "Clear").click()
+    await expect(input(preview, "Servings")).toHaveValue("")
+    await button(preview, "Reset to 4").click()
+    await expect(input(preview, "Servings")).toHaveValue("4")
+  },
+  controller: async (preview) => {
+    const zoom = input(preview, "Zoom")
+    await expect(zoom).toHaveValue("100%")
+    await button(preview, "Zoom In").click()
+    await expect(zoom).toHaveValue("200%")
+    await button(preview, "Actual Size").click()
+    await expect(zoom).toHaveValue("100%")
+    await button(preview, "Read").click()
+    await expect(lastLog(preview)).toHaveText("Zoom is 100%")
+  },
+  form: async (preview) => {
+    await steps("Quantity", "2", "3")(preview, "")
+    // Gift cards submits with the form through its form ID.
+    await button(preview, "Save").click()
+    await expect(lastLog(preview)).toHaveText("Submitted quantity=3, tip=4.5, gift-cards=0")
+    await button(preview, "Reset").click()
+    await expect(input(preview, "Quantity")).toHaveValue("2")
+  },
+  render: async (preview) => {
+    const temperature = input(preview, "Temperature")
+    await expect(temperature).toHaveValue(/^-2\s?°C$/)
+    await temperature.press("End")
+    await expect(temperature).toHaveValue(/^40\s?°C$/)
+    await expect(button(preview, "Warmer")).toHaveText("Max")
+  },
 }
 
-// Arrow keys step the field.
-for (const framework of frameworks) {
-  test(`arrow keys step a number input in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/number-input`)
-    await page.waitForLoadState("networkidle")
-    const input = page
-      .locator('[data-example="number-input/min-max"]')
-      .getByRole("textbox", { name: /^Guests$/ })
-    await input.focus()
-    await page.keyboard.press("ArrowUp")
-    await expect(input).toHaveValue("3")
-    await page.keyboard.press("ArrowDown")
-    await page.keyboard.press("ArrowDown")
-    await expect(input).toHaveValue("1")
-  })
-}
+testExamples("number-input", checks, "components", [...Object.keys(checks), "buttons", "rtl"])

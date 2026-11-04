@@ -1,3 +1,5 @@
+"use client"
+
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
@@ -8,7 +10,7 @@ import {
 } from "@ui-sdk/react/number-input"
 import { MinusIcon, PlusIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Field>
@@ -16,11 +18,11 @@ export function Example() {
         <NumberInput defaultValue={1} min={0}>
           <NumberInputGroup>
             <NumberInputDecrement aria-label="إنقاص">
-              <MinusIcon />
+              <MinusIcon aria-hidden="true" />
             </NumberInputDecrement>
             <NumberInputControl />
             <NumberInputIncrement aria-label="زيادة">
-              <PlusIcon />
+              <PlusIcon aria-hidden="true" />
             </NumberInputIncrement>
           </NumberInputGroup>
         </NumberInput>
@@ -28,3 +30,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

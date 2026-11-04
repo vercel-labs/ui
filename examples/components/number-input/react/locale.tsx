@@ -1,3 +1,5 @@
+"use client"
+
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
@@ -31,7 +33,7 @@ const fields = [
   format: Intl.NumberFormatOptions
 }[]
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       {fields.map(({ label, ...options }) => (
@@ -54,3 +56,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

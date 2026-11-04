@@ -1,14 +1,16 @@
+"use client"
+
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
+  NumberInputControl,
   NumberInputDecrement,
   NumberInputGroup,
   NumberInputIncrement,
-  NumberInputControl,
 } from "@ui-sdk/react/number-input"
 import { MinusIcon, PlusIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <Field>
       <FieldLabel>Temperature</FieldLabel>
@@ -20,14 +22,16 @@ export function Example() {
               <button {...props} title={state.atBound ? "As cold as it goes" : "Colder"} />
             )}
           >
-            <MinusIcon />
+            <MinusIcon aria-hidden="true" />
           </NumberInputDecrement>
           <NumberInputControl />
           <NumberInputIncrement aria-label="Warmer">
-            {(state) => (state.atBound ? <span>Max</span> : <PlusIcon />)}
+            {(state) => (state.atBound ? <span>Max</span> : <PlusIcon aria-hidden="true" />)}
           </NumberInputIncrement>
         </NumberInputGroup>
       </NumberInput>
     </Field>
   )
 }
+
+export { Example }

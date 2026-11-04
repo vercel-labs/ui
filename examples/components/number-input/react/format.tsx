@@ -1,3 +1,5 @@
+"use client"
+
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   NumberInput,
@@ -19,7 +21,7 @@ const fields = [
   { label: "Weight", defaultValue: 2.5, step: 0.1, format: { style: "unit", unit: "kilogram" } },
 ] satisfies { label: string; defaultValue: number; step: number; format: Intl.NumberFormatOptions }[]
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       {fields.map(({ label, ...options }) => (
@@ -41,3 +43,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }
