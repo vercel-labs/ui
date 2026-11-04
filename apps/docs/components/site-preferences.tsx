@@ -51,11 +51,23 @@ function SavedLabel() {
       <span className="text-muted-foreground [html[data-framework]:not([data-framework=''])_&]:hidden">
         Framework
       </span>
-      {items.map(({ value, label }) => (
+      {frameworkIds.map((value) => (
         <span key={value} className={cn("hidden", shownFor[value])}>
-          {label}
+          <FrameworkName framework={value} />
         </span>
       ))}
+    </>
+  )
+}
+
+// The header has no room for "Web Components" on a phone.
+function FrameworkName({ framework }: { framework: Framework }) {
+  const { label, short } = frameworks[framework]
+  if (label === short) return label
+  return (
+    <>
+      <span className="sm:hidden">{short}</span>
+      <span className="max-sm:hidden">{label}</span>
     </>
   )
 }
@@ -83,7 +95,9 @@ function FrameworkPicker({ urls }: { urls: string[] }) {
         aria-label="Framework"
         className="h-8 min-w-0 rounded-2xl px-2.5 data-placeholder:text-foreground bg-foreground/5 hover:bg-foreground/10"
       >
-        <SelectValue className="truncate">{inFramework ? undefined : <SavedLabel />}</SelectValue>
+        <SelectValue className="truncate">
+          {inFramework ? <FrameworkName framework={section} /> : <SavedLabel />}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent align="start" sideOffset={6} className="min-w-44 transition-none">
         {items.map(({ value, label }) => (
