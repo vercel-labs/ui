@@ -40,7 +40,7 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
               {page.data.title}
             </h1>
             {page.data.description && (
-              <p className="mt-3 text-[15px] leading-relaxed text-pretty text-subtle">
+              <p className="mt-3 text-base leading-relaxed sm:text-[15px] text-pretty text-subtle">
                 {page.data.description}
               </p>
             )}
