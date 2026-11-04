@@ -945,7 +945,7 @@ interface UiDatePickerElement
 }
 
 /**
- * The events of `<ui-otp-input>`. `complete` fires when a change fills every slot.
+ * The events of `<ui-otp-input>`. `valuecommit` fires when a change fills every slot.
  * @stable
  */
 type OTPInputEvents = {
