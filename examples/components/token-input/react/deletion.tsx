@@ -11,6 +11,7 @@ import {
 import {
   TokenInput,
   TokenInputEditor,
+  TokenInputToken,
   type TokenDeletion,
   type TokenInputValue,
 } from "@ui-sdk/react/token-input"
@@ -21,7 +22,7 @@ import {
   TriggerMenuItem,
   TriggerMenuList,
 } from "@ui-sdk/react/trigger-menu"
-import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, FileIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
 
@@ -79,6 +80,12 @@ function Example() {
         <TokenInput
           tokenDeletion={deletion}
           defaultValue={draft}
+          renderToken={(token) => (
+            <TokenInputToken>
+              <FileIcon aria-hidden="true" />
+              {token.label}
+            </TokenInputToken>
+          )}
           onValueChange={(value, details) => {
             for (const token of details.removed) log(`Removed ${token.label} (${deletion})`)
           }}
