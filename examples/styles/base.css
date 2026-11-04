@@ -1155,7 +1155,9 @@
     cursor: default;
     user-select: none;
 
-    & + & {
+    /* An open submenu renders in place after its trigger; the next item keeps its gap. */
+    & + &,
+    [data-slot="menu-content"] + & {
       margin-top: 1px;
     }
 
@@ -1182,12 +1184,14 @@
       }
     }
 
+    /* A disabled item still takes focus, so it keeps a quiet outline but no fill. */
     &[data-disabled] {
       color: var(--line-disabled);
 
       &[data-highlighted] {
         background: transparent;
-        box-shadow: none;
+        box-shadow: inset 0 0 0 1px var(--line);
+        color: var(--line-disabled);
       }
     }
 
@@ -1268,7 +1272,7 @@
     [data-slot="trigger-menu-separator"]
   ) {
     height: 1px;
-    margin: var(--space-1) -5px;
+    margin: var(--space-1) -4px;
     border: 0;
     background: var(--line-faint);
   }
