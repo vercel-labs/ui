@@ -124,7 +124,7 @@ function MobileMenu({
 
   return (
     // Two landmarks, like the header and sidebar on large screens.
-    <div className="flex flex-col gap-12 px-8 pt-6 pb-12">
+    <div className="flex flex-col gap-12 px-6 pt-6 pb-12 sm:px-8">
       <nav aria-label="Sections">
         <MenuGroup label="Menu">
           {menu.map((item) => {

@@ -34,7 +34,7 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
   return (
     <>
       <div className="min-w-0 flex-1">
-        <article className="w-full xl:max-w-2xl px-8 pt-8 pb-24 lg:px-10">
+        <article className="w-full xl:max-w-2xl px-6 pt-8 pb-24 sm:px-8 lg:px-10">
           <header className="mb-10">
             <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
               {page.data.title}
