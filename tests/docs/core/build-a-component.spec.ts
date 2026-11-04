@@ -12,13 +12,13 @@ async function paintAt(page: Page, x: number, y: number) {
 }
 
 test("Build a component's examples render without errors", async ({ page }) => {
-  const { errors } = await openExamples(page, "/docs/core/build-a-component")
+  const { errors } = await openExamples(page, "/docs/behaviors/build-a-component")
   await expect(page.locator("[data-example]")).toHaveCount(2)
   expect(errors).toEqual([])
 })
 
 test("Mute toggles its pressed state with a click, Enter and Space", async ({ page }) => {
-  await openExamples(page, "/docs/core/build-a-component")
+  await openExamples(page, "/docs/behaviors/build-a-component")
   const button = page.locator("[data-example]").first().getByRole("button", { name: "Mute", exact: true })
   await expect(button).toHaveAttribute("aria-pressed", "false")
   await button.click()
@@ -30,7 +30,7 @@ test("Mute toggles its pressed state with a click, Enter and Space", async ({ pa
 })
 
 test("highlighted lines span the code block's full scrollable width", async ({ page }) => {
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/behaviors/build-a-component")
   const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
   await pre.scrollIntoViewIfNeeded()
   const { clientWidth, scrollWidth, bands } = await pre.evaluate((el) => ({
@@ -44,7 +44,7 @@ test("highlighted lines span the code block's full scrollable width", async ({ p
 })
 
 test("line numbers stay pinned while the code scrolls", async ({ page }) => {
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/behaviors/build-a-component")
   const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
   await pre.scrollIntoViewIfNeeded()
   const hits = await pre.evaluate((el) => {
@@ -60,7 +60,7 @@ test("line numbers stay pinned while the code scrolls", async ({ page }) => {
 })
 
 test("a highlighted gutter matches its band, and the block keeps its end padding", async ({ page }) => {
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/behaviors/build-a-component")
   const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
   await pre.scrollIntoViewIfNeeded()
   for (const theme of ["light", "dark"] as const) {
@@ -118,7 +118,7 @@ test("installation, rendering and the next guide follow the framework docs visit
   page,
 }) => {
   await page.goto("/docs/vue")
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/behaviors/build-a-component")
   await expect(page.getByRole("tablist", { name: "Framework", exact: true })).toHaveCount(0)
   const content = page.getByRole("main")
   await expect(content).toContainText("npm install @ui-sdk/vue")
@@ -126,10 +126,10 @@ test("installation, rendering and the next guide follow the framework docs visit
   await expect(content).toContainText('import { muteButton } from "@/lib/mute-button"')
   await expect(content).not.toContainText('from "@ui-sdk/react/primitive"')
 
-  await page.goto("/docs/core/compose-behaviors")
+  await page.goto("/docs/behaviors/compose-behaviors")
   await expect(content).toContainText('import { createParts } from "@ui-sdk/vue/primitive"')
   await page.goto("/docs/web-components")
-  await page.goto("/docs/core/compose-behaviors")
+  await page.goto("/docs/behaviors/compose-behaviors")
   await expect(content).toContainText("createParts(rating,")
   await expect(content).toContainText('import { rating } from "./rating"')
   await expect(content).not.toContainText('import { createParts } from "@ui-sdk/vue/primitive"')

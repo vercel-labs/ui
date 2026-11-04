@@ -27,7 +27,7 @@ const docs = defineDocs({
 })
 
 // Every page under /docs. Each top-level folder is a section with its own
-// sidebar: Core and Agents, which no framework changes, and one per
+// sidebar: Behaviors and Agents, which no framework changes, and one per
 // framework, like /docs/react/components/menu.
 const source = loader({
   baseUrl: "/docs",

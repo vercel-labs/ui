@@ -78,7 +78,7 @@ const view = createPreference({
 export { view }
 ```
 
-The preference now saves changes in local storage and restores the saved value when the page reloads. You can also [use session storage or cookies with `createPreference`](../../core/behaviors/preferences#remember-the-choice).
+The preference now saves changes in local storage and restores the saved value when the page reloads. You can also [use session storage or cookies with `createPreference`](/docs/behaviors/preferences#remember-the-choice).
 
 ## Read the Value
 
@@ -124,7 +124,7 @@ Keep passing it to `Preferences`. Its attribute now goes on `<html>`, so styles 
 
 ## Multiple Preferences
 
-Pass more than one preference in the list. For example, you can apply `view` alongside a [color scheme](../../core/behaviors/preferences#choose-a-color-scheme):
+Pass more than one preference in the list. For example, you can apply `view` alongside a [color scheme](/docs/behaviors/preferences#choose-a-color-scheme):
 
 ```tsx
 <Preferences preferences={[view, colorScheme]}>

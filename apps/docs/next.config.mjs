@@ -28,21 +28,21 @@ const config = {
   async headers() {
     return webReleaseHeaders()
   },
-  // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
-  // Agents' own `.md` files are the whole section, and they win.
+  // Every page as Markdown, like `/docs/react/components/menu.md`. Behaviors'
+  // and Agents' own `.md` files are the whole section, and they win.
   async rewrites() {
     return [{ source: "/docs/:path*.md", destination: "/md/:path*" }]
   },
   async redirects() {
     const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
-    const pages = "components|utilities|rendering|server-rendering"
+    const pages = "components|utilities|rendering|server-rendering|how-it-works|build-with-an-agent"
     return [
       {
         source: `/docs/:framework(${frameworks.join("|")})/:folder(hooks|utilities)/observe`,
-        destination: "/docs/core/observe",
+        destination: "/docs/behaviors/observe",
         permanent: true,
       },
-      { source: "/docs/utilities/observe", destination: "/docs/core/observe", permanent: true },
+      { source: "/docs/utilities/observe", destination: "/docs/behaviors/observe", permanent: true },
       {
         source: `/docs/:framework(${frameworks.join("|")})/why`,
         destination: "/docs/:framework",
@@ -77,55 +77,54 @@ const config = {
         permanent: false,
       })),
       { source: `/docs/:page(${pages})/:rest*`, destination: "/docs/react/:page/:rest*", permanent: false },
+      // Core became Behaviors, with its Behaviors and Foundations groups as pages
+      // of their own. Its introduction moved to each framework's.
+      { source: "/docs/core", destination: "/docs/behaviors", permanent: true },
+      { source: "/docs/core/get-started", destination: "/docs/behaviors/build-a-component", permanent: true },
       {
-        source: "/docs/core/get-started",
-        destination: "/docs/core/build-a-component",
+        source: "/docs/core/:page(building-blocks|behaviors)",
+        destination: "/docs/behaviors",
+        permanent: true,
+      },
+      { source: "/docs/core/primitives", destination: "/docs/behaviors/define-a-primitive", permanent: true },
+      {
+        source: "/docs/:path(core/behaviors|behaviors|core/kernel)/state-and-events",
+        destination: "/docs/behaviors/state-and-changes",
         permanent: true,
       },
       {
-        source: "/docs/agents/create-agent",
-        destination: "/docs/agents/connect-an-agent",
+        source: "/docs/core/:folder(behaviors|kernel)/:rest*",
+        destination: "/docs/behaviors/:rest*",
         permanent: true,
       },
-      {
-        source: "/docs/agents/webmcp",
-        destination: "/docs/agents/connect-an-agent/webmcp",
-        permanent: true,
-      },
+      { source: "/docs/core/:rest*", destination: "/docs/behaviors/:rest*", permanent: true },
       // Where Primitives and Building Blocks were before Core had its section.
       {
         source: "/docs/:framework/utilities/primitives",
-        destination: "/docs/core/kernel/define-a-primitive",
+        destination: "/docs/behaviors/define-a-primitive",
         permanent: true,
       },
-      // Building Blocks became Behaviors, a page per job, and took Popups and Canvas with it.
       {
         source: "/docs/:framework/utilities/building-blocks",
-        destination: "/docs/core/behaviors",
+        destination: "/docs/behaviors",
         permanent: true,
       },
-      { source: "/docs/core/building-blocks", destination: "/docs/core/behaviors", permanent: true },
-      // Older Core pages now live in Foundations or Behaviors.
+      // Building with an agent moved to each framework. Connect an Agent's pages
+      // are the Agents section's own.
       {
-        source: "/docs/core/primitives",
-        destination: "/docs/core/kernel/define-a-primitive",
+        source: "/docs/agents/build-with-an-agent",
+        destination: "/docs/build-with-an-agent",
         permanent: true,
       },
       {
-        source: "/docs/:path(core/behaviors|behaviors|core/kernel)/state-and-events",
-        destination: "/docs/core/kernel/state-and-changes",
+        source: "/docs/agents/skills",
+        destination: "/docs/build-with-an-agent#add-the-skill",
         permanent: true,
       },
-      { source: "/docs/behaviors/llms.txt", destination: "/docs/core/llms.txt", permanent: true },
+      { source: "/docs/agents/create-agent", destination: "/docs/agents/connect-an-agent", permanent: true },
       {
-        source: "/docs/:path(core/behaviors|behaviors)/date",
-        destination: "/docs/core/date",
-        permanent: true,
-      },
-      { source: "/docs/behaviors/:rest*", destination: "/docs/core/behaviors/:rest*", permanent: true },
-      {
-        source: "/docs/core/:page(popups|canvas|trees)",
-        destination: "/docs/core/behaviors/:page",
+        source: "/docs/agents/connect-an-agent/:rest+",
+        destination: "/docs/agents/:rest+",
         permanent: true,
       },
       // Each framework's Primitives page became Rendering.
@@ -139,7 +138,7 @@ const config = {
       { source: "/docs/react/utilities/:rest*", destination: "/docs/react/hooks/:rest*", permanent: true },
       // Core and Agents were once a copy per framework.
       { source: "/docs/:framework/core.md", destination: "/docs/core.md", permanent: true },
-      { source: "/docs/:framework/core/:page*", destination: "/docs/core/:page*", permanent: true },
+      { source: "/docs/:framework/core/:page*", destination: "/docs/behaviors/:page*", permanent: true },
       { source: "/docs/:framework/agents", destination: "/docs/agents", permanent: true },
     ]
   },

@@ -1,0 +1,125 @@
+---
+title: Your Own Components
+description: Let an agent use the components you build with definePrimitive, wherever they're rendered.
+---
+
+A component you build with [`definePrimitive`](/docs/behaviors/define-a-primitive) shows up in the agent's snapshot next to every Select and Dialog on the page. Add an `agent` key to say which of its methods an agent can call.
+
+You write the key once, in the component. Anyone who renders the component gets it: an app that installs your rating from npm [creates the bridge](./connect-an-agent#create-the-bridge), renders `<Rating>`, and its agent can rate, with no tool or schema to write.
+
+## Try It
+
+This rating has `agent: { actions: ["rate"] }`. Press **Read the page** to see what an agent sees, then **Ask for 4 stars** to send the step an agent would send.
+
+<ComponentExample name="core/rating-agent" />
+
+## Add the Agent Key
+
+Here's the rating's primitive. Its API has one method, `rate`:
+
+```ts title="rating.ts"
+const rating = definePrimitive({
+  name: "rating",
+  state: (options: { defaultValue?: number }) => ({ value: options.defaultValue ?? 0 }),
+  api: (context) => {
+    const change = createChange(context)
+    return {
+      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+    }
+  },
+  slots: (slot) => ({
+    root: slot({ attrs: () => ({ role: "group" }) }),
+  }),
+  agent: { actions: ["rate"] },
+})
+```
+
+`actions` lists the API methods an agent can call. Put `agent` last, after `slots`, so TypeScript has read your API by then.
+
+With the key, the snapshot lists `rate`:
+
+```json
+[{ "ref": "c1", "component": "rating", "actions": ["rate"], "label": "Your rating", "value": 0 }]
+```
+
+And an agent can call it with the arguments the method takes:
+
+```ts
+await agent.act({ steps: [{ ref: "Your rating", action: "rate", args: [4] }] })
+// { ok: true, steps: [{ ref: "c1", changes: [{ key: "value", value: 4, ... }] }], ... }
+```
+
+The change goes through `createChange`, so the app's `onValueChange` sees `details.source === "agent"` and can cancel it, like any other change. [Permissions](./permissions) covers that.
+
+## Choose What an Agent Calls
+
+Only the methods in `actions` are offered. The rest of your API, like a `keydown` handler or a roving focus helper, stays private to your component, and a step that names one is refused.
+
+If `actions` names a method your API doesn't have, development builds warn, so a typo shows up right away.
+
+Without an `agent` key, the bridge guesses from method names: `set` followed by a capital letter, like `setValue`, and verbs like `open`, `toggle` or `clear`. It can't guess `rate`, so the rating would show `"actions": []`, and a step that asks for `rate` would get:
+
+```txt
+rating c1 takes no rate now. It takes: nothing.
+```
+
+Listing your actions makes the component say exactly what it does, whatever its methods are called.
+
+## Lists
+
+When your component's value is always one of its items, like a size picker, add `closed: true`:
+
+```ts
+agent: { actions: ["setValue"], closed: true },
+```
+
+The agent can name an item by its label or its value. If it names something that isn't there, the step is refused with the real items, so it can try again:
+
+```txt
+No item "XL" in Size (c1). Its items: Small, Medium, Large.
+```
+
+The bridge reads the items from your state's `items`. If they live somewhere else, return them from `items`:
+
+```ts
+agent: { actions: ["setValue"], items: (api) => api.allItems() },
+```
+
+## Content Behind Items
+
+Tabs and accordions hide other components behind their closed items. Add `reveals: true` and, when an agent looks for something it can't find, the error lists the closed items it might be behind, so the agent can open one first:
+
+```ts
+agent: { actions: ["setValue"], closed: true, reveals: true },
+```
+
+## Show It When It Matters
+
+`shown` decides whether an agent sees the component right now. A field wrapper, for example, only needs to show while it has errors, since its input already carries the label:
+
+```ts
+agent: { shown: (state) => state.errors.length > 0 },
+```
+
+## Secret Values
+
+For a value an agent should never read, like a PIN, add `secret: true`. The agent can still fill it in, and the snapshot shows `"[redacted]"` instead of the value:
+
+```ts
+agent: { actions: ["setValue", "clear"], secret: true },
+```
+
+To hide one particular field instead, the app can mark it with `data-agent-secret`. See [Permissions](./permissions).
+
+## API Reference
+
+| Key       | Type                 | Description                                                                                            |
+| --------- | -------------------- | ------------------------------------------------------------------------------------------------------ |
+| `actions` | `string[]`           | The API methods an agent can call. Without it, methods named like changes, such as `setValue`.         |
+| `closed`  | `boolean`            | The value is always one of the items, so a step that names another item is refused.                    |
+| `items`   | `(api) => unknown`   | The items as data, when they aren't the state's `items`.                                               |
+| `reveals` | `boolean`            | Closed items hide other components. A component the agent can't find is reported as maybe behind them. |
+| `shown`   | `(state) => boolean` | Whether an agent sees the component right now.                                                         |
+| `secret`  | `boolean`            | The value is always redacted, in the snapshot, in step results and in `observe`.                       |
+
+The `agent` key is experimental.

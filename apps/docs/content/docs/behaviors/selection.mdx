@@ -1,0 +1,351 @@
+---
+title: Selection
+description: Choose items, extend a selection, or select a rectangle of shapes or cells.
+---
+
+`createSelection` chooses item keys and extends ranges, `createLasso` selects items with a drawn rectangle, and `createCellRange` selects a block of grid cells.
+
+Import them from `@ui-sdk/core`. Pair them with [Focus and Keys](./focus) to move between items and choose them.
+
+## Selecting Items
+
+### Choose One
+
+Keep the selected keys in a `string[]`, even when only one item can be chosen. In `api`, add `createSelection` alongside the existing roving focus behavior:
+
+```ts
+const change = createChange(context)
+const selection = createSelection(context, {
+  key: "value",
+  set: (value, details) => change("value", value, details),
+  order: () => roving.items().map((item) => item.key),
+})
+```
+
+Start `value` at `[]` and return `selection` from `api`. The `set` callback uses the same [change pattern](./state-and-changes#changes) as the guides.
+
+The behavior gives you methods to call from your event handlers. For example, a pointer press can choose one item:
+
+```ts
+pointerdown: (event, { api, key }) => api.selection.choose(key, { reason: "item-press", event }),
+```
+
+`choose` selects that item. `toggle` also lets the user clear it. Add this branch to your existing key handler for Space:
+
+```ts
+if (event.key === " ") {
+  event.preventDefault()
+  selection.toggle(key, { reason: "item-press", event })
+}
+```
+
+This plan picker uses both. `selection.isSelected(key)` lets its Enter handler check whether a plan is chosen before continuing.
+
+<ComponentExample
+  name="behaviors/selection-single"
+  caption="Click a plan, or use the arrows and Space to choose one. Space on the chosen plan clears it; Enter continues with it."
+/>
+
+For a listbox, give the root `role="listbox"`, each item `role="option"`, and set its `aria-selected` from `state.value.includes(key)`. Keep the focus wiring from [Focus and Keys](./focus#roving-focus).
+
+### Choose Many
+
+Add `multiple` to the selection options:
+
+```ts
+multiple: () => true,
+```
+
+Now `toggle` adds or removes one item while keeping the others. Use it for both pointer presses and Space, as in this topping picker. A listbox that allows this also needs `aria-multiselectable="true"` on its root.
+
+<ComponentExample
+  name="behaviors/selection-multiple"
+  caption="Click toppings to add or remove them. With the keyboard, use Left and Right, then Space."
+/>
+
+### Ranges and Select All
+
+`extend` selects from an anchor to another item. The anchor is the last item chosen or toggled without Shift. These three calls give a file list its usual pointer interactions:
+
+```ts
+press(event: PointerEvent, key: string) {
+  const details = { reason: "item-press" as const, event }
+  if (event.shiftKey) {
+    selection.extend(key, { ...details, from: context.store.get().focused })
+  } else if (event.metaKey || event.ctrlKey) {
+    selection.toggle(key, details)
+  } else {
+    selection.choose(key, details)
+  }
+},
+```
+
+For Shift with the arrows, use the result of the existing focus handler:
+
+```ts
+const moved = roving.keydown(event, el)
+if (moved?.shift) {
+  selection.extend(moved.key, {
+    from: moved.from,
+    reason: "list-navigation",
+    event,
+  })
+}
+```
+
+`from` supplies the starting point when there isn't an anchor yet. `selection.anchor()` returns the current anchor's key.
+
+A range keeps what was selected when the anchor was set, then adds the items between the anchor and the target. Pass `additive: false` to select only the range. Supplying a different selection from outside starts the next range over.
+
+<ComponentExample
+  name="behaviors/selection"
+  caption="Click a file, then Shift-click another for a range. Control or Command-click toggles one file. Turn on Ranges replace the selection to compare."
+/>
+
+In multiple mode, `toggleAll` selects every available key in `order`, or clears them if they're already selected. Call it from your Control or Command+A handler after preventing the browser's default action:
+
+```ts
+selection.toggleAll({ reason: "list-navigation", event })
+```
+
+`order` determines what ranges and select-all can reach. For a virtualized list, pass the full list of keys, including items that aren't rendered.
+
+### Items That Can't Be Selected
+
+Use `selectable` to skip keys that shouldn't be chosen, toggled, or added to a range:
+
+```ts
+selectable: (key) => !context.options().owners.includes(key),
+```
+
+In this member list, owners start selected. The demo uses `toggle` and `toggleAll`, which leave those owners alone.
+
+<ComponentExample
+  name="behaviors/selection-selectable"
+  caption="Focus a member and press Control or Command+A twice. Ana stays selected while the other members are selected, then cleared."
+/>
+
+This doesn't pin an item in the selection: `choose` and a range with `additive: false` can replace the whole value. If some keys must always stay selected, enforce that in your `set` callback.
+
+## Rectangle Selection
+
+### Draw a Rectangle
+
+`createLasso` selects items touched by a rectangle. Start with `selected: string[]` and `lasso: LassoDraft | null` in state, with `lasso` set to `null`. Add `lasso` to the primitive's `live` fields, as covered in [Live State](./state-and-changes#live-state).
+
+Create the behavior in `api` and return it as `lasso`:
+
+```ts
+const lasso = createLasso(context, {
+  slot: "shape",
+  draft: "lasso",
+  selected: () => context.store.get().selected,
+  set: (keys, details) => change("selected", keys, details),
+})
+```
+
+Give the surface `position: relative`, `touch-action: none` and `user-select: none` so drawing doesn't scroll the page or select text. Start when the pointer lands on its empty space:
+
+```ts
+pointerdown: (event, { el, api }) => {
+  if (el && event.target === el) {
+    api.lasso.pointerdown(event, el)
+  }
+},
+```
+
+Keep the rectangle part rendered. Its `style` hides it when there's no drag:
+
+```ts
+lasso: slot({
+  attrs: () => ({ "aria-hidden": "true" }),
+  live: live((state, { api }) => ({ style: api.lasso.style(state) })),
+}),
+```
+
+<ComponentExample
+  name="behaviors/lasso"
+  caption="Drag from empty space to select shapes. Hold Shift to add to the selection; press Escape before releasing to cancel the rectangle."
+/>
+
+`lasso.touches(state, key)` tells you which items belong to the preview selection. With Shift, that includes items selected before the drag. Use it for a `data-lassoed` highlight.
+
+The selection changes once, when the pointer is released, with the reason `"lasso"`. Escape cancels the drag and keeps the previous selection.
+
+### Items It Skips
+
+Add `selectable` to exclude items from the rectangle's hits, and `message` to customize the screen reader announcement:
+
+```ts
+selectable: (key) => !context.options().locked.includes(key),
+message: (count) => `${count} ${count === 1 ? "photo" : "photos"} selected`,
+```
+
+The announcement runs after the selection request is accepted.
+
+<ComponentExample
+  name="behaviors/lasso-photos"
+  caption="Drag from empty space across the photos. City and Lake stay unselected; a screen reader announces the selected count when you release."
+/>
+
+## Ranges of Cells
+
+### Select a Block
+
+[Focus and Keys](./focus#grids) shows how to navigate a grid. Add `createCellRange` when you also need to drag across cells, select whole rows or columns, or copy a block.
+
+Keep a `range: CellRange | null` field in state, starting at `null`. Pass the existing grid behavior and its row and column counts:
+
+```ts
+const range = createCellRange(context, {
+  key: "range",
+  grid,
+  rows: () => 4,
+  cols: () => 5,
+})
+```
+
+Return `range` from `api`, then update the existing cell slot:
+
+```ts
+attrs: (state, { props, api }) => ({
+  role: "gridcell",
+  tabindex: api.grid.tabIndex(state, props),
+  ...api.range.cellAttrs(state, props),
+}),
+on: {
+  keydown: (event, { api }) => api.range.keydown(event),
+  pointerdown: (event, { api, props }) => api.range.pointerdown(event, props),
+},
+bind: (el, { api, props }) => api.range.bind(el, props),
+```
+
+`range.bind` also binds grid focus, and `range.keydown` forwards ordinary navigation to the grid. You don't need to call both behaviors for the same event.
+
+<ComponentExample
+  name="behaviors/cell-range"
+  caption="Drag across cells, or click one and hold Shift with the arrows. The total follows the selected range."
+/>
+
+Focus stays on the active cell as the range grows. A move without Shift clears the range. The behavior also handles these shortcuts:
+
+| Keys          | Action                   |
+| ------------- | ------------------------ |
+| Shift+Space   | Select the range's rows. |
+| Control+Space | Select its columns.      |
+| Control+A     | Select every cell.       |
+| Escape        | Clear the range.         |
+
+`cellAttrs` marks the explicit range with `aria-selected`, `data-selected`, and `data-range-edge`. The last one lists the sides of the range a cell sits on, such as `"top left"`, so you can draw an outline with `[data-range-edge~="top"]`.
+
+### Selecting from Code
+
+The same range can be changed from buttons or other controls. Row and column indexes start at zero:
+
+```ts
+range.selectColumns(1)
+range.selectRows(0, 1)
+range.select({ anchor: { row: 1, col: 1 }, end: { row: 2, col: 2 } })
+range.selectAll()
+range.select(null)
+```
+
+These calls change the range without moving focus. `select(null)` clears it.
+
+<ComponentExample
+  name="behaviors/cell-range-select"
+  caption="Use the buttons to select a column, rows, a block or the whole grid. The summary names the range and counts values over 10."
+/>
+
+`range.bounds(state)` gives the inclusive `top`, `left`, `bottom` and `right` indexes. With no explicit range, it falls back to the active cell, or returns `null` if there isn't one. `range.contains(state, cell)` uses the same rule when you need to total or count cells.
+
+By default, range changes write to state directly. To report them through `createChange`, add `set`. You can also customize what screen readers hear after keyboard selection:
+
+```ts
+set: (value, details) => change("range", value, details),
+message: ({ top, left, bottom, right }) =>
+  `Rows ${top + 1} to ${bottom + 1}, columns ${left + 1} to ${right + 1} selected`,
+```
+
+For rows that aren't rendered yet, `reveal` works as it does in [grid focus](./focus#rows-that-arent-rendered).
+
+### Copy and Paste
+
+`range.text(state, read)` reads the selected cells as tab-separated text. Call it from the grid's `copy` handler:
+
+```ts
+copy(event: ClipboardEvent) {
+  const state = context.store.get()
+  const text = range.text(state, ({ row, col }) => state.cells[row][col])
+  event.preventDefault()
+  event.clipboardData?.setData("text/plain", text)
+},
+```
+
+In the `paste` handler, `textToCells` turns clipboard text into rows:
+
+```ts
+const rows = textToCells(event.clipboardData?.getData("text/plain") ?? "")
+```
+
+Your handler prevents the default paste and writes those values into state, starting at the selection's top-left cell. Stop at the grid's edges. The demo's Code tab shows the full handler.
+
+<ComponentExample
+  name="behaviors/cell-range-clipboard"
+  caption="Select cells and copy with Control or Command+C. Click a destination cell and paste with Control or Command+V."
+/>
+
+`cellsToText(rows)` works in the other direction. Use it to copy an entire sheet, even when only part of it is selected.
+
+## API Reference
+
+### Item Selection Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/selection/selection-model.ts"
+  name="SelectionOptions"
+  type='SelectionOptions<"value", "item-press">'
+  events={false}
+  examples={{
+    key: "Choose One",
+    set: "Choose One",
+    order: "Choose One",
+    multiple: "Choose Many",
+    selectable: "Items That Can't Be Selected",
+  }}
+/>
+
+### Rectangle Selection Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/selection/lasso.ts"
+  name="LassoOptions"
+  type="LassoOptions<{ lasso: LassoDraft | null }>"
+  events={false}
+  examples={{
+    slot: "Draw a Rectangle",
+    draft: "Draw a Rectangle",
+    selected: "Draw a Rectangle",
+    set: "Draw a Rectangle",
+    selectable: "Items It Skips",
+    message: "Items It Skips",
+  }}
+/>
+
+### Cell Range Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/selection/cell-range.ts"
+  name="CellRangeOptions"
+  type="CellRangeOptions<{ range: CellRange | null }>"
+  events={false}
+  examples={{
+    key: "Select a Block",
+    grid: "Select a Block",
+    rows: "Select a Block",
+    cols: "Select a Block",
+    reveal: "./focus#Rows That Aren't Rendered",
+    set: "Selecting from Code",
+    message: "Selecting from Code",
+  }}
+/>

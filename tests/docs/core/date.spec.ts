@@ -2,14 +2,14 @@ import { expect, test } from "@playwright/test"
 import { openExamples } from "./behaviors/helpers"
 
 test("every example renders without errors", async ({ page }) => {
-  const { errors } = await openExamples(page, "/docs/core/date")
+  const { errors } = await openExamples(page, "/docs/behaviors/date")
   await expect(page.locator("[data-example]")).toHaveCount(8)
   await expect(page.locator("figure > figcaption")).toHaveCount(8)
   expect(errors).toEqual([])
 })
 
 test("values: real dates build, February 30 doesn't, and a picked date comes apart", async ({ page }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   await expect(page.locator("[data-built]")).toHaveText("No such day")
   await page.getByLabel("Day", { exact: true }).fill("28")
   await expect(page.locator("[data-built]")).toHaveText("2026-02-28")
@@ -27,7 +27,7 @@ test("values: real dates build, February 30 doesn't, and a picked date comes apa
 test("days: check-out and the weekday follow, and a date outside the season moves into it", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   await expect(page.locator("[data-check-in]")).toHaveText("Thursday, 2026-12-24")
   await expect(page.locator("[data-check-out]")).toHaveText("Sunday, 2026-12-27")
   await expect(page.locator("[data-away]")).toHaveText("69 days after Oct 16")
@@ -40,7 +40,7 @@ test("days: check-out and the weekday follow, and a date outside the season move
 test("months: a month on from January 31 is February 28, and the week follows its first day", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   const date = page.locator("[data-date]")
   await expect(page.locator("[data-this-month]").first()).toHaveText("2026-01-01 to 2026-01-31, 31 days")
   await page.getByRole("button", { name: "+ Month" }).click()
@@ -58,7 +58,7 @@ test("months: a month on from January 31 is February 28, and the week follows it
 })
 
 test("month sizes: six weeks each line up, and without them February 2026 takes four", async ({ page }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   const weeks = (month: string) => page.locator(`[data-month="${month}"] [data-week]`)
   await expect(weeks("2026-02-01")).toHaveCount(6)
   await expect(weeks("2026-08-01")).toHaveCount(6)
@@ -71,7 +71,7 @@ test("month sizes: six weeks each line up, and without them February 2026 takes 
 test("locale: names, ranges and the first day follow the locale, and Persian keeps Gregorian months", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   const locale = page.getByRole("combobox", { name: "Locale" }).nth(1)
   await expect(page.locator("[data-long]")).toHaveText("Friday, October 16, 2026")
   await expect(page.locator("[data-range]")).toHaveText("Oct 16 – 20, 2026")
@@ -87,7 +87,7 @@ test("locale: names, ranges and the first day follow the locale, and Persian kee
 })
 
 test("today: each city shows its own date", async ({ page }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   for (const zone of ["Asia/Tokyo", "America/Los_Angeles"]) {
     const expected = await page.evaluate(
       (timeZone) => new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone }).format(new Date()),
@@ -101,7 +101,7 @@ test("today: each city shows its own date", async ({ page }) => {
 test("parse: typed text reads in the locale's order, and a two-digit year follows the reference", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   const input = page.getByRole("textbox", { name: "Date", exact: true })
   const parsed = page.locator("[data-parsed]")
   await expect(parsed).toHaveText("2026-10-16, Friday, October 16, 2026")
@@ -118,7 +118,7 @@ test("parse: typed text reads in the locale's order, and a two-digit year follow
 })
 
 test("the date lookup links to each focused example", async ({ page }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   const lookup = page.getByRole("main").getByRole("table")
   const links = lookup.getByRole("link")
   await expect(links).toHaveCount(7)

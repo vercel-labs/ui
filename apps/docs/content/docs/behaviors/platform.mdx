@@ -1,0 +1,123 @@
+---
+title: Platform
+description: Announce a change, follow the page's direction, and adapt keyboard shortcuts to the user's platform.
+---
+
+Use `announce` to send messages to screen readers, `isRTL` to read text direction, and the shortcut helpers to match and label keyboard shortcuts for the user's platform.
+
+These helpers are available from `@ui-sdk/core`. You can use them inside a primitive or on their own.
+
+## Announcements
+
+Say you've built a copy button. Once the copy succeeds, use `announce` to let a screen reader know:
+
+```ts
+import { announce } from "@ui-sdk/core"
+
+async function copyText(text: string) {
+  await navigator.clipboard.writeText(text)
+  announce("Copied")
+}
+```
+
+`announce` writes to a shared live region. By default, it asks the screen reader to wait for a pause before reading the message. Try it with a screen reader:
+
+<ComponentExample name="behaviors/announce" />
+
+This is useful for results that aren't otherwise announced, like a list finishing a sort or a file being copied. Call it after the action succeeds, in an event handler or `bind`. Keep `attrs` and `state` free of side effects.
+
+## Urgent Announcements
+
+For something that needs attention now, use `priority: "assertive"`:
+
+```ts
+announce("Enter an email address", { priority: "assertive" })
+```
+
+This asks the screen reader to interrupt its current message. Use it sparingly; most updates can wait.
+
+Some screen readers need the live region to exist before its text changes. If a component will announce soon after it appears, prepare the regions in its root's `bind`:
+
+```ts
+import { prepareAnnouncements } from "@ui-sdk/core"
+
+root: slot({
+  bind: (el) => prepareAnnouncements(el.ownerDocument),
+}),
+```
+
+`announce` uses the current document by default. For an element inside a frame, pass its document too: `announce("Copied", { doc: el.ownerDocument })`.
+
+## Direction
+
+In a left-to-right pager, Right goes forward. In a right-to-left pager, Left does. Use `isRTL` to read an element's computed direction:
+
+```ts
+import { isRTL } from "@ui-sdk/core"
+
+function isForwardKey(event: KeyboardEvent, el: HTMLElement) {
+  const forward = isRTL(el) ? "ArrowLeft" : "ArrowRight"
+  return event.key === forward
+}
+```
+
+Call this from your key handler so it follows changes to the page's direction. Focus the pager below and try the arrow keys, then turn on **Right to left**:
+
+<ComponentExample name="core/page-stepper" />
+
+[Roving Focus](./focus#roving-focus) already handles this for Left and Right. For language rather than direction, see [The Page's Language](./text#the-pages-language). To follow the light or dark scheme people choose or their browser prefers, see [Preferences](./preferences).
+
+## Shortcuts
+
+Use `mod` for Command on Apple platforms and Control elsewhere. Inside a `keydown` handler, match the shortcut before calling your action:
+
+```ts
+import { matchesShortcut } from "@ui-sdk/core"
+
+if (matchesShortcut(event, "mod+b")) {
+  event.preventDefault()
+  toggleBold()
+}
+```
+
+Here, `toggleBold` is your own function. `matchesShortcut` only checks the keys; the handler prevents the browser's default action and runs yours.
+
+The same shortcut string gives you both a visible label and an `aria-keyshortcuts` value:
+
+```ts
+import { ariaKeyshortcuts, formatShortcut } from "@ui-sdk/core"
+
+formatShortcut("mod+b") // Displays “⌘B” on Apple platforms, “Ctrl+B” elsewhere.
+ariaKeyshortcuts("mod+b") // "Meta+B" or "Control+B".
+```
+
+These labels depend on the user's platform. In a primitive, set them in `bind` so the server and initial client render stay consistent:
+
+```ts
+keys: slot({
+  bind: (el) => {
+    el.textContent = formatShortcut("mod+b")
+  },
+}),
+```
+
+Try the shortcut while typing in the note:
+
+<ComponentExample name="core/bold-shortcut" />
+
+`formatShortcut` keeps the label in left-to-right order, even on a right-to-left page. For tests, import `setPlatform` from `@ui-sdk/core/testing` and call `setPlatform("apple")` or `setPlatform("other")`.
+
+## Layers and Positioning
+
+Building a popup? [Placing a Popup](./popups#placing-a-popup) introduces `position`. [Layers of Your Own](./popups#layers-of-your-own) covers `bindLayer`, the top layer, and keeping an element usable over a modal.
+
+## API Reference
+
+| Helper                             | Use it to…                                               |
+| ---------------------------------- | -------------------------------------------------------- |
+| `announce(text, options?)`         | Announce a result, with optional `priority` and `doc`.   |
+| `prepareAnnouncements(doc)`        | Create the live regions before the first announcement.   |
+| `isRTL(el)`                        | Read an element's text direction.                        |
+| `matchesShortcut(event, shortcut)` | Check whether a key press matches a shortcut.            |
+| `formatShortcut(shortcut)`         | Show the shortcut using the platform's symbols or names. |
+| `ariaKeyshortcuts(shortcut)`       | Generate the value for `aria-keyshortcuts`.              |

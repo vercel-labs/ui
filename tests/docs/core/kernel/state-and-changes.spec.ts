@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { openExamples } from "../behaviors/helpers"
 
-const url = "/docs/core/kernel/state-and-changes"
+const url = "/docs/behaviors/state-and-changes"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)

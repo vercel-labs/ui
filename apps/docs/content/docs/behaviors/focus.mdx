@@ -1,0 +1,474 @@
+---
+title: Focus and Keys
+description: Move through lists and grids, find items by typing, keep focus when the page changes, and give fields the right keyboard.
+---
+
+Use `createRovingFocus` for a group with one tab stop and arrow-key navigation, and `createGridFocus` for rows and columns. The other helpers find items by typing, choose nearby targets, restore focus when items move or disappear, and give a field the right keyboard with `inputHints`.
+
+Import them from `@ui-sdk/core`. [Compose Behaviors](./compose-behaviors#give-the-group-one-tab-stop) shows how to connect roving focus to a part. Your component decides what a focused item does; [Selection](./selection) covers choosing items and ranges.
+
+## Roving Focus
+
+### One Tab Stop
+
+The rating used a custom `move` function for all four arrows. For a row of buttons, `createRovingFocus` can handle the keys for you:
+
+```ts
+const roving = createRovingFocus(context, {
+  slot: "item",
+  key: "focused",
+  orientation: () => "horizontal",
+})
+```
+
+This handles Left, Right, Home and End. Leave out `orientation` for a vertical list that uses Up and Down. Left and Right follow the page's text direction.
+
+<ComponentExample
+  name="behaviors/roving-focus"
+  caption="Tab into the toolbar. Use Left, Right, Home or End to move between buttons; Tab leaves the group."
+/>
+
+By default, the last focused item keeps the tab stop. To return to the selected item instead, use `remember: false`, `preferred` and `claims`, as we did in the [rating guide](./compose-behaviors#give-the-group-one-tab-stop).
+
+### Disabled Items and Wrapping
+
+An unavailable action can still be useful to find. Pass `disabled` to prefer enabled items when choosing the tab stop, while letting the arrows reach every action:
+
+```ts
+const roving = createRovingFocus(context, {
+  slot: "item",
+  key: "focused",
+  disabled: (item) => !!item.props.disabled,
+  loop: () => true,
+})
+```
+
+`loop` wraps from the last item to the first, and back.
+
+<ComponentExample
+  name="behaviors/roving-focus-disabled"
+  caption="Tab to Cut, then press Up to reach the disabled Redo action. Keep pressing Up or Down to wrap around."
+/>
+
+The item still needs `aria-disabled` and a press handler that ignores it. A native `disabled` button can't receive focus. If every item is disabled, the group can still give one of them the tab stop.
+
+### Items That Can't Take Focus
+
+Use `focusable` when an item should be skipped altogether. These nested folders stay rendered while their branch is closed:
+
+```ts
+focusable: (item) => !item.props.nested || context.store.get().open,
+```
+
+<ComponentExample
+  name="behaviors/roving-focus-focusable"
+  caption="Use the arrows to reach Labels. Press Enter to open it, then Down to reach Work."
+/>
+
+The group checks `focusable` again when state changes. If it depends on something outside that state, call `roving.check()` after it changes.
+
+### Items That Come and Go
+
+`roving.focus(key)` moves focus to an item. You can also call it just before that item renders:
+
+```ts
+function add(tag: string) {
+  context.options().onAdd?.(tag)
+  roving.focus(tag)
+}
+```
+
+<ComponentExample
+  name="behaviors/roving-focus-items"
+  caption="Type a tag and press Enter. The new tag receives focus and the count updates."
+/>
+
+`roving.items()` returns the focusable items in document order, with each item's `key`, `props` and `el`. This demo uses `onItemsChange` to update the count after items join or leave.
+
+This works when the new item renders as part of the current update. For data loaded later, call `focus(key)` when the item is ready. If the user moves focus elsewhere in the meantime, it stays there.
+
+### Move the Tab Stop Without Moving Focus
+
+A shortcut can use a toolbar action while focus stays in an editor. Call `remember` from that shortcut's handler so the next visit to the toolbar lands on the action:
+
+```ts
+api.roving.remember("Underline")
+```
+
+<ComponentExample
+  name="behaviors/roving-focus-remember"
+  caption="In Notes, press Control or Command with U, then Shift+Tab. Focus returns to Underline."
+/>
+
+`remember(key)` changes the tab stop without moving focus. Groups with `remember: false` ignore it.
+
+### Any Layout
+
+The rating's `move` function stepped through stars. A keypad can use the same hook to move three items at a time for Up and Down:
+
+```ts
+move: (event, { from, items, rtl }) => {
+  if (event.ctrlKey || event.metaKey) {
+    return
+  }
+
+  const index = items.findIndex((item) => item.key === from.key)
+  const by = {
+    ArrowDown: 3,
+    ArrowUp: -3,
+    ArrowRight: rtl ? -1 : 1,
+    ArrowLeft: rtl ? 1 : -1,
+  }[event.key]
+
+  return by === undefined ? undefined : items[index + by]?.key
+},
+```
+
+<ComponentExample
+  name="behaviors/roving-focus-move"
+  caption="Focus a number. Use Up and Down to move a row, or Left and Right to move one item."
+/>
+
+`move` receives the focused item, the focusable items in document order, and the text direction. Return a key to move there, or `undefined` to leave the key press alone. It replaces the built-in arrow, Home, End and wrapping rules, so include any of those your component needs.
+
+Like `focus(key)`, it can return the key of an item about to render. A calendar can use this to move from the last day of one month into the next.
+
+### Around a Ring
+
+For actions arranged around a circle, Left and Right can follow their order around the ring. Use the built-in horizontal keys with wrapping:
+
+```ts
+const roving = createRovingFocus(context, {
+  slot: "action",
+  key: "focused",
+  orientation: () => "horizontal",
+  loop: () => true,
+})
+```
+
+Render the actions in their order around the circle. Their positions don't change which action comes next.
+
+<ComponentExample
+  name="behaviors/roving-focus-ring"
+  caption="Focus an action, then keep pressing Left or Right to cycle around the ring. Home and End jump to the first and last actions."
+/>
+
+## Spatial Focus
+
+### Follow the Layout
+
+On a board, the next item in the document may not be the one to the right. Use `spatialMove()` to choose a nearby item in the arrow's direction:
+
+```ts
+const roving = createRovingFocus(context, {
+  slot: "note",
+  key: "focused",
+  move: spatialMove(),
+})
+```
+
+<ComponentExample
+  name="behaviors/spatial-focus"
+  caption="Focus a note, then use the arrow keys to move to a nearby note in that direction."
+/>
+
+`spatialMove` measures the elements and favors items directly ahead. Left always means left on screen, even in right-to-left text. Home and End use document order. Alt, Control and Command combinations are left for other shortcuts.
+
+### Supply Your Own Positions
+
+If your app already knows where items are, pass a `rect` function. This is useful for a zoomed canvas or a layout calculated from angles:
+
+```ts
+move: spatialMove({
+  rect: (el, key) => {
+    const { x, y } = place(key)
+    return { left: x, right: x, top: y, bottom: y }
+  },
+}),
+```
+
+Use the same units for every item, with larger `y` values farther down.
+
+### Choose a Target Without Moving Focus
+
+`nearestInDirection` uses the same position-based search on plain boxes. It returns a key, so you can decide what to do with the result:
+
+```ts
+const next = nearestInDirection(
+  { left: 0, right: 10, top: 0, bottom: 10 },
+  [{ key: "next", rect: { left: 20, right: 30, top: 0, bottom: 10 } }],
+  [1, 0],
+)
+// next is "next".
+```
+
+The direction is `[x, y]`: `[1, 0]` means right and `[0, -1]` means up. If nothing lies that way, the result is `undefined`.
+
+<ComponentExample
+  name="behaviors/nearest-city"
+  caption="Focus the map and use the arrow keys to choose a city. Focus stays on the map."
+/>
+
+## Typeahead
+
+[Text](./text#find-an-item-by-typing) covers finding an item from typed characters. To move focus to that match, combine it with `roving.items()` and `roving.focus()`:
+
+```ts
+const typeahead = createTypeahead()
+
+function keydown(event: KeyboardEvent, el: HTMLElement) {
+  if (event.defaultPrevented || roving.keydown(event, el) || !isTypeaheadKey(event)) {
+    return
+  }
+  if (event.key === " " && typeahead.active()) {
+    event.preventDefault()
+  }
+
+  const items = roving.items()
+  const index = typeahead(
+    event.key,
+    items.map((item) => labelOf(item.el)),
+    items.findIndex((item) => item.el === el),
+  )
+  if (index !== -1) {
+    roving.focus(items[index].key)
+  }
+}
+```
+
+Create `typeahead` once in `api`, then connect this handler to the item's `keydown`.
+
+<ComponentExample
+  name="behaviors/typeahead"
+  caption="Focus Apple and press P repeatedly to cycle through matches. Pause, then type PL quickly to reach Plum."
+/>
+
+## Focus Recovery
+
+When a focused row is removed, the browser can leave focus on the page. `createFocusRecovery` lets you choose where it should go:
+
+```ts
+const recovery = createFocusRecovery<{ value: string; index: number }>({
+  fallback: (lost) => {
+    const items = roving.items()
+    return (items[lost.props.index] ?? items.at(-1))?.el
+  },
+})
+```
+
+This picks the row that takes the old one's place, or the last row if we removed the end. Return `recovery` from `api`, then bind it alongside roving focus:
+
+```ts
+bind: (el, part) => {
+  const unbindFocus = part.api.roving.bind(el, part)
+  const unbindRecovery = part.api.recovery.bind(el, part)
+  return () => {
+    unbindFocus()
+    unbindRecovery()
+  }
+},
+```
+
+<ComponentExample
+  name="behaviors/focus-recovery"
+  caption="Focus a task and press Delete, or click Done. Focus moves to a remaining task."
+/>
+
+`fallback` receives the removed part's key, last props and element. Returning nothing leaves focus where it is. Recovery runs when the part unbinds and waits for the render to finish; it won't take focus back from something else, such as a dialog.
+
+## Focus That Follows a Move
+
+Sometimes an item moves to another list and renders as a new element. Call `keepFocus` after changing state, with a function that finds the new element:
+
+```ts
+move(task: string) {
+  const { done } = context.store.get()
+  context.store.set({ done: [...done, task] })
+  keepFocus(() => context.element("task", task))
+},
+```
+
+<ComponentExample
+  name="behaviors/keep-focus"
+  caption="Focus a task and press Enter. Focus follows it between lists. Turn off Keep focus on the task to compare."
+/>
+
+`keepFocus` retries after the update so the new element has time to render. If the user moves focus elsewhere in the meantime, it leaves that focus alone.
+
+## Grids
+
+### One Tab Stop in a Grid
+
+For cells addressed by row and column, use `createGridFocus`. Import the `GridCell` type from `@ui-sdk/core`, start the active cell at `null`, then create the behavior in `api`:
+
+```ts
+state: () => ({ active: null as GridCell | null }),
+api: (context) => ({
+  grid: createGridFocus(context, {
+    key: "active",
+    rows: () => 3,
+    cols: () => 6,
+  }),
+}),
+```
+
+Each cell has a zero-based `row` and `col`. Connect its tab stop, keys and element to the behavior:
+
+```ts
+seat: slot<{ row: number; col: number }>({
+  props: { row: "number", col: "number" },
+  attrs: (state, { props, api }) => ({
+    role: "gridcell",
+    tabindex: api.grid.tabIndex(state, props),
+  }),
+  on: {
+    keydown: (event, { api }) => api.grid.keydown(event),
+    pointerdown: (event, { api, props }) => api.grid.focus(props, { reason: "item-press", event }),
+  },
+  bind: (el, { api, props }) => api.grid.bind(el, props),
+}),
+```
+
+Render the cells inside rows with `role="row"`, inside a root with `role="grid"`. Give each cell a stable `id`, such as `"1:2"`, so the primitive can tell them apart.
+
+<ComponentExample
+  name="behaviors/grid-focus"
+  caption="Focus a seat and use the arrows to move. Home and End reach the row's ends; Control+Home and Control+End reach the grid's corners."
+/>
+
+Left and Right follow the text direction. Call `grid.focus({ row, col })` to move to a cell from another interaction, such as a click.
+
+### Cells That Can't Take Focus
+
+Pass `disabled` to skip unavailable cells:
+
+```ts
+disabled: (cell) => context.options().taken.includes(`${cell.row}:${cell.col}`),
+```
+
+Unlike roving focus's `disabled` option, this skips the cell during navigation. Before the grid is entered, Tab lands on the first cell that isn't disabled, row by row.
+
+<ComponentExample
+  name="behaviors/grid-focus-disabled"
+  caption="Use the arrows to move past taken seats. Press Tab to leave the grid; the active seat stays marked."
+/>
+
+Use `grid.isActive(state, cell)` to keep the active cell marked when focus leaves:
+
+```ts
+"data-active": api.grid.isActive(state, props) ? "" : undefined,
+```
+
+### Selecting a Range
+
+`onMove` tells you where focus moved, where it came from, and whether Shift was held. Use that to keep the start of a selection:
+
+```ts
+onMove: (cell, { from, shift }) => {
+  const anchor = context.store.get().anchor ?? from
+  context.store.set({ anchor: shift && anchor ? anchor : cell })
+},
+```
+
+<ComponentExample
+  name="behaviors/grid-focus-range"
+  caption="Click a cell, then hold Shift and use the arrows or click another cell to extend the range. Move without Shift to start again."
+/>
+
+For Shift-click, pass `shift: event.shiftKey` to `grid.focus`. The callback also receives the `event` and a `reason`: `"list-navigation"` for keys, `"item-press"` for a press or `"imperative"`, the names a listbox reports. [Selection](./selection#ranges-of-cells) covers turning the anchor and active cell into a range.
+
+### Rows That Aren't Rendered
+
+A large grid may render only the visible rows. Add `reveal` to bring a target row into view before focus moves there:
+
+```ts
+reveal: ({ row }) => {
+  const { first } = context.store.get()
+  if (row < first) {
+    context.store.set({ first: row })
+  } else if (row >= first + 6) {
+    context.store.set({ first: row - 5 })
+  }
+},
+pageSize: () => 6,
+```
+
+This timetable shows six rows at a time.
+
+<ComponentExample
+  name="behaviors/grid-focus-reveal"
+  caption="Focus a cell and press Down past the last visible row, or Page Down, to bring the next rows into view."
+/>
+
+`pageSize` sets how far Page Up and Page Down move. With a [virtualized list](./lists#long-lists), `reveal` can call `virtualizer.scrollToIndex(row)` instead. Focus lands when the cell binds.
+
+## Input Hints
+
+A few attributes tell the browser what a field holds: `inputmode` picks a phone's keys, like an `@` for an email address or a number pad for a code, and `enterkeyhint` picks its Return key. `autocomplete` says what to autofill, and `autocapitalize`, `autocorrect` and `spellcheck` say whether to change what people type. `inputHints` fills them in for a kind of field:
+
+```tsx
+import { inputHints } from "@ui-sdk/core"
+
+const hints = inputHints("email", { enter: "next" })
+// { inputMode: "email", enterKeyHint: "next", autoComplete: "email", autoCapitalize: "none", autoCorrect: "off", spellCheck: "false" }
+```
+
+Spread them on an `<input>` or `<textarea>`. They're spelled as React spells them, and HTML reads attribute names in any case, so the same object works in Vue, Svelte, Solid and `setAttribute`. `enter` sets the Return key, like `"next"` while more fields follow and `"done"` on the last one. iPhone's number pads, for `"tel"`, `"numeric"`, `"decimal"` and `"one-time-code"`, have no Return key, so there `enter` only shows on other phones.
+
+| Kind                                    | Keys and Return key                          | Autofill and corrections                              |
+| --------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| `"email"`, `"url"`                      | Keys for an address                          | Autofills the address, no capitals or corrections     |
+| `"tel"`, `"one-time-code"`              | A number pad                                 | Autofills the number, or the code from a text message |
+| `"numeric"`, `"decimal"`                | Digits, with a decimal point for `"decimal"` | No autofill                                           |
+| `"search"`                              | A search Return key                          | No autofill, capitals or spelling marks               |
+| `"name"`, `"username"`, `"postal-code"` | The usual keys                               | Autofills them, capitalizing names and postal codes   |
+| `"current-password"`, `"new-password"`  | The usual keys                               | Offers the saved password, or suggests a new one      |
+| `"message"`                             | A send Return key                            | Capitals, corrections and spelling marks on           |
+
+<ComponentExample
+  name="behaviors/input-hints"
+  caption="Tap each field on a phone: the keys change, and so does the Return key, which iOS 26 draws as a glyph, like › for next and → for search."
+/>
+
+They're only hints: a field keeps its own `type` and validation, so a `type="email"` field still checks the address. Attributes after the spread replace the hints.
+
+## API Reference
+
+### Roving Focus Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/focus/roving-focus.ts"
+  name="RovingFocusOptions"
+  events={false}
+  examples={{
+    slot: "One Tab Stop",
+    key: "One Tab Stop",
+    orientation: "One Tab Stop",
+    loop: "Disabled Items and Wrapping",
+    remember: "One Tab Stop",
+    disabled: "Disabled Items and Wrapping",
+    focusable: "Items That Can't Take Focus",
+    preferred: "One Tab Stop",
+    claims: "One Tab Stop",
+    move: "Any Layout",
+    onItemsChange: "Items That Come and Go",
+  }}
+/>
+
+### Grid Focus Options
+
+<TypeTable
+  path="../../packages/core/src/foundation/focus/grid-focus.ts"
+  name="GridFocusOptions"
+  type="GridFocusOptions<{ active: GridCell | null }>"
+  events={false}
+  examples={{
+    key: "One Tab Stop in a Grid",
+    rows: "One Tab Stop in a Grid",
+    cols: "One Tab Stop in a Grid",
+    disabled: "Cells That Can't Take Focus",
+    onMove: "Selecting a Range",
+    pageSize: "Rows That Aren't Rendered",
+    reveal: "Rows That Aren't Rendered",
+  }}
+/>

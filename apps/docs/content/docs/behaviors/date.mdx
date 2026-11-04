@@ -1,0 +1,256 @@
+---
+title: Dates
+description: Work with calendar dates, build month grids, and read and format dates in someone's language.
+---
+
+`@ui-sdk/core/date` provides date arithmetic, month grids, localized labels, and parsing for calendars and date fields.
+
+The helpers work with date strings such as `"2026-10-16"` and run without a DOM. Calendar and Date Picker use the same helpers.
+
+## Dates as Strings
+
+### Real Dates
+
+Build a date with `isoDate`, and read its fields with `dateParts`. Months run from 1 to 12. Both functions return `undefined` when the date doesn't exist:
+
+```ts
+import { dateParts, isISODate, isoDate } from "@ui-sdk/core/date"
+
+isoDate(2026, 10, 16) // "2026-10-16"
+isoDate(2026, 2, 30) // undefined
+dateParts("2026-10-16") // { year: 2026, month: 10, day: 16 }
+isISODate("2026-02-30") // false
+```
+
+<ComponentExample
+  name="behaviors/date-values"
+  caption="Change February 30 to February 28 to get a valid date. Pick another date below to read its year, month, and day, or press Today."
+/>
+
+These strings use `YYYY-MM-DD`, the same format as `<input type="date">`. Valid dates sort in date order, so comparisons such as `start < end` work directly.
+
+To bring in an existing value, use `toISODate`. It accepts an ISO string, a `Date`, or an object with `year`, `month`, and `day`, including a `Temporal.PlainDate`:
+
+```ts
+import { toISODate } from "@ui-sdk/core/date"
+
+toISODate({ year: 2026, month: 10, day: 16 }) // "2026-10-16"
+toISODate(new Date()) // Today's date in the runtime's local time zone.
+```
+
+A `Date` represents an instant, so this conversion uses its local year, month, and day. The resulting string has no time zone.
+
+## Arithmetic
+
+### Whole Days
+
+For a three-night stay, add three days to check-in:
+
+```ts
+import { addDays, daysBetween } from "@ui-sdk/core/date"
+
+addDays("2026-12-24", 3) // "2026-12-27"
+daysBetween("2026-12-24", "2026-12-27") // 3
+```
+
+Negative numbers move backward. The arithmetic uses whole days, so crossing a daylight saving change doesn't add or lose a day.
+
+Use `clampDate` to keep a date inside a booking season. `weekday` returns 0 for Sunday through 6 for Saturday:
+
+```ts
+import { clampDate, weekday } from "@ui-sdk/core/date"
+
+clampDate("2026-10-20", "2026-11-01", "2027-01-31") // "2026-11-01"
+weekday("2026-12-24") // 4: Thursday.
+```
+
+<ComponentExample
+  name="behaviors/date-days"
+  caption="Change the check-in date or number of nights. Try a check-in before November 1 to see it move into the booking season."
+/>
+
+### Weeks and Months
+
+Moving by months keeps the day when possible. January 31 becomes February 28 because February has no 31st:
+
+```ts
+import { addMonths, addYears } from "@ui-sdk/core/date"
+
+addMonths("2026-01-31", 1) // "2026-02-28"
+addYears("2028-02-29", 1) // "2029-02-28"
+```
+
+For boundaries, use `startOfWeek` and `endOfWeek`, or `startOfMonth` and `endOfMonth`. The week helpers take the first weekday, with 0 for Sunday:
+
+```ts
+import { daysInMonth, endOfMonth, isSameMonth, startOfWeek } from "@ui-sdk/core/date"
+
+startOfWeek("2026-10-16", 1) // "2026-10-12": Monday.
+endOfMonth("2026-02-10") // "2026-02-28"
+daysInMonth(2028, 2) // 29
+isSameMonth("2026-09-28", "2026-10-04") // false
+```
+
+<ComponentExample
+  name="behaviors/date-months"
+  caption="Press + Month from January 31, then change which day starts the week. Reset and add two years to try the same move in a leap year."
+/>
+
+## Month Grids
+
+### A Month to Pick From
+
+`monthGrid` returns rows of seven ISO dates. Days from the neighboring months fill the edges. Choose the first weekday with `weekStartsOn`:
+
+```ts
+import { firstDayOfWeek, monthGrid } from "@ui-sdk/core/date"
+
+const weeks = monthGrid("2026-10-01", {
+  weekStartsOn: firstDayOfWeek("de-DE"),
+})
+// The first week runs from "2026-09-28" to "2026-10-04".
+```
+
+Render one row per week and one button per date. This example adds [roving focus](./focus#roving-focus), using each date as a key. Its custom `move` adds one day for a horizontal arrow or seven for a vertical arrow. When focus reaches another month, the example renders that month.
+
+<ComponentExample
+  name="core/month-grid"
+  caption="Tab into the month and use the arrow keys to move by days and weeks. Move beyond the month to turn the page, or change the locale to see a different first weekday."
+/>
+
+### Weeks That Fit the Month
+
+A grid has six weeks by default, which keeps adjacent calendars the same height. Pass `fixedWeeks: false` to return only the weeks the month needs:
+
+```ts
+monthGrid("2026-02-01").length // 6
+monthGrid("2026-02-01", { fixedWeeks: false }).length // 4
+```
+
+<ComponentExample
+  name="behaviors/month-sizes"
+  caption="Clear Six weeks each. February, March, and August 2026 need four, five, and six rows when weeks start on Sunday."
+/>
+
+## Names and Labels
+
+### Names in Any Language
+
+Pass a locale to format a date for the person reading it. Without one, these functions use the runtime's locale:
+
+```ts
+import { formatDate, formatDateRange } from "@ui-sdk/core/date"
+
+formatDate("2026-10-16", "de-DE") // "Freitag, 16. Oktober 2026"
+formatDate("2026-10-16", "en-US", { month: "long", year: "numeric" }) // "October 2026"
+formatDateRange("2026-10-16", "2026-10-20", "en-US") // "Oct 16 – 20, 2026"
+```
+
+`formatDate` takes `Intl.DateTimeFormat` options. Its default includes the weekday, day, month, and year, which makes a useful accessible label for a day button.
+
+For a calendar's headings, get month and weekday names separately. Keep the weekday names in the same order as the grid:
+
+```ts
+import { firstDayOfWeek, monthNames, weekdayNames } from "@ui-sdk/core/date"
+
+const firstDay = firstDayOfWeek("de-DE") // 1: Monday.
+const weekdays = weekdayNames("de-DE", "short", firstDay)
+const months = monthNames("de-DE")
+```
+
+You can get the page's locale with [`pageLocale`](./text#the-pages-language). `firstDayOfWeek` also respects an explicit week preference, such as `"en-US-u-fw-mon"` for Monday.
+
+<ComponentExample
+  name="behaviors/date-locale"
+  caption="Change the locale to compare the date label, range, weekday order, and month names. Choose Persian to see localized labels on the same Gregorian dates."
+/>
+
+For a label with separate styles, `formatDateToParts` returns each formatted piece and its type:
+
+```ts
+import { formatDateToParts } from "@ui-sdk/core/date"
+
+const parts = formatDateToParts("2026-10-16", "en-US", {
+  month: "long",
+  day: "numeric",
+})
+// [{ type: "month", value: "October" }, { type: "literal", value: " " }, { type: "day", value: "16" }]
+```
+
+These helpers use `Intl` and reuse its formatters. They keep month and day labels aligned with the Gregorian grid. A locale that uses different months, such as Persian, uses Gregorian labels; calendars that share those months, such as Thai Buddhist, can keep their own years. `dateFormatter(locale, options)` exposes the cached formatter when you need it directly.
+
+### Today
+
+`todayDate()` returns today's date where the code runs. Pass a time zone when the date belongs to a particular place:
+
+```ts
+import { todayDate } from "@ui-sdk/core/date"
+
+todayDate()
+todayDate("Asia/Tokyo")
+```
+
+<ComponentExample
+  name="behaviors/date-today"
+  caption="Compare today's date in each city with Here, the browser's local date. Cities can show different dates near midnight."
+/>
+
+For server rendering, pass the same time zone on the server and client, or wait until the component mounts to mark today.
+
+## Typing a Date
+
+### Read What People Type
+
+`parseDate` reads the locale's date order and returns an ISO date. It returns `undefined` for incomplete or invalid input:
+
+```ts
+import { parseDate } from "@ui-sdk/core/date"
+
+parseDate("10/16/2026", "en-US") // "2026-10-16"
+parseDate("16.10.2026", "de-DE") // "2026-10-16"
+parseDate("16 oct 2026", "fr") // "2026-10-16"
+parseDate("Feb 30", "en-US") // undefined
+```
+
+Dots, slashes, and spaces work as separators. The parser also accepts ISO dates, month names, locale digits, and digits without separators, such as `"16102026"` in German.
+
+When the year is missing, the parser uses the reference date's year. That defaults to the current year. Pass `referenceDate` when the result should stay predictable:
+
+```ts
+parseDate("October 16", "en-US", { referenceDate: "2026-01-01" }) // "2026-10-16"
+parseDate("16.10.70", "de-DE", { referenceDate: "2026-01-01" }) // "1970-10-16"
+parseDate("16.10.70", "de-DE", { referenceDate: "2060-01-01" }) // "2070-10-16"
+```
+
+Two-digit years fall in the 100-year window ending 20 years after the reference year.
+
+<ComponentExample
+  name="behaviors/date-parse"
+  caption="Type a date, then change the locale to try another order. Enter 16.10.70 in German and change the reference year from 2026 to 2060 to see which century is used."
+/>
+
+Use `datePattern` for the input's placeholder and a hint showing the order:
+
+```ts
+import { datePattern } from "@ui-sdk/core/date"
+
+const pattern = datePattern("de-DE")
+pattern.fields // ["day", "month", "year"]
+pattern.placeholder // "TT.MM.JJJJ"
+pattern.separator // "."
+// pattern.example is December 31 in the current year, written in this locale.
+```
+
+## API Reference
+
+All of these functions come from `@ui-sdk/core/date`.
+
+| You Want To                                  | Use                                                                                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Validate or convert a date                   | [`isoDate`, `isISODate`, `dateParts`, `toISODate`](#real-dates)                                                                            |
+| Move a date or measure a stay                | [`addDays`, `daysBetween`, `weekday`, `clampDate`](#whole-days)                                                                            |
+| Move between months or find their boundaries | [`addMonths`, `addYears`, `startOfWeek`, `endOfWeek`, `startOfMonth`, `endOfMonth`, `daysInMonth`, `isSameMonth`](#weeks-and-months)       |
+| Build rows for a calendar                    | [`monthGrid`](#month-grids)                                                                                                                |
+| Label dates and calendar headings            | [`formatDate`, `formatDateRange`, `formatDateToParts`, `monthNames`, `weekdayNames`, `firstDayOfWeek`, `dateFormatter`](#names-and-labels) |
+| Find today in a time zone                    | [`todayDate`](#today)                                                                                                                      |
+| Read typed dates or show their format        | [`parseDate`, `datePattern`](#typing-a-date)                                                                                               |

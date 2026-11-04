@@ -2,13 +2,13 @@ import { expect, test } from "@playwright/test"
 import { openExamples } from "./behaviors/helpers"
 
 test("the introduction's examples render without errors", async ({ page }) => {
-  const { errors } = await openExamples(page, "/docs/core")
+  const { errors } = await openExamples(page, "/docs/react")
   await expect(page.locator("[data-example]")).toHaveCount(1)
   expect(errors).toEqual([])
 })
 
 test("emoji picker: search, then arrows and Enter pick an emoji", async ({ page }) => {
-  await openExamples(page, "/docs/core")
+  await openExamples(page, "/docs/react")
   const example = page.locator('[data-example="core/emoji-picker"]')
   const grid = page.getByRole("group", { name: "Emoji" })
   const footer = page.locator("[data-footer]")
@@ -40,7 +40,7 @@ test.describe("on a phone", () => {
   test.use({ viewport: { width: 375, height: 800 }, hasTouch: true })
 
   test("emoji picker: the arrows follow the columns that fit, and a tap picks", async ({ page }) => {
-    await openExamples(page, "/docs/core")
+    await openExamples(page, "/docs/react")
     const grid = page.getByRole("group", { name: "Emoji" })
     const buttons = grid.getByRole("button")
     const tops = await buttons.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top))

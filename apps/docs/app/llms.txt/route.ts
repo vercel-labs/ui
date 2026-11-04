@@ -8,12 +8,12 @@ export function GET() {
 
 > The layer underneath a UI library: how interfaces behave, written once in a framework-free TypeScript core and rendered in React, Vue, Svelte, Solid and web components.
 
-To build something ui-sdk doesn't ship, read Core: build a component, compose behaviors, then explore the helpers you need. To render a primitive, or to use what we ship, read your framework's llms.txt: its Rendering page, then every component's parts, props, state and styling hooks. To operate a page, or hand it to the browser's agent, read Agents.
+To build something ui-sdk doesn't ship, read Behaviors: build a component, compose behaviors, then explore the ones you need. To render a primitive, or to use what we ship, read your framework's llms.txt: its Rendering page, then every component's parts, props, state and styling hooks. To operate a page, or hand it to the browser's agent, read Agents.
 
-## Core and Agents
+## Behaviors and Agents
 
-- [Core](/docs/core/llms.txt): the guides and reference, Foundations (primitives, state, platform, text, and dates), Behaviors (focus, selection, dragging, lists, trees, transitions, popups, and canvases), and Testing
-- [Agents](/docs/agents/llms.txt): the agent bridge, WebMCP and our skills, in one file
+- [Behaviors](/docs/behaviors/llms.txt): every behavior by job (focus, selection, dragging, lists, trees, transitions, popups, and canvases), the helpers (text, numbers, dates, platform, and storage), building and testing your own component, and the reference
+- [Agents](/docs/agents/llms.txt): the agent bridge and WebMCP, in one file
 
 ## Frameworks
 

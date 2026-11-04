@@ -10,7 +10,7 @@ import { renderToString } from "react-dom/server"
 import { afterEach, expect, test } from "vitest"
 
 const docs = path.resolve(import.meta.dirname, "../../../apps/docs/content/docs")
-const page = ["core/compose-behaviors.mdx", "react/rendering.mdx"]
+const page = ["behaviors/compose-behaviors.mdx", "react/rendering.mdx"]
   .map((file) => readFileSync(path.join(docs, file), "utf8"))
   .join("\n")
 const dir = path.join(import.meta.dirname, ".walkthrough")

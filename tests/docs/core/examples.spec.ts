@@ -5,7 +5,7 @@ test("every example on the Core pages, and on Trees and Dates, renders without e
   test.setTimeout(90_000)
   for (const [slug, count] of [
     ["core/compose-behaviors", 5],
-    ["core/behaviors/trees", 6],
+    ["behaviors/trees", 6],
     ["core/date", 8],
   ] as const) {
     const { errors } = await openExamples(page, `/docs/${slug}`)
@@ -15,7 +15,7 @@ test("every example on the Core pages, and on Trees and Dates, renders without e
 })
 
 test("rating: all four arrows select and wrap, with one tab stop", async ({ page }) => {
-  await openExamples(page, "/docs/core/compose-behaviors")
+  await openExamples(page, "/docs/behaviors/compose-behaviors")
   const example = page.locator("[data-example]").last()
   const group = example.getByRole("radiogroup", { name: "Rating" })
   await group.scrollIntoViewIfNeeded()
@@ -46,7 +46,7 @@ test("rating: all four arrows select and wrap, with one tab stop", async ({ page
 test("tree checkboxes: a folder checks its files, shows mixed, and the strategy shapes the value", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/behaviors/trees")
+  await openExamples(page, "/docs/behaviors/trees")
   // The fifth example on Trees.
   const example = page.locator("[data-example]").nth(4)
   const src = example.getByRole("checkbox", { name: "src", exact: true })
@@ -66,7 +66,7 @@ test("tree checkboxes: a folder checks its files, shows mixed, and the strategy 
 test("month grid: arrows move by days and weeks, turn the month, and the locale moves the week start", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/date")
+  await openExamples(page, "/docs/behaviors/date")
   const grid = page.getByRole("grid", { name: "October 2026" })
   await grid.scrollIntoViewIfNeeded()
   const selected = grid.getByRole("gridcell", { selected: true })

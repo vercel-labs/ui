@@ -160,8 +160,8 @@ function coreEntries() {
       const page = name
         ? (docPage(["react", "components", name]) ??
           docPage(["react", "hooks", name]) ??
-          docPage(["core", name]))
-        : docPage(["core", "reference"])
+          docPage(["behaviors", name]))
+        : docPage(["behaviors", "reference"])
       return {
         entry: `@ui-sdk/core${name ? `/${name}` : ""}`,
         page,

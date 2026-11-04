@@ -1,41 +1,7 @@
 ---
 title: Built for Agents
-description: ui-sdk gives agents the building blocks to create components and the tools to use them.
+description: Let an agent read your components' state and call their actions.
 ---
-
-## Agents Build Components
-
-You can ask an agent to build a component for your app, from a toggle button to an emoji picker or a kanban board.
-
-`@ui-sdk/core` gives it **behaviors**: tested building blocks for focus, keyboard navigation, selection, popups, drag and drop, and more. The agent combines them to handle the interactions your component needs.
-
-A **primitive** brings a component's state, actions and parts together. Here's a small one: a mute button.
-
-```ts
-import { definePrimitive } from "@ui-sdk/core"
-
-const muteButton = definePrimitive({
-  name: "mute-button",
-  state: () => ({ muted: false }),
-  api: (context) => ({
-    toggle: () => context.store.set({ muted: !context.store.get().muted }),
-  }),
-  slots: (slot) => ({
-    root: slot({
-      attrs: (state) => ({ type: "button", "aria-pressed": String(state.muted) }),
-      press: ({ api }) => api.toggle(),
-    }),
-  }),
-})
-
-export { muteButton }
-```
-
-Pressing the button changes `muted`, and `aria-pressed` follows it. The same primitive can render in React, Vue, Svelte, Solid and Web Components. [Build a Component](../core/build-a-component) walks through connecting it to your framework and adding styles.
-
-The [component skill](./skills) gives the agent a workflow to follow. Each package includes Markdown docs for the installed version, and the [testing kit](../core/testing) helps it check keyboard behavior, focus and ARIA in the finished component.
-
-## Agents Use Your Components
 
 Connect an agent to a UI built with ui-sdk and it can read component state and call component actions directly. For example, it can rename a project by calling the input's `setValue` action.
 
@@ -69,22 +35,24 @@ await agent.act({
 
 The change goes through the input's API and change callback. Your app can provide an `allow` callback to approve or refuse requested actions. Change callbacks receive `source: "agent"` and can cancel a change too.
 
-You can give these tools to your own agent, or register them with a supported browser through [WebMCP](./connect-an-agent/webmcp).
+You can give these tools to your own agent, or register them with a supported browser through [WebMCP](./webmcp).
 
 ## Benchmark
 
 In a project-settings benchmark, agents renamed a project, updated members and notification settings, then saved. One used browser tools on a page built with another component library; the other used the agent bridge on the same screen built with ui-sdk.
 
-|            | Browser tools           | ui-sdk + agent bridge | Delta |
-| ---------- | ----------------------- | --------------------- | ----- |
-| Tool calls | 16                      | <Won>5</Won>          | −69%  |
-| Text read  | 39.8k                   | <Won>6.8k</Won>       | −83%  |
-| Time       | 41 s                    | <Won>16 s</Won>       | −61%  |
-| Cost       | $0.073                  | <Won>$0.032</Won>     | −56%  |
+|            | Browser tools | ui-sdk + agent bridge | Delta |
+| ---------- | ------------- | --------------------- | ----- |
+| Tool calls | 16            | <Won>5</Won>          | −69%  |
+| Text read  | 39.8k         | <Won>6.8k</Won>       | −83%  |
+| Time       | 41 s          | <Won>16 s</Won>       | −61%  |
+| Cost       | $0.073        | <Won>$0.032</Won>     | −56%  |
 
 These are medians from three runs per approach. Both agents used Sonnet through Claude Code with the same task and system prompt, plus instructions for their available tools. Every run completed the task. Text read counts characters returned by the tools. Time and cost are what Claude Code reported for those runs.
 
 ## Where to Start
 
-- **[Build with an Agent](./build-with-an-agent):** give it the docs, describe the component, and check its work.
 - **[Connect an Agent](./connect-an-agent):** set up the bridge, read your components, and call their actions.
+- **[Guide](./guide):** build a Vite app, try the bridge in the console, and let ChatGPT use it through WebMCP.
+
+To build components with an agent instead, see [Build with an Agent](/docs/build-with-an-agent).

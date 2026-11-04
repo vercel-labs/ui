@@ -38,7 +38,7 @@ Both initial renders show “Loading language…”. Once mounted, the paragraph
 
 ## Saved Preferences and Storage
 
-Preferences like a color scheme or an emoji skin tone are saved in the browser, so the server can't render them. [Preferences](../core/behaviors/preferences) covers the preferences themselves; this is how they fit server rendering.
+Preferences like a color scheme or an emoji skin tone are saved in the browser, so the server can't render them. [Preferences](/docs/behaviors/preferences) covers the preferences themselves; this is how they fit server rendering.
 
 ### Show Them Before Hydration
 
@@ -58,7 +58,7 @@ Render `Preferences` around your app. On the server it renders one inline script
 
 A preference made with `global: true` goes on `<html>` instead. Pass `nonce` if your Content Security Policy only allows inline scripts with one.
 
-Content that reads a preference through `usePreference` renders the default on the server and the saved value once mounted. Style by the attribute instead wherever the first paint has to be right, as [Style by Preferences](../core/behaviors/preferences#style-by-preferences) shows.
+Content that reads a preference through `usePreference` renders the default on the server and the saved value once mounted. Style by the attribute instead wherever the first paint has to be right, as [Style by Preferences](/docs/behaviors/preferences#style-by-preferences) shows.
 
 ### Read a Cookie on the Server
 

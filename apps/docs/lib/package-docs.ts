@@ -10,10 +10,10 @@ import { frameworkPages, utilitiesFolder } from "./sections"
 import { sectionMarkdown } from "./section-markdown"
 
 // The docs as Markdown inside each package, so whoever installs one reads
-// them in node_modules, with no access to the site: Core and Agents as one
-// file each, and every page of the package's framework.
+// them in node_modules, with no access to the site: Behaviors (as core.md)
+// and Agents as one file each, and every page of the package's framework.
 
-/** Each package and the framework whose pages it ships. Core ships Core and Agents only. */
+/** Each package and the framework whose pages it ships. Core ships Behaviors and Agents only. */
 const packageFrameworks: Record<string, Framework | undefined> = {
   core: undefined,
   react: "react",
@@ -35,16 +35,16 @@ const anchor = (heading: string) =>
 
 // The file a page is copied to in a package for `framework`, relative to the
 // docs folder, or null for a page with no copy there, like another
-// framework's. Core and Agents are one file each, so their pages are headings.
+// framework's. Behaviors and Agents are one file each, so their pages are headings.
 function fileOf({ slugs, hash }: LinkTarget, framework: Framework | undefined) {
   const [section, ...rest] = slugs
-  if (section === "core" || section === "agents") {
+  if (section === "behaviors" || section === "agents") {
     const page = rest.length ? docPage(slugs) : undefined
     const file = section === "agents" ? "agents.md" : "core.md"
     return `${file}${hash ? `#${hash}` : page ? `#${anchor(page.title)}` : ""}`
   }
   if (!framework) return null
-  // A link that names no framework, from Core or Agents, is this framework's.
+  // A link that names no framework, from Behaviors or Agents, is this framework's.
   const [folder, name] = frameworkPages.includes(section)
     ? [section === "utilities" ? utilitiesFolder(framework) : section, rest[0]]
     : section === framework
@@ -83,14 +83,14 @@ const frameworkFiles = (framework: Framework) => [
 
 // The docs folder's index: every page, with what it's for.
 function index(name: string, framework: Framework | undefined) {
-  const core = docPage(["core"])!
+  const behaviors = docPage(["behaviors"])!
   const agents = docPage(["agents"])!
   const llms = framework
     ? `Start with [llms.txt](./llms.txt): how the components fit together, then an index of every component, in one file for an agent's context. Each page below has the rest.\n\n`
-    : `[llms.txt](./llms.txt) is the Core docs, the same as core.md, under the name agents look for.\n\n`
-  const shared = `## Core and Agents
+    : `[llms.txt](./llms.txt) is the Behaviors docs, the same as core.md, under the name agents look for.\n\n`
+  const shared = `## Behaviors and Agents
 
-- [Core](./core.md): ${core.description} Every Core page in one file.
+- [Behaviors](./core.md): ${behaviors.description} Every Behaviors page in one file.
 - [Agents](./agents.md): ${agents.description} Every Agents page in one file.
 `
   if (!framework)
@@ -140,15 +140,18 @@ async function writePackageDocs(names = Object.keys(packageFrameworks)) {
     const dir = path.join(repoRoot, "packages", name, "docs")
     await rm(dir, { recursive: true, force: true })
     const files: Record<string, string> = { "README.md": index(name, framework) }
-    for (const section of ["core", "agents"] as const)
-      files[`${section}.md`] = await sectionMarkdown(
+    for (const [section, file] of [
+      ["behaviors", "core.md"],
+      ["agents", "agents.md"],
+    ] as const)
+      files[file] = await sectionMarkdown(
         section,
-        (slugs, hash) => linksFrom(`${section}.md`, framework)({ slugs, hash }),
-        `<!-- ui-sdk ${section === "core" ? "Core" : "Agents"} docs, as one file. -->`,
+        (slugs, hash) => linksFrom(file, framework)({ slugs, hash }),
+        `<!-- ui-sdk ${section === "behaviors" ? "Behaviors" : "Agents"} docs, as one file. -->`,
       )
     files["llms.txt"] = framework
       ? await frameworkLlms(framework, linksFrom("llms.txt", framework))
-      : await sectionMarkdown("core", (slugs, hash) => linksFrom("llms.txt", framework)({ slugs, hash }))
+      : await sectionMarkdown("behaviors", (slugs, hash) => linksFrom("llms.txt", framework)({ slugs, hash }))
     if (framework)
       // Component and utility pages are in folders; guides keep every example styled.
       for (const { page, file } of frameworkFiles(framework))

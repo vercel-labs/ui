@@ -1,22 +1,19 @@
 ---
 title: Introduction
-description: Use unstyled Svelte components with keyboard, focus, and screen reader support built in.
+description: Set up ui-sdk in your Svelte project, then ask your agent to build something.
 ---
 
 <Callout>
 
-This section covers using ui-sdk in Svelte.
+These docs cover ui-sdk in Svelte. Using another framework? See [React](/docs/react), [Vue](/docs/vue), [Solid](/docs/solid) or [Web Components](/docs/web-components).
 
-- To browse the components library, see [Components](./components).
-- To build your own with `@ui-sdk/core`, see [Core](/docs/core).
+To build your own components from behaviors, see [Behaviors](/docs/behaviors).
 
 </Callout>
 
-`@ui-sdk/svelte` gives you components such as Select, Dialog, and Tabs, built on ui-sdk's behaviors. They handle interactions, focus, and ARIA attributes. You choose their markup and styles.
+ui-sdk is a library of behaviors, like a popup, a list you move through with the arrow keys, or dragging to sort. Your agent puts them together to build the components your app needs, in Svelte.
 
-Import the parts you need, put them together in your app, and style them with your own CSS. The examples use Tailwind CSS.
-
-## Quick Start
+## Set Up
 
 Copy this prompt into your agent:
 
@@ -30,13 +27,44 @@ Set up ui-sdk in this Svelte project. It needs Svelte 5.33 or newer.
 
 It installs ui-sdk and points your `AGENTS.md` at the docs that ship with the packages.
 
-## Set It Up Yourself
+## Build Something
+
+Then ask your agent to build a component:
+
+```text prompt
+Build an emoji picker with ui-sdk: a search field above a grid of emoji. Typing filters the grid, the arrow keys move between emoji, and Enter picks one. Use our existing styles.
+```
+
+Here's an emoji picker an agent built from ui-sdk's behaviors:
+
+<ComponentExample
+  name="core/emoji-picker"
+  hideCode
+  caption="Click an emoji to pick it, or type to search. Press Down to enter the results, use the arrow keys to move, and press Enter to pick."
+/>
+
+It uses four behaviors:
+
+- **One Tab stop.** [`createRovingFocus`](/docs/behaviors/focus#roving-focus) lets Tab enter the grid once. The arrow keys move between emoji, and the next Tab leaves it.
+- **Arrows that follow the layout.** [`spatialMove`](/docs/behaviors/focus#spatial-focus) chooses the nearest emoji in the direction you press. Down still goes down when the grid fits fewer columns on a small screen.
+- **Search results.** [`fuzzyScore`](/docs/behaviors/text#rank-what-someone-searches-for) ranks each emoji's name and keywords against what you type. "party" finds the party popper, and "ship" finds the rocket.
+- **Announcements.** [`announce`](/docs/behaviors/platform#announcements) tells screen readers how many emoji match and which one you picked.
+
+Your agent picks behaviors like these for whatever you ask it to build.
+
+## Keep Going
 
 <Cards>
-  <Card title="Installation" href="./installation" description="Install the packages in your Svelte app." />
-  <Card title="First Component" href="./first-component" description="Add and style your first component." />
+  <Card
+    title="How It Works"
+    href="./how-it-works"
+    description="See what your agent built, one piece at a time."
+  />
+  <Card title="Behaviors" href="/docs/behaviors" description="Browse every behavior by the job it does." />
+  <Card
+    title="Components"
+    href="./components"
+    description="Use ready-made components like Select, Dialog and Tabs."
+  />
+  <Card title="Agents" href="/docs/agents" description="Let an agent use the app you built." />
 </Cards>
-
-## Explore the Components
-
-The [Using Components guides](./parts-and-composition) cover patterns the components share, such as composing parts, handling state, and styling.

@@ -1,0 +1,91 @@
+---
+title: Build with an Agent
+description: Give an agent the right context, build a small version, and check how it behaves.
+---
+
+Tell the agent what you're building, which framework you use, and how the component should behave. It can use ui-sdk's components and behaviors to put it together.
+
+## Give It the Docs
+
+Each package includes Markdown docs that match the version you installed. Start with:
+
+```text
+This project uses Web Components and ui-sdk. Read
+node_modules/@ui-sdk/web/docs/llms.txt to see what's available.
+
+For a custom component, read the relevant sections of docs/core.md
+and docs/rendering.md in the same package.
+```
+
+`llms.txt` covers your framework's APIs. `core.md` covers the behaviors, and `rendering.md` explains how to render a primitive in your framework.
+
+[Build a Component](/docs/behaviors/build-a-component) walks through the code. [All Behaviors](/docs/behaviors) helps the agent find a behavior for each interaction.
+
+## Add the Skill
+
+If your agent supports skills, install `ui-sdk-create-component`:
+
+```bash
+npx skills add vercel-labs/ui --skill ui-sdk-create-component
+```
+
+It gives the agent a workflow for reading the installed docs, choosing behaviors, defining a primitive, rendering it as a web component and testing the result. The same skill ships inside `@ui-sdk/core`, at `node_modules/@ui-sdk/core/skills/ui-sdk-create-component/SKILL.md`, and that copy always matches the version you installed. If your agent doesn't support skills, point it there instead.
+
+To use it, name the skill and the interaction you want:
+
+```text
+Use ui-sdk-create-component to build a five-star rating as a web component.
+Arrow keys should move between stars and choose a rating.
+Use our existing styles and test the keyboard behavior.
+```
+
+## Describe the Interaction
+
+Give the agent a concrete example of what someone should be able to do. For an emoji picker:
+
+```text
+Build an emoji picker as a web component using ui-sdk.
+
+Add a search input and a grid of emoji. Down from the search input
+should move focus to the first result. Arrow keys move through the
+grid, and Enter selects an emoji. Announce the selection to screen readers.
+
+Use our existing styles.
+```
+
+Include details that matter to your app, such as whether the picker opens in a popup or whether a parent component owns the selected value. The agent can choose the behaviors from those requirements.
+
+## Start Small
+
+Ask for one working example first:
+
+```text
+Start with a small, fixed list of emoji and one example page.
+Reuse public ui-sdk components and behaviors where they fit.
+```
+
+Try that version, then ask for a specific change:
+
+```text
+When a search has no results, show "No emoji found" and keep focus
+in the search input. Keep the input in the same position as results change.
+```
+
+This gives you something to review as the component takes shape.
+
+## Check the Result
+
+Ask the agent to test the interactions you described:
+
+```text
+Test moving from search into the grid, navigating with arrow keys,
+and selecting with Enter. Check the empty search state and the
+selection announcement too.
+
+Run the project's typecheck and relevant tests. Tell me what passed
+and anything you couldn't check.
+```
+
+The [testing guide](/docs/behaviors/testing) shows how to check a primitive with `@ui-sdk/core/testing`.
+
+Try the example yourself too: Tab into the search input, search for an emoji, press Down, move with the arrows, and select with Enter. Then try a search with no results. These are the same interactions the agent's tests should cover.

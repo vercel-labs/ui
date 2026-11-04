@@ -1,4 +1,14 @@
 {
   "title": "Agents",
-  "pages": ["build-with-an-agent", "skills", "connect-an-agent"]
+  "pages": [
+    "index",
+    "connect-an-agent",
+    "guide",
+    "your-components",
+    "permissions",
+    "observe-changes",
+    "history-and-undo",
+    "webmcp",
+    "reference"
+  ]
 }

@@ -49,15 +49,15 @@ function Example() {
     <LinkPreview>
       <p>
         Every popup sits on the{" "}
-        <LinkPreviewTrigger href="/docs/core/behaviors/popups" payload={pages.popups}>
+        <LinkPreviewTrigger href="/docs/behaviors/popups" payload={pages.popups}>
           popup layer
         </LinkPreviewTrigger>
         , moves{" "}
-        <LinkPreviewTrigger href="/docs/core/behaviors/focus" payload={pages.focus}>
+        <LinkPreviewTrigger href="/docs/behaviors/focus" payload={pages.focus}>
           focus
         </LinkPreviewTrigger>{" "}
         in and back, and animates with{" "}
-        <LinkPreviewTrigger href="/docs/core/behaviors/motion" payload={pages.motion}>
+        <LinkPreviewTrigger href="/docs/behaviors/motion" payload={pages.motion}>
           motion
         </LinkPreviewTrigger>{" "}
         it shares with the rest of the page.

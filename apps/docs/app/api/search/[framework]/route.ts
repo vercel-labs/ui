@@ -9,7 +9,7 @@ export function generateStaticParams() {
 }
 
 export async function GET(_request: Request, { params }: RouteContext<"/api/search/[framework]">) {
-  const sections = ["core", "agents", (await params).framework]
+  const sections = ["behaviors", "agents", (await params).framework]
   const pages = source.getPages().filter((page) => sections.includes(page.slugs[0]))
   return Response.json(
     pages.map((page) => {

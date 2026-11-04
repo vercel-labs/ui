@@ -105,6 +105,6 @@ test("tree data fields link to the example that shows them", async ({ page }) =>
 test("the link to rows that aren't rendered lands on its heading", async ({ page }) => {
   await openBehaviors(page, "trees")
   await page.getByRole("link", { name: "rows that aren't rendered" }).click()
-  await expect(page).toHaveURL(/\/docs\/core\/behaviors\/focus#rows-that-arent-rendered$/)
+  await expect(page).toHaveURL(/\/docs\/behaviors\/focus#rows-that-arent-rendered$/)
   await expect(page.locator('[id="rows-that-arent-rendered"]')).toHaveCount(1)
 })

@@ -12,24 +12,21 @@ import * as React from "react"
 import { FrameworkPicker } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
-import { useActiveTree, useMenuLink } from "./section-nav"
+import { useMenuLink } from "./section-nav"
 
 // The header on small screens. The menu fills the screen below it. Pages outside
 // the docs, like the homepage, have no section and list only the menu.
 function MobileNav({
   section,
   tree,
-  componentsTree,
   urls = [],
 }: {
   section?: Section
   tree?: PageTree.Root
-  componentsTree?: PageTree.Root
   urls?: string[]
 }) {
   const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
-  const active = useActiveTree(tree, componentsTree)
 
   // Search can navigate while the menu is open, so the menu closes on any navigation.
   React.useEffect(() => setOpen(false), [pathname])
@@ -84,7 +81,7 @@ function MobileNav({
             className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas/90 outline-none backdrop-blur-md [scrollbar-width:none] lg:hidden"
           >
             <PopoverTitle className="sr-only">Menu</PopoverTitle>
-            <MobileMenu section={section} tree={active} onNavigate={() => setOpen(false)} />
+            <MobileMenu section={section} tree={tree} onNavigate={() => setOpen(false)} />
           </PopoverContent>
         </Popover>
       </div>

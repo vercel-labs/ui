@@ -1,0 +1,223 @@
+---
+title: Text
+description: Find items by typing, rank search results, highlight matches and format text in the right language.
+---
+
+Use `createTypeahead` to find items as someone types, `fuzzyScore` to rank search results, and `matchRanges` or `matchSegments` to highlight matches.
+
+`pageLocale` and `userLocale` read the page's or user's language for matching and formatting.
+
+## Find an Item by Typing
+
+Start with a few labels. `createTypeahead()` remembers the keys you type and returns the index of the matching item:
+
+```ts
+import { createTypeahead } from "@ui-sdk/core"
+
+const fruits = ["Apple", "Pear", "Plum"]
+const typeahead = createTypeahead()
+
+typeahead("p", fruits, 0) // 1 (Pear).
+typeahead("l", fruits, 1) // 2 (Plum).
+```
+
+The third argument is the current index. Pressing “p” searches after Apple; pressing “l” soon after continues the query as “pl”. A search with no match returns `-1`.
+
+Try it below. Type “p” repeatedly to cycle through the matching fruit, or type “pl” quickly to find Plum.
+
+<ComponentExample name="core/fruit-picker" />
+
+In a keydown handler, use `isTypeaheadKey(event)` from `@ui-sdk/core` to check whether a key types a character. It leaves arrows and shortcuts such as Ctrl+C out of the search. [Focus and Keys](./focus#typeahead) shows how to connect the result to roving focus.
+
+## What an Item Is Called
+
+An item's label may include a shortcut hint. `labelOf(el)` reads the name and skips text marked `aria-hidden`:
+
+```html
+<button id="copy-command">Copy <kbd aria-hidden="true">⌘C</kbd></button>
+```
+
+```ts
+import { labelOf } from "@ui-sdk/core"
+
+const button = document.getElementById("copy-command")!
+labelOf(button) // "Copy".
+```
+
+Use those labels when you call your typeahead search. If an item has no visible text, `labelOf` uses its `aria-label` instead. An icon button with `aria-label="Delete"` can be found by typing “d”.
+
+Try “c” for Copy or Cut, and “d” for Delete:
+
+<ComponentExample name="core/command-list" />
+
+## Names with Spaces
+
+By default, keys typed within 500 milliseconds of each other form one query. Pass a longer timeout if people need more time:
+
+```ts
+const typeahead = createTypeahead(1500)
+```
+
+While a query is active, Space continues it, so “new y” can find New York. `typeahead.active()` tells you whether a query is in progress. Use that to decide whether Space should continue searching or activate the current item.
+
+`typeahead.reset()` clears the query immediately. For example, call it when your component handles Escape:
+
+```ts
+if (event.key === "Escape") {
+  typeahead.reset()
+}
+```
+
+Try “new y” below. Enter picks the city; Space picks it when no search is active. Escape clears the search, and the checkbox gives you more time between keys.
+
+<ComponentExample name="core/city-picker" />
+
+## Rank What Someone Searches For
+
+A search field often needs to filter and sort a whole list. `fuzzyScore(text, query)` returns a score from `0` to `1`. Keep results above zero, then put the best matches first:
+
+```ts
+import { fuzzyScore } from "@ui-sdk/core/text-match"
+
+const commands = ["Open settings", "Settings", "Git push"]
+const query = "set"
+
+const ranked = commands
+  .map((command) => ({ command, score: fuzzyScore(command, query) }))
+  .filter(({ score }) => score > 0)
+  .sort((a, b) => b.score - a.score)
+
+ranked.map(({ command }) => command) // ["Settings", "Open settings"].
+```
+
+An exact match scores highest, followed by a match at the start of the label. Letters can also match in order, so “gp” finds “Git push”. An empty query gives every item a score of `1`.
+
+Try “gp”, “set” or “resu” below:
+
+<ComponentExample name="core/command-search" />
+
+Matching follows the user's language. Case and accents are ignored when that language treats them as equivalent, so someone typing “resume” can find “Résumé”.
+
+## Highlight What Matched
+
+Once you have a result, show which part matched. `matchRanges` finds the ranges; `matchSegments` splits the original text into pieces you can render:
+
+```ts
+import { matchRanges, matchSegments } from "@ui-sdk/core/text-match"
+
+const ranges = matchRanges("Settings", "set", "startsWith")
+// [{ start: 0, end: 3 }].
+
+matchSegments("Settings", ranges)
+// [{ text: "Set", match: true }, { text: "tings", match: false }].
+```
+
+Render each matching segment inside a `<mark>` element. The original text stays intact, including its case and accents.
+
+Choose the matching mode your search uses:
+
+| Mode           | What it highlights                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| `"contains"`   | The first occurrence of the query.                                                         |
+| `"startsWith"` | The query at the start of the label, ignoring leading whitespace.                          |
+| `"fuzzy"`      | The whole query when it appears, preferring a word start; otherwise, its letters in order. |
+
+No match gives you an empty range array. The exported types are `MatchRange`, with `start` and `end` like `slice` takes, and `MatchSegment`, with `text` and `match`.
+
+Change the mode below to see the difference:
+
+<ComponentExample name="core/command-highlights" />
+
+## The Page's Language
+
+Use the page's language when you format something for the reader. `pageLocale()` reads the document's `lang`, with the browser's preferred language as a fallback:
+
+```ts
+import { pageLocale } from "@ui-sdk/core"
+
+const price = new Intl.NumberFormat(pageLocale(), {
+  style: "currency",
+  currency: "EUR",
+})
+
+price.format(12.5)
+```
+
+For a section with its own `lang`, pass an element from that section to `pageLocale(el)`. It reads the nearest `lang` attribute. Inside a primitive, `bind` is a good place to read it because the element is in the page.
+
+`userLocale()` reads the browser's preferred language directly. The search helpers use this language when comparing what someone typed. If no locale is available, the helpers return `undefined`, and `Intl` uses its runtime's default.
+
+Pick a language below to see prices and sorting change. In Swedish, Å and Ö sort after Z.
+
+<ComponentExample name="core/price-list" />
+
+The same locale works with `Intl.DateTimeFormat`, `Intl.ListFormat` and `Intl.Collator`. [Dates](./date) covers calendar dates.
+
+## Tags from Elsewhere
+
+A server or an older system might give you `en_US`, while `Intl` expects `en-US`. `toLocale` normalizes these tags:
+
+```ts
+import { toLocale } from "@ui-sdk/core"
+
+toLocale("en_US") // "en-US".
+toLocale("de_DE.UTF-8") // "de-DE".
+toLocale("??") // undefined.
+```
+
+It returns `undefined` for an invalid tag, so you can pass the result to `Intl` and let it use the default locale.
+
+Try a few tags below:
+
+<ComponentExample name="core/language-tag" />
+
+## Properly Handle Input Method Editors
+
+Chinese, Japanese, Korean, Vietnamese and many other languages are typed through an input method editor, or IME. It turns keystrokes into text in steps: typing "nihon" in Japanese shows にほん, then Space offers 日本, and Enter confirms it. Until then, the text is still being composed, and a field that acts on every keystroke acts on fragments.
+
+### Search as Someone Types
+
+Every step of a composition fires an `input` event, so a search on each one runs for にh and にほn before the word is done. Skip the events `isComposing(event)` marks, and search once the input method commits, on `compositionend`:
+
+```ts
+import { isComposing } from "@ui-sdk/core"
+
+field.addEventListener("input", (event) => {
+  if (!isComposing(event)) search(field.value)
+})
+field.addEventListener("compositionend", () => search(field.value))
+```
+
+Chrome and Firefox end the composition after its last `input` event, so `compositionend` is what brings the committed text. On Android, Gboard composes English words too, so results there change a word at a time.
+
+<ComponentExample
+  name="core/search-as-you-type"
+  caption="Type with a Japanese or Chinese input method: the results wait for the text you confirm. Turn off the waiting to see a search for every step of the composition."
+/>
+
+### Enter to Send
+
+Enter often confirms what an input method suggests, so a field that sends on Enter would send half-written text. Check `isComposing(event)` before acting on the key:
+
+```ts
+textarea.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey || isComposing(event)) return
+  event.preventDefault()
+  send()
+})
+```
+
+`isComposing` takes React's events too, so the same lines go in `onChange` and `onKeyDown`. It reads the event's `isComposing`, and counts key code 229 as composing, because Safari on macOS ends the composition before that last Enter arrives and reports it as not composing. No state to keep: every event says for itself whether the input method has it. Core's own components already handle both.
+
+## API Reference
+
+| For                                                                    | Helpers                                                                       |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [Finding an item as someone types](#find-an-item-by-typing)            | `createTypeahead`, `isTypeaheadKey`; the search has `active()` and `reset()`. |
+| [Reading an item's label](#what-an-item-is-called)                     | `labelOf`                                                                     |
+| [Ranking search results](#rank-what-someone-searches-for)              | `fuzzyScore`                                                                  |
+| [Highlighting matches](#highlight-what-matched)                        | `matchRanges`, `matchSegments`, `MatchRange`, `MatchSegment`                  |
+| [Choosing a language](#the-pages-language)                             | `pageLocale`, `userLocale`, [`toLocale`](#tags-from-elsewhere)                |
+| [Handling input method editors](#properly-handle-input-method-editors) | `isComposing`                                                                 |
+
+The ranking and highlighting helpers come from `@ui-sdk/core/text-match`. The other helpers come from `@ui-sdk/core`.

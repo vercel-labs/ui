@@ -29,29 +29,20 @@ for (const [label, width] of [
   ["desktop", 1280],
   ["mobile", 390],
 ] as const) {
-  test(`the ${label} docs list the sections, and Components opens the React catalog`, async ({ page }) => {
+  test(`the ${label} docs list the sections, and Behaviors is current on its pages`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
-    await page.goto("/docs/core")
+    await page.goto("/docs/behaviors")
     // On a phone the sections open from the menu.
     if (label === "mobile") await page.getByRole("button", { name: "Menu", exact: true }).click()
     const sections = page.getByRole("navigation", { name: "Sections" }).filter({ visible: true })
     await expect(sections).toHaveCount(1)
     await expect(sections.getByRole("listitem")).toHaveText(menu.map((item) => item.title))
-    await expect(sections.getByRole("link", { name: "Core", exact: true })).toHaveAttribute(
+    await expect(sections.getByRole("link", { name: "Behaviors", exact: true })).toHaveAttribute(
       "aria-current",
       "page",
     )
-    await sections.getByRole("link", { name: "Components", exact: true }).click()
-    await expect(page).toHaveURL(/\/docs\/react\/components$/)
-    if (label === "mobile") await page.getByRole("button", { name: "Menu", exact: true }).click()
-    await expect(sections.getByRole("link", { name: "Components", exact: true })).toHaveAttribute(
-      "aria-current",
-      "page",
-    )
-    const docs = page.getByRole("navigation", { name: "Docs" }).filter({ visible: true })
-    await expect(docs.getByRole("link", { name: "Overview", exact: true })).toBeVisible()
-    await expect(docs.getByRole("link", { name: "Button", exact: true })).toBeVisible()
-    await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toHaveCount(0)
+    await sections.getByRole("link", { name: "Agents", exact: true }).click()
+    await expect(page).toHaveURL(/\/docs\/agents$/)
   })
 }
 
@@ -74,7 +65,7 @@ test("the header's framework picker stays on Core and Agents pages and changes t
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   const picker = page.getByRole("combobox", { name: "Framework", exact: true })
-  for (const path of ["/docs/core", "/docs/agents"]) {
+  for (const path of ["/docs/behaviors", "/docs/agents"]) {
     await page.goto(path)
     // Nothing picked yet.
     await expect(picker).toHaveText("Framework", { useInnerText: true })
@@ -83,9 +74,8 @@ test("the header's framework picker stays on Core and Agents pages and changes t
   await page.getByRole("option", { name: "Svelte", exact: true }).click()
   await expect(picker).toHaveText("Svelte", { useInnerText: true })
   await expect(page).toHaveURL(/\/docs\/agents$/)
-  const sections = page.getByRole("navigation", { name: "Sections" })
-  await sections.getByRole("link", { name: "Components", exact: true }).click()
-  await expect(page).toHaveURL(/\/docs\/svelte\/components$/)
+  await page.goto("/docs")
+  await expect(page).toHaveURL(/\/docs\/svelte$/)
 })
 
 test("the header shows the saved framework and framework-less links before the page hydrates", async ({
@@ -94,45 +84,41 @@ test("the header shows the saved framework and framework-less links before the p
   await page.context().addCookies([{ name: "framework", value: "vue", url: "http://localhost" }])
   // No scripts but the inline ones, so React never hydrates.
   await page.route(/\.js(\?|$)/, (route) => route.abort())
-  for (const path of ["/", "/docs/core"]) {
+  for (const path of ["/", "/docs/behaviors"]) {
     await page.goto(path)
     await expect(page.getByRole("combobox", { name: "Framework", exact: true })).toHaveText("Vue", {
       useInnerText: true,
     })
   }
-  const sections = page.getByRole("navigation", { name: "Sections" }).first()
-  await expect(sections.getByRole("link", { name: "Components", exact: true })).toHaveAttribute(
-    "href",
-    "/docs/components",
-  )
 })
 
-test("Get Started and Components split a framework's docs, each with its own sidebar", async ({ page }) => {
+test("a framework's sidebar holds its guides and its components, A to Z", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto("/docs/frameworks")
+  await page.goto("/docs")
   await expect(page).toHaveURL(/\/docs\/react$/)
   const sections = page.getByRole("navigation", { name: "Sections" })
   const docs = page.getByRole("navigation", { name: "Docs" })
   const frameworks = sections.getByRole("button", { name: "Get Started", exact: true })
-  const components = sections.getByRole("link", { name: "Components", exact: true })
   await expect(frameworks).toHaveAttribute("data-current", "")
-  await expect(components).not.toHaveAttribute("aria-current", "page")
-  await expect(components).not.toHaveAttribute("aria-haspopup")
-  await expect(docs.getByText("Using Components", { exact: true })).toBeVisible()
+  await expect(sections.getByRole("link", { name: "Components", exact: true })).toHaveCount(0)
+  for (const name of [
+    "Introduction",
+    "How It Works",
+    "Build with an Agent",
+    "Parts and Composition",
+    "Button",
+  ])
+    await expect(docs.getByRole("link", { name, exact: true })).toBeVisible()
+  const components = docs.getByRole("link", { name: "Components", exact: true })
+  await expect(components).toHaveAttribute("href", "/docs/react/components")
+  const names = await components.locator("xpath=following-sibling::ul[1]").getByRole("link").allTextContents()
+  expect(names).toContain("Accordion")
+  expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)))
+
+  await page.goto("/docs/react/components/button")
+  await expect(frameworks).toHaveAttribute("data-current", "")
   await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toBeVisible()
-  await expect(docs.getByRole("link", { name: "Button", exact: true })).toHaveCount(0)
 
-  await components.click()
-  await expect(page).toHaveURL(/\/docs\/react\/components$/)
-  await expect(components).toHaveAttribute("aria-current", "page")
-  await expect(frameworks).not.toHaveAttribute("data-current")
-  await expect(docs.getByRole("link", { name: "Overview", exact: true })).toBeVisible()
-  await expect(docs.getByRole("link", { name: "Button", exact: true })).toBeVisible()
-  await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toHaveCount(0)
-
-  await page.getByRole("combobox", { name: "Framework", exact: true }).click()
-  await page.getByRole("option", { name: "Vue", exact: true }).click()
-  await expect(page).toHaveURL(/\/docs\/vue\/components$/)
   await frameworks.click()
   const list = sections.getByRole("link", { name: /^(React|Vue|Svelte|Web Components|Solid)$/ })
   await expect(list).toHaveText(["React", "Vue", "Svelte", "Web Components", "Solid"])

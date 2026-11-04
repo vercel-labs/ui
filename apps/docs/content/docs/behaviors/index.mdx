@@ -1,0 +1,155 @@
+---
+title: All Behaviors
+description: Find the behaviors for what you're building, grouped by the job they do.
+---
+
+A **behavior** is one thing an interface does, like moving between items with the arrow keys or sorting a list by dragging. You combine behaviors to build a component, then render it in your framework. [Build a Component](./build-a-component) walks through your first one.
+
+Each name below links to its guide and examples. Import them from `@ui-sdk/core` unless a different entrypoint is shown.
+
+## Focus and Keys
+
+| Helper                                                               | What It Does                                                             |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [`createRovingFocus`](./focus#roving-focus)                          | Gives a group one Tab stop and moves focus with the arrow keys.          |
+| [`createGridFocus`](./focus#grids)                                   | Moves focus by row and column, including cells that aren't rendered yet. |
+| [`spatialMove`](./focus#spatial-focus)                               | Chooses the next item from its position on screen.                       |
+| [`nearestInDirection`](./focus#choose-a-target-without-moving-focus) | Finds the nearest item in a direction without moving focus.              |
+| [`createTypeahead`](./focus#typeahead)                               | Finds an item as someone types its name.                                 |
+| [`isTypeaheadKey`](./text#find-an-item-by-typing)                    | Checks whether a key can be used for typeahead.                          |
+| [`labelOf`](./text#what-an-item-is-called)                           | Reads an element's label for matching typed text.                        |
+| [`createFocusRecovery`](./focus#focus-recovery)                      | Restores focus when the focused item is removed.                         |
+| [`keepFocus`](./focus#focus-that-follows-a-move)                     | Preserves focus through a change that moves an element.                  |
+
+## Selection
+
+| Helper                                           | What It Does                                                     |
+| ------------------------------------------------ | ---------------------------------------------------------------- |
+| [`createSelection`](./selection#selecting-items) | Tracks selected items, including multiple selections and ranges. |
+| [`createLasso`](./selection#rectangle-selection) | Selects items touched by a rectangle drawn with the pointer.     |
+| [`createCellRange`](./selection#ranges-of-cells) | Selects a rectangular range of grid cells.                       |
+| [`cellsToText`](./selection#copy-and-paste)      | Converts cell values to text for copying.                        |
+| [`textToCells`](./selection#copy-and-paste)      | Parses pasted text into rows of cell values.                     |
+
+## Drag and Drop
+
+| Helper                                                              | What It Does                                                       |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [`bindDrag`](./drag-and-drop#pointer-drags)                         | Tracks a pointer drag with capture, thresholds, and cancellation.  |
+| [`dragThreshold`](./drag-and-drop#follow-a-pointer)                 | Sets the standard drag threshold to 3 pixels.                      |
+| [`createReorder`](./drag-and-drop#reordering)                       | Reorders a list or grid with the pointer or keyboard.              |
+| [`createTreeReorder`](./drag-and-drop#reordering-a-tree)            | Reorders and nests tree items with their descendants.              |
+| [`createTransfer`](./drag-and-drop#moving-between-lists)            | Moves items within or between lists.                               |
+| [`bindDragPreview`](./drag-and-drop#dragging-a-copy)                | Shows a copy of the dragged element above the page.                |
+| [`createAutoScroll`](./drag-and-drop#scrolling-while-dragging)      | Scrolls a container when a drag approaches its edge.               |
+| [`settleDraft`](./drag-and-drop#keeping-focus-and-the-draft)        | Keeps a draft visible while a controlled value catches up.         |
+| [`reorderMessage`](./drag-and-drop#whats-read-out)                  | Provides the default announcements for reordering a list.          |
+| [`subtreeEnd`](./drag-and-drop#limits-and-moving-from-code)         | Finds the first row index after a subtree.                         |
+| [`treeReorderMessage`](./drag-and-drop#limits-and-moving-from-code) | Provides the default announcements for reordering a tree.          |
+| [`transferMessage`](./drag-and-drop#a-board-with-rules)             | Provides the default announcements for moving items between lists. |
+
+## Dragging and Resizing
+
+| Helper                                                               | What It Does                                                   |
+| -------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [`createMove`](./direct-manipulation#moving-in-two-dimensions)       | Moves freely positioned objects with the pointer or keyboard.  |
+| [`createResize`](./direct-manipulation#resizing-boxes)               | Resizes boxes from their edges and corners.                    |
+| [`createSwipeActions`](./direct-manipulation#swiping-rows-aside)     | Reveals actions behind a row and supports full-swipe actions.  |
+| [`createArea`](./direct-manipulation#two-dimensional-values)         | Picks a value along two axes, such as a point on a pad.        |
+| [`createSpans`](./direct-manipulation#ranges-on-tracks)              | Draws, moves, and resizes ranges on tracks.                    |
+| [`stackSpans`](./direct-manipulation#days-that-run-down)             | Places overlapping ranges in separate lanes.                   |
+| [`createPreview`](./direct-manipulation#previews)                    | Tracks a value being tried before it is chosen.                |
+| [`moveMessage`](./direct-manipulation#several-at-once)               | Provides the default announcements for changes in position.    |
+| [`resizeMessage`](./direct-manipulation#several-boxes-and-from-code) | Provides the default announcements for resizing boxes.         |
+| [`isSpanFree`](./direct-manipulation#changing-ranges-from-code)      | Checks whether a proposed range overlaps another on its track. |
+| [`spansMessage`](./direct-manipulation#changing-ranges-from-code)    | Provides the default announcements for changes to ranges.      |
+
+## Lists
+
+| Helper                                                      | What It Does                                                                 |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| [`createVirtualizer`](./lists#long-lists)                   | Calculates which rows to render and where to place them.                     |
+| [`createStickToBottom`](./lists#logs-that-follow-their-end) | Follows new content while preserving the reader's place when they scroll up. |
+| [`createInlineEdit`](./lists#editing-in-place)              | Manages editing, committing, and canceling a value in place.                 |
+
+## Trees
+
+| Helper                                              | What It Does                                                         |
+| --------------------------------------------------- | -------------------------------------------------------------------- |
+| [`createTreeCollection`](./trees#a-trees-shape)     | Looks up parents, children, levels, and visible nodes.               |
+| [`treeDataNodes`](./trees#tree-data-and-file-paths) | Converts nested items into nodes for a tree collection.              |
+| [`treeFromPaths`](./trees#tree-data-and-file-paths) | Builds nested tree data from file paths.                             |
+| [`visibleTreeRows`](./trees#flat-rows)              | Flattens open branches into rows with parent, level, and index data. |
+| [`treeCheckedStates`](./trees#check-a-branch)       | Calculates checked, unchecked, and mixed states across a tree.       |
+| [`toggleTreeChecked`](./trees#check-a-branch)       | Returns the next checked value when a node is toggled.               |
+
+## Transitions and Gestures
+
+| Helper                                                         | What It Does                                                                       |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [`bindPanel`](./motion#panels-and-presence)                    | Coordinates panel height, transitions, and focus when opening or closing.          |
+| [`hiddenAttrs`](./motion#find-in-page-and-opening-at-once)     | Sets visibility attributes for hidden or searchable content.                       |
+| [`bindFindable`](./motion#find-in-page-on-its-own)             | Reveals hidden content when the browser finds a match.                             |
+| [`supportsHiddenUntilFound`](./motion#find-in-page-on-its-own) | Checks whether the browser can search hidden content.                              |
+| [`animateIn`](./motion#entering-and-leaving)                   | Applies the starting state for a CSS entrance animation.                           |
+| [`animateOut`](./motion#entering-and-leaving)                  | Applies the exit state and calls your completion callback after animations finish. |
+
+### Gesture Calculations
+
+Import these helpers from `@ui-sdk/core/gesture`.
+
+| Helper                                                 | What It Does                                                             |
+| ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| [`createVelocityTracker`](./motion#throws-and-springs) | Measures velocity from recent pointer positions.                         |
+| [`projectDistance`](./motion#throws-and-springs)       | Estimates how far a moving value will travel as it slows down.           |
+| [`solveSpring`](./motion#throws-and-springs)           | Calculates a spring's position and velocity over time.                   |
+| [`rubberBand`](./motion#past-an-edge)                  | Adds resistance as a value moves past an edge.                           |
+| [`sectorOf`](./motion#which-way-a-stroke-points)       | Converts a stroke's direction into a sector, such as a radial menu item. |
+
+## Popups and Layers
+
+| Helper                                                               | What It Does                                                           |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [`createPopup`](./popups#make-your-own)                              | Manages opening, closing, positioning, and focus using a popup preset. |
+| [`popupState`](./popups#a-popup-of-your-own)                         | Creates the initial open, mounted, and payload state.                  |
+| [`popupTrigger`](./popups#a-popup-of-your-own)                       | Builds a trigger slot that opens and closes the popup.                 |
+| [`popupContent`](./popups#a-popup-of-your-own)                       | Builds a content slot with presence, placement, and focus handling.    |
+| [`popupClose`](./popups#a-popup-of-your-own)                         | Builds a slot that closes the popup.                                   |
+| [`popupTitle`](./popups#one-popup-many-triggers)                     | Connects a visible title to the popup's accessible name.               |
+| [`popupDescription`](./popups#one-popup-many-triggers)               | Connects descriptive text to the popup.                                |
+| [`popupArrow`](./popups#one-popup-many-triggers)                     | Builds an arrow slot that follows the popup's placement.               |
+| [`popupBackdrop`](./popups#every-part-and-parts-of-your-own)         | Builds a backdrop slot behind a modal popup.                           |
+| [`popupViewport`](./popups#every-part-and-parts-of-your-own)         | Builds a full-screen container slot for a popup sheet.                 |
+| [`popupSlots`](./popups#every-part-and-parts-of-your-own)            | Builds the standard popup parts together.                              |
+| [`position`](./popups#placing-a-popup)                               | Places an element beside an anchor and updates its placement.          |
+| [`bindLayer`](./popups#layers-of-your-own)                           | Registers a floating element for Escape and outside-press dismissal.   |
+| [`bindPersistentLayer`](./popups#modal-layers-and-what-stays-usable) | Keeps an element usable across layers, including modal popups.         |
+| [`isDismissal`](./popups#modal-layers-and-what-stays-usable)         | Identifies a dismissal reason, such as Escape or an outside press.     |
+| [`supportsTopLayer`](./popups#types-and-the-top-layer)               | Checks whether the browser supports the top layer used by popups.      |
+
+[Popup presets](./popups#pick-its-behavior) choose the interaction for a popover, dialog, tooltip, or hover card. [Popup controllers](./popups#open-from-code) open existing popup components from code and wait for a result. Import each from its component entrypoint, such as `@ui-sdk/core/popover`.
+
+## Preferences
+
+| Helper                                                             | What It Does                                                                      |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| [`createPreference`](./preferences#create-a-preference)            | Holds a choice from a list, notifies subscribers, and can save it between visits. |
+| [`createColorScheme`](./preferences#choose-a-color-scheme)         | Builds on a preference to choose light, dark, or the browser's scheme.            |
+| [`colorSchemeOf`](./preferences#browser-preferences-on-the-server) | Reads the color scheme a browser sends with a request.                            |
+| [`preferencesScript`](./preferences#server-rendering)              | Puts saved preferences on their attributes before the first paint.                |
+
+### Storage
+
+| Helper                                                         | What It Does                                                      |
+| -------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [`createLocalStorage`](./storage#keep-a-value)                 | Keeps a value in localStorage, for every tab, until it's removed. |
+| [`createSessionStorage`](./storage#keep-a-value)               | Keeps a value in sessionStorage, for the tab, while it's open.    |
+| [`createCookieStorage`](./storage#read-a-cookie-on-the-server) | Keeps a value in a cookie, which the server reads too.            |
+
+## Canvas
+
+| Helper                                               | What It Does                                                                |
+| ---------------------------------------------------- | --------------------------------------------------------------------------- |
+| [`createViewport`](./canvas#panning-and-zooming)     | Pans and zooms a canvas and converts between screen and canvas coordinates. |
+| [`createConnect`](./canvas#connections)              | Tracks connections between ports with the pointer or keyboard.              |
+| [`connectMessage`](./canvas#snapping-words-and-code) | Provides the default announcements for connection steps.                    |

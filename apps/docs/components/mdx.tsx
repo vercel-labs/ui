@@ -53,7 +53,7 @@ function InlineCode(props: ComponentProps<"code">) {
 
 // Every element MDX renders, styled here instead of with a prose plugin.
 // `framework` is the section's, for tables and examples that differ by
-// framework. Core and Agents pages have none.
+// framework. Behaviors and Agents pages have none.
 function getMDXComponents(
   framework: Framework = "react",
   resolve: (href: string) => string = (href) => href,
@@ -72,7 +72,11 @@ function getMDXComponents(
       const url = resolve(href)
       const className =
         "font-normal text-foreground underline decoration-foreground/25 underline-offset-[3px] transition-colors hover:decoration-foreground"
-      if (/^\/docs\/(components|utilities|rendering|server-rendering)\b/.test(url))
+      if (
+        /^\/docs\/(components|utilities|rendering|server-rendering|how-it-works|build-with-an-agent)\b/.test(
+          url,
+        )
+      )
         return <FrameworkLink href={url} className={className} {...props} />
       return url.startsWith("/") || url.startsWith("#") ? (
         <Link href={url} className={className} {...props} />
@@ -161,7 +165,10 @@ function getMDXComponents(
       hideCode?: boolean
       hideTabs?: boolean
       compact?: boolean
-    }) => <ComponentExample {...props} framework={framework} />,
+    }) => (
+      // Core's examples are written once, in React, so every framework's pages show that one.
+      <ComponentExample {...props} framework={props.name.startsWith("core/") ? "react" : framework} />
+    ),
     SpecList,
     DataAttributes: (props: { component?: string; part?: string }) => (
       <DataAttributes {...props} framework={framework} />

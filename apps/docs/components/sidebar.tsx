@@ -6,23 +6,13 @@ import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
-import { useActiveTree } from "./section-nav"
 
-function Sidebar({
-  tree,
-  componentsTree,
-  tocs,
-}: {
-  tree: PageTree.Root
-  componentsTree?: PageTree.Root
-  tocs: Record<string, TableOfContents>
-}) {
-  const active = useActiveTree(tree, componentsTree) ?? tree
+function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, TableOfContents> }) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-6 pe-4 pb-8 scrollbar-none">
         <nav aria-label="Docs">
-          <Nodes nodes={active.children} tocs={tocs} />
+          <Nodes nodes={tree.children} tocs={tocs} />
         </nav>
       </div>
     </div>

@@ -1,0 +1,33 @@
+{
+  "title": "Behaviors",
+  "pages": [
+    "index",
+    "---Build Your Own---",
+    "build-a-component",
+    "compose-behaviors",
+    "define-a-primitive",
+    "state-and-changes",
+    "testing",
+    "---By Job---",
+    "focus",
+    "selection",
+    "lists",
+    "trees",
+    "popups",
+    "drag-and-drop",
+    "direct-manipulation",
+    "motion",
+    "canvas",
+    "preferences",
+    "---Helpers---",
+    "text",
+    "number",
+    "date",
+    "platform",
+    "mobile",
+    "storage",
+    "observe",
+    "---Reference---",
+    "reference"
+  ]
+}

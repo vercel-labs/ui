@@ -1,0 +1,354 @@
+---
+title: State and Changes
+description: Report changes, let the app accept or cancel them, and choose how state updates reach the page.
+---
+
+`createChange` reports state changes through callbacks and lets the caller accept or cancel them. The other helpers handle commits, frequent updates, and undo.
+
+These helpers are exported from `@ui-sdk/core`. For a first example of `createChange` and controlled state, see [Build a Component](./build-a-component#control-the-state).
+
+## Changes
+
+This button needs two presses to confirm. The first arms it; a timer disarms it if you don't press again.
+
+<ComponentExample name="core/confirm-button" />
+
+Create `change` once in `api`, then call it from a method when an interaction happens:
+
+```ts
+api: (context) => {
+  const change = createChange(context)
+  return {
+    arm: (event?: Event) => change("armed", true, { reason: "press", event }),
+  }
+},
+```
+
+Calling `arm` asks for `armed: true`. It calls `onArmedChange` first, then writes the value if the callback allows it and the app isn't controlling `armed`.
+
+The return value tells you whether the request was accepted. It's `false` if the value was already the same or the callback canceled it. For controlled state, `true` means the request was accepted; the app still needs to pass the value back.
+
+Use `context.store.set` for internal bookkeeping that needs no callback, such as the item with the tab stop:
+
+```ts
+context.store.set({ pending: true })
+```
+
+## What a Change Reports
+
+Try a click, a keyboard press, and the timeout. The callback can tell them apart. Turn on **Lock** to refuse changes.
+
+<ComponentExample name="core/confirm-button-details" />
+
+A callback gets the requested value and a `details` object. For example, the app can refuse to arm the button:
+
+```ts
+onArmedChange: (armed, details) => {
+  if (armed && locked) {
+    details.cancel()
+  }
+},
+```
+
+- `reason` says what happened, such as `"press"` or `"timeout"`.
+- `event` is the DOM event behind it, when there is one.
+- `source` says how it happened: `"mouse"`, `"touch"`, `"pen"`, `"keyboard"`, `"virtual"`, `"programmatic"` or `"agent"`.
+- `cancel()` refuses the request; `canceled` records that decision.
+
+A virtual click has no pointer or keyboard press behind it and may come from assistive technology. Agent calls through `@ui-sdk/core/agent` report `"agent"`. Use the source for things like analytics and focus choices, without changing which actions are available.
+
+Call `details.cancel()` to refuse an uncontrolled change. Calling `event.preventDefault()` alone doesn't cancel it. With controlled state, the app decides by passing a new value or keeping the old one.
+
+## Reasons
+
+A reason describes the interaction, rather than just saying that something changed. Here, the app lets the Close button work but can refuse Escape.
+
+<ComponentExample name="core/notice" />
+
+Declare the reasons your callback can receive:
+
+```ts
+type NoticeOptions = {
+  onOpenChange?: (open: boolean, details: ChangeDetails<"close-press" | "escape-key">) => void
+}
+```
+
+Use a shared reason when one fits. `ReasonVocabulary` lists them, and checking `details.reason` narrows `details.event`: `"escape-key"`, for example, gives you a `KeyboardEvent`. Development builds also warn when an event doesn't match its reason.
+
+Custom reasons work too. A reason outside the vocabulary, such as `"validation"`, has `Event` as its event type.
+
+`isDismissal` groups reasons such as Escape, a press outside and a swipe. Use it when the same rule applies to several ways of closing:
+
+```ts
+onOpenChange: (open, details) => {
+  if (!open && isDismissal(details.reason) && hasUnsavedChanges) {
+    details.cancel()
+  }
+},
+```
+
+## State a User Controls
+
+The checkbox and the panel's trigger below share one value held by the app.
+
+<ComponentExample name="core/disclosure" />
+
+[Build a Component](./build-a-component#control-the-state) shows how to connect the value, callback and `sync`. A few details matter when you make this reusable:
+
+- Read `defaultOpen` when creating the state. Changing that option later doesn't reset the panel.
+- Return only controlled values from `sync`. `{}` leaves state alone; `{ open: undefined }` overwrites it.
+- Keep each key controlled or uncontrolled for the instance's lifetime. Development builds warn about switching, or passing both `open` and `defaultOpen`.
+- Those checks cover `open`, `value` and `checked` by default. Use `controlled: ["expanded"]` to enable them for another key.
+
+## Events That Aren't State
+
+Sometimes a callback asks for an action, such as deleting a file. There's no state key named `delete` to update.
+
+<ComponentExample name="behaviors/dispatch" />
+
+Use `dispatch` to call an option with the same details a change receives:
+
+```ts
+remove(file: string, event?: Event) {
+  const canceled = dispatch(context, "onDelete", file, { reason: "delete-press", event })
+  if (canceled) {
+    return
+  }
+  context.store.set({ files: context.store.get().files.filter((name) => name !== file) })
+},
+```
+
+`dispatch` returns `true` when the callback canceled the action. In this example, the app uses it to protect the readme.
+
+## Commits
+
+Drag the volume slider. The value changes throughout the drag, but **Saved** changes when you let go. Each arrow-key step saves immediately.
+
+<ComponentExample name="core/volume" />
+
+Use `createChange` for the ongoing value and `createCommit` for the end of the interaction. Both are created inside `api`:
+
+```ts
+const change = createChange(context)
+const commit = createCommit(context)
+```
+
+While dragging, report each value:
+
+```ts
+change("value", value, { reason: "track-press", event })
+```
+
+On release, report the final value:
+
+```ts
+commit("value", context.store.get().value, { reason: "track-press", event })
+```
+
+Declare `onValueCommit` in the options schema and type it with `CommitDetails`. Add `commits: ["value"]` to the primitive definition so `observe` reports one committed change per interaction. A commit reports the value; it doesn't write it and can't be canceled.
+
+The demo positions its thumb with `css`, which turns declarations into a `style` attribute and skips `undefined` values:
+
+```ts
+style: css({ left: `${state.value}%` }),
+```
+
+## Live State
+
+Hover over the seats, then choose one. Hover changes often; the selected seat is a separate value.
+
+<ComponentExample name="core/seats" />
+
+List frequently updated keys in the primitive's `live` field:
+
+```ts
+live: ["hovered"],
+```
+
+Then use a slot's `live` field to write attributes directly to its element:
+
+```ts
+live: live((state, part) => ({
+  "data-hovered": state.hovered === part.key ? "" : undefined,
+})),
+```
+
+This updates the hover attribute without rendering the seat again. A render function that explicitly reads a live key still subscribes to it, so a label can show the hovered seat.
+
+`selects` answers a different question: which parts need to hear about a state change? For the selected seat, each part only compares the value with its own key:
+
+```ts
+selects: selects({ selected: ({ key }) => [key] }),
+```
+
+When selection moves, the old and new seats hear about it. Array values are matched by membership; plain objects by entry. Only list keys read in these ways. A range comparison, such as filling every star up to a rating, needs updates for more than the old and new values.
+
+## Attributes Kept Current
+
+Typing in this filter updates each item's `hidden` attribute without rendering the items again.
+
+<ComponentExample name="core/filter-list" />
+
+Use `direct` when the attribute already belongs in `attrs`:
+
+```ts
+item: slot<{ value: string }>({
+  props: { value: "string" },
+  direct: direct(["hidden"]),
+  attrs: (state, part) => ({
+    hidden: part.key.toLowerCase().includes(state.query.toLowerCase()) ? undefined : "",
+  }),
+}),
+```
+
+Keeping `hidden` in `attrs` also puts it in server-rendered HTML. Use `live` for attributes driven by live state, and `direct` to keep selected attributes from `attrs` current between renders.
+
+## Controllers
+
+A controller lets code outside a component call its API. These buttons start and stop a countdown through one handle.
+
+<ComponentExample name="core/timer-controller" />
+
+Give the handle the methods it should expose:
+
+```ts
+function createCountdownController() {
+  return createController<{
+    start: (seconds: number) => void
+    stop: () => void
+    left: () => number
+  }>()
+}
+```
+
+The primitive takes a `controller` option with schema kind `"value"`, and the handle drives whatever its `api` returns:
+
+```ts
+return {
+  start,
+  stop,
+  left: () => context.store.get().left,
+}
+```
+
+Create the handle once and pass it to the component's `controller` option. `controller.start(30)` forwards to the attached instance's `start` method. Before the component attaches it, a method does nothing and returns `undefined`. The handle detaches when the instance is destroyed.
+
+The methods choose their own change reasons. For example, the countdown's `start` method calls `change("left", seconds, { reason: "imperative" })`; each timer tick uses `"timeout"`.
+
+## Undo
+
+Paint a few pixels, then undo and redo. The buttons and keyboard shortcuts use the same history.
+
+<ComponentExample name="behaviors/history" />
+
+`createHistory` stores snapshots of any value. Record the result after each edit:
+
+```ts
+const history = createHistory(pixels)
+history.record(nextPixels)
+
+const previous = history.undo()
+if (previous !== undefined) {
+  show(previous)
+}
+```
+
+`undo()` and `redo()` return the value to show, or `undefined` when there's no step left. They don't update your component's state themselves. `canUndo()` and `canRedo()` tell you when to disable the buttons. Recording a new edit after undoing replaces the redo branch.
+
+For keyboard shortcuts, `matchesShortcut(event, "mod+z")` recognizes Command on Apple platforms and Control elsewhere. Use `"mod+shift+z"` for redo.
+
+### Undo for Typing
+
+Typing usually feels better when a run of edits takes one undo step. Try typing, pausing, and typing again. **Fix** replaces “teh” throughout the history; **Clear** starts over.
+
+<ComponentExample name="core/notes-history" />
+
+```ts
+const history = createHistory("", { limit: 10, groupDelay: 800 })
+
+history.record(text, { group: "typing" })
+history.seal()
+history.map((text) => text.replaceAll("teh", "the"))
+history.reset("")
+```
+
+Edits in the same `group` join a step while the gaps stay below `groupDelay`. Call `seal()` when that run should end, such as when the caret moves. `limit` caps the undo steps, `map` rewrites every snapshot, and `reset` replaces the history with a new starting value.
+
+## How People Are Working
+
+Tab to the save button, then try clicking it. The hint follows how focus arrived.
+
+<ComponentExample name="core/input-source" />
+
+`sourceOf(event)` identifies a mouse, touch, pen, keyboard, virtual or programmatic event. Without an event, `sourceOf()` reports the last keyboard or pointer input. `isFocusFromKeyboard()` checks whether focus just arrived from the keyboard:
+
+```ts
+save: slot({
+  press: ({ api }, event) => api.save(sourceOf(event)),
+  on: { focus: (_event, { store }) => store.set({ hint: isFocusFromKeyboard() }) },
+}),
+```
+
+`createChange` starts input tracking when the primitive is created, so its first change can identify the input behind it.
+
+## Changes from Elsewhere
+
+An image load or a timer doesn't need a pointer or key event. Shared reasons such as `"image-load"` and `"timeout"` already resolve to a programmatic source. To supply your own source resolver, pass it as the second argument:
+
+```ts
+const change = createChange(context, () => "programmatic")
+```
+
+A controlled drag has one more timing concern: its draft may need to stay visible until the app returns the committed value. `settleDraft(store, value, before, clear)` handles that handoff. Pass a getter as `value`, the value from before the commit as `before`, and a cleanup that checks it's still clearing the same draft. [Drag and Drop](./drag-and-drop) shows it in a reordering example.
+
+## API Reference
+
+### What a Change Reports
+
+<TypeTable
+  path="../../packages/core/src/foundation/kernel/details.ts"
+  name="ChangeDetails"
+  events={false}
+  examples={{
+    reason: "What a Change Reports",
+    event: "What a Change Reports",
+    source: "What a Change Reports",
+    cancel: "What a Change Reports",
+    canceled: "What a Change Reports",
+  }}
+/>
+
+### What a Commit Reports
+
+<TypeTable
+  path="../../packages/core/src/foundation/kernel/details.ts"
+  name="CommitDetails"
+  events={false}
+  examples={{ reason: "Commits", event: "Commits", source: "Commits" }}
+/>
+
+### Undo
+
+<TypeTable
+  path="../../packages/core/src/foundation/kernel/history.ts"
+  name="HistoryOptions"
+  events={false}
+  examples={{ limit: "Undo for Typing", groupDelay: "Undo for Typing" }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/kernel/history.ts"
+  name="UndoHistory"
+  type="ReturnType<typeof createHistory<unknown>>"
+  events={false}
+  examples={{
+    record: "Undo",
+    seal: "Undo for Typing",
+    undo: "Undo",
+    redo: "Undo",
+    canUndo: "Undo",
+    canRedo: "Undo",
+    map: "Undo for Typing",
+    reset: "Undo for Typing",
+  }}
+/>

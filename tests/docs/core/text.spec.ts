@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { openExamples } from "./behaviors/helpers"
 
-const url = "/docs/core/text"
+const url = "/docs/behaviors/text"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
@@ -133,7 +133,7 @@ test("tags from elsewhere: a POSIX tag is repaired, and something else falls bac
 test("search as you type: results wait for the input method to commit, unless the waiting is off", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/text")
+  await openExamples(page, "/docs/behaviors/text")
   const field = page.getByRole("searchbox", { name: "Filter" })
   const results = page.getByRole("status").filter({ hasText: /Results for|Type to see results/ })
   await field.scrollIntoViewIfNeeded()

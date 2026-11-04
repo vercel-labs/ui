@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { openExamples } from "./behaviors/helpers"
 
 test("every example renders without errors", async ({ page }) => {
-  const { errors } = await openExamples(page, "/docs/core/number")
+  const { errors } = await openExamples(page, "/docs/behaviors/number")
   await expect(page.locator("[data-example]")).toHaveCount(5)
   await expect(page.locator("figure > figcaption")).toHaveCount(5)
   expect(errors).toEqual([])
@@ -11,7 +11,7 @@ test("every example renders without errors", async ({ page }) => {
 test("steps: arrows step by the step, Shift and Alt by the large and small steps, Home and End to the bounds", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/number")
+  await openExamples(page, "/docs/behaviors/number")
   const quantity = page.getByRole("spinbutton", { name: "Quantity in kg" })
   await expect(quantity).toHaveAttribute("aria-valuenow", "2.5")
   await quantity.focus()
@@ -45,7 +45,7 @@ test("steps: arrows step by the step, Shift and Alt by the large and small steps
 test("scale: the slider turns the needle, and a log scale gives small angles most of the slider", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/number")
+  await openExamples(page, "/docs/behaviors/number")
   const angle = page.locator("[data-angle]")
   const position = page.locator("[data-position]")
   const slider = page.getByRole("slider", { name: "Rotation" })
@@ -68,7 +68,7 @@ test("scale: the slider turns the needle, and a log scale gives small angles mos
 test("scrub: the playhead snaps to sections, keys stop at them, and Command scrubs freely", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/number")
+  await openExamples(page, "/docs/behaviors/number")
   const slider = page.getByRole("slider", { name: "Playhead" })
   const time = page.locator("[data-time]")
   const section = page.locator("[data-section]")
@@ -107,7 +107,7 @@ test("scrub: the playhead snaps to sections, keys stop at them, and Command scru
 })
 
 test("format: the value, its range and its parts follow the locale and the style", async ({ page }) => {
-  await openExamples(page, "/docs/core/number")
+  await openExamples(page, "/docs/behaviors/number")
   await expect(page.locator("[data-plain]")).toHaveText("€1,234.50")
   await expect(page.locator("[data-formatted] [data-type=currency]")).toHaveText("€")
   await page.getByLabel("Locale").first().selectOption("de-DE")
@@ -126,7 +126,7 @@ test("format: the value, its range and its parts follow the locale and the style
 test("parse: typed numbers read in the locale, partial ones wait, and others are marked", async ({
   page,
 }) => {
-  await openExamples(page, "/docs/core/number")
+  await openExamples(page, "/docs/behaviors/number")
   const amount = page.getByLabel("Amount")
   const parsed = page.locator("[data-parsed]")
   await expect(parsed).toHaveText("1234.5")

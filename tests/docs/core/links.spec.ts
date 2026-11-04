@@ -2,13 +2,13 @@ import { readdirSync } from "node:fs"
 import path from "node:path"
 import { expect, test } from "@playwright/test"
 
-// Every Core page, by its path under /docs, from the content folder.
+// Every Behaviors page, by its path under /docs, from the content folder.
 const content = path.resolve(import.meta.dirname, "../../../apps/docs/content/docs")
-const pages = readdirSync(path.join(content, "core"), { recursive: true, encoding: "utf8" })
+const pages = readdirSync(path.join(content, "behaviors"), { recursive: true, encoding: "utf8" })
   .filter((file) => file.endsWith(".mdx"))
-  .map((file) => `/docs/core/${file.replace(/(\/?index)?\.mdx$/, "")}`.replace(/\/$/, ""))
+  .map((file) => `/docs/behaviors/${file.replace(/(\/?index)?\.mdx$/, "")}`.replace(/\/$/, ""))
 
-test("every link to a heading on a Core page lands on one", async ({ page }) => {
+test("every link to a heading on a Behaviors page lands on one", async ({ page }) => {
   // Every page compiles on its first visit in dev, so this takes a while.
   test.setTimeout(900_000)
   const headings = new Map<string, Set<string>>()
@@ -32,7 +32,7 @@ test("every link to a heading on a Core page lands on one", async ({ page }) => 
         urls.map((url) => ({ path: url.pathname, hash: decodeURIComponent(url.hash.slice(1)) })),
       )
     for (const { path: to, hash } of hrefs) {
-      if (!to.startsWith("/docs/core")) continue
+      if (!to.startsWith("/docs/behaviors")) continue
       if (!(await idsOf(to)).has(hash)) broken.push(`${from} → ${to}#${hash}`)
     }
   }

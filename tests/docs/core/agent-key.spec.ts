@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { openExamples } from "./behaviors/helpers"
 
 test("the rating's agent key lets an agent read it and rate", async ({ page }) => {
-  const { errors } = await openExamples(page, "/docs/agents/connect-an-agent/your-components")
+  const { errors } = await openExamples(page, "/docs/agents/your-components")
   const example = page.locator("[data-example]").first()
   await example.getByRole("button", { name: "Read the page" }).click()
   const output = example.getByRole("status")

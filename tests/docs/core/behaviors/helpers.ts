@@ -16,6 +16,6 @@ async function openExamples(page: Page, url: string) {
 }
 
 // Opens a Behaviors page.
-const openBehaviors = (page: Page, name: string) => openExamples(page, `/docs/core/behaviors/${name}`)
+const openBehaviors = (page: Page, name: string) => openExamples(page, `/docs/behaviors/${name}`)
 
 export { openBehaviors, openExamples }

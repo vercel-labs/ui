@@ -6,8 +6,8 @@ import { sectionPages, sectionTree } from "@/lib/section-tree"
 import Link from "next/link"
 
 export default function HomePage() {
-  const core = sectionTree("core")
-  const pages = core ? sectionPages(core) : []
+  const behaviors = sectionTree("behaviors")
+  const pages = behaviors ? sectionPages(behaviors) : []
 
   return (
     <div className="flex flex-1 flex-col">
@@ -53,7 +53,7 @@ export default function HomePage() {
             </p>
             <p>Available for React, Vue, Svelte, Solid and Web Components.</p>
             <Link
-              href="/docs/core"
+              href="/docs"
               className="inline-flex h-8.5 shrink-0 items-center justify-center rounded-full bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors outline-none hover:bg-primary/90 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Read the Docs

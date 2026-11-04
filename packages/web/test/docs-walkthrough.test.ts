@@ -6,7 +6,7 @@ import path from "node:path"
 import { expect, test } from "vitest"
 
 const docs = path.resolve(import.meta.dirname, "../../../apps/docs/content/docs")
-const page = ["core/compose-behaviors.mdx", "web-components/rendering.mdx"]
+const page = ["behaviors/compose-behaviors.mdx", "web-components/rendering.mdx"]
   .map((file) => readFileSync(path.join(docs, file), "utf8"))
   .join("\n")
 const dir = path.join(import.meta.dirname, ".walkthrough")

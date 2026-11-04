@@ -1,0 +1,83 @@
+---
+title: How It Works
+description: See the behaviors, primitive and parts your agent builds with in Vue.
+---
+
+When your agent builds a component with ui-sdk, it uses three pieces. Let's look at each one, starting with the smallest.
+
+## Behaviors
+
+A **behavior** is one thing an interface does. Moving between items with the arrow keys is a behavior. So is ranking search results, or telling a screen reader what changed.
+
+The emoji picker from the [Introduction](./index) uses four: `createRovingFocus` for one Tab stop and the arrow keys, `spatialMove` for arrows that follow the grid, `fuzzyScore` for search, and `announce` for screen readers. Behaviors come from `@ui-sdk/core`, and they work the same in every framework.
+
+[All Behaviors](/docs/behaviors) lists them by the job they do.
+
+## A Primitive
+
+A **primitive** puts one component together: its state, the functions that change it, and its parts. Here's a small one, a mute button:
+
+```ts title="lib/mute-button.ts"
+import { definePrimitive } from "@ui-sdk/core"
+
+const muteButton = definePrimitive({
+  name: "mute-button",
+  state: () => ({ muted: false }),
+  api: (context) => ({
+    toggle: () => context.store.set({ muted: !context.store.get().muted }),
+  }),
+  slots: (slot) => ({
+    root: slot({
+      attrs: (state) => ({ type: "button", "aria-pressed": String(state.muted) }),
+      press: ({ api }) => api.toggle(),
+    }),
+  }),
+})
+
+export { muteButton }
+```
+
+Pressing the button calls `toggle`, which flips `muted`, and `aria-pressed` follows it. The primitive holds the behavior. The markup and styles come from you.
+
+The emoji picker's primitive is bigger, with a search field, a grid and a button per emoji, but it has the same shape.
+
+## Parts in Vue
+
+`createParts` turns each part of a primitive into a Vue component:
+
+```ts title="components/ui/mute-button.tsx"
+import { createParts } from "@ui-sdk/vue/primitive"
+import { muteButton } from "@/lib/mute-button"
+
+const { Root: MuteButton } = createParts(muteButton, { root: "button" })
+
+export { MuteButton }
+```
+
+Then import it wherever you want to use it:
+
+```vue title="pages/index.vue"
+<script setup lang="ts">
+import { MuteButton } from "@/components/ui/mute-button"
+</script>
+
+<template>
+  <MuteButton>Mute</MuteButton>
+</template>
+```
+
+The parts expose state as attributes, like `aria-pressed`, so your styles can follow it. The same primitive renders in React, Svelte, Solid and Web Components too.
+
+## Why Behaviors
+
+Component libraries cover familiar patterns, like menus, dialogs and tabs. Your product may also need a kanban board, a timeline you can scrub, or a picker made for one task.
+
+You can build the interface, but the interactions take work. Focus needs somewhere to go when an item disappears. A drag needs a keyboard alternative. Closing a popup needs to return you to where you were.
+
+Behaviors give you and your agent that work already done and tested. The ready-made [Components](./components) are built from the same behaviors.
+
+## Keep Going
+
+- [Build with an Agent](./build-with-an-agent) helps you get good results from your agent.
+- [Build a Component](/docs/behaviors/build-a-component) builds the mute button by hand, then styles it.
+- [Rendering](./rendering) covers `createParts` in Vue.

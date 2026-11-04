@@ -90,8 +90,8 @@ async function frameworkLlms(framework: Framework, link: PageLinks) {
 
 This file is the context an agent needs to build with ${name}: how ${label} renders a primitive and the conventions every part shares, then every component with a link to its page. Read the pages of the components you use. It's generated from the docs, for this release.
 
-- [Core](${to({ slugs: ["core"] })}): build a component, compose behaviors, and explore the foundations, from defining a primitive to working with state, the browser and text.
-- [Agents](${to({ slugs: ["agents"] })}): letting an agent operate a page, and WebMCP.
+- [Behaviors](${to({ slugs: ["behaviors"] })}): every behavior by job, building your own component from them, and testing it.
+- [Agents](${to({ slugs: ["agents"] })}): letting an agent use your app, and WebMCP.
 
 ${guides.join("\n\n")}
 

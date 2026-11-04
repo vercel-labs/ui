@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test"
 import { openExamples } from "./behaviors/helpers"
 
-const url = "/docs/core/mobile"
+const url = "/docs/behaviors/mobile"
 
 // Headless browsers have no on-screen keyboard, so the visual viewport is one the test can shrink.
 async function withKeyboard(page: Page) {

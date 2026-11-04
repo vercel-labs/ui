@@ -4,7 +4,7 @@ Write like you're explaining the API to a friend who hasn't used it yet. Start w
 
 ## Start from a Current Page
 
-Use [Build a Component](../apps/docs/content/docs/core/build-a-component.mdx) as the main reference for the voice. It starts with something you can try:
+Use [Build a Component](../apps/docs/content/docs/behaviors/build-a-component.mdx) as the main reference for the voice. It starts with something you can try:
 
 > Let's start with a toggle button. Press **Mute** to turn it on. Press it again to turn it off.
 
@@ -13,12 +13,12 @@ It explains each concept when the example needs it, then moves to the next step:
 Read the page you're changing and choose a reference for the kind of explanation it needs:
 
 - [First Component](../apps/docs/content/docs/react/first-component.mdx) for a short framework walkthrough: create a component, render it, and style its state. Each step explains what the reader should see.
-- [Focus and Keys](../apps/docs/content/docs/core/behaviors/focus.mdx) for behavior documentation: explain one interaction with a short snippet, then let the reader try it in a demo with instructions below.
+- [Focus and Keys](../apps/docs/content/docs/behaviors/focus.mdx) for behavior documentation: explain one interaction with a short snippet, then let the reader try it in a demo with instructions below.
 - [Select](../apps/docs/content/docs/react/components/select.mdx) for a component page: introduce its parts, show how they work together, and explain useful behaviors and compositions.
-- [Connect an Agent's Guide](../apps/docs/content/docs/agents/connect-an-agent/guide.mdx) for a complete walkthrough: carry one example from setup to a working result, with actions the reader can follow.
-- [Storage](https://github.com/vercel-labs/ui/blob/551810b9a6119ff30dd3d98c27be7f5db371c405/apps/docs/content/docs/core/storage.mdx) for helper documentation: explain the choices, return values, and limitations where they affect use.
+- [Connect an Agent's Guide](../apps/docs/content/docs/agents/guide.mdx) for a complete walkthrough: carry one example from setup to a working result, with actions the reader can follow.
+- [Storage](https://github.com/vercel-labs/ui/blob/551810b9a6119ff30dd3d98c27be7f5db371c405/apps/docs/content/docs/behaviors/storage.mdx) for helper documentation: explain the choices, return values, and limitations where they affect use.
 
-[Preferences](../apps/docs/content/docs/core/behaviors/preferences.mdx) is a supporting reference for introducing a general helper before a specialized use, and for a code-only example that defines a value in one file and reads it in another. [Permissions](../apps/docs/content/docs/agents/connect-an-agent/permissions.mdx) shows how a follow-up page can reuse the Guide's example without repeating setup.
+[Preferences](../apps/docs/content/docs/behaviors/preferences.mdx) is a supporting reference for introducing a general helper before a specialized use, and for a code-only example that defines a value in one file and reads it in another. [Permissions](../apps/docs/content/docs/agents/permissions.mdx) shows how a follow-up page can reuse the Guide's example without repeating setup.
 
 Use these as writing references. API explanations still need to match the current implementation.
 
@@ -75,10 +75,10 @@ When changing demos, follow [the example styling guide](examples.md).
 
 ## Keep Each Page Focused
 
-- **Core** explains building blocks and how to combine them. Framework snippets belong where they help use a shared feature; broader rendering setup belongs in the framework guide.
-- **Framework guides** cover installation, first use, rendering, and framework-specific integration.
+- **Behaviors** explains building blocks and how to combine them. Framework snippets belong where they help use a shared feature; broader rendering setup belongs in the framework guide.
+- **Framework guides** cover the introduction's setup and build prompts, how ui-sdk works, building with an agent, installation, first use, rendering, and framework-specific integration.
 - **Component pages** explain behavior, state, and composition. Show the same behavior across frameworks while keeping each framework's code idiomatic.
-- **Agent guides** distinguish building with an agent from connecting an agent to a UI. Reuse the established walkthrough rather than starting a new app on every page.
+- **Agent guides** cover connecting an agent to a UI; building with an agent is a framework guide. Reuse the established walkthrough rather than starting a new app on every page.
 
 For a new component page, start from the usual outline: a short introduction and demo, Installation, Composition, Usage, Build Your Own where it applies, one section per example, Custom Rendering, Styling, Data Attributes, API Reference, and Accessibility. Adapt it to the component: a simple Button can use Usage and direct behavior headings; a component with several parts benefits from Composition. Preserve useful existing variations rather than adding empty sections to match the outline.
 
