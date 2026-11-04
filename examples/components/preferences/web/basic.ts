@@ -1,57 +1,58 @@
 import { createLocalStorage, createPreference } from "@ui-sdk/core"
 import "@ui-sdk/web/button"
 import "@ui-sdk/web/preferences"
+import { log } from "../../../shared/web/log"
+
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+  storage: createLocalStorage("ui-sdk-preferences-view"),
+})
+
+const files = [
+  { name: "Q3 roadmap.pdf", detail: "2.4 MB" },
+  { name: "Launch checklist.md", detail: "12 KB" },
+  { name: "Offsite photos", detail: "24 items" },
+  { name: "Brand assets.zip", detail: "18 MB" },
+]
 
 function mount(root: HTMLElement) {
-  const density = createPreference({
-    values: ["comfortable", "compact"],
-    defaultValue: "comfortable",
-    attribute: "data-density",
-    storage: createLocalStorage("ui-sdk-preferences-density"),
-  })
-
   root.innerHTML = `
     <ui-preferences>
-      <div data-slot="card">
-        <ui-button>
-          <button type="button" aria-pressed="false">
-            Compact layout
-          </button>
-        </ui-button>
-        <ul data-slot="list" aria-label="Documents">
-          <li>Project notes</li>
-          <li>Meeting notes</li>
-          <li>Release notes</li>
+      <div data-slot="stack">
+        <div data-slot="controls" role="group" aria-label="View">
+          <ui-button><button type="button" data-value="list">List</button></ui-button>
+          <ui-button><button type="button" data-value="grid">Grid</button></ui-button>
+        </div>
+        <ul data-slot="files" aria-label="Files">
+          ${files.map((file) => `<li><span>${file.name}</span><span data-slot="hint">${file.detail}</span></li>`).join("")}
         </ul>
-        <span data-slot="hint">Density: comfortable</span>
       </div>
     </ui-preferences>
   `
 
   const preferences = root.querySelector("ui-preferences")!
-  const button = root.querySelector("button")!
-  const label = root.querySelector("span")!
-  preferences.preferences = [density]
+  const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-value]")]
+  preferences.preferences = [view]
 
   const update = () => {
-    const { value } = density.get()
-    button.setAttribute("aria-pressed", String(value === "compact"))
-    label.textContent = `Density: ${value}`
+    const { value } = view.get()
+    for (const button of buttons) button.setAttribute("aria-pressed", String(button.dataset.value === value))
   }
-  const toggle = (event: MouseEvent) => {
-    density.set(density.get().value === "compact" ? "comfortable" : "compact", {
-      reason: "press",
-      event,
-    })
+  const choose = (event: MouseEvent) => {
+    const next = (event.currentTarget as HTMLButtonElement).dataset.value as "list" | "grid"
+    view.set(next, { reason: "press", event })
+    log(root, `Saved the ${next} view`)
   }
 
-  const stop = density.subscribe(update)
+  const stop = view.subscribe(update)
   update()
-  button.addEventListener("click", toggle)
+  for (const button of buttons) button.addEventListener("click", choose)
 
   return () => {
     stop()
-    button.removeEventListener("click", toggle)
+    for (const button of buttons) button.removeEventListener("click", choose)
     preferences.preferences = []
   }
 }

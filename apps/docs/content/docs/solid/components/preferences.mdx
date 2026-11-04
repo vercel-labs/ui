@@ -7,7 +7,7 @@ description: Apply user preferences to data attributes so your styles can follow
 
 <ComponentExample
   name="preferences/basic"
-  caption="Press Compact layout to change the spacing, then reload the page. Your choice is saved."
+  caption="Choose Grid, then reload the page. The files come back in the view you chose, and the console logs each change."
 />
 
 ## Installation
@@ -18,32 +18,32 @@ npm install @ui-sdk/solid @ui-sdk/core
 
 ## Usage
 
-Define the preference you want to apply. Here, `density` controls the space between rows:
+Define the preference you want to apply. Here, `view` chooses how a file list is laid out:
 
 ```ts title="preferences.ts"
 import { createPreference } from "@ui-sdk/core"
 
-const density = createPreference({
-  values: ["comfortable", "compact"],
-  defaultValue: "comfortable",
-  attribute: "data-density",
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
 })
 
-export { density }
+export { view }
 ```
 
-Pass it to `Preferences`, then style the content using its attribute:
+Pass it to `Preferences`, then style the content by its attribute:
 
 ```tsx title="file-list.tsx"
 import { Preferences } from "@ui-sdk/solid/preferences"
-import { density } from "./preferences"
+import { view } from "./preferences"
 
 function FileList() {
   return (
-    <Preferences preferences={[density]}>
-      <ul>
-        <li class="py-3 [[data-density=compact]_&]:py-1">Project notes</li>
-        <li class="py-3 [[data-density=compact]_&]:py-1">Meeting notes</li>
+    <Preferences preferences={[view]}>
+      <ul data-slot="files">
+        <li>Q3 roadmap.pdf</li>
+        <li>Launch checklist.md</li>
       </ul>
     </Preferences>
   )
@@ -52,7 +52,14 @@ function FileList() {
 export { FileList }
 ```
 
-`Preferences` starts with `data-density="comfortable"`. Calling `density.set("compact")` updates it, and the rows use the compact spacing.
+```css
+[data-view="grid"] [data-slot="files"] {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+```
+
+`Preferences` starts with `data-view="list"`. Calling `view.set("grid")` updates it, and the list becomes a grid. `Preferences` renders with `display: contents`, so it adds no box of its own.
 
 ## Save the Value
 
@@ -61,14 +68,14 @@ Add `storage` to save the choice between visits:
 ```ts title="preferences.ts"
 import { createLocalStorage, createPreference } from "@ui-sdk/core"
 
-const density = createPreference({
-  values: ["comfortable", "compact"],
-  defaultValue: "comfortable",
-  attribute: "data-density",
-  storage: createLocalStorage("ui-sdk-preferences-density"),
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+  storage: createLocalStorage("ui-sdk-preferences-view"),
 })
 
-export { density }
+export { view }
 ```
 
 The preference now saves changes in local storage and restores the saved value when the page reloads. You can also [use session storage or cookies with `createPreference`](../../core/behaviors/preferences#remember-the-choice).
@@ -77,17 +84,24 @@ The preference now saves changes in local storage and restores the saved value w
 
 Use `usePreference` when the value affects what your component renders:
 
-```tsx title="density-label.tsx"
+```tsx title="view-switch.tsx"
 import { usePreference } from "@ui-sdk/solid/preferences"
-import { density } from "./preferences"
+import { view } from "./preferences"
 
-function DensityLabel() {
-  const densityState = usePreference(density)
+function ViewSwitch() {
+  const state = usePreference(view)
 
-  return <span>Density: {densityState().value}</span>
+  return (
+    <button
+      aria-pressed={state().value === "grid" ? "true" : "false"}
+      onClick={() => view.set(state().value === "grid" ? "list" : "grid")}
+    >
+      Grid
+    </button>
+  )
 }
 
-export { DensityLabel }
+export { ViewSwitch }
 ```
 
 Pass the same preference instance wherever you need its value. `usePreference` also works outside a `Preferences` component.
@@ -97,12 +111,12 @@ Pass the same preference instance wherever you need its value. `usePreference` a
 Set `global: true` when defining the preference:
 
 ```ts
-const density = createPreference({
-  values: ["comfortable", "compact"],
-  defaultValue: "comfortable",
-  attribute: "data-density",
-  storage: createLocalStorage("ui-sdk-preferences-density"),
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
   global: true,
+  storage: createLocalStorage("ui-sdk-preferences-view"),
 })
 ```
 
@@ -110,10 +124,10 @@ Keep passing it to `Preferences`. Its attribute now goes on `<html>`, so styles 
 
 ## Multiple Preferences
 
-Pass more than one preference in the list. For example, you can apply `density` alongside a [color scheme](../../core/behaviors/preferences#choose-a-color-scheme):
+Pass more than one preference in the list. For example, you can apply `view` alongside a [color scheme](../../core/behaviors/preferences#choose-a-color-scheme):
 
 ```tsx
-<Preferences preferences={[density, colorScheme]}>
+<Preferences preferences={[view, colorScheme]}>
   <App />
 </Preferences>
 ```
@@ -129,7 +143,7 @@ Follow the [server rendering setup](../server-rendering#saved-preferences-and-st
 If your Content Security Policy requires a nonce, pass the nonce from your response:
 
 ```tsx
-<Preferences preferences={[density]} nonce={nonce}>
+<Preferences preferences={[view]} nonce={nonce}>
   <App />
 </Preferences>
 ```

@@ -2,36 +2,44 @@
 import { createLocalStorage, createPreference } from "@ui-sdk/core"
 import { Button } from "@ui-sdk/vue/button"
 import { Preferences, usePreference } from "@ui-sdk/vue/preferences"
+import { useLog } from "../../../shared/vue/log"
 
-const density = createPreference({
-  values: ["comfortable", "compact"],
-  defaultValue: "comfortable",
-  attribute: "data-density",
-  storage: createLocalStorage("ui-sdk-preferences-density"),
+const view = createPreference({
+  values: ["list", "grid"],
+  defaultValue: "list",
+  attribute: "data-view",
+  storage: createLocalStorage("ui-sdk-preferences-view"),
 })
-const state = usePreference(density)
+
+const files = [
+  { name: "Q3 roadmap.pdf", detail: "2.4 MB" },
+  { name: "Launch checklist.md", detail: "12 KB" },
+  { name: "Offsite photos", detail: "24 items" },
+  { name: "Brand assets.zip", detail: "18 MB" },
+]
+
+const log = useLog()
+const state = usePreference(view)
+
+function choose(next: "list" | "grid", event: MouseEvent) {
+  view.set(next, { reason: "press", event })
+  log(`Saved the ${next} view`)
+}
 </script>
 
 <template>
-  <Preferences :preferences="[density]">
-    <div data-slot="card">
-      <Button
-        :aria-pressed="state.value === 'compact'"
-        @click="
-          density.set(state.value === 'compact' ? 'comfortable' : 'compact', {
-            reason: 'press',
-            event: $event,
-          })
-        "
-      >
-        Compact layout
-      </Button>
-      <ul data-slot="list" aria-label="Documents">
-        <li v-for="name in ['Project notes', 'Meeting notes', 'Release notes']" :key="name">
-          {{ name }}
+  <Preferences :preferences="[view]">
+    <div data-slot="stack">
+      <div data-slot="controls" role="group" aria-label="View">
+        <Button :aria-pressed="state.value === 'list'" @click="choose('list', $event)">List</Button>
+        <Button :aria-pressed="state.value === 'grid'" @click="choose('grid', $event)">Grid</Button>
+      </div>
+      <ul data-slot="files" aria-label="Files">
+        <li v-for="file in files" :key="file.name">
+          <span>{{ file.name }}</span>
+          <span data-slot="hint">{{ file.detail }}</span>
         </li>
       </ul>
-      <span data-slot="hint">Density: {{ state.value }}</span>
     </div>
   </Preferences>
 </template>
