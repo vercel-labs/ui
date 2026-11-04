@@ -6,26 +6,46 @@ import {
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
+  ComboboxTrigger,
 } from "@ui-sdk/solid/combobox"
 import { For, Show } from "solid-js"
 
 const users = [
-  { id: 1, name: "Ada Lovelace", username: "ada", role: "Owner" },
-  { id: 2, name: "Grace Hopper", username: "grace", role: "Admin" },
-  { id: 3, name: "Alan Turing", username: "alan", role: "Member" },
-  { id: 4, name: "Margaret Hamilton", username: "margaret", role: "Member" },
-  { id: 5, name: "Edsger Dijkstra", username: "edsger", role: "Guest" },
+  { id: 1, name: "Hollis Grant", username: "hollis", role: "Owner" },
+  { id: 2, name: "Inès Moreau", username: "ines", role: "Admin" },
+  { id: 3, name: "Kofi Mensah", username: "kofi", role: "Member" },
+  { id: 4, name: "Wren Takahashi", username: "wren", role: "Member" },
+  { id: 5, name: "Tomasz Wójcik", username: "tomasz", role: "Guest" },
 ]
 
-export function Example() {
+function Example() {
   return (
     <Combobox>
       <div data-slot="stack">
-        <ComboboxLabel>Mention</ComboboxLabel>
-        <ComboboxInput
-          placeholder="@username"
-          render={(props) => (
-            <div data-slot="row">
+        <ComboboxLabel>Assignee</ComboboxLabel>
+        <div data-slot="row">
+          <ComboboxInput
+            placeholder="Search people"
+            render={(props) => (
+              <div data-slot="row">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m21 21-4.34-4.34" />
+                  <circle cx="11" cy="11" r="8" />
+                </svg>
+                <input {...props} />
+              </div>
+            )}
+          />
+          <ComboboxTrigger aria-label="Show people">
+            {(state) => (
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -35,13 +55,11 @@ export function Example() {
                 stroke-linejoin="round"
                 aria-hidden="true"
               >
-                <path d="m21 21-4.34-4.34" />
-                <circle cx="11" cy="11" r="8" />
+                <path d={state.open ? "m18 15-6-6-6 6" : "m6 9 6 6 6-6"} />
               </svg>
-              <input {...props} />
-            </div>
-          )}
-        />
+            )}
+          </ComboboxTrigger>
+        </div>
       </div>
       <ComboboxContent>
         <ComboboxEmpty>No one by that name.</ComboboxEmpty>
@@ -56,7 +74,14 @@ export function Example() {
                       {user.name}
                       <span data-slot="hint">@{user.username}</span>
                     </span>
-                    <Show when={state.selected}>
+                    <Show
+                      when={state.selected}
+                      fallback={
+                        <Show when={state.highlighted}>
+                          <kbd data-slot="kbd">Enter</kbd>
+                        </Show>
+                      }
+                    >
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -79,3 +104,5 @@ export function Example() {
     </Combobox>
   )
 }
+
+export { Example }

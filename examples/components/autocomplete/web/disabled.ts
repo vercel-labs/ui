@@ -44,7 +44,7 @@ function mount(root: HTMLElement) {
             <input placeholder="Type “b”" />
           </ui-autocomplete-input>
         </div>
-        <ui-autocomplete-content>
+        <ui-autocomplete-content hidden>
           <ui-autocomplete-list>
             ${fruits
               .map(

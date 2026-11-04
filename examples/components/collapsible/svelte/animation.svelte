@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
   import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
+  import { useLog } from "../../../shared/svelte/log"
 
   const notes = [
     "Search now matches file contents, not only names.",
@@ -8,24 +9,25 @@
     "Uploads resume after the connection drops.",
   ]
 
-  let settled = $state("")
+  const log = useLog()
 </script>
 
-
-  <Collapsible onOpenChangeComplete={(open) => (settled = open ? "opening" : "closing")}>
-    <CollapsibleTrigger data-variant="secondary">
-      Release notes
-      <ChevronDownIcon />
-    </CollapsibleTrigger>
-    <CollapsiblePanel>
-      <ul>
-        {#each notes as note (note)}
-          <li>{note}</li>
-        {/each}
-      </ul>
-    </CollapsiblePanel>
-  </Collapsible>
-  <output data-slot="output">
-    {settled ? `Finished ${settled}` : "Not animated yet"}
-  </output>
-
+<Collapsible
+  data-variant="card"
+  onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+>
+  <CollapsibleTrigger>
+    <span data-slot="stack">
+      <span>Release notes</span>
+      <span data-slot="hint">Version 2.4, released October 28</span>
+    </span>
+    <ChevronDownIcon />
+  </CollapsibleTrigger>
+  <CollapsiblePanel>
+    <ul>
+      {#each notes as note (note)}
+        <li>{note}</li>
+      {/each}
+    </ul>
+  </CollapsiblePanel>
+</Collapsible>

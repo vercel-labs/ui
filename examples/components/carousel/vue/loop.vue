@@ -14,20 +14,18 @@ const slides = [1, 2, 3, 4, 5]
 
 <template>
   <Carousel aria-label="Featured" loop>
-    <CarouselViewport>
-      <CarouselContent>
-        <CarouselItem v-for="slide in slides" :key="slide">
-          <div data-slot="tile">
-            {{ slide }}
-          </div>
-        </CarouselItem>
-      </CarouselContent>
-    </CarouselViewport>
     <div data-slot="row">
-      <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+      <CarouselPrevious aria-label="Previous slide">
         <ChevronLeftIcon />
       </CarouselPrevious>
-      <CarouselNext data-variant="secondary" aria-label="Next slide">
+      <CarouselViewport>
+        <CarouselContent>
+          <CarouselItem v-for="slide in slides" :key="slide">
+            <div data-slot="tile">{{ slide }}</div>
+          </CarouselItem>
+        </CarouselContent>
+      </CarouselViewport>
+      <CarouselNext aria-label="Next slide">
         <ChevronRightIcon />
       </CarouselNext>
     </div>

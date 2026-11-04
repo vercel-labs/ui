@@ -59,7 +59,7 @@ const countryLabel = (value: string) => countries.find((country) => country.valu
         </ComboboxChipsOverflow>
         <ComboboxInput placeholder="Add" />
       </ComboboxChips>
-      <p data-slot="output">
+      <p data-slot="hint">
         <ComboboxValue :max-labels="2" :get-more-label="(count: number) => `${count} more`" />
       </p>
     </div>

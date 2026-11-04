@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { Button } from "@ui-sdk/vue/button"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const count = ref(0)
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Button @click="count++">Button</Button>
-    <output data-slot="output">Pressed {{ count }} {{ count === 1 ? "time" : "times" }}</output>
-  </div>
+  <Button @click="log('Pressed')">Button</Button>
 </template>

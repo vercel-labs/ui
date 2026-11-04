@@ -22,27 +22,35 @@ function Example() {
     target?.focus()
     setProjects((list) => list.filter((project) => project !== name))
   }
+
   return (
     <div data-slot="stack">
-      <ul aria-label="Projects">
+      <div data-slot="controls">
+        <button
+          ref={(element) => (reset = element)}
+          type="button"
+          onClick={() => setProjects(["Acme", "Globex", "Initech"])}
+        >
+          Reset Projects
+        </button>
+      </div>
+      <ul data-slot="list" aria-label="Projects">
         <For each={projects()} fallback={<li data-slot="row">All projects deleted.</li>}>
           {(name) => (
             <li data-slot="row">
               {name}
-              <button type="button" onClick={(event) => remove(name, event.currentTarget)}>
+              <button
+                type="button"
+                data-size="sm"
+                aria-label={`Delete ${name}`}
+                onClick={(event) => remove(name, event.currentTarget)}
+              >
                 Delete
               </button>
             </li>
           )}
         </For>
       </ul>
-      <button
-        type="button"
-        ref={(element) => (reset = element)}
-        onClick={() => setProjects(["Acme", "Globex", "Initech"])}
-      >
-        Reset projects
-      </button>
       <AlertDialog controller={confirm.controller}>
         <AlertDialogBackdrop />
         <AlertDialogContent<{
@@ -53,7 +61,7 @@ function Example() {
               <div data-slot="stack">
                 <AlertDialogTitle>Delete {state.payload?.name}?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  The project and its files will be deleted for everyone.
+                  The project and its files will be deleted for everyone on your team.
                 </AlertDialogDescription>
               </div>
               <div data-slot="row">

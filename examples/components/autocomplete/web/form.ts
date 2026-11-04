@@ -1,5 +1,6 @@
 import "@ui-sdk/web/autocomplete"
 import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 const fruits = [
   "Apple",
@@ -28,7 +29,8 @@ function mount(root: HTMLElement) {
           <ui-autocomplete-input>
             <input />
           </ui-autocomplete-input>
-          <ui-autocomplete-content>
+          <ui-autocomplete-content hidden>
+            <ui-autocomplete-empty>No fruits found.</ui-autocomplete-empty>
             <ui-autocomplete-list>
               ${fruits.map((fruit) => `<ui-autocomplete-item value="${fruit}">${fruit}</ui-autocomplete-item>`).join("")}
             </ui-autocomplete-list>
@@ -41,14 +43,13 @@ function mount(root: HTMLElement) {
         <button type="submit" data-variant="solid">Submit</button>
         <button type="reset">Reset</button>
       </div>
-      <output data-slot="output">Not submitted</output>
     </form>
   `
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     const data = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
-    root.querySelector("output")!.textContent = data.join("&")
+    log(root, `Submitted ${data.join("&")}`)
   })
 }
 

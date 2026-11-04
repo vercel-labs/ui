@@ -9,26 +9,35 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "@ui-sdk/solid/combobox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
 import { createSignal, For } from "solid-js"
 
 const countries = [
-  { value: "ar", label: "Argentina" },
+  { value: "ar", label: "Argentina", keywords: ["república argentina"] },
   { value: "au", label: "Australia" },
-  { value: "at", label: "Austria" },
-  { value: "be", label: "Belgium" },
-  { value: "br", label: "Brazil" },
+  { value: "at", label: "Austria", keywords: ["österreich"] },
+  { value: "be", label: "Belgium", keywords: ["belgië", "belgique"] },
+  { value: "br", label: "Brazil", keywords: ["brasil"] },
   { value: "ca", label: "Canada" },
   { value: "cl", label: "Chile" },
-  { value: "dk", label: "Denmark" },
-  { value: "fi", label: "Finland" },
+  { value: "dk", label: "Denmark", keywords: ["danmark"] },
+  { value: "fi", label: "Finland", keywords: ["suomi"] },
   { value: "fr", label: "France" },
-  { value: "de", label: "Germany" },
-  { value: "gr", label: "Greece" },
-  { value: "jp", label: "Japan" },
-  { value: "nl", label: "Netherlands" },
-  { value: "es", label: "Spain" },
-  { value: "se", label: "Sweden" },
-  { value: "ch", label: "Switzerland" },
+  { value: "de", label: "Germany", keywords: ["deutschland"] },
+  { value: "gr", label: "Greece", keywords: ["hellas", "ελλάδα"] },
+  { value: "jp", label: "Japan", keywords: ["nippon", "日本"] },
+  { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
+  { value: "es", label: "Spain", keywords: ["españa"] },
+  { value: "se", label: "Sweden", keywords: ["sverige"] },
+  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
 ]
 
 function fuzzy(item: { label: string }, query: string) {
@@ -37,35 +46,69 @@ function fuzzy(item: { label: string }, query: string) {
   return at === query.length
 }
 
-const filters = [
-  { name: "Contains", filter: "contains" },
-  { name: "Starts with", filter: "startsWith" },
-  { name: "Fuzzy", filter: fuzzy },
-] as const
+const filters = {
+  contains: "contains",
+  startsWith: "startsWith",
+  fuzzy,
+} as const
+const modes = [
+  { value: "contains", label: "Contains" },
+  { value: "startsWith", label: "Starts with" },
+  { value: "fuzzy", label: "Fuzzy" },
+]
+type Mode = keyof typeof filters
 
 function Example() {
-  const [mode, setMode] = createSignal<(typeof filters)[number]>(filters[0])
+  const [mode, setMode] = createSignal<Mode>("contains")
 
   return (
     <div data-slot="stack">
-      <div role="group" aria-label="Filter" data-slot="row">
-        <For each={filters}>
-          {(option) => (
-            <button
-              type="button"
-              aria-pressed={mode() === option ? "true" : "false"}
-              onClick={() => setMode(option)}
+      <div data-slot="controls">
+        <Select items={modes} value={mode()} onValueChange={(next) => next && setMode(next as Mode)}>
+          <SelectLabel>Filter</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
             >
-              {option.name}
-            </button>
-          )}
-        </For>
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </SelectTrigger>
+          <SelectContent>
+            <For each={modes}>
+              {(option) => (
+                <SelectItem value={option.value}>
+                  {option.label}
+                  <SelectItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </SelectItemIndicator>
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </Select>
       </div>
-      <Combobox filter={mode().filter}>
+      <Combobox filter={filters[mode()]}>
         <div data-slot="stack">
           <ComboboxLabel>Country</ComboboxLabel>
           <div data-slot="row">
-            <ComboboxInput placeholder="Try “an” or “swd”" />
+            <ComboboxInput placeholder="Try “an”, “swd” or “deutschland”" />
             <ComboboxTrigger aria-label="Show countries">
               <svg
                 viewBox="0 0 24 24"
@@ -86,7 +129,7 @@ function Example() {
           <ComboboxList>
             <For each={countries}>
               {(country) => (
-                <ComboboxItem value={country.value} label={country.label}>
+                <ComboboxItem value={country.value} label={country.label} keywords={country.keywords}>
                   {country.label}
                   <ComboboxItemIndicator>
                     <svg

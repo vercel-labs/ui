@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 type Invoice = { id: string; customer: string; amount: string; status: "Paid" | "Due" }
 
@@ -20,15 +21,20 @@ const invoices: Invoice[] = [
 
 function Example() {
   const reminder = createDialogController<Invoice, "send">()
-  const [status, setStatus] = createSignal("")
+  const log = useLog()
 
   async function remindFromCode() {
     const { reason, returnValue } = await reminder.open({ payload: invoices[2] })
-    setStatus(returnValue === "send" ? "Reminder sent from code" : `Closed with ${reason}`)
+    log(returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`)
   }
 
   return (
-    <>
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={remindFromCode}>
+          Open from Code
+        </button>
+      </div>
       <ul data-slot="list">
         <For each={invoices}>
           {(invoice) => (
@@ -49,13 +55,10 @@ function Example() {
           )}
         </For>
       </ul>
-      <button type="button" onClick={remindFromCode}>
-        Open from code
-      </button>
       <Dialog
         controller={reminder}
         onOpenChange={(open, details) => {
-          if (!open && details.returnValue === "send") setStatus("Reminder sent")
+          if (!open && details.returnValue === "send") log("Reminder sent")
         }}
       >
         <DialogBackdrop />
@@ -81,8 +84,7 @@ function Example() {
           }}
         </DialogContent>
       </Dialog>
-      <output data-slot="output">{status()}</output>
-    </>
+    </div>
   )
 }
 

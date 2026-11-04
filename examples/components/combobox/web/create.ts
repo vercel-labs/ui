@@ -30,7 +30,7 @@ function mount(root: HTMLElement) {
           </ui-combobox-input>
         </ui-combobox-chips>
       </div>
-      <ui-combobox-content>
+      <ui-combobox-content hidden>
         <ui-combobox-list>
           ${labels.map(item).join("")}
           <ui-combobox-create min-length="2">

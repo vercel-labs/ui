@@ -7,6 +7,7 @@
     CommandPage,
     createCommandController,
   } from "@ui-sdk/svelte/command"
+  import { useLog } from "../../../shared/svelte/log"
 
   const themes = [
     { value: "light", label: "Light" },
@@ -15,17 +16,13 @@
   ]
 
   const palette = createCommandController()
-  let ran = $state("")
-
-  function onAction(value: string) {
-    ran = value
-  }
+  const log = useLog()
 </script>
 
 <div data-slot="stack">
-  <div data-slot="row">
+  <div data-slot="controls">
     <button type="button" onclick={() => palette.push("theme")}>
-      Open themes
+      Open Themes
     </button>
     <button type="button" onclick={() => palette.pop()}>
       Back
@@ -37,13 +34,13 @@
       Search “li”
     </button>
     <button type="button" onclick={() => palette.run()}>
-      Run highlighted
+      Run Highlighted
     </button>
     <button type="button" onclick={() => palette.focus()}>
       Focus
     </button>
   </div>
-  <Command controller={palette} {onAction}>
+  <Command controller={palette} onAction={(value) => log(`Ran ${value}`)}>
     <CommandInput aria-label="Search commands" />
     <CommandList>
       <CommandPage>
@@ -58,5 +55,4 @@
       </CommandPage>
     </CommandList>
   </Command>
-  <output data-slot="output">{ran ? `Ran ${ran}` : "Nothing run yet"}</output>
 </div>

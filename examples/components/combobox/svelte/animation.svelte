@@ -11,6 +11,7 @@
     ComboboxList,
     ComboboxTrigger,
   } from "@ui-sdk/svelte/combobox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const frameworks = [
     { value: "next", label: "Next.js" },
@@ -22,13 +23,10 @@
     { value: "qwik", label: "Qwik City" },
   ]
 
-  let status = $state("Closed")
+  const log = useLog()
 </script>
 
-<Combobox
-  onOpenChange={(open) => (status = open ? "Opening…" : "Closing…")}
-  onOpenChangeComplete={(open) => (status = open ? "Open" : "Closed")}
->
+<Combobox onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
   <div data-slot="stack">
     <ComboboxLabel>Framework</ComboboxLabel>
     <div data-slot="row">
@@ -37,7 +35,6 @@
         <ChevronDownIcon />
       </ComboboxTrigger>
     </div>
-    <output data-slot="output">{status}</output>
   </div>
   <ComboboxContent>
     <ComboboxEmpty>No frameworks found.</ComboboxEmpty>

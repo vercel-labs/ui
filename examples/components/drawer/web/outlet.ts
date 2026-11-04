@@ -1,4 +1,5 @@
 import "@ui-sdk/web/drawer"
+import "@ui-sdk/web/field"
 
 const messages = [
   { from: "Inès", text: "The proofs are back from the printer." },
@@ -28,25 +29,28 @@ function mount(root: HTMLElement) {
           </ul>
         </ui-drawer-outlet>
       </div>
-      <ui-drawer-backdrop></ui-drawer-backdrop>
-      <ui-drawer-content>
+      <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+      <ui-drawer-content hidden>
         <div data-slot="grip" aria-hidden="true"></div>
         <div data-slot="stack">
           <ui-drawer-title>New message</ui-drawer-title>
-          <ui-drawer-description>Drag it down slowly and watch the inbox follow.</ui-drawer-description>
+          <ui-drawer-description>Write a quick note to the team.</ui-drawer-description>
         </div>
-        <div data-slot="stack">
-          <input aria-label="To" placeholder="To" />
-          <textarea aria-label="Message" placeholder="Message"></textarea>
-        </div>
+        <ui-field>
+          <ui-field-label>To</ui-field-label>
+          <input value="Design team" />
+        </ui-field>
+        <ui-field>
+          <ui-field-label>Message</ui-field-label>
+          <textarea placeholder="What's new?"></textarea>
+        </ui-field>
         <div data-slot="stack">
           <ui-drawer-close value="send"><button data-variant="solid">Send</button></ui-drawer-close>
         </div>
       </ui-drawer-content>
     </ui-drawer>
   `
-  const outlet = root.querySelector("ui-drawer-outlet")!
-  outlet.keyframes = { scale: [1, 0.94], borderRadius: ["0px", "24px"] }
+  root.querySelector("ui-drawer-outlet")!.keyframes = { scale: [1, 0.94], borderRadius: ["0px", "24px"] }
 }
 
 export { mount }

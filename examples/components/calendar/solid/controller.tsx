@@ -1,3 +1,4 @@
+import { todayDate } from "@ui-sdk/core/date"
 import {
   Calendar,
   CalendarDay,
@@ -13,14 +14,18 @@ import {
 
 function Example() {
   const calendar = createCalendarController()
+  const select = (date: string) => {
+    calendar.setValue(date)
+    calendar.focus(date)
+  }
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        <button type="button" onClick={() => calendar.focus("2026-12-25")}>
+      <div data-slot="controls">
+        <button type="button" onClick={() => select("2026-12-25")}>
           Go to Christmas
         </button>
-        <button type="button" onClick={() => calendar.setValue(null)}>
-          Clear
+        <button type="button" onClick={() => select(todayDate())}>
+          Today
         </button>
       </div>
       <Calendar controller={calendar} defaultValue="2026-10-16" defaultMonth="2026-10">

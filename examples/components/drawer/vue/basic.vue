@@ -23,7 +23,7 @@ const calories = ref(goal.initial)
       <div data-slot="grip" aria-hidden="true" />
 
       <div data-slot="stack">
-        <DrawerTitle>Move Goal</DrawerTitle>
+        <DrawerTitle>Move goal</DrawerTitle>
         <DrawerDescription>Set your daily activity goal.</DrawerDescription>
       </div>
 
@@ -37,9 +37,7 @@ const calories = ref(goal.initial)
           <MinusIcon aria-hidden="true" />
         </button>
         <div data-slot="stack">
-          <div aria-live="polite">
-            {{ calories }}
-          </div>
+          <div aria-live="polite">{{ calories }}</div>
           <div data-slot="hint">Calories/day</div>
         </div>
         <button

@@ -32,7 +32,7 @@ function mount(root: HTMLElement) {
           ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
         </button>
       </ui-combobox-trigger>
-      <ui-combobox-content anchor="#combobox-popup-button">
+      <ui-combobox-content hidden anchor="#combobox-popup-button">
         <div data-slot="row">
           ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
           <ui-combobox-input>

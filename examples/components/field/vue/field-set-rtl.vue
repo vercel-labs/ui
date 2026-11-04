@@ -8,11 +8,11 @@ import { Input } from "@ui-sdk/vue/input"
     <FieldLegend>العنوان</FieldLegend>
     <FieldDescription>نحتاج عنوانك لتوصيل طلبك.</FieldDescription>
     <Field name="street">
-      <FieldLabel> الشارع </FieldLabel>
+      <FieldLabel>الشارع</FieldLabel>
       <Input />
     </Field>
     <Field name="city">
-      <FieldLabel> المدينة </FieldLabel>
+      <FieldLabel>المدينة</FieldLabel>
       <Input />
     </Field>
   </FieldSet>

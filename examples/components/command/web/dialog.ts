@@ -1,6 +1,7 @@
 import "@ui-sdk/web/command"
 import "@ui-sdk/web/dialog"
 import { Calculator, Calendar, createElement, CreditCard, Search, Settings, Smile, User } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const commands = [
   { value: "calendar", label: "Calendar", icon: Calendar },
@@ -21,15 +22,15 @@ function mount(root: HTMLElement) {
             <ui-dialog-shortcut></ui-dialog-shortcut>
           </button>
         </ui-dialog-trigger>
-        <ui-dialog-backdrop></ui-dialog-backdrop>
-        <ui-dialog-content>
+        <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+        <ui-dialog-content hidden>
           <ui-dialog-title>Command palette</ui-dialog-title>
           <ui-command>
             <div data-slot="row">
-                ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
-                <ui-command-input>
-                  <input aria-label="Search commands" placeholder="Type a command or search..." />
-                </ui-command-input>
+              ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
+              <ui-command-input>
+                <input aria-label="Search commands" placeholder="Type a command or search..." />
+              </ui-command-input>
             </div>
             <ui-command-empty>No results found.</ui-command-empty>
             <ui-command-list>
@@ -50,13 +51,11 @@ function mount(root: HTMLElement) {
           </ui-command>
         </ui-dialog-content>
       </ui-dialog>
-      <output data-slot="output">Press ⌘K or Ctrl+K</output>
     </div>
   `
-  const dialog = root.querySelector("ui-dialog") as HTMLElement & { open: boolean }
-  const output = root.querySelector("output")!
+  const dialog = root.querySelector("ui-dialog")!
   root.querySelector("ui-command")!.addEventListener("action", (event) => {
-    output.textContent = `Ran ${(event as CustomEvent<{ value: string }>).detail.value}`
+    log(root, `Ran ${event.detail.value}`)
     dialog.open = false
   })
 }

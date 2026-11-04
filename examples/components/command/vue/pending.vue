@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { LoaderCircleIcon } from "@lucide/vue"
 import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/vue/command"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
-const log = ref("")
+const log = useLog()
 
 async function deploy() {
   await wait(1200)
-  log.value = "Deployed"
+  log("Deployed to production")
 }
 
 async function sync() {
   await wait(600)
+  log("Couldn't sync: offline")
   throw new Error("Offline")
 }
 </script>
@@ -34,6 +35,5 @@ async function sync() {
         </CommandItem>
       </CommandList>
     </Command>
-    <output data-slot="output">{{ log || "Run a command" }}</output>
   </div>
 </template>

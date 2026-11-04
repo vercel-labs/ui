@@ -25,29 +25,20 @@
       content: "No. Panels open on the server or on mount show at once.",
     },
   ]
-
-  let status = $state("")
 </script>
 
-<div>
-  <Accordion defaultValue={["one"]}>
-    {#each items as item (item.value)}
-      <AccordionItem
-        value={item.value}
-        onOpenChangeComplete={(open) =>
-          (status = `${open ? "Finished opening" : "Finished closing"} “${item.label}”`)}
-      >
-        <AccordionHeader>
-          <AccordionTrigger>
-            {item.label}
-            <ChevronDownIcon aria-hidden="true" />
-          </AccordionTrigger>
-        </AccordionHeader>
-        <AccordionPanel>
-          {item.content}
-        </AccordionPanel>
-      </AccordionItem>
-    {/each}
-  </Accordion>
-  <output data-slot="output">{status || "Open or close an item."}</output>
-</div>
+<Accordion defaultValue={["one"]}>
+  {#each items as item (item.value)}
+    <AccordionItem value={item.value}>
+      <AccordionHeader>
+        <AccordionTrigger>
+          {item.label}
+          <ChevronDownIcon aria-hidden="true" />
+        </AccordionTrigger>
+      </AccordionHeader>
+      <AccordionPanel>
+        {item.content}
+      </AccordionPanel>
+    </AccordionItem>
+  {/each}
+</Accordion>

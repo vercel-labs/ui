@@ -1,19 +1,20 @@
 import "@ui-sdk/web/date-picker"
 import { Calendar, ChevronLeft, ChevronRight, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-date-picker default-value="2026-10-16">
       <div data-slot="row">
         <ui-date-picker-input><input aria-label="Due date" /></ui-date-picker-input>
         <ui-date-picker-trigger>
-          <button>
+          <button data-variant="ghost">
             ${createElement(Calendar, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-date-picker-trigger>
       </div>
       <ui-date-picker-hint></ui-date-picker-hint>
-      <ui-date-picker-content>
+      <ui-date-picker-content hidden>
         <div data-slot="row">
           <ui-calendar-previous>
             <button data-variant="ghost">
@@ -36,11 +37,11 @@ export function mount(root: HTMLElement) {
           </ui-calendar-weeks>
         </ui-calendar-grid>
       </ui-date-picker-content>
-      <p data-slot="hint">2026-10-16 (initial)</p>
     </ui-date-picker>
   `
-  const picker = root.querySelector("ui-date-picker")!
-  picker.addEventListener("valuechange", (event) => {
-    root.querySelector("p")!.textContent = `${event.detail.value ?? "No date"} (${event.detail.reason})`
+  root.querySelector("ui-date-picker")!.addEventListener("valuechange", (event) => {
+    log(root, `${event.detail.value ?? "No date"} (${event.detail.reason})`)
   })
 }
+
+export { mount }

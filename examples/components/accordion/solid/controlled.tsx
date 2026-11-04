@@ -17,7 +17,6 @@ const items = [
 function Example() {
   const accordion = createAccordionController()
   const [value, setValue] = createSignal(["account"])
-  const [reason, setReason] = createSignal("")
 
   return (
     <div>
@@ -26,15 +25,7 @@ function Example() {
           Review security
         </button>
       </div>
-      <Accordion
-        multiple
-        value={value()}
-        onValueChange={(next, details) => {
-          setValue(next)
-          setReason(details.reason)
-        }}
-        controller={accordion}
-      >
+      <Accordion multiple value={value()} onValueChange={setValue} controller={accordion}>
         <For each={items}>
           {(item) => (
             <AccordionItem
@@ -65,10 +56,6 @@ function Example() {
           )}
         </For>
       </Accordion>
-      <output data-slot="output">
-        Open: {value().join(", ") || "none"}
-        {reason() ? `, last change: ${reason()}` : ""}
-      </output>
     </div>
   )
 }

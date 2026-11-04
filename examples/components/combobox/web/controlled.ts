@@ -1,5 +1,6 @@
 import "@ui-sdk/web/combobox"
 import { Check, ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -23,9 +24,13 @@ const countries = [
 
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" data-action="value">Choose Japan</button>
+        <button type="button" data-action="open">Open</button>
+      </div>
       <ui-combobox default-value="fr" debug>
         <div data-slot="stack">
           <ui-combobox-label>Country</ui-combobox-label>
@@ -38,7 +43,7 @@ export function mount(root: HTMLElement) {
             </ui-combobox-trigger>
           </div>
         </div>
-        <ui-combobox-content>
+        <ui-combobox-content hidden>
           <ui-combobox-empty>No countries found.</ui-combobox-empty>
           <ui-combobox-list>
             ${countries
@@ -54,28 +59,21 @@ export function mount(root: HTMLElement) {
           </ui-combobox-list>
         </ui-combobox-content>
       </ui-combobox>
-      <div data-slot="row">
-        <button type="button" data-value>Japan</button>
-        <button type="button" data-open>Open</button>
-      </div>
-      <output data-slot="output">Change something</output>
     </div>
   `
-  const combobox = root.querySelector("ui-combobox") as HTMLElement & {
-    value: string | null
-    open: boolean
-    itemToLabel: (value: string) => string
-  }
-  combobox.itemToLabel = countryLabel
-  const log = root.querySelector("output")!
-  const listen = (type: string, describe: (value: never, reason: string) => string) =>
-    combobox.addEventListener(type, (event) => {
-      const { value, reason } = (event as CustomEvent<{ value: never; reason: string }>).detail
-      log.textContent = describe(value, reason)
-    })
-  listen("valuechange", (value: string | null, reason) => `value: ${value} (${reason})`)
-  listen("querychange", (value: string, reason) => `query: “${value}” (${reason})`)
-  listen("openchange", (value: boolean, reason) => `open: ${value} (${reason})`)
-  root.querySelector("[data-value]")!.addEventListener("click", () => (combobox.value = "jp"))
-  root.querySelector("[data-open]")!.addEventListener("click", () => (combobox.open = true))
+  const combobox = root.querySelector("ui-combobox")!
+  combobox.itemToLabel = (value) => countryLabel(value as string)
+  combobox.addEventListener("valuechange", (event) =>
+    log(root, `value: ${event.detail.value} (${event.detail.reason})`),
+  )
+  combobox.addEventListener("querychange", (event) =>
+    log(root, `query: “${event.detail.value}” (${event.detail.reason})`),
+  )
+  combobox.addEventListener("openchange", (event) =>
+    log(root, `open: ${event.detail.value} (${event.detail.reason})`),
+  )
+  root.querySelector("[data-action=value]")!.addEventListener("click", () => (combobox.value = "jp"))
+  root.querySelector("[data-action=open]")!.addEventListener("click", () => (combobox.open = true))
 }
+
+export { mount }

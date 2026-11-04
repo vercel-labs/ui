@@ -58,7 +58,7 @@ function mount(root: HTMLElement) {
           </ui-combobox-trigger>
         </div>
       </div>
-      <ui-combobox-content>
+      <ui-combobox-content hidden>
         <ui-combobox-status></ui-combobox-status>
         <ui-combobox-empty>No movies match “<span>the</span>”.</ui-combobox-empty>
         <ui-combobox-list></ui-combobox-list>

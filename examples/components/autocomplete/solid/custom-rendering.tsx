@@ -1,49 +1,42 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
   AutocompleteList,
 } from "@ui-sdk/solid/autocomplete"
-import { For, Show } from "solid-js"
+import { For } from "solid-js"
 
-const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Blackberry"]
+const pages = [
+  { title: "Installation", section: "Get Started", href: "#installation" },
+  { title: "Composition", section: "Concepts", href: "#composition" },
+  { title: "Build Your Own", section: "Concepts", href: "#build-your-own" },
+  { title: "Styling", section: "Guides", href: "#styling" },
+  { title: "API Reference", section: "Reference", href: "#api-reference" },
+  { title: "Accessibility", section: "Reference", href: "#accessibility" },
+]
 
 function Example() {
   return (
-    <Autocomplete required>
+    <Autocomplete>
       <div data-slot="stack">
-        <AutocompleteLabel>Fruit</AutocompleteLabel>
-        <AutocompleteInput />
+        <AutocompleteLabel>Jump to</AutocompleteLabel>
+        <AutocompleteInput placeholder="e.g. Styling" />
       </div>
       <AutocompleteContent>
+        <AutocompleteEmpty>No sections found.</AutocompleteEmpty>
         <AutocompleteList>
-          <AutocompleteItem value="Fruit guide" render={(props) => <a {...props} href="#fruit-guide" />}>
-            Read the fruit guide
-          </AutocompleteItem>
-          <For each={fruits}>
-            {(fruit) => (
-              <AutocompleteItem value={fruit}>
-                {(state) => (
-                  <>
-                    {fruit}
-                    <Show when={state.highlighted}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <path d="m12 19-7-7 7-7" />
-                        <path d="M19 12H5" />
-                      </svg>
-                    </Show>
-                  </>
-                )}
+          <For each={pages}>
+            {(page) => (
+              <AutocompleteItem
+                value={page.title}
+                label={page.title}
+                render={(props) => <a {...props} href={page.href} />}
+              >
+                {page.title}
+                <span data-slot="hint">{page.section}</span>
               </AutocompleteItem>
             )}
           </For>

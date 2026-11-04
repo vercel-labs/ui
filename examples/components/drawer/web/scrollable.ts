@@ -14,9 +14,9 @@ const paragraphs = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-drawer>
-      <ui-drawer-trigger><button>Scrollable content</button></ui-drawer-trigger>
-      <ui-drawer-backdrop></ui-drawer-backdrop>
-      <ui-drawer-content initial-focus="content">
+      <ui-drawer-trigger><button>Scrollable Content</button></ui-drawer-trigger>
+      <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+      <ui-drawer-content initial-focus="content" hidden>
         <div data-slot="grip" aria-hidden="true"></div>
         <div data-slot="stack">
           <ui-drawer-title>Release notes</ui-drawer-title>
@@ -26,7 +26,7 @@ function mount(root: HTMLElement) {
           ${[...paragraphs, ...paragraphs].map((paragraph) => `<p data-slot="hint">${paragraph}</p>`).join("")}
         </div>
         <div data-slot="stack">
-          <ui-drawer-close><button data-variant="solid">Got it</button></ui-drawer-close>
+          <ui-drawer-close><button data-variant="solid">Got It</button></ui-drawer-close>
         </div>
       </ui-drawer-content>
     </ui-drawer>

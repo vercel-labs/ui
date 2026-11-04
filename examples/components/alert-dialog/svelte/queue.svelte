@@ -9,24 +9,22 @@
     createConfirm,
   } from "@ui-sdk/svelte/alert-dialog"
   import type { DialogContentState } from "@ui-sdk/svelte/dialog"
+  import { useLog } from "../../../shared/svelte/log"
 
   const confirm = createConfirm<{ name: string }>()
-  let result = $state("")
+  const log = useLog()
 
   async function review() {
-    result = ""
     const acme = confirm({ name: "Acme" })
     const globex = confirm({ name: "Globex" })
     const [first, second] = await Promise.all([acme, globex])
-    result = `Acme: ${first ? "confirmed" : "canceled"}. Globex: ${second ? "confirmed" : "canceled"}.`
+    log(`Acme: ${first ? "confirmed" : "canceled"}`)
+    log(`Globex: ${second ? "confirmed" : "canceled"}`)
   }
 </script>
 
 <div data-slot="stack">
-  <button type="button" onclick={review}>
-    Review two projects
-  </button>
-  <output data-slot="output" aria-live="polite">{result}</output>
+  <button type="button" onclick={review}>Review Two Projects</button>
   <AlertDialog controller={confirm.controller}>
     <AlertDialogBackdrop />
     <AlertDialogContent>
@@ -38,12 +36,8 @@
           </AlertDialogDescription>
         </div>
         <div data-slot="row">
-          <AlertDialogClose>
-            Cancel
-          </AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">
-            Archive
-          </AlertDialogClose>
+          <AlertDialogClose>Cancel</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm">Archive</AlertDialogClose>
         </div>
       {/snippet}
     </AlertDialogContent>

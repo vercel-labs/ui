@@ -2,6 +2,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
@@ -32,7 +33,7 @@ const fruit = createAutocompleteController()
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
+    <div data-slot="controls">
       <button type="button" data-size="sm" @click="fruit.open()">Open</button>
       <button type="button" data-size="sm" @click="fruit.setValue('Pea')">Type “Pea”</button>
       <button type="button" data-size="sm" @click="fruit.clear()">Clear</button>
@@ -42,6 +43,7 @@ const fruit = createAutocompleteController()
       <AutocompleteLabel>Fruit</AutocompleteLabel>
       <AutocompleteInput />
       <AutocompleteContent>
+        <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
           <AutocompleteItem v-for="item in fruits" :key="item" :value="item">{{ item }}</AutocompleteItem>
         </AutocompleteList>

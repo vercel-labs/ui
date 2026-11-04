@@ -13,7 +13,7 @@ import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
     </Checkbox>
     <div data-slot="stack">
       <FieldLabel>Require two-factor authentication</FieldLabel>
-      <FieldDescription> Your organization requires this setting. </FieldDescription>
+      <FieldDescription>Your organization requires this setting.</FieldDescription>
     </div>
   </Field>
 </template>

@@ -5,26 +5,36 @@ import {
   createCollapsibleController,
 } from "@ui-sdk/solid/collapsible"
 import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const recoveryCodes = ["7KQ2-M9XD", "P4TR-8HZC", "W3NB-6JUE", "C5YF-2LSA"]
 
 function Example() {
+  const log = useLog()
   const collapsible = createCollapsibleController()
   const [open, setOpen] = createSignal(false)
-  const [reason, setReason] = createSignal("")
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => collapsible.toggle()}>
+          Toggle
+        </button>
+      </div>
       <Collapsible
+        data-variant="card"
         open={open()}
         onOpenChange={(next, details) => {
           setOpen(next)
-          setReason(details.reason)
+          log(`${next ? "Opened" : "Closed"} (${details.reason})`)
         }}
         controller={collapsible}
       >
-        <CollapsibleTrigger data-variant="secondary">
-          Recovery codes
+        <CollapsibleTrigger>
+          <span data-slot="stack">
+            <span>Recovery codes</span>
+            <span data-slot="hint">Each code signs you in once</span>
+          </span>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -39,23 +49,15 @@ function Example() {
         </CollapsibleTrigger>
         <CollapsiblePanel>
           <div data-slot="stack">
-            <p>Each code signs you in once if you lose your phone.</p>
-            <ul data-slot="log">
+            <ul>
               <For each={recoveryCodes}>{(code) => <li>{code}</li>}</For>
             </ul>
-            <button data-variant="secondary" onClick={() => collapsible.close()}>
+            <button type="button" onClick={() => collapsible.close()}>
               Done
             </button>
           </div>
         </CollapsiblePanel>
       </Collapsible>
-      <button data-variant="secondary" onClick={() => collapsible.toggle()}>
-        Toggle from outside
-      </button>
-      <output data-slot="output">
-        {open() ? "Open" : "Closed"}
-        {reason() && `, last change: ${reason()}`}
-      </output>
     </div>
   )
 }

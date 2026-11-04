@@ -7,27 +7,25 @@ import {
   AlertDialogTitle,
   createConfirm,
 } from "@ui-sdk/solid/alert-dialog"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
   const confirm = createConfirm<{ name: string }>()
-  const [result, setResult] = createSignal("")
+  const log = useLog()
 
   async function review() {
-    setResult("")
     const acme = confirm({ name: "Acme" })
     const globex = confirm({ name: "Globex" })
     const [first, second] = await Promise.all([acme, globex])
-    setResult(`Acme: ${first ? "confirmed" : "canceled"}. Globex: ${second ? "confirmed" : "canceled"}.`)
+    log(`Acme: ${first ? "confirmed" : "canceled"}`)
+    log(`Globex: ${second ? "confirmed" : "canceled"}`)
   }
+
   return (
     <div data-slot="stack">
       <button type="button" onClick={review}>
-        Review two projects
+        Review Two Projects
       </button>
-      <output data-slot="output" aria-live="polite">
-        {result()}
-      </output>
       <AlertDialog controller={confirm.controller}>
         <AlertDialogBackdrop />
         <AlertDialogContent<{

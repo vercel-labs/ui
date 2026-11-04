@@ -1,48 +1,45 @@
 import "@ui-sdk/web/checkbox"
+import "@ui-sdk/web/field"
 import { Check, createElement } from "lucide"
-
-const formId = "checkbox-signup"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <form data-slot="stack" id="${formId}">
-        <label data-slot="label">
-          <ui-checkbox name="terms" value="yes" required>
-            <ui-checkbox-indicator>
-              ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
-            </ui-checkbox-indicator>
-          </ui-checkbox>
-          I agree to the terms
-        </label>
-        <div data-slot="row">
-          <button type="submit">
-            Submit
-          </button>
-          <button type="reset">
-            Reset
-          </button>
-        </div>
-      </form>
-      <label data-slot="label">
-        <ui-checkbox form="${formId}" name="newsletter" value="weekly" default-checked>
+    <form data-slot="stack">
+      <ui-field>
+        <ui-checkbox name="terms" value="yes" required>
           <ui-checkbox-indicator>
             ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
           </ui-checkbox-indicator>
         </ui-checkbox>
-        Send me the weekly newsletter
-      </label>
-      <output data-slot="output"></output>
-    </div>
+        <div data-slot="stack">
+          <ui-field-label>Accept terms and conditions</ui-field-label>
+          <ui-field-description>You agree to our Terms of Service and Privacy Policy.</ui-field-description>
+        </div>
+      </ui-field>
+      <ui-field>
+        <ui-checkbox name="newsletter" value="weekly" default-checked>
+          <ui-checkbox-indicator>
+            ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
+          </ui-checkbox-indicator>
+        </ui-checkbox>
+        <div data-slot="stack">
+          <ui-field-label>Send me the weekly newsletter</ui-field-label>
+          <ui-field-description>Product news and tips, once a week. Unsubscribe anytime.</ui-field-description>
+        </div>
+      </ui-field>
+      <div data-slot="row">
+        <button type="submit">Create Account</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
   `
   const form = root.querySelector("form")!
-  const result = root.querySelector("output")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     const entries = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
-    result.textContent = `Submitted: ${entries.join(", ") || "nothing"}`
+    log(root, entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
   })
-  form.addEventListener("reset", () => (result.textContent = ""))
 }
 
 export { mount }

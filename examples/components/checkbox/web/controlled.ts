@@ -1,9 +1,13 @@
 import "@ui-sdk/web/checkbox"
 import { Check, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button">Toggle</button>
+      </div>
       <label data-slot="label">
         <ui-checkbox>
           <ui-checkbox-indicator>
@@ -12,19 +16,13 @@ function mount(root: HTMLElement) {
         </ui-checkbox>
         Email me about product updates
       </label>
-      <button type="button">
-        Toggle from outside
-      </button>
-      <output data-slot="output">Checked: false</output>
     </div>
   `
-  const control = root.querySelector("ui-checkbox")!
-  root.querySelector("button")!.addEventListener("click", () => control.api.toggle())
-
-  control.addEventListener("checkedchange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: boolean | "indeterminate"; reason: string }>)
-      .detail
-    root.querySelector("output")!.textContent = `Checked: ${value}, last change: ${reason}`
+  const updates = root.querySelector("ui-checkbox")!
+  root.querySelector("[data-slot=controls] button")!.addEventListener("click", () => updates.api.toggle())
+  updates.addEventListener("checkedchange", (event) => {
+    const { value, reason } = event.detail
+    log(root, `${value === "indeterminate" ? "Mixed" : value ? "Checked" : "Unchecked"} (${reason})`)
   })
 }
 

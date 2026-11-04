@@ -1,5 +1,6 @@
 import "@ui-sdk/web/carousel"
-import { Pause, Play, createElement } from "lucide"
+import { ChevronLeft, ChevronRight, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const photos = [
   { name: "Dunes" },
@@ -13,28 +14,28 @@ const photos = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-carousel aria-label="Photos" default-playing interval="4000">
-      <ui-carousel-viewport>
-        <ui-carousel-content>
-          ${photos.map((photo) => `<ui-carousel-item><div data-slot="tile">${photo.name}</div></ui-carousel-item>`).join("")}
-        </ui-carousel-content>
-      </ui-carousel-viewport>
-      <div data-slot="row">
+      <div data-slot="controls">
         <ui-carousel-play-toggle>
-          <button data-variant="secondary">
-            <span data-show="playing">${createElement(Pause, { "aria-hidden": "true" }).outerHTML}<span data-slot="visually-hidden">Stop slide rotation</span></span>
-            <span data-show="stopped">${createElement(Play, { "aria-hidden": "true" }).outerHTML}<span data-slot="visually-hidden">Start slide rotation</span></span>
-          </button>
+          <button><span data-show="playing">Pause</span><span data-show="stopped">Play</span></button>
         </ui-carousel-play-toggle>
-        <ui-carousel-indicator-group aria-label="Choose a photo">
-          ${photos.map((photo) => `<ui-carousel-indicator><button aria-label="${photo.name}"><span></span></button></ui-carousel-indicator>`).join("")}
-        </ui-carousel-indicator-group>
       </div>
-      <p data-slot="hint" aria-live="polite"></p>
+      <div data-slot="row">
+        <ui-carousel-previous>
+          <button aria-label="Previous slide">${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML}</button>
+        </ui-carousel-previous>
+        <ui-carousel-viewport>
+          <ui-carousel-content>
+            ${photos.map((photo) => `<ui-carousel-item><div data-slot="tile">${photo.name}</div></ui-carousel-item>`).join("")}
+          </ui-carousel-content>
+        </ui-carousel-viewport>
+        <ui-carousel-next>
+          <button aria-label="Next slide">${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</button>
+        </ui-carousel-next>
+      </div>
     </ui-carousel>
   `
-  const output = root.querySelector("p")!
   root.querySelector("ui-carousel")!.addEventListener("playingchange", (event) => {
-    output.textContent = `${event.detail.value ? "Playing" : "Stopped"} (${event.detail.reason})`
+    log(root, `${event.detail.value ? "Playing" : "Stopped"} (${event.detail.reason})`)
   })
 }
 

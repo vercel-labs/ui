@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
   Autocomplete,
-  AutocompleteArrow,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
@@ -18,8 +18,10 @@ const box = ref<HTMLDivElement | null>(null)
 <template>
   <div ref="box" data-slot="card">
     <Autocomplete modal="pointer" :container="box">
-      <AutocompleteLabel>Fruit</AutocompleteLabel>
-      <AutocompleteInput />
+      <div data-slot="stack">
+        <AutocompleteLabel>Fruit</AutocompleteLabel>
+        <AutocompleteInput />
+      </div>
       <AutocompleteContent
         side="top"
         align="end"
@@ -29,7 +31,7 @@ const box = ref<HTMLDivElement | null>(null)
         :anchor="box"
         keep-mounted
       >
-        <AutocompleteArrow />
+        <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
           <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{ fruit }}</AutocompleteItem>
         </AutocompleteList>

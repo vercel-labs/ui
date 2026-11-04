@@ -12,7 +12,7 @@ import {
   ComboboxTrigger,
   createComboboxController,
 } from "@ui-sdk/vue/combobox"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -37,11 +37,11 @@ const countries = [
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
 const country = createComboboxController<string>()
-const log = ref("")
+const log = useLog()
 
-async function openCountry() {
+async function openAndWait() {
   const { reason } = await country.open()
-  log.value = `Closed by ${reason}, with ${country.getValue() ?? "nothing"}`
+  log(`Closed by ${reason}, with ${country.getValue() ?? "nothing"}`)
 }
 
 function search() {
@@ -53,6 +53,12 @@ function search() {
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="openAndWait">Open and Wait</button>
+      <button type="button" @click="search">Search “sw”</button>
+      <button type="button" @click="country.setValue('de')">Choose Germany</button>
+      <button type="button" @click="country.clear()">Clear</button>
+    </div>
     <Combobox :controller="country" :item-to-label="countryLabel">
       <div data-slot="stack">
         <ComboboxLabel>Country</ComboboxLabel>
@@ -75,12 +81,5 @@ function search() {
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
-    <div data-slot="row">
-      <button type="button" @click="openCountry">Open</button>
-      <button type="button" @click="search">Search “sw”</button>
-      <button type="button" @click="country.setValue('de')">Germany</button>
-      <button type="button" @click="country.clear()">Clear</button>
-    </div>
-    <output data-slot="output">{{ log || "Use the buttons" }}</output>
   </div>
 </template>

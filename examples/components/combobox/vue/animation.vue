@@ -11,7 +11,7 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "@ui-sdk/vue/combobox"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -23,14 +23,11 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-const status = ref("Closed")
+const log = useLog()
 </script>
 
 <template>
-  <Combobox
-    @open-change="(open: boolean) => (status = open ? 'Opening…' : 'Closing…')"
-    @open-change-complete="(open: boolean) => (status = open ? 'Open' : 'Closed')"
-  >
+  <Combobox @open-change-complete="(open: boolean) => log(open ? 'Finished opening' : 'Finished closing')">
     <div data-slot="stack">
       <ComboboxLabel>Framework</ComboboxLabel>
       <div data-slot="row">
@@ -39,7 +36,6 @@ const status = ref("Closed")
           <ChevronDownIcon />
         </ComboboxTrigger>
       </div>
-      <output data-slot="output">{{ status }}</output>
     </div>
     <ComboboxContent>
       <ComboboxEmpty>No frameworks found.</ComboboxEmpty>

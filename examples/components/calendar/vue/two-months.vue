@@ -14,7 +14,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 </script>
 
 <template>
-  <Calendar :months="2" page-by="page" default-value="2026-10-16">
+  <Calendar :months="2" page-by="page" month-format="short" default-value="2026-10-16">
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
         <ChevronLeftIcon aria-hidden="true" />
@@ -24,7 +24,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
         <ChevronRightIcon aria-hidden="true" />
       </CalendarNext>
     </div>
-    <div data-slot="stack">
+    <div data-slot="row">
       <CalendarGrid :offset="0">
         <CalendarWeekdays v-slot="{ index }">
           <CalendarWeekday :index="index" />

@@ -8,12 +8,11 @@
     DrawerTitle,
     DrawerTrigger,
   } from "@ui-sdk/svelte/drawer"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
 </script>
 
 <Drawer>
-  <DrawerTrigger>
-    Account
-  </DrawerTrigger>
+  <DrawerTrigger>Account</DrawerTrigger>
   <DrawerBackdrop />
   <DrawerContent>
     <div data-slot="grip" aria-hidden="true"></div>
@@ -24,7 +23,7 @@
     <dl>
       <div data-slot="row">
         <dt>Email</dt>
-        <dd>ada@example.com</dd>
+        <dd>hollis@example.com</dd>
       </div>
       <div data-slot="row">
         <dt>Password</dt>
@@ -37,9 +36,7 @@
     </dl>
     <div data-slot="stack">
       <Drawer>
-        <DrawerTrigger>
-          Change password
-        </DrawerTrigger>
+        <DrawerTrigger>Change Password</DrawerTrigger>
         <DrawerBackdrop />
         <DrawerContent>
           <div data-slot="grip" aria-hidden="true"></div>
@@ -47,20 +44,16 @@
             <DrawerTitle>Change password</DrawerTitle>
             <DrawerDescription>Use at least 12 characters.</DrawerDescription>
           </div>
-          <label data-slot="label">
-            New password
-            <input type="password" />
-          </label>
+          <Field>
+            <FieldLabel>New password</FieldLabel>
+            <FieldControl type="password" />
+          </Field>
           <div data-slot="stack">
-            <DrawerClose data-variant="solid">
-              Update
-            </DrawerClose>
+            <DrawerClose data-variant="solid">Update</DrawerClose>
           </div>
         </DrawerContent>
       </Drawer>
-      <DrawerClose data-variant="solid">
-        Done
-      </DrawerClose>
+      <DrawerClose data-variant="solid">Done</DrawerClose>
     </div>
   </DrawerContent>
 </Drawer>

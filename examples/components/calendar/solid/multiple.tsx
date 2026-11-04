@@ -12,7 +12,7 @@ import {
 import { createSignal } from "solid-js"
 
 function Example() {
-  const [dates, setDates] = createSignal<string[]>(["2026-10-06", "2026-10-13"])
+  const [dates, setDates] = createSignal<string[]>(["2026-10-07", "2026-10-16", "2026-10-26"])
   return (
     <div>
       <Calendar mode="multiple" value={dates()} onValueChange={(value) => setDates(value as string[])}>
@@ -50,7 +50,6 @@ function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </Calendar>
-      <output data-slot="output">{dates().length} selected</output>
     </div>
   )
 }

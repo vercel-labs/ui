@@ -11,15 +11,18 @@ import {
   CalendarWeeks,
 } from "@ui-sdk/vue/calendar"
 import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const anchor = ref<string | null>(null)
-const focused = ref<string | null>(null)
+const log = useLog()
 </script>
 
 <template>
   <div>
-    <Calendar mode="range" @anchor-change="anchor = $event" @focused-change="focused = $event">
+    <Calendar
+      mode="range"
+      @anchor-change="(anchor) => log(anchor ? `Started on ${anchor}` : 'Range finished')"
+      @focused-change="(focused) => log(`Focus on ${focused}`)"
+    >
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <ChevronLeftIcon aria-hidden="true" />
@@ -38,8 +41,5 @@ const focused = ref<string | null>(null)
         </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
-    <output data-slot="output">
-      {{ anchor ? `Started on ${anchor}, focus on ${focused}` : `Focus on ${focused ?? "no date yet"}` }}
-    </output>
   </div>
 </template>

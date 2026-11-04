@@ -13,10 +13,11 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/solid/date-picker"
+import { useLog } from "../../../shared/solid/log"
 import { createSignal } from "solid-js"
 
 function Example() {
-  const [log, setLog] = createSignal("")
+  const log = useLog()
   const [anchor, setAnchor] = createSignal<HTMLElement | null>(null)
   const [container, setContainer] = createSignal<HTMLElement | null>(null)
   return (
@@ -25,9 +26,9 @@ function Example() {
         defaultOpen={false}
         presentation="auto"
         container={container()}
-        onOpenChange={(open, details) => setLog(`${open ? "Opened" : "Closed"} (${details.reason})`)}
-        onOpenChangeComplete={(open) => open || setLog((log) => `${log}, done`)}
-        onMonthChange={(month, details) => setLog(`Showing ${month} (${details.reason})`)}
+        onOpenChange={(open, details) => log(`${open ? "Opened" : "Closed"} (${details.reason})`)}
+        onOpenChangeComplete={(open) => open || log("Finished closing")}
+        onMonthChange={(month, details) => log(`Showing ${month} (${details.reason})`)}
       >
         <div data-slot="row" ref={setAnchor}>
           <DatePickerInput aria-label="Due date" />
@@ -49,16 +50,7 @@ function Example() {
           </DatePickerTrigger>
         </div>
         <DatePickerHint />
-        <DatePickerContent
-          side="top"
-          align="end"
-          sideOffset={8}
-          alignOffset={-4}
-          collisionPadding={16}
-          anchor={anchor()}
-          finalFocus="none"
-          keepMounted
-        >
+        <DatePickerContent anchor={anchor()} sideOffset={6} collisionPadding={16} keepMounted>
           <div data-slot="row">
             <CalendarPrevious data-variant="ghost">
               <svg
@@ -95,7 +87,6 @@ function Example() {
         </DatePickerContent>
       </DatePicker>
       <div ref={setContainer} />
-      <p data-slot="hint">{log() || "Opens above, lined up with the end of the field."}</p>
     </div>
   )
 }

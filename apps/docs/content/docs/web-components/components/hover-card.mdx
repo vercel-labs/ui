@@ -3,9 +3,11 @@ title: Hover Card
 description: Preview a link on hover or keyboard focus while keeping its normal navigation.
 ---
 
+A hover card shows a preview of where a link goes, like a person's profile, to someone who pauses on it. The link still works as a link.
+
 <ComponentExample
   name="hover-card/basic"
-  caption="Hover the profile link or leave keyboard focus on it to open its preview."
+  caption="Hover @hollis, or Tab to it and wait, to open Hollis Grant's profile preview. Move the pointer away or press Escape to close it."
 />
 
 ## Installation
@@ -14,7 +16,7 @@ description: Preview a link on hover or keyboard focus while keeping its normal 
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
-Importing the component defines its elements. On the server the import does nothing.
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/hover-card"
@@ -29,155 +31,180 @@ ui-hover-card
 ├── ui-hover-card-trigger
 │   └── a
 └── ui-hover-card-content
+    └── ui-hover-card-arrow
 ```
 
-Wrap a link and its preview in a hover card.
+The trigger wraps your own link (an `<a>`, so give it an `href`), and pressing it follows the link. The content is the preview, and the arrow is optional.
 
-The trigger wraps your own `<a>`, so it stays a link.
+The card only adds a preview for people who pause on the link: everything in it should be reachable from the page the link goes to, since touch and screen reader users may never open it. For a tip on a button, use a [Tooltip](./tooltip). For content that opens with a press, use a [Popover](./popover).
 
-The trigger is a link, and pressing it follows the link. The card only adds a preview for people who pause on it: everything in it should be reachable from the page the link goes to, since touch and screen reader users may never open it. For a tip on a button, use a [Tooltip](./tooltip). For content that opens with a press, use a [Popover](./popover).
+## Usage
 
-## Examples
+Import the parts and put them together:
 
-### Side
+```html
+<script type="module">
+  import "@ui-sdk/web/hover-card"
+</script>
 
-`side` picks where the card opens: `bottom` by default. It flips to the other side when there isn't room, and shifts along the link to stay on screen.
+<ui-hover-card>
+  <ui-hover-card-trigger><a href="/people/hollis">@hollis</a></ui-hover-card-trigger>
+  <ui-hover-card-content hidden>
+    <p>Hollis Grant</p>
+    <p>Design engineer on the payments team.</p>
+  </ui-hover-card-content>
+</ui-hover-card>
+```
 
-<ComponentExample name="hover-card/side" caption="Hover each link to compare the four preferred sides." />
+## Positioning
 
-### Delays
+`side` picks where the card opens, `bottom` by default, and `align` lines it up with the start, center or end of the link. The card flips to the other side when there isn't room and shifts along the link to stay on screen.
 
-`delay` is how long the pointer rests on the link, or keyboard focus stays on it, before the card opens: 600 milliseconds by default. `closeDelay` is how long it stays open once the pointer leaves the link and the card: 300 milliseconds by default. The pointer can cross the gap between the link and the card without closing it.
+`ui-hover-card-arrow` follows the side the card actually lands on, including after a flip, and gets the same `data-side`. It points at the middle of the link and keeps `arrow-padding` away from the corners; `data-arrow-clamped` tells you when it can't reach the middle.
+
+<ComponentExample
+  name="hover-card/side"
+  caption="Choose a side and an alignment, then hover @ines. The card opens there and its arrow points at the link."
+/>
+
+`side-offset` is the gap to the link, 4 pixels by default. `align-offset` shifts the card along it, and `collision-padding` is the space kept from the edges of the window. `anchor` positions the card against something other than the link, named by a CSS selector.
+
+```html
+<ui-hover-card-content
+  side="right"
+  align="start"
+  side-offset="8"
+  collision-padding="16"
+  anchor="#row"
+  hidden
+></ui-hover-card-content>
+```
+
+## Delays
+
+`delay` is how long the pointer rests on the link, or keyboard focus stays on it, before the card opens: 600 milliseconds by default. `close-delay` is how long it stays open once the pointer leaves the link and the card: 300 milliseconds by default. The pointer can cross the gap between the link and the card without closing it.
 
 `disabled` stops the card from opening and leaves a plain link.
 
-<ComponentExample
-  name="hover-card/delay"
-  caption="Change the delays, then move between the link and card to see when it opens and closes."
-/>
+```html
+<ui-hover-card delay="300" close-delay="150" disabled></ui-hover-card>
+```
 
-### Offsets
+## Controlled
 
-`sideOffset` is the gap to the link, 4 pixels by default. `alignOffset` shifts along it, and `collisionPadding` is the space kept from the edges of the window.
+Set the element's `open` property and listen for `openchange`; the `open` attribute sets where it starts. Every change carries a [reason](#reasons) in `event.detail.reason`, like `trigger-hover`, `trigger-focus`, `focus-out`, `escape-key` or `outside-press`. Call `event.preventDefault()` to stop it.
 
-<ComponentExample
-  name="hover-card/offsets"
-  caption="Change the placement controls, then hover the link to see its offsets."
-/>
+```html
+<ui-hover-card></ui-hover-card>
 
-### Arrow
+<script type="module">
+  const card = document.querySelector("ui-hover-card")
+  card.addEventListener("openchange", (event) => (open = event.detail.value))
+  card.open = true
+</script>
+```
 
-The arrow follows the side the card actually lands on, including after it flips away from an edge, and gets the same `data-side`. It points at the middle of the link, even after the card shifts, and keeps `arrowPadding` away from the corners. Change the side and alignment, then hover the link.
+## One Card for Many Links
 
-<ComponentExample
-  name="hover-card/arrow"
-  caption="Change the side and alignment, then hover the link to see where the arrow points."
-/>
+A feed or a list can share one card instead of rendering one per link. Give the card an `id` and name it from each trigger with `for`. Each trigger takes a `payload` property, like its person, read when it connects, so set it before the trigger goes into the page. The card's `payloadchange` event carries it in `event.detail.value`; render the content from it there. Only the link that opened the card gets `data-open`. The card's `api.open({ payload })` opens it from code.
 
-### Anchor
+```html
+<ui-hover-card id="profile">
+  <ui-hover-card-content hidden><p></p></ui-hover-card-content>
+</ui-hover-card>
 
-Position the card against something other than the link with `anchor`: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`. Here a name in a commit row opens a card lined up with the whole row.
+<script type="module">
+  const card = document.querySelector("#profile")
+  for (const person of people) {
+    const trigger = Object.assign(document.createElement("ui-hover-card-trigger"), { payload: person })
+    trigger.setAttribute("for", "profile")
+    trigger.innerHTML = `<a href="${person.url}">${person.name}</a>`
+    feed.append(trigger)
+  }
+  card.addEventListener("payloadchange", (event) => {
+    card.querySelector("p").textContent = event.detail.value?.bio
+  })
+</script>
+```
 
-<ComponentExample
-  name="hover-card/anchor"
-  caption="Hover the author name. The card aligns with the whole commit row."
-/>
+A card can have links of its own. Tab from a link with an open card moves into the card, and Tab past its end moves on to the page after the link. Focus leaving the card closes it.
 
-### Controlled
+## Container
 
-The element's `open` property is live: read it, or set it to open or close the card. The `open` attribute
-sets where it starts, and changing it later opens or closes the card too. Listen for `openchange`, and call
-`preventDefault()` on it to cancel the change.
+Cards render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the card somewhere else, named by a CSS selector, for iframes, shadow roots or a specific stacking context. See the shared [popup guide](../popups).
 
-Every change carries a [reason](#reasons), like `trigger-hover`, `trigger-focus`, `focus-out`, `escape-key` or `outside-press`. A [controller](#controller), from `createHoverCardController()`, opens the card from anywhere.
+```html
+<ui-hover-card-content container="#card-host" hidden></ui-hover-card-content>
+```
 
-The element's `api` is its controller.
+## Animation
 
-<ComponentExample
-  name="hover-card/controlled"
-  caption="Open the card from the link or the external control, and read the change reason."
-/>
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the card stays mounted until the exit finishes. `openchangecomplete` fires after the transition, and `keep-mounted` keeps the closed card in the page, hidden, for animation libraries that drive the exit from state.
 
-### One Card for Many Links
-
-A feed or a list can share one card instead of rendering one per link. Put the links anywhere on the page and connect them to the card with its controller. Each link passes a `payload`, like its person, and the content reads it from its state. Only the link that opened the card gets `data-open`.
-
-Name the card with `for`, and set each trigger's `payload` property. The trigger reads it when it connects, so set it before the trigger goes into the page. Render the content when `payloadchange` fires, with the payload in `event.detail.value`. It fires when a link with another payload opens the card, and when the pointer or focus moves on to another link while it's open, which hands the card over without an `openchange`.
-
-The card here has a link of its own. Tab from a link with an open card moves into the card, and Tab past its end moves on to the page after the link. Focus leaving the card closes it.
-
-<ComponentExample
-  name="hover-card/payload"
-  caption="Move between authors. One card updates its preview; Tab can reach View profile inside it."
-/>
-
-### Container
-
-Cards render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the card somewhere else, for iframes, shadow roots or a specific stacking context.
-
-<ComponentExample
-  name="hover-card/container"
-  caption="Hover the link to render the preview inside the specified container."
-/>
-
-### Animation
-
-`openchangecomplete` runs once the card has finished opening or closing, after any
-animation, with the new open state. `keepMounted` on the content keeps the closed card in the page, hidden,
-for animation libraries that drive the exit from state. See [Styling](#styling) for the attributes to animate.
-
-It's an `openchangecomplete` event with the open state in `event.detail.value`. Add `keep-mounted` to `<ui-hover-card-content>`.
-
-<ComponentExample
-  name="hover-card/animation"
-  caption="Open and close the card, then watch the completion callback update the output."
-/>
-
-## Keyboard and Touch
-
-Keyboard focus on the link opens the card after the same `delay` as the pointer, so tabbing through a page of links doesn't flash a card at every stop. Escape closes it and leaves focus on the link, and Enter follows the link. When the card has something to focus, Tab moves into it, and focus leaving the card closes it.
-
-Touch screens have no hover, so a tap follows the link without opening the card. Anything in the card should
-be on the page the link goes to.
-
-## Styling
-
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework.
-
-<DataAttributes component="hover-card" />
-
-Open cards also set CSS variables for sizing and animation, listed under [HoverCardContent](#hovercardcontent).
-
-Animate with `data-starting-style` and `data-ending-style`. The card stays mounted until its exit animation finishes.
+<StyleTabs>
 
 ```css
 [data-slot="hover-card-content"] {
   transition:
     opacity 150ms,
     scale 150ms;
-  transform-origin: var(--transform-origin);
-}
 
-[data-slot="hover-card-content"]:is([data-starting-style], [data-ending-style]) {
-  opacity: 0;
-  scale: 0.96;
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    scale: 0.96;
+  }
 }
 ```
 
+```html
+<ui-hover-card-content
+  class="origin-(--transform-origin) transition-[opacity,scale] duration-150 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0"
+  hidden
+></ui-hover-card-content>
+```
+
+</StyleTabs>
+
 ## Custom Rendering
 
-<ComponentExample
-  name="hover-card/custom-rendering"
-  caption="Hover or focus the author link to see its custom trigger and content respond to open state."
-/>
+Elements have no render functions. The trigger wraps your own link, so the link can hold anything, like an avatar and a name. The link gets `data-open` while the card is open from it.
 
-The trigger wraps your own link, so it can hold anything, like an avatar and a name. The link gets `data-open` while the card is open from it, so style its children with `group-data-open:`.
+```html
+<ui-hover-card-trigger>
+  <a href="/people/hollis">
+    <span aria-hidden="true">HG</span>
+    Hollis Grant
+  </a>
+</ui-hover-card-trigger>
+```
 
-Each part's state is listed under [State](#state).
+## Styling
+
+Each element has a `data-slot`, such as `hover-card-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes). Use `data-open` on the trigger's link to mark the link whose card is showing, and `data-side` to style the content and arrow for the side they landed on. Put `transform-origin: var(--transform-origin)` on the content so it scales from the link.
+
+Keep overflow visible around an arrow that extends outside the card. If the body needs to scroll, put scrolling on an inner element.
+
+### `<ui-hover-card-content>` [#styling-hovercardcontent]
+
+<CssVariables component="hover-card" part="content" />
+
+## Data Attributes
+
+### `<ui-hover-card-trigger>` [#data-attributes-hovercardtrigger]
+
+<DataAttributes component="hover-card" part="trigger" />
+
+### `<ui-hover-card-content>` [#data-attributes-hovercardcontent]
+
+<DataAttributes component="hover-card" part="content" />
+
+### `<ui-hover-card-arrow>` [#data-attributes-hovercardarrow]
+
+<DataAttributes component="hover-card" part="arrow" />
 
 ## API Reference
 
-Props are attributes in kebab case, like `close-delay` and `side-offset`: `"false"` is false, and numbers are numbers. `anchor` and `container` take CSS selectors. Callbacks are DOM events.
+Props are attributes in kebab case, like `close-delay` and `side-offset`: `"false"` is false, and numbers are numbers. `anchor` and `container` take CSS selectors, and `controller` is a property. Callbacks are DOM events.
 
 ### HoverCard
 
@@ -193,7 +220,9 @@ A trigger outside the card names it with `for="card-id"`, and takes `payload` as
 
 <TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
 
-<CssVariables component="hover-card" part="content" />
+### HoverCardArrow
+
+Points at the link from the side the card landed on. `<ui-hover-card-arrow>` is positioned on the content's edge.
 
 ### State
 
@@ -229,8 +258,9 @@ For a payload change, it says what opened the card or took it over.
 
 ### Controller
 
-The element's `api` property has the same methods. The `open` property reads and sets whether the card is
-open.
+Create one with `createHoverCardController<Payload>()` from `@ui-sdk/web/hover-card` and assign it to the root
+element's `controller` property. The root element's `api` property has the same methods, and its `open` property reads
+and sets whether the card is open. `Payload` is the type of the data triggers and `open()` pass.
 
 Every write method takes an optional `{ reason, event }`, passed to `openchange`.
 
@@ -247,6 +277,7 @@ Events fire on their own element and don't bubble, with the new state in `event.
 | -------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
 | `open` property, attribute | `ui-hover-card`         | Whether the card is open. The attribute sets where it starts, and is live       |
 | `api` property             | `ui-hover-card`         | The [controller](#controller)                                                   |
+| `controller` property      | `ui-hover-card`         | A controller from `createHoverCardController()`, to drive it from code          |
 | `openchange` event         | `ui-hover-card`         | `detail: { value: open, reason, event }`                                        |
 | `openchangecomplete` event | `ui-hover-card`         | `detail: { value: open }`, after the animation                                  |
 | `payloadchange` event      | `ui-hover-card`         | `detail: { value: payload, reason, event }`, when the content's payload changes |
@@ -256,6 +287,20 @@ Events fire on their own element and don't bubble, with the new state in `event.
 ## Accessibility
 
 The trigger stays a plain link, and the card is a preview beside it, not a dialog. Every line below is an automated test.
+
+### Keyboard
+
+| Key    | Does                                                                         |
+| ------ | ---------------------------------------------------------------------------- |
+| Tab    | On the link, opens the card after `delay`; with the card open, moves into it |
+| Enter  | Follows the link                                                             |
+| Escape | Closes the card and leaves focus on the link                                 |
+
+Keyboard focus opens the card after the same `delay` as the pointer, so tabbing through a page of links doesn't flash a card at every stop. Focus leaving the card closes it.
+
+Touch screens have no hover, so a tap follows the link without opening the card. Anything in the card should be on the page the link goes to.
+
+### Tested Behavior
 
 <SpecList spec="hover-card" />
 

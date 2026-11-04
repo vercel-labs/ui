@@ -77,9 +77,9 @@
     </AutocompleteEmpty>
     <AutocompleteList>
       {#snippet children(state)}
-        {#each (state.items as { value: string; label: string; disabled?: boolean }[]) as item (item.value)}
-          <AutocompleteItem value={item.value} label={item.label} disabled={item.disabled}>
-            {item.label}
+        {#each (state.items as string[]) as city (city)}
+          <AutocompleteItem value={city}>
+            {city}
           </AutocompleteItem>
         {/each}
       {/snippet}

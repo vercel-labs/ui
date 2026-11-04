@@ -29,39 +29,89 @@ Command
     └── CommandItem
 ```
 
-Give the input an accessible name and each command a unique value. Keep empty and status messages outside the list, which holds commands and groups.
+Give the input an accessible name and each command a unique value. Keep empty and status messages outside the list, which holds commands and groups. `@action` reports the value of the command that ran; use it to perform the action.
 
-Typing filters the commands. Arrow keys move the highlight, and Enter runs the highlighted command. Focus stays in the input, which points to the highlight with `aria-activedescendant`. `@action` reports the value of the command that ran; use it to perform the action.
+Use `CommandGroup` and `CommandGroupLabel` to name related commands, with a `CommandSeparator` between groups. Groups and separators disappear when filtering leaves them empty.
 
-## Examples
+## Usage
 
-### Dialog
+Import the parts and put them together:
+
+```vue
+<script setup lang="ts">
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/vue/command"
+</script>
+
+<template>
+  <Command>
+    <CommandInput aria-label="Search commands" />
+    <CommandEmpty>No commands found.</CommandEmpty>
+    <CommandList>
+      <CommandItem value="new-file">New file</CommandItem>
+      <CommandItem value="new-folder">New folder</CommandItem>
+    </CommandList>
+  </Command>
+</template>
+```
+
+## Build Your Own
+
+`@ui-sdk/vue/command` comes with a ready-made Command. If you'd like to build your own, with your own names, start from the `command` primitive in `@ui-sdk/core`:
+
+```ts title="palette.ts"
+import { command } from "@ui-sdk/core/command"
+import { createParts } from "@ui-sdk/vue/primitive"
+
+const {
+  Root: Palette,
+  Input: PaletteSearch,
+  Empty: PaletteEmpty,
+  List: PaletteList,
+  Item: PaletteAction,
+} = createParts(command, {
+  input: "input",
+  empty: "div",
+  list: "div",
+  item: "div",
+})
+
+export { Palette, PaletteAction, PaletteEmpty, PaletteList, PaletteSearch }
+```
+
+```vue
+<template>
+  <Palette>
+    <PaletteSearch aria-label="Search actions" />
+    <PaletteEmpty>No actions found.</PaletteEmpty>
+    <PaletteList>
+      <PaletteAction value="new-file">New file</PaletteAction>
+      <PaletteAction value="new-folder">New folder</PaletteAction>
+    </PaletteList>
+  </Palette>
+</template>
+```
+
+Each part keeps the behavior, state and data attributes of its ready-made counterpart: typing filters the commands, arrow keys move the highlight and Enter runs it. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Dialog
 
 Put Command inside a [Dialog](./dialog) for a command palette. Give the dialog a title, put `shortcut="mod+k"` on its trigger, and close it when a command runs. The dialog handles dismissal and returns focus to the trigger.
 
 <ComponentExample
   name="command/dialog"
-  caption="Press Search or use Cmd+K / Ctrl+K. Choose a command to run it and close the palette."
+  caption="Press Search or use Cmd+K / Ctrl+K. Choose a command to run it and close the palette; the console logs what ran."
 />
 
-### Shortcuts
+## Shortcuts
 
 An item’s `shortcut` can run it while the command list is mounted, even when the search or current page hides it. `CommandShortcut` displays the keys for the current platform, and the item gets `aria-keyshortcuts`. Shortcuts inside a dialog run while it is open.
 
 <ComponentExample
   name="command/shortcuts"
-  caption="Press Cmd+P / Ctrl+P to run Profile, even when the search hides it. The result appears below."
+  caption="Press Cmd+P / Ctrl+P to run Profile, even when the search hides it. The console logs each command that runs."
 />
 
-### Groups
-
-Use `CommandGroup` and `CommandGroupLabel` to name related commands. Groups and separators disappear when filtering leaves them empty.
-
-### Scrollable
-
-Give the list a height limit and `overflow-y-auto`. Keyboard navigation scrolls the highlighted command into view. Keep the input outside the scrolling area so it stays available.
-
-### Highlight Matches
+## Highlight Matches
 
 `CommandItemText` marks the matched text. The default fuzzy filter can match letters that are apart, so one command may have several marked segments.
 
@@ -70,17 +120,20 @@ Give the list a height limit and `overflow-y-auto`. Keyboard navigation scrolls 
   caption="Type “prf” to find Profile. Matching letters are marked even when they are not next to each other."
 />
 
-### Icons
+## Filter and Keywords
 
-`CommandItemIcon` keeps decorative icons out of accessible names and filtering. Add `mirror` for directional icons, as the Go back command does below. An icon-only command still needs an `aria-label`.
+`"fuzzy"` is the default: `nf` matches New file. `"contains"` and `"startsWith"` match the text itself. A custom function returns a boolean or a score; zero hides a command and higher scores rank first.
 
-When mixing commands with and without icons, `data-has-icons` on the list and `data-has-icon` on each item let you reserve matching space with logical padding.
+Data commands are sorted by score. Commands written directly in markup keep their order, even though the best match can be highlighted.
 
-### Suggestions
+`keywords` adds search terms without changing the command's label. Use it for synonyms or names someone might type instead.
 
-Pass `emptyItems` alongside `items` to show suggested or recent commands while the first page’s search is empty. Once someone types, the full collection is searched.
+<ComponentExample
+  name="command/filter"
+  caption="Type “nf” with Fuzzy to find New file. Choose Words and type “zo in” for Zoom in, or type “smiley” to find Search emoji through a keyword."
+/>
 
-### Pages
+## Pages
 
 Set an item’s `page` to the value of a `CommandPage` to open it. An unnamed page holds the first set of commands. The `pages` array records the stack of pages that have been opened.
 
@@ -91,18 +144,24 @@ Backspace in an empty search goes back and restores the previous page’s query.
   caption="Choose Change theme or Switch team. Use Go back, or press Backspace in an empty search field, to return."
 />
 
-### Items as Data
+## Items as Data
 
 Pass `items` to provide commands, groups, separators, and pages as `CommandData`. A data command with its own `items` opens a page. Its shortcut still works when another page or filter hides it.
 
 The data can render bare parts for you. For styled commands, render from the list’s `state.items`, which follows the current page and ranked results. The example handles groups and separators as well as commands. [Lists and Menus](../lists-and-menus) covers the shared data format.
 
+Pass `empty-items` alongside `items` to show suggested or recent commands while the first page's search is empty. Once someone types, the full collection is searched.
+
+```vue
+<Command :items="commands" :empty-items="[{ type: 'group', label: 'Suggested', items: recent }]" />
+```
+
 <ComponentExample
   name="command/data"
-  caption="Choose Change theme to open its commands. Press Cmd+I / Ctrl+I to run Open inbox from any page."
+  caption="Choose Change theme to open its commands. Press Cmd+I / Ctrl+I to run Open inbox from any page; the console logs what ran."
 />
 
-### Async Results
+## Async Results
 
 Use [async options](../utilities/async-options) to wait for typing to pause and discard stale results. Send query changes to `setQuery()`, render the returned items, and pass `status`. Set `filter` to `false` to keep the server’s order.
 
@@ -113,37 +172,18 @@ Use [async options](../utilities/async-options) to wait for typing to pause and 
   caption="Type “login” and wait for matching issues. Replace the text to start a new search; only the latest results appear."
 />
 
-### Pending Actions
+## Pending Actions
 
-Return a promise from `onAction` or an item’s `onSelect`. The command gets `data-pending` and `aria-busy` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
+Return a promise from `@action` or an item’s `@select`. The command gets `data-pending` and `aria-busy` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
 
 An item’s `@select` runs before `@action`. Call `preventDefault()` on its event to stop the action.
 
 <ComponentExample
   name="command/pending"
-  caption="Run Deploy to production and try it again while it is pending. Sync with server demonstrates a failure and retry."
+  caption="Run Deploy to production and try it again while it's pending. Sync with server fails and can be retried; the console logs each outcome."
 />
 
-### Filter
-
-`"fuzzy"` is the default: `nf` matches New file. `"contains"` and `"startsWith"` match the text itself. A custom function returns a boolean or a score; zero hides a command and higher scores rank first.
-
-Data commands are sorted by score. Commands written directly in markup keep their order, even though the best match can be highlighted.
-
-<ComponentExample
-  name="command/filter"
-  caption="Type “nf” with Fuzzy to find New file. Choose Words and type “zo in” to find Zoom in."
-/>
-
-### Keywords
-
-`keywords` adds search terms without changing the command’s label. Use it for synonyms or names someone might type instead.
-
-### Auto Highlight
-
-By default, Command highlights the first available command and the best match while typing. Set `auto-highlight` to `false` to wait for an arrow key or pointer movement. `loop` independently controls whether arrow keys wrap.
-
-### Virtualized
+## Virtualized
 
 Pass the full `items` collection so filtering and keyboard navigation include commands that are not mounted. Render only visible rows, giving each its index in the current results. `@value-change` includes that index so you can scroll a newly highlighted row into view.
 
@@ -152,18 +192,7 @@ Pass the full `items` collection so filtering and keyboard navigation include co
   caption="Search 10,000 commands or move through them with the arrow keys. Only the rows near the viewport render."
 />
 
-### Custom Rendering
-
-Render a command as an anchor when it should navigate. Enter follows the highlighted link; modified clicks keep their usual browser behavior. [Parts and Composition](../parts-and-composition) covers the render API.
-
-<ComponentExample
-  name="command/custom-rendering"
-  caption="Search for Installation and press Enter. The command follows the link to that section on this page."
-/>
-
-## State and Events
-
-### Controlled
+## Controlled
 
 The highlighted command, search text, and page stack are separate:
 
@@ -173,30 +202,106 @@ The highlighted command, search text, and page stack are separate:
 | `query` | The search text.                    | `@query-change`     |
 | `pages` | An array of page values.            | `@pages-change`     |
 
-Supply a value and its change callback to control it, or use `defaultValue`, `defaultQuery`, and `defaultPages` for starting state. Change callbacks receive details; call `details.cancel()` to reject a change. `@action` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
+Bind them with `v-model:value`, `v-model:query` and `v-model:pages`, or use `default-value`, `default-query`, and `default-pages` for starting state. Change events receive details; call `details.cancel()` to reject a change. `@action` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
 
-### Controller
+<ComponentExample
+  name="command/controlled"
+  caption="Open Change theme, search and move the highlight. The console logs each highlight, query and page change with its reason."
+/>
+
+## Controller
 
 Create a `createCommandController()` for one instance and pass it as `controller`. It can read and set the highlight, query, and page stack. Use `push()` and `pop()` to navigate pages, `run()` to run the highlighted command or a named one, and `focus()` to focus the search. See [Controllers](../controllers) for setup and lifecycle.
 
-### RTL
+<ComponentExample
+  name="command/controller"
+  caption="Use the buttons to open pages, search, move the highlight and run it from outside. The console logs each command that runs."
+/>
 
-Set `dir="rtl"` on a containing element. Text, logical spacing, and icons marked with `mirror` follow that direction without a provider.
+## Custom Rendering
+
+Render a command as an anchor when it should navigate. Enter follows the highlighted link; modified clicks keep their usual browser behavior.
+
+<ComponentExample
+  name="command/custom-rendering"
+  caption="Search for Installation and press Enter. The command follows the link to that section on this page."
+/>
 
 ## Styling
 
-Style the parts through their data attributes, which are the same in every framework. Use `data-highlighted` for the active command and `data-pending` for an action in progress.
+Each part has a `data-slot`, such as `command-item`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
 
-<DataAttributes component="command" />
+Use `data-highlighted` for the active command and `data-pending` for an action in progress. Give the list a height limit and `overflow-y: auto` for long lists; keyboard navigation scrolls the highlighted command into view. When mixing commands with and without icons, `data-has-icons` on the list and `data-has-icon` on each item let you reserve matching space with logical padding.
+
+## Data Attributes
+
+### Command [#data-attributes-command]
+
+<DataAttributes component="command" part="root" />
+
+### CommandInput [#data-attributes-commandinput]
+
+<DataAttributes component="command" part="input" />
+
+### CommandList [#data-attributes-commandlist]
+
+<DataAttributes component="command" part="list" />
+
+### CommandItem [#data-attributes-commanditem]
+
+<DataAttributes component="command" part="item" />
+
+### CommandItemText [#data-attributes-commanditemtext]
+
+<DataAttributes component="command" part="item-text" />
+
+### CommandItemIcon [#data-attributes-commanditemicon]
+
+<DataAttributes component="command" part="item-icon" />
+
+### CommandEmpty [#data-attributes-commandempty]
+
+<DataAttributes component="command" part="empty" />
+
+### CommandStatus [#data-attributes-commandstatus]
+
+<DataAttributes component="command" part="status" />
 
 ## API Reference
 
-Props are the same as below, and callbacks are events, except `onAction` and `onSelect`, which are function
-props.
+Props are the same as below, and callbacks are events, except `onAction` and `onSelect`, which are function props.
 
 ### Command
 
 <TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandOptions" />
+
+### CommandInput
+
+The search field. Renders an `input` with the combobox role.
+
+### CommandStatus
+
+Describes loading and failures. Renders a `div` with the status role.
+
+### CommandEmpty
+
+Shows while no command matches. Renders a `div`.
+
+### CommandList
+
+Holds the commands. Renders a `div` with the listbox role, always shown.
+
+### CommandPage
+
+<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandPageProps" />
+
+### CommandGroup
+
+Groups commands under a label. Renders a `div` with the group role.
+
+### CommandGroupLabel
+
+Names its group. Renders a `div`.
 
 ### CommandItem
 
@@ -206,13 +311,17 @@ props.
 
 <TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandItemIconProps" />
 
-### CommandPage
+### CommandItemText
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandPageProps" />
+Shows its command's label, and marks what matched the search. Renders a `span`.
 
 ### CommandShortcut
 
 <TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandShortcutProps" />
+
+### CommandSeparator
+
+Separates commands or groups. Renders a `div` with the separator role.
 
 ### Items as Data
 
@@ -284,21 +393,36 @@ Create one with `createCommandController()` and pass it as `controller`.
 
 Events get the new state first, then the details. `v-model` only updates when the change event wasn't canceled.
 
-| Binding         | On            | Receives                                                                            |
-| --------------- | ------------- | ----------------------------------------------------------------------------------- |
-| `v-model:value` | `Command`     | The highlighted command                                                             |
-| `v-model:query` | `Command`     | The search text                                                                     |
-| `v-model:pages` | `Command`     | The stack of pages                                                                  |
-| `@value-change` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index` |
-| `@query-change` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                        |
-| `@pages-change` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                       |
-| `@action`       | `Command`     | `(value, { event })`, a function prop. Return a Promise to mark the command pending |
-| `@load-more`    | `Command`     | When the last command is reached                                                    |
-| `@select`       | `CommandItem` | `(event)`, a function prop. Return a Promise to mark the command pending            |
+| Binding         | On            | Receives                                                                                              |
+| --------------- | ------------- | ----------------------------------------------------------------------------------------------------- |
+| `v-model:value` | `Command`     | The highlighted command                                                                               |
+| `v-model:query` | `Command`     | The search text                                                                                       |
+| `v-model:pages` | `Command`     | The stack of pages                                                                                    |
+| `@value-change` | `Command`     | `(value, details)`: the highlighted command, the [reason](#reasons) and its `index`                   |
+| `@query-change` | `Command`     | `(query, details)`: the new text, and the [reason](#reasons)                                          |
+| `@pages-change` | `Command`     | `(pages, details)`: the new stack, and the [reason](#reasons)                                         |
+| `@action`       | `Command`     | `(value, { event })`, a function prop. Return a Promise to mark the command pending                   |
+| `@load-more`    | `Command`     | When the last command is reached                                                                      |
+| `@select`       | `CommandItem` | `(event)`, a function prop, before `@action`. `preventDefault()` skips it. A Promise marks it pending |
 
 ## Accessibility
 
-The command list follows the [WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with a listbox that's always shown. Every line below is an automated test.
+The command list follows the [WAI-ARIA combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) with a listbox that's always shown. Focus stays in the input, which points to the highlighted command with `aria-activedescendant`. Every line below is an automated test.
+
+### Keyboard
+
+| Key                | Does                                                                  |
+| ------------------ | --------------------------------------------------------------------- |
+| Typing             | Filters the commands and highlights the best match                    |
+| ArrowDown, ArrowUp | Moves the highlight. Wraps unless `:loop="false"`                     |
+| Enter              | Runs the highlighted command, or follows it when it renders as a link |
+| Escape             | Clears the search, then goes back a page                              |
+| Backspace          | In an empty search, goes back a page and restores its query           |
+| An item's shortcut | Runs it while the list is mounted, even when hidden by the search     |
+
+The first available command is highlighted by default. Set `:auto-highlight="false"` to wait for an arrow key or pointer movement.
+
+### Tested Behavior
 
 <SpecList spec="command" />
 

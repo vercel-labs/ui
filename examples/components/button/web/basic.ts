@@ -1,19 +1,9 @@
 import "@ui-sdk/web/button"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
-  root.innerHTML = `
-    <div data-slot="stack">
-      <ui-button><button>Button</button></ui-button>
-      <output data-slot="output">Pressed 0 times</output>
-    </div>
-  `
-  const button = root.querySelector("ui-button")!
-  const output = root.querySelector("output")!
-  let count = 0
-  button.addEventListener("action", () => {
-    count++
-    output.textContent = `Pressed ${count} ${count === 1 ? "time" : "times"}`
-  })
+  root.innerHTML = `<ui-button><button>Button</button></ui-button>`
+  root.querySelector("ui-button")!.addEventListener("action", () => log(root, "Pressed"))
 }
 
 export { mount }

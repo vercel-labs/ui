@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
           (task) => `
             <label data-slot="label">
               <ui-checkbox${task.done ? " default-checked" : ""}>
-                <ui-checkbox-indicator keep-mounted>
+                <ui-checkbox-indicator>
                   ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
                 </ui-checkbox-indicator>
               </ui-checkbox>

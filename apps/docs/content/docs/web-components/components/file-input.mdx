@@ -3,240 +3,381 @@ title: File Input
 description: Choose, drop, or paste files, validate them, and submit them with a form.
 ---
 
+A file input holds the files someone chooses, drops, or pastes, checks them against your rules, and submits them with a form. Uploading them to a server is up to your app.
+
 <ComponentExample
   name="file-input/basic"
-  caption="Choose or drop a few files, then remove one. You can also paste files while focus is inside the drop zone."
+  caption="Browse Files or drop a few files on the zone, then remove one. Tab to the list to move between files with the arrow keys, and press Delete to remove the focused one."
 />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/web @ui-sdk/core
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
-Importing the component defines its elements. On the server the import does nothing.
+Import the component to register its elements. The import is safe on the server.
 
 ```ts
 import "@ui-sdk/web/file-input"
 ```
 
-<a id="composition" />
+## Composition
+
+Use the following composition to build a `ui-file-input`:
+
+```text
+ui-file-input
+├── ui-file-input-trigger
+│   └── button
+├── ui-file-input-dropzone
+└── ui-file-input-list
+    └── template
+        └── ui-file-input-item
+            └── ui-file-input-item-remove
+                └── button
+```
+
+The trigger wraps a native button that opens the system file picker. The drop zone takes files that are dropped on it or pasted while focus is inside it; keep a trigger beside it for people using a keyboard. The list copies the item in its `<template>` once for each file, and an item's `file` property holds its file; elements in the item with `data-file="name"`, `"size"`, `"type"` or `"path"` show that about the file. A remove button wraps a native button that removes its item's file.
 
 ## Usage
 
-Start with a trigger. Add a drop zone or list when the workflow needs one.
-
-```ts
-import "@ui-sdk/web/file-input"
-```
+Import the parts and put them together:
 
 ```html
-<ui-file-input name="attachment">
-  <ui-file-input-trigger>
-    <button type="button">Choose a file</button>
-  </ui-file-input-trigger>
+<script type="module">
+  import "@ui-sdk/web/file-input"
+</script>
+
+<ui-file-input name="attachments" multiple>
+  <ui-file-input-dropzone>
+    <p>Drag and drop files here</p>
+    <ui-file-input-trigger><button>Browse Files</button></ui-file-input-trigger>
+  </ui-file-input-dropzone>
+  <ui-file-input-list aria-label="Files">
+    <template>
+      <ui-file-input-item>
+        <span data-file="name"></span>
+        <span data-file="size"></span>
+        <ui-file-input-item-remove>
+          <button type="button"><svg aria-hidden="true">…</svg></button>
+        </ui-file-input-item-remove>
+      </ui-file-input-item>
+    </template>
+  </ui-file-input-list>
 </ui-file-input>
 ```
 
-## Parts
+## Upload Button
 
-- `ui-file-input` holds the files and applies validation.
-- `ui-file-input-trigger` wraps your button to open the picker.
-- `ui-file-input-dropzone` accepts drops and pastes. Pair it with a trigger for keyboard access.
-- `ui-file-input-list` clones its template for each file. Use `data-file="name"`, `"size"`, `"type"`, or `"path"` to display file details.
-- `ui-file-input-item-remove` wraps a button that removes its file.
+A trigger is enough when you only need the system file picker. Read the chosen file from the `valuechange` event to show its name beside the button.
 
-## Examples
+```html
+<ui-file-input name="resume">
+  <ui-file-input-trigger><button>Upload Resume</button></ui-file-input-trigger>
+  <span>No file chosen</span>
+</ui-file-input>
+```
 
-### Upload Button
+```ts
+const input = document.querySelector("ui-file-input")!
+input.addEventListener("valuechange", (event) => {
+  input.querySelector("span")!.textContent = event.detail.value[0]?.name ?? "No file chosen"
+})
+```
 
-A trigger is enough when you only need the system file picker. The component holds `File` objects; uploading them to a server is up to your app.
+## Accepted Types
 
-<ComponentExample
-  name="file-input/trigger"
-  caption="Choose Upload a file and select a file. Its name appears beside the button."
-/>
+`accept` takes MIME types, wildcards, and extensions, separated by commas, such as `image/*,.pdf`. It checks files from the picker, drops, and pastes. An extension matches the filename, even when the operating system reports an unexpected MIME type.
 
-### Accept
+A rejected file never joins the value. The `reject` event's `detail.value` has each one with its `reasons`, such as `file-type`, so you can say why it was left out. While files are dragged over a drop zone, `data-drag-reject` shows when their types won't be accepted.
 
-`accept` takes MIME types, wildcards, and extensions, such as `image/*,.pdf`. It checks files from the picker, drops, and pastes. An extension matches the filename, even if the operating system reports an unexpected MIME type.
+```html
+<ui-file-input multiple accept="image/*,.pdf"></ui-file-input>
+```
 
-<ComponentExample
-  name="file-input/accept"
-  caption="Add an image or PDF, then try a text file. The unsupported file is rejected and the message explains why."
-/>
+```ts
+input.addEventListener("reject", (event) => setRejected(event.detail.value))
+```
 
-### Limits
+## Limits
 
-Use `maxFiles` to limit the total count, and `minSize` or `maxSize` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full.
+Use `max-files` to limit the total count, and `min-size` or `max-size` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full, and rejects the rest with `too-many-files`.
 
-<ComponentExample
-  name="file-input/limits"
-  caption="Add up to three files, then try another or one larger than 5 MB. Remove a file to make room."
-/>
+```html
+<ui-file-input multiple max-files="3" min-size="1" max-size="5000000"></ui-file-input>
+```
 
-### One File
+## One File
 
-Without `multiple`, a new file replaces the current one. A rejected file leaves the current value unchanged. With `multiple`, accepted files are added to the list.
+Without `multiple`, a new file replaces the current one. A rejected file leaves the current value unchanged. With `multiple`, accepted files join the list.
 
-<ComponentExample
-  name="file-input/single"
-  caption="Choose a PDF, then choose another. The second file replaces the first."
-/>
+```html
+<ui-file-input accept=".pdf">
+  <ui-file-input-trigger><button>Choose a PDF</button></ui-file-input-trigger>
+</ui-file-input>
+```
 
-### List
+```ts
+input.addEventListener("valuechange", (event) => {
+  input.querySelector("button")!.textContent = event.detail.value[0] ? "Replace PDF" : "Choose a PDF"
+})
+```
+
+## Validation
+
+Set the `validate` property for checks of your own. Return a reason string to reject a file, or `null` to accept it. It runs after the built-in type and size checks, and its reason reaches the `reject` event like theirs. Validate uploads on your server too.
+
+```ts
+const input = document.querySelector("ui-file-input")!
+input.validate = (file) => (input.value.some((other) => other.name === file.name) ? "duplicate" : null)
+input.addEventListener("reject", (event) => setRejected(event.detail.value))
+```
+
+## File List
 
 The list has one Tab stop. Arrow keys, Home, and End move between files; Delete or Backspace removes the focused file. Remove buttons are named for their file and stay outside the Tab order.
 
-This example creates an object URL for each image preview and revokes it when the preview is removed.
+For an image preview, put an `<img>` in the template, create an object URL from the item's `file` when the item is added, and revoke it when the item goes away:
 
-<ComponentExample
-  name="file-input/list"
-  caption="Add a few images. Tab to the list, use the arrow keys to move, and press Delete or Backspace to remove the focused image."
-/>
+```html
+<ui-file-input-list aria-label="Images">
+  <template>
+    <ui-file-input-item>
+      <img alt="" />
+      <span data-file="name"></span>
+      <ui-file-input-item-remove>
+        <button type="button"><svg aria-hidden="true">…</svg></button>
+      </ui-file-input-item-remove>
+    </ui-file-input-item>
+  </template>
+</ui-file-input-list>
+```
 
-### Attachments
+```ts
+const list = document.querySelector("ui-file-input-list")!
+new MutationObserver((records) => {
+  for (const { addedNodes, removedNodes } of records) {
+    for (const node of addedNodes) {
+      const image = (node as Element).querySelector?.("img")
+      const file = (node as HTMLElement & { file?: File }).file
+      if (image && file && !image.src) image.src = URL.createObjectURL(file)
+    }
+    for (const node of removedNodes) {
+      const image = (node as Element).querySelector?.("img")
+      if (image && !node.isConnected) URL.revokeObjectURL(image.src)
+    }
+  }
+}).observe(list, { childList: true })
+```
 
-Combine a drop zone with a textarea to attach files to a message. File pastes inside the zone are accepted; text pastes keep their normal behavior. `pasteTarget` can also point to another element or `"document"`.
+## Attachments
 
-<ComponentExample
-  name="file-input/prompt"
-  caption="Type a message and attach a file. With the message empty, press Backspace to remove the last attachment. Send clears this local demo."
-/>
+Put a textarea inside a drop zone to attach files to a message. `paste-target` takes file pastes from the textarea too, through a CSS selector; text pastes keep their normal behavior. It can also be `"document"`.
 
-### Page-Wide
+```html
+<ui-file-input multiple>
+  <ui-file-input-dropzone paste-target="#message">
+    <ui-file-input-list aria-label="Attachments">
+      <template>
+        <ui-file-input-item><span data-file="name"></span></ui-file-input-item>
+      </template>
+    </ui-file-input-list>
+    <textarea id="message" aria-label="Message"></textarea>
+    <ui-file-input-trigger>
+      <button aria-label="Attach Files"><svg aria-hidden="true">…</svg></button>
+    </ui-file-input-trigger>
+  </ui-file-input-dropzone>
+</ui-file-input>
+```
 
-Set `target="document"` to accept files dropped anywhere on the page. `data-dragging` lets you show an overlay while a file is over the window. A drop on another zone stays with that zone.
+## Page-Wide Drop
+
+Set `target="document"` to take files dropped anywhere on the page. The zone shows `data-dragging` while a file is over the window, so it can be a full-page overlay. A drop on another zone stays with that zone.
 
 <ComponentExample
   name="file-input/page"
-  caption="Drag a file over this page to see the overlay, then drop it outside the other drop zones. Remove it from the list afterward."
+  caption="Drag a file over this page to see the overlay, then drop it. The file joins the Attachments list; a drop on the first example's zone stays there."
 />
 
-### Folders
+While a drop zone is connected, dropping a file outside every zone doesn't navigate away from the page. Drops onto native file inputs and ordinary text drops keep their behavior.
 
-`directory` enables folder selection and multiple files. Dropped folders are read recursively, up to 1,000 files, skipping system files such as `.DS_Store`. `relativePath(file)` returns the path inside the folder.
+## Folders
 
-<ComponentExample
-  name="file-input/folder"
-  caption="Choose or drop a folder. The list shows each file with its path inside the folder."
-/>
+`directory` picks a whole folder and turns on `multiple`. Dropped folders are read recursively, up to 1,000 files, skipping system files such as `.DS_Store`. `data-file="path"` shows the path inside the folder, the same as `relativePath(file)` from `@ui-sdk/web/file-input`.
 
-### Camera
+```html
+<ui-file-input directory>
+  <ui-file-input-trigger><button>Choose a Folder</button></ui-file-input-trigger>
+  <ui-file-input-list aria-label="Files">
+    <template>
+      <ui-file-input-item><span data-file="path"></span></ui-file-input-item>
+    </template>
+  </ui-file-input-list>
+</ui-file-input>
+```
 
-Use `capture="environment"` to request the rear camera, or `"user"` for the front camera. The picker offered depends on the device and browser.
+## Camera
 
-<ComponentExample
-  name="file-input/camera"
-  caption="Choose Take a photo. A supported mobile browser can offer the camera; other browsers open a file picker."
-/>
+Use `capture="environment"` to request the rear camera, or `"user"` for the front camera. The picker offered depends on the device and browser; a desktop browser opens a file picker.
 
-### Disabled
+```html
+<ui-file-input accept="image/*" capture="environment">
+  <ui-file-input-trigger><button>Take a Photo</button></ui-file-input-trigger>
+</ui-file-input>
+```
 
-`disabled` prevents picking, dropping, and pasting files. It also excludes the value from form submission.
+## Controlled
 
-<ComponentExample
-  name="file-input/disabled"
-  caption="Try Browse or drop a file on the zone. The disabled input keeps its value unchanged."
-/>
+Set the element's `value` property and listen for `valuechange`. `event.detail` has the files as `value`, the `reason`, and the `added`, `removed`, and `rejected` files. Call `event.preventDefault()` to keep the current value. The `reject` event reports rejected files even when none were accepted.
 
-### Avatar
+```ts
+const input = document.querySelector("ui-file-input")!
+input.value = files
+input.addEventListener("valuechange", (event) => setFiles(event.detail.value))
+```
 
-Use a single image value to replace a profile photo. Keep the preview URL separate from the file and revoke it when the file changes or the example unmounts.
+## Opening from Anywhere
 
-<ComponentExample
-  name="file-input/avatar"
-  caption="Upload an image or drop one on the avatar. Replace it or choose Remove to clear the preview."
-/>
+Create a controller with `createFileInputController()` and set it as the element's `controller` property. Use it to open the picker, add or remove files, clear the value, or read the files. Open the picker from a user action, such as a button press, so the browser allows it. The element's `api` property has the same methods. A `ui-file-input-trigger` outside the file input connects with `for` set to the file input's `id`.
 
-## Behavior and Options
+```html
+<button type="button" data-action="open">Choose Files</button>
+<button type="button" data-action="clear">Clear</button>
+<ui-file-input multiple></ui-file-input>
+```
 
-### Controlled
+```ts
+import { createFileInputController } from "@ui-sdk/web/file-input"
 
-Read or set the element’s `value` property and listen for `valuechange`. `event.detail` includes the `reason`, `added`, `removed`, and `rejected` files. Call `event.preventDefault()` to cancel the change. The `reject` event reports rejected files even when none were accepted.
+const attachments = createFileInputController()
+document.querySelector("ui-file-input")!.controller = attachments
+document.querySelector('[data-action="open"]')!.addEventListener("click", () => attachments.open())
+document.querySelector('[data-action="clear"]')!.addEventListener("click", () => attachments.clear())
+```
 
-<ComponentExample
-  name="file-input/controlled"
-  caption="Add a file, remove one with its remove button, then try Remove last. The example keeps the files in application state."
-/>
+## Announcements
 
-### Validation
+The component announces accepted, removed, and rejected files through a polite live region. Set the `announcement` property to change the message, or return `null` to skip it.
 
-Add `validate` for app-specific checks. Return a reason string to reject a file, or `null` to accept it. This runs after the built-in type and size checks. Validate uploads on your server too.
-
-<ComponentExample
-  name="file-input/validate"
-  caption="Add a file, then try another file with the same name. The custom check rejects the duplicate."
-/>
-
-### Announcements
-
-The component announces accepted, removed, and rejected files. Use `announcement` to change the message, or return `null` to skip it.
-
-<ComponentExample
-  name="file-input/announcement"
-  caption="With a screen reader, add and remove images. The announcement includes their names. Try another file type to hear the rejection."
-/>
-
-### Controller
-
-The element’s `api` exposes `open`, `addFiles`, `removeFile`, `clear`, and `getValue`. You can also attach a controller to its `controller` property, as this example does. Open the picker from a user action, such as a button press, so the browser allows it.
-
-<ComponentExample
-  name="file-input/controller"
-  caption="Choose Add a note to create a local text file, then Clear. Open the picker uses the same controller."
-/>
-
-### Outside the Zone
-
-While a file drop zone is mounted, dropping a file outside all zones does not navigate away from the page. Drops onto native file inputs and ordinary text drops keep their behavior.
+```ts
+input.announcement = ({ added, removed }) =>
+  added.length
+    ? `Added ${added.map((file) => file.name).join(", ")}.`
+    : removed.length
+      ? `Removed ${removed.map((file) => file.name).join(", ")}.`
+      : null
+```
 
 ## Forms
 
-With `name`, the custom element submits its files through `ElementInternals` after it upgrades. Set its `defaultValue` property before connecting it to supply the files a reset restores. `form` connects a file input to a form elsewhere on the page. Rejected files never submit.
+With `name`, the element submits its files through `ElementInternals` once it upgrades. A form reset returns to `defaultValue`, a property you set from script before connecting the element. `form` connects the file input to a form elsewhere on the page. Rejected files never submit, and `disabled` leaves the value out of the submission as well as stopping picks, drops, and pastes.
 
-<ComponentExample
-  name="file-input/form"
-  caption="Choose Send to inspect the filenames that would submit. Add or remove files, then Reset to restore the starting file. Nothing is uploaded."
-/>
+```html
+<form method="post" enctype="multipart/form-data">
+  <ui-file-input name="attachments" multiple>
+    <ui-file-input-trigger><button>Attach Files</button></ui-file-input-trigger>
+  </ui-file-input>
+  <button type="submit">Send</button>
+  <button type="reset">Reset</button>
+</form>
+```
 
-### Field
+```ts
+input.defaultValue = [coverLetter]
+```
 
-Wrap the file input in a [Field](./field) to connect its label, description, and validation message. The trigger becomes the field’s control; pressing the label opens the picker. `required` prevents submission with no file.
+## Fields
 
-<ComponentExample
-  name="file-input/field"
-  caption="Choose Continue with no file to see the required error. Add a scan, submit again, then Reset."
-/>
+Wrap the file input in a [Field](./field) to connect its label, description, and validation message. The trigger becomes the field's control, and pressing the label opens the picker. `required` stops the form from submitting with no file.
 
-## Styling
-
-Use `data-dragging`, `data-drag-accept`, and `data-drag-reject` on the drop zone. Drag acceptance reflects the file information the browser exposes before a drop. A Field also adds attributes such as `data-invalid` to the trigger.
-
-<DataAttributes component="file-input" />
+```html
+<ui-field>
+  <ui-field-label>Proof of address</ui-field-label>
+  <ui-file-input name="proof" required accept="image/*,.pdf">
+    <ui-file-input-trigger><button>Choose a File</button></ui-file-input-trigger>
+  </ui-file-input>
+  <ui-field-description>A utility bill or bank statement from the last 3 months.</ui-field-description>
+  <ui-field-error match="valueMissing">Add a scan to continue.</ui-field-error>
+</ui-field>
+```
 
 ## Custom Rendering
 
-The trigger and remove parts wrap your own buttons. A list template controls the markup for each file. Use the part’s data attributes to change its appearance.
+Parts have no render functions: each element is the part, and the trigger and remove parts wrap your own buttons. Give a part attributes of its own, like `role` and `aria-label` in place of a `<section>`, and show content from its data attributes, like `in-data-drag-reject:inline` in Tailwind. The list's `<template>` is the markup for each file:
+
+```html
+<ui-file-input-dropzone role="region" aria-label="Gallery upload">
+  <span class="hidden in-data-drag-reject:inline">Images only</span>
+  <span class="hidden in-data-drag-accept:inline">Release to add</span>
+  <span class="in-data-dragging:hidden">Drag images here</span>
+</ui-file-input-dropzone>
+<ui-file-input-list aria-label="Images">
+  <template>
+    <ui-file-input-item><span data-file="name"></span></ui-file-input-item>
+  </template>
+</ui-file-input-list>
+```
+
+## Styling
+
+Use `data-dragging`, `data-drag-accept`, and `data-drag-reject` on the drop zone to show what a drop would do. Drag acceptance reflects the file information the browser exposes before a drop. Inside a Field, the trigger also gets the field's attributes, such as `data-invalid`.
+
+Each element has a `data-slot`, such as `file-input-dropzone`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### `<ui-file-input>` [#data-attributes-fileinput]
+
+<DataAttributes component="file-input" part="root" />
+
+### `<ui-file-input-trigger>` [#data-attributes-fileinputtrigger]
+
+<DataAttributes component="file-input" part="trigger" />
+
+### `<ui-file-input-dropzone>` [#data-attributes-fileinputdropzone]
+
+<DataAttributes component="file-input" part="dropzone" />
+
+### `<ui-file-input-list>` [#data-attributes-fileinputlist]
+
+<DataAttributes component="file-input" part="list" />
+
+### `<ui-file-input-item>` [#data-attributes-fileinputitem]
+
+<DataAttributes component="file-input" part="item" />
+
+### `<ui-file-input-item-remove>` [#data-attributes-fileinputitemremove]
+
+<DataAttributes component="file-input" part="item-remove" />
 
 ## API Reference
 
-Props are attributes in kebab case, like `max-size`. `accept` is comma-separated. `validate`,
-`announcement`, `controller` and `defaultValue` are properties, set from script, and `value` is the files.
-`onValueChange` is the `valuechange` event: `detail.value` holds the files, beside `reason`, `added`,
-`removed` and `rejected`. Call `preventDefault()` to cancel. `onReject` is the `reject` event.
+Props are attributes in kebab case, like `max-size`. `accept` is comma-separated, and `paste-target` is `"document"` or a CSS selector. `validate`, `announcement`, `controller` and `defaultValue` are properties, set from script, and `value` is the files. `onValueChange` is the `valuechange` event: `detail.value` holds the files, beside `reason`, `added`, `removed` and `rejected`. Call `preventDefault()` to cancel. `onReject` is the `reject` event.
 
 ### FileInput
 
 <TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputOptions" />
 
+### FileInputTrigger
+
+<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputTriggerProps" />
+
 ### FileInputDropzone
 
 <TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputDropzoneProps" />
 
+### FileInputList
+
+Copies the item in its `<template>` once for each file. Without a template, each item shows the file's name and a remove button.
+
 ### FileInputItem
 
 <TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputItemProps" />
+
+### FileInputItemRemove
+
+Wraps a button that removes its item's file. It's named for the file and stays out of the Tab order.
 
 ### State
 
@@ -273,7 +414,7 @@ Rejected files carry one or more of these reasons, or a reason from your `valida
 
 ### Controller
 
-The element's `api` property has the same methods.
+Create one with `createFileInputController()` and set it as the `controller` property. The element's `api` property has the same methods.
 
 <ControllerTable
   path="../../packages/core/src/components/file-input/file-input.ts"

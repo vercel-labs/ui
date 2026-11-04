@@ -11,7 +11,8 @@ import {
   type CommandData,
   type CommandDataItem,
 } from "@ui-sdk/solid/command"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const commands: CommandData = [
   {
@@ -43,20 +44,14 @@ const commands: CommandData = [
 ]
 
 function Example() {
-  const [ran, setRan] = createSignal("")
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <Command
-        items={commands}
-        onAction={(value) => {
-          setRan(value)
-        }}
-      >
+      <Command items={commands} onAction={(value) => log(`Ran ${value}`)}>
         <CommandInput aria-label="Search commands" placeholder="Type a command..." />
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandList>{(state) => <Commands items={state.items} />}</CommandList>
       </Command>
-      <output data-slot="output">{ran() ? `Ran ${ran()}` : "Nothing run yet"}</output>
     </div>
   )
 }

@@ -9,19 +9,16 @@ import {
   CalendarWeekdays,
   CalendarWeeks,
 } from "@ui-sdk/solid/calendar"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
-  const [range, setRange] = createSignal<{ anchor: string | null; focused: string | null }>({
-    anchor: null,
-    focused: null,
-  })
+  const log = useLog()
   return (
     <div>
       <Calendar
         mode="range"
-        onAnchorChange={(anchor) => setRange((current) => ({ ...current, anchor }))}
-        onFocusedChange={(focused) => setRange((current) => ({ ...current, focused }))}
+        onAnchorChange={(anchor) => log(anchor ? `Started on ${anchor}` : "Range finished")}
+        onFocusedChange={(focused) => log(`Focus on ${focused}`)}
       >
         <div data-slot="row">
           <CalendarPrevious data-variant="ghost">
@@ -57,11 +54,6 @@ function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </Calendar>
-      <output data-slot="output">
-        {range().anchor
-          ? `Started on ${range().anchor}, focus on ${range().focused}`
-          : `Focus on ${range().focused ?? "no date yet"}`}
-      </output>
     </div>
   )
 }

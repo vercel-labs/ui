@@ -10,7 +10,7 @@ import {
   CommandList,
   CommandShortcut,
 } from "@ui-sdk/vue/command"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const settings = [
   { value: "profile", label: "Profile", icon: UserIcon, shortcut: "mod+p" },
@@ -18,16 +18,12 @@ const settings = [
   { value: "settings", label: "Settings", icon: SettingsIcon, shortcut: "mod+s" },
 ]
 
-const ran = ref("")
-
-function onAction(value: string) {
-  ran.value = value
-}
+const log = useLog()
 </script>
 
 <template>
   <div data-slot="stack">
-    <Command @action="onAction">
+    <Command @action="(value: string) => log(`Ran ${value}`)">
       <CommandInput aria-label="Search settings" placeholder="Search settings..." />
       <CommandList>
         <CommandGroup>
@@ -47,6 +43,5 @@ function onAction(value: string) {
         </CommandGroup>
       </CommandList>
     </Command>
-    <output data-slot="output">{{ ran ? `Ran ${ran}` : "Try a shortcut" }}</output>
   </div>
 </template>

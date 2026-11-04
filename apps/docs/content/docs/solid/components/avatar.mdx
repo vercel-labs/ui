@@ -30,48 +30,144 @@ Avatar
 
 The image is a real `img`, including in server markup. The browser can start fetching it before hydration. The fallback stays visible until the image loads; if loading fails, the fallback remains.
 
-## Examples
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Avatar, AvatarFallback, AvatarImage } from "@ui-sdk/solid/avatar"
+
+function Example() {
+  return (
+    <Avatar>
+      <AvatarImage src="/ada.png" alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+    </Avatar>
+  )
+}
+
+export { Example }
+```
+
+## Build Your Own
+
+`@ui-sdk/solid/avatar` comes with a ready-made Avatar. If you'd like to build your own, with your own names, start from the `avatar` primitive in `@ui-sdk/core`:
+
+```ts title="user-photo.ts"
+import { avatar } from "@ui-sdk/core/avatar"
+import { createParts } from "@ui-sdk/solid/primitive"
+
+const {
+  Root: UserPhoto,
+  Image: UserPhotoImage,
+  Fallback: UserPhotoInitials,
+} = createParts(avatar, { root: "span", image: "img", fallback: "span" })
+
+export { UserPhoto, UserPhotoImage, UserPhotoInitials }
+```
+
+```tsx
+<UserPhoto>
+  <UserPhotoImage src="https://github.com/shadcn.png" alt="shadcn" />
+  <UserPhotoInitials>CN</UserPhotoInitials>
+</UserPhoto>
+```
+
+These are the same parts the ready-made Avatar is made of, with your names. See [Rendering](../rendering) and [Custom Rendering](#custom-rendering) for more.
+
+## Fallback Delay
 
 <span id="behavior-and-options" />
 
-### Fallback Delay
-
 Set `delay` on the fallback to wait before showing it. This avoids flashing initials when an image loads quickly. Without a delay, the fallback appears immediately, including on the server.
 
-### Loading Status
+```tsx
+<Avatar>
+  <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
+  <AvatarFallback delay={600}>CN</AvatarFallback>
+</Avatar>
+```
 
-`onLoadingStatusChange` receives the new status and change details. The possible statuses are `loading`, `loaded`, `error`, and `idle`.
+## Image Attributes
 
-When you replace a loaded image, the browser keeps it visible while the next source loads. A failed replacement shows the fallback. The change details explain why the status changed; see [Reasons](#reasons).
+Pass image attributes such as `srcset`, `crossorigin`, and `referrerpolicy` to the image. They work on the same `img` the browser loads. For avatars farther down a page, use `loading="lazy"`.
 
-### Image Attributes
-
-Pass image attributes such as `srcSet`, `crossOrigin`, and `referrerPolicy` to the image. They work on the same `img` the browser loads. For avatars farther down a page, use `loading="lazy"`.
+```tsx
+<Avatar>
+  <AvatarImage
+    src="https://github.com/shadcn.png"
+    srcset="https://github.com/shadcn.png?size=80 1x, https://github.com/shadcn.png?size=160 2x"
+    alt="shadcn"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    loading="lazy"
+  />
+  <AvatarFallback>CN</AvatarFallback>
+</Avatar>
+```
 
 <span id="render-functions" />
 
-### Interactive Avatar
+## Interactive Avatar
 
 Use a button when clicking an avatar performs an action. Give it an accessible name that stays available while the image loads.
 
+```tsx
+<Avatar render={(props) => <button {...props} type="button" aria-label="shadcn" />} onClick={openProfile}>
+  <AvatarImage src="https://github.com/shadcn.png" alt="" />
+  <AvatarFallback aria-hidden="true">CN</AvatarFallback>
+</Avatar>
+```
+
 [Parts and Composition](../parts-and-composition) explains how to change the root element in this framework.
+
+## Loading Status
+
+`onLoadingStatusChange` receives the new status and change details. The possible statuses are `loading`, `loaded`, `error`, and `idle`.
+
+```tsx
+<Avatar
+  onLoadingStatusChange={(status, details) => {
+    if (status === "error") reportBrokenImage(details.reason)
+  }}
+>
+  <AvatarImage src={user.image} alt={user.name} />
+  <AvatarFallback>{user.initials}</AvatarFallback>
+</Avatar>
+```
+
+When you replace a loaded image, the browser keeps it visible while the next source loads. A failed replacement shows the fallback. The change details explain why the status changed; see [Reasons](#reasons).
+
+## Custom Rendering
+
+Use [Parts and Composition](../parts-and-composition) to replace an element or read its state. Every part receives the loading status, so the fallback can say something different when the image fails:
+
+```tsx
+<Avatar>
+  <AvatarImage src={user.image} alt={user.name} />
+  <AvatarFallback>{(state) => (state.loadingStatus === "error" ? "?" : user.initials)}</AvatarFallback>
+</Avatar>
+```
 
 ## Styling
 
 Set the root's size and let the image and fallback fill it. The image manages its own hidden styles until it loads; keep those styles intact when changing its element.
 
-<span id="badge" />
-<span id="group" />
-<span id="sizes" />
-<span id="right-to-left" />
+Each part has a `data-slot`, such as `avatar-fallback`, and shows the loading status through the attributes listed under [Data Attributes](#data-attributes).
 
-Extra badges, groups, and sizes are ordinary layout choices. Use logical CSS properties when the layout needs to support right to left.
+## Data Attributes
 
-<DataAttributes component="avatar" />
+### Avatar [#data-attributes-avatar]
 
-## Custom Rendering
+<DataAttributes component="avatar" part="root" />
 
-Use [Parts and Composition](../parts-and-composition) to replace an element or read its state. The parts expose `loadingStatus` when you need different fallback content for an error.
+### AvatarImage [#data-attributes-avatarimage]
+
+<DataAttributes component="avatar" part="image" />
+
+### AvatarFallback [#data-attributes-avatarfallback]
+
+<DataAttributes component="avatar" part="fallback" />
 
 ## API Reference
 
@@ -80,6 +176,10 @@ Props and callbacks are the same as below, as Solid props.
 ### Avatar
 
 <TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
+
+### AvatarImage
+
+The image. Renders a real `img`, so the browser can fetch it before hydration, and accepts its attributes, such as `srcset`, `crossorigin` and `referrerpolicy`.
 
 ### AvatarFallback
 

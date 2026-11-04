@@ -1,5 +1,7 @@
+import "@ui-sdk/web/checkbox"
 import "@ui-sdk/web/combobox"
-import { Check, createElement } from "lucide"
+import "@ui-sdk/web/select"
+import { Check, ChevronDown, createElement } from "lucide"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -11,37 +13,54 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-const sides = ["top", "right", "bottom", "left"]
-const aligns = ["start", "center", "end"]
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+]
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
 
-export function mount(root: HTMLElement) {
+const select = (name: string, label: string, options: { value: string; label: string }[], value: string) => `
+  <ui-select data-control="${name}" default-value="${value}">
+    <ui-select-label>${label}</ui-select-label>
+    <ui-select-trigger>
+      <button>
+        <ui-select-value></ui-select-value>
+        ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+      </button>
+    </ui-select-trigger>
+    <ui-select-content hidden>
+      ${options
+        .map(
+          (option) => `
+            <ui-select-item value="${option.value}">
+              ${option.label}
+              <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
+            </ui-select-item>
+          `,
+        )
+        .join("")}
+    </ui-select-content>
+  </ui-select>
+`
+
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div data-slot="stack">
-        <div role="group" aria-label="Side" data-slot="row">
-          ${sides
-            .map(
-              (value) => `
-                <button type="button" data-side="${value}" aria-pressed="${value === "bottom"}">
-                  ${value}
-                </button>
-              `,
-            )
-            .join("")}
-        </div>
-        <div role="group" aria-label="Align" data-slot="row">
-          ${aligns
-            .map(
-              (value) => `
-                <button type="button" data-align="${value}" aria-pressed="${value === "start"}">
-                  ${value}
-                </button>
-              `,
-            )
-            .join("")}
-        </div>
+      <div data-slot="controls">
+        ${select("side", "Side", sides, "bottom")}
+        ${select("align", "Align", aligns, "start")}
         <label data-slot="label">
-          <input type="checkbox" />
+          <ui-checkbox>
+            <ui-checkbox-indicator>
+              ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
+            </ui-checkbox-indicator>
+          </ui-checkbox>
           Anchor to the box
         </label>
       </div>
@@ -50,8 +69,7 @@ export function mount(root: HTMLElement) {
           <ui-combobox-input>
             <input aria-label="Framework" placeholder="Framework" />
           </ui-combobox-input>
-          <ui-combobox-content side="bottom" align="start" side-offset="10" align-offset="0" collision-padding="16">
-            <ui-combobox-arrow></ui-combobox-arrow>
+          <ui-combobox-content hidden side="bottom" align="start" side-offset="10" align-offset="0" collision-padding="16">
             <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
             <ui-combobox-list>
               ${frameworks
@@ -71,17 +89,14 @@ export function mount(root: HTMLElement) {
     </div>
   `
   const content = root.querySelector("ui-combobox-content")!
-  for (const name of ["side", "align"]) {
-    const buttons = root.querySelectorAll<HTMLButtonElement>(`[data-${name}]`)
-    for (const button of buttons)
-      button.addEventListener("click", () => {
-        content.setAttribute(name, button.getAttribute(`data-${name}`)!)
-        for (const other of buttons) other.setAttribute("aria-pressed", String(other === button))
-      })
-  }
-  const anchored = root.querySelector<HTMLInputElement>('input[type="checkbox"]')!
-  anchored.addEventListener("change", () => {
-    if (anchored.checked) content.setAttribute("anchor", "#combobox-positioning-box")
+  for (const control of root.querySelectorAll("ui-select"))
+    control.addEventListener("valuechange", (event) => {
+      if (event.detail.value) content.setAttribute(control.dataset.control!, String(event.detail.value))
+    })
+  root.querySelector("ui-checkbox")!.addEventListener("checkedchange", (event) => {
+    if (event.detail.value === true) content.setAttribute("anchor", "#combobox-positioning-box")
     else content.removeAttribute("anchor")
   })
 }
+
+export { mount }

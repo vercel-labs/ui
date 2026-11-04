@@ -45,7 +45,7 @@ function mount(root: HTMLElement) {
           <input placeholder="e.g. Paris" />
         </ui-autocomplete-input>
       </div>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
         <ui-autocomplete-status></ui-autocomplete-status>
         <ui-autocomplete-empty>No cities start with “<span></span>”.</ui-autocomplete-empty>
         <ui-autocomplete-list></ui-autocomplete-list>

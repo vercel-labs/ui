@@ -14,18 +14,20 @@
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
   import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+
+  let field: HTMLElement | undefined = $state()
 </script>
 
-<DatePicker mode="range" months={2} defaultValue={["2026-10-12", "2026-10-16"]}>
-  <div data-slot="row">
-    <DatePickerInput aria-label="Check in" />
+<DatePicker mode="range" months={2} monthFormat="short" defaultValue={["2026-10-12", "2026-10-16"]}>
+  <div data-slot="row" bind:this={field}>
+    <DatePickerInput aria-label="Check in" placeholder="Check in" />
     <span data-slot="hint">–</span>
-    <DatePickerInput end aria-label="Check out" />
+    <DatePickerInput end aria-label="Check out" placeholder="Check out" />
     <DatePickerTrigger data-variant="ghost">
       <CalendarIcon aria-hidden="true" />
     </DatePickerTrigger>
   </div>
-  <DatePickerContent>
+  <DatePickerContent anchor={field} align="center">
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
         <ChevronLeftIcon aria-hidden="true" />
@@ -35,7 +37,7 @@
         <ChevronRightIcon aria-hidden="true" />
       </CalendarNext>
     </div>
-    <div data-slot="stack">
+    <div data-slot="row">
       <CalendarGrid>
         <CalendarWeekdays>
           {#snippet children(index)}

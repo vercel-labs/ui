@@ -11,25 +11,34 @@
     ComboboxList,
     ComboboxTrigger,
   } from "@ui-sdk/svelte/combobox"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectItemIndicator,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
 
   const countries = [
-    { value: "ar", label: "Argentina" },
+    { value: "ar", label: "Argentina", keywords: ["república argentina"] },
     { value: "au", label: "Australia" },
-    { value: "at", label: "Austria" },
-    { value: "be", label: "Belgium" },
-    { value: "br", label: "Brazil" },
+    { value: "at", label: "Austria", keywords: ["österreich"] },
+    { value: "be", label: "Belgium", keywords: ["belgië", "belgique"] },
+    { value: "br", label: "Brazil", keywords: ["brasil"] },
     { value: "ca", label: "Canada" },
     { value: "cl", label: "Chile" },
-    { value: "dk", label: "Denmark" },
-    { value: "fi", label: "Finland" },
+    { value: "dk", label: "Denmark", keywords: ["danmark"] },
+    { value: "fi", label: "Finland", keywords: ["suomi"] },
     { value: "fr", label: "France" },
-    { value: "de", label: "Germany" },
-    { value: "gr", label: "Greece" },
-    { value: "jp", label: "Japan" },
-    { value: "nl", label: "Netherlands" },
-    { value: "es", label: "Spain" },
-    { value: "se", label: "Sweden" },
-    { value: "ch", label: "Switzerland" },
+    { value: "de", label: "Germany", keywords: ["deutschland"] },
+    { value: "gr", label: "Greece", keywords: ["hellas", "ελλάδα"] },
+    { value: "jp", label: "Japan", keywords: ["nippon", "日本"] },
+    { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
+    { value: "es", label: "Spain", keywords: ["españa"] },
+    { value: "se", label: "Sweden", keywords: ["sverige"] },
+    { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
   ]
 
   function fuzzy(item: { label: string }, query: string) {
@@ -38,28 +47,46 @@
     return at === query.length
   }
 
-  const filters = [
-    { name: "Contains", filter: "contains" },
-    { name: "Starts with", filter: "startsWith" },
-    { name: "Fuzzy", filter: fuzzy },
-  ] as const
+  const filters = {
+    contains: "contains",
+    startsWith: "startsWith",
+    fuzzy,
+  } as const
+  const modes = [
+    { value: "contains", label: "Contains" },
+    { value: "startsWith", label: "Starts with" },
+    { value: "fuzzy", label: "Fuzzy" },
+  ]
+  type Mode = keyof typeof filters
 
-  let mode = $state.raw<(typeof filters)[number]>(filters[0])
+  let mode = $state<Mode>("contains")
 </script>
 
 <div data-slot="stack">
-  <div role="group" aria-label="Filter" data-slot="row">
-    {#each filters as option (option.name)}
-      <button type="button" aria-pressed={mode === option} onclick={() => (mode = option)}>
-        {option.name}
-      </button>
-    {/each}
+  <div data-slot="controls">
+    <Select items={modes} value={mode} onValueChange={(next) => next && (mode = next as Mode)}>
+      <SelectLabel>Filter</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
+      <SelectContent>
+        {#each modes as option (option.value)}
+          <SelectItem value={option.value}>
+            {option.label}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
   </div>
-  <Combobox filter={mode.filter}>
+  <Combobox filter={filters[mode]}>
     <div data-slot="stack">
       <ComboboxLabel>Country</ComboboxLabel>
       <div data-slot="row">
-        <ComboboxInput placeholder="Try “an” or “swd”" />
+        <ComboboxInput placeholder="Try “an”, “swd” or “deutschland”" />
         <ComboboxTrigger aria-label="Show countries">
           <ChevronDownIcon aria-hidden="true" />
         </ComboboxTrigger>
@@ -69,7 +96,7 @@
       <ComboboxEmpty>No countries found.</ComboboxEmpty>
       <ComboboxList>
         {#each countries as country (country.value)}
-          <ComboboxItem value={country.value} label={country.label}>
+          <ComboboxItem value={country.value} label={country.label} keywords={country.keywords}>
             {country.label}
             <ComboboxItemIndicator>
               <CheckIcon aria-hidden="true" />

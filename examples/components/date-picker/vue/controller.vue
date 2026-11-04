@@ -21,36 +21,38 @@ const controller = createDatePickerController()
 </script>
 
 <template>
-  <DatePicker :controller="controller" default-value="2026-10-16">
-    <div data-slot="row">
-      <DatePickerInput aria-label="Due date" />
-      <DatePickerTrigger>
-        <CalendarIcon />
-      </DatePickerTrigger>
-    </div>
-    <DatePickerHint />
-    <DatePickerContent>
-      <div data-slot="row">
-        <CalendarPrevious data-variant="ghost">
-          <ChevronLeftIcon />
-        </CalendarPrevious>
-        <CalendarHeading />
-        <CalendarNext data-variant="ghost">
-          <ChevronRightIcon />
-        </CalendarNext>
-      </div>
-      <CalendarGrid>
-        <CalendarWeekdays v-slot="{ index }">
-          <CalendarWeekday :index="index" />
-        </CalendarWeekdays>
-        <CalendarWeeks v-slot="{ cell }">
-          <CalendarDay :value="cell.date" />
-        </CalendarWeeks>
-      </CalendarGrid>
-    </DatePickerContent>
-    <div data-slot="row">
-      <button type="button" @click="controller.setValue('2026-12-25')">Christmas</button>
+  <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="controller.setValue('2026-12-25')">Choose Christmas</button>
       <button type="button" @click="controller.open()">Open</button>
     </div>
-  </DatePicker>
+    <DatePicker :controller="controller" default-value="2026-10-16">
+      <div data-slot="row">
+        <DatePickerInput aria-label="Due date" />
+        <DatePickerTrigger data-variant="ghost">
+          <CalendarIcon aria-hidden="true" />
+        </DatePickerTrigger>
+      </div>
+      <DatePickerHint />
+      <DatePickerContent>
+        <div data-slot="row">
+          <CalendarPrevious data-variant="ghost">
+            <ChevronLeftIcon aria-hidden="true" />
+          </CalendarPrevious>
+          <CalendarHeading />
+          <CalendarNext data-variant="ghost">
+            <ChevronRightIcon aria-hidden="true" />
+          </CalendarNext>
+        </div>
+        <CalendarGrid>
+          <CalendarWeekdays v-slot="{ index }">
+            <CalendarWeekday :index="index" />
+          </CalendarWeekdays>
+          <CalendarWeeks v-slot="{ cell }">
+            <CalendarDay :value="cell.date" />
+          </CalendarWeeks>
+        </CalendarGrid>
+      </DatePickerContent>
+    </DatePicker>
+  </div>
 </template>

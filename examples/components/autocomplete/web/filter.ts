@@ -18,7 +18,7 @@ function mount(root: HTMLElement) {
           <input placeholder="Try “bug”" />
         </ui-autocomplete-input>
       </div>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
         <ui-autocomplete-empty>No tags found.</ui-autocomplete-empty>
         <ui-autocomplete-list>
           ${tags

@@ -75,15 +75,9 @@ const { state: results, setQuery, loadMore } = useAsyncOptions(searchCities, { d
         <template v-if="state.empty && !state.loading">No cities start with “{{ state.query }}”.</template>
       </AutocompleteEmpty>
       <AutocompleteList v-slot="{ state }">
-        <AutocompleteItem
-          v-for="item in state.items as { value: string; label: string; disabled?: boolean }[]"
-          :key="item.value"
-          :value="item.value"
-          :label="item.label"
-          :disabled="item.disabled"
-        >
-          {{ item.label }}
-        </AutocompleteItem>
+        <AutocompleteItem v-for="city in state.items as string[]" :key="city" :value="city">{{
+          city
+        }}</AutocompleteItem>
       </AutocompleteList>
     </AutocompleteContent>
   </Autocomplete>

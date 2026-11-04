@@ -1,20 +1,23 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field-set>
-      <fieldset data-slot="stack" dir="rtl">
+      <fieldset dir="rtl">
         <legend>العنوان</legend>
         <ui-field-description>نحتاج عنوانك لتوصيل طلبك.</ui-field-description>
         <ui-field name="street">
           <ui-field-label>الشارع</ui-field-label>
-          <input />
+          <ui-input><input /></ui-input>
         </ui-field>
         <ui-field name="city">
           <ui-field-label>المدينة</ui-field-label>
-          <input />
+          <ui-input><input /></ui-input>
         </ui-field>
       </fieldset>
     </ui-field-set>
   `
 }
+
+export { mount }

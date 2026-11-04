@@ -10,6 +10,7 @@ import {
   ComboboxTrigger,
 } from "@ui-sdk/solid/combobox"
 import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -33,29 +34,37 @@ const countries = [
 
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
-export function Example() {
+function Example() {
   const [value, setValue] = createSignal<string | null>("fr")
   const [query, setQuery] = createSignal("France")
   const [open, setOpen] = createSignal(false)
-  const [log, setLog] = createSignal("")
+  const log = useLog()
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => setValue("jp")}>
+          Choose Japan
+        </button>
+        <button type="button" onClick={() => setOpen(true)}>
+          Open
+        </button>
+      </div>
       <Combobox
         value={value()}
         onValueChange={(next, details) => {
           setValue(next)
-          setLog(`value: ${next} (${details.reason})`)
+          log(`value: ${next} (${details.reason})`)
         }}
         query={query()}
         onQueryChange={(next, details) => {
           setQuery(next)
-          setLog(`query: “${next}” (${details.reason})`)
+          log(`query: “${next}” (${details.reason})`)
         }}
         open={open()}
         onOpenChange={(next, details) => {
           setOpen(next)
-          setLog(`open: ${next} (${details.reason})`)
+          log(`open: ${next} (${details.reason})`)
         }}
         itemToLabel={countryLabel}
         debug
@@ -105,15 +114,8 @@ export function Example() {
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
-      <div data-slot="row">
-        <button type="button" onClick={() => setValue("jp")}>
-          Japan
-        </button>
-        <button type="button" onClick={() => setOpen(true)}>
-          Open
-        </button>
-      </div>
-      <output data-slot="output">{log() || "Change something"}</output>
     </div>
   )
 }
+
+export { Example }

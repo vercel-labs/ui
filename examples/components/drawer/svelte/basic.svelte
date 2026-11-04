@@ -15,51 +15,42 @@
 </script>
 
 <Drawer>
-  <DrawerTrigger>
-    Open Drawer
-  </DrawerTrigger>
+  <DrawerTrigger>Open Drawer</DrawerTrigger>
   <DrawerBackdrop />
   <DrawerContent>
     <div data-slot="grip" aria-hidden="true"></div>
-    
+
+    <div data-slot="stack">
+      <DrawerTitle>Move goal</DrawerTitle>
+      <DrawerDescription>Set your daily activity goal.</DrawerDescription>
+    </div>
+
+    <div data-slot="row">
+      <button
+        type="button"
+        aria-label="Decrease"
+        disabled={calories <= goal.min}
+        onclick={() => (calories -= goal.step)}
+      >
+        <MinusIcon aria-hidden="true" />
+      </button>
       <div data-slot="stack">
-        <DrawerTitle>Move Goal</DrawerTitle>
-        <DrawerDescription>Set your daily activity goal.</DrawerDescription>
+        <div aria-live="polite">{calories}</div>
+        <div data-slot="hint">Calories/day</div>
       </div>
-      
-        <div data-slot="row">
-          <button
-            type="button"
-            aria-label="Decrease"
-            disabled={calories <= goal.min}
-            onclick={() => (calories -= goal.step)}
-          >
-            <MinusIcon aria-hidden="true" />
-          </button>
-          <div data-slot="stack">
-            <div aria-live="polite">
-              {calories}
-            </div>
-            <div data-slot="hint">Calories/day</div>
-          </div>
-          <button
-            type="button"
-            aria-label="Increase"
-            disabled={calories >= goal.max}
-            onclick={() => (calories += goal.step)}
-          >
-            <PlusIcon aria-hidden="true" />
-          </button>
-        </div>
-      
-      <div data-slot="stack">
-        <DrawerClose data-variant="solid" value="submit">
-          Submit
-        </DrawerClose>
-        <DrawerClose>
-          Cancel
-        </DrawerClose>
-      </div>
-    
+      <button
+        type="button"
+        aria-label="Increase"
+        disabled={calories >= goal.max}
+        onclick={() => (calories += goal.step)}
+      >
+        <PlusIcon aria-hidden="true" />
+      </button>
+    </div>
+
+    <div data-slot="stack">
+      <DrawerClose data-variant="solid" value="submit">Submit</DrawerClose>
+      <DrawerClose>Cancel</DrawerClose>
+    </div>
   </DrawerContent>
 </Drawer>

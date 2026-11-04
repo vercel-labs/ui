@@ -1,20 +1,26 @@
 import { createCheckboxController, type CheckedState } from "@ui-sdk/core/checkbox"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
+  const log = useLog()
   const updates = createCheckboxController()
   const [checked, setChecked] = createSignal<CheckedState>(false)
-  const [reason, setReason] = createSignal("")
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => updates.toggle()}>
+          Toggle
+        </button>
+      </div>
       <label data-slot="label">
         <Checkbox
           checked={checked()}
           onCheckedChange={(next, details) => {
             setChecked(next)
-            setReason(details.reason)
+            log(`${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`)
           }}
           controller={updates}
         >
@@ -34,13 +40,6 @@ function Example() {
         </Checkbox>
         Email me about product updates
       </label>
-      <button type="button" onClick={() => updates.toggle()}>
-        Toggle from outside
-      </button>
-      <output data-slot="output">
-        Checked: {String(checked())}
-        {reason() && `, last change: ${reason()}`}
-      </output>
     </div>
   )
 }

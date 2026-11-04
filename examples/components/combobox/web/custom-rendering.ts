@@ -1,27 +1,42 @@
 import "@ui-sdk/web/combobox"
-import { Check, createElement, Search } from "lucide"
+import { Check, ChevronDown, ChevronUp, createElement, Search } from "lucide"
 
 const users = [
-  { id: 1, name: "Ada Lovelace", username: "ada", role: "Owner" },
-  { id: 2, name: "Grace Hopper", username: "grace", role: "Admin" },
-  { id: 3, name: "Alan Turing", username: "alan", role: "Member" },
-  { id: 4, name: "Margaret Hamilton", username: "margaret", role: "Member" },
-  { id: 5, name: "Edsger Dijkstra", username: "edsger", role: "Guest" },
+  { id: 1, name: "Hollis Grant", username: "hollis", role: "Owner" },
+  { id: 2, name: "Inès Moreau", username: "ines", role: "Admin" },
+  { id: 3, name: "Kofi Mensah", username: "kofi", role: "Member" },
+  { id: 4, name: "Wren Takahashi", username: "wren", role: "Member" },
+  { id: 5, name: "Tomasz Wójcik", username: "tomasz", role: "Guest" },
 ]
 
-export function mount(root: HTMLElement) {
+const chevron = (open: boolean) =>
+  createElement(open ? ChevronUp : ChevronDown, { "aria-hidden": "true" }).outerHTML
+
+const mark = (item: Element) =>
+  item.hasAttribute("data-selected")
+    ? createElement(Check, { "aria-hidden": "true" }).outerHTML
+    : item.hasAttribute("data-highlighted")
+      ? `<kbd data-slot="kbd">Enter</kbd>`
+      : ""
+
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-combobox>
       <div data-slot="stack">
-        <ui-combobox-label>Mention</ui-combobox-label>
+        <ui-combobox-label>Assignee</ui-combobox-label>
         <div data-slot="row">
-          ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
-          <ui-combobox-input>
-            <input placeholder="@username" />
-          </ui-combobox-input>
+          <div data-slot="row">
+            ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
+            <ui-combobox-input>
+              <input placeholder="Search people" />
+            </ui-combobox-input>
+          </div>
+          <ui-combobox-trigger>
+            <button aria-label="Show people">${chevron(false)}</button>
+          </ui-combobox-trigger>
         </div>
       </div>
-      <ui-combobox-content>
+      <ui-combobox-content hidden>
         <ui-combobox-empty>No one by that name.</ui-combobox-empty>
         <ui-combobox-list>
           ${users
@@ -33,7 +48,6 @@ export function mount(root: HTMLElement) {
                     ${user.name}
                     <span data-slot="hint">@${user.username}</span>
                   </span>
-                  ${createElement(Check, { "data-show": "selected", "aria-hidden": "true" }).outerHTML}
                 </ui-combobox-item>
               `,
             )
@@ -42,4 +56,23 @@ export function mount(root: HTMLElement) {
       </ui-combobox-content>
     </ui-combobox>
   `
+  const update = (el: Element) => {
+    if (el.localName === "button") el.innerHTML = chevron(el.hasAttribute("data-open"))
+    if (el.localName !== "ui-combobox-item") return
+    el.querySelector(":scope > svg, :scope > kbd")?.remove()
+    el.insertAdjacentHTML("beforeend", mark(el))
+  }
+  const observer = new MutationObserver((records) =>
+    records.forEach((record) => update(record.target as Element)),
+  )
+  observer.observe(root.querySelector("ui-combobox-trigger")!, {
+    subtree: true,
+    attributeFilter: ["data-open"],
+  })
+  observer.observe(root.querySelector("ui-combobox-list")!, {
+    subtree: true,
+    attributeFilter: ["data-selected", "data-highlighted"],
+  })
 }
+
+export { mount }

@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
@@ -29,10 +30,10 @@ const fruits = [
 
 const fruit = createAutocompleteController()
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" data-size="sm" onClick={() => fruit.open()}>
           Open
         </button>
@@ -50,6 +51,7 @@ export function Example() {
         <AutocompleteLabel>Fruit</AutocompleteLabel>
         <AutocompleteInput />
         <AutocompleteContent>
+          <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
             <For each={fruits}>{(item) => <AutocompleteItem value={item}>{item}</AutocompleteItem>}</For>
           </AutocompleteList>
@@ -58,3 +60,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

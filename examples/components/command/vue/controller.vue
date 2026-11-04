@@ -7,7 +7,7 @@ import {
   CommandPage,
   createCommandController,
 } from "@ui-sdk/vue/command"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const themes = [
   { value: "light", label: "Light" },
@@ -16,24 +16,20 @@ const themes = [
 ]
 
 const palette = createCommandController()
-const ran = ref("")
-
-function onAction(value: string) {
-  ran.value = value
-}
+const log = useLog()
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
-      <button type="button" @click="palette.push('theme')">Open themes</button>
+    <div data-slot="controls">
+      <button type="button" @click="palette.push('theme')">Open Themes</button>
       <button type="button" @click="palette.pop()">Back</button>
       <button type="button" @click="palette.setValue('dark')">Highlight Dark</button>
       <button type="button" @click="palette.setQuery('li')">Search “li”</button>
-      <button type="button" @click="palette.run()">Run highlighted</button>
+      <button type="button" @click="palette.run()">Run Highlighted</button>
       <button type="button" @click="palette.focus()">Focus</button>
     </div>
-    <Command :controller="palette" @action="onAction">
+    <Command :controller="palette" @action="(value: string) => log(`Ran ${value}`)">
       <CommandInput aria-label="Search commands" />
       <CommandList>
         <CommandPage>
@@ -46,6 +42,5 @@ function onAction(value: string) {
         </CommandPage>
       </CommandList>
     </Command>
-    <output data-slot="output">{{ ran ? `Ran ${ran}` : "Nothing run yet" }}</output>
   </div>
 </template>

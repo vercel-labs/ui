@@ -9,23 +9,23 @@
     CalendarWeekday,
     CalendarWeekdays,
     CalendarWeeks,
-    type CalendarMonthChangeReason,
     type CalendarValue,
-    type CalendarValueChangeReason,
   } from "@ui-sdk/svelte/calendar"
   import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let value = $state<CalendarValue>("2026-10-16")
   let month = $state("2026-10")
-  let reason = $state("")
-
-  function onChange(_next: unknown, details: { reason: CalendarValueChangeReason | CalendarMonthChangeReason }) {
-    reason = details.reason
-  }
 </script>
 
 <div>
-  <Calendar bind:value bind:month onValueChange={onChange} onMonthChange={onChange}>
+  <Calendar
+    bind:value
+    bind:month
+    onValueChange={(next, details) => log(`Selected ${String(next)} (${details.reason})`)}
+    onMonthChange={(next, details) => log(`Showing ${next} (${details.reason})`)}
+  >
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
         <ChevronLeftIcon />
@@ -48,7 +48,4 @@
       </CalendarWeeks>
     </CalendarGrid>
   </Calendar>
-  <output data-slot="output">
-    {String(value)}, showing {month} {reason && `(${reason})`}
-  </output>
 </div>

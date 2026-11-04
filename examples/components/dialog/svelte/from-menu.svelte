@@ -9,6 +9,7 @@
     DialogDescription,
     DialogTitle,
   } from "@ui-sdk/svelte/dialog"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/svelte/menu"
 
   const rename = createDialogController()
@@ -36,17 +37,13 @@
       <DialogTitle>Rename file</DialogTitle>
       <DialogDescription>Names must be unique in a folder.</DialogDescription>
     </div>
-    <label data-slot="label">
-      Name
-      <input value="report.pdf" />
-    </label>
+    <Field>
+      <FieldLabel>Name</FieldLabel>
+      <FieldControl defaultValue="report.pdf" />
+    </Field>
     <div data-slot="row">
-      <DialogClose>
-        Cancel
-      </DialogClose>
-      <DialogClose data-variant="solid" value="rename">
-        Rename
-      </DialogClose>
+      <DialogClose>Cancel</DialogClose>
+      <DialogClose data-variant="solid" value="rename">Rename</DialogClose>
     </div>
   </DialogContent>
 </Dialog>

@@ -1,6 +1,7 @@
 import "@ui-sdk/web/checkbox"
 import "@ui-sdk/web/field"
 import { Check, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const channels = [
   { value: "email", label: "Email" },
@@ -13,9 +14,7 @@ function mount(root: HTMLElement) {
     <form data-slot="stack">
       <ui-field>
         <ui-field-label>Notifications</ui-field-label>
-        <ui-field-description>
-          Choose how we tell you about your orders.
-        </ui-field-description>
+        <ui-field-description>Choose how we tell you about your orders.</ui-field-description>
         <ui-checkbox-group name="notifications" required>
           ${channels
             .map(
@@ -32,19 +31,18 @@ function mount(root: HTMLElement) {
             )
             .join("")}
         </ui-checkbox-group>
-        <div><ui-field-error>Choose at least one way to be notified.</ui-field-error></div>
+        <div>
+          <ui-field-error>Choose at least one way to be notified.</ui-field-error>
+        </div>
       </ui-field>
-      <button type="submit">
-        Save
-      </button>
-      <output data-slot="output"></output>
+      <button type="submit">Save</button>
     </form>
   `
   const form = root.querySelector("form")!
-  const result = root.querySelector("output")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    result.textContent = `notifications: ${new FormData(form).getAll("notifications").join(", ")}`
+    const entries = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
+    log(root, `Saved ${entries.join("&")}`)
   })
 }
 

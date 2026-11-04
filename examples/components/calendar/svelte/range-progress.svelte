@@ -11,16 +11,16 @@
     CalendarWeeks,
   } from "@ui-sdk/svelte/calendar"
   import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let anchor = $state<string | null>(null)
-  let focused = $state<string | null>(null)
+  const log = useLog()
 </script>
 
 <div>
   <Calendar
     mode="range"
-    onAnchorChange={(date) => (anchor = date)}
-    onFocusedChange={(date) => (focused = date)}
+    onAnchorChange={(anchor) => log(anchor ? `Started on ${anchor}` : "Range finished")}
+    onFocusedChange={(focused) => log(`Focus on ${focused}`)}
   >
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
@@ -44,7 +44,4 @@
       </CalendarWeeks>
     </CalendarGrid>
   </Calendar>
-  <output data-slot="output">
-    {anchor ? `Started on ${anchor}, focus on ${focused}` : `Focus on ${focused ?? "no date yet"}`}
-  </output>
 </div>

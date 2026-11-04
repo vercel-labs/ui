@@ -11,24 +11,18 @@
 </script>
 
 <AlertDialog>
-  <AlertDialogTrigger>
-    Delete project
-  </AlertDialogTrigger>
+  <AlertDialogTrigger>Delete Project</AlertDialogTrigger>
   <AlertDialogBackdrop />
   <AlertDialogContent>
     <div data-slot="stack">
       <AlertDialogTitle>Delete this project?</AlertDialogTitle>
       <AlertDialogDescription>
-        The project and its files will be deleted for everyone.
+        This permanently deletes the project, its files and its deployment history for everyone on your team.
       </AlertDialogDescription>
     </div>
     <div data-slot="row">
-      <AlertDialogClose>
-        Cancel
-      </AlertDialogClose>
-      <AlertDialogClose data-variant="solid" value="confirm">
-        Delete
-      </AlertDialogClose>
+      <AlertDialogClose>Cancel</AlertDialogClose>
+      <AlertDialogClose data-variant="solid" value="confirm">Delete</AlertDialogClose>
     </div>
   </AlertDialogContent>
 </AlertDialog>

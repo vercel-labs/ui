@@ -12,6 +12,7 @@
     type CommandData,
     type CommandDataItem,
   } from "@ui-sdk/svelte/command"
+  import { useLog } from "../../../shared/svelte/log"
 
   const commands: CommandData = [
     {
@@ -42,11 +43,7 @@
     },
   ]
 
-  let ran = $state("")
-
-  function onAction(value: string) {
-    ran = value
-  }
+  const log = useLog()
 </script>
 
 {#snippet commandList(items: CommandData)}
@@ -79,7 +76,7 @@
 {/snippet}
 
 <div data-slot="stack">
-  <Command items={commands} {onAction}>
+  <Command items={commands} onAction={(value) => log(`Ran ${value}`)}>
     <CommandInput aria-label="Search commands" placeholder="Type a command..." />
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandList>
@@ -88,5 +85,4 @@
       {/snippet}
     </CommandList>
   </Command>
-  <output data-slot="output">{ran ? `Ran ${ran}` : "Nothing run yet"}</output>
 </div>

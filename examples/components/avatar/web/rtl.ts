@@ -18,7 +18,7 @@ const team = [
   },
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   const avatars = team.map(
     (person) => `
       <ui-avatar>
@@ -33,3 +33,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

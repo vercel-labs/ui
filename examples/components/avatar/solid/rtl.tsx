@@ -19,7 +19,7 @@ const team = [
   },
 ]
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="row" dir="rtl">
       <For each={team}>
@@ -34,3 +34,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

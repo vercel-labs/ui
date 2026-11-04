@@ -6,23 +6,23 @@
     createCheckboxController,
     type CheckedState,
   } from "@ui-sdk/svelte/checkbox"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   const updates = createCheckboxController()
   let checked = $state<CheckedState>(false)
-  let reason = $state("")
-
-  function onCheckedChange(_: CheckedState, details: { reason: string }) {
-    reason = details.reason
-  }
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={() => updates.toggle()}>Toggle</button>
+  </div>
   <label data-slot="label">
     <Checkbox
       bind:checked
       controller={updates}
-
-      {onCheckedChange}
+      onCheckedChange={(next, details) =>
+        log(`${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`)}
     >
       <CheckboxIndicator>
         <CheckIcon aria-hidden="true" />
@@ -30,10 +30,4 @@
     </Checkbox>
     Email me about product updates
   </label>
-  <button type="button" onclick={() => updates.toggle()}>
-    Toggle from outside
-  </button>
-  <output data-slot="output">
-      Checked: {String(checked)}{reason ? `, last change: ${reason}` : ""}
-    </output>
 </div>

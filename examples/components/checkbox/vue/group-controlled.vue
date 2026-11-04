@@ -4,31 +4,36 @@ import type { ChangeDetails } from "@ui-sdk/core"
 import { createCheckboxGroupController } from "@ui-sdk/core/checkbox"
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const days = [
-  { value: "mon", label: "Mon" },
-  { value: "tue", label: "Tue" },
-  { value: "wed", label: "Wed" },
-  { value: "thu", label: "Thu" },
-  { value: "fri", label: "Fri" },
-  { value: "sat", label: "Sat" },
-  { value: "sun", label: "Sun" },
+  { value: "mon", label: "Monday" },
+  { value: "tue", label: "Tuesday" },
+  { value: "wed", label: "Wednesday" },
+  { value: "thu", label: "Thursday" },
+  { value: "fri", label: "Friday" },
+  { value: "sat", label: "Saturday" },
+  { value: "sun", label: "Sunday" },
 ]
 
 const weekdays = ["mon", "tue", "wed", "thu", "fri"]
 
+const log = useLog()
 const schedule = createCheckboxGroupController()
-
 const value = ref(["mon", "tue"])
-const reason = ref("")
 
-function onValueChange(_: string[], details: ChangeDetails) {
-  reason.value = details.reason
+function onValueChange(next: string[], details: ChangeDetails) {
+  const names = days.filter((day) => next.includes(day.value)).map((day) => day.label)
+  log(`${names.join(", ") || "No days"} (${details.reason})`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="schedule.setValue(weekdays)">Select Weekdays</button>
+      <button type="button" @click="schedule.setValue([])">Clear</button>
+    </div>
     <h3 id="controlled-days">Working days</h3>
     <CheckboxGroup
       v-model:value="value"
@@ -45,13 +50,5 @@ function onValueChange(_: string[], details: ChangeDetails) {
         {{ day.label }}
       </label>
     </CheckboxGroup>
-    <div data-slot="row">
-      <button type="button" @click="schedule.setValue(weekdays)">Select weekdays</button>
-      <button type="button" @click="schedule.setValue([])">Clear</button>
-    </div>
-
-    <output data-slot="output"
-      >Value: {{ JSON.stringify(value) }}{{ reason && `, last change: ${reason}` }}</output
-    >
   </div>
 </template>

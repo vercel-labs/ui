@@ -13,22 +13,20 @@
 </script>
 
 <Carousel aria-label="Featured" defaultPage={3}>
-  <CarouselViewport>
-    <CarouselContent>
-      {#each slides as slide (slide)}
-        <CarouselItem>
-          <div data-slot="tile">
-            {slide}
-          </div>
-        </CarouselItem>
-      {/each}
-    </CarouselContent>
-  </CarouselViewport>
   <div data-slot="row">
-    <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+    <CarouselPrevious aria-label="Previous slide">
       <ChevronLeftIcon />
     </CarouselPrevious>
-    <CarouselNext data-variant="secondary" aria-label="Next slide">
+    <CarouselViewport>
+      <CarouselContent>
+        {#each slides as slide (slide)}
+          <CarouselItem>
+            <div data-slot="tile">{slide}</div>
+          </CarouselItem>
+        {/each}
+      </CarouselContent>
+    </CarouselViewport>
+    <CarouselNext aria-label="Next slide">
       <ChevronRightIcon />
     </CarouselNext>
   </div>

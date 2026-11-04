@@ -13,7 +13,7 @@ function mount(root: HTMLElement) {
         </ui-date-picker-trigger>
       </div>
       <ui-date-picker-hint></ui-date-picker-hint>
-      <ui-date-picker-content>
+      <ui-date-picker-content hidden>
         <div data-slot="row">
           <ui-calendar-previous>
             <button data-variant="ghost">

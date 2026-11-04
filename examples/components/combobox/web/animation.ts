@@ -1,5 +1,6 @@
 import "@ui-sdk/web/combobox"
 import { Check, ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -11,7 +12,7 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-combobox>
       <div data-slot="stack">
@@ -24,9 +25,8 @@ export function mount(root: HTMLElement) {
             <button aria-label="Show frameworks">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
           </ui-combobox-trigger>
         </div>
-        <output data-slot="output">Closed</output>
       </div>
-      <ui-combobox-content>
+      <ui-combobox-content hidden>
         <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
         <ui-combobox-list>
           ${frameworks
@@ -43,12 +43,11 @@ export function mount(root: HTMLElement) {
       </ui-combobox-content>
     </ui-combobox>
   `
-  const combobox = root.querySelector("ui-combobox")!
-  const status = root.querySelector("output")!
-  combobox.addEventListener("openchange", (event) => {
-    status.textContent = (event as CustomEvent<{ value: boolean }>).detail.value ? "Opening…" : "Closing…"
-  })
-  combobox.addEventListener("openchangecomplete", (event) => {
-    status.textContent = (event as CustomEvent<{ value: boolean }>).detail.value ? "Open" : "Closed"
-  })
+  root
+    .querySelector("ui-combobox")!
+    .addEventListener("openchangecomplete", (event) =>
+      log(root, event.detail.value ? "Finished opening" : "Finished closing"),
+    )
 }
+
+export { mount }

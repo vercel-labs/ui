@@ -37,7 +37,7 @@ const priceOf = (date: string) => 80 + ((Number(date.slice(8)) * 7) % 5) * 10
         <CalendarDay v-slot="{ state }" :value="cell.date">
           <span data-slot="stack">
             <span>{{ state.label }}</span>
-            <span v-if="!state.outside && !state.disabled"> ${{ priceOf(state.date) }} </span>
+            <span v-if="!state.outside && !state.disabled" data-slot="hint">${{ priceOf(state.date) }}</span>
           </span>
         </CalendarDay>
       </CalendarWeeks>

@@ -20,6 +20,20 @@ function Example() {
     <DatePicker defaultValue="2026-10-16">
       <div data-slot="row">
         <DatePickerInput aria-label="Due date" />
+        <DatePickerClear data-variant="ghost" aria-label="Clear date">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </DatePickerClear>
         <DatePickerTrigger data-variant="ghost">
           <svg
             viewBox="0 0 24 24"
@@ -73,7 +87,6 @@ function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </DatePickerContent>
-      <DatePickerClear data-variant="ghost">Clear</DatePickerClear>
     </DatePicker>
   )
 }

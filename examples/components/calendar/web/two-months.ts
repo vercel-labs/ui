@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, createElement } from "lucide"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-calendar months="2" page-by="page" default-value="2026-10-16">
+    <ui-calendar months="2" page-by="page" month-format="short" default-value="2026-10-16">
       <div data-slot="row">
         <ui-calendar-previous>
           <button data-variant="ghost">
@@ -17,7 +17,7 @@ function mount(root: HTMLElement) {
           </button>
         </ui-calendar-next>
       </div>
-      <div data-slot="stack">
+      <div data-slot="row">
         <ui-calendar-grid offset="0">
           <ui-calendar-weekdays>
             <template><ui-calendar-weekday></ui-calendar-weekday></template>

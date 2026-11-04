@@ -4,17 +4,9 @@
 
 <div data-slot="row">
   <Button>
-    {#snippet render({ props })}<a
-      {...props}
-      href="#installation"
-    >Get started</a>{/snippet}
+    {#snippet render({ props })}<a {...props} href="#installation">Get Started</a>{/snippet}
   </Button>
-  <Button
-    disabled
-  >
-    {#snippet render({ props })}<a
-      {...props}
-      href="#changelog"
-    >Changelog</a>{/snippet}
+  <Button disabled>
+    {#snippet render({ props })}<a {...props} href="#changelog">Changelog</a>{/snippet}
   </Button>
 </div>

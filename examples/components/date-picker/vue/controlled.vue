@@ -18,12 +18,13 @@ import {
 } from "@ui-sdk/vue/date-picker"
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const value = ref<DatePickerValue>("2026-10-16")
-const reason = ref("initial")
+const log = useLog()
 
-function onValueChange(_next: DatePickerValue, details: { reason: DatePickerValueChangeReason }) {
-  reason.value = details.reason
+function onValueChange(next: DatePickerValue, details: { reason: DatePickerValueChangeReason }) {
+  log(`${next ?? "No date"} (${details.reason})`)
 }
 </script>
 
@@ -31,19 +32,19 @@ function onValueChange(_next: DatePickerValue, details: { reason: DatePickerValu
   <DatePicker v-model:value="value" @value-change="onValueChange">
     <div data-slot="row">
       <DatePickerInput aria-label="Due date" />
-      <DatePickerTrigger>
-        <CalendarIcon />
+      <DatePickerTrigger data-variant="ghost">
+        <CalendarIcon aria-hidden="true" />
       </DatePickerTrigger>
     </div>
     <DatePickerHint />
     <DatePickerContent>
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
-          <ChevronLeftIcon />
+          <ChevronLeftIcon aria-hidden="true" />
         </CalendarPrevious>
         <CalendarHeading />
         <CalendarNext data-variant="ghost">
-          <ChevronRightIcon />
+          <ChevronRightIcon aria-hidden="true" />
         </CalendarNext>
       </div>
       <CalendarGrid>
@@ -55,6 +56,5 @@ function onValueChange(_next: DatePickerValue, details: { reason: DatePickerValu
         </CalendarWeeks>
       </CalendarGrid>
     </DatePickerContent>
-    <p data-slot="hint">{{ value ?? "No date" }} ({{ reason }})</p>
   </DatePicker>
 </template>

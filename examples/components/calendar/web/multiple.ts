@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, createElement } from "lucide"
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div>
-      <ui-calendar mode="multiple" default-value="2026-10-06,2026-10-13">
+      <ui-calendar mode="multiple" default-value="2026-10-07,2026-10-16,2026-10-26">
         <div data-slot="row">
           <ui-calendar-previous>
             <button data-variant="ghost">
@@ -27,12 +27,8 @@ function mount(root: HTMLElement) {
           </ui-calendar-weeks>
         </ui-calendar-grid>
       </ui-calendar>
-      <output data-slot="output">2 selected</output>
     </div>
   `
-  root.querySelector("ui-calendar")!.addEventListener("valuechange", (event) => {
-    root.querySelector("output")!.textContent = `${(event.detail.value as string[]).length} selected`
-  })
 }
 
 export { mount }

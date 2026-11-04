@@ -1,37 +1,39 @@
 <script setup lang="ts">
-import { ArrowLeftIcon } from "@lucide/vue"
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
   AutocompleteList,
 } from "@ui-sdk/vue/autocomplete"
 
-const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Blackberry"]
+const pages = [
+  { title: "Installation", section: "Get Started", href: "#installation" },
+  { title: "Composition", section: "Concepts", href: "#composition" },
+  { title: "Build Your Own", section: "Concepts", href: "#build-your-own" },
+  { title: "Styling", section: "Guides", href: "#styling" },
+  { title: "API Reference", section: "Reference", href: "#api-reference" },
+  { title: "Accessibility", section: "Reference", href: "#accessibility" },
+]
 </script>
 
 <template>
-  <Autocomplete required>
+  <Autocomplete>
     <div data-slot="stack">
-      <AutocompleteLabel>Fruit</AutocompleteLabel>
-      <AutocompleteInput>
-        <template #render="{ props }">
-          <input v-bind="props" />
-        </template>
-      </AutocompleteInput>
+      <AutocompleteLabel>Jump to</AutocompleteLabel>
+      <AutocompleteInput placeholder="e.g. Styling" />
     </div>
     <AutocompleteContent>
+      <AutocompleteEmpty>No sections found.</AutocompleteEmpty>
       <AutocompleteList>
-        <AutocompleteItem value="Fruit guide" href="#fruit-guide">
+        <AutocompleteItem v-for="page in pages" :key="page.href" :value="page.title" :label="page.title">
           <template #render="{ props }">
-            <a v-bind="props">Read the fruit guide</a>
-          </template>
-        </AutocompleteItem>
-        <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit" :label="fruit">
-          <template #render="{ props, state }">
-            <div v-bind="props">{{ fruit }}<ArrowLeftIcon v-if="state.highlighted" aria-hidden="true" /></div>
+            <a v-bind="props" :href="page.href">
+              {{ page.title }}
+              <span data-slot="hint">{{ page.section }}</span>
+            </a>
           </template>
         </AutocompleteItem>
       </AutocompleteList>

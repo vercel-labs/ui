@@ -1,8 +1,8 @@
 <script lang="ts">
   import {
     Autocomplete,
-    AutocompleteArrow,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteInput,
     AutocompleteItem,
     AutocompleteLabel,
@@ -16,8 +16,10 @@
 
 <div bind:this={box} data-slot="card">
   <Autocomplete modal="pointer" container={box}>
-    <AutocompleteLabel>Fruit</AutocompleteLabel>
-    <AutocompleteInput />
+    <div data-slot="stack">
+      <AutocompleteLabel>Fruit</AutocompleteLabel>
+      <AutocompleteInput />
+    </div>
     <AutocompleteContent
       side="top"
       align="end"
@@ -27,7 +29,7 @@
       anchor={box}
       keepMounted
     >
-      <AutocompleteArrow />
+      <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
       <AutocompleteList>
         {#each fruits as fruit (fruit)}
           <AutocompleteItem value={fruit}>

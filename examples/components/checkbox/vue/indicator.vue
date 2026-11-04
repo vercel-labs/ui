@@ -13,7 +13,7 @@ const tasks = [
   <div data-slot="stack">
     <label data-slot="label" v-for="task in tasks" :key="task.label">
       <Checkbox :default-checked="task.done">
-        <CheckboxIndicator keep-mounted>
+        <CheckboxIndicator>
           <CheckIcon aria-hidden="true" />
         </CheckboxIndicator>
       </Checkbox>

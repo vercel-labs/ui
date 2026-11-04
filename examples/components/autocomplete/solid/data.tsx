@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteInput,
@@ -25,6 +26,7 @@ function Example() {
         <AutocompleteInput placeholder="e.g. Peach" />
       </div>
       <AutocompleteContent>
+        <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
           <For each={fruitGroups}>
             {(group, index) => (

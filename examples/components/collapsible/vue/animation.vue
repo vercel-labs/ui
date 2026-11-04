@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronDownIcon } from "@lucide/vue"
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const notes = [
   "Search now matches file contents, not only names.",
@@ -9,13 +9,19 @@ const notes = [
   "Uploads resume after the connection drops.",
 ]
 
-const settled = ref("")
+const log = useLog()
 </script>
 
 <template>
-  <Collapsible @open-change-complete="(open: boolean) => (settled = open ? 'opening' : 'closing')">
-    <CollapsibleTrigger data-variant="secondary">
-      Release notes
+  <Collapsible
+    data-variant="card"
+    @open-change-complete="(open: boolean) => log(open ? 'Finished opening' : 'Finished closing')"
+  >
+    <CollapsibleTrigger>
+      <span data-slot="stack">
+        <span>Release notes</span>
+        <span data-slot="hint">Version 2.4, released October 28</span>
+      </span>
       <ChevronDownIcon />
     </CollapsibleTrigger>
     <CollapsiblePanel>
@@ -24,5 +30,4 @@ const settled = ref("")
       </ul>
     </CollapsiblePanel>
   </Collapsible>
-  <output data-slot="output">{{ settled ? `Finished ${settled}` : "Not animated yet" }}</output>
 </template>

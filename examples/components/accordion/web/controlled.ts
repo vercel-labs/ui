@@ -35,17 +35,12 @@ function mount(root: HTMLElement) {
           )
           .join("")}
       </ui-accordion>
-      <output data-slot="output">Open: account</output>
     </div>
   `
   const accordion = root.querySelector("ui-accordion")!
   root
-    .querySelector("[data-slot=row] button")!
+    .querySelector("[data-slot=controls] button")!
     .addEventListener("click", () => accordion.api.open("security"))
-  accordion.addEventListener("valuechange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string[]; reason: string }>).detail
-    root.querySelector("output")!.textContent = `Open: ${value.join(", ") || "none"}, last change: ${reason}`
-  })
   accordion.addEventListener(
     "openchange",
     (event) => {

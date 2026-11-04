@@ -20,7 +20,7 @@ function Example() {
         <div data-slot="grip" aria-hidden="true" />
 
         <div data-slot="stack">
-          <DrawerTitle>Move Goal</DrawerTitle>
+          <DrawerTitle>Move goal</DrawerTitle>
           <DrawerDescription>Set your daily activity goal.</DrawerDescription>
         </div>
 

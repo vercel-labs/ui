@@ -8,6 +8,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@ui-sdk/vue/dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
 import { CopyIcon, EllipsisIcon, PencilIcon } from "@lucide/vue"
 
@@ -37,10 +38,10 @@ const rename = createDialogController()
         <DialogTitle>Rename file</DialogTitle>
         <DialogDescription>Names must be unique in a folder.</DialogDescription>
       </div>
-      <label data-slot="label">
-        Name
-        <input value="report.pdf" />
-      </label>
+      <Field>
+        <FieldLabel>Name</FieldLabel>
+        <FieldControl defaultValue="report.pdf" />
+      </Field>
       <div data-slot="row">
         <DialogClose>Cancel</DialogClose>
         <DialogClose data-variant="solid" value="rename">Rename</DialogClose>

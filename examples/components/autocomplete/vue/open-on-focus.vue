@@ -2,6 +2,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteInput,
@@ -16,6 +17,7 @@ const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
   <Autocomplete open-on-focus>
     <AutocompleteInput aria-label="Search" placeholder="Search…" />
     <AutocompleteContent>
+      <AutocompleteEmpty>No results.</AutocompleteEmpty>
       <AutocompleteList>
         <AutocompleteGroup>
           <AutocompleteGroupLabel>Recent searches</AutocompleteGroupLabel>

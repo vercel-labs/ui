@@ -6,32 +6,29 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 
 function Example() {
   return (
     <Dialog presentation="sheet">
-      <DialogTrigger>Edit profile</DialogTrigger>
+      <DialogTrigger>Edit Profile</DialogTrigger>
       <DialogContent>
         <div data-slot="stack">
           <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription>
+          <DialogDescription>Make changes to your profile here. Save when you're done.</DialogDescription>
         </div>
-        <div data-slot="stack">
-          <label data-slot="label">
-            Name
-            <input value="Hollis Grant" />
-          </label>
-          <label data-slot="label">
-            Username
-            <input value="@hollis" />
-          </label>
-        </div>
+        <Field>
+          <FieldLabel>Name</FieldLabel>
+          <FieldControl defaultValue="Hollis Grant" />
+        </Field>
+        <Field>
+          <FieldLabel>Username</FieldLabel>
+          <FieldControl defaultValue="@hollis" />
+        </Field>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>
           <DialogClose data-variant="solid" value="save">
-            Save changes
+            Save Changes
           </DialogClose>
         </div>
       </DialogContent>

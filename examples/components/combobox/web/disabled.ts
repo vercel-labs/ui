@@ -24,9 +24,9 @@ const countries = [
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
 const variants = [
-  { label: "Disabled", attributes: 'default-value="fr" disabled' },
-  { label: "Read-only", attributes: 'default-value="fr" read-only' },
-  { label: "Disabled item", attributes: "" },
+  { label: "Billing country", attributes: 'default-value="fr" disabled' },
+  { label: "Shipping from", attributes: 'default-value="fr" read-only' },
+  { label: "Shipping to", attributes: "" },
 ]
 
 function mount(root: HTMLElement) {
@@ -47,7 +47,7 @@ function mount(root: HTMLElement) {
                   </ui-combobox-trigger>
                 </div>
               </div>
-              <ui-combobox-content>
+              <ui-combobox-content hidden>
                 <ui-combobox-empty>No countries found.</ui-combobox-empty>
                 <ui-combobox-list>
                   ${countries

@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
@@ -34,6 +35,7 @@ function Example() {
         <AutocompleteInput placeholder="Type, then Enter" />
       </div>
       <AutocompleteContent>
+        <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
           <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
         </AutocompleteList>

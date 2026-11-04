@@ -1,27 +1,36 @@
 <script setup lang="ts">
 import { Button } from "@ui-sdk/vue/button"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import { computed, ref, useId } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const title = ref("")
-const published = ref(false)
 const hint = useId()
 const ready = computed(() => title.value.trim() !== "")
+
+function onTitle(event: Event) {
+  title.value = (event.target as HTMLInputElement).value
+}
 </script>
 
 <template>
   <div data-slot="stack">
-    <label data-slot="label">
-      Title
-      <input v-model="title" @input="published = false" />
-    </label>
+    <Field>
+      <FieldLabel>Title</FieldLabel>
+      <FieldControl :value="title" @input="onTitle" />
+    </Field>
     <div data-slot="row">
-      <Button :disabled="!ready" focusable-when-disabled @click="published = true">
-        <template #render="{ props }">
-          <button v-bind="props" :aria-describedby="hint">Publish</button>
-        </template>
+      <Button
+        :disabled="!ready"
+        focusable-when-disabled
+        :aria-describedby="hint"
+        @click="log(`Published “${title}”`)"
+      >
+        Publish
       </Button>
-      <p :id="hint">
-        {{ !ready ? "Add a title to publish." : published ? "Published." : "Ready to publish." }}
+      <p :id="hint" data-slot="hint">
+        {{ ready ? "Ready to publish." : "Add a title to publish." }}
       </p>
     </div>
   </div>

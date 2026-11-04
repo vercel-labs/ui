@@ -18,6 +18,7 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
+  import { useLog } from "../../../shared/svelte/log"
 
   const commands = [
     { value: "calendar", label: "Calendar", icon: CalendarIcon },
@@ -28,11 +29,11 @@
     { value: "settings", label: "Settings", icon: SettingsIcon },
   ]
 
+  const log = useLog()
   let open = $state(false)
-  let ran = $state("")
 
   function onAction(value: string) {
-    ran = value
+    log(`Ran ${value}`)
     open = false
   }
 </script>
@@ -68,5 +69,4 @@
       </Command>
     </DialogContent>
   </Dialog>
-  <output data-slot="output">{ran ? `Ran ${ran}` : "Press ⌘K or Ctrl+K"}</output>
 </div>

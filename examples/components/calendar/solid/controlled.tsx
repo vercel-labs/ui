@@ -11,23 +11,24 @@ import {
   type CalendarValue,
 } from "@ui-sdk/solid/calendar"
 import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
+function Example() {
   const [value, setValue] = createSignal<CalendarValue>("2026-10-16")
   const [month, setMonth] = createSignal("2026-10")
-  const [reason, setReason] = createSignal("")
+  const log = useLog()
   return (
     <div>
       <Calendar
         value={value()}
         onValueChange={(next, details) => {
           setValue(next)
-          setReason(details.reason)
+          log(`Selected ${String(next)} (${details.reason})`)
         }}
         month={month()}
         onMonthChange={(next, details) => {
           setMonth(next)
-          setReason(details.reason)
+          log(`Showing ${next} (${details.reason})`)
         }}
       >
         <div data-slot="row">
@@ -64,9 +65,8 @@ export function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </Calendar>
-      <output data-slot="output">
-        {String(value())}, showing {month()} {reason() && `(${reason()})`}
-      </output>
     </div>
   )
 }
+
+export { Example }

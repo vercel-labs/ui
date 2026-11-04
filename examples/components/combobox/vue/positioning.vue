@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { CheckIcon } from "@lucide/vue"
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import {
   Combobox,
-  ComboboxArrow,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
@@ -10,6 +10,15 @@ import {
   ComboboxItemIndicator,
   ComboboxList,
 } from "@ui-sdk/vue/combobox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue/select"
 import { ref } from "vue"
 
 const frameworks = [
@@ -22,42 +31,65 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-const sides = ["top", "right", "bottom", "left"] as const
-const aligns = ["start", "center", "end"] as const
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+]
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
+type Side = "top" | "right" | "bottom" | "left"
+type Align = "start" | "center" | "end"
 
-const side = ref<(typeof sides)[number]>("bottom")
-const align = ref<(typeof aligns)[number]>("start")
+const side = ref<Side>("bottom")
+const align = ref<Align>("start")
 const box = ref<HTMLDivElement | null>(null)
 const anchored = ref(false)
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="stack">
-      <div role="group" aria-label="Side" data-slot="row">
-        <button
-          v-for="value in sides"
-          :key="value"
-          type="button"
-          :aria-pressed="side === value"
-          @click="side = value"
-        >
-          {{ value }}
-        </button>
-      </div>
-      <div role="group" aria-label="Align" data-slot="row">
-        <button
-          v-for="value in aligns"
-          :key="value"
-          type="button"
-          :aria-pressed="align === value"
-          @click="align = value"
-        >
-          {{ value }}
-        </button>
-      </div>
+    <div data-slot="controls">
+      <Select :items="sides" :value="side" @value-change="(next) => next && (side = next as Side)">
+        <SelectLabel>Side</SelectLabel>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="option in sides" :key="option.value" :value="option.value">
+            {{ option.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      <Select :items="aligns" :value="align" @value-change="(next) => next && (align = next as Align)">
+        <SelectLabel>Align</SelectLabel>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="option in aligns" :key="option.value" :value="option.value">
+            {{ option.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
       <label data-slot="label">
-        <input v-model="anchored" type="checkbox" />
+        <Checkbox :checked="anchored" @checked-change="(next) => (anchored = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
         Anchor to the box
       </label>
     </div>
@@ -72,7 +104,6 @@ const anchored = ref(false)
           :collision-padding="16"
           :anchor="anchored ? box : null"
         >
-          <ComboboxArrow />
           <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
           <ComboboxList>
             <ComboboxItem

@@ -76,12 +76,8 @@ function Example() {
         </AutocompleteEmpty>
         <AutocompleteList>
           {(state) => (
-            <For each={state.items as { value: string; label: string; disabled?: boolean }[]}>
-              {(item) => (
-                <AutocompleteItem value={item.value} label={item.label} disabled={item.disabled}>
-                  {item.label}
-                </AutocompleteItem>
-              )}
+            <For each={state.items as string[]}>
+              {(city) => <AutocompleteItem value={city}>{city}</AutocompleteItem>}
             </For>
           )}
         </AutocompleteList>

@@ -7,31 +7,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 </script>
 
 <template>
   <Dialog presentation="sheet">
-    <DialogTrigger>Edit profile</DialogTrigger>
+    <DialogTrigger>Edit Profile</DialogTrigger>
     <DialogContent>
       <div data-slot="stack">
         <DialogTitle>Edit profile</DialogTitle>
-        <DialogDescription>
-          Make changes to your profile here. Click save when you're done.
-        </DialogDescription>
+        <DialogDescription>Make changes to your profile here. Save when you're done.</DialogDescription>
       </div>
-      <div data-slot="stack">
-        <label data-slot="label">
-          Name
-          <input value="Hollis Grant" />
-        </label>
-        <label data-slot="label">
-          Username
-          <input value="@hollis" />
-        </label>
-      </div>
+      <Field>
+        <FieldLabel>Name</FieldLabel>
+        <FieldControl defaultValue="Hollis Grant" />
+      </Field>
+      <Field>
+        <FieldLabel>Username</FieldLabel>
+        <FieldControl defaultValue="@hollis" />
+      </Field>
       <div data-slot="row">
         <DialogClose>Cancel</DialogClose>
-        <DialogClose data-variant="solid" value="save">Save changes</DialogClose>
+        <DialogClose data-variant="solid" value="save">Save Changes</DialogClose>
       </div>
     </DialogContent>
   </Dialog>

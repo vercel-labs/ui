@@ -1,12 +1,14 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteList,
 } from "@ui-sdk/solid/autocomplete"
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const fruits = [
   "Apple",
@@ -27,7 +29,7 @@ const fruits = [
 ]
 
 function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+  const log = useLog()
   return (
     <form
       id="order"
@@ -35,7 +37,7 @@ function Example() {
       onSubmit={(event) => {
         event.preventDefault()
         const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-        setSubmitted(data.join("&"))
+        log(`Submitted ${data.join("&")}`)
       }}
     >
       <Field>
@@ -43,6 +45,7 @@ function Example() {
         <Autocomplete name="fruit" form="order" required defaultValue="Apple">
           <AutocompleteInput />
           <AutocompleteContent>
+            <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
             <AutocompleteList>
               <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
             </AutocompleteList>
@@ -59,7 +62,6 @@ function Example() {
         </button>
         <button type="reset">Reset</button>
       </div>
-      <output data-slot="output">{submitted() || "Not submitted"}</output>
     </form>
   )
 }

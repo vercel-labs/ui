@@ -12,8 +12,8 @@ A drawer gives a task its own sheet without leaving the page. It shares [Dialog�
 
 ## Installation
 
-```package-install
-npm install @ui-sdk/web
+```bash
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
 Import the component to register its elements. The import is safe on the server.
@@ -38,37 +38,51 @@ ui-drawer
         └── button
 ```
 
-The content is the sheet. The drawer positions it inside a full-screen viewport and moves it with `translate`. Give it a size, a surface, and corners; leave positioning and translation to the drawer. Give the backdrop a color, such as `bg-black/30`; the drawer manages its opacity.
+The content is the sheet. The drawer positions it inside a full-screen viewport and moves it with `translate`. Give it a size, a surface, and corners; leave positioning and translation to the drawer. Give the backdrop a color, such as `bg-black/30`; the drawer manages its opacity. Give the content and backdrop `hidden` to keep them hidden before the elements upgrade.
 
-## Examples
+## Usage
 
-### Scrollable Content
+Import the parts and put them together:
 
-Put long content in an inner `min-h-0 flex-1 overflow-y-auto` area. A downward drag scrolls that area first; when it reaches the top, the same gesture can move the drawer. `initialFocus="content"` starts focus on the sheet itself.
+```html
+<script type="module">
+  import "@ui-sdk/web/drawer"
+</script>
+
+<ui-drawer>
+  <ui-drawer-trigger><button>Filters</button></ui-drawer-trigger>
+  <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+  <ui-drawer-content hidden>
+    <ui-drawer-title>Filters</ui-drawer-title>
+    <ui-drawer-description>Narrow down the results.</ui-drawer-description>
+    <ui-drawer-close><button>Done</button></ui-drawer-close>
+  </ui-drawer-content>
+</ui-drawer>
+```
+
+## Scrollable Content
+
+Put long content in an inner `min-h-0 flex-1 overflow-y-auto` area. A downward drag scrolls that area first; when it reaches the top, the same gesture can move the drawer. `initial-focus="content"` starts focus on the sheet itself.
 
 <ComponentExample
   name="drawer/scrollable"
   caption="Open the long sheet and scroll its text. At the top, drag downward to move the sheet; on a keyboard, Tab reaches the controls and Escape closes it."
 />
 
-### Sides
-
-<span id="rtl" />
+## Sides
 
 `side` chooses bottom, top, left, or right. Logical `start` and `end` follow text direction. The content’s `data-side` tells you which physical edge to style.
 
-Side drawers can opt into `preventEdgeSwipe` to keep an edge gesture from starting iOS Safari’s back or forward navigation. It also prevents clicks right at those edges, so use it only when you need that tradeoff.
+Side drawers can opt into `prevent-edge-swipe` to keep an edge gesture from starting iOS Safari’s back or forward navigation. It also prevents clicks right at those edges, so use it only when you need that tradeoff.
 
 <ComponentExample
   name="drawer/sides"
   caption="Open a sheet from each edge. Drag it back toward that edge, press outside, or press Escape to close it."
 />
 
-### Snap Points
+## Snap Points
 
-<span id="snap-points-1" />
-
-`snapPoints` are the places the drawer can rest. It opens at the first, or at `defaultSnapPoint`, and settles at another after a drag. A fast fling can skip intermediate points.
+`snap-points` are the places the drawer can rest, as a comma-separated list. It opens at the first, or at `default-snap-point`, and settles at another after a drag. A fast fling can skip intermediate points.
 
 | Value              | Size                                       |
 | ------------------ | ------------------------------------------ |
@@ -80,93 +94,135 @@ Side drawers can opt into `preventEdgeSwipe` to keep an edge gesture from starti
 
 The sheet’s CSS size is the limit: `1` cannot make a short sheet fill the screen. Use a height such as `h-[calc(100dvh-3rem)]` when the largest point should nearly fill it. The drawer measures again when content or available space changes; a moved resting point reports `content-resize`.
 
-<ComponentExample
-  name="drawer/snap-points"
-  caption="Open the sheet at its middle snap point. Drag or press the handle to try the smaller and larger resting points."
-/>
-
-### Handle
-
-A Handle is a button with an accessible name. Pressing it moves to the next larger snap point, then wraps to the smallest. Arrow keys along the drawer’s axis move one point without wrapping; Home and End move to the ends. `canExpand` and `canCollapse` let the example show which moves remain.
+A Handle wraps a button with an accessible name. Pressing it moves to the next larger snap point, then wraps to the smallest. Arrow keys along the drawer’s axis move one point without wrapping; Home and End move to the ends. `canExpand` and `canCollapse` let the example show which moves remain.
 
 For a sheet with one snap point, use a decorative bar instead of an inactive button.
 
-### Controlled
-
-Read or set the element’s `open` and `snapPoint` properties. Listen for `openchange` and `snappointchange`; the attributes set their initial values. You can control opening and snap points independently. Cancel a proposed change with `event.preventDefault()`; a canceled swipe springs back. `openchangecomplete` runs after the sheet settles.
-
 <ComponentExample
-  name="drawer/controlled"
-  caption="Toggle open, choose a snap point, or move the sheet itself. The readout and log show the state and the reason for each change."
+  name="drawer/snap-points"
+  caption="Open the sheet at its middle snap point. Drag it, press the handle, or Tab to the handle and use Up, Down, Home and End to try the other resting points."
 />
 
-### Not Dismissible
+## Controlled
 
-With `dismissible` false, Escape, outside presses, back gestures, and swipes leave the drawer open. `dismissattempt` tells you what was tried, so you can offer a way to discard unsaved work. Close parts, triggers, and controllers can still close it deliberately.
+Set the element’s `open` and `snapPoint` properties, and listen for `openchange` and `snappointchange`; the attributes set where it starts. You can control opening and snap points independently. Cancel a proposed change with `event.preventDefault()`; a canceled swipe springs back. `openchangecomplete` fires after the sheet settles.
 
-<ComponentExample
-  name="drawer/non-dismissible"
-  caption="Open the draft, then try Escape or a swipe to close it. The sheet stays open and reports the attempt; Discard or Post closes it explicitly."
-/>
+```html
+<ui-drawer snap-points="0.25,0.5,1" snap-point="0.5"></ui-drawer>
 
-### Modal Above a Snap Point
+<script type="module">
+  const drawer = document.querySelector("ui-drawer")
+  drawer.addEventListener("openchange", (event) => (open.checked = event.detail.value))
+  drawer.addEventListener("snappointchange", (event) => (size.value = String(event.detail.value)))
+  drawer.open = true
+  drawer.snapPoint = 1
+</script>
+```
 
-<span id="modality-per-snap-point" />
+## Not Dismissible
 
-Set `modalAbove` when the page should stay usable beside a small sheet. At or below that point there is no dim, inert page, scroll lock, or `aria-modal`. Above it, `modal` applies. The switch happens when the drawer settles and does not move focus; `data-interactive` exposes the usable-page state.
+With `dismissible="false"`, Escape, outside presses, back gestures, and swipes leave the drawer open. `dismissattempt` tells you what was tried, so you can offer a way to discard unsaved work. Close parts, triggers, and controllers can still close it deliberately.
+
+```html
+<ui-drawer dismissible="false">
+  <ui-drawer-trigger><button>Write a Post</button></ui-drawer-trigger>
+  <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+  <ui-drawer-content hidden>
+    <ui-drawer-close id="discard" hidden><button>Discard</button></ui-drawer-close>
+    <ui-drawer-close value="post"><button>Post</button></ui-drawer-close>
+  </ui-drawer-content>
+</ui-drawer>
+
+<script type="module">
+  const drawer = document.querySelector("ui-drawer")
+  drawer.addEventListener("dismissattempt", () => (discard.hidden = false))
+</script>
+```
+
+## Modal
+
+Set `modal-above` when the page should stay usable beside a small sheet. At or below that point there is no dim, inert page, scroll lock, or `aria-modal`. Above it, `modal` applies. The switch happens when the drawer settles and does not move focus; `data-interactive` exposes the usable-page state.
+
+`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A non-modal drawer closes on an outside press only when `close-on-outside-press` is enabled.
 
 <ComponentExample
   name="drawer/non-modal"
   caption="Open directions at the small snap point and choose another place behind the sheet. Expand it to make the sheet modal, then collapse it to use the page again."
 />
 
-### Modal
-
-`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A non-modal drawer closes on an outside press only when `closeOnOutsidePress` is enabled.
-
-### Nested Drawers
-
-<span id="nesting-and-stacking" />
+## Nested Drawers
 
 A drawer opened inside another joins its stack. Escape and outside presses affect the topmost one; closing a parent closes its children. `--drawer-stack` follows the sheets above it as they open and drag, so a parent can scale back with `[scale:calc(1-var(--drawer-stack)*0.04)]`.
 
 <ComponentExample
   name="drawer/nested"
-  caption="Open Account, then Change password. The parent steps back as the child opens; Escape closes one sheet at a time."
+  caption="Open Account, then Change Password. The parent steps back as the child opens; Escape closes one sheet at a time."
 />
 
-### Forms
+## Forms
 
-A Close part with the `action` attribute dispatches an `action` event. Pass the Promise to `event.detail.waitUntil()`. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Dialog’s async actions](./dialog#forms) for the shared pending and error contract.
+A Close part with the `action` attribute fires an `action` event; pass a Promise to `event.detail.waitUntil()`. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Dialog’s async actions](./dialog#forms) for the shared pending and error contract.
 
-This example also uses `keepMounted` to preserve unfinished fields and `finalFocus` to return to the updated profile.
+`keep-mounted` preserves unfinished fields, and `final-focus` returns focus to the updated profile.
 
-<ComponentExample
-  name="drawer/form"
-  caption="Edit the profile and save. The first request fails and leaves your edits in place; try again to save them and return focus to the profile summary."
-/>
+```html
+<ui-drawer-content keep-mounted final-focus="#profile-summary" hidden>
+  <form><!-- fields --></form>
+  <ui-drawer-close action><button>Save Changes</button></ui-drawer-close>
+</ui-drawer-content>
 
-### Outlets
+<script type="module">
+  const close = document.querySelector("ui-drawer-close[action]")
+  const button = close.querySelector("button")
+  close.addEventListener("action", (event) => {
+    button.textContent = "Saving…"
+    const saving = save()
+    event.detail.waitUntil(saving)
+    saving.then(
+      () => (button.textContent = "Save Changes"),
+      () => (button.textContent = "Try Again"),
+    )
+  })
+</script>
+```
 
-An Outlet makes another element follow the sheet’s progress. Its `keyframes` run from collapsed to fully expanded; this example scales and rounds the inbox behind a compose sheet. An outlet outside the drawer connects with `for="drawer-id"`.
+## Outlets
+
+An Outlet makes another element follow the sheet’s progress. Its `keyframes` property runs from collapsed to fully expanded; this example scales and rounds the inbox behind a compose sheet. An outlet outside the drawer connects with `for="drawer-id"`.
 
 <ComponentExample
   name="drawer/outlet"
   caption="Open Compose, then drag the sheet slowly. The inbox behind it scales and rounds with the sheet’s progress."
 />
 
-### Opening from Anywhere
+## Opening from Anywhere
 
-Give the drawer an `id`, connect external triggers with `for`, and assign each trigger’s `payload` property. Read the active payload with `api.getPayload()`. This lets one sheet serve every row, including disabled triggers for unavailable actions.
+Give the drawer an `id`, connect external triggers with `for`, and assign each trigger’s `payload` property. The drawer’s `payloadchange` event carries it in `event.detail.value`. This lets one sheet serve every row, including disabled triggers for unavailable actions.
 
-Calling `open({ payload })` on `drawer.api` returns a Promise with the closing `reason` and `returnValue`. `getSnapPoint()` and `setSnapPoint()` also let code read or move the sheet. The [controller guide](../controllers) covers the shared result and payload flow.
+Calling `open({ payload })` on the drawer’s `api` returns a Promise with the closing `reason` and `returnValue`. `getSnapPoint()` and `setSnapPoint()` also let code read or move the sheet. The [controller guide](../controllers) covers the shared result and payload flow.
 
-<ComponentExample
-  name="drawer/controller"
-  caption="Share a file from its row or use Share the roadmap. Choose Copy link or Send by email to return a result; the uploading file’s trigger is disabled."
-/>
+```html
+<ui-drawer-trigger for="share" disabled><button>Share</button></ui-drawer-trigger>
 
-### Action Sheet
+<ui-drawer id="share">
+  <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+  <ui-drawer-content hidden>
+    <ui-drawer-title></ui-drawer-title>
+  </ui-drawer-content>
+</ui-drawer>
+
+<script type="module">
+  const drawer = document.querySelector("#share")
+  document.querySelector("ui-drawer-trigger").payload = file
+  drawer.addEventListener("payloadchange", (event) => {
+    drawer.querySelector("ui-drawer-title").textContent = `Share ${event.detail.value?.name}`
+  })
+
+  const { reason, returnValue } = await drawer.api.open({ payload: roadmap })
+</script>
+```
+
+## Action Sheet
 
 A sheet can offer choices instead of a form. Give each Close part a `value`; the open Promise returns the chosen action. Escape, an outside press, or a swipe returns no value, which this example treats as Cancel.
 
@@ -174,59 +230,137 @@ Put the least risky action first because a keyboard or code open starts there. U
 
 <ComponentExample
   name="drawer/action-sheet"
-  caption="Open Photo options and choose an action. The readout shows the returned value; dismissing the sheet counts as Cancel."
+  caption="Open Photo Options and choose an action. The console logs the returned value; dismissing the sheet counts as Cancel."
 />
 
-### Native Scrolling
+## Responsive
 
-<span id="drivers" />
+This recipe uses a media query to choose a drawer on a narrow screen and a dialog on a wide screen. It replaces the markup at the breakpoint, so an open sheet closes and field edits reset. Keep the open state and field values outside that markup if they must survive the switch.
 
-`driver="scroll-snap"` uses native scrolling and CSS snap points for a bottom sheet. `"pointer"` uses pointer dragging and spring motion on every side.
+```html
+<div id="profile"></div>
 
-The default `"auto"` chooses native scrolling for a bottom sheet on a touch screen. It uses pointer dragging for mouse and pen, other sides, `modalAbove`, or `expandOnScroll` false. `data-driver` reports the active choice. Both drivers use the same snap points and state.
+<script type="module">
+  import "@ui-sdk/web/dialog"
+  import "@ui-sdk/web/drawer"
 
-### Theme Color
+  const isDesktop = matchMedia("(min-width: 768px)")
+  const render = () => {
+    const name = isDesktop.matches ? "dialog" : "drawer"
+    document.querySelector("#profile").innerHTML = `
+      <ui-${name}>
+        <ui-${name}-trigger><button>Edit Profile</button></ui-${name}-trigger>
+        <ui-${name}-backdrop hidden></ui-${name}-backdrop>
+        <ui-${name}-content hidden>${profileForm}</ui-${name}-content>
+      </ui-${name}>
+    `
+  }
+  isDesktop.addEventListener("change", render)
+  render()
+</script>
+```
 
-`themeColor` dims an existing `<meta name="theme-color">` with the backdrop. It leaves pages without that tag alone. This demo supplies a neutral tag when needed so you can see the change in its readout.
+## Driver and Physics
 
-### Physics
+`driver` picks how the sheet moves. `"scroll-snap"` uses native scrolling and CSS snap points for a bottom sheet; `"pointer"` uses pointer dragging and spring motion on every side. The default `"auto"` chooses native scrolling for a bottom sheet on a touch screen, and pointer dragging for mouse and pen, other sides, `modal-above`, or `expand-on-scroll="false"`. `data-driver` reports the active choice.
 
-<span id="physics-1" />
+Override part of `sheetPhysics.ios` with the `physics` property to tune the pointer driver: `response` changes spring timing, `dampingRatio` changes settling, `momentumDampingRatio` affects flings, and `rubberBand` changes resistance past the largest point.
 
-Override part of `sheetPhysics.ios` with `physics`. `response` changes spring timing, `dampingRatio` changes settling, `momentumDampingRatio` affects flings, and `rubberBand` changes resistance past the largest point. These options affect the pointer driver, so the example selects it explicitly.
+```html
+<ui-drawer driver="pointer"></ui-drawer>
 
-### Persistent Elements
+<script type="module">
+  document.querySelector("ui-drawer").physics = { response: 0.3, dampingRatio: 0.9 }
+</script>
+```
 
-`persistentElements` keeps selected elements usable while the drawer is modal. Pass an array of elements or selectors, or a function returning elements. Something that must stay above the backdrop also needs its own top-layer surface, as the chat button has here.
+## Page Integration
 
-### Container
+`theme-color` dims an existing `<meta name="theme-color">` with the backdrop, so the browser's toolbars can follow it; pages without that tag are left alone. `persistent-elements` keeps selected elements usable while the drawer is modal: a comma-separated list of selectors, or assign the `persistentElements` property an array of elements or a function returning elements. Something that must stay above the backdrop also needs its own top-layer surface.
 
-Drawers normally render in place and use the top layer. `container` moves the backdrop and viewport elsewhere, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups).
+Drawers render in place and use the top layer. `container` takes a selector and moves the backdrop and viewport there, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups).
 
-### Responsive
-
-This recipe uses a media query to choose a Drawer on a narrow screen and a Dialog on a wide screen. It replaces the component tree at the breakpoint, so an open sheet closes and local field edits reset. Lift the open and field values above that branch if they must survive the switch.
-
-<ComponentExample
-  name="drawer/responsive"
-  caption="Open Edit profile on a narrow and a wide window. The same fields appear in a drawer or a dialog; changing the breakpoint replaces that view."
-/>
-
-## Keyboard and Focus
-
-The drawer shares [Dialog’s focus behavior](./dialog#focus): focus moves inside on open and returns when it closes. A touch open focuses the content so a field does not summon the keyboard immediately. When the on-screen keyboard opens, the viewport shrinks and the focused field can scroll into view inside the sheet.
-
-## Styling
-
-<DataAttributes component="drawer" />
-
-Leave the content’s `translate` and the backdrop’s opacity to the drawer. You can style scale, corners, colors, and the inner scroll area. A bottom sheet can use an `after` element below its edge to cover the gap during overscroll, as the examples do.
-
-The drawer respects reduced motion, fading instead of sliding.
+```html
+<ui-drawer theme-color persistent-elements="#chat-launcher" container="#drawer-host"></ui-drawer>
+```
 
 ## Custom Rendering
 
-Trigger, Close, and Handle parts wrap your native button. Content adds a full-screen `ui-drawer-viewport` when one is not already present.
+Elements have no render functions. Trigger, Close, and Handle parts wrap your native button or link, and `as-child` on the title binds your own heading. Content adds a full-screen `ui-drawer-viewport` around itself when the markup has none. Watch the drawer's `openchange` event and the content's data attributes, like `data-expanded`, to change what's inside.
+
+```html
+<ui-drawer>
+  <ui-drawer-trigger shortcut="mod+j"><button>View Details</button></ui-drawer-trigger>
+  <ui-drawer-content hidden>
+    <ui-drawer-title as-child><h3>Quarterly report</h3></ui-drawer-title>
+    <ui-drawer-description>Drag up to see more.</ui-drawer-description>
+    <ui-drawer-close><a href="/reports/q3">Open the Full Page</a></ui-drawer-close>
+  </ui-drawer-content>
+</ui-drawer>
+
+<script type="module">
+  const drawer = document.querySelector("ui-drawer")
+  const content = drawer.querySelector("ui-drawer-content")
+  drawer.addEventListener("openchange", (event) => {
+    drawer.querySelector("ui-drawer-trigger button").textContent = event.detail.value
+      ? "Viewing"
+      : "View Details"
+  })
+  new MutationObserver(() => {
+    content.querySelector("ui-drawer-description").textContent = content.hasAttribute("data-expanded")
+      ? "Showing all of it."
+      : "Drag up to see more."
+  }).observe(content, { attributeFilter: ["data-expanded"] })
+</script>
+```
+
+## Styling
+
+Each element has a `data-slot`, such as `drawer-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes).
+
+Leave the content's `translate` and the backdrop's opacity to the drawer. You can style scale, corners, colors, and the inner scroll area. A bottom sheet can use an `after` element below its edge to cover the gap during overscroll, as the examples do. The drawer respects reduced motion, fading instead of sliding.
+
+### `<ui-drawer-content>` [#styling-drawercontent]
+
+<CssVariables component="drawer" part="content" />
+
+### `<ui-drawer-viewport>` [#styling-viewport]
+
+<CssVariables component="drawer" part="viewport" />
+
+### `<ui-drawer-outlet>` [#styling-draweroutlet]
+
+<CssVariables component="drawer" part="outlet" />
+
+## Data Attributes
+
+### `<ui-drawer-trigger>` [#data-attributes-drawertrigger]
+
+<DataAttributes component="drawer" part="trigger" />
+
+### `<ui-drawer-backdrop>` [#data-attributes-drawerbackdrop]
+
+<DataAttributes component="drawer" part="backdrop" />
+
+### `<ui-drawer-viewport>` [#data-attributes-viewport]
+
+<DataAttributes component="drawer" part="viewport" />
+
+### `<ui-drawer-content>` [#data-attributes-drawercontent]
+
+<DataAttributes component="drawer" part="content" />
+
+### `<ui-drawer-handle>` [#data-attributes-drawerhandle]
+
+<DataAttributes component="drawer" part="handle" />
+
+### `<ui-drawer-close>` [#data-attributes-drawerclose]
+
+<DataAttributes component="drawer" part="close" />
+
+### `<ui-drawer-outlet>` [#data-attributes-draweroutlet]
+
+<DataAttributes component="drawer" part="outlet" />
 
 ## API Reference
 
@@ -245,11 +379,25 @@ A trigger outside the drawer names it with `for="drawer-id"`, and takes `payload
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerProps" />
 
+### DrawerBackdrop
+
+Dims the page behind a modal drawer, which manages its opacity. `<ui-drawer-backdrop>` takes no attributes of its own.
+
 ### DrawerContent
 
 <TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerContentProps" />
 
-<CssVariables component="drawer" part="content" />
+### DrawerHandle
+
+Resizes the sheet: a press moves to the next snap point, and arrow keys, Home and End choose one. `<ui-drawer-handle>` wraps your native button.
+
+### DrawerTitle
+
+Names the drawer. `<ui-drawer-title>` renders a level 2 heading.
+
+### DrawerDescription
+
+Describes the drawer while it's rendered. `<ui-drawer-description>` is a paragraph.
 
 ### DrawerClose
 
@@ -261,9 +409,9 @@ A trigger outside the drawer names it with `for="drawer-id"`, and takes `payload
 
 ### DrawerOutlet
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletProps" />
+An outlet outside the drawer names it with `for="drawer-id"`.
 
-<CssVariables component="drawer" part="outlet" />
+<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletProps" />
 
 ### State
 
@@ -313,8 +461,9 @@ The dismissals `dismissible` can refuse:
 
 ### Controller
 
-The element's `api` property has the same methods. The `open` and `snapPoint` properties read and set whether it's
-open and where it rests.
+Create one with `createDrawerController<Payload, Result>()` from `@ui-sdk/web/drawer` and assign it to the root
+element's `controller` property. The root element's `api` property has the same methods, and its `open` and
+`snapPoint` properties read and set whether it's open and where it rests.
 
 Every write method takes an optional `{ reason, event }`, which the events carry. Closing with a controller always works, even when the drawer isn't dismissible or an action is running.
 
@@ -344,6 +493,20 @@ Events fire on their own element and don't bubble. Calling `preventDefault()` on
 ## Accessibility
 
 The trigger is a button that opens a dialog, and the drawer follows the [WAI-ARIA modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) while it's modal: `aria-modal`, focus trapped inside, the page inert, labelled by its title and described by its description. Escape closes it. The handle is a button that controls the drawer: a press moves to the next snap point, arrow keys along the drawer's axis step, and Home and End go to the ends. Every line below is an automated test.
+
+### Keyboard
+
+| Key                       | Does                                                                          |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| Enter, Space              | On the trigger, opens the drawer; on the handle, moves to the next snap point |
+| Arrow keys along the axis | On the handle, moves one snap point without wrapping                          |
+| Home, End                 | On the handle, moves to the smallest or largest snap point                    |
+| Tab, Shift+Tab            | Moves through the sheet's controls, staying inside while it's modal           |
+| Escape                    | Closes the topmost drawer when it's dismissible                               |
+
+It shares [Dialog’s focus behavior](./dialog#focus): focus moves inside on open and returns when it closes. A touch open focuses the content so a field does not summon the keyboard immediately. When the on-screen keyboard opens, the viewport shrinks and the focused field can scroll into view inside the sheet.
+
+### Tested Behavior
 
 <SpecList spec="drawer" />
 

@@ -16,8 +16,8 @@ import {
     <FileInputDropzone>
       <UploadIcon aria-hidden="true" />
       <p>Drag and drop files here</p>
-      <p data-slot="hint">Or paste them, or browse your computer.</p>
-      <FileInputTrigger>Browse files</FileInputTrigger>
+      <p data-slot="hint">Or paste them from your clipboard.</p>
+      <FileInputTrigger>Browse Files</FileInputTrigger>
     </FileInputDropzone>
     <FileInputList aria-label="Files">
       <FileInputItem v-slot="{ state }">

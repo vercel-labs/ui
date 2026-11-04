@@ -4,11 +4,11 @@
 
 <div dir="rtl">
   <HoverCard>
-    <HoverCardTrigger href="https://example.com/people/ada">آدا لوفليس</HoverCardTrigger>
+    <HoverCardTrigger href="https://example.com/people/hollis">هوليس غرانت</HoverCardTrigger>
     <HoverCardContent align="start" sideOffset={10}>
       <HoverCardArrow />
-      <p>آدا لوفليس</p>
-      <p>كتبت أول برنامج منشور للمحرك التحليلي.</p>
+      <p>هوليس غرانت</p>
+      <p>مهندس تصميم في فريق المدفوعات.</p>
     </HoverCardContent>
   </HoverCard>
 </div>

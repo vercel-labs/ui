@@ -1,15 +1,20 @@
 import "@ui-sdk/web/button"
+import "@ui-sdk/web/field"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   const hintId = `publish-hint-${crypto.randomUUID()}`
   root.innerHTML = `
     <div data-slot="stack">
-      <label data-slot="label">Title<input /></label>
+      <ui-field>
+        <ui-field-label>Title</ui-field-label>
+        <input />
+      </ui-field>
       <div data-slot="row">
         <ui-button disabled focusable-when-disabled>
           <button aria-describedby="${hintId}">Publish</button>
         </ui-button>
-        <p id="${hintId}">Add a title to publish.</p>
+        <p id="${hintId}" data-slot="hint">Add a title to publish.</p>
       </div>
     </div>
   `
@@ -21,9 +26,7 @@ function mount(root: HTMLElement) {
     publish.disabled = !ready
     hint.textContent = ready ? "Ready to publish." : "Add a title to publish."
   })
-  publish.addEventListener("action", () => {
-    hint.textContent = "Published."
-  })
+  publish.addEventListener("action", () => log(root, `Published “${title.value}”`))
 }
 
 export { mount }

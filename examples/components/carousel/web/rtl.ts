@@ -14,13 +14,13 @@ function mount(root: HTMLElement) {
         </ui-carousel-viewport>
         <div data-slot="row">
           <ui-carousel-previous>
-            <button data-variant="secondary" aria-label="الشريحة السابقة">${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML}</button>
+            <button aria-label="الشريحة السابقة">${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML}</button>
           </ui-carousel-previous>
           <ui-carousel-indicator-group aria-label="اختر شريحة">
             ${slides.map((slide) => `<ui-carousel-indicator><button aria-label="الشريحة ${slide}"></button></ui-carousel-indicator>`).join("")}
           </ui-carousel-indicator-group>
           <ui-carousel-next>
-            <button data-variant="secondary" aria-label="الشريحة التالية">${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</button>
+            <button aria-label="الشريحة التالية">${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</button>
           </ui-carousel-next>
         </div>
       </ui-carousel>

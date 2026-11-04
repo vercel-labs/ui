@@ -6,45 +6,40 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { createSignal } from "solid-js"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
-  const [result, setResult] = createSignal("")
+  const log = useLog()
   return (
-    <>
-      <Dialog
-        onOpenChange={(open, details) => {
-          if (!open)
-            setResult(
-              details.returnValue ? `Saved as ${details.returnValue}` : `Closed with ${details.reason}`,
-            )
-        }}
-      >
-        <DialogTrigger>New article</DialogTrigger>
-        <DialogBackdrop />
-        <DialogContent>
-          <div data-slot="stack">
-            <DialogTitle>New article</DialogTitle>
-            <DialogDescription>Save it as a draft or publish it now.</DialogDescription>
+    <Dialog
+      onOpenChange={(open, details) => {
+        if (!open) log(details.returnValue ? `Saved as ${details.returnValue}` : `Closed (${details.reason})`)
+      }}
+    >
+      <DialogTrigger>New Article</DialogTrigger>
+      <DialogBackdrop />
+      <DialogContent>
+        <div data-slot="stack">
+          <DialogTitle>New article</DialogTitle>
+          <DialogDescription>Save it as a draft or publish it now.</DialogDescription>
+        </div>
+        <form data-slot="stack" method="dialog">
+          <Field>
+            <FieldLabel>Title</FieldLabel>
+            <FieldControl required defaultValue="Shipping updates for spring" />
+          </Field>
+          <div data-slot="row">
+            <button type="submit" value="draft">
+              Save Draft
+            </button>
+            <button data-variant="solid" type="submit" value="published">
+              Publish
+            </button>
           </div>
-          <form data-slot="stack" method="dialog">
-            <label data-slot="label">
-              Title
-              <input required value="Hello, world" />
-            </label>
-            <div data-slot="row">
-              <button type="submit" value="draft">
-                Save draft
-              </button>
-              <button data-variant="solid" type="submit" value="published">
-                Publish
-              </button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-      <output data-slot="output">{result()}</output>
-    </>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
           </ui-combobox-trigger>
         </div>
       </div>
-      <ui-combobox-content anchor="#combobox-icons-field">
+      <ui-combobox-content hidden anchor="#combobox-icons-field">
         <ui-combobox-empty>No statuses found.</ui-combobox-empty>
         <ui-combobox-list>
           <ui-combobox-item value="backlog" label="Backlog">

@@ -6,27 +6,17 @@ import {
   CarouselPrevious,
   CarouselViewport,
 } from "@ui-sdk/solid/carousel"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const slides = [1, 2, 3, 4, 5]
 
 function Example() {
-  const [rested, setRested] = createSignal(1)
+  const log = useLog()
   return (
-    <Carousel aria-label="Featured" onPageChangeComplete={setRested}>
-      <CarouselViewport>
-        <CarouselContent>
-          <For each={slides}>
-            {(slide) => (
-              <CarouselItem>
-                <div data-slot="tile">{slide}</div>
-              </CarouselItem>
-            )}
-          </For>
-        </CarouselContent>
-      </CarouselViewport>
+    <Carousel aria-label="Featured" onPageChangeComplete={(page) => log(`Rested on slide ${page}`)}>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+        <CarouselPrevious aria-label="Previous slide">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -39,10 +29,18 @@ function Example() {
             <path d="m15 18-6-6 6-6" />
           </svg>
         </CarouselPrevious>
-        <div data-slot="bar">
-          <div />
-        </div>
-        <CarouselNext data-variant="secondary" aria-label="Next slide">
+        <CarouselViewport>
+          <CarouselContent>
+            <For each={slides}>
+              {(slide) => (
+                <CarouselItem>
+                  <div data-slot="tile">{slide}</div>
+                </CarouselItem>
+              )}
+            </For>
+          </CarouselContent>
+        </CarouselViewport>
+        <CarouselNext aria-label="Next slide">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -56,7 +54,11 @@ function Example() {
           </svg>
         </CarouselNext>
       </div>
-      <p data-slot="hint">Rested on slide {rested()}</p>
+      <div data-slot="row">
+        <div data-slot="bar">
+          <div />
+        </div>
+      </div>
     </Carousel>
   )
 }

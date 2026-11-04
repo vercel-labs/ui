@@ -1,5 +1,6 @@
 import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/solid/command"
-import { createSignal, Show } from "solid-js"
+import { Show } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
@@ -19,7 +20,7 @@ const Spinner = () => (
 )
 
 function Example() {
-  const [log, setLog] = createSignal("")
+  const log = useLog()
   return (
     <div data-slot="stack">
       <Command>
@@ -29,7 +30,7 @@ function Example() {
             value="deploy"
             onSelect={async () => {
               await wait(1200)
-              setLog("Deployed")
+              log("Deployed to production")
             }}
           >
             {(state) => (
@@ -45,6 +46,7 @@ function Example() {
             value="sync"
             onSelect={async () => {
               await wait(600)
+              log("Couldn't sync: offline")
               throw new Error("Offline")
             }}
           >
@@ -66,7 +68,6 @@ function Example() {
           </CommandItem>
         </CommandList>
       </Command>
-      <output data-slot="output">{log() || "Run a command"}</output>
     </div>
   )
 }

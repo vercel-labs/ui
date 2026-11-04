@@ -12,14 +12,15 @@ import {
 
 <template>
   <AlertDialog>
-    <AlertDialogTrigger>Delete project</AlertDialogTrigger>
+    <AlertDialogTrigger>Delete Project</AlertDialogTrigger>
     <AlertDialogBackdrop />
     <AlertDialogContent>
       <div data-slot="stack">
         <AlertDialogTitle>Delete this project?</AlertDialogTitle>
-        <AlertDialogDescription
-          >The project and its files will be deleted for everyone.</AlertDialogDescription
-        >
+        <AlertDialogDescription>
+          This permanently deletes the project, its files and its deployment history for everyone on your
+          team.
+        </AlertDialogDescription>
       </div>
       <div data-slot="row">
         <AlertDialogClose>Cancel</AlertDialogClose>

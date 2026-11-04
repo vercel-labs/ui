@@ -33,46 +33,42 @@ ui-checkbox
 
 Wrap the checkbox and its text in a label. The indicator shows while the checkbox is checked or mixed.
 
-`ui-checkbox` is the control itself. It uses the `checkbox` role and takes part in forms through `ElementInternals`, without a hidden input.
+## Usage
 
-## Examples
+Import the parts and put them together:
 
-### Description
+```html
+<script type="module">
+  import "@ui-sdk/web/checkbox"
+</script>
 
-Use `FieldLabel` and `FieldDescription` when a choice needs more explanation. The field connects both to the checkbox.
+<label>
+  <ui-checkbox>
+    <ui-checkbox-indicator aria-hidden="true">✓</ui-checkbox-indicator>
+  </ui-checkbox>
+  Accept terms and conditions
+</label>
+```
+
+## Description
+
+Use `ui-field-label` and `ui-field-description` when a choice needs more explanation. The field connects both to the checkbox.
 
 <ComponentExample
   name="checkbox/description"
   caption="Click Accept terms and conditions. The field connects the label and description to the checkbox."
 />
 
-### Disabled
+## Disabled
 
 `disabled` prevents focus and changes, and leaves the checkbox out of form submissions. A disabled `fieldset` does the same.
 
 <ComponentExample
   name="checkbox/disabled"
-  caption="Both checkboxes are disabled. Clicking their labels leaves their values unchanged."
+  caption="Security alerts are always on, so that checkbox is disabled. Clicking its label leaves it checked."
 />
 
-<span id="behavior-and-options" />
-
-### Indeterminate
-
-An indeterminate checkbox represents a partly checked set. It has `aria-checked="mixed"` and `data-indeterminate`. A press checks it; only your code puts it back into the mixed state.
-
-Start with `default-checked="indeterminate"`, or pass `"indeterminate"` as the controlled value. The indicator's state tells it which icon to show. A [parent checkbox](#parent-checkbox) derives this state from a group for you.
-
-### Controlled
-
-Read or set the element’s `checked` property and listen for `checkedchange`. Its `api.toggle()` method lets another button change it. [State and Events](../state-and-events) covers canceling changes and choosing who owns the value.
-
-<ComponentExample
-  name="checkbox/controlled"
-  caption="Change the checkbox, then choose Toggle from outside. The readout shows its value and the reason for each change."
-/>
-
-### Read-Only
+## Read-Only
 
 `read-only` keeps the checkbox focusable and included in form submissions, while preventing the user from changing it.
 
@@ -81,27 +77,57 @@ Read or set the element’s `checked` property and listen for `checkedchange`. I
   caption="Tab to the checked checkbox. Space and clicks leave the setting unchanged."
 />
 
+## Indeterminate
+
+An indeterminate checkbox represents a partly checked set. It has `aria-checked="mixed"` and `data-indeterminate`. A press checks it; only your code puts it back into the mixed state.
+
+Start with `default-checked="indeterminate"`, or pass `"indeterminate"` as the controlled value. The indicator's `data-indeterminate` tells it which icon to show. A [parent checkbox](#parent-checkbox) derives this state from a group for you.
+
+```html
+<ui-checkbox default-checked="indeterminate">
+  <ui-checkbox-indicator aria-hidden="true">–</ui-checkbox-indicator>
+</ui-checkbox>
+
+<script type="module">
+  import "@ui-sdk/web/checkbox"
+
+  const indicator = document.querySelector("ui-checkbox-indicator")
+  new MutationObserver(() => {
+    indicator.textContent = indicator.hasAttribute("data-indeterminate") ? "–" : "✓"
+  }).observe(indicator, { attributeFilter: ["data-indeterminate"] })
+</script>
+```
+
+## Controlled
+
+Read or set the element's `checked` property and listen for `checkedchange`. Its `api` property is a [controller](#checkbox-controller) that changes it from anywhere, like the Toggle button below.
+
+<ComponentExample
+  name="checkbox/controlled"
+  caption="Change the checkbox, or press Toggle. The console logs each change and its reason."
+/>
+
 ## Forms
 
-Set `name` and `value` to include a checked checkbox in a native form. Unchecked and mixed checkboxes submit nothing. The default value is `"on"`.
+Set `name` and `value` to include a checked checkbox in a native form. Unchecked and mixed checkboxes submit nothing. The default value is `"on"`. Independent checkboxes can share a name to submit several values; use a [group](#group) when your app also needs one list of checked values.
 
-`required` blocks submission until the checkbox is checked. Reset returns it to `default-checked`. Set `form` to a form's id to join it from elsewhere on the page. Space toggles the checkbox; Enter submits its form.
+`required` blocks submission until the checkbox is checked. Reset returns it to `default-checked`. Set `form` to a form's id to join it from elsewhere on the page.
 
 <ComponentExample
   name="checkbox/form"
-  caption="Submit with the terms unchecked to see native validation. Accept the terms and submit; Reset restores the defaults and clears the result. The newsletter checkbox belongs to the same form from outside it."
+  caption="Create the account with the terms unchecked to see native validation, then accept them and try again. The console logs what was submitted, and Reset restores the defaults."
 />
 
 ## Group
 
-`CheckboxGroup` keeps one list of checked values. Each checkbox supplies its `value`; the group returns selected values in the order the checkboxes appear. Name the group with `aria-label`, `aria-labelledby`, or a [Field](#group-in-a-field).
+`ui-checkbox-group` keeps one list of checked values. Each checkbox supplies its `value`; the group returns selected values in the order the checkboxes appear. Name the group with `aria-label`, `aria-labelledby`, or a [field](#group-in-a-form).
 
 <ComponentExample
   name="checkbox/group"
   caption="Choose several toppings. The group keeps one list of checked values."
 />
 
-### Parent Checkbox
+## Parent Checkbox
 
 Add a checkbox with `parent` to check or uncheck the group. It is checked when every value is selected, unchecked when none are, and mixed in between. It points to its children with `aria-controls` and submits nothing itself.
 
@@ -112,16 +138,7 @@ Pass `all-values` to the group so the parent has the right state on the first re
   caption="Select all checks every topping. Uncheck one topping to put Select all into its mixed state."
 />
 
-### Table
-
-The same parent checkbox can select rows from a table header. Each row supplies its value and accessible name.
-
-<ComponentExample
-  name="checkbox/table"
-  caption="Select rows individually, or use Select all in the header. The selected count follows the group."
-/>
-
-### Disabled Group
+## Disabled Group
 
 Disable the group to lock every checkbox, or disable one child to keep just that value fixed. A parent changes only enabled children.
 
@@ -130,52 +147,97 @@ Disable the group to lock every checkbox, or disable one child to keep just that
   caption="The Backups group is disabled. In Sync folders, Select all changes the enabled folders while Desktop stays checked."
 />
 
-### Controlled Group
+## Controlled Group
 
-Read or set the group element’s `value` property and listen for `valuechange`. The group’s `api.setValue()` method can replace that list, as Select weekdays and Clear do below.
+Read or set the group element's `value` property and listen for `valuechange`. Its `api` property is a [controller](#checkboxgroup-controller) that can replace that list, as Select Weekdays and Clear do below.
 
 <ComponentExample
   name="checkbox/group-controlled"
-  caption="Choose working days, then try Select weekdays and Clear. The readout shows the group value and the reason it changed."
+  caption="Choose working days, or press Select Weekdays or Clear. The console logs the group's value and the reason it changed."
 />
 
-### Group in a Field
+## Group in a Form
 
-A field supplies the group's label and description. `FieldError` shows the validation message inline and clears when a selection makes the group valid. [Forms and Validation](../forms) covers the shared field behavior.
+Set `name` on the group to submit every checked value under that name. `required` requires at least one selection, and Reset restores `default-value`. The same `disabled` and `form` options apply as on a single checkbox.
+
+In a field, the field supplies the group's label and description, and `ui-field-error` shows the validation message inline until a selection makes the group valid. [Forms and Validation](../forms) covers the shared field behavior.
 
 <ComponentExample
   name="checkbox/group-field"
-  caption="Save with nothing checked to see the inline error. Choose a notification method to clear it, then save again."
+  caption="Save with nothing checked to see the inline error. Choose a notification method and save; the console logs the submitted values."
 />
 
-## Styling
+## Table
 
-<span id="right-to-left" />
-<span id="horizontal-group" />
-<span id="right-to-left-group" />
+The same parent checkbox can select rows from a table header. Each row supplies its value and accessible name.
 
-Use your layout to arrange the checkboxes, including in right-to-left text. [Styling and Animation](../styling-and-animation) covers state attributes and transitions.
+<ComponentExample
+  name="checkbox/table"
+  caption="Select rows individually, or use Select all in the header. The console logs how many are selected."
+/>
 
-`Checkbox`:
+## Animation
 
-<DataAttributes component="checkbox" />
+The indicator has `data-starting-style` as it appears and `data-ending-style` while it leaves, and stays mounted until its exit finishes. Transition from those states:
 
-`CheckboxGroup`:
+<StyleTabs>
 
-<DataAttributes component="checkbox-group" />
+```css
+[data-slot="checkbox-indicator"] {
+  transition:
+    opacity 0.15s,
+    scale 0.15s;
 
-### Indicator
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+```
 
-`keep-mounted` keeps the indicator in the page while unchecked. Use `data-unchecked` for that state and `data-starting-style` and `data-ending-style` for its entry and exit.
+```html
+<ui-checkbox-indicator
+  class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0"
+></ui-checkbox-indicator>
+```
+
+</StyleTabs>
+
+`keep-mounted` keeps the indicator in the page while unchecked, with `data-unchecked`, for styles that show both states.
 
 <ComponentExample
   name="checkbox/indicator"
-  caption="Check and uncheck a task. Its indicator stays mounted so the check can animate in both directions."
+  caption="Check and uncheck a task. The check scales and fades in, and out before it unmounts."
 />
 
 ## Custom Rendering
 
-The checkbox, indicator, and group can render your own elements. Keep the part's props on the interactive element so its role, label, and keyboard behavior stay connected. [Composition](../parts-and-composition) covers the framework's rendering API.
+Elements have no render functions. `ui-checkbox` is the interactive element itself, so put your content inside it, where its role, label, and keyboard behavior stay connected. Style it from its attributes, and watch them to change what's inside: here each checkbox swaps its icon when `data-checked` changes.
+
+<ComponentExample
+  name="checkbox/render"
+  caption="Choose topics. Each checkbox shows a check or a plus from its state."
+/>
+
+## Styling
+
+Use `data-checked`, `data-unchecked` and `data-indeterminate` for the checked state, and `data-disabled`, `data-readonly` and `data-required` for the rest. The indicator gets the same state attributes as its checkbox.
+
+Each part has a `data-slot`, such as `checkbox-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### `<ui-checkbox>` [#data-attributes-checkbox]
+
+<DataAttributes component="checkbox" part="root" />
+
+### `<ui-checkbox-indicator>` [#data-attributes-checkboxindicator]
+
+<DataAttributes component="checkbox" part="indicator" />
+
+### `<ui-checkbox-group>` [#data-attributes-checkboxgroup]
+
+<DataAttributes component="checkbox-group" part="group" />
 
 ## API Reference
 
@@ -259,17 +321,25 @@ Events fire on their own element and don't bubble, with the new state or value i
 
 ## Accessibility
 
-The checkbox follows the [WAI-ARIA checkbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/). Every line below is an automated test.
+The checkbox follows the [WAI-ARIA checkbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/), and a group's parent checkbox follows its [mixed checkbox example](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/examples/checkbox-mixed/). `ui-checkbox` is the control itself, with the `checkbox` role, and takes part in forms through `ElementInternals`, without a hidden input. Every line below is an automated test.
+
+### Keyboard
+
+| Key   | Does                                         |
+| ----- | -------------------------------------------- |
+| Tab   | Moves to the next checkbox                   |
+| Space | Checks or unchecks it, or checks a mixed one |
+| Enter | Submits its form                             |
+
+### Tested Behavior
 
 <SpecList spec="checkbox" />
 
-### Groups
-
-A group's parent checkbox follows the pattern's [mixed checkbox example](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/examples/checkbox-mixed/).
+Groups and parent checkboxes:
 
 <SpecList spec="checkbox.group" />
 
-### Forms
+In forms:
 
 <SpecList spec="forms.form" />
 

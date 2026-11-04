@@ -2,6 +2,7 @@
   import {
     Autocomplete,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteInput,
     AutocompleteItem,
     AutocompleteLabel,
@@ -31,7 +32,7 @@
 </script>
 
 <div data-slot="stack">
-  <div data-slot="row">
+  <div data-slot="controls">
     <button type="button" data-size="sm" onclick={() => fruit.open()}>
       Open
     </button>
@@ -49,6 +50,7 @@
     <AutocompleteLabel>Fruit</AutocompleteLabel>
     <AutocompleteInput />
     <AutocompleteContent>
+      <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
       <AutocompleteList>
         {#each fruits as item (item)}
           <AutocompleteItem value={item}>

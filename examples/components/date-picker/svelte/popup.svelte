@@ -13,26 +13,13 @@
     DatePickerHint,
     DatePickerInput,
     DatePickerTrigger,
-    type DatePickerMonthChangeReason,
-    type DatePickerOpenChangeReason,
   } from "@ui-sdk/svelte/date-picker"
   import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let log = $state("")
+  const log = useLog()
   let anchor: HTMLElement | undefined = $state()
   let container: HTMLElement | undefined = $state()
-
-  function onOpenChange(open: boolean, details: { reason: DatePickerOpenChangeReason }) {
-    log = `${open ? "Opened" : "Closed"} (${details.reason})`
-  }
-
-  function onOpenChangeComplete(open: boolean) {
-    if (!open) log = `${log}, done`
-  }
-
-  function onMonthChange(month: string, details: { reason: DatePickerMonthChangeReason }) {
-    log = `Showing ${month} (${details.reason})`
-  }
 </script>
 
 <div data-slot="stack">
@@ -40,9 +27,9 @@
     defaultOpen={false}
     presentation="auto"
     {container}
-    {onOpenChange}
-    {onOpenChangeComplete}
-    {onMonthChange}
+    onOpenChange={(open, details) => log(`${open ? "Opened" : "Closed"} (${details.reason})`)}
+    onOpenChangeComplete={(open) => open || log("Finished closing")}
+    onMonthChange={(month, details) => log(`Showing ${month} (${details.reason})`)}
   >
     <div data-slot="row" bind:this={anchor}>
       <DatePickerInput aria-label="Due date" />
@@ -51,16 +38,7 @@
       </DatePickerTrigger>
     </div>
     <DatePickerHint />
-    <DatePickerContent
-      side="top"
-      align="end"
-      sideOffset={8}
-      alignOffset={-4}
-      collisionPadding={16}
-      {anchor}
-      finalFocus="none"
-      keepMounted
-    >
+    <DatePickerContent {anchor} sideOffset={6} collisionPadding={16} keepMounted>
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <ChevronLeftIcon aria-hidden="true" />
@@ -85,5 +63,4 @@
     </DatePickerContent>
   </DatePicker>
   <div bind:this={container}></div>
-  <p data-slot="hint">{log || "Opens above, lined up with the end of the field."}</p>
 </div>

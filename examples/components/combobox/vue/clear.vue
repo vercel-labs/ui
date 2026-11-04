@@ -13,6 +13,7 @@ import {
   ComboboxTrigger,
 } from "@ui-sdk/vue/combobox"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -27,41 +28,46 @@ const frameworks = [
 const frameworkLabel = (value: string) =>
   frameworks.find((framework) => framework.value === value)?.label ?? value
 
+const log = useLog()
 const value = ref<string | null>("sveltekit")
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Combobox v-model:value="value" :item-to-label="frameworkLabel">
-      <div data-slot="stack">
-        <ComboboxLabel>Framework</ComboboxLabel>
-        <div data-slot="row">
-          <ComboboxInput placeholder="Select a framework" />
-          <ComboboxClear aria-label="Clear framework">
-            <XIcon aria-hidden="true" />
-          </ComboboxClear>
-          <ComboboxTrigger aria-label="Show frameworks">
-            <ChevronDownIcon aria-hidden="true" />
-          </ComboboxTrigger>
-        </div>
+  <Combobox
+    v-model:value="value"
+    :item-to-label="frameworkLabel"
+    @value-change="
+      (next: string | null, details: { reason: string }) =>
+        log(`${next ? frameworkLabel(next) : 'Cleared'} (${details.reason})`)
+    "
+  >
+    <div data-slot="stack">
+      <ComboboxLabel>Framework</ComboboxLabel>
+      <div data-slot="row">
+        <ComboboxInput placeholder="Select a framework" />
+        <ComboboxClear aria-label="Clear framework">
+          <XIcon aria-hidden="true" />
+        </ComboboxClear>
+        <ComboboxTrigger aria-label="Show frameworks">
+          <ChevronDownIcon aria-hidden="true" />
+        </ComboboxTrigger>
       </div>
-      <ComboboxContent>
-        <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-        <ComboboxList>
-          <ComboboxItem
-            v-for="framework in frameworks"
-            :key="framework.value"
-            :value="framework.value"
-            :label="framework.label"
-          >
-            {{ framework.label }}
-            <ComboboxItemIndicator>
-              <CheckIcon aria-hidden="true" />
-            </ComboboxItemIndicator>
-          </ComboboxItem>
-        </ComboboxList>
-      </ComboboxContent>
-    </Combobox>
-    <output data-slot="output">Value: {{ JSON.stringify(value) }}</output>
-  </div>
+    </div>
+    <ComboboxContent>
+      <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
+      <ComboboxList>
+        <ComboboxItem
+          v-for="framework in frameworks"
+          :key="framework.value"
+          :value="framework.value"
+          :label="framework.label"
+        >
+          {{ framework.label }}
+          <ComboboxItemIndicator>
+            <CheckIcon aria-hidden="true" />
+          </ComboboxItemIndicator>
+        </ComboboxItem>
+      </ComboboxList>
+    </ComboboxContent>
+  </Combobox>
 </template>

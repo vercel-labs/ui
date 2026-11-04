@@ -46,11 +46,11 @@
     </CarouselContent>
   </CarouselViewport>
   <div data-slot="row">
-    <CarouselPrevious data-variant="secondary">
+    <CarouselPrevious>
       <ChevronLeftIcon />
       Previous
     </CarouselPrevious>
-    <CarouselNext data-variant="secondary">
+    <CarouselNext>
       {#snippet render({ props, state })}
         {#if state.disabled}
           <a

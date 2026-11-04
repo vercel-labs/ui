@@ -8,12 +8,13 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxItemIndicator,
-  ComboboxLabel,
   ComboboxList,
   ComboboxTrigger,
   ComboboxValue,
 } from "@ui-sdk/solid/combobox"
-import { createSignal, For } from "solid-js"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -37,42 +38,38 @@ const countries = [
 
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
 function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <form
-        id="combobox-profile"
-        data-slot="stack"
-        onSubmit={(event) => {
-          event.preventDefault()
-          const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(data.join("&"))
-        }}
-        onReset={() => setSubmitted("")}
-      >
-        <Combobox name="country" required itemToLabel={countryLabel}>
-          <div data-slot="stack">
-            <ComboboxLabel>Country</ComboboxLabel>
-            <div data-slot="row">
-              <ComboboxInput placeholder="Search countries" />
-              <ComboboxTrigger aria-label="Show countries">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </ComboboxTrigger>
-            </div>
+    <form
+      data-slot="stack"
+      onSubmit={(event) => {
+        event.preventDefault()
+        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        log(`Submitted ${entries.join("&")}`)
+      }}
+    >
+      <Field name="country">
+        <FieldLabel>Country</FieldLabel>
+        <Combobox required itemToLabel={countryLabel}>
+          <div data-slot="row">
+            <ComboboxInput placeholder="Search countries" />
+            <ComboboxTrigger aria-label="Show countries">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </ComboboxTrigger>
           </div>
           <ComboboxContent>
             <ComboboxEmpty>No countries found.</ComboboxEmpty>
@@ -100,44 +97,48 @@ function Example() {
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
-        <Combobox name="interests" multiple defaultValue={["Design"]}>
-          <div data-slot="stack">
-            <ComboboxLabel>Interests</ComboboxLabel>
-            <ComboboxChips>
-              <ComboboxValue>
-                {(state) => (
-                  <For each={state.value as string[]}>
-                    {(label) => (
-                      <ComboboxChip value={label}>
-                        {label}
-                        <ComboboxChipRemove aria-label={`Remove ${label}`}>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M18 6 6 18" />
-                            <path d="m6 6 12 12" />
-                          </svg>
-                        </ComboboxChipRemove>
-                      </ComboboxChip>
-                    )}
-                  </For>
-                )}
-              </ComboboxValue>
-              <ComboboxInput placeholder="Add interests" />
-            </ComboboxChips>
-          </div>
+        <FieldDescription>Where we ship your order.</FieldDescription>
+        <div>
+          <FieldError match="valueMissing">Choose a country.</FieldError>
+        </div>
+      </Field>
+      <Field name="interests">
+        <FieldLabel>Interests</FieldLabel>
+        <Combobox multiple defaultValue={["Design"]}>
+          <ComboboxChips>
+            <ComboboxValue>
+              {(state) => (
+                <For each={state.value as string[]}>
+                  {(interest) => (
+                    <ComboboxChip value={interest}>
+                      {interest}
+                      <ComboboxChipRemove aria-label={`Remove ${interest}`}>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M18 6 6 18" />
+                          <path d="m6 6 12 12" />
+                        </svg>
+                      </ComboboxChipRemove>
+                    </ComboboxChip>
+                  )}
+                </For>
+              )}
+            </ComboboxValue>
+            <ComboboxInput placeholder="Add interests" />
+          </ComboboxChips>
           <ComboboxContent>
             <ComboboxList>
-              <For each={labels}>
-                {(label) => (
-                  <ComboboxItem value={label}>
-                    {label}
+              <For each={interests}>
+                {(interest) => (
+                  <ComboboxItem value={interest}>
+                    {interest}
                     <ComboboxItemIndicator>
                       <svg
                         viewBox="0 0 24 24"
@@ -157,60 +158,12 @@ function Example() {
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
-        <div data-slot="row">
-          <button type="submit" data-variant="solid">
-            Submit
-          </button>
-          <button type="reset">Reset</button>
-        </div>
-      </form>
-      <Combobox name="timezone" form="combobox-profile" defaultValue="Paris">
-        <div data-slot="stack">
-          <ComboboxLabel>City</ComboboxLabel>
-          <div data-slot="row">
-            <ComboboxInput />
-            <ComboboxTrigger aria-label="Show cities">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </ComboboxTrigger>
-          </div>
-        </div>
-        <ComboboxContent>
-          <ComboboxList>
-            <For each={["London", "Paris", "Berlin", "Madrid"]}>
-              {(city) => (
-                <ComboboxItem value={city}>
-                  {city}
-                  <ComboboxItemIndicator>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                  </ComboboxItemIndicator>
-                </ComboboxItem>
-              )}
-            </For>
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-      <output data-slot="output">{submitted() || "Submit the form"}</output>
-    </div>
+      </Field>
+      <div data-slot="row">
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
   )
 }
 

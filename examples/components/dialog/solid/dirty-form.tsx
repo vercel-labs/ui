@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import { createSignal, Show } from "solid-js"
 
 function Example() {
@@ -26,18 +27,22 @@ function Example() {
       dismissible={!dirty()}
       onDismissAttempt={() => setAsking(true)}
     >
-      <DialogTrigger>Write a post</DialogTrigger>
+      <DialogTrigger>Write a Post</DialogTrigger>
       <DialogBackdrop />
       <DialogContent>
         <div data-slot="stack">
           <DialogTitle>New post</DialogTitle>
-          <DialogDescription>Type something, then press Escape or click outside.</DialogDescription>
+          <DialogDescription>Share an update with your team.</DialogDescription>
         </div>
-        <textarea
-          ref={post}
-          aria-label="Post"
-          onInput={(event) => setDirty(event.currentTarget.value !== "")}
-        />
+        <Field>
+          <FieldLabel>Post</FieldLabel>
+          <FieldControl
+            render={(props) => (
+              <textarea {...props} ref={(element) => (post = element)} placeholder="What's new?" />
+            )}
+            onInput={(event) => setDirty(event.currentTarget.value !== "")}
+          />
+        </Field>
         <Show
           when={asking()}
           fallback={
@@ -58,7 +63,7 @@ function Example() {
                   post?.focus()
                 }}
               >
-                Keep editing
+                Keep Editing
               </button>
               <button data-variant="solid" type="button" onClick={close}>
                 Discard

@@ -1,12 +1,14 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
   AutocompleteList,
 } from "@ui-sdk/solid/autocomplete"
 import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const fruits = [
   "Apple",
@@ -26,10 +28,10 @@ const fruits = [
   "Strawberry",
 ]
 
-export function Example() {
+function Example() {
   const [value, setValue] = createSignal("")
   const [open, setOpen] = createSignal(false)
-  const [log, setLog] = createSignal("")
+  const log = useLog()
   return (
     <div data-slot="stack">
       <Autocomplete
@@ -37,26 +39,28 @@ export function Example() {
         onValueChange={(next, details) => {
           if (next.length > 12) return details.cancel()
           setValue(next)
-          setLog(`text: ${details.reason}`)
+          log(`text: ${details.reason}`)
         }}
         open={open()}
         onOpenChange={(next, details) => {
           setOpen(next)
-          setLog(`${next ? "opened" : "closed"}: ${details.reason}`)
+          log(`${next ? "opened" : "closed"}: ${details.reason}`)
         }}
-        onOpenChangeComplete={(next) => setLog(`${next ? "opened" : "closed"} and settled`)}
-        onHighlight={(highlighted) => highlighted && setLog(`highlighted ${highlighted}`)}
+        onOpenChangeComplete={(next) => log(`${next ? "opened" : "closed"} and settled`)}
+        onHighlight={(highlighted) => highlighted && log(`highlighted ${highlighted}`)}
         debug
       >
         <AutocompleteLabel>Fruit (12 characters at most)</AutocompleteLabel>
         <AutocompleteInput />
         <AutocompleteContent>
+          <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
             <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>
-      <output data-slot="output">{log() || "Type something"}</output>
     </div>
   )
 }
+
+export { Example }

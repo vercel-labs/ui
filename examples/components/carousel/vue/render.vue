@@ -40,11 +40,11 @@ const focusIf = (focus: boolean) => (link: unknown) => {
       </CarouselContent>
     </CarouselViewport>
     <div data-slot="row">
-      <CarouselPrevious data-variant="secondary">
+      <CarouselPrevious>
         <ChevronLeftIcon />
         Previous
       </CarouselPrevious>
-      <CarouselNext data-variant="secondary">
+      <CarouselNext>
         <template #render="{ props, state }">
           <a v-if="state.disabled" :ref="focusIf(nextFocused())" href="https://example.com/gallery"
             >See all photos</a

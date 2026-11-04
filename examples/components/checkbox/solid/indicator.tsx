@@ -14,7 +14,7 @@ function Example() {
         {(task) => (
           <label data-slot="label">
             <Checkbox defaultChecked={task.done}>
-              <CheckboxIndicator keepMounted>
+              <CheckboxIndicator>
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"

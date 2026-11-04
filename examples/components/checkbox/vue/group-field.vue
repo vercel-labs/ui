@@ -2,7 +2,7 @@
 import { CheckIcon } from "@lucide/vue"
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const channels = [
   { value: "email", label: "Email" },
@@ -10,10 +10,13 @@ const channels = [
   { value: "push", label: "Push notifications" },
 ]
 
-const saved = ref<string | null>(null)
+const log = useLog()
 
 function onSubmit(event: Event) {
-  saved.value = new FormData(event.target as HTMLFormElement).getAll("notifications").join(", ")
+  const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
+    ([name, value]) => `${name}=${value}`,
+  )
+  log(`Saved ${entries.join("&")}`)
 }
 </script>
 
@@ -21,7 +24,7 @@ function onSubmit(event: Event) {
   <form data-slot="stack" @submit.prevent="onSubmit">
     <Field>
       <FieldLabel>Notifications</FieldLabel>
-      <FieldDescription> Choose how we tell you about your orders. </FieldDescription>
+      <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
       <CheckboxGroup name="notifications" required>
         <label data-slot="label" v-for="channel in channels" :key="channel.value">
           <Checkbox :value="channel.value">
@@ -37,6 +40,5 @@ function onSubmit(event: Event) {
       </div>
     </Field>
     <button type="submit">Save</button>
-    <output data-slot="output">{{ saved !== null ? `notifications: ${saved}` : "" }}</output>
   </form>
 </template>

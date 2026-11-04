@@ -1,6 +1,6 @@
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import {
   Combobox,
-  ComboboxArrow,
   ComboboxContent,
   ComboboxEmpty,
   ComboboxInput,
@@ -8,6 +8,15 @@ import {
   ComboboxItemIndicator,
   ComboboxList,
 } from "@ui-sdk/solid/combobox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
 import { createSignal, For } from "solid-js"
 
 const frameworks = [
@@ -20,50 +29,123 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-const sides = ["top", "right", "bottom", "left"] as const
-const aligns = ["start", "center", "end"] as const
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+]
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
+type Side = "top" | "right" | "bottom" | "left"
+type Align = "start" | "center" | "end"
 
-export function Example() {
-  const [side, setSide] = createSignal<(typeof sides)[number]>("bottom")
-  const [align, setAlign] = createSignal<(typeof aligns)[number]>("start")
+function Example() {
+  const [side, setSide] = createSignal<Side>("bottom")
+  const [align, setAlign] = createSignal<Align>("start")
   const [box, setBox] = createSignal<HTMLDivElement | null>(null)
   const [anchored, setAnchored] = createSignal(false)
 
   return (
     <div data-slot="stack">
-      <div data-slot="stack">
-        <div role="group" aria-label="Side" data-slot="row">
-          <For each={sides}>
-            {(value) => (
-              <button
-                type="button"
-                aria-pressed={side() === value ? "true" : "false"}
-                onClick={() => setSide(value)}
-              >
-                {value}
-              </button>
-            )}
-          </For>
-        </div>
-        <div role="group" aria-label="Align" data-slot="row">
-          <For each={aligns}>
-            {(value) => (
-              <button
-                type="button"
-                aria-pressed={align() === value ? "true" : "false"}
-                onClick={() => setAlign(value)}
-              >
-                {value}
-              </button>
-            )}
-          </For>
-        </div>
+      <div data-slot="controls">
+        <Select items={sides} value={side()} onValueChange={(next) => next && setSide(next as Side)}>
+          <SelectLabel>Side</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </SelectTrigger>
+          <SelectContent>
+            <For each={sides}>
+              {(option) => (
+                <SelectItem value={option.value}>
+                  {option.label}
+                  <SelectItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </SelectItemIndicator>
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </Select>
+        <Select items={aligns} value={align()} onValueChange={(next) => next && setAlign(next as Align)}>
+          <SelectLabel>Align</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </SelectTrigger>
+          <SelectContent>
+            <For each={aligns}>
+              {(option) => (
+                <SelectItem value={option.value}>
+                  {option.label}
+                  <SelectItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </SelectItemIndicator>
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </Select>
         <label data-slot="label">
-          <input
-            type="checkbox"
-            checked={anchored()}
-            onChange={(event) => setAnchored(event.currentTarget.checked)}
-          />
+          <Checkbox checked={anchored()} onCheckedChange={(next) => setAnchored(next === true)}>
+            <CheckboxIndicator>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </CheckboxIndicator>
+          </Checkbox>
           Anchor to the box
         </label>
       </div>
@@ -78,7 +160,6 @@ export function Example() {
             collisionPadding={16}
             anchor={anchored() ? box() : null}
           >
-            <ComboboxArrow />
             <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
             <ComboboxList>
               <For each={frameworks}>
@@ -108,3 +189,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

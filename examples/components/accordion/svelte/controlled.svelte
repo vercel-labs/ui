@@ -27,7 +27,6 @@
   const accordion = createAccordionController()
 
   let value = $state(["account"])
-  let reason = $state("")
 
   function confirmClose(item: string, open: boolean, details: ChangeDetails) {
     if (!open && item === "security" && !window.confirm("Close the security settings?")) details.cancel()
@@ -38,12 +37,7 @@
   <div data-slot="controls">
     <button type="button" onclick={() => accordion.open("security")}>Review security</button>
   </div>
-  <Accordion
-    bind:value
-    multiple
-    controller={accordion}
-    onValueChange={(_, details) => (reason = details.reason)}
-  >
+  <Accordion bind:value multiple controller={accordion}>
     {#each items as item (item.value)}
       <AccordionItem
         value={item.value}
@@ -61,7 +55,4 @@
       </AccordionItem>
     {/each}
   </Accordion>
-  <output data-slot="output">
-    Open: {value.join(", ") || "none"}{reason ? `, last change: ${reason}` : ""}
-  </output>
 </div>

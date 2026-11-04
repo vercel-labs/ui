@@ -2,6 +2,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
@@ -34,6 +35,7 @@ const fruits = [
       <AutocompleteInput placeholder="Type “bl”" />
     </div>
     <AutocompleteContent>
+      <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
       <AutocompleteList>
         <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{ fruit }}</AutocompleteItem>
       </AutocompleteList>

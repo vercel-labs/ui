@@ -1,5 +1,6 @@
 import type { CommandData } from "@ui-sdk/core/command"
 import "@ui-sdk/web/command"
+import { log } from "../../../shared/web/log"
 
 const commands: CommandData = [
   {
@@ -50,15 +51,11 @@ function mount(root: HTMLElement) {
           </ui-command-list>
         </template>
       </ui-command>
-      <output data-slot="output">Nothing run yet</output>
     </div>
   `
   const command = root.querySelector("ui-command")!
   command.items = commands
-  const output = root.querySelector("output")!
-  command.addEventListener("action", (event) => {
-    output.textContent = `Ran ${(event as CustomEvent<{ value: string }>).detail.value}`
-  })
+  command.addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
 }
 
 export { mount }

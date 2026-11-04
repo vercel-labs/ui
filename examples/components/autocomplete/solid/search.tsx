@@ -1,21 +1,24 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteList,
 } from "@ui-sdk/solid/autocomplete"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
 
 function Example() {
-  const [searched, setSearched] = createSignal("")
+  const log = useLog()
   return (
     <form role="search" data-slot="stack" onSubmit={(event) => event.preventDefault()}>
-      <Autocomplete submitOnSelect name="q" onSubmit={(value) => setSearched(value)}>
+      <Autocomplete submitOnSelect name="q" onSubmit={(value) => log(`Searched “${value}”`)}>
         <AutocompleteInput type="search" aria-label="Search" placeholder="Search…" />
         <AutocompleteContent>
+          <AutocompleteEmpty>No results.</AutocompleteEmpty>
           <AutocompleteList>
             <For each={recent}>
               {(search) => <AutocompleteItem value={search}>{search}</AutocompleteItem>}
@@ -23,7 +26,6 @@ function Example() {
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>
-      <output data-slot="output">{searched() ? `Searched “${searched()}”` : "Press Enter to search"}</output>
     </form>
   )
 }

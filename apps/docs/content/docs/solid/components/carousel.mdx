@@ -30,23 +30,73 @@ Carousel
 
 Put the slides inside a viewport, then add the controls you need.
 
-The root is a region described as a carousel, so name it with `aria-label`, like "Featured products". The viewport is the scrolling window, and the content is the row of slides inside it, a flex row (a column when vertical). Give each slide its size with a flex basis, like `basis-full` for one to a view or `basis-1/3` for three.
+The viewport is the scrolling window, and the content is the row of slides inside it, a flex row (a column when vertical). Name the carousel with `aria-label`, like "Featured products", and give Previous, Next, the indicators and the play toggle text, or an `aria-label` when they hold an icon.
 
-Each slide is a group described as a slide and labelled "1 of 5", unless it has an `aria-label` of its own,
-which is also how you translate it. Slides less than half in view are `inert` and hidden from screen
-readers, so Tab and the virtual cursor only reach what shows.
+## Usage
 
-`CarouselPrevious`, `CarouselNext`, the indicators and the play toggle have no text of their own. Give them text, or an `aria-label` when they hold an icon.
+Import the parts and put them together:
 
-## Examples
+```tsx
+import {
+  Carousel,
+  CarouselViewport,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@ui-sdk/solid/carousel"
 
-### Vertical
+function FeaturedSlides() {
+  return (
+    <Carousel aria-label="Featured">
+      <CarouselViewport>
+        <CarouselContent>
+          <CarouselItem>First slide</CarouselItem>
+          <CarouselItem>Second slide</CarouselItem>
+        </CarouselContent>
+      </CarouselViewport>
+      <CarouselPrevious>Previous</CarouselPrevious>
+      <CarouselNext>Next</CarouselNext>
+    </Carousel>
+  )
+}
+
+export { FeaturedSlides }
+```
+
+## Vertical
 
 `orientation="vertical"` scrolls up and down. Give the viewport a height. Up and down arrows page it, not left and right.
 
 <ComponentExample name="carousel/vertical" caption="Scroll vertically, or use the up and down controls." />
 
-### Indicators
+## Loop
+
+`loop` makes the slides go round. Next on the last page goes to the first, which comes in after the last, and a swipe, a drag or a wheel back from the first page reaches the last, with native scrolling all the way. Rotation always wraps.
+
+The slides take turns at the ends of the content with CSS `order` while the carousel rests, so the current page always has slides on both sides. They keep their place in the document, so screen readers and Tab follow the slides' own order. The content needs to lay its slides out in a row with even gaps, as flex and grid do, and hold a page of slides to either side of the current one. With fewer, like two slides one to a view, Next on the last page scrolls back to the first instead.
+
+<ComponentExample name="carousel/loop" caption="Keep moving forward or backward to wrap around the slides." />
+
+## Align
+
+`align` lines pages up at the viewport's `start` (the default), `center` or `end`. Centered slides narrower than the viewport let their neighbors peek in. The first and last pages stay at the ends of the content, so there's no empty space before the first slide.
+
+<ComponentExample
+  name="carousel/align"
+  caption="Choose Start, Center or End, then page through the slides. Centered slides let their neighbors peek in on both sides."
+/>
+
+## Default Page
+
+`defaultPage` is the page it starts on, when uncontrolled. It's 1 by default.
+
+<ComponentExample
+  name="carousel/default-page"
+  caption="Start on the chosen page, then move forward or backward."
+/>
+
+## Indicators
 
 Indicators are a tablist: one Tab stop on the current page, arrows to move between them and show their page, Home and End for the ends. Each controls the slides of its page.
 
@@ -58,7 +108,24 @@ fit. An indicator's `page` is inferred from their order; pass it to render the s
   caption="Choose a named indicator, then use arrows, Home, and End to move between them."
 />
 
-### Autoplay
+## Pages
+
+`slidesPerPage` is how many slides a page holds: Next moves that many, and each indicator stands for that
+many. `"auto"` fits as many as show. Pages that can't reach the start, like the last few slides, merge into
+the last page, so five slides three to a view make three pages.
+
+<ComponentExample name="carousel/pages" caption="Move through groups of slides using the page controls." />
+
+## Thumbnails
+
+A gallery and a strip of thumbnails share the selected page. The thumbnail carousel scrolls freely with `dragFree` and fits as many as show. Pressing a thumbnail selects its slide.
+
+<ComponentExample
+  name="carousel/thumbnails"
+  caption="Choose a thumbnail to change the gallery, or scroll either strip."
+/>
+
+## Autoplay
 
 `defaultPlaying` starts rotating, every `interval` milliseconds (5000 by default). `CarouselPlayToggle`
 starts and stops it; label it from `playing` in its state.
@@ -69,68 +136,10 @@ As the carousel pattern asks, rotation stops when keyboard focus moves in and do
 
 <ComponentExample
   name="carousel/autoplay"
-  caption="Start or stop rotation. Hover to pause it, or move keyboard focus inside to stop it."
+  caption="Start or stop rotation. Hover to pause it, or move keyboard focus inside to stop it. The console logs each change and why."
 />
 
-The timed indicators use this keyframe in your stylesheet:
-
-```css
-@keyframes carousel-progress {
-  from {
-    scale: 0 1;
-  }
-}
-```
-
-### Loop
-
-`loop` makes the slides go round. Next on the last page goes to the first, which comes in after the last, and a swipe, a drag or a wheel back from the first page reaches the last, with native scrolling all the way. Rotation always wraps.
-
-The slides take turns at the ends of the content with CSS `order` while the carousel rests, so the current page always has slides on both sides. They keep their place in the document, so screen readers and Tab follow the slides' own order. The content needs to lay its slides out in a row with even gaps, as flex and grid do, and hold a page of slides to either side of the current one. With fewer, like two slides one to a view, Next on the last page scrolls back to the first instead.
-
-<ComponentExample name="carousel/loop" caption="Keep moving forward or backward to wrap around the slides." />
-
-### Align
-
-`align` lines pages up at the viewport's `start` (the default), `center` or `end`. Centered slides narrower than the viewport let their neighbors peek in. The first and last pages stay at the ends of the content, so there's no empty space before the first slide.
-
-<ComponentExample
-  name="carousel/align"
-  caption="Page through centered slides with the neighboring slides partly visible."
-/>
-
-### Pages
-
-`slidesPerPage` is how many slides a page holds: Next moves that many, and each indicator stands for that
-many. `"auto"` fits as many as show. Pages that can't reach the start, like the last few slides, merge into
-the last page, so five slides three to a view make three pages.
-
-<ComponentExample name="carousel/pages" caption="Move through groups of slides using the page controls." />
-
-### Thumbnails
-
-A gallery and a strip of thumbnails share the selected page. The thumbnail carousel scrolls freely with `dragFree` and fits as many as show. Pressing a thumbnail selects its slide.
-
-<ComponentExample
-  name="carousel/thumbnails"
-  caption="Choose a thumbnail to change the gallery, or scroll either strip."
-/>
-
-## Behavior and Options
-
-### Controlled
-
-Pass `page` and `onPageChange` to control the page, from 1. The root's state has `pageCount`, which is null
-until the slides are measured.
-
-Every change carries a [reason](#reasons): `next-press` and `previous-press` for the parts, `item-press` for an indicator, `list-navigation` for arrow keys, `swipe` for a finger or a mouse drag, `scroll` for a wheel or trackpad, `timeout` for rotation and `imperative` from a [controller](#controller). Call `details.cancel()` to stay on the page: a swipe or drag springs back. A controlled page that doesn't change scrolls back too.
-
-<ComponentExample
-  name="carousel/controlled"
-  caption="Change the page to see the value and reason kept by the application."
-/>
-
-### Progress
+## Progress
 
 `--carousel-progress` on the root says how far the slides have scrolled, from 0 at the first page to 1 at the last, on every frame of a scroll or a spring, with no re-renders, so a progress bar can follow it in CSS. With `loop`, it goes round from 0 to 1 and back to 0. The controller's `getProgress()` reads the same number.
 
@@ -139,19 +148,22 @@ Start work there that would stutter the motion, like loading the next slides' im
 
 <ComponentExample
   name="carousel/progress"
-  caption="Move through the slides and watch the progress bar follow the scroll position."
+  caption="Move through the slides. The progress bar follows the scroll position, and the console logs the slide it rests on."
 />
 
-### Default Page
+## Controlled
 
-`defaultPage` is the page it starts on, when uncontrolled. It's 1 by default.
+Pass `page` and `onPageChange` to control the page, from 1. The root's state has `pageCount`, which is null
+until the slides are measured.
+
+Every change carries a [reason](#reasons): `next-press` and `previous-press` for the parts, `item-press` for an indicator, `list-navigation` for arrow keys, `swipe` for a finger or a mouse drag, `scroll` for a wheel or trackpad, `timeout` for rotation and `imperative` from a [controller](#controller). Call `details.cancel()` to stay on the page: a swipe or drag springs back. A controlled page that doesn't change scrolls back too.
 
 <ComponentExample
-  name="carousel/default-page"
-  caption="Start on the chosen page, then move forward or backward."
+  name="carousel/controlled"
+  caption="Change the page. The console logs each page and the reason for the change."
 />
 
-### Paging from Anywhere
+## Paging from Anywhere
 
 A [controller](#controller), from `createCarouselController()`, pages the carousel from anywhere. Pass it
 as `controller` to the carousel, and to `CarouselPrevious`, `CarouselNext`, `CarouselIndicatorGroup` or
@@ -164,7 +176,7 @@ as `controller` to the carousel, and to `CarouselPrevious`, `CarouselNext`, `Car
   caption="Use the controls outside the carousel to change its page."
 />
 
-### Swipes and Drags
+## Swipes and Drags
 
 Touch, trackpads and wheels scroll the viewport natively, with CSS scroll snap doing the paging. Native scrolling and snapping also work before JavaScript loads. A mouse or pen drags the slides too: they follow the pointer, stretch past the ends, and spring from the release velocity to the page a fling would reach. A drag that moved never clicks the link it started on, and fields inside slides keep their pointer.
 
@@ -173,31 +185,25 @@ and the nearest page becomes the current one.
 
 Buttons, keys, indicators, rotation, and controllers animate the scroll position. A second press updates the destination while it is moving. Reduced motion makes those changes immediate.
 
-## Keyboard
+## Custom Rendering
 
-Arrow keys follow the orientation, and swap left and right in right-to-left text.
+Every part takes `render`, a function that receives the props to spread and
+the part's state. `class`, `style` and `children` can be functions of the same state: a slide's `index`,
+`active` and `inView`, a step's `disabled`, an indicator's `page` and `selected`, the play toggle's
+`playing` and `paused`.
 
-| Key                                       | Does                                                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Tab                                       | Reaches the play toggle, links and controls in slides in view, Previous, Next and the current indicator |
-| ArrowRight, ArrowLeft                     | In the viewport, the next and previous page. ArrowDown and ArrowUp when vertical                        |
-| Home, End                                 | In the viewport or the indicators, the first and last page                                              |
-| ArrowRight, ArrowLeft, ArrowDown, ArrowUp | In the indicators, the next and previous indicator, which shows its page                                |
-| Enter, Space                              | Presses Previous, Next, an indicator or the play toggle                                                 |
-
-Fields and widgets inside slides keep their arrow keys: a text field's caret moves, and the carousel stays put. When arrow keys page away from a slide that has focus, focus moves to the slide that comes in, so it never stays on something out of view. Previous and Next stay focusable at the ends, with `aria-disabled`, so focus never drops to the page when Next reaches the last slide.
+<ComponentExample
+  name="carousel/render"
+  caption="Change slides to see each slide and control describe its current state."
+/>
 
 ## Styling
 
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-disabled` or `data-disabled` on Previous and Next at their end, `aria-selected` or `data-selected` on the current indicator, `data-active` on the current page's slides, `data-in-view` on slides in view, and `data-playing` and `data-paused` on the root.
+Use `data-disabled` on Previous and Next at their end, `data-selected` on the current indicator, `data-active` on the current page's slides, `data-in-view` on slides in view, and `data-playing` and `data-paused` on the root.
 
-```tsx
-<CarouselNext class="aria-disabled:opacity-50" />
-<CarouselIndicator class="bg-neutral-950/20 data-selected:bg-neutral-900" />
-<CarouselItem class="opacity-40 data-in-view:opacity-100" />
-```
+Slides size themselves: give them a `flex-basis` of 100% for one to a view or a third for three, and put the gap on the content, taking it out of each basis. The viewport writes the few styles scrolling needs inline: its overflow, `scroll-snap-type` and `overscroll-behavior`. Slides get `flex-shrink: 0` and their snap alignment. Hide the scrollbar with `scrollbar-width: none` if you like.
 
-The viewport writes the few styles scrolling needs inline: its overflow, `scroll-snap-type` and `overscroll-behavior`. Slides get `flex-shrink: 0` and their snap alignment. Hide the scrollbar with `[scrollbar-width:none]` if you like.
+Each part has a `data-slot`, such as `carousel-item`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### Carousel [#styling-carousel]
 
@@ -233,18 +239,6 @@ The viewport writes the few styles scrolling needs inline: its overflow, `scroll
 
 <DataAttributes component="carousel" part="play-toggle" />
 
-## Custom Rendering
-
-Every part takes `render`, a function that receives the props to spread and
-the part's state. `class`, `style` and `children` can be functions of the same state: a slide's `index`,
-`active` and `inView`, a step's `disabled`, an indicator's `page` and `selected`, the play toggle's
-`playing` and `paused`.
-
-<ComponentExample
-  name="carousel/render"
-  caption="Change slides to see each slide and control describe its current state."
-/>
-
 ## API Reference
 
 Props and callbacks are the same as below, as Solid props.
@@ -252,15 +246,38 @@ Props and callbacks are the same as below, as Solid props.
 ### Carousel
 
 <TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselOptions" />
+
+### CarouselViewport
+
+The scrolling area. Renders a `div` that scrolls and snaps natively, and takes focus for the arrow keys.
+
+### CarouselContent
+
+Holds the slides. Renders a `div` that announces slides coming into view, except while rotating.
+
+### CarouselItem
+
+One slide. Renders a `div` with the group role, named by its position, like "2 of 5".
+
+### CarouselPrevious
+
+<TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselControlProps" />
+
+### CarouselNext
+
+Shows the next page. Takes the same props as `CarouselPrevious`.
+
+### CarouselIndicatorGroup
+
+Groups the indicators. Renders a `div` with the tablist role. Takes the same props as `CarouselPrevious`.
+
 ### CarouselIndicator
 
 <TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselIndicatorProps" />
 
-### CarouselPrevious, CarouselNext, CarouselIndicatorGroup and CarouselPlayToggle
+### CarouselPlayToggle
 
-<TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselControlProps" />
-
-`CarouselViewport`, `CarouselContent` and `CarouselItem` take no props of their own.
+Starts and stops rotation. Renders a `button`. Takes the same props as `CarouselPrevious`.
 
 ### State
 
@@ -335,6 +352,24 @@ Callbacks get the new value first, then the details.
 ## Accessibility
 
 It follows the [WAI-ARIA carousel pattern](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/): a region described as a carousel, slides as groups described as slides and labelled by position, Previous and Next that control the slides, a rotation control, and indicators as a tablist. Every line below is an automated test.
+
+Each slide is labelled by its position, like "1 of 5", unless it has an `aria-label` of its own, which is also how you translate it. Slides less than half in view are `inert` and hidden from screen readers, so Tab and the virtual cursor only reach what shows.
+
+### Keyboard
+
+Arrow keys follow the orientation, and swap left and right in right-to-left text.
+
+| Key                                       | Does                                                                                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Tab                                       | Reaches the play toggle, links and controls in slides in view, Previous, Next and the current indicator |
+| ArrowRight, ArrowLeft                     | In the viewport, the next and previous page. ArrowDown and ArrowUp when vertical                        |
+| Home, End                                 | In the viewport or the indicators, the first and last page                                              |
+| ArrowRight, ArrowLeft, ArrowDown, ArrowUp | In the indicators, the next and previous indicator, which shows its page                                |
+| Enter, Space                              | Presses Previous, Next, an indicator or the play toggle                                                 |
+
+Fields and widgets inside slides keep their arrow keys: a text field's caret moves, and the carousel stays put. When arrow keys page away from a slide that has focus, focus moves to the slide that comes in, so it never stays on something out of view. Previous and Next stay focusable at the ends, with `aria-disabled`, so focus never drops to the page when Next reaches the last slide.
+
+### Tested Behavior
 
 <SpecList spec="carousel" />
 

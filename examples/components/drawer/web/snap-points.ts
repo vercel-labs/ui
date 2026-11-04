@@ -18,24 +18,26 @@ const places = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-drawer snap-points="0.25,0.5,1" default-snap-point="0.5" expand-on-scroll>
-      <ui-drawer-trigger><button>Find a place</button></ui-drawer-trigger>
-      <ui-drawer-backdrop></ui-drawer-backdrop>
-      <ui-drawer-content>
+      <ui-drawer-trigger><button>Find a Place</button></ui-drawer-trigger>
+      <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+      <ui-drawer-content hidden>
         <ui-drawer-handle><button aria-label="Resize"></button></ui-drawer-handle>
         <div data-slot="stack">
           <ui-drawer-title>Places nearby</ui-drawer-title>
           <ui-drawer-description>Drag the drawer, or press the handle, to see more.</ui-drawer-description>
         </div>
-        <ul data-slot="scroll">
-          ${places
-            .map(
-              (place) => `<li data-slot="stack">
-                <span>${place.name}</span>
-                <span data-slot="hint">${place.detail}</span>
-              </li>`,
-            )
-            .join("")}
-        </ul>
+        <div data-slot="scroll">
+          <ul data-slot="list">
+            ${places
+              .map(
+                (place) => `<li>
+                  <div>${place.name}</div>
+                  <div data-slot="hint">${place.detail}</div>
+                </li>`,
+              )
+              .join("")}
+          </ul>
+        </div>
       </ui-drawer-content>
     </ui-drawer>
   `

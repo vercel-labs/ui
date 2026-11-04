@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import {
   Dialog,
   DialogBackdrop,
@@ -9,34 +11,60 @@ import {
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const topics = [
+  { label: "Product updates", checked: true },
+  { label: "Security alerts", checked: true },
+  { label: "Weekly digest", checked: false },
+]
+
+const log = useLog()
 const open = ref(false)
-const log = ref<string[]>([])
-const write = (line: string) => (log.value = [line, ...log.value].slice(0, 8))
-const onOpenChange = (next: boolean, details: { reason: string }) =>
-  write(`onOpenChange(${next}, "${details.reason}")`)
-const onOpenChangeComplete = (next: boolean) => write(`onOpenChangeComplete(${next})`)
+
+function onOpenChange(next: boolean, details: { reason: string }) {
+  log(`${next ? "Opened" : "Closed"} (${details.reason})`)
+}
 </script>
 
 <template>
-  <label data-slot="label">
-    <input v-model="open" type="checkbox" />
-    open
-  </label>
-  <Dialog v-model:open="open" @open-change="onOpenChange" @open-change-complete="onOpenChangeComplete">
-    <DialogTrigger>Open</DialogTrigger>
-    <DialogBackdrop />
-    <DialogContent>
-      <div data-slot="stack">
-        <DialogTitle>Controlled</DialogTitle>
-        <DialogDescription>Close it any way you like, and watch the log.</DialogDescription>
-      </div>
-      <div data-slot="row">
-        <DialogClose data-variant="solid">Close</DialogClose>
-      </div>
-    </DialogContent>
-  </Dialog>
-  <ol data-slot="log">
-    <li v-for="(line, index) in log" :key="index">{{ line }}</li>
-  </ol>
+  <div data-slot="stack">
+    <div data-slot="controls">
+      <label data-slot="label">
+        <Checkbox :checked="open" @checked-change="(next) => (open = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
+        Open
+      </label>
+    </div>
+    <Dialog
+      v-model:open="open"
+      @open-change="onOpenChange"
+      @open-change-complete="(next: boolean) => log(next ? 'Finished opening' : 'Finished closing')"
+    >
+      <DialogTrigger>Notification Settings</DialogTrigger>
+      <DialogBackdrop />
+      <DialogContent>
+        <div data-slot="stack">
+          <DialogTitle>Notification settings</DialogTitle>
+          <DialogDescription>Choose what we email you about.</DialogDescription>
+        </div>
+        <div data-slot="stack">
+          <label v-for="topic in topics" :key="topic.label" data-slot="label">
+            <Checkbox :default-checked="topic.checked">
+              <CheckboxIndicator>
+                <CheckIcon aria-hidden="true" />
+              </CheckboxIndicator>
+            </Checkbox>
+            {{ topic.label }}
+          </label>
+        </div>
+        <div data-slot="row">
+          <DialogClose data-variant="solid">Done</DialogClose>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </div>
 </template>

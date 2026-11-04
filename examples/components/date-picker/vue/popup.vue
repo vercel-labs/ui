@@ -18,21 +18,22 @@ import {
 } from "@ui-sdk/vue/date-picker"
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const log = ref("")
+const log = useLog()
 const anchor = ref<HTMLElement | null>(null)
 const container = ref<HTMLElement | null>(null)
 
 function onOpenChange(open: boolean, details: { reason: DatePickerOpenChangeReason }) {
-  log.value = `${open ? "Opened" : "Closed"} (${details.reason})`
+  log(`${open ? "Opened" : "Closed"} (${details.reason})`)
 }
 
 function onOpenChangeComplete(open: boolean) {
-  if (!open) log.value = `${log.value}, done`
+  if (!open) log("Finished closing")
 }
 
 function onMonthChange(month: string, details: { reason: DatePickerMonthChangeReason }) {
-  log.value = `Showing ${month} (${details.reason})`
+  log(`Showing ${month} (${details.reason})`)
 }
 </script>
 
@@ -46,23 +47,14 @@ function onMonthChange(month: string, details: { reason: DatePickerMonthChangeRe
       @open-change-complete="onOpenChangeComplete"
       @month-change="onMonthChange"
     >
-      <div data-slot="row" ref="anchor">
+      <div ref="anchor" data-slot="row">
         <DatePickerInput aria-label="Due date" />
         <DatePickerTrigger data-variant="ghost">
           <CalendarIcon aria-hidden="true" />
         </DatePickerTrigger>
       </div>
       <DatePickerHint />
-      <DatePickerContent
-        side="top"
-        align="end"
-        :side-offset="8"
-        :align-offset="-4"
-        :collision-padding="16"
-        :anchor="anchor"
-        final-focus="none"
-        keep-mounted
-      >
+      <DatePickerContent :anchor="anchor" :side-offset="6" :collision-padding="16" keep-mounted>
         <div data-slot="row">
           <CalendarPrevious data-variant="ghost">
             <ChevronLeftIcon aria-hidden="true" />
@@ -83,8 +75,5 @@ function onMonthChange(month: string, details: { reason: DatePickerMonthChangeRe
       </DatePickerContent>
     </DatePicker>
     <div ref="container" />
-    <p data-slot="hint">
-      {{ log || "Opens above, lined up with the end of the field." }}
-    </p>
   </div>
 </template>

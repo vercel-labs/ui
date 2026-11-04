@@ -43,7 +43,7 @@ function Example() {
         </CarouselContent>
       </CarouselViewport>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary">
+        <CarouselPrevious>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -58,7 +58,6 @@ function Example() {
           Previous
         </CarouselPrevious>
         <CarouselNext
-          data-variant="secondary"
           render={(props, state) =>
             state.disabled ? (
               <a

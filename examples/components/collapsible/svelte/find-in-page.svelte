@@ -3,16 +3,15 @@
   import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
 </script>
 
-<div data-slot="stack">
-  <Collapsible>
-    <CollapsibleTrigger data-variant="secondary">
-      Ingredients
-      <ChevronDownIcon />
-    </CollapsibleTrigger>
-    <CollapsiblePanel hiddenUntilFound>
-      <p data-slot="hint">
-        Flour, butter, brown sugar, eggs, a pinch of cardamom and sea salt.
-      </p>
-    </CollapsiblePanel>
-  </Collapsible>
-</div>
+<Collapsible data-variant="card">
+  <CollapsibleTrigger>
+    <span data-slot="stack">
+      <span>Ingredients</span>
+      <span data-slot="hint">Morning buns, makes 12</span>
+    </span>
+    <ChevronDownIcon />
+  </CollapsibleTrigger>
+  <CollapsiblePanel hiddenUntilFound>
+    <p>Flour, butter, brown sugar, eggs, a pinch of cardamom and sea salt.</p>
+  </CollapsiblePanel>
+</Collapsible>

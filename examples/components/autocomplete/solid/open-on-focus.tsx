@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteInput,
@@ -16,6 +17,7 @@ function Example() {
     <Autocomplete openOnFocus>
       <AutocompleteInput aria-label="Search" placeholder="Search…" />
       <AutocompleteContent>
+        <AutocompleteEmpty>No results.</AutocompleteEmpty>
         <AutocompleteList>
           <AutocompleteGroup>
             <AutocompleteGroupLabel>Recent searches</AutocompleteGroupLabel>

@@ -13,10 +13,10 @@ function mount(root: HTMLElement) {
       </ui-carousel-viewport>
       <div data-slot="row">
         <ui-carousel-previous>
-          <button data-variant="secondary" aria-label="Previous slide">${createElement(ChevronUp, { "aria-hidden": "true" }).outerHTML}</button>
+          <button aria-label="Previous slide">${createElement(ChevronUp, { "aria-hidden": "true" }).outerHTML}</button>
         </ui-carousel-previous>
         <ui-carousel-next>
-          <button data-variant="secondary" aria-label="Next slide">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
+          <button aria-label="Next slide">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
         </ui-carousel-next>
       </div>
     </ui-carousel>

@@ -9,7 +9,8 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "@ui-sdk/solid/combobox"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -21,14 +22,11 @@ const frameworks = [
   { value: "qwik", label: "Qwik City" },
 ]
 
-export function Example() {
-  const [status, setStatus] = createSignal("Closed")
+function Example() {
+  const log = useLog()
 
   return (
-    <Combobox
-      onOpenChange={(open) => setStatus(open ? "Opening…" : "Closing…")}
-      onOpenChangeComplete={(open) => setStatus(open ? "Open" : "Closed")}
-    >
+    <Combobox onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
       <div data-slot="stack">
         <ComboboxLabel>Framework</ComboboxLabel>
         <div data-slot="row">
@@ -47,7 +45,6 @@ export function Example() {
             </svg>
           </ComboboxTrigger>
         </div>
-        <output data-slot="output">{status()}</output>
       </div>
       <ComboboxContent>
         <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
@@ -77,3 +74,5 @@ export function Example() {
     </Combobox>
   )
 }
+
+export { Example }

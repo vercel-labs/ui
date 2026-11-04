@@ -34,9 +34,9 @@ function mount(root: HTMLElement) {
             <input placeholder="Add" />
           </ui-combobox-input>
         </ui-combobox-chips>
-        <p data-slot="output"></p>
+        <p data-slot="hint"></p>
       </div>
-      <ui-combobox-content>
+      <ui-combobox-content hidden>
         <ui-combobox-empty>No countries found.</ui-combobox-empty>
         <ui-combobox-list>
           ${countries

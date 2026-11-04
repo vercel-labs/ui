@@ -8,7 +8,7 @@ import {
   formatFileSize,
 } from "@ui-sdk/solid/file-input"
 
-export function Example() {
+function Example() {
   return (
     <FileInput multiple>
       <FileInputDropzone>
@@ -26,8 +26,8 @@ export function Example() {
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
         </svg>
         <p>Drag and drop files here</p>
-        <p data-slot="hint">Or paste them, or browse your computer.</p>
-        <FileInputTrigger>Browse files</FileInputTrigger>
+        <p data-slot="hint">Or paste them from your clipboard.</p>
+        <FileInputTrigger>Browse Files</FileInputTrigger>
       </FileInputDropzone>
       <FileInputList aria-label="Files">
         <FileInputItem>
@@ -68,3 +68,5 @@ export function Example() {
     </FileInput>
   )
 }
+
+export { Example }

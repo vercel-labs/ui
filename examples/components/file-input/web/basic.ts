@@ -1,14 +1,14 @@
 import "@ui-sdk/web/file-input"
 import { createElement, File as FileIcon, Upload, X } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-file-input multiple>
       <ui-file-input-dropzone>
         ${createElement(Upload, { "aria-hidden": "true" }).outerHTML}
         <p>Drag and drop files here</p>
-        <p data-slot="hint">Or paste them, or browse your computer.</p>
-        <ui-file-input-trigger><button>Browse files</button></ui-file-input-trigger>
+        <p data-slot="hint">Or paste them from your clipboard.</p>
+        <ui-file-input-trigger><button>Browse Files</button></ui-file-input-trigger>
       </ui-file-input-dropzone>
       <ui-file-input-list aria-label="Files">
         <template>
@@ -23,3 +23,5 @@ export function mount(root: HTMLElement) {
     </ui-file-input>
   `
 }
+
+export { mount }

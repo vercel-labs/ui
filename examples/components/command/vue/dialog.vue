@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { CalculatorIcon, CalendarIcon, CreditCardIcon, SearchIcon, SettingsIcon, SmileIcon, UserIcon } from "@lucide/vue"
+import {
+  CalculatorIcon,
+  CalendarIcon,
+  CreditCardIcon,
+  SearchIcon,
+  SettingsIcon,
+  SmileIcon,
+  UserIcon,
+} from "@lucide/vue"
 import {
   Command,
   CommandEmpty,
@@ -19,6 +27,7 @@ import {
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const commands = [
   { value: "calendar", label: "Calendar", icon: CalendarIcon },
@@ -30,10 +39,10 @@ const commands = [
 ]
 
 const open = ref(false)
-const ran = ref("")
+const log = useLog()
 
 function onAction(value: string) {
-  ran.value = value
+  log(`Ran ${value}`)
   open.value = false
 }
 </script>
@@ -73,6 +82,5 @@ function onAction(value: string) {
         </Command>
       </DialogContent>
     </Dialog>
-    <output data-slot="output">{{ ran ? `Ran ${ran}` : "Press ⌘K or Ctrl+K" }}</output>
   </div>
 </template>

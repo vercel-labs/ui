@@ -2,6 +2,7 @@
   import {
     Autocomplete,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteGroup,
     AutocompleteGroupLabel,
     AutocompleteInput,
@@ -24,6 +25,7 @@
     <AutocompleteInput placeholder="e.g. Peach" />
   </div>
   <AutocompleteContent>
+    <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
     <AutocompleteList>
       {#each fruitGroups as group, index (group.label)}
         {#if index > 0}<AutocompleteSeparator />{/if}

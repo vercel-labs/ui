@@ -8,34 +8,34 @@
     CarouselPrevious,
     CarouselViewport,
   } from "@ui-sdk/svelte/carousel"
+  import { useLog } from "../../../shared/svelte/log"
+
+  const log = useLog()
 
   const slides = [1, 2, 3, 4, 5]
-
-  let rested = $state(1)
 </script>
 
-<Carousel aria-label="Featured" onPageChangeComplete={(page) => (rested = page)}>
-  <CarouselViewport>
-    <CarouselContent>
-      {#each slides as slide (slide)}
-        <CarouselItem>
-          <div data-slot="tile">
-            {slide}
-          </div>
-        </CarouselItem>
-      {/each}
-    </CarouselContent>
-  </CarouselViewport>
+<Carousel aria-label="Featured" onPageChangeComplete={(page) => log(`Rested on slide ${page}`)}>
   <div data-slot="row">
-    <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+    <CarouselPrevious aria-label="Previous slide">
       <ChevronLeftIcon />
     </CarouselPrevious>
-    <div data-slot="bar">
-      <div></div>
-    </div>
-    <CarouselNext data-variant="secondary" aria-label="Next slide">
+    <CarouselViewport>
+      <CarouselContent>
+        {#each slides as slide (slide)}
+          <CarouselItem>
+            <div data-slot="tile">{slide}</div>
+          </CarouselItem>
+        {/each}
+      </CarouselContent>
+    </CarouselViewport>
+    <CarouselNext aria-label="Next slide">
       <ChevronRightIcon />
     </CarouselNext>
   </div>
-  <p data-slot="hint">Rested on slide {rested}</p>
+  <div data-slot="row">
+    <div data-slot="bar">
+      <div></div>
+    </div>
+  </div>
 </Carousel>

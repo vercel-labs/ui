@@ -9,6 +9,7 @@
     DrawerTitle,
     DrawerTrigger,
   } from "@ui-sdk/svelte/drawer"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
 
   const messages = [
     { from: "Inès", text: "The proofs are back from the printer." },
@@ -23,9 +24,7 @@
     <DrawerOutlet keyframes={{ scale: [1, 0.94], borderRadius: ["0px", "24px"] }}>
       <div data-slot="row">
         <span>Inbox</span>
-        <DrawerTrigger data-variant="solid">
-          Compose
-        </DrawerTrigger>
+        <DrawerTrigger data-variant="solid">Compose</DrawerTrigger>
       </div>
       <ul data-slot="list">
         {#each messages as message (message.from)}
@@ -42,21 +41,22 @@
     <div data-slot="grip" aria-hidden="true"></div>
     <div data-slot="stack">
       <DrawerTitle>New message</DrawerTitle>
-      <DrawerDescription>
-        Drag it down slowly and watch the inbox follow.
-      </DrawerDescription>
+      <DrawerDescription>Write a quick note to the team.</DrawerDescription>
     </div>
+    <Field>
+      <FieldLabel>To</FieldLabel>
+      <FieldControl defaultValue="Design team" />
+    </Field>
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <FieldControl>
+        {#snippet render({ props })}
+          <textarea {...props} placeholder="What's new?"></textarea>
+        {/snippet}
+      </FieldControl>
+    </Field>
     <div data-slot="stack">
-      <input aria-label="To" placeholder="To" />
-      <textarea
-        aria-label="Message"
-        placeholder="Message"
-      ></textarea>
-    </div>
-    <div data-slot="stack">
-      <DrawerClose data-variant="solid" value="send">
-        Send
-      </DrawerClose>
+      <DrawerClose data-variant="solid" value="send">Send</DrawerClose>
     </div>
   </DrawerContent>
 </Drawer>

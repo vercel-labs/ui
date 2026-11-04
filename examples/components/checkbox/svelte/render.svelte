@@ -1,6 +1,6 @@
 <script lang="ts">
   import { CheckIcon, PlusIcon } from "@lucide/svelte"
-  import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
+  import { Checkbox } from "@ui-sdk/svelte/checkbox"
 
   const topics = [
     { value: "design", label: "Design", checked: true },
@@ -10,36 +10,22 @@
   ]
 </script>
 
-<div data-slot="stack">
-  <fieldset>
-    <legend>Topics you follow</legend>
-    <div data-slot="row">
-      {#each topics as topic (topic.value)}
-        <Checkbox name="topics" value={topic.value} defaultChecked={topic.checked}>
-          {#snippet render({ props, state })}
-            <button {...props}>
-              {#if state.checked}
-                <CheckIcon />
-              {:else}
-                <PlusIcon />
-              {/if}
-              {topic.label}
-            </button>
-          {/snippet}
-        </Checkbox>
-      {/each}
-    </div>
-  </fieldset>
-  <label data-slot="label">
-    <Checkbox>
-      {#snippet render({ props })}
-        <span {...props}>
-          <CheckboxIndicator>
-            <CheckIcon />
-          </CheckboxIndicator>
-        </span>
-      {/snippet}
-    </Checkbox>
-    Notify me about new topics
-  </label>
-</div>
+<fieldset>
+  <legend>Topics you follow</legend>
+  <div data-slot="row">
+    {#each topics as topic (topic.value)}
+      <Checkbox name="topics" value={topic.value} defaultChecked={topic.checked}>
+        {#snippet render({ props, state })}
+          <button {...props}>
+            {#if state.checked}
+              <CheckIcon />
+            {:else}
+              <PlusIcon />
+            {/if}
+            {topic.label}
+          </button>
+        {/snippet}
+      </Checkbox>
+    {/each}
+  </div>
+</fieldset>

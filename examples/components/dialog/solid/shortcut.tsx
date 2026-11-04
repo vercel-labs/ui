@@ -3,13 +3,12 @@ import {
   DialogBackdrop,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogShortcut,
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { For } from "solid-js"
-
-const pages = ["Introduction", "Installation", "Dialog", "Alert Dialog", "Menu"]
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 
 function Example() {
   return (
@@ -24,37 +23,34 @@ function Example() {
           stroke-linejoin="round"
           aria-hidden="true"
         >
-          <path d="m21 21-4.34-4.34" />
-          <circle cx="11" cy="11" r="8" />
+          <path d="M5 12h14" />
+          <path d="M12 5v14" />
         </svg>
-        Search docs
+        New Contact
         <DialogShortcut />
       </DialogTrigger>
       <DialogBackdrop />
       <DialogContent>
-        <DialogTitle>Search docs</DialogTitle>
-        <input aria-label="Search" placeholder="Search…" />
         <div data-slot="stack">
-          <For each={pages}>
-            {(page) => (
-              <DialogClose value={page}>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
-                  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
-                </svg>
-                {page}
-              </DialogClose>
-            )}
-          </For>
+          <DialogTitle>New contact</DialogTitle>
+          <DialogDescription>Add someone to your address book.</DialogDescription>
         </div>
+        <form data-slot="stack" method="dialog">
+          <Field>
+            <FieldLabel>Name</FieldLabel>
+            <FieldControl name="name" required placeholder="Kofi Mensah" />
+          </Field>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <FieldControl name="email" type="email" required placeholder="kofi@example.com" />
+          </Field>
+          <div data-slot="row">
+            <DialogClose>Cancel</DialogClose>
+            <button data-variant="solid" type="submit" value="save">
+              Save Contact
+            </button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )

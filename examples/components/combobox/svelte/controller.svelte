@@ -12,6 +12,7 @@
     ComboboxTrigger,
     createComboboxController,
   } from "@ui-sdk/svelte/combobox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const countries = [
     { value: "ar", label: "Argentina" },
@@ -36,11 +37,11 @@
   const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
   const country = createComboboxController<string>()
-  let log = $state("")
+  const log = useLog()
 
-  async function openCountry() {
+  async function openAndWait() {
     const { reason } = await country.open()
-    log = `Closed by ${reason}, with ${country.getValue() ?? "nothing"}`
+    log(`Closed by ${reason}, with ${country.getValue() ?? "nothing"}`)
   }
 
   function search() {
@@ -51,6 +52,20 @@
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={openAndWait}>
+      Open and Wait
+    </button>
+    <button type="button" onclick={search}>
+      Search “sw”
+    </button>
+    <button type="button" onclick={() => country.setValue("de")}>
+      Choose Germany
+    </button>
+    <button type="button" onclick={() => country.clear()}>
+      Clear
+    </button>
+  </div>
   <Combobox controller={country} itemToLabel={countryLabel}>
     <div data-slot="stack">
       <ComboboxLabel>Country</ComboboxLabel>
@@ -75,19 +90,4 @@
       </ComboboxList>
     </ComboboxContent>
   </Combobox>
-  <div data-slot="row">
-    <button type="button" onclick={openCountry}>
-      Open
-    </button>
-    <button type="button" onclick={search}>
-      Search “sw”
-    </button>
-    <button type="button" onclick={() => country.setValue("de")}>
-      Germany
-    </button>
-    <button type="button" onclick={() => country.clear()}>
-      Clear
-    </button>
-  </div>
-  <output data-slot="output">{log || "Use the buttons"}</output>
 </div>

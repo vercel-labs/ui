@@ -26,25 +26,23 @@
 </script>
 
 <Drawer snapPoints={[0.25, 0.5, 1]} defaultSnapPoint={0.5} expandOnScroll>
-  <DrawerTrigger>
-    Find a place
-  </DrawerTrigger>
+  <DrawerTrigger>Find a Place</DrawerTrigger>
   <DrawerBackdrop />
   <DrawerContent>
     <DrawerHandle aria-label="Resize" />
     <div data-slot="stack">
       <DrawerTitle>Places nearby</DrawerTitle>
-      <DrawerDescription>
-        Drag the drawer, or press the handle, to see more.
-      </DrawerDescription>
+      <DrawerDescription>Drag the drawer, or press the handle, to see more.</DrawerDescription>
     </div>
-    <ul data-slot="scroll">
-      {#each places as place (place.name)}
-        <li data-slot="stack">
-          <span>{place.name}</span>
-          <span data-slot="hint">{place.detail}</span>
-        </li>
-      {/each}
-    </ul>
+    <div data-slot="scroll">
+      <ul data-slot="list">
+        {#each places as place (place.name)}
+          <li>
+            <div>{place.name}</div>
+            <div data-slot="hint">{place.detail}</div>
+          </li>
+        {/each}
+      </ul>
+    </div>
   </DrawerContent>
 </Drawer>

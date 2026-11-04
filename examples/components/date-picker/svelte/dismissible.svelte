@@ -30,9 +30,9 @@
   onDismissAttempt={() => (asking = true)}
 >
   <div data-slot="row">
-    <DatePickerInput aria-label="Check in" />
+    <DatePickerInput aria-label="Check in" placeholder="Check in" />
     <span data-slot="hint">–</span>
-    <DatePickerInput end aria-label="Check out" />
+    <DatePickerInput end aria-label="Check out" placeholder="Check out" />
     <DatePickerTrigger data-variant="ghost">
       <CalendarIcon aria-hidden="true" />
     </DatePickerTrigger>
@@ -60,9 +60,7 @@
       </CalendarWeeks>
     </CalendarGrid>
     {#if asking}
-      <p data-slot="hint" role="alert">
-        Pick a check-in and a check-out date, or press the calendar button to close.
-      </p>
+      <p data-slot="hint" role="alert">Pick a check-out date to finish your stay.</p>
     {/if}
   </DatePickerContent>
 </DatePicker>

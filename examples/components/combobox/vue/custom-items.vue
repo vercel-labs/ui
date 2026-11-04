@@ -13,11 +13,11 @@ import {
 } from "@ui-sdk/vue/combobox"
 
 const users = [
-  { id: 1, name: "Ada Lovelace", username: "ada", role: "Owner" },
-  { id: 2, name: "Grace Hopper", username: "grace", role: "Admin" },
-  { id: 3, name: "Alan Turing", username: "alan", role: "Member" },
-  { id: 4, name: "Margaret Hamilton", username: "margaret", role: "Member" },
-  { id: 5, name: "Edsger Dijkstra", username: "edsger", role: "Guest" },
+  { id: 1, name: "Hollis Grant", username: "hollis", role: "Owner" },
+  { id: 2, name: "Inès Moreau", username: "ines", role: "Admin" },
+  { id: 3, name: "Kofi Mensah", username: "kofi", role: "Member" },
+  { id: 4, name: "Wren Takahashi", username: "wren", role: "Member" },
+  { id: 5, name: "Tomasz Wójcik", username: "tomasz", role: "Guest" },
 ]
 </script>
 

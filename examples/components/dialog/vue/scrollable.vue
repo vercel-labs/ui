@@ -21,7 +21,7 @@ const paragraphs = [
 
 <template>
   <Dialog>
-    <DialogTrigger>Scrollable content</DialogTrigger>
+    <DialogTrigger>Scrollable Content</DialogTrigger>
     <DialogBackdrop />
     <DialogContent initial-focus="content">
       <div data-slot="stack">

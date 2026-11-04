@@ -8,35 +8,34 @@ import {
   CarouselPrevious,
   CarouselViewport,
 } from "@ui-sdk/vue/carousel"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const slides = [1, 2, 3, 4, 5]
 
-const rested = ref(1)
+const log = useLog()
 </script>
 
 <template>
-  <Carousel aria-label="Featured" @page-change-complete="(page: number) => (rested = page)">
-    <CarouselViewport>
-      <CarouselContent>
-        <CarouselItem v-for="slide in slides" :key="slide">
-          <div data-slot="tile">
-            {{ slide }}
-          </div>
-        </CarouselItem>
-      </CarouselContent>
-    </CarouselViewport>
+  <Carousel aria-label="Featured" @page-change-complete="(page: number) => log(`Rested on slide ${page}`)">
     <div data-slot="row">
-      <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+      <CarouselPrevious aria-label="Previous slide">
         <ChevronLeftIcon />
       </CarouselPrevious>
-      <div data-slot="bar">
-        <div />
-      </div>
-      <CarouselNext data-variant="secondary" aria-label="Next slide">
+      <CarouselViewport>
+        <CarouselContent>
+          <CarouselItem v-for="slide in slides" :key="slide">
+            <div data-slot="tile">{{ slide }}</div>
+          </CarouselItem>
+        </CarouselContent>
+      </CarouselViewport>
+      <CarouselNext aria-label="Next slide">
         <ChevronRightIcon />
       </CarouselNext>
     </div>
-    <p data-slot="hint">Rested on slide {{ rested }}</p>
+    <div data-slot="row">
+      <div data-slot="bar">
+        <div />
+      </div>
+    </div>
   </Carousel>
 </template>

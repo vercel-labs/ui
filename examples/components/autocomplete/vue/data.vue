@@ -2,6 +2,7 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteInput,
@@ -25,6 +26,7 @@ const fruitGroups = [
       <AutocompleteInput placeholder="e.g. Peach" />
     </div>
     <AutocompleteContent>
+      <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
       <AutocompleteList>
         <template v-for="(group, index) in fruitGroups" :key="group.label">
           <AutocompleteSeparator v-if="index > 0" />

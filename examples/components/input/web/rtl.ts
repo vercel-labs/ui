@@ -1,8 +1,8 @@
 import "@ui-sdk/web/field"
 import "@ui-sdk/web/input"
-import { Search, X, createElement } from "lucide"
+import { X, createElement } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack" dir="rtl">
       <ui-field name="name">
@@ -13,7 +13,6 @@ export function mount(root: HTMLElement) {
         <ui-field-description>كما يظهر في ملفك الشخصي.</ui-field-description>
       </ui-field>
       <ui-input-group>
-        ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
         <ui-input>
           <input type="search" aria-label="بحث" value="حسن" />
         </ui-input>
@@ -26,3 +25,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

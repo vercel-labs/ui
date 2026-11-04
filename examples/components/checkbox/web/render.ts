@@ -8,33 +8,30 @@ const topics = [
   { value: "sales", label: "Sales", checked: false },
 ]
 
-export function mount(root: HTMLElement) {
+const icon = (checked: boolean) => createElement(checked ? Check : Plus, { "aria-hidden": "true" }).outerHTML
+
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <fieldset>
-        <legend>Topics you follow</legend>
-        <div data-slot="row">
-          ${topics
-            .map(
-              (topic) => `
-                <ui-checkbox name="topics" value="${topic.value}"${topic.checked ? " default-checked" : ""}>
-                  ${createElement(Plus, { "aria-hidden": "true" }).outerHTML}
-                  ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
-                  ${topic.label}
-                </ui-checkbox>
-              `,
-            )
-            .join("")}
-        </div>
-      </fieldset>
-      <label data-slot="label">
-        <ui-checkbox>
-          <ui-checkbox-indicator>
-            ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
-          </ui-checkbox-indicator>
-        </ui-checkbox>
-        Notify me about new topics
-      </label>
-    </div>
+    <fieldset>
+      <legend>Topics you follow</legend>
+      <div data-slot="row">
+        ${topics
+          .map(
+            (topic) =>
+              `<ui-checkbox name="topics" value="${topic.value}"${topic.checked ? " default-checked" : ""}>${icon(topic.checked)}${topic.label}</ui-checkbox>`,
+          )
+          .join("")}
+      </div>
+    </fieldset>
   `
+  const update = (checkbox: Element) => {
+    checkbox.querySelector("svg")!.outerHTML = icon(checkbox.hasAttribute("data-checked"))
+  }
+  new MutationObserver((records) => records.forEach((record) => update(record.target as Element))).observe(
+    root,
+    { subtree: true, attributeFilter: ["data-checked"] },
+  )
+  root.querySelectorAll("ui-checkbox").forEach(update)
 }
+
+export { mount }

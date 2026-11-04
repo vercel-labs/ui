@@ -27,24 +27,33 @@ async function remove(name: string, button: HTMLButtonElement) {
 
 <template>
   <div data-slot="stack">
-    <ul aria-label="Projects">
-      <li data-slot="row" v-for="name in projects" :key="name">
+    <div data-slot="controls">
+      <button ref="reset" type="button" @click="projects = ['Acme', 'Globex', 'Initech']">
+        Reset Projects
+      </button>
+    </div>
+    <ul data-slot="list" aria-label="Projects">
+      <li v-for="name in projects" :key="name" data-slot="row">
         {{ name }}
-        <button type="button" @click="remove(name, $event.currentTarget as HTMLButtonElement)">Delete</button>
+        <button
+          type="button"
+          data-size="sm"
+          :aria-label="`Delete ${name}`"
+          @click="remove(name, $event.currentTarget as HTMLButtonElement)"
+        >
+          Delete
+        </button>
       </li>
-      <li data-slot="row" v-if="projects.length === 0">All projects deleted.</li>
+      <li v-if="projects.length === 0" data-slot="row">All projects deleted.</li>
     </ul>
-    <button ref="reset" type="button" @click="projects = ['Acme', 'Globex', 'Initech']">
-      Reset projects
-    </button>
     <AlertDialog :controller="confirm.controller">
       <AlertDialogBackdrop />
       <ProjectAlertDialogContent v-slot="{ state }">
         <div data-slot="stack">
           <AlertDialogTitle>Delete {{ state.payload?.name }}?</AlertDialogTitle>
-          <AlertDialogDescription
-            >The project and its files will be deleted for everyone.</AlertDialogDescription
-          >
+          <AlertDialogDescription>
+            The project and its files will be deleted for everyone on your team.
+          </AlertDialogDescription>
         </div>
         <div data-slot="row">
           <AlertDialogClose>Cancel</AlertDialogClose>

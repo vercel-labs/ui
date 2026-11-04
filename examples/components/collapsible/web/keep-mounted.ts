@@ -1,20 +1,24 @@
 import "@ui-sdk/web/collapsible"
+import "@ui-sdk/web/field"
 import { ChevronDown, createElement } from "lucide"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-collapsible>
+    <ui-collapsible data-variant="card">
       <ui-collapsible-trigger>
-        <button data-variant="secondary">
-          Add a delivery note
+        <button type="button" aria-expanded="false">
+          <span data-slot="stack">
+            <span>Add a delivery note</span>
+            <span data-slot="hint">Optional, for the courier</span>
+          </span>
           ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
         </button>
       </ui-collapsible-trigger>
-      <ui-collapsible-panel keep-mounted>
-        <label data-slot="label">
-          <span>Delivery note</span>
+      <ui-collapsible-panel keep-mounted hidden>
+        <ui-field>
+          <ui-field-label>Delivery note</ui-field-label>
           <textarea placeholder="Leave it with the front desk…"></textarea>
-        </label>
+        </ui-field>
       </ui-collapsible-panel>
     </ui-collapsible>
   `

@@ -36,6 +36,44 @@ The heading names the displayed month. Previous and Next change it, and a grid h
 
 An empty `Calendar` renders the default structure, and an empty `CalendarGrid` renders its headers and weeks. Write the parts out to add your classes and content. Each grid is named by its month and has the `grid` role.
 
+## Usage
+
+Import the parts and put them together:
+
+```svelte
+<script lang="ts">
+  import {
+    Calendar,
+    CalendarDay,
+    CalendarGrid,
+    CalendarHeading,
+    CalendarNext,
+    CalendarPrevious,
+    CalendarWeekday,
+    CalendarWeekdays,
+    CalendarWeeks,
+  } from "@ui-sdk/svelte/calendar"
+</script>
+
+<Calendar defaultValue="2026-10-16">
+  <CalendarPrevious />
+  <CalendarHeading />
+  <CalendarNext />
+  <CalendarGrid>
+    <CalendarWeekdays>
+      {#snippet children(index)}
+        <CalendarWeekday {index} />
+      {/snippet}
+    </CalendarWeekdays>
+    <CalendarWeeks>
+      {#snippet children(cell)}
+        <CalendarDay value={cell.date} />
+      {/snippet}
+    </CalendarWeeks>
+  </CalendarGrid>
+</Calendar>
+```
+
 ## Values
 
 Dates are ISO strings such as `"2026-10-16"`, with no time or time zone attached. No date library is needed. The [date helpers](../../core/date) handle arithmetic; `Intl` formats names and labels.
@@ -48,9 +86,7 @@ Dates are ISO strings such as `"2026-10-16"`, with no time or time zone attached
 
 A value with the wrong shape for its mode is treated as no selection.
 
-## Examples
-
-### Range
+## Range
 
 `mode="range"` chooses a start and then an end. Moving the pointer or focus previews the range; the value changes once both ends are chosen. A date before the start ends it too, and becomes the start. Escape cancels an unfinished range.
 
@@ -59,36 +95,16 @@ A value with the wrong shape for its mode is treated as no selection.
   caption="Choose a start date, then move to an end date to preview the range. Choose the end to finish, or press Escape to cancel the unfinished range."
 />
 
-### Range Limits
-
-`minDays` and `maxDays` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen. Until then, the dates that can't end the range are disabled.
-
-A range cannot include an unavailable date unless `allowUnavailable` is set. That allows unavailable dates between the ends; they still cannot be chosen as an endpoint.
-
-<ComponentExample
-  name="calendar/range-limits"
-  caption="In October 2026, choose October 15 then October 20. This example accepts 3–8 days and allows the range to span the unavailable weekend."
-/>
-
-### Range in Progress
-
-The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `onAnchorChange` and `onFocusedChange` report them before they change, to show the range being picked outside the calendar, and canceling either keeps things as they were. A day that takes focus because the months turned reports nothing.
-
-<ComponentExample
-  name="calendar/range-progress"
-  caption="Choose a start date, then move with the arrow keys. The line below follows the start and the focused date until Enter picks the end."
-/>
-
-### Multiple
+## Multiple
 
 `mode="multiple"` toggles each date independently. Its value is a sorted array, even when dates were chosen in another order.
 
 <ComponentExample
   name="calendar/multiple"
-  caption="Choose another date to add it, or choose a selected date to remove it. The count updates below."
+  caption="Choose another date to add it, or choose a selected date to remove it."
 />
 
-### Unavailable Dates
+## Unavailable Dates
 
 `unavailable` accepts a date, `{ from, to }`, `{ weekday: [0, 6] }` for weekends, `{ before }`, `{ after }`, a predicate, or an array of these matchers. Weekday zero is Sunday.
 
@@ -99,11 +115,11 @@ Unavailable dates cannot be selected, but stay focusable so keyboard and screen 
   caption="Try an unavailable date, then choose an available one. Unavailable days remain focusable so their state can be heard."
 />
 
-### Deselect
+## Deselect
 
 `deselectable` lets a second press on the selected date clear it, in single mode.
 
-### Min and Max
+## Min and Max
 
 `min` and `max` set the earliest and latest selectable dates. Dates outside those bounds cannot receive focus. Arrow keys stop at the bounds, and Previous and Next stop at their months.
 
@@ -112,62 +128,7 @@ Unavailable dates cannot be selected, but stay focusable so keyboard and screen 
   caption="Move toward either end of the allowed dates. Keyboard navigation and month buttons stop at the limits."
 />
 
-### Two Months
-
-Set `months` to `2` and render grids with offsets `0` and `1`. Arrow keys move between the grids without turning the page. Dates that another visible month already shows leave an empty cell, so each date appears once.
-
-`pageBy="page"` makes Previous, Next, and navigation beyond the visible grids move by the full number of months.
-
-<ComponentExample
-  name="calendar/two-months"
-  caption="Move between October and November with arrow keys. Next advances both visible months to December and January."
-/>
-
-### Month and Year Selects
-
-`CalendarMonthSelect` and `CalendarYearSelect` are native selects for jumping directly to a date, such as a birthday. The year options run from `min` to `max`, or ten years either side of the current year shown when bounds are missing. Months outside the bounds are disabled.
-
-They update the first displayed month with the `select-change` reason. Their state exposes the options if you want to render a different select.
-
-<ComponentExample
-  name="calendar/month-year-select"
-  caption="Choose a year and month to jump directly to a birthday, then choose the day."
-/>
-
-### Language
-
-`locale` controls month names, weekday headers, and full date labels. Without it, Calendar uses the surrounding page’s `lang`, then the browser’s language. The first weekday follows the locale unless `weekStartsOn` overrides it. `weekdayFormat` accepts `"narrow"`, `"short"`, or `"long"`.
-
-Previous and Next are named "Previous month" and "Next month". Pass `aria-label` to name them in another language. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
-
-<ComponentExample
-  name="calendar/locale"
-  caption="Move through the calendar. Month names, weekday headers, and full date labels are in German, with Monday first."
-/>
-
-### Right to Left
-
-Set `dir="rtl"` on an ancestor. The week runs from the right, and Left and Right Arrow swap so they follow the visual order. No provider is needed.
-
-### Custom Days
-
-A day’s children receive its state, including the date, label, selection, and whether it is outside the month. This example adds a price below each day. Weekday headers can have custom content too.
-
-<ComponentExample
-  name="calendar/custom-day"
-  caption="Choose a date to see its price selected with it. Dates outside the current month have no price."
-/>
-
-### Fixed Weeks
-
-`fixedWeeks` renders six week rows in every month. Set `showOutsideDays` to `false` to leave dates from neighboring months blank.
-
-<ComponentExample
-  name="calendar/fixed-weeks"
-  caption="Move from February to March. Both grids keep six week rows, and dates outside each month are hidden."
-/>
-
-### Disabled and Read Only
+## Disabled and Read Only
 
 `disabled` prevents focus, selection, and month navigation. `readOnly` allows navigation so dates can be inspected, but keeps the selected value unchanged.
 
@@ -181,15 +142,107 @@ A day’s children receive its state, including the date, label, selection, and 
   caption="Move through dates and months. The selected value stays unchanged."
 />
 
-## Behavior and Options
+## Two Months
 
-### Controlled
+Set `months` to `2` and render grids with offsets `0` and `1`. Arrow keys move between the grids without turning the page. Dates that another visible month already shows leave an empty cell, so each date appears once.
+
+`pageBy="page"` makes Previous, Next, and navigation beyond the visible grids move by the full number of months.
+
+<ComponentExample
+  name="calendar/two-months"
+  caption="Move between October and November with arrow keys. Next advances both visible months to December and January."
+/>
+
+## Fixed Weeks
+
+`fixedWeeks` renders six week rows in every month. Set `showOutsideDays` to `false` to leave dates from neighboring months blank.
+
+<ComponentExample
+  name="calendar/fixed-weeks"
+  caption="Move from February to March. Both grids keep six week rows, and dates outside each month are hidden."
+/>
+
+## Month and Year Selects
+
+`CalendarMonthSelect` and `CalendarYearSelect` are native selects for jumping directly to a date, such as a birthday. The year options run from `min` to `max`, or ten years either side of the current year shown when bounds are missing. Months outside the bounds are disabled.
+
+They update the first displayed month with the `select-change` reason. Their state exposes the options if you want to render a different select.
+
+<ComponentExample
+  name="calendar/month-year-select"
+  caption="Choose a year and month to jump directly to a birthday, then choose the day."
+/>
+
+## Custom Month and Year Selects
+
+The month and year selects are native `select` elements. To use your own select, control the calendar's `month` and drive it from your select's value, as with the [Select](./select) component here. Keep a `CalendarHeading` in the calendar, visually hidden if you like, so the grid stays named.
+
+<ComponentExample
+  name="calendar/custom-select"
+  caption="Choose a month or a year from the selects. The calendar follows, and the arrow keys still move between days."
+/>
+
+## Language
+
+`locale` controls month names, weekday headers, and full date labels. Without it, Calendar uses the surrounding page’s `lang`, then the browser’s language. The first weekday follows the locale unless `weekStartsOn` overrides it. `weekdayFormat` accepts `"narrow"`, `"short"`, or `"long"`.
+
+Previous and Next are named "Previous month" and "Next month". Pass `aria-label` to name them in another language. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
+
+<ComponentExample
+  name="calendar/locale"
+  caption="Move through the calendar. Month names, weekday headers, and full date labels are in German, with Monday first."
+/>
+
+## Name Formats
+
+Set `weekdayFormat` for the weekday headers and `monthFormat` for the heading and the month select. Both take `"narrow"`, `"short"` or `"long"`, and follow the calendar's locale. Screen readers still hear full names: the grid and each day keep their long labels.
+
+<ComponentExample
+  name="calendar/formats"
+  caption="The weekday headers are narrow and the heading uses short month names: Oct – Nov 2026."
+/>
+
+## Custom Days
+
+A day’s `children` snippet receives its state, including the date, label, selection, and whether it is outside the month. This example adds a price below each day. Weekday headers can have custom content too.
+
+<ComponentExample
+  name="calendar/custom-day"
+  caption="Choose a date to see its price selected with it. Dates outside the current month have no price."
+/>
+
+## Range Limits
+
+`minDays` and `maxDays` count both ends. A three-day range includes its start, the day between, and its end. A press that would break a limit keeps the start, so another end can be chosen. Until then, the dates that can't end the range are disabled.
+
+A range cannot include an unavailable date unless `allowUnavailable` is set. That allows unavailable dates between the ends; they still cannot be chosen as an endpoint.
+
+<ComponentExample
+  name="calendar/range-limits"
+  caption="In October 2026, choose October 15 then October 20. This example accepts 3–8 days and allows the range to span the unavailable weekend."
+/>
+
+## Range in Progress
+
+The root's state has `anchor`, the start while an end is being picked, and `focused`, the date with the Tab stop. `onAnchorChange` and `onFocusedChange` report them before they change, to show the range being picked outside the calendar, and canceling either keeps things as they were. A day that takes focus because the months turned reports nothing.
+
+<ComponentExample
+  name="calendar/range-progress"
+  caption="Choose a start date, then move with the arrow keys. The console logs the start and each focused date until Enter picks the end."
+/>
+
+## Controlled
 
 The selection and displayed month are separate. `value` uses the shape for the chosen mode; `month` names the first displayed month, such as `"2026-10"`.
 
 Use `value` with `onValueChange` and `month` with `onMonthChange` to control them. Use `defaultValue` and `defaultMonth` for initial state. Change details include a reason; `details.cancel()` rejects the change. [State and Events](../state-and-events) covers the binding pattern, and the [reason tables](#reasons) list Calendar’s reasons.
 
-### Today
+<ComponentExample
+  name="calendar/controlled"
+  caption="Choose a date or change the month. The console logs each change and its reason."
+/>
+
+## Today
 
 Today gets `aria-current="date"` and `data-today`. When there is no selection or starting month, the calendar opens on today’s month. It reads today on the client; set `today` to pin a date explicitly.
 
@@ -200,38 +253,68 @@ Today gets `aria-current="date"` and `data-today`. When there is no selection or
   caption="Find the marked date for today in Pacific/Kiritimati, which may differ from today in your time zone."
 />
 
-### Driving It from Anywhere
+## Driving It from Anywhere
 
 A `createCalendarController()` instance can set the value, change months, and focus a date. Focusing a date in another month shows that month first. [Controllers](../controllers) covers setup and lifecycle.
 
 <ComponentExample
   name="calendar/controller"
-  caption="Press Go to Christmas to show December and focus December 25. Clear removes the selection without moving focus to a date."
+  caption="Press Go to Christmas to select December 25 and move focus there, or Today to jump back to today and select it."
 />
 
-## Keyboard
+## Presets
 
-The grid has one Tab stop: the selected date when visible, otherwise today, otherwise the first available date. Moving into another month shows it and then focuses the date.
+Drive a range calendar from buttons for the ranges people pick most. Each preset sets the value through the [controller](#driving-it-from-anywhere) and moves focus to its first day, using the [date helpers](../../core/date) for the arithmetic.
 
-| Key                             | Action                                          |
-| ------------------------------- | ----------------------------------------------- |
-| Left / Right Arrow              | Move one day, following the page’s direction.   |
-| Up / Down Arrow                 | Move one week.                                  |
-| Home / End                      | Move to the first or last day of the week.      |
-| Page Up / Page Down             | Move one month, keeping the day where possible. |
-| Shift+Page Up / Shift+Page Down | Move one year.                                  |
-| Enter / Space                   | Select the focused date.                        |
-| Escape                          | Cancel an unfinished range.                     |
+<ComponentExample
+  name="calendar/presets"
+  caption="Choose Last 7 Days, This Month or Next 30 Days. The range is selected and the calendar shows its start."
+/>
+
+## Custom Rendering
+
+The grid’s `children` snippet receives its state, with its month, label, weekdays, and weeks, when you need to write the table yourself. Preserve empty cells marked `hidden` so dates shown by another month do not appear twice. [Parts and Composition](../parts-and-composition) covers changing a part’s element without losing its behavior.
+
+<ComponentExample
+  name="calendar/custom-grid"
+  caption="The table is written out by hand from the grid's state. Navigate and select as usual."
+/>
 
 ## Styling
 
 Use `data-selected`, `data-today`, `data-outside`, `data-unavailable`, and `data-disabled` to style dates. A range also exposes its start, middle, end, and unfinished preview. Navigation buttons also get `data-disabled` when they reach the bounds.
 
-<DataAttributes component="calendar" />
+Each part has a `data-slot`, such as `calendar-day`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
-## Custom Rendering
+## Data Attributes
 
-The grid’s state exposes its month, label, weekdays, and weeks when you need to write the table yourself. Preserve empty cells marked `hidden` so dates shown by another month do not appear twice. [Parts and Composition](../parts-and-composition) covers changing a part’s element without losing its behavior.
+### Calendar [#data-attributes-calendar]
+
+<DataAttributes component="calendar" part="root" />
+
+### CalendarPrevious [#data-attributes-calendarprevious]
+
+<DataAttributes component="calendar" part="previous" />
+
+### CalendarNext [#data-attributes-calendarnext]
+
+<DataAttributes component="calendar" part="next" />
+
+### CalendarMonthSelect [#data-attributes-calendarmonthselect]
+
+<DataAttributes component="calendar" part="month-select" />
+
+### CalendarYearSelect [#data-attributes-calendaryearselect]
+
+<DataAttributes component="calendar" part="year-select" />
+
+### CalendarGrid [#data-attributes-calendargrid]
+
+<DataAttributes component="calendar" part="grid" />
+
+### CalendarDay [#data-attributes-calendarday]
+
+<DataAttributes component="calendar" part="day" />
 
 ## API Reference
 
@@ -241,23 +324,49 @@ Props and callbacks are the same as below, as Svelte props.
 
 <TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarOptions" />
 
+### CalendarPrevious
+
+Shows the previous month. Renders a `button` that is disabled at `min`.
+
+### CalendarHeading
+
+Names the months shown, like "October 2026". Renders an `h2` the grid is labelled by, and screen readers hear it change.
+
+### CalendarNext
+
+Shows the next month. Renders a `button` that is disabled at `max`.
+
+### CalendarMonthSelect
+
+A native `select` of the months, in the locale, that changes the first month shown.
+
+### CalendarYearSelect
+
+A native `select` of the years from `min` to `max`, or 10 either side of the year shown.
+
 ### CalendarGrid
 
 <TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarGridProps" />
+
+### CalendarWeekdays
+
+Renders the header row. Its `children` snippet receives each weekday's index.
 
 ### CalendarWeekday
 
 <TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarWeekdayProps" />
 
+### CalendarWeeks
+
+Renders the week rows. Its `children` snippet receives each cell, with its `date`.
+
 ### CalendarDay
 
 <TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarDayProps" />
 
-`CalendarHeading`, `CalendarPrevious`, `CalendarNext`, `CalendarMonthSelect`, `CalendarYearSelect`, `CalendarWeekdays` and `CalendarWeeks` take no props of their own.
-
 ### State
 
-What render functions, state-based class names and children functions receive, per part.
+What `render` and `children` snippets receive, per part.
 
 `Calendar`:
 
@@ -339,6 +448,22 @@ Callbacks get the new value first, then the details. A bound value only updates 
 ## Accessibility
 
 It follows the grid of the [WAI-ARIA date picker dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/): each month is a `grid` named by its month, weekday headers are `columnheader`s named by their full names, and each day is a focusable `gridcell` named by its full date, like "Friday, October 16, 2026", with `aria-selected`, `aria-disabled` and `aria-current="date"`. A grid that selects several dates or a range is `aria-multiselectable`. Every line below is an automated test.
+
+### Keyboard
+
+The grid has one Tab stop: the selected date when visible, otherwise today, otherwise the first available date. Moving into another month shows it and then focuses the date.
+
+| Key                             | Action                                          |
+| ------------------------------- | ----------------------------------------------- |
+| Left / Right Arrow              | Move one day, following the page’s direction.   |
+| Up / Down Arrow                 | Move one week.                                  |
+| Home / End                      | Move to the first or last day of the week.      |
+| Page Up / Page Down             | Move one month, keeping the day where possible. |
+| Shift+Page Up / Shift+Page Down | Move one year.                                  |
+| Enter / Space                   | Select the focused date.                        |
+| Escape                          | Cancel an unfinished range.                     |
+
+### Tested Behavior
 
 <SpecList spec="calendar" />
 

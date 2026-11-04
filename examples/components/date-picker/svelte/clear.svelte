@@ -15,12 +15,15 @@
     DatePickerInput,
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, XIcon } from "@lucide/svelte"
 </script>
 
 <DatePicker defaultValue="2026-10-16">
   <div data-slot="row">
     <DatePickerInput aria-label="Due date" />
+    <DatePickerClear data-variant="ghost" aria-label="Clear date">
+      <XIcon aria-hidden="true" />
+    </DatePickerClear>
     <DatePickerTrigger data-variant="ghost">
       <CalendarIcon aria-hidden="true" />
     </DatePickerTrigger>
@@ -49,7 +52,4 @@
       </CalendarWeeks>
     </CalendarGrid>
   </DatePickerContent>
-  <DatePickerClear data-variant="ghost">
-    Clear
-  </DatePickerClear>
 </DatePicker>

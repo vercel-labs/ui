@@ -12,6 +12,7 @@
     ComboboxList,
     ComboboxTrigger,
   } from "@ui-sdk/svelte/combobox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const frameworks = [
     { value: "next", label: "Next.js" },
@@ -26,36 +27,38 @@
   const frameworkLabel = (value: string) =>
     frameworks.find((framework) => framework.value === value)?.label ?? value
 
+  const log = useLog()
   let value = $state<string | null>("sveltekit")
 </script>
 
-<div data-slot="stack">
-  <Combobox bind:value itemToLabel={frameworkLabel}>
-    <div data-slot="stack">
-      <ComboboxLabel>Framework</ComboboxLabel>
-      <div data-slot="row">
-        <ComboboxInput placeholder="Select a framework" />
-        <ComboboxClear aria-label="Clear framework">
-          <XIcon aria-hidden="true" />
-        </ComboboxClear>
-        <ComboboxTrigger aria-label="Show frameworks">
-          <ChevronDownIcon aria-hidden="true" />
-        </ComboboxTrigger>
-      </div>
+<Combobox
+  bind:value
+  onValueChange={(next, details) => log(`${next ? frameworkLabel(next) : "Cleared"} (${details.reason})`)}
+  itemToLabel={frameworkLabel}
+>
+  <div data-slot="stack">
+    <ComboboxLabel>Framework</ComboboxLabel>
+    <div data-slot="row">
+      <ComboboxInput placeholder="Select a framework" />
+      <ComboboxClear aria-label="Clear framework">
+        <XIcon aria-hidden="true" />
+      </ComboboxClear>
+      <ComboboxTrigger aria-label="Show frameworks">
+        <ChevronDownIcon aria-hidden="true" />
+      </ComboboxTrigger>
     </div>
-    <ComboboxContent>
-      <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
-      <ComboboxList>
-        {#each frameworks as framework (framework.value)}
-          <ComboboxItem value={framework.value} label={framework.label}>
-            {framework.label}
-            <ComboboxItemIndicator>
-              <CheckIcon aria-hidden="true" />
-            </ComboboxItemIndicator>
-          </ComboboxItem>
-        {/each}
-      </ComboboxList>
-    </ComboboxContent>
-  </Combobox>
-  <output data-slot="output">Value: {JSON.stringify(value)}</output>
-</div>
+  </div>
+  <ComboboxContent>
+    <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
+    <ComboboxList>
+      {#each frameworks as framework (framework.value)}
+        <ComboboxItem value={framework.value} label={framework.label}>
+          {framework.label}
+          <ComboboxItemIndicator>
+            <CheckIcon aria-hidden="true" />
+          </ComboboxItemIndicator>
+        </ComboboxItem>
+      {/each}
+    </ComboboxList>
+  </ComboboxContent>
+</Combobox>

@@ -20,7 +20,6 @@ const items = [
 const accordion = createAccordionController()
 
 const value = ref(["account"])
-const reason = ref("")
 
 function confirmClose(item: string, open: boolean, details: ChangeDetails) {
   if (!open && item === "security" && !window.confirm("Close the security settings?")) details.cancel()
@@ -32,12 +31,7 @@ function confirmClose(item: string, open: boolean, details: ChangeDetails) {
     <div data-slot="controls">
       <button type="button" @click="accordion.open('security')">Review security</button>
     </div>
-    <Accordion
-      v-model:value="value"
-      multiple
-      :controller="accordion"
-      @value-change="(_: string[], details: ChangeDetails) => (reason = details.reason)"
-    >
+    <Accordion v-model:value="value" multiple :controller="accordion">
       <AccordionItem
         v-for="item in items"
         :key="item.value"
@@ -55,8 +49,5 @@ function confirmClose(item: string, open: boolean, details: ChangeDetails) {
         </AccordionPanel>
       </AccordionItem>
     </Accordion>
-    <output data-slot="output">
-      Open: {{ value.join(", ") || "none" }}{{ reason ? `, last change: ${reason}` : "" }}
-    </output>
   </div>
 </template>

@@ -7,8 +7,8 @@ export function mount(root: HTMLElement) {
     <div dir="rtl">
       <ui-drawer side="start">
         <ui-drawer-trigger><button>القائمة</button></ui-drawer-trigger>
-        <ui-drawer-backdrop></ui-drawer-backdrop>
-        <ui-drawer-content>
+        <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+        <ui-drawer-content hidden>
           <div data-slot="stack">
             <ui-drawer-title>القائمة</ui-drawer-title>
             <ui-drawer-description>اسحبها نحو حافتها لإغلاقها.</ui-drawer-description>

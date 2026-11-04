@@ -14,34 +14,30 @@
     DatePickerInput,
     DatePickerTrigger,
     type DatePickerValue,
-    type DatePickerValueChangeReason,
   } from "@ui-sdk/svelte/date-picker"
   import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let value = $state<DatePickerValue>("2026-10-16")
-  let reason = $state("initial")
-
-  function onValueChange(_next: DatePickerValue, details: { reason: DatePickerValueChangeReason }) {
-    reason = details.reason
-  }
 </script>
 
-<DatePicker bind:value {onValueChange}>
+<DatePicker bind:value onValueChange={(next, details) => log(`${next ?? "No date"} (${details.reason})`)}>
   <div data-slot="row">
     <DatePickerInput aria-label="Due date" />
-    <DatePickerTrigger>
-      <CalendarIcon />
+    <DatePickerTrigger data-variant="ghost">
+      <CalendarIcon aria-hidden="true" />
     </DatePickerTrigger>
   </div>
   <DatePickerHint />
   <DatePickerContent>
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
-        <ChevronLeftIcon />
+        <ChevronLeftIcon aria-hidden="true" />
       </CalendarPrevious>
       <CalendarHeading />
       <CalendarNext data-variant="ghost">
-        <ChevronRightIcon />
+        <ChevronRightIcon aria-hidden="true" />
       </CalendarNext>
     </div>
     <CalendarGrid>
@@ -57,5 +53,4 @@
       </CalendarWeeks>
     </CalendarGrid>
   </DatePickerContent>
-  <p data-slot="hint">{value ?? "No date"} ({reason})</p>
 </DatePicker>

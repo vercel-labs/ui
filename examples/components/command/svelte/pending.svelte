@@ -1,18 +1,20 @@
 <script lang="ts">
   import { LoaderCircleIcon } from "@lucide/svelte"
   import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/svelte/command"
+  import { useLog } from "../../../shared/svelte/log"
 
   const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
-  let log = $state("")
+  const log = useLog()
 
   async function deploy() {
     await wait(1200)
-    log = "Deployed"
+    log("Deployed to production")
   }
 
   async function sync() {
     await wait(600)
+    log("Couldn't sync: offline")
     throw new Error("Offline")
   }
 </script>
@@ -39,5 +41,4 @@
       </CommandItem>
     </CommandList>
   </Command>
-  <output data-slot="output">{log || "Run a command"}</output>
 </div>

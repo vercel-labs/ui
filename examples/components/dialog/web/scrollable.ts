@@ -12,9 +12,11 @@ const paragraphs = [
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-dialog>
-      <ui-dialog-trigger><button>Scrollable content</button></ui-dialog-trigger>
-      <ui-dialog-backdrop></ui-dialog-backdrop>
-      <ui-dialog-content initial-focus="content">
+      <ui-dialog-trigger>
+        <button>Scrollable Content</button>
+      </ui-dialog-trigger>
+      <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+      <ui-dialog-content initial-focus="content" hidden>
         <div data-slot="stack">
           <ui-dialog-title>Terms of service</ui-dialog-title>
           <ui-dialog-description>Please read before you continue.</ui-dialog-description>
@@ -23,8 +25,12 @@ function mount(root: HTMLElement) {
           ${paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("")}
         </div>
         <div data-slot="row">
-          <ui-dialog-close><button>Decline</button></ui-dialog-close>
-          <ui-dialog-close value="accept"><button data-variant="solid">Accept</button></ui-dialog-close>
+          <ui-dialog-close>
+            <button>Decline</button>
+          </ui-dialog-close>
+          <ui-dialog-close value="accept">
+            <button data-variant="solid">Accept</button>
+          </ui-dialog-close>
         </div>
       </ui-dialog-content>
     </ui-dialog>

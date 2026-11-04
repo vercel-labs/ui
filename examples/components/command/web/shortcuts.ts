@@ -1,5 +1,6 @@
 import "@ui-sdk/web/command"
 import { createElement, CreditCard, Settings, User } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const settings = [
   { value: "profile", label: "Profile", icon: User, shortcut: "mod+p" },
@@ -31,13 +32,11 @@ function mount(root: HTMLElement) {
           </ui-command-group>
         </ui-command-list>
       </ui-command>
-      <output data-slot="output">Try a shortcut</output>
     </div>
   `
-  const output = root.querySelector("output")!
-  root.querySelector("ui-command")!.addEventListener("action", (event) => {
-    output.textContent = `Ran ${(event as CustomEvent<{ value: string }>).detail.value}`
-  })
+  root
+    .querySelector("ui-command")!
+    .addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
 }
 
 export { mount }

@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
+import type { ChangeDetails } from "@ui-sdk/core"
 import { createCheckboxController, type CheckedState } from "@ui-sdk/core/checkbox"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const updates = createCheckboxController()
 const checked = ref<CheckedState>(false)
-const reason = ref("")
 
-function onCheckedChange(_: CheckedState, details: { reason: string }) {
-  reason.value = details.reason
+function onCheckedChange(next: CheckedState, details: ChangeDetails) {
+  log(`${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="updates.toggle()">Toggle</button>
+    </div>
     <label data-slot="label">
       <Checkbox v-model:checked="checked" :controller="updates" @checked-change="onCheckedChange">
         <CheckboxIndicator>
@@ -23,9 +28,5 @@ function onCheckedChange(_: CheckedState, details: { reason: string }) {
       </Checkbox>
       Email me about product updates
     </label>
-    <button type="button" @click="updates.toggle()">Toggle from outside</button>
-    <output data-slot="output"
-      >Checked: {{ String(checked) }}{{ reason && `, last change: ${reason}` }}</output
-    >
   </div>
 </template>

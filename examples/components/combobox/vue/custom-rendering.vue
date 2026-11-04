@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckIcon, SearchIcon } from "@lucide/vue"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "@lucide/vue"
 import {
   Combobox,
   ComboboxContent,
@@ -8,29 +8,36 @@ import {
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
+  ComboboxTrigger,
 } from "@ui-sdk/vue/combobox"
 
 const users = [
-  { id: 1, name: "Ada Lovelace", username: "ada", role: "Owner" },
-  { id: 2, name: "Grace Hopper", username: "grace", role: "Admin" },
-  { id: 3, name: "Alan Turing", username: "alan", role: "Member" },
-  { id: 4, name: "Margaret Hamilton", username: "margaret", role: "Member" },
-  { id: 5, name: "Edsger Dijkstra", username: "edsger", role: "Guest" },
+  { id: 1, name: "Hollis Grant", username: "hollis", role: "Owner" },
+  { id: 2, name: "Inès Moreau", username: "ines", role: "Admin" },
+  { id: 3, name: "Kofi Mensah", username: "kofi", role: "Member" },
+  { id: 4, name: "Wren Takahashi", username: "wren", role: "Member" },
+  { id: 5, name: "Tomasz Wójcik", username: "tomasz", role: "Guest" },
 ]
 </script>
 
 <template>
   <Combobox>
     <div data-slot="stack">
-      <ComboboxLabel>Mention</ComboboxLabel>
-      <ComboboxInput placeholder="@username">
-        <template #render="{ props }">
-          <div data-slot="row">
-            <SearchIcon />
-            <input v-bind="props" />
-          </div>
-        </template>
-      </ComboboxInput>
+      <ComboboxLabel>Assignee</ComboboxLabel>
+      <div data-slot="row">
+        <ComboboxInput placeholder="Search people">
+          <template #render="{ props }">
+            <div data-slot="row">
+              <SearchIcon aria-hidden="true" />
+              <input v-bind="props" />
+            </div>
+          </template>
+        </ComboboxInput>
+        <ComboboxTrigger v-slot="{ state }" aria-label="Show people">
+          <ChevronUpIcon v-if="state.open" aria-hidden="true" />
+          <ChevronDownIcon v-else aria-hidden="true" />
+        </ComboboxTrigger>
+      </div>
     </div>
     <ComboboxContent>
       <ComboboxEmpty>No one by that name.</ComboboxEmpty>
@@ -38,22 +45,18 @@ const users = [
         <ComboboxItem
           v-for="user in users"
           :key="user.id"
+          v-slot="{ state }"
           :value="user.username"
           :label="user.name"
           :keywords="[user.username]"
         >
-          <template #render="{ props, state }">
-            <div v-bind="props">
-              <span data-slot="badge">
-                {{ user.name.slice(0, 1) }}
-              </span>
-              <span data-slot="stack">
-                {{ user.name }}
-                <span data-slot="hint">@{{ user.username }}</span>
-              </span>
-              <CheckIcon v-if="state.selected" />
-            </div>
-          </template>
+          <span data-slot="badge">{{ user.name.slice(0, 1) }}</span>
+          <span data-slot="stack">
+            {{ user.name }}
+            <span data-slot="hint">@{{ user.username }}</span>
+          </span>
+          <CheckIcon v-if="state.selected" aria-hidden="true" />
+          <kbd v-else-if="state.highlighted" data-slot="kbd">Enter</kbd>
         </ComboboxItem>
       </ComboboxList>
     </ComboboxContent>

@@ -2,12 +2,13 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteList,
 } from "@ui-sdk/vue/autocomplete"
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const fruits = [
   "Apple",
@@ -27,13 +28,13 @@ const fruits = [
   "Strawberry",
 ]
 
-const submitted = ref("")
+const log = useLog()
 
 function submit(event: Event) {
   const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
     ([name, value]) => `${name}=${value}`,
   )
-  submitted.value = data.join("&")
+  log(`Submitted ${data.join("&")}`)
 }
 </script>
 
@@ -44,6 +45,7 @@ function submit(event: Event) {
       <Autocomplete name="fruit" form="order" required default-value="Apple">
         <AutocompleteInput />
         <AutocompleteContent>
+          <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
             <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{
               fruit
@@ -58,6 +60,5 @@ function submit(event: Event) {
       <button type="submit" data-variant="solid">Submit</button>
       <button type="reset">Reset</button>
     </div>
-    <output data-slot="output">{{ submitted || "Not submitted" }}</output>
   </form>
 </template>

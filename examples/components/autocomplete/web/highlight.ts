@@ -27,7 +27,7 @@ function mount(root: HTMLElement) {
           <input placeholder="e.g. berry" />
         </ui-autocomplete-input>
       </div>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
         <ui-autocomplete-empty>No fruits found.</ui-autocomplete-empty>
         <ui-autocomplete-list>
           ${fruits

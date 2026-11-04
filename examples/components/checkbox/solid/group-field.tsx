@@ -1,6 +1,7 @@
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const channels = [
   { value: "email", label: "Email" },
@@ -9,14 +10,15 @@ const channels = [
 ]
 
 function Example() {
-  const [saved, setSaved] = createSignal<string | null>(null)
+  const log = useLog()
 
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setSaved(new FormData(event.currentTarget).getAll("notifications").join(", "))
+        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        log(`Saved ${entries.join("&")}`)
       }}
     >
       <Field>
@@ -51,7 +53,6 @@ function Example() {
         </div>
       </Field>
       <button type="submit">Save</button>
-      <output data-slot="output">{saved() !== null ? `notifications: ${saved()}` : ""}</output>
     </form>
   )
 }

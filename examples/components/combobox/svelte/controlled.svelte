@@ -11,6 +11,7 @@
     ComboboxList,
     ComboboxTrigger,
   } from "@ui-sdk/svelte/combobox"
+  import { useLog } from "../../../shared/svelte/log"
 
   const countries = [
     { value: "ar", label: "Argentina" },
@@ -37,19 +38,27 @@
   let value = $state<string | null>("fr")
   let query = $state("France")
   let open = $state(false)
-  let log = $state("")
+  const log = useLog()
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={() => (value = "jp")}>
+      Choose Japan
+    </button>
+    <button type="button" onclick={() => (open = true)}>
+      Open
+    </button>
+  </div>
   <Combobox
     bind:value
     bind:query
     bind:open
     itemToLabel={countryLabel}
     debug
-    onValueChange={(next, details) => (log = `value: ${next} (${details.reason})`)}
-    onQueryChange={(next, details) => (log = `query: “${next}” (${details.reason})`)}
-    onOpenChange={(next, details) => (log = `open: ${next} (${details.reason})`)}
+    onValueChange={(next, details) => log(`value: ${next} (${details.reason})`)}
+    onQueryChange={(next, details) => log(`query: “${next}” (${details.reason})`)}
+    onOpenChange={(next, details) => log(`open: ${next} (${details.reason})`)}
   >
     <div data-slot="stack">
       <ComboboxLabel>Country</ComboboxLabel>
@@ -74,13 +83,4 @@
       </ComboboxList>
     </ComboboxContent>
   </Combobox>
-  <div data-slot="row">
-    <button type="button" onclick={() => (value = "jp")}>
-      Japan
-    </button>
-    <button type="button" onclick={() => (open = true)}>
-      Open
-    </button>
-  </div>
-  <output data-slot="output">{log || "Change something"}</output>
 </div>

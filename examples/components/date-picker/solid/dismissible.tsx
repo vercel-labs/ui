@@ -32,9 +32,9 @@ function Example() {
       onDismissAttempt={() => setAsking(true)}
     >
       <div data-slot="row">
-        <DatePickerInput aria-label="Check in" />
+        <DatePickerInput aria-label="Check in" placeholder="Check in" />
         <span data-slot="hint">–</span>
-        <DatePickerInput end aria-label="Check out" />
+        <DatePickerInput end aria-label="Check out" placeholder="Check out" />
         <DatePickerTrigger data-variant="ghost">
           <svg
             viewBox="0 0 24 24"
@@ -88,7 +88,7 @@ function Example() {
         </CalendarGrid>
         <Show when={asking()}>
           <p data-slot="hint" role="alert">
-            Pick a check-in and a check-out date, or press the calendar button to close.
+            Pick a check-out date to finish your stay.
           </p>
         </Show>
       </DatePickerContent>

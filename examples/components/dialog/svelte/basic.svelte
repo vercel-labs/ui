@@ -9,28 +9,23 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
 </script>
 
 <Dialog>
-  <DialogTrigger>
-    Share
-  </DialogTrigger>
+  <DialogTrigger>Share</DialogTrigger>
   <DialogBackdrop />
   <DialogContent>
     <div data-slot="stack">
       <DialogTitle>Share link</DialogTitle>
-      <DialogDescription>
-        Anyone who has this link will be able to view this.
-      </DialogDescription>
+      <DialogDescription>Anyone who has this link will be able to view this.</DialogDescription>
     </div>
-    <label data-slot="label">
-      <span data-slot="visually-hidden">Link</span>
-      <input value="https://example.com/project" readonly />
-    </label>
+    <Field>
+      <FieldLabel>Link</FieldLabel>
+      <FieldControl defaultValue="https://example.com/project" readonly />
+    </Field>
     <div data-slot="row">
-      <DialogClose>
-        Close
-      </DialogClose>
+      <DialogClose data-variant="solid">Done</DialogClose>
     </div>
     <DialogClose aria-label="Close">
       <XIcon aria-hidden="true" />

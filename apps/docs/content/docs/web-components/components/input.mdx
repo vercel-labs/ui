@@ -3,15 +3,17 @@ title: Input
 description: Enter text, add a clear button, and connect the value to your form or state.
 ---
 
+An input is a native text field for short values like a name, an email address or a search. It works inside a field and a form, and adds a clear button, text around the input, and change reasons.
+
 <ComponentExample
   name="input/basic"
-  caption="Focus Email and type an address. The component uses a native input, so ordinary text selection and editing work."
+  caption="Edit the website, then press Clear website. The text clears, focus returns to the input and the console logs the reason. Pressing https:// focuses the input too."
 />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/web @ui-sdk/core
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
 Importing the component defines its elements. On the server the import does nothing.
@@ -35,124 +37,166 @@ ui-input-group
     └── button
 ```
 
-`<ui-input>` wraps your own `<input>`, which keeps every native behavior. A plain `<input>` works in a field too; wrap it when you want `valuechange`, `data-filled` or the `api`.
+`<ui-input>` wraps your own `<input>`, so put its type, placeholder, autocomplete and other native attributes on the input. `<ui-input-group>` holds text or buttons around it, and `<ui-input-clear>` wraps a button that empties it.
 
-`Input` renders a native `<input>`, so every native attribute works: `type`, `placeholder`, `autoComplete`, `minLength`, `pattern`. Inside a [Field](./field), it takes the field's `id`, its label as its name, its description and errors as its description, and `aria-invalid`.
+## Usage
 
-## Examples
+Import the parts and put them together:
 
-### Field
+```html
+<script type="module">
+  import "@ui-sdk/web/input"
+</script>
 
-Wrap the input in a [Field](./field) to associate a visible label and description. Field also supplies its name when the input does not have one.
+<ui-input-group>
+  <ui-input><input type="search" aria-label="Search" /></ui-input>
+  <ui-input-clear><button type="button" aria-label="Clear search"></button></ui-input-clear>
+</ui-input-group>
+```
 
-<ComponentExample
-  name="input/field"
-  caption="Click Username to focus the input, then edit it. A screen reader includes the description when it reads the field."
-/>
+## Fields
 
-### Disabled
+Wrap the input in a [Field](./field) to give it a visible label, a description and errors. The field also supplies its `name` when the input has none.
 
-Set `disabled` on the input or its Field to prevent editing and remove it from the tab order.
+```html
+<ui-field name="username">
+  <ui-field-label>Username</ui-field-label>
+  <ui-input><input autocomplete="username" /></ui-input>
+  <ui-field-description>Choose a unique username for your account.</ui-field-description>
+</ui-field>
+```
 
-<ComponentExample
-  name="input/disabled"
-  caption="Try to edit Email or reach it with Tab. The disabled field is skipped and cannot be changed."
-/>
+## Disabled and Read Only
 
-### Invalid
+Set `disabled` on the input or its field to prevent editing and leave it out of the tab order and the submitted values. A `readonly` input can still be focused, selected and submitted.
 
-Set `invalid` on Field for an error your app decides. The input gets `aria-invalid`, and Field associates the error message with it.
+```html
+<ui-field disabled>
+  <ui-field-label>Email</ui-field-label>
+  <ui-input><input type="email" value="hollis@example.com" /></ui-input>
+</ui-field>
 
-<ComponentExample
-  name="input/invalid"
-  caption="Focus Email. The field is marked invalid, and its error message explains the expected address format."
-/>
+<ui-field>
+  <ui-field-label>Profile URL</ui-field-label>
+  <ui-input><input readonly value="example.com/hollis" /></ui-input>
+</ui-field>
+```
 
-### Required
+## Validation
 
-Use the native `required` attribute for browser validation. Field shows the error after an unsuccessful submit.
+Use native constraints such as `required`, `type="email"` and `pattern`. The field shows its error after a submit attempt and updates it as the value changes. Set the field's `invalid` property for an error your app decides; the input gets `aria-invalid`. [Field](./field#validation) covers the error parts and their matches.
 
-<ComponentExample
-  name="input/required"
-  caption="Choose Continue while Email is empty. The browser blocks submission and focuses the required field."
-/>
+```html
+<ui-field name="email">
+  <ui-field-label>Email</ui-field-label>
+  <ui-input><input type="email" required /></ui-input>
+  <ui-field-error match="valueMissing">Enter your email address.</ui-field-error>
+  <ui-field-error match="true">That email is already in use.</ui-field-error>
+</ui-field>
+```
 
-### Input Group
+```ts
+document.querySelector("ui-field")!.invalid = emailTaken ? true : undefined
+```
 
-Place text around an input with `InputGroup`. Clicking that text focuses the input. The prefix and suffix are display content; they are not added to the submitted value.
+## Input Group
 
-<ComponentExample
-  name="input/input-group"
-  caption="Click https:// or .com to focus Website, then type a domain name. Only the text you enter belongs to the input's value."
-/>
+Place text or buttons around an input with `<ui-input-group>`. Pressing the group's text focuses the input. The text is display content, not part of the submitted value.
 
-### Clear Button
+```html
+<ui-input-group>
+  <span>https://</span>
+  <ui-input><input aria-label="Website" placeholder="example" /></ui-input>
+  <span>.com</span>
+</ui-input-group>
+```
 
-`InputClear` appears when the input has editable text. Pressing it clears the value, reports `clear-press`, and returns focus to the input. Controlled state and native input listeners receive the change too.
+## Clear Button
 
-<ComponentExample
-  name="input/clear"
-  caption="Choose Clear search. The text clears, focus returns to the input, and the last change shows clear-press. Type again to bring the button back."
-/>
+`<ui-input-clear>` shows while the input has text it can clear. Pressing its button empties the value, reports `clear-press` and returns focus to the input. `valuechange` and native `input` listeners receive the change too.
 
-### Controlled
+```html
+<ui-input-group>
+  <ui-input><input type="search" aria-label="Search people" /></ui-input>
+  <ui-input-clear>
+    <button type="button" aria-label="Clear search"><svg aria-hidden="true">…</svg></button>
+  </ui-input-clear>
+</ui-input-group>
+```
 
-Set the `value` property and listen for `valuechange`. Its detail contains the new value and the reason. The example derives a read-only profile URL from the display name.
+## Controlled
 
-<ComponentExample
-  name="input/controlled"
-  caption="Edit Display name. Profile URL updates with it and stays read-only."
-/>
+Set the element's `value` property and listen for `valuechange` to keep the text in your own state. Native `input` events still work.
 
-See [State and Events](../state-and-events) for the shared controlled-state conventions. Input's [reasons](#reasons) distinguish typing, clearing, resetting, and controller changes.
+```ts
+const input = document.querySelector("ui-input")!
+input.value = "Hollis Grant"
+input.addEventListener("valuechange", (event) => setName(event.detail.value))
+```
 
-### Filtering What's Typed
+See [State and Events](../state-and-events) for the shared controlled-state conventions. Input's [reasons](#reasons) tell typing, clearing, resetting and controller changes apart.
+
+## Filtering What's Typed
 
 Call `event.preventDefault()` in the `valuechange` listener to reject a change. The previous text and caret position are restored.
 
-<ComponentExample
-  name="input/filter"
-  caption="Type 12a3 into Verification code. The letter is rejected and the value becomes 123. The input accepts up to six digits."
-/>
+```html
+<ui-input><input inputmode="numeric" maxlength="6" /></ui-input>
+```
 
-### Controller
+```ts
+input.addEventListener("valuechange", (event) => {
+  if (!/^\d*$/.test(event.detail.value)) event.preventDefault()
+})
+```
 
-Use `createInputController()` for actions outside the input. Its methods update the input through the same change callbacks as typing.
+## Controller
 
-<ComponentExample
-  name="input/controller"
-  caption="Choose Quick reply to fill Message, Clear to empty it, and Focus to move the caret into the input."
-/>
+Use the element's `api` for actions outside the input. Its methods update the input through the same `valuechange` events as typing.
 
-[Controllers](../controllers) covers creating and sharing a controller.
+```html
+<ui-input><input aria-label="Message" /></ui-input>
+<button type="button" data-action="reply">Quick Reply</button>
+<button type="button" data-action="clear">Clear</button>
+<button type="button" data-action="focus">Focus</button>
+```
 
-## Related Controls
+```ts
+const message = document.querySelector("ui-input")!.api
+document
+  .querySelector('[data-action="reply"]')!
+  .addEventListener("click", () => message.setValue("On my way!"))
+document.querySelector('[data-action="clear"]')!.addEventListener("click", () => message.clear())
+document.querySelector('[data-action="focus"]')!.addEventListener("click", () => message.focus())
+```
 
-<span id="password" />
-<span id="file" />
+[Controllers](../controllers) covers an element's `api`.
 
-Use [Password Input](./password-input) for showing and hiding passwords. A native file input works with `type="file"`; use [File Input](./file-input) for file selection with dropping, previews, and validation.
+## Passwords and Files
+
+Use [Password Input](./password-input) to show and hide a password. A native file input works with `type="file"`; use [File Input](./file-input) for dropping, previews and validation.
 
 ## Styling
 
-Input exposes `data-filled`, `data-disabled`, `data-readonly`, and `data-required`. Field adds its validation and focus attributes. For a group, style `:has(input:focus-visible)` so focusing a button inside it keeps the button's own ring.
+Each part has a `data-slot`, such as `input-group`, and shows its state through the attributes listed under [Data Attributes](#data-attributes). Use `data-filled`, `data-disabled`, `data-readonly` and `data-required` on the input, and the field's validation and focus attributes inside a field. For a group's focus ring, style `:has(input:focus-visible)`, so a focused button inside it keeps its own ring.
 
-<span id="field-group" />
-<span id="inline" />
-<span id="grid" />
-<span id="badge" />
-<span id="right-to-left" />
+## Data Attributes
 
-Arrange fields with ordinary layout styles. Logical padding and margins follow the surrounding `dir` automatically.
+### `<ui-input>` [#data-attributes-input]
 
-<DataAttributes component="input" />
+<DataAttributes component="input" part="root" />
 
-<DataAttributes component="input-group" />
+### `<ui-input-group>` [#data-attributes-inputgroup]
+
+<DataAttributes component="input-group" part="group" />
+
+### `<ui-input-clear>` [#data-attributes-inputclear]
+
+<DataAttributes component="input-group" part="clear" />
 
 ## API Reference
 
-`<ui-input>` has no attributes of its own: put native ones on the `<input>`. It fires a `valuechange`
-event that doesn't bubble, with `detail: { value, reason, event, source }`, and `preventDefault()` cancels the change.
+Put native attributes on the `<input>`, where `value` is the default. The `<ui-input>` element's `value` property reads and writes the text, and its `api` has the controller's methods. `onValueChange` is the `valuechange` event, which doesn't bubble: `event.detail` has the `value` and the `reason`, and `preventDefault()` cancels the change.
 
 ### Input
 
@@ -164,11 +208,15 @@ event that doesn't bubble, with `detail: { value, reason, event, source }`, and 
 
 <TypeTable path="../../packages/core/src/components/input/input.ts" name="InputGroupOptions" />
 
+### InputClear
+
+Wraps a `<button>` that empties the input in its group and focuses it. It shows only while there's text to clear.
+
 ### State
 
 <StateTable path="../../packages/core/src/components/input/input.ts" name="InputState" />
 
-`InputGroup` and `InputClear` receive the state of the field inside the group.
+`<ui-input-group>` and `<ui-input-clear>` receive the state of the input inside the group.
 
 <StateTable path="../../packages/core/src/components/input/input.ts" name="InputGroupState" />
 
@@ -178,12 +226,12 @@ event that doesn't bubble, with `detail: { value, reason, event, source }`, and 
 
 ### Controller
 
-The element's `api` property has the same methods.
+The `<ui-input>` element's `api` property has these methods.
 
 <ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
 
 ## Accessibility
 
-Give the input a visible Field label or an `aria-label`. Give the clear button an accessible name too. The native input keeps standard text editing, selection, autocomplete, and form behavior.
+Give the input a visible field label or an `aria-label`, and give the clear button an accessible name. The native input keeps standard text editing, selection, autocomplete and form behavior.
 
 <SpecList spec="input" />

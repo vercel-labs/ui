@@ -16,7 +16,7 @@ const open = ref(false)
 <template>
   <div data-slot="stack">
     <AlertDialog v-model:open="open">
-      <AlertDialogTrigger>Review changes</AlertDialogTrigger>
+      <AlertDialogTrigger>Review Changes</AlertDialogTrigger>
       <AlertDialogBackdrop />
       <AlertDialogContent>
         <div data-slot="stack">
@@ -26,11 +26,10 @@ const open = ref(false)
           >
         </div>
         <div data-slot="row">
-          <AlertDialogClose>Keep editing</AlertDialogClose>
+          <AlertDialogClose>Keep Editing</AlertDialogClose>
           <AlertDialogClose data-variant="solid" value="confirm">Discard</AlertDialogClose>
         </div>
       </AlertDialogContent>
     </AlertDialog>
-    <output data-slot="output">Open: {{ open }}</output>
   </div>
 </template>

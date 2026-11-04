@@ -1,5 +1,6 @@
 import "@ui-sdk/web/combobox"
 import { Check, ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -23,9 +24,15 @@ const countries = [
 
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" data-action="open">Open and Wait</button>
+        <button type="button" data-action="search">Search “sw”</button>
+        <button type="button" data-action="germany">Choose Germany</button>
+        <button type="button" data-action="clear">Clear</button>
+      </div>
       <ui-combobox>
         <div data-slot="stack">
           <ui-combobox-label>Country</ui-combobox-label>
@@ -38,7 +45,7 @@ export function mount(root: HTMLElement) {
             </ui-combobox-trigger>
           </div>
         </div>
-        <ui-combobox-content>
+        <ui-combobox-content hidden>
           <ui-combobox-empty>No countries found.</ui-combobox-empty>
           <ui-combobox-list>
             ${countries
@@ -54,33 +61,15 @@ export function mount(root: HTMLElement) {
           </ui-combobox-list>
         </ui-combobox-content>
       </ui-combobox>
-      <div data-slot="row">
-        <button type="button" data-action="open">Open</button>
-        <button type="button" data-action="search">Search “sw”</button>
-        <button type="button" data-action="germany">Germany</button>
-        <button type="button" data-action="clear">Clear</button>
-      </div>
-      <output data-slot="output">Use the buttons</output>
     </div>
   `
-  const combobox = root.querySelector("ui-combobox") as HTMLElement & {
-    itemToLabel: (value: string) => string
-    api: {
-      open: () => Promise<{ reason: string }>
-      getValue: () => string | null
-      setValue: (value: string | null) => void
-      setQuery: (query: string) => void
-      clear: () => void
-      focus: () => void
-    }
-  }
-  combobox.itemToLabel = countryLabel
+  const combobox = root.querySelector("ui-combobox")!
+  combobox.itemToLabel = (value) => countryLabel(value as string)
   const country = combobox.api
-  const log = root.querySelector("output")!
   const actions: Record<string, () => void> = {
     open: async () => {
       const { reason } = await country.open()
-      log.textContent = `Closed by ${reason}, with ${country.getValue() ?? "nothing"}`
+      log(root, `Closed by ${reason}, with ${country.getValue() ?? "nothing"}`)
     },
     search: () => {
       country.focus()
@@ -93,3 +82,5 @@ export function mount(root: HTMLElement) {
   for (const button of root.querySelectorAll<HTMLElement>("[data-action]"))
     button.addEventListener("click", () => actions[button.dataset.action!]())
 }
+
+export { mount }

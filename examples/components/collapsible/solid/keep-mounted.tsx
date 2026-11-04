@@ -1,10 +1,14 @@
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 
 function Example() {
   return (
-    <Collapsible>
-      <CollapsibleTrigger data-variant="secondary">
-        Add a delivery note
+    <Collapsible data-variant="card">
+      <CollapsibleTrigger>
+        <span data-slot="stack">
+          <span>Add a delivery note</span>
+          <span data-slot="hint">Optional, for the courier</span>
+        </span>
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -18,10 +22,13 @@ function Example() {
         </svg>
       </CollapsibleTrigger>
       <CollapsiblePanel keepMounted>
-        <label data-slot="label">
-          <span>Delivery note</span>
-          <textarea placeholder="Leave it with the front desk…" />
-        </label>
+        <Field>
+          <FieldLabel>Delivery note</FieldLabel>
+          <FieldControl
+            render={(props) => <textarea {...props} />}
+            placeholder="Leave it with the front desk…"
+          />
+        </Field>
       </CollapsiblePanel>
     </Collapsible>
   )

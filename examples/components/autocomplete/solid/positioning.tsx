@@ -1,7 +1,7 @@
 import {
   Autocomplete,
-  AutocompleteArrow,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
@@ -11,13 +11,15 @@ import { createSignal, For } from "solid-js"
 
 const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Blackberry", "Blueberry"]
 
-export function Example() {
+function Example() {
   const [box, setBox] = createSignal<HTMLElement | null>(null)
   return (
     <div ref={setBox} data-slot="card">
       <Autocomplete modal="pointer" container={box()}>
-        <AutocompleteLabel>Fruit</AutocompleteLabel>
-        <AutocompleteInput />
+        <div data-slot="stack">
+          <AutocompleteLabel>Fruit</AutocompleteLabel>
+          <AutocompleteInput />
+        </div>
         <AutocompleteContent
           side="top"
           align="end"
@@ -27,7 +29,7 @@ export function Example() {
           anchor={box()}
           keepMounted
         >
-          <AutocompleteArrow />
+          <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
             <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
           </AutocompleteList>
@@ -36,3 +38,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

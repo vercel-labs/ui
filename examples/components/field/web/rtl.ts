@@ -2,7 +2,7 @@ import "@ui-sdk/web/checkbox"
 import "@ui-sdk/web/field"
 import { Check, createElement } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack" dir="rtl">
       <ui-field>
@@ -25,3 +25,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

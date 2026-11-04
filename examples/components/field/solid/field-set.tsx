@@ -1,14 +1,7 @@
-import {
-  Field,
-  FieldControl,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@ui-sdk/solid/field"
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
-export function Example() {
+function Example() {
   return (
     <FieldSet>
       <FieldLegend>Address</FieldLegend>
@@ -16,19 +9,21 @@ export function Example() {
       <FieldGroup>
         <Field name="street">
           <FieldLabel>Street address</FieldLabel>
-          <FieldControl autocomplete="street-address" />
+          <Input autocomplete="street-address" />
         </Field>
         <div data-slot="grid">
           <Field name="city">
             <FieldLabel>City</FieldLabel>
-            <FieldControl autocomplete="address-level2" />
+            <Input autocomplete="address-level2" />
           </Field>
           <Field name="postal-code">
             <FieldLabel>Postal code</FieldLabel>
-            <FieldControl autocomplete="postal-code" />
+            <Input autocomplete="postal-code" />
           </Field>
         </div>
       </FieldGroup>
     </FieldSet>
   )
 }
+
+export { Example }

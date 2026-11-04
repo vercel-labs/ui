@@ -5,8 +5,8 @@ export function mount(root: HTMLElement) {
     <div dir="rtl">
       <ui-dialog>
         <ui-dialog-trigger><button>تعديل الملف الشخصي</button></ui-dialog-trigger>
-        <ui-dialog-backdrop></ui-dialog-backdrop>
-        <ui-dialog-content>
+        <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+        <ui-dialog-content hidden>
           <div data-slot="stack">
             <ui-dialog-title>تعديل الملف الشخصي</ui-dialog-title>
             <ui-dialog-description>أجرِ التغييرات على ملفك الشخصي هنا.</ui-dialog-description>

@@ -1,5 +1,6 @@
 import "@ui-sdk/web/combobox"
 import { Check, ChevronDown, createElement, X } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const frameworks = [
   { value: "next", label: "Next.js" },
@@ -16,48 +17,43 @@ const frameworkLabel = (value: string) =>
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-combobox default-value="sveltekit">
-        <div data-slot="stack">
-          <ui-combobox-label>Framework</ui-combobox-label>
-          <div data-slot="row">
-            <ui-combobox-input>
-              <input placeholder="Select a framework" />
-            </ui-combobox-input>
-            <ui-combobox-clear>
-              <button aria-label="Clear framework">${createElement(X, { "aria-hidden": "true" }).outerHTML}</button>
-            </ui-combobox-clear>
-            <ui-combobox-trigger>
-              <button aria-label="Show frameworks">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
-            </ui-combobox-trigger>
-          </div>
+    <ui-combobox default-value="sveltekit">
+      <div data-slot="stack">
+        <ui-combobox-label>Framework</ui-combobox-label>
+        <div data-slot="row">
+          <ui-combobox-input>
+            <input placeholder="Select a framework" />
+          </ui-combobox-input>
+          <ui-combobox-clear>
+            <button aria-label="Clear framework">${createElement(X, { "aria-hidden": "true" }).outerHTML}</button>
+          </ui-combobox-clear>
+          <ui-combobox-trigger>
+            <button aria-label="Show frameworks">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
+          </ui-combobox-trigger>
         </div>
-        <ui-combobox-content>
-          <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
-          <ui-combobox-list>
-            ${frameworks
-              .map(
-                (framework) => `
-                  <ui-combobox-item value="${framework.value}" label="${framework.label}">
-                    ${framework.label}
-                    <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
-                  </ui-combobox-item>
-                `,
-              )
-              .join("")}
-          </ui-combobox-list>
-        </ui-combobox-content>
-      </ui-combobox>
-      <output data-slot="output">Value: "sveltekit"</output>
-    </div>
+      </div>
+      <ui-combobox-content hidden>
+        <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
+        <ui-combobox-list>
+          ${frameworks
+            .map(
+              (framework) => `
+                <ui-combobox-item value="${framework.value}" label="${framework.label}">
+                  ${framework.label}
+                  <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
+                </ui-combobox-item>
+              `,
+            )
+            .join("")}
+        </ui-combobox-list>
+      </ui-combobox-content>
+    </ui-combobox>
   `
-  const combobox = root.querySelector("ui-combobox") as HTMLElement & {
-    itemToLabel: (value: string) => string
-  }
-  combobox.itemToLabel = frameworkLabel
+  const combobox = root.querySelector("ui-combobox")!
+  combobox.itemToLabel = (value) => frameworkLabel(value as string)
   combobox.addEventListener("valuechange", (event) => {
-    const { value } = (event as CustomEvent<{ value: string | null }>).detail
-    root.querySelector("output")!.textContent = `Value: ${JSON.stringify(value)}`
+    const { value, reason } = event.detail
+    log(root, `${value ? frameworkLabel(value as string) : "Cleared"} (${reason})`)
   })
 }
 

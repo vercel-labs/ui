@@ -10,7 +10,8 @@ import {
   ComboboxTrigger,
   createComboboxController,
 } from "@ui-sdk/solid/combobox"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -36,11 +37,38 @@ const countryLabel = (value: string) => countries.find((country) => country.valu
 
 const country = createComboboxController<string>()
 
-export function Example() {
-  const [log, setLog] = createSignal("")
+function Example() {
+  const log = useLog()
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button
+          type="button"
+          onClick={async () => {
+            const { reason } = await country.open()
+            log(`Closed by ${reason}, with ${country.getValue() ?? "nothing"}`)
+          }}
+        >
+          Open and Wait
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            country.focus()
+            country.setQuery("sw")
+            country.open()
+          }}
+        >
+          Search “sw”
+        </button>
+        <button type="button" onClick={() => country.setValue("de")}>
+          Choose Germany
+        </button>
+        <button type="button" onClick={() => country.clear()}>
+          Clear
+        </button>
+      </div>
       <Combobox controller={country} itemToLabel={countryLabel}>
         <div data-slot="stack">
           <ComboboxLabel>Country</ComboboxLabel>
@@ -87,34 +115,8 @@ export function Example() {
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
-      <div data-slot="row">
-        <button
-          type="button"
-          onClick={async () => {
-            const { reason } = await country.open()
-            setLog(`Closed by ${reason}, with ${country.getValue() ?? "nothing"}`)
-          }}
-        >
-          Open
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            country.focus()
-            country.setQuery("sw")
-            country.open()
-          }}
-        >
-          Search “sw”
-        </button>
-        <button type="button" onClick={() => country.setValue("de")}>
-          Germany
-        </button>
-        <button type="button" onClick={() => country.clear()}>
-          Clear
-        </button>
-      </div>
-      <output data-slot="output">{log() || "Use the buttons"}</output>
     </div>
   )
 }
+
+export { Example }

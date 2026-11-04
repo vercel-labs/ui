@@ -18,10 +18,10 @@ const fruits = [
   "Strawberry",
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" data-action="open" data-size="sm">Open</button>
         <button type="button" data-action="type" data-size="sm">Type “Pea”</button>
         <button type="button" data-action="clear" data-size="sm">Clear</button>
@@ -32,7 +32,8 @@ export function mount(root: HTMLElement) {
         <ui-autocomplete-input>
           <input />
         </ui-autocomplete-input>
-        <ui-autocomplete-content>
+        <ui-autocomplete-content hidden>
+          <ui-autocomplete-empty>No fruits found.</ui-autocomplete-empty>
           <ui-autocomplete-list>
             ${fruits.map((item) => `<ui-autocomplete-item value="${item}">${item}</ui-autocomplete-item>`).join("")}
           </ui-autocomplete-list>
@@ -50,3 +51,5 @@ export function mount(root: HTMLElement) {
   for (const button of root.querySelectorAll<HTMLElement>("[data-action]"))
     button.addEventListener("click", () => actions[button.dataset.action!]())
 }
+
+export { mount }

@@ -2,11 +2,13 @@
   import {
     Autocomplete,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteInput,
     AutocompleteItem,
     AutocompleteList,
   } from "@ui-sdk/svelte/autocomplete"
   import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { useLog } from "../../../shared/svelte/log"
 
   const fruits = [
     "Apple",
@@ -26,14 +28,14 @@
     "Strawberry",
   ]
 
-  let submitted = $state("")
+  const log = useLog()
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
     const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
       ([name, value]) => `${name}=${value}`,
     )
-    submitted = data.join("&")
+    log(`Submitted ${data.join("&")}`)
   }
 </script>
 
@@ -43,6 +45,7 @@
     <Autocomplete name="fruit" form="order" required defaultValue="Apple">
       <AutocompleteInput />
       <AutocompleteContent>
+        <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
           {#each fruits as fruit (fruit)}
             <AutocompleteItem value={fruit}>
@@ -63,5 +66,4 @@
       Reset
     </button>
   </div>
-  <output data-slot="output">{submitted || "Not submitted"}</output>
 </form>

@@ -20,9 +20,7 @@
 </script>
 
 <Dialog>
-  <DialogTrigger>
-    Scrollable content
-  </DialogTrigger>
+  <DialogTrigger>Scrollable Content</DialogTrigger>
   <DialogBackdrop />
   <DialogContent initialFocus="content">
     <div data-slot="stack">
@@ -31,18 +29,12 @@
     </div>
     <div data-slot="scroll">
       {#each paragraphs as paragraph (paragraph)}
-        <p>
-          {paragraph}
-        </p>
+        <p>{paragraph}</p>
       {/each}
     </div>
     <div data-slot="row">
-      <DialogClose>
-        Decline
-      </DialogClose>
-      <DialogClose data-variant="solid" value="accept">
-        Accept
-      </DialogClose>
+      <DialogClose>Decline</DialogClose>
+      <DialogClose data-variant="solid" value="accept">Accept</DialogClose>
     </div>
   </DialogContent>
 </Dialog>

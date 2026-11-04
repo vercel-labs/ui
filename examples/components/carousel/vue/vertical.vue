@@ -24,10 +24,10 @@ const slides = [1, 2, 3, 4, 5]
       </CarouselContent>
     </CarouselViewport>
     <div data-slot="row">
-      <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+      <CarouselPrevious aria-label="Previous slide">
         <ChevronUpIcon />
       </CarouselPrevious>
-      <CarouselNext data-variant="secondary" aria-label="Next slide">
+      <CarouselNext aria-label="Next slide">
         <ChevronDownIcon />
       </CarouselNext>
     </div>

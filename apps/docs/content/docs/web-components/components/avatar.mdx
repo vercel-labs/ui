@@ -30,54 +30,148 @@ ui-avatar
 └── ui-avatar-fallback
 ```
 
-- `Avatar` shares the image's loading state with its parts.
+- `ui-avatar` shares the image's loading state with its parts.
 - A direct-child `img` supplies the image. There is no image custom element.
-- `AvatarFallback` shows when no image is loaded.
+- `ui-avatar-fallback` shows when no image is loaded.
 
-The image is a real `img`, including in server markup. The browser can start fetching it before hydration. The fallback stays visible until the image loads; if loading fails, the fallback remains.
+The image is a real `img`, including in server markup. The browser can start fetching it before the elements upgrade. The fallback stays visible until the image loads; if loading fails, the fallback remains.
 
-## Examples
+## Usage
+
+Import the parts and put them together:
+
+```html
+<script type="module">
+  import "@ui-sdk/web/avatar"
+</script>
+
+<ui-avatar>
+  <img src="/ada.png" alt="Ada Lovelace" />
+  <ui-avatar-fallback>AL</ui-avatar-fallback>
+</ui-avatar>
+```
+
+## Build Your Own
+
+`@ui-sdk/web/avatar` comes with ready-made `ui-avatar` elements. If you'd like to build your own, with your own element names, start from the `avatar` primitive in `@ui-sdk/core`:
+
+```ts title="user-photo-elements.ts"
+import { avatar } from "@ui-sdk/core/avatar"
+import { createParts } from "@ui-sdk/web"
+
+createParts(avatar, {
+  root: {
+    tag: "user-photo",
+    children: { image: (el) => el.querySelector(":scope > img") },
+    optionalChildren: ["image"],
+  },
+  fallback: "user-photo-initials",
+})
+```
+
+```html
+<user-photo>
+  <img src="https://github.com/shadcn.png" alt="shadcn" />
+  <user-photo-initials>CN</user-photo-initials>
+</user-photo>
+```
+
+These are the same parts the ready-made elements are made of, with your names. See [Rendering](../rendering) and [Custom Rendering](#custom-rendering) for more.
+
+## Fallback Delay
 
 <span id="behavior-and-options" />
 
-### Fallback Delay
-
 Set `delay` on the fallback to wait before showing it. This avoids flashing initials when an image loads quickly. Without a delay, the fallback appears immediately, including on the server.
 
-### Loading Status
+```html
+<ui-avatar>
+  <img src="https://github.com/shadcn.png" alt="shadcn" />
+  <ui-avatar-fallback delay="600">CN</ui-avatar-fallback>
+</ui-avatar>
+```
 
-Listen for `loadingstatuschange` on `ui-avatar`. The event detail contains `value` and `reason`. The possible statuses are `loading`, `loaded`, `error`, and `idle`.
+## Image Attributes
 
-When you replace a loaded image, the browser keeps it visible while the next source loads. A failed replacement shows the fallback. The change details explain why the status changed; see [Reasons](#reasons).
+Pass image attributes such as `srcset`, `crossorigin`, and `referrerpolicy` to the image. They work on the same `img` the browser loads. For avatars farther down a page, use `loading="lazy"`.
 
-### Image Attributes
-
-Pass image attributes such as `srcSet`, `crossOrigin`, and `referrerPolicy` to the image. They work on the same `img` the browser loads. For avatars farther down a page, use `loading="lazy"`.
+```html
+<ui-avatar>
+  <img
+    src="https://github.com/shadcn.png"
+    srcset="https://github.com/shadcn.png?size=80 1x, https://github.com/shadcn.png?size=160 2x"
+    alt="shadcn"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    loading="lazy"
+  />
+  <ui-avatar-fallback>CN</ui-avatar-fallback>
+</ui-avatar>
+```
 
 <span id="render-functions" />
 
-### Interactive Avatar
+## Interactive Avatar
 
 Use a button when clicking an avatar performs an action. Give it an accessible name that stays available while the image loads.
 
-[Parts and Composition](../parts-and-composition) explains how to change the root element in this framework.
+```html
+<button type="button" aria-label="shadcn">
+  <ui-avatar>
+    <img src="https://github.com/shadcn.png" alt="" />
+    <ui-avatar-fallback aria-hidden="true">CN</ui-avatar-fallback>
+  </ui-avatar>
+</button>
+```
+
+The `img` has to stay a direct child of `ui-avatar`, so put the avatar inside the button instead of binding the button with `as-child`.
+
+## Loading Status
+
+Listen for `loadingstatuschange` on `ui-avatar`. The event detail contains the new status in `value` and the change details beside it. The possible statuses are `loading`, `loaded`, `error`, and `idle`.
+
+```ts
+const avatar = document.querySelector("ui-avatar")!
+
+avatar.addEventListener("loadingstatuschange", (event) => {
+  if (event.detail.value === "error") reportBrokenImage(event.detail.reason)
+})
+```
+
+When you replace a loaded image, the browser keeps it visible while the next source loads. A failed replacement shows the fallback. The change details explain why the status changed; see [Reasons](#reasons).
+
+## Custom Rendering
+
+Use [Parts and Composition](../parts-and-composition) to choose the elements parts bind. Every part shows the loading status, and `ui-avatar` reports each change, so the fallback can say something different when the image fails:
+
+```ts
+const avatar = document.querySelector("ui-avatar")!
+const fallback = avatar.querySelector("ui-avatar-fallback")!
+
+avatar.addEventListener("loadingstatuschange", (event) => {
+  fallback.textContent = event.detail.value === "error" ? "?" : user.initials
+})
+```
 
 ## Styling
 
 Set the root's size and let the image and fallback fill it. The image manages its own hidden styles until it loads; keep those styles intact when changing its element.
 
-<span id="badge" />
-<span id="group" />
-<span id="sizes" />
-<span id="right-to-left" />
+Each part has a `data-slot`, such as `avatar-fallback`, and shows the loading status through the attributes listed under [Data Attributes](#data-attributes).
 
-Extra badges, groups, and sizes are ordinary layout choices. Use logical CSS properties when the layout needs to support right to left.
+## Data Attributes
 
-<DataAttributes component="avatar" />
+### `<ui-avatar>` [#data-attributes-avatar]
 
-## Custom Rendering
+<DataAttributes component="avatar" part="root" />
 
-Use [Parts and Composition](../parts-and-composition) to replace an element or read its state. The parts expose `loadingStatus` when you need different fallback content for an error.
+### `<img>` [#data-attributes-avatarimage]
+
+<DataAttributes component="avatar" part="image" />
+
+### `<ui-avatar-fallback>` [#data-attributes-avatarfallback]
+
+<DataAttributes component="avatar" part="fallback" />
 
 ## API Reference
 
@@ -86,6 +180,10 @@ Props are attributes in kebab case, like `delay` on `<ui-avatar-fallback>`. Call
 ### Avatar
 
 <TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
+
+### AvatarImage
+
+The image. A real `img`, a direct child of `ui-avatar`, so the browser can fetch it before the elements upgrade, with its own attributes, such as `srcset`, `crossorigin` and `referrerpolicy`.
 
 ### AvatarFallback
 

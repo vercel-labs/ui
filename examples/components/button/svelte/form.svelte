@@ -1,33 +1,24 @@
 <script lang="ts">
   import { Button } from "@ui-sdk/svelte/button"
-  let submitted = $state<{ email: string; count: number }>()
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { useLog } from "../../../shared/svelte/log"
+
+  const log = useLog()
 
   function onSubmit(event: SubmitEvent) {
     event.preventDefault()
     const email = String(new FormData(event.currentTarget as HTMLFormElement).get("email"))
-    submitted = { email, count: (submitted?.count ?? 0) + 1 }
+    log(`Subscribed ${email}`)
   }
 </script>
 
-<form data-slot="stack"
-  onsubmit={onSubmit}
-  onreset={() => (submitted = undefined)}
->
-  <label data-slot="label">
-    Email
-    <input
-      name="email"
-      type="email"
-      value="ada@example.com"
-    />
-  </label>
+<form data-slot="stack" onsubmit={onSubmit}>
+  <Field>
+    <FieldLabel>Email</FieldLabel>
+    <FieldControl name="email" type="email" defaultValue="ada@example.com" />
+  </Field>
   <div data-slot="row">
-    <Button
-      type="submit"
-    >Subscribe</Button>
-    <Button
-      type="reset"
-    >Reset</Button>
+    <Button type="submit">Subscribe</Button>
+    <Button type="reset">Reset</Button>
   </div>
-  <output data-slot="output">{submitted ? `Submitted: ${submitted.email} (${submitted.count} ${submitted.count === 1 ? "time" : "times"})` : ""}</output>
 </form>

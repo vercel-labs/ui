@@ -3,12 +3,14 @@ title: Field
 description: Connect a form control to its label, description, and validation errors.
 ---
 
-<ComponentExample name="field/input" caption="Press Username to focus the input, then enter a name." />
+A field connects a form control to its label, its description and the errors it shows, so you never wire up `id`, `for` or `aria-describedby` by hand.
+
+<ComponentExample name="field/input" caption="Press Username to focus the input, then type a name." />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/web @ui-sdk/core
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
 Importing the component defines every field part, [field sets](#field-sets) included. Import the controls you put inside too. On the server the import does nothing.
@@ -17,11 +19,25 @@ Importing the component defines every field part, [field sets](#field-sets) incl
 import "@ui-sdk/web/field"
 ```
 
-<span id="composition" />
+## Composition
+
+Use the following composition to build a `ui-field`:
+
+```text
+ui-field
+├── ui-field-label
+├── input
+├── ui-field-description
+└── ui-field-error
+```
 
 ## Usage
 
 ```html
+<script type="module">
+  import "@ui-sdk/web/field"
+</script>
+
 <ui-field name="username">
   <ui-field-label>Username</ui-field-label>
   <input autocomplete="username" required />
@@ -30,7 +46,7 @@ import "@ui-sdk/web/field"
 </ui-field>
 ```
 
-The control is your own element: a native `<input>`, `<textarea>` or `<select>`, or one of ours, like `<ui-checkbox>`. The field finds the first one inside it and writes its `id`, `aria-labelledby`, `aria-describedby` and `aria-invalid`. Pressing `<ui-field-label>` focuses the control, or toggles a checkbox or switch.
+The control is your own element: a native `<input>`, `<textarea>` or `<select>`, or one of ours, like `<ui-checkbox>`. The field finds the first one inside it and writes its `id`, `aria-labelledby`, `aria-describedby` and `aria-invalid`.
 
 The label names the control, and the description and any error that shows describe it.
 
@@ -49,54 +65,50 @@ Group related fields in a [field set](#field-sets):
 </ui-field-set>
 ```
 
-## Examples
+## Controls
 
-### Textarea
+The control is your own element, so put a `<textarea>` or a native `<select>` in the field, with the options inside:
 
-Put a `<textarea>` in the field.
+```html
+<ui-field>
+  <ui-field-label>Feedback</ui-field-label>
+  <textarea name="feedback"></textarea>
+</ui-field>
 
-<ComponentExample
-  name="field/textarea"
-  caption="Press Feedback to focus the textarea, then write a message."
-/>
+<ui-field>
+  <ui-field-label>Department</ui-field-label>
+  <select name="department">
+    <option value="design">Design</option>
+    <option value="engineering">Engineering</option>
+  </select>
+</ui-field>
+```
 
-### Select
+A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field takes the place of the input and uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
 
-Put a native `<select>` in the field.
+```html
+<ui-field>
+  <ui-switch name="mfa"></ui-switch>
+  <ui-field-label>Two-factor authentication</ui-field-label>
+  <ui-field-description>Ask for a code when you sign in.</ui-field-description>
+</ui-field>
 
-<ComponentExample
-  name="field/select"
-  caption="Open Department and choose an option. The label names the native select."
-/>
+<ui-field>
+  <ui-field-label>Plan</ui-field-label>
+  <ui-radio-group name="plan" default-value="monthly">
+    <label>
+      <ui-radio value="monthly"></ui-radio>
+      Monthly
+    </label>
+    <label>
+      <ui-radio value="yearly"></ui-radio>
+      Yearly
+    </label>
+  </ui-radio-group>
+</ui-field>
+```
 
-### Checkbox
-
-A [Checkbox](./checkbox) inside a field uses its label and description. Pressing the label toggles the checkbox.
-
-### Radio
-
-A [Radio Group](./radio) uses the field label to name the group. Give each radio its own label too.
-
-### Switch
-
-A [Switch](./switch) uses the same label and description association as a checkbox.
-
-### Choice Card
-
-A label can wrap a choice and its content. See [Radio](./radio) for selection behavior; the card layout is your own CSS.
-
-A label can also wrap a whole `<ui-field>`, so one card holds a control with its own description. Outside a field, put `as-child` on a `<ui-field-label>` around a native `<label>`, which labels the control inside it.
-
-<ComponentExample
-  name="field/wrapping-label"
-  caption="Click anywhere on a card to check its box. Its description still describes the checkbox."
-/>
-
-### Right to Left
-
-Fields follow the surrounding `dir`. Use logical spacing such as `ps-3` and `text-start` in your styles.
-
-### Validation and Errors
+## Validation
 
 Use native constraints such as `required`, `type="email"`, and `pattern`. Errors appear after a submit attempt and update as the value changes. The first invalid control takes focus.
 
@@ -107,115 +119,121 @@ Leave an error empty to show the browser's message, or use `match="valueMissing"
   caption="Press Subscribe with an empty or invalid email, then correct it to clear the error."
 />
 
-## Behavior and Options
-
-### Required and Disabled
-
-A required control marks every part with `data-required`, and the parts' state has `required`, so a label can show a mark with CSS alone.
-
-A disabled field disables its control and marks every part with `data-disabled`, the way a [disabled field set](#disabled-field-set) does for every field inside it.
-
-### Errors from Your Code
+## Errors from Your Code
 
 Pass `invalid` when your server or form library supplies an error. `true` shows it immediately. Clear the value to return to the browser's validation.
 
 Give this error its own text and set `match` to `true`. Named matches such as `valueMissing` still refer to native validation. `invalid="false"` hides the field's invalid state, but does not make an invalid native control pass validation.
 
-<ComponentExample
-  name="field/server-error"
-  caption="Try ada@example.com to see a server error. Change the email and submit again."
-/>
+```html
+<ui-field name="email">
+  <ui-field-label>Email</ui-field-label>
+  <input type="email" required />
+  <ui-field-error match="valueMissing">Enter your email address.</ui-field-error>
+</ui-field>
 
-### Character Count
+<script type="module">
+  const field = document.querySelector("ui-field")
+  const serverError = document.createElement("ui-field-error")
+  serverError.setAttribute("match", "true")
 
-Keep the text in state and display its length in the description. Set `maxLength` on the control to enforce the limit.
+  function showServerError(message) {
+    serverError.textContent = message
+    field.append(serverError)
+    field.invalid = true
+  }
 
-<ComponentExample
-  name="field/character-count"
-  caption="Edit the bio and watch the count. The textarea accepts up to 280 characters."
-/>
+  field.querySelector("input").addEventListener("input", () => {
+    serverError.remove()
+    field.invalid = undefined
+  })
+</script>
+```
+
+## Required and Disabled
+
+A required control marks every part with `data-required`, and the parts' state has `required`, so a label can show a mark with CSS alone.
+
+A disabled field disables its control and marks every part with `data-disabled`, the way a [disabled field set](#disabled-field-sets) does for every field inside it.
+
+## Character Count
+
+Listen for `input` on the control and show its length in the description. Set `maxlength` on the control to enforce the limit.
+
+```html
+<ui-field>
+  <ui-field-label>Bio</ui-field-label>
+  <textarea maxlength="280"></textarea>
+  <ui-field-description>0 / 280</ui-field-description>
+</ui-field>
+
+<script type="module">
+  const bio = document.querySelector("textarea")
+  const count = document.querySelector("ui-field-description")
+  bio.addEventListener("input", () => {
+    count.textContent = `${bio.value.length} / 280`
+  })
+</script>
+```
 
 ## Forms
 
 The control submits its value under its own `name`, or the field's name if it has none. Reset restores the control's default and hides validation errors. Disabled controls are left out of the submitted values. See [Forms](../forms) for the shared form behavior.
 
-This sign-up form combines text fields, a required plan, a switch, and a required checkbox:
-
-<ComponentExample
-  name="field/sign-up"
-  caption="Submit the empty form to see its errors. Complete it to inspect the submitted values, then press Reset."
-/>
-
 ## Field Sets
+
+A field set groups related fields under a legend, and disables them together.
 
 <ComponentExample
   name="field/field-set"
   caption="Move through the address fields. Their legend and description name the group."
 />
 
-A field set groups related fields under a legend, and disables them together.
+`<ui-field-set>` wraps a native `<fieldset>` and its `<legend>`, and displays as contents, so the set is named, and disabled, before scripts run. Keep the legend the first child. For a legend that isn't a native `<legend>`, use `<ui-field-legend>`: it still names the set through `aria-labelledby`.
 
-`<ui-field-set>` wraps a native `<fieldset>` and its `<legend>`, and displays as contents, so the set is named, and disabled, before scripts run. Keep the legend the first child. For a legend that isn't a native `<legend>`, use `<ui-field-legend>`: it still names the set, through `aria-labelledby`.
+A `<ui-field-description>` right inside the set, outside any `<ui-field>`, describes the set, so screen readers read it as focus enters. `<ui-field-group>` stacks the fields, with no role and no state: the field set is what names and disables a group.
 
-`<ui-field-description>` describes the nearest `<ui-field>`, or the `<ui-field-set>` when no field is closer, so screen readers read a set's description as focus enters. `<ui-field-group>` stacks the fields, with no role and no state: the field set is what names and disables a group.
-
-### Disabled Field Set
+## Disabled Field Sets
 
 Disabling the set disables its controls and nested field sets. The form leaves their values out of submissions.
 
-<ComponentExample
-  name="field/field-set-disabled"
-  caption="Turn off “Same as shipping address” to edit the billing address. Turn it back on to disable the whole set."
-/>
-
-### Checkboxes in a Field Set
-
-The legend names a [checkbox group](./checkbox#group), so the group needs no label of its own.
-
-<ComponentExample
-  name="field/field-set-checkboxes"
-  caption="Choose the notifications you want. The legend names the group."
-/>
-
-### Radios in a Field Set
-
-A [radio group](./radio) in a field set.
-
-Here the legend is a `<ui-field-legend>`, and still names the set.
-
-<ComponentExample
-  name="field/field-set-radios"
-  caption="Choose Monthly or Yearly. Use the arrow keys to change the selected plan."
-/>
-
-### Right to Left Field Set
-
-A field set follows its surrounding `dir`, just like an individual field.
-
-## Styling
-
-Apply classes directly to the parts. Each part receives the field’s state as data attributes:
-
 ```html
-<ui-field-label class="data-invalid:text-neutral-950">Email</ui-field-label>
-<input class="border-neutral-300 data-invalid:border-neutral-950/50" />
+<ui-field-set disabled>
+  <fieldset>
+    <legend>Billing address</legend>
+    <ui-field name="billing-street">
+      <ui-field-label>Street address</ui-field-label>
+      <input autocomplete="billing street-address" />
+    </ui-field>
+  </fieldset>
+</ui-field-set>
 ```
 
-The field writes the same attributes on the control inside it.
+## Groups in a Field Set
 
-`Field`:
+The legend names a [checkbox group](./checkbox#group) or a [radio group](./radio) inside the set, so the group needs no label of its own.
 
-<DataAttributes component="field" />
-
-`FieldSet`, and a `FieldLegend` or `FieldDescription` that belongs to it:
-
-<DataAttributes component="field-set" />
-
-`FieldGroup` has `data-slot="field-group"` and no state attributes.
+```html
+<ui-field-set>
+  <fieldset>
+    <legend>Notifications</legend>
+    <ui-checkbox-group name="notify" default-value="mentions">
+      <label>
+        <ui-checkbox value="mentions"></ui-checkbox>
+        Mentions
+      </label>
+      <label>
+        <ui-checkbox value="follows"></ui-checkbox>
+        New followers
+      </label>
+    </ui-checkbox-group>
+  </fieldset>
+</ui-field-set>
+```
 
 ## Custom Rendering
 
-The control is your own element, so render whatever you like. Parts have no render functions: show and hide content from the parts' data attributes, like `in-data-invalid:inline` in Tailwind. An empty `<ui-field-error>` fills itself with the current message.
+The control is your own element, so render whatever you like. Parts have no render functions: show and hide content from the parts' data attributes, like `in-data-invalid:inline` in Tailwind. An empty `<ui-field-error>` fills itself with the message for the current problem.
 
 ## Custom Controls
 
@@ -224,6 +242,48 @@ Web components have no hook: the field finds its control itself. It takes the fi
 So a custom element of your own joins a field when it has one of those roles. The field reads validity only from native inputs, selects and textareas and from our own elements, so yours submits and validates through a native input inside it, with its own `name`.
 
 To build a control from scratch on the primitives ours use, see [Primitives](../../core/kernel/define-a-primitive).
+
+## Styling
+
+Use `data-invalid` and `data-valid` for validation, and `data-focused`, `data-required` and `data-disabled` for the rest. Every part of a field gets the same attributes, so a label can turn red with its control.
+
+Each part has a `data-slot`, such as `field-label`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### `<ui-field>` [#data-attributes-field]
+
+<DataAttributes component="field" part="root" />
+
+### `<ui-field-label>` [#data-attributes-fieldlabel]
+
+<DataAttributes component="field" part="label" />
+
+### `<input>` [#data-attributes-fieldcontrol]
+
+<DataAttributes component="field" part="control" />
+
+### `<ui-field-description>` [#data-attributes-fielddescription]
+
+<DataAttributes component="field" part="description" />
+
+### `<ui-field-error>` [#data-attributes-fielderror]
+
+<DataAttributes component="field" part="error" />
+
+### `<fieldset>` [#data-attributes-fieldset]
+
+`<ui-field-group>` has `data-slot="field-group"` and no state attributes.
+
+<DataAttributes component="field-set" part="set" />
+
+### `<legend>` [#data-attributes-fieldlegend]
+
+<DataAttributes component="field-set" part="legend" />
+
+### `<ui-field-description>` in a `<ui-field-set>` [#data-attributes-fieldset-description]
+
+<DataAttributes component="field-set" part="description" />
 
 ## API Reference
 
@@ -249,7 +309,7 @@ A field has no change events. Read its state from the parts' data attributes. Ad
 
 <StateTable path="../../packages/core/src/components/field/field.ts" name="FieldErrorState" />
 
-A `FieldDescription` receives the field's state, or only `disabled` when it describes a field set.
+A `<ui-field-description>` receives the field's state, or only `disabled` when it describes a field set.
 
 <StateTable path="../../packages/core/src/components/field/field.ts" name="FieldDescriptionState" />
 

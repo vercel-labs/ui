@@ -4,6 +4,7 @@
     Autocomplete,
     AutocompleteClear,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteInput,
     AutocompleteItem,
     AutocompleteLabel,
@@ -44,6 +45,7 @@
     </div>
   </div>
   <AutocompleteContent>
+    <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
     <AutocompleteList>
       {#each fruits as fruit (fruit)}
         <AutocompleteItem value={fruit}>

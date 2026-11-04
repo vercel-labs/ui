@@ -1,5 +1,7 @@
 import "@ui-sdk/web/combobox"
-import { Check, ChevronDown, createElement } from "lucide"
+import "@ui-sdk/web/field"
+import { Check, ChevronDown, createElement, X } from "lucide"
+import { log } from "../../../shared/web/log"
 
 const countries = [
   { value: "ar", label: "Argentina" },
@@ -23,25 +25,23 @@ const countries = [
 
 const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <form id="combobox-profile" data-slot="stack">
-        <ui-combobox name="country" required>
-          <div data-slot="stack">
-            <ui-combobox-label>Country</ui-combobox-label>
-            <div data-slot="row">
-              <ui-combobox-input>
-                <input placeholder="Search countries" />
-              </ui-combobox-input>
-              <ui-combobox-trigger>
-                <button aria-label="Show countries">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
-              </ui-combobox-trigger>
-            </div>
+    <form data-slot="stack">
+      <ui-field name="country">
+        <ui-field-label>Country</ui-field-label>
+        <ui-combobox required>
+          <div data-slot="row">
+            <ui-combobox-input>
+              <input placeholder="Search countries" />
+            </ui-combobox-input>
+            <ui-combobox-trigger>
+              <button aria-label="Show countries">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
+            </ui-combobox-trigger>
           </div>
-          <ui-combobox-content>
+          <ui-combobox-content hidden>
             <ui-combobox-empty>No countries found.</ui-combobox-empty>
             <ui-combobox-list>
               ${countries
@@ -57,22 +57,26 @@ function mount(root: HTMLElement) {
             </ui-combobox-list>
           </ui-combobox-content>
         </ui-combobox>
-        <ui-combobox name="interests" multiple default-value="Design">
-          <div data-slot="stack">
-            <ui-combobox-label>Interests</ui-combobox-label>
-            <ui-combobox-chips>
-              <ui-combobox-input>
-                <input placeholder="Add interests" />
-              </ui-combobox-input>
-            </ui-combobox-chips>
-          </div>
-          <ui-combobox-content>
+        <ui-field-description>Where we ship your order.</ui-field-description>
+        <div>
+          <ui-field-error match="valueMissing">Choose a country.</ui-field-error>
+        </div>
+      </ui-field>
+      <ui-field name="interests">
+        <ui-field-label>Interests</ui-field-label>
+        <ui-combobox multiple default-value="Design">
+          <ui-combobox-chips>
+            <ui-combobox-input>
+              <input placeholder="Add interests" />
+            </ui-combobox-input>
+          </ui-combobox-chips>
+          <ui-combobox-content hidden>
             <ui-combobox-list>
-              ${labels
+              ${interests
                 .map(
-                  (label) => `
-                    <ui-combobox-item value="${label}">
-                      ${label}
+                  (interest) => `
+                    <ui-combobox-item value="${interest}">
+                      ${interest}
                       <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                     </ui-combobox-item>
                   `,
@@ -82,57 +86,26 @@ function mount(root: HTMLElement) {
           </ui-combobox-content>
           <template>
             <ui-combobox-chip>
-              <ui-combobox-chip-remove><button type="button">×</button></ui-combobox-chip-remove>
+              <ui-combobox-chip-remove>
+                <button type="button">${createElement(X, { "aria-hidden": "true" }).outerHTML}</button>
+              </ui-combobox-chip-remove>
             </ui-combobox-chip>
           </template>
         </ui-combobox>
-        <div data-slot="row">
-          <button type="submit" data-variant="solid">Submit</button>
-          <button type="reset">Reset</button>
-        </div>
-      </form>
-      <ui-combobox name="timezone" form="combobox-profile" default-value="Paris">
-        <div data-slot="stack">
-          <ui-combobox-label>City</ui-combobox-label>
-          <div data-slot="row">
-            <ui-combobox-input>
-              <input />
-            </ui-combobox-input>
-            <ui-combobox-trigger>
-              <button aria-label="Show cities">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
-            </ui-combobox-trigger>
-          </div>
-        </div>
-        <ui-combobox-content>
-          <ui-combobox-list>
-            ${["London", "Paris", "Berlin", "Madrid"]
-              .map(
-                (city) => `
-                  <ui-combobox-item value="${city}">
-                    ${city}
-                    <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
-                  </ui-combobox-item>
-                `,
-              )
-              .join("")}
-          </ui-combobox-list>
-        </ui-combobox-content>
-      </ui-combobox>
-      <output data-slot="output">Submit the form</output>
-    </div>
+      </ui-field>
+      <div data-slot="row">
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
   `
-  const [country, interests] = root.querySelectorAll("ui-combobox") as NodeListOf<
-    HTMLElement & { itemToLabel: (value: string) => string }
-  >
-  country.itemToLabel = countryLabel
+  root.querySelector("ui-combobox")!.itemToLabel = (value) => countryLabel(value as string)
   const form = root.querySelector("form")!
-  const output = root.querySelector("output")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    const data = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
-    output.textContent = data.join("&")
+    const entries = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
+    log(root, `Submitted ${entries.join("&")}`)
   })
-  form.addEventListener("reset", () => (output.textContent = "Submit the form"))
 }
 
 export { mount }

@@ -2,12 +2,14 @@
 import {
   Autocomplete,
   AutocompleteContent,
+  AutocompleteEmpty,
   AutocompleteInput,
   AutocompleteItem,
   AutocompleteLabel,
   AutocompleteList,
 } from "@ui-sdk/vue/autocomplete"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const fruits = [
   "Apple",
@@ -29,11 +31,11 @@ const fruits = [
 
 const value = ref("")
 const open = ref(false)
-const log = ref("")
+const log = useLog()
 
 function changeValue(next: string, details: { reason: string; cancel: () => void }) {
   if (next.length > 12) return details.cancel()
-  log.value = `text: ${details.reason}`
+  log(`text: ${details.reason}`)
 }
 </script>
 
@@ -46,19 +48,19 @@ function changeValue(next: string, details: { reason: string; cancel: () => void
       @value-change="changeValue"
       @open-change="
         (next: boolean, details: { reason: string }) =>
-          (log = `${next ? 'opened' : 'closed'}: ${details.reason}`)
+          log(`${next ? 'opened' : 'closed'}: ${details.reason}`)
       "
-      @open-change-complete="(next: boolean) => (log = `${next ? 'opened' : 'closed'} and settled`)"
-      @highlight="(highlighted: string | null) => highlighted && (log = `highlighted ${highlighted}`)"
+      @open-change-complete="(next: boolean) => log(`${next ? 'opened' : 'closed'} and settled`)"
+      @highlight="(highlighted: string | null) => highlighted && log(`highlighted ${highlighted}`)"
     >
       <AutocompleteLabel>Fruit (12 characters at most)</AutocompleteLabel>
       <AutocompleteInput />
       <AutocompleteContent>
+        <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
           <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{ fruit }}</AutocompleteItem>
         </AutocompleteList>
       </AutocompleteContent>
     </Autocomplete>
-    <output data-slot="output">{{ log || "Type something" }}</output>
   </div>
 </template>

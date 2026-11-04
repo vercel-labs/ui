@@ -1,24 +1,25 @@
 import "@ui-sdk/web/combobox"
+import "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
 
 const countries = [
-  { value: "ar", label: "Argentina" },
+  { value: "ar", label: "Argentina", keywords: ["república argentina"] },
   { value: "au", label: "Australia" },
-  { value: "at", label: "Austria" },
-  { value: "be", label: "Belgium" },
-  { value: "br", label: "Brazil" },
+  { value: "at", label: "Austria", keywords: ["österreich"] },
+  { value: "be", label: "Belgium", keywords: ["belgië", "belgique"] },
+  { value: "br", label: "Brazil", keywords: ["brasil"] },
   { value: "ca", label: "Canada" },
   { value: "cl", label: "Chile" },
-  { value: "dk", label: "Denmark" },
-  { value: "fi", label: "Finland" },
+  { value: "dk", label: "Denmark", keywords: ["danmark"] },
+  { value: "fi", label: "Finland", keywords: ["suomi"] },
   { value: "fr", label: "France" },
-  { value: "de", label: "Germany" },
-  { value: "gr", label: "Greece" },
-  { value: "jp", label: "Japan" },
-  { value: "nl", label: "Netherlands" },
-  { value: "es", label: "Spain" },
-  { value: "se", label: "Sweden" },
-  { value: "ch", label: "Switzerland" },
+  { value: "de", label: "Germany", keywords: ["deutschland"] },
+  { value: "gr", label: "Greece", keywords: ["hellas", "ελλάδα"] },
+  { value: "jp", label: "Japan", keywords: ["nippon", "日本"] },
+  { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
+  { value: "es", label: "Spain", keywords: ["españa"] },
+  { value: "se", label: "Sweden", keywords: ["sverige"] },
+  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
 ]
 
 function fuzzy(item: { label: string }, query: string) {
@@ -27,43 +28,57 @@ function fuzzy(item: { label: string }, query: string) {
   return at === query.length
 }
 
-const filters = [
-  { name: "Contains", filter: "contains" },
-  { name: "Starts with", filter: "startsWith" },
-  { name: "Fuzzy", filter: fuzzy },
+const modes = [
+  { value: "contains", label: "Contains" },
+  { value: "startsWith", label: "Starts with" },
+  { value: "fuzzy", label: "Fuzzy" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div role="group" aria-label="Filter" data-slot="row">
-        ${filters
-          .map(
-            (option, index) => `
-              <button type="button" data-filter="${index}" aria-pressed="${index === 0}">${option.name}</button>
-            `,
-          )
-          .join("")}
+      <div data-slot="controls">
+        <ui-select default-value="contains">
+          <ui-select-label>Filter</ui-select-label>
+          <ui-select-trigger>
+            <button>
+              <ui-select-value></ui-select-value>
+              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-select-trigger>
+          <ui-select-content hidden>
+            ${modes
+              .map(
+                (option) => `
+                  <ui-select-item value="${option.value}">
+                    ${option.label}
+                    <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
+                  </ui-select-item>
+                `,
+              )
+              .join("")}
+          </ui-select-content>
+        </ui-select>
       </div>
       <ui-combobox filter="contains">
         <div data-slot="stack">
           <ui-combobox-label>Country</ui-combobox-label>
           <div data-slot="row">
             <ui-combobox-input>
-              <input placeholder="Try “an” or “swd”" />
+              <input placeholder="Try “an”, “swd” or “deutschland”" />
             </ui-combobox-input>
             <ui-combobox-trigger>
               <button aria-label="Show countries">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
             </ui-combobox-trigger>
           </div>
         </div>
-        <ui-combobox-content>
+        <ui-combobox-content hidden>
           <ui-combobox-empty>No countries found.</ui-combobox-empty>
           <ui-combobox-list>
             ${countries
               .map(
                 (country) => `
-                  <ui-combobox-item value="${country.value}" label="${country.label}">
+                  <ui-combobox-item value="${country.value}" label="${country.label}"${country.keywords ? ` keywords="${country.keywords.join(",")}"` : ""}>
                     ${country.label}
                     <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                   </ui-combobox-item>
@@ -75,18 +90,16 @@ function mount(root: HTMLElement) {
       </ui-combobox>
     </div>
   `
-  const combobox = root.querySelector("ui-combobox") as HTMLElement & { filter?: typeof fuzzy }
-  const buttons = root.querySelectorAll<HTMLButtonElement>("[data-filter]")
-  for (const button of buttons)
-    button.addEventListener("click", () => {
-      const { filter } = filters[Number(button.dataset.filter)]
-      if (typeof filter === "function") combobox.filter = filter
-      else {
-        combobox.filter = undefined
-        combobox.setAttribute("filter", filter)
-      }
-      for (const other of buttons) other.setAttribute("aria-pressed", String(other === button))
-    })
+  const combobox = root.querySelector("ui-combobox")!
+  root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
+    const mode = event.detail.value
+    if (!mode) return
+    if (mode === "fuzzy") combobox.filter = fuzzy
+    else {
+      combobox.filter = undefined
+      combobox.setAttribute("filter", String(mode))
+    }
+  })
 }
 
 export { mount }

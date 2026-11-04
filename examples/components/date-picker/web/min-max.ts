@@ -5,7 +5,7 @@ function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-date-picker min="2026-10-05" max="2026-11-20" default-value="2026-10-16">
       <div data-slot="row">
-        <ui-date-picker-input><input aria-label="Due date" /></ui-date-picker-input>
+        <ui-date-picker-input><input aria-label="Delivery date" /></ui-date-picker-input>
         <ui-date-picker-trigger>
           <button data-variant="ghost">
             ${createElement(Calendar, { "aria-hidden": "true" }).outerHTML}
@@ -13,7 +13,7 @@ function mount(root: HTMLElement) {
         </ui-date-picker-trigger>
       </div>
       <ui-date-picker-hint></ui-date-picker-hint>
-      <ui-date-picker-content>
+      <ui-date-picker-content hidden>
         <div data-slot="row">
           <ui-calendar-previous>
             <button data-variant="ghost">
@@ -38,6 +38,7 @@ function mount(root: HTMLElement) {
       </ui-date-picker-content>
     </ui-date-picker>
   `
+  root.querySelector("ui-date-picker")!.unavailable = [{ weekday: [0, 6] }]
 }
 
 export { mount }

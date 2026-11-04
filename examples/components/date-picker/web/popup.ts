@@ -1,5 +1,6 @@
 import "@ui-sdk/web/date-picker"
 import { Calendar, ChevronLeft, ChevronRight, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
 let count = 0
 
@@ -17,7 +18,7 @@ function mount(root: HTMLElement) {
           </ui-date-picker-trigger>
         </div>
         <ui-date-picker-hint></ui-date-picker-hint>
-        <ui-date-picker-content side="top" align="end" side-offset="8" align-offset="-4" collision-padding="16" anchor="#${id}-anchor" final-focus="none" keep-mounted>
+        <ui-date-picker-content hidden anchor="#${id}-anchor" side-offset="6" collision-padding="16" keep-mounted>
           <div data-slot="row">
             <ui-calendar-previous>
               <button data-variant="ghost">
@@ -42,19 +43,17 @@ function mount(root: HTMLElement) {
         </ui-date-picker-content>
       </ui-date-picker>
       <div id="${id}-container"></div>
-      <p data-slot="hint">Opens above, lined up with the end of the field.</p>
     </div>
   `
   const picker = root.querySelector("ui-date-picker")!
-  const log = root.querySelector("p")!
   picker.addEventListener("openchange", (event) => {
-    log.textContent = `${event.detail.value ? "Opened" : "Closed"} (${event.detail.reason})`
+    log(root, `${event.detail.value ? "Opened" : "Closed"} (${event.detail.reason})`)
   })
   picker.addEventListener("openchangecomplete", (event) => {
-    if (!event.detail.value) log.textContent = `${log.textContent}, done`
+    if (!event.detail.value) log(root, "Finished closing")
   })
   picker.addEventListener("monthchange", (event) => {
-    log.textContent = `Showing ${event.detail.value} (${event.detail.reason})`
+    log(root, `Showing ${event.detail.value} (${event.detail.reason})`)
   })
 }
 

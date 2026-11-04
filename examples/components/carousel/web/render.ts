@@ -15,28 +15,37 @@ function mount(root: HTMLElement) {
     <ui-carousel aria-label="Photos">
       <ui-carousel-viewport>
         <ui-carousel-content>
-          ${photos.map((photo, index) => `<ui-carousel-item><div data-slot="tile">${photo.name}<span data-slot="hint">${index + 1} / ${photos.length}<span> · showing</span></span></div></ui-carousel-item>`).join("")}
+          ${photos.map((photo, index) => `<ui-carousel-item><div data-slot="tile">${photo.name}<span data-slot="hint">${index + 1} / ${photos.length}<span hidden> · showing</span></span></div></ui-carousel-item>`).join("")}
         </ui-carousel-content>
       </ui-carousel-viewport>
       <div data-slot="row">
         <ui-carousel-previous>
-          <button data-variant="secondary">${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML} Previous</button>
+          <button>${createElement(ChevronLeft, { "aria-hidden": "true" }).outerHTML} Previous</button>
         </ui-carousel-previous>
         <ui-carousel-next>
-          <button data-variant="secondary">Next ${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</button>
+          <button>Next ${createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML}</button>
         </ui-carousel-next>
-        <a data-variant="secondary" href="https://example.com/gallery">See all photos</a>
+        <a href="https://example.com/gallery" hidden>See all photos</a>
       </div>
     </ui-carousel>
   `
+  const carousel = root.querySelector("ui-carousel")!
   const next = root.querySelector<HTMLElement>("ui-carousel-next button")!
-  root.querySelector("ui-carousel")!.addEventListener("pagechange", () => {
-    if (document.activeElement !== next) return
-    requestAnimationFrame(() => {
-      if (next.hasAttribute("data-disabled"))
-        root.querySelector<HTMLElement>('a[href="https://example.com/gallery"]')!.focus()
-    })
+  const link = root.querySelector("a")!
+  const update = () => {
+    for (const item of carousel.querySelectorAll("ui-carousel-item"))
+      item.querySelector<HTMLElement>("[data-slot='hint'] > span")!.hidden = !item.hasAttribute("data-active")
+    const end = next.hasAttribute("data-disabled")
+    const focused = document.activeElement === next
+    link.hidden = !end
+    if (end && focused) link.focus()
+    next.hidden = end
+  }
+  new MutationObserver(update).observe(carousel, {
+    subtree: true,
+    attributeFilter: ["data-active", "data-disabled"],
   })
+  update()
 }
 
 export { mount }

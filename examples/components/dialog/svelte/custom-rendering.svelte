@@ -15,7 +15,7 @@
   <DialogTrigger shortcut="mod+i">
     {#snippet render({ props, state })}
       <button {...props}>
-        {state.open ? "Viewing" : "View details"}
+        {state.open ? "Viewing" : "View Details"}
         <DialogShortcut>
           {#snippet children(shortcut)}{shortcut.text}{/snippet}
         </DialogShortcut>
@@ -32,16 +32,14 @@
           {/snippet}
         </DialogTitle>
         <DialogDescription>
-          {state.nested ? "Opened from another dialog." : "Opened from the page."} {state.stack} open
-          above it.{state.nestedOpen ? " A child is open." : ""}
+          {state.nested ? "Opened from another dialog." : "Quarterly report, updated today."}
         </DialogDescription>
       </div>
       <div data-slot="row">
+        <DialogClose>Close</DialogClose>
         <DialogClose data-variant="solid" href="https://example.com/details">
           {#snippet render({ props })}
-            <a {...props}>
-              Open the full page
-            </a>
+            <a {...props}>Open the Full Page</a>
           {/snippet}
         </DialogClose>
       </div>

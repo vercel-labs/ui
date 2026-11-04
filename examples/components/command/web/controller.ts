@@ -1,4 +1,5 @@
 import "@ui-sdk/web/command"
+import { log } from "../../../shared/web/log"
 
 const themes = [
   { value: "light", label: "Light" },
@@ -6,15 +7,15 @@ const themes = [
   { value: "system", label: "System" },
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div data-slot="row">
-        <button type="button" data-action="push">Open themes</button>
+      <div data-slot="controls">
+        <button type="button" data-action="push">Open Themes</button>
         <button type="button" data-action="pop">Back</button>
         <button type="button" data-action="highlight">Highlight Dark</button>
         <button type="button" data-action="search">Search “li”</button>
-        <button type="button" data-action="run">Run highlighted</button>
+        <button type="button" data-action="run">Run Highlighted</button>
         <button type="button" data-action="focus">Focus</button>
       </div>
       <ui-command>
@@ -32,21 +33,10 @@ export function mount(root: HTMLElement) {
           </ui-command-page>
         </ui-command-list>
       </ui-command>
-      <output data-slot="output">Nothing run yet</output>
     </div>
   `
-  const command = root.querySelector("ui-command") as HTMLElement & {
-    api: {
-      push: (page: string) => void
-      pop: () => void
-      setValue: (value: string | null) => void
-      setQuery: (query: string) => void
-      run: (value?: string) => void
-      focus: () => void
-    }
-  }
+  const command = root.querySelector("ui-command")!
   const palette = command.api
-  const output = root.querySelector("output")!
   const actions: Record<string, () => void> = {
     push: () => palette.push("theme"),
     pop: () => palette.pop(),
@@ -57,7 +47,7 @@ export function mount(root: HTMLElement) {
   }
   for (const button of root.querySelectorAll<HTMLElement>("[data-action]"))
     button.addEventListener("click", () => actions[button.dataset.action!]())
-  command.addEventListener("action", (event) => {
-    output.textContent = `Ran ${(event as CustomEvent<{ value: string }>).detail.value}`
-  })
+  command.addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
 }
+
+export { mount }

@@ -8,7 +8,8 @@ import {
   CommandList,
   CommandShortcut,
 } from "@ui-sdk/solid/command"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const icon = (markup: string) => () => (
   <svg
@@ -37,14 +38,10 @@ const settings = [
 ]
 
 function Example() {
-  const [ran, setRan] = createSignal("")
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <Command
-        onAction={(value) => {
-          setRan(value)
-        }}
-      >
+      <Command onAction={(value) => log(`Ran ${value}`)}>
         <CommandInput aria-label="Search settings" placeholder="Search settings..." />
         <CommandList>
           <CommandGroup>
@@ -63,7 +60,6 @@ function Example() {
           </CommandGroup>
         </CommandList>
       </Command>
-      <output data-slot="output">{ran() ? `Ran ${ran()}` : "Try a shortcut"}</output>
     </div>
   )
 }

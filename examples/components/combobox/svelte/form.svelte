@@ -10,11 +10,12 @@
     ComboboxInput,
     ComboboxItem,
     ComboboxItemIndicator,
-    ComboboxLabel,
     ComboboxList,
     ComboboxTrigger,
     ComboboxValue,
   } from "@ui-sdk/svelte/combobox"
+  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { useLog } from "../../../shared/svelte/log"
 
   const countries = [
     { value: "ar", label: "Argentina" },
@@ -38,30 +39,28 @@
 
   const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
 
-  const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+  const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
-  let submitted = $state("")
+  const log = useLog()
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
+    const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
       ([name, value]) => `${name}=${value}`,
     )
-    submitted = data.join("&")
+    log(`Submitted ${entries.join("&")}`)
   }
 </script>
 
-<div data-slot="stack">
-  <form id="combobox-profile" data-slot="stack" onsubmit={submit} onreset={() => (submitted = "")}>
-    <Combobox name="country" required itemToLabel={countryLabel}>
-      <div data-slot="stack">
-        <ComboboxLabel>Country</ComboboxLabel>
-        <div data-slot="row">
-          <ComboboxInput placeholder="Search countries" />
-          <ComboboxTrigger aria-label="Show countries">
-            <ChevronDownIcon aria-hidden="true" />
-          </ComboboxTrigger>
-        </div>
+<form data-slot="stack" onsubmit={submit}>
+  <Field name="country">
+    <FieldLabel>Country</FieldLabel>
+    <Combobox required itemToLabel={countryLabel}>
+      <div data-slot="row">
+        <ComboboxInput placeholder="Search countries" />
+        <ComboboxTrigger aria-label="Show countries">
+          <ChevronDownIcon aria-hidden="true" />
+        </ComboboxTrigger>
       </div>
       <ComboboxContent>
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
@@ -77,30 +76,34 @@
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
-    <Combobox name="interests" multiple defaultValue={["Design"]}>
-      <div data-slot="stack">
-        <ComboboxLabel>Interests</ComboboxLabel>
-        <ComboboxChips>
-          <ComboboxValue>
-            {#snippet children({ value })}
-              {#each value as string[] as label (label)}
-                <ComboboxChip value={label}>
-                  {label}
-                  <ComboboxChipRemove aria-label={`Remove ${label}`}>
-                    <XIcon aria-hidden="true" />
-                  </ComboboxChipRemove>
-                </ComboboxChip>
-              {/each}
-            {/snippet}
-          </ComboboxValue>
-          <ComboboxInput placeholder="Add interests" />
-        </ComboboxChips>
-      </div>
+    <FieldDescription>Where we ship your order.</FieldDescription>
+    <div>
+      <FieldError match="valueMissing">Choose a country.</FieldError>
+    </div>
+  </Field>
+  <Field name="interests">
+    <FieldLabel>Interests</FieldLabel>
+    <Combobox multiple defaultValue={["Design"]}>
+      <ComboboxChips>
+        <ComboboxValue>
+          {#snippet children({ value })}
+            {#each value as string[] as interest (interest)}
+              <ComboboxChip value={interest}>
+                {interest}
+                <ComboboxChipRemove aria-label={`Remove ${interest}`}>
+                  <XIcon aria-hidden="true" />
+                </ComboboxChipRemove>
+              </ComboboxChip>
+            {/each}
+          {/snippet}
+        </ComboboxValue>
+        <ComboboxInput placeholder="Add interests" />
+      </ComboboxChips>
       <ComboboxContent>
         <ComboboxList>
-          {#each labels as label (label)}
-            <ComboboxItem value={label}>
-              {label}
+          {#each interests as interest (interest)}
+            <ComboboxItem value={interest}>
+              {interest}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />
               </ComboboxItemIndicator>
@@ -109,37 +112,9 @@
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
-    <div data-slot="row">
-      <button type="submit" data-variant="solid">
-        Submit
-      </button>
-      <button type="reset">
-        Reset
-      </button>
-    </div>
-  </form>
-  <Combobox name="timezone" form="combobox-profile" defaultValue="Paris">
-    <div data-slot="stack">
-      <ComboboxLabel>City</ComboboxLabel>
-      <div data-slot="row">
-        <ComboboxInput />
-        <ComboboxTrigger aria-label="Show cities">
-          <ChevronDownIcon aria-hidden="true" />
-        </ComboboxTrigger>
-      </div>
-    </div>
-    <ComboboxContent>
-      <ComboboxList>
-        {#each ["London", "Paris", "Berlin", "Madrid"] as city (city)}
-          <ComboboxItem value={city}>
-            {city}
-            <ComboboxItemIndicator>
-              <CheckIcon aria-hidden="true" />
-            </ComboboxItemIndicator>
-          </ComboboxItem>
-        {/each}
-      </ComboboxList>
-    </ComboboxContent>
-  </Combobox>
-  <output data-slot="output">{submitted || "Submit the form"}</output>
-</div>
+  </Field>
+  <div data-slot="row">
+    <button type="submit">Submit</button>
+    <button type="reset">Reset</button>
+  </div>
+</form>

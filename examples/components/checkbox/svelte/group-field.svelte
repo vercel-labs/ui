@@ -2,6 +2,7 @@
   import { CheckIcon } from "@lucide/svelte"
   import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
   import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { useLog } from "../../../shared/svelte/log"
 
   const channels = [
     { value: "email", label: "Email" },
@@ -9,20 +10,19 @@
     { value: "push", label: "Push notifications" },
   ]
 
-  let saved = $state<string | null>(null)
+  const log = useLog()
 
-  function onSubmit(event: SubmitEvent) {
+  function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    saved = new FormData(event.target as HTMLFormElement).getAll("notifications").join(", ")
+    const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+    log(`Saved ${entries.join("&")}`)
   }
 </script>
 
 <form data-slot="stack" onsubmit={onSubmit}>
   <Field>
     <FieldLabel>Notifications</FieldLabel>
-    <FieldDescription>
-      Choose how we tell you about your orders.
-    </FieldDescription>
+    <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
     <CheckboxGroup name="notifications" required>
       {#each channels as channel (channel.value)}
         <label data-slot="label">
@@ -35,10 +35,9 @@
         </label>
       {/each}
     </CheckboxGroup>
-    <div><FieldError>Choose at least one way to be notified.</FieldError></div>
+    <div>
+      <FieldError>Choose at least one way to be notified.</FieldError>
+    </div>
   </Field>
-  <button type="submit">
-    Save
-  </button>
-  <output data-slot="output">{saved !== null ? `notifications: ${saved}` : ""}</output>
+  <button type="submit">Save</button>
 </form>

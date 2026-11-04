@@ -6,7 +6,8 @@ import {
   CommandPage,
   createCommandController,
 } from "@ui-sdk/solid/command"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const themes = [
   { value: "light", label: "Light" },
@@ -16,13 +17,13 @@ const themes = [
 
 const palette = createCommandController()
 
-export function Example() {
-  const [ran, setRan] = createSignal("")
+function Example() {
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" onClick={() => palette.push("theme")}>
-          Open themes
+          Open Themes
         </button>
         <button type="button" onClick={() => palette.pop()}>
           Back
@@ -34,18 +35,13 @@ export function Example() {
           Search “li”
         </button>
         <button type="button" onClick={() => palette.run()}>
-          Run highlighted
+          Run Highlighted
         </button>
         <button type="button" onClick={() => palette.focus()}>
           Focus
         </button>
       </div>
-      <Command
-        controller={palette}
-        onAction={(value) => {
-          setRan(value)
-        }}
-      >
+      <Command controller={palette} onAction={(value) => log(`Ran ${value}`)}>
         <CommandInput aria-label="Search commands" />
         <CommandList>
           <CommandPage>
@@ -58,7 +54,8 @@ export function Example() {
           </CommandPage>
         </CommandList>
       </Command>
-      <output data-slot="output">{ran() ? `Ran ${ran()}` : "Nothing run yet"}</output>
     </div>
   )
 }
+
+export { Example }

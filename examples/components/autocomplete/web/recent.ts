@@ -10,7 +10,7 @@ function mount(root: HTMLElement) {
       <ui-autocomplete-input>
         <input type="search" aria-label="Search docs" placeholder="Search docs…" />
       </ui-autocomplete-input>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
         <ui-autocomplete-empty>No topics found.</ui-autocomplete-empty>
         <ui-autocomplete-list></ui-autocomplete-list>
       </ui-autocomplete-content>

@@ -21,7 +21,7 @@ const paragraphs = [
 function Example() {
   return (
     <Dialog>
-      <DialogTrigger>Scrollable content</DialogTrigger>
+      <DialogTrigger>Scrollable Content</DialogTrigger>
       <DialogBackdrop />
       <DialogContent initialFocus="content">
         <div data-slot="stack">

@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
       <ui-autocomplete-input>
         <input type="search" aria-label="Search mail" placeholder="Search mail…" />
       </ui-autocomplete-input>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
         <ui-autocomplete-empty>No searches found.</ui-autocomplete-empty>
         <ui-autocomplete-list>
           ${mailSearches

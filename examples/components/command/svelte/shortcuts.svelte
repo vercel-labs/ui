@@ -10,6 +10,7 @@
     CommandList,
     CommandShortcut,
   } from "@ui-sdk/svelte/command"
+  import { useLog } from "../../../shared/svelte/log"
 
   const settings = [
     { value: "profile", label: "Profile", icon: UserIcon, shortcut: "mod+p" },
@@ -17,15 +18,11 @@
     { value: "settings", label: "Settings", icon: SettingsIcon, shortcut: "mod+s" },
   ]
 
-  let ran = $state("")
-
-  function onAction(value: string) {
-    ran = value
-  }
+  const log = useLog()
 </script>
 
 <div data-slot="stack">
-  <Command {onAction}>
+  <Command onAction={(value) => log(`Ran ${value}`)}>
     <CommandInput aria-label="Search settings" placeholder="Search settings..." />
     <CommandList>
       <CommandGroup>
@@ -44,5 +41,4 @@
       </CommandGroup>
     </CommandList>
   </Command>
-  <output data-slot="output">{ran ? `Ran ${ran}` : "Try a shortcut"}</output>
 </div>

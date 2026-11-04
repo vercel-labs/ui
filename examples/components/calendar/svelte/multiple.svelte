@@ -12,7 +12,7 @@
   } from "@ui-sdk/svelte/calendar"
   import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
 
-  let dates = $state<string[]>(["2026-10-06", "2026-10-13"])
+  let dates = $state<string[]>(["2026-10-07", "2026-10-16", "2026-10-26"])
 </script>
 
 <div>
@@ -39,5 +39,4 @@
       </CalendarWeeks>
     </CalendarGrid>
   </Calendar>
-  <output data-slot="output">{dates.length} selected</output>
 </div>

@@ -15,21 +15,24 @@
 </script>
 
 <Carousel aria-label="Products" slidesPerPage={3}>
-  <CarouselViewport>
-    <CarouselContent>
-      {#each products as product (product)}
-        <CarouselItem>
-          <div data-slot="tile">
-            {product}
-          </div>
-        </CarouselItem>
-      {/each}
-    </CarouselContent>
-  </CarouselViewport>
   <div data-slot="row">
-    <CarouselPrevious data-variant="secondary" aria-label="Previous page">
+    <CarouselPrevious aria-label="Previous page">
       <ChevronLeftIcon />
     </CarouselPrevious>
+    <CarouselViewport>
+      <CarouselContent>
+        {#each products as product (product)}
+          <CarouselItem>
+            <div data-slot="tile">{product}</div>
+          </CarouselItem>
+        {/each}
+      </CarouselContent>
+    </CarouselViewport>
+    <CarouselNext aria-label="Next page">
+      <ChevronRightIcon />
+    </CarouselNext>
+  </div>
+  <div data-slot="row">
     <CarouselIndicatorGroup aria-label="Choose a page">
       {#snippet children(state)}
         {#each { length: state.pageCount ?? 3 }, index (index)}
@@ -37,8 +40,5 @@
         {/each}
       {/snippet}
     </CarouselIndicatorGroup>
-    <CarouselNext data-variant="secondary" aria-label="Next page">
-      <ChevronRightIcon />
-    </CarouselNext>
   </div>
 </Carousel>

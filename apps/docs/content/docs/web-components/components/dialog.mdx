@@ -12,8 +12,8 @@ A dialog gives a task its own space: share a link, edit a record, or collect a f
 
 ## Installation
 
-```package-install
-npm install @ui-sdk/web
+```bash
+npm install @ui-sdk/web @ui-sdk/core
 ```
 
 Import the component to register its elements. The import is safe on the server.
@@ -38,123 +38,200 @@ ui-dialog
         └── button
 ```
 
-The title names the dialog; the description gives it context. A dialog can have several Close parts. Give an icon-only close button an accessible name, as the first example does.
-
-<span id="custom-close-button" />
+The title names the dialog; the description gives it context. A dialog can have several Close parts, each wrapping its own native button. Give an icon-only close button an accessible name, as the first example does. Give the content and backdrop `hidden` to keep them hidden before the elements upgrade.
 
 The backdrop is optional. Without one, style the content’s `::backdrop`. For a question that requires an explicit answer, use [Alert Dialog](./alert-dialog).
 
-## Examples
+## Usage
 
-### Scrollable Content
+Import the parts and put them together:
 
-<span id="sticky-footer" />
+```html
+<script type="module">
+  import "@ui-sdk/web/dialog"
+</script>
+
+<ui-dialog>
+  <ui-dialog-trigger><button>Open</button></ui-dialog-trigger>
+  <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+  <ui-dialog-content hidden>
+    <ui-dialog-title>Project details</ui-dialog-title>
+    <ui-dialog-description>Review the details before continuing.</ui-dialog-description>
+    <ui-dialog-close><button>Close</button></ui-dialog-close>
+  </ui-dialog-content>
+</ui-dialog>
+```
+
+## Build Your Own
+
+`@ui-sdk/web/dialog` comes with ready-made `ui-dialog` elements. If you'd like to build your own, with your own element names, start from the `dialog` primitive in `@ui-sdk/core`:
+
+```ts title="share-elements.ts"
+import { dialog } from "@ui-sdk/core/dialog"
+import { createParts, wrappedButton } from "@ui-sdk/web"
+
+createParts(dialog, {
+  root: "share-dialog",
+  trigger: { tag: "share-trigger", target: wrappedButton, display: "contents" },
+  backdrop: "share-backdrop",
+  content: "share-panel",
+  title: "share-title",
+  description: "share-description",
+  close: { tag: "share-close", target: wrappedButton, display: "contents" },
+})
+```
+
+```html
+<share-dialog>
+  <share-trigger><button>Share</button></share-trigger>
+  <share-backdrop hidden></share-backdrop>
+  <share-panel hidden>
+    <share-title>Share this page</share-title>
+    <share-description>Anyone with the link can view it.</share-description>
+    <share-close><button>Done</button></share-close>
+  </share-panel>
+</share-dialog>
+```
+
+Each element keeps the behavior, state and data attributes of its ready-made counterpart: the content opens in the top layer, traps focus and makes the page inert. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Scrollable Content
 
 Keep the header and actions outside the scrolling area. A viewport height limit, a shrinking middle grid row, and `overflow-y: auto` keep long content usable. `initial-focus="content"` focuses the dialog itself so reading starts at the top.
 
 <ComponentExample
   name="dialog/scrollable"
-  caption="Open Scrollable content in a short window. Scroll the terms while the title and Decline/Accept buttons stay in view."
+  caption="Open Scrollable Content in a short window. Scroll the terms while the title and Decline/Accept buttons stay in view."
 />
 
-### Modal
+## Forms
+
+A form with `method="dialog"` closes the dialog on a valid submission. The submit button’s `value` becomes the `returnValue`, just like a Close part’s `value`. An ordinary form stays open until you close the dialog yourself.
+
+<ComponentExample
+  name="dialog/form"
+  caption="Open New Article and choose Save Draft or Publish. The console logs the submitted button's value. An empty title prevents submission."
+/>
+
+## Focus
+
+Use `initial-focus` to pick where focus starts, and `final-focus` to choose where it goes after closing. Each takes a selector. The default returns to the trigger, or to the element focused before a controller opened the dialog. See [popup focus](../popups) for the shared focus rules.
+
+```html
+<ui-dialog-content initial-focus="#invite-email" final-focus="#next-step" hidden></ui-dialog-content>
+```
+
+## Controlled
+
+Set the element’s `open` property and listen for `openchange` to keep another control in sync. Cancel a proposed change with `event.preventDefault()`. `openchangecomplete` reports when opening or closing has finished; see [state and events](../state-and-events) for the common change contract.
+
+<ComponentExample
+  name="dialog/controlled"
+  caption="Check Open or press Notification Settings, then close the dialog. The console logs each change, its reason and when it finishes."
+/>
+
+## Keyboard Shortcut
+
+A trigger’s `shortcut` opens it from the keyboard. `mod+j` means Command+J on Apple platforms and Control+J elsewhere. A `ui-dialog-shortcut` inside the trigger's button displays the right keys and the trigger exposes `aria-keyshortcuts`.
+
+<ComponentExample
+  name="dialog/shortcut"
+  caption="Press Command+J or Control+J to open New contact. The button shows the keys, and Escape returns focus to it."
+/>
+
+## Animation
+
+The content and backdrop have `data-starting-style` while they open and `data-ending-style` while they close. Transition from those states, and the dialog stays mounted until the exit finishes. `openchangecomplete` fires after the transition, and `keep-mounted` keeps the content in the page while closed.
+
+<StyleTabs>
+
+```css
+[data-slot="dialog-content"] {
+  transition:
+    opacity 0.2s,
+    translate 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    scale 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    translate: 0 16px;
+    scale: 0.96;
+  }
+
+  &[data-ending-style] {
+    transition-duration: 0.15s;
+  }
+}
+```
+
+```html
+<ui-dialog-content
+  class="transition-[opacity,translate,scale] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] data-starting-style:translate-y-4 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:translate-y-4 data-ending-style:scale-96 data-ending-style:opacity-0 data-ending-style:duration-150"
+  hidden
+></ui-dialog-content>
+```
+
+</StyleTabs>
+
+<ComponentExample
+  name="dialog/animation"
+  caption="Open the dialog and close it. The console logs when each animation finishes; focus returns as closing starts."
+/>
+
+## Modal
 
 `modal` controls how the dialog shares the page:
 
 - `true`, the default, makes the page inert, locks scrolling, and keeps Tab inside.
 - `"trap-focus"` keeps Tab inside while the page can still scroll and receive clicks.
-- `false` lets focus leave the dialog. Escape closes it while focus is inside; outside presses close it only when `closeOnOutsidePress` is enabled.
+- `false` lets focus leave the dialog. Escape closes it while focus is inside; outside presses close it only when `close-on-outside-press` is enabled.
+
+To keep a small part of the page usable while a modal dialog is open, like a chat launcher, list it in `persistent-elements`: a comma-separated list of selectors. Assign the `persistentElements` property an array of elements, or a function returning elements when the dialog opens. Persistent elements don't change stacking on their own.
+
+Dialogs render where you put them and use the browser's top layer. Set `container` to a selector when their DOM needs to live elsewhere, like a shadow root. The [popup guide](../popups) covers containers and iframes.
 
 <ComponentExample
   name="dialog/modal"
-  caption="Choose a mode, open Notes, and try Tab or clicking the page. Enable closeOnOutsidePress to compare dismissal behavior."
+  caption="Choose a mode, open Notes, and try Tab or clicking the page. Check Close on outside press to compare dismissal."
 />
 
-### Warn Before Closing a Dirty Form
+## Warn Before Closing a Dirty Form
 
-Set `dismissible` to false while there are unsaved changes. Escape, an outside press, or a back gesture then keeps the dialog open and reports `dismissattempt`. Explicit Close parts and controller calls still work, so you can offer a deliberate way out.
+Set `dismissible` to `"false"` while there are unsaved changes. Escape, an outside press, or a back gesture then keeps the dialog open and fires `dismissattempt`. Explicit Close parts and controller calls still work, so you can offer a deliberate way out.
 
 <ComponentExample
   name="dialog/dirty-form"
   caption="Type a post, then press Escape or click outside. Keep editing returns to the field; Discard closes the dialog and clears the draft."
 />
 
-### Nested Dialogs
+## Nested Dialogs
 
 A dialog opened inside another joins its stack. Escape closes the topmost dialog and returns focus to its trigger. Closing the parent also closes its children. `data-nested-open` and `--dialog-stack` let you show which layer is active.
 
 <ComponentExample
   name="dialog/nested"
-  caption="Open Account, then Change password. Press Escape once to return to Account, and again to close it."
+  caption="Open Account, then Change Password. Press Escape once to return to Account, and again to close it."
 />
 
-### Opening from a Menu Item
+## Opening from a Menu Item
 
-Render the dialog outside the menu and open it with `api.open()`. When the item disappears, the menu’s trigger becomes the place to return focus.
+Render the dialog outside the menu and open it with its `api.open()`. When the item disappears, the menu’s trigger becomes the place to return focus.
 
 <ComponentExample
   name="dialog/from-menu"
-  caption="Open File actions and choose Rename. Close the dialog to return focus to the File actions button."
+  caption="Open File Actions and choose Rename. Close the dialog to return focus to the File Actions button."
 />
 
-### Opening from Anywhere
+## Opening from Anywhere
 
-Connect an external `ui-dialog-trigger` with `for="dialog-id"`, and assign its `payload` property. The dialog’s `api.open({ payload })` opens it from code and returns a promise that resolves when it closes, with the reason and any `returnValue`. Each trigger remains the return-focus target for the dialog it opened. See [controllers](../controllers) for the shared controller pattern.
+Connect triggers outside the dialog with `for="dialog-id"`, and give each one a `payload` property. The dialog's `payloadchange` event carries it in `event.detail.value`. The dialog's `api.open({ payload })` opens it from code and returns a promise that resolves when it closes, with the reason and any `returnValue`. Each trigger remains the return-focus target for the dialog it opened. See [controllers](../controllers) for the shared controller pattern.
 
 <ComponentExample
   name="dialog/payload"
-  caption="Open a reminder from either unpaid invoice, or press Open from code. The same dialog shows that invoice and reports how it closed."
+  caption="Open a reminder from either unpaid invoice, or press Open from Code. The same dialog shows that invoice, and the console logs how it closed."
 />
 
-### Forms
-
-A form with `method="dialog"` closes the dialog on a valid submission. The submit button’s `value` becomes the `returnValue`, just like a Close part’s `value`. An ordinary form stays open until you close the dialog yourself.
-
-<ComponentExample
-  name="dialog/form"
-  caption="Open New article and choose Save draft or Publish. The readout shows the submitted button’s value. An empty title prevents submission."
-/>
-
-### Focus
-
-Use `initial-focus` to pick where focus starts, and `final-focus` to choose where it goes next. The default returns to the trigger or the element focused before a controller opened the dialog. See [popup focus](../popups) for the shared focus rules.
-
-### Controlled
-
-Set the element’s `open` property and listen for `openchange` to keep another control in sync. Cancel a proposed change with `event.preventDefault()`. `openchangecomplete` reports when opening or closing has finished; see [state and events](../state-and-events) for the common change contract.
-
-<ComponentExample
-  name="dialog/controlled"
-  caption="Use the open checkbox or Open button, then close the dialog. The log records each change and its completion."
-/>
-
-### Keyboard Shortcut
-
-A trigger’s `shortcut` opens it from the keyboard. `mod+j` means Command+J on Apple platforms and Control+J elsewhere. The Shortcut part displays the right keys and the trigger exposes `aria-keyshortcuts`.
-
-<ComponentExample
-  name="dialog/shortcut"
-  caption="Press Command+J or Control+J to open Search docs. Escape returns to the trigger; choosing a page closes the dialog with that page as its value."
-/>
-
-### Persistent Elements
-
-Keep a small part of the page usable while a modal dialog is open. `persistent-elements` accepts selectors; assign `persistentElements` an array of elements or a function returning them. The chat launcher here uses a native popover to sit above the backdrop; persistent elements alone do not change stacking.
-
-### Container
-
-Dialogs render where you put them and use the browser’s top layer. Set `container` when their DOM needs to live elsewhere. The shared [popup guide](../popups) covers containers, shadow roots, and iframes.
-
-### Animation
-
-The content and backdrop receive `data-starting-style` and `data-ending-style`. They stay present through exit animations, and `openchangecomplete` runs after the transition. This example keeps the content mounted; see [styling and animation](../styling-and-animation) for the shared lifecycle.
-
-<ComponentExample
-  name="dialog/animation"
-  caption="Open the dialog and close it. The readout follows Opening, Open, Closing, and Closed; focus returns as closing starts."
-/>
-
-### Presentation
+## Presentation
 
 `presentation="sheet"` presents the same task as a sheet. Use `"auto"` to choose a sheet on small touch screens and a centered dialog elsewhere, decided each time it opens. A swipe down closes a dismissible sheet; a protected one springs back and reports a dismissal attempt.
 
@@ -162,14 +239,21 @@ Style `data-presentation` to support both layouts. The sheet manages its own pos
 
 <ComponentExample
   name="dialog/presentation"
-  caption="Open Edit profile as a sheet. On a touch screen, drag it down to dismiss it, or use Cancel or Save changes."
+  caption="Open Edit Profile as a sheet. On a touch screen, drag it down to dismiss it, or use Cancel or Save Changes."
+/>
+
+## Custom Rendering
+
+Elements have no render functions. Add `as-child` to the title to bind your own heading, and put a link inside a Close part to close from it. Watch the dialog's `openchange` event and the content's data attributes, like `data-nested`, to change what's inside: here the trigger's label and the description follow them.
+
+<ComponentExample
+  name="dialog/custom-rendering"
+  caption="Open View Details. The trigger's label and the description come from their state, and Close renders as a link."
 />
 
 ## Styling
 
-<span id="rtl" />
-
-Style parts with their state attributes and CSS variables. Logical properties, such as the examples’ `end-4`, keep the same layout in right-to-left text.
+Each element has a `data-slot`, such as `dialog-content`, and shows its state through the attributes listed under [Data Attributes](#data-attributes). Use `data-open` and `data-closed` for each state, and `data-starting-style` and `data-ending-style` for transitions.
 
 ### `<ui-dialog-content>` [#styling-dialogcontent]
 
@@ -197,10 +281,6 @@ Style parts with their state attributes and CSS variables. Logical properties, s
 
 <DataAttributes component="dialog" part="close" />
 
-## Custom Rendering
-
-Web parts keep their own elements. Trigger and Close parts bind to the native button or link inside them.
-
 ## API Reference
 
 Props are attributes in kebab case, like `close-on-outside-press`: `"false"` is false. `container` takes a
@@ -216,9 +296,22 @@ A trigger outside the dialog names it with `for="dialog-id"`, and takes `payload
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerProps" />
 
+### DialogBackdrop
+
+Dims the page behind a modal dialog. `<ui-dialog-backdrop>` takes no attributes of its own.
+
 ### DialogContent
 
 <TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogContentProps" />
+
+### DialogTitle
+
+Names the dialog. `<ui-dialog-title>` renders a level 2 heading.
+
+### DialogDescription
+
+Describes the dialog while it's rendered. `<ui-dialog-description>` is a paragraph.
+
 ### DialogClose
 
 With the `action` attribute, its `action` event's `detail.source` says how the part was pressed, as [Button](./button#changes-after-an-await) describes.
@@ -269,8 +362,9 @@ The dismissals `dismissible` can refuse:
 
 ### Controller
 
-The element's `api` property has the same methods. The `open` property reads and sets whether the dialog is
-open.
+Create one with `createDialogController<Payload, Result>()` from `@ui-sdk/web/dialog` and assign it to the root
+element's `controller` property. The root element's `api` property has the same methods, and its `open` property reads
+and sets whether the dialog is open.
 
 Every write method takes an optional `{ reason, event }`, passed to `openchange`. Closing with a controller always works, even when the dialog isn't dismissible or an action is running.
 
@@ -295,6 +389,17 @@ Events fire on their own element and don't bubble. Calling `preventDefault()` on
 ## Accessibility
 
 The trigger is a button that opens a dialog, and the dialog follows the [WAI-ARIA modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/): `aria-modal` while it's modal, labelled by its title, described by its description only while one is rendered. Every line below is an automated test.
+
+### Keyboard
+
+| Key                  | Does                                                                 |
+| -------------------- | -------------------------------------------------------------------- |
+| Enter, Space         | On the trigger, opens the dialog                                     |
+| Tab, Shift+Tab       | Moves through the dialog's controls, staying inside while it's modal |
+| Escape               | Closes the topmost dialog and returns focus to its trigger           |
+| A trigger's shortcut | Opens its dialog from anywhere on the page                           |
+
+### Tested Behavior
 
 <SpecList spec="dialog" only={["trigger", "focus", "dismissal", "presses", "modal", "nested dialogs"]} />
 

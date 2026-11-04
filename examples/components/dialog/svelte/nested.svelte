@@ -8,46 +8,43 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
 </script>
 
 <Dialog>
-  <DialogTrigger>
-    Account
-  </DialogTrigger>
+  <DialogTrigger>Account</DialogTrigger>
   <DialogBackdrop />
   <DialogContent>
     <div data-slot="stack">
       <DialogTitle>Account</DialogTitle>
       <DialogDescription>Manage how you sign in.</DialogDescription>
     </div>
-    <div data-slot="row">
+    <div data-slot="card">
+      <div data-slot="stack">
+        <span>Password</span>
+        <span data-slot="hint">Last changed 3 months ago</span>
+      </div>
       <Dialog>
-        <DialogTrigger>
-          Change password
-        </DialogTrigger>
+        <DialogTrigger>Change Password</DialogTrigger>
         <DialogBackdrop />
         <DialogContent>
           <div data-slot="stack">
             <DialogTitle>Change password</DialogTitle>
             <DialogDescription>Use at least 12 characters.</DialogDescription>
           </div>
-          <label data-slot="label">
-            New password
-            <input type="password" />
-          </label>
+          <Field>
+            <FieldLabel>New password</FieldLabel>
+            <FieldControl type="password" />
+          </Field>
           <div data-slot="row">
-            <DialogClose>
-              Cancel
-            </DialogClose>
-            <DialogClose data-variant="solid">
-              Update
-            </DialogClose>
+            <DialogClose>Cancel</DialogClose>
+            <DialogClose data-variant="solid">Update</DialogClose>
           </div>
         </DialogContent>
       </Dialog>
-      <DialogClose data-variant="solid">
-        Done
-      </DialogClose>
+    </div>
+    <div data-slot="row">
+      <DialogClose data-variant="solid">Done</DialogClose>
     </div>
   </DialogContent>
 </Dialog>

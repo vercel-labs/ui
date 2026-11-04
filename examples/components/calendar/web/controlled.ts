@@ -1,7 +1,8 @@
 import "@ui-sdk/web/calendar"
 import { ChevronLeft, ChevronRight, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div>
       <ui-calendar default-value="2026-10-16" default-month="2026-10">
@@ -27,22 +28,15 @@ export function mount(root: HTMLElement) {
           </ui-calendar-weeks>
         </ui-calendar-grid>
       </ui-calendar>
-      <output data-slot="output">2026-10-16, showing 2026-10</output>
     </div>
   `
   const calendar = root.querySelector("ui-calendar")!
-  const output = root.querySelector("output")!
-  let value = calendar.value
-  let month = calendar.month
-  const show = (reason: string) => {
-    output.textContent = `${String(value)}, showing ${month} (${reason})`
-  }
   calendar.addEventListener("valuechange", (event) => {
-    value = event.detail.value
-    show(event.detail.reason)
+    log(root, `Selected ${String(event.detail.value)} (${event.detail.reason})`)
   })
   calendar.addEventListener("monthchange", (event) => {
-    month = event.detail.value
-    show(event.detail.reason)
+    log(root, `Showing ${event.detail.value} (${event.detail.reason})`)
   })
 }
+
+export { mount }

@@ -27,7 +27,8 @@ function mount(root: HTMLElement) {
           <input placeholder="Type, then Enter" />
         </ui-autocomplete-input>
       </div>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
+        <ui-autocomplete-empty>No fruits found.</ui-autocomplete-empty>
         <ui-autocomplete-list>
           ${fruits.map((fruit) => `<ui-autocomplete-item value="${fruit}">${fruit}</ui-autocomplete-item>`).join("")}
         </ui-autocomplete-list>

@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
 import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const icon = (markup: string) => () => (
   <svg
@@ -59,7 +60,7 @@ const commands = [
 
 function Example() {
   const [open, setOpen] = createSignal(false)
-  const [ran, setRan] = createSignal("")
+  const log = useLog()
   return (
     <div data-slot="stack">
       <Dialog open={open()} onOpenChange={(next) => setOpen(next)}>
@@ -72,7 +73,7 @@ function Example() {
           <DialogTitle>Command palette</DialogTitle>
           <Command
             onAction={(value) => {
-              setRan(value)
+              log(`Ran ${value}`)
               setOpen(false)
             }}
           >
@@ -99,7 +100,6 @@ function Example() {
           </Command>
         </DialogContent>
       </Dialog>
-      <output data-slot="output">{ran() ? `Ran ${ran()}` : "Press ⌘K or Ctrl+K"}</output>
     </div>
   )
 }

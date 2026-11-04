@@ -2,36 +2,27 @@
 import { ChevronDownIcon } from "@lucide/vue"
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
 
-const details = [
-  { label: "Shipping address", value: "221B Baker Street, London" },
-  { label: "Items", value: "2 × Linen shirt" },
-  { label: "Delivery", value: "Standard, arrives March 7" },
-  { label: "Total", value: "$84.00" },
+const items = [
+  { name: "Linen shirt", price: "$48.00" },
+  { name: "Canvas tote", price: "$18.00" },
+  { name: "Wool socks", price: "$18.00" },
 ]
 </script>
 
 <template>
-  <Collapsible>
-    <div data-slot="row">
-      <div data-slot="stack">
-        <p>Order #4189</p>
-        <p data-slot="hint">Placed on March 3</p>
+  <Collapsible data-variant="card">
+    <CollapsibleTrigger>
+      <span data-slot="stack">
+        <span>Order #4189</span>
+        <span data-slot="hint">3 items, $84.00</span>
+      </span>
+      <ChevronDownIcon />
+    </CollapsibleTrigger>
+    <CollapsiblePanel>
+      <div v-for="item in items" :key="item.name" data-slot="row">
+        <span>{{ item.name }}</span>
+        <span>{{ item.price }}</span>
       </div>
-      <span data-slot="row"> Shipped </span>
-    </div>
-    <div>
-      <CollapsibleTrigger data-variant="secondary">
-        Order details
-        <ChevronDownIcon />
-      </CollapsibleTrigger>
-      <CollapsiblePanel>
-        <dl>
-          <div data-slot="row" v-for="detail in details" :key="detail.label">
-            <dt>{{ detail.label }}</dt>
-            <dd>{{ detail.value }}</dd>
-          </div>
-        </dl>
-      </CollapsiblePanel>
-    </div>
+    </CollapsiblePanel>
   </Collapsible>
 </template>

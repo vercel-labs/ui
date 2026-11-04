@@ -14,7 +14,7 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 import { ref } from "vue"
 
-const dates = ref<string[]>(["2026-10-06", "2026-10-13"])
+const dates = ref<string[]>(["2026-10-07", "2026-10-16", "2026-10-26"])
 
 function onValueChange(value: CalendarValue) {
   dates.value = value as string[]
@@ -42,6 +42,5 @@ function onValueChange(value: CalendarValue) {
         </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
-    <output data-slot="output">{{ dates.length }} selected</output>
   </div>
 </template>

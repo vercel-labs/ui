@@ -7,19 +7,18 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let result = $state("")
-
-  function onOpenChange(open: boolean, details: { reason: string; returnValue?: string }) {
-    if (!open)
-      result = details.returnValue ? `Saved as ${details.returnValue}` : `Closed with ${details.reason}`
-  }
+  const log = useLog()
 </script>
 
-<Dialog {onOpenChange}>
-  <DialogTrigger>
-    New article
-  </DialogTrigger>
+<Dialog
+  onOpenChange={(open, details) => {
+    if (!open) log(details.returnValue ? `Saved as ${details.returnValue}` : `Closed (${details.reason})`)
+  }}
+>
+  <DialogTrigger>New Article</DialogTrigger>
   <DialogBackdrop />
   <DialogContent>
     <div data-slot="stack">
@@ -27,19 +26,14 @@
       <DialogDescription>Save it as a draft or publish it now.</DialogDescription>
     </div>
     <form data-slot="stack" method="dialog">
-      <label data-slot="label">
-        Title
-        <input required value="Hello, world" />
-      </label>
+      <Field>
+        <FieldLabel>Title</FieldLabel>
+        <FieldControl required defaultValue="Shipping updates for spring" />
+      </Field>
       <div data-slot="row">
-        <button type="submit" value="draft">
-          Save draft
-        </button>
-        <button data-variant="solid" type="submit" value="published">
-          Publish
-        </button>
+        <button type="submit" value="draft">Save Draft</button>
+        <button data-variant="solid" type="submit" value="published">Publish</button>
       </div>
     </form>
   </DialogContent>
 </Dialog>
-<output data-slot="output">{result}</output>

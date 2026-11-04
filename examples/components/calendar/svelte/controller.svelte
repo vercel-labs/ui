@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { todayDate } from "@ui-sdk/core/date"
   import {
     Calendar,
     CalendarDay,
@@ -14,16 +15,17 @@
   import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
 
   const calendar = createCalendarController()
+
+  function select(date: string) {
+    calendar.setValue(date)
+    calendar.focus(date)
+  }
 </script>
 
 <div data-slot="stack">
-  <div data-slot="row">
-    <button type="button" onclick={() => calendar.focus("2026-12-25")}>
-      Go to Christmas
-    </button>
-    <button type="button" onclick={() => calendar.setValue(null)}>
-      Clear
-    </button>
+  <div data-slot="controls">
+    <button type="button" onclick={() => select("2026-12-25")}>Go to Christmas</button>
+    <button type="button" onclick={() => select(todayDate())}>Today</button>
   </div>
   <Calendar controller={calendar} defaultValue="2026-10-16" defaultMonth="2026-10">
     <div data-slot="row">

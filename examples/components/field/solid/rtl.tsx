@@ -1,7 +1,7 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack" dir="rtl">
       <Field>
@@ -39,3 +39,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

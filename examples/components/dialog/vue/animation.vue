@@ -8,17 +8,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const status = ref("Closed")
+const log = useLog()
 </script>
 
 <template>
-  <Dialog
-    @open-change="(open: boolean) => (status = open ? 'Opening' : 'Closing')"
-    @open-change-complete="(open: boolean) => (status = open ? 'Open' : 'Closed')"
-  >
-    <DialogTrigger>Slide in</DialogTrigger>
+  <Dialog @open-change-complete="(open: boolean) => log(open ? 'Finished opening' : 'Finished closing')">
+    <DialogTrigger>Slide In</DialogTrigger>
     <DialogBackdrop />
     <DialogContent keep-mounted>
       <div data-slot="stack">
@@ -30,5 +27,4 @@ const status = ref("Closed")
       </div>
     </DialogContent>
   </Dialog>
-  <output data-slot="output">{{ status }}</output>
 </template>

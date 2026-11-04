@@ -8,7 +8,8 @@ function mount(root: HTMLElement) {
       <ui-autocomplete-input>
         <input aria-label="Search" placeholder="Search…" />
       </ui-autocomplete-input>
-      <ui-autocomplete-content>
+      <ui-autocomplete-content hidden>
+        <ui-autocomplete-empty>No results.</ui-autocomplete-empty>
         <ui-autocomplete-list>
           <ui-autocomplete-group>
             <ui-autocomplete-group-label>Recent searches</ui-autocomplete-group-label>

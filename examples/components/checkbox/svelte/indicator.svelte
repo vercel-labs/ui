@@ -13,7 +13,7 @@
   {#each tasks as task (task.label)}
     <label data-slot="label">
       <Checkbox defaultChecked={task.done}>
-        <CheckboxIndicator keepMounted>
+        <CheckboxIndicator>
           <CheckIcon aria-hidden="true" />
         </CheckboxIndicator>
       </Checkbox>

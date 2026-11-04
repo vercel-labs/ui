@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { PauseIcon, PlayIcon } from "@lucide/vue"
+import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 import {
   Carousel,
   CarouselContent,
-  CarouselIndicator,
-  CarouselIndicatorGroup,
   CarouselItem,
+  CarouselNext,
   CarouselPlayToggle,
+  CarouselPrevious,
   CarouselViewport,
 } from "@ui-sdk/vue/carousel"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const photos = [
   { name: "Dunes" },
@@ -20,7 +20,7 @@ const photos = [
   { name: "Harbor" },
 ]
 
-const log = ref("")
+const log = useLog()
 </script>
 
 <template>
@@ -30,40 +30,26 @@ const log = ref("")
     :interval="4000"
     @playing-change="
       (playing: boolean, details: { reason: string }) =>
-        (log = `${playing ? 'Playing' : 'Stopped'} (${details.reason})`)
+        log(`${playing ? 'Playing' : 'Stopped'} (${details.reason})`)
     "
   >
-    <CarouselViewport>
-      <CarouselContent>
-        <CarouselItem v-for="photo in photos" :key="photo.name">
-          <div data-slot="tile">
-            {{ photo.name }}
-          </div>
-        </CarouselItem>
-      </CarouselContent>
-    </CarouselViewport>
-    <div data-slot="row">
-      <CarouselPlayToggle data-variant="secondary" v-slot="{ state }">
-        <template v-if="state.playing">
-          <PauseIcon />
-          <span data-slot="visually-hidden">Stop slide rotation</span>
-        </template>
-        <template v-else>
-          <PlayIcon />
-          <span data-slot="visually-hidden">Start slide rotation</span>
-        </template>
-      </CarouselPlayToggle>
-      <CarouselIndicatorGroup aria-label="Choose a photo">
-        <CarouselIndicator
-          v-for="(photo, index) in photos"
-          :key="photo.name"
-          :page="index + 1"
-          :aria-label="photo.name"
-        >
-          <span />
-        </CarouselIndicator>
-      </CarouselIndicatorGroup>
+    <div data-slot="controls">
+      <CarouselPlayToggle v-slot="{ state }">{{ state.playing ? "Pause" : "Play" }}</CarouselPlayToggle>
     </div>
-    <p data-slot="hint" aria-live="polite">{{ log }}</p>
+    <div data-slot="row">
+      <CarouselPrevious aria-label="Previous slide">
+        <ChevronLeftIcon />
+      </CarouselPrevious>
+      <CarouselViewport>
+        <CarouselContent>
+          <CarouselItem v-for="photo in photos" :key="photo.name">
+            <div data-slot="tile">{{ photo.name }}</div>
+          </CarouselItem>
+        </CarouselContent>
+      </CarouselViewport>
+      <CarouselNext aria-label="Next slide">
+        <ChevronRightIcon />
+      </CarouselNext>
+    </div>
   </Carousel>
 </template>

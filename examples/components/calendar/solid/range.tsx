@@ -12,7 +12,7 @@ import {
 
 function Example() {
   return (
-    <Calendar mode="range" months={2} defaultValue={["2026-10-12", "2026-10-16"]}>
+    <Calendar mode="range" months={2} monthFormat="short" defaultValue={["2026-10-12", "2026-10-16"]}>
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <svg
@@ -42,7 +42,7 @@ function Example() {
           </svg>
         </CalendarNext>
       </div>
-      <div data-slot="stack">
+      <div data-slot="row">
         <CalendarGrid offset={0}>
           <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>

@@ -2,6 +2,7 @@
   import {
     Autocomplete,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteInput,
     AutocompleteItem,
     AutocompleteLabel,
@@ -33,6 +34,7 @@
     <AutocompleteInput placeholder="Type “bl”" />
   </div>
   <AutocompleteContent>
+    <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
     <AutocompleteList>
       {#each fruits as fruit (fruit)}
         <AutocompleteItem value={fruit}>

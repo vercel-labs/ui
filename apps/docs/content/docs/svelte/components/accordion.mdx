@@ -36,9 +36,34 @@ Give every item a unique `value`. Put its trigger inside a heading, then add the
 
 `AccordionHeader` renders an `h3` by default. Use a heading level that fits the surrounding document. Tab moves between triggers; Enter or Space opens and closes their panels.
 
+## Usage
+
+Import the parts and put them together:
+
+```svelte
+<script lang="ts">
+  import {
+    Accordion,
+    AccordionHeader,
+    AccordionItem,
+    AccordionPanel,
+    AccordionTrigger,
+  } from "@ui-sdk/svelte/accordion"
+</script>
+
+<Accordion>
+  <AccordionItem value="shipping">
+    <AccordionHeader>
+      <AccordionTrigger>Shipping</AccordionTrigger>
+    </AccordionHeader>
+    <AccordionPanel>Orders arrive in five to seven days.</AccordionPanel>
+  </AccordionItem>
+</Accordion>
+```
+
 ## Build Your Own
 
-`@ui-sdk/svelte` comes with a ready-made Accordion. If you'd like to build your own, with your own names, start from the `accordion` primitive in `@ui-sdk/core`:
+`@ui-sdk/svelte/accordion` comes with a ready-made Accordion. If you'd like to build your own, with your own names, start from the `accordion` primitive in `@ui-sdk/core`:
 
 ```ts title="faq.ts"
 import { accordion } from "@ui-sdk/core/accordion"
@@ -113,11 +138,11 @@ The open trigger reports `aria-disabled="true"` because pressing it leaves its p
 
 Use `bind:value` to own the open items. [State and Events](../state-and-events) covers the shared pattern.
 
-An item can refuse a change: call `details.cancel()` in its `onOpenChange` callback. Item callbacks run before the accordion's `onValueChange`, including the item that would close when another opens. Canceling any one of them cancels the whole change. `onValueChange` also gets the [reason](#reasons) for the change, which the example shows below the accordion.
+An item can refuse a change: call `details.cancel()` in its `onOpenChange` callback. Item callbacks run before the accordion's `onValueChange`, including the item that would close when another opens. Canceling any one of them cancels the whole change. `onValueChange` also gets the [reason](#reasons) for the change.
 
 <ComponentExample
   name="accordion/controlled"
-  caption="Press Security to open it, then press it again. Cancel the confirmation and Security stays open; accept it and the section closes. The line below lists the open items and the reason for the last change."
+  caption="Press Security to open it, then press it again. Cancel the confirmation and Security stays open; accept it and the section closes."
 />
 
 ## Keep Mounted
@@ -147,6 +172,8 @@ A link to an element inside a closed panel can reveal it too. Give the target an
   caption="Press Jump to the refund timeline. The closed Refunds panel opens and the browser moves to the linked paragraph."
 />
 
+With `hiddenUntilFound`, Svelte's server render writes `hidden="until-found"`, so closed panels are findable from the start. For an initial URL hash, [open the item explicitly](#url-hash).
+
 ## Animation
 
 Each part has a `data-slot`, such as `accordion-panel`. The panel exposes its measured height as `--accordion-panel-height`. Animate that height to or from zero with `data-starting-style` and `data-ending-style`:
@@ -175,7 +202,7 @@ The panel stays mounted until its exit animation finishes. An item's `onOpenChan
 
 <ComponentExample
   name="accordion/animation"
-  caption="Open or close an item. The message below updates after the panel finishes its height animation."
+  caption="Open or close an item. Its panel animates its height."
 />
 
 ## Expand All
@@ -246,6 +273,17 @@ Call this from `onValueChange` after updating your state. If your app already ha
 
 Scroll after `onOpenChangeComplete`, when the panel has its full height. Scrolling in `onOpenChange` would measure it before it opens. The [Expand All example](#expand-all) shows the full setup and scrolls only when someone opens a single item.
 
+## Custom Rendering
+
+<span id="render-functions" />
+
+Use a `render` snippet to choose another heading level or element. [Parts and Composition](../parts-and-composition#choose-the-element) covers custom elements and part state. Accordion's states are listed under [State](#state).
+
+<ComponentExample
+  name="accordion/render"
+  caption="Each step is an h4 with its number and a Show or Hide hint that follows its open state. Open Import the parts to see it update."
+/>
+
 ## Styling
 
 Style the parts with the attributes below. This turns the chevron as its panel opens, mirrors it in right to left with `:dir(rtl)`, and dims disabled triggers:
@@ -303,17 +341,6 @@ Style the parts with the attributes below. This turns the chevron as its panel o
 ### AccordionPanel [#data-attributes-accordionpanel]
 
 <DataAttributes component="accordion" part="panel" />
-
-## Custom Rendering
-
-<span id="render-functions" />
-
-Use a `render` snippet to choose another heading level or element. [Parts and Composition](../parts-and-composition#choose-the-element) covers custom elements and part state. Accordion's states are listed under [State](#state).
-
-<ComponentExample
-  name="accordion/render"
-  caption="Each step is an h4 with its number and a Show or Hide hint that follows its open state. Open Import the parts to see it update."
-/>
 
 ## API Reference
 

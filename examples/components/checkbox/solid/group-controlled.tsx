@@ -1,35 +1,45 @@
 import { createCheckboxGroupController } from "@ui-sdk/core/checkbox"
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { createSignal, For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 type Day = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun"
 
 const days: { value: Day; label: string }[] = [
-  { value: "mon", label: "Mon" },
-  { value: "tue", label: "Tue" },
-  { value: "wed", label: "Wed" },
-  { value: "thu", label: "Thu" },
-  { value: "fri", label: "Fri" },
-  { value: "sat", label: "Sat" },
-  { value: "sun", label: "Sun" },
+  { value: "mon", label: "Monday" },
+  { value: "tue", label: "Tuesday" },
+  { value: "wed", label: "Wednesday" },
+  { value: "thu", label: "Thursday" },
+  { value: "fri", label: "Friday" },
+  { value: "sat", label: "Saturday" },
+  { value: "sun", label: "Sunday" },
 ]
 
 const weekdays: Day[] = ["mon", "tue", "wed", "thu", "fri"]
 
 function Example() {
+  const log = useLog()
   const schedule = createCheckboxGroupController<Day>()
   const [value, setValue] = createSignal<Day[]>(["mon", "tue"])
-  const [reason, setReason] = createSignal("")
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => schedule.setValue(weekdays)}>
+          Select Weekdays
+        </button>
+        <button type="button" onClick={() => schedule.setValue([])}>
+          Clear
+        </button>
+      </div>
       <h3 id="controlled-days">Working days</h3>
       <CheckboxGroup
         aria-labelledby="controlled-days"
         value={value()}
         onValueChange={(next, details) => {
           setValue(next)
-          setReason(details.reason)
+          const names = days.filter((day) => next.includes(day.value)).map((day) => day.label)
+          log(`${names.join(", ") || "No days"} (${details.reason})`)
         }}
         controller={schedule}
       >
@@ -56,19 +66,6 @@ function Example() {
           )}
         </For>
       </CheckboxGroup>
-      <div data-slot="row">
-        <button type="button" onClick={() => schedule.setValue(weekdays)}>
-          Select weekdays
-        </button>
-        <button type="button" onClick={() => schedule.setValue([])}>
-          Clear
-        </button>
-      </div>
-
-      <output data-slot="output">
-        Value: {JSON.stringify(value())}
-        {reason() && `, last change: ${reason()}`}
-      </output>
     </div>
   )
 }

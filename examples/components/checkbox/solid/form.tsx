@@ -1,48 +1,21 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
-import { createSignal } from "solid-js"
-
-const formId = "checkbox-signup"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <form
-        data-slot="stack"
-        id={formId}
-        onSubmit={(event) => {
-          event.preventDefault()
-          const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(entries.join(", ") || "nothing")
-        }}
-        onReset={() => setSubmitted("")}
-      >
-        <label data-slot="label">
-          <Checkbox name="terms" value="yes" required>
-            <CheckboxIndicator>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-            </CheckboxIndicator>
-          </Checkbox>
-          I agree to the terms
-        </label>
-        <div data-slot="row">
-          <button type="submit">Submit</button>
-          <button type="reset">Reset</button>
-        </div>
-      </form>
-      <label data-slot="label">
-        <Checkbox form={formId} name="newsletter" value="weekly" defaultChecked>
+    <form
+      data-slot="stack"
+      onSubmit={(event) => {
+        event.preventDefault()
+        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
+      }}
+    >
+      <Field>
+        <Checkbox name="terms" value="yes" required>
           <CheckboxIndicator>
             <svg
               viewBox="0 0 24 24"
@@ -57,10 +30,37 @@ function Example() {
             </svg>
           </CheckboxIndicator>
         </Checkbox>
-        Send me the weekly newsletter
-      </label>
-      <output data-slot="output">{submitted() && `Submitted: ${submitted()}`}</output>
-    </div>
+        <div data-slot="stack">
+          <FieldLabel>Accept terms and conditions</FieldLabel>
+          <FieldDescription>You agree to our Terms of Service and Privacy Policy.</FieldDescription>
+        </div>
+      </Field>
+      <Field>
+        <Checkbox name="newsletter" value="weekly" defaultChecked>
+          <CheckboxIndicator>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+          </CheckboxIndicator>
+        </Checkbox>
+        <div data-slot="stack">
+          <FieldLabel>Send me the weekly newsletter</FieldLabel>
+          <FieldDescription>Product news and tips, once a week. Unsubscribe anytime.</FieldDescription>
+        </div>
+      </Field>
+      <div data-slot="row">
+        <button type="submit">Create Account</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
   )
 }
 

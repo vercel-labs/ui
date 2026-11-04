@@ -25,7 +25,7 @@ function Example() {
         </CarouselContent>
       </CarouselViewport>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary" aria-label="Previous slide">
+        <CarouselPrevious aria-label="Previous slide">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -38,7 +38,7 @@ function Example() {
             <path d="m18 15-6-6-6 6" />
           </svg>
         </CarouselPrevious>
-        <CarouselNext data-variant="secondary" aria-label="Next slide">
+        <CarouselNext aria-label="Next slide">
           <svg
             viewBox="0 0 24 24"
             fill="none"

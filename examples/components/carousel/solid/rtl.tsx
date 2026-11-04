@@ -28,7 +28,7 @@ function Example() {
           </CarouselContent>
         </CarouselViewport>
         <div data-slot="row">
-          <CarouselPrevious data-variant="secondary" aria-label="الشريحة السابقة">
+          <CarouselPrevious aria-label="الشريحة السابقة">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -46,7 +46,7 @@ function Example() {
               {(slide) => <CarouselIndicator page={slide} aria-label={`الشريحة ${slide}`} />}
             </For>
           </CarouselIndicatorGroup>
-          <CarouselNext data-variant="secondary" aria-label="الشريحة التالية">
+          <CarouselNext aria-label="الشريحة التالية">
             <svg
               viewBox="0 0 24 24"
               fill="none"

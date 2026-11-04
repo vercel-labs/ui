@@ -1,17 +1,10 @@
-import { createSignal } from "solid-js"
 import { Button } from "@ui-sdk/solid/button"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
-  const [count, setCount] = createSignal(0)
+  const log = useLog()
 
-  return (
-    <div data-slot="stack">
-      <Button onClick={() => setCount((current) => current + 1)}>Button</Button>
-      <output data-slot="output">
-        Pressed {count()} {count() === 1 ? "time" : "times"}
-      </output>
-    </div>
-  )
+  return <Button onClick={() => log("Pressed")}>Button</Button>
 }
 
 export { Example }

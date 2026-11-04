@@ -18,9 +18,9 @@ function Example() {
   return (
     <DatePicker mode="range" today="2026-10-16">
       <div data-slot="row">
-        <DatePickerInput aria-label="Check in" />
+        <DatePickerInput aria-label="Check in" placeholder="Check in" />
         <span data-slot="hint">–</span>
-        <DatePickerInput end aria-label="Check out" />
+        <DatePickerInput end aria-label="Check out" placeholder="Check out" />
         <DatePickerTrigger data-variant="ghost">
           <svg
             viewBox="0 0 24 24"
@@ -74,13 +74,13 @@ function Example() {
         </CalendarGrid>
         <div data-slot="row">
           <DatePickerPreset data-variant="ghost" value={["2026-10-10", "2026-10-16"]}>
-            Last 7 days
+            Last 7 Days
           </DatePickerPreset>
           <DatePickerPreset data-variant="ghost" value={["2026-09-17", "2026-10-16"]}>
-            Last 30 days
+            Last 30 Days
           </DatePickerPreset>
           <DatePickerPreset data-variant="ghost" value={["2026-10-01", "2026-10-31"]}>
-            This month
+            This Month
           </DatePickerPreset>
         </div>
       </DatePickerContent>

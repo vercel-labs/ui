@@ -8,33 +8,32 @@ import {
   AlertDialogTitle,
   createConfirm,
 } from "@ui-sdk/vue/alert-dialog"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const confirm = createConfirm<{ name: string }>()
 const ProjectAlertDialogContent = AlertDialogContent<{ name: string }>
-const result = ref("")
+const log = useLog()
 
 async function review() {
-  result.value = ""
   const acme = confirm({ name: "Acme" })
   const globex = confirm({ name: "Globex" })
   const [first, second] = await Promise.all([acme, globex])
-  result.value = `Acme: ${first ? "confirmed" : "canceled"}. Globex: ${second ? "confirmed" : "canceled"}.`
+  log(`Acme: ${first ? "confirmed" : "canceled"}`)
+  log(`Globex: ${second ? "confirmed" : "canceled"}`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <button type="button" @click="review">Review two projects</button>
-    <output data-slot="output" aria-live="polite">{{ result }}</output>
+    <button type="button" @click="review">Review Two Projects</button>
     <AlertDialog :controller="confirm.controller">
       <AlertDialogBackdrop />
       <ProjectAlertDialogContent v-slot="{ state }">
         <div data-slot="stack">
           <AlertDialogTitle>Archive {{ state.payload?.name }}?</AlertDialogTitle>
-          <AlertDialogDescription
-            >Archived projects leave the active list. You can restore them later.</AlertDialogDescription
-          >
+          <AlertDialogDescription>
+            Archived projects leave the active list. You can restore them later.
+          </AlertDialogDescription>
         </div>
         <div data-slot="row">
           <AlertDialogClose>Cancel</AlertDialogClose>

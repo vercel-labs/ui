@@ -1,27 +1,32 @@
 import "@ui-sdk/web/dialog"
+import "@ui-sdk/web/field"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-dialog presentation="sheet">
-      <ui-dialog-trigger><button>Edit profile</button></ui-dialog-trigger>
-      <ui-dialog-content>
+      <ui-dialog-trigger>
+        <button>Edit Profile</button>
+      </ui-dialog-trigger>
+      <ui-dialog-content hidden>
         <div data-slot="stack">
           <ui-dialog-title>Edit profile</ui-dialog-title>
-          <ui-dialog-description>Make changes to your profile here. Click save when you're done.</ui-dialog-description>
+          <ui-dialog-description>Make changes to your profile here. Save when you're done.</ui-dialog-description>
         </div>
-        <div data-slot="stack">
-          <label data-slot="label">
-            Name
-            <input value="Hollis Grant" />
-          </label>
-          <label data-slot="label">
-            Username
-            <input value="@hollis" />
-          </label>
-        </div>
+        <ui-field>
+          <ui-field-label>Name</ui-field-label>
+          <input value="Hollis Grant" />
+        </ui-field>
+        <ui-field>
+          <ui-field-label>Username</ui-field-label>
+          <input value="@hollis" />
+        </ui-field>
         <div data-slot="row">
-          <ui-dialog-close><button>Cancel</button></ui-dialog-close>
-          <ui-dialog-close value="save"><button data-variant="solid">Save changes</button></ui-dialog-close>
+          <ui-dialog-close>
+            <button>Cancel</button>
+          </ui-dialog-close>
+          <ui-dialog-close value="save">
+            <button data-variant="solid">Save Changes</button>
+          </ui-dialog-close>
         </div>
       </ui-dialog-content>
     </ui-dialog>

@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
             (page) => `
               <ui-command-item value="${page}" label="${page}" as-child>
                 <a href="#${page.toLowerCase()}">
-                  ${page}
+                  <ui-command-item-text>${page}</ui-command-item-text>
                   ${createElement(CornerDownLeft, { "aria-hidden": "true" }).outerHTML}
                 </a>
               </ui-command-item>

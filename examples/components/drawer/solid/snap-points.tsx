@@ -27,7 +27,7 @@ const places = [
 function Example() {
   return (
     <Drawer snapPoints={[0.25, 0.5, 1]} defaultSnapPoint={0.5} expandOnScroll>
-      <DrawerTrigger>Find a place</DrawerTrigger>
+      <DrawerTrigger>Find a Place</DrawerTrigger>
       <DrawerBackdrop />
       <DrawerContent>
         <DrawerHandle aria-label="Resize" />
@@ -35,16 +35,18 @@ function Example() {
           <DrawerTitle>Places nearby</DrawerTitle>
           <DrawerDescription>Drag the drawer, or press the handle, to see more.</DrawerDescription>
         </div>
-        <ul data-slot="scroll">
-          <For each={places}>
-            {(place) => (
-              <li data-slot="stack">
-                <span>{place.name}</span>
-                <span data-slot="hint">{place.detail}</span>
-              </li>
-            )}
-          </For>
-        </ul>
+        <div data-slot="scroll">
+          <ul data-slot="list">
+            <For each={places}>
+              {(place) => (
+                <li>
+                  <div>{place.name}</div>
+                  <div data-slot="hint">{place.detail}</div>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
       </DrawerContent>
     </Drawer>
   )

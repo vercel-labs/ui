@@ -1,30 +1,39 @@
 import "@ui-sdk/web/dialog"
-import { createElement, File, Search } from "lucide"
-
-const pages = ["Introduction", "Installation", "Dialog", "Alert Dialog", "Menu"]
+import "@ui-sdk/web/field"
+import { createElement, Plus } from "lucide"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-dialog>
       <ui-dialog-trigger shortcut="mod+j">
         <button>
-          ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
-          Search docs
+          ${createElement(Plus, { "aria-hidden": "true" }).outerHTML}
+          New Contact
           <ui-dialog-shortcut></ui-dialog-shortcut>
         </button>
       </ui-dialog-trigger>
-      <ui-dialog-backdrop></ui-dialog-backdrop>
-      <ui-dialog-content>
-        <ui-dialog-title>Search docs</ui-dialog-title>
-        <input aria-label="Search" placeholder="Search…" />
+      <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+      <ui-dialog-content hidden>
         <div data-slot="stack">
-          ${pages
-            .map(
-              (page) =>
-                `<ui-dialog-close value="${page}"><button>${createElement(File, { "aria-hidden": "true" }).outerHTML}${page}</button></ui-dialog-close>`,
-            )
-            .join("")}
+          <ui-dialog-title>New contact</ui-dialog-title>
+          <ui-dialog-description>Add someone to your address book.</ui-dialog-description>
         </div>
+        <form data-slot="stack" method="dialog">
+          <ui-field>
+            <ui-field-label>Name</ui-field-label>
+            <input name="name" required placeholder="Kofi Mensah" />
+          </ui-field>
+          <ui-field>
+            <ui-field-label>Email</ui-field-label>
+            <input name="email" type="email" required placeholder="kofi@example.com" />
+          </ui-field>
+          <div data-slot="row">
+            <ui-dialog-close>
+              <button type="button">Cancel</button>
+            </ui-dialog-close>
+            <button data-variant="solid" type="submit" value="save">Save Contact</button>
+          </div>
+        </form>
       </ui-dialog-content>
     </ui-dialog>
   `

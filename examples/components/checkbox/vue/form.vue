@@ -1,42 +1,46 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
-import { ref } from "vue"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
+import { useLog } from "../../../shared/vue/log"
 
-const formId = "checkbox-signup"
-const submitted = ref("")
+const log = useLog()
 
 function onSubmit(event: Event) {
-  const data = new FormData(event.currentTarget as HTMLFormElement)
-  const entries = [...data].map(([name, value]) => `${name}=${value}`)
-  submitted.value = entries.join(", ") || "nothing"
+  const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
+    ([name, value]) => `${name}=${value}`,
+  )
+  log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
 }
 </script>
 
 <template>
-  <div data-slot="stack">
-    <form data-slot="stack" :id="formId" @submit.prevent="onSubmit" @reset="submitted = ''">
-      <label data-slot="label">
-        <Checkbox name="terms" value="yes" required>
-          <CheckboxIndicator>
-            <CheckIcon aria-hidden="true" />
-          </CheckboxIndicator>
-        </Checkbox>
-        I agree to the terms
-      </label>
-      <div data-slot="row">
-        <button type="submit">Submit</button>
-        <button type="reset">Reset</button>
-      </div>
-    </form>
-    <label data-slot="label">
-      <Checkbox :form="formId" name="newsletter" value="weekly" default-checked>
+  <form data-slot="stack" @submit.prevent="onSubmit">
+    <Field>
+      <Checkbox name="terms" value="yes" required>
         <CheckboxIndicator>
           <CheckIcon aria-hidden="true" />
         </CheckboxIndicator>
       </Checkbox>
-      Send me the weekly newsletter
-    </label>
-    <output data-slot="output">{{ submitted && `Submitted: ${submitted}` }}</output>
-  </div>
+      <div data-slot="stack">
+        <FieldLabel>Accept terms and conditions</FieldLabel>
+        <FieldDescription>You agree to our Terms of Service and Privacy Policy.</FieldDescription>
+      </div>
+    </Field>
+    <Field>
+      <Checkbox name="newsletter" value="weekly" default-checked>
+        <CheckboxIndicator>
+          <CheckIcon aria-hidden="true" />
+        </CheckboxIndicator>
+      </Checkbox>
+      <div data-slot="stack">
+        <FieldLabel>Send me the weekly newsletter</FieldLabel>
+        <FieldDescription>Product news and tips, once a week. Unsubscribe anytime.</FieldDescription>
+      </div>
+    </Field>
+    <div data-slot="row">
+      <button type="submit">Create Account</button>
+      <button type="reset">Reset</button>
+    </div>
+  </form>
 </template>

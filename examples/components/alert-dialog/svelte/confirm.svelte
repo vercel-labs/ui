@@ -25,11 +25,21 @@
 </script>
 
 <div data-slot="stack">
-  <ul aria-label="Projects">
+  <div data-slot="controls">
+    <button type="button" bind:this={reset} onclick={() => (projects = ["Acme", "Globex", "Initech"])}>
+      Reset Projects
+    </button>
+  </div>
+  <ul data-slot="list" aria-label="Projects">
     {#each projects as name (name)}
       <li data-slot="row">
         {name}
-        <button type="button" onclick={(event) => remove(name, event.currentTarget)}>
+        <button
+          type="button"
+          data-size="sm"
+          aria-label={`Delete ${name}`}
+          onclick={(event) => remove(name, event.currentTarget)}
+        >
           Delete
         </button>
       </li>
@@ -37,9 +47,6 @@
       <li data-slot="row">All projects deleted.</li>
     {/each}
   </ul>
-  <button type="button" bind:this={reset} onclick={() => (projects = ["Acme", "Globex", "Initech"])}>
-    Reset projects
-  </button>
   <AlertDialog controller={confirm.controller}>
     <AlertDialogBackdrop />
     <AlertDialogContent>
@@ -47,16 +54,12 @@
         <div data-slot="stack">
           <AlertDialogTitle>Delete {state.payload?.name}?</AlertDialogTitle>
           <AlertDialogDescription>
-            The project and its files will be deleted for everyone.
+            The project and its files will be deleted for everyone on your team.
           </AlertDialogDescription>
         </div>
         <div data-slot="row">
-          <AlertDialogClose>
-            Cancel
-          </AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">
-            Delete
-          </AlertDialogClose>
+          <AlertDialogClose>Cancel</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm">Delete</AlertDialogClose>
         </div>
       {/snippet}
     </AlertDialogContent>

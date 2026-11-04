@@ -15,22 +15,29 @@ import {
 } from "@ui-sdk/vue/calendar"
 import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const value = ref<CalendarValue>("2026-10-16")
 const month = ref("2026-10")
-const reason = ref("")
+const log = useLog()
 
-function onChange(
-  _next: unknown,
-  details: { reason: CalendarValueChangeReason | CalendarMonthChangeReason },
-) {
-  reason.value = details.reason
+function onValueChange(next: CalendarValue, details: { reason: CalendarValueChangeReason }) {
+  log(`Selected ${String(next)} (${details.reason})`)
+}
+
+function onMonthChange(next: string, details: { reason: CalendarMonthChangeReason }) {
+  log(`Showing ${next} (${details.reason})`)
 }
 </script>
 
 <template>
   <div>
-    <Calendar v-model:value="value" v-model:month="month" @value-change="onChange" @month-change="onChange">
+    <Calendar
+      v-model:value="value"
+      v-model:month="month"
+      @value-change="onValueChange"
+      @month-change="onMonthChange"
+    >
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <ChevronLeftIcon />
@@ -49,8 +56,5 @@ function onChange(
         </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
-    <output data-slot="output">
-      {{ String(value) }}, showing {{ month }} {{ reason && `(${reason})` }}
-    </output>
   </div>
 </template>

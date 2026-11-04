@@ -3,9 +3,11 @@ title: Collapsible
 description: Show and hide a panel, preserve its contents, and animate its height.
 ---
 
+Use a collapsible to show and hide one panel of content. For a set of panels, use an [accordion](./accordion).
+
 <ComponentExample
   name="collapsible/basic"
-  caption="Press Order details, or focus it and press Enter or Space, to show or hide the order."
+  caption="Press Order #4189, or focus it and press Enter or Space, to show the items."
 />
 
 ## Installation
@@ -14,11 +16,21 @@ description: Show and hide a panel, preserve its contents, and animate its heigh
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
+## Composition
+
+Use the following composition to build a `Collapsible`:
+
+```text
+Collapsible
+├── CollapsibleTrigger
+└── CollapsiblePanel
+```
+
+The root and panel render divs, and the trigger renders a native button. Put other content around them, like a heading or a summary that always shows.
+
 ## Usage
 
-Put a trigger and a panel inside `Collapsible`. The trigger reports whether the panel is open with `aria-expanded` and points to the panel with `aria-controls` while it is mounted.
-
-<span id="composition" />
+Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
@@ -31,75 +43,125 @@ Put a trigger and a panel inside `Collapsible`. The trigger reports whether the 
 </Collapsible>
 ```
 
-The root and panel render divs, and the trigger renders a native button. You can put other content around them.
+## Build Your Own
 
-## Examples
+`@ui-sdk/svelte/collapsible` comes with a ready-made Collapsible. If you'd like to build your own, with your own names, start from the `collapsible` primitive in `@ui-sdk/core`:
 
-### Disabled
+```ts title="spoiler.ts"
+import { collapsible } from "@ui-sdk/core/collapsible"
+import { createParts } from "@ui-sdk/svelte/primitive"
+
+const {
+  Root: Spoiler,
+  Trigger: SpoilerToggle,
+  Panel: SpoilerContent,
+} = createParts(collapsible, {
+  root: "div",
+  trigger: "button",
+  panel: "div",
+})
+
+export { Spoiler, SpoilerContent, SpoilerToggle }
+```
+
+```svelte
+<Spoiler>
+  <SpoilerToggle>Show the ending</SpoilerToggle>
+  <SpoilerContent>The butler did it.</SpoilerContent>
+</Spoiler>
+```
+
+Each part keeps the behavior, state and data attributes of its ready-made counterpart. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Disabled
 
 Set `disabled` on the root to stop its trigger from opening or closing the panel. The trigger stays in the tab order and reports `aria-disabled="true"`. A disabled `<fieldset>` around the collapsible disables it too.
 
-## Behavior and Options
+```svelte
+<Collapsible disabled>
+  <CollapsibleTrigger>Gift options</CollapsibleTrigger>
+  <CollapsiblePanel>Add a gift message and wrapping.</CollapsiblePanel>
+</Collapsible>
+```
 
-### Opening and Closing
+## Keep Mounted
 
-Enter, Space or a click toggles the panel. Focus stays on the trigger. When you close a panel while focus is inside it, focus returns to the trigger.
-
-By default, a closed panel unmounts, so Tab skips its contents.
-
-### Find in Page
-
-Set `hiddenUntilFound` on the panel to keep it in the DOM as `hidden="until-found"`. Browser Find and links to content inside the panel can reveal it. The panel opens without an animation so the match is visible immediately.
-
-Svelte renders `hidden="until-found"` on the server, so the panel can be found before hydration.
-
-<ComponentExample
-  name="collapsible/find-in-page"
-  caption="Leave Ingredients closed. Open your browser's Find command and search for cardamom to reveal the panel."
-/>
-
-### Keep Mounted
-
-Panels unmount when they close. Set `keepMounted` on the panel to keep it mounted and hidden, so a field keeps what you typed into it.
+Panels unmount when they close, so Tab skips their contents. Set `keepMounted` on the panel to keep it mounted and hidden, so a field keeps what you typed into it.
 
 <ComponentExample
   name="collapsible/keep-mounted"
   caption="Open Add a delivery note, type a note, then close and reopen the panel. Your note is still there."
 />
 
-### Animation
+## Find in Page
 
-Animate the measured `--collapsible-panel-height` between zero and the content's height. `data-starting-style` marks the opening frame; `data-ending-style` stays present during the closing animation.
+Set `hiddenUntilFound` on the panel to keep it in the DOM as `hidden="until-found"`. Browser Find and links to content inside the panel can reveal it. The panel opens without an animation so the match is visible immediately.
 
-```svelte
-<CollapsiblePanel class="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 data-starting-style:h-0 data-ending-style:h-0 motion-reduce:transition-none" />
+Svelte renders `hidden="until-found"` on the server, so the closed panel is findable before hydration.
+
+<ComponentExample
+  name="collapsible/find-in-page"
+  caption="Leave Ingredients closed. Open your browser's Find command and search for cardamom to reveal the panel."
+/>
+
+## Controlled
+
+Bind `open` with `bind:open`. `onOpenChange` also gets the change details: call `details.cancel()` in it to cancel the change.
+
+For a button elsewhere on the page, create a [controller](#controller) with `createCollapsibleController()` and pass it as `controller`. Create one controller per mounted collapsible.
+
+<ComponentExample
+  name="collapsible/controlled"
+  caption="Open Recovery codes with Toggle or its trigger, then press Done. The console logs each change and its reason, and Done returns focus to the trigger."
+/>
+
+## Animation
+
+Animate the measured `--collapsible-panel-height` between zero and the content's height. `data-starting-style` marks the opening frame, and `data-ending-style` stays on while it closes. The panel stays mounted until its closing animation finishes, and a panel open on its first paint doesn't animate.
+
+<StyleTabs>
+
+```css
+[data-slot="collapsible-panel"] {
+  height: var(--collapsible-panel-height);
+  overflow: hidden;
+  transition: height 0.2s ease-out;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    height: 0;
+  }
+}
 ```
 
-The panel stays mounted until its closing animation finishes. A panel open on its first paint does not animate. Keyframe animations can use `data-open` and `data-closed` too; respect reduced motion in either case.
+```svelte
+<CollapsiblePanel
+  class="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-starting-style:h-0 data-ending-style:h-0"
+/>
+```
+
+</StyleTabs>
 
 `onOpenChangeComplete` reports when opening or closing has finished.
 
 <ComponentExample
   name="collapsible/animation"
-  caption="Open and close Release notes. The status updates after the height and opacity transitions finish."
+  caption="Open and close Release notes. The console logs when each animation finishes."
 />
 
-### Controlled
+## Custom Rendering
 
-Use `bind:open` to keep the open state in your component. `onOpenChange` also receives the change details. Call `details.cancel()` in the callback to cancel the change.
-
-For a button elsewhere on the page, create a [controller](#controller) with `createCollapsibleController` from `@ui-sdk/svelte/collapsible` and pass it as `controller`. Create one controller per mounted collapsible.
+Use a part's `render` snippet to choose its element, and read its state from that snippet or from `children`. The trigger below renders inside a heading, and the panel renders as an ordered list.
 
 <ComponentExample
-  name="collapsible/controlled"
-  caption="Open Recovery codes with either button, then choose Done. The status shows the change reason, and Done returns focus to the trigger."
+  name="collapsible/render"
+  caption="Press Track parcel to open the ordered list. The summary changes from Arrives Thursday to 3 updates."
 />
-
-See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
 
 ## Styling
 
-Use the parts' data attributes to style open and disabled states. The examples rotate their chevron from the trigger's `data-open` attribute.
+Use `data-open`, `data-closed` and `data-disabled` to style each state. The examples turn their chevron from the trigger's `data-open`.
+
+Each part has a `data-slot`, such as `collapsible-panel`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### CollapsiblePanel [#styling-collapsiblepanel]
 
@@ -119,15 +181,6 @@ Use the parts' data attributes to style open and disabled states. The examples r
 
 <DataAttributes component="collapsible" part="panel" />
 
-## Custom Rendering
-
-Use a part's `render` snippet to choose its element and read its state. Spread `props` onto the element that handles the behavior. Below, the trigger is a button inside a heading and the panel is an ordered list. See [Parts and Composition](../parts-and-composition).
-
-<ComponentExample
-  name="collapsible/render"
-  caption="Press Track parcel to open the ordered list. The summary changes from Arrives Thursday to 3 updates."
-/>
-
 ## API Reference
 
 Props and callbacks are the same as below, as Svelte props. `open` can be bound with `bind:open`.
@@ -146,6 +199,7 @@ The trigger takes no options of its own, only the props of the element it render
   path="../../packages/core/src/components/collapsible/collapsible.ts"
   name="CollapsiblePanelProps"
 />
+
 ### State
 
 What `render` and `children` snippets receive. The trigger and the panel receive the same state as the
@@ -185,7 +239,18 @@ Callbacks get the new state first, then the details. A bound `open` only updates
 
 ## Accessibility
 
-The collapsible follows the [WAI-ARIA disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/). Every line below is an automated test.
+The collapsible follows the [WAI-ARIA disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/). The trigger says whether the panel is open with `aria-expanded`, and points to the panel with `aria-controls` while it's mounted. Every line below is an automated test.
+
+### Keyboard
+
+| Key          | Does                                                   |
+| ------------ | ------------------------------------------------------ |
+| Enter, Space | Opens or closes the panel. Focus stays on the trigger. |
+| Tab          | Moves from the trigger into an open panel              |
+
+Closing a panel while focus is inside it moves focus back to the trigger.
+
+### Tested Behavior
 
 <SpecList spec="collapsible" only={["opening and closing", "keyboard", "mounting"]} />
 

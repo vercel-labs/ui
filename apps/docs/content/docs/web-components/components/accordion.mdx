@@ -46,9 +46,30 @@ Give every item a unique `value`. Put its trigger inside a heading, then add the
 
 The header wraps your heading and the trigger wraps your button. Use a heading level that fits the surrounding document. Tab moves between triggers; Enter or Space opens and closes their panels.
 
+## Usage
+
+Import the parts and put them together:
+
+```html
+<script type="module">
+  import "@ui-sdk/web/accordion"
+</script>
+
+<ui-accordion>
+  <ui-accordion-item value="shipping">
+    <ui-accordion-header>
+      <h3>
+        <ui-accordion-trigger><button>Shipping</button></ui-accordion-trigger>
+      </h3>
+    </ui-accordion-header>
+    <ui-accordion-panel hidden>Orders arrive in five to seven days.</ui-accordion-panel>
+  </ui-accordion-item>
+</ui-accordion>
+```
+
 ## Build Your Own
 
-`@ui-sdk/web` comes with a ready-made `ui-accordion` elements. If you'd like to build your own, with your own names, start from the `accordion` primitive in `@ui-sdk/core`:
+`@ui-sdk/web/accordion` comes with ready-made `ui-accordion` elements. If you'd like to build your own, with your own names, start from the `accordion` primitive in `@ui-sdk/core`:
 
 ```ts title="faq-elements.ts"
 import { accordion } from "@ui-sdk/core/accordion"
@@ -117,11 +138,11 @@ The open trigger reports `aria-disabled="true"` because pressing it leaves its p
 
 Read or set the element’s `value` property to choose the open items. Setting it commits the change without firing `valuechange` or `openchange`, like a native input’s `value`; `api.setValue()` fires them like a press. Listen to `valuechange` to follow the changes people make. [State and Events](../state-and-events) covers the shared pattern.
 
-An item can refuse a change: call `event.preventDefault()` in its `openchange` listener. Item `openchange` events fire before the accordion's `valuechange`, including the item that would close when another opens. Canceling any one of them cancels the whole change. `valuechange` also carries the [reason](#reasons) for the change, which the example shows below the accordion.
+An item can refuse a change: call `event.preventDefault()` in its `openchange` listener. Item `openchange` events fire before the accordion's `valuechange`, including the item that would close when another opens. Canceling any one of them cancels the whole change. `valuechange` also carries the [reason](#reasons) for the change.
 
 <ComponentExample
   name="accordion/controlled"
-  caption="Press Security to open it, then press it again. Cancel the confirmation and Security stays open; accept it and the section closes. The line below lists the open items and the reason for the last change."
+  caption="Press Security to open it, then press it again. Cancel the confirmation and Security stays open; accept it and the section closes."
 />
 
 ## Keep Mounted
@@ -150,6 +171,8 @@ A link to an element inside a closed panel can reveal it too. Give the target an
   name="accordion/deep-link"
   caption="Press Jump to the refund timeline. The closed Refunds panel opens and the browser moves to the linked paragraph."
 />
+
+With `hidden-until-found`, write `hidden="until-found"` on each closed `ui-accordion-panel` so it is findable before the elements upgrade. For an initial URL hash, [open the item explicitly](#url-hash).
 
 ## Animation
 
@@ -181,7 +204,7 @@ The panel stays mounted until its exit animation finishes. An item's `openchange
 
 <ComponentExample
   name="accordion/animation"
-  caption="Open or close an item. The message below updates after the panel finishes its height animation."
+  caption="Open or close an item. Its panel animates its height."
 />
 
 ## Expand All
@@ -252,6 +275,17 @@ Call this with `event.detail.value` from a `valuechange` listener. If your app a
 
 Scroll after `openchangecomplete`, when the panel has its full height. Scrolling in `openchange` would measure it before it opens. The [Expand All example](#expand-all) shows the full setup and scrolls only when someone opens a single item.
 
+## Custom Rendering
+
+<span id="render-functions" />
+
+Write the heading level you need inside `ui-accordion-header`. Other parts can bind your element with `as-child`. [Parts and Composition](../parts-and-composition#choose-the-element) covers custom elements and part state. Accordion's states are listed under [State](#state).
+
+<ComponentExample
+  name="accordion/render"
+  caption="Each step is an h4 with its number and a Show or Hide hint that follows its open state. Open Import the parts to see it update."
+/>
+
 ## Styling
 
 Style the parts with the attributes below. This turns the chevron as its panel opens, mirrors it in right to left with `:dir(rtl)`, and dims disabled triggers:
@@ -313,17 +347,6 @@ Style the parts with the attributes below. This turns the chevron as its panel o
 ### `<ui-accordion-panel>` [#data-attributes-accordionpanel]
 
 <DataAttributes component="accordion" part="panel" />
-
-## Custom Rendering
-
-<span id="render-functions" />
-
-Write the heading level you need inside `ui-accordion-header`. Other parts can bind your element with `as-child`. [Parts and Composition](../parts-and-composition#choose-the-element) covers custom elements and part state. Accordion's states are listed under [State](#state).
-
-<ComponentExample
-  name="accordion/render"
-  caption="Each step is an h4 with its number and a Show or Hide hint that follows its open state. Open Import the parts to see it update."
-/>
 
 ## API Reference
 

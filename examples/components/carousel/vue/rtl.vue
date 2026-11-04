@@ -27,7 +27,7 @@ const slides = [1, 2, 3, 4, 5]
         </CarouselContent>
       </CarouselViewport>
       <div data-slot="row">
-        <CarouselPrevious data-variant="secondary" aria-label="الشريحة السابقة">
+        <CarouselPrevious aria-label="الشريحة السابقة">
           <ChevronLeftIcon />
         </CarouselPrevious>
         <CarouselIndicatorGroup aria-label="اختر شريحة">
@@ -38,7 +38,7 @@ const slides = [1, 2, 3, 4, 5]
             :aria-label="`الشريحة ${slide}`"
           />
         </CarouselIndicatorGroup>
-        <CarouselNext data-variant="secondary" aria-label="الشريحة التالية">
+        <CarouselNext aria-label="الشريحة التالية">
           <ChevronRightIcon />
         </CarouselNext>
       </div>

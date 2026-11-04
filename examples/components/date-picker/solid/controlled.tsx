@@ -13,23 +13,24 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/solid/date-picker"
+import { useLog } from "../../../shared/solid/log"
 import { createSignal } from "solid-js"
 import type { DatePickerValue } from "@ui-sdk/solid/date-picker"
 
-export function Example() {
+function Example() {
   const [value, setValue] = createSignal<DatePickerValue>("2026-10-16")
-  const [reason, setReason] = createSignal("initial")
+  const log = useLog()
   return (
     <DatePicker
       value={value()}
       onValueChange={(next, details) => {
         setValue(next)
-        setReason(details.reason)
+        log(`${next ?? "No date"} (${details.reason})`)
       }}
     >
       <div data-slot="row">
         <DatePickerInput aria-label="Due date" />
-        <DatePickerTrigger>
+        <DatePickerTrigger data-variant="ghost">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -82,9 +83,8 @@ export function Example() {
           <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
         </CalendarGrid>
       </DatePickerContent>
-      <p data-slot="hint">
-        {value() ?? "No date"} ({reason()})
-      </p>
     </DatePicker>
   )
 }
+
+export { Example }

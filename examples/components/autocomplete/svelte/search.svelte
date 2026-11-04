@@ -2,20 +2,23 @@
   import {
     Autocomplete,
     AutocompleteContent,
+    AutocompleteEmpty,
     AutocompleteInput,
     AutocompleteItem,
     AutocompleteList,
   } from "@ui-sdk/svelte/autocomplete"
+  import { useLog } from "../../../shared/svelte/log"
 
   const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
 
-  let searched = $state("")
+  const log = useLog()
 </script>
 
 <form role="search" data-slot="stack" onsubmit={(event) => event.preventDefault()}>
-  <Autocomplete submitOnSelect name="q" onSubmit={(value) => (searched = value)}>
+  <Autocomplete submitOnSelect name="q" onSubmit={(value) => log(`Searched “${value}”`)}>
     <AutocompleteInput type="search" aria-label="Search" placeholder="Search…" />
     <AutocompleteContent>
+      <AutocompleteEmpty>No results.</AutocompleteEmpty>
       <AutocompleteList>
         {#each recent as search (search)}
           <AutocompleteItem value={search}>
@@ -25,5 +28,4 @@
       </AutocompleteList>
     </AutocompleteContent>
   </Autocomplete>
-  <output data-slot="output">{searched ? `Searched “${searched}”` : "Press Enter to search"}</output>
 </form>

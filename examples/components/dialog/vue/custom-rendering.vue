@@ -16,7 +16,7 @@ import {
     <DialogTrigger shortcut="mod+i">
       <template #render="{ props, state }">
         <button v-bind="props">
-          {{ state.open ? "Viewing" : "View details" }}
+          {{ state.open ? "Viewing" : "View Details" }}
           <DialogShortcut v-slot="{ state: shortcut }">{{ shortcut.text }}</DialogShortcut>
         </button>
       </template>
@@ -30,14 +30,14 @@ import {
           </template>
         </DialogTitle>
         <DialogDescription>
-          {{ state.nested ? "Opened from another dialog." : "Opened from the page." }} {{ state.stack }} open
-          above it.{{ state.nestedOpen ? " A child is open." : "" }}
+          {{ state.nested ? "Opened from another dialog." : "Quarterly report, updated today." }}
         </DialogDescription>
       </div>
       <div data-slot="row">
+        <DialogClose>Close</DialogClose>
         <DialogClose data-variant="solid" href="https://example.com/details">
           <template #render="{ props }">
-            <a v-bind="props">Open the full page</a>
+            <a v-bind="props">Open the Full Page</a>
           </template>
         </DialogClose>
       </div>

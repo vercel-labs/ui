@@ -30,7 +30,7 @@ function mount(root: HTMLElement) {
           </ui-combobox-trigger>
         </div>
       </div>
-      <ui-combobox-content>
+      <ui-combobox-content hidden>
         <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
         <ui-combobox-list>
           ${frameworks

@@ -34,6 +34,33 @@ Every [Calendar part](./calendar#composition) also works inside `DatePickerConte
 
 An empty `DatePicker` renders the input, trigger, and calendar too. In range mode, it renders an input for each end.
 
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import {
+  DatePicker,
+  DatePickerContent,
+  DatePickerHint,
+  DatePickerInput,
+  DatePickerTrigger,
+} from "@ui-sdk/solid/date-picker"
+
+function Example() {
+  return (
+    <DatePicker defaultValue="2026-10-16">
+      <DatePickerInput aria-label="Due date" />
+      <DatePickerTrigger>Choose date</DatePickerTrigger>
+      <DatePickerHint />
+      <DatePickerContent />
+    </DatePicker>
+  )
+}
+
+export { Example }
+```
+
 ## Values
 
 Dates are strings such as `"2026-10-16"`, with no time or time zone attached. No date library is needed.
@@ -54,82 +81,53 @@ The field formats a valid date after it is committed, leaving your typing alone 
   caption="Type not a date and press Enter to mark the field invalid. Replace it with 10/18/2026 to clear the invalid state."
 />
 
-## Examples
-
-### Range
+## Range
 
 `mode="range"` uses one input for the start and another with `end` for the end. The calendar stays open after the start is picked and closes once both dates are chosen. A typed end before the start is invalid.
 
 The range is `null` until both ends are valid. Clearing either input clears the complete value while leaving the other input’s date visible.
+
+For two months side by side, set `months={2}` and add a second `CalendarGrid` with `offset={1}`. `pageBy="page"` moves both months together.
 
 <ComponentExample
   name="date-picker/range"
   caption="Choose October 20, then October 23. The calendar stays open after the first date and closes after the second."
 />
 
-A booking can combine two months, range limits, unavailable dates, and form submission. Here, `pageBy="page"` moves both months together, and `allowUnavailable` allows a stay to cross a booked date. The `form` option connects the picker to a form elsewhere on the page.
-
-
-### Presets
+## Presets
 
 `DatePickerPreset` chooses its `value` and closes the popup. It exposes `aria-pressed` and `data-selected` when that value matches the selection. Your application calculates relative dates, such as the last seven days.
 
 <ComponentExample
   name="date-picker/presets"
-  caption="Open the calendar and choose Last 7 days. Reopen it to see the selected preset."
+  caption="Open the calendar and choose Last 7 Days. Reopen it to see the selected preset."
 />
 
-### Min, Max and Unavailable Dates
+## Min, Max and Unavailable Dates
 
 `min`, `max`, and `unavailable` apply to both typing and calendar selection. A date outside those rules is invalid when typed. [Calendar](./calendar#unavailable-dates) explains the available matchers and how unavailable dates differ from the bounds.
 
-<ComponentExample
-  name="date-picker/min-max"
-  caption="Try typing 11/21/2026, then 10/16/2026. Dates outside the allowed bounds are invalid and cannot be picked."
-/>
-
-
 For ranges, `minDays` and `maxDays` count both endpoints. `allowUnavailable` permits unavailable dates between them, but never as an endpoint. See [Range Limits](./calendar#range-limits).
 
-### Language
+<ComponentExample
+  name="date-picker/min-max"
+  caption="Try typing 11/21/2026, past the last allowed date, then 10/17/2026, a Saturday. Both are invalid and can't be picked; 10/19/2026 is accepted."
+/>
+
+## Language
 
 `locale` sets the input’s format, hint, month names, and date labels. Without it, Date Picker follows the surrounding page’s `lang`, then the browser’s language. Date strings remain Gregorian ISO dates.
 
 The trigger, popup, and calendar navigation have English accessible labels by default. Pass `aria-label` to translate those controls too.
+
+Calendar’s `weekStartsOn`, `weekdayFormat`, `fixedWeeks`, `showOutsideDays`, and `timeZone` options apply here too. [Calendar](./calendar#language) shows these options without the popup.
 
 <ComponentExample
   name="date-picker/locale"
   caption="Enter 3.12.2026 and press Enter. The field, format hint, and calendar use German dates."
 />
 
-Calendar’s `weekStartsOn`, `weekdayFormat`, `fixedWeeks`, `showOutsideDays`, and `timeZone` options apply here too. [Calendar](./calendar#language) shows these options without the popup.
-
-### The Popup
-
-`DatePickerContent` opens below the input by default. Position it with `side`, `align`, and offsets, or provide a custom `anchor`. `container` changes where it renders; `keepMounted` retains it while closed, and `finalFocus` controls focus after it closes. [Popups](../popups) covers these shared options.
-
-`presentation="auto"` uses a sheet on small touch screens and a popover elsewhere. `presentation="sheet"` always uses a sheet. Style the two layouts using `data-presentation`, as this example does.
-
-<ComponentExample
-  name="date-picker/popup"
-  caption="Open the calendar to see it placed above the field when there is room. On a small touch screen, it opens as a sheet. The text below reports changes."
-/>
-
-### Staying Open
-
-Set `closeOnSelect` to `false` to keep the calendar open after choosing a date, completing a range, or pressing a preset.
-
-
-### Keep It Open Until Both Dates Are Picked
-
-Set `dismissible` to `false` while a choice is incomplete. Escape, an outside press, or the system back gesture then leave the popup open. `onDismissAttempt` reports intentional attempts, so you can explain what is missing. Focus leaving is refused quietly. The trigger and imperative controls can still close it.
-
-<ComponentExample
-  name="date-picker/dismissible"
-  caption="Choose a check-in date, then press outside the calendar. The message asks for a check-out date before the popup can be dismissed."
-/>
-
-### Clear
+## Clear
 
 `DatePickerClear` clears the value and focuses the input. It gets `data-empty` when there is nothing to clear. Emptying a single-date input clears its value too.
 
@@ -138,51 +136,79 @@ Set `dismissible` to `false` while a choice is incomplete. Escape, an outside pr
   caption="Press Clear to empty the value and focus the input. The Clear button disappears until there is a value again."
 />
 
-### Disabled and Read Only
+## Disabled and Read Only
 
 `disabled` prevents typing, opening, and selection. `readOnly` lets people open the calendar and inspect its dates without changing the value.
 
+```tsx
+<DatePicker disabled defaultValue="2026-10-16" />
+<DatePicker readOnly defaultValue="2026-10-16" />
+```
 
+## Staying Open
+
+Set `closeOnSelect` to `false` to keep the calendar open after choosing a date, completing a range, or pressing a preset.
+
+```tsx
+<DatePicker closeOnSelect={false} />
+```
+
+## Keep It Open Until Both Dates Are Picked
+
+Set `dismissible` to `false` while a choice is incomplete. Escape, an outside press, or the system back gesture then leave the popup open. `onDismissAttempt` reports intentional attempts, so you can explain what is missing. Focus leaving is refused quietly. The trigger and imperative controls can still close it.
+
+<ComponentExample
+  name="date-picker/dismissible"
+  caption="Choose a check-in date, then press outside the calendar. The message asks for a check-out date before the popup can be dismissed."
+/>
+
+## Popup and Presentation
+
+`DatePickerContent` opens below the input by default. Position it with `side`, `align`, and offsets, or provide a custom `anchor`. `container` changes where it renders; `keepMounted` retains it while closed, and `finalFocus` controls focus after it closes. [Popups](../popups) covers these shared options.
+
+`presentation="auto"` uses a sheet on small touch screens and a popover elsewhere. `presentation="sheet"` always uses a sheet. Style the two layouts using `data-presentation`.
+
+<ComponentExample
+  name="date-picker/popup"
+  caption="Open the calendar. On a small touch screen it opens as a sheet, and the console logs each open, close and month change."
+/>
 
 ## Forms
 
 `name` submits an ISO date. In range mode, use `startName` and `endName` for separate fields, or `name` to submit both ends under the same name. `required` blocks an empty submission, text that isn't a date blocks one too, a form reset restores `defaultValue`, and a disabled `fieldset` disables the picker. Server-rendered hidden inputs submit the initial value before hydration too.
 
+In a [Field](./field), the field connects the label, description, and errors to the input, and shows an error for an empty required date or text that isn't a date. Its `name` is used when the picker has none, and a disabled field disables the picker.
+
 <ComponentExample
   name="date-picker/form"
-  caption="Press Submit with an empty field, then enter a date and submit again. A valid date submits as an ISO string."
+  caption="Press Submit with an empty field to see the inline error, then choose a date and submit. The console logs the ISO date."
 />
 
-A [Field](./field) connects the label, description, and errors to the input, and shows an error for an empty required date or text that isn't a date. Its `name` is used when the picker has none, and a disabled field disables the picker.
-
-
-## Behavior and Options
-
-### Controlled
+## Controlled
 
 The selected value, displayed month, and open state are separate. `value` uses the shape for the chosen mode; `month` is the first displayed month, such as `"2026-10"`; `open` is a boolean.
 
 Use `value` with `onValueChange`, `month` with `onMonthChange`, and `open` with `onOpenChange` to control them. `defaultValue`, `defaultMonth`, and `defaultOpen` set initial state instead. Change details carry a reason; `details.cancel()` rejects the requested change. [State and Events](../state-and-events) covers the binding pattern, and the [reason tables](#reasons) list Date Picker’s reasons.
 
-### Driving It from Anywhere
+<ComponentExample
+  name="date-picker/controlled"
+  caption="Type or choose a date. The console logs each value and the reason for the change."
+/>
+
+## Driving It from Anywhere
 
 A `createDatePickerController()` instance can set the value, show a month, open or close the popup, and focus a date in the open calendar. [Controllers](../controllers) covers setup and lifecycle; the [controller reference](#controller) lists the methods.
 
-## Keyboard
-
-| Key             | Where   | Action                                                                        |
-| --------------- | ------- | ----------------------------------------------------------------------------- |
-| Enter           | Input   | Commit the typed date.                                                        |
-| Alt+Down Arrow  | Input   | Open the calendar.                                                            |
-| Enter / Space   | Trigger | Open or close the calendar.                                                   |
-| Escape          | Popup   | Cancel an unfinished range first; otherwise close the popup.                  |
-| Tab / Shift+Tab | Popup   | Move through controls. Leaving the popup closes it when dismissal is allowed. |
-
-Opening focuses the selected date, otherwise today, otherwise the first focusable date. The calendar’s [arrow keys and month navigation](./calendar#keyboard) work here too. An ancestor’s `dir="rtl"` reverses Left and Right Arrow to follow the visual order.
+<ComponentExample
+  name="date-picker/controller"
+  caption="Press Choose Christmas to set the date from outside, or Open to open the calendar."
+/>
 
 ## Styling
 
 The root, inputs, and trigger expose `data-disabled`. Invalid input sets `data-invalid` on that input and the root. The root and trigger expose `data-open`; presets expose `data-selected`, and Clear exposes `data-empty`. Calendar days carry [Calendar’s state attributes](./calendar#styling).
+
+Each part has a `data-slot`, such as `date-picker-input`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### DatePickerContent [#styling-datepickercontent]
 
@@ -229,6 +255,18 @@ Props and callbacks are the same as below, as Solid props.
 ### DatePickerInput
 
 <TypeTable path="../../packages/core/src/components/date-picker/date-picker.ts" name="DatePickerInputProps" />
+
+### DatePickerTrigger
+
+Opens and closes the calendar. Renders a `button` with `aria-haspopup="dialog"`, named by the chosen date.
+
+### DatePickerHint
+
+Describes the expected format, and its state includes an example date. Renders a `span` that describes the input.
+
+### DatePickerClear
+
+Clears the value and focuses the input. Renders a `button`.
 
 ### DatePickerContent
 
@@ -338,5 +376,19 @@ Callbacks get the new value first, then the details.
 ## Accessibility
 
 It follows the [WAI-ARIA date picker dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/): a plain text input that every screen reader handles, a button with `aria-haspopup="dialog"` and `aria-expanded` named by the date chosen, and a dialog holding the calendar's grid. Focus moves into the grid when the dialog opens and back to the button when a date is picked or Escape closes it. Every line below is an automated test.
+
+### Keyboard
+
+| Key             | Where   | Action                                                                        |
+| --------------- | ------- | ----------------------------------------------------------------------------- |
+| Enter           | Input   | Commit the typed date.                                                        |
+| Alt+Down Arrow  | Input   | Open the calendar.                                                            |
+| Enter / Space   | Trigger | Open or close the calendar.                                                   |
+| Escape          | Popup   | Cancel an unfinished range first; otherwise close the popup.                  |
+| Tab / Shift+Tab | Popup   | Move through controls. Leaving the popup closes it when dismissal is allowed. |
+
+Opening focuses the selected date, otherwise today, otherwise the first focusable date. The calendar’s [arrow keys and month navigation](./calendar#keyboard) work here too. An ancestor’s `dir="rtl"` reverses Left and Right Arrow to follow the visual order.
+
+### Tested Behavior
 
 <SpecList spec="date-picker" />

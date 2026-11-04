@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Command, CommandInput, CommandItem, CommandList, CommandPage } from "@ui-sdk/svelte/command"
+  import { useLog } from "../../../shared/svelte/log"
 
   const themes = [
     { value: "light", label: "Light" },
@@ -7,44 +8,32 @@
     { value: "system", label: "System" },
   ]
 
+  const log = useLog()
   let value = $state<string | null>("dark")
   let query = $state("")
   let pages = $state(["theme"])
-  let reason = $state("")
 </script>
 
-<div data-slot="stack">
-  <Command
-    bind:value
-    bind:query
-    bind:pages
-    onValueChange={(_next: string | null, details: { reason: string }) => (reason = details.reason)}
-  >
-    <CommandInput aria-label="Search themes" placeholder="Search themes..." />
-    <CommandList>
-      <CommandPage>
-        <CommandItem value="theme" page="theme">Change theme…</CommandItem>
-      </CommandPage>
-      <CommandPage value="theme">
-        {#each themes as theme (theme.value)}
-          <CommandItem value={theme.value}>
-            {theme.label}
-          </CommandItem>
-        {/each}
-      </CommandPage>
-    </CommandList>
-  </Command>
-  <output data-slot="output">
-    Highlighted {value ?? "nothing"} ({reason || "start"}), text “{query}”, pages [{pages.join(", ")}]
-  </output>
-  <Command defaultValue="system" defaultQuery="s" defaultPages={[]} debug>
-    <CommandInput aria-label="Search themes, uncontrolled" />
-    <CommandList>
+<Command
+  bind:value
+  bind:query
+  bind:pages
+  onValueChange={(next, details) => log(`Highlighted ${next ?? "nothing"} (${details.reason})`)}
+  onQueryChange={(next, details) => log(`Query “${next}” (${details.reason})`)}
+  onPagesChange={(next, details) => log(`Pages [${next.join(", ")}] (${details.reason})`)}
+  onAction={(next) => log(`Ran ${next}`)}
+>
+  <CommandInput aria-label="Search themes" placeholder="Search themes..." />
+  <CommandList>
+    <CommandPage>
+      <CommandItem value="theme" page="theme">Change theme…</CommandItem>
+    </CommandPage>
+    <CommandPage value="theme">
       {#each themes as theme (theme.value)}
         <CommandItem value={theme.value}>
           {theme.label}
         </CommandItem>
       {/each}
-    </CommandList>
-  </Command>
-</div>
+    </CommandPage>
+  </CommandList>
+</Command>

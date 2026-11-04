@@ -47,7 +47,7 @@
     >
       <div data-slot="stack">
         <ComboboxLabel>
-          {variant === "disabled" ? "Disabled" : variant === "readOnly" ? "Read-only" : "Disabled item"}
+          {variant === "disabled" ? "Billing country" : variant === "readOnly" ? "Shipping from" : "Shipping to"}
         </ComboboxLabel>
         <div data-slot="row">
           <ComboboxInput placeholder="Search countries" />
