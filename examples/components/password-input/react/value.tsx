@@ -12,7 +12,7 @@ function strength(password: string) {
   ].filter(Boolean).length
 }
 
-export function Example() {
+function Example() {
   const [value, setValue] = React.useState("")
   const score = strength(value)
   return (
@@ -21,7 +21,7 @@ export function Example() {
       <PasswordInput value={value} onValueChange={(next) => setValue(next)} autoComplete="new-password">
         <PasswordInputControl />
         <PasswordInputToggle aria-label="Show password">
-          {(state) => (state.visible ? <EyeOffIcon /> : <EyeIcon />)}
+          {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
         </PasswordInputToggle>
       </PasswordInput>
       <div data-slot="strength" aria-hidden="true">
@@ -37,3 +37,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

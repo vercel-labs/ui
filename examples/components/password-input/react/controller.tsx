@@ -7,22 +7,14 @@ import {
 } from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [password] = React.useState(createPasswordInputController)
-  const [reading, setReading] = React.useState("")
   return (
     <div data-slot="stack">
-      <Field name="new-password">
-        <FieldLabel>New password</FieldLabel>
-        <PasswordInput controller={password} autoComplete="new-password">
-          <PasswordInputControl />
-          <PasswordInputToggle aria-label="Show password">
-            {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
-          </PasswordInputToggle>
-        </PasswordInput>
-      </Field>
-      <div data-slot="row">
+      <div data-slot="controls">
         <button
           type="button"
           onClick={() => {
@@ -41,9 +33,7 @@ export function Example() {
         <button
           type="button"
           onClick={() =>
-            setReading(
-              `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}.`,
-            )
+            log(`${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`)
           }
         >
           Read
@@ -52,7 +42,17 @@ export function Example() {
           Focus
         </button>
       </div>
-      <output data-slot="output">{reading}</output>
+      <Field name="new-password">
+        <FieldLabel>New password</FieldLabel>
+        <PasswordInput controller={password} autoComplete="new-password">
+          <PasswordInputControl />
+          <PasswordInputToggle aria-label="Show password">
+            {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
+          </PasswordInputToggle>
+        </PasswordInput>
+      </Field>
     </div>
   )
 }
+
+export { Example }

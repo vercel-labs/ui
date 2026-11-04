@@ -2,7 +2,7 @@ import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Field name="password">
@@ -10,7 +10,7 @@ export function Example() {
         <PasswordInput>
           <PasswordInputControl />
           <PasswordInputToggle aria-label="إظهار كلمة المرور">
-            {(state) => (state.visible ? <EyeOffIcon /> : <EyeIcon />)}
+            {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
           </PasswordInputToggle>
         </PasswordInput>
         <FieldDescription>ثمانية أحرف على الأقل.</FieldDescription>
@@ -18,3 +18,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

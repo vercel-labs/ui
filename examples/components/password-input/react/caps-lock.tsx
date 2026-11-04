@@ -2,7 +2,7 @@ import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon, LockIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <Field name="password">
       <FieldLabel>Password</FieldLabel>
@@ -23,3 +23,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

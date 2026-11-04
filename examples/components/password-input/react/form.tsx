@@ -3,9 +3,10 @@ import { Input } from "@ui-sdk/react/input"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [submitted, setSubmitted] = React.useState("")
+function Example() {
+  const log = useLog()
   return (
     <div data-slot="stack">
       <form
@@ -15,9 +16,8 @@ export function Example() {
           event.preventDefault()
           const data = new FormData(event.currentTarget)
           const length = String(data.get("password")).length
-          setSubmitted(`Signed in as ${data.get("email")}, with a password of ${length} characters.`)
+          log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
         }}
-        onReset={() => setSubmitted("")}
       >
         <Field name="email">
           <FieldLabel>Email</FieldLabel>
@@ -34,14 +34,15 @@ export function Example() {
         </PasswordInput>
       </Field>
       <div data-slot="row">
-        <button type="submit" form="sign-in">
-          Sign in
+        <button type="submit" form="sign-in" data-variant="solid">
+          Sign In
         </button>
         <button type="reset" form="sign-in">
           Reset
         </button>
       </div>
-      <output data-slot="output">{submitted}</output>
     </div>
   )
 }
+
+export { Example }

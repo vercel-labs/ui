@@ -12,7 +12,7 @@ const rules = [
   },
 ]
 
-export function Example() {
+function Example() {
   const [password, setPassword] = React.useState("")
   return (
     <Field name="new-password">
@@ -47,3 +47,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }
