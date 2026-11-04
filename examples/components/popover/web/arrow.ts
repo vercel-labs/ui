@@ -41,8 +41,9 @@ function mount(root: HTMLElement) {
       other.setAttribute("aria-pressed", String(other === button))
   })
   root.querySelector("ui-popover")!.addEventListener("openchange", (event) => {
-    const { value, event: cause } = event.detail
-    if (!value && cause?.target instanceof Node && controls.contains(cause.target)) event.preventDefault()
+    const { reason, event: cause } = event.detail
+    const inControls = cause?.target instanceof Node && controls.contains(cause.target)
+    if (inControls && reason !== "escape-key") event.preventDefault()
   })
 }
 

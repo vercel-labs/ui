@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CircleQuestionMarkIcon } from "@lucide/vue"
+import type { ChangeDetails } from "@ui-sdk/core"
 import {
   Popover,
   PopoverArrow,
@@ -22,9 +23,10 @@ const open = ref(false)
 const side = ref<Side>("bottom")
 const controls = ref<HTMLElement | null>(null)
 
-function onOpenChange(next: boolean, details: { event?: Event; cancel: () => void }) {
+function onOpenChange(next: boolean, details: ChangeDetails) {
   const target = details.event?.target
-  if (!next && target instanceof Node && controls.value?.contains(target)) return details.cancel()
+  const inControls = target instanceof Node && controls.value?.contains(target)
+  if (inControls && details.reason !== "escape-key") return details.cancel()
   open.value = next
 }
 </script>

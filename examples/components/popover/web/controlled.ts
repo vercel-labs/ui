@@ -38,13 +38,16 @@ function mount(root: HTMLElement) {
       </ui-popover>
     </div>
   `
+  const controls = root.querySelector('[data-slot="controls"]')!
   const toggle = root.querySelector("ui-checkbox")!
   const popover = root.querySelector("ui-popover")!
   toggle.addEventListener("checkedchange", (event) => {
     popover.open = event.detail.value === true
   })
   popover.addEventListener("openchange", (event) => {
-    const { value, reason } = event.detail
+    const { value, reason, event: cause } = event.detail
+    const inControls = cause?.target instanceof Node && controls.contains(cause.target)
+    if (inControls && reason !== "escape-key") return event.preventDefault()
     toggle.checked = value
     log(root, `${value ? "Opened" : "Closed"} (${reason})`)
   })

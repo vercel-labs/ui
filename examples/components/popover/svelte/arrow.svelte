@@ -39,7 +39,8 @@
     {open}
     onOpenChange={(next, details) => {
       const target = details.event?.target
-      if (!next && target instanceof Node && controls?.contains(target)) return details.cancel()
+      const inControls = target instanceof Node && controls?.contains(target)
+      if (inControls && details.reason !== "escape-key") return details.cancel()
       open = next
     }}
   >

@@ -201,10 +201,20 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
 
   async controlled({ page, preview, tooltip }) {
     const open = preview.getByRole("checkbox", { name: "Open" })
+    const label = preview.locator("label", { hasText: "Open" })
     await open.click()
     await expect(tooltip).toHaveText("Download as CSV")
     await open.click()
     await expect(tooltip).toHaveCount(0)
+    // Pressing the label while it's open closes it once, not as an outside press the click then undoes.
+    await label.click()
+    await expect(tooltip).toHaveText("Download as CSV")
+    await label.click()
+    await expect(tooltip).toHaveCount(0)
+    await expect(open).not.toBeChecked()
+    await page.waitForTimeout(300)
+    await expect(tooltip).toHaveCount(0)
+    await expect(lastLog(preview)).toHaveCount(0)
     await preview.getByRole("button", { name: "Export" }).hover()
     await expect(tooltip).toHaveText("Download as CSV")
     await expect(lastLog(preview)).toHaveText("Opened (trigger-hover)")

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
+import type { ChangeDetails } from "@ui-sdk/core"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
@@ -15,15 +16,19 @@ import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
 const open = ref(false)
+const controls = ref<HTMLElement | null>(null)
 
-function onOpenChange(next: boolean, details: { reason: string }) {
+function onOpenChange(next: boolean, details: ChangeDetails) {
+  const target = details.event?.target
+  const inControls = target instanceof Node && controls.value?.contains(target)
+  if (inControls && details.reason !== "escape-key") return details.cancel()
   log(`${next ? "Opened" : "Closed"} (${details.reason})`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="controls">
+    <div ref="controls" data-slot="controls">
       <label data-slot="label">
         <Checkbox :checked="open" @checked-change="(next) => (open = next === true)">
           <CheckboxIndicator>

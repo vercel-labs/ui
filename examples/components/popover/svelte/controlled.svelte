@@ -14,10 +14,11 @@
 
   const log = useLog()
   let open = $state(false)
+  let controls: HTMLDivElement | undefined = $state()
 </script>
 
 <div data-slot="stack">
-  <div data-slot="controls">
+  <div data-slot="controls" bind:this={controls}>
     <label data-slot="label">
       <Checkbox checked={open} onCheckedChange={(next) => (open = next === true)}>
         <CheckboxIndicator>
@@ -29,7 +30,12 @@
   </div>
   <Popover
     bind:open
-    onOpenChange={(next, details) => log(`${next ? "Opened" : "Closed"} (${details.reason})`)}
+    onOpenChange={(next, details) => {
+      const target = details.event?.target
+      const inControls = target instanceof Node && controls?.contains(target)
+      if (inControls && details.reason !== "escape-key") return details.cancel()
+      log(`${next ? "Opened" : "Closed"} (${details.reason})`)
+    }}
   >
     <PopoverTrigger>Set Status</PopoverTrigger>
     <PopoverContent>
