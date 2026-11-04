@@ -47,6 +47,41 @@ Import the parts and put them together:
 </Meter>
 ```
 
+## Build Your Own
+
+`@ui-sdk/react/meter` comes with a ready-made Meter. If you'd like to build your own, with your own names, start from the `meter` primitive in `@ui-sdk/core`:
+
+```ts title="quota.ts"
+"use client"
+
+import { meter } from "@ui-sdk/core/meter"
+import { createParts } from "@ui-sdk/react/primitive"
+
+const {
+  Root: Quota,
+  Label: QuotaLabel,
+  Value: QuotaValue,
+  Track: QuotaTrack,
+  Indicator: QuotaFill,
+} = createParts(meter, { root: "div", label: "span", value: "span", track: "div", indicator: "div" })
+
+export { Quota, QuotaFill, QuotaLabel, QuotaTrack, QuotaValue }
+```
+
+```tsx
+<Quota value={68}>
+  <QuotaLabel>Storage</QuotaLabel>
+  <QuotaValue>{(state) => state.text}</QuotaValue>
+  <QuotaTrack>
+    <QuotaFill />
+  </QuotaTrack>
+</Quota>
+```
+
+`MeterValue` shows the formatted value when it has no children. A part from `createParts` renders only its children, so pass `(state) => state.text` to show the same text.
+
+Each part keeps the behavior, state and data attributes of its ready-made counterpart: the root is the `meter`, and the indicator sets its width from the value. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
 ## Bounds
 
 `min` and `max` set the range. They default to 0 and 100, and values outside the range are clamped. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
