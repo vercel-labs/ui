@@ -15,7 +15,14 @@ const time = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes 
 function Example() {
   return (
     <Field>
-      <Slider defaultValue={[540, 1020]} min={0} max={1440} step={15} minStepsBetweenThumbs={16} format={time}>
+      <Slider
+        defaultValue={[540, 1020]}
+        min={0}
+        max={1440}
+        step={15}
+        minStepsBetweenThumbs={16}
+        format={time}
+      >
         <div data-slot="row">
           <FieldLabel>Opening hours</FieldLabel>
           <SliderValue />

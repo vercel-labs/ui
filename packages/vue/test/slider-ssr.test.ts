@@ -81,7 +81,16 @@ describe("server rendering a slider and a number input", () => {
   test("the docs' render example keeps its thumb's range input", async () => {
     const file = new URL("../../../examples/components/slider/vue/render.vue", import.meta.url)
     const { descriptor } = parse(readFileSync(file, "utf8"))
-    const components = { Field, FieldLabel, Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack, SliderValue }
+    const components = {
+      Field,
+      FieldLabel,
+      Slider,
+      SliderControl,
+      SliderIndicator,
+      SliderThumb,
+      SliderTrack,
+      SliderValue,
+    }
     const bindings = compileScript(descriptor, { id: "render" }).bindings
     expect(Object.keys(bindings ?? {}).sort()).toEqual(Object.keys(components).sort())
     const html = await renderToString(createSSRApp({ components, template: descriptor.template?.content }))
