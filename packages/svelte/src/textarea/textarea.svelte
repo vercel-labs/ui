@@ -10,6 +10,7 @@ text. Its text is its content, so it takes no children.
     textarea as textareaPrimitive,
     type InputValueChangeReason,
     type TextareaState,
+    type TextareaSubmitDetails,
   } from "@ui-sdk/core/input"
   import type { Attachment } from "svelte/attachments"
   import { useFieldControl } from "../field/context"
@@ -21,6 +22,8 @@ text. Its text is its content, so it takes no children.
     value = $bindable(),
     defaultValue,
     autoResize,
+    submitShortcut,
+    onSubmit,
     disabled,
     readOnly,
     required,
@@ -37,6 +40,10 @@ text. Its text is its content, so it takes no children.
        * `max-height`; past the maximum, it scrolls.
        */
       autoResize?: boolean
+      /** Which keys submit: `"enter"`, with Shift+Enter for a new line, or `"mod+enter"`, with Enter for a new line. */
+      submitShortcut?: "enter" | "mod+enter"
+      /** Runs on the submit shortcut. Without it, the shortcut submits the form the textarea is in. */
+      onSubmit?: (value: string, details: TextareaSubmitDetails) => void
     } = $props()
 
   const id = $props.id()
@@ -48,6 +55,8 @@ text. Its text is its content, so it takes no children.
     },
     defaultValue,
     autoResize,
+    submitShortcut,
+    onSubmit,
     controller,
     debug,
     onValueChange: (next: string, details: ChangeDetails<InputValueChangeReason>) => {

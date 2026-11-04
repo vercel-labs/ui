@@ -85,7 +85,7 @@ function onWebsite(value: string, details: ChangeDetails<InputValueChangeReason>
         </Field>
         <Field :name="f.bio.name" :invalid="invalidOf(errors, f.bio.name)">
           <FieldLabel class="label">{{ f.bio.label }}</FieldLabel>
-          <Textarea class="textarea" auto-resize />
+          <Textarea class="textarea" auto-resize :submit-shortcut="options.submitShortcut" />
           <FieldDescription>{{ f.bio.description }}</FieldDescription>
           <FieldError v-slot="{ state }" class="field-error">
             {{ messageOf(errors, f.bio.name) || state.message }}

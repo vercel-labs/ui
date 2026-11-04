@@ -14,9 +14,11 @@ function Textarea({
   controller,
   debug,
   autoResize,
+  onSubmit,
+  submitShortcut,
   render,
   ...props
-}: TextareaOptions & Native<"textarea", TextareaState>) {
+}: TextareaOptions & Omit<Native<"textarea", TextareaState>, "onSubmit">) {
   const field = useFieldControl()
   const textarea = usePrimitive(textareaPrimitive, {
     value,
@@ -25,6 +27,8 @@ function Textarea({
     controller,
     debug,
     autoResize,
+    onSubmit,
+    submitShortcut,
   })
   const element = {
     ...elementProps(props, field, value, defaultValue),
@@ -48,6 +52,7 @@ export type {
   TextareaPrimitive,
   TextareaProps,
   TextareaState,
+  TextareaSubmitDetails,
 } from "@ui-sdk/core/input"
 
 export { Textarea }

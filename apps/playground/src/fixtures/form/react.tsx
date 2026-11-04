@@ -70,7 +70,7 @@ function Fixture() {
           </Field>
           <Field name={f.bio.name} invalid={invalidOf(errors, f.bio.name)}>
             <FieldLabel className="label">{f.bio.label}</FieldLabel>
-            <Textarea className="textarea" autoResize />
+            <Textarea className="textarea" autoResize submitShortcut={options.submitShortcut} />
             <FieldDescription>{f.bio.description}</FieldDescription>
             <FieldError className="field-error">{error(f.bio.name)}</FieldError>
           </Field>

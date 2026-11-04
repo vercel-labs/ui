@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { textarea } from "../src/components/input/input"
 import { attrs, bind } from "../src/foundation/kernel/part"
+import { setPlatform } from "../src/foundation/platform/platform"
 
 // Stands in for a <textarea> with a 1px border, 8px padding and 20px lines.
 // `value` sits on its prototype like the real one, so a field can watch writes.
@@ -14,7 +15,7 @@ class FakeTextarea extends EventTarget {
   }
   disabled = false
   readOnly = false
-  form = null
+  form: { requestSubmit: () => void } | null = null
   isConnected = true
   selectionStart = 0
   ownerDocument = new EventTarget()
@@ -54,8 +55,35 @@ function setup(options: { autoResize?: boolean; defaultValue?: string } = {}) {
   return { el, instance, unbind }
 }
 
+// Binds with core attaching the listeners, so dispatched keys reach the root's handlers.
+function setupKeys(options: { submitShortcut?: "enter" | "mod+enter"; onSubmit?: () => void } = {}) {
+  const el = new FakeTextarea()
+  el.value = "Hi Hollis"
+  el.form = { requestSubmit: vi.fn() }
+  const instance = textarea({ id: "t", defaultValue: "Hi Hollis", ...options })
+  const unbind = bind(instance.part("root", {}), el as unknown as HTMLElement, {
+    by: "framework",
+    attaches: [],
+  })
+  const press = (keys: Partial<KeyboardEvent> = {}) => {
+    const event = Object.assign(new Event("keydown", { cancelable: true }), {
+      key: "Enter",
+      shiftKey: false,
+      ctrlKey: false,
+      metaKey: false,
+      altKey: false,
+      isComposing: false,
+      ...keys,
+    })
+    el.dispatchEvent(event)
+    return event
+  }
+  return { el, instance, unbind, press, requestSubmit: el.form.requestSubmit }
+}
+
 afterEach(() => {
   vi.unstubAllGlobals()
+  setPlatform("other")
 })
 
 describe("textarea", () => {
@@ -120,5 +148,73 @@ describe("textarea", () => {
     el.value = "One\nTwo\nThree"
     expect(el.style.height).toBe("")
     unbind()
+  })
+
+  describe("submitShortcut", () => {
+    test("without it, Enter starts a new line and nothing submits", () => {
+      const { press, requestSubmit, unbind } = setupKeys()
+      expect(press().defaultPrevented).toBe(false)
+      expect(press({ ctrlKey: true }).defaultPrevented).toBe(false)
+      expect(requestSubmit).not.toHaveBeenCalled()
+      unbind()
+    })
+
+    test("with enter, Enter submits the form and Shift+Enter starts a new line", () => {
+      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "enter" })
+      expect(press({ shiftKey: true }).defaultPrevented).toBe(false)
+      expect(press({ ctrlKey: true }).defaultPrevented).toBe(false)
+      expect(requestSubmit).not.toHaveBeenCalled()
+      expect(press().defaultPrevented).toBe(true)
+      expect(requestSubmit).toHaveBeenCalledTimes(1)
+      unbind()
+    })
+
+    test("with mod+enter, Ctrl+Enter submits and Enter starts a new line", () => {
+      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "mod+enter" })
+      expect(press().defaultPrevented).toBe(false)
+      expect(press({ metaKey: true }).defaultPrevented).toBe(false)
+      expect(press({ ctrlKey: true, shiftKey: true }).defaultPrevented).toBe(false)
+      expect(requestSubmit).not.toHaveBeenCalled()
+      expect(press({ ctrlKey: true }).defaultPrevented).toBe(true)
+      expect(requestSubmit).toHaveBeenCalledTimes(1)
+      unbind()
+    })
+
+    test("with mod+enter on Apple platforms, Command+Enter submits", () => {
+      setPlatform("apple")
+      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "mod+enter" })
+      expect(press({ ctrlKey: true }).defaultPrevented).toBe(false)
+      expect(press({ metaKey: true }).defaultPrevented).toBe(true)
+      expect(requestSubmit).toHaveBeenCalledTimes(1)
+      unbind()
+    })
+
+    test("onSubmit gets the value and the key press instead of the form submitting", () => {
+      const onSubmit = vi.fn()
+      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "enter", onSubmit })
+      const event = press()
+      expect(onSubmit).toHaveBeenCalledWith("Hi Hollis", { event })
+      expect(requestSubmit).not.toHaveBeenCalled()
+      unbind()
+    })
+
+    test("nothing submits while an input method composes", () => {
+      const onSubmit = vi.fn()
+      const { press, unbind } = setupKeys({ submitShortcut: "enter", onSubmit })
+      expect(press({ isComposing: true }).defaultPrevented).toBe(false)
+      // Safari ends a composition with isComposing false and key code 229.
+      expect(press({ keyCode: 229 }).defaultPrevented).toBe(false)
+      expect(onSubmit).not.toHaveBeenCalled()
+      unbind()
+    })
+
+    test("setting it after binding takes effect on the next key press", () => {
+      const { instance, press, requestSubmit, unbind } = setupKeys()
+      press()
+      instance.setOptions({ id: "t", defaultValue: "Hi Hollis", submitShortcut: "enter" })
+      press()
+      expect(requestSubmit).toHaveBeenCalledTimes(1)
+      unbind()
+    })
   })
 })

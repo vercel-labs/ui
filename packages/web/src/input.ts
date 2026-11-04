@@ -42,6 +42,9 @@ function defineInputElements() {
       display: "contents",
       children: { root: (el) => el.querySelector(":scope > textarea") },
       childProps: controlProps,
+      // The submit shortcut submits the form the textarea is in, so a form's own
+      // submit event hears it. A bubbling "submit" event would reach the form too.
+      silent: ["onSubmit"],
       state: textState,
       api: textApi,
     },

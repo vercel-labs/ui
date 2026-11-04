@@ -30,7 +30,7 @@ export * from "./input"
 // Textarea's entry re-exports createInputController like input's does; two star
 // exports of one external binding are ambiguous to a bundler, so this one is named.
 export { Textarea } from "./textarea"
-export type { TextareaOptions, TextareaState } from "./textarea"
+export type { TextareaOptions, TextareaState, TextareaSubmitDetails } from "./textarea"
 export * from "./password-input"
 export * from "./number-input"
 export * from "./otp-input"

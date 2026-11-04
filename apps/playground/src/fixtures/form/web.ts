@@ -26,7 +26,7 @@ function markup(options: ReturnType<typeof formOptions>) {
               </ui-field>
               <ui-field name="${f.bio.name}">
                 <ui-field-label class="label">${f.bio.label}</ui-field-label>
-                <ui-textarea auto-resize><textarea class="textarea"></textarea></ui-textarea>
+                <ui-textarea auto-resize${options.submitShortcut ? ` submit-shortcut="${options.submitShortcut}"` : ""}><textarea class="textarea"></textarea></ui-textarea>
                 <ui-field-description>${f.bio.description}</ui-field-description>
                 <ui-field-error class="field-error"></ui-field-error>
               </ui-field>

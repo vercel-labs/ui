@@ -90,6 +90,27 @@ Set `invalid` on the field for an error your app decides. The field shows its er
   caption="Focus Review. The textarea is marked invalid, and the error below says how long the review should be."
 />
 
+## Submit Shortcut
+
+Set `submitShortcut` to submit the textarea's form from the keyboard. With `"mod+enter"`, Enter still starts a new line and Command or Control+Enter submits. With `"enter"`, Enter submits and Shift+Enter starts a new line. Without it, Enter always starts a new line, and neither submits while an input method is composing.
+
+```tsx
+import { Textarea } from "@ui-sdk/react/textarea"
+
+function Example() {
+  return (
+    <form action="/messages" method="post">
+      <Textarea name="message" aria-label="Message" required submitShortcut="mod+enter" />
+      <button type="submit">Send</button>
+    </form>
+  )
+}
+
+export { Example }
+```
+
+The shortcut submits like the Send button, so `required` and the form's `onSubmit` still apply. Pass `onSubmit` to the textarea to handle the shortcut yourself instead. It receives the value, and the form doesn't submit.
+
 ## Styling
 
 Style the native textarea directly, with `data-filled`, `data-disabled`, `data-readonly` and `data-required` for its states. Inside a field it also receives the field's validation attributes, such as `data-invalid`. For `autoResize`, set `min-height` and `max-height` to bound its growth. Use logical spacing so the text follows the surrounding direction.

@@ -16,6 +16,7 @@ import {
 } from "../../foundation/forms/text-field"
 import { select } from "../../foundation/kernel/selects"
 import { createChange, inputSource } from "../../foundation/kernel/input-source"
+import { isApple } from "../../foundation/platform/platform"
 
 /**
  * Reads and writes a text field from anywhere. Pass it as the `controller` option.
@@ -57,6 +58,15 @@ type InputOptions = TextFieldOptions & {
 } & PrimitiveOptions
 
 /**
+ * What `onSubmit` of `textarea` receives besides the value.
+ * @stable
+ */
+type TextareaSubmitDetails = {
+  /** The key press that submitted. */
+  event?: Event
+}
+
+/**
  * The options `textarea` takes. A component takes them as props on its root.
  * @stable
  */
@@ -67,6 +77,14 @@ type TextareaOptions = InputOptions & {
    * @defaultValue false
    */
   autoResize?: boolean
+  /**
+   * Runs on the submit shortcut, unless an input method is composing. Without it, the shortcut submits the form the textarea is in.
+   */
+  onSubmit?: (value: string, details: TextareaSubmitDetails) => void
+  /**
+   * Which keys submit: `"enter"`, with Shift+Enter for a new line, or `"mod+enter"`, with Enter for a new line. Without it, Enter always starts a new line.
+   */
+  submitShortcut?: "enter" | "mod+enter"
 }
 
 /** Native attributes the field's state attributes follow. */
@@ -210,17 +228,35 @@ const textareaPrimitive = /* @__PURE__ */ definePrimitive({
     onValueChange: "callback",
     controller: "value",
     autoResize: "boolean",
+    onSubmit: "callback",
+    submitShortcut: "string",
   },
   // `autoResize` is state, so turning it on or off after mount reaches the bound root.
   state: (options: TextareaOptions) => ({ ...initialText(options), autoResize: !!options.autoResize }),
   live: ["value"],
   sync: (options) => ({ ...syncText(options), autoResize: !!options.autoResize }),
-  api: (context) => textFieldApi(context, createChange(context), "root"),
+  api: (context) => {
+    const field = textFieldApi(context, createChange(context), "root")
+    const { options, store, element } = context
+    function submitKey(event: KeyboardEvent) {
+      const shortcut = options().submitShortcut
+      if (!shortcut || event.key !== "Enter") return
+      const mod = isApple() ? event.metaKey : event.ctrlKey
+      const submits = shortcut === "enter" ? !event.shiftKey && !mod && !event.altKey : mod && !event.shiftKey
+      if (!submits) return
+      event.preventDefault()
+      const onSubmit = options().onSubmit
+      if (onSubmit) onSubmit(store.get().value, { event })
+      else (element("root") as HTMLTextAreaElement | undefined)?.form?.requestSubmit()
+    }
+    return { ...field, internal: { ...field.internal, submitKey } }
+  },
   slots: (slot) => ({
     root: slot<TextareaProps, TextareaState>({
       props: { disabled: "boolean", readOnly: "boolean", required: "boolean" },
       state: (state, { props }) => textState(state, props),
       attrs: (state, { props }) => textAttrs(state, props),
+      on: { keydown: (event, { api }) => api.internal.submitKey(event) },
       bind: (el, { api, store }) => {
         const unbind = api.internal.bind(el as TextControl)
         let unfit: (() => void) | undefined
@@ -406,5 +442,6 @@ export {
   type TextareaPrimitive,
   type TextareaProps,
   type TextareaState,
+  type TextareaSubmitDetails,
 }
 export type { InputValueChangeReason } from "../../foundation/forms/text-field"

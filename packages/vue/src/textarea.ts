@@ -1,5 +1,5 @@
-import { textarea as textareaPrimitive } from "@ui-sdk/core/input"
-import { defineComponent } from "vue"
+import { textarea as textareaPrimitive, type TextareaSubmitDetails } from "@ui-sdk/core/input"
+import { defineComponent, type PropType } from "vue"
 import { withElement } from "./create-parts"
 import { useFieldControl } from "./field-context"
 import { elementProps, readOnlyOf, textEmits, textOptions, textProps } from "./text-control"
@@ -14,13 +14,24 @@ const Textarea = withElement(
   defineComponent({
     name: "Textarea",
     inheritAttrs: false,
-    props: { ...textProps, autoResize: optionalBoolean },
+    props: {
+      ...textProps,
+      autoResize: optionalBoolean,
+      submitShortcut: String as PropType<"enter" | "mod+enter">,
+      // A function prop, so `@submit` binds to it, and without one the shortcut submits the form.
+      onSubmit: Function as PropType<(value: string, details: TextareaSubmitDetails) => void>,
+    },
     emits: textEmits,
     slots: Object as PartSlots<typeof textareaPrimitive, "root">,
     setup(props, { attrs, emit }) {
       const field = useFieldControl()
       const options = textOptions(props, emit)
-      const textarea = usePrimitive(textareaPrimitive, () => ({ ...options(), autoResize: props.autoResize }))
+      const textarea = usePrimitive(textareaPrimitive, () => ({
+        ...options(),
+        autoResize: props.autoResize,
+        submitShortcut: props.submitShortcut,
+        onSubmit: props.onSubmit,
+      }))
       const part = () => ({
         disabled: props.disabled || field?.disabled(),
         readOnly: readOnlyOf(props, attrs),
@@ -52,6 +63,7 @@ export type {
   TextareaPrimitive,
   TextareaProps,
   TextareaState,
+  TextareaSubmitDetails,
 } from "@ui-sdk/core/input"
 
 export { Textarea }

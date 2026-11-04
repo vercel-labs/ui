@@ -324,7 +324,7 @@ const cases: Case[] = [
     primitive: textarea,
     markup: `<root as="textarea" aria-label="Notes"></root>`,
     parts: { root: { "": {} } },
-    values: { value: ["Ada", "Grace"], autoResize: [false, true] },
+    values: { value: ["Ada", "Grace"], autoResize: [false, true], submitShortcut: ["enter", "mod+enter"] },
   },
   {
     name: "listbox",

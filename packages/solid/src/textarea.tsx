@@ -8,7 +8,7 @@ import { usePart, usePrimitive } from "./use-primitive"
  * A native <textarea>, wired to the Field it's in, that can grow with its text.
  * @stable
  */
-function Textarea(props: TextareaOptions & Native<"textarea", TextareaState>) {
+function Textarea(props: TextareaOptions & Omit<Native<"textarea", TextareaState>, "onSubmit">) {
   const field = useFieldControl()
   const textarea = usePrimitive(textareaPrimitive, () => ({
     value: props.value,
@@ -17,8 +17,20 @@ function Textarea(props: TextareaOptions & Native<"textarea", TextareaState>) {
     controller: props.controller,
     debug: props.debug,
     autoResize: props.autoResize,
+    onSubmit: props.onSubmit,
+    submitShortcut: props.submitShortcut,
   }))
-  const rest = omit(props, "value", "defaultValue", "onValueChange", "controller", "debug", "autoResize")
+  const rest = omit(
+    props,
+    "value",
+    "defaultValue",
+    "onValueChange",
+    "controller",
+    "debug",
+    "autoResize",
+    "onSubmit",
+    "submitShortcut",
+  )
   const element = elementProps(
     rest,
     field,
@@ -49,6 +61,7 @@ export type {
   TextareaPrimitive,
   TextareaProps,
   TextareaState,
+  TextareaSubmitDetails,
 } from "@ui-sdk/core/input"
 
 export { Textarea }

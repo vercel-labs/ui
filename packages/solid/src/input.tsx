@@ -67,6 +67,7 @@ export type {
   TextareaPrimitive,
   TextareaProps,
   TextareaState,
+  TextareaSubmitDetails,
 } from "@ui-sdk/core/input"
 
 export { Input, InputClear, InputGroup }

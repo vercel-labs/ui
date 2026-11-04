@@ -48,6 +48,7 @@ function formOptions() {
     disabled: params.has("disabled"),
     controlled: params.has("controlled"),
     noDigits: params.has("no-digits"),
+    submitShortcut: (params.get("submit-shortcut") ?? undefined) as "enter" | "mod+enter" | undefined,
   }
 }
 
