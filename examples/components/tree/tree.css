@@ -63,7 +63,9 @@
   [data-slot="tree-item"] {
     outline: none;
 
-    &:focus-visible > [data-slot="tree-label"] {
+    /* A web label rendered as its child, like a link, sits inside the label element. */
+    &:focus-visible > [data-slot="tree-label"],
+    &:focus-visible > :not([data-slot]) > [data-slot="tree-label"] {
       box-shadow: inset 0 0 0 1px var(--ink);
 
       &:not([data-selected], [data-current]) {
