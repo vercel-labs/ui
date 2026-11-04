@@ -2,7 +2,7 @@
 
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const toppings = [
   { value: "basil", label: "Basil" },
@@ -14,22 +14,24 @@ const toppings = [
 ]
 
 function Example() {
-  const [value, setValue] = React.useState<string[]>(["cheese", "onion"])
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Listbox multiple value={value} onValueChange={setValue} aria-label="Toppings">
-        {toppings.map((topping) => (
-          <ListboxItem key={topping.value} value={topping.value}>
-            <ListboxItemIndicator keepMounted>
-              <CheckIcon aria-hidden="true" />
-            </ListboxItemIndicator>
-            {topping.label}
-          </ListboxItem>
-        ))}
-      </Listbox>
-      <output data-slot="output">Value: {JSON.stringify(value)}</output>
-    </div>
+    <Listbox
+      multiple
+      defaultValue={["cheese", "onion"]}
+      onValueChange={(value, details) => log(`${value.join(", ") || "Nothing"} (${details.reason})`)}
+      aria-label="Toppings"
+    >
+      {toppings.map((topping) => (
+        <ListboxItem key={topping.value} value={topping.value}>
+          {topping.label}
+          <ListboxItemIndicator>
+            <CheckIcon aria-hidden="true" />
+          </ListboxItemIndicator>
+        </ListboxItem>
+      ))}
+    </Listbox>
   )
 }
 

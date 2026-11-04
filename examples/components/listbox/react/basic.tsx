@@ -1,31 +1,32 @@
 "use client"
 
-import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
 
-const frameworks = [
-  { value: "next", label: "Next.js" },
-  { value: "remix", label: "Remix" },
-  { value: "astro", label: "Astro" },
-  { value: "nuxt", label: "Nuxt" },
-  { value: "sveltekit", label: "SvelteKit" },
+const topics = [
+  { value: "comments", label: "Comments" },
+  { value: "mentions", label: "Mentions" },
+  { value: "reactions", label: "Reactions" },
+  { value: "sign-ins", label: "New sign-ins" },
+  { value: "billing", label: "Billing" },
 ]
 
 function Example() {
   return (
     <Field>
-      <FieldLabel>Framework</FieldLabel>
-      <Listbox defaultValue="next">
-        {frameworks.map((framework) => (
-          <ListboxItem key={framework.value} value={framework.value}>
-            {framework.label}
+      <FieldLabel>Email me about</FieldLabel>
+      <Listbox multiple activation="automatic" defaultValue={["mentions"]}>
+        {topics.map((topic) => (
+          <ListboxItem key={topic.value} value={topic.value}>
+            {topic.label}
             <ListboxItemIndicator>
               <CheckIcon aria-hidden="true" />
             </ListboxItemIndicator>
           </ListboxItem>
         ))}
       </Listbox>
+      <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
     </Field>
   )
 }

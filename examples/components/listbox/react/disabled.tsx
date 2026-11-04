@@ -18,6 +18,11 @@ function Example() {
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => setDisabled(!disabled)}>
+          {disabled ? "Enable the List" : "Disable the List"}
+        </button>
+      </div>
       <Listbox multiple disabled={disabled} defaultValue={["basil"]} aria-label="Toppings">
         {toppings.map((topping) => (
           <ListboxItem key={topping.value} value={topping.value} disabled={topping.value === "olive"}>
@@ -28,9 +33,6 @@ function Example() {
           </ListboxItem>
         ))}
       </Listbox>
-      <button type="button" onClick={() => setDisabled(!disabled)}>
-        {disabled ? "Enable" : "Disable"} the list
-      </button>
     </div>
   )
 }

@@ -1,6 +1,13 @@
 import { expect, type Locator } from "@playwright/test"
 import { testExamples, type Check } from "./docs-helpers"
 
+// The newest line in an example's console.
+const lastLog = (preview: Locator) =>
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+
 // The options of the example's list.
 const option = (preview: Locator, name: string) => preview.getByRole("option", { name, exact: true })
 
@@ -15,27 +22,32 @@ const selects =
 // Each example's check, in the order they appear on the Listbox page.
 const checks: Record<string, Check> = {
   basic: async (preview) => {
-    await expect(preview.getByRole("listbox", { name: "Framework" })).toBeVisible()
-    await expect(option(preview, "Next.js")).toHaveAttribute("aria-selected", "true")
-    await selects("Astro")(preview, "")
-    await expect(option(preview, "Next.js")).toHaveAttribute("aria-selected", "false")
+    await expect(preview.getByRole("listbox", { name: "Email me about" })).toBeVisible()
+    await expect(option(preview, "Mentions")).toHaveAttribute("aria-selected", "true")
+    // A click replaces the selection, and Shift selects the range from it.
+    await option(preview, "Comments").click()
+    await expect(option(preview, "Mentions")).toHaveAttribute("aria-selected", "false")
+    await option(preview, "New sign-ins").click({ modifiers: ["Shift"] })
+    for (const name of ["Comments", "Mentions", "Reactions", "New sign-ins"])
+      await expect(option(preview, name)).toHaveAttribute("aria-selected", "true")
+    await expect(option(preview, "Billing")).toHaveAttribute("aria-selected", "false")
   },
   multiple: async (preview) => {
     await option(preview, "Basil").click()
-    await expect(preview.getByText('Value: ["cheese","onion","basil"]')).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("cheese, onion, basil (item-press)")
   },
   activation: async (preview) => {
     await option(preview, "index.ts").click()
     // A click replaces the selection.
-    await expect(preview.getByText("1 selected")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("1 selected (item-press)")
   },
   manual: async (preview) => {
     await selects("Nuxt")(preview, "")
-    await expect(preview.getByText("Value: nuxt")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("nuxt (item-press)")
   },
   deselectable: async (preview) => {
     await option(preview, "Astro").click()
-    await expect(preview.getByText("Value: none")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("Nothing (item-press)")
   },
   groups: async (preview) => {
     await expect(preview.getByRole("group", { name: "Vegetables" })).toBeVisible()
@@ -57,15 +69,15 @@ const checks: Record<string, Check> = {
   form: async (preview) => {
     await option(preview, "Basil").click()
     await preview.getByRole("button", { name: "Order" }).click()
-    await expect(preview.getByText("Submitted: cheese, basil")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("Ordered cheese, basil")
   },
   data: async (preview) => {
     await expect(option(preview, "Pro")).toHaveAttribute("aria-selected", "true")
     await option(preview, "Team").click()
-    await expect(preview.getByText("team, $50 a month")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("team, $50 a month")
   },
   controller: async (preview) => {
-    await preview.getByRole("button", { name: "Select all" }).click()
+    await preview.getByRole("button", { name: "Select All" }).click()
     await expect(option(preview, "Pepper")).toHaveAttribute("aria-selected", "true")
     await preview.getByRole("button", { name: "Clear" }).click()
     await expect(option(preview, "Pepper")).toHaveAttribute("aria-selected", "false")
