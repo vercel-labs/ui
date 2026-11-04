@@ -80,7 +80,7 @@ function ExamplePreview({
     <div
       data-example={name}
       className={cn(
-        "flex min-w-0 flex-1 flex-col items-center justify-center px-6 text-foreground sm:px-10",
+        "flex min-w-0 flex-1 flex-col items-center justify-center overflow-x-auto px-6 text-foreground sm:px-10",
         compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
       )}
     >
