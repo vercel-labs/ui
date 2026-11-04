@@ -44,14 +44,17 @@ function ExamplePreview({
     return () => figure?.removeEventListener("example-reset", reset)
   }, [])
 
-  // Demo links point at `#`, which would scroll the docs page to the top when followed.
+  // Demo links point at `#`, which would scroll the docs page to the top when followed. The
+  // document hears the click after the example's own handlers, which skip a prevented click.
   React.useEffect(() => {
     const element = host.current
     const stay = (event: MouseEvent) => {
-      if ((event.target as Element).closest?.('a[href="#"]')) event.preventDefault()
+      const target = event.target as Element
+      if (element && event.composedPath().includes(element) && target.closest?.('a[href="#"]'))
+        event.preventDefault()
     }
-    element?.addEventListener("click", stay)
-    return () => element?.removeEventListener("click", stay)
+    document.addEventListener("click", stay)
+    return () => document.removeEventListener("click", stay)
   }, [])
 
   React.useEffect(() => {
