@@ -59,19 +59,10 @@ Import the parts and put them together:
 
 ```ts title="upload-elements.ts"
 import { progress } from "@ui-sdk/core/progress"
-import { partState } from "@ui-sdk/core/renderer"
 import { createParts } from "@ui-sdk/web"
 
 createParts(progress, {
-  root: {
-    tag: "upload-progress",
-    display: "block",
-    render: (el, instance) =>
-      instance.subscribe(() => {
-        const value = el.querySelector("upload-value")
-        if (value) value.textContent = (partState(instance.part("value")) as { text: string }).text
-      }),
-  },
+  root: { tag: "upload-progress", display: "block" },
   label: "upload-label",
   value: "upload-value",
   track: { tag: "upload-track", display: "block" },
@@ -82,14 +73,14 @@ createParts(progress, {
 ```html
 <upload-progress value="40">
   <upload-label>Uploading photos</upload-label>
-  <upload-value></upload-value>
+  <upload-value>40%</upload-value>
   <upload-track>
     <upload-bar></upload-bar>
   </upload-track>
 </upload-progress>
 ```
 
-`ui-progress-value` shows the formatted value while it's empty. An element from `createParts` shows only what you put in it, so the root's `render` writes the value part's `text` into it whenever the state changes.
+`ui-progress-value` fills in the formatted value for you. An element from `createParts` shows only what you put in it, so write the text yourself when you set the value, like `40%` here.
 
 Each element keeps the behavior, state and data attributes of its ready-made counterpart: the root is the `progressbar`, and the indicator sets its width from the value. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
 

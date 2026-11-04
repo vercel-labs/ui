@@ -63,19 +63,10 @@ Import the parts and put them together:
 
 ```ts title="quota-elements.ts"
 import { meter } from "@ui-sdk/core/meter"
-import { partState } from "@ui-sdk/core/renderer"
 import { createParts } from "@ui-sdk/web"
 
 createParts(meter, {
-  root: {
-    tag: "quota-meter",
-    display: "block",
-    render: (el, instance) =>
-      instance.subscribe(() => {
-        const value = el.querySelector("quota-value")
-        if (value) value.textContent = (partState(instance.part("value")) as { text: string }).text
-      }),
-  },
+  root: { tag: "quota-meter", display: "block" },
   label: "quota-label",
   value: "quota-value",
   track: { tag: "quota-track", display: "block" },
@@ -86,14 +77,14 @@ createParts(meter, {
 ```html
 <quota-meter value="68">
   <quota-label>Storage</quota-label>
-  <quota-value></quota-value>
+  <quota-value>68%</quota-value>
   <quota-track>
     <quota-fill></quota-fill>
   </quota-track>
 </quota-meter>
 ```
 
-`ui-meter-value` shows the formatted value while it's empty. An element from `createParts` shows only what you put in it, so the root's `render` writes the value part's `text` into it whenever the state changes.
+`ui-meter-value` fills in the formatted value for you. An element from `createParts` shows only what you put in it, so write the text yourself when you set the value, like `68%` here.
 
 Each element keeps the behavior, state and data attributes of its ready-made counterpart: the root is the `meter`, and the indicator sets its width from the value. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
 
