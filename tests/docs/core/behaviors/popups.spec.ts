@@ -263,7 +263,7 @@ test("modal layer: a press outside only closes it, the window blurring closes it
   await expect(panel).toBeVisible()
   // The player works over the panel, and doesn't close it.
   await page.getByRole("button", { name: "Pause" }).click()
-  await expect(page.getByText("Paused")).toBeVisible()
+  await expect(example.getByText("Paused")).toBeVisible()
   await expect(panel).toBeVisible()
   await counter.click()
   await expect(panel).toHaveCount(0)

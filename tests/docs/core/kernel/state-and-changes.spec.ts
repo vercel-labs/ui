@@ -102,15 +102,16 @@ test("reasons: Escape and the button each report theirs, and dismissals can be r
 
 test("state a user controls: the trigger and the page change the same open state", async ({ page }) => {
   await openExamples(page, url)
+  const example = page.locator('[data-example="core/disclosure"]')
   const trigger = page.getByRole("button", { name: "Shipping details" })
   const outside = page.getByRole("checkbox", { name: "Open from outside" })
   await trigger.click()
   await expect(trigger).toHaveAttribute("aria-expanded", "true")
-  await expect(page.getByText("Ships in two days")).toBeVisible()
+  await expect(example.getByText("Ships in two days")).toBeVisible()
   await expect(outside).toBeChecked()
   await outside.uncheck()
   await expect(trigger).toHaveAttribute("aria-expanded", "false")
-  await expect(page.getByText("Ships in two days")).toHaveCount(0)
+  await expect(example.getByText("Ships in two days")).toHaveCount(0)
 })
 
 test("commits: a drag changes the value on every step and commits once, keys commit each step", async ({
@@ -199,14 +200,15 @@ test("how people are working: the save says how it was pressed, and the hint sho
   page,
 }) => {
   await openExamples(page, url)
+  const example = page.locator('[data-example="core/input-source"]')
   const save = page.getByRole("button", { name: "Save", exact: true })
   await save.click()
   await expect(page.getByRole("status").filter({ hasText: "Saved" })).toHaveText("Saved with mouse")
-  await expect(page.getByText("Enter or Space saves")).toHaveCount(0)
+  await expect(example.getByText("Enter or Space saves")).toHaveCount(0)
   await page.keyboard.press("Shift+Tab")
   await page.keyboard.press("Tab")
   await expect(save).toBeFocused()
-  await expect(page.getByText("Enter or Space saves")).toBeVisible()
+  await expect(example.getByText("Enter or Space saves")).toBeVisible()
   await page.keyboard.press("Enter")
   await expect(page.getByRole("status").filter({ hasText: "Saved" })).toHaveText("Saved with keyboard")
 })

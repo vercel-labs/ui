@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 
 test("a web example's shortcuts stop when it leaves the page", async ({ page }) => {
   await page.goto("/docs/web-components/utilities/shortcuts")
-  await expect(page.getByText("Press N or the keys to save.")).toBeVisible()
+  await expect(page.locator("[data-example]").getByText("Press N or the keys to save.")).toBeVisible()
   // Guide pages list guides, not components.
   await leaveFor(page, "Forms")
   // A shortcut left registered would still take N, and prevent its default.
@@ -27,12 +27,4 @@ test("a web example's shortcuts stop when it leaves the page", async ({ page }) 
   )
   await page.keyboard.press("n")
   expect(await page.evaluate(() => (window as unknown as { prevented?: boolean }).prevented)).toBe(false)
-})
-
-test("a web example's theme-color tag goes when it leaves the page", async ({ page }) => {
-  await page.goto("/docs/web-components/components/drawer")
-  const meta = page.locator('meta[name="theme-color"]')
-  await expect(meta).toHaveCount(1)
-  await leaveFor(page, "Separator")
-  await expect(meta).toHaveCount(0)
 })

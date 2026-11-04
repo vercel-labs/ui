@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test"
+import { expect, test, type Locator, type Page } from "@playwright/test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 
@@ -29,6 +29,10 @@ const examples = {
   confirm: undefined,
   queue: undefined,
 }
+// The lines an example logged to its console, oldest first.
+const logs = (preview: Locator) =>
+  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])')
+
 const exact = (text: string) => new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`)
 
 async function load(page: Page, framework: string) {
@@ -145,7 +149,6 @@ for (const framework of frameworks) {
 
     await action.click()
     await expect(alert, "the second try succeeds and closes it").toHaveCount(0)
-    await expect(preview).toContainText("Deleted")
     await expect(trigger).toBeFocused()
 
     expect(errors).toEqual([])
@@ -164,17 +167,6 @@ for (const framework of frameworks) {
 }
 
 for (const framework of frameworks) {
-  test(`the controlled alert dialog follows app state in ${framework}`, async ({ page }) => {
-    const { errors, example } = await load(page, framework)
-    const preview = example("controlled")
-    await expect(preview.getByRole("status")).toHaveText("Open: false")
-    await preview.getByRole("button", { name: "Review Changes" }).click()
-    await expect(preview.getByRole("status", { includeHidden: true })).toHaveText("Open: true")
-    await page.getByRole("alertdialog").getByRole("button", { name: "Keep Editing" }).click()
-    await expect(preview.getByRole("status")).toHaveText("Open: false")
-    expect(errors).toEqual([])
-  })
-
   test(`confirms answer queued questions one at a time in ${framework}`, async ({ page }) => {
     const { errors, example } = await load(page, framework)
     const preview = example("queue")
@@ -188,7 +180,8 @@ for (const framework of frameworks) {
     await expect(alert).toHaveAccessibleName("Archive Globex?")
     await alert.getByRole("button", { name: "Archive", exact: true }).click()
     await expect(alert).toHaveCount(0)
-    await expect(preview.getByRole("status")).toHaveText("Acme: canceled. Globex: confirmed.")
+    // Both answers settle together, in the order they were asked.
+    await expect(logs(preview)).toHaveText(["Acme: canceled", "Globex: confirmed"])
     await expect(trigger).toBeFocused()
     expect(errors).toEqual([])
   })

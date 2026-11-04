@@ -11,7 +11,7 @@ test("panel: a question opens its answer with a height animation, and closes aga
   await openBehaviors(page, "motion")
   const trigger = page.getByRole("button", { name: "Can I get a refund?" })
   await trigger.scrollIntoViewIfNeeded()
-  const answer = page.getByText("within 30 days")
+  const answer = page.locator('[data-example="behaviors/panel"]').getByText("within 30 days")
   await expect(answer).toHaveCount(0)
   await trigger.click()
   await expect(trigger).toHaveAttribute("aria-expanded", "true")

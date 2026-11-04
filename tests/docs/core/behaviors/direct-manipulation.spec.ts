@@ -268,15 +268,16 @@ test("spans edit: the buttons change Standup, noon is checked first, and a blur 
   page,
 }) => {
   await openBehaviors(page, "direct-manipulation")
+  const example = page.locator('[data-example="behaviors/spans-edit"]')
   await page.locator('[data-slot="room-action"]', { hasText: "Later" }).click()
-  await expect(page.getByText("Standup 10:00–11:00")).toBeVisible()
+  await expect(example.getByText("Standup 10:00–11:00")).toBeVisible()
   await page.locator('[data-slot="room-action"]', { hasText: "Longer" }).click()
-  await expect(page.getByText("Standup 10:00–11:30")).toBeVisible()
+  await expect(example.getByText("Standup 10:00–11:30")).toBeVisible()
   await page.locator('[data-slot="room-action"]', { hasText: "Book noon" }).click()
-  await expect(page.getByText("Booked noon.")).toBeVisible()
-  await expect(page.getByText("Lunch 12:00–13:00")).toBeVisible()
+  await expect(example.getByText("Booked noon.")).toBeVisible()
+  await expect(example.getByText("Lunch 12:00–13:00")).toBeVisible()
   await page.locator('[data-slot="room-action"]', { hasText: "Book noon" }).click()
-  await expect(page.getByText("Noon is taken.")).toBeVisible()
+  await expect(example.getByText("Noon is taken.")).toBeVisible()
   const atlas = page.getByRole("group", { name: "Atlas" }).last()
   const width = (await atlas.boundingBox())!.width
   const board = atlas.getByText(/^Board meeting/)
@@ -288,10 +289,10 @@ test("spans edit: the buttons change Standup, noon is checked first, and a blur 
   await expect(standup).toHaveAttribute("data-dragging", "")
   await page.evaluate(() => window.dispatchEvent(new Event("blur")))
   await page.mouse.up()
-  await expect(page.getByText("Standup 10:00–11:30")).toBeVisible()
+  await expect(example.getByText("Standup 10:00–11:30")).toBeVisible()
   await page.locator('[data-slot="room-action"]', { hasText: "Delete" }).click()
   await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText("Standup is cancelled.")
-  await expect(page.getByText(/Standup 10:00–/)).toHaveCount(0)
+  await expect(example.getByText(/Standup 10:00–/)).toHaveCount(0)
 })
 
 test("preview themes: hovering previews, Contrast previews as nothing, and arrows are read out", async ({

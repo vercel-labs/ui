@@ -7,7 +7,7 @@ import path from "node:path"
 // real. Navigation Menu's Link Component example keeps hash routes: its
 // router handles every click, so nothing follows them. Examples whose links
 // are hash routes on purpose, like Tabs' and Accordion's, aren't listed.
-const root = path.join(import.meta.dirname, "../../examples")
+const root = path.join(import.meta.dirname, "../../examples/components")
 const components = ["hover-card", "navigation-menu", "carousel", "dialog", "drawer", "popover", "tooltip"]
 const hashLink = /href(?:=|: ?|", )["'`{]*#/
 

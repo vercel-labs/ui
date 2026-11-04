@@ -21,7 +21,7 @@ test("rating: all four arrows select and wrap, with one tab stop", async ({ page
   await group.scrollIntoViewIfNeeded()
   await expect(group.locator('[tabindex="0"]')).toHaveCount(1)
   await group.getByRole("radio", { name: "5 stars" }).click()
-  await expect(example.locator("[data-value]")).toHaveText("5.0")
+  await expect(example.locator("[data-value]")).toHaveText("5")
   for (const [key, value] of [
     ["ArrowLeft", 4],
     ["ArrowUp", 3],
@@ -39,7 +39,7 @@ test("rating: all four arrows select and wrap, with one tab stop", async ({ page
     await expect(selected).toHaveAttribute("aria-checked", "true")
     await expect(selected).toHaveAttribute("tabindex", "0")
     await expect(group.locator('[tabindex="0"]')).toHaveCount(1)
-    await expect(example.locator("[data-value]")).toHaveText(value.toFixed(1))
+    await expect(example.locator("[data-value]")).toHaveText(String(value))
   }
 })
 

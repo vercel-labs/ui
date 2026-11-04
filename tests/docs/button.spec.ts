@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test"
+import { expect, test, type Locator } from "@playwright/test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 
@@ -11,30 +11,23 @@ const examplesIn = (folder: string) =>
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name.replace(/\.\w+$/, ""))
 
-// Every fixture, and the button to press in it. Links, disabled buttons and
-// the examples that wait are checked below.
-const press: Record<string, RegExp | undefined> = {
-  basic: /^Button$/,
-  outline: /^Outline$/,
-  secondary: /^Secondary$/,
-  ghost: /^Ghost$/,
-  destructive: /^Delete$/,
-  "link-style": /^Resend code$/,
-  icon: /^Download$/,
-  "with-icon": /^New project$/,
-  size: /^Small$/,
-  rounded: /^Subscribe$/,
-  group: /^Archive$/,
-  disabled: undefined,
-  rtl: /^متابعة$/,
-  pending: undefined,
-  "focusable-when-disabled": undefined,
-  link: undefined,
-  form: undefined,
-  render: undefined,
-}
-const examples = Object.keys(press)
-const rendered = ["basic", "pending", "render", "disabled", "focusable-when-disabled", "link", "form"]
+// The lines an example logged to its console, oldest first.
+const logs = (preview: Locator) =>
+  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])')
+
+// The order examples appear on the Button page.
+const order = [
+  "basic",
+  "pending",
+  "pending-content",
+  "render",
+  "disabled",
+  "focusable-when-disabled",
+  "link",
+  "form",
+]
+// Right-to-left examples stay in the folders but are off the page for now.
+const fixtures = [...order, "rtl"]
 const failure = "Couldn't save. Check your connection and try again."
 
 for (const framework of frameworks) {
@@ -44,53 +37,38 @@ for (const framework of frameworks) {
     page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
     await page.goto(`/docs/${framework}/components/button`)
     const previews = page.locator("[data-example]")
-    const shown = rendered
-    await expect(previews).toHaveCount(shown.length)
+    await expect(previews).toHaveCount(order.length)
     expect(
       await previews.evaluateAll((previews) =>
-        previews.map((preview) => preview.getAttribute("data-example")).sort(),
+        previews.map((preview) => preview.getAttribute("data-example")),
       ),
-    ).toEqual(shown.map((name) => `button/${name}`).sort())
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...examples].sort())
+    ).toEqual(order.map((name) => `button/${name}`))
+    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
     const example = (name: string) => page.locator(`[data-example="button/${name}"]`)
 
-    await expect(example("basic").getByRole("status")).toHaveText("Pressed 0 times")
-
-    for (const name of shown) {
-      const label = press[name]
-      if (!label) continue
-      const button = example(name).getByRole("button", { name: label })
-      await expect(button, name).toBeEnabled()
-      await button.click()
-    }
-
+    // A press, Enter and Space each press the button once.
     const counter = example("basic")
-    await expect(counter.getByRole("status")).toHaveText("Pressed 1 time")
-    await counter.getByRole("button", { name: /^Button$/ }).focus()
+    const button = counter.getByRole("button", { name: /^Button$/ })
+    await expect(logs(counter)).toHaveCount(0)
+    await button.click()
+    await expect(logs(counter)).toHaveText(["Pressed"])
+    await button.focus()
     await page.keyboard.press("Enter")
-    await expect(counter.getByRole("status")).toHaveText("Pressed 2 times")
+    await expect(logs(counter)).toHaveCount(2)
     await page.keyboard.press(" ")
-    await expect(counter.getByRole("status")).toHaveText("Pressed 3 times")
+    await expect(logs(counter)).toHaveText(["Pressed", "Pressed", "Pressed"])
 
     // The basic button sits in the middle of its preview.
-    const preview = await example("basic").boundingBox()
-    const basic = await example("basic").getByRole("button").boundingBox()
+    const preview = await counter.boundingBox()
+    const basic = await button.boundingBox()
     expect(Math.abs(basic!.x + basic!.width / 2 - (preview!.x + preview!.width / 2))).toBeLessThan(2)
-
-    // A disabled button can't be pressed.
-    await expect(example("disabled").getByRole("button", { name: /^Disabled$/ })).toBeDisabled()
 
     // A pending button is busy until its Promise settles.
     // It keeps focus meanwhile, and a second press doesn't start it again.
     const save = example("pending").getByRole("button", { name: /^Save$/ })
-    // Its spinner shows only meanwhile.
-    const spinner = save.locator("svg")
-    await expect(spinner).toBeHidden()
     await save.click()
     await expect(save).toHaveAttribute("aria-busy", "true")
-    await expect(spinner).toBeVisible()
     await expect(save).not.toHaveAttribute("aria-busy", "true")
-    await expect(spinner).toBeHidden()
     await save.focus()
     const pressed = Date.now()
     await page.keyboard.press("Enter")
@@ -100,6 +78,36 @@ for (const framework of frameworks) {
     await expect(save).toBeFocused()
     await expect(save).not.toHaveAttribute("aria-busy", "true")
     expect(Date.now() - pressed).toBeLessThan(2300)
+
+    // Its arrow turns into a spinner only meanwhile.
+    const download = example("pending-content").getByRole("button", { name: /^Save$/ })
+    const spinner = download.locator('[data-show="pending"]')
+    const arrow = download.locator('[data-show="idle"]')
+    await expect(spinner).toBeHidden()
+    await expect(arrow).toBeVisible()
+    await download.click()
+    await expect(download).toHaveAttribute("aria-busy", "true")
+    await expect(spinner).toBeVisible()
+    await expect(arrow).toBeHidden()
+    await expect(download).not.toHaveAttribute("aria-busy", "true")
+    await expect(spinner).toBeHidden()
+    await expect(arrow).toBeVisible()
+
+    // The label follows the state, and a failed save keeps its retry label until the next press.
+    const render = example("render")
+    const action = render.getByRole("button")
+    await expect(action).toHaveAccessibleName("Save Changes")
+    await action.click()
+    await expect(action).toHaveAccessibleName("Saving…")
+    await expect(action).toHaveAccessibleName("Try Again")
+    await expect(logs(render)).toHaveText([failure])
+    await action.click()
+    await expect(action, "the next press clears the error").toHaveAccessibleName("Saving…")
+    await expect(action).toHaveAccessibleName("Try Again")
+    await expect(logs(render)).toHaveText([failure, failure])
+
+    // A disabled button can't be pressed.
+    await expect(example("disabled").getByRole("button", { name: /^Disabled$/ })).toBeDisabled()
 
     // Disabled until there's a title, and it stays focusable meanwhile.
     const focusable = example("focusable-when-disabled")
@@ -112,11 +120,12 @@ for (const framework of frameworks) {
     await page.keyboard.press("Enter")
     await page.keyboard.press(" ")
     await publish.click({ force: true })
-    await expect(focusable.getByText("Add a title to publish.")).toBeVisible()
+    await expect(logs(focusable), "a disabled press does nothing").toHaveCount(0)
     await focusable.getByRole("textbox", { name: "Title" }).fill("Release notes")
     await expect(publish).toBeEnabled()
+    await expect(publish).toHaveAccessibleDescription("Ready to publish.")
     await publish.click()
-    await expect(focusable.getByText("Published.")).toBeVisible()
+    await expect(logs(focusable)).toHaveText(["Published “Release notes”"])
 
     // A link stays a link and navigates, unless it's disabled.
     const link = example("link")
@@ -125,44 +134,23 @@ for (const framework of frameworks) {
     await expect(changelog).toHaveAttribute("tabindex", "-1")
     await changelog.click({ force: true })
     expect(page.url()).not.toContain("#changelog")
-    const start = link.getByRole("link", { name: /^Get started$/ })
+    const start = link.getByRole("link", { name: /^Get Started$/ })
     await expect(start).toHaveAttribute("href", "#installation")
     await expect(start).not.toHaveAttribute("type")
     await start.click()
     await expect(page).toHaveURL(/#installation$/)
 
+    // Clicking Subscribe and pressing Enter both submit the field's current value.
     const form = example("form")
-    const subscribe = form.getByRole("button", { name: /^Subscribe$/ })
-    // Clicking Submit and pressing Enter both submit the field's current value.
-    await form.getByRole("textbox", { name: "Email" }).fill("user@example.com")
-    await subscribe.click()
-    await expect(form.getByRole("status")).toHaveText("Submitted: user@example.com (1 time)")
-    await form.getByRole("textbox", { name: "Email" }).focus()
+    const email = form.getByRole("textbox", { name: "Email" })
+    await email.fill("user@example.com")
+    await form.getByRole("button", { name: /^Subscribe$/ }).click()
+    await expect(logs(form)).toHaveText(["Subscribed user@example.com"])
+    await email.focus()
     await page.keyboard.press("Enter")
-    await expect(form.getByRole("status")).toHaveText("Submitted: user@example.com (2 times)")
+    await expect(logs(form)).toHaveText(["Subscribed user@example.com", "Subscribed user@example.com"])
     await form.getByRole("button", { name: /^Reset$/ }).click()
-    await expect(form.getByText(/^Submitted:/)).toBeHidden()
-    await expect(form.getByRole("textbox", { name: "Email" })).toHaveValue("ada@example.com")
-    await expect(form.getByRole("status")).toHaveText("")
-
-    // The label follows the state, and a failed save shows its error until the next press.
-    const render = example("render")
-    const action = render.getByRole("button")
-    await expect(action).toHaveAccessibleName("Save changes")
-    await action.click()
-    await expect(action).toHaveAccessibleName("Saving…")
-    await expect(action).toHaveAccessibleName("Save changes")
-    const fail = render.getByRole("checkbox", { name: "Make saving fail" })
-    await fail.click()
-    await expect(fail).toBeChecked()
-    await action.click()
-    await expect(render.getByRole("alert")).toHaveText(failure)
-    await expect(action).toHaveAccessibleName("Try again")
-    await fail.click()
-    await expect(fail).not.toBeChecked()
-    await action.click()
-    await expect(render.getByText(failure)).toBeHidden()
-    await expect(action).toHaveAccessibleName("Save changes")
+    await expect(email).toHaveValue("ada@example.com")
 
     expect(errors).toEqual([])
   })

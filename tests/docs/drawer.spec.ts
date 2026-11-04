@@ -141,7 +141,6 @@ for (const framework of frameworks) {
   })
 }
 
-
 // The drawer is named by its title.
 for (const framework of frameworks) {
   test(`the drawer is named by its title in ${framework}`, async ({ page }) => {

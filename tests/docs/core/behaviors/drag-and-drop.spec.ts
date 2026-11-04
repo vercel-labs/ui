@@ -21,6 +21,7 @@ test("collapse: below the minimum the sidebar eases toward collapsing or the min
   page,
 }) => {
   await openBehaviors(page, "drag-and-drop")
+  const example = page.locator('[data-example="behaviors/bind-drag-collapse"]')
   const divider = page.getByRole("separator", { name: "Resize sidebar" })
   await divider.scrollIntoViewIfNeeded()
   const root = (await divider.locator("..").boundingBox())!
@@ -35,10 +36,10 @@ test("collapse: below the minimum the sidebar eases toward collapsing or the min
   await press()
   await page.mouse.move(root.x + 120, y, { steps: 6 })
   await expect(divider).toHaveAttribute("aria-valuenow", "140")
-  await expect(page.getByText("Release to open at 160px")).toBeVisible()
+  await expect(example.getByText("Release to open at 160px")).toBeVisible()
   await page.mouse.move(root.x + 40, y, { steps: 6 })
   await expect(divider).toHaveAttribute("aria-valuenow", "20")
-  await expect(page.getByText("Release to collapse")).toBeVisible()
+  await expect(example.getByText("Release to collapse")).toBeVisible()
   await page.mouse.up()
   await expect(divider).toHaveAttribute("aria-valuetext", "Collapsed")
   await press()

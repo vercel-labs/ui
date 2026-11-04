@@ -164,13 +164,21 @@ const checks: Record<string, Check> = {
   "range-limits": async (preview) => {
     await showMonth(preview, "October 2026")
     await expectUnavailable(preview, "Saturday, October 17, 2026")
-    await day(preview, "Wednesday, October 14, 2026").click()
     await day(preview, "Thursday, October 15, 2026").click()
-    await day(preview, "Tuesday, October 20, 2026").click()
+    // Until the end is picked, days that would make the stay too short or too long, or
+    // end it on a booked day, are disabled.
+    await expectUnavailable(preview, "Friday, October 16, 2026")
+    await expectUnavailable(preview, "Saturday, October 17, 2026")
+    await expectUnavailable(preview, "Monday, October 19, 2026", false)
+    await expectUnavailable(preview, "Thursday, October 22, 2026", false)
+    await expectUnavailable(preview, "Friday, October 23, 2026")
+    await day(preview, "Friday, October 16, 2026").click({ force: true })
     await expect(
-      day(preview, "Wednesday, October 14, 2026"),
+      day(preview, "Thursday, October 15, 2026"),
       "a press that would make a stay too short keeps its start",
     ).toHaveAttribute("aria-selected", "true")
+    await expectSelected(preview, "Friday, October 16, 2026", false)
+    await day(preview, "Tuesday, October 20, 2026").click()
     await expectSelected(preview, "Thursday, October 15, 2026")
     await expect(
       day(preview, "Sunday, October 18, 2026"),
@@ -213,11 +221,16 @@ const checks: Record<string, Check> = {
     await expect(day(preview, today)).toHaveAttribute("aria-current", "date")
   },
   controller: async (preview) => {
-    await preview.getByRole("button", { name: "Clear" }).click()
-    await expectSelected(preview, "Friday, October 16, 2026", false)
+    await expectSelected(preview, "Friday, October 16, 2026")
     await preview.getByRole("button", { name: "Go to Christmas" }).click()
     await expect(preview.getByRole("heading")).toHaveText("December 2026")
+    await expectSelected(preview, "Friday, December 25, 2026")
     await expect(day(preview, "Friday, December 25, 2026")).toBeFocused()
+    // Today turns back to today's month and selects it.
+    await preview.getByRole("button", { name: "Today", exact: true }).click()
+    const today = preview.locator('[aria-current="date"]')
+    await expect(today).toHaveAttribute("aria-selected", "true")
+    await expect(today).toBeFocused()
   },
   presets: async (preview) => {
     await preview.getByRole("button", { name: "Last 7 Days" }).click()

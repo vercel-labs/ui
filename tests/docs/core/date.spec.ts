@@ -48,7 +48,7 @@ test("months: a month on from January 31 is February 28, and the week follows it
   await expect(page.locator("[data-this-week]")).toHaveText("2026-02-23 to 2026-03-01, across two months")
   await page.getByRole("combobox", { name: "Weeks start on" }).selectOption("0")
   await expect(page.locator("[data-this-week]")).toHaveText("2026-02-22 to 2026-02-28")
-  await page.getByRole("button", { name: "Reset" }).click()
+  await page.getByRole("button", { name: "Reset", exact: true }).click()
   await page.getByRole("button", { name: "+ Year" }).click()
   await page.getByRole("button", { name: "+ Year" }).click()
   await expect(date).toHaveText("2028-01-31")

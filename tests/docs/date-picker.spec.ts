@@ -117,15 +117,18 @@ const checks: Record<string, Check> = {
     await close(preview)
   },
   popup: async (preview) => {
-    // Room above the field, so the popup doesn't flip below it.
-    await input(preview).evaluate((el) => el.scrollIntoView({ block: "center" }))
+    // Room below the field, so the popup doesn't flip above it.
+    await input(preview).evaluate((el) => {
+      el.scrollIntoView({ block: "start" })
+      window.scrollBy(0, -160)
+    })
     await trigger(preview).click()
     await expect(dialog(preview)).toBeVisible()
     await expect(lastLog(preview)).toHaveText("Opened (trigger-press)")
-    // It opens above the field, in the example's own container where there is one.
+    // It opens below the field by default, in the example's own container where there is one.
     await expect(preview.getByRole("dialog")).toBeVisible()
     const field = (await input(preview).boundingBox())!
-    expect((await dialog(preview).boundingBox())!.y).toBeLessThan(field.y)
+    expect((await dialog(preview).boundingBox())!.y).toBeGreaterThanOrEqual(field.y + field.height)
     await close(preview)
     await expect(lastLog(preview)).toHaveText("Finished closing")
   },

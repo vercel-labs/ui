@@ -18,7 +18,10 @@ const fieldIn = (preview: Locator) =>
 
 // The newest line in the preview's console pane, where examples log events.
 const lastLogIn = (preview: Locator) =>
-  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])').last()
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 // The list the field controls, wherever it renders, and its suggestions.
 async function listOf(field: Locator, page: Page) {
@@ -43,6 +46,9 @@ async function type(field: Locator, text: string) {
 
 const highlightedIn = (page: Page) => page.locator('[role="option"][data-highlighted]')
 
+// The suggestions that are open, wherever they render.
+const openContentIn = (page: Page) => page.locator('[data-slot="autocomplete-content"][data-open]')
+
 // The web frameworks, in the order the examples appear on the Autocomplete page.
 const web: Record<string, Check> = {
   async demo(preview, page) {
@@ -58,7 +64,7 @@ const web: Record<string, Check> = {
     await expect(field).toBeFocused()
     // Text that matches nothing stays, with the empty message.
     await type(field, "zz")
-    await expect(page.getByText("No fruits found.")).toBeVisible()
+    await expect(openContentIn(page).getByText("No fruits found.")).toBeVisible()
     await close(field, page)
     await expect(field).toHaveValue("zz")
   },
@@ -329,6 +335,28 @@ const web: Record<string, Check> = {
     await expect(field).toHaveAttribute("aria-expanded", "false")
     await expect(content).toBeAttached()
     await expect(content).toBeHidden()
+  },
+
+  async animation(preview, page) {
+    const field = fieldIn(preview)
+    await type(field, "man")
+    await expect(await optionsOf(field, page)).toHaveText(["Mango"])
+    const content = openContentIn(page)
+    await expect(content).not.toHaveAttribute("data-starting-style")
+    // It fades out, then unmounts or hides.
+    const watch = await content.evaluateHandle((el) => {
+      const seen = { el, ending: false }
+      // Reads the records, not the element: the attribute can come and go before the callback runs.
+      new MutationObserver((records) => {
+        for (const record of records) {
+          if (record.attributeName === "data-ending-style" && record.oldValue === null) seen.ending = true
+        }
+      }).observe(el, { attributes: true, attributeOldValue: true })
+      return seen
+    })
+    await close(field, page)
+    expect(await watch.evaluate((seen) => seen.ending)).toBe(true)
+    await expect.poll(() => watch.evaluate((seen) => !seen.el.isConnected || seen.el.hidden)).toBe(true)
   },
 
   async presentation(preview, page) {

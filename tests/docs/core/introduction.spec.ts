@@ -9,6 +9,7 @@ test("the introduction's examples render without errors", async ({ page }) => {
 
 test("emoji picker: search, then arrows and Enter pick an emoji", async ({ page }) => {
   await openExamples(page, "/docs/core")
+  const example = page.locator('[data-example="core/emoji-picker"]')
   const grid = page.getByRole("group", { name: "Emoji" })
   const footer = page.locator("[data-footer]")
   await expect(grid.locator('[tabindex="0"]')).toHaveCount(1)
@@ -32,7 +33,7 @@ test("emoji picker: search, then arrows and Enter pick an emoji", async ({ page 
   await expect(grid.getByRole("button")).toHaveCount(1)
   await expect(grid.getByRole("button")).toHaveAccessibleName("rocket")
   await search.fill("zzzzzz")
-  await expect(page.getByText("No emoji found.")).toBeVisible()
+  await expect(example.getByText("No emoji found.")).toBeVisible()
 })
 
 test.describe("on a phone", () => {

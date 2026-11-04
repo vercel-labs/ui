@@ -85,7 +85,10 @@ for (const framework of frameworks) {
     // follows --carousel-progress.
     const progress = previews.nth(order.indexOf("progress"))
     await expect(
-      progress.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])').last(),
+      progress
+        .locator("xpath=ancestor::figure[1]")
+        .locator('section[aria-label="Console"] li:not([aria-hidden])')
+        .last(),
     ).toHaveText("Rested on slide 2")
     const root = progress.locator("[aria-roledescription='carousel']")
     await expect

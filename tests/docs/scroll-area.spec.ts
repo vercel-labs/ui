@@ -63,7 +63,7 @@ for (const framework of ["react", "svelte", "solid"]) {
     await page.emulateMedia({ reducedMotion: "reduce" })
     await page.goto(`/docs/${framework}/components/scroll-area`)
     await page.waitForLoadState("networkidle")
-    const preview = page.locator("[data-example]").nth(9)
+    const preview = page.locator('[data-example="scroll-area/controller"]')
     await preview.scrollIntoViewIfNeeded()
     await preview.getByRole("button", { name: "Jump to the end" }).click()
     await expect(preview.getByText("v1.2.0-beta.1", { exact: true })).toBeInViewport()

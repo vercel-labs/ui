@@ -3,7 +3,7 @@ import { openBehaviors } from "./helpers"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "selection")
-  await expect(page.locator("[data-example]")).toHaveCount(10)
+  await expect(page.locator("[data-example]")).toHaveCount(9)
   expect(errors).toEqual([])
 })
 
@@ -133,23 +133,6 @@ test("selectable: owners stay selected through clicks and select all", async ({ 
   await page.keyboard.press("ControlOrMeta+a")
   await expect(selected).toHaveCount(1)
   await expect(list.getByRole("option", { name: /^Ana/ })).toHaveAttribute("aria-selected", "true")
-})
-
-test("helpers: checkboxes toggle, Shift-click takes a range, and the top box selects all", async ({
-  page,
-}) => {
-  await openBehaviors(page, "selection")
-  const summary = page.locator("[data-inbox-summary]")
-  await page.getByRole("checkbox", { name: "Invoice" }).click()
-  await page.getByRole("checkbox", { name: "Flight details" }).click({ modifiers: ["Shift"] })
-  await expect(summary).toHaveText("4 selected, the last range covers 4")
-  await expect(page.getByRole("checkbox", { name: "Weekly report" })).toBeChecked()
-  await page.getByRole("checkbox", { name: "Lunch?" }).click()
-  await expect(summary).toHaveText("3 selected")
-  await page.getByRole("checkbox", { name: "Select all" }).check()
-  await expect(summary).toHaveText("6 selected")
-  await page.getByRole("checkbox", { name: "Select all" }).uncheck()
-  await expect(summary).toHaveText("0 selected")
 })
 
 test("lasso: locked photos stay out, and screen readers hear how many were selected", async ({ page }) => {

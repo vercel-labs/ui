@@ -40,10 +40,11 @@ test("every example renders without errors", async ({ page }) => {
 test("bind viewport: the readout follows the keyboard as it opens and closes", async ({ page }) => {
   await withKeyboard(page)
   await openExamples(page, url)
+  const example = page.locator('[data-example="behaviors/viewport-bind"]')
   const keyboard = page.locator('[data-row="Keyboard"]')
   await keyboard.scrollIntoViewIfNeeded()
   await expect(keyboard).toHaveText("0px")
-  await expect(page.getByText("No keyboard open")).toBeVisible()
+  await expect(example.getByText("No keyboard open")).toBeVisible()
   // A smaller viewport without a focused field is zoom, not a keyboard.
   await openKeyboard(page, 300)
   await expect(keyboard).toHaveText("0px")
@@ -51,7 +52,7 @@ test("bind viewport: the readout follows the keyboard as it opens and closes", a
   await page.getByPlaceholder("Tap here on a phone").focus()
   await openKeyboard(page, 300)
   await expect(keyboard).toHaveText("300px")
-  await expect(page.getByText("The keyboard covers the bottom of the page")).toBeVisible()
+  await expect(example.getByText("The keyboard covers the bottom of the page")).toBeVisible()
   await openKeyboard(page, 0)
   await expect(keyboard).toHaveText("0px")
 })
@@ -80,7 +81,8 @@ test("avoid keyboard: the pill under the list rises above the keyboard, and sett
   await expect(pill.locator("..")).toHaveAttribute("data-keyboard", "")
   // The example's wrapper keeps 16 pixels between the pill and the keyboard.
   await expect.poll(gap).toBe(316)
-  await list.press("End")
+  // End scrolls the page on macOS instead of moving the caret.
+  await list.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(el.value.length, el.value.length))
   await list.pressSequentially("\n- eggs")
   await expect(pill).toHaveText("3 items · Saved")
   await openKeyboard(page, 0)

@@ -92,7 +92,7 @@ test("inline edit: Enter renames, Escape puts the name back, and typing starts o
   await expect(second).toBeFocused()
 
   await second.dblclick()
-  await page.keyboard.press("Control+A")
+  await page.keyboard.press("ControlOrMeta+A")
   await page.keyboard.press("Backspace")
   await page.keyboard.press("Enter")
   await expect(input).toBeFocused()
@@ -218,7 +218,7 @@ test("inline edit fields: Tab saves and moves on, a price must be a number, the 
   await page.keyboard.type("x")
   await page.keyboard.press("Enter")
   await expect(input).toBeFocused()
-  await page.keyboard.press("Control+A")
+  await page.keyboard.press("ControlOrMeta+A")
   await page.keyboard.type("59")
   await page.keyboard.press("Enter")
   await expect(field("Price")).toContainText("$59")

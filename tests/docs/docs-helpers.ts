@@ -51,7 +51,8 @@ function testExamples(
   fixtures = Object.keys(checks),
 ) {
   const order = Object.keys(checks).filter(onPage)
-  const root = path.join(import.meta.dirname, "../../examples", component)
+  const nested = path.join(import.meta.dirname, "../../examples/components", component)
+  const root = existsSync(nested) ? nested : path.join(import.meta.dirname, "../../examples", component)
   const examplesIn = (folder: string) =>
     readdirSync(path.join(root, folder), { withFileTypes: true })
       .filter((entry) => entry.isFile())
