@@ -78,7 +78,7 @@ type TextareaOptions = InputOptions & {
    */
   autoResize?: boolean
   /**
-   * Runs on the submit shortcut, unless an input method is composing. Without it, the shortcut submits the form the textarea is in.
+   * Runs on the submit shortcut, unless an input method is composing. Without it, the shortcut submits the form the textarea is in. With neither, the key is left alone, so Enter adds a line.
    */
   onSubmit?: (value: string, details: TextareaSubmitDetails) => void
   /**
@@ -244,10 +244,12 @@ const textareaPrimitive = /* @__PURE__ */ definePrimitive({
       const mod = isApple() ? event.metaKey : event.ctrlKey
       const submits = shortcut === "enter" ? !event.shiftKey && !mod && !event.altKey : mod && !event.shiftKey
       if (!submits) return
+      const { onSubmit } = options()
+      const form = (element("root") as HTMLTextAreaElement | undefined)?.form
+      if (!onSubmit && !form) return
       event.preventDefault()
-      const onSubmit = options().onSubmit
       if (onSubmit) onSubmit(store.get().value, { event })
-      else (element("root") as HTMLTextAreaElement | undefined)?.form?.requestSubmit()
+      else form?.requestSubmit()
     }
     return { ...field, internal: { ...field.internal, submitKey } }
   },

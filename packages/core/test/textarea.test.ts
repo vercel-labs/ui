@@ -198,6 +198,22 @@ describe("textarea", () => {
       unbind()
     })
 
+    test("outside a form and without onSubmit, the shortcut leaves Enter to add a line", () => {
+      const { el, press, unbind } = setupKeys({ submitShortcut: "enter" })
+      el.form = null
+      expect(press().defaultPrevented).toBe(false)
+      unbind()
+    })
+
+    test("outside a form, onSubmit still runs on the shortcut", () => {
+      const onSubmit = vi.fn()
+      const { el, press, unbind } = setupKeys({ submitShortcut: "mod+enter", onSubmit })
+      el.form = null
+      expect(press({ ctrlKey: true }).defaultPrevented).toBe(true)
+      expect(onSubmit).toHaveBeenCalledTimes(1)
+      unbind()
+    })
+
     test("nothing submits while an input method composes", () => {
       const onSubmit = vi.fn()
       const { press, unbind } = setupKeys({ submitShortcut: "enter", onSubmit })
