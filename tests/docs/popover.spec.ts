@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test"
+import { expect, test, type Locator, type Page } from "@playwright/test"
 import { readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
 
@@ -11,67 +11,182 @@ const examplesIn = (folder: string) =>
     .filter((file) => file.isFile())
     .map((file) => file.name.replace(/\.\w+$/, ""))
 
-// The order examples appear on the Popover page, and the trigger to press in each.
-const triggers: Record<string, RegExp> = {
-  basic: /^Open popover$/,
-  form: /^Edit profile$/,
-  draft: /^Add note$/,
-  placement: /^Placement$/,
-  arrow: /^Help$/,
-  anchor: /filters/i,
-  modal: /^(Non-modal|Modal)$/,
-  focus: /^(First field|Status)$/,
-  hover: /^@ada$/,
-  controlled: /^Share$/,
-  shortcut: /^Dimensions$/,
-  payload: /^Edit Grace Hopper$/,
-  container: /^Open (in the box|popover)$/,
-  animation: /^Animated$/,
-  presentation: /^Dimensions$/,
+type Context = { popover: Locator; preview: Locator; page: Page }
+
+type Example = {
+  // The trigger to press.
+  trigger: RegExp
+  // What to check once the popover is open.
+  check?: (context: Context) => Promise<void>
 }
-const order = Object.keys(triggers)
+
+// The latest line in an example's console.
+function lastLog(preview: Locator) {
+  return preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+}
+
+// The examples in the order they appear on the Popover page.
+const examples: Record<string, Example> = {
+  basic: {
+    trigger: /^Share$/,
+    check: async ({ popover }) => {
+      await expect(popover).toHaveAccessibleName("Share this document")
+      await expect(popover.getByRole("textbox", { name: "Link" })).toBeFocused()
+    },
+  },
+  form: { trigger: /^Edit Profile$/ },
+  draft: { trigger: /^Add Note$/ },
+  placement: { trigger: /^Delivery$/ },
+  offsets: { trigger: /^Delivery$/ },
+  arrow: { trigger: /^Help$/ },
+  anchor: {
+    trigger: /^Search filters$/,
+    check: async ({ popover, preview }) => {
+      const [field, box] = await Promise.all([
+        preview.getByRole("searchbox", { name: "Search files" }).boundingBox(),
+        popover.boundingBox(),
+      ])
+      expect(Math.abs(box!.x - field!.x)).toBeLessThanOrEqual(1)
+    },
+  },
+  modal: { trigger: /^Add Comment$/ },
+  focus: {
+    trigger: /^Rename$/,
+    check: async ({ popover }) => {
+      await expect(popover.getByRole("textbox", { name: "Name" })).toBeFocused()
+    },
+  },
+  hover: { trigger: /^@kofi$/ },
+  controlled: { trigger: /^Set Status$/ },
+  shortcut: { trigger: /^Invite/ },
+  payload: {
+    trigger: /^Edit Inès Moreau$/,
+    check: async ({ popover, preview }) => {
+      await expect(popover).toHaveAccessibleName("Inès Moreau")
+      await expect(lastLog(preview)).toHaveText("Editing Inès Moreau")
+    },
+  },
+  animation: {
+    trigger: /^What's New$/,
+    check: async ({ preview }) => {
+      await expect(lastLog(preview)).toHaveText("Open")
+    },
+  },
+  presentation: {
+    trigger: /^Add Reminder$/,
+    check: async ({ popover }) => {
+      await expect(popover).toHaveAttribute("data-presentation", "sheet")
+    },
+  },
+  "custom-rendering": {
+    trigger: /^Show Updates/,
+    check: async ({ preview }) => {
+      await expect(preview.getByRole("button", { name: /^Hide Updates/ })).toBeVisible()
+    },
+  },
+}
+const order = Object.keys(examples)
+
+const open = async (page: Page, framework: string, name: string) => {
+  await page.goto(`/docs/${framework}/components/popover`)
+  await page.waitForLoadState("networkidle")
+  const preview = page.locator(`[data-example="popover/${name}"]`)
+  await preview.scrollIntoViewIfNeeded()
+  return preview
+}
 
 for (const framework of frameworks) {
   test(`every popover example works in ${framework}`, async ({ page }) => {
+    test.setTimeout(120_000)
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
     page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
     await page.goto(`/docs/${framework}/components/popover`)
+    await page.waitForLoadState("networkidle")
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
     for (const folder of folders)
-      expect(examplesIn(folder).sort(), folder).toEqual(
-        [...order, "align", "offsets", "rtl", "custom-rendering"].sort(),
-      )
+      expect(examplesIn(folder).sort(), folder).toEqual([...order, "align", "rtl"].sort())
 
     for (const [index, name] of order.entries()) {
-      const trigger = previews.nth(index).getByRole("button", { name: triggers[name] }).first()
-      await trigger.scrollIntoViewIfNeeded()
-      await trigger.click()
-      await expect(page.getByRole("dialog").first(), `${name} popover`).toBeVisible()
-      await page.keyboard.press("Escape")
-      await expect(page.getByRole("dialog"), `${name} closes`).toHaveCount(0)
+      await test.step(name, async () => {
+        const preview = previews.nth(index)
+        await expect(preview).toHaveAttribute("data-example", `popover/${name}`)
+        const trigger = preview.getByRole("button", { name: examples[name].trigger }).first()
+        await trigger.scrollIntoViewIfNeeded()
+        await trigger.click()
+        const popover = page.getByRole("dialog").first()
+        await expect(popover, `${name} opens`).toBeVisible()
+        await examples[name].check?.({ popover, preview, page })
+        await page.keyboard.press("Escape")
+        await expect(page.getByRole("dialog"), `${name} closes`).toHaveCount(0)
+      })
     }
 
     expect(errors).toEqual([])
   })
 }
 
+// A form saves its value and closes the popover.
+for (const framework of frameworks) {
+  test(`the form saves and closes in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "form")
+    await preview.getByRole("button", { name: "Edit Profile" }).click()
+    const popover = page.getByRole("dialog", { name: "Edit profile" })
+    await popover.getByRole("textbox", { name: "Name" }).fill("Wren Takahashi")
+    await popover.getByRole("button", { name: "Save" }).click()
+    await expect(popover).toHaveCount(0)
+    await expect(lastLog(preview)).toHaveText("Saved Wren Takahashi")
+  })
+}
+
+// With a note typed, Escape asks first, and Discard closes.
+for (const framework of frameworks) {
+  test(`a note keeps the popover open in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "draft")
+    await preview.getByRole("button", { name: "Add Note" }).click()
+    const popover = page.getByRole("dialog", { name: "Add a note" })
+    await popover.getByRole("textbox", { name: "Note" }).fill("Order more labels")
+    await page.keyboard.press("Escape")
+    await expect(popover).toBeVisible()
+    await expect(popover.getByRole("alert")).toContainText("Discard your note?")
+    await expect(lastLog(preview)).toHaveText("Kept open (escape-key)")
+    await popover.getByRole("button", { name: "Discard" }).click()
+    await expect(popover).toHaveCount(0)
+    await expect(lastLog(preview)).toHaveText("Discarded the note")
+  })
+}
+
+// The popover opens on the side chosen for it.
+for (const framework of frameworks) {
+  test(`the popover opens on the chosen side in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "placement")
+    await preview.getByRole("combobox", { name: "Side" }).click()
+    await page.getByRole("option", { name: "Top", exact: true }).click()
+    const trigger = preview.getByRole("button", { name: "Delivery" })
+    await trigger.click()
+    const popover = page.getByRole("dialog", { name: "Delivery window" })
+    await expect(popover).toHaveAttribute("data-side", "top")
+    const [button, box] = await Promise.all([trigger.boundingBox(), popover.boundingBox()])
+    expect(box!.y + box!.height).toBeLessThanOrEqual(button!.y)
+  })
+}
+
 // The arrow example moves the open popover to another side. The arrow follows it.
 for (const framework of frameworks) {
   test(`the arrow follows the popover's side in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/popover`)
-    const preview = page.locator("[data-example]").nth(order.indexOf("arrow"))
-    const trigger = preview.getByRole("button", { name: "Help" })
-    await trigger.scrollIntoViewIfNeeded()
-    await trigger.click()
+    const preview = await open(page, framework, "arrow")
+    await preview.getByRole("button", { name: "Help" }).click()
     const dialog = page.getByRole("dialog", { name: "Keyboard shortcuts" })
     const arrow = dialog.locator('[data-slot="popover-arrow"]')
-    for (const side of ["top", "right", "left", "bottom"]) {
-      await preview.getByRole("group", { name: /side/i }).getByRole("button", { name: side }).click()
+    for (const side of ["Top", "Right", "Left", "Bottom"]) {
+      await preview.getByRole("group", { name: "Side" }).getByRole("button", { name: side }).click()
       await expect(dialog).toBeVisible()
-      await expect(dialog).toHaveAttribute("data-side", side)
-      await expect(arrow).toHaveAttribute("data-side", side)
+      await expect(dialog).toHaveAttribute("data-side", side.toLowerCase())
+      await expect(arrow).toHaveAttribute("data-side", side.toLowerCase())
     }
   })
 }
@@ -79,16 +194,13 @@ for (const framework of frameworks) {
 // The arrow sticks out of the popover, so the popover mustn't clip it.
 for (const framework of frameworks) {
   test(`the arrow shows outside the popover on every side in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/popover`)
-    const preview = page.locator("[data-example]").nth(order.indexOf("arrow"))
-    const trigger = preview.getByRole("button", { name: "Help" })
-    await trigger.scrollIntoViewIfNeeded()
-    await trigger.click()
+    const preview = await open(page, framework, "arrow")
+    await preview.getByRole("button", { name: "Help" }).click()
     const dialog = page.getByRole("dialog", { name: "Keyboard shortcuts" })
     const arrow = dialog.locator('[data-slot="popover-arrow"]')
     await expect.poll(() => dialog.evaluate((el) => getComputedStyle(el).overflow)).toBe("visible")
     for (const side of ["top", "right", "left", "bottom"]) {
-      await preview.getByRole("group", { name: /side/i }).getByRole("button", { name: side }).click()
+      await preview.getByRole("group", { name: "Side" }).getByRole("button", { name: side }).click()
       await expect(arrow).toHaveAttribute("data-side", side)
       const nearTip = async () => {
         const box = (await arrow.boundingBox())!
@@ -101,20 +213,79 @@ for (const framework of frameworks) {
   })
 }
 
+// Each popover in the focus example starts focus somewhere else.
+for (const framework of frameworks) {
+  test(`initialFocus picks where focus starts in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "focus")
+    await preview.getByRole("button", { name: "Publish" }).click()
+    const publish = page.getByRole("dialog", { name: "Publish changes?" })
+    await expect(publish.getByRole("button", { name: "Publish" })).toBeFocused()
+    await page.keyboard.press("Escape")
+    const status = preview.getByRole("button", { name: "Status" })
+    await status.click()
+    await expect(page.getByRole("dialog", { name: "All systems normal" })).toBeVisible()
+    await expect(status).toBeFocused()
+  })
+}
+
+// Hovering opens the popover, and its content can be used.
+for (const framework of frameworks) {
+  test(`hovering opens the profile in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "hover")
+    await preview.getByRole("button", { name: "@kofi" }).hover()
+    const popover = page.getByRole("dialog", { name: "Kofi Mensah" })
+    await expect(popover).toBeVisible()
+    await popover.getByRole("button", { name: "Follow" }).click()
+    await expect(lastLog(preview)).toHaveText("Followed @kofi")
+  })
+}
+
+// The checkbox and the popover share one open state.
+for (const framework of frameworks) {
+  test(`the controlled popover follows its checkbox in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "controlled")
+    const checkbox = preview.getByRole("checkbox", { name: "Open" })
+    await checkbox.click()
+    const popover = page.getByRole("dialog", { name: "Set a status" })
+    await expect(popover).toBeVisible()
+    await page.keyboard.press("Escape")
+    await expect(popover).toHaveCount(0)
+    await expect(checkbox).not.toBeChecked()
+    await expect(lastLog(preview)).toHaveText("Closed (escape-key)")
+  })
+}
+
 // The shortcut example's trigger opens and closes with its keys, which it advertises.
 for (const framework of frameworks) {
   test(`the shortcut example opens the popover in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/popover`)
-    const preview = page.locator("[data-example]").nth(order.indexOf("shortcut"))
-    // Examples load after the page, so wait for the trigger before pressing keys.
-    const trigger = preview.getByRole("button", { name: triggers.shortcut })
-    await trigger.scrollIntoViewIfNeeded()
-    const popover = page.getByRole("dialog", { name: "Dimensions" })
+    const preview = await open(page, framework, "shortcut")
+    const trigger = preview.getByRole("button", { name: /^Invite/ })
+    const popover = page.getByRole("dialog", { name: "Invite people" })
     await expect(trigger).toHaveAttribute("aria-keyshortcuts", /^(Meta|Control)\+I$/)
     await page.keyboard.press("ControlOrMeta+i")
     await expect(popover).toBeVisible()
     await page.keyboard.press("ControlOrMeta+i")
     await expect(popover).toHaveCount(0)
+  })
+}
+
+// One popover edits the row that opened it, and code can open it too.
+for (const framework of frameworks) {
+  test(`one popover edits each row in ${framework}`, async ({ page }) => {
+    const preview = await open(page, framework, "payload")
+    await expect(preview.getByRole("button", { name: "Edit Hollis Grant" })).toBeDisabled()
+    await preview.getByRole("button", { name: "Edit Kofi Mensah" }).click()
+    const popover = page.getByRole("dialog", { name: "Kofi Mensah" })
+    await popover.getByRole("combobox", { name: "Role" }).selectOption("Admin")
+    await popover.getByRole("button", { name: "Save" }).click()
+    await expect(popover).toHaveCount(0)
+    await expect(preview.getByRole("listitem").filter({ hasText: "Kofi Mensah" })).toContainText("Admin")
+
+    await preview.getByRole("button", { name: "Edit Newest Member" }).click()
+    const newest = page.getByRole("dialog", { name: "Wren Takahashi" })
+    await newest.getByRole("button", { name: "Cancel" }).click()
+    await expect(newest).toHaveCount(0)
+    await expect(lastLog(preview)).toHaveText("Closed (close-press), returned cancel")
   })
 }
 
@@ -148,17 +319,3 @@ test("every popover prop appears in an example", () => {
     expect(missing, folder).toEqual([])
   }
 })
-
-// The popover is named by its title.
-for (const framework of frameworks) {
-  test(`the popover is named by its title in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/popover`)
-    await page.waitForLoadState("networkidle")
-    await page
-      .locator("[data-example]")
-      .first()
-      .getByRole("button", { name: /^Open popover$/ })
-      .click()
-    await expect(page.getByRole("dialog", { name: "Dimensions" })).toBeVisible()
-  })
-}

@@ -11,44 +11,33 @@ import {
 } from "@ui-sdk/react/popover"
 import { CircleQuestionMarkIcon } from "lucide-react"
 
-const sides = ["top", "right", "bottom", "left"] as const
-const aligns = ["start", "center", "end"] as const
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+] as const
+type Side = (typeof sides)[number]["value"]
 
 function Example() {
   const [open, setOpen] = React.useState(false)
-  const [side, setSide] = React.useState<(typeof sides)[number]>("bottom")
-  const [align, setAlign] = React.useState<(typeof aligns)[number]>("start")
+  const [side, setSide] = React.useState<Side>("bottom")
   const controls = React.useRef<HTMLDivElement>(null)
 
   return (
     <div data-slot="stack">
-      <div data-slot="stack" ref={controls}>
-        <div data-slot="row" role="group" aria-label="Side">
-          {sides.map((value) => (
-            <button
-              key={value}
-              type="button"
-              data-size="sm"
-              aria-pressed={side === value}
-              onClick={() => setSide(value)}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
-        <div data-slot="row" role="group" aria-label="Align">
-          {aligns.map((value) => (
-            <button
-              key={value}
-              type="button"
-              data-size="sm"
-              aria-pressed={align === value}
-              onClick={() => setAlign(value)}
-            >
-              {value}
-            </button>
-          ))}
-        </div>
+      <div data-slot="controls" role="group" aria-label="Side" ref={controls}>
+        {sides.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            data-size="sm"
+            aria-pressed={side === option.value}
+            onClick={() => setSide(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
       <Popover
         open={open}
@@ -61,10 +50,10 @@ function Example() {
         <PopoverTrigger aria-label="Help">
           <CircleQuestionMarkIcon aria-hidden="true" />
         </PopoverTrigger>
-        <PopoverContent side={side} align={align} sideOffset={10} arrowPadding={12}>
+        <PopoverContent side={side} sideOffset={10} arrowPadding={12}>
           <PopoverArrow />
           <PopoverTitle>Keyboard shortcuts</PopoverTitle>
-          <PopoverDescription>Press ? anywhere to see every shortcut.</PopoverDescription>
+          <PopoverDescription>Press ? anywhere to see them all.</PopoverDescription>
         </PopoverContent>
       </Popover>
     </div>

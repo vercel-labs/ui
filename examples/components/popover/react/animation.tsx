@@ -1,31 +1,32 @@
 "use client"
 
-import * as React from "react"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [status, setStatus] = React.useState("Closed")
+  const log = useLog()
 
   return (
-    <>
-      <Popover
-        onOpenChange={(open) => setStatus(open ? "Opening" : "Closing")}
-        onOpenChangeComplete={(open) => setStatus(open ? "Open" : "Closed")}
-      >
-        <PopoverTrigger>Animated</PopoverTrigger>
-        <PopoverContent keepMounted>
-          <PopoverTitle>Scale and fade</PopoverTitle>
-          <PopoverDescription>300ms in and out, from the trigger.</PopoverDescription>
-        </PopoverContent>
-      </Popover>
-      <output data-slot="output">{status}</output>
-    </>
+    <Popover
+      onOpenChange={(open) => log(open ? "Opening" : "Closing")}
+      onOpenChangeComplete={(open) => log(open ? "Open" : "Closed")}
+    >
+      <PopoverTrigger>What's New</PopoverTrigger>
+      <PopoverContent keepMounted>
+        <PopoverTitle>What's new</PopoverTitle>
+        <PopoverDescription>Comments now support threads and reactions.</PopoverDescription>
+        <div data-slot="row">
+          <PopoverClose data-variant="solid">Got It</PopoverClose>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 

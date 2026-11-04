@@ -7,26 +7,26 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
-import { BellIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <Popover>
       <PopoverTrigger
         shortcut="mod+u"
         render={(props, state) => (
           <button {...props}>
-            <BellIcon />
-            {state.open ? "Hide updates" : "Show updates"}
+            {state.open ? "Hide Updates" : "Show Updates"}
             <PopoverShortcut>{(shortcut) => shortcut.text}</PopoverShortcut>
           </button>
         )}
       />
       <PopoverContent>
         <PopoverTitle render={<h3 />}>Updates</PopoverTitle>
-        <PopoverDescription>Version 2.0 is out.</PopoverDescription>
-        <PopoverClose render={<a href="https://example.com/changelog" />}>Read the changelog</PopoverClose>
+        <PopoverDescription>Version 2.4 adds threaded comments.</PopoverDescription>
+        <PopoverClose render={<a href="#" />}>Read the Changelog</PopoverClose>
       </PopoverContent>
     </Popover>
   )
 }
+
+export { Example }

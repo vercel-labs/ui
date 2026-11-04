@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   Popover,
   PopoverClose,
@@ -9,33 +10,71 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
 const modes = [
-  { label: "Non-modal", modal: false },
-  { label: "Trap focus", modal: "trap-focus" },
-  { label: "Modal", modal: true },
-] as const
+  { value: "false", label: "Non-modal" },
+  { value: "trap-focus", label: "Trap focus" },
+  { value: "true", label: "Modal" },
+]
+
+type Mode = "false" | "trap-focus" | "true"
+
+const notes = {
+  false: "Tab can leave, and focus leaving closes it.",
+  "trap-focus": "Tab stays inside. The page still scrolls and takes clicks.",
+  true: "Tab stays inside. The page is inert and doesn't scroll.",
+}
 
 function Example() {
-  const [clicks, setClicks] = React.useState(0)
+  const [mode, setMode] = React.useState<Mode>("false")
+  const modal = mode === "true" ? true : mode === "false" ? false : "trap-focus"
 
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        {modes.map((mode) => (
-          <Popover key={mode.label} modal={mode.modal}>
-            <PopoverTrigger>{mode.label}</PopoverTrigger>
-            <PopoverContent>
-              <PopoverTitle>{mode.label}</PopoverTitle>
-              <PopoverDescription>Press Tab, then click the box below.</PopoverDescription>
-              <PopoverClose>Close</PopoverClose>
-            </PopoverContent>
-          </Popover>
-        ))}
+      <div data-slot="controls">
+        <Select items={modes} value={mode} onValueChange={(next) => next && setMode(next as Mode)}>
+          <SelectLabel>Modal</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon aria-hidden="true" />
+          </SelectTrigger>
+          <SelectContent>
+            {modes.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+                <SelectItemIndicator>
+                  <CheckIcon aria-hidden="true" />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <button type="button" onClick={() => setClicks(clicks + 1)}>
-        Clicked {clicks} {clicks === 1 ? "time" : "times"}. Open a popover, then click here.
-      </button>
+      <Popover modal={modal}>
+        <PopoverTrigger>Add Comment</PopoverTrigger>
+        <PopoverContent>
+          <PopoverTitle>Add a comment</PopoverTitle>
+          <PopoverDescription>{notes[mode]}</PopoverDescription>
+          <Field>
+            <FieldLabel>Comment</FieldLabel>
+            <FieldControl render={<textarea />} defaultValue="Looks good to me." />
+          </Field>
+          <div data-slot="row">
+            <PopoverClose>Cancel</PopoverClose>
+            <PopoverClose data-variant="solid">Comment</PopoverClose>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

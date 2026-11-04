@@ -1,3 +1,6 @@
+"use client"
+
+import * as React from "react"
 import {
   Popover,
   PopoverContent,
@@ -5,51 +8,73 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
-import * as React from "react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
 const choices = {
-  sideOffset: [0, 8, 24],
-  alignOffset: [-16, 0, 16],
-  collisionPadding: [8, 48],
+  sideOffset: { label: "Side offset", values: ["4", "8", "16", "24"] },
+  alignOffset: { label: "Align offset", values: ["-16", "0", "16"] },
+  collisionPadding: { label: "Collision padding", values: ["8", "24", "48"] },
 }
+type Name = keyof typeof choices
 
-export function Example() {
-  const [offsets, setOffsets] = React.useState({ sideOffset: 8, alignOffset: 0, collisionPadding: 8 })
+function Example() {
+  const [offsets, setOffsets] = React.useState<Record<Name, string>>({
+    sideOffset: "8",
+    alignOffset: "0",
+    collisionPadding: "8",
+  })
 
   return (
     <div data-slot="stack">
-      <div data-slot="stack">
-        {(Object.keys(choices) as (keyof typeof choices)[]).map((name) => (
-          <div key={name} data-slot="row" role="group" aria-label={name}>
-            {choices[name].map((value) => (
-              <button
-                key={value}
-                type="button"
-                data-size="sm"
-                aria-pressed={offsets[name] === value}
-                onClick={() => setOffsets({ ...offsets, [name]: value })}
-              >
-                {name} {value}
-              </button>
-            ))}
-          </div>
+      <div data-slot="controls">
+        {(Object.keys(choices) as Name[]).map((name) => (
+          <Select
+            key={name}
+            items={choices[name].values}
+            value={offsets[name]}
+            onValueChange={(next) => next && setOffsets({ ...offsets, [name]: next })}
+          >
+            <SelectLabel>{choices[name].label}</SelectLabel>
+            <SelectTrigger>
+              <SelectValue />
+              <ChevronDownIcon aria-hidden="true" />
+            </SelectTrigger>
+            <SelectContent>
+              {choices[name].values.map((value) => (
+                <SelectItem key={value} value={value}>
+                  {value}px
+                  <SelectItemIndicator>
+                    <CheckIcon aria-hidden="true" />
+                  </SelectItemIndicator>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         ))}
       </div>
       <Popover>
-        <PopoverTrigger>Offsets</PopoverTrigger>
+        <PopoverTrigger>Delivery</PopoverTrigger>
         <PopoverContent
           align="start"
-          sideOffset={offsets.sideOffset}
-          alignOffset={offsets.alignOffset}
-          collisionPadding={offsets.collisionPadding}
+          sideOffset={Number(offsets.sideOffset)}
+          alignOffset={Number(offsets.alignOffset)}
+          collisionPadding={Number(offsets.collisionPadding)}
         >
-          <PopoverTitle>Offsets</PopoverTitle>
-          <PopoverDescription>
-            {offsets.sideOffset}px from the trigger, shifted {offsets.alignOffset}px,{" "}
-            {offsets.collisionPadding}px from the edges.
-          </PopoverDescription>
+          <PopoverTitle>Delivery window</PopoverTitle>
+          <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
         </PopoverContent>
       </Popover>
     </div>
   )
 }
+
+export { Example }

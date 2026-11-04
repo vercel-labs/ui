@@ -1,46 +1,55 @@
 "use client"
 
 import * as React from "react"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
+  const log = useLog()
   const [open, setOpen] = React.useState(false)
   const [note, setNote] = React.useState("")
   const [asking, setAsking] = React.useState(false)
-  const [saved, setSaved] = React.useState(false)
   const field = React.useRef<HTMLTextAreaElement>(null)
   const close = () => {
     setOpen(false)
+    setNote("")
     setAsking(false)
   }
 
   return (
-    <>
-      <Popover
-        open={open}
-        onOpenChange={(next) => (next ? setOpen(true) : close())}
-        dismissible={note === ""}
-        onDismissAttempt={() => setAsking(true)}
-      >
-        <PopoverTrigger>Add note</PopoverTrigger>
-        <PopoverContent>
-          <PopoverTitle>Note</PopoverTitle>
-          <PopoverDescription>Type something, then press Escape or click outside.</PopoverDescription>
-          <textarea
-            ref={field}
-            aria-label="Note"
+    <Popover
+      open={open}
+      onOpenChange={(next) => (next ? setOpen(true) : close())}
+      dismissible={note === ""}
+      onDismissAttempt={(details) => {
+        log(`Kept open (${details.reason})`)
+        setAsking(true)
+      }}
+    >
+      <PopoverTrigger>Add Note</PopoverTrigger>
+      <PopoverContent>
+        <PopoverTitle>Add a note</PopoverTitle>
+        <PopoverDescription>Only your team can see it.</PopoverDescription>
+        <Field>
+          <FieldLabel>Note</FieldLabel>
+          <FieldControl
+            render={<textarea ref={field} placeholder="Call the printer about the proofs." />}
             value={note}
-            onChange={(event) => setNote(event.target.value)}
+            onChange={(event) => setNote(event.currentTarget.value)}
           />
-          {asking ? (
-            <div role="alert" data-slot="row">
-              Discard your note?
+        </Field>
+        {asking ? (
+          <div data-slot="row" role="alert">
+            Discard your note?
+            <div data-slot="row">
               <button
                 type="button"
                 data-size="sm"
@@ -49,37 +58,38 @@ function Example() {
                   field.current?.focus()
                 }}
               >
-                Keep editing
+                Keep Editing
               </button>
               <button
                 type="button"
                 data-size="sm"
-                data-variant="destructive"
+                data-variant="solid"
                 onClick={() => {
-                  setNote("")
+                  log("Discarded the note")
                   close()
                 }}
               >
                 Discard
               </button>
             </div>
-          ) : (
+          </div>
+        ) : (
+          <div data-slot="row">
+            <PopoverClose>Cancel</PopoverClose>
             <button
               type="button"
               data-variant="solid"
               onClick={() => {
-                setSaved(true)
-                setNote("")
+                log(note ? "Saved the note" : "Nothing to save")
                 close()
               }}
             >
               Save
             </button>
-          )}
-        </PopoverContent>
-      </Popover>
-      <output data-slot="output">{saved ? "Note saved" : "No note yet"}</output>
-    </>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
   )
 }
 

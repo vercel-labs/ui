@@ -1,34 +1,29 @@
 "use client"
 
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
 
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
-
 function Example() {
   return (
     <Popover presentation="sheet">
-      <PopoverTrigger>Dimensions</PopoverTrigger>
+      <PopoverTrigger>Add Reminder</PopoverTrigger>
       <PopoverContent>
-        <PopoverTitle>Dimensions</PopoverTitle>
-        <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-        <div data-slot="stack">
-          {dimensions.map((dimension) => (
-            <label data-slot="label" key={dimension.label}>
-              {dimension.label}
-              <input defaultValue={dimension.value} />
-            </label>
-          ))}
+        <PopoverTitle>New reminder</PopoverTitle>
+        <PopoverDescription>We'll notify you at the time you pick.</PopoverDescription>
+        <Field>
+          <FieldLabel>Remind me to</FieldLabel>
+          <FieldControl defaultValue="Send the Q3 roadmap" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <PopoverClose data-variant="solid">Save</PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

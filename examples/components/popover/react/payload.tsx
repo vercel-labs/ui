@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   createPopoverController,
   Popover,
@@ -9,21 +10,37 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
+import { useLog } from "../../../shared/react/log"
 
 type Member = { name: string; role: string }
 
+const roles = ["Admin", "Editor", "Viewer"]
+
 function Example() {
+  const log = useLog()
   const [popover] = React.useState(() => createPopoverController<Member>())
   const [members, setMembers] = React.useState<Member[]>([
-    { name: "Ada Lovelace", role: "Owner" },
-    { name: "Grace Hopper", role: "Editor" },
-    { name: "Alan Turing", role: "Viewer" },
+    { name: "Hollis Grant", role: "Owner" },
+    { name: "Inès Moreau", role: "Editor" },
+    { name: "Kofi Mensah", role: "Viewer" },
+    { name: "Wren Takahashi", role: "Viewer" },
   ])
-  const [status, setStatus] = React.useState("")
+  const newest = members[members.length - 1]
 
   return (
     <div data-slot="stack">
-      <ul>
+      <div data-slot="controls">
+        <button
+          type="button"
+          onClick={async (event) => {
+            const result = await popover.open({ payload: newest, anchor: event.currentTarget })
+            log(`Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`)
+          }}
+        >
+          Edit Newest Member
+        </button>
+      </div>
+      <ul data-slot="list">
         {members.map((member) => (
           <li data-slot="row" key={member.name}>
             {member.name}
@@ -45,15 +62,15 @@ function Example() {
         controller={popover}
         onPayloadChange={(payload) => {
           const member = payload as Member | undefined
-          if (member) setStatus(`Editing ${member.name}`)
+          if (member) log(`Editing ${member.name}`)
         }}
       >
-        <PopoverContent<Member> align="end">
+        <PopoverContent<Member> align="end" sideOffset={8}>
           {(state) => {
             const member = state.payload
             return (
               <>
-                <PopoverTitle>Edit {member?.name}</PopoverTitle>
+                <PopoverTitle>{member?.name}</PopoverTitle>
                 <PopoverDescription>Roles decide what they can change.</PopoverDescription>
                 <form
                   data-slot="stack"
@@ -61,21 +78,34 @@ function Example() {
                   onSubmit={(event) => {
                     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement
                     if (submitter.value !== "save" || !member) return
-                    const next = String(new FormData(event.currentTarget).get("role"))
+                    const role = String(new FormData(event.currentTarget).get("role"))
                     setMembers((current) =>
-                      current.map((entry) => (entry.name === member.name ? { ...entry, role: next } : entry)),
+                      current.map((entry) => (entry.name === member.name ? { ...entry, role } : entry)),
                     )
                   }}
                 >
-                  <label data-slot="label">
-                    Role
-                    <input key={member?.name} name="role" defaultValue={member?.role} />
-                  </label>
+                  <Field>
+                    <FieldLabel>Role</FieldLabel>
+                    <FieldControl
+                      key={member?.name}
+                      name="role"
+                      defaultValue={member?.role}
+                      render={
+                        <select>
+                          {roles.map((role) => (
+                            <option key={role}>{role}</option>
+                          ))}
+                        </select>
+                      }
+                    />
+                  </Field>
                   <div data-slot="row">
-                    <button value="save" data-variant="solid">
+                    <button type="submit" value="cancel" formNoValidate>
+                      Cancel
+                    </button>
+                    <button type="submit" value="save" data-variant="solid">
                       Save
                     </button>
-                    <button value="cancel">Cancel</button>
                   </div>
                 </form>
               </>
@@ -83,20 +113,6 @@ function Example() {
           }}
         </PopoverContent>
       </Popover>
-      <button
-        type="button"
-        data-variant="ghost"
-        onClick={async (event) => {
-          const result = await popover.open({
-            payload: members[members.length - 1],
-            anchor: event.currentTarget,
-          })
-          setStatus(`Closed with ${result.reason}, returned ${result.returnValue ?? "nothing"}`)
-        }}
-      >
-        Edit the newest member
-      </button>
-      <output data-slot="output">{status || "Not edited yet"}</output>
     </div>
   )
 }

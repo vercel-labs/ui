@@ -1,5 +1,7 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverShortcut,
@@ -7,30 +9,23 @@ import {
   PopoverTrigger,
 } from "@ui-sdk/react/popover"
 
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
-
 function Example() {
   return (
     <Popover>
       <PopoverTrigger shortcut="mod+i">
-        Dimensions
+        Invite
         <PopoverShortcut />
       </PopoverTrigger>
       <PopoverContent>
-        <PopoverTitle>Dimensions</PopoverTitle>
-        <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-        <div data-slot="stack">
-          {dimensions.map((dimension) => (
-            <label data-slot="label" key={dimension.label}>
-              {dimension.label}
-              <input defaultValue={dimension.value} />
-            </label>
-          ))}
+        <PopoverTitle>Invite people</PopoverTitle>
+        <PopoverDescription>They'll get an email with a link to join.</PopoverDescription>
+        <Field>
+          <FieldLabel>Email</FieldLabel>
+          <FieldControl type="email" placeholder="wren@example.com" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <PopoverClose data-variant="solid">Send Invite</PopoverClose>
         </div>
       </PopoverContent>
     </Popover>
