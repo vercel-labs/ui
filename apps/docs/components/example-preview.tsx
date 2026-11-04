@@ -44,6 +44,16 @@ function ExamplePreview({
     return () => figure?.removeEventListener("example-reset", reset)
   }, [])
 
+  // Demo links point at `#`, which would scroll the docs page to the top when followed.
+  React.useEffect(() => {
+    const element = host.current
+    const stay = (event: MouseEvent) => {
+      if ((event.target as Element).closest?.('a[href="#"]')) event.preventDefault()
+    }
+    element?.addEventListener("click", stay)
+    return () => element?.removeEventListener("click", stay)
+  }, [])
+
   React.useEffect(() => {
     setEntries([])
     const base = `/examples/${frameworks[framework].example}`

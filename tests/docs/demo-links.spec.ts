@@ -2,14 +2,14 @@ import { expect, test } from "@playwright/test"
 import { readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
 
-// A demo link to `#something` rewrites the docs' URL and jumps to the top of
-// the page when followed, so these components' demo links point somewhere
-// real. Navigation Menu's Link Component example keeps hash routes: its
-// router handles every click, so nothing follows them. Examples whose links
-// are hash routes on purpose, like Tabs' and Accordion's, aren't listed.
+// A demo link to `#something` rewrites the docs' URL when followed, so these
+// components' demo links use a bare `#`, which the docs preview doesn't follow.
+// Navigation Menu's Link Component example keeps hash routes: its router
+// handles every click. Examples whose links are hash routes on purpose, like
+// Tabs' and Accordion's, aren't listed.
 const root = path.join(import.meta.dirname, "../../examples/components")
 const components = ["hover-card", "navigation-menu", "carousel", "dialog", "drawer", "popover", "tooltip"]
-const hashLink = /href(?:=|: ?|", )["'`{]*#/
+const hashLink = /href(?:=|: ?|", )["'`{]*#[^"'`]/
 
 test("no example links to a hash on the docs page", () => {
   const found: string[] = []

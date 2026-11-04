@@ -11,7 +11,7 @@ description: Show a measurement within a known range, such as storage used or an
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/react @ui-sdk/core
+npm install @ui-sdk/react @ui-sdk/core
 ```
 
 ## Composition
@@ -31,8 +31,6 @@ Meter
 - `MeterValue` displays the formatted value.
 - `MeterTrack` gives the bar its size, and `MeterIndicator` fills it.
 
-<span id="label-and-value" />
-
 The value is already part of the root's accessible description. The visible value is hidden from screen readers to avoid reading it twice.
 
 ## Usage
@@ -49,9 +47,7 @@ Import the parts and put them together:
 </Meter>
 ```
 
-## Examples
-
-### Bounds
+## Bounds
 
 `min` and `max` set the range. They default to 0 and 100, and values outside the range are clamped. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
 
@@ -60,7 +56,7 @@ Import the parts and put them together:
   caption="Compare the score with the filled track. The number shows 720; the fill shows its position between 300 and 850."
 />
 
-### Format and Locale
+## Format and Locale
 
 Pass `Intl.NumberFormat` options to `format` for units, currency, or decimal places. A function can return custom text, such as the number of occupied seats.
 
@@ -73,11 +69,9 @@ A percent format reports the value's position between `min` and `max`. Other for
 
 `locale` controls digits and separators. If you omit it, the component reads the page's language after it mounts, with the browser's language as a fallback. The initial server and client render use English.
 
-<span id="right-to-left" />
-
 Set `dir="rtl"` on the surrounding content to fill the track from the right.
 
-### Value Label
+## Value Label
 
 Use `getValueLabel` when a screen reader needs more context than the visible number. It receives the value and details containing `formatted`, `percent`, `min`, and `max`.
 
@@ -86,25 +80,27 @@ Use `getValueLabel` when a screen reader needs more context than the visible num
   caption="Read API requests with a screen reader. It announces 750 of 1000 requests and 75%, while the visible value stays compact."
 />
 
-<span id="behavior-and-options" />
-
-### Changing the Value
+## Changing the Value
 
 Pass a new `value` when your reading changes. Meter follows your state and has no `onValueChange` callback.
 
 Use [Progress](./progress) for a task that is working toward completion, such as an upload.
 
+## Custom Rendering
+
+See [Parts and Composition](../parts-and-composition) for changing a part's element or reading its state. Use `format` for text that should be shared by the visible value and screen readers.
+
 ## Styling
 
 Give the track a height, background, and width. The indicator sets its width as an inline percentage of the track. Both styling options are shown in each example's Code tab.
 
-The root exposes a CSS variable, listed under [Meter](#meter), for positioning other content alongside the reading.
+Each part has a `data-slot`, such as `meter-indicator`, and no state attributes: the reading is in `--meter-value` and the indicator's width.
 
-<span id="render-functions" />
+### Meter [#styling-meter]
 
-## Custom Rendering
+The root exposes a CSS variable for positioning other content alongside the reading.
 
-See [Parts and Composition](../parts-and-composition) for changing a part's element or reading its state. Use `format` for text that should be shared by the visible value and screen readers.
+<CssVariables component="meter" part="root" />
 
 ## API Reference
 
@@ -113,8 +109,6 @@ Props are the same as below, as React props.
 ### Meter
 
 <TypeTable path="../../packages/core/src/components/meter/meter.ts" name="MeterOptions" />
-
-<CssVariables component="meter" part="root" />
 
 ### State
 
@@ -129,5 +123,9 @@ What render functions, state-based class names and slots receive. Every part get
 ## Accessibility
 
 Name the component with `MeterLabel` or `aria-label`. It exposes the range and formatted value through the `meter` role. Use `getValueLabel` when that value needs more explanation.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="meter" />

@@ -1,4 +1,19 @@
 @scope ([data-example]) {
+  /* The menu sits near the top, centered, with room below for its open panels inside the preview. */
+  :scope:is(
+    [data-example="navigation-menu/basic"],
+    [data-example="navigation-menu/link-component"],
+    [data-example="navigation-menu/rtl"],
+    [data-example="navigation-menu/vertical"],
+    [data-example="navigation-menu/click-only"],
+    [data-example="navigation-menu/nested"],
+    [data-example="navigation-menu/animation"],
+    [data-example="navigation-menu/custom-rendering"]
+  ) {
+    justify-content: flex-start;
+    min-height: 22rem;
+  }
+
   [data-slot="navigation-menu-root"] {
     position: relative;
 
@@ -95,25 +110,6 @@
   [data-slot="navigation-menu-content"]:not([data-motion="from-end"]) [data-show="from-end"],
   [data-slot="navigation-menu-content"]:not([data-motion="from-start"]) [data-show="from-start"] {
     display: none;
-  }
-
-  [data-slot="navigation-menu-indicator"] {
-    position: absolute;
-    inset-inline-start: var(--active-item-left);
-    inset-block-end: var(--active-item-bottom);
-    width: var(--active-item-width);
-    height: 2px;
-    border-radius: 999px;
-    background: var(--ink);
-    opacity: 0;
-
-    &:is([dir="rtl"], [dir="rtl"] *) {
-      inset-inline-start: var(--active-item-right);
-    }
-
-    &[data-visible] {
-      opacity: 1;
-    }
   }
 
   [data-slot="navigation-menu-viewport"] {

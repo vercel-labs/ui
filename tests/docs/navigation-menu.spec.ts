@@ -16,31 +16,33 @@ const examplesIn = (folder: string) =>
 const triggers: Record<string, { name: string; press?: boolean }> = {
   basic: { name: "Components" },
   "link-component": { name: "Guides" },
-  rtl: { name: "الأدلة" },
   vertical: { name: "Components" },
   "click-only": { name: "Guides", press: true },
-  delay: { name: "Guides" },
-  indicator: { name: "Components" },
-  "viewport-placement": { name: "Guides" },
-  "without-viewport": { name: "Components" },
   nested: { name: "Components" },
-  controlled: { name: "Guides" },
-  controller: { name: "Components" },
-  "keep-mounted": { name: "Guides" },
-  "close-on-select": { name: "Components" },
   animation: { name: "Components" },
-  container: { name: "Guides" },
   "custom-rendering": { name: "Guides" },
 }
 const order = Object.keys(triggers)
+const fixtures = ["rtl"]
 
 // The menu's open panels.
 function panels(page: Page) {
   return page.locator('[data-slot="navigation-menu-content"]:visible')
 }
 
+function example(page: Page, name: string) {
+  return page.locator(`[data-example="navigation-menu/${name}"]`)
+}
+
+function lastLog(preview: Locator) {
+  return preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+}
+
 function triggerIn(page: Page, name: string) {
-  return page.locator("[data-example]").nth(order.indexOf(name)).getByRole("button", {
+  return example(page, name).getByRole("button", {
     name: triggers[name].name,
     exact: true,
   })
@@ -66,7 +68,8 @@ for (const framework of frameworks) {
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
     await expect(page.locator("[data-example]")).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order].sort())
+    for (const folder of folders)
+      expect(examplesIn(folder).sort(), folder).toEqual([...order, ...fixtures].sort())
 
     for (const name of order) {
       const { press } = triggers[name]
@@ -86,13 +89,13 @@ for (const framework of frameworks) {
   test(`a router link closes the menu and marks the current page in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
-    const preview = page.locator("[data-example]").nth(order.indexOf("link-component"))
-    await open(triggerIn(page, "link-component"))
+    const preview = example(page, "link-component")
+    await open(triggerIn(page, "link-component"), true)
     const link = panels(page).getByRole("link", { name: /^Installation/ })
     await link.click()
-    await expect(preview.getByText("Route: #installation")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("Navigated to #installation")
     await expect(panels(page)).toHaveCount(0)
-    await open(triggerIn(page, "link-component"))
+    await open(triggerIn(page, "link-component"), true)
     await expect(link).toHaveAttribute("aria-current", "page")
   })
 }
@@ -108,27 +111,15 @@ for (const framework of frameworks) {
   })
 }
 
-// closeOnSelect={false} keeps the panel open, and a link's own closeOnSelect closes it.
+// Switching items logs the new one, and closing logs once the animation ends.
 for (const framework of frameworks) {
-  test(`links follow closeOnSelect in ${framework}`, async ({ page }) => {
+  test(`the animated menu reports when it finishes in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
-    const preview = page.locator("[data-example]").nth(order.indexOf("close-on-select"))
-    await open(triggerIn(page, "close-on-select"))
-    await panels(page).getByRole("link", { name: "Tabs", exact: true }).click()
-    await expect(preview.getByText("Opened: Tabs")).toBeVisible()
-    await expect(panels(page)).toHaveCount(1)
-    await panels(page).getByRole("link", { name: "Browse all" }).click()
-    await expect(preview.getByText("Opened: All components")).toBeVisible()
-    await expect(panels(page)).toHaveCount(0)
-  })
-}
-
-// The RTL example reads right to left on every tab.
-for (const framework of frameworks) {
-  test(`the RTL navigation menu reads right to left in ${framework}`, async ({ page }) => {
-    await page.goto(`/docs/${framework}/components/navigation-menu`)
-    const nav = page.locator("[data-example]").nth(order.indexOf("rtl")).getByRole("navigation").first()
-    await expect.poll(() => nav.evaluate((el) => getComputedStyle(el).direction)).toBe("rtl")
+    const preview = example(page, "animation")
+    await open(triggerIn(page, "animation"))
+    await expect(lastLog(preview)).toHaveText("Finished opening")
+    await close(page)
+    await expect(lastLog(preview)).toHaveText("Finished closing")
   })
 }

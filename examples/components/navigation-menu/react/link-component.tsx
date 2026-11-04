@@ -11,6 +11,7 @@ import {
 } from "@ui-sdk/react/navigation-menu"
 import { ChevronDownIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const gettingStarted = [
   {
@@ -49,46 +50,48 @@ function Link({
 }
 
 function Example() {
+  const log = useLog()
   const [route, setRoute] = React.useState("#introduction")
+  const navigate = (href: string) => {
+    setRoute(href)
+    log(`Navigated to ${href}`)
+  }
 
   return (
-    <div data-slot="stack">
-      <NavigationMenu aria-label="Docs">
-        <NavigationMenuList>
-          <NavigationMenuItem value="guides">
-            <NavigationMenuTrigger>
-              Guides
-              <ChevronDownIcon />
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul>
-                {gettingStarted.map((page) => (
-                  <li key={page.href}>
-                    <NavigationMenuLink
-                      render={<Link href={page.href} onNavigate={setRoute} />}
-                      current={route === page.href}
-                    >
-                      <span>{page.title}</span>
-                      <span data-slot="hint">{page.description}</span>
-                    </NavigationMenuLink>
-                  </li>
-                ))}
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink
-              render={<Link href="#components" onNavigate={setRoute} />}
-              current={route === "#components"}
-            >
-              Components
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-        <NavigationMenuViewport />
-      </NavigationMenu>
-      <output data-slot="output">Route: {route}</output>
-    </div>
+    <NavigationMenu aria-label="Docs">
+      <NavigationMenuList>
+        <NavigationMenuItem value="guides">
+          <NavigationMenuTrigger>
+            Guides
+            <ChevronDownIcon />
+          </NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul>
+              {gettingStarted.map((page) => (
+                <li key={page.title}>
+                  <NavigationMenuLink
+                    render={<Link href={page.href} onNavigate={navigate} />}
+                    current={route === page.href}
+                  >
+                    <span>{page.title}</span>
+                    <span data-slot="hint">{page.description}</span>
+                  </NavigationMenuLink>
+                </li>
+              ))}
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink
+            render={<Link href="#components" onNavigate={navigate} />}
+            current={route === "#components"}
+          >
+            Components
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+      <NavigationMenuViewport sideOffset={8} />
+    </NavigationMenu>
   )
 }
 
