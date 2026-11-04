@@ -13,12 +13,14 @@ const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}
 function Example() {
   return (
     <ScrollArea>
-      <ScrollAreaViewport>
+      <ScrollAreaViewport role="region" aria-label="Tags">
         <ScrollAreaContent>
-          <h4>Tags</h4>
-          {tags.map((tag) => (
-            <div key={tag}>{tag}</div>
-          ))}
+          <h3>Tags</h3>
+          <ul>
+            {tags.map((tag) => (
+              <li key={tag}>{tag}</li>
+            ))}
+          </ul>
         </ScrollAreaContent>
       </ScrollAreaViewport>
       <ScrollAreaScrollbar>

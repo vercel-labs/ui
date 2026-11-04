@@ -22,9 +22,11 @@ function Example() {
           <ScrollArea type={type}>
             <ScrollAreaViewport>
               <ScrollAreaContent>
-                {tags.map((tag) => (
-                  <div key={tag}>{tag}</div>
-                ))}
+                <ul>
+                  {tags.map((tag) => (
+                    <li key={tag}>{tag}</li>
+                  ))}
+                </ul>
               </ScrollAreaContent>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar>

@@ -17,13 +17,15 @@ function Example() {
         <>
           <ScrollAreaViewport render={<article />} aria-label="Releases">
             <ScrollAreaContent>
-              {tags.map((tag) => (
-                <p key={tag}>{tag}</p>
-              ))}
+              <ul>
+                {tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
             </ScrollAreaContent>
           </ScrollAreaViewport>
           <p data-slot="hint" aria-hidden>
-            {state.atStart ? "Scroll for older releases" : "Keep going"}
+            {state.atStart ? "Scroll for older releases" : "More releases below"}
           </p>
           <ScrollAreaScrollbar>
             <ScrollAreaThumb />

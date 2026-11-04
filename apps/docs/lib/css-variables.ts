@@ -221,7 +221,7 @@ const meaning: Record<string, string> = {
   "--scroll-area-corner-height":
     "The horizontal scrollbar's height while both show, so the vertical one stops short of it. 0px otherwise.",
   "--scroll-area-overflow-y-start":
-    "How far the content reaches above the view, in pixels. Grow a top fade or shadow with it. Not inherited, like the other overflow and progress variables, so scrolling never restyles the content. A child of the root that reads it takes it with `[--scroll-area-overflow-y-start:inherit]`.",
+    "How far the content reaches above the view, in pixels. Grow a top fade or shadow with it. Not inherited, like the other overflow and progress variables, so scrolling never restyles the content. A child of the root that reads it takes it with `--scroll-area-overflow-y-start: inherit`.",
   "--scroll-area-overflow-y-end": "How far the content reaches below the view, in pixels.",
   "--scroll-area-overflow-x-start":
     "How far the content reaches past the inline start, in pixels, left in LTR and right in RTL.",
