@@ -38,7 +38,7 @@ function CodeBlockTabsList({
   return (
     <TabBar>
       <TabsList aria-label={label}>{children}</TabsList>
-      <CopyButton className="ms-auto size-[30px] shrink-0 rounded-[8px] hover:bg-muted" />
+      <CopyButton className="ms-auto" />
     </TabBar>
   )
 }
@@ -139,10 +139,7 @@ function FrameworkTabs({ children }: { children: React.ReactNode }) {
               ))}
             </SelectContent>
           </Select>
-          <CopyButton
-            label="Copy prompt"
-            className="ms-auto shrink-0 rounded-[8px] max-sm:[&>span]:sr-only"
-          />
+          <CopyButton label="Copy prompt" className="ms-auto max-sm:[&>span]:sr-only" />
         </TabBar>
         {children}
       </Tabs>

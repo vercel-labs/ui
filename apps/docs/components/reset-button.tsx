@@ -11,7 +11,7 @@ function ResetButton({ className }: { className?: string }) {
         aria-label="Reset preview"
         onClick={(event) => event.currentTarget.closest("figure")?.dispatchEvent(new Event("example-reset"))}
         className={cn(
-          "inline-flex size-[30px] shrink-0 items-center justify-center rounded-[8px] text-subtle outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
+          "inline-flex size-8 shrink-0 items-center justify-center rounded-[8px] text-subtle outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
           className,
         )}
       >
