@@ -57,7 +57,7 @@ function CodeBlockTabsTrigger({ value, children }: { value: string; children: Re
 function TabBar({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("flex min-w-0 items-center gap-2 border-b border-border/60 p-2", className)}
+      className={cn("flex min-w-0 items-center gap-2 border-b border-border/60 p-frame", className)}
       {...props}
     />
   )
@@ -127,7 +127,7 @@ function FrameworkTabs({ children }: { children: React.ReactNode }) {
             <SelectTrigger
               variant="ghost"
               aria-label="Framework"
-              className="mx-0 h-8 rounded-[8px] bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted sm:hidden"
+              className="mx-0 h-8 rounded-frame-control bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted sm:hidden"
             >
               <SelectValue />
             </SelectTrigger>

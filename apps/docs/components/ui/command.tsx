@@ -68,7 +68,7 @@ function CommandItem({
   return (
     <CommandItemPrimitive
       className={cn(
-        "flex min-h-8 cursor-default items-center gap-2.5 rounded-xl px-2.5 py-1.5 outline-none select-none data-highlighted:bg-foreground/5 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4",
+        "flex min-h-8 cursor-default items-center gap-2.5 rounded-[calc(var(--radius-3xl)-0.375rem)] px-2.5 py-1.5 outline-none select-none data-highlighted:bg-foreground/5 data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}

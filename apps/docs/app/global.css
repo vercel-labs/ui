@@ -121,6 +121,13 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Corners nest: a control inside a frame's corner is inset the same on every side, and its
+     radius is the frame's minus that inset. Segments do the same inside their track. */
+  --radius-frame: var(--radius-2xl);
+  --spacing-frame: 0.5rem;
+  --radius-frame-control: calc(var(--radius-frame) - var(--spacing-frame));
+  --spacing-frame-track: 3px;
+  --radius-frame-segment: calc(var(--radius-frame-control) - var(--spacing-frame-track));
 }
 
 html {

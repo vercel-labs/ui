@@ -90,7 +90,7 @@ async function ComponentExample({
               <TabsStackedPanel
                 value="preview"
                 keepMounted
-                className="relative grid rounded-b-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+                className="relative grid rounded-b-frame outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
               >
                 {preview}
                 <StylingNote
@@ -101,7 +101,7 @@ async function ComponentExample({
               <TabsStackedPanel
                 value="code"
                 keepMounted
-                className={cn("overflow-hidden rounded-b-2xl outline-none", flat)}
+                className={cn("overflow-hidden rounded-b-frame outline-none", flat)}
               >
                 {source}
               </TabsStackedPanel>

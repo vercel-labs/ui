@@ -15,7 +15,7 @@ function TabsList({
   return (
     <TabsListPrimitive
       className={cn(
-        "inline-flex max-w-full min-w-0 items-center gap-0.5 overflow-x-auto scrollbar-none rounded-[8px] bg-muted p-[3px]",
+        "inline-flex max-w-full min-w-0 items-center gap-0.5 overflow-x-auto scrollbar-none rounded-frame-control bg-muted p-frame-track",
         className,
       )}
       {...props}
@@ -30,7 +30,7 @@ function TabsTab({
   return (
     <TabsTabPrimitive
       className={cn(
-        "group/tabs-tab inline-flex h-[26px] shrink-0 items-center rounded-[5px] px-3 text-[13px] font-medium whitespace-nowrap text-muted-foreground outline-none transition-colors select-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-selected:bg-background data-selected:text-foreground data-selected:shadow-[0_1px_2px_rgb(0_0_0/0.05)] data-selected:ring-1 data-selected:ring-border dark:data-selected:bg-foreground/[0.1]",
+        "group/tabs-tab inline-flex h-[26px] shrink-0 items-center rounded-frame-segment px-3 text-[13px] font-medium whitespace-nowrap text-muted-foreground outline-none transition-colors select-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-selected:bg-background data-selected:text-foreground data-selected:shadow-[0_1px_2px_rgb(0_0_0/0.05)] data-selected:ring-1 data-selected:ring-border dark:data-selected:bg-foreground/[0.1]",
         className,
       )}
       {...props}
