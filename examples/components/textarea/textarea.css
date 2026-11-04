@@ -1,5 +1,15 @@
 @scope ([data-example]) {
+  /* base.css gives every text control height: var(--size) through a selector that outranks its textarea rule. */
+  :scope [data-slot="textarea-root"] {
+    height: auto;
+  }
+
   [data-slot="textarea-root"] + [data-slot="field-description"] {
     font-variant-numeric: tabular-nums;
+  }
+
+  /* A field that holds the growing textarea's maximum height, so its label stays put as it grows. */
+  :scope[data-example="textarea/auto-resize"] [data-slot="field-root"] {
+    min-height: calc(12rem + 2.5rem + 2 * var(--space-2));
   }
 }

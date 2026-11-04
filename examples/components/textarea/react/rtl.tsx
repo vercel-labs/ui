@@ -1,7 +1,7 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import { Textarea } from "@ui-sdk/react/textarea"
 
-export function Example() {
+function Example() {
   return (
     <Field dir="rtl" name="feedback">
       <FieldLabel>ملاحظاتك</FieldLabel>
@@ -10,3 +10,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

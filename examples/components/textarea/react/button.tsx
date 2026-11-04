@@ -1,26 +1,32 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Textarea, createInputController } from "@ui-sdk/react/textarea"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [message] = React.useState(createInputController)
-  const [sent, setSent] = React.useState<string[]>([])
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
-        setSent((list) => [...list, String(data.get("message"))])
+        log(`Sent “${data.get("message")}”`)
         message.clear()
       }}
     >
       <Field name="message">
         <FieldLabel>Message</FieldLabel>
-        <Textarea controller={message} required autoResize />
+        <Textarea controller={message} required placeholder="Write a reply to Hollis Grant." />
       </Field>
-      <button type="submit">Send message</button>
-      <p data-slot="output">{sent.length ? `Sent: ${sent.at(-1)}` : "Nothing sent yet."}</p>
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">
+          Send Message
+        </button>
+      </div>
     </form>
   )
 }
+
+export { Example }
