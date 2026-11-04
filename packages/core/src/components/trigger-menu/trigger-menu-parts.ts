@@ -219,6 +219,8 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
     attrs: (state, { id, key, props, api }) => ({
       id: `${id}-option-${idPart(key)}`,
       "aria-disabled": props.disabled ? "true" : undefined,
+      // Written by `live`, so moving the highlight doesn't render every option.
+      "aria-selected": undefined,
       hidden: api.internal.listbox.matches(key, props) ? undefined : "",
       "data-disabled": props.disabled ? "" : undefined,
     }),

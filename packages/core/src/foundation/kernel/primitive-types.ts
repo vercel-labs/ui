@@ -2,7 +2,19 @@
 // and parts, the context its api gets, and what adapters derive from it.
 import type { ChangeSource } from "./details"
 import type { Direct, Live } from "./live"
-import type { Focus, FocusableRole, HandledKey, KeyedRole, PressableRole, Role, Unneeded } from "./roles"
+import type {
+  AriaOf,
+  Focus,
+  FocusableRole,
+  HandledKey,
+  KeyedRole,
+  NamelessRole,
+  PressableRole,
+  RequiredAria,
+  Role,
+  RoleAria,
+  Unneeded,
+} from "./roles"
 import type { Selects } from "./selects"
 import type { Store } from "./store"
 
@@ -107,13 +119,7 @@ type Part<State extends object = any, Api = any, Props = any> = {
   el: HTMLElement | undefined
 }
 
-/**
- * One part of a primitive, like a trigger or an item: how its element
- * renders, reacts and binds. Build slots with the `slot` helper `slots`
- * receives. Every field is optional.
- * @stable
- */
-type SlotDefinition<State extends object, Api, Props, Public = {}> = {
+type SlotFields<State extends object, Api, Props, Public> = {
   /**
    * Whether the slot's element should exist. Adapters that cannot unmount
    * markup, like custom elements, bind and unbind on it. Defaults to always.
@@ -159,9 +165,16 @@ type SlotDefinition<State extends object, Api, Props, Public = {}> = {
    * popup's content registers here, so shortcuts inside a closed one don't run.
    */
   connect?: (el: HTMLElement) => () => void
-} & SlotSchema<Props>
+}
 
-type Demanding = FocusableRole | PressableRole | KeyedRole
+/**
+ * One part of a primitive, like a trigger or an item: how its element
+ * renders, reacts and binds. Build slots with the `slot` helper `slots`
+ * receives. Every field is optional.
+ * @stable
+ */
+type SlotDefinition<State extends object, Api, Props, Public = {}> = SlotFields<State, Api, Props, Public> &
+  SlotSchema<Props>
 
 type Keys<State> = readonly HandledKey[] | ((state: State) => readonly HandledKey[])
 
@@ -227,6 +240,36 @@ type RoleFields<State extends object, Api, Props> = {
   keys?: Keys<State> | Unneeded
 }
 
+// An attribute the role doesn't take, typed as the sentence that says so, so
+// the error names it: "aria-orientation isn't allowed on a group".
+type NotAllowed<
+  K extends string,
+  R extends string,
+> = `${K} isn't allowed on ${R extends `${"a" | "e" | "i" | "o" | "u"}${string}` ? "an" : "a"} ${R}`
+
+type RoleAttrs<R extends string> = Attrs & {
+  [
+    K in Exclude<RoleAria, AriaOf<R>> | (R extends NamelessRole ? "aria-label" | "aria-labelledby" : never)
+  ]?: NotAllowed<K, R>
+}
+
+// A role's required states are keys its `attrs` always returns, so leaving
+// one out is a build error. One that `live` keeps current is `undefined` here.
+// One field, not a union, so the error names the missing state.
+type AttrsFor<R extends string, State extends object, Api, Props> = [RequiredAria<R>] extends [never]
+  ? { attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => RoleAttrs<R> }
+  : {
+      attrs: (
+        state: State,
+        context: { id: string; key: string; props: Props; api: Api },
+      ) => RoleAttrs<R> & { [K in RequiredAria<R>]: string | undefined }
+    }
+
+// Without a literal role, the role's attributes aren't known here, so development builds check them.
+type UnroledAttrs<State extends object, Api, Props> = {
+  attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Attrs
+}
+
 // The role's literal picks the member, so TypeScript asks for exactly what that role needs.
 type RoleDeclaration<State extends object, Api, Props> = Omit<
   RoleFields<State, Api, Props>,
@@ -234,12 +277,12 @@ type RoleDeclaration<State extends object, Api, Props> = Omit<
 > &
   KeysDeclaration<State, Api, Props> &
   (
-    | { role?: Exclude<Role, Demanding> }
-    | {
+    | ({ role?: undefined } & UnroledAttrs<State, Api, Props>)
+    | ({
         role: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Role | undefined
         roles: readonly Role[]
-      }
-    | { [R in Demanding]: { role: R } & Needs<R, State, Api, Props> }[Demanding]
+      } & UnroledAttrs<State, Api, Props>)
+    | { [R in Role]: { role: R } & Needs<R, State, Api, Props> & AttrsFor<R, State, Api, Props> }[Role]
   )
 
 /**
@@ -268,7 +311,10 @@ type AnySlot = SlotDefinition<any, any, any, any>
  * @stable
  */
 type SlotFactory<State extends object, Api> = <Props extends object = {}, Public extends object = {}>(
-  definition: SlotDefinition<State, Api, Props & BaseSlotProps, Public> &
+  // `attrs` comes from the role's member alone, typed for that role: one
+  // signature, so its parameters keep their types.
+  definition: Omit<SlotFields<State, Api, Props & BaseSlotProps, Public>, "attrs"> &
+    SlotSchema<Props & BaseSlotProps> &
     RoleDeclaration<State, Api, Props & BaseSlotProps>,
 ) => SlotDefinition<State, Api, NoInfer<Props> & BaseSlotProps, NoInfer<Public>>
 

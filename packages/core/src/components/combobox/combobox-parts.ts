@@ -505,7 +505,6 @@ const comboboxChips = /* @__PURE__ */ (() => ({
         "aria-label": api.internal.selection.labelOf(props.value) || undefined,
         tabindex: "-1",
         "aria-disabled": isDisabled(state) ? "true" : undefined,
-        "aria-readonly": state.readOnly ? "true" : undefined,
         "data-disabled": isLocked(state) ? "" : undefined,
         "data-value": api.internal.keyOf(props.value),
       }),

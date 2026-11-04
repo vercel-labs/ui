@@ -341,6 +341,8 @@ function optionPart<State extends AutocompleteCoreState, Api extends CoreApi>() 
       // Real focus reaches options only after a screen reader's tap moved it into the list.
       tabindex: state.focusInList ? "-1" : undefined,
       "aria-disabled": props.disabled ? "true" : undefined,
+      // Written by `live`, so moving the highlight doesn't render every option.
+      "aria-selected": undefined,
       ...positionAttrs(props.index, api.internal.listbox),
       hidden: api.internal.listbox.matches(key, props) ? undefined : "",
       "data-disabled": props.disabled ? "" : undefined,

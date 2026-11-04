@@ -463,6 +463,8 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
           max: String(upper),
           step: String(state.step),
           value: String(value),
+          // The range input's value says it, without another write per move.
+          "aria-valuenow": undefined,
           "aria-valuetext": formatValue(value, state),
           "aria-orientation": state.orientation,
           disabled: isDisabled(state) ? "" : undefined,

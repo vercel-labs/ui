@@ -24,6 +24,7 @@ function checkRole(
   _own: Record<string, unknown> | undefined,
   _role: unknown,
   _from: { component: string; id?: string },
+  _live?: Record<string, unknown>,
 ) {}
 
 function checkFocus(

@@ -3,7 +3,7 @@
 // production build resolves `dev-stub.ts` instead and ships none of this.
 import type { ChangeReason } from "./details"
 import { callbackName, defaultName } from "./option-names"
-import { knownRoles, unmetNeeds } from "./roles"
+import { ariaProblems, knownRoles, unmetNeeds } from "./roles"
 
 /**
  * What core reports to a devtools hook in development. Internal until the devtools ship.
@@ -148,13 +148,17 @@ function checkRoles(slots: Record<string, object>, from: { component: string }) 
 const warnedRole = new WeakSet<object>()
 
 /** Checks the role a part renders with against its slot's declaration. */
+const warnedAria = new WeakMap<object, Set<string>>()
+
 function checkRole(
   definition: { role?: unknown; roles?: readonly string[] },
   slot: string,
   own: Record<string, unknown> | undefined,
   role: unknown,
   from: { component: string; id?: string },
+  live?: Record<string, unknown>,
 ) {
+  if (typeof role === "string") checkAria(definition, slot, role, { ...own, ...live }, from)
   if (warnedRole.has(definition)) return
   if (own?.role !== undefined && definition.role !== undefined) {
     warnedRole.add(definition)
@@ -170,6 +174,38 @@ function checkRole(
     warnedRole.add(definition)
     warn(
       `the "${slot}" part picked the role "${String(role)}", which its slot's \`roles\` doesn't list.`,
+      from,
+    )
+  }
+}
+
+// What the role takes and requires, against everything the part writes: its
+// `attrs` and its `live`. Once per slot and attribute.
+function checkAria(
+  definition: object,
+  slot: string,
+  role: string,
+  written: Record<string, unknown>,
+  from: { component: string; id?: string },
+) {
+  const { notAllowed, missing } = ariaProblems(role, written)
+  if (!notAllowed.length && !missing.length) return
+  let warned = warnedAria.get(definition)
+  if (!warned) warnedAria.set(definition, (warned = new Set()))
+  const a = /^[aeiou]/.test(role) ? "an" : "a"
+  for (const name of notAllowed) {
+    if (warned.has(name)) continue
+    warned.add(name)
+    warn(
+      `the "${slot}" part is ${a} ${role}, which doesn't take \`${name}\`, so assistive technology ignores it.`,
+      from,
+    )
+  }
+  for (const name of missing) {
+    if (warned.has(name)) continue
+    warned.add(name)
+    warn(
+      `the "${slot}" part is ${a} ${role}, which needs \`${name}\`, and neither its \`attrs\` nor its \`live\` writes it.`,
       from,
     )
   }

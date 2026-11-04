@@ -2,7 +2,7 @@
 // What development builds check of a slot's declared role, for definitions
 // the types can't see, like JavaScript or a spread slot, and for elements.
 import { afterEach, expect, test, vi } from "vitest"
-import { definePrimitive } from "../src/index"
+import { definePrimitive, live } from "../src/index"
 import { listbox } from "../src/components/listbox/listbox-root"
 import { mount } from "../src/testing/mount"
 import { partAttrs } from "../src/testing"
@@ -89,6 +89,52 @@ test("warns when a role picked from state isn't one the slot lists", () => {
   ])
 })
 
+test("warns once about ARIA a part's role doesn't take, or a state it renders without", () => {
+  const read = warnings()
+  const press = () => {}
+  const aria = definePrimitive({
+    name: "aria",
+    state: () => ({ decorative: false, on: false }),
+    api: ({ store }) => ({ decorate: () => store.set({ decorative: true }) }),
+    slots: (slot) => ({
+      // A role from state: the types can't tell which one, so this checks each.
+      line: slot({
+        role: (state) => (state.decorative ? "none" : "separator"),
+        roles: ["none", "separator"],
+        attrs: () => ({ "aria-orientation": "vertical" }),
+      }),
+      box: slot(loose({ role: "checkbox", focus: "native", press })),
+      unset: slot({ role: "option", focus: "roving", press, attrs: () => ({ "aria-selected": undefined }) }),
+      range: slot({
+        role: "slider",
+        focus: "native",
+        keys: ["ArrowUp"],
+        on: { keydown: () => {} },
+        attrs: () => ({ type: "range", "aria-valuenow": undefined }),
+      }),
+      written: slot({
+        role: "option",
+        focus: "roving",
+        press,
+        attrs: () => ({ "aria-selected": undefined }),
+        live: live(() => ({ "aria-selected": "false" })),
+      }),
+    }),
+  })
+  const instance = aria({ id: "a" })
+  for (const name of ["line", "box", "unset", "range", "written"] as const) partAttrs(instance.part(name))
+  expect(read()).toEqual([
+    expect.stringContaining('the "box" part is a checkbox, which needs `aria-checked`'),
+    expect.stringContaining('the "unset" part is an option, which needs `aria-selected`'),
+  ])
+  instance.api.decorate()
+  partAttrs(instance.part("line"))
+  partAttrs(instance.part("line"))
+  expect(read().slice(2)).toEqual([
+    expect.stringContaining('the "line" part is a none, which doesn\'t take `aria-orientation`'),
+  ])
+})
+
 test("checks the element can take focus the way the slot says", async () => {
   const read = warnings()
   const press = () => {}
@@ -98,8 +144,13 @@ test("checks the element can take focus the way the slot says", async () => {
     api: () => ({}),
     slots: (slot) => ({
       native: slot({ role: "button", focus: "native", press }),
-      roving: slot({ role: "tab", focus: "roving", press }),
-      stop: slot({ role: "tab", focus: "roving", press, attrs: () => ({ tabindex: "-1" }) }),
+      roving: slot({ role: "tab", focus: "roving", press, attrs: () => ({ "aria-selected": "false" }) }),
+      stop: slot({
+        role: "tab",
+        focus: "roving",
+        press,
+        attrs: () => ({ tabindex: "-1", "aria-selected": "false" }),
+      }),
     }),
   })
   mounts.push(

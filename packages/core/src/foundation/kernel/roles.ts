@@ -135,10 +135,178 @@ const keyedRoles = [
   "treegrid",
 ] as const
 
+// Each role-specific ARIA attribute, with the roles that support it, from
+// WAI-ARIA 1.2 with what subclass roles inherit. Global ones, like
+// `aria-label` and `aria-describedby`, aren't listed: every role takes them.
+const ariaSupport = {
+  "aria-activedescendant": [
+    "application",
+    "combobox",
+    "grid",
+    "group",
+    "listbox",
+    "menu",
+    "menubar",
+    "radiogroup",
+    "row",
+    "searchbox",
+    "spinbutton",
+    "tablist",
+    "textbox",
+    "toolbar",
+    "tree",
+    "treegrid",
+  ],
+  "aria-autocomplete": ["combobox", "searchbox", "textbox"],
+  "aria-checked": ["checkbox", "menuitemcheckbox", "menuitemradio", "option", "radio", "switch", "treeitem"],
+  "aria-colcount": ["grid", "table", "treegrid"],
+  "aria-colindex": ["cell", "columnheader", "gridcell", "row", "rowheader"],
+  "aria-colspan": ["cell", "columnheader", "gridcell", "rowheader"],
+  "aria-expanded": [
+    "application",
+    "button",
+    "checkbox",
+    "columnheader",
+    "combobox",
+    "gridcell",
+    "link",
+    "listbox",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "row",
+    "rowheader",
+    "switch",
+    "tab",
+    "treeitem",
+  ],
+  "aria-level": ["heading", "listitem", "row", "treeitem"],
+  "aria-modal": ["alertdialog", "dialog"],
+  "aria-multiline": ["searchbox", "textbox"],
+  "aria-multiselectable": ["grid", "listbox", "tablist", "tree", "treegrid"],
+  "aria-orientation": [
+    "listbox",
+    "menu",
+    "menubar",
+    "radiogroup",
+    "scrollbar",
+    "separator",
+    "slider",
+    "tablist",
+    "toolbar",
+    "tree",
+    "treegrid",
+  ],
+  "aria-placeholder": ["searchbox", "textbox"],
+  "aria-posinset": [
+    "article",
+    "listitem",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "option",
+    "radio",
+    "row",
+    "tab",
+    "treeitem",
+  ],
+  "aria-pressed": ["button"],
+  "aria-readonly": [
+    "checkbox",
+    "columnheader",
+    "combobox",
+    "grid",
+    "gridcell",
+    "listbox",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "radiogroup",
+    "rowheader",
+    "searchbox",
+    "slider",
+    "spinbutton",
+    "switch",
+    "textbox",
+  ],
+  "aria-required": [
+    "checkbox",
+    "columnheader",
+    "combobox",
+    "gridcell",
+    "listbox",
+    "radiogroup",
+    "rowheader",
+    "searchbox",
+    "spinbutton",
+    "switch",
+    "textbox",
+    "tree",
+    "treegrid",
+  ],
+  "aria-rowcount": ["grid", "table", "treegrid"],
+  "aria-rowindex": ["cell", "columnheader", "gridcell", "row", "rowheader"],
+  "aria-rowspan": ["cell", "columnheader", "gridcell", "rowheader"],
+  "aria-selected": ["columnheader", "gridcell", "option", "row", "rowheader", "tab", "treeitem"],
+  "aria-setsize": [
+    "article",
+    "listitem",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "option",
+    "radio",
+    "row",
+    "tab",
+    "treeitem",
+  ],
+  "aria-sort": ["columnheader", "rowheader"],
+  "aria-valuemax": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
+  "aria-valuemin": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
+  "aria-valuenow": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
+  "aria-valuetext": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
+} as const satisfies Record<string, readonly (typeof roles)[number][]>
+
+// Roles that can't be named: an `aria-label` on them is ignored.
+const namelessRoles = [
+  "caption",
+  "code",
+  "deletion",
+  "emphasis",
+  "generic",
+  "insertion",
+  "none",
+  "paragraph",
+  "presentation",
+  "strong",
+  "subscript",
+  "superscript",
+] as const
+
+// The states a role's pattern can't work without, which its slot's `attrs` must always write.
+const requiredStates = {
+  checkbox: ["aria-checked"],
+  combobox: ["aria-expanded"],
+  menuitemcheckbox: ["aria-checked"],
+  menuitemradio: ["aria-checked"],
+  meter: ["aria-valuenow"],
+  option: ["aria-selected"],
+  radio: ["aria-checked"],
+  slider: ["aria-valuenow"],
+  switch: ["aria-checked"],
+  tab: ["aria-selected"],
+} as const satisfies Partial<Record<(typeof roles)[number], readonly (keyof typeof ariaSupport)[]>>
+
 /**
  * A WAI-ARIA role a part can declare with its slot's `role`.
  */
 type Role = (typeof roles)[number]
+
+type RoleAria = keyof typeof ariaSupport
+
+// The role-specific attributes a role takes, and the states it requires.
+type AriaOf<R> = { [K in RoleAria]: R extends (typeof ariaSupport)[K][number] ? K : never }[RoleAria]
+type RequiredAria<R> = R extends keyof typeof requiredStates ? (typeof requiredStates)[R][number] : never
+type NamelessRole = (typeof namelessRoles)[number]
 
 type FocusableRole = (typeof focusableRoles)[number]
 type PressableRole = (typeof pressableRoles)[number]
@@ -203,13 +371,48 @@ function unmetNeeds(
 
 const knownRoles = new Set<string>(roles)
 
+const naming = ["aria-label", "aria-labelledby"]
+
+// States an input exposes on its own, by its `type`, like a range input's value.
+const nativeStates: Record<string, readonly string[]> = {
+  checkbox: ["aria-checked"],
+  number: ["aria-valuenow"],
+  radio: ["aria-checked"],
+  range: ["aria-valuenow"],
+}
+
+/**
+ * The ARIA attributes a part renders that its role doesn't take, and the
+ * states the role requires that it renders without, like `aria-checked` on a checkbox.
+ */
+function ariaProblems(role: string, attrs: Record<string, unknown>) {
+  const notAllowed: string[] = []
+  for (const [name, value] of Object.entries(attrs)) {
+    if (value === undefined) continue
+    const supported = (ariaSupport as Record<string, readonly string[]>)[name]
+    if (supported && !supported.includes(role)) notAllowed.push(name)
+    if (naming.includes(name) && (namelessRoles as readonly string[]).includes(role)) notAllowed.push(name)
+  }
+  const required = (requiredStates as Record<string, readonly string[] | undefined>)[role] ?? []
+  const native = nativeStates[attrs.type as string] ?? []
+  return {
+    notAllowed,
+    missing: required.filter((name) => attrs[name] === undefined && !native.includes(name)),
+  }
+}
+
 export {
+  type AriaOf,
+  ariaProblems,
   type Focus,
   type FocusableRole,
   type HandledKey,
   type KeyedRole,
   knownRoles,
+  type NamelessRole,
   type PressableRole,
+  type RequiredAria,
+  type RoleAria,
   type Role,
   type Unneeded,
   unmetNeeds,

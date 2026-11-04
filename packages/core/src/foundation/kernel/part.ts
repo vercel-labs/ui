@@ -129,7 +129,16 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
   const own = definition.attrs?.(state, context)
   const declared = definition.role
   const role = typeof declared === "function" ? declared(state, context) : declared
-  if (dev) checkRole(definition, part.slot, own, role, { component: ownerOf(part).label, id: part.id })
+  if (dev) {
+    checkRole(
+      definition,
+      part.slot,
+      own,
+      role,
+      { component: ownerOf(part).label, id: part.id },
+      definition.live?.read(state, context),
+    )
+  }
   const result: Attrs = {
     "data-slot": `${ownerOf(part).name}-${part.slot}`,
     ...(declared === undefined ? undefined : { role }),

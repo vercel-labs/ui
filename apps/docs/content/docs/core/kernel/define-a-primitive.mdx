@@ -180,7 +180,18 @@ root: slot({
 }),
 ```
 
-Development builds warn about anything the types can't see, like a spread slot or JavaScript. Set `globalThis.__UI_SDK_STRICT__ = true` in your test setup to turn every warning into an error.
+The role decides the part's ARIA too. Its `attrs` returns the states the role can't work without, like `aria-checked` on a checkbox or `aria-selected` on an option, and nothing the role doesn't take: `aria-orientation` on a group fails with "aria-orientation isn't allowed on a group".
+
+```ts
+box: slot({
+  role: "checkbox",
+  focus: "native",
+  press: ({ api }) => api.toggle(),
+  attrs: (state) => ({ "aria-checked": String(state.checked) }),
+}),
+```
+
+A state that `live` keeps current is `undefined` in `attrs`, so `attrs` still names it. Development builds warn about anything the types can't see, like a spread slot or JavaScript, and about a required state that renders without a value. Set `globalThis.__UI_SDK_STRICT__ = true` in your test setup to turn every warning into an error.
 
 ## Working with the Element
 
