@@ -3,7 +3,7 @@ import { ThemeToggle } from "./theme-toggle"
 
 function SiteFooter() {
   return (
-    <footer className="container flex flex-wrap items-center justify-between gap-4 py-8">
+    <footer className="container flex items-center justify-between gap-4 py-8">
       <div className="flex items-center gap-4">
         <a
           href="https://vercel.com"
@@ -12,7 +12,7 @@ function SiteFooter() {
         >
           <VercelLogo className="h-4 w-auto" />
         </a>
-        <p className="text-[13px] text-subtle">
+        <p className="hidden text-[13px] text-subtle sm:block">
           The{" "}
           <a
             href="https://github.com/vercel-labs/ui"
