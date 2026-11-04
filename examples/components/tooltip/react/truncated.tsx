@@ -26,7 +26,7 @@ function FileRow({ name }: { name: string }) {
         }}
       >
         <TooltipTrigger>
-          <FileIcon />
+          <FileIcon aria-hidden="true" />
           <span ref={text}>{name}</span>
         </TooltipTrigger>
         <TooltipContent>{name}</TooltipContent>

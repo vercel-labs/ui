@@ -22,90 +22,70 @@
     transition:
       scale 0.1s ease-out,
       box-shadow 0.1s ease-out,
-      background-color 0.12s;
+      background-color 0.12s,
+      color 0.12s;
 
     &:hover:not([data-disabled], [data-pressed]) {
       background: var(--tint);
     }
 
+    &:active:not([data-disabled]) {
+      scale: 0.97;
+    }
+
     &[data-pressed] {
-      background: var(--tint);
-      box-shadow: inset 0 0 0 1px var(--ink);
+      background: var(--ink);
+      color: var(--paper);
     }
 
     &[data-disabled] {
-      background: transparent;
-      box-shadow: none;
       color: var(--line-disabled);
     }
 
     &[data-disabled][data-pressed] {
-      background: var(--tint);
-      box-shadow: inset 0 0 0 1px var(--line-faint);
+      background: var(--line-faint);
     }
 
-    &[aria-label]:has(> [data-slot="toggle-icon"]) {
+    &[aria-label]:has(> [data-slot="toggle-icon"]:only-child) {
       width: var(--size);
       padding: 0;
-    }
-
-    &[data-size="sm"] {
-      min-width: var(--size-sm);
-      height: var(--size-sm);
-      padding-inline: var(--space-2);
-      font-size: var(--text-sm);
-    }
-
-    &[data-size="lg"] {
-      min-width: calc(var(--size) + 6px);
-      height: calc(var(--size) + 6px);
-      padding-inline: var(--space-4);
-    }
-
-    &[data-size="sm"][aria-label]:has(> [data-slot="toggle-icon"]) {
-      width: var(--size-sm);
-    }
-
-    &[data-size="lg"][aria-label]:has(> [data-slot="toggle-icon"]) {
-      width: calc(var(--size) + 6px);
     }
 
     &:focus-visible {
       position: relative;
       z-index: 1;
     }
+  }
 
-    &[data-variant="outline"] {
-      padding-inline: 14px;
-      background: var(--surface-1);
+  /* A toggle on its own looks like an outline button, and fills in while pressed. */
+  [data-slot="toggle-root"]:not([data-variant="ghost"], [data-slot="toggle-group"] *) {
+    padding-inline: 14px;
+    background: var(--surface-1);
+    box-shadow:
+      inset 0 0 0 1px var(--ink),
+      var(--shadow-drop);
+
+    &:hover:not([data-disabled], [data-pressed]) {
+      background: var(--tint);
+    }
+
+    &:active:not([data-disabled]) {
       box-shadow:
         inset 0 0 0 1px var(--ink),
-        var(--shadow-drop);
+        var(--shadow-drop-pressed);
+    }
 
-      &:hover:not([data-disabled], [data-pressed]) {
-        background: var(--tint);
-      }
+    &[data-pressed] {
+      background: var(--ink);
+    }
 
-      &:active:not([data-disabled]) {
-        scale: 0.97;
-        box-shadow:
-          inset 0 0 0 1px var(--ink),
-          var(--shadow-drop-pressed);
-      }
+    &[data-disabled] {
+      background: var(--surface-1);
+      box-shadow: inset 0 0 0 1px var(--line-faint);
+    }
 
-      &[data-pressed] {
-        background: var(--tint);
-        box-shadow: inset 0 0 0 1px var(--ink);
-      }
-
-      &[data-disabled] {
-        background: var(--surface-1);
-        box-shadow: inset 0 0 0 1px var(--line-faint);
-      }
-
-      &[data-size="sm"] {
-        padding-inline: 10px;
-      }
+    &[data-disabled][data-pressed] {
+      background: var(--line-faint);
     }
   }
 
@@ -126,45 +106,39 @@
       flex-direction: column;
     }
 
-    &:has([data-slot="toggle-root"][data-variant="outline"]) {
-      gap: var(--space-1);
-    }
-
-    &[data-variant="spaced"] {
-      gap: var(--space-2);
-    }
-
-    &[data-variant="framed"] {
-      padding: 3px;
-      border-radius: var(--radius-surface);
-      background: var(--surface-1);
-      box-shadow: var(--shadow-1);
-    }
-
-    & [data-slot="toggle-root"]:not([data-variant="outline"]) {
+    & [data-slot="toggle-root"] {
       border-radius: var(--radius-row);
-    }
-
-    &[data-disabled] [data-slot="toggle-root"] {
-      color: var(--line-disabled);
     }
   }
 
-  :is([data-slot="toggle-root"], [data-slot="toggle-group"] + p) {
-    &[data-variant="light"] {
-      font-weight: 300;
-    }
+  /* A group outside a toolbar sits on its own track, sized like a menubar or toolbar so it lines up with inputs. */
+  [data-slot="toggle-group"]:not([data-slot="toolbar-root"] *) {
+    padding: 3px;
+    border-radius: var(--radius-surface);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
 
-    &[data-variant="normal"] {
-      font-weight: 400;
-    }
+    & [data-slot="toggle-root"] {
+      height: var(--size-sm);
+      min-width: var(--size-sm);
 
-    &[data-variant="medium"] {
-      font-weight: 500;
+      /* An icon-only toggle, named by its aria-label, is square. */
+      &[aria-label] {
+        width: var(--size-sm);
+        padding-inline: 0;
+      }
     }
+  }
 
-    &[data-variant="bold"] {
-      font-weight: 700;
+  /* Basic: a document's title and details, with its star toggle at the end. */
+  :scope[data-example="toggle/basic"] [data-slot="card"] {
+    align-items: center;
+    width: 20rem;
+    max-width: 100%;
+
+    & [data-slot="stack"] {
+      flex: 1;
+      min-width: 0;
     }
   }
 }

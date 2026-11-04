@@ -41,9 +41,7 @@ export function Example() {
           {(name) => (
             <li data-slot="row">
               {name}
-              <button data-variant="secondary" onClick={(event) => remove(name, event.currentTarget)}>
-                Delete
-              </button>
+              <button onClick={(event) => remove(name, event.currentTarget)}>Delete</button>
             </li>
           )}
         </For>
@@ -70,10 +68,8 @@ export function Example() {
                 <AlertDialogTitle>{question()?.title}</AlertDialogTitle>
                 <AlertDialogDescription>{question()?.description}</AlertDialogDescription>
                 <div data-slot="row">
-                  <AlertDialogClose data-variant="secondary">{question()?.cancelLabel}</AlertDialogClose>
-                  <AlertDialogClose data-variant="secondary" value="confirm">
-                    {question()?.confirmLabel}
-                  </AlertDialogClose>
+                  <AlertDialogClose>{question()?.cancelLabel}</AlertDialogClose>
+                  <AlertDialogClose value="confirm">{question()?.confirmLabel}</AlertDialogClose>
                 </div>
               </>
             )

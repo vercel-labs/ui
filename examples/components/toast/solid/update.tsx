@@ -28,15 +28,9 @@ export function Example() {
   return (
     <>
       <div data-slot="row">
-        <button data-variant="secondary" onClick={upload}>
-          Upload
-        </button>
-        <button data-variant="secondary" onClick={() => toast.dismiss("upload")}>
-          Cancel upload
-        </button>
-        <button data-variant="secondary" onClick={() => toast.dismiss()}>
-          Dismiss all
-        </button>
+        <button onClick={upload}>Upload</button>
+        <button onClick={() => toast.dismiss("upload")}>Cancel upload</button>
+        <button onClick={() => toast.dismiss()}>Dismiss all</button>
       </div>
       <ToastRegion toaster={toast}>
         {(item) => (

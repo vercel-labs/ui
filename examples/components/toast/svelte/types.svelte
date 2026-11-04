@@ -19,26 +19,26 @@
 </script>
 
 <div data-slot="row">
-  <button data-variant="secondary" onclick={() => toast("Event has been created")}>
+  <button onclick={() => toast("Event has been created")}>
     Default
   </button>
-  <button data-variant="secondary" onclick={() => toast.success("Event has been created")}>
+  <button onclick={() => toast.success("Event has been created")}>
     Success
   </button>
-  <button data-variant="secondary"
+  <button
     onclick={() => toast.info("Be at the area 10 minutes before the event time")}
   >
     Info
   </button>
-  <button data-variant="secondary"
+  <button
     onclick={() => toast.warning("Event start time cannot be earlier than 8am")}
   >
     Warning
   </button>
-  <button data-variant="secondary" onclick={() => toast.error("Event has not been created")}>
+  <button onclick={() => toast.error("Event has not been created")}>
     Error
   </button>
-  <button data-variant="secondary" onclick={promise}>
+  <button onclick={promise}>
     Promise
   </button>
 </div>

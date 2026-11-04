@@ -1,14 +1,18 @@
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { toLabel, TokenInput, TokenInputEditor } from "@ui-sdk/react/token-input"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [sent, setSent] = React.useState("")
+function Example() {
+  const log = useLog()
+
   return (
-    <div data-slot="stack">
-      <TokenInput submitShortcut="mod+enter" onSubmit={(value) => setSent(toLabel(value))}>
-        <TokenInputEditor aria-label="Message" placeholder="Enter adds a line, Cmd/Ctrl+Enter sends" />
+    <Field>
+      <FieldLabel>Message</FieldLabel>
+      <TokenInput submitShortcut="mod+enter" onSubmit={(value) => log(`Sent ${toLabel(value)}`)}>
+        <TokenInputEditor placeholder="Write a message" />
       </TokenInput>
-      <p data-slot="output">{sent ? `Sent:\n${sent}` : "Nothing sent yet."}</p>
-    </div>
+    </Field>
   )
 }
+
+export { Example }

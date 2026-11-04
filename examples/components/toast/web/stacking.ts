@@ -7,7 +7,7 @@ export function mount(root: HTMLElement) {
 
   root.innerHTML = `
     <div data-slot="row">
-      <button data-variant="secondary">Add toast</button>
+      <button>Add toast</button>
       <label data-slot="label">
         <input type="checkbox" />
         Always expanded

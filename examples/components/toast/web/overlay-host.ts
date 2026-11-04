@@ -22,7 +22,7 @@ export function mount(root: HTMLElement) {
         (name) => `
           <li data-slot="row">
             ${name}
-            <button data-variant="secondary" data-project="${name}">Delete</button>
+            <button data-project="${name}">Delete</button>
           </li>
         `,
       )
@@ -56,8 +56,8 @@ export function mount(root: HTMLElement) {
         <ui-alert-dialog-title></ui-alert-dialog-title>
         <ui-alert-dialog-description></ui-alert-dialog-description>
         <div data-slot="row">
-          <ui-alert-dialog-close><button data-variant="secondary"></button></ui-alert-dialog-close>
-          <ui-alert-dialog-close value="confirm"><button data-variant="secondary"></button></ui-alert-dialog-close>
+          <ui-alert-dialog-close><button></button></ui-alert-dialog-close>
+          <ui-alert-dialog-close value="confirm"><button></button></ui-alert-dialog-close>
         </div>
       </ui-alert-dialog-content>
     </ui-alert-dialog>

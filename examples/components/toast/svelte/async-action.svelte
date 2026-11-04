@@ -9,7 +9,7 @@
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary"
+<button
   onclick={() => toast("File deleted", { action: { label: "Undo", onAction: restore } })}
 >
   Delete file
@@ -17,7 +17,7 @@
 <ToastRegion toaster={toast}>
   <Toast>
     <ToastTitle />
-    <ToastAction data-variant="secondary">
+    <ToastAction>
       {#snippet children(state)}
         {state.pending ? "Restoring…" : state.error ? "Try again" : "Undo"}
       {/snippet}

@@ -1,23 +1,27 @@
 "use client"
 
-import { Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
+import { Toggle, ToggleIcon } from "@ui-sdk/react/toggle"
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { BoldIcon, ItalicIcon } from "lucide-react"
+import { BoldIcon, ItalicIcon, LinkIcon } from "lucide-react"
 
 function Example() {
   return (
     <div dir="rtl">
       <Toolbar aria-label="تنسيق">
-        <ToggleGroup multiple aria-label="نمط النص">
-          <Toggle data-variant="ghost" value="bold" aria-label="غامق">
+        <Toggle aria-label="غامق">
+          <ToggleIcon>
             <BoldIcon />
-          </Toggle>
-          <Toggle data-variant="ghost" value="italic" aria-label="مائل">
+          </ToggleIcon>
+        </Toggle>
+        <Toggle aria-label="مائل">
+          <ToggleIcon>
             <ItalicIcon />
-          </Toggle>
-        </ToggleGroup>
+          </ToggleIcon>
+        </Toggle>
         <ToolbarSeparator />
-        <ToolbarButton data-variant="secondary">حفظ</ToolbarButton>
+        <ToolbarButton aria-label="إدراج رابط">
+          <LinkIcon aria-hidden="true" />
+        </ToolbarButton>
       </Toolbar>
     </div>
   )

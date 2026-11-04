@@ -14,7 +14,7 @@
 </script>
 
 <div data-slot="row">
-  <button data-variant="secondary" onclick={add}>
+  <button onclick={add}>
     Add toast
   </button>
   <label data-slot="label">

@@ -6,9 +6,9 @@ export function mount(root: HTMLElement) {
 
   root.innerHTML = `
     <div data-slot="row">
-      <button data-variant="secondary">1 second</button>
-      <button data-variant="secondary">3 seconds</button>
-      <button data-variant="secondary">Until dismissed</button>
+      <button>1 second</button>
+      <button>3 seconds</button>
+      <button>Until dismissed</button>
     </div>
     <ui-toast-region>
       <template>
@@ -17,7 +17,7 @@ export function mount(root: HTMLElement) {
             <ui-toast-title></ui-toast-title>
             <ui-toast-description></ui-toast-description>
           </div>
-          <ui-toast-close><button data-variant="secondary"></button></ui-toast-close>
+          <ui-toast-close><button></button></ui-toast-close>
         </ui-toast>
       </template>
     </ui-toast-region>

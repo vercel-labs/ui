@@ -20,7 +20,6 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast("Message archived", {
             action: { label: "Undo", onAction: () => setStatus("Restored"), dismiss: true },
@@ -39,12 +38,8 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastAction data-variant="secondary" />
-            {item.cancel && (
-              <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
-                {item.cancel.label}
-              </ToastClose>
-            )}
+            <ToastAction />
+            {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
           </Toast>
         )}
       </ToastRegion>

@@ -20,7 +20,7 @@
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary" onclick={create}>
+<button onclick={create}>
   Create invoice
 </button>
 <ToastRegion toaster={toast}>
@@ -30,7 +30,7 @@
         <ToastTitle />
         <ToastDescription />
       </div>
-      <ToastAction data-variant="secondary" />
+      <ToastAction />
     </Toast>
   {/snippet}
 </ToastRegion>

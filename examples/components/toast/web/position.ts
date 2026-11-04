@@ -15,7 +15,7 @@ export function mount(root: HTMLElement) {
 
   root.innerHTML = `
     <div data-slot="row">
-      ${placements.map((item) => `<button data-variant="secondary">${item.label}</button>`).join("")}
+      ${placements.map((item) => `<button>${item.label}</button>`).join("")}
     </div>
     <ui-toast-region side="bottom" align="end">
       <template>

@@ -24,7 +24,7 @@
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary" onclick={message}>
+<button onclick={message}>
   New message
 </button>
 <ToastRegion toaster={toast} aria-label="Messages">
@@ -37,8 +37,8 @@
         <ToastTitle />
         <ToastDescription />
       </div>
-      <ToastAction data-variant="secondary" />
-      <ToastClose data-variant="secondary" aria-label="Close">
+      <ToastAction />
+      <ToastClose aria-label="Close">
         <XIcon aria-hidden="true" />
       </ToastClose>
     </Toast>

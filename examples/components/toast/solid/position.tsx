@@ -24,7 +24,6 @@ export function Example() {
         <For each={placements}>
           {(item) => (
             <button
-              data-variant="secondary"
               onClick={() => {
                 setPlacement(item)
                 toast("Event has been created", { description: item.label })

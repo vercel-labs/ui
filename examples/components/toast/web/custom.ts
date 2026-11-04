@@ -6,7 +6,7 @@ export function mount(root: HTMLElement) {
   const toast = createToaster()
 
   root.innerHTML = `
-    <button data-variant="secondary">New message</button>
+    <button>New message</button>
     <ui-toast-region aria-label="Messages">
       <template>
         <ui-toast>
@@ -15,9 +15,9 @@ export function mount(root: HTMLElement) {
             <ui-toast-title></ui-toast-title>
             <ui-toast-description></ui-toast-description>
           </div>
-          <ui-toast-action><button data-variant="secondary"></button></ui-toast-action>
+          <ui-toast-action><button></button></ui-toast-action>
           <ui-toast-close>
-            <button data-variant="secondary" aria-label="Close">
+            <button aria-label="Close">
               ${createElement(X, { "aria-hidden": "true" }).outerHTML}
             </button>
           </ui-toast-close>

@@ -11,17 +11,14 @@ export function Example() {
 
   return (
     <>
-      <button
-        data-variant="secondary"
-        onClick={() => toast("File deleted", { action: { label: "Undo", onAction: restore } })}
-      >
+      <button onClick={() => toast("File deleted", { action: { label: "Undo", onAction: restore } })}>
         Delete file
       </button>
       <ToastRegion toaster={toast}>
         {() => (
           <Toast>
             <ToastTitle />
-            <ToastAction data-variant="secondary">
+            <ToastAction>
               {(state) => (state.pending ? "Restoring…" : state.error ? "Try again" : "Undo")}
             </ToastAction>
           </Toast>

@@ -1,33 +1,22 @@
 "use client"
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
-import * as React from "react"
-
-const items = ["Inbox", "Drafts", "Sent"]
+import { ArchiveIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [status, setStatus] = React.useState("Closed")
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <div data-slot="row">
-        {items.map((item) => (
-          <Tooltip
-            key={item}
-            onOpenChange={(open) => setStatus(open ? `${item} opening` : `${item} closing`)}
-            onOpenChangeComplete={(open) =>
-              setStatus((status) =>
-                open ? `${item} open` : status === `${item} closing` ? `${item} closed` : status,
-              )
-            }
-          >
-            <TooltipTrigger>{item}</TooltipTrigger>
-            <TooltipContent>Open {item.toLowerCase()}</TooltipContent>
-          </Tooltip>
-        ))}
-      </div>
-      <output data-slot="output">{status}</output>
-    </div>
+    <Tooltip
+      onOpenChange={(open) => log(open ? "Opening" : "Closing")}
+      onOpenChangeComplete={(open) => log(open ? "Open" : "Closed")}
+    >
+      <TooltipTrigger aria-label="Archive">
+        <ArchiveIcon aria-hidden="true" />
+      </TooltipTrigger>
+      <TooltipContent>Archive</TooltipContent>
+    </Tooltip>
   )
 }
 

@@ -16,12 +16,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button
-    data-variant="secondary"
-    @click="toast('Press Alt+T to reach this toast', { action: { label: 'Open' } })"
-  >
-    Show toast
-  </button>
+  <button @click="toast('Press Alt+T to reach this toast', { action: { label: 'Open' } })">Show toast</button>
   <ToastRegion :toaster="toast" shortcut="alt+t" aria-label="Alerts">
     <template #default="{ toast: item }">
       <Toast>
@@ -29,7 +24,7 @@ onUnmounted(() => {
           <ToastTitle />
           <ToastDescription />
         </div>
-        <ToastClose data-variant="secondary" />
+        <ToastClose />
       </Toast>
     </template>
   </ToastRegion>

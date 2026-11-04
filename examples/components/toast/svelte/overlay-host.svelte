@@ -39,7 +39,7 @@
   {#each projects as name (name)}
     <li data-slot="row">
       {name}
-      <button data-variant="secondary" onclick={(event) => remove(name, event.currentTarget)}>
+      <button onclick={(event) => remove(name, event.currentTarget)}>
         Delete
       </button>
     </li>
@@ -64,10 +64,10 @@
         {question?.description}
       </AlertDialogDescription>
       <div data-slot="row">
-        <AlertDialogClose data-variant="secondary">
+        <AlertDialogClose>
           {question?.cancelLabel}
         </AlertDialogClose>
-        <AlertDialogClose data-variant="secondary" value="confirm">
+        <AlertDialogClose value="confirm">
           {question?.confirmLabel}
         </AlertDialogClose>
       </div>

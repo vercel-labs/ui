@@ -3,9 +3,11 @@ title: Toolbar
 description: Give buttons, toggles, menus and fields one tab stop with arrow-key navigation.
 ---
 
+Use a Toolbar to group the controls of an editor, a canvas or a table. Tab enters it once, and the arrow keys move between its buttons, toggles, menus and fields.
+
 <ComponentExample
   name="toolbar/demo"
-  caption="Tab into Formatting, then use Left and Right to move between toggles and the font menu. Down opens the menu when its trigger is focused."
+  caption="Tab into the toolbar, then use Left and Right to move between Bold, Italic, Underline and Insert link. Press Space to toggle the focused style. The console logs each change."
 />
 
 ## Installation
@@ -14,20 +16,37 @@ description: Give buttons, toggles, menus and fields one tab stop with arrow-key
 npm install @ui-sdk/react @ui-sdk/core
 ```
 
+## Composition
+
+Use the following composition to build a `Toolbar`:
+
+```text
+Toolbar
+├── ToolbarButton
+├── ToolbarSeparator
+├── ToolbarGroup
+│   ├── ToolbarButton
+│   └── ToolbarButton
+├── ToolbarLink
+└── ToolbarInput
+```
+
+Put buttons, links and fields straight inside the toolbar. `ToolbarGroup` names a set of related items, and `ToolbarSeparator` draws a line between sets. Toggles and toggle groups join the toolbar on their own, and menu and select triggers join through `ToolbarButton`.
+
 ## Usage
 
-Put controls inside a named `Toolbar`. The toolbar provides one tab stop and moves focus between its controls with the arrow keys.
-
-<span id="composition" />
+Import the parts and put them together:
 
 ```tsx
-import { Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
+import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/react/toolbar"
 
 function Example() {
   return (
-    <Toolbar aria-label="History">
+    <Toolbar aria-label="Formatting">
       <ToolbarButton>Undo</ToolbarButton>
       <ToolbarButton>Redo</ToolbarButton>
+      <ToolbarSeparator />
+      <ToolbarButton>Insert Link</ToolbarButton>
     </Toolbar>
   )
 }
@@ -35,138 +54,153 @@ function Example() {
 export { Example }
 ```
 
-Use `ToolbarButton` for buttons, `ToolbarLink` for links and `ToolbarInput` for fields. Toggles and toggle groups join automatically. Give every icon-only control an accessible name.
+Name the toolbar with `aria-label`, and give every icon-only control its own.
 
-## Examples
+## Toggle Groups
 
-### With a Toggle Group
-
-A [toggle group](./toggle#group) joins the toolbar's navigation instead of creating another tab stop. Arrow keys move focus; Enter or Space changes a toggle.
+A [Toggle](./toggle) group inside a toolbar joins its navigation instead of adding another tab stop. Arrow keys move focus without pressing anything; Enter or Space presses the focused toggle.
 
 <ComponentExample
   name="toolbar/toggle-group"
-  caption="Move from the formatting group to Code and Clear with the arrow keys. Clear resets the group's formatting values."
+  caption="Arrow from the alignment group to the list group, then press Space on Align center or Numbered list. The console logs each choice."
 />
 
-### With a Menu
+## Groups
 
-Render the menu trigger through `ToolbarButton`. Put this inside a [Menu](./menu) within the toolbar:
-
-```tsx
-<ToolbarButton render={<MenuTrigger />}>Share</ToolbarButton>
-```
-
-In a horizontal toolbar, Down opens the menu while Left and Right move between toolbar controls.
-
-<ComponentExample
-  name="toolbar/menu"
-  caption="Focus Share and press Down, then choose Email or Copy link. Escape closes the menu and returns to its trigger."
-/>
-
-### With a Select
-
-Compose a [Select](./select) trigger the same way. The trigger keeps its select behavior while joining the toolbar's focus order.
-
-<ComponentExample
-  name="toolbar/select"
-  caption="Open Zoom to choose a value, or use Zoom in and Zoom out. Fit to screen returns to 100%."
-/>
-
-### With Fields
-
-Render a field through `ToolbarInput`, or use its default native input. The field keeps Home and End, and Left and Right while they can move the caret. At the matching boundary, with no text selected, an arrow moves to the next toolbar item.
-
-Entering a field with an arrow puts its caret at the far end in that direction: press the same arrow again to leave, or the other arrow to edit. A [Number Input](./number-input) keeps Up and Down for stepping its value.
-
-<ComponentExample
-  name="toolbar/input"
-  caption="Move into Font size and use Up or Down to change it. In Find, move the caret to an edge before using that arrow to leave the field."
-/>
-
-### With Links
-
-Links join the same focus order and keep their normal link behavior. The demo intercepts a plain click to update its local page while leaving modified clicks alone.
-
-<ComponentExample
-  name="toolbar/link"
-  caption="Use the arrows to reach Files changed, then press Enter. The status changes to Showing: files."
-/>
-
-### Groups
-
-Use `ToolbarGroup` to name related controls. Set `disabled` on the group to disable those controls together.
+Use `ToolbarGroup` to name related controls. Set `disabled` on the group to disable them together; they stay focusable with `aria-disabled`.
 
 <ComponentExample
   name="toolbar/group"
-  caption="Move through Clipboard and History with the arrow keys. Undo and Redo remain focusable but are disabled."
+  caption="Move through Cut, Copy and Paste into History with the arrow keys. Undo and Redo stay focusable but do nothing."
 />
 
-## Behavior and Options
+## Menus
 
-### Keyboard
+Render a [Menu](./menu) trigger through `ToolbarButton`. In a horizontal toolbar, Down opens the menu while Left and Right keep moving between toolbar items.
 
-Tab enters on the first enabled item, then returns to the item focused last on later visits. The next Tab leaves the toolbar.
+```tsx
+<Menu>
+  <ToolbarButton render={<MenuTrigger />}>Share</ToolbarButton>
+  <MenuContent>…</MenuContent>
+</Menu>
+```
 
-| Key                        | Action                                          |
-| -------------------------- | ----------------------------------------------- |
-| `ArrowRight` / `ArrowLeft` | Move focus in a horizontal toolbar              |
-| `ArrowDown` / `ArrowUp`    | Move focus in a vertical toolbar                |
-| `Home` / `End`             | Focus the first or last item, except in a field |
-| `Enter` / `Space`          | Activate a button or toggle, or open its popup  |
+<ComponentExample
+  name="toolbar/menu"
+  caption="Focus Share and press Down, then choose Email or Copy Link. Escape closes the menu and returns focus to Share."
+/>
 
-Controls keep the keys they use: Down can open a menu, and Up and Down can step a number input. Toolbar navigation does not press toggles.
+## Selects
 
-### Vertical
+A [Select](./select) trigger joins the same way. It keeps its select behavior while it takes part in the toolbar's focus order.
 
-Set `orientation="vertical"` to move with Up and Down. Separators expose the perpendicular orientation for styling.
+<ComponentExample
+  name="toolbar/select"
+  caption="Open Zoom and choose a value, or step it with Zoom out and Zoom in. Each button turns off at the end of the range."
+/>
+
+## Fields
+
+Use `ToolbarInput` for a text field, or render another field through it, like a [Number Input](./number-input) control. A field keeps Home, End and the arrow keys while they move its caret. At the matching end, with no text selected, an arrow moves to the next item.
+
+Entering a field with an arrow puts its caret at the far end in that direction: press the same arrow again to leave, or the other arrow to edit. A number input keeps Up and Down for stepping its value.
+
+<ComponentExample
+  name="toolbar/input"
+  caption="Move into Font size and press Up or Down to change it. In Find, type a word, then move the caret to an edge before that arrow leaves the field."
+/>
+
+## Links
+
+`ToolbarLink` joins the same focus order and keeps its link behavior. The demo handles a plain click itself and leaves modified clicks, like opening in a new tab, to the browser.
+
+<ComponentExample
+  name="toolbar/link"
+  caption="Arrow to Files Changed and press Enter. The console logs the page it opened."
+/>
+
+## Vertical
+
+Set `orientation="vertical"` to move with Up and Down, like a canvas tool palette. Separators turn to run across the toolbar.
 
 <ComponentExample
   name="toolbar/vertical"
-  caption="Use Up and Down to move between tools and Delete. Space changes the focused tool."
+  caption="Use Up and Down to move between the tools and Delete. Space picks the focused tool."
 />
 
-### Disabled
+## Disabled
 
-Disabled items stay reachable with `aria-disabled` by default. They ignore activation, including keys that would activate a component rendered through them. Toolbar navigation still works.
-
-Set `focusableWhenDisabled` to `false` to skip an item instead. A disabled field cannot be edited. Disabling the whole toolbar preserves a tab stop so users can still find it.
+A disabled item stays reachable with `aria-disabled`, so people can find it, but it ignores presses, including keys meant for a component rendered through it. Set `focusableWhenDisabled` to `false` to skip it instead.
 
 <ComponentExample
   name="toolbar/disabled"
-  caption="Arrow from Reply to the disabled Archive button. Delete is skipped. The Comment toolbar stays focusable but cannot be edited or submitted."
+  caption="Arrow from Reply to Archive, which is disabled but focusable. Delete is skipped. Only Reply logs a press."
 />
 
-### Loop
+Set `disabled` on the toolbar to disable every item. The toolbar keeps its tab stop, and its fields can't be edited.
 
-Arrow keys wrap by default. Set `loop` to `false` to stop at the ends.
+```tsx
+<Toolbar disabled aria-label="Formatting">
+  <ToolbarButton>Bold</ToolbarButton>
+  <ToolbarInput aria-label="Find" />
+</Toolbar>
+```
+
+## Loop
+
+Arrow keys wrap from the last item to the first by default. Set `loop` to `false` to stop at the ends.
 
 <ComponentExample
   name="toolbar/loop"
   caption="Focus Last and press Right. Focus stays there; Home still moves to First."
 />
 
-### Controller
+## Controller
 
-Create a controller with `createToolbarController` from `@ui-sdk/react/toolbar` and pass it as `controller`. Its `focus()` method moves to the last focused item. Create one controller per mounted toolbar.
+Create a controller with `createToolbarController` and pass it as `controller`. Its `focus()` moves focus to the item focused last, like the Alt+F10 shortcut editors give their toolbars. Create one controller per toolbar.
 
 <ComponentExample
   name="toolbar/controller"
-  caption="Type in Notes, then press Alt+F10 or choose Focus toolbar. Use a toolbar action to update the status."
+  caption="Type in Notes, then press Alt+F10 or choose Focus Toolbar. Press a toolbar button and the console logs it."
 />
-
-## Styling
-
-Style orientation and disabled states through the parts' data attributes. A separator's orientation is perpendicular to its toolbar.
-
-<DataAttributes component="toolbar" />
 
 ## Custom Rendering
 
-Render a component through `ToolbarButton` or `ToolbarInput` to combine their behavior. A render function must spread the toolbar props onto the inner component. See [Parts and Composition](../parts-and-composition) for the rendering contract.
+Render a component through `ToolbarButton` or `ToolbarInput` to combine their behavior, as the menu, select and number input examples do. A render function must spread the toolbar props onto the inner component. [Parts and Composition](../parts-and-composition) explains the rendering contract.
+
+## Styling
+
+Use `data-orientation` on the root for a row or a column, and on a separator for the way its line runs, across the toolbar. Use `data-disabled` to style unavailable items and groups. Toggles inside keep their own `data-pressed`.
+
+Each part has a `data-slot`, such as `toolbar-button`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### Toolbar [#data-attributes-toolbar]
+
+<DataAttributes component="toolbar" part="root" />
+
+### ToolbarButton [#data-attributes-toolbarbutton]
+
+<DataAttributes component="toolbar" part="button" />
+
+### ToolbarLink [#data-attributes-toolbarlink]
+
+<DataAttributes component="toolbar" part="link" />
+
+### ToolbarInput [#data-attributes-toolbarinput]
+
+<DataAttributes component="toolbar" part="input" />
+
+### ToolbarGroup [#data-attributes-toolbargroup]
+
+<DataAttributes component="toolbar" part="group" />
+
+### ToolbarSeparator [#data-attributes-toolbarseparator]
+
+<DataAttributes component="toolbar" part="separator" />
 
 ## API Reference
-
-Props are the same as below, as React props.
 
 ### Toolbar
 
@@ -184,7 +218,11 @@ Props are the same as below, as React props.
 
 <TypeTable path="../../packages/core/src/components/toolbar/toolbar.ts" name="ToolbarGroupProps" />
 
+`ToolbarLink` and `ToolbarSeparator` take no props of their own.
+
 ### State
+
+What render functions and state-based class names receive on `ToolbarButton`:
 
 <StateTable path="../../packages/core/src/components/toolbar/toolbar.ts" name="ToolbarButtonState" />
 
@@ -194,6 +232,23 @@ Props are the same as below, as React props.
 
 ## Accessibility
 
-The toolbar follows the [WAI-ARIA toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/). Every line below is an automated test.
+The toolbar follows the [WAI-ARIA toolbar pattern](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/). The root has the `toolbar` role and `aria-orientation`, and separators have the `separator` role.
+
+### Keyboard
+
+The toolbar has one tab stop, a roving focus. Tab enters on the first enabled item, then returns to the item focused last. The next Tab leaves the toolbar.
+
+| Key                        | Action                                          |
+| -------------------------- | ----------------------------------------------- |
+| `ArrowRight` / `ArrowLeft` | Move focus in a horizontal toolbar              |
+| `ArrowDown` / `ArrowUp`    | Move focus in a vertical toolbar                |
+| `Home` / `End`             | Focus the first or last item, except in a field |
+| `Enter` / `Space`          | Activate a button or toggle, or open its popup  |
+
+Controls keep the keys they use: Down opens a menu, and Up and Down step a number input. Moving focus never presses a toggle. In right-to-left text, Left and Right swap.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="toolbar" />

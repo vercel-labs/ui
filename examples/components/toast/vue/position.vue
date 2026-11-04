@@ -27,7 +27,7 @@ onUnmounted(() => {
 
 <template>
   <div data-slot="row">
-    <button data-variant="secondary" v-for="item in placements" :key="item.label" @click="place(item)">
+    <button v-for="item in placements" :key="item.label" @click="place(item)">
       {{ item.label }}
     </button>
   </div>

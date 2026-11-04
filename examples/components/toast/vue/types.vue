@@ -22,16 +22,12 @@ onUnmounted(() => {
 
 <template>
   <div data-slot="row">
-    <button data-variant="secondary" @click="toast('Event has been created')">Default</button>
-    <button data-variant="secondary" @click="toast.success('Event has been created')">Success</button>
-    <button data-variant="secondary" @click="toast.info('Be at the area 10 minutes before the event time')">
-      Info
-    </button>
-    <button data-variant="secondary" @click="toast.warning('Event start time cannot be earlier than 8am')">
-      Warning
-    </button>
-    <button data-variant="secondary" @click="toast.error('Event has not been created')">Error</button>
-    <button data-variant="secondary" @click="promise">Promise</button>
+    <button @click="toast('Event has been created')">Default</button>
+    <button @click="toast.success('Event has been created')">Success</button>
+    <button @click="toast.info('Be at the area 10 minutes before the event time')">Info</button>
+    <button @click="toast.warning('Event start time cannot be earlier than 8am')">Warning</button>
+    <button @click="toast.error('Event has not been created')">Error</button>
+    <button @click="promise">Promise</button>
   </div>
   <ToastRegion :toaster="toast">
     <template #default>

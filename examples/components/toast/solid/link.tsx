@@ -17,7 +17,6 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast("Invoice created", {
             description: "INV-1042",
@@ -37,7 +36,7 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastAction data-variant="secondary" />
+            <ToastAction />
           </Toast>
         )}
       </ToastRegion>

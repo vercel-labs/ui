@@ -23,9 +23,9 @@ export function mount(root: HTMLElement) {
 
   root.innerHTML = `
     <div data-slot="row">
-      <button data-variant="secondary">Upload</button>
-      <button data-variant="secondary">Cancel upload</button>
-      <button data-variant="secondary">Dismiss all</button>
+      <button>Upload</button>
+      <button>Cancel upload</button>
+      <button>Dismiss all</button>
     </div>
     <ui-toast-region>
       <template>

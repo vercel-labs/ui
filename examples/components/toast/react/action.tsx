@@ -1,15 +1,9 @@
-import {
-  Toast,
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/react/toast"
 import * as React from "react"
+import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [toast] = React.useState(() => createToaster())
   React.useEffect(
     () => () => {
@@ -18,38 +12,30 @@ export function Example() {
     [toast],
   )
 
-  const [status, setStatus] = React.useState("")
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast("Message archived", {
-            action: { label: "Undo", onAction: () => setStatus("Restored"), dismiss: true },
-            cancel: { label: "Dismiss", onCancel: () => setStatus("Kept archived") },
-            onDismiss: ({ reason }) => reason === "timeout" && setStatus("Timed out"),
+            action: { label: "Undo", onAction: () => log("Message restored") },
+            cancel: { label: "Dismiss", onCancel: () => log("Kept archived") },
+            onDismiss: ({ reason }) => log(`Closed (${reason})`),
           })
         }
       >
-        Archive message
+        Archive Message
       </button>
-      <output data-slot="output">{status}</output>
       <ToastRegion toaster={toast}>
         {(item) => (
           <Toast>
-            <div data-slot="stack">
-              <ToastTitle />
-              <ToastDescription />
-            </div>
-            <ToastAction data-variant="secondary" />
-            {item.cancel && (
-              <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
-                {item.cancel.label}
-              </ToastClose>
-            )}
+            <ToastTitle />
+            {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

@@ -1,4 +1,5 @@
 @scope ([data-example]) {
+  /* The tooltip grows out of its trigger and fades in, and one that opens at once, in a group, doesn't animate. */
   [data-slot="tooltip-content"] {
     display: flex;
     align-items: center;
@@ -6,7 +7,7 @@
     box-sizing: border-box;
     width: max-content;
     max-width: min(16rem, var(--available-width));
-    padding: 4px 8px;
+    padding: 6px 10px;
     border-radius: var(--radius-control);
     background: var(--surface-2);
     box-shadow: var(--shadow-2);
@@ -14,37 +15,30 @@
     font-size: var(--text-xs);
     line-height: 16px;
     transform-origin: var(--transform-origin);
+    transition:
+      opacity 150ms ease-out,
+      scale 150ms ease-out;
+
+    &:is([data-starting-style], [data-ending-style]) {
+      opacity: 0;
+      scale: 0.9;
+    }
+
+    &[data-instant] {
+      transition: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: opacity 150ms ease-out;
+
+      &:is([data-starting-style], [data-ending-style]) {
+        scale: none;
+      }
+    }
   }
 
   [data-slot="tooltip-shortcut"] {
     margin-inline-start: auto;
-  }
-
-  [data-slot="tooltip-arrow"] {
-    width: 8px;
-    height: 8px;
-    background: var(--surface-2);
-    rotate: 45deg;
-
-    &[data-side="bottom"] {
-      top: -4px;
-      box-shadow: -1px -1px 0 var(--line);
-    }
-
-    &[data-side="top"] {
-      bottom: -4px;
-      box-shadow: 1px 1px 0 var(--line);
-    }
-
-    &[data-side="left"] {
-      right: -4px;
-      box-shadow: 1px -1px 0 var(--line);
-    }
-
-    &[data-side="right"] {
-      left: -4px;
-      box-shadow: -1px 1px 0 var(--line);
-    }
   }
 
   a[data-slot="tooltip-trigger"][data-variant="link"] {
@@ -167,17 +161,28 @@
     font-size: var(--text-sm);
   }
 
-  :scope[data-example="tooltip/animation"] {
-    & [data-slot="tooltip-content"] {
-      transition: opacity var(--duration);
+  /* The controls leave room for the tooltip that opens above Export. */
+  :scope[data-example="tooltip/controlled"] [data-slot="controls"] {
+    margin-bottom: var(--space-8);
+  }
 
-      &:is([data-starting-style], [data-ending-style]) {
-        opacity: 0;
-      }
+  /* The side buttons sit around an empty middle, wide enough for a tooltip that flips into it on a phone. */
+  :scope[data-example="tooltip/side"] [data-slot="grid"] {
+    grid-template-columns: auto 7rem auto;
+    justify-items: center;
+    gap: var(--space-2);
 
-      &[data-instant] {
-        transition: none;
-      }
+    & > button:nth-of-type(1),
+    & > button:nth-of-type(4) {
+      grid-column: 2;
+    }
+
+    & > button:nth-of-type(2) {
+      grid-column: 1;
+    }
+
+    & > button:nth-of-type(3) {
+      grid-column: 3;
     }
   }
 }

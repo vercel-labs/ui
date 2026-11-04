@@ -18,7 +18,6 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast({
             title: "Ada Lovelace",
@@ -42,8 +41,8 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastAction data-variant="secondary" />
-            <ToastClose data-variant="secondary" aria-label="Close">
+            <ToastAction />
+            <ToastClose aria-label="Close">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"

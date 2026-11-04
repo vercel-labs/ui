@@ -1,35 +1,37 @@
 "use client"
 
-import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
+import { CheckIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [tooltip] = React.useState(() => createTooltipController())
+  const log = useLog()
   const [open, setOpen] = React.useState(false)
-  const [reason, setReason] = React.useState("")
 
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        <Tooltip
-          open={open}
-          onOpenChange={(next, details) => {
-            setOpen(next)
-            setReason(details.reason)
-          }}
-          controller={tooltip}
-        >
-          <TooltipTrigger>Export</TooltipTrigger>
-          <TooltipContent>Download a CSV of this table</TooltipContent>
-        </Tooltip>
-        <button type="button" onClick={() => tooltip.open()}>
-          Show from elsewhere
-        </button>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Checkbox checked={open} onCheckedChange={(next) => setOpen(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
+          Open
+        </label>
       </div>
-      <output data-slot="output">
-        {open ? "Open" : "Closed"}
-        {reason && `, last change: ${reason}`}
-      </output>
+      <Tooltip
+        open={open}
+        onOpenChange={(next, details) => {
+          setOpen(next)
+          log(`${next ? "Opened" : "Closed"} (${details.reason})`)
+        }}
+      >
+        <TooltipTrigger>Export</TooltipTrigger>
+        <TooltipContent>Download as CSV</TooltipContent>
+      </Tooltip>
     </div>
   )
 }

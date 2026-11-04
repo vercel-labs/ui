@@ -28,9 +28,9 @@ onUnmounted(() => {
 
 <template>
   <div data-slot="row">
-    <button data-variant="secondary" @click="upload">Upload</button>
-    <button data-variant="secondary" @click="toast.dismiss('upload')">Cancel upload</button>
-    <button data-variant="secondary" @click="toast.dismiss()">Dismiss all</button>
+    <button @click="upload">Upload</button>
+    <button @click="toast.dismiss('upload')">Cancel upload</button>
+    <button @click="toast.dismiss()">Dismiss all</button>
   </div>
   <ToastRegion :toaster="toast">
     <template #default="{ toast: item }">

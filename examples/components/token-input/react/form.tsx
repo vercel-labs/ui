@@ -1,5 +1,9 @@
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/react/token-input"
+import { CheckIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const draft: TokenInputValue = [
   "Explain ",
@@ -7,51 +11,55 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
-export function Example() {
-  const [submitted, setSubmitted] = React.useState("")
+function Example() {
+  const log = useLog()
   const [disabled, setDisabled] = React.useState(false)
   const [readOnly, setReadOnly] = React.useState(false)
   const formId = React.useId()
+
   return (
     <div data-slot="stack">
-      <div data-slot="row">
+      <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={disabled} onChange={(event) => setDisabled(event.target.checked)} />
+          <Checkbox checked={disabled} onCheckedChange={(next) => setDisabled(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
           Disabled
         </label>
         <label data-slot="label">
-          <input type="checkbox" checked={readOnly} onChange={(event) => setReadOnly(event.target.checked)} />
+          <Checkbox checked={readOnly} onCheckedChange={(next) => setReadOnly(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
           Read-only
         </label>
       </div>
-      <TokenInput
-        form={formId}
-        name="prompt"
-        required
-        defaultValue={draft}
-        disabled={disabled}
-        readOnly={readOnly}
-      >
-        <label id={`${formId}-label`} data-slot="label">
-          Prompt
-        </label>
-        <TokenInputEditor aria-labelledby={`${formId}-label`} />
-      </TokenInput>
-      <form
-        onReset={() => setSubmitted("")}
-        id={formId}
-        data-slot="stack"
-        onSubmit={(event) => {
-          event.preventDefault()
-          setSubmitted(String(new FormData(event.currentTarget).get("prompt") ?? ""))
-        }}
-      >
-        <div data-slot="row">
-          <button type="submit">Submit</button>
+      <div data-slot="stack">
+        <Field disabled={disabled}>
+          <FieldLabel>Prompt</FieldLabel>
+          <TokenInput form={formId} name="prompt" required defaultValue={draft} readOnly={readOnly}>
+            <TokenInputEditor />
+          </TokenInput>
+        </Field>
+        <form
+          id={formId}
+          data-slot="row"
+          onSubmit={(event) => {
+            event.preventDefault()
+            log(`Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`)
+          }}
+        >
+          <button type="submit" data-variant="solid">
+            Submit
+          </button>
           <button type="reset">Reset</button>
-        </div>
-        <p data-slot="output">{submitted}</p>
-      </form>
+        </form>
+      </div>
     </div>
   )
 }
+
+export { Example }

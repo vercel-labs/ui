@@ -17,7 +17,7 @@ export function mount(root: HTMLElement) {
   }
 
   root.innerHTML = `
-    <button data-variant="secondary">Save</button>
+    <button>Save</button>
     <ui-toast-region>
       <template>
         <ui-toast>

@@ -3,52 +3,18 @@ title: Toast
 description: Show notifications with actions, timed dismissal, and screen reader announcements.
 ---
 
+A toast tells someone that something happened, like a saved change or a sent message, and goes away on its own. It can offer an action such as Undo, stacks with the toasts before it, and is announced to screen readers without taking focus.
+
 <ComponentExample
   name="toast/demo"
-  caption="Press Show toast, then dismiss the notification or wait for it to close."
+  caption="Press Create Event. Choose Undo, swipe the toast away, or wait for it to close. Undo logs Event removed."
 />
 
 ## Installation
 
 ```bash
-pnpm add @ui-sdk/react @ui-sdk/core
+npm install @ui-sdk/react @ui-sdk/core
 ```
-
-## Usage
-
-Mount `OverlayHost` once near your app's root, then call `toast()` when an action finishes. The host renders the notification. This small example shows the connection:
-
-```tsx
-import { OverlayHost } from "@ui-sdk/react/overlays"
-import { Toast, ToastTitle, toast } from "@ui-sdk/react/toast"
-
-function App() {
-  return (
-    <>
-      <button type="button" onClick={() => toast("Changes saved")}>
-        Save
-      </button>
-      <OverlayHost
-        toast={{
-          expanded: true,
-          className: "m-4 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 outline-none",
-          children: () => (
-            <Toast className="rounded-2xl bg-white p-4 text-sm text-neutral-950 shadow-lg ring-1 ring-neutral-950/5">
-              <ToastTitle />
-            </Toast>
-          ),
-        }}
-      />
-    </>
-  )
-}
-
-export { App }
-```
-
-The `toast.children` function renders each toast. Put your classes directly on the returned parts.
-
-You can also place a `ToastRegion` yourself. It takes over rendering for its toaster. Use `createToaster()` for an independent queue, as the demos below do.
 
 ## Composition
 
@@ -56,152 +22,226 @@ Use the following composition to build a `ToastRegion`:
 
 ```text
 ToastRegion
+├── Toast
+│   ├── ToastTitle
+│   ├── ToastDescription
+│   ├── ToastAction
+│   └── ToastClose
 └── Toast
     ├── ToastTitle
-    ├── ToastDescription
-    ├── ToastAction
-    └── ToastClose
+    └── ToastDescription
 ```
 
-The region groups notifications. A toast gets its name from its title and its description from the description part. Empty title, description, and action parts show the corresponding text from the toast data.
+The region renders one `Toast` for each toast in its queue, newest first, through its children function. A toast is named by its title and described by its description. Empty title, description and action parts show the text from the toast's data, so a region's renderer is usually the same few parts.
 
-Render the parts yourself to style them. A region without a custom renderer uses unstyled parts.
+## Usage
 
-## Examples
+Import the parts and put them together, then call `toast()` when an action finishes:
 
-### Types
+```tsx
+import { Toast, ToastDescription, ToastRegion, ToastTitle, toast } from "@ui-sdk/react/toast"
 
-`success`, `info`, `warning`, `error`, and `loading` set the toast's type. Types expose `data-type` for your renderer. Errors are announced immediately by default; loading toasts stay until updated or dismissed. You can override the announcement priority.
+function Example() {
+  return (
+    <>
+      <button type="button" onClick={() => toast("Event created", { description: "Friday at 10:00 AM" })}>
+        Create Event
+      </button>
+      <ToastRegion>
+        {() => (
+          <Toast>
+            <ToastTitle />
+            <ToastDescription />
+          </Toast>
+        )}
+      </ToastRegion>
+    </>
+  )
+}
+
+export { Example }
+```
+
+`toast()` works from anywhere, not only from components, and returns the toast's id. Place the region once, near your app's root. Without children, it renders each toast's title, description, action and cancel button with unstyled parts.
+
+The examples below each call `createToaster()` for a queue of their own and pass it to their region as `toaster`, so their toasts don't mix.
+
+## Types
+
+`toast.success`, `.info`, `.warning`, `.error` and `.loading` set the toast's type, which the toast exposes as `data-type` for an icon or a color. Errors are announced right away and other types wait for a pause; set `priority` to change that. A loading toast stays until it's updated or dismissed.
 
 <ComponentExample
   name="toast/types"
-  caption="Choose a message type. Error notifications are announced immediately; other types wait for a pause."
+  caption="Choose a type. Each toast shows its type's icon, and Loading turns into Photos uploaded when it finishes."
 />
 
-### Description
+## Position
 
-Pass `description` for supporting text and render a description part, as in the first demo.
-
-### Position
-
-Set `side` to `top` or `bottom`, and `align` to `start`, `center`, or `end`. Start and end follow the writing direction.
+Set the region's `side` to `top` or `bottom`, and `align` to `start`, `center` or `end`. Start and end follow the writing direction. A toast can be swiped toward the side and, unless it's centered, toward the end it's aligned to.
 
 <ComponentExample
   name="toast/position"
-  caption="Choose a position and look for the notification at that edge of the page."
+  caption="Choose a side and an alignment, then press Create Event and look for the toast at that edge of the page."
 />
 
-### Action and Cancel
+## Action and Cancel
 
-Add an `action` for something such as Undo, or a `cancel` action to dismiss the message. Their callbacks can update your app. `onDismiss` tells you why the toast is closing, and `details.cancel()` keeps it open. A canceled `timeout` starts the countdown again.
+Add an `action`, like Undo, and a `cancel` button that dismisses the toast. Their callbacks can update your app. `onDismiss` tells you why the toast is closing, and `details.cancel()` keeps it open; a canceled timeout starts the countdown again.
 
 <ComponentExample
   name="toast/action"
-  caption="Archive the message, then choose Undo or Dismiss in the notification. The result appears below the button."
+  caption="Press Archive Message, then choose Undo or Dismiss, swipe the toast away, or let it time out. The console logs why it closed."
 />
 
-### Link
+## Link
 
-Give an action an `href` to render a link. It keeps normal link behavior, including opening in another tab.
+Give an action an `href` to render it as a link. It keeps normal link behavior, including opening in a new tab.
 
-<ComponentExample
-  name="toast/link"
-  caption="Create an invoice, then follow View in the notification to its summary below."
-/>
+<ComponentExample name="toast/link" caption="Press Send Invoice, then follow View in the toast." />
 
-### Promise
+## Promise
 
-`toast.promise()` shows a loading message, then updates the same toast when the promise resolves or rejects. A toast dismissed while loading stays closed.
+`toast.promise()` shows a loading toast, then updates the same toast when the promise resolves or rejects. Each message can be a string, options with a description or an action, or a function of the result. A toast dismissed while loading stays closed.
 
 <ComponentExample
   name="toast/promise"
-  caption="Press Save to see loading become success. Press it again to try the error path."
+  caption="Press Save Changes to see Saving changes become Changes saved. Press it again for the error, then choose Retry."
 />
 
-### Custom Rendering
+## Stacking
 
-Pass extra values in `data` and read them while rendering each toast. This example adds the sender’s initials and a reply action.
-
-<ComponentExample
-  name="toast/custom"
-  caption="Press New message to show a notification with custom data. Use Reply or Close."
-/>
-
-### Stacking
-
-`maxVisible` limits how many notifications are visible; the rest wait in the queue. Their timers start when they become visible. Set `expanded` to keep the stack open, or let it expand while hovered or focused.
-
-The demo uses `--toast-index`, `--toast-offset`, `--toast-height`, `--toast-front-height`, `data-front`, and `data-expanded` to arrange the stack.
+`maxVisible` limits how many toasts show at once, three by default; the rest wait in the queue, and their timers start when they show. The stack expands while the pointer or focus is in it. Set `expanded` to keep it open. [Styling](#styling) shows the CSS that lays out the stack.
 
 <ComponentExample
   name="toast/stacking"
-  caption="Add more than four notifications to queue the rest. Hover or focus the stack to expand it."
+  caption="Press Add Toast a few times, then hover the stack to expand it. Past four toasts, the rest wait their turn. Check Always expanded to keep it open."
 />
 
-### Duration
+## Duration
 
-Set `duration` in milliseconds, or use `Infinity` for a notification that stays until dismissed. Timers pause while the pointer or focus is in the region and while the page is hidden or its window is inactive.
+Set `duration` in milliseconds, on the toaster or on one toast, or `Infinity` for a toast that stays until it's dismissed. The default is five seconds. Timers pause while the pointer or focus is in the region, and while the page is hidden or its window is inactive.
 
 <ComponentExample
   name="toast/duration"
-  caption="Choose a duration. Hover or focus a toast to pause its timer; Got it closes the persistent one."
+  caption="Press each button. Hover a toast to pause its timer. The session toast stays until you press Got It."
 />
 
-### Update and Dismiss
+## Update and Dismiss
 
-Keep the id returned by `toast()` to update or dismiss that notification. Calling `toast.dismiss()` without an id closes the whole queue.
+Keep the id `toast()` returns to update or dismiss that toast, or pass your own `id`. `toast.update()` returns whether the toast was still there, and `toast.dismiss()` without an id closes every toast.
 
 <ComponentExample
   name="toast/update"
-  caption="Start an upload and watch one notification update. Cancel it before completion or dismiss all notifications."
+  caption="Press Upload Report and watch one toast count up to Report uploaded. Cancel Upload closes it early, and Dismiss All clears every toast."
 />
 
-### Async Action
+## Async Action
 
-Return a promise from an action to show its pending state and prevent repeated presses. The action's state also exposes errors so you can offer a retry. See [Button](./button#changes-after-an-await) for async change handling.
+Return a promise from an action to keep the toast open while it runs. The action's state has `pending` while it runs and `error` if it fails, so the button can say Restoring… or offer a retry, and presses are ignored until it settles. See [Button](./button#changes-after-an-await) for changes made after an `await`.
 
 <ComponentExample
   name="toast/async-action"
-  caption="Delete the file, then press Undo. The action stays pending while the simulated restore completes."
+  caption="Press Delete File, then Undo. The button shows Restoring… until the restore finishes, then the toast closes."
 />
 
-### Keyboard Shortcut
+## Keyboard Shortcut
 
-F6 moves focus to the newest notification and back. Set `shortcut` to use another key combination. Escape dismisses the focused toast; focus then moves to the next one or returns to where it came from.
+F6 moves focus to the newest toast and back. Set the region's `shortcut` to use another key, or `null` to turn it off. The region advertises it through `aria-keyshortcuts`.
 
 <ComponentExample
   name="toast/shortcut"
-  caption="Show a toast, then press Alt+T to focus it. Press Escape to dismiss it or Alt+T again to return."
+  caption="Press Send Message, then Alt+T (Option+T on a Mac) to focus the toast. Press Escape to dismiss it, or Alt+T again to go back."
 />
 
-<span id="rtl" />
+## Overlay Host and Confirm
 
-### Right to Left
+Instead of placing a region, render `OverlayHost` once near your app's root. It renders the toaster's region, with the `toast.children` you give it, and `confirm()` questions as alert dialogs. A region you place yourself takes over from the host for its toaster.
 
-Placement and swipe directions follow the surrounding writing direction. Use `start` and `end` for alignment.
-
-### Overlay Host and Confirm
-
-`confirm()` opens an alert dialog through the same overlay host. To style the question, render an `AlertDialog` with the confirm controller and read the question from its content's `payload`.
-
-This example confirms a deletion, then shows its result as a toast. [Alert Dialog](./alert-dialog) covers `createConfirm()` in more detail.
+To style the question, render an `AlertDialog` with the confirm controller and read the question from its content's `payload`. [Alert Dialog](./alert-dialog) covers `createConfirm()` in more detail.
 
 <ComponentExample
   name="toast/overlay-host"
-  caption="Delete a project and confirm or cancel. Confirming removes the row and shows a toast."
+  caption="Press Delete on a project and confirm. The row goes away and a toast says so. Reset Projects brings them back."
 />
 
-## Accessibility
+## Custom Rendering
 
-Keep messages short and include an action when someone needs to respond. Use `duration: Infinity` when a message must remain available. Notifications use shared live regions, so they are announced once without making the whole toast region live.
+Pass anything else your toast needs in `data`, and read it from the toast the region's children function receives. Every part also takes `render`; this example renders each toast's `li` itself, making the ones hidden behind a collapsed stack `inert`.
 
-The region remains reachable while a modal dialog is open. Tab moves through its controls, and focus returns when the last focused toast closes. Pair your transitions with `motion-reduce:` styles.
-
-<SpecList spec="toast" />
+<ComponentExample
+  name="toast/custom"
+  caption="Press New Message to show a toast with Hollis Grant's initials. Choose Reply or close it."
+/>
 
 ## Styling
 
-Use Tailwind classes directly on the parts. State attributes and CSS variables expose the stack position, expansion, and swipe progress:
+Toasts are unstyled, and the region and its toasts carry what you need to animate a stack:
+
+- **The stack.** The region sets `--toast-front-height`, the newest toast's height, and `--toast-stack-height`, all of them added up. Each toast gets `--toast-index`, 0 for the newest, `--toast-offset`, the height of the toasts in front of it, and `--toast-height`, its own height. Position the toasts absolutely in the region and set `height: var(--toast-height)` so changes in height animate.
+- **Collapsed and expanded.** `data-front` marks the newest toast. While the stack is collapsed, clip the toasts behind it to `--toast-front-height` and peek them out by their index. While it's expanded, the region and its toasts get `data-expanded`; move each toast by its `--toast-offset`.
+- **Swiping.** While a toast is swiped it gets `data-swiping`, and `--toast-swipe-x` and `--toast-swipe-y` hold how far it moved. Translate it by them and turn off transitions. When a swipe dismisses it, `data-swipe-direction` says which way, so it can leave in that direction. A mouse drag that starts on selectable text selects it, so set `user-select: none` on toasts to swipe them from anywhere.
+- **Entering and leaving.** A toast has `data-starting-style` for its first frame and `data-ending-style` while it leaves, and stays mounted until its transitions finish.
+
+A stack at the bottom of the page, in plain CSS:
+
+```css
+[data-slot="toast-region"] {
+  width: 356px;
+  height: var(--toast-front-height);
+}
+
+[data-slot="toast-region"][data-expanded] {
+  height: calc(var(--toast-stack-height) + (var(--toast-count) - 1) * 12px);
+}
+
+[data-slot="toast-root"] {
+  --y: calc(var(--toast-index) * -12px);
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: calc(100 - var(--toast-index));
+  overflow: hidden;
+  height: var(--toast-height);
+  translate: var(--toast-swipe-x, 0px) calc(var(--y) + var(--toast-swipe-y, 0px));
+  scale: calc(1 - var(--toast-index) * 0.05);
+  transition-property: translate, scale, opacity, height;
+  transition-duration: 400ms;
+  user-select: none;
+}
+
+[data-slot="toast-root"]:not([data-front], [data-expanded]) {
+  height: var(--toast-front-height);
+}
+
+[data-slot="toast-root"][data-expanded] {
+  --y: calc(-1 * (var(--toast-offset) + var(--toast-index) * 12px));
+  scale: 1;
+}
+
+[data-slot="toast-root"][data-starting-style] {
+  transition: none;
+}
+
+[data-slot="toast-root"][data-starting-style][data-front] {
+  --y: 100%;
+}
+
+[data-slot="toast-root"]:is([data-starting-style]:not([data-front]), [data-ending-style]) {
+  opacity: 0;
+}
+
+[data-slot="toast-root"][data-swiping] {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="toast-root"] {
+    transition-property: opacity;
+  }
+}
+```
+
+Each part has a `data-slot`, such as `toast-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### ToastRegion [#styling-toastregion]
 
@@ -212,6 +252,8 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 <CssVariables component="toast" part="root" />
 
 ## Data Attributes
+
+`ToastTitle` and `ToastDescription` have no state attributes. `ToastClose` gets `data-pending`, like `ToastAction`, while a Promise from its `action` runs.
 
 ### ToastRegion [#data-attributes-toastregion]
 
@@ -272,3 +314,25 @@ Use Tailwind classes directly on the parts. State attributes and CSS variables e
 ### Reasons
 
 <ReasonTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastDismissReason" />
+
+## Accessibility
+
+Toasts are announced through shared [live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Guides/Live_regions), once each, without making the visible region live: politely by default and assertively for errors. While it has toasts, the region is a landmark named Notifications; set `aria-label` to name it in the page's language. Keep messages short, and use `duration: Infinity` for one that has to stay available.
+
+### Keyboard
+
+F6, or the region's `shortcut`, moves focus to the newest toast, and pressing it again returns focus to where it came from. Tab moves through the toasts and their buttons, and Tab past the last one goes back too. Escape dismisses the focused toast; focus then moves to the next toast, or back where it came from after the last one. The region stays reachable while a modal dialog is open, and its timers pause while focus is inside.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="toast" />
+
+Also tested:
+
+<SpecList spec="toast.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="toast.sr" />

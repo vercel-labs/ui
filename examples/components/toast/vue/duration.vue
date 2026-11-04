@@ -25,9 +25,9 @@ onUnmounted(() => {
 
 <template>
   <div data-slot="row">
-    <button data-variant="secondary" @click="toast('Copied', { duration: 1000 })">1 second</button>
-    <button data-variant="secondary" @click="toast('Saved')">3 seconds</button>
-    <button data-variant="secondary" @click="untilDismissed">Until dismissed</button>
+    <button @click="toast('Copied', { duration: 1000 })">1 second</button>
+    <button @click="toast('Saved')">3 seconds</button>
+    <button @click="untilDismissed">Until dismissed</button>
   </div>
   <ToastRegion :toaster="toast">
     <template #default="{ toast: item }">
@@ -36,7 +36,7 @@ onUnmounted(() => {
           <ToastTitle />
           <ToastDescription />
         </div>
-        <ToastClose data-variant="secondary" v-if="item.cancel" :action="item.cancel.onCancel">
+        <ToastClose v-if="item.cancel" :action="item.cancel.onCancel">
           {{ item.cancel.label }}
         </ToastClose>
       </Toast>

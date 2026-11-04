@@ -1,25 +1,12 @@
 import * as React from "react"
-import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import { CircleCheckIcon, LoaderCircleIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [toast] = React.useState(() => createToaster())
-
   const timer = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined)
-
-  function upload() {
-    clearInterval(timer.current)
-    const id = toast.loading("Uploading… 0%", { id: "upload" })
-    let progress = 0
-    timer.current = setInterval(() => {
-      progress += 25
-      const done = progress >= 100
-      const open = toast.update(
-        id,
-        done ? { title: "Upload complete", type: "success" } : { title: `Uploading… ${progress}%` },
-      )
-      if (done || !open) clearInterval(timer.current)
-    }, 600)
-  }
   React.useEffect(
     () => () => {
       clearInterval(timer.current)
@@ -28,29 +15,42 @@ export function Example() {
     [toast],
   )
 
+  function upload() {
+    clearInterval(timer.current)
+    const id = toast.loading("Uploading report.pdf… 0%", { id: "upload" })
+    let progress = 0
+    timer.current = setInterval(() => {
+      progress += 20
+      const done = progress >= 100
+      const open = toast.update(
+        id,
+        done
+          ? { title: "Report uploaded", type: "success" }
+          : { title: `Uploading report.pdf… ${progress}%` },
+      )
+      if (!open) log("Upload canceled")
+      if (done || !open) clearInterval(timer.current)
+    }, 700)
+  }
+
   return (
     <>
       <div data-slot="row">
-        <button data-variant="secondary" onClick={upload}>
-          Upload
-        </button>
-        <button data-variant="secondary" onClick={() => toast.dismiss("upload")}>
-          Cancel upload
-        </button>
-        <button data-variant="secondary" onClick={() => toast.dismiss()}>
-          Dismiss all
-        </button>
+        <button onClick={upload}>Upload Report</button>
+        <button onClick={() => toast.dismiss("upload")}>Cancel Upload</button>
+        <button onClick={() => toast.dismiss()}>Dismiss All</button>
       </div>
       <ToastRegion toaster={toast}>
-        {(item) => (
+        {() => (
           <Toast>
-            <div data-slot="stack">
-              <ToastTitle />
-              <ToastDescription />
-            </div>
+            <CircleCheckIcon data-show="success" aria-hidden="true" />
+            <LoaderCircleIcon data-show="loading" aria-hidden="true" />
+            <ToastTitle />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

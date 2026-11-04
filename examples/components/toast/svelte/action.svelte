@@ -24,7 +24,7 @@
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary" onclick={archive}>
+<button onclick={archive}>
   Archive message
 </button>
 <output data-slot="output">{status}</output>
@@ -35,9 +35,9 @@
         <ToastTitle />
         <ToastDescription />
       </div>
-      <ToastAction data-variant="secondary" />
+      <ToastAction />
       {#if item.cancel}
-        <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
+        <ToastClose action={item.cancel.onCancel}>
           {item.cancel.label}
         </ToastClose>
       {/if}

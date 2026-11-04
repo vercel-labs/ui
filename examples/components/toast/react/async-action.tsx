@@ -1,10 +1,21 @@
 import * as React from "react"
-import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/react/toast"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [toast] = React.useState(() => createToaster({ duration: 4000 }))
+function restore() {
+  return new Promise((resolve) => setTimeout(resolve, 1500))
+}
 
-  const restore = () => new Promise((resolve) => setTimeout(resolve, 1500))
+function Example() {
+  const log = useLog()
+  const [toast] = React.useState(() => createToaster({ duration: 6000 }))
   React.useEffect(
     () => () => {
       toast.dismiss()
@@ -15,17 +26,30 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
-        onClick={() => toast("File deleted", { action: { label: "Undo", onAction: restore } })}
+        onClick={() =>
+          toast("File deleted", {
+            description: "Q3 report.pdf",
+            action: {
+              label: "Undo",
+              onAction: async () => {
+                await restore()
+                log("Q3 report.pdf restored")
+              },
+            },
+          })
+        }
       >
-        Delete file
+        Delete File
       </button>
       <ToastRegion toaster={toast}>
         {() => (
           <Toast>
-            <ToastTitle />
-            <ToastAction data-variant="secondary">
-              {(state) => (state.pending ? "Restoring…" : state.error ? "Try again" : "Undo")}
+            <div data-slot="stack">
+              <ToastTitle />
+              <ToastDescription />
+            </div>
+            <ToastAction data-variant="solid">
+              {(state) => (state.pending ? "Restoring…" : state.error ? "Retry" : "Undo")}
             </ToastAction>
           </Toast>
         )}
@@ -33,3 +57,5 @@ export function Example() {
     </>
   )
 }
+
+export { Example }

@@ -5,7 +5,7 @@ export function mount(root: HTMLElement) {
   const toast = createToaster()
 
   root.innerHTML = `
-    <button data-variant="secondary">Archive message</button>
+    <button>Archive message</button>
     <output data-slot="output"></output>
     <ui-toast-region>
       <template>
@@ -14,8 +14,8 @@ export function mount(root: HTMLElement) {
             <ui-toast-title></ui-toast-title>
             <ui-toast-description></ui-toast-description>
           </div>
-          <ui-toast-action><button data-variant="secondary"></button></ui-toast-action>
-          <ui-toast-close><button data-variant="secondary"></button></ui-toast-close>
+          <ui-toast-action><button></button></ui-toast-action>
+          <ui-toast-close><button></button></ui-toast-close>
         </ui-toast>
       </template>
     </ui-toast-region>

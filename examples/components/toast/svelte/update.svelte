@@ -24,13 +24,13 @@
 </script>
 
 <div data-slot="row">
-  <button data-variant="secondary" onclick={upload}>
+  <button onclick={upload}>
     Upload
   </button>
-  <button data-variant="secondary" onclick={() => toast.dismiss("upload")}>
+  <button onclick={() => toast.dismiss("upload")}>
     Cancel upload
   </button>
-  <button data-variant="secondary" onclick={() => toast.dismiss()}>
+  <button onclick={() => toast.dismiss()}>
     Dismiss all
   </button>
 </div>

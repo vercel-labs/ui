@@ -22,13 +22,13 @@
 </script>
 
 <div data-slot="row">
-  <button data-variant="secondary" onclick={() => toast("Copied", { duration: 1000 })}>
+  <button onclick={() => toast("Copied", { duration: 1000 })}>
     1 second
   </button>
-  <button data-variant="secondary" onclick={() => toast("Saved")}>
+  <button onclick={() => toast("Saved")}>
     3 seconds
   </button>
-  <button data-variant="secondary" onclick={untilDismissed}>
+  <button onclick={untilDismissed}>
     Until dismissed
   </button>
 </div>
@@ -40,7 +40,7 @@
         <ToastDescription />
       </div>
       {#if item.cancel}
-        <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
+        <ToastClose action={item.cancel.onCancel}>
           {item.cancel.label}
         </ToastClose>
       {/if}

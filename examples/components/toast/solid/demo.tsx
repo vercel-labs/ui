@@ -17,7 +17,6 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast("Event has been created", {
             description: "Your event is ready to share.",
@@ -35,11 +34,7 @@ export function Example() {
               <ToastDescription />
             </div>
 
-            {item.cancel && (
-              <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
-                {item.cancel.label}
-              </ToastClose>
-            )}
+            {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
           </Toast>
         )}
       </ToastRegion>

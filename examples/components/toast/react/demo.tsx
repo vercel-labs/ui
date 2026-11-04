@@ -1,14 +1,16 @@
 import * as React from "react"
 import {
   Toast,
-  ToastClose,
+  ToastAction,
   ToastDescription,
   ToastRegion,
   ToastTitle,
   createToaster,
 } from "@ui-sdk/react/toast"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [toast] = React.useState(() => createToaster())
   React.useEffect(
     () => () => {
@@ -20,32 +22,28 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
-          toast("Event has been created", {
-            description: "Your event is ready to share.",
-            cancel: { label: "Dismiss" },
+          toast("Event created", {
+            description: "Friday, June 12 at 10:00 AM",
+            action: { label: "Undo", onAction: () => log("Event removed") },
           })
         }
       >
-        Show toast
+        Create Event
       </button>
       <ToastRegion toaster={toast}>
-        {(item) => (
+        {() => (
           <Toast>
             <div data-slot="stack">
               <ToastTitle />
               <ToastDescription />
             </div>
-
-            {item.cancel && (
-              <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
-                {item.cancel.label}
-              </ToastClose>
-            )}
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

@@ -1,36 +1,35 @@
 "use client"
 
-import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
-import { Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
+import { Toggle, ToggleIcon } from "@ui-sdk/react/toggle"
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { BoldIcon, ChevronDownIcon, ItalicIcon, UnderlineIcon } from "lucide-react"
+import { BoldIcon, ItalicIcon, LinkIcon, UnderlineIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
+
+const styles = [
+  { label: "Bold", icon: BoldIcon },
+  { label: "Italic", icon: ItalicIcon },
+  { label: "Underline", icon: UnderlineIcon },
+]
 
 function Example() {
+  const log = useLog()
   return (
     <Toolbar aria-label="Formatting">
-      <ToggleGroup multiple aria-label="Text style">
-        <Toggle data-variant="ghost" value="bold" aria-label="Bold">
-          <BoldIcon />
+      {styles.map(({ label, icon: Icon }) => (
+        <Toggle
+          key={label}
+          aria-label={label}
+          onPressedChange={(pressed) => log(`${label} ${pressed ? "on" : "off"}`)}
+        >
+          <ToggleIcon>
+            <Icon />
+          </ToggleIcon>
         </Toggle>
-        <Toggle data-variant="ghost" value="italic" aria-label="Italic">
-          <ItalicIcon />
-        </Toggle>
-        <Toggle data-variant="ghost" value="underline" aria-label="Underline">
-          <UnderlineIcon />
-        </Toggle>
-      </ToggleGroup>
+      ))}
       <ToolbarSeparator />
-      <Menu>
-        <ToolbarButton data-variant="secondary" render={<MenuTrigger />}>
-          Sans
-          <ChevronDownIcon />
-        </ToolbarButton>
-        <MenuContent>
-          {["Sans", "Serif", "Mono"].map((font) => (
-            <MenuItem key={font}>{font}</MenuItem>
-          ))}
-        </MenuContent>
-      </Menu>
+      <ToolbarButton aria-label="Insert link" onClick={() => log("Insert link")}>
+        <LinkIcon aria-hidden="true" />
+      </ToolbarButton>
     </Toolbar>
   )
 }

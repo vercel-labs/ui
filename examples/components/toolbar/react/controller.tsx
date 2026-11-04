@@ -2,28 +2,35 @@
 
 import { useShortcut } from "@ui-sdk/react/shortcuts"
 import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
+import { BoldIcon, ItalicIcon, LinkIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
+
+const actions = [
+  { label: "Bold", icon: BoldIcon },
+  { label: "Italic", icon: ItalicIcon },
+  { label: "Insert link", icon: LinkIcon },
+]
 
 function Example() {
+  const log = useLog()
   const [toolbar] = React.useState(createToolbarController)
-  const [action, setAction] = React.useState("nothing yet")
   useShortcut("alt+f10", () => toolbar.focus(), { allowInInput: true })
   return (
     <div data-slot="stack">
-      <textarea aria-label="Notes" placeholder="Type, then press Alt+F10" />
-      <Toolbar controller={toolbar} aria-label="Notes">
-        {["Bold", "Italic", "Link"].map((label) => (
-          <ToolbarButton data-variant="secondary" key={label} onClick={() => setAction(label.toLowerCase())}>
-            {label}
+      <div data-slot="controls">
+        <button type="button" onClick={() => toolbar.focus()}>
+          Focus Toolbar
+        </button>
+      </div>
+      <Toolbar controller={toolbar} aria-label="Notes formatting">
+        {actions.map(({ label, icon: Icon }) => (
+          <ToolbarButton key={label} aria-label={label} onClick={() => log(label)}>
+            <Icon aria-hidden="true" />
           </ToolbarButton>
         ))}
       </Toolbar>
-      <div data-slot="row">
-        <button data-variant="secondary" type="button" onClick={() => toolbar.focus()}>
-          Focus toolbar
-        </button>
-        <output data-slot="output">Last: {action}</output>
-      </div>
+      <textarea aria-label="Notes" placeholder="Type, then press Alt+F10" />
     </div>
   )
 }

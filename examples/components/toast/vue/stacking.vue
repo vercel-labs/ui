@@ -18,7 +18,7 @@ onUnmounted(() => {
 
 <template>
   <div data-slot="row">
-    <button data-variant="secondary" @click="add">Add toast</button>
+    <button @click="add">Add toast</button>
     <label data-slot="label">
       <input v-model="expanded" type="checkbox" />
       Always expanded

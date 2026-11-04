@@ -1,3 +1,4 @@
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { toText, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/react/token-input"
 import {
   type TriggerMenuDataItem,
@@ -7,6 +8,7 @@ import {
   TriggerMenuList,
 } from "@ui-sdk/react/trigger-menu"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const files = [
   { value: "src/app.tsx", label: "app.tsx", keywords: ["src"] },
@@ -22,35 +24,30 @@ const draft: TokenInputValue = [
   " in two sentences.",
 ]
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [value, setValue] = React.useState<TokenInputValue>(draft)
-  const [last, setLast] = React.useState("")
+
   return (
-    <div data-slot="stack">
+    <Field>
+      <FieldLabel>Prompt</FieldLabel>
       <TokenInput
         value={value}
         onValueChange={(next, details) => {
           setValue(next)
           const removed = details.removed.map((token) => token.label).join(", ")
-          setLast(
-            `${details.reason}${details.inputType ? ` (${details.inputType})` : ""}${removed ? `, removed ${removed}` : ""}`,
-          )
+          log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
         }}
         history={{ limit: 50, groupDelay: 1000 }}
         getTokenDescription={(token) => (token.type === "file" ? "attached file" : token.type)}
       >
-        <TokenInputEditor aria-label="Prompt" />
+        <TokenInputEditor />
         <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
           <TriggerMenuContent>
             <TriggerMenuList>
               {(state) =>
                 (state.items as TriggerMenuDataItem[]).map((item) => (
-                  <TriggerMenuItem
-                    key={item.value}
-                    value={item.value}
-                    label={item.label}
-                    disabled={item.disabled}
-                  >
+                  <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
                     {item.label}
                   </TriggerMenuItem>
                 ))
@@ -59,8 +56,8 @@ export function Example() {
           </TriggerMenuContent>
         </TriggerMenu>
       </TokenInput>
-      <p data-slot="output">{last || "Type, paste or press Cmd+Z."}</p>
-      <p data-slot="output">{toText(value)}</p>
-    </div>
+    </Field>
   )
 }
+
+export { Example }

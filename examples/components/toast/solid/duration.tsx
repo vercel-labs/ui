@@ -17,14 +17,9 @@ export function Example() {
   return (
     <>
       <div data-slot="row">
-        <button data-variant="secondary" onClick={() => toast("Copied", { duration: 1000 })}>
-          1 second
-        </button>
-        <button data-variant="secondary" onClick={() => toast("Saved")}>
-          3 seconds
-        </button>
+        <button onClick={() => toast("Copied", { duration: 1000 })}>1 second</button>
+        <button onClick={() => toast("Saved")}>3 seconds</button>
         <button
-          data-variant="secondary"
           onClick={() =>
             toast("Your session expires soon", {
               duration: Infinity,
@@ -43,11 +38,7 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            {item.cancel && (
-              <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
-                {item.cancel.label}
-              </ToastClose>
-            )}
+            {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
           </Toast>
         )}
       </ToastRegion>

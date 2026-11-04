@@ -14,7 +14,7 @@
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary"
+<button
   onclick={() => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } })}
 >
   Show toast
@@ -26,7 +26,7 @@
         <ToastTitle />
         <ToastDescription />
       </div>
-      <ToastClose data-variant="secondary" />
+      <ToastClose />
     </Toast>
   {/snippet}
 </ToastRegion>

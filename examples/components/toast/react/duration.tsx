@@ -1,15 +1,8 @@
 import * as React from "react"
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/react/toast"
+import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
 
-export function Example() {
-  const [toast] = React.useState(() => createToaster({ duration: 3000 }))
+function Example() {
+  const [toast] = React.useState(() => createToaster())
   React.useEffect(
     () => () => {
       toast.dismiss()
@@ -20,34 +13,26 @@ export function Example() {
   return (
     <>
       <div data-slot="row">
-        <button data-variant="secondary" onClick={() => toast("Copied", { duration: 1000 })}>
-          1 second
-        </button>
-        <button data-variant="secondary" onClick={() => toast("Saved")}>
-          3 seconds
-        </button>
+        <button onClick={() => toast("Link copied", { duration: 1000 })}>1 Second</button>
+        <button onClick={() => toast("Changes saved")}>5 Seconds</button>
         <button
-          data-variant="secondary"
           onClick={() =>
-            toast("Your session expires soon", {
+            toast("Your session expires in 5 minutes", {
               duration: Infinity,
               dismissible: false,
-              cancel: { label: "Got it" },
+              cancel: { label: "Got It" },
             })
           }
         >
-          Until dismissed
+          Until Dismissed
         </button>
       </div>
       <ToastRegion toaster={toast}>
         {(item) => (
           <Toast>
-            <div data-slot="stack">
-              <ToastTitle />
-              <ToastDescription />
-            </div>
+            <ToastTitle />
             {item.cancel && (
-              <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
+              <ToastClose data-variant="solid" action={item.cancel.onCancel}>
                 {item.cancel.label}
               </ToastClose>
             )}
@@ -57,3 +42,5 @@ export function Example() {
     </>
   )
 }
+
+export { Example }

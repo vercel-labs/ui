@@ -42,9 +42,7 @@ onUnmounted(() => {
   <ul data-slot="list">
     <li data-slot="row" v-for="name in projects" :key="name">
       {{ name }}
-      <button data-variant="secondary" @click="remove(name, $event.currentTarget as HTMLElement)">
-        Delete
-      </button>
+      <button @click="remove(name, $event.currentTarget as HTMLElement)">Delete</button>
     </li>
   </ul>
   <OverlayHost :overlays="overlays">
@@ -64,10 +62,10 @@ onUnmounted(() => {
         {{ state.payload?.description }}
       </AlertDialogDescription>
       <div data-slot="row">
-        <AlertDialogClose data-variant="secondary">
+        <AlertDialogClose>
           {{ state.payload?.cancelLabel }}
         </AlertDialogClose>
-        <AlertDialogClose data-variant="secondary" value="confirm">
+        <AlertDialogClose value="confirm">
           {{ state.payload?.confirmLabel }}
         </AlertDialogClose>
       </div>

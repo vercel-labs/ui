@@ -10,29 +10,12 @@ export function Example() {
   return (
     <>
       <div data-slot="row">
-        <button data-variant="secondary" onClick={() => toast("Event has been created")}>
-          Default
-        </button>
-        <button data-variant="secondary" onClick={() => toast.success("Event has been created")}>
-          Success
-        </button>
+        <button onClick={() => toast("Event has been created")}>Default</button>
+        <button onClick={() => toast.success("Event has been created")}>Success</button>
+        <button onClick={() => toast.info("Be at the area 10 minutes before the event time")}>Info</button>
+        <button onClick={() => toast.warning("Event start time cannot be earlier than 8am")}>Warning</button>
+        <button onClick={() => toast.error("Event has not been created")}>Error</button>
         <button
-          data-variant="secondary"
-          onClick={() => toast.info("Be at the area 10 minutes before the event time")}
-        >
-          Info
-        </button>
-        <button
-          data-variant="secondary"
-          onClick={() => toast.warning("Event start time cannot be earlier than 8am")}
-        >
-          Warning
-        </button>
-        <button data-variant="secondary" onClick={() => toast.error("Event has not been created")}>
-          Error
-        </button>
-        <button
-          data-variant="secondary"
           onClick={() =>
             toast.promise(
               new Promise<{ name: string }>((resolve) => setTimeout(() => resolve({ name: "Event" }), 2000)),

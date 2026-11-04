@@ -24,7 +24,7 @@
 
 <div data-slot="row">
   {#each placements as item (item.label)}
-    <button data-variant="secondary" onclick={() => place(item)}>
+    <button onclick={() => place(item)}>
       {item.label}
     </button>
   {/each}

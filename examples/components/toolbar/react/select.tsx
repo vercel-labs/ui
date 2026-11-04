@@ -8,52 +8,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { CheckIcon, ChevronsUpDownIcon, MonitorIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
+import { Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
+import { CheckIcon, ChevronsUpDownIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 const zooms = ["50%", "75%", "100%", "150%", "200%"]
 
 function Example() {
+  const log = useLog()
   const [zoom, setZoom] = React.useState("100%")
   const index = zooms.indexOf(zoom)
+  const change = (value: string) => {
+    setZoom(value)
+    log(`Zoom ${value}`)
+  }
   return (
     <Toolbar aria-label="View">
-      <ToolbarButton
-        data-variant="secondary"
-        aria-label="Zoom out"
-        disabled={index === 0}
-        onClick={() => setZoom(zooms[index - 1])}
-      >
-        <ZoomOutIcon />
+      <ToolbarButton aria-label="Zoom out" disabled={index === 0} onClick={() => change(zooms[index - 1])}>
+        <ZoomOutIcon aria-hidden="true" />
       </ToolbarButton>
-      <Select value={zoom} onValueChange={(value) => value && setZoom(value)}>
-        <ToolbarButton data-variant="secondary" render={<SelectTrigger />} aria-label="Zoom">
+      <Select value={zoom} onValueChange={(value) => value && change(value)}>
+        <ToolbarButton render={<SelectTrigger />} aria-label="Zoom">
           <SelectValue />
-          <ChevronsUpDownIcon />
+          <ChevronsUpDownIcon aria-hidden="true" />
         </ToolbarButton>
         <SelectContent>
           {zooms.map((zoom) => (
             <SelectItem key={zoom} value={zoom}>
               {zoom}
               <SelectItemIndicator>
-                <CheckIcon />
+                <CheckIcon aria-hidden="true" />
               </SelectItemIndicator>
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       <ToolbarButton
-        data-variant="secondary"
         aria-label="Zoom in"
         disabled={index === zooms.length - 1}
-        onClick={() => setZoom(zooms[index + 1])}
+        onClick={() => change(zooms[index + 1])}
       >
-        <ZoomInIcon />
-      </ToolbarButton>
-      <ToolbarSeparator />
-      <ToolbarButton data-variant="secondary" aria-label="Fit to screen" onClick={() => setZoom("100%")}>
-        <MonitorIcon />
+        <ZoomInIcon aria-hidden="true" />
       </ToolbarButton>
     </Toolbar>
   )

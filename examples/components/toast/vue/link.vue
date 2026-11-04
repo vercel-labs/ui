@@ -23,7 +23,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button data-variant="secondary" @click="create">Create invoice</button>
+  <button @click="create">Create invoice</button>
   <p data-slot="hint" id="invoice-1042">Invoice INV-1042 · $240 · Draft</p>
   <ToastRegion :toaster="toast">
     <template #default="{ toast: item }">
@@ -32,7 +32,7 @@ onUnmounted(() => {
           <ToastTitle />
           <ToastDescription />
         </div>
-        <ToastAction data-variant="secondary" />
+        <ToastAction />
       </Toast>
     </template>
   </ToastRegion>

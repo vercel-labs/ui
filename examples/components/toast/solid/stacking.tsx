@@ -13,10 +13,7 @@ export function Example() {
   return (
     <>
       <div data-slot="row">
-        <button
-          data-variant="secondary"
-          onClick={() => toast(`Notification ${++count}`, { description: "Stacked with the others" })}
-        >
+        <button onClick={() => toast(`Notification ${++count}`, { description: "Stacked with the others" })}>
           Add toast
         </button>
         <label data-slot="label">

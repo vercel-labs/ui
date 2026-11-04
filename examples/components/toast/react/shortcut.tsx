@@ -1,15 +1,10 @@
 import * as React from "react"
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastRegion,
-  ToastTitle,
-  createToaster,
-} from "@ui-sdk/react/toast"
+import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [toast] = React.useState(() => createToaster())
+function Example() {
+  const log = useLog()
+  const [toast] = React.useState(() => createToaster({ duration: 10000 }))
   React.useEffect(
     () => () => {
       toast.dismiss()
@@ -20,22 +15,22 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
-        onClick={() => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } })}
+        onClick={() =>
+          toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })
+        }
       >
-        Show toast
+        Send Message
       </button>
       <ToastRegion toaster={toast} shortcut="alt+t" aria-label="Alerts">
-        {(item) => (
+        {() => (
           <Toast>
-            <div data-slot="stack">
-              <ToastTitle />
-              <ToastDescription />
-            </div>
-            <ToastClose data-variant="secondary" />
+            <ToastTitle />
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

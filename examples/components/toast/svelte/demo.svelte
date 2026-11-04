@@ -21,7 +21,7 @@
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary" onclick={show}>
+<button onclick={show}>
   Show toast
 </button>
 <ToastRegion toaster={toast}>
@@ -33,7 +33,7 @@
       </div>
 
       {#if item.cancel}
-        <ToastClose data-variant="secondary" action={item.cancel.onCancel}>
+        <ToastClose action={item.cancel.onCancel}>
           {item.cancel.label}
         </ToastClose>
       {/if}

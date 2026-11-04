@@ -23,7 +23,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button data-variant="secondary" @click="show">Show toast</button>
+  <button @click="show">Show toast</button>
   <ToastRegion :toaster="toast">
     <template #default="{ toast: item }">
       <Toast>
@@ -32,7 +32,7 @@ onUnmounted(() => {
           <ToastDescription />
         </div>
 
-        <ToastClose data-variant="secondary" v-if="item.cancel" :action="item.cancel.onCancel">
+        <ToastClose v-if="item.cancel" :action="item.cancel.onCancel">
           {{ item.cancel.label }}
         </ToastClose>
       </Toast>

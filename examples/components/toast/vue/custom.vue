@@ -27,7 +27,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button data-variant="secondary" @click="message">New message</button>
+  <button @click="message">New message</button>
   <ToastRegion :toaster="toast" aria-label="Messages">
     <template #default="{ toast: item }">
       <Toast>
@@ -38,8 +38,8 @@ onUnmounted(() => {
           <ToastTitle />
           <ToastDescription />
         </div>
-        <ToastAction data-variant="secondary" />
-        <ToastClose data-variant="secondary" aria-label="Close">
+        <ToastAction />
+        <ToastClose aria-label="Close">
           <XIcon aria-hidden="true" />
         </ToastClose>
       </Toast>

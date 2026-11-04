@@ -11,17 +11,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button
-    data-variant="secondary"
-    @click="toast('File deleted', { action: { label: 'Undo', onAction: restore } })"
-  >
+  <button @click="toast('File deleted', { action: { label: 'Undo', onAction: restore } })">
     Delete file
   </button>
   <ToastRegion :toaster="toast">
     <template #default>
       <Toast>
         <ToastTitle />
-        <ToastAction data-variant="secondary" v-slot="{ state }">
+        <ToastAction v-slot="{ state }">
           {{ state.pending ? "Restoring…" : state.error ? "Try again" : "Undo" }}
         </ToastAction>
       </Toast>

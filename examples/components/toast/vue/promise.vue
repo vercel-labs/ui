@@ -26,7 +26,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button data-variant="secondary" @click="start">Save</button>
+  <button @click="start">Save</button>
   <ToastRegion :toaster="toast">
     <template #default="{ toast: item }">
       <Toast>

@@ -2,47 +2,40 @@
 
 import { registerShortcut } from "@ui-sdk/core/shortcuts"
 import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/react/tooltip"
-import { SaveIcon, Share2Icon } from "lucide-react"
+import { SaveIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [status, setStatus] = React.useState("Nothing yet")
-  const save = () => setStatus("Saved")
-  const share = () => setStatus("Shared")
+  const log = useLog()
 
   React.useEffect(() => {
-    const offSave = registerShortcut("mod+s", save)
-    const offShare = registerShortcut("mod+shift+e", share)
+    const offSave = registerShortcut("mod+s", () => log("Saved"))
+    const offShare = registerShortcut("mod+shift+e", () => log("Shared"))
     return () => {
       offSave()
       offShare()
     }
-  }, [])
+  }, [log])
 
   return (
-    <div data-slot="stack">
-      <div data-slot="row">
-        <Tooltip shortcut="mod+s">
-          <TooltipTrigger onClick={save}>
-            <SaveIcon />
-          </TooltipTrigger>
-          <TooltipContent>
-            Save
-            <TooltipShortcut />
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip shortcut="mod+shift+e">
-          <TooltipTrigger onClick={share}>
-            <Share2Icon />
-            Share
-          </TooltipTrigger>
-          <TooltipContent>
-            Share with your team
-            <TooltipShortcut render={(props, state) => <kbd {...props}>{state.text}</kbd>} />
-          </TooltipContent>
-        </Tooltip>
-      </div>
-      <output data-slot="output">{status}</output>
+    <div data-slot="row">
+      <Tooltip shortcut="mod+s">
+        <TooltipTrigger aria-label="Save" onClick={() => log("Saved")}>
+          <SaveIcon aria-hidden="true" />
+        </TooltipTrigger>
+        <TooltipContent>
+          Save
+          <TooltipShortcut />
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip shortcut="mod+shift+e">
+        <TooltipTrigger onClick={() => log("Shared")}>Share</TooltipTrigger>
+        <TooltipContent>
+          Share with your team
+          <TooltipShortcut />
+        </TooltipContent>
+      </Tooltip>
     </div>
   )
 }

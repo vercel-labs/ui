@@ -1,6 +1,7 @@
-import { OverlayHost, createOverlays } from "@ui-sdk/react/overlays"
+import * as React from "react"
 import {
   AlertDialog,
+  AlertDialogBackdrop,
   AlertDialogClose,
   AlertDialogContent,
   AlertDialogDescription,
@@ -8,13 +9,16 @@ import {
   createConfirm,
   type ConfirmOptions,
 } from "@ui-sdk/react/alert-dialog"
-import { Toast, ToastDescription, ToastTitle, createToaster } from "@ui-sdk/react/toast"
-import * as React from "react"
+import { OverlayHost, createOverlays } from "@ui-sdk/react/overlays"
+import { Toast, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import { CircleCheckIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   const [overlays] = React.useState(() => createOverlays())
   const [toast] = React.useState(() => createToaster({ overlays }))
   const [confirm] = React.useState(() => createConfirm({ overlays }))
+  const [projects, setProjects] = React.useState(["Acme", "Globex", "Initech"])
+  const reset = React.useRef<HTMLButtonElement>(null)
   React.useEffect(
     () => () => {
       toast.dismiss()
@@ -22,64 +26,76 @@ export function Example() {
     [toast],
   )
 
-  const [projects, setProjects] = React.useState(["Acme", "Globex"])
-  async function remove(name: string, button: HTMLElement) {
-    const yes = await confirm({
+  async function remove(name: string, button: HTMLButtonElement) {
+    const confirmed = await confirm({
       title: `Delete ${name}?`,
-      description: "This permanently deletes the project and its files.",
+      description: "The project and its files will be deleted for everyone on your team.",
       confirmLabel: "Delete",
-      cancelLabel: "Keep it",
+      cancelLabel: "Cancel",
     })
-    if (!yes) return
-    const row = button.closest("li")!
-    ;(row.nextElementSibling ?? row.previousElementSibling)?.querySelector("button")?.focus()
+    if (!confirmed) return
+    const row = button.closest("li")
+    const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+    ;(next ?? reset.current)?.focus()
     setProjects((list) => list.filter((project) => project !== name))
     toast.success(`${name} deleted`, { priority: "assertive" })
   }
+
   return (
-    <>
-      <ul data-slot="list">
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <button ref={reset} type="button" onClick={() => setProjects(["Acme", "Globex", "Initech"])}>
+          Reset Projects
+        </button>
+      </div>
+      <ul data-slot="list" aria-label="Projects">
         {projects.map((name) => (
           <li data-slot="row" key={name}>
             {name}
-            <button data-variant="secondary" onClick={(event) => remove(name, event.currentTarget)}>
+            <button
+              type="button"
+              data-size="sm"
+              aria-label={`Delete ${name}`}
+              onClick={(event) => remove(name, event.currentTarget)}
+            >
               Delete
             </button>
           </li>
         ))}
+        {projects.length === 0 && <li data-slot="row">All projects deleted.</li>}
       </ul>
       <OverlayHost
         overlays={overlays}
         toast={{
           children: () => (
             <Toast>
-              <div data-slot="stack">
-                <ToastTitle />
-                <ToastDescription />
-              </div>
+              <CircleCheckIcon data-show="success" aria-hidden="true" />
+              <ToastTitle />
             </Toast>
           ),
         }}
       />
       <AlertDialog controller={confirm.controller}>
+        <AlertDialogBackdrop />
         <AlertDialogContent<ConfirmOptions>>
-          {(state) => {
-            const question = state.payload
-            return (
-              <>
-                <AlertDialogTitle>{question?.title}</AlertDialogTitle>
-                <AlertDialogDescription>{question?.description}</AlertDialogDescription>
-                <div data-slot="row">
-                  <AlertDialogClose data-variant="secondary">{question?.cancelLabel}</AlertDialogClose>
-                  <AlertDialogClose data-variant="secondary" value="confirm">
-                    {question?.confirmLabel}
-                  </AlertDialogClose>
-                </div>
-              </>
-            )
-          }}
+          {(state) => (
+            <>
+              <div data-slot="stack">
+                <AlertDialogTitle>{state.payload?.title}</AlertDialogTitle>
+                <AlertDialogDescription>{state.payload?.description}</AlertDialogDescription>
+              </div>
+              <div data-slot="row">
+                <AlertDialogClose>{state.payload?.cancelLabel}</AlertDialogClose>
+                <AlertDialogClose data-variant="solid" value="confirm">
+                  {state.payload?.confirmLabel}
+                </AlertDialogClose>
+              </div>
+            </>
+          )}
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   )
 }
+
+export { Example }

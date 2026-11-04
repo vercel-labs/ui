@@ -26,7 +26,7 @@ function save() {
   onDestroy(() => { toast.dismiss() })
 </script>
 
-<button data-variant="secondary" onclick={start}>
+<button onclick={start}>
   Save
 </button>
 <ToastRegion toaster={toast}>

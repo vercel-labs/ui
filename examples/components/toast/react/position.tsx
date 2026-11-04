@@ -1,17 +1,32 @@
-import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
 import * as React from "react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
-export function Example() {
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "bottom", label: "Bottom" },
+]
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
+type Side = "top" | "bottom"
+type Align = "start" | "center" | "end"
+
+function Example() {
   const [toast] = React.useState(() => createToaster())
-
-  const placements = [
-    { side: "top", align: "start", label: "Top Left" },
-    { side: "top", align: "center", label: "Top Center" },
-    { side: "top", align: "end", label: "Top Right" },
-    { side: "bottom", align: "start", label: "Bottom Left" },
-    { side: "bottom", align: "center", label: "Bottom Center" },
-    { side: "bottom", align: "end", label: "Bottom Right" },
-  ] as const
+  const [side, setSide] = React.useState<Side>("bottom")
+  const [align, setAlign] = React.useState<Align>("end")
   React.useEffect(
     () => () => {
       toast.dismiss()
@@ -19,25 +34,49 @@ export function Example() {
     [toast],
   )
 
-  const [placement, setPlacement] = React.useState<(typeof placements)[number]>(placements[5])
   return (
-    <>
-      <div data-slot="row">
-        {placements.map((item) => (
-          <button
-            data-variant="secondary"
-            key={item.label}
-            onClick={() => {
-              setPlacement(item)
-              toast("Event has been created", { description: item.label })
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <Select items={sides} value={side} onValueChange={(next) => next && setSide(next as Side)}>
+          <SelectLabel>Side</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon aria-hidden="true" />
+          </SelectTrigger>
+          <SelectContent>
+            {sides.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+                <SelectItemIndicator>
+                  <CheckIcon aria-hidden="true" />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select items={aligns} value={align} onValueChange={(next) => next && setAlign(next as Align)}>
+          <SelectLabel>Align</SelectLabel>
+          <SelectTrigger>
+            <SelectValue />
+            <ChevronDownIcon aria-hidden="true" />
+          </SelectTrigger>
+          <SelectContent>
+            {aligns.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+                <SelectItemIndicator>
+                  <CheckIcon aria-hidden="true" />
+                </SelectItemIndicator>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <ToastRegion toaster={toast} side={placement.side} align={placement.align}>
-        {(item) => (
+      <button onClick={() => toast("Event created", { description: "Friday, June 12 at 10:00 AM" })}>
+        Create Event
+      </button>
+      <ToastRegion toaster={toast} side={side} align={align}>
+        {() => (
           <Toast>
             <div data-slot="stack">
               <ToastTitle />
@@ -46,6 +85,8 @@ export function Example() {
           </Toast>
         )}
       </ToastRegion>
-    </>
+    </div>
   )
 }
+
+export { Example }

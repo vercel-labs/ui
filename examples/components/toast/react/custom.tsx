@@ -9,8 +9,10 @@ import {
   createToaster,
 } from "@ui-sdk/react/toast"
 import { XIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [toast] = React.useState(() => createToaster())
   React.useEffect(
     () => () => {
@@ -22,17 +24,16 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast({
-            title: "Ada Lovelace",
-            description: "Can you look at the draft?",
-            data: { initials: "AL" },
-            action: { label: "Reply", onAction: () => toast("Reply opened") },
+            title: "Hollis Grant",
+            description: "Can you review the draft?",
+            data: { initials: "HG" },
+            action: { label: "Reply", onAction: () => log("Replying to Hollis Grant") },
           })
         }
       >
-        New message
+        New Message
       </button>
       <ToastRegion toaster={toast} aria-label="Messages">
         {(item) => (
@@ -46,8 +47,8 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastAction data-variant="secondary" />
-            <ToastClose data-variant="secondary" aria-label="Close">
+            <ToastAction data-variant="solid" />
+            <ToastClose aria-label="Close">
               <XIcon aria-hidden="true" />
             </ToastClose>
           </Toast>
@@ -56,3 +57,5 @@ export function Example() {
     </>
   )
 }
+
+export { Example }

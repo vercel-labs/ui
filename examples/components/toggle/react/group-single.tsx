@@ -2,17 +2,17 @@ import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/react/toggle"
 import { TextAlignCenterIcon, TextAlignEndIcon, TextAlignStartIcon } from "lucide-react"
 
 const alignments = [
-  { value: "left", label: "Align left", icon: TextAlignStartIcon },
-  { value: "center", label: "Align center", icon: TextAlignCenterIcon },
-  { value: "right", label: "Align right", icon: TextAlignEndIcon },
+  { value: "start", label: "Align start", icon: TextAlignStartIcon, mirror: true },
+  { value: "center", label: "Align center", icon: TextAlignCenterIcon, mirror: false },
+  { value: "end", label: "Align end", icon: TextAlignEndIcon, mirror: true },
 ]
 
 function Example() {
   return (
-    <ToggleGroup defaultValue={["left"]} aria-label="Text alignment">
+    <ToggleGroup defaultValue={["start"]} deselectable={false} aria-label="Text alignment">
       {alignments.map((item) => (
         <Toggle key={item.value} value={item.value} aria-label={item.label}>
-          <ToggleIcon>
+          <ToggleIcon mirror={item.mirror}>
             <item.icon />
           </ToggleIcon>
         </Toggle>

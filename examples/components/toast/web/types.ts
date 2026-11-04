@@ -7,12 +7,12 @@ export function mount(root: HTMLElement) {
 
   root.innerHTML = `
     <div data-slot="row">
-      <button data-variant="secondary">Default</button>
-      <button data-variant="secondary">Success</button>
-      <button data-variant="secondary">Info</button>
-      <button data-variant="secondary">Warning</button>
-      <button data-variant="secondary">Error</button>
-      <button data-variant="secondary">Promise</button>
+      <button>Default</button>
+      <button>Success</button>
+      <button>Info</button>
+      <button>Warning</button>
+      <button>Error</button>
+      <button>Promise</button>
     </div>
     <ui-toast-region>
       <template>

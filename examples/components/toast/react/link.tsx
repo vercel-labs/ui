@@ -8,7 +8,7 @@ import {
   createToaster,
 } from "@ui-sdk/react/toast"
 
-export function Example() {
+function Example() {
   const [toast] = React.useState(() => createToaster())
   React.useEffect(
     () => () => {
@@ -20,30 +20,28 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
-          toast("Invoice created", {
-            description: "INV-1042",
-            action: { label: "View", href: "#invoice-1042" },
+          toast("Invoice sent", {
+            description: "Hollis Grant · $240.00",
+            action: { label: "View", href: "#" },
           })
         }
       >
-        Create invoice
+        Send Invoice
       </button>
-      <p data-slot="hint" id="invoice-1042">
-        Invoice INV-1042 · $240 · Draft
-      </p>
       <ToastRegion toaster={toast}>
-        {(item) => (
+        {() => (
           <Toast>
             <div data-slot="stack">
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastAction data-variant="secondary" />
+            <ToastAction data-variant="solid" />
           </Toast>
         )}
       </ToastRegion>
     </>
   )
 }
+
+export { Example }

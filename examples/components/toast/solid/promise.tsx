@@ -22,7 +22,6 @@ export function Example() {
   return (
     <>
       <button
-        data-variant="secondary"
         onClick={() =>
           toast.promise(save, {
             loading: "Saving…",

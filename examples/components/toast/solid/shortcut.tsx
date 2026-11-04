@@ -16,10 +16,7 @@ export function Example() {
 
   return (
     <>
-      <button
-        data-variant="secondary"
-        onClick={() => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } })}
-      >
+      <button onClick={() => toast("Press Alt+T to reach this toast", { cancel: { label: "Done" } })}>
         Show toast
       </button>
       <ToastRegion toaster={toast} shortcut="alt+t" aria-label="Alerts">
@@ -29,7 +26,7 @@ export function Example() {
               <ToastTitle />
               <ToastDescription />
             </div>
-            <ToastClose data-variant="secondary" />
+            <ToastClose />
           </Toast>
         )}
       </ToastRegion>
