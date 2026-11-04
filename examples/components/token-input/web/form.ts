@@ -47,7 +47,6 @@ function mount(root: HTMLElement) {
   const [disabled, readOnly] = root.querySelectorAll("ui-checkbox")
   disabled.addEventListener("checkedchange", (event) => {
     field.toggleAttribute("disabled", event.detail.value === true)
-    prompt.toggleAttribute("disabled", event.detail.value === true)
   })
   readOnly.addEventListener("checkedchange", (event) => {
     prompt.toggleAttribute("read-only", event.detail.value === true)

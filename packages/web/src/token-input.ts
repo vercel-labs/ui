@@ -46,6 +46,9 @@ function defineTokenInputElements() {
       // The submit shortcut submits the form the element is in, so a form's own
       // submit event hears it. A bubbling "submit" event would reach the form too.
       silent: ["onSubmit"],
+      // A disabled <ui-field> around it disables it, as a disabled Field does
+      // in the other frameworks.
+      options: (el) => ({ ...(el.closest("ui-field")?.hasAttribute("disabled") && { disabled: true }) }),
       display: "block",
       state: {
         value: {

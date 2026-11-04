@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test } from "vitest"
 import { instanceOf } from "../src/define-element"
+import { defineFieldElements } from "../src/field"
 import { defineTokenInputElements } from "../src/token-input"
 import { defineTriggerMenuElements } from "../src/trigger-menu"
 
@@ -81,4 +82,50 @@ test("tokens show only what renderToken renders when it's set after mount, and t
   input.renderToken = undefined
   await wait()
   expect(hosts()).toEqual(["routes.ts file"])
+})
+
+test("a disabled field disables the token input inside it, which then submits and requires nothing", async () => {
+  const submitted = new Map<ElementInternals, unknown>()
+  const missing = new Map<ElementInternals, boolean>()
+  const { setFormValue, setValidity } = ElementInternals.prototype
+  ElementInternals.prototype.setFormValue = function (value) {
+    submitted.set(this, value)
+  }
+  ElementInternals.prototype.setValidity = function (flags) {
+    missing.set(this, !!flags?.valueMissing)
+  }
+  try {
+    defineFieldElements()
+    defineTokenInputElements()
+    document.body.innerHTML = `
+      <ui-field disabled>
+        <ui-field-label>Prompt</ui-field-label>
+        <ui-token-input name="prompt" required>
+          <ui-token-input-editor></ui-token-input-editor>
+        </ui-token-input>
+      </ui-field>`
+    await wait()
+    const field = document.querySelector("ui-field")!
+    const editor = document.querySelector("ui-token-input-editor")!
+    const [internals] = submitted.keys()
+    expect(editor.getAttribute("contenteditable")).toBe("false")
+    expect(editor.getAttribute("aria-disabled")).toBe("true")
+    expect(submitted.get(internals)).toBeNull()
+    expect(missing.get(internals)).toBe(false)
+
+    field.removeAttribute("disabled")
+    await wait()
+    expect(editor.getAttribute("contenteditable")).toBe("true")
+    expect(editor.hasAttribute("aria-disabled")).toBe(false)
+    expect(submitted.get(internals)).toBe("")
+    expect(missing.get(internals)).toBe(true)
+
+    field.setAttribute("disabled", "")
+    await wait()
+    expect(editor.getAttribute("contenteditable")).toBe("false")
+    expect(submitted.get(internals)).toBeNull()
+  } finally {
+    ElementInternals.prototype.setFormValue = setFormValue
+    ElementInternals.prototype.setValidity = setValidity
+  }
 })
