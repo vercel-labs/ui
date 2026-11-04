@@ -8,6 +8,7 @@ import { FileIcon } from "lucide-react"
 import { TabBar } from "./code-tabs"
 import { CopyButton } from "./copy-button"
 import { ResetButton } from "./reset-button"
+import { StylingNote } from "./styling-note"
 import { Frame } from "./frame"
 
 async function ComponentExample({
@@ -89,9 +90,13 @@ async function ComponentExample({
               <TabsStackedPanel
                 value="preview"
                 keepMounted
-                className="grid rounded-b-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+                className="relative grid rounded-b-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
               >
                 {preview}
+                <StylingNote
+                  packageName={`@ui-sdk/${framework === "web-components" ? "web" : framework}`}
+                  className="absolute end-1.5 bottom-1.5"
+                />
               </TabsStackedPanel>
               <TabsStackedPanel
                 value="code"
