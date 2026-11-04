@@ -9,25 +9,14 @@ import {
   SliderTrack,
   SliderValue,
 } from "@ui-sdk/react/slider"
-import * as React from "react"
-
-const save = () => new Promise((resolve) => setTimeout(resolve, 600))
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [changes, setChanges] = React.useState(0)
-  const [status, setStatus] = React.useState("Drag to change the brightness.")
+  const log = useLog()
 
   return (
     <Field>
-      <Slider
-        defaultValue={50}
-        onValueChange={() => setChanges((count) => count + 1)}
-        onValueCommit={async (value, details) => {
-          setStatus("Saving…")
-          await save()
-          setStatus(`Saved ${value} (${details.reason}).`)
-        }}
-      >
+      <Slider defaultValue={50} onValueCommit={(value, details) => log(`Saved ${value} (${details.reason})`)}>
         <div data-slot="row">
           <FieldLabel>Brightness</FieldLabel>
           <SliderValue />
@@ -39,10 +28,6 @@ function Example() {
           </SliderTrack>
         </SliderControl>
       </Slider>
-      <output data-slot="output">
-        <span>Changes: {changes}</span>
-        <span>{status}</span>
-      </output>
     </Field>
   )
 }

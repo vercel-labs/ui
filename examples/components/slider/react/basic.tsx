@@ -1,17 +1,31 @@
 "use client"
 
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+} from "@ui-sdk/react/slider"
 
 function Example() {
   return (
-    <Slider defaultValue={75}>
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb aria-label="Volume" />
-        </SliderTrack>
-      </SliderControl>
-    </Slider>
+    <Field>
+      <Slider defaultValue={75}>
+        <div data-slot="row">
+          <FieldLabel>Volume</FieldLabel>
+          <SliderValue />
+        </div>
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+      </Slider>
+    </Field>
   )
 }
 

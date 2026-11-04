@@ -3,10 +3,12 @@ title: Slider
 description: Adjust a number or a range with draggable thumbs and keyboard controls.
 ---
 
+Use a slider to pick a number or a range along a scale, like a volume or a price range, by dragging a thumb or with the arrow keys.
+
 <ComponentExample
   name="slider/basic"
   inspect
-  caption="Drag the thumb or focus it and use the arrow keys to adjust Volume."
+  caption="Drag the thumb, or focus it and use the arrow keys, to adjust Volume."
 />
 
 ## Installation
@@ -38,7 +40,7 @@ A control handles presses around the track. Put a thumb on that track for each v
 - **SliderValue** shows the formatted value, and a range joined with an en dash. It's optional.
 
 Each thumb renders a visually hidden `<input type="range">` inside itself. That input is what takes focus, so
-screen readers on phones adjust it with their own gestures. Style focus on the thumb with `has-focus-visible:`.
+screen readers on phones adjust it with their own gestures. Style focus on the thumb with `:has(:focus-visible)`.
 The slider also renders a hidden input that the form submits.
 
 A single thumb is named by a `FieldLabel` in a `Field`, or by `aria-label` on the thumb. In a range, give
@@ -78,169 +80,194 @@ function VolumeSlider() {
 export { VolumeSlider }
 ```
 
-## Examples
+## Range
 
-### Range
+Pass an array for a range, then render one thumb per number. Give each thumb its `index`, from 0, and its own name, like "Minimum price". The indicator fills the space between the first and the last thumb, and the `FieldLabel` names the group.
 
-Pass an array for a range, then render one thumb per number. Give each thumb its `index`, from 0, and its own name. The indicator fills the space between the first and the last thumb.
+<ComponentExample name="slider/range" caption="Move either end of Price. The thumbs stay in order." />
 
-<ComponentExample name="slider/range" caption="Move either end of the range. The thumbs stay in order." />
-
-### Multiple Thumbs
+## Multiple Thumbs
 
 Any number of thumbs works the same way. They never pass each other, and a press on the track moves the nearest one.
 
 <ComponentExample
   name="slider/multiple"
-  caption="Adjust Low, Mid, and High independently without moving past another thumb."
+  caption="Adjust Low, Medium and High independently, without moving one past another."
 />
 
-### Vertical
+## Vertical
 
-Set `orientation="vertical"`. The bottom is the minimum, ArrowUp increases it, and every part gets `data-orientation`, so one set of classes can style both axes with `data-[orientation=vertical]:`.
+Set `orientation="vertical"` and give the slider a height. The bottom is the minimum, ArrowUp increases the value, and every part gets `data-orientation`, so `[data-orientation="vertical"]` styles the vertical axis.
 
 <ComponentExample
   name="slider/vertical"
   caption="Drag up or down, or use the arrow keys, to adjust Bass and Treble."
 />
 
-### Field
+## Field
 
 Put the slider in a `Field`. The label names the thumb, the description describes it, and `SliderValue` shows the value beside the label. Screen readers don't announce `SliderValue` as it changes, since the thumb already says its value.
 
 <ComponentExample
   name="slider/field"
-  caption="Use the Volume label to focus the thumb, then change the value."
+  caption="Click the Volume label to focus the thumb, then use the arrow keys to change the value."
 />
 
-### Disabled
+## Disabled
 
-Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted. A disabled `<fieldset>` around it disables it too. `readOnly` keeps it focusable and submitted, but drags, keys and screen reader adjustments leave its value alone. `required` adds `data-required`; a slider always has a value, so it never blocks a form.
+Set `disabled`. A disabled slider can't be focused or moved, and isn't submitted. A disabled `<fieldset>` around it disables it too.
 
 <ComponentExample
   name="slider/disabled"
-  caption="The disabled slider keeps its value and cannot be focused or dragged."
+  caption="Brightness keeps its value, but can't be focused or dragged."
 />
 
-## Behavior and Options
+## Controlled
 
-### Controlled
-
-Pass `value` and `onValueChange` to control the slider.
-The value keeps its shape: a number stays a number and an array stays an array. Every change carries a reason,
-like `drag`, `track-press` or `step-key`, and `details.thumb` says which thumb moved. Call `details.cancel()`
-to keep the current value.
+Pass `value` and `onValueChange` to control the slider. The value keeps its shape: a number stays a number and an array stays an array. Every change carries a [reason](#reasons), like `drag`, `track-press` or `step-key`, and `details.thumb` says which thumb moved. Call `details.cancel()` to keep the current value.
 
 <ComponentExample
   name="slider/controlled"
-  caption="Adjust the temperature range, then use Reset. The application keeps the values and change reason."
+  caption="Drag either Temperature thumb to log the range and its reason. Reset sets the value from outside."
 />
 
-### Step and Bounds
+## Step and Bounds
 
 `min` and `max` set the bounds, 0 and 100 by default, and `step` sets how far one step moves, counted from `min`. Decimal steps avoid floating-point drift, so a 0.1 step can reach 0.3 cleanly. When the steps from `min` don't land on `max`, the highest step below it is the end.
 
-<ComponentExample name="slider/step" caption="Choose a year in steps of five." />
+<ComponentExample name="slider/step" caption="Move Year in steps of five, and Opacity in steps of 0.05." />
 
-### Large Step
+## Large Step
 
 Arrow keys move one step. Page Up, Page Down and Shift with an arrow key move by `largeStep`, which is ten steps unless you set it. Home and End go to the bounds.
 
 <ComponentExample
   name="slider/large-step"
-  caption="Focus Zoom and try an arrow key, Shift with an arrow key, Page Up, and Page Down."
+  caption="Focus Zoom and press an arrow key to move 1%, then Page Up, Page Down or Shift with an arrow key to move 25%."
 />
 
-### Distance Between Thumbs
+## Distance Between Thumbs
 
 Set `minStepsBetweenThumbs` to keep neighbouring thumbs that many steps apart. A thumb stops at its neighbour, and Home and End move it only as far as its neighbour allows.
 
 <ComponentExample
   name="slider/min-steps"
-  caption="Move either end of the opening hours. The thumbs keep their required gap."
+  caption="Move either end of Opening hours. The thumbs stay at least four hours apart."
 />
 
-### Format and Locale
+## Format and Locale
 
 `format` takes `Intl.NumberFormat` options, like `{ style: "currency", currency: "USD" }` or `{ style: "percent" }`, or a function of the value. It sets what `SliderValue` shows and what screen readers announce for each thumb, while the value stays a plain number. `locale` sets separators, digits and symbol placement. Without it, the slider uses the page's `lang`, or the browser's language, once the page is interactive. Server markup uses English until then, so it never disagrees with the client.
 
 <ComponentExample
   name="slider/format"
-  caption="Adjust the sliders to compare currency, percentages, units, a custom duration, and German number formatting."
+  caption="Adjust Budget, Opacity, Weight, Duration and Preis to compare currency, a percentage, a unit, a custom function and German formatting."
 />
 
-### Saving on Commit
+## Saving on Commit
 
-`onValueChange` runs on every step of a drag. `onValueCommit` runs once,
-when the interaction that changed the value ends: the pointer lifts, the key comes up, or a screen reader
-adjusts it. Use the commit callback to save once per interaction. A press that doesn't change the value
-commits nothing.
+`onValueChange` runs on every step of a drag. `onValueCommit` runs once, when the interaction that changed the value ends: the pointer lifts, the key comes up, or a screen reader adjusts it. Use the commit callback to save once per interaction. A press that doesn't change the value commits nothing.
 
 <ComponentExample
   name="slider/commit"
-  caption="Drag or use a key, then release it. The saved value updates once the interaction ends."
+  caption="Drag Brightness and release it, or press an arrow key. The console logs the value once, when you let go."
 />
 
-### Controller
+## Controller
 
 A controller, from `createSliderController()`, moves the slider from anywhere with `setValue()`, reads it with `getValue()` and focuses a thumb with `focus()`. Values set through it are clamped, snapped to the step and sorted, and reported with the `imperative` reason.
 
 <ComponentExample
   name="slider/controller"
-  caption="Use Mute, Louder, Read, and Focus to operate the slider through its controller."
+  caption="Use Mute, Louder and Focus to operate Volume from outside the slider. The console logs each change with the imperative reason, and Read logs the value."
 />
 
-### Render Functions
+## Form
 
-`render`, `className` and `children` can be functions of the part's state, like whether a thumb is being
-dragged, its `thumbValue` and its `percent` along the track.
-
-<ComponentExample
-  name="slider/render"
-  caption="Focus or drag the Brightness thumb to reveal its value bubble."
-/>
-
-## Forms
-
-A hidden input beside the slider is what the form sees. It takes the slider's `name`, `form` and `disabled`,
-so `FormData`, `form.reset()`, a disabled `<fieldset>` and the browser's restore all work.
+A hidden input beside the slider is what the form sees. It takes the slider's `name`, `form` and `disabled`, so `FormData`, `form.reset()`, a disabled `<fieldset>` and the browser's restore all work.
 
 - **Submit:** a single thumb submits its number under `name`, like `40`. A range submits `"start/end"`, like `200/800`. Without a name, it submits nothing.
 - **Reset:** a form reset returns it to `defaultValue`, with the `reset` reason.
 - **Join a form from elsewhere:** set `form` to the id of a form.
 
+`required` adds `data-required`. A slider always has a value, so it never blocks a form.
+
 <ComponentExample
   name="slider/form"
-  caption="Adjust the filters and save to inspect the submitted values. Reset restores the defaults."
+  caption="Adjust the filters and press Save to log the submitted values. Distance sits outside the form and joins it by id. Reset restores the defaults."
 />
 
-## Styling
+## Read-Only
 
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework. With Tailwind, use data attribute variants. The thumb's range input is what takes focus, so draw the focus ring with `has-focus-visible:`.
+Set `readOnly` to keep the slider focusable and submitted, while drags, keys and screen reader adjustments leave its value alone.
 
 ```tsx
-<SliderControl className="flex items-center py-2 data-disabled:opacity-50">
-  <SliderTrack className="h-1 w-full rounded-2xl bg-neutral-200 data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1">
-    <SliderIndicator className="rounded-2xl bg-neutral-900" />
-    <SliderThumb className="size-4 rounded-2xl bg-white shadow-md ring-1 ring-black/10 has-focus-visible:ring-4 has-focus-visible:ring-neutral-400/50 data-dragging:ring-4 data-dragging:ring-neutral-400/50" />
-  </SliderTrack>
-</SliderControl>
+<Field>
+  <FieldLabel>Storage</FieldLabel>
+  <Slider name="storage" defaultValue={50} readOnly>
+    <SliderControl>
+      <SliderTrack>
+        <SliderIndicator />
+        <SliderThumb />
+      </SliderTrack>
+    </SliderControl>
+  </Slider>
+  <FieldDescription>Set by your plan.</FieldDescription>
+</Field>
 ```
-
-<DataAttributes component="slider" />
-
-Thumbs and the indicator are placed with inline styles: `position: absolute`, and `inset-inline-start` or `bottom` in percent. They also get CSS variables, listed under [SliderIndicator](#sliderindicator) and [SliderThumb](#sliderthumb), for anything else that should follow them.
 
 ## Custom Rendering
 
-Every part takes `render`, to render a different element or component in its place. `className` and `children` can be functions of the state: `className={(state) => (state.dragging ? "bg-neutral-900" : "bg-neutral-900/70")}`.
+Every part takes `render`, to render a different element or component in its place. `render`, `className` and `children` can be functions of the part's state, like whether a thumb is being dragged, its `thumbValue` and its `percent` along the track. Here the thumb's children add a bubble with its value, and `SliderValue`'s children add a percent sign.
 
-```tsx
-// A bubble above the thumb with its value.
-<SliderThumb>{(state) => <span className="absolute bottom-full">{state.thumbValue}</span>}</SliderThumb>
-```
+<ComponentExample
+  name="slider/render"
+  caption="Focus or drag the Brightness thumb to show its value above it."
+/>
 
 See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
+
+## Styling
+
+Parts are unstyled, apart from the positions they need: thumbs and the indicator get `position: absolute` and their place along the track in percent, as inline styles. Give the control some height around a thin track, the track a size and a background, and each thumb a size. The thumb's range input is what takes focus, so draw the focus ring on the thumb with `:has(:focus-visible)`, and style a drag with `data-dragging`.
+
+Each part has a `data-slot`, such as `slider-thumb`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+The indicator and thumbs also write CSS variables, for anything else that should follow them, like a label above a thumb.
+
+### SliderIndicator [#styling-sliderindicator]
+
+<CssVariables component="slider" part="indicator" />
+
+### SliderThumb [#styling-sliderthumb]
+
+<CssVariables component="slider" part="thumb" />
+
+## Data Attributes
+
+### Slider [#data-attributes-slider]
+
+<DataAttributes component="slider" part="root" />
+
+### SliderValue [#data-attributes-slidervalue]
+
+<DataAttributes component="slider" part="value" />
+
+### SliderControl [#data-attributes-slidercontrol]
+
+<DataAttributes component="slider" part="control" />
+
+### SliderTrack [#data-attributes-slidertrack]
+
+<DataAttributes component="slider" part="track" />
+
+### SliderIndicator [#data-attributes-sliderindicator]
+
+<DataAttributes component="slider" part="indicator" />
+
+### SliderThumb [#data-attributes-sliderthumb]
+
+<DataAttributes component="slider" part="thumb" />
 
 ## API Reference
 
@@ -250,17 +277,9 @@ Props and callbacks are the same as below, as React props.
 
 <TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
 
-### SliderIndicator
-
-The indicator takes no props of its own.
-
-<CssVariables component="slider" part="indicator" />
-
 ### SliderThumb
 
 <TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
-
-<CssVariables component="slider" part="thumb" />
 
 ### State
 
@@ -301,6 +320,29 @@ Callbacks get the new value first, then the details.
 
 ## Accessibility
 
-The slider follows the [WAI-ARIA slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), and the [multi-thumb slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/) for ranges. Every line below is an automated test.
+The slider follows the [WAI-ARIA slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), and the [multi-thumb slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/) for ranges. Each thumb is a native range input, named by a `FieldLabel` or its own `aria-label`, and the slider is a group around them.
+
+### Keyboard
+
+Focus a thumb to use these keys. Tab moves through the thumbs in order.
+
+| Key                                        | Moves the thumb                                                       |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| ArrowRight or ArrowUp                      | One `step` up. In right to left, ArrowRight moves down.               |
+| ArrowLeft or ArrowDown                     | One `step` down. In right to left, ArrowLeft moves up.                |
+| Page Up, Page Down, or Shift with an arrow | By `largeStep`, ten steps by default.                                 |
+| Home or End                                | To the minimum or maximum, or as far as a neighbouring thumb lets it. |
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="slider" />
+
+Beyond the pattern:
+
+<SpecList spec="slider.enhancements" />
+
+Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
+
+<SpecList spec="slider.sr" />

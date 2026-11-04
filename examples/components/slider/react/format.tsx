@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Slider,
   SliderControl,
@@ -47,18 +48,20 @@ function Example() {
   return (
     <div data-slot="stack">
       {sliders.map(({ label, ...options }) => (
-        <Slider key={label} {...options}>
-          <div data-slot="row">
-            <span data-slot="label">{label}</span>
-            <SliderValue />
-          </div>
-          <SliderControl>
-            <SliderTrack>
-              <SliderIndicator />
-              <SliderThumb aria-label={label} />
-            </SliderTrack>
-          </SliderControl>
-        </Slider>
+        <Field key={label}>
+          <Slider {...options}>
+            <div data-slot="row">
+              <FieldLabel>{label}</FieldLabel>
+              <SliderValue />
+            </div>
+            <SliderControl>
+              <SliderTrack>
+                <SliderIndicator />
+                <SliderThumb />
+              </SliderTrack>
+            </SliderControl>
+          </Slider>
+        </Field>
       ))}
     </div>
   )

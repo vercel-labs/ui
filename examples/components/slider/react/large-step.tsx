@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   Slider,
   SliderControl,
@@ -11,19 +12,26 @@ import {
 
 function Example() {
   return (
-    <Slider defaultValue={100} min={25} max={400} largeStep={25} format={{ style: "unit", unit: "percent" }}>
-      <div data-slot="row">
-        <span data-slot="label">Zoom</span>
-        <SliderValue />
-      </div>
-      <SliderControl>
-        <SliderTrack>
-          <SliderIndicator />
-          <SliderThumb aria-label="Zoom" />
-        </SliderTrack>
-      </SliderControl>
-      <p data-slot="hint">Focus the thumb and press Page Up to zoom by 25%.</p>
-    </Slider>
+    <Field>
+      <Slider
+        defaultValue={100}
+        min={25}
+        max={400}
+        largeStep={25}
+        format={{ style: "unit", unit: "percent" }}
+      >
+        <div data-slot="row">
+          <FieldLabel>Zoom</FieldLabel>
+          <SliderValue />
+        </div>
+        <SliderControl>
+          <SliderTrack>
+            <SliderIndicator />
+            <SliderThumb />
+          </SliderTrack>
+        </SliderControl>
+      </Slider>
+    </Field>
   )
 }
 

@@ -10,22 +10,22 @@ import {
   SliderValue,
 } from "@ui-sdk/react/slider"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const formId = React.useId()
-  const [submitted, setSubmitted] = React.useState("")
+  const log = useLog()
+  const form = React.useId()
 
   return (
     <div data-slot="stack">
       <form
-        id={formId}
+        id={form}
         data-slot="stack"
         onSubmit={(event) => {
           event.preventDefault()
           const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(data.join(", "))
+          log(`Submitted ${data.join(", ")}`)
         }}
-        onReset={() => setSubmitted("")}
       >
         <Field>
           <Slider name="price" defaultValue={[200, 800]} max={1000} step={10}>
@@ -56,15 +56,11 @@ function Example() {
             </SliderControl>
           </Slider>
         </Field>
-        <div data-slot="row">
-          <button type="submit">Save</button>
-          <button type="reset">Reset</button>
-        </div>
       </form>
       <Field>
         <Slider
           name="distance"
-          form={formId}
+          form={form}
           defaultValue={25}
           max={100}
           step={5}
@@ -82,7 +78,14 @@ function Example() {
           </SliderControl>
         </Slider>
       </Field>
-      {submitted && <output data-slot="output">Submitted: {submitted}</output>}
+      <div data-slot="row">
+        <button type="submit" form={form} data-variant="solid">
+          Save
+        </button>
+        <button type="reset" form={form}>
+          Reset
+        </button>
+      </div>
     </div>
   )
 }

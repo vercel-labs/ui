@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
 
 const channels = [
@@ -11,14 +12,17 @@ function Example() {
   return (
     <div data-slot="row">
       {channels.map((channel) => (
-        <Slider key={channel.label} orientation="vertical" defaultValue={channel.value}>
-          <SliderControl>
-            <SliderTrack>
-              <SliderIndicator />
-              <SliderThumb aria-label={channel.label} />
-            </SliderTrack>
-          </SliderControl>
-        </Slider>
+        <Field key={channel.label}>
+          <Slider orientation="vertical" defaultValue={channel.value}>
+            <SliderControl>
+              <SliderTrack>
+                <SliderIndicator />
+                <SliderThumb />
+              </SliderTrack>
+            </SliderControl>
+          </Slider>
+          <FieldLabel>{channel.label}</FieldLabel>
+        </Field>
       ))}
     </div>
   )
