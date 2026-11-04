@@ -18,7 +18,7 @@ function Example() {
       ]
     : []
   return (
-    <div ref={ref}>
+    <div ref={ref} data-slot="stack">
       <input aria-label="Message" placeholder="Tap here on a phone" />
       <dl aria-label="Viewport">
         {rows.map(([name, value]) => (
@@ -28,9 +28,9 @@ function Example() {
           </React.Fragment>
         ))}
       </dl>
-      <p>
-        <span>No keyboard open</span>
-        <span>The keyboard covers the bottom of the page</span>
+      <p data-slot="keyboard-hint">
+        <span data-show="closed">No keyboard open</span>
+        <span data-show="open">The keyboard covers the bottom of the page</span>
       </p>
     </div>
   )

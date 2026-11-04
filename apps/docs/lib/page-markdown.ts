@@ -34,7 +34,9 @@ type PageOptions = { compact?: boolean; lean?: boolean }
 // The tag's attributes: `name="text"`, `name='text'`, `name={["a", "b"]}`, `name={false}` or `name={{ key: "text" }}`.
 function attributes(source: string) {
   const found: Record<string, string> = {}
-  for (const match of source.matchAll(/(\w+)=(?:"([^"]*)"|'([^']*)'|\{\{([^}]*)\}\}|\{([^}]*)\})/g))
+  for (const match of source.matchAll(
+    /(\w+)=(?:"([^"]*)"|'([^']*)'|\{\{((?:"[^"]*"|'[^']*'|[^}"'])*)\}\}|\{([^}]*)\})/g,
+  ))
     found[match[1]] = match[2] ?? match[3] ?? (match[4] === undefined ? match[5] : `{${match[4]}}`)
   return found
 }
@@ -115,7 +117,10 @@ const unstyled = (code: string) =>
 
 // A component's tag, self-closing, with attributes that may span lines.
 const tag = (name: string) =>
-  new RegExp(`<${name}\\b((?:\\s+\\w+(?:="[^"]*"|='[^']*'|=\\{\\{[^}]*\\}\\}|=\\{[^}]*\\}))*)\\s*\\/>`, "g")
+  new RegExp(
+    `<${name}\\b((?:\\s+\\w+(?:="[^"]*"|='[^']*'|=\\{\\{(?:"[^"]*"|'[^']*'|[^}"'])*\\}\\}|=\\{[^}]*\\}))*)\\s*\\/>`,
+    "g",
+  )
 
 /**
  * The page at `file` as Markdown, its links mapped by `link`. `framework` is

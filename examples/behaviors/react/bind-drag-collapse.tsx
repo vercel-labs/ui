@@ -123,7 +123,7 @@ const SidebarDivider = parts.Divider
 function Example() {
   return (
     <Sidebar>
-      <nav aria-label="Files">
+      <nav aria-label="Files" data-slot="sidebar-nav">
         <ul>
           {["README.md", "package.json", "src", "tests"].map((file) => (
             <li key={file}>{file}</li>
@@ -131,11 +131,11 @@ function Example() {
         </ul>
       </nav>
       <SidebarDivider aria-label="Resize sidebar" />
-      <div>
-        <span>Drag the divider left to collapse</span>
-        <span>Drag right a bit to open</span>
-        <span>Release to collapse</span>
-        <span>Release to open at {minWidth}px</span>
+      <div data-slot="sidebar-hint">
+        <span data-show="open">Drag the divider left to collapse</span>
+        <span data-show="collapsed">Drag right a bit to open</span>
+        <span data-show="landing-collapsed">Release to collapse</span>
+        <span data-show="landing-open">Release to open at {minWidth}px</span>
       </div>
     </Sidebar>
   )

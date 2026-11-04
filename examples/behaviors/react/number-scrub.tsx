@@ -32,20 +32,23 @@ function Example() {
     free.current = event.metaKey || event.ctrlKey
   }
   return (
-    <div>
-      <div>
+    <div data-slot="scrubber-root">
+      <div data-slot="scrubber-track">
         {sections.map((candidate) => (
           <div
             key={candidate.label}
+            data-slot="scrubber-section"
             data-active={candidate === section || undefined}
             style={{ left: `${fractionOf(candidate.at, range) * 100}%` }}
           >
             {candidate.label}
           </div>
         ))}
-        <div data-playhead style={{ left: `${fractionOf(time, range) * 100}%` }}>
-          <div />
-        </div>
+        <div
+          data-slot="scrubber-playhead"
+          data-playhead
+          style={{ left: `${fractionOf(time, range) * 100}%` }}
+        />
       </div>
       <input
         type="range"
@@ -67,11 +70,11 @@ function Example() {
           setTime(stepBy(time, move, range, { snap: !(event.metaKey || event.ctrlKey) }))
         }}
       />
-      <p>
+      <p data-slot="scrubber-readout">
         <span data-time>{clock(time)}</span>
         <span data-section>{section?.label ?? "Between sections"}</span>
       </p>
-      <p>Hold ⌘ or Ctrl to scrub freely.</p>
+      <p data-slot="hint">Hold ⌘ or Ctrl to scrub freely.</p>
     </div>
   )
 }

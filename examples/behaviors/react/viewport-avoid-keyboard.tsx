@@ -10,16 +10,18 @@ function Example() {
   const lift = React.useRef<HTMLDivElement>(null)
   React.useEffect(() => bindAvoidKeyboard(lift.current!), [])
   return (
-    <div>
+    <div data-slot="groceries-root">
       <textarea
         aria-label="Groceries"
         rows={4}
         defaultValue={groceries}
         onChange={(event) => setItems(count(event.target.value))}
       />
-      <p>On a phone, tap the list, then scroll the page with the keyboard open.</p>
-      <div ref={lift}>
-        <p aria-live="polite">{items === 1 ? "1 item" : `${items} items`} · Saved</p>
+      <p data-slot="hint">On a phone, tap the list, then scroll the page with the keyboard open.</p>
+      <div ref={lift} data-slot="groceries-lift">
+        <p aria-live="polite" data-slot="groceries-pill">
+          {items === 1 ? "1 item" : `${items} items`} · Saved
+        </p>
       </div>
     </div>
   )

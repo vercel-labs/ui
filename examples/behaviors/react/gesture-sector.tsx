@@ -57,19 +57,20 @@ const react = definePrimitive({
       attrs: () => ({ "aria-hidden": "true", style: css({ "touch-action": "none" }) }),
       on: { pointerdown: (event, { el, api }) => api.pointerdown(event, el!) },
     }),
-    reaction: slot<{ index: number }>({
-      props: { index: "number" },
+    reaction: slot<{ value: string }>({
+      props: { value: "string" },
       attrs: (state, { props }) => {
-        const { x, y } = sectorPoint(props.index, reactions.length, 72, start)
+        const index = reactions.indexOf(props.value)
+        const { x, y } = sectorPoint(index, reactions.length, 72, start)
         return {
           type: "button",
-          "aria-label": `React with ${reactions[props.index]}`,
-          "aria-pressed": String(state.picked === reactions[props.index]),
-          "data-pointing": state.pointing === props.index ? "" : undefined,
+          "aria-label": `React with ${props.value}`,
+          "aria-pressed": String(state.picked === props.value),
+          "data-pointing": state.pointing === index ? "" : undefined,
           style: css({ position: "absolute", left: "50%", top: "50%", translate: `${x}px ${y}px` }),
         }
       },
-      press: ({ api, props }) => api.pick(props.index),
+      press: ({ api, props }) => api.pick(reactions.indexOf(props.value)),
     }),
   }),
 })
@@ -88,8 +89,8 @@ function Example() {
       {({ picked }) => (
         <>
           <ReactionHandle>{picked ?? "·"}</ReactionHandle>
-          {reactions.map((reaction, index) => (
-            <Reaction key={reaction} index={index}>
+          {reactions.map((reaction) => (
+            <Reaction key={reaction} value={reaction}>
               {reaction}
             </Reaction>
           ))}

@@ -92,7 +92,7 @@ function ExampleConsole({ entries }: { entries: string[] }) {
   }, [entries])
 
   return (
-    <section aria-label="Console" className="border-t border-border/60 text-xs">
+    <section role="group" aria-label="Console" className="border-t border-border/60 text-xs">
       <div className="border-b border-border/40 px-4 py-1.5 text-muted-foreground">Console</div>
       <ol
         ref={list}
