@@ -1,12 +1,24 @@
+"use client"
+
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 
 const folders = [
-  { value: "inbox", label: "Inbox", count: 12 },
-  { value: "unread", label: "Unread", count: 3 },
-  { value: "archived", label: "Archived", count: 0 },
+  { value: "inbox", label: "Inbox", count: 12, content: "12 conversations, 3 of them unread." },
+  {
+    value: "unread",
+    label: "Unread",
+    count: 3,
+    content: "Hollis Grant, Inès Moreau and Kofi Mensah wrote to you.",
+  },
+  {
+    value: "archived",
+    label: "Archived",
+    count: 0,
+    content: "Nothing archived yet. Archived mail stays searchable.",
+  },
 ]
 
-export function Example() {
+function Example() {
   return (
     <Tabs defaultValue="inbox">
       <TabsList aria-label="Mail">
@@ -17,7 +29,7 @@ export function Example() {
             render={(props) => (
               <button {...props}>
                 {props.children}
-                {folder.count > 0 && <span data-slot="row">{folder.count}</span>}
+                {folder.count > 0 && <span data-slot="badge">{folder.count}</span>}
               </button>
             )}
           >
@@ -27,9 +39,11 @@ export function Example() {
       </TabsList>
       {folders.map((folder) => (
         <TabsPanel key={folder.value} value={folder.value}>
-          {folder.count > 0 ? `${folder.count} conversations.` : "Nothing archived yet."}
+          {folder.content}
         </TabsPanel>
       ))}
     </Tabs>
   )
 }
+
+export { Example }

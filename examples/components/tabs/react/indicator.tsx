@@ -3,26 +3,40 @@
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 import * as React from "react"
 
+const orientations = [
+  { value: "horizontal", label: "Horizontal" },
+  { value: "vertical", label: "Vertical" },
+] as const
+
 function Example() {
-  const [vertical, setVertical] = React.useState(false)
+  const [orientation, setOrientation] = React.useState<"horizontal" | "vertical">("horizontal")
 
   return (
-    <div data-slot="stack">
-      <Tabs defaultValue="music" orientation={vertical ? "vertical" : "horizontal"}>
+    <div>
+      <div data-slot="controls" role="group" aria-label="Orientation">
+        {orientations.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            data-size="sm"
+            aria-pressed={orientation === option.value}
+            onClick={() => setOrientation(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <Tabs defaultValue="music" orientation={orientation}>
         <TabsList aria-label="Library">
           <TabsTab value="music">Music</TabsTab>
           <TabsTab value="podcasts">Podcasts</TabsTab>
           <TabsTab value="audiobooks">Audiobooks</TabsTab>
           <TabsIndicator />
         </TabsList>
-        <TabsPanel value="music">312 songs, 24 albums.</TabsPanel>
-        <TabsPanel value="podcasts">8 shows, 3 new episodes.</TabsPanel>
-        <TabsPanel value="audiobooks">2 books in progress.</TabsPanel>
+        <TabsPanel value="music">312 songs in 24 albums, synced to this device.</TabsPanel>
+        <TabsPanel value="podcasts">8 shows you follow, with 3 new episodes.</TabsPanel>
+        <TabsPanel value="audiobooks">2 books in progress, 6 hours left in total.</TabsPanel>
       </Tabs>
-      <label data-slot="label">
-        <input type="checkbox" checked={vertical} onChange={(event) => setVertical(event.target.checked)} />
-        Vertical
-      </label>
     </div>
   )
 }

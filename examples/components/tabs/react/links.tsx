@@ -3,9 +3,24 @@
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 
 const pages = [
-  { value: "overview", href: "#project-overview", label: "Overview", content: "Everything at a glance." },
-  { value: "activity", href: "#project-activity", label: "Activity", content: "What changed this week." },
-  { value: "members", href: "#project-members", label: "Members", content: "Who can edit the project." },
+  {
+    value: "overview",
+    href: "#project-overview",
+    label: "Overview",
+    content: "Hollis Grant started this project in March. It has 14 open issues.",
+  },
+  {
+    value: "activity",
+    href: "#project-activity",
+    label: "Activity",
+    content: "Wren Takahashi merged 3 pull requests and closed 5 issues this week.",
+  },
+  {
+    value: "members",
+    href: "#project-members",
+    label: "Members",
+    content: "Hollis Grant owns the project. Wren Takahashi and 3 others can edit it.",
+  },
 ]
 
 function Example() {

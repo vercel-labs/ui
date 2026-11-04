@@ -12,9 +12,11 @@ function Example() {
         <TabsIndicator />
       </TabsList>
       <div data-slot="stack">
-        <TabsPanel value="overview">Everything about the project at a glance.</TabsPanel>
-        <TabsPanel value="activity">Deploys, comments and reviews from the last week.</TabsPanel>
-        <TabsPanel value="settings">Rename, transfer or archive the project.</TabsPanel>
+        <TabsPanel value="overview">The launch is on track for Friday, with 4 of 6 tasks done.</TabsPanel>
+        <TabsPanel value="activity">
+          Inès Moreau deployed to production and Kofi Mensah left a review.
+        </TabsPanel>
+        <TabsPanel value="settings">Rename the project, transfer it to another team or archive it.</TabsPanel>
       </div>
     </Tabs>
   )
