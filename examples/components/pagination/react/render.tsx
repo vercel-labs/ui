@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@ui-sdk/react/pagination"
-import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "lucide-react"
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react"
 
 function Example() {
   return (
@@ -19,42 +19,43 @@ function Example() {
           <>
             <PaginationItem>
               <PaginationPrevious
-                data-variant="ghost"
                 aria-label="Previous page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : ["Page", state.page].join(" ")} />
+                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
                 )}
               >
-                <ChevronLeftIcon />
+                {(state) => (
+                  <>
+                    <ArrowLeftIcon aria-hidden="true" />
+                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                  </>
+                )}
               </PaginationPrevious>
             </PaginationItem>
             {items.map((item) => (
               <PaginationItem key={item}>
                 {typeof item === "number" ? (
                   <PaginationLink page={item}>
-                    {(state) => (
-                      <>
-                        {state.page}
-                        {state.current && <span aria-hidden />}
-                      </>
-                    )}
+                    {(state) => (state.current ? `Page ${state.page}` : state.page)}
                   </PaginationLink>
                 ) : (
-                  <PaginationEllipsis>
-                    <EllipsisIcon />
-                  </PaginationEllipsis>
+                  <PaginationEllipsis />
                 )}
               </PaginationItem>
             ))}
             <PaginationItem>
               <PaginationNext
-                data-variant="ghost"
                 aria-label="Next page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : ["Page", state.page].join(" ")} />
+                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
                 )}
               >
-                <ChevronRightIcon />
+                {(state) => (
+                  <>
+                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                    <ArrowRightIcon aria-hidden="true" />
+                  </>
+                )}
               </PaginationNext>
             </PaginationItem>
           </>

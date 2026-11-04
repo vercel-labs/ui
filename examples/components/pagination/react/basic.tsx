@@ -10,10 +10,17 @@ import {
   PaginationPrevious,
 } from "@ui-sdk/react/pagination"
 import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "lucide-react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
+  const log = useLog()
+
   return (
-    <Pagination aria-label="Pagination" pageCount={10}>
+    <Pagination
+      aria-label="Pagination"
+      pageCount={10}
+      onPageChange={(page, details) => log(`Page ${page} (${details.reason})`)}
+    >
       <PaginationList>
         {({ items }) => (
           <>
