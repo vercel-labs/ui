@@ -31,7 +31,8 @@ type MeterLabelDetails = GaugeLabelDetails<number>
  */
 type MeterOptions = GaugeOptions<number> & {
   /**
-   * The reading, between `min` and `max`. Values outside them are clamped. A
+   * The reading, between `min` and `max`. Outside them, the fill, the percentage
+   * and `aria-valuenow` are clamped, while the state keeps the value as given. A
    * meter always has a value, since there's no busy state.
    */
   value: number
