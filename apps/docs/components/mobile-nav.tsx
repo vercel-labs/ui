@@ -37,7 +37,7 @@ function MobileNav({
   return (
     <header
       data-mobile-header
-      className="container sticky top-0 z-10 flex h-14 items-center gap-4 bg-canvas/85 backdrop-blur-md lg:hidden"
+      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
       <a
         href="https://vercel.com"
@@ -48,7 +48,7 @@ function MobileNav({
       >
         <VercelLogo className="h-[18px] w-auto" />
       </a>
-      <span aria-hidden className="ms-0.5 text-lg font-light text-foreground/20">
+      <span aria-hidden className="text-lg font-light text-foreground/20">
         /
       </span>
       <Link
@@ -58,7 +58,7 @@ function MobileNav({
       >
         <Logo className="h-[18px] w-auto" />
       </Link>
-      <span aria-hidden className="ms-0.5 text-lg font-light text-foreground/20">
+      <span aria-hidden className="text-lg font-light text-foreground/20">
         /
       </span>
       <FrameworkPicker urls={urls} />
