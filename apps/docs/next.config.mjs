@@ -138,7 +138,7 @@ const config = {
       { source: "/docs/react/utilities/:rest*", destination: "/docs/react/hooks/:rest*", permanent: true },
       // Core and Agents were once a copy per framework.
       { source: "/docs/:framework/core.md", destination: "/docs/core.md", permanent: true },
-      { source: "/docs/:framework/core/:page*", destination: "/docs/behaviors/:page*", permanent: true },
+      { source: "/docs/:framework/core/:page*", destination: "/docs/core/:page*", permanent: true },
       { source: "/docs/:framework/agents", destination: "/docs/agents", permanent: true },
     ]
   },
