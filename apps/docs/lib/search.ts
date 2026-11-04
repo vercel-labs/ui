@@ -7,11 +7,18 @@ type SearchPage = {
 
 const weights = { page: 30, heading: 20, text: 10 }
 
+// A part's own heading repeats under Data Attributes and API Reference, and often matches the
+// page title, so a page shows each heading text once.
+function uniqueHeadings(page: SearchPage) {
+  const seen = new Set([page.title])
+  return page.headings.filter((heading) => !seen.has(heading.content) && seen.add(heading.content))
+}
+
 function createSearchIndex(pages: SearchPage[]) {
   return pages.map((page) =>
     [
       { type: "page" as const, content: page.title, url: page.url },
-      ...page.headings.map((heading) => ({
+      ...uniqueHeadings(page).map((heading) => ({
         type: "heading" as const,
         content: heading.content,
         url: `${page.url}#${heading.id}`,
