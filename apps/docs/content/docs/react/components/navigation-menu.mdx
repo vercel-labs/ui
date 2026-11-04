@@ -74,7 +74,7 @@ export { Example }
 
 ## Link Component
 
-Render your router's link for client-side navigation. `active` marks the link for the current page with `aria-current="page"` and `data-active`.
+Render your router's link for client-side navigation. `current` marks the link for the current page with `aria-current="page"` and `data-current`.
 
 Pass the router's link to `render`, like `render={<Link href="/docs" />}`.
 
@@ -145,7 +145,7 @@ The menu waits for whatever animations run, and only those. Turn them off for pe
 
 ## Indicator
 
-`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `active` while every panel is closed. Its box comes from the `--active-item-*` [variables](#styling-navigationmenuindicator), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
+`NavigationMenuIndicator` sits under the open trigger, or under the top-level link with `current` while every panel is closed. Its box comes from the `--active-item-*` [variables](#styling-navigationmenuindicator), relative to its positioned ancestor, and it gets `data-visible` while it has something to cover. Screen readers skip it.
 
 ```tsx
 <NavigationMenu aria-label="Main">
@@ -271,10 +271,10 @@ Panels render in place and show in the top layer, so no ancestor clips or covers
 
 <ComponentExample
   name="navigation-menu/custom-rendering"
-  caption="Open Guides to see its render state, then compare the active link and disabled trigger."
+  caption="Open Guides to see its render state, then compare the current link and disabled trigger."
 />
 
-Use [render functions](../parts-and-composition) to change the markup or read a part's state. Here the root reads `nested`, the content reads `motion`, and a disabled trigger shows a badge.
+Use [render functions](../parts-and-composition) to change the markup or read a part's state. Here a trigger reads `open` to swap its icon, the content reads `motion`, the current link reads `current` to say you're there, and a disabled trigger reads `disabled` to show a badge.
 
 `disabled` on a trigger stops it from opening its panel. Each part's state is listed under [State](#state).
 

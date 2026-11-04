@@ -37,7 +37,7 @@ Name the navigation with `aria-label`, then put the page links and steps in a li
 
 `items` contains page numbers and the strings `"ellipsis-start"` and `"ellipsis-end"`. Render a link for each number and an ellipsis for each gap. Key entries by the item itself so a page link keeps its element as the range moves.
 
-`PaginationLink` shows its page number unless you supply children. The current link gets `aria-current="page"` and `data-active`. `PaginationEllipsis` shows “…” and is hidden from screen readers.
+`PaginationLink` shows its page number unless you supply children. The current link gets `aria-current="page"` and `data-current`. `PaginationEllipsis` shows “…” and is hidden from screen readers.
 
 Give Previous, Next, First, and Last text or an `aria-label`. At an end, a step gets `aria-disabled="true"` and `data-disabled` and stops changing the page. As a button, it stays in the tab order.
 
@@ -236,7 +236,7 @@ const items = paginationRange({ page: slide, pageCount: 20, siblings: 2, boundar
 
 ## Custom Rendering
 
-Every part takes `render`. Pass an element and its props merge with the part's, or a function that receives the props and the part's state. `className`, `style` and `children` can be functions of the same state: whether a link is `active`, and for a step, the `page` it goes to and whether it's `disabled`.
+Every part takes `render`. Pass an element and its props merge with the part's, or a function that receives the props and the part's state. `className`, `style` and `children` can be functions of the same state: whether a link is `current`, and for a step, the `page` it goes to and whether it's `disabled`.
 
 <ComponentExample
   name="pagination/render"
@@ -245,7 +245,7 @@ Every part takes `render`. Pass an element and its props merge with the part's, 
 
 ## Styling
 
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-active` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
+Parts are unstyled. Style them through the attributes they render, which are the same in every framework: `aria-current="page"` or `data-current` on the current page's link, and `aria-disabled` or `data-disabled` on a step at its end.
 
 Each part has a `data-slot`, such as `pagination-link`, and its state attributes are listed under [Data Attributes](#data-attributes). The root, list, items and ellipsis have none.
 
