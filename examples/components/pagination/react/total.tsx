@@ -11,8 +11,10 @@ import {
 } from "@ui-sdk/react/pagination"
 import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "lucide-react"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
+  const log = useLog()
   const [page, setPage] = React.useState(2)
   const [pageSize, setPageSize] = React.useState(20)
   const total = 95
@@ -30,6 +32,7 @@ function Example() {
             onChange={(event) => {
               setPageSize(Number(event.target.value))
               setPage(1)
+              log(`${event.target.value} rows per page`)
             }}
           >
             <option value={10}>10</option>
@@ -43,7 +46,10 @@ function Example() {
         total={total}
         pageSize={pageSize}
         page={page}
-        onPageChange={(next) => setPage(next)}
+        onPageChange={(next) => {
+          setPage(next)
+          log(`Page ${next}`)
+        }}
       >
         <PaginationList>
           {({ items }) => (

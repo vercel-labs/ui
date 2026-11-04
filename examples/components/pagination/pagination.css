@@ -1,4 +1,36 @@
 @scope ([data-example]) {
+  /* A table footer: the summary and page size on one line, the pages centered below. */
+  :scope[data-example="pagination/total"] {
+    & [data-slot="stack"] {
+      align-self: center;
+      align-items: stretch;
+      gap: var(--space-4);
+      width: 28rem;
+      max-width: 100%;
+    }
+
+    & [data-slot="row"] {
+      justify-content: space-between;
+    }
+
+    & p {
+      margin: 0;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    & [data-slot="label"] {
+      font-weight: 400;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    & select {
+      width: 4.5rem;
+      color: var(--ink);
+    }
+  }
+
   [data-slot="pagination-list"] {
     display: flex;
     flex-direction: row;
