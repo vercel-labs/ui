@@ -196,7 +196,7 @@ import type { drawer } from "@ui-sdk/core/drawer"
 import type { field, fieldGroup, fieldSet } from "@ui-sdk/core/field"
 import type { fileInput } from "@ui-sdk/core/file-input"
 import type { hoverCard } from "@ui-sdk/core/hover-card"
-import type { input, inputGroup } from "@ui-sdk/core/input"
+import type { input, inputGroup, textarea } from "@ui-sdk/core/input"
 import type { listbox } from "@ui-sdk/core/listbox"
 import type { menu } from "@ui-sdk/core/menu"
 import type { menubar } from "@ui-sdk/core/menubar"
@@ -790,10 +790,20 @@ interface UiRadioElement
  */
 type InputEvents = { valuechange: UiChangeEvent<string, InputValueChangeReason> }
 /**
- * `<ui-input>` and `<ui-textarea>`: `value`, the controller's methods on `api`, and typed events.
+ * `<ui-input>`: `value`, the controller's methods on `api`, and typed events.
  * @stable
  */
 interface UiInputElement extends UiElement<InputEvents>, AttributeProperties<typeof input, "api" | "value"> {
+  value: string
+  api: InputController
+}
+
+/**
+ * `<ui-textarea>`: `value`, `autoResize`, `submitShortcut`, the controller's methods on `api`, and typed events.
+ * @stable
+ */
+interface UiTextareaElement
+  extends UiElement<InputEvents>, AttributeProperties<typeof textarea, "api" | "value"> {
   value: string
   api: InputController
 }
@@ -1491,7 +1501,7 @@ declare global {
     "ui-radio": UiRadioElement
     "ui-input": UiInputElement
     "ui-input-group": UiInputGroupElement
-    "ui-textarea": UiInputElement
+    "ui-textarea": UiTextareaElement
     "ui-password-input": UiPasswordInputElement
     "ui-pagination": UiPaginationElement
     "ui-calendar": UiCalendarElement
@@ -2109,6 +2119,7 @@ export {
   type UiSliderElement,
   type UiSwitchElement,
   type UiTabsElement,
+  type UiTextareaElement,
   type UiToastRegionElement,
   type UiToggleElement,
   type UiToggleGroupElement,

@@ -74,7 +74,8 @@ function defineTokenInputElements() {
       ],
       render(el, { api, subscribe }) {
         const target = el as TokenInputElement
-        api.internal.setCustom(!!(target.renderToken || el.querySelector(":scope > template")))
+        const mode = contentMode(target)
+        api.internal.setCustom(mode !== "label")
         // A trigger menu inside finds this editor, whichever upgraded first, and
         // a new one when the token input is put back on the page.
         reconfigureInside(el)
@@ -85,6 +86,10 @@ function defineTokenInputElements() {
         const unsubscribe = subscribe(showTokens)
         return () => {
           unsubscribe()
+          // Renderers that keep nodes per container, like lit's or React's, update
+          // the ones they left, so a new renderToken renders over them. Hosts only
+          // empty when the element leaves or switches to a template or labels.
+          if (el.isConnected && contentMode(target) === mode) return
           for (const { host } of api.internal.hosts()) if (rendered.has(host)) host.replaceChildren()
         }
       },
@@ -94,6 +99,9 @@ function defineTokenInputElements() {
     "token-remove": { tag: "ui-token-input-token-remove", context: tokenOf },
   })
 }
+
+const contentMode = (el: TokenInputElement) =>
+  el.renderToken ? "renderToken" : el.querySelector(":scope > template") ? "template" : "label"
 
 // Renders each token's content into its host, from `renderToken` or the template.
 function renderTokens(el: TokenInputElement, api: TokenInputApi, rendered: WeakMap<HTMLElement, Token>) {

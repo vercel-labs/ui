@@ -485,6 +485,8 @@ type Part = {
   shown?: boolean
   // The `data-slot` it last wrote, which a part around it on the same element writes too.
   dataSlot?: string
+  // Syncs it again through its owner, once a part on the same element lets go.
+  sync?: () => void
   // Reads its props again, for parts whose props come from their surroundings.
   reread?: () => Record<string, unknown>
   // Watches a native child's attributes that its props follow.
@@ -544,8 +546,24 @@ function innerPart(part: Part, owner: HTMLElement) {
   for (let node: HTMLElement | null = part.el; node && node !== owner; node = node.parentElement) {
     const other = slotParts.get(node)
     if (other === part) return
-    if (other?.el === part.el) return other
+    if (other?.el === part.el && registered.has(other)) return other
   }
+}
+
+// Each owner on a shared element writes the inner part's `data-slot`, and takes
+// the other's for what it found there. Once a part lets go, the slot is
+// forgotten, and the parts still bound write their own again.
+function handOver(part: Part) {
+  part.dataSlot = undefined
+  const sharing: Part[] = []
+  for (let node: HTMLElement | null = part.el; node; node = node.parentElement) {
+    const other = slotParts.get(node)
+    if (other && other !== part && other.el === part.el && registered.has(other)) sharing.push(other)
+  }
+  if (!sharing.length) return
+  part.el.removeAttribute("data-slot")
+  markAuthored(part.el, "data-slot")
+  for (const other of sharing) other.sync?.()
 }
 
 // A part its owner let go of when it left the page registers again once the owner is back.
@@ -915,6 +933,8 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         adoptStyles(this)
         if (this.#connected) {
           for (const part of this.#parts) elementMoved(part.el)
+          // Options from its surroundings, like a disabled field around it, may differ where it landed.
+          if (config.options) this.#configure()
           return
         }
         upgradeProperties(this, [...Object.keys(state), ...(config.properties ?? []), ...Object.keys(schema)])
@@ -1087,6 +1107,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       register(part: Part) {
         this.#parts.add(part)
         registered.add(part)
+        part.sync = () => this.#pending.has(part) || this.#sync(part)
         if (!this.#pending.size) queueMicrotask(() => this.#flush())
         this.#pending.add(part)
       }
@@ -1146,6 +1167,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         this.#parts.delete(part)
         registered.delete(part)
         this.#pending.delete(part)
+        handOver(part)
       }
 
       // Binds every bound part again, in DOM order, for what they found when

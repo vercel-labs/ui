@@ -84,6 +84,29 @@ test("tokens show only what renderToken renders when it's set after mount, and t
   expect(hosts()).toEqual(["routes.ts file"])
 })
 
+test("a new renderToken renders into the nodes the last one left, for renderers that keep them per container", async () => {
+  tokenInputs(1)
+  document.body.innerHTML = `
+    <ui-token-input value="Open [@routes.ts](file:routes.ts)">
+      <ui-token-input-editor aria-label="Prompt"></ui-token-input-editor>
+    </ui-token-input>`
+  const input = document.querySelector("ui-token-input") as HTMLElement & {
+    renderToken?: (token: { label: string }, host: HTMLElement) => void
+  }
+  const nodes = new WeakMap<HTMLElement, Text>()
+  const renderWith = (prefix: string) => (token: { label: string }, host: HTMLElement) => {
+    let node = nodes.get(host)
+    if (!node) nodes.set(host, (node = host.appendChild(document.createTextNode(""))))
+    node.textContent = `${prefix} ${token.label}`
+  }
+  input.renderToken = renderWith("First")
+  await wait()
+  expect(hosts()).toEqual(["First routes.ts file"])
+  input.renderToken = renderWith("Second")
+  await wait()
+  expect(hosts()).toEqual(["Second routes.ts file"])
+})
+
 test("a disabled field disables the token input inside it, which then submits and requires nothing", async () => {
   const submitted = new Map<ElementInternals, unknown>()
   const missing = new Map<ElementInternals, boolean>()
@@ -127,5 +150,60 @@ test("a disabled field disables the token input inside it, which then submits an
   } finally {
     ElementInternals.prototype.setFormValue = setFormValue
     ElementInternals.prototype.setValidity = setValidity
+  }
+})
+
+async function tokenInputInFields() {
+  const submitted = new Map<ElementInternals, unknown>()
+  ElementInternals.prototype.setValidity ??= () => {}
+  const { setFormValue } = ElementInternals.prototype
+  ElementInternals.prototype.setFormValue = function (value) {
+    submitted.set(this, value)
+  }
+  defineFieldElements()
+  defineTokenInputElements()
+  document.body.innerHTML = `
+    <ui-field id="disabled" disabled>
+      <ui-token-input name="prompt" value="Hello">
+        <ui-token-input-editor aria-label="Prompt"></ui-token-input-editor>
+      </ui-token-input>
+    </ui-field>
+    <ui-field id="enabled"></ui-field>`
+  await wait()
+  const [internals] = submitted.keys()
+  return {
+    input: document.querySelector("ui-token-input")!,
+    editor: document.querySelector("ui-token-input-editor")!,
+    submitted: () => submitted.get(internals),
+    restore: () => (ElementInternals.prototype.setFormValue = setFormValue),
+  }
+}
+
+test("a token input moved out of a disabled field is editable again and submits its value", async () => {
+  const { input, editor, submitted, restore } = await tokenInputInFields()
+  try {
+    expect(editor.getAttribute("contenteditable")).toBe("false")
+    expect(submitted()).toBeNull()
+    document.getElementById("enabled")!.append(input)
+    await wait()
+    expect(editor.getAttribute("contenteditable")).toBe("true")
+    expect(submitted()).toBe("Hello")
+  } finally {
+    restore()
+  }
+})
+
+test("a token input moved into a disabled field is disabled and submits nothing", async () => {
+  const { input, editor, submitted, restore } = await tokenInputInFields()
+  try {
+    document.getElementById("enabled")!.append(input)
+    await wait()
+    expect(submitted()).toBe("Hello")
+    document.getElementById("disabled")!.append(input)
+    await wait()
+    expect(editor.getAttribute("contenteditable")).toBe("false")
+    expect(submitted()).toBeNull()
+  } finally {
+    restore()
   }
 })

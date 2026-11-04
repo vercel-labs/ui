@@ -325,6 +325,7 @@ export type {
   UiSliderElement,
   UiSwitchElement,
   UiTabsElement,
+  UiTextareaElement,
   UiToastRegionElement,
   UiTokenInputElement,
   UiTreeElement,
