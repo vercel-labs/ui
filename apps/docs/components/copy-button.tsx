@@ -28,7 +28,7 @@ function CopyButton({ label, className }: { label?: string; className?: string }
         type="button"
         onClick={copy}
         className={cn(
-          "inline-flex h-7 items-center gap-1.5 rounded-full bg-foreground/5 px-2.5 text-[13px] text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/30",
+          "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[8px] bg-foreground/5 px-2.5 text-[13px] text-foreground outline-none transition-colors hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/30",
           className,
         )}
       >
@@ -44,7 +44,7 @@ function CopyButton({ label, className }: { label?: string; className?: string }
         aria-label={copied ? "Copied" : "Copy code"}
         onClick={copy}
         className={cn(
-          "inline-flex size-7 items-center justify-center rounded-full text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
+          "inline-flex size-8 shrink-0 items-center justify-center rounded-[8px] text-subtle outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
           className,
         )}
       >

@@ -24,7 +24,7 @@ function Pre({
   return (
     <Frame data-code-frame="" className="relative my-5 overflow-hidden">
       {title && (
-        <div className="flex items-center gap-2 border-b border-border/60 px-4 py-2.5 font-mono text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 border-b border-border/60 p-2 ps-4 font-mono text-xs text-muted-foreground">
           {Mark ? (
             <Mark aria-hidden className="size-3.5" />
           ) : (
@@ -33,16 +33,16 @@ function Pre({
             )
           )}
           {title}
-          <CopyButton className="-my-1.5 -me-2 ms-auto rounded-[8px]" />
+          <CopyButton className="ms-auto" />
         </div>
       )}
       {!title && prompt && (
         <div
           data-prompt-bar=""
-          className="flex items-center border-b border-border/60 px-4 py-2 text-[13px] text-subtle"
+          className="flex items-center border-b border-border/60 p-2 ps-4 text-[13px] text-subtle"
         >
           Prompt
-          <CopyButton label="Copy prompt" className="-my-1 -me-2 ms-auto" />
+          <CopyButton label="Copy prompt" className="ms-auto" />
         </div>
       )}
       <pre
@@ -53,9 +53,7 @@ function Pre({
           "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[13px] leading-[1.7] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]",
         )}
       />
-      {!title && !prompt && copy && (
-        <CopyButton className="absolute top-2 end-2 rounded-[8px] bg-background" />
-      )}
+      {!title && !prompt && copy && <CopyButton className="absolute top-2 end-2 bg-background" />}
     </Frame>
   )
 }

@@ -34,13 +34,13 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
   return (
     <>
       <div className="min-w-0 flex-1">
-        <article className="w-full xl:max-w-2xl px-4 pt-8 pb-24 sm:px-8 lg:px-10">
+        <article className="w-full xl:max-w-2xl px-6 pt-8 pb-24 sm:px-8 lg:px-10">
           <header className="mb-10">
             <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
               {page.data.title}
             </h1>
             {page.data.description && (
-              <p className="mt-3 text-[15px] leading-relaxed text-pretty text-subtle">
+              <p className="mt-3 text-base leading-relaxed sm:text-[15px] text-pretty text-subtle">
                 {page.data.description}
               </p>
             )}

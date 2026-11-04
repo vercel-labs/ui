@@ -23,7 +23,7 @@ export default async function Layout({ children, params }: LayoutProps<"/docs/[s
   const nav = { section, tree, componentsTree, tocs, urls }
 
   return (
-    <div className="container flex flex-1">
+    <div className="container flex flex-1 max-lg:px-0">
       <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 lg:block">
         <Sidebar tree={tree} componentsTree={componentsTree} tocs={tocs} />
       </aside>

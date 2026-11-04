@@ -37,7 +37,7 @@ function MobileNav({
   return (
     <header
       data-mobile-header
-      className="container sticky top-0 z-10 flex h-14 items-center gap-4 bg-canvas/85 backdrop-blur-md lg:hidden"
+      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
       <a
         href="https://vercel.com"
@@ -48,7 +48,7 @@ function MobileNav({
       >
         <VercelLogo className="h-[18px] w-auto" />
       </a>
-      <span aria-hidden className="ms-0.5 text-lg font-light text-foreground/20">
+      <span aria-hidden className="text-lg font-light text-foreground/20">
         /
       </span>
       <Link
@@ -58,7 +58,7 @@ function MobileNav({
       >
         <Logo className="h-[18px] w-auto" />
       </Link>
-      <span aria-hidden className="ms-0.5 text-lg font-light text-foreground/20">
+      <span aria-hidden className="text-lg font-light text-foreground/20">
         /
       </span>
       <FrameworkPicker urls={urls} />
@@ -68,7 +68,7 @@ function MobileNav({
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             aria-label="Menu"
-            className="group -me-2 inline-flex size-10 touch-manipulation items-center justify-center rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+            className="group -me-3 inline-flex size-10 touch-manipulation items-center justify-center rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
           >
             <span className="relative size-4">
               <span className="absolute start-0 top-1 h-0.5 w-4 bg-foreground transition-all duration-100 group-aria-expanded:top-[0.4375rem] group-aria-expanded:-rotate-45 motion-reduce:transition-none" />
@@ -124,7 +124,7 @@ function MobileMenu({
 
   return (
     // Two landmarks, like the header and sidebar on large screens.
-    <div className="flex flex-col gap-12 px-6 pt-6 pb-12">
+    <div className="flex flex-col gap-12 px-6 pt-6 pb-12 sm:px-8">
       <nav aria-label="Sections">
         <MenuGroup label="Menu">
           {menu.map((item) => {

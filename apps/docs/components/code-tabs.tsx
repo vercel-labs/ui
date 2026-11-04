@@ -1,5 +1,6 @@
 "use client"
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
 import { frameworkIds, frameworks, isFramework } from "@/lib/frameworks"
 import { packageManager, styling, useFramework } from "@/lib/preferences"
@@ -37,7 +38,7 @@ function CodeBlockTabsList({
   return (
     <TabBar>
       <TabsList aria-label={label}>{children}</TabsList>
-      <CopyButton className="ms-auto size-[30px] shrink-0 rounded-[8px] hover:bg-muted" />
+      <CopyButton className="ms-auto" />
     </TabBar>
   )
 }
@@ -98,6 +99,8 @@ function StyleTabs({ children }: { children: React.ReactNode }) {
   )
 }
 
+const frameworkItems = frameworkIds.map((value) => ({ value, label: frameworks[value].label }))
+
 function FrameworkTabs({ children }: { children: React.ReactNode }) {
   const [framework, setFramework] = useFramework()
   return (
@@ -109,17 +112,34 @@ function FrameworkTabs({ children }: { children: React.ReactNode }) {
         className="flex flex-col [&_[data-prompt-bar]]:hidden"
       >
         <TabBar>
-          <TabsList aria-label="Framework">
+          <TabsList aria-label="Framework" className="max-sm:hidden">
             {frameworkIds.map((id) => (
               <TabsTab key={id} value={id}>
                 {frameworks[id].label}
               </TabsTab>
             ))}
           </TabsList>
-          <CopyButton
-            label="Copy prompt"
-            className="ms-auto shrink-0 rounded-[8px] max-sm:[&>span]:sr-only"
-          />
+          <Select
+            items={frameworkItems}
+            value={framework}
+            onValueChange={(next) => next && isFramework(next) && setFramework(next)}
+          >
+            <SelectTrigger
+              variant="ghost"
+              aria-label="Framework"
+              className="mx-0 h-8 rounded-[8px] bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted sm:hidden"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start" sideOffset={6} className="min-w-44">
+              {frameworkItems.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <CopyButton label="Copy prompt" className="ms-auto max-sm:[&>span]:sr-only" />
         </TabBar>
         {children}
       </Tabs>

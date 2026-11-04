@@ -25,7 +25,7 @@ function CommandInput({
       <Icon aria-hidden className={cn("size-4 shrink-0 text-subtle", loading && "animate-spin")} />
       <CommandInputPrimitive
         className={cn(
-          "h-12 w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-subtle",
+          "h-12 w-full min-w-0 bg-transparent text-sm outline-none pointer-coarse:text-base placeholder:text-subtle",
           className,
         )}
         {...props}
