@@ -379,7 +379,9 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // the element hears the click either way, so the menu closes on route changes.
   function bindLink(el: HTMLElement, key: string) {
     return on(el, "click", (event) =>
-      linkPress(event, context.props<NavigationMenuLinkProps>("link", key)?.closeOnSelect),
+      afterDispatch(el, event, () =>
+        linkPress(event, context.props<NavigationMenuLinkProps>("link", key)?.closeOnSelect),
+      ),
     )
   }
 
@@ -653,6 +655,24 @@ function isShownInViewport(state: NavigationMenuStoreState, key: string) {
 function isShown(state: NavigationMenuStoreState, key: string) {
   if (state.viewport) return state.mounted && isShownInViewport(state, key)
   return key === state.value || state.contents.includes(key)
+}
+
+// Closing unmounts the panel, and a browser flushes microtasks between
+// listeners, so closing from the link's own listener would remove it before a
+// handler delegated higher up, like React's, hears the click.
+function afterDispatch(el: HTMLElement, event: Event, run: () => void) {
+  const view = el.ownerDocument.defaultView
+  if (!view) return run()
+  let done = false
+  const finish = () => {
+    if (done) return
+    done = true
+    view.removeEventListener(event.type, finish)
+    view.clearTimeout(timer)
+    run()
+  }
+  const timer = view.setTimeout(finish)
+  view.addEventListener(event.type, finish, { once: true })
 }
 
 export {
