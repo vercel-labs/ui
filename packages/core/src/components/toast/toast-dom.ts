@@ -94,8 +94,8 @@ function focusAfterClose<T>(toasts: readonly T[], closing: T, fallback: T | unde
 }
 
 /**
- * Whether a press landed on text, rather than around it. A mouse drag that
- * starts on text selects it, so it doesn't swipe.
+ * Whether a press landed on selectable text, rather than around it. A mouse
+ * drag that starts there selects the text, so it doesn't swipe.
  */
 function pressedText(event: PointerEvent) {
   const doc = (event.target as Node | null)?.ownerDocument
@@ -104,6 +104,13 @@ function pressedText(event: PointerEvent) {
   const caret = doc.caretPositionFromPoint?.(x, y)
   const node = caret ? caret.offsetNode : doc.caretRangeFromPoint?.(x, y)?.startContainer
   if (node?.nodeType !== Node.TEXT_NODE) return false
+  // `user-select: auto` takes its parent's, which Firefox doesn't compute.
+  for (let el = node.parentElement; el; el = el.parentElement) {
+    const { userSelect, webkitUserSelect } = getComputedStyle(el)
+    const value = userSelect || webkitUserSelect
+    if (value === "none") return false
+    if (value && value !== "auto") break
+  }
   const range = doc.createRange()
   range.selectNodeContents(node)
   return Array.from(range.getClientRects()).some(

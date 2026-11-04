@@ -494,7 +494,7 @@ function toastRegionApi(
     if (target?.closest("input, textarea, select, [contenteditable]:not([contenteditable='false'])")) return
     const { side, align } = store.get()
     const directions = swipeDirections(side, align, isRTL(el))
-    // A mouse drag that starts on text selects it.
+    // A mouse drag that starts on selectable text selects it.
     if (down.pointerType === "mouse" && pressedText(down)) return
     trackSwipe(drags, el, down, directions, {
       onStart: () => {

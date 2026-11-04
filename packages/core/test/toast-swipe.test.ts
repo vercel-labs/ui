@@ -17,17 +17,21 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-const touch = (type: string, y: number, pointerId = 1) =>
-  new PointerEvent(type, {
-    clientX: 0,
-    clientY: y,
-    pointerId,
-    pointerType: "touch",
-    isPrimary: pointerId === 1,
-    button: 0,
-    buttons: type === "pointerup" ? 0 : 1,
-    bubbles: true,
-  })
+const pointer =
+  (pointerType: string) =>
+  (type: string, y: number, pointerId = 1) =>
+    new PointerEvent(type, {
+      clientX: 0,
+      clientY: y,
+      pointerId,
+      pointerType,
+      isPrimary: pointerId === 1,
+      button: 0,
+      buttons: type === "pointerup" ? 0 : 1,
+      bubbles: true,
+    })
+const touch = pointer("touch")
+const mouse = pointer("mouse")
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 
@@ -70,4 +74,32 @@ test("a swipe cut short by its region going away lets go of the toast", async ()
   document.dispatchEvent(touch("pointermove", 80))
   await frame()
   expect(el.style.getPropertyValue("--toast-swipe-y")).not.toBe("80px")
+})
+
+// jsdom has no layout: every point lands on the toast's text.
+function pressOnText(text: Text) {
+  const range = document.createRange()
+  range.selectNodeContents(text)
+  document.caretRangeFromPoint = () => range
+  Range.prototype.getClientRects = () =>
+    [{ left: 0, right: 100, top: 0, bottom: 20 }] as unknown as DOMRectList
+  cleanups.push(() => {
+    delete (document as Partial<Document>).caretRangeFromPoint
+    delete (Range.prototype as Partial<Range>).getClientRects
+  })
+}
+
+test.each([
+  ["swipes a toast from text that can't be selected", "none", true],
+  ["leaves text that can be selected to select", "auto", false],
+])("a mouse drag %s", async (_, userSelect, swipes) => {
+  const { el } = mountToast()
+  el.style.userSelect = userSelect
+  const title = el.appendChild(document.createElement("span"))
+  pressOnText(title.appendChild(document.createTextNode("Saved")))
+  title.dispatchEvent(mouse("pointerdown", 0))
+  document.dispatchEvent(mouse("pointermove", 20))
+  document.dispatchEvent(mouse("pointermove", 30))
+  await frame()
+  expect(el.hasAttribute("data-swiping")).toBe(swipes)
 })
