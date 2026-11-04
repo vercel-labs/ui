@@ -91,7 +91,7 @@ A rejected file never joins the value. `@reject` receives each one with its `rea
 
 ## Limits
 
-Use `maxFiles` to limit the total count, and `minSize` or `maxSize` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full, and rejects the rest with `too-many-files`.
+Use `max-files` to limit the total count, and `min-size` or `max-size` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full, and rejects the rest with `too-many-files`.
 
 ```vue
 <FileInput multiple :max-files="3" :min-size="1" :max-size="5_000_000">
@@ -162,7 +162,7 @@ watchEffect((onCleanup) => {
 
 ## Attachments
 
-Put a textarea inside a drop zone to attach files to a message. `pasteTarget` takes file pastes from the textarea too; text pastes keep their normal behavior. It can also be another element, a CSS selector, or `"document"`.
+Put a textarea inside a drop zone to attach files to a message. `paste-target` takes file pastes from the textarea too; text pastes keep their normal behavior. It can also be another element, a CSS selector, or `"document"`.
 
 ```vue
 <script setup lang="ts">
@@ -266,7 +266,7 @@ The component announces accepted, removed, and rejected files through a polite l
 
 ## Forms
 
-With `name`, the component submits its files through a native file input, which can submit before hydration. A form reset returns to `defaultValue`. `form` connects the file input to a form elsewhere on the page. Rejected files never submit, and `disabled` leaves the value out of the submission as well as stopping picks, drops, and pastes.
+With `name`, the component submits its files through a native file input, which can submit before hydration. A form reset returns to `default-value`. `form` connects the file input to a form elsewhere on the page. Rejected files never submit, and `disabled` leaves the value out of the submission as well as stopping picks, drops, and pastes.
 
 ```vue
 <form method="post" enctype="multipart/form-data">

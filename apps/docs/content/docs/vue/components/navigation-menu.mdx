@@ -89,7 +89,7 @@ Render the router's link with the `render` slot. With Vue Router, use `RouterLin
   caption="Choose a link to update the current page without reloading the example."
 />
 
-Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `closeOnSelect` to false to keep it open on every press, see [Close on Select](#close-on-select).
+Routers call `preventDefault()` on a link's click to navigate without a page load. The menu listens on the link element itself, so it still closes after a client-side route change. A press with a modifier key or the middle button opens the link elsewhere and leaves the menu open. Set `close-on-select` to false to keep it open on every press, see [Close on Select](#close-on-select).
 
 ## Icons
 
@@ -256,7 +256,7 @@ Closed content stays in its item, with its own classes, and moves into the viewp
 
 ## Close on Select
 
-Pressing a link closes the menu by default, like after a route change. With `closeOnSelect` set to false on the menu, it stays open, and a link's own `closeOnSelect` wins over the menu's.
+Pressing a link closes the menu by default, like after a route change. With `close-on-select` set to false on the menu, it stays open, and a link's own `close-on-select` wins over the menu's.
 
 ```vue
 <NavigationMenu aria-label="Main" :close-on-select="false">

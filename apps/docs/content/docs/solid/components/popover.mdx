@@ -82,7 +82,7 @@ Set `dismissible` to false while there is unsaved work. Escape and outside press
 
 ## Placement
 
-`side` chooses an edge of the trigger, `bottom` by default, and `align` lines the popover up with its start, center, or end. Start and end follow text direction. The popover flips or shifts when the requested position doesn't fit, and `data-side` and `data-align` report where it landed. The [popup guide](../popups) covers the shared positioning options.
+`side` chooses an edge of the trigger, `bottom` by default, and `align` lines the popover up with its start, center, or end. Start and end follow text direction. The popover flips or shifts when the requested position doesn't fit, and `data-side` and `data-align` report where it landed. The [popup guide](../popups#place-the-content) covers the shared positioning options.
 
 <ComponentExample
   name="popover/placement"
@@ -133,7 +133,7 @@ Set `anchor` to position against something other than the trigger. It accepts an
 
 ## Focus
 
-Use `initialFocus` to choose the first focused element, or `"none"` to leave focus where it is. `finalFocus` controls where focus returns. Opening on hover leaves focus alone; opening with touch focuses the panel itself so no on-screen keyboard appears. See [popup focus](../popups) for the shared focus rules.
+Use `initialFocus` to choose the first focused element, or `"none"` to leave focus where it is. `finalFocus` controls where focus returns. Opening on hover leaves focus alone; opening with touch focuses the panel itself so no on-screen keyboard appears. See [popup focus](../popups#focus) for the shared focus rules.
 
 <ComponentExample
   name="popover/focus"
@@ -200,7 +200,7 @@ Style `data-presentation` for both layouts. The sheet manages its own position a
 
 ## Container
 
-Popovers render in place by default and use the browser's top layer. `container` moves their DOM to another element while keyboard order still follows the trigger. See [popups](../popups) for the shared container behavior.
+Popovers render in place by default and use the browser's top layer. `container` moves their DOM to another element while keyboard order still follows the trigger. See [popups](../popups#mounting-and-containers) for the shared container behavior.
 
 ```tsx
 const [container, setContainer] = createSignal<HTMLDivElement>()
