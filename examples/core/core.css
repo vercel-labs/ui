@@ -55,6 +55,10 @@
     width: 28rem;
     max-width: 100%;
 
+    & > [data-slot="tabs-root"] {
+      align-self: stretch;
+    }
+
     & > [data-slot="tabs-root"] + [data-slot="row"] {
       align-self: stretch;
       padding-top: var(--space-3);

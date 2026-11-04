@@ -552,7 +552,7 @@
 
   :is(
     [data-slot="input-root"],
-    [data-slot="field-control"]:not([type="checkbox"], [type="radio"]),
+    :where([data-slot="field-control"]:not([type="checkbox"], [type="radio"])),
     [data-slot="textarea-root"],
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],

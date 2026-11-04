@@ -1,9 +1,4 @@
 @scope ([data-example]) {
-  /* base.css gives every text control height: var(--size) through a selector that outranks its textarea rule. */
-  :scope [data-slot="textarea-root"] {
-    height: auto;
-  }
-
   [data-slot="textarea-root"] + [data-slot="field-description"] {
     font-variant-numeric: tabular-nums;
   }
