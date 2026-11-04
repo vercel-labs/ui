@@ -1,52 +1,56 @@
+"use client"
+
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
-  const [submitted, setSubmitted] = React.useState("")
+function Example() {
+  const log = useLog()
 
   return (
     <div data-slot="stack">
       <form
-        id="verify"
-        data-slot="stack"
+        id="verify-sign-in"
         onSubmit={(event) => {
           event.preventDefault()
           const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(data.join(", "))
+          log(`Submitted ${data.join(", ")}`)
         }}
-        onReset={() => setSubmitted("")}
       >
         <Field>
           <FieldLabel>Verification code</FieldLabel>
-          <OTPInput name="code" required autoComplete="one-time-code">
+          <OTPInput name="code" required>
             <OTPInputGroup>
               {[0, 1, 2, 3, 4, 5].map((index) => (
                 <OTPInputSlot key={index} index={index} />
               ))}
             </OTPInputGroup>
           </OTPInput>
-          <FieldDescription>Enter the six-digit code from your message.</FieldDescription>
-          <div>
-            <FieldError />
-          </div>
+          <FieldDescription>Enter the six-digit code we sent to hollis@example.com.</FieldDescription>
+          <FieldError />
         </Field>
-        <div data-slot="row">
-          <button type="submit">Verify</button>
-          <button type="reset">Reset</button>
-        </div>
       </form>
       <Field>
         <FieldLabel>Recovery code (optional)</FieldLabel>
-        <OTPInput name="recovery" form="verify" maxLength={8} pattern="alphanumeric">
+        <OTPInput name="recovery" form="verify-sign-in" maxLength={8} pattern="alphanumeric">
           <OTPInputGroup>
             {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
               <OTPInputSlot key={index} index={index} />
             ))}
           </OTPInputGroup>
         </OTPInput>
+        <FieldError />
       </Field>
-      <output data-slot="output">{submitted ? `Submitted: ${submitted}` : ""}</output>
+      <div data-slot="row">
+        <button type="reset" form="verify-sign-in">
+          Reset
+        </button>
+        <button type="submit" form="verify-sign-in" data-variant="solid">
+          Verify
+        </button>
+      </div>
     </div>
   )
 }
+
+export { Example }

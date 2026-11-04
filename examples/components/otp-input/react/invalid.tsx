@@ -1,21 +1,25 @@
-import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
+"use client"
 
-export function Example() {
+import { Field, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
+import * as React from "react"
+
+function Example() {
+  const [invalid, setInvalid] = React.useState(true)
+
   return (
-    <div data-slot="stack">
-      <OTPInput
-        defaultValue="000000"
-        aria-label="Verification code"
-        aria-invalid
-        aria-describedby="otp-error"
-      >
+    <Field invalid={invalid}>
+      <FieldLabel>Verification code</FieldLabel>
+      <OTPInput defaultValue="482913" onValueChange={() => setInvalid(false)}>
         <OTPInputGroup>
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <OTPInputSlot key={index} index={index} />
           ))}
         </OTPInputGroup>
       </OTPInput>
-      <p id="otp-error">That code didn't work. Check it and try again.</p>
-    </div>
+      <FieldError>That code has expired. Request a new one.</FieldError>
+    </Field>
   )
 }
+
+export { Example }

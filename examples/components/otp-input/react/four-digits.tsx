@@ -1,13 +1,21 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
 
-export function Example() {
+function Example() {
   return (
-    <OTPInput maxLength={4} textAlign="center" aria-label="PIN">
-      <OTPInputGroup>
-        {[0, 1, 2, 3].map((index) => (
-          <OTPInputSlot key={index} index={index} />
-        ))}
-      </OTPInputGroup>
-    </OTPInput>
+    <Field>
+      <FieldLabel>PIN</FieldLabel>
+      <OTPInput maxLength={4} textAlign="center">
+        <OTPInputGroup>
+          {[0, 1, 2, 3].map((index) => (
+            <OTPInputSlot key={index} index={index} />
+          ))}
+        </OTPInputGroup>
+      </OTPInput>
+    </Field>
   )
 }
+
+export { Example }

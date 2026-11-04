@@ -1,7 +1,9 @@
+"use client"
+
 import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/react/otp-input"
 import { MinusIcon } from "lucide-react"
 
-export function Example() {
+function Example() {
   return (
     <OTPInput maxLength={6} aria-label="Verification code">
       <OTPInputGroup>
@@ -9,14 +11,14 @@ export function Example() {
         <OTPInputSlot index={1} />
       </OTPInputGroup>
       <OTPInputSeparator>
-        <MinusIcon />
+        <MinusIcon aria-hidden="true" />
       </OTPInputSeparator>
       <OTPInputGroup>
         <OTPInputSlot index={2} />
         <OTPInputSlot index={3} />
       </OTPInputGroup>
       <OTPInputSeparator>
-        <MinusIcon />
+        <MinusIcon aria-hidden="true" />
       </OTPInputSeparator>
       <OTPInputGroup>
         <OTPInputSlot index={4} />
@@ -25,3 +27,5 @@ export function Example() {
     </OTPInput>
   )
 }
+
+export { Example }

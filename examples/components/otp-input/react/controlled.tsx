@@ -1,22 +1,32 @@
+"use client"
+
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const [value, setValue] = React.useState("")
 
   return (
-    <div data-slot="stack">
-      <label htmlFor="one-time-password" data-slot="label">
-        One-time password
-      </label>
-      <OTPInput id="one-time-password" value={value} onValueChange={setValue}>
+    <Field>
+      <FieldLabel>One-time password</FieldLabel>
+      <OTPInput
+        value={value}
+        onValueChange={(value, details) => {
+          setValue(value)
+          log(`${value || "Empty"} (${details.reason})`)
+        }}
+      >
         <OTPInputGroup>
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <OTPInputSlot key={index} index={index} />
           ))}
         </OTPInputGroup>
       </OTPInput>
-      <p data-slot="output">{value ? `You entered: ${value}` : "Enter your one-time password."}</p>
-    </div>
+    </Field>
   )
 }
+
+export { Example }
