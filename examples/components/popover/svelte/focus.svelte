@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Popover,
     PopoverClose,
@@ -11,31 +12,36 @@
 
 <div data-slot="row">
   <Popover>
-    <PopoverTrigger>First field</PopoverTrigger>
+    <PopoverTrigger>Rename</PopoverTrigger>
     <PopoverContent>
-      <PopoverTitle>Rename</PopoverTitle>
-      <label data-slot="label">
-        Name
-        <input value="Quarterly report" />
-      </label>
-    </PopoverContent>
-  </Popover>
-  <Popover>
-    <PopoverTrigger>Specific element</PopoverTrigger>
-    <PopoverContent initialFocus="[data-confirm]">
-      <PopoverTitle>Apply changes?</PopoverTitle>
-      <PopoverDescription>Focus starts on Apply, not Cancel.</PopoverDescription>
+      <PopoverTitle>Rename file</PopoverTitle>
+      <PopoverDescription>Focus starts in the first field.</PopoverDescription>
+      <Field>
+        <FieldLabel>Name</FieldLabel>
+        <FieldControl defaultValue="Q3 roadmap.pdf" />
+      </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>
-        <PopoverClose data-confirm="" data-variant="solid">Apply</PopoverClose>
+        <PopoverClose data-variant="solid">Save</PopoverClose>
       </div>
     </PopoverContent>
   </Popover>
   <Popover>
-    <PopoverTrigger>No focus change</PopoverTrigger>
+    <PopoverTrigger>Publish</PopoverTrigger>
+    <PopoverContent initialFocus="[data-autofocus]">
+      <PopoverTitle>Publish changes?</PopoverTitle>
+      <PopoverDescription>Focus starts on Publish, not Cancel.</PopoverDescription>
+      <div data-slot="row">
+        <PopoverClose>Cancel</PopoverClose>
+        <PopoverClose data-autofocus="" data-variant="solid">Publish</PopoverClose>
+      </div>
+    </PopoverContent>
+  </Popover>
+  <Popover>
+    <PopoverTrigger>Status</PopoverTrigger>
     <PopoverContent initialFocus="none" finalFocus="none">
-      <PopoverTitle>Status</PopoverTitle>
-      <PopoverDescription>All systems are running.</PopoverDescription>
+      <PopoverTitle>All systems normal</PopoverTitle>
+      <PopoverDescription>Focus stays on the trigger.</PopoverDescription>
     </PopoverContent>
   </Popover>
 </div>

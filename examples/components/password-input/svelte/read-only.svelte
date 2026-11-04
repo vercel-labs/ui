@@ -8,7 +8,7 @@
   <FieldLabel>Recovery key</FieldLabel>
   <PasswordInput readOnly defaultValue="7Hq2-vX9p-Lm4c" autoComplete="off">
     <PasswordInputControl />
-    <PasswordInputToggle aria-label="Show password">
+    <PasswordInputToggle aria-label="Show recovery key">
       {#snippet children(state)}
         {#if state.visible}
           <EyeOffIcon aria-hidden="true" />
@@ -18,7 +18,5 @@
       {/snippet}
     </PasswordInputToggle>
   </PasswordInput>
-  <FieldDescription>
-    Keep it somewhere safe. You can show it, but not change it.
-  </FieldDescription>
+  <FieldDescription>Keep it somewhere safe. You can show it, but not change it.</FieldDescription>
 </Field>

@@ -1,37 +1,41 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/vue/popover"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const open = ref(false)
-const name = ref("Ada Lovelace")
-const saved = ref("")
 
-function save() {
-  saved.value = name.value
+function onSubmit(event: Event) {
+  log(`Saved ${new FormData(event.currentTarget as HTMLFormElement).get("name")}`)
   open.value = false
 }
 </script>
 
 <template>
   <Popover v-model:open="open">
-    <PopoverTrigger>Edit profile</PopoverTrigger>
+    <PopoverTrigger>Edit Profile</PopoverTrigger>
     <PopoverContent>
-      <PopoverTitle>Profile</PopoverTitle>
-      <PopoverDescription>Your name appears on your posts.</PopoverDescription>
-      <form data-slot="stack" @submit.prevent="save">
-        <label data-slot="label">
-          Name
-          <input v-model="name" />
-        </label>
-        <button type="submit" data-variant="solid">Save</button>
+      <PopoverTitle>Edit profile</PopoverTitle>
+      <PopoverDescription>Your name shows on your posts.</PopoverDescription>
+      <form data-slot="stack" @submit.prevent="onSubmit">
+        <Field>
+          <FieldLabel>Name</FieldLabel>
+          <FieldControl name="name" required default-value="Hollis Grant" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <button type="submit" data-variant="solid">Save</button>
+        </div>
       </form>
     </PopoverContent>
   </Popover>
-  <output data-slot="output">{{ saved ? `Saved ${saved}` : "Not saved yet" }}</output>
 </template>

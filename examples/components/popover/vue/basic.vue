@@ -1,31 +1,28 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/vue/popover"
-
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
 </script>
 
 <template>
   <Popover>
-    <PopoverTrigger>Open popover</PopoverTrigger>
+    <PopoverTrigger>Share</PopoverTrigger>
     <PopoverContent>
-      <PopoverTitle>Dimensions</PopoverTitle>
-      <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-      <div data-slot="stack">
-        <label v-for="dimension in dimensions" :key="dimension.label" data-slot="label">
-          {{ dimension.label }}
-          <input :value="dimension.value" />
-        </label>
+      <PopoverTitle>Share this document</PopoverTitle>
+      <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
+      <Field>
+        <FieldLabel>Link</FieldLabel>
+        <FieldControl readonly default-value="acme.app/d/q3-roadmap" />
+      </Field>
+      <div data-slot="row">
+        <PopoverClose>Cancel</PopoverClose>
+        <PopoverClose data-variant="solid">Copy Link</PopoverClose>
       </div>
     </PopoverContent>
   </Popover>

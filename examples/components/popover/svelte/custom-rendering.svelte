@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { BellIcon } from "@lucide/svelte"
   import {
     Popover,
     PopoverClose,
@@ -15,8 +14,7 @@
   <PopoverTrigger shortcut="mod+u">
     {#snippet render({ props, state })}
       <button {...props}>
-        <BellIcon />
-        {state.open ? "Hide updates" : "Show updates"}
+        {state.open ? "Hide Updates" : "Show Updates"}
         <PopoverShortcut>
           {#snippet children(shortcut)}{shortcut.text}{/snippet}
         </PopoverShortcut>
@@ -29,10 +27,10 @@
         <h3 {...props}>Updates</h3>
       {/snippet}
     </PopoverTitle>
-    <PopoverDescription>Version 2.0 is out.</PopoverDescription>
-    <PopoverClose href="https://example.com/changelog">
+    <PopoverDescription>Version 2.4 adds threaded comments.</PopoverDescription>
+    <PopoverClose href="#">
       {#snippet render({ props })}
-        <a {...props}>Read the changelog</a>
+        <a {...props}>Read the Changelog</a>
       {/snippet}
     </PopoverClose>
   </PopoverContent>

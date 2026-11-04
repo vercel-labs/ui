@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { BellIcon } from "@lucide/vue"
 import {
   Popover,
   PopoverClose,
@@ -16,8 +15,7 @@ import {
     <PopoverTrigger shortcut="mod+u">
       <template #render="{ props, state }">
         <button v-bind="props">
-          <BellIcon />
-          {{ state.open ? "Hide updates" : "Show updates" }}
+          {{ state.open ? "Hide Updates" : "Show Updates" }}
           <PopoverShortcut v-slot="{ state: shortcut }">{{ shortcut.text }}</PopoverShortcut>
         </button>
       </template>
@@ -28,10 +26,10 @@ import {
           <h3 v-bind="props">Updates</h3>
         </template>
       </PopoverTitle>
-      <PopoverDescription>Version 2.0 is out.</PopoverDescription>
-      <PopoverClose href="https://example.com/changelog">
+      <PopoverDescription>Version 2.4 adds threaded comments.</PopoverDescription>
+      <PopoverClose>
         <template #render="{ props }">
-          <a v-bind="props">Read the changelog</a>
+          <a v-bind="props" href="#">Read the Changelog</a>
         </template>
       </PopoverClose>
     </PopoverContent>

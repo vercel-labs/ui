@@ -1,39 +1,31 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverShortcut,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/solid/popover"
-import { For } from "solid-js"
-
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
 
 function Example() {
   return (
     <Popover>
       <PopoverTrigger shortcut="mod+i">
-        Dimensions
+        Invite
         <PopoverShortcut />
       </PopoverTrigger>
       <PopoverContent>
-        <PopoverTitle>Dimensions</PopoverTitle>
-        <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-        <div data-slot="stack">
-          <For each={dimensions}>
-            {(dimension) => (
-              <label data-slot="label">
-                {dimension.label}
-                <input value={dimension.value} />
-              </label>
-            )}
-          </For>
+        <PopoverTitle>Invite people</PopoverTitle>
+        <PopoverDescription>They'll get an email with a link to join.</PopoverDescription>
+        <Field>
+          <FieldLabel>Email</FieldLabel>
+          <FieldControl type="email" placeholder="wren@example.com" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <PopoverClose data-variant="solid">Send Invite</PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

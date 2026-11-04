@@ -1,22 +1,26 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/vue/radio"
 
-const options = [
-  { value: "default", label: "افتراضي" },
-  { value: "comfortable", label: "مريح" },
-  { value: "compact", label: "مضغوط" },
+const speeds = [
+  { value: "standard", label: "عادي" },
+  { value: "express", label: "سريع" },
+  { value: "overnight", label: "خلال ليلة" },
 ]
 </script>
 
 <template>
   <div dir="rtl">
-    <RadioGroup default-value="comfortable" aria-label="الكثافة">
-      <label data-slot="label" v-for="option in options" :key="option.value">
-        <Radio :value="option.value">
-          <RadioIndicator />
-        </Radio>
-        {{ option.label }}
-      </label>
-    </RadioGroup>
+    <Field>
+      <FieldLabel>سرعة الشحن</FieldLabel>
+      <RadioGroup default-value="express">
+        <label v-for="speed in speeds" :key="speed.value" data-slot="label">
+          <Radio :value="speed.value">
+            <RadioIndicator />
+          </Radio>
+          {{ speed.label }}
+        </label>
+      </RadioGroup>
+    </Field>
   </div>
 </template>

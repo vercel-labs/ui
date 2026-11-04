@@ -16,7 +16,7 @@
 </script>
 
 <Field name="new-password">
-  <FieldLabel >Create a password</FieldLabel>
+  <FieldLabel>Create a password</FieldLabel>
   <PasswordInput
     value={password}
     autoComplete="new-password"

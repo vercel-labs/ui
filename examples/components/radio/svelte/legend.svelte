@@ -1,34 +1,27 @@
 <script lang="ts">
+  import { FieldDescription, FieldLegend, FieldSet } from "@ui-sdk/svelte/field"
   import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
 
-  const plans = [
-    { value: "monthly", label: "Monthly", price: "$9.99/month" },
-    { value: "yearly", label: "Yearly", price: "$99.99/year" },
-    { value: "lifetime", label: "Lifetime", price: "$299.99" },
+  const periods = [
+    { value: "monthly", label: "Monthly", price: "$12 per month" },
+    { value: "yearly", label: "Yearly", price: "$120 per year" },
   ]
 
   const id = $props.id()
 </script>
 
-<fieldset data-slot="stack">
-  <legend
-    id={`${id}-subscription-legend`}
-  >Subscription plan</legend>
-  <p data-slot="hint" id={`${id}-subscription-hint`}>
-    Yearly and lifetime plans offer significant savings.
-  </p>
-  <RadioGroup
-    defaultValue="monthly"
-    aria-labelledby={`${id}-subscription-legend`}
-    aria-describedby={`${id}-subscription-hint`}
-  >
-    {#each plans as plan (plan.value)}
+<FieldSet>
+  <FieldLegend id={`${id}-legend`}>Billing period</FieldLegend>
+  <FieldDescription id={`${id}-description`}>Yearly billing gets you two months free.</FieldDescription>
+  <RadioGroup defaultValue="monthly" aria-labelledby={`${id}-legend`} aria-describedby={`${id}-description`}>
+    {#each periods as period (period.value)}
       <label data-slot="label">
-        <Radio value={plan.value}>
+        <Radio value={period.value}>
           <RadioIndicator />
         </Radio>
-        {plan.label} <span data-slot="hint">{plan.price}</span>
+        {period.label}
+        <span data-slot="hint">({period.price})</span>
       </label>
     {/each}
   </RadioGroup>
-</fieldset>
+</FieldSet>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
   import {
     Popover,
     PopoverContent,
@@ -6,46 +7,66 @@
     PopoverTitle,
     PopoverTrigger,
   } from "@ui-sdk/svelte/popover"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectItemIndicator,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
 
   const choices = {
-    sideOffset: [0, 8, 24],
-    alignOffset: [-16, 0, 16],
-    collisionPadding: [8, 48],
+    sideOffset: { label: "Side offset", values: ["4", "8", "16", "24"] },
+    alignOffset: { label: "Align offset", values: ["-16", "0", "16"] },
+    collisionPadding: { label: "Collision padding", values: ["8", "24", "48"] },
   }
-  const names = Object.keys(choices) as (keyof typeof choices)[]
-  let offsets = $state({ sideOffset: 8, alignOffset: 0, collisionPadding: 8 })
+  type Name = keyof typeof choices
+
+  let offsets = $state<Record<Name, string>>({
+    sideOffset: "8",
+    alignOffset: "0",
+    collisionPadding: "8",
+  })
 </script>
 
 <div data-slot="stack">
-  <div data-slot="stack">
-    {#each names as name (name)}
-      <div data-slot="row" role="group" aria-label={name}>
-        {#each choices[name] as value (value)}
-          <button
-            type="button"
-            data-size="sm"
-            aria-pressed={offsets[name] === value}
-            onclick={() => (offsets[name] = value)}
-          >
-            {name} {value}
-          </button>
-        {/each}
-      </div>
+  <div data-slot="controls">
+    {#each Object.keys(choices) as Name[] as name (name)}
+      <Select
+        items={choices[name].values}
+        value={offsets[name]}
+        onValueChange={(next) => next && (offsets[name] = next)}
+      >
+        <SelectLabel>{choices[name].label}</SelectLabel>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon aria-hidden="true" />
+        </SelectTrigger>
+        <SelectContent>
+          {#each choices[name].values as value (value)}
+            <SelectItem {value}>
+              {value}px
+              <SelectItemIndicator>
+                <CheckIcon aria-hidden="true" />
+              </SelectItemIndicator>
+            </SelectItem>
+          {/each}
+        </SelectContent>
+      </Select>
     {/each}
   </div>
   <Popover>
-    <PopoverTrigger>Offsets</PopoverTrigger>
+    <PopoverTrigger>Delivery</PopoverTrigger>
     <PopoverContent
       align="start"
-      sideOffset={offsets.sideOffset}
-      alignOffset={offsets.alignOffset}
-      collisionPadding={offsets.collisionPadding}
+      sideOffset={Number(offsets.sideOffset)}
+      alignOffset={Number(offsets.alignOffset)}
+      collisionPadding={Number(offsets.collisionPadding)}
     >
-      <PopoverTitle>Offsets</PopoverTitle>
-      <PopoverDescription>
-        {offsets.sideOffset}px from the trigger, shifted {offsets.alignOffset}px,
-        {offsets.collisionPadding}px from the edges.
-      </PopoverDescription>
+      <PopoverTitle>Delivery window</PopoverTitle>
+      <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
     </PopoverContent>
   </Popover>
 </div>

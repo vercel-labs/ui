@@ -1,69 +1,76 @@
 import "@ui-sdk/web/popover"
+import "@ui-sdk/web/select"
+import { Check, ChevronDown, createElement } from "lucide"
 
-const sides = ["top", "right", "bottom", "left"]
-const aligns = ["start", "center", "end"]
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+]
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
+
+const check = createElement(Check, { "aria-hidden": "true" }).outerHTML
+const chevron = createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML
+
+function select(
+  attribute: string,
+  label: string,
+  value: string,
+  options: { value: string; label: string }[],
+) {
+  return `
+    <ui-select data-attribute="${attribute}" default-value="${value}">
+      <ui-select-label>${label}</ui-select-label>
+      <ui-select-trigger>
+        <button>
+          <ui-select-value></ui-select-value>
+          ${chevron}
+        </button>
+      </ui-select-trigger>
+      <ui-select-content hidden>
+        ${options
+          .map(
+            (option) => `
+              <ui-select-item value="${option.value}">
+                ${option.label}
+                <ui-select-item-indicator>${check}</ui-select-item-indicator>
+              </ui-select-item>
+            `,
+          )
+          .join("")}
+      </ui-select-content>
+    </ui-select>
+  `
+}
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
-      <div data-slot="stack">
-        <div data-slot="row" role="group" aria-label="Side" data-attribute="side">
-          ${sides
-            .map(
-              (value) =>
-                `<button type="button" data-size="sm" value="${value}" aria-pressed="${value === "bottom"}">${value}</button>`,
-            )
-            .join("")}
-        </div>
-        <div data-slot="row" role="group" aria-label="Align" data-attribute="align">
-          ${aligns
-            .map(
-              (value) =>
-                `<button type="button" data-size="sm" value="${value}" aria-pressed="${value === "center"}">${value}</button>`,
-            )
-            .join("")}
-        </div>
+      <div data-slot="controls">
+        ${select("side", "Side", "bottom", sides)}
+        ${select("align", "Align", "center", aligns)}
       </div>
-      <div data-slot="stack">
-<label data-slot="label">
-  Side offset<span data-slot="hint">8px</span>
-  <input type="range" data-setting="side-offset" min="0" max="32" value="8" />
-</label>
-<label data-slot="label">
-  Align offset<span data-slot="hint">0px</span>
-  <input type="range" data-setting="align-offset" min="-24" max="24" value="0" />
-</label>
-<label data-slot="label">
-  Collision padding<span data-slot="hint">8px</span>
-  <input type="range" data-setting="collision-padding" min="0" max="48" value="8" />
-</label>
-</div>
-<ui-popover>
-        <ui-popover-trigger><button>Placement</button></ui-popover-trigger>
-        <ui-popover-content side="bottom" align="center" side-offset="8" align-offset="0" collision-padding="8">
-          <ui-popover-arrow></ui-popover-arrow>
-          <ui-popover-title>bottom center</ui-popover-title>
-          <ui-popover-description>Choose a side, alignment, and offsets above.</ui-popover-description>
+      <ui-popover>
+        <ui-popover-trigger>
+          <button>Delivery</button>
+        </ui-popover-trigger>
+        <ui-popover-content side="bottom" align="center" side-offset="8">
+          <ui-popover-title>Delivery window</ui-popover-title>
+          <ui-popover-description>Arrives Tuesday between 9 AM and noon.</ui-popover-description>
         </ui-popover-content>
       </ui-popover>
     </div>
   `
   const content = root.querySelector("ui-popover-content")!
-  for (const input of root.querySelectorAll<HTMLInputElement>("input[data-setting]")) {
-    input.addEventListener("input", () => {
-      content.setAttribute(input.dataset.setting!, input.value)
-      input.closest("label")!.querySelector("span")!.textContent = `${input.value}px`
-    })
-  }
-  for (const group of root.querySelectorAll<HTMLElement>("[data-attribute]"))
-    group.addEventListener("click", (event) => {
-      const button = (event.target as HTMLElement).closest("button")
-      if (!button) return
-      content.setAttribute(group.dataset.attribute!, button.value)
-      for (const other of group.querySelectorAll("button"))
-        other.setAttribute("aria-pressed", String(other === button))
-      root.querySelector("ui-popover-title")!.textContent =
-        `${content.getAttribute("side")} ${content.getAttribute("align")}`
+  for (const control of root.querySelectorAll("ui-select"))
+    control.addEventListener("valuechange", (event) => {
+      const value = event.detail.value
+      if (typeof value === "string") content.setAttribute(control.dataset.attribute!, value)
     })
 }
 

@@ -2,7 +2,7 @@ import "@ui-sdk/web/password-input"
 import "@ui-sdk/web/field"
 import { createElement, Eye, EyeOff } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>Password</ui-field-label>
@@ -19,3 +19,5 @@ export function mount(root: HTMLElement) {
     </ui-field>
   `
 }
+
+export { mount }

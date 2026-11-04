@@ -1,26 +1,30 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { For } from "solid-js"
 
-const options = [
-  { value: "default", label: "Default" },
-  { value: "comfortable", label: "Comfortable" },
-  { value: "compact", label: "Compact" },
+const speeds = [
+  { value: "standard", label: "Standard" },
+  { value: "express", label: "Express" },
+  { value: "overnight", label: "Overnight" },
 ]
 
 function Example() {
   return (
-    <RadioGroup defaultValue="comfortable" aria-label="Density">
-      <For each={options}>
-        {(option) => (
-          <label data-slot="label">
-            <Radio value={option.value}>
-              <RadioIndicator />
-            </Radio>
-            {option.label}
-          </label>
-        )}
-      </For>
-    </RadioGroup>
+    <Field>
+      <FieldLabel>Shipping speed</FieldLabel>
+      <RadioGroup defaultValue="standard">
+        <For each={speeds}>
+          {(speed) => (
+            <label data-slot="label">
+              <Radio value={speed.value}>
+                <RadioIndicator />
+              </Radio>
+              {speed.label}
+            </label>
+          )}
+        </For>
+      </RadioGroup>
+    </Field>
   )
 }
 

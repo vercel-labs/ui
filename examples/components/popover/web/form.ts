@@ -1,29 +1,36 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/popover"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-popover>
-      <ui-popover-trigger><button>Edit profile</button></ui-popover-trigger>
+      <ui-popover-trigger>
+        <button>Edit Profile</button>
+      </ui-popover-trigger>
       <ui-popover-content>
-        <ui-popover-title>Profile</ui-popover-title>
-        <ui-popover-description>Your name appears on your posts.</ui-popover-description>
+        <ui-popover-title>Edit profile</ui-popover-title>
+        <ui-popover-description>Your name shows on your posts.</ui-popover-description>
         <form data-slot="stack">
-          <label data-slot="label">
-            Name
-            <input name="name" value="Ada Lovelace" />
-          </label>
-          <button type="submit" data-variant="solid">Save</button>
+          <ui-field>
+            <ui-field-label>Name</ui-field-label>
+            <input name="name" required value="Hollis Grant" />
+          </ui-field>
+          <div data-slot="row">
+            <ui-popover-close>
+              <button type="button">Cancel</button>
+            </ui-popover-close>
+            <button type="submit" data-variant="solid">Save</button>
+          </div>
         </form>
       </ui-popover-content>
     </ui-popover>
-    <output data-slot="output">Not saved yet</output>
   `
   const popover = root.querySelector("ui-popover")!
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
-    const name = new FormData(event.target as HTMLFormElement).get("name")
-    root.querySelector("output")!.textContent = `Saved ${name}`
-    popover.api.close()
+    log(root, `Saved ${new FormData(event.target as HTMLFormElement).get("name")}`)
+    popover.open = false
   })
 }
 

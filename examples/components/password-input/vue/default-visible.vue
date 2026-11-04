@@ -10,10 +10,10 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
     <PasswordInput default-visible default-value="maple-orbit-42" auto-complete="new-password">
       <PasswordInputControl />
       <PasswordInputToggle v-slot="{ state }" aria-label="Show password">
-        <EyeOffIcon aria-hidden="true" v-if="state.visible" />
-        <EyeIcon aria-hidden="true" v-else />
+        <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+        <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
-    <FieldDescription> Guests read it from here, so it starts shown. </FieldDescription>
+    <FieldDescription>Guests read it from here, so it starts shown.</FieldDescription>
   </Field>
 </template>

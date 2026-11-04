@@ -5,13 +5,41 @@ import {
   PasswordInputControl,
   PasswordInputToggle,
 } from "@ui-sdk/solid/password-input"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
+function Example() {
+  const log = useLog()
   const password = createPasswordInputController()
-  const [reading, setReading] = createSignal("")
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <button
+          type="button"
+          onClick={() => {
+            password.setValue("plum-kettle-orbit-42")
+            password.setVisible(true)
+          }}
+        >
+          Suggest
+        </button>
+        <button type="button" onClick={() => password.toggleVisible()}>
+          Toggle
+        </button>
+        <button type="button" onClick={() => password.clear()}>
+          Clear
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            log(`${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`)
+          }
+        >
+          Read
+        </button>
+        <button type="button" onClick={() => password.focus()}>
+          Focus
+        </button>
+      </div>
       <Field name="new-password">
         <FieldLabel>New password</FieldLabel>
         <PasswordInput controller={password} autoComplete="new-password">
@@ -51,37 +79,8 @@ export function Example() {
           </PasswordInputToggle>
         </PasswordInput>
       </Field>
-      <div data-slot="row">
-        <button
-          type="button"
-          onClick={() => {
-            password.setValue("plum-kettle-orbit-42")
-            password.setVisible(true)
-          }}
-        >
-          Suggest
-        </button>
-        <button type="button" onClick={() => password.toggleVisible()}>
-          Toggle
-        </button>
-        <button type="button" onClick={() => password.clear()}>
-          Clear
-        </button>
-        <button
-          type="button"
-          onClick={() =>
-            setReading(
-              `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}.`,
-            )
-          }
-        >
-          Read
-        </button>
-        <button type="button" onClick={() => password.focus()}>
-          Focus
-        </button>
-      </div>
-      <output data-slot="output">{reading()}</output>
     </div>
   )
 }
+
+export { Example }

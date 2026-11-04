@@ -1,10 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Input } from "@ui-sdk/solid/input"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
-import { createSignal } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-export function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+function Example() {
+  const log = useLog()
   return (
     <div data-slot="stack">
       <form
@@ -14,9 +14,8 @@ export function Example() {
           event.preventDefault()
           const data = new FormData(event.currentTarget)
           const length = String(data.get("password")).length
-          setSubmitted(`Signed in as ${data.get("email")}, with a password of ${length} characters.`)
+          log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
         }}
-        onReset={() => setSubmitted("")}
       >
         <Field name="email">
           <FieldLabel>Email</FieldLabel>
@@ -63,14 +62,15 @@ export function Example() {
         </PasswordInput>
       </Field>
       <div data-slot="row">
-        <button type="submit" form="sign-in">
-          Sign in
+        <button type="submit" form="sign-in" data-variant="solid">
+          Sign In
         </button>
         <button type="reset" form="sign-in">
           Reset
         </button>
       </div>
-      <output data-slot="output">{submitted()}</output>
     </div>
   )
 }
+
+export { Example }

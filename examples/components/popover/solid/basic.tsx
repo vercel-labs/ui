@@ -1,35 +1,27 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/solid/popover"
-import { For } from "solid-js"
-
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
 
 function Example() {
   return (
     <Popover>
-      <PopoverTrigger>Open popover</PopoverTrigger>
+      <PopoverTrigger>Share</PopoverTrigger>
       <PopoverContent>
-        <PopoverTitle>Dimensions</PopoverTitle>
-        <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-        <div data-slot="stack">
-          <For each={dimensions}>
-            {(dimension) => (
-              <label data-slot="label">
-                {dimension.label}
-                <input value={dimension.value} />
-              </label>
-            )}
-          </For>
+        <PopoverTitle>Share this document</PopoverTitle>
+        <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
+        <Field>
+          <FieldLabel>Link</FieldLabel>
+          <FieldControl readonly defaultValue="acme.app/d/q3-roadmap" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <PopoverClose data-variant="solid">Copy Link</PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

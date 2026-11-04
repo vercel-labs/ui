@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { CheckIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
-  createPopoverController,
   Popover,
   PopoverClose,
   PopoverContent,
@@ -9,32 +11,42 @@ import {
   PopoverTrigger,
 } from "@ui-sdk/vue/popover"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const popover = createPopoverController()
+const log = useLog()
 const open = ref(false)
-const reason = ref("")
+
+function onOpenChange(next: boolean, details: { reason: string }) {
+  log(`${next ? "Opened" : "Closed"} (${details.reason})`)
+}
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
-      <Popover
-        v-model:open="open"
-        :controller="popover"
-        @open-change="(_: boolean, details: { reason: string }) => (reason = details.reason)"
-      >
-        <PopoverTrigger>Share</PopoverTrigger>
-        <PopoverContent>
-          <PopoverTitle>Share this file</PopoverTitle>
-          <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
-          <PopoverClose>Done</PopoverClose>
-        </PopoverContent>
-      </Popover>
-      <button type="button" data-variant="ghost" @click="popover.open()">Open from elsewhere</button>
+    <div data-slot="controls">
+      <label data-slot="label">
+        <Checkbox :checked="open" @checked-change="(next) => (open = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon aria-hidden="true" />
+          </CheckboxIndicator>
+        </Checkbox>
+        Open
+      </label>
     </div>
-
-    <output data-slot="output"
-      >{{ open ? "Open" : "Closed" }}{{ reason && `, last change: ${reason}` }}</output
-    >
+    <Popover v-model:open="open" @open-change="onOpenChange">
+      <PopoverTrigger>Set Status</PopoverTrigger>
+      <PopoverContent>
+        <PopoverTitle>Set a status</PopoverTitle>
+        <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
+        <Field>
+          <FieldLabel>Status</FieldLabel>
+          <FieldControl default-value="In a meeting" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <PopoverClose data-variant="solid">Save</PopoverClose>
+        </div>
+      </PopoverContent>
+    </Popover>
   </div>
 </template>

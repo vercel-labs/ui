@@ -9,10 +9,10 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
     <FieldLabel>Password</FieldLabel>
     <PasswordInput v-slot="{ state }">
       <PasswordInputControl />
-      <span><LockIcon aria-hidden="true" v-if="state.capsLock" /></span>
+      <span><LockIcon v-if="state.capsLock" aria-hidden="true" /></span>
       <PasswordInputToggle v-slot="{ state: toggle }" aria-label="Show password">
-        <EyeOffIcon aria-hidden="true" v-if="toggle.visible" />
-        <EyeIcon aria-hidden="true" v-else />
+        <EyeOffIcon v-if="toggle.visible" aria-hidden="true" />
+        <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
     <p data-slot="caps-lock">Caps Lock is on.</p>

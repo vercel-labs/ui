@@ -3,18 +3,22 @@
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Input } from "@ui-sdk/svelte/input"
   import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/svelte/password-input"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let submitted = $state("")
-
-  function onSubmit(event: Event) {
-    const data = new FormData(event.currentTarget as HTMLFormElement)
-    const length = String(data.get("password")).length
-    submitted = `Signed in as ${data.get("email")}, with a password of ${length} characters.`
-  }
+  const log = useLog()
 </script>
 
 <div data-slot="stack">
-  <form data-slot="stack" id="sign-in" onsubmit={(event) => { event.preventDefault(); onSubmit(event) }} onreset={() => (submitted = '')}>
+  <form
+    data-slot="stack"
+    id="sign-in"
+    onsubmit={(event) => {
+      event.preventDefault()
+      const data = new FormData(event.currentTarget)
+      const length = String(data.get("password")).length
+      log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
+    }}
+  >
     <Field name="email">
       <FieldLabel>Email</FieldLabel>
       <Input type="email" required autocomplete="username" />
@@ -36,12 +40,7 @@
     </PasswordInput>
   </Field>
   <div data-slot="row">
-    <button type="submit" form="sign-in">
-      Sign in
-    </button>
-    <button type="reset" form="sign-in">
-      Reset
-    </button>
+    <button type="submit" form="sign-in" data-variant="solid">Sign In</button>
+    <button type="reset" form="sign-in">Reset</button>
   </div>
-  <output data-slot="output">{submitted}</output>
 </div>

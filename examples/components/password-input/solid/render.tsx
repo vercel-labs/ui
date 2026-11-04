@@ -1,7 +1,7 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
 
-export function Example() {
+function Example() {
   return (
     <Field name="password">
       <FieldLabel>Password</FieldLabel>
@@ -47,3 +47,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

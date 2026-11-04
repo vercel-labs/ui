@@ -9,9 +9,7 @@
   <PasswordInput>
     {#snippet children(state)}
       <PasswordInputControl />
-      <span>{#if state.capsLock}
-        <LockIcon aria-hidden="true" />
-      {/if}</span>
+      <span>{#if state.capsLock}<LockIcon aria-hidden="true" />{/if}</span>
       <PasswordInputToggle aria-label="Show password">
         {#snippet children(toggle)}
           {#if toggle.visible}

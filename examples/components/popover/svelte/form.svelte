@@ -1,35 +1,40 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Popover,
+    PopoverClose,
     PopoverContent,
     PopoverDescription,
     PopoverTitle,
     PopoverTrigger,
   } from "@ui-sdk/svelte/popover"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let open = $state(false)
-  let name = $state("Ada Lovelace")
-  let saved = $state("")
-
-  function save(event: SubmitEvent) {
-    event.preventDefault()
-    saved = name
-    open = false
-  }
 </script>
 
 <Popover bind:open>
-  <PopoverTrigger>Edit profile</PopoverTrigger>
+  <PopoverTrigger>Edit Profile</PopoverTrigger>
   <PopoverContent>
-    <PopoverTitle>Profile</PopoverTitle>
-    <PopoverDescription>Your name appears on your posts.</PopoverDescription>
-    <form data-slot="stack" onsubmit={save}>
-      <label data-slot="label">
-        Name
-        <input bind:value={name} />
-      </label>
-      <button type="submit" data-variant="solid">Save</button>
+    <PopoverTitle>Edit profile</PopoverTitle>
+    <PopoverDescription>Your name shows on your posts.</PopoverDescription>
+    <form
+      data-slot="stack"
+      onsubmit={(event) => {
+        event.preventDefault()
+        log(`Saved ${new FormData(event.currentTarget).get("name")}`)
+        open = false
+      }}
+    >
+      <Field>
+        <FieldLabel>Name</FieldLabel>
+        <FieldControl name="name" required defaultValue="Hollis Grant" />
+      </Field>
+      <div data-slot="row">
+        <PopoverClose>Cancel</PopoverClose>
+        <button type="submit" data-variant="solid">Save</button>
+      </div>
     </form>
   </PopoverContent>
 </Popover>
-<output data-slot="output">{saved ? `Saved ${saved}` : "Not saved yet"}</output>

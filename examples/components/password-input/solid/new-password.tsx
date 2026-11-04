@@ -11,7 +11,7 @@ const rules = [
   },
 ]
 
-export function Example() {
+function Example() {
   const [password, setPassword] = createSignal("")
   return (
     <Field name="new-password">
@@ -101,3 +101,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

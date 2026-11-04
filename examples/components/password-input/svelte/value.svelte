@@ -22,9 +22,9 @@
     <PasswordInputToggle aria-label="Show password">
       {#snippet children(state)}
         {#if state.visible}
-          <EyeOffIcon />
+          <EyeOffIcon aria-hidden="true" />
         {:else}
-          <EyeIcon />
+          <EyeIcon aria-hidden="true" />
         {/if}
       {/snippet}
     </PasswordInputToggle>
@@ -36,7 +36,7 @@
   </div>
   <output data-slot="output">
     {value
-        ? `Strength: ${["Weak", "Weak", "Fair", "Good", "Strong"][score]} (${value.length} characters)`
-        : "Type a password to rate it."}
+      ? `Strength: ${["Weak", "Weak", "Fair", "Good", "Strong"][score]} (${value.length} characters)`
+      : "Type a password to rate it."}
   </output>
 </Field>

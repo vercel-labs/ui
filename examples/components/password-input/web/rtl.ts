@@ -2,7 +2,7 @@ import "@ui-sdk/web/password-input"
 import "@ui-sdk/web/field"
 import { createElement, Eye, EyeOff } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div dir="rtl">
       <ui-field>
@@ -21,3 +21,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

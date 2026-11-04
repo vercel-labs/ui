@@ -2,14 +2,14 @@ import "@ui-sdk/web/password-input"
 import "@ui-sdk/web/field"
 import { createElement, Eye, EyeOff } from "lucide"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>Recovery key</ui-field-label>
       <ui-password-input name="recovery-key" read-only default-value="7Hq2-vX9p-Lm4c">
         <input autocomplete="off" />
         <ui-password-input-toggle>
-          <button aria-label="Show password">
+          <button aria-label="Show recovery key">
             ${createElement(Eye, { "aria-hidden": "true" }).outerHTML}
             ${createElement(EyeOff, { "aria-hidden": "true" }).outerHTML}
           </button>
@@ -19,3 +19,5 @@ export function mount(root: HTMLElement) {
     </ui-field>
   `
 }
+
+export { mount }

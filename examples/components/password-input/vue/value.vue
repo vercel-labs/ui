@@ -23,8 +23,8 @@ const score = computed(
     <PasswordInput v-model:value="value" auto-complete="new-password">
       <PasswordInputControl />
       <PasswordInputToggle v-slot="{ state }" aria-label="Show password">
-        <EyeOffIcon v-if="state.visible" />
-        <EyeIcon v-else />
+        <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+        <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
     <div data-slot="strength" aria-hidden="true">

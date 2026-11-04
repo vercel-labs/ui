@@ -2,21 +2,27 @@ import {
   Popover,
   PopoverArrow,
   PopoverContent,
-  PopoverClose,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/solid/popover"
+import { useLog } from "../../../shared/solid/log"
 
 function Example() {
+  const log = useLog()
+
   return (
     <Popover openOnHover delay={200} closeDelay={150}>
-      <PopoverTrigger>@ada</PopoverTrigger>
-      <PopoverContent sideOffset={10}>
+      <PopoverTrigger>@kofi</PopoverTrigger>
+      <PopoverContent sideOffset={8}>
         <PopoverArrow />
-        <PopoverTitle>Ada Lovelace</PopoverTitle>
-        <PopoverDescription>A collaborator on this project.</PopoverDescription>
-        <PopoverClose>Close preview</PopoverClose>
+        <PopoverTitle>Kofi Mensah</PopoverTitle>
+        <PopoverDescription>Engineering manager, platform team.</PopoverDescription>
+        <div data-slot="row">
+          <button type="button" data-size="sm" data-variant="solid" onClick={() => log("Followed @kofi")}>
+            Follow
+          </button>
+        </div>
       </PopoverContent>
     </Popover>
   )

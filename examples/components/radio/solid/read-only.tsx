@@ -1,4 +1,4 @@
-import { createUniqueId } from "solid-js"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { For } from "solid-js"
 
@@ -9,21 +9,11 @@ const plans = [
 ]
 
 function Example() {
-  const id = createUniqueId()
   return (
-    <div data-slot="stack">
-      <div data-slot="stack">
-        <span id={`${id}-current-plan`}>Your plan</span>
-        <p data-slot="hint" id={`${id}-current-plan-hint`}>
-          Ask an admin to change plans.
-        </p>
-      </div>
-      <RadioGroup
-        defaultValue="pro"
-        readOnly
-        aria-labelledby={`${id}-current-plan`}
-        aria-describedby={`${id}-current-plan-hint`}
-      >
+    <Field>
+      <FieldLabel>Your plan</FieldLabel>
+      <FieldDescription>Ask an admin to change plans.</FieldDescription>
+      <RadioGroup defaultValue="pro" readOnly>
         <For each={plans}>
           {(plan) => (
             <label data-slot="label">
@@ -35,7 +25,7 @@ function Example() {
           )}
         </For>
       </RadioGroup>
-    </div>
+    </Field>
   )
 }
 

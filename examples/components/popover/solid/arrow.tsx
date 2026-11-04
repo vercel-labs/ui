@@ -8,46 +8,34 @@ import {
 } from "@ui-sdk/solid/popover"
 import { createSignal, For } from "solid-js"
 
-const sides = ["top", "right", "bottom", "left"] as const
-const aligns = ["start", "center", "end"] as const
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+] as const
+type Side = (typeof sides)[number]["value"]
 
 function Example() {
   const [open, setOpen] = createSignal(false)
-  const [side, setSide] = createSignal<(typeof sides)[number]>("bottom")
-  const [align, setAlign] = createSignal<(typeof aligns)[number]>("start")
+  const [side, setSide] = createSignal<Side>("bottom")
   let controls: HTMLDivElement | undefined
 
   return (
     <div data-slot="stack">
-      <div data-slot="stack" ref={controls}>
-        <div data-slot="row" role="group" aria-label="Side">
-          <For each={sides}>
-            {(value) => (
-              <button
-                type="button"
-                data-size="sm"
-                aria-pressed={side() === value ? "true" : "false"}
-                onClick={() => setSide(value)}
-              >
-                {value}
-              </button>
-            )}
-          </For>
-        </div>
-        <div data-slot="row" role="group" aria-label="Align">
-          <For each={aligns}>
-            {(value) => (
-              <button
-                type="button"
-                data-size="sm"
-                aria-pressed={align() === value ? "true" : "false"}
-                onClick={() => setAlign(value)}
-              >
-                {value}
-              </button>
-            )}
-          </For>
-        </div>
+      <div data-slot="controls" role="group" aria-label="Side" ref={controls}>
+        <For each={sides}>
+          {(option) => (
+            <button
+              type="button"
+              data-size="sm"
+              aria-pressed={side() === option.value ? "true" : "false"}
+              onClick={() => setSide(option.value)}
+            >
+              {option.label}
+            </button>
+          )}
+        </For>
       </div>
       <Popover
         open={open()}
@@ -72,10 +60,10 @@ function Example() {
             <path d="M12 17h.01" />
           </svg>
         </PopoverTrigger>
-        <PopoverContent side={side()} align={align()} sideOffset={10} arrowPadding={12}>
+        <PopoverContent side={side()} sideOffset={10} arrowPadding={12}>
           <PopoverArrow />
           <PopoverTitle>Keyboard shortcuts</PopoverTitle>
-          <PopoverDescription>Press ? anywhere to see every shortcut.</PopoverDescription>
+          <PopoverDescription>Press ? anywhere to see them all.</PopoverDescription>
         </PopoverContent>
       </Popover>
     </div>

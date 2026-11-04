@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { CheckIcon } from "@lucide/svelte"
+  import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
-    createPopoverController,
     Popover,
     PopoverClose,
     PopoverContent,
@@ -8,26 +10,39 @@
     PopoverTitle,
     PopoverTrigger,
   } from "@ui-sdk/svelte/popover"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const popover = createPopoverController()
+  const log = useLog()
   let open = $state(false)
-  let reason = $state("")
 </script>
 
 <div data-slot="stack">
-  <div data-slot="row">
-    <Popover bind:open controller={popover} onOpenChange={(_, details) => (reason = details.reason)}>
-      <PopoverTrigger>Share</PopoverTrigger>
-      <PopoverContent>
-        <PopoverTitle>Share this file</PopoverTitle>
-        <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
-        <PopoverClose>Done</PopoverClose>
-      </PopoverContent>
-    </Popover>
-    <button type="button" data-variant="ghost" onclick={() => popover.open()}>
-      Open from elsewhere
-    </button>
+  <div data-slot="controls">
+    <label data-slot="label">
+      <Checkbox checked={open} onCheckedChange={(next) => (open = next === true)}>
+        <CheckboxIndicator>
+          <CheckIcon aria-hidden="true" />
+        </CheckboxIndicator>
+      </Checkbox>
+      Open
+    </label>
   </div>
-
-  <output data-slot="output">{open ? "Open" : "Closed"}{reason ? `, last change: ${reason}` : ""}</output>
+  <Popover
+    bind:open
+    onOpenChange={(next, details) => log(`${next ? "Opened" : "Closed"} (${details.reason})`)}
+  >
+    <PopoverTrigger>Set Status</PopoverTrigger>
+    <PopoverContent>
+      <PopoverTitle>Set a status</PopoverTitle>
+      <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
+      <Field>
+        <FieldLabel>Status</FieldLabel>
+        <FieldControl defaultValue="In a meeting" />
+      </Field>
+      <div data-slot="row">
+        <PopoverClose>Cancel</PopoverClose>
+        <PopoverClose data-variant="solid">Save</PopoverClose>
+      </div>
+    </PopoverContent>
+  </Popover>
 </div>

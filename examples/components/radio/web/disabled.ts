@@ -1,55 +1,57 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/radio"
 
+const themes = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+  { value: "system", label: "System" },
+]
+
+const backups = [
+  { value: "hourly", label: "Hourly", disabled: true },
+  { value: "daily", label: "Daily", disabled: false },
+  { value: "weekly", label: "Weekly", disabled: false },
+]
+
 function mount(root: HTMLElement) {
-  const id = crypto.randomUUID()
   root.innerHTML = `
-    <div data-slot="row">
-      <div data-slot="stack">
-        <span data-slot="hint" id="${id}-theme-heading">Theme</span>
-        <ui-radio-group default-value="light" disabled aria-labelledby="${id}-theme-heading">
-          <label data-slot="label">
-            <ui-radio value="light">
-              <ui-radio-indicator></ui-radio-indicator>
-            </ui-radio>
-            Light
-          </label>
-          <label data-slot="label">
-            <ui-radio value="dark">
-              <ui-radio-indicator></ui-radio-indicator>
-            </ui-radio>
-            Dark
-          </label>
-          <label data-slot="label">
-            <ui-radio value="system">
-              <ui-radio-indicator></ui-radio-indicator>
-            </ui-radio>
-            System
-          </label>
+    <div data-slot="stack">
+      <ui-field>
+        <ui-field-label>Theme</ui-field-label>
+        <ui-field-description>Set by your organization.</ui-field-description>
+        <ui-radio-group default-value="light" disabled>
+          ${themes
+            .map(
+              (theme) => `
+                <label data-slot="label">
+                  <ui-radio value="${theme.value}">
+                    <ui-radio-indicator></ui-radio-indicator>
+                  </ui-radio>
+                  ${theme.label}
+                </label>
+              `,
+            )
+            .join("")}
         </ui-radio-group>
-      </div>
-      <div data-slot="stack">
-        <span data-slot="hint" id="${id}-notify-heading">Notify me about</span>
-        <ui-radio-group default-value="all" aria-labelledby="${id}-notify-heading">
-          <label data-slot="label">
-            <ui-radio value="all">
-              <ui-radio-indicator></ui-radio-indicator>
-            </ui-radio>
-            All
-          </label>
-          <label data-slot="label">
-            <ui-radio value="mentions" disabled>
-              <ui-radio-indicator></ui-radio-indicator>
-            </ui-radio>
-            Mentions
-          </label>
-          <label data-slot="label">
-            <ui-radio value="nothing">
-              <ui-radio-indicator></ui-radio-indicator>
-            </ui-radio>
-            Nothing
-          </label>
+      </ui-field>
+      <ui-field>
+        <ui-field-label>Backups</ui-field-label>
+        <ui-field-description>Hourly backups need the Pro plan.</ui-field-description>
+        <ui-radio-group default-value="daily">
+          ${backups
+            .map(
+              (backup) => `
+                <label data-slot="label">
+                  <ui-radio value="${backup.value}"${backup.disabled ? " disabled" : ""}>
+                    <ui-radio-indicator></ui-radio-indicator>
+                  </ui-radio>
+                  ${backup.label}
+                </label>
+              `,
+            )
+            .join("")}
         </ui-radio-group>
-      </div>
+      </ui-field>
     </div>
   `
 }

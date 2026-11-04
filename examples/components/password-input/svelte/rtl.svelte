@@ -12,9 +12,9 @@
       <PasswordInputToggle aria-label="إظهار كلمة المرور">
         {#snippet children(state)}
           {#if state.visible}
-            <EyeOffIcon />
+            <EyeOffIcon aria-hidden="true" />
           {:else}
-            <EyeIcon />
+            <EyeIcon aria-hidden="true" />
           {/if}
         {/snippet}
       </PasswordInputToggle>

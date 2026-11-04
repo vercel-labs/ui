@@ -7,13 +7,13 @@ A popover keeps a small task close to the thing it belongs to. Put fields, butto
 
 <ComponentExample
   name="popover/basic"
-  caption="Open the popover and edit the dimensions. Escape, another press on the trigger, or a press outside closes it."
+  caption="Press Share to open the popover, then close it with Cancel, Copy Link, Escape, or a press outside. Focus returns to Share."
 />
 
 ## Installation
 
-```package-install
-npm install @ui-sdk/solid
+```bash
+npm install @ui-sdk/solid @ui-sdk/core
 ```
 
 ## Composition
@@ -24,157 +24,208 @@ Use the following composition to build a `Popover`:
 Popover
 ├── PopoverTrigger
 └── PopoverContent
+    ├── PopoverArrow
     ├── PopoverTitle
     ├── PopoverDescription
     └── PopoverClose
 ```
 
-The content has the dialog role. Its title names it and its description adds context. The trigger can live inside the popover or [connect from elsewhere](#triggers-outside-the-popover).
+The content has the dialog role. Its title names it and its description adds context. The arrow is optional, and a popover can have several Close parts. The trigger can live inside the popover or [connect from elsewhere](#triggers-outside-the-popover).
 
-## Examples
+## Usage
 
-### With Form
+Import the parts and put them together:
 
-An ordinary form can save a value and then close the popover. Focus starts on the first field and returns to the trigger when the task finishes. A form with `method="dialog"` closes on submission and returns its submit button’s value; the [row editor](#triggers-outside-the-popover) shows that version.
+```tsx
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
+
+function Example() {
+  return (
+    <Popover>
+      <PopoverTrigger>Share</PopoverTrigger>
+      <PopoverContent>
+        <PopoverTitle>Share this document</PopoverTitle>
+        <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
+        <PopoverClose>Done</PopoverClose>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+export { Example }
+```
+
+## Forms
+
+An ordinary form can save a value and then close the popover. Focus starts on the first field and returns to the trigger when the task finishes. A form with `method="dialog"` closes on submission and returns its submit button's value; the [row editor](#triggers-outside-the-popover) shows that version.
 
 <ComponentExample
   name="popover/form"
-  caption="Open Edit profile, change the name, and press Save. The popover closes and the readout shows the saved name."
+  caption="Open Edit Profile, change the name, and press Save. The popover closes and the console logs the saved name."
 />
 
-### Keep It Open While Editing
+## Keep It Open While Editing
 
-Set `dismissible` to false while there is unsaved work. Deliberate dismissal attempts report `onDismissAttempt`, so you can ask whether to discard it. Focus leaving is refused quietly. The trigger, Close parts, and controller can still close it explicitly.
+Set `dismissible` to false while there is unsaved work. Escape and outside presses then keep the popover open and report `onDismissAttempt`, so you can ask whether to discard it. Focus leaving is refused quietly. The trigger, Close parts, and controller can still close it.
 
 <ComponentExample
   name="popover/draft"
-  caption="Type a note, then press Escape or click outside. Keep editing returns to the field; Discard closes without saving, and Save keeps the note."
+  caption="Open Add Note, type something, then press Escape or click outside. Keep Editing returns to the field; Discard closes the popover and clears the note."
 />
 
-### Placement
+## Placement
 
-<span id="align" />
-<span id="offsets" />
-<span id="rtl" />
-
-`side` chooses an edge; `align` chooses where along it to line up. Start and end follow text direction. The popover flips or shifts when the requested position does not fit.
-
-`sideOffset` is the gap from the anchor, `alignOffset` shifts along its edge, and `collisionPadding` keeps space around the viewport boundary. The [popup guide](../popups) covers the shared positioning options.
+`side` chooses an edge of the trigger, `bottom` by default, and `align` lines the popover up with its start, center, or end. Start and end follow text direction. The popover flips or shifts when the requested position doesn't fit, and `data-side` and `data-align` report where it landed. The [popup guide](../popups) covers the shared positioning options.
 
 <ComponentExample
   name="popover/placement"
-  inspect
-  caption="Choose a side and alignment, adjust the offsets, then open Placement. Near a window edge, the popover can flip or shift to stay visible."
+  caption="Choose a side and an alignment, then open Delivery. Near a window edge, the popover flips or shifts to stay visible."
 />
 
-### Arrow
+## Offsets
 
-The arrow follows the side the popover actually uses, including after a flip. `arrowPadding` keeps it away from corners; `data-arrow-clamped` tells you when it cannot point exactly at the anchor’s center. This example cancels dismissal when you press its placement controls, so the open arrow can move.
+`sideOffset` is the gap to the trigger, 4 pixels by default. `alignOffset` shifts the popover along the trigger's edge, and `collisionPadding` is the space kept from the edges of the window.
+
+<ComponentExample
+  name="popover/offsets"
+  caption="Change the offsets and the padding, then open Delivery. The popover moves away from the trigger and along it."
+/>
+
+## Arrow
+
+`PopoverArrow` follows the side the popover actually uses, including after a flip, and gets the same `data-side`. `arrowPadding` keeps it away from the corners; `data-arrow-clamped` tells you when it can't point at the middle of the trigger. This example cancels dismissal when you press its side buttons, so the open arrow can move.
 
 <ComponentExample
   name="popover/arrow"
-  caption="Open Help, then change Side or Align. The panel stays open while its arrow follows the new position."
+  caption="Open Help, then press Top, Right, Bottom, or Left. The popover stays open while it and its arrow move to that side."
 />
 
 Keep overflow visible around an arrow that extends outside the panel. If the body needs to scroll, put scrolling on an inner element. You can also draw an arrow with `::before`, using `data-side` and `--arrow-offset` to position it.
 
-### Anchor
+## Anchor
 
 Set `anchor` to position against something other than the trigger. It accepts an element, a selector, a point such as `{ x, y }`, or an object with `getBoundingClientRect()`, such as a text range. The position is read again as the anchor moves.
 
 <ComponentExample
   name="popover/anchor"
-  caption="Open Search filters. The popover lines up with the search field instead of the small trigger beside it."
+  caption="Press the filters button. The popover lines up with the search field instead of the small button beside it."
 />
 
-### Modal
+## Modal
 
-The default leaves the page usable and closes when focus leaves the popover. `modal="trap-focus"` keeps Tab inside while the page can still scroll and receive clicks. `modal` also makes the rest of the page inert and locks scrolling.
+`modal` controls how the popover shares the page:
+
+- `false`, the default, leaves the page usable, and focus leaving the popover closes it.
+- `"trap-focus"` keeps Tab inside while the page can still scroll and receive clicks.
+- `true` also makes the rest of the page inert and locks scrolling.
 
 <ComponentExample
   name="popover/modal"
-  caption="Compare Non-modal, Trap focus, and Modal. Try Tab, then press the counter below to see whether the page can receive the click."
+  caption="Choose a mode, open Add Comment, and try Tab or clicking the page."
 />
 
-### Focus
+## Focus
 
-Use `initialFocus` to choose the first focused element, or `"none"` to leave focus where it is. `finalFocus` controls where focus returns. Hover opening leaves focus alone; touch opening focuses the panel itself so the keyboard does not appear unexpectedly.
+Use `initialFocus` to choose the first focused element, or `"none"` to leave focus where it is. `finalFocus` controls where focus returns. Opening on hover leaves focus alone; opening with touch focuses the panel itself so no on-screen keyboard appears. See [popup focus](../popups) for the shared focus rules.
 
 <ComponentExample
   name="popover/focus"
-  caption="Open each example: First field focuses its input, Specific element focuses Apply, and No focus change leaves focus on the trigger."
+  caption="Open each one: Rename focuses its field, Publish focuses its Publish button, and Status leaves focus on the trigger."
 />
 
-### Open on Hover
+## Open on Hover
 
 `openOnHover` adds pointer opening while keeping click, keyboard, and touch activation. `delay` and `closeDelay` control the pause before opening and closing. You can cross the gap into the content and interact with it.
 
 <ComponentExample
   name="popover/hover"
-  caption="Hover over @ada, then move into the preview and press Close preview. You can also open it by pressing the trigger."
+  caption="Hover @kofi, then move into the popover and press Follow. You can also open it by pressing the trigger."
 />
 
-### Controlled
+## Controlled
 
-Pass `open={open()}` and update the signal in `onOpenChange`. Use `details.cancel()` to reject a proposed change. A controller can open it from another control; [state and events](../state-and-events) and [controllers](../controllers) cover these shared patterns.
+Pass `open={open()}` and update the signal in `onOpenChange`. Use `details.cancel()` to reject a proposed change. See [state and events](../state-and-events) for the common change contract.
 
 <ComponentExample
   name="popover/controlled"
-  caption="Open Share directly or press Open from elsewhere. Close it to see the value and change reason in the readout."
+  caption="Check Open or press Set Status, then close the popover. The console logs each change and its reason."
 />
 
-### Keyboard Shortcut
+## Keyboard Shortcut
 
-Set a trigger’s `shortcut` to toggle the popover from the keyboard. `mod+i` means Command+I or Control+I. The Shortcut part displays the platform’s keys, and the trigger advertises them through `aria-keyshortcuts`.
+Set a trigger's `shortcut` to toggle the popover from the keyboard. `mod+i` means Command+I on Apple platforms and Control+I elsewhere. The Shortcut part displays the platform's keys, and the trigger advertises them through `aria-keyshortcuts`.
 
 <ComponentExample
   name="popover/shortcut"
-  caption="Press Command+I or Control+I to open Dimensions. Press the same shortcut again, or Escape, to close it."
+  caption="Press Command+I or Control+I to open Invite. Press the same shortcut again, or Escape, to close it."
 />
 
-### Triggers Outside the Popover
+## Triggers Outside the Popover
 
 Connect the triggers and popover to one `createPopoverController<Member>()`. Each trigger passes its row as `payload`; the content reads the active row from its state. Only the active trigger is expanded and receives focus back. Opening from another row updates the same panel, so one editor can serve the whole list.
 
-`controller.open({ payload, anchor })` opens it from code and returns a promise with the closing reason and any `returnValue`. The payload stays available during the exit animation.
+`controller.open({ payload, anchor })` opens it from code and returns a promise with the closing reason and any `returnValue`. The payload stays available during the exit animation. See [controllers](../controllers) for the shared pattern.
 
 <ComponentExample
   name="popover/payload"
-  caption="Edit Grace Hopper or Alan Turing and save a new role. The owner cannot be edited. Edit the newest member opens the same editor from code and reports its result."
+  caption="Edit Inès Moreau or Kofi Mensah and save a new role. The owner can't be edited. Edit Newest Member opens the same editor from code, and the console logs how it closed."
 />
 
-### Container
+## Animation
 
-Popovers render in place by default and use the browser’s top layer. `container` moves their DOM to another element while keyboard order still follows the trigger. See [popups](../popups) for the shared container behavior.
-
-<ComponentExample
-  name="popover/container"
-  caption="Open in the box. The popover is rendered inside the marked container in the DOM while remaining positioned by its trigger."
-/>
-
-### Animation
-
-Animate `data-starting-style` and `data-ending-style`; `onOpenChangeComplete` reports when each transition finishes. `keepMounted` leaves the closed content in the DOM, hidden. See [styling and animation](../styling-and-animation) for the common lifecycle.
+The content has `data-starting-style` while it opens and `data-ending-style` while it closes. Transition from those states, and the popover stays mounted until the exit finishes. `onOpenChangeComplete` runs after the transition, and `keepMounted` keeps the closed content in the page, hidden. See [styling and animation](../styling-and-animation) for the common lifecycle.
 
 <ComponentExample
   name="popover/animation"
-  caption="Open Animated, then dismiss it. The readout follows Opening, Open, Closing, and Closed."
+  caption="Open What's New, then press Got It. The console logs Opening, Open, Closing, and Closed."
 />
 
-### Presentation
+## Presentation
 
 `presentation="sheet"` shows the task as a sheet; `"auto"` chooses a sheet on small touch screens each time it opens. A sheet is modal by default and can be swiped down to dismiss. If dismissal is disabled, it springs back and reports the attempt.
 
-Style `data-presentation` for both layouts. The sheet manages its own position and movement, so leave its translation alone and avoid the floating panel’s fixed width. `--sheet-backdrop` sets the dim behind it.
+Style `data-presentation` for both layouts. The sheet manages its own position and movement, so leave its translation alone and avoid the floating panel's fixed width. `--sheet-backdrop` sets the dim behind it.
 
 <ComponentExample
   name="popover/presentation"
-  caption="Open Dimensions as a sheet. Edit a value, then dismiss it with Escape, the dimmed area, or a downward swipe on a touch screen."
+  caption="Open Add Reminder as a sheet. Dismiss it with Cancel, Save, Escape, the dimmed area, or a downward swipe on a touch screen."
+/>
+
+## Container
+
+Popovers render in place by default and use the browser's top layer. `container` moves their DOM to another element while keyboard order still follows the trigger. See [popups](../popups) for the shared container behavior.
+
+```tsx
+const [container, setContainer] = createSignal<HTMLDivElement>()
+
+<div ref={setContainer} />
+<Popover>
+  <PopoverTrigger>Details</PopoverTrigger>
+  <PopoverContent container={container()}>...</PopoverContent>
+</Popover>
+```
+
+## Custom Rendering
+
+Every part takes `render`, a function that receives the props to spread and the part's state. `class`, `style` and `children` can be functions of the same state. The content's `children` function can read its payload, as the row editor does.
+
+<ComponentExample
+  name="popover/custom-rendering"
+  caption="Open Show Updates. The trigger's label comes from its state, the title renders as an h3, and Close renders as a link."
 />
 
 ## Styling
 
-Use the state attributes to style each part and the positioning variables to size or animate the panel. `--transform-origin` keeps a scale animation attached to the anchor.
+Use `data-open` on the trigger to mark it while its popover shows, and `data-side` and `data-align` to style the content and arrow for where they landed. Put `transform-origin: var(--transform-origin)` on the content so a scale animation starts from the trigger.
+
+Each part has a `data-slot`, such as `popover-content`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### PopoverContent [#styling-popovercontent]
 
@@ -185,6 +236,8 @@ Use the state attributes to style each part and the positioning variables to siz
 <CssVariables component="popover" part="viewport" />
 
 ## Data Attributes
+
+`PopoverTitle`, `PopoverDescription` and `PopoverClose` have no state attributes.
 
 ### PopoverTrigger [#data-attributes-popovertrigger]
 
@@ -198,11 +251,9 @@ Use the state attributes to style each part and the positioning variables to siz
 
 <DataAttributes component="popover" part="arrow" />
 
-## Custom Rendering
-
-Use the shared [composition guide](../parts-and-composition) when a part needs your own element. A content render function can read its payload, as the row editor does.
-
 ## API Reference
+
+Props and callbacks are the same as below, as Solid props.
 
 ### Popover
 
@@ -217,6 +268,23 @@ A trigger outside the popover also takes `controller`.
 ### PopoverContent
 
 <TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentProps" />
+
+### PopoverArrow
+
+Points at the trigger from the side the popover landed on. Renders a `div`.
+
+### PopoverTitle
+
+Names the popover. Renders an `h2`.
+
+### PopoverDescription
+
+Describes the popover while it's rendered. Renders a `p`.
+
+### PopoverClose
+
+Closes the popover. Renders a `button`.
+
 ### PopoverShortcut
 
 <TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutProps" />
@@ -277,7 +345,11 @@ Callbacks get the new state first, then the details.
 
 ## Accessibility
 
-The trigger is a button that opens a dialog, and focus inside follows the [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Every line below is an automated test.
+The trigger is a button that opens a dialog, and focus inside follows the [WAI-ARIA dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="popover" only={["trigger", "focus", "dismissal", "modal", "hover", "nested popovers"]} />
 

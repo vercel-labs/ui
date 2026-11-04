@@ -1,26 +1,29 @@
 <script setup lang="ts">
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/vue/popover"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const status = ref("Closed")
+const log = useLog()
 </script>
 
 <template>
   <Popover
-    @open-change="(open: boolean) => (status = open ? 'Opening' : 'Closing')"
-    @open-change-complete="(open: boolean) => (status = open ? 'Open' : 'Closed')"
+    @open-change="(open: boolean) => log(open ? 'Opening' : 'Closing')"
+    @open-change-complete="(open: boolean) => log(open ? 'Open' : 'Closed')"
   >
-    <PopoverTrigger>Animated</PopoverTrigger>
+    <PopoverTrigger>What's New</PopoverTrigger>
     <PopoverContent keep-mounted>
-      <PopoverTitle>Scale and fade</PopoverTitle>
-      <PopoverDescription>300ms in and out, from the trigger.</PopoverDescription>
+      <PopoverTitle>What's new</PopoverTitle>
+      <PopoverDescription>Comments now support threads and reactions.</PopoverDescription>
+      <div data-slot="row">
+        <PopoverClose data-variant="solid">Got It</PopoverClose>
+      </div>
     </PopoverContent>
   </Popover>
-  <output data-slot="output">{{ status }}</output>
 </template>

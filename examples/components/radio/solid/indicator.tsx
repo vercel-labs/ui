@@ -1,3 +1,4 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { For } from "solid-js"
 
@@ -9,18 +10,21 @@ const themes = [
 
 function Example() {
   return (
-    <RadioGroup defaultValue="system" aria-label="Theme">
-      <For each={themes}>
-        {(theme) => (
-          <label data-slot="label">
-            <Radio value={theme.value}>
-              <RadioIndicator keepMounted />
-            </Radio>
-            {theme.label}
-          </label>
-        )}
-      </For>
-    </RadioGroup>
+    <Field>
+      <FieldLabel>Theme</FieldLabel>
+      <RadioGroup defaultValue="system">
+        <For each={themes}>
+          {(theme) => (
+            <label data-slot="label">
+              <Radio value={theme.value}>
+                <RadioIndicator keepMounted />
+              </Radio>
+              {theme.label}
+            </label>
+          )}
+        </For>
+      </RadioGroup>
+    </Field>
   )
 }
 

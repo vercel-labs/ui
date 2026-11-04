@@ -1,3 +1,4 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/radio"
 
 const plans = [
@@ -7,19 +8,11 @@ const plans = [
 ]
 
 function mount(root: HTMLElement) {
-  const id = crypto.randomUUID()
   root.innerHTML = `
-    <div data-slot="stack">
-      <div data-slot="stack">
-        <span id="${id}-current-plan">Your plan</span>
-        <p data-slot="hint" id="${id}-current-plan-hint">Ask an admin to change plans.</p>
-      </div>
-      <ui-radio-group
-        default-value="pro"
-        read-only
-        aria-labelledby="${id}-current-plan"
-        aria-describedby="${id}-current-plan-hint"
-      >
+    <ui-field>
+      <ui-field-label>Your plan</ui-field-label>
+      <ui-field-description>Ask an admin to change plans.</ui-field-description>
+      <ui-radio-group default-value="pro" read-only>
         ${plans
           .map(
             (plan) => `
@@ -28,11 +21,12 @@ function mount(root: HTMLElement) {
                   <ui-radio-indicator></ui-radio-indicator>
                 </ui-radio>
                 ${plan.label}
-              </label>`,
+              </label>
+            `,
           )
           .join("")}
       </ui-radio-group>
-    </div>
+    </ui-field>
   `
 }
 

@@ -10,10 +10,10 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
     <PasswordInput default-value="hunter22">
       <PasswordInputControl />
       <PasswordInputToggle v-slot="{ state }" aria-label="Show password">
-        <EyeOffIcon aria-hidden="true" v-if="state.visible" />
-        <EyeIcon aria-hidden="true" v-else />
+        <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+        <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
-    <FieldDescription> Your administrator manages this password. </FieldDescription>
+    <FieldDescription>Your administrator manages this password.</FieldDescription>
   </Field>
 </template>

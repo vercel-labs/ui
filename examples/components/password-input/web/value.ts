@@ -11,7 +11,7 @@ function strength(password: string) {
   ].filter(Boolean).length
 }
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>New password</ui-field-label>
@@ -44,3 +44,5 @@ export function mount(root: HTMLElement) {
       : "Type a password to rate it."
   })
 }
+
+export { mount }

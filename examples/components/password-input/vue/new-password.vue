@@ -26,18 +26,18 @@ const password = ref("")
     >
       <PasswordInputControl />
       <PasswordInputToggle v-slot="{ state }" aria-label="Show password">
-        <EyeOffIcon aria-hidden="true" v-if="state.visible" />
-        <EyeIcon aria-hidden="true" v-else />
+        <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+        <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
     <ul data-slot="stack" aria-label="Password requirements">
       <template v-for="rule in rules" :key="rule.label">
-        <li data-slot="row" v-if="rule.test(password)">
+        <li v-if="rule.test(password)" data-slot="row">
           <CheckIcon aria-hidden="true" />
           <span data-slot="visually-hidden">Done:</span>
           {{ rule.label }}
         </li>
-        <li data-slot="row" v-else>
+        <li v-else data-slot="row">
           <XIcon aria-hidden="true" />
           <span data-slot="visually-hidden">To do:</span>
           {{ rule.label }}

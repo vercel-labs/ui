@@ -3,28 +3,25 @@ import { EyeIcon, EyeOffIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const visible = ref(false)
-const reason = ref("")
+
+function onVisibleChange(next: boolean, details: { reason: string }) {
+  log(`${next ? "Shown" : "Hidden"} (${details.reason})`)
+}
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Field name="password">
-      <FieldLabel>Password</FieldLabel>
-      <PasswordInput
-        v-model:visible="visible"
-        @visible-change="(_visible: boolean, details: { reason: string }) => (reason = details.reason)"
-      >
-        <PasswordInputControl />
-        <PasswordInputToggle v-slot="{ state }" aria-label="Show password">
-          <EyeOffIcon aria-hidden="true" v-if="state.visible" />
-          <EyeIcon aria-hidden="true" v-else />
-        </PasswordInputToggle>
-      </PasswordInput>
-    </Field>
-    <output data-slot="output">
-      {{ visible ? "The password is shown" : "The password is hidden" }}{{ reason ? ` (${reason}).` : "." }}
-    </output>
-  </div>
+  <Field name="password">
+    <FieldLabel>Password</FieldLabel>
+    <PasswordInput v-model:visible="visible" @visible-change="onVisibleChange">
+      <PasswordInputControl />
+      <PasswordInputToggle v-slot="{ state }" aria-label="Show password">
+        <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+        <EyeIcon v-else aria-hidden="true" />
+      </PasswordInputToggle>
+    </PasswordInput>
+  </Field>
 </template>

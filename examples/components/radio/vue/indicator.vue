@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/vue/radio"
 
 const themes = [
@@ -9,12 +10,15 @@ const themes = [
 </script>
 
 <template>
-  <RadioGroup default-value="system" aria-label="Theme">
-    <label data-slot="label" v-for="theme in themes" :key="theme.value">
-      <Radio :value="theme.value">
-        <RadioIndicator keep-mounted />
-      </Radio>
-      {{ theme.label }}
-    </label>
-  </RadioGroup>
+  <Field>
+    <FieldLabel>Theme</FieldLabel>
+    <RadioGroup default-value="system">
+      <label v-for="theme in themes" :key="theme.value" data-slot="label">
+        <Radio :value="theme.value">
+          <RadioIndicator keep-mounted />
+        </Radio>
+        {{ theme.label }}
+      </label>
+    </RadioGroup>
+  </Field>
 </template>

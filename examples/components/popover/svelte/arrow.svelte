@@ -9,45 +9,47 @@
     PopoverTrigger,
   } from "@ui-sdk/svelte/popover"
 
-  const sides = ["top", "right", "bottom", "left"] as const
-  const aligns = ["start", "center", "end"] as const
-  let open = $state(false)
-  let side = $state<(typeof sides)[number]>("bottom")
-  let align = $state<(typeof aligns)[number]>("start")
-  let controls: HTMLDivElement | undefined = $state()
+  const sides = [
+    { value: "top", label: "Top" },
+    { value: "right", label: "Right" },
+    { value: "bottom", label: "Bottom" },
+    { value: "left", label: "Left" },
+  ] as const
+  type Side = (typeof sides)[number]["value"]
 
-  function onOpenChange(next: boolean, details: { event?: Event; cancel: () => void }) {
-    const target = details.event?.target
-    if (!next && target instanceof Node && controls?.contains(target)) return details.cancel()
-    open = next
-  }
+  let open = $state(false)
+  let side = $state<Side>("bottom")
+  let controls: HTMLDivElement | undefined = $state()
 </script>
 
 <div data-slot="stack">
-  <div data-slot="stack" bind:this={controls}>
-    <div data-slot="row" role="group" aria-label="Side">
-      {#each sides as value (value)}
-        <button type="button" data-size="sm" aria-pressed={side === value} onclick={() => (side = value)}>
-          {value}
-        </button>
-      {/each}
-    </div>
-    <div data-slot="row" role="group" aria-label="Align">
-      {#each aligns as value (value)}
-        <button type="button" data-size="sm" aria-pressed={align === value} onclick={() => (align = value)}>
-          {value}
-        </button>
-      {/each}
-    </div>
+  <div data-slot="controls" role="group" aria-label="Side" bind:this={controls}>
+    {#each sides as option (option.value)}
+      <button
+        type="button"
+        data-size="sm"
+        aria-pressed={side === option.value}
+        onclick={() => (side = option.value)}
+      >
+        {option.label}
+      </button>
+    {/each}
   </div>
-  <Popover {open} {onOpenChange}>
+  <Popover
+    {open}
+    onOpenChange={(next, details) => {
+      const target = details.event?.target
+      if (!next && target instanceof Node && controls?.contains(target)) return details.cancel()
+      open = next
+    }}
+  >
     <PopoverTrigger aria-label="Help">
       <CircleQuestionMarkIcon aria-hidden="true" />
     </PopoverTrigger>
-    <PopoverContent {side} {align} sideOffset={10} arrowPadding={12}>
+    <PopoverContent {side} sideOffset={10} arrowPadding={12}>
       <PopoverArrow />
       <PopoverTitle>Keyboard shortcuts</PopoverTitle>
-      <PopoverDescription>Press ? anywhere to see every shortcut.</PopoverDescription>
+      <PopoverDescription>Press ? anywhere to see them all.</PopoverDescription>
     </PopoverContent>
   </Popover>
 </div>

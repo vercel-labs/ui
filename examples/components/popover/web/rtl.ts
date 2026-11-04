@@ -1,6 +1,6 @@
 import "@ui-sdk/web/popover"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div dir="rtl">
       <ui-popover>
@@ -14,3 +14,5 @@ export function mount(root: HTMLElement) {
     </div>
   `
 }
+
+export { mount }

@@ -1,13 +1,13 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
 
-export function Example() {
+function Example() {
   return (
     <Field name="recovery-key">
       <FieldLabel>Recovery key</FieldLabel>
       <PasswordInput readOnly defaultValue="7Hq2-vX9p-Lm4c" autoComplete="off">
         <PasswordInputControl />
-        <PasswordInputToggle aria-label="Show password">
+        <PasswordInputToggle aria-label="Show recovery key">
           {(state) =>
             state.visible ? (
               <svg
@@ -45,3 +45,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

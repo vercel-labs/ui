@@ -1,43 +1,40 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/vue/radio"
-import { ref } from "vue"
+import { useId } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const methods = [
+const speeds = [
   { value: "standard", label: "Standard", detail: "Free, 5 to 7 days" },
   { value: "express", label: "Express", detail: "$9, 2 days" },
   { value: "overnight", label: "Overnight", detail: "$24, next day" },
 ]
 
-const submitted = ref("")
+const log = useLog()
+const id = useId()
 
 function submit(event: Event) {
-  submitted.value = JSON.stringify(Object.fromEntries(new FormData(event.currentTarget as HTMLFormElement)))
+  log(`Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`)
 }
-import { useId } from "vue"
-
-const id = useId()
 </script>
 
 <template>
   <div data-slot="stack">
-    <RadioGroup
-      aria-label="Shipping"
-      name="shipping"
-      :form="`${id}-shipping-form`"
-      required
-      default-value="standard"
-    >
-      <label data-slot="label" v-for="method in methods" :key="method.value">
-        <Radio :value="method.value">
-          <RadioIndicator />
-        </Radio>
-        {{ method.label }} <span data-slot="hint">{{ method.detail }}</span>
-      </label>
-    </RadioGroup>
-    <form data-slot="row" :id="`${id}-shipping-form`" @submit.prevent="submit" @reset="submitted = ''">
-      <button type="submit">Submit</button>
+    <Field>
+      <FieldLabel>Shipping speed</FieldLabel>
+      <RadioGroup name="shipping" :form="`${id}-checkout`" required default-value="standard">
+        <label v-for="speed in speeds" :key="speed.value" data-slot="label">
+          <Radio :value="speed.value">
+            <RadioIndicator />
+          </Radio>
+          {{ speed.label }}
+          <span data-slot="hint">({{ speed.detail }})</span>
+        </label>
+      </RadioGroup>
+    </Field>
+    <form :id="`${id}-checkout`" data-slot="row" @submit.prevent="submit">
+      <button type="submit" data-variant="solid">Continue</button>
       <button type="reset">Reset</button>
     </form>
-    <output data-slot="output" v-if="submitted">Submitted: {{ submitted }}</output>
   </div>
 </template>

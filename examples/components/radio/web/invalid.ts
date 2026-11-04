@@ -1,43 +1,44 @@
-import "@ui-sdk/web/radio"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/radio"
+import { log } from "../../../shared/web/log"
 
-const options = [
+const channels = [
   { value: "email", label: "Email only" },
   { value: "sms", label: "SMS only" },
-  { value: "both", label: "Both email and SMS" },
+  { value: "both", label: "Email and SMS" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <form data-slot="stack">
       <ui-field>
-        <ui-field-label>Notification preferences</ui-field-label>
-        <ui-field-description>Choose how you want to receive notifications.</ui-field-description>
-        <ui-radio-group name="notifications" required>
-          ${options
+        <ui-field-label>Order updates</ui-field-label>
+        <ui-field-description>Choose how we tell you about your orders.</ui-field-description>
+        <ui-radio-group name="updates" required>
+          ${channels
             .map(
-              (option) => `
+              (channel) => `
                 <label data-slot="label">
-                  <ui-radio value="${option.value}">
+                  <ui-radio value="${channel.value}">
                     <ui-radio-indicator></ui-radio-indicator>
                   </ui-radio>
-                  ${option.label}
-                </label>`,
+                  ${channel.label}
+                </label>
+              `,
             )
             .join("")}
         </ui-radio-group>
-        <ui-field-error>Choose how to receive notifications.</ui-field-error>
+        <ui-field-error>Choose how to get order updates.</ui-field-error>
       </ui-field>
-      <button type="submit">Save</button>
-      <output data-slot="output" hidden></output>
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">Save</button>
+      </div>
     </form>
   `
   const form = root.querySelector("form")!
-  const saved = root.querySelector("output")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    saved.hidden = false
-    saved.textContent = `Saved: ${new FormData(form).get("notifications")}`
+    log(root, `Saved updates=${new FormData(form).get("updates")}`)
   })
 }
 

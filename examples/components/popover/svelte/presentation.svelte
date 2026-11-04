@@ -1,32 +1,27 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Popover,
+    PopoverClose,
     PopoverContent,
     PopoverDescription,
     PopoverTitle,
     PopoverTrigger,
   } from "@ui-sdk/svelte/popover"
-
-  const dimensions = [
-    { label: "Width", value: "100%" },
-    { label: "Max. width", value: "300px" },
-    { label: "Height", value: "25px" },
-    { label: "Max. height", value: "none" },
-  ]
 </script>
 
 <Popover presentation="sheet">
-  <PopoverTrigger>Dimensions</PopoverTrigger>
+  <PopoverTrigger>Add Reminder</PopoverTrigger>
   <PopoverContent>
-    <PopoverTitle>Dimensions</PopoverTitle>
-    <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-    <div data-slot="stack">
-      {#each dimensions as dimension (dimension.label)}
-        <label data-slot="label">
-          {dimension.label}
-          <input value={dimension.value} />
-        </label>
-      {/each}
+    <PopoverTitle>New reminder</PopoverTitle>
+    <PopoverDescription>We'll notify you at the time you pick.</PopoverDescription>
+    <Field>
+      <FieldLabel>Remind me to</FieldLabel>
+      <FieldControl defaultValue="Send the Q3 roadmap" />
+    </Field>
+    <div data-slot="row">
+      <PopoverClose>Cancel</PopoverClose>
+      <PopoverClose data-variant="solid">Save</PopoverClose>
     </div>
   </PopoverContent>
 </Popover>

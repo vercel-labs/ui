@@ -18,7 +18,5 @@
       {/snippet}
     </PasswordInputToggle>
   </PasswordInput>
-  <FieldDescription>
-    Guests read it from here, so it starts shown.
-  </FieldDescription>
+  <FieldDescription>Guests read it from here, so it starts shown.</FieldDescription>
 </Field>

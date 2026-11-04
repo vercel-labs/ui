@@ -1,59 +1,89 @@
 <script lang="ts">
+  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Popover,
+    PopoverClose,
     PopoverContent,
     PopoverDescription,
     PopoverTitle,
     PopoverTrigger,
   } from "@ui-sdk/svelte/popover"
+  import { useLog } from "../../../shared/svelte/log"
 
+  const log = useLog()
   let open = $state(false)
   let note = $state("")
   let asking = $state(false)
-  let saved = $state(false)
   let field: HTMLTextAreaElement | undefined = $state()
 
   function close() {
     open = false
-    asking = false
-  }
-
-  function keepEditing() {
-    asking = false
-    field?.focus()
-  }
-
-  function discard() {
     note = ""
-    close()
-  }
-
-  function save() {
-    saved = true
-    note = ""
-    close()
+    asking = false
   }
 </script>
 
 <Popover
   bind:open={() => open, (next) => (next ? (open = true) : close())}
   dismissible={note === ""}
-  onDismissAttempt={() => (asking = true)}
+  onDismissAttempt={(details) => {
+    log(`Kept open (${details.reason})`)
+    asking = true
+  }}
 >
-  <PopoverTrigger>Add note</PopoverTrigger>
+  <PopoverTrigger>Add Note</PopoverTrigger>
   <PopoverContent>
-    <PopoverTitle>Note</PopoverTitle>
-    <PopoverDescription>Type something, then press Escape or click outside.</PopoverDescription>
-    <textarea bind:this={field} bind:value={note} aria-label="Note"></textarea>
+    <PopoverTitle>Add a note</PopoverTitle>
+    <PopoverDescription>Only your team can see it.</PopoverDescription>
+    <Field>
+      <FieldLabel>Note</FieldLabel>
+      <FieldControl value={note} oninput={(event) => (note = event.currentTarget.value)}>
+        {#snippet render({ props })}
+          <textarea bind:this={field} {...props} placeholder="Call the printer about the proofs."></textarea>
+        {/snippet}
+      </FieldControl>
+    </Field>
     {#if asking}
-      <div role="alert" data-slot="row">
+      <div data-slot="row" role="alert">
         Discard your note?
-        <button type="button" data-size="sm" onclick={keepEditing}>Keep editing</button>
-        <button type="button" data-size="sm" data-variant="destructive" onclick={discard}>Discard</button>
+        <div data-slot="row">
+          <button
+            type="button"
+            data-size="sm"
+            onclick={() => {
+              asking = false
+              field?.focus()
+            }}
+          >
+            Keep Editing
+          </button>
+          <button
+            type="button"
+            data-size="sm"
+            data-variant="solid"
+            onclick={() => {
+              log("Discarded the note")
+              close()
+            }}
+          >
+            Discard
+          </button>
+        </div>
       </div>
     {:else}
-      <button type="button" data-variant="solid" onclick={save}>Save</button>
+      <div data-slot="row">
+        <PopoverClose>Cancel</PopoverClose>
+        <button
+          type="button"
+          data-variant="solid"
+          onclick={() => {
+            log(note ? "Saved the note" : "Nothing to save")
+            close()
+          }}
+        >
+          Save
+        </button>
+      </div>
     {/if}
   </PopoverContent>
 </Popover>
-<output data-slot="output">{saved ? "Note saved" : "No note yet"}</output>

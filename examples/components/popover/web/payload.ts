@@ -1,42 +1,51 @@
+import "@ui-sdk/web/field"
 import type { UiPopoverElement } from "@ui-sdk/web/popover"
 import "@ui-sdk/web/popover"
+import { log } from "../../../shared/web/log"
 
 type Member = { name: string; role: string }
+
+const roles = ["Admin", "Editor", "Viewer"]
 
 let count = 0
 
 function mount(root: HTMLElement) {
   const id = `member-editor-${++count}`
   const members: Member[] = [
-    { name: "Ada Lovelace", role: "Owner" },
-    { name: "Grace Hopper", role: "Editor" },
-    { name: "Alan Turing", role: "Viewer" },
+    { name: "Hollis Grant", role: "Owner" },
+    { name: "Inès Moreau", role: "Editor" },
+    { name: "Kofi Mensah", role: "Viewer" },
+    { name: "Wren Takahashi", role: "Viewer" },
   ]
   root.innerHTML = `
     <div data-slot="stack">
-      <ul></ul>
+      <div data-slot="controls">
+        <button type="button">Edit Newest Member</button>
+      </div>
+      <ul data-slot="list"></ul>
       <ui-popover id="${id}">
-        <ui-popover-content align="end">
+        <ui-popover-content align="end" side-offset="8">
           <ui-popover-title></ui-popover-title>
           <ui-popover-description>Roles decide what they can change.</ui-popover-description>
-          <form method="dialog" data-slot="stack">
-            <label data-slot="label">
-              Role
-              <input name="role" />
-            </label>
+          <form data-slot="stack" method="dialog">
+            <ui-field>
+              <ui-field-label>Role</ui-field-label>
+              <select name="role">
+                ${roles.map((role) => `<option>${role}</option>`).join("")}
+              </select>
+            </ui-field>
             <div data-slot="row">
-              <button value="save" data-variant="solid">Save</button>
-              <button value="cancel">Cancel</button>
+              <button type="submit" value="cancel" formnovalidate>Cancel</button>
+              <button type="submit" value="save" data-variant="solid">Save</button>
             </div>
           </form>
         </ui-popover-content>
       </ui-popover>
-      <button type="button" data-edit-newest data-variant="ghost">Edit the newest member</button>
-      <output data-slot="output">Not edited yet</output>
     </div>
   `
   const popover = root.querySelector<UiPopoverElement<Member>>("ui-popover")!
   const form = root.querySelector("form")!
+  const list = root.querySelector("ul")!
 
   const rows = new Map<Member, HTMLElement>()
   for (const member of members) {
@@ -49,17 +58,17 @@ function mount(root: HTMLElement) {
     trigger.innerHTML = `<button aria-label="Edit ${member.name}" data-size="sm" data-variant="ghost">Edit</button>`
     item.append(trigger)
     rows.set(member, item)
-    root.querySelector("ul")!.append(item)
+    list.append(item)
   }
 
   const show = (member?: Member) => {
-    root.querySelector("ui-popover-title")!.textContent = `Edit ${member?.name}`
-    form.querySelector("input")!.value = member?.role ?? ""
+    root.querySelector("ui-popover-title")!.textContent = member?.name ?? ""
+    form.querySelector("select")!.value = member?.role ?? ""
   }
   popover.addEventListener("payloadchange", (event) => {
     const member = event.detail.value
     show(member)
-    if (member) root.querySelector("output")!.textContent = `Editing ${member.name}`
+    if (member) log(root, `Editing ${member.name}`)
   })
   popover.addEventListener("openchange", (event) => {
     if (event.detail.value) show(popover.api.getPayload())
@@ -71,11 +80,10 @@ function mount(root: HTMLElement) {
     rows.get(member)!.querySelector("span")!.textContent = member.role
   })
 
-  const opener = root.querySelector<HTMLButtonElement>("[data-edit-newest]")!
+  const opener = root.querySelector<HTMLButtonElement>("[data-slot=controls] button")!
   opener.addEventListener("click", async () => {
     const result = await popover.api.open({ payload: members[members.length - 1], anchor: opener })
-    root.querySelector("output")!.textContent =
-      `Closed with ${result.reason}, returned ${result.returnValue ?? "nothing"}`
+    log(root, `Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`)
   })
 }
 

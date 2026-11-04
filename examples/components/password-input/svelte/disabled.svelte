@@ -18,7 +18,5 @@
       {/snippet}
     </PasswordInputToggle>
   </PasswordInput>
-  <FieldDescription>
-    Your administrator manages this password.
-  </FieldDescription>
+  <FieldDescription>Your administrator manages this password.</FieldDescription>
 </Field>

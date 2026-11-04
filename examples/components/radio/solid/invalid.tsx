@@ -1,45 +1,47 @@
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
-import { createSignal, For, Show } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-const options = [
+const channels = [
   { value: "email", label: "Email only" },
   { value: "sms", label: "SMS only" },
-  { value: "both", label: "Both email and SMS" },
+  { value: "both", label: "Email and SMS" },
 ]
 
 function Example() {
-  const [saved, setSaved] = createSignal("")
+  const log = useLog()
 
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setSaved(String(new FormData(event.currentTarget).get("notifications")))
+        log(`Saved updates=${new FormData(event.currentTarget).get("updates")}`)
       }}
     >
       <Field>
-        <FieldLabel>Notification preferences</FieldLabel>
-        <FieldDescription>Choose how you want to receive notifications.</FieldDescription>
-        <RadioGroup name="notifications" required>
-          <For each={options}>
-            {(option) => (
+        <FieldLabel>Order updates</FieldLabel>
+        <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+        <RadioGroup name="updates" required>
+          <For each={channels}>
+            {(channel) => (
               <label data-slot="label">
-                <Radio value={option.value}>
+                <Radio value={channel.value}>
                   <RadioIndicator />
                 </Radio>
-                {option.label}
+                {channel.label}
               </label>
             )}
           </For>
         </RadioGroup>
-        <FieldError>Choose how to receive notifications.</FieldError>
+        <FieldError>Choose how to get order updates.</FieldError>
       </Field>
-      <button type="submit">Save</button>
-      <Show when={saved()}>
-        <output data-slot="output">Saved: {saved()}</output>
-      </Show>
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">
+          Save
+        </button>
+      </div>
     </form>
   )
 }

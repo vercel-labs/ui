@@ -11,7 +11,7 @@ function strength(password: string) {
   ].filter(Boolean).length
 }
 
-export function Example() {
+function Example() {
   const [value, setValue] = createSignal("")
   const score = () => strength(value())
   return (
@@ -64,3 +64,5 @@ export function Example() {
     </Field>
   )
 }
+
+export { Example }

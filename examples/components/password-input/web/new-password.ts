@@ -11,7 +11,7 @@ const rules = [
   },
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-field>
       <ui-field-label>Create a password</ui-field-label>
@@ -49,3 +49,5 @@ export function mount(root: HTMLElement) {
     })
   })
 }
+
+export { mount }

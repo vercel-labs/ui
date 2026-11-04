@@ -1,35 +1,27 @@
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/solid/popover"
-import { For } from "solid-js"
-
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
 
 function Example() {
   return (
     <Popover presentation="sheet">
-      <PopoverTrigger>Dimensions</PopoverTrigger>
+      <PopoverTrigger>Add Reminder</PopoverTrigger>
       <PopoverContent>
-        <PopoverTitle>Dimensions</PopoverTitle>
-        <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
-        <div data-slot="stack">
-          <For each={dimensions}>
-            {(dimension) => (
-              <label data-slot="label">
-                {dimension.label}
-                <input value={dimension.value} />
-              </label>
-            )}
-          </For>
+        <PopoverTitle>New reminder</PopoverTitle>
+        <PopoverDescription>We'll notify you at the time you pick.</PopoverDescription>
+        <Field>
+          <FieldLabel>Remind me to</FieldLabel>
+          <FieldControl defaultValue="Send the Q3 roadmap" />
+        </Field>
+        <div data-slot="row">
+          <PopoverClose>Cancel</PopoverClose>
+          <PopoverClose data-variant="solid">Save</PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

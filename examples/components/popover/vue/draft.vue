@@ -1,37 +1,50 @@
 <script setup lang="ts">
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/vue/popover"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const log = useLog()
 const open = ref(false)
 const note = ref("")
 const asking = ref(false)
-const saved = ref(false)
-const field = ref<HTMLTextAreaElement | null>(null)
+let field: HTMLTextAreaElement | undefined
 
 function close() {
   open.value = false
+  note.value = ""
   asking.value = false
+}
+
+function onInput(event: Event) {
+  field = event.target as HTMLTextAreaElement
+  note.value = field.value
+}
+
+function onDismissAttempt(details: { reason: string }) {
+  log(`Kept open (${details.reason})`)
+  asking.value = true
 }
 
 function keepEditing() {
   asking.value = false
-  field.value?.focus()
+  field?.focus()
 }
 
 function discard() {
-  note.value = ""
+  log("Discarded the note")
   close()
 }
 
 function save() {
-  saved.value = true
-  note.value = ""
+  log(note.value ? "Saved the note" : "Nothing to save")
   close()
 }
 </script>
@@ -41,20 +54,31 @@ function save() {
     :open="open"
     :dismissible="note === ''"
     @update:open="(next: boolean) => (next ? (open = true) : close())"
-    @dismiss-attempt="asking = true"
+    @dismiss-attempt="onDismissAttempt"
   >
-    <PopoverTrigger>Add note</PopoverTrigger>
+    <PopoverTrigger>Add Note</PopoverTrigger>
     <PopoverContent>
-      <PopoverTitle>Note</PopoverTitle>
-      <PopoverDescription>Type something, then press Escape or click outside.</PopoverDescription>
-      <textarea ref="field" v-model="note" aria-label="Note" />
-      <div v-if="asking" role="alert" data-slot="row">
+      <PopoverTitle>Add a note</PopoverTitle>
+      <PopoverDescription>Only your team can see it.</PopoverDescription>
+      <Field>
+        <FieldLabel>Note</FieldLabel>
+        <FieldControl :value="note" @input="onInput">
+          <template #render="{ props }">
+            <textarea v-bind="props" placeholder="Call the printer about the proofs." />
+          </template>
+        </FieldControl>
+      </Field>
+      <div v-if="asking" data-slot="row" role="alert">
         Discard your note?
-        <button type="button" data-size="sm" @click="keepEditing">Keep editing</button>
-        <button type="button" data-size="sm" data-variant="destructive" @click="discard">Discard</button>
+        <div data-slot="row">
+          <button type="button" data-size="sm" @click="keepEditing">Keep Editing</button>
+          <button type="button" data-size="sm" data-variant="solid" @click="discard">Discard</button>
+        </div>
       </div>
-      <button v-else type="button" data-variant="solid" @click="save">Save</button>
+      <div v-else data-slot="row">
+        <PopoverClose>Cancel</PopoverClose>
+        <button type="button" data-variant="solid" @click="save">Save</button>
+      </div>
     </PopoverContent>
   </Popover>
-  <output data-slot="output">{{ saved ? "Note saved" : "No note yet" }}</output>
 </template>

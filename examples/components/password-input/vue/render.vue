@@ -8,23 +8,15 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
   <Field name="password">
     <FieldLabel>Password</FieldLabel>
     <PasswordInput>
-      <template #render="{ props, state }">
-        <div v-bind="props">
-          <PasswordInputControl>
-            <template #render="{ props: control, state: field }">
-              <input v-bind="control" />
-            </template>
-          </PasswordInputControl>
-          <PasswordInputToggle aria-label="Show password">
-            <template #render="{ props: toggle, state: shown }">
-              <button v-bind="toggle">
-                <EyeOffIcon v-if="shown.visible" />
-                <EyeIcon v-else />
-              </button>
-            </template>
-          </PasswordInputToggle>
-        </div>
-      </template>
+      <PasswordInputControl />
+      <PasswordInputToggle aria-label="Show password">
+        <template #render="{ props, state }">
+          <button v-bind="props">
+            <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+            <EyeIcon v-else aria-hidden="true" />
+          </button>
+        </template>
+      </PasswordInputToggle>
     </PasswordInput>
   </Field>
 </template>

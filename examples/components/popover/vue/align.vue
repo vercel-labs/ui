@@ -7,16 +7,20 @@ import {
   PopoverTrigger,
 } from "@ui-sdk/vue/popover"
 
-const aligns = ["start", "center", "end"] as const
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+] as const
 </script>
 
 <template>
   <div data-slot="row">
-    <Popover v-for="align in aligns" :key="align">
-      <PopoverTrigger>Align {{ align }}</PopoverTrigger>
-      <PopoverContent :align="align">
-        <PopoverTitle>Aligned to the {{ align }}</PopoverTitle>
-        <PopoverDescription>The popover lines up with the trigger's {{ align }}.</PopoverDescription>
+    <Popover v-for="align in aligns" :key="align.value">
+      <PopoverTrigger>{{ align.label }}</PopoverTrigger>
+      <PopoverContent :align="align.value" :side-offset="8">
+        <PopoverTitle>Delivery window</PopoverTitle>
+        <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
       </PopoverContent>
     </Popover>
   </div>

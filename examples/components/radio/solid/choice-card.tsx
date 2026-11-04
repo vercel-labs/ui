@@ -1,29 +1,33 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { For } from "solid-js"
 
 const plans = [
-  { value: "plus", label: "Plus", description: "For individuals and small teams." },
-  { value: "pro", label: "Pro", description: "For growing businesses." },
-  { value: "enterprise", label: "Enterprise", description: "For large teams and enterprises." },
+  { value: "hobby", label: "Hobby", description: "Free for personal projects." },
+  { value: "pro", label: "Pro", description: "$20 per month for growing teams." },
+  { value: "enterprise", label: "Enterprise", description: "Custom pricing and support." },
 ]
 
 function Example() {
   return (
-    <RadioGroup defaultValue="plus" aria-label="Plan">
-      <For each={plans}>
-        {(plan) => (
-          <label data-slot="card">
-            <span data-slot="stack">
-              <span>{plan.label}</span>
-              <span data-slot="hint">{plan.description}</span>
-            </span>
-            <Radio value={plan.value}>
-              <RadioIndicator />
-            </Radio>
-          </label>
-        )}
-      </For>
-    </RadioGroup>
+    <Field>
+      <FieldLabel>Plan</FieldLabel>
+      <RadioGroup defaultValue="hobby">
+        <For each={plans}>
+          {(plan) => (
+            <label data-slot="card">
+              <span data-slot="stack">
+                <span>{plan.label}</span>
+                <span data-slot="hint">{plan.description}</span>
+              </span>
+              <Radio value={plan.value}>
+                <RadioIndicator />
+              </Radio>
+            </label>
+          )}
+        </For>
+      </RadioGroup>
+    </Field>
   )
 }
 

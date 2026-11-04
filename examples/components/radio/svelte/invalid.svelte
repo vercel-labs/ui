@@ -1,43 +1,39 @@
 <script lang="ts">
   import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
   import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const options = [
+  const channels = [
     { value: "email", label: "Email only" },
     { value: "sms", label: "SMS only" },
-    { value: "both", label: "Both email and SMS" },
+    { value: "both", label: "Email and SMS" },
   ]
 
-  let saved = $state("")
+  const log = useLog()
 
-  function submit(event: SubmitEvent) {
+  function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    saved = String(new FormData(event.currentTarget as HTMLFormElement).get("notifications"))
+    log(`Saved updates=${new FormData(event.currentTarget).get("updates")}`)
   }
 </script>
 
-<form data-slot="stack" onsubmit={submit}>
+<form data-slot="stack" onsubmit={onSubmit}>
   <Field>
-    <FieldLabel>Notification preferences</FieldLabel>
-    <FieldDescription>
-      Choose how you want to receive notifications.
-    </FieldDescription>
-    <RadioGroup name="notifications" required>
-      {#each options as option (option.value)}
+    <FieldLabel>Order updates</FieldLabel>
+    <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+    <RadioGroup name="updates" required>
+      {#each channels as channel (channel.value)}
         <label data-slot="label">
-          <Radio value={option.value}>
+          <Radio value={channel.value}>
             <RadioIndicator />
           </Radio>
-          {option.label}
+          {channel.label}
         </label>
       {/each}
     </RadioGroup>
-    <FieldError>Choose how to receive notifications.</FieldError>
+    <FieldError>Choose how to get order updates.</FieldError>
   </Field>
-  <button type="submit">
-    Save
-  </button>
-  {#if saved}
-    <output data-slot="output">Saved: {saved}</output>
-  {/if}
+  <div data-slot="row">
+    <button type="submit" data-variant="solid">Save</button>
+  </div>
 </form>

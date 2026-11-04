@@ -1,18 +1,26 @@
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import {
   Popover,
+  PopoverClose,
   PopoverContent,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger,
 } from "@ui-sdk/solid/popover"
-import { createSignal } from "solid-js"
+import { createSignal, For } from "solid-js"
+
+const types = [
+  { label: "Documents", checked: true },
+  { label: "Images", checked: false },
+  { label: "Shared with me", checked: true },
+]
 
 function Example() {
   const [anchor, setAnchor] = createSignal<HTMLInputElement>()
 
   return (
     <div data-slot="row">
-      <input ref={setAnchor} placeholder="Search" aria-label="Search" />
+      <input ref={setAnchor} type="search" placeholder="Search files" aria-label="Search files" />
       <Popover>
         <PopoverTrigger aria-label="Search filters">
           <svg
@@ -24,13 +32,48 @@ function Example() {
             stroke-linejoin="round"
             aria-hidden="true"
           >
-            <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
-            <circle cx="12" cy="12" r="3" />
+            <path d="M10 5H3" />
+            <path d="M12 19H3" />
+            <path d="M14 3v4" />
+            <path d="M16 17v4" />
+            <path d="M21 12h-9" />
+            <path d="M21 19h-5" />
+            <path d="M21 5h-7" />
+            <path d="M8 10v4" />
+            <path d="M8 12H3" />
           </svg>
         </PopoverTrigger>
         <PopoverContent anchor={anchor()} align="start" sideOffset={8}>
           <PopoverTitle>Filters</PopoverTitle>
-          <PopoverDescription>The popover lines up with the search field.</PopoverDescription>
+          <PopoverDescription>Show only these kinds of files.</PopoverDescription>
+          <div data-slot="stack">
+            <For each={types}>
+              {(type) => (
+                <label data-slot="label">
+                  <Checkbox defaultChecked={type.checked}>
+                    <CheckboxIndicator>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </CheckboxIndicator>
+                  </Checkbox>
+                  {type.label}
+                </label>
+              )}
+            </For>
+          </div>
+          <div data-slot="row">
+            <PopoverClose>Cancel</PopoverClose>
+            <PopoverClose data-variant="solid">Apply</PopoverClose>
+          </div>
         </PopoverContent>
       </Popover>
     </div>

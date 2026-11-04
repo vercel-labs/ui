@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from "@ui-sdk/solid/popover"
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
       <Popover>
@@ -21,3 +21,5 @@ export function Example() {
     </div>
   )
 }
+
+export { Example }

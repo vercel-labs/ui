@@ -1,53 +1,76 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/popover"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-popover>
-      <ui-popover-trigger><button>Add note</button></ui-popover-trigger>
+      <ui-popover-trigger>
+        <button>Add Note</button>
+      </ui-popover-trigger>
       <ui-popover-content>
-        <ui-popover-title>Note</ui-popover-title>
-        <ui-popover-description>Type something, then press Escape or click outside.</ui-popover-description>
-        <textarea aria-label="Note"></textarea>
-        <div role="alert" data-slot="row" hidden>
+        <ui-popover-title>Add a note</ui-popover-title>
+        <ui-popover-description>Only your team can see it.</ui-popover-description>
+        <ui-field>
+          <ui-field-label>Note</ui-field-label>
+          <textarea placeholder="Call the printer about the proofs."></textarea>
+        </ui-field>
+        <div data-slot="row" role="alert" hidden>
           Discard your note?
-          <button type="button" data-size="sm" data-keep>Keep editing</button>
-          <button type="button" data-size="sm" data-variant="destructive" data-discard>Discard</button>
+          <div data-slot="row">
+            <button type="button" data-size="sm">Keep Editing</button>
+            <button type="button" data-size="sm" data-variant="solid">Discard</button>
+          </div>
         </div>
-        <button type="button" data-variant="solid" data-save>Save</button>
+        <div data-slot="row">
+          <ui-popover-close>
+            <button>Cancel</button>
+          </ui-popover-close>
+          <button type="button" data-variant="solid">Save</button>
+        </div>
       </ui-popover-content>
     </ui-popover>
-    <output data-slot="output">No note yet</output>
   `
   const popover = root.querySelector("ui-popover")!
-  const textarea = root.querySelector("textarea")!
+  const note = root.querySelector("textarea")!
   const alert = root.querySelector<HTMLElement>('[role="alert"]')!
-  const save = root.querySelector<HTMLElement>("[data-save]")!
+  const actions = root.querySelector<HTMLElement>('ui-popover-content > [data-slot="row"]:not([role])')!
+  const [keep, discard] = alert.querySelectorAll("button")
   const ask = (asking: boolean) => {
     alert.hidden = !asking
-    save.hidden = asking
+    actions.hidden = asking
   }
-  const update = () => {
-    if (textarea.value) popover.setAttribute("dismissible", "false")
-    else popover.removeAttribute("dismissible")
-  }
-  const clear = () => {
-    textarea.value = ""
-    update()
-    popover.api.close()
-  }
-  textarea.addEventListener("input", update)
-  popover.addEventListener("dismissattempt", () => ask(true))
-  root.querySelector("[data-keep]")!.addEventListener("click", () => {
+  const reset = () => {
     ask(false)
-    textarea.focus()
+    note.value = ""
+    popover.removeAttribute("dismissible")
+  }
+  const close = () => {
+    reset()
+    popover.open = false
+  }
+  note.addEventListener("input", () => {
+    if (note.value) popover.setAttribute("dismissible", "false")
+    else popover.removeAttribute("dismissible")
   })
-  root.querySelector("[data-discard]")!.addEventListener("click", clear)
-  save.addEventListener("click", () => {
-    root.querySelector("output")!.textContent = "Note saved"
-    clear()
+  popover.addEventListener("dismissattempt", (event) => {
+    log(root, `Kept open (${event.detail.reason})`)
+    ask(true)
+  })
+  keep.addEventListener("click", () => {
+    ask(false)
+    note.focus()
+  })
+  discard.addEventListener("click", () => {
+    log(root, "Discarded the note")
+    close()
+  })
+  actions.querySelector("[data-variant=solid]")!.addEventListener("click", () => {
+    log(root, note.value ? "Saved the note" : "Nothing to save")
+    close()
   })
   popover.addEventListener("openchange", (event) => {
-    if (!event.detail.value) ask(false)
+    if (!event.detail.value) reset()
   })
 }
 

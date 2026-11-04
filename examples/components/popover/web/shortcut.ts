@@ -1,31 +1,29 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/popover"
-
-const dimensions = [
-  { label: "Width", value: "100%" },
-  { label: "Max. width", value: "300px" },
-  { label: "Height", value: "25px" },
-  { label: "Max. height", value: "none" },
-]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-popover>
       <ui-popover-trigger shortcut="mod+i">
         <button>
-          Dimensions
+          Invite
           <ui-popover-shortcut></ui-popover-shortcut>
         </button>
       </ui-popover-trigger>
       <ui-popover-content>
-        <ui-popover-title>Dimensions</ui-popover-title>
-        <ui-popover-description>Set the dimensions for the layer.</ui-popover-description>
-        <div data-slot="stack">
-          ${dimensions
-            .map(
-              (dimension) =>
-                `<label data-slot="label">${dimension.label}<input value="${dimension.value}" /></label>`,
-            )
-            .join("")}
+        <ui-popover-title>Invite people</ui-popover-title>
+        <ui-popover-description>They'll get an email with a link to join.</ui-popover-description>
+        <ui-field>
+          <ui-field-label>Email</ui-field-label>
+          <input type="email" placeholder="wren@example.com" />
+        </ui-field>
+        <div data-slot="row">
+          <ui-popover-close>
+            <button>Cancel</button>
+          </ui-popover-close>
+          <ui-popover-close>
+            <button data-variant="solid">Send Invite</button>
+          </ui-popover-close>
         </div>
       </ui-popover-content>
     </ui-popover>

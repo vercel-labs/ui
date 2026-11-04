@@ -1,38 +1,36 @@
 <script lang="ts">
-  import { BellIcon, CheckIcon, MailIcon, MoonIcon } from "@lucide/svelte"
+  import { CheckIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Radio, RadioGroup } from "@ui-sdk/svelte/radio"
 
   const options = [
-    { value: "all", label: "Everything", description: "Every message and update.", icon: BellIcon },
-    { value: "mentions", label: "Mentions", description: "Only when someone mentions you.", icon: MailIcon },
-    { value: "none", label: "Nothing", description: "Turn notifications off.", icon: MoonIcon },
+    { value: "all", label: "Everything", description: "Every message and update." },
+    { value: "mentions", label: "Mentions", description: "Only when someone mentions you." },
+    { value: "none", label: "Nothing", description: "Turn notifications off." },
   ]
 
   const id = $props.id()
 </script>
 
-<RadioGroup aria-label="Notify me about" defaultValue="mentions">
-  {#each options as option (option.value)}
-    {@const Icon = option.icon}
-    <Radio
-      value={option.value}
-      aria-labelledby={`${id}-notify-${option.value}-label`}
-      aria-describedby={`${id}-notify-${option.value}-description`}
-    >
-      {#snippet render({ props, state })}
-        <button {...props}>
-          <Icon />
-          <span data-slot="stack">
-            <span
-              id={`${id}-notify-${option.value}-label`}
-            >{option.label}</span>
-            <span data-slot="hint" id={`${id}-notify-${option.value}-description`}>
-              {option.description}
+<Field>
+  <FieldLabel>Notify me about</FieldLabel>
+  <RadioGroup defaultValue="mentions">
+    {#each options as option (option.value)}
+      <Radio
+        value={option.value}
+        aria-labelledby={`${id}-${option.value}-label`}
+        aria-describedby={`${id}-${option.value}-description`}
+      >
+        {#snippet render({ props, state })}
+          <button {...props}>
+            <span data-slot="stack">
+              <span id={`${id}-${option.value}-label`}>{option.label}</span>
+              <span data-slot="hint" id={`${id}-${option.value}-description`}>{option.description}</span>
             </span>
-          </span>
-          {#if state.checked}<CheckIcon />{/if}
-        </button>
-      {/snippet}
-    </Radio>
-  {/each}
-</RadioGroup>
+            <CheckIcon aria-hidden="true" data-checked={state.checked ? "" : undefined} />
+          </button>
+        {/snippet}
+      </Radio>
+    {/each}
+  </RadioGroup>
+</Field>

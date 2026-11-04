@@ -3,9 +3,11 @@ title: Radio
 description: Choose one option, move the selection with arrow keys, and submit it with a form.
 ---
 
+Use radios for a short list of choices where only one can be picked, like a shipping speed or a plan. The group keeps one value and gives the whole list a single tab stop.
+
 <ComponentExample
   name="radio/basic"
-  caption="Choose Compact, then use the arrow keys to move focus and check another density."
+  caption="Choose Express, then use the arrow keys to move the selection between speeds."
 />
 
 ## Installation
@@ -14,155 +16,197 @@ description: Choose one option, move the selection with arrow keys, and submit i
 npm install @ui-sdk/svelte @ui-sdk/core
 ```
 
+## Composition
+
+Use the following composition to build a `RadioGroup`:
+
+```text
+RadioGroup
+├── Radio
+│   └── RadioIndicator
+└── Radio
+    └── RadioIndicator
+```
+
+Give each radio a `value` and wrap it with its text in a label. The group's value is the checked radio's value, and the indicator shows while its radio is checked.
+
 ## Usage
 
-Give each radio a `value` and put it inside a named `RadioGroup`. The group's value is the checked radio's value. Without `defaultValue`, nothing starts checked and Tab enters on the first enabled radio.
-
-<span id="composition" />
+Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
 </script>
 
-<RadioGroup defaultValue="comfortable" aria-label="Density">
-  <label><Radio value="comfortable"><RadioIndicator /></Radio> Comfortable</label>
-  <label><Radio value="compact"><RadioIndicator /></Radio> Compact</label>
-</RadioGroup>
+<Field>
+  <FieldLabel>Shipping speed</FieldLabel>
+  <RadioGroup defaultValue="standard">
+    <label>
+      <Radio value="standard">
+        <RadioIndicator />
+      </Radio>
+      Standard
+    </label>
+    <label>
+      <Radio value="express">
+        <RadioIndicator />
+      </Radio>
+      Express
+    </label>
+  </RadioGroup>
+</Field>
 ```
 
-Each radio renders a button with `role="radio"` and a hidden native radio that handles forms. Wrap a radio in a label, or connect a separate label with `for` and `id`.
+The field's label names the group. Without a field, name it with `aria-label` or `aria-labelledby`. Without `defaultValue`, nothing starts checked and Tab enters on the first enabled radio.
 
-## Examples
+## Description
 
-### Description
-
-Use `aria-describedby` to connect each option to a longer explanation. Keep that explanation separate from its label.
+Put each radio in its own `Field` with a `FieldLabel` and `FieldDescription` when an option needs more explanation. That field connects both to its radio, while the outer field still names the group.
 
 <ComponentExample
   name="radio/description"
-  caption="Choose a density by its label. Each radio is also connected to the description below it."
+  caption="Choose Weekly digest by its label. Each radio is also described by the line under it."
 />
 
-### Choice Card
+## Choice Card
 
-Wrap the option's content in its label to make the whole card clickable. `:has([data-checked])` lets the card reflect the radio inside it.
+Wrap an option's content in its label to make the whole card clickable. `:has([data-checked])` lets the card reflect the radio inside it.
 
 <ComponentExample
   name="radio/choice-card"
   caption="Click anywhere on the Pro card to choose it. Arrow keys move the selection between cards too."
 />
 
-### With a Legend
+## Fieldset and Legend
 
-Use a fieldset and legend to describe the choices together. Connect the group to the legend with `aria-labelledby`, and to any help text with `aria-describedby`.
+Use `FieldSet` and `FieldLegend` to describe a set of choices together. Connect the group to the legend with `aria-labelledby`, and to the description with `aria-describedby`.
 
 <ComponentExample
   name="radio/legend"
-  caption="Choose Yearly. The group's legend and help text describe the choices together."
+  caption="Choose Yearly. The legend and the line under it describe both billing periods."
 />
 
-### Disabled
+## Disabled
 
-Set `disabled` on the group or on one radio. Disabled options are skipped by Tab and arrow-key navigation. A disabled fieldset also disables the group, and disabled values are not submitted.
+Set `disabled` on the group or on one radio. Disabled radios can't be focused or checked, and arrow keys skip them. A disabled fieldset disables the group too, and a disabled group submits nothing.
 
 <ComponentExample
   name="radio/disabled"
-  caption="The Theme group is disabled. In Notify me about, arrow keys skip Mentions and move between All and Nothing."
+  caption="The Theme group is disabled. In Backups, Hourly is disabled, so the arrow keys move between Daily and Weekly."
 />
 
-### Invalid
+## Read-Only
 
-Put a required group in [Field](./field) with a label and an error message. Submitting without a choice shows the error inline and moves focus to the group.
+Set `readOnly` on the group to keep its value while still letting people focus and read the options. Arrow keys move focus without checking anything, and the value still submits with a form.
 
 <ComponentExample
-  name="radio/invalid"
-  caption="Press Save without a choice to see the error. Choose SMS only, then save again."
+  name="radio/read-only"
+  caption="Click Team, or focus Pro and press the Down arrow. Pro stays checked."
 />
 
-## Behavior and Options
+## Controlled
 
-### Controlled
-
-Use `bind:value`. `onValueChange` also receives the change details. Call `details.cancel()` in the callback to keep the current value.
-
-Create a controller with `createRadioGroupController` from `@ui-sdk/svelte/radio` and pass it as `controller` to check a radio from another button. Create one controller per mounted group.
+Use `bind:value` to own the value, and `onValueChange` for the reason. Call `details.cancel()` in the callback to keep the current value. A [controller](#controller) from `createRadioGroupController()` checks a radio from anywhere, like the Choose Team button below. Create one controller per mounted group.
 
 <ComponentExample
   name="radio/controlled"
-  caption="Choose Starter, then Choose Team. The status shows the selected value and the reason for each change."
+  caption="Choose Starter, then press Choose Team. The console logs each change and its reason."
 />
 
 See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
 
-### Read Only
+## Form
 
-Set `readOnly` on the group to keep the value fixed while letting users focus and read the options. Arrow keys still move focus. The current value still submits with a form.
+Each radio renders a button with the `radio` role and a hidden native radio, so the group takes part in forms. Set `name` to submit the checked value; the group submits nothing without a name or a checked radio. `required` blocks submission until there's a choice, and a reset returns to `defaultValue`.
 
-<ComponentExample
-  name="radio/read-only"
-  caption="Move focus from Pro to Team, or click Team. Pro remains checked."
-/>
-
-### Form
-
-Set `name` to submit the selected value. `required` blocks submission until there is a choice. A form reset returns to `defaultValue`.
-
-The demo keeps the group outside its form and connects them with the form's `id` through the group's `form` prop.
+Set `form` to a form's id to join it from elsewhere on the page, as this group does.
 
 <ComponentExample
   name="radio/form"
-  caption="Choose Express and Submit to see the form value. Reset returns the choice to Standard."
+  caption="Choose Express and press Continue. The console logs the submitted value, and Reset returns the choice to Standard."
 />
 
-### Horizontal
+## Validation
 
-Use your own layout classes to put radios in a row or column. There is no orientation option: arrow keys work on both axes, like native radios.
-
-### Loop
-
-Arrow keys wrap from the last radio to the first. Set `loop` to `false` to stop at the ends.
+Put a required group in a [Field](./field) with a `FieldError`. Submitting without a choice shows the error under the group and moves focus to it. The [Forms guide](../forms) covers the shared field behavior.
 
 <ComponentExample
-  name="radio/loop"
-  caption="Focus Low and press Up, or focus High and press Down. Focus stays at that end of the group."
+  name="radio/invalid"
+  caption="Press Save without a choice to see the error. Choose SMS only and save again; the console logs the saved value."
 />
 
-### Indicator
+## Animation
 
-The indicator is present while its radio is checked. It stays mounted during an exit animation, then unmounts. Set `keepMounted` to keep it present while unchecked too.
+The indicator has `data-starting-style` as it appears and `data-ending-style` while it leaves, and stays mounted until its exit finishes. Transition from those states:
 
-Use `data-starting-style` and `data-ending-style` for entry and exit animations. The demo also uses the kept indicator to preview an unchecked option on hover.
+<StyleTabs>
+
+```css
+[data-slot="radio-indicator"] {
+  transition:
+    opacity 0.15s,
+    scale 0.15s;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+```
+
+```svelte
+<RadioIndicator class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0" />
+```
+
+</StyleTabs>
+
+`keepMounted` keeps the indicator in the page while unchecked, with `data-unchecked`. Here it lets a hovered option preview its dot.
 
 <ComponentExample
   name="radio/indicator"
-  caption="Hover an unchecked theme to preview its dot, then choose it. Reduced-motion settings skip the transition."
+  caption="Hover Light to preview its dot, then choose it. The dot scales in on Light and out of System."
 />
 
-### Render Functions
+## Loop
 
-Use a part's `render` snippet to choose its element and read its state. Spread `props` onto the element that handles the behavior. This demo makes each radio a full row with an icon, description and checked marker.
+Arrow keys wrap from the last radio to the first. Set `loop` to `false` to stop at the ends.
 
-<ComponentExample
-  name="radio/render"
-  caption="Choose Nothing to move the checked marker. Each row has its own label and description."
-/>
-
-## Forms
-
-The hidden native radios handle submission, reset and validation in a plain form. The group submits nothing without a `name` or a checked option. Enter on a radio submits its form; Space checks the focused option.
-
-Use [Field](./field) for inline validation and the [Forms guide](../forms) for shared form behavior.
-
-## Styling
-
-Style the parts from their checked, disabled, read-only and animation attributes. The demos use the same radio style throughout.
-
-<DataAttributes component="radio" />
+```svelte
+<RadioGroup defaultValue="low" loop={false}>
+  ...
+</RadioGroup>
+```
 
 ## Custom Rendering
 
-Use a part's `render` snippet to choose its element and read its state. Spread `props` onto the element that handles the behavior. See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for the values each part exposes.
+The group, radio and indicator take a `render` snippet, which receives the props to spread and the part's state. Keep the part's props on the interactive element so its role, label and keyboard behavior stay connected. See [Parts and Composition](../parts-and-composition) for the rendering contract.
+
+<ComponentExample
+  name="radio/render"
+  caption="Choose Nothing. Each radio renders a full-width button that shows a check from its state."
+/>
+
+## Styling
+
+Use `data-checked` and `data-unchecked` for the checked state, and `data-disabled`, `data-readonly` and `data-required` for the rest. The indicator gets the same state attributes as its radio, and the group gets `data-disabled`, `data-readonly` and `data-required`.
+
+Each part has a `data-slot`, such as `radio-root`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+## Data Attributes
+
+### RadioGroup [#data-attributes-radiogroup]
+
+<DataAttributes component="radio" part="group" />
+
+### Radio [#data-attributes-radio]
+
+<DataAttributes component="radio" part="root" />
+
+### RadioIndicator [#data-attributes-radioindicator]
+
+<DataAttributes component="radio" part="indicator" />
 
 ## API Reference
 
@@ -182,7 +226,7 @@ Props and callbacks are the same as below, as Svelte props. `value` can be bound
 
 ### State
 
-What `render` and `children` snippets receive.
+What render functions, state-based class names and slots receive.
 
 <StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupState" />
 
@@ -215,9 +259,26 @@ Callbacks get the new value first, then the details. A bound `value` only update
 
 ## Accessibility
 
-Radio groups follow the [WAI-ARIA radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), and behave like native radios that share a name. Every line below is an automated test.
+Radio groups follow the [WAI-ARIA radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/), and behave like native radios that share a name. `Radio` renders a button with the `radio` role, and a hidden native radio that takes part in forms.
+
+### Keyboard
+
+| Key        | Does                                                                    |
+| ---------- | ----------------------------------------------------------------------- |
+| Tab        | Moves into the group, onto the checked radio or the first enabled one   |
+| Arrow keys | Move to the next or previous radio and check it, skipping disabled ones |
+| Space      | Checks the focused radio                                                |
+| Enter      | Submits its form                                                        |
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="radio" />
+
+In a field:
+
+<SpecList spec="radio.field" />
 
 In right-to-left pages:
 

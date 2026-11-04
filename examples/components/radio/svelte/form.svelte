@@ -1,48 +1,40 @@
 <script lang="ts">
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const methods = [
+  const speeds = [
     { value: "standard", label: "Standard", detail: "Free, 5 to 7 days" },
     { value: "express", label: "Express", detail: "$9, 2 days" },
     { value: "overnight", label: "Overnight", detail: "$24, next day" },
   ]
 
-  let submitted = $state("")
-
-  function submit(event: SubmitEvent) {
-    event.preventDefault()
-    submitted = JSON.stringify(Object.fromEntries(new FormData(event.currentTarget as HTMLFormElement)))
-  }
-
+  const log = useLog()
   const id = $props.id()
+
+  function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
+    event.preventDefault()
+    log(`Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`)
+  }
 </script>
 
 <div data-slot="stack">
-  <RadioGroup
-    aria-label="Shipping"
-    name="shipping"
-    form={`${id}-shipping-form`}
-    required
-    defaultValue="standard"
-  >
-    {#each methods as method (method.value)}
-      <label data-slot="label">
-        <Radio value={method.value}>
-          <RadioIndicator />
-        </Radio>
-        {method.label} <span data-slot="hint">{method.detail}</span>
-      </label>
-    {/each}
-  </RadioGroup>
-  <form data-slot="row" id={`${id}-shipping-form`} onsubmit={submit} onreset={() => (submitted = "")}>
-    <button type="submit">
-      Submit
-    </button>
-    <button type="reset">
-      Reset
-    </button>
+  <Field>
+    <FieldLabel>Shipping speed</FieldLabel>
+    <RadioGroup name="shipping" form={`${id}-checkout`} required defaultValue="standard">
+      {#each speeds as speed (speed.value)}
+        <label data-slot="label">
+          <Radio value={speed.value}>
+            <RadioIndicator />
+          </Radio>
+          {speed.label}
+          <span data-slot="hint">({speed.detail})</span>
+        </label>
+      {/each}
+    </RadioGroup>
+  </Field>
+  <form data-slot="row" id={`${id}-checkout`} onsubmit={onSubmit}>
+    <button type="submit" data-variant="solid">Continue</button>
+    <button type="reset">Reset</button>
   </form>
-  {#if submitted}
-    <output data-slot="output">Submitted: {submitted}</output>
-  {/if}
 </div>

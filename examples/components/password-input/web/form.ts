@@ -1,14 +1,16 @@
 import "@ui-sdk/web/password-input"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { createElement, Eye, EyeOff } from "lucide"
+import { log } from "../../../shared/web/log"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
     <div data-slot="stack">
       <form data-slot="stack" id="sign-in">
-        <ui-field>
+        <ui-field name="email">
           <ui-field-label>Email</ui-field-label>
-          <input type="email" name="email" required autocomplete="username" />
+          <ui-input><input type="email" required autocomplete="username" /></ui-input>
         </ui-field>
       </form>
       <ui-field>
@@ -24,19 +26,18 @@ export function mount(root: HTMLElement) {
         </ui-password-input>
       </ui-field>
       <div data-slot="row">
-        <button type="submit" form="sign-in">Sign in</button>
+        <button type="submit" form="sign-in" data-variant="solid">Sign In</button>
         <button type="reset" form="sign-in">Reset</button>
       </div>
-      <output data-slot="output"></output>
     </div>
   `
   const form = root.querySelector("form")!
-  const submitted = root.querySelector("output")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     const data = new FormData(form)
     const length = String(data.get("password")).length
-    submitted.textContent = `Signed in as ${data.get("email")}, with a password of ${length} characters.`
+    log(root, `Signed in as ${data.get("email")}, with a password of ${length} characters`)
   })
-  form.addEventListener("reset", () => (submitted.textContent = ""))
 }
+
+export { mount }

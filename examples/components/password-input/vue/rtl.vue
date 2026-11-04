@@ -11,8 +11,8 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
       <PasswordInput>
         <PasswordInputControl />
         <PasswordInputToggle v-slot="{ state }" aria-label="إظهار كلمة المرور">
-          <EyeOffIcon v-if="state.visible" />
-          <EyeIcon v-else />
+          <EyeOffIcon v-if="state.visible" aria-hidden="true" />
+          <EyeIcon v-else aria-hidden="true" />
         </PasswordInputToggle>
       </PasswordInput>
       <FieldDescription>ثمانية أحرف على الأقل.</FieldDescription>
