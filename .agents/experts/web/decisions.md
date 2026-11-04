@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot).
 
 ## Settled
 
@@ -44,6 +44,12 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **A value change restored by Escape has no `detail.event`**, like the `querychange` before it: a popup's close carries no event to `revertQuery`.
 - **A number input moved from one field to another** leaves the first field's label `for` on the moved input until that field finds a new control.
+- **A submit shortcut also submits a read-only `<ui-textarea>`.**
+- **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
+- **`submit-shortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
+- **`<ui-tooltip-trigger><ui-toggle><button>`** flips the button's `data-slot` after a click: the rule that gives the inner part's `data-slot` to an element two parts share (`innerPart`) misses owners that bind their own element.
+- **`pressedText` doesn't see `user-select: none` across a shadow root**: it walks `parentElement`, which stops at the root, so a toast in one doesn't swipe from text its host makes unselectable.
+- **`ui-token-input` gets no `disabled` or `data-disabled` from a disabled field**, though its editor does.
 
 ## Revisit
 
