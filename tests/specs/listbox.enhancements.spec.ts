@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test"
 import { changeItems, expect, test } from "../fixtures"
 import { expectSelected, list, option, tabIn } from "./listbox.helpers"
 
@@ -71,6 +72,41 @@ test("the selected option scrolls into view without taking focus @enhancement", 
   await open("listbox", { long: "", value: "topping-200" })
   await expect(option(page, "Topping 200")).toBeInViewport()
   expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+})
+
+// How far an option sits from the 32px scroll padding at each edge of the list.
+// Scroll positions are whole pixels and options aren't, so a pixel is close enough.
+function offPadding(page: Page, name: string) {
+  return option(page, name).evaluate((el) => {
+    const list = el.closest('[role="listbox"]')!
+    const top = list.getBoundingClientRect().top + list.clientTop
+    const box = el.getBoundingClientRect()
+    return { top: Math.abs(box.top - top - 32), bottom: Math.abs(top + list.clientHeight - box.bottom - 32) }
+  })
+}
+
+test("arrow keys keep the focused option clear of the list's scroll padding at both ends @enhancement", async ({
+  page,
+  open,
+  tab,
+}) => {
+  await open("listbox", { long: "", layout: "scroll-padding" })
+  await tabIn(page, tab)
+  for (let press = 0; press < 20; press++) await page.keyboard.press("ArrowDown")
+  await expect(option(page, "Topping 21")).toBeFocused()
+  expect((await offPadding(page, "Topping 21")).bottom).toBeLessThan(1)
+  await page.keyboard.press("End")
+  for (let press = 0; press < 30; press++) await page.keyboard.press("ArrowUp")
+  await expect(option(page, "Topping 270")).toBeFocused()
+  expect((await offPadding(page, "Topping 270")).top).toBeLessThan(1)
+})
+
+test("the selected option scrolls into view clear of the list's scroll padding @enhancement", async ({
+  page,
+  open,
+}) => {
+  await open("listbox", { long: "", value: "topping-200", layout: "scroll-padding" })
+  await expect.poll(async () => (await offPadding(page, "Topping 200")).bottom).toBeLessThan(1)
 })
 
 test("a focused option that leaves the list hands focus back to it, so keys keep working @enhancement", async ({

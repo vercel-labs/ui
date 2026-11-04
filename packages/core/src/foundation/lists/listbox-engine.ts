@@ -124,13 +124,20 @@ function entryOf<T>(item: ListItem<T>, toKey: (value: unknown) => string, group?
   }
 }
 
-// Scrolls a child into view in its scrolling ancestor, without scrolling the
-// page the way scrollIntoView would. `stop` is the last ancestor to check.
+// Scrolls a child into view in its scrolling ancestor, honoring its
+// scroll-padding, without scrolling the page the way scrollIntoView would.
+// `stop` is the last ancestor to check.
 function revealInList(el: HTMLElement, stop: HTMLElement | undefined) {
   for (let node = el.parentElement; node; node = node.parentElement) {
-    if (/(auto|scroll)/.test(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight) {
-      const top = el.getBoundingClientRect().top - node.getBoundingClientRect().top + node.scrollTop
-      const scrollTop = scrollToShow(node.scrollTop, node.clientHeight, top, el.offsetHeight)
+    const style = getComputedStyle(node)
+    if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight) {
+      const top =
+        el.getBoundingClientRect().top - node.getBoundingClientRect().top - node.clientTop + node.scrollTop
+      const before = parseFloat(style.scrollPaddingTop) || 0
+      const after = parseFloat(style.scrollPaddingBottom) || 0
+      const shown = scrollToShow(node.scrollTop, node.clientHeight, top, el.offsetHeight, before, after)
+      // The last option's padding asks past the end, which would write on every move.
+      const scrollTop = Math.min(shown, node.scrollHeight - node.clientHeight)
       if (scrollTop !== node.scrollTop) node.scrollTop = scrollTop
       return
     }

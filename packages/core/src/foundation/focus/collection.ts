@@ -89,10 +89,11 @@ function inOrder(values: readonly string[], order: readonly string[]) {
 }
 
 // The scroll position that brings a span into a viewport along one axis, or
-// the current one when it's already in view.
-function scrollToShow(scroll: number, viewport: number, start: number, size: number) {
-  if (start < scroll) return start
-  if (start + size > scroll + viewport) return Math.max(0, start + size - viewport)
+// the current one when it's already in view. The span stays `before` and
+// `after` clear of the edges, like scroll-padding.
+function scrollToShow(scroll: number, viewport: number, start: number, size: number, before = 0, after = 0) {
+  if (start - before < scroll) return Math.max(0, start - before)
+  if (start + size + after > scroll + viewport) return Math.max(0, start + size + after - viewport)
   return scroll
 }
 
