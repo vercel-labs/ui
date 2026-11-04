@@ -1,24 +1,28 @@
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
 
-const options = [
-  { value: "default", label: "افتراضي" },
-  { value: "comfortable", label: "مريح" },
-  { value: "compact", label: "مضغوط" },
+const speeds = [
+  { value: "standard", label: "عادي" },
+  { value: "express", label: "سريع" },
+  { value: "overnight", label: "خلال ليلة" },
 ]
 
 function Example() {
   return (
     <div dir="rtl">
-      <RadioGroup defaultValue="comfortable" aria-label="الكثافة">
-        {options.map((option) => (
-          <label data-slot="label" key={option.value}>
-            <Radio value={option.value}>
-              <RadioIndicator />
-            </Radio>
-            {option.label}
-          </label>
-        ))}
-      </RadioGroup>
+      <Field>
+        <FieldLabel>سرعة الشحن</FieldLabel>
+        <RadioGroup defaultValue="express">
+          {speeds.map((speed) => (
+            <label data-slot="label" key={speed.value}>
+              <Radio value={speed.value}>
+                <RadioIndicator />
+              </Radio>
+              {speed.label}
+            </label>
+          ))}
+        </RadioGroup>
+      </Field>
     </div>
   )
 }

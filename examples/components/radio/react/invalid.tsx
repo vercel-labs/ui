@@ -2,42 +2,45 @@
 
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-const options = [
+const channels = [
   { value: "email", label: "Email only" },
   { value: "sms", label: "SMS only" },
-  { value: "both", label: "Both email and SMS" },
+  { value: "both", label: "Email and SMS" },
 ]
 
 function Example() {
-  const [saved, setSaved] = React.useState("")
+  const log = useLog()
 
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setSaved(String(new FormData(event.currentTarget).get("notifications")))
+        log(`Saved updates=${new FormData(event.currentTarget).get("updates")}`)
       }}
     >
       <Field>
-        <FieldLabel>Notification preferences</FieldLabel>
-        <FieldDescription>Choose how you want to receive notifications.</FieldDescription>
-        <RadioGroup name="notifications" required>
-          {options.map((option) => (
-            <label data-slot="label" key={option.value}>
-              <Radio value={option.value}>
+        <FieldLabel>Order updates</FieldLabel>
+        <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+        <RadioGroup name="updates" required>
+          {channels.map((channel) => (
+            <label data-slot="label" key={channel.value}>
+              <Radio value={channel.value}>
                 <RadioIndicator />
               </Radio>
-              {option.label}
+              {channel.label}
             </label>
           ))}
         </RadioGroup>
-        <FieldError>Choose how to receive notifications.</FieldError>
+        <FieldError>Choose how to get order updates.</FieldError>
       </Field>
-      <button type="submit">Save</button>
-      {saved && <output data-slot="output">Saved: {saved}</output>}
+      <div data-slot="row">
+        <button type="submit" data-variant="solid">
+          Save
+        </button>
+      </div>
     </form>
   )
 }

@@ -1,49 +1,49 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
-const methods = [
+const speeds = [
   { value: "standard", label: "Standard", detail: "Free, 5 to 7 days" },
   { value: "express", label: "Express", detail: "$9, 2 days" },
   { value: "overnight", label: "Overnight", detail: "$24, next day" },
 ]
 
 function Example() {
+  const log = useLog()
   const id = React.useId()
-  const [submitted, setSubmitted] = React.useState("")
 
   return (
     <div data-slot="stack">
-      <RadioGroup
-        aria-label="Shipping"
-        name="shipping"
-        form={`${id}-shipping-form`}
-        required
-        defaultValue="standard"
-      >
-        {methods.map((method) => (
-          <label data-slot="label" key={method.value}>
-            <Radio value={method.value}>
-              <RadioIndicator />
-            </Radio>
-            {method.label} <span data-slot="hint">{method.detail}</span>
-          </label>
-        ))}
-      </RadioGroup>
+      <Field>
+        <FieldLabel>Shipping speed</FieldLabel>
+        <RadioGroup name="shipping" form={`${id}-checkout`} required defaultValue="standard">
+          {speeds.map((speed) => (
+            <label data-slot="label" key={speed.value}>
+              <Radio value={speed.value}>
+                <RadioIndicator />
+              </Radio>
+              {speed.label}
+              <span data-slot="hint">({speed.detail})</span>
+            </label>
+          ))}
+        </RadioGroup>
+      </Field>
       <form
         data-slot="row"
-        id={`${id}-shipping-form`}
+        id={`${id}-checkout`}
         onSubmit={(event) => {
           event.preventDefault()
-          setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))))
+          log(`Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`)
         }}
-        onReset={() => setSubmitted("")}
       >
-        <button type="submit">Submit</button>
+        <button type="submit" data-variant="solid">
+          Continue
+        </button>
         <button type="reset">Reset</button>
       </form>
-      {submitted && <output data-slot="output">Submitted: {submitted}</output>}
     </div>
   )
 }
