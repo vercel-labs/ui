@@ -1,8 +1,8 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
@@ -35,16 +35,16 @@ function Example() {
   const [scrollTop, setScrollTop] = createSignal(0)
 
   return (
-    <Select
-      items={manyItems}
-      placeholder="Select an item"
-      onHighlight={(value, { index }) => {
-        const el = scroller
-        if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
-      }}
-    >
-      <div data-slot="stack">
-        <SelectLabel>Item</SelectLabel>
+    <Field>
+      <FieldLabel>Item</FieldLabel>
+      <Select
+        items={manyItems}
+        placeholder="Select an item"
+        onHighlight={(value, { index }) => {
+          const el = scroller
+          if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
+        }}
+      >
         <SelectTrigger>
           <SelectValue />
           <svg
@@ -59,38 +59,38 @@ function Example() {
             <path d="m6 9 6 6 6-6" />
           </svg>
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <div
-          ref={scroller}
-          style={{ height: `${height}px` }}
-          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-        >
-          <SelectList>
-            {(state) => {
-              const items = () => state.items as { value: string; label: string }[]
-              const rows = () => visibleRows(scrollTop(), height, items().length, row)
-              return (
-                <div style={{ height: `${items().length * row}px` }}>
-                  <For each={items().slice(rows().start, rows().end)}>
-                    {(item, offset) => (
-                      <SelectItem
-                        value={item.value}
-                        label={item.label}
-                        index={rows().start + offset()}
-                        style={{ top: `${(rows().start + offset()) * row}px`, height: `${row}px` }}
-                      >
-                        {item.label}
-                      </SelectItem>
-                    )}
-                  </For>
-                </div>
-              )
-            }}
-          </SelectList>
-        </div>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <div
+            ref={scroller}
+            style={{ height: `${height}px` }}
+            onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+          >
+            <SelectList>
+              {(state) => {
+                const items = () => state.items as { value: string; label: string }[]
+                const rows = () => visibleRows(scrollTop(), height, items().length, row)
+                return (
+                  <div style={{ height: `${items().length * row}px` }}>
+                    <For each={items().slice(rows().start, rows().end)}>
+                      {(item, offset) => (
+                        <SelectItem
+                          value={item.value}
+                          label={item.label}
+                          index={rows().start + offset()}
+                          style={{ top: `${(rows().start + offset()) * row}px`, height: `${row}px` }}
+                        >
+                          {item.label}
+                        </SelectItem>
+                      )}
+                    </For>
+                  </div>
+                )
+              }}
+            </SelectList>
+          </div>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

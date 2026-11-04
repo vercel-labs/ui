@@ -1,15 +1,8 @@
 <script setup lang="ts">
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectList,
-  SelectTrigger,
-  SelectValue,
-} from "@ui-sdk/vue/select"
-import { ref } from "vue"
 import { ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Select, SelectContent, SelectItem, SelectList, SelectTrigger, SelectValue } from "@ui-sdk/vue/select"
+import { ref } from "vue"
 
 const manyItems = Array.from({ length: 10_000 }, (_, index) => ({
   value: `item-${index + 1}`,
@@ -35,7 +28,7 @@ const height = 288
 const scroller = ref<HTMLDivElement | null>(null)
 const scrollTop = ref(0)
 
-function onHighlight(_value: unknown, { index }: { index: number }) {
+function highlight(_value: unknown, { index }: { index: number }) {
   const el = scroller.value
   if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
 }
@@ -47,35 +40,35 @@ function visible(items: { value: string; label: string }[]) {
 </script>
 
 <template>
-  <Select :items="manyItems" placeholder="Select an item" @highlight="onHighlight">
-    <div data-slot="stack">
-      <SelectLabel>Item</SelectLabel>
+  <Field>
+    <FieldLabel>Item</FieldLabel>
+    <Select :items="manyItems" placeholder="Select an item" @highlight="highlight">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <div
-        ref="scroller"
-        :style="{ height: `${height}px` }"
-        @scroll="scrollTop = ($event.currentTarget as HTMLDivElement).scrollTop"
-      >
-        <SelectList v-slot="{ state }">
-          <div :style="{ height: `${state.items.length * row}px` }">
-            <SelectItem
-              v-for="{ item, index } in visible(state.items as { value: string; label: string }[])"
-              :key="item.value"
-              :value="item.value"
-              :label="item.label"
-              :index="index"
-              :style="{ top: `${index * row}px`, height: `${row}px` }"
-            >
-              {{ item.label }}
-            </SelectItem>
-          </div>
-        </SelectList>
-      </div>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <div
+          ref="scroller"
+          :style="{ height: `${height}px` }"
+          @scroll="scrollTop = ($event.currentTarget as HTMLDivElement).scrollTop"
+        >
+          <SelectList v-slot="{ state }">
+            <div :style="{ height: `${state.items.length * row}px` }">
+              <SelectItem
+                v-for="{ item, index } in visible(state.items as { value: string; label: string }[])"
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"
+                :index="index"
+                :style="{ top: `${index * row}px`, height: `${row}px` }"
+              >
+                {{ item.label }}
+              </SelectItem>
+            </div>
+          </SelectList>
+        </div>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

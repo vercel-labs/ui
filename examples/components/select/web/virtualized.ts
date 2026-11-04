@@ -1,3 +1,4 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
 import { ChevronDown, createElement } from "lucide"
 
@@ -24,29 +25,30 @@ const height = 288
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-select placeholder="Select an item">
-      <div data-slot="stack">
-        <ui-select-label>Item</ui-select-label>
+    <ui-field>
+      <ui-field-label>Item</ui-field-label>
+      <ui-select placeholder="Select an item">
         <ui-select-trigger>
           <button>
             <ui-select-value></ui-select-value>
             ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-select-trigger>
-      </div>
-      <ui-select-content>
-        <div style="height: ${height}px">
-          <ui-select-list>
-            <div style="height: ${manyItems.length * row}px"></div>
-          </ui-select-list>
-        </div>
-      </ui-select-content>
-    </ui-select>
+        <ui-select-content>
+          <div style="height: ${height}px"></div>
+        </ui-select-content>
+      </ui-select>
+    </ui-field>
   `
-  const select = root.querySelector("ui-select") as HTMLElement & { items: typeof manyItems }
+  const select = root.querySelector("ui-select")!
   const scroller = root.querySelector<HTMLElement>("ui-select-content > div")!
-  const rows = root.querySelector<HTMLElement>("ui-select-list > div")!
   select.items = manyItems
+  scroller.innerHTML = `
+    <ui-select-list>
+      <div style="height: ${manyItems.length * row}px"></div>
+    </ui-select-list>
+  `
+  const rows = scroller.querySelector<HTMLElement>("ui-select-list > div")!
 
   const rendered = new Map<number, Element>()
   const render = () => {
@@ -69,7 +71,7 @@ function mount(root: HTMLElement) {
   render()
   scroller.addEventListener("scroll", render)
   select.addEventListener("highlight", (event) => {
-    const { index } = (event as CustomEvent<{ value: string | null; index: number }>).detail
+    const { index } = event.detail
     if (index < 0) return
     scroller.scrollTop = scrollForRow(index, scroller.scrollTop, scroller.clientHeight, row)
     render()

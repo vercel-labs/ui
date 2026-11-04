@@ -3,11 +3,13 @@
 </script>
 
 <Resizable orientation="vertical">
-  <ResizablePanel
-    defaultSize={25}
-  >Header</ResizablePanel>
-  <ResizableHandle aria-label="Resize header" />
-  <ResizablePanel
-    defaultSize={75}
-  >Content</ResizablePanel>
+  <ResizablePanel defaultSize={45} minSize={25}>
+    <h3>Inbox</h3>
+    <span data-slot="hint">3 unread messages</span>
+  </ResizablePanel>
+  <ResizableHandle aria-label="Resize inbox" />
+  <ResizablePanel defaultSize={55} minSize={25}>
+    <h3>Quarterly report</h3>
+    <span data-slot="hint">From Hollis Grant</span>
+  </ResizablePanel>
 </Resizable>

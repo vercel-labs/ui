@@ -7,41 +7,43 @@
     ScrollAreaThumb,
     ScrollAreaViewport,
   } from "@ui-sdk/svelte/scroll-area"
+  import { useLog } from "../../../shared/svelte/log"
 
   const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}`)
 
+  const log = useLog()
   const controller = createScrollAreaController()
-  let position = $state("At the start")
-  const read = () =>
-    (position = controller.isAtEnd() ? "At the end" : controller.isAtStart() ? "At the start" : "In between")
+  let edge: string | null = "start"
+
+  function read() {
+    const next = controller.isAtEnd() ? "end" : controller.isAtStart() ? "start" : null
+    if (next && next !== edge) log(`At the ${next}`)
+    edge = next
+  }
 </script>
 
 <div data-slot="stack">
+  <div data-slot="controls">
+    <button type="button" onclick={() => controller.scrollToStart({ behavior: "smooth" })}>
+      Back to Top
+    </button>
+    <button type="button" onclick={() => controller.scrollToEnd({ behavior: "instant" })}>
+      Jump to the End
+    </button>
+  </div>
   <ScrollArea {controller}>
-    <ScrollAreaViewport onscroll={read}>
+    <ScrollAreaViewport role="region" aria-label="Tags" onscroll={read}>
       <ScrollAreaContent>
-        {#each tags as tag (tag)}
-          <div>{tag}</div>
-        {/each}
+        <h3>Tags</h3>
+        <ul>
+          {#each tags as tag (tag)}
+            <li>{tag}</li>
+          {/each}
+        </ul>
       </ScrollAreaContent>
     </ScrollAreaViewport>
     <ScrollAreaScrollbar>
       <ScrollAreaThumb />
     </ScrollAreaScrollbar>
   </ScrollArea>
-  <div data-slot="stack">
-    <button data-variant="secondary"
-      type="button"
-      onclick={() => controller.scrollToStart({ behavior: "smooth" })}
-    >
-      Back to top
-    </button>
-    <button data-variant="secondary"
-      type="button"
-      onclick={() => controller.scrollToEnd({ behavior: "instant" })}
-    >
-      Jump to the end
-    </button>
-    <output data-slot="output">{position}</output>
-  </div>
 </div>

@@ -1,4 +1,5 @@
-import { createAsyncOptions } from "@ui-sdk/core/async-options"
+import { useAsyncOptions } from "@ui-sdk/solid/async-options"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
@@ -6,13 +7,12 @@ import {
   SelectInput,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectList,
   SelectStatus,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
-import { For, createSignal, onCleanup } from "solid-js"
+import { createSignal, For } from "solid-js"
 
 const countryList = [
   { value: "ar", label: "Argentina" },
@@ -57,26 +57,23 @@ function searchCountries(query: string, { signal, page }: { signal: AbortSignal;
 
 function Example() {
   const [query, setQuery] = createSignal("")
-  const results = createAsyncOptions(searchCountries, { immediate: true })
-  const [loaded, setLoaded] = createSignal(results.getState())
-  onCleanup(results.subscribe(() => setLoaded(results.getState())))
-  onCleanup(() => results.cancel())
+  const results = useAsyncOptions(searchCountries, { immediate: true })
 
   return (
-    <Select
-      items={loaded().items}
-      filter={false}
-      status={loaded().status}
-      query={query()}
-      onQueryChange={(next) => {
-        setQuery(next)
-        results.setQuery(next)
-      }}
-      onLoadMore={results.loadMore}
-      placeholder="Select a country"
-    >
-      <div data-slot="stack">
-        <SelectLabel>Country</SelectLabel>
+    <Field>
+      <FieldLabel>Country</FieldLabel>
+      <Select
+        items={results.items}
+        filter={false}
+        status={results.status}
+        query={query()}
+        onQueryChange={(next) => {
+          setQuery(next)
+          results.setQuery(next)
+        }}
+        onLoadMore={results.loadMore}
+        placeholder="Select a country"
+      >
         <SelectTrigger>
           <SelectValue />
           <svg
@@ -91,47 +88,47 @@ function Example() {
             <path d="m6 9 6 6 6-6" />
           </svg>
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-        <SelectEmpty>
-          {(state) => (state.empty && !state.loading ? `No countries match “${state.query}”.` : null)}
-        </SelectEmpty>
-        <SelectList>
-          {(state) => (
-            <For each={state.items as { value: string; label: string; disabled?: boolean }[]}>
-              {(item) => (
-                <SelectItem value={item.value} label={item.label} disabled={item.disabled}>
-                  {item.label}
-                  <SelectItemIndicator>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                  </SelectItemIndicator>
-                </SelectItem>
-              )}
-            </For>
-          )}
-        </SelectList>
-        <SelectStatus>
-          {(state) =>
-            state.loading
-              ? "Loading…"
-              : state.status === "error"
-                ? "Couldn't load countries."
-                : `${state.count} shown`
-          }
-        </SelectStatus>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectEmpty>
+            {(state) => (state.empty && !state.loading ? `No countries match “${state.query}”.` : null)}
+          </SelectEmpty>
+          <SelectList>
+            {(state) => (
+              <For each={state.items as { value: string; label: string; disabled?: boolean }[]}>
+                {(item) => (
+                  <SelectItem value={item.value} label={item.label} disabled={item.disabled}>
+                    {item.label}
+                    <SelectItemIndicator>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </SelectItemIndicator>
+                  </SelectItem>
+                )}
+              </For>
+            )}
+          </SelectList>
+          <SelectStatus>
+            {(state) =>
+              state.loading
+                ? "Loading…"
+                : state.status === "error"
+                  ? "Couldn't load countries."
+                  : `${state.count} shown`
+            }
+          </SelectStatus>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

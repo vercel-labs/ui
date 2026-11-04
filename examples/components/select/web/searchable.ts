@@ -1,5 +1,6 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
-import { Check, ChevronDown, Search, createElement } from "lucide"
+import { Check, ChevronDown, createElement } from "lucide"
 
 const countries = [
   { value: "ar", label: "Argentina", code: "+54" },
@@ -32,38 +33,35 @@ const popularCountries = [
   { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
 ]
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-select placeholder="Select a country" filter="contains">
-      <div data-slot="stack">
-        <ui-select-label>Country</ui-select-label>
+    <ui-field>
+      <ui-field-label>Country</ui-field-label>
+      <ui-select placeholder="Select a country" filter="contains">
         <ui-select-trigger>
           <button>
             <ui-select-value></ui-select-value>
             ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-select-trigger>
-      </div>
-      <ui-select-content>
-        <div data-slot="row">
-          ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
+        <ui-select-content>
           <ui-select-input>
             <input aria-label="Search countries" placeholder="Search countries…" />
           </ui-select-input>
-        </div>
-        <ui-select-empty>No countries found.</ui-select-empty>
-        <ui-select-list></ui-select-list>
-      </ui-select-content>
-      <template>
-        <ui-select-group>
-          <ui-select-group-label></ui-select-group-label>
+          <ui-select-empty>No countries found.</ui-select-empty>
+          <ui-select-list></ui-select-list>
+        </ui-select-content>
+        <template>
+          <ui-select-group>
+            <ui-select-group-label></ui-select-group-label>
+          </ui-select-group>
           <ui-select-item>
             <ui-select-item-text></ui-select-item-text>
             <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
           </ui-select-item>
-        </ui-select-group>
-      </template>
-    </ui-select>
+        </template>
+      </ui-select>
+    </ui-field>
   `
   const select = root.querySelector("ui-select")!
   select.emptyItems = popularCountries
@@ -71,3 +69,5 @@ export function mount(root: HTMLElement) {
     change.type === "results" ? `${change.count} ${change.count === 1 ? "country" : "countries"} found` : null
   select.items = countries
 }
+
+export { mount }

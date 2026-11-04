@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -6,12 +8,10 @@ import {
   SelectGroupLabel,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
   type ListData,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
 const sizeGroups = [
   { type: "group", label: "Common", items: ["Small", "Medium", "Large"] },
@@ -20,24 +20,24 @@ const sizeGroups = [
 </script>
 
 <template>
-  <Select :items="sizeGroups" name="size" default-value="Medium">
-    <div data-slot="stack">
-      <SelectLabel>Size</SelectLabel>
+  <Field>
+    <FieldLabel>Size</FieldLabel>
+    <Select :items="sizeGroups" name="size" default-value="Medium">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <SelectGroup v-for="group in sizeGroups" :key="group.label">
-        <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
-        <SelectItem v-for="size in group.items" :key="size" :value="size">
-          {{ size }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectGroup>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectGroup v-for="group in sizeGroups" :key="group.label">
+          <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
+          <SelectItem v-for="size in group.items" :key="size" :value="size">
+            {{ size }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

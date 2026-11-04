@@ -15,7 +15,9 @@ function mount(root: HTMLElement) {
               <ui-scroll-area type="${type}">
                 <ui-scroll-area-viewport>
                   <ui-scroll-area-content>
-                    ${tags.map((tag) => `<div>${tag}</div>`).join("")}
+                    <ul>
+                      ${tags.map((tag) => `<li>${tag}</li>`).join("")}
+                    </ul>
                   </ui-scroll-area-content>
                 </ui-scroll-area-viewport>
                 <ui-scroll-area-scrollbar>

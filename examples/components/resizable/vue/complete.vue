@@ -1,23 +1,33 @@
 <script setup lang="ts">
-import type { ResizableLayoutCommitDetails } from "@ui-sdk/vue/resizable"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
-import { ref } from "vue"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableLayoutCommitDetails,
+} from "@ui-sdk/vue/resizable"
+import { useLog } from "../../../shared/vue/log"
 
-const moves = ref(0)
-const saved = ref("nothing yet")
+const log = useLog()
 
-function save(layout: number[], details: ResizableLayoutCommitDetails) {
-  saved.value = `${layout.map(Math.round).join(" / ")} after ${details.reason}`
+function onLayoutCommit(layout: number[], details: ResizableLayoutCommitDetails) {
+  log(`Saved ${layout.map(Math.round).join(" / ")} (${details.reason})`)
 }
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Resizable @layout-change="moves++" @layout-commit="save">
-      <ResizablePanel :default-size="40">Files</ResizablePanel>
-      <ResizableHandle aria-label="Resize files" />
-      <ResizablePanel>Editor</ResizablePanel>
-    </Resizable>
-    <output data-slot="output">{{ moves }} changes, saved {{ saved }}</output>
-  </div>
+  <Resizable @layout-commit="onLayoutCommit">
+    <ResizablePanel :default-size="40" :min-size="20">
+      <h3>Files</h3>
+      <ul>
+        <li>page.tsx</li>
+        <li>layout.tsx</li>
+        <li>globals.css</li>
+      </ul>
+    </ResizablePanel>
+    <ResizableHandle aria-label="Resize files" />
+    <ResizablePanel :min-size="20">
+      <h3>page.tsx</h3>
+      <span data-slot="hint">Saved just now</span>
+    </ResizablePanel>
+  </Resizable>
 </template>

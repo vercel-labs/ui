@@ -1,21 +1,21 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const statuses = [
+    { value: "backlog", label: "Backlog" },
+    { value: "todo", label: "Todo" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "done", label: "Done" },
   ]
 
   const modes = [
@@ -25,37 +25,35 @@
   ] as const
 
   let modal = $state<boolean | "pointer">("pointer")
-  let presses = $state(0)
+  const log = useLog()
 </script>
 
 <div data-slot="stack">
-  <div role="group" aria-label="Modal" data-slot="row">
+  <div data-slot="controls" role="group" aria-label="Modal">
     {#each modes as mode (mode.label)}
       <button type="button" aria-pressed={modal === mode.value} onclick={() => (modal = mode.value)}>
         {mode.label}
       </button>
     {/each}
   </div>
-  <Select {modal} defaultValue="apple">
-    <div data-slot="stack">
-      <SelectLabel>Fruit</SelectLabel>
+  <Field>
+    <FieldLabel>Status</FieldLabel>
+    <Select {modal} defaultValue="todo">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      {#each fruits as fruit (fruit.value)}
-        <SelectItem value={fruit.value}>
-          {fruit.label}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      {/each}
-    </SelectContent>
-  </Select>
-  <button type="button" onclick={() => presses++}>
-    Pressed {presses} times
-  </button>
+      <SelectContent>
+        {#each statuses as status (status.value)}
+          <SelectItem value={status.value}>
+            {status.label}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
+  </Field>
+  <button type="button" onclick={() => log("Pressed Save Draft")}>Save Draft</button>
 </div>

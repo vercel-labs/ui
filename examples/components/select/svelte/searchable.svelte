@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { CheckIcon, ChevronDownIcon, SearchIcon } from "@lucide/svelte"
-  import type { ListAnnouncement } from "@ui-sdk/core/select"
+  import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -11,7 +11,6 @@
     SelectItem,
     SelectItemIndicator,
     SelectItemText,
-    SelectLabel,
     SelectList,
     SelectTrigger,
     SelectValue,
@@ -47,54 +46,49 @@
   const popularCountries = [
     { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
   ]
-
-  const announcement = (change: ListAnnouncement) =>
-    change.type === "results" ? `${change.count} ${change.count === 1 ? "country" : "countries"} found` : null
 </script>
 
-<Select
-  items={countries}
-  emptyItems={popularCountries}
-  placeholder="Select a country"
-  filter="contains"
-  {announcement}
->
-  <div data-slot="stack">
-    <SelectLabel>Country</SelectLabel>
+<Field>
+  <FieldLabel>Country</FieldLabel>
+  <Select
+    items={countries}
+    emptyItems={popularCountries}
+    placeholder="Select a country"
+    filter="contains"
+    announcement={(change) =>
+      change.type === "results" ? `${change.count} ${change.count === 1 ? "country" : "countries"} found` : null}
+  >
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    <div data-slot="row">
-      <SearchIcon />
+    <SelectContent>
       <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-    </div>
-    <SelectEmpty>No countries found.</SelectEmpty>
-    <SelectList>
-      {#snippet children(state)}
-        {#snippet countryItem(country: { value: string; label: string })}
-          <SelectItem value={country.value} label={country.label}>
-            <SelectItemText />
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
+      <SelectEmpty>No countries found.</SelectEmpty>
+      <SelectList>
+        {#snippet children(state)}
+          {#snippet countryItem(country: { value: string; label: string })}
+            <SelectItem value={country.value} label={country.label}>
+              <SelectItemText />
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          {/snippet}
+          {#each (state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]) as entry ("items" in entry ? entry.label : entry.value)}
+            {#if "items" in entry}
+              <SelectGroup>
+                <SelectGroupLabel>{entry.label}</SelectGroupLabel>
+                {#each entry.items as country (country.value)}
+                  {@render countryItem(country)}
+                {/each}
+              </SelectGroup>
+            {:else}
+              {@render countryItem(entry)}
+            {/if}
+          {/each}
         {/snippet}
-        {#each (state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]) as entry ("items" in entry ? entry.label : entry.value)}
-          {#if "items" in entry}
-            <SelectGroup>
-              <SelectGroupLabel>{entry.label}</SelectGroupLabel>
-              {#each entry.items as country (country.value)}
-                {@render countryItem(country)}
-              {/each}
-            </SelectGroup>
-          {:else}
-            {@render countryItem(entry)}
-          {/if}
-        {/each}
-      {/snippet}
-    </SelectList>
-  </SelectContent>
-</Select>
+      </SelectList>
+    </SelectContent>
+  </Select>
+</Field>

@@ -1,55 +1,55 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
 type Member = { id: number; name: string; email: string }
 
 const members: Member[] = [
-  { id: 1, name: "Ada Lovelace", email: "ada@example.com" },
-  { id: 2, name: "Grace Hopper", email: "grace@example.com" },
-  { id: 3, name: "Alan Turing", email: "alan@example.com" },
-  { id: 4, name: "Margaret Hamilton", email: "margaret@example.com" },
+  { id: 1, name: "Hollis Grant", email: "hollis@example.com" },
+  { id: 2, name: "Inès Moreau", email: "ines@example.com" },
+  { id: 3, name: "Kofi Mensah", email: "kofi@example.com" },
+  { id: 4, name: "Wren Takahashi", email: "wren@example.com" },
 ]
 
-const assignee = ref<Member | null>({ ...members[1] })
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
+  <Field>
+    <FieldLabel>Assignee</FieldLabel>
     <Select
-      v-model:value="assignee"
+      :default-value="{ ...members[1] }"
       name="assignee"
       :item-to-value="(member: Member) => String(member.id)"
       :item-to-label="(member: Member) => member.name"
       :is-item-equal-to-value="(item: Member, value: Member) => item.id === value.id"
       placeholder="Unassigned"
+      @value-change="(member: Member | null) => log(`Submits assignee=${member ? member.id : ''}`)"
     >
-      <div data-slot="stack">
-        <SelectLabel>Assignee</SelectLabel>
-        <SelectTrigger>
-          <SelectValue />
-          <ChevronDownIcon />
-        </SelectTrigger>
-      </div>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
       <SelectContent>
         <SelectItem v-for="member in members" :key="member.id" :value="member">
-          <span>{{ member.name }}</span>
-          <span data-slot="hint">{{ member.email }}</span>
+          <span data-slot="stack">
+            {{ member.name }}
+            <span data-slot="hint">{{ member.email }}</span>
+          </span>
           <SelectItemIndicator>
             <CheckIcon />
           </SelectItemIndicator>
         </SelectItem>
       </SelectContent>
     </Select>
-    <output data-slot="output">Submits assignee={{ assignee ? assignee.id : "" }}</output>
-  </div>
+  </Field>
 </template>

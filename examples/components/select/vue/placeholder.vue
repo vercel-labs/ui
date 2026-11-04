@@ -1,53 +1,55 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
 const sizes = ["Extra small", "Small", "Medium", "Large", "Extra large"]
+
+const wraps = ["Paper", "Ribbon", "Box"]
 </script>
 
 <template>
   <div data-slot="stack">
-    <Select placeholder="Select a size">
-      <div data-slot="stack">
-        <SelectLabel>Size</SelectLabel>
+    <Field>
+      <FieldLabel>Size</FieldLabel>
+      <Select placeholder="Select a size">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectItem v-for="size in sizes" :key="size" :value="size">
-          {{ size }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
-    <Select>
-      <div data-slot="stack">
-        <SelectLabel>Gift wrap</SelectLabel>
+        <SelectContent>
+          <SelectItem v-for="size in sizes" :key="size" :value="size">
+            {{ size }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
+    <Field>
+      <FieldLabel>Gift wrap</FieldLabel>
+      <Select>
         <SelectTrigger>
           <SelectValue placeholder="None" />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectItem v-for="wrap in ['Paper', 'Ribbon', 'Box']" :key="wrap" :value="wrap">
-          {{ wrap }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectItem v-for="wrap in wraps" :key="wrap" :value="wrap">
+            {{ wrap }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
   </div>
 </template>

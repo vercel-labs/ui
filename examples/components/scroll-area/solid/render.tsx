@@ -16,11 +16,13 @@ function Example() {
         <>
           <ScrollAreaViewport render={(props) => <article {...props} />} aria-label="Releases">
             <ScrollAreaContent>
-              <For each={tags}>{(tag) => <p>{tag}</p>}</For>
+              <ul>
+                <For each={tags}>{(tag) => <li>{tag}</li>}</For>
+              </ul>
             </ScrollAreaContent>
           </ScrollAreaViewport>
           <p data-slot="hint" aria-hidden="true">
-            {state.atStart ? "Scroll for older releases" : "Keep going"}
+            {state.atStart ? "Scroll for older releases" : "More releases below"}
           </p>
           <ScrollAreaScrollbar>
             <ScrollAreaThumb />

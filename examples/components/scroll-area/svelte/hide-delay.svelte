@@ -7,19 +7,26 @@
     ScrollAreaViewport,
   } from "@ui-sdk/svelte/scroll-area"
 
+  const delays = [
+    { value: 0, label: "No delay" },
+    { value: 2000, label: "2000 ms delay" },
+  ]
+
   const tags = Array.from({ length: 20 }, (_, index) => `v1.2.0-beta.${50 - index}`)
 </script>
 
-<div data-slot="row">
-  {#each [0, 2000] as delay (delay)}
+<div data-slot="grid">
+  {#each delays as delay (delay.value)}
     <div data-slot="stack">
-      <code>scrollHideDelay={delay}</code>
-      <ScrollArea type="scroll" scrollHideDelay={delay}>
+      <span data-slot="hint">{delay.label}</span>
+      <ScrollArea type="scroll" scrollHideDelay={delay.value}>
         <ScrollAreaViewport>
           <ScrollAreaContent>
-            {#each tags as tag (tag)}
-              <div>{tag}</div>
-            {/each}
+            <ul>
+              {#each tags as tag (tag)}
+                <li>{tag}</li>
+              {/each}
+            </ul>
           </ScrollAreaContent>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar>

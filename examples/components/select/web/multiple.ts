@@ -1,33 +1,43 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const languages = [
+  { value: "en", label: "English" },
+  { value: "fr", label: "French" },
+  { value: "de", label: "German" },
+  { value: "ja", label: "Japanese" },
+  { value: "pt", label: "Portuguese" },
+  { value: "es", label: "Spanish" },
 ]
+
+function summary(value: string[]) {
+  const labels = value.map((key) => languages.find((language) => language.value === key)?.label ?? key)
+  return labels.length === 0
+    ? "Select languages"
+    : labels.length > 2
+      ? `${labels[0]} and ${labels.length - 1} more`
+      : labels.join(", ")
+}
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-select multiple default-value="apple, grapes" placeholder="Select fruits">
-        <div data-slot="stack">
-          <ui-select-label>Fruits</ui-select-label>
-          <ui-select-trigger>
-            <button>
-              <ui-select-value><span></span></ui-select-value>
-              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
-            </button>
-          </ui-select-trigger>
-        </div>
+    <ui-field>
+      <ui-field-label>Languages</ui-field-label>
+      <ui-select multiple default-value="en, ja" placeholder="Select languages">
+        <ui-select-trigger>
+          <button>
+            <ui-select-value>${summary(["en", "ja"])}</ui-select-value>
+            ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+          </button>
+        </ui-select-trigger>
         <ui-select-content>
-          ${fruits
+          ${languages
             .map(
-              (fruit) => `
-                <ui-select-item value="${fruit.value}">
-                  ${fruit.label}
+              (language) => `
+                <ui-select-item value="${language.value}">
+                  ${language.label}
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
               `,
@@ -35,24 +45,13 @@ function mount(root: HTMLElement) {
             .join("")}
         </ui-select-content>
       </ui-select>
-      <output data-slot="output"></output>
-    </div>
+    </ui-field>
   `
-  const text = root.querySelector("ui-select-value > span")!
-  const output = root.querySelector("output")!
-  const show = (value: string[]) => {
-    const labels = value.map((key) => fruits.find((fruit) => fruit.value === key)?.label ?? key)
-    text.textContent =
-      labels.length === 0
-        ? "Select fruits"
-        : labels.length > 2
-          ? `${labels[0]} and ${labels.length - 1} more`
-          : labels.join(", ")
-    output.textContent = `Value: ${JSON.stringify(value)}`
-  }
-  show(["apple", "grapes"])
+  const text = root.querySelector("ui-select-value")!
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
-    show((event as CustomEvent<{ value: string[] }>).detail.value)
+    const value = event.detail.value as string[]
+    text.textContent = summary(value)
+    log(root, `value: ${JSON.stringify(value)}`)
   })
 }
 

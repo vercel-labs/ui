@@ -4,15 +4,15 @@
 
 <div data-slot="stack" dir="rtl">
   <div data-slot="stack">
-    <div>الحساب</div>
+    <h3>الحساب</h3>
     <p data-slot="hint">إدارة ملفك الشخصي وتفضيلاتك.</p>
   </div>
   <Separator />
   <div data-slot="row">
-    <div>الملف الشخصي</div>
+    <span>الملف الشخصي</span>
     <Separator orientation="vertical" />
-    <div>الفوترة</div>
+    <span>الفوترة</span>
     <Separator orientation="vertical" />
-    <div>الإعدادات</div>
+    <span>الإعدادات</span>
   </div>
 </div>

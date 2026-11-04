@@ -9,8 +9,18 @@ const session: ResizableStorage = {
 
 <template>
   <Resizable auto-save-id="docs-storage" :storage="session">
-    <ResizablePanel id="session-files" :default-size="30">Files</ResizablePanel>
-    <ResizableHandle aria-label="Resize files" />
-    <ResizablePanel id="session-editor">Editor</ResizablePanel>
+    <ResizablePanel id="session-chats" :default-size="35" :min-size="20">
+      <h3>Messages</h3>
+      <ul>
+        <li>Inès Moreau</li>
+        <li>Kofi Mensah</li>
+        <li>Wren Takahashi</li>
+      </ul>
+    </ResizablePanel>
+    <ResizableHandle aria-label="Resize messages" />
+    <ResizablePanel id="session-thread" :min-size="20">
+      <h3>Inès Moreau</h3>
+      <span data-slot="hint">Can we move the review to Friday?</span>
+    </ResizablePanel>
   </Resizable>
 </template>

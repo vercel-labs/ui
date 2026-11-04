@@ -1,58 +1,59 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const countries = [
+  { value: "ca", label: "Canada" },
+  { value: "dk", label: "Denmark" },
+  { value: "fr", label: "France" },
+  { value: "de", label: "Germany" },
+  { value: "jp", label: "Japan" },
+  { value: "es", label: "Spain" },
 ]
 
-const variants = ["disabled", "readOnly", "item"] as const
+const fields = [
+  { label: "Billing country", disabled: true },
+  { label: "Shipping from", readOnly: true },
+  { label: "Shipping to" },
+]
 </script>
 
 <template>
   <div data-slot="stack">
-    <Select
-      v-for="variant in variants"
-      :key="variant"
-      :default-value="variant === 'item' ? null : 'banana'"
-      placeholder="Select a fruit"
-      :disabled="variant === 'disabled'"
-      :read-only="variant === 'readOnly'"
-    >
-      <div data-slot="stack">
-        <SelectLabel>
-          {{ variant === "disabled" ? "Disabled" : variant === "readOnly" ? "Read-only" : "Disabled item" }}
-        </SelectLabel>
+    <Field v-for="field in fields" :key="field.label">
+      <FieldLabel>{{ field.label }}</FieldLabel>
+      <Select
+        :default-value="field.disabled || field.readOnly ? 'fr' : null"
+        placeholder="Select a country"
+        :disabled="field.disabled"
+        :read-only="field.readOnly"
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectItem
-          v-for="fruit in fruits"
-          :key="fruit.value"
-          :value="fruit.value"
-          :disabled="fruit.value === 'grapes'"
-        >
-          {{ fruit.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectItem
+            v-for="country in countries"
+            :key="country.value"
+            :value="country.value"
+            :disabled="country.value === 'dk'"
+          >
+            {{ country.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
   </div>
 </template>

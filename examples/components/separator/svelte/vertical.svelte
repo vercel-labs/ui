@@ -2,10 +2,10 @@
   import { Separator } from "@ui-sdk/svelte/separator"
 </script>
 
-<div data-slot="row">
-  <span>Profile</span>
+<nav aria-label="Legal" data-slot="row">
+  <a href="#privacy">Privacy</a>
   <Separator orientation="vertical" />
-  <span>Billing</span>
+  <a href="#terms">Terms</a>
   <Separator orientation="vertical" />
-  <span>Settings</span>
-</div>
+  <a href="#cookies">Cookies</a>
+</nav>

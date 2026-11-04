@@ -1,40 +1,40 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const statuses = [
+    { value: "backlog", label: "Backlog" },
+    { value: "todo", label: "Todo" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "in-review", label: "In Review" },
+    { value: "done", label: "Done" },
   ]
 </script>
 
-<Select placeholder="Select a fruit" presentation="sheet">
-  <div data-slot="stack">
-    <SelectLabel>Fruit</SelectLabel>
+<Field>
+  <FieldLabel>Status</FieldLabel>
+  <Select defaultValue="todo" presentation="sheet">
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    {#each fruits as fruit (fruit.value)}
-      <SelectItem value={fruit.value}>
-        {fruit.label}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    {/each}
-  </SelectContent>
-</Select>
+    <SelectContent>
+      {#each statuses as status (status.value)}
+        <SelectItem value={status.value}>
+          {status.label}
+          <SelectItemIndicator>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

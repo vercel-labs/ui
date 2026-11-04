@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -6,13 +8,11 @@ import {
   SelectGroupLabel,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
   type ListData,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
 const plans = [
   { value: "free", label: "Free" },
@@ -33,31 +33,31 @@ const items: ListData = [
 </script>
 
 <template>
-  <Select :items="items" default-value="pro">
-    <div data-slot="stack">
-      <SelectLabel>Plan</SelectLabel>
+  <Field>
+    <FieldLabel>Plan</FieldLabel>
+    <Select :items="items" default-value="pro">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <SelectItem v-for="plan in plans" :key="plan.value" :value="plan.value">
-        {{ plan.label }}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-      <SelectSeparator />
-      <SelectGroup>
-        <SelectGroupLabel>Contact sales</SelectGroupLabel>
-        <SelectItem v-for="plan in sales" :key="plan.value" :value="plan.value" :disabled="plan.disabled">
+      <SelectContent>
+        <SelectItem v-for="plan in plans" :key="plan.value" :value="plan.value">
           {{ plan.label }}
           <SelectItemIndicator>
             <CheckIcon />
           </SelectItemIndicator>
         </SelectItem>
-      </SelectGroup>
-    </SelectContent>
-  </Select>
+        <SelectSeparator />
+        <SelectGroup>
+          <SelectGroupLabel>Contact sales</SelectGroupLabel>
+          <SelectItem v-for="plan in sales" :key="plan.value" :value="plan.value" :disabled="plan.disabled">
+            {{ plan.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

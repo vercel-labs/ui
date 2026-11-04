@@ -1,56 +1,94 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
   import {
     Select,
     SelectArrow,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const fonts = [
+    { value: "inter", label: "Inter" },
+    { value: "geist", label: "Geist" },
+    { value: "source-serif", label: "Source Serif" },
+    { value: "geist-mono", label: "Geist Mono" },
   ]
 
-  const sides = ["top", "right", "bottom", "left"] as const
-  const aligns = ["start", "center", "end"] as const
+  const sides = [
+    { value: "top", label: "Top" },
+    { value: "right", label: "Right" },
+    { value: "bottom", label: "Bottom" },
+    { value: "left", label: "Left" },
+  ]
 
-  let side = $state<(typeof sides)[number]>("bottom")
-  let align = $state<(typeof aligns)[number]>("start")
-  let box: HTMLDivElement | undefined = $state()
+  const aligns = [
+    { value: "start", label: "Start" },
+    { value: "center", label: "Center" },
+    { value: "end", label: "End" },
+  ]
+
+  type Side = "top" | "right" | "bottom" | "left"
+  type Align = "start" | "center" | "end"
+
+  let side = $state<Side>("bottom")
+  let align = $state<Align>("start")
+  let box = $state<HTMLDivElement | null>(null)
   let anchored = $state(false)
 </script>
 
 <div data-slot="stack">
-  <div data-slot="stack">
-    <div role="group" aria-label="Side" data-slot="row">
-      {#each sides as value (value)}
-        <button type="button" aria-pressed={side === value} onclick={() => (side = value)}>
-          {value}
-        </button>
-      {/each}
-    </div>
-    <div role="group" aria-label="Align" data-slot="row">
-      {#each aligns as value (value)}
-        <button type="button" aria-pressed={align === value} onclick={() => (align = value)}>
-          {value}
-        </button>
-      {/each}
-    </div>
+  <div data-slot="controls">
+    <Select items={sides} value={side} onValueChange={(next) => next && (side = next as Side)}>
+      <SelectLabel>Side</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
+      <SelectContent>
+        {#each sides as option (option.value)}
+          <SelectItem value={option.value}>
+            {option.label}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
+    <Select items={aligns} value={align} onValueChange={(next) => next && (align = next as Align)}>
+      <SelectLabel>Align</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
+      <SelectContent>
+        {#each aligns as option (option.value)}
+          <SelectItem value={option.value}>
+            {option.label}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
     <label data-slot="label">
-      <input bind:checked={anchored} type="checkbox" />
+      <Checkbox checked={anchored} onCheckedChange={(next) => (anchored = next === true)}>
+        <CheckboxIndicator>
+          <CheckIcon />
+        </CheckboxIndicator>
+      </Checkbox>
       Anchor to the box
     </label>
   </div>
   <div bind:this={box} data-slot="card">
-    <Select defaultValue="apple">
-      <SelectTrigger aria-label="Fruit">
+    <Select defaultValue="inter">
+      <SelectTrigger aria-label="Font">
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
@@ -63,9 +101,9 @@
         anchor={anchored ? box : null}
       >
         <SelectArrow />
-        {#each fruits as fruit (fruit.value)}
-          <SelectItem value={fruit.value}>
-            {fruit.label}
+        {#each fonts as font (font.value)}
+          <SelectItem value={font.value}>
+            {font.label}
             <SelectItemIndicator>
               <CheckIcon />
             </SelectItemIndicator>

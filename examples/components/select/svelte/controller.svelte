@@ -1,39 +1,50 @@
 <script lang="ts">
-  import { CheckIcon } from "@lucide/svelte"
+  import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
     SelectTrigger,
+    SelectValue,
     createSelectController,
   } from "@ui-sdk/svelte/select"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const statuses = [
+    { value: "backlog", label: "Backlog" },
+    { value: "todo", label: "Todo" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "done", label: "Done" },
   ]
 
-  const fruit = createSelectController<string>()
-  let log = $state("")
+  const status = createSelectController<string>()
+  const log = useLog()
 
-  async function openFruit() {
-    const { reason } = await fruit.open()
-    log = `Closed by ${reason}, with ${fruit.getValue() ?? "nothing"}`
+  async function openAndWait() {
+    const { reason } = await status.open()
+    log(`Closed by ${reason}, with ${status.getValue() ?? "nothing"}`)
   }
 </script>
 
 <div data-slot="stack">
-  <div data-slot="row">
-    <span data-slot="hint">Toolbar</span>
-    <SelectTrigger controller={fruit} aria-label="Fruit" />
+  <div data-slot="controls">
+    <button type="button" onclick={openAndWait}>Open and Wait</button>
+    <button type="button" onclick={() => status.setValue("done")}>Mark Done</button>
+    <button type="button" onclick={() => status.clear()}>Clear</button>
+    <button type="button" onclick={() => status.focus()}>Focus</button>
   </div>
-  <Select controller={fruit} items={fruits} placeholder="Fruit">
+  <Field>
+    <FieldLabel>Status</FieldLabel>
+    <SelectTrigger controller={status}>
+      <SelectValue />
+      <ChevronDownIcon />
+    </SelectTrigger>
+  </Field>
+  <Select controller={status} items={statuses} placeholder="Select a status">
     <SelectContent>
-      {#each fruits as item (item.value)}
+      {#each statuses as item (item.value)}
         <SelectItem value={item.value}>
           {item.label}
           <SelectItemIndicator>
@@ -43,19 +54,4 @@
       {/each}
     </SelectContent>
   </Select>
-  <div data-slot="row">
-    <button type="button" onclick={openFruit}>
-      Open
-    </button>
-    <button type="button" onclick={() => fruit.setValue("banana")}>
-      Banana
-    </button>
-    <button type="button" onclick={() => fruit.clear()}>
-      Clear
-    </button>
-    <button type="button" onclick={() => fruit.focus()}>
-      Focus
-    </button>
-  </div>
-  <output data-slot="output">{log || "Use the buttons"}</output>
 </div>

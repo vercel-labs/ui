@@ -1,48 +1,55 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
-import type { ListData } from "@ui-sdk/core/select"
+import type { ListData } from "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
 
-const plans: ListData = [
+const plans = [
   { value: "free", label: "Free" },
   { value: "pro", label: "Pro" },
   { value: "team", label: "Team" },
-  { type: "separator" },
-  {
-    type: "group",
-    label: "Contact sales",
-    items: [
-      { value: "enterprise", label: "Enterprise" },
-      { value: "education", label: "Education", disabled: true },
-    ],
-  },
 ]
+
+const sales = [
+  { value: "enterprise", label: "Enterprise" },
+  { value: "education", label: "Education", disabled: true },
+]
+
+const items: ListData = [
+  ...plans,
+  { type: "separator" },
+  { type: "group", label: "Contact sales", items: sales },
+]
+
+const item = (plan: { value: string; label: string; disabled?: boolean }) => `
+  <ui-select-item value="${plan.value}"${plan.disabled ? " disabled" : ""}>
+    ${plan.label}
+    <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
+  </ui-select-item>
+`
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-select default-value="pro">
-      <div data-slot="stack">
-        <ui-select-label>Plan</ui-select-label>
+    <ui-field>
+      <ui-field-label>Plan</ui-field-label>
+      <ui-select default-value="pro">
         <ui-select-trigger>
           <button>
             <ui-select-value></ui-select-value>
             ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-select-trigger>
-      </div>
-      <template>
         <ui-select-content>
-          <ui-select-group>
-            <ui-select-group-label></ui-select-group-label>
-            <ui-select-item>
-              <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
-            </ui-select-item>
-          </ui-select-group>
+          ${plans.map(item).join("")}
           <ui-select-separator></ui-select-separator>
+          <ui-select-group>
+            <ui-select-group-label>Contact sales</ui-select-group-label>
+            ${sales.map(item).join("")}
+          </ui-select-group>
         </ui-select-content>
-      </template>
-    </ui-select>
+      </ui-select>
+    </ui-field>
   `
-  root.querySelector("ui-select")!.items = plans
+  root.querySelector("ui-select")!.items = items
 }
 
 export { mount }

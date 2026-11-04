@@ -1,41 +1,51 @@
 <script setup lang="ts">
-import { CheckIcon } from "@lucide/vue"
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
   SelectTrigger,
+  SelectValue,
   createSelectController,
 } from "@ui-sdk/vue/select"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const statuses = [
+  { value: "backlog", label: "Backlog" },
+  { value: "todo", label: "Todo" },
+  { value: "in-progress", label: "In Progress" },
+  { value: "done", label: "Done" },
 ]
 
-const fruit = createSelectController<string>()
-const log = ref("")
+const status = createSelectController<string>()
+const log = useLog()
 
-async function openFruit() {
-  const { reason } = await fruit.open()
-  log.value = `Closed by ${reason}, with ${fruit.getValue() ?? "nothing"}`
+async function openAndWait() {
+  const { reason } = await status.open()
+  log(`Closed by ${reason}, with ${status.getValue() ?? "nothing"}`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="row">
-      <span data-slot="hint">Toolbar</span>
-      <SelectTrigger :controller="fruit" aria-label="Fruit" />
+    <div data-slot="controls">
+      <button type="button" @click="openAndWait">Open and Wait</button>
+      <button type="button" @click="status.setValue('done')">Mark Done</button>
+      <button type="button" @click="status.clear()">Clear</button>
+      <button type="button" @click="status.focus()">Focus</button>
     </div>
-    <Select :controller="fruit" :items="fruits" placeholder="Fruit">
+    <Field>
+      <FieldLabel>Status</FieldLabel>
+      <SelectTrigger :controller="status">
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
+    </Field>
+    <Select :controller="status" :items="statuses" placeholder="Select a status">
       <SelectContent>
-        <SelectItem v-for="item in fruits" :key="item.value" :value="item.value">
+        <SelectItem v-for="item in statuses" :key="item.value" :value="item.value">
           {{ item.label }}
           <SelectItemIndicator>
             <CheckIcon />
@@ -43,12 +53,5 @@ async function openFruit() {
         </SelectItem>
       </SelectContent>
     </Select>
-    <div data-slot="row">
-      <button type="button" @click="openFruit">Open</button>
-      <button type="button" @click="fruit.setValue('banana')">Banana</button>
-      <button type="button" @click="fruit.clear()">Clear</button>
-      <button type="button" @click="fruit.focus()">Focus</button>
-    </div>
-    <output data-slot="output">{{ log || "Use the buttons" }}</output>
   </div>
 </template>

@@ -1,71 +1,66 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
 import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const roles = [
+  { value: "viewer", label: "Viewer" },
+  { value: "commenter", label: "Commenter" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
+  { value: "owner", label: "Owner" },
 ]
 
-const value = ref<string | null>("apple")
+const value = ref<string | null>("viewer")
 const open = ref(false)
-const log = ref("")
+const log = useLog()
 
-function onValueChange(next: unknown, details: { reason: string; cancel: () => void }) {
-  if (next === "pineapple") {
+function changeValue(next: string | null, details: { reason: string; cancel: () => void }) {
+  if (next === "owner") {
     details.cancel()
-    log.value = "Pineapple is sold out"
+    log("Only the owner can transfer ownership")
     return
   }
-  log.value = `value: ${next} (${details.reason})`
-}
-
-function onOpenChange(next: boolean, details: { reason: string }) {
-  log.value = `open: ${next} (${details.reason})`
+  log(`value: ${next} (${details.reason})`)
 }
 </script>
 
 <template>
   <div data-slot="stack">
-    <Select
-      v-model:value="value"
-      v-model:open="open"
-      debug
-      @value-change="onValueChange"
-      @open-change="onOpenChange"
-    >
-      <div data-slot="stack">
-        <SelectLabel>Fruit</SelectLabel>
+    <div data-slot="controls">
+      <button type="button" @click="value = 'editor'">Make Editor</button>
+      <button type="button" @click="open = true">Open</button>
+    </div>
+    <Field>
+      <FieldLabel>Role</FieldLabel>
+      <Select
+        v-model:value="value"
+        v-model:open="open"
+        @value-change="changeValue"
+        @open-change="(next, details) => log(`open: ${next} (${details.reason})`)"
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-          {{ fruit.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
-    <div data-slot="row">
-      <button type="button" @click="value = 'blueberry'">Blueberry</button>
-      <button type="button" @click="open = true">Open</button>
-    </div>
-    <output data-slot="output">{{ log || "Change something" }}</output>
+        <SelectContent>
+          <SelectItem v-for="role in roles" :key="role.value" :value="role.value">
+            {{ role.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
   </div>
 </template>

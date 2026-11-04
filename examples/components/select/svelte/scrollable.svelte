@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -58,26 +59,27 @@
   ]
 </script>
 
-<Select placeholder="Select a timezone">
-  <SelectTrigger aria-label="Timezone">
-    <SelectValue />
-    <ChevronDownIcon />
-  </SelectTrigger>
-  <SelectContent>
-    {#each timezones as group (group.label)}
-      <SelectGroup>
-        <SelectGroupLabel>
-          {group.label}
-        </SelectGroupLabel>
-        {#each group.items as item (item.value)}
-          <SelectItem value={item.value}>
-            {item.label}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        {/each}
-      </SelectGroup>
-    {/each}
-  </SelectContent>
-</Select>
+<Field>
+  <FieldLabel>Time zone</FieldLabel>
+  <Select placeholder="Select a time zone">
+    <SelectTrigger>
+      <SelectValue />
+      <ChevronDownIcon />
+    </SelectTrigger>
+    <SelectContent>
+      {#each timezones as group (group.label)}
+        <SelectGroup>
+          <SelectGroupLabel>{group.label}</SelectGroupLabel>
+          {#each group.items as item (item.value)}
+            <SelectItem value={item.value}>
+              {item.label}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          {/each}
+        </SelectGroup>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

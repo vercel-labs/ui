@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -9,67 +11,71 @@ import {
   SelectItem,
   SelectItemIndicator,
   SelectItemText,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const produce = [
+const regions = [
   {
-    label: "Fruits",
+    label: "Americas",
     items: [
-      { value: "apple", label: "Apple" },
-      { value: "banana", label: "Banana" },
-      { value: "orange", label: "Orange" },
+      { value: "br", label: "Brazil" },
+      { value: "ca", label: "Canada" },
+      { value: "mx", label: "Mexico" },
     ],
   },
   {
-    label: "Vegetables",
+    label: "Europe",
     items: [
-      { value: "carrot", label: "Carrot" },
-      { value: "broccoli", label: "Broccoli" },
-      { value: "spinach", label: "Spinach" },
+      { value: "fr", label: "France" },
+      { value: "de", label: "Germany" },
+      { value: "es", label: "Spain" },
+    ],
+  },
+  {
+    label: "Asia Pacific",
+    items: [
+      { value: "au", label: "Australia" },
+      { value: "jp", label: "Japan" },
+      { value: "sg", label: "Singapore" },
     ],
   },
 ]
 </script>
 
 <template>
-  <Select placeholder="Select produce">
-    <div data-slot="stack">
-      <SelectLabel>Produce</SelectLabel>
+  <Field>
+    <FieldLabel>Country</FieldLabel>
+    <Select placeholder="Select a country">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <SelectInput aria-label="Search produce" placeholder="Search…" />
-      <SelectEmpty>Nothing found.</SelectEmpty>
-      <SelectList>
-        <SelectGroup v-for="group in produce" :key="group.label">
-          <SelectGroupLabel>
-            {{ group.label }}
-          </SelectGroupLabel>
-          <SelectItem v-for="item in group.items" :key="item.value" :value="item.value" :label="item.label">
-            <SelectItemText>
-              <template #render="{ props, state }">
-                <span v-bind="props">
-                  <template v-for="(segment, index) in state.segments" :key="index">
-                    <b v-if="segment.match">{{ segment.text }}</b>
-                    <template v-else>{{ segment.text }}</template>
-                  </template>
-                </span>
-              </template>
-            </SelectItemText>
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        </SelectGroup>
-      </SelectList>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+        <SelectEmpty>No countries found.</SelectEmpty>
+        <SelectList>
+          <SelectGroup v-for="group in regions" :key="group.label">
+            <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
+            <SelectItem v-for="item in group.items" :key="item.value" :value="item.value" :label="item.label">
+              <SelectItemText>
+                <template #render="{ props, state }">
+                  <span v-bind="props">
+                    <template v-for="(segment, index) in state.segments" :key="index">
+                      <b v-if="segment.match">{{ segment.text }}</b>
+                      <template v-else>{{ segment.text }}</template>
+                    </template>
+                  </span>
+                </template>
+              </SelectItemText>
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          </SelectGroup>
+        </SelectList>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

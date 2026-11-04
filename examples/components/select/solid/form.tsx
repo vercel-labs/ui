@@ -1,67 +1,47 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
-import { createSignal, For } from "solid-js"
-
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
-]
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 const countries = [
-  { value: "ar", label: "Argentina", code: "+54" },
-  { value: "au", label: "Australia", code: "+61" },
-  { value: "at", label: "Austria", code: "+43" },
-  { value: "be", label: "Belgium", code: "+32" },
-  { value: "br", label: "Brazil", code: "+55" },
-  { value: "ca", label: "Canada", code: "+1" },
-  { value: "cl", label: "Chile", code: "+56" },
-  { value: "cn", label: "China", code: "+86" },
-  { value: "dk", label: "Denmark", code: "+45" },
-  { value: "fi", label: "Finland", code: "+358" },
-  { value: "fr", label: "France", code: "+33" },
-  { value: "de", label: "Germany", code: "+49" },
-  { value: "gr", label: "Greece", code: "+30" },
-  { value: "in", label: "India", code: "+91" },
-  { value: "ie", label: "Ireland", code: "+353" },
-  { value: "it", label: "Italy", code: "+39" },
-  { value: "jp", label: "Japan", code: "+81" },
-  { value: "mx", label: "Mexico", code: "+52" },
-  { value: "nl", label: "Netherlands", code: "+31" },
-  { value: "no", label: "Norway", code: "+47" },
-  { value: "pt", label: "Portugal", code: "+351" },
-  { value: "es", label: "Spain", code: "+34" },
-  { value: "se", label: "Sweden", code: "+46" },
-  { value: "ch", label: "Switzerland", code: "+41" },
+  { value: "au", label: "Australia" },
+  { value: "br", label: "Brazil" },
+  { value: "ca", label: "Canada" },
+  { value: "fr", label: "France" },
+  { value: "de", label: "Germany" },
+  { value: "jp", label: "Japan" },
+  { value: "es", label: "Spain" },
+  { value: "se", label: "Sweden" },
 ]
 
+const topics = ["Design", "Engineering", "Marketing", "Research", "Sales"]
+
+const frequencies = ["Daily", "Weekly", "Monthly"]
+
 function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+  const log = useLog()
 
   return (
     <div data-slot="stack">
       <form
-        id="select-order"
+        id="select-newsletter"
         data-slot="stack"
         onSubmit={(event) => {
           event.preventDefault()
-          const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
-          setSubmitted(data.join("&"))
+          const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+          log(`Submitted ${entries.join("&")}`)
         }}
-        onReset={() => setSubmitted("")}
       >
-        <Select name="country" autoComplete="country" required placeholder="Select a country">
-          <div data-slot="stack">
-            <SelectLabel>Country</SelectLabel>
+        <Field>
+          <FieldLabel>Country</FieldLabel>
+          <Select name="country" autoComplete="country" required placeholder="Select a country">
             <SelectTrigger>
               <SelectValue />
               <svg
@@ -76,33 +56,33 @@ function Example() {
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </SelectTrigger>
-          </div>
-          <SelectContent>
-            <For each={countries}>
-              {(country) => (
-                <SelectItem value={country.value}>
-                  {country.label}
-                  <SelectItemIndicator>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                  </SelectItemIndicator>
-                </SelectItem>
-              )}
-            </For>
-          </SelectContent>
-        </Select>
-        <Select name="fruit" multiple defaultValue={["apple"]}>
-          <div data-slot="stack">
-            <SelectLabel>Fruits</SelectLabel>
+            <SelectContent>
+              <For each={countries}>
+                {(country) => (
+                  <SelectItem value={country.value}>
+                    {country.label}
+                    <SelectItemIndicator>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </SelectItemIndicator>
+                  </SelectItem>
+                )}
+              </For>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field>
+          <FieldLabel>Topics</FieldLabel>
+          <Select name="topics" multiple defaultValue={["Design"]}>
             <SelectTrigger>
               <SelectValue />
               <svg
@@ -117,38 +97,34 @@ function Example() {
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </SelectTrigger>
-          </div>
-          <SelectContent>
-            <For each={fruits}>
-              {(fruit) => (
-                <SelectItem value={fruit.value}>
-                  {fruit.label}
-                  <SelectItemIndicator>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                  </SelectItemIndicator>
-                </SelectItem>
-              )}
-            </For>
-          </SelectContent>
-        </Select>
-        <div data-slot="row">
-          <button type="submit">Submit</button>
-          <button type="reset">Reset</button>
-        </div>
+            <SelectContent>
+              <For each={topics}>
+                {(topic) => (
+                  <SelectItem value={topic}>
+                    {topic}
+                    <SelectItemIndicator>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </SelectItemIndicator>
+                  </SelectItem>
+                )}
+              </For>
+            </SelectContent>
+          </Select>
+        </Field>
       </form>
-      <Select name="size" form="select-order" defaultValue="Medium">
-        <div data-slot="stack">
-          <SelectLabel>Size</SelectLabel>
+      <Field>
+        <FieldLabel>Frequency</FieldLabel>
+        <Select name="frequency" form="select-newsletter" defaultValue="Weekly">
           <SelectTrigger>
             <SelectValue />
             <svg
@@ -163,31 +139,38 @@ function Example() {
               <path d="m6 9 6 6 6-6" />
             </svg>
           </SelectTrigger>
-        </div>
-        <SelectContent>
-          <For each={["Small", "Medium", "Large"]}>
-            {(size) => (
-              <SelectItem value={size}>
-                {size}
-                <SelectItemIndicator>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                </SelectItemIndicator>
-              </SelectItem>
-            )}
-          </For>
-        </SelectContent>
-      </Select>
-      <output data-slot="output">{submitted() || "Submit the form"}</output>
+          <SelectContent>
+            <For each={frequencies}>
+              {(frequency) => (
+                <SelectItem value={frequency}>
+                  {frequency}
+                  <SelectItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </SelectItemIndicator>
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </Select>
+      </Field>
+      <div data-slot="row">
+        <button type="submit" form="select-newsletter" data-variant="solid">
+          Save
+        </button>
+        <button type="reset" form="select-newsletter">
+          Reset
+        </button>
+      </div>
     </div>
   )
 }

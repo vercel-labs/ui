@@ -12,12 +12,12 @@ const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}
 
 <template>
   <ScrollArea>
-    <ScrollAreaViewport>
+    <ScrollAreaViewport role="region" aria-label="Tags">
       <ScrollAreaContent>
-        <h4>Tags</h4>
-        <div v-for="tag in tags" :key="tag">
-          {{ tag }}
-        </div>
+        <h3>Tags</h3>
+        <ul>
+          <li v-for="tag in tags" :key="tag">{{ tag }}</li>
+        </ul>
       </ScrollAreaContent>
     </ScrollAreaViewport>
     <ScrollAreaScrollbar>

@@ -1,40 +1,39 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const roles = [
+  { value: "viewer", label: "Viewer" },
+  { value: "commenter", label: "Commenter" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
 ]
 </script>
 
 <template>
-  <Select placeholder="Select a fruit">
-    <div data-slot="stack">
-      <SelectLabel>Fruit</SelectLabel>
+  <Field>
+    <FieldLabel>Role</FieldLabel>
+    <Select placeholder="Select a role">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-        {{ fruit.label }}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectItem v-for="role in roles" :key="role.value" :value="role.value">
+          {{ role.label }}
+          <SelectItemIndicator>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -10,49 +12,54 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const produce = [
+const fonts = [
   {
-    label: "Fruits",
+    label: "Sans serif",
     items: [
-      { value: "apple", label: "Apple" },
-      { value: "banana", label: "Banana" },
-      { value: "orange", label: "Orange" },
+      { value: "inter", label: "Inter" },
+      { value: "geist", label: "Geist" },
     ],
   },
   {
-    label: "Vegetables",
+    label: "Serif",
     items: [
-      { value: "carrot", label: "Carrot" },
-      { value: "broccoli", label: "Broccoli" },
-      { value: "spinach", label: "Spinach" },
+      { value: "source-serif", label: "Source Serif" },
+      { value: "lora", label: "Lora" },
+    ],
+  },
+  {
+    label: "Monospace",
+    items: [
+      { value: "geist-mono", label: "Geist Mono" },
+      { value: "jetbrains-mono", label: "JetBrains Mono" },
     ],
   },
 ]
 </script>
 
 <template>
-  <Select placeholder="Select produce">
-    <SelectTrigger aria-label="Produce">
-      <SelectValue />
-      <ChevronDownIcon />
-    </SelectTrigger>
-    <SelectContent>
-      <template v-for="(group, index) in produce" :key="group.label">
-        <SelectSeparator v-if="index > 0" />
-        <SelectGroup>
-          <SelectGroupLabel>
-            {{ group.label }}
-          </SelectGroupLabel>
-          <SelectItem v-for="item in group.items" :key="item.value" :value="item.value">
-            {{ item.label }}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        </SelectGroup>
-      </template>
-    </SelectContent>
-  </Select>
+  <Field>
+    <FieldLabel>Font</FieldLabel>
+    <Select placeholder="Select a font">
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
+      <SelectContent>
+        <template v-for="(group, index) in fonts" :key="group.label">
+          <SelectSeparator v-if="index > 0" />
+          <SelectGroup>
+            <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
+            <SelectItem v-for="item in group.items" :key="item.value" :value="item.value">
+              {{ item.label }}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          </SelectGroup>
+        </template>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

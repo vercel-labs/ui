@@ -1,4 +1,5 @@
 import { createAsyncOptions } from "@ui-sdk/core/async-options"
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
 
@@ -45,39 +46,41 @@ function searchCountries(query: string, { signal, page }: { signal: AbortSignal;
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-select filter="false" placeholder="Select a country">
-      <div data-slot="stack">
-        <ui-select-label>Country</ui-select-label>
+    <ui-field>
+      <ui-field-label>Country</ui-field-label>
+      <ui-select filter="false" placeholder="Select a country">
         <ui-select-trigger>
           <button>
             <ui-select-value></ui-select-value>
             ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-select-trigger>
-      </div>
-      <ui-select-content>
-        <ui-select-input>
-          <input aria-label="Search countries" placeholder="Search countries…" />
-        </ui-select-input>
-        <ui-select-empty>No countries match “<span></span>”.</ui-select-empty>
-        <ui-select-list></ui-select-list>
-        <ui-select-status></ui-select-status>
-      </ui-select-content>
-      <template>
-        <ui-select-item>
-          <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
-        </ui-select-item>
-      </template>
-    </ui-select>
+        <ui-select-content>
+          <ui-select-input>
+            <input aria-label="Search countries" placeholder="Search countries…" />
+          </ui-select-input>
+          <ui-select-empty></ui-select-empty>
+          <ui-select-list></ui-select-list>
+          <ui-select-status></ui-select-status>
+        </ui-select-content>
+        <template>
+          <ui-select-item>
+            <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
+          </ui-select-item>
+        </template>
+      </ui-select>
+    </ui-field>
   `
   const select = root.querySelector("ui-select")!
+  const empty = root.querySelector("ui-select-empty")!
   const status = root.querySelector("ui-select-status")!
-  const query = root.querySelector("ui-select-empty span")!
   const results = createAsyncOptions(searchCountries, { immediate: true })
+  let query = ""
   const update = () => {
     const { items, status: loading } = results.getState()
     select.items = items
     select.setAttribute("status", loading)
+    empty.textContent = loading === "loading" ? "" : `No countries match “${query}”.`
     status.textContent =
       loading === "loading"
         ? "Loading…"
@@ -88,8 +91,9 @@ function mount(root: HTMLElement) {
   results.subscribe(update)
   update()
   select.addEventListener("querychange", (event) => {
-    query.textContent = event.detail.value
-    results.setQuery(event.detail.value)
+    query = event.detail.value
+    results.setQuery(query)
+    update()
   })
   select.addEventListener("loadmore", () => results.loadMore())
 }

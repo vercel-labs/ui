@@ -1,66 +1,92 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import {
   Select,
   SelectArrow,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
 import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const fonts = [
+  { value: "inter", label: "Inter" },
+  { value: "geist", label: "Geist" },
+  { value: "source-serif", label: "Source Serif" },
+  { value: "geist-mono", label: "Geist Mono" },
 ]
 
-const sides = ["top", "right", "bottom", "left"] as const
-const aligns = ["start", "center", "end"] as const
+const sides = [
+  { value: "top", label: "Top" },
+  { value: "right", label: "Right" },
+  { value: "bottom", label: "Bottom" },
+  { value: "left", label: "Left" },
+]
 
-const side = ref<(typeof sides)[number]>("bottom")
-const align = ref<(typeof aligns)[number]>("start")
+const aligns = [
+  { value: "start", label: "Start" },
+  { value: "center", label: "Center" },
+  { value: "end", label: "End" },
+]
+
+type Side = "top" | "right" | "bottom" | "left"
+type Align = "start" | "center" | "end"
+
+const side = ref<Side>("bottom")
+const align = ref<Align>("start")
 const box = ref<HTMLDivElement | null>(null)
 const anchored = ref(false)
 </script>
 
 <template>
   <div data-slot="stack">
-    <div data-slot="stack">
-      <div role="group" aria-label="Side" data-slot="row">
-        <button
-          v-for="value in sides"
-          :key="value"
-          type="button"
-          :aria-pressed="side === value"
-          @click="side = value"
-        >
-          {{ value }}
-        </button>
-      </div>
-      <div role="group" aria-label="Align" data-slot="row">
-        <button
-          v-for="value in aligns"
-          :key="value"
-          type="button"
-          :aria-pressed="align === value"
-          @click="align = value"
-        >
-          {{ value }}
-        </button>
-      </div>
+    <div data-slot="controls">
+      <Select :items="sides" :value="side" @value-change="(next) => next && (side = next as Side)">
+        <SelectLabel>Side</SelectLabel>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="option in sides" :key="option.value" :value="option.value">
+            {{ option.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      <Select :items="aligns" :value="align" @value-change="(next) => next && (align = next as Align)">
+        <SelectLabel>Align</SelectLabel>
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="option in aligns" :key="option.value" :value="option.value">
+            {{ option.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
       <label data-slot="label">
-        <input v-model="anchored" type="checkbox" />
+        <Checkbox :checked="anchored" @checked-change="(next) => (anchored = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon />
+          </CheckboxIndicator>
+        </Checkbox>
         Anchor to the box
       </label>
     </div>
     <div ref="box" data-slot="card">
-      <Select default-value="apple">
-        <SelectTrigger aria-label="Fruit">
+      <Select default-value="inter">
+        <SelectTrigger aria-label="Font">
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
@@ -73,8 +99,8 @@ const anchored = ref(false)
           :anchor="anchored ? box : null"
         >
           <SelectArrow />
-          <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-            {{ fruit.label }}
+          <SelectItem v-for="font in fonts" :key="font.value" :value="font.value">
+            {{ font.label }}
             <SelectItemIndicator>
               <CheckIcon />
             </SelectItemIndicator>

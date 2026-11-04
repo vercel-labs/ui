@@ -1,60 +1,61 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
 type Member = { id: number; name: string; email: string }
 
 const members: Member[] = [
-  { id: 1, name: "Ada Lovelace", email: "ada@example.com" },
-  { id: 2, name: "Grace Hopper", email: "grace@example.com" },
-  { id: 3, name: "Alan Turing", email: "alan@example.com" },
-  { id: 4, name: "Margaret Hamilton", email: "margaret@example.com" },
+  { id: 1, name: "Hollis Grant", email: "hollis@example.com" },
+  { id: 2, name: "Inès Moreau", email: "ines@example.com" },
+  { id: 3, name: "Kofi Mensah", email: "kofi@example.com" },
+  { id: 4, name: "Wren Takahashi", email: "wren@example.com" },
 ]
 
 function Example() {
-  const [assignee, setAssignee] = createSignal<Member | null>({ ...members[1] })
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
+    <Field>
+      <FieldLabel>Assignee</FieldLabel>
       <Select
-        value={assignee()}
-        onValueChange={setAssignee}
+        defaultValue={{ ...members[1] }}
+        onValueChange={(member) => log(`Submits assignee=${member ? member.id : ""}`)}
         name="assignee"
         itemToValue={(member) => String(member.id)}
         itemToLabel={(member) => member.name}
         isItemEqualToValue={(item, value) => item.id === value.id}
         placeholder="Unassigned"
       >
-        <div data-slot="stack">
-          <SelectLabel>Assignee</SelectLabel>
-          <SelectTrigger>
-            <SelectValue />
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </SelectTrigger>
-        </div>
+        <SelectTrigger>
+          <SelectValue />
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </SelectTrigger>
         <SelectContent>
           <For each={members}>
             {(member) => (
               <SelectItem value={member}>
-                <span>{member.name}</span>
-                <span data-slot="hint">{member.email}</span>
+                <span data-slot="stack">
+                  {member.name}
+                  <span data-slot="hint">{member.email}</span>
+                </span>
                 <SelectItemIndicator>
                   <svg
                     viewBox="0 0 24 24"
@@ -73,8 +74,7 @@ function Example() {
           </For>
         </SelectContent>
       </Select>
-      <output data-slot="output">Submits assignee={assignee()?.id ?? ""}</output>
-    </div>
+    </Field>
   )
 }
 

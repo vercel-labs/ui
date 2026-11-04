@@ -9,35 +9,34 @@
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const methods = [
+    { value: "standard", label: "Standard" },
+    { value: "express", label: "Express" },
+    { value: "overnight", label: "Overnight" },
   ]
 
-  let submitted = $state("")
+  const log = useLog()
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    submitted = `Ordered ${new FormData(event.currentTarget as HTMLFormElement).get("fruit")}.`
+    log(`Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`)
   }
 </script>
 
 <form data-slot="stack" onsubmit={submit}>
-  <Field name="fruit">
-    <FieldLabel>Fruit</FieldLabel>
-    <Select required placeholder="Select a fruit">
+  <Field name="shipping">
+    <FieldLabel>Shipping method</FieldLabel>
+    <Select required placeholder="Select a shipping method">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        {#each fruits as fruit (fruit.value)}
-          <SelectItem value={fruit.value}>
-            {fruit.label}
+        {#each methods as method (method.value)}
+          <SelectItem value={method.value}>
+            {method.label}
             <SelectItemIndicator>
               <CheckIcon />
             </SelectItemIndicator>
@@ -45,11 +44,8 @@
         {/each}
       </SelectContent>
     </Select>
-    <FieldDescription>We deliver it tomorrow.</FieldDescription>
-    <FieldError match="valueMissing">Pick a fruit to order.</FieldError>
+    <FieldDescription>Express arrives in two business days.</FieldDescription>
+    <FieldError match="valueMissing">Choose a shipping method.</FieldError>
   </Field>
-  <button type="submit">
-    Order
-  </button>
-  <output data-slot="output">{submitted}</output>
+  <button type="submit" data-variant="solid">Continue</button>
 </form>

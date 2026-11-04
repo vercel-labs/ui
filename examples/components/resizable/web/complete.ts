@@ -1,28 +1,26 @@
 import "@ui-sdk/web/resizable"
+import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-resizable>
-        <ui-resizable-panel default-size="40">Files</ui-resizable-panel>
-        <ui-resizable-handle aria-label="Resize files"></ui-resizable-handle>
-        <ui-resizable-panel>Editor</ui-resizable-panel>
-      </ui-resizable>
-      <output data-slot="output">0 changes, saved nothing yet</output>
-    </div>
+    <ui-resizable>
+      <ui-resizable-panel default-size="40" min-size="20">
+        <h3>Files</h3>
+        <ul>
+          <li>page.tsx</li>
+          <li>layout.tsx</li>
+          <li>globals.css</li>
+        </ul>
+      </ui-resizable-panel>
+      <ui-resizable-handle aria-label="Resize files"></ui-resizable-handle>
+      <ui-resizable-panel min-size="20">
+        <h3>page.tsx</h3>
+        <span data-slot="hint">Saved just now</span>
+      </ui-resizable-panel>
+    </ui-resizable>
   `
-  const group = root.querySelector("ui-resizable")!
-  const output = root.querySelector("output")!
-  let moves = 0
-  let saved = "nothing yet"
-  const show = () => (output.textContent = `${moves} changes, saved ${saved}`)
-  group.addEventListener("layoutchange", () => {
-    moves++
-    show()
-  })
-  group.addEventListener("layoutcommit", (event) => {
-    saved = `${event.detail.value.map(Math.round).join(" / ")} after ${event.detail.reason}`
-    show()
+  root.querySelector("ui-resizable")!.addEventListener("layoutcommit", (event) => {
+    log(root, `Saved ${event.detail.value.map(Math.round).join(" / ")} (${event.detail.reason})`)
   })
 }
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -7,7 +8,6 @@
     SelectGroupLabel,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectSeparator,
     SelectTrigger,
     SelectValue,
@@ -32,34 +32,34 @@
   ]
 </script>
 
-<Select {items} defaultValue="pro">
-  <div data-slot="stack">
-    <SelectLabel>Plan</SelectLabel>
+<Field>
+  <FieldLabel>Plan</FieldLabel>
+  <Select {items} defaultValue="pro">
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    {#each plans as plan (plan.value)}
-      <SelectItem value={plan.value}>
-        {plan.label}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    {/each}
-    <SelectSeparator />
-    <SelectGroup>
-      <SelectGroupLabel>Contact sales</SelectGroupLabel>
-      {#each sales as plan (plan.value)}
-        <SelectItem value={plan.value} disabled={plan.disabled}>
+    <SelectContent>
+      {#each plans as plan (plan.value)}
+        <SelectItem value={plan.value}>
           {plan.label}
           <SelectItemIndicator>
             <CheckIcon />
           </SelectItemIndicator>
         </SelectItem>
       {/each}
-    </SelectGroup>
-  </SelectContent>
-</Select>
+      <SelectSeparator />
+      <SelectGroup>
+        <SelectGroupLabel>Contact sales</SelectGroupLabel>
+        {#each sales as plan (plan.value)}
+          <SelectItem value={plan.value} disabled={plan.disabled}>
+            {plan.label}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectGroup>
+    </SelectContent>
+  </Select>
+</Field>

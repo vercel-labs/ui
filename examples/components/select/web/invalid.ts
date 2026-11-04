@@ -1,23 +1,20 @@
-import "@ui-sdk/web/select"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
+import { log } from "../../../shared/web/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const methods = [
+  { value: "standard", label: "Standard" },
+  { value: "express", label: "Express" },
+  { value: "overnight", label: "Overnight" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
     <form data-slot="stack">
-      <ui-field name="fruit">
-        <ui-field-label>
-          Fruit
-        </ui-field-label>
-        <ui-select name="fruit" required placeholder="Select a fruit">
+      <ui-field name="shipping">
+        <ui-field-label>Shipping method</ui-field-label>
+        <ui-select required placeholder="Select a shipping method">
           <ui-select-trigger>
             <button>
               <ui-select-value></ui-select-value>
@@ -25,11 +22,11 @@ function mount(root: HTMLElement) {
             </button>
           </ui-select-trigger>
           <ui-select-content>
-            ${fruits
+            ${methods
               .map(
-                (fruit) => `
-                  <ui-select-item value="${fruit.value}">
-                    ${fruit.label}
+                (method) => `
+                  <ui-select-item value="${method.value}">
+                    ${method.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
                 `,
@@ -37,23 +34,16 @@ function mount(root: HTMLElement) {
               .join("")}
           </ui-select-content>
         </ui-select>
-        <ui-field-description>
-          We deliver it tomorrow.
-        </ui-field-description>
-        <ui-field-error match="valueMissing">
-          Pick a fruit to order.
-        </ui-field-error>
+        <ui-field-description>Express arrives in two business days.</ui-field-description>
+        <ui-field-error match="valueMissing">Choose a shipping method.</ui-field-error>
       </ui-field>
-      <button type="submit">
-        Order
-      </button>
-      <output data-slot="output"></output>
+      <button type="submit" data-variant="solid">Continue</button>
     </form>
   `
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    root.querySelector("output")!.textContent = `Ordered ${new FormData(form).get("fruit")}.`
+    log(root, `Submitted shipping=${new FormData(form).get("shipping")}`)
   })
 }
 

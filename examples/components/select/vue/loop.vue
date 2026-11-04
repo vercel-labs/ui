@@ -1,41 +1,40 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const priorities = [
+  { value: "urgent", label: "Urgent" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+  { value: "none", label: "No priority" },
 ]
 </script>
 
 <template>
-  <Select :loop="false" default-value="pineapple">
-    <div data-slot="stack">
-      <SelectLabel>Fruit</SelectLabel>
+  <Field>
+    <FieldLabel>Priority</FieldLabel>
+    <Select :loop="false" default-value="none">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-      <p data-slot="hint">Open it and press ArrowDown.</p>
-    </div>
-    <SelectContent>
-      <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-        {{ fruit.label }}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectItem v-for="priority in priorities" :key="priority.value" :value="priority.value">
+          {{ priority.label }}
+          <SelectItemIndicator>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

@@ -1,26 +1,24 @@
 <script lang="ts">
-  import {
-    Resizable,
-    ResizableHandle,
-    ResizablePanel,
-    type ResizableLayoutCommitDetails,
-  } from "@ui-sdk/svelte/resizable"
+  import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/svelte/resizable"
+  import { useLog } from "../../../shared/svelte/log"
 
-  let moves = $state(0)
-  let saved = $state("nothing yet")
-
-  function save(layout: number[], details: ResizableLayoutCommitDetails) {
-    saved = `${layout.map(Math.round).join(" / ")} after ${details.reason}`
-  }
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
-  <Resizable onLayoutChange={() => moves++} onLayoutCommit={save}>
-    <ResizablePanel
-      defaultSize={40}
-    >Files</ResizablePanel>
-    <ResizableHandle aria-label="Resize files" />
-    <ResizablePanel>Editor</ResizablePanel>
-  </Resizable>
-  <output data-slot="output">{moves} changes, saved {saved}</output>
-</div>
+<Resizable
+  onLayoutCommit={(layout, details) => log(`Saved ${layout.map(Math.round).join(" / ")} (${details.reason})`)}
+>
+  <ResizablePanel defaultSize={40} minSize={20}>
+    <h3>Files</h3>
+    <ul>
+      <li>page.tsx</li>
+      <li>layout.tsx</li>
+      <li>globals.css</li>
+    </ul>
+  </ResizablePanel>
+  <ResizableHandle aria-label="Resize files" />
+  <ResizablePanel minSize={20}>
+    <h3>page.tsx</h3>
+    <span data-slot="hint">Saved just now</span>
+  </ResizablePanel>
+</Resizable>

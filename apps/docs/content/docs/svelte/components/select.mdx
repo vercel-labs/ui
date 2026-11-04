@@ -8,7 +8,7 @@ Use a Select when someone needs to choose from a set of options. It handles open
 <ComponentExample
   name="select/demo"
   inspect
-  caption="Open Fruit and choose Blueberry. The list closes and the trigger shows your choice."
+  caption="Open Role and choose Editor. The list closes and the trigger shows your choice."
 />
 
 ## Installation
@@ -31,13 +31,37 @@ Select
     └── SelectItem
 ```
 
-Start with a label, a trigger, and a list of items. `SelectValue` shows the selected item's label inside the trigger.
+Start with a label, a trigger, and a list of items. `SelectValue` shows the selected item's label inside the trigger. `SelectLabel` names the trigger; inside a [Field](./field), use its `FieldLabel` instead, as the examples do.
 
-The trigger has the `combobox` role, and the popup is a `listbox`. `SelectLabel` names the trigger. If you don't need a visible label, give `SelectTrigger` an `aria-label` instead.
+## Usage
 
-## Examples
+Import the parts and put them together:
 
-### Items as Data
+```svelte
+<script lang="ts">
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
+</script>
+
+<Select placeholder="Select a role">
+  <SelectLabel>Role</SelectLabel>
+  <SelectTrigger>
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="viewer">Viewer</SelectItem>
+    <SelectItem value="editor">Editor</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+## Items as Data
 
 Pass an array to `items` when your options come from data. A string is both the value and the label. Use an object when they differ:
 
@@ -67,18 +91,16 @@ The select can render bare items from this data. To style them, keep `items` on 
 
 Items can change while the list is open. Navigation follows the new order, and selection and highlight stay with their values while those items remain. Removing the highlighted item clears the highlight. [Lists and Menus](../lists-and-menus) covers shared data shapes.
 
-<span id="options" />
-
-### Groups
+## Groups
 
 Put related items inside `SelectGroup` and name each group with `SelectGroupLabel`. `SelectSeparator` adds a visual break without becoming an option.
 
 <ComponentExample
   name="select/groups"
-  caption="Open Produce and choose from Fruits or Vegetables. Each group has a label that screen readers can announce."
+  caption="Open Font and choose from Sans serif, Serif or Monospace. Each group has a label that screen readers announce."
 />
 
-### Icons
+## Icons
 
 `SelectItemIcon` keeps an icon separate from the item's text, so it doesn't affect its accessible name, typeahead, or search. Add `SelectValueIcon` to the trigger to show the selected item's icon there too.
 
@@ -96,7 +118,7 @@ The full example marks directional icons with `mirror`, so they flip in right-to
   caption="Choose Center or End. Both the label and the icon in the trigger update to match the selected item."
 />
 
-### Typeahead
+## Typeahead
 
 With the trigger focused and closed, typing selects the next matching option without opening the list. With the list open, typing moves the highlight; Enter chooses the highlighted item.
 
@@ -104,26 +126,19 @@ Set an item's `label` when its content includes extra text that shouldn't be mat
 
 <ComponentExample
   name="select/typeahead"
-  caption="Focus Country and type “sw” to select Sweden without opening the list. Open it and type “g” to highlight a matching country, then press Enter."
+  caption="Focus Country and type “sw” to select Sweden without opening the list. Open it and type “g” to highlight Germany, then press Enter."
 />
 
-<span id="loop" />
-<span id="rtl" />
-
-Arrow keys move through the open list; Home and End reach its first and last items. Set `loop={false}` to stop arrow keys at either end. The popup follows the trigger's inherited text direction; use logical CSS properties for spacing in right-to-left layouts.
-
-### Disabled
+## Disabled
 
 A disabled select can't be focused or changed and doesn't submit a value. A read-only select stays focusable and submits its value, but can't change. Keyboard navigation skips disabled items, and they can't be chosen.
 
 <ComponentExample
   name="select/disabled"
-  caption="Tab through the controls to compare disabled and read-only behavior. Open Disabled item and press the arrow keys: the highlight skips Grapes, which can't be chosen."
+  caption="Billing country is disabled and Shipping from is read-only. Open Shipping to and press the arrow keys: the highlight skips Denmark, which can't be chosen."
 />
 
-<span id="placeholder" />
-
-### Clear Button
+## Clear Button
 
 `placeholder` appears while nothing is selected. Add `SelectClear` to return to that state. Clearing sets a single value to `null`, or multiple values to an empty array, and returns focus to the trigger.
 
@@ -131,25 +146,25 @@ Keep the clear button beside the trigger: a button can't contain another button.
 
 <ComponentExample
   name="select/clearable"
-  caption="Press Clear fruit. The trigger shows its placeholder, focus returns to it, and the value below becomes null. Choose another fruit to restore the clear button."
+  caption="Press the clear button. The trigger shows Unassigned, focus returns to it, and the console logs null. Choose someone to bring the button back."
 />
 
-### Multiple
+## Multiple
 
 Set `multiple` to select more than one value. The value becomes an array, and choosing an item toggles it while keeping the list open.
 
 ```svelte
-<Select multiple defaultValue={["apple", "grapes"]} />
+<Select multiple defaultValue={["en", "ja"]} />
 ```
 
 `SelectValue` exposes the selected `labels` to its `children` snippet. Use them to summarize a long selection, as this example does.
 
 <ComponentExample
   name="select/multiple"
-  caption="Choose several fruits, then choose one again to remove it. The list stays open and the array below follows your selection."
+  caption="Choose several languages, then choose one again to remove it. The list stays open, and the console logs the array."
 />
 
-### Select All
+## Select All
 
 Add `SelectSelectAll` to select or clear every enabled item. It shows a mixed state when only some are selected. Inside a `SelectGroup`, it applies to that group.
 
@@ -157,33 +172,31 @@ Add `SelectSelectAll` to select or clear every enabled item. It shows a mixed st
 
 <ComponentExample
   name="select/select-all"
-  caption="Open Fruits and press Select all. Press it again to clear the selection, then choose one fruit to see the mixed state."
+  caption="Open Regions and press Select all. Press it again to clear the selection, then choose one region to see the mixed state."
 />
 
-<span id="searchable" />
-
-### Search with Groups
+## Search with Groups
 
 Add `SelectInput` inside `SelectContent` to filter the options. Put the items in `SelectList`, so the search field stays outside the scrollable list. `SelectEmpty` shows when nothing matches.
 
 ```svelte
 <SelectContent>
-  <SelectInput aria-label="Search produce" />
-  <SelectEmpty>Nothing found.</SelectEmpty>
+  <SelectInput aria-label="Search countries" />
+  <SelectEmpty>No countries found.</SelectEmpty>
   <SelectList><!-- Items go here. --></SelectList>
 </SelectContent>
 ```
 
-Groups with no matching items hide automatically. `SelectItemText` can highlight the matching text; this example reads `state.segments` from its `children` snippet to bold the matches. Closing the popup clears the search.
+Groups with no matching items hide automatically. `SelectItemText` can highlight the matching text; this example reads `state.segments` in its `render` snippet to bold the matches. Closing the popup clears the search.
 
 <ComponentExample
   name="select/search-groups"
-  caption="Open Produce and type “car”. Only Vegetables and Carrot remain. Try “zz” to see the empty message, then clear the search to show every option."
+  caption="Open Country and type “ja”. Only Asia Pacific and Japan remain. Try “zz” to see the empty message, then clear the search to show every country."
 />
 
 Arrow keys move the highlight while focus stays in the search field. On a touch screen reader, focus moves into the items instead. To show recent choices before a search, pass `emptyItems` alongside `items`. [Lists and Menus](../lists-and-menus#search-and-load-items) covers filtering options.
 
-### Async Search
+## Async Search
 
 Use `filter={false}` when the server already filters your options. Connect `query` and `onQueryChange` to your loader, and pass its items and status to `Select`.
 
@@ -194,7 +207,7 @@ This example uses [Async Options](../utilities/async-options) to replace stale r
   caption="Open Country and type “an”. Results arrive after a short delay. Clear the search and move or scroll to the last result to load another page."
 />
 
-### Object Values
+## Object Values
 
 A value can be an object. Tell Select how to identify it, display it, and compare it with another copy:
 
@@ -206,10 +219,10 @@ A value can be an object. Tell Select how to identify it, display it, and compar
 
 <ComponentExample
   name="select/object-values"
-  caption="Grace starts selected even though the initial value is a copy of her item. Choose another assignee to see the submitted ID change."
+  caption="Inès starts selected even though the initial value is a copy of her item. Choose another assignee; the console logs the ID the form submits."
 />
 
-### Virtualized
+## Virtualized
 
 For a large list, pass every option through `items` and render only the visible rows. `onHighlight` tells your virtualizer which row to bring into view. Give each rendered item its full-list `index` so the accessibility attributes describe its position correctly.
 
@@ -220,45 +233,45 @@ The example includes its own small row-windowing helpers. You can use the same p
   caption="Open Item and press End to reach Item 10000, then Home to return to the beginning. Scroll through the list; only nearby rows render."
 />
 
-### Align Item with Trigger
+## Align Item with Trigger
 
 Set `alignItemWithTrigger` on `SelectContent` to place the selected item over the trigger. It falls back to normal popup placement when opened by touch or when there isn't enough room.
 
 <ComponentExample
   name="select/align-item"
-  caption="Open Fruit with Align item with trigger checked, then close it, uncheck the setting, and open it again to compare placement."
+  caption="Open Priority: Medium sits over the trigger. Close it, uncheck Align item with trigger, and open it again to compare placement."
 />
 
-### Scrollable
+## Scrollable
 
 Limit the content's height and allow vertical scrolling. `--available-height` tells you how much room the popup has; the highlighted item scrolls into view as you move with the keyboard.
 
 <ComponentExample
   name="select/scrollable"
-  caption="Open Timezone and move down with the arrow keys. The list scrolls to keep the highlighted option visible, and group labels stay at the top."
+  caption="Open Time zone and move down with the arrow keys. The list scrolls to keep the highlighted option visible."
 />
 
-### Invalid
+## Invalid
 
 Inside a [Field](./field), the field's label names the trigger, its description and errors describe it, and its `name` is used for submission. After invalid submission, the trigger gets `aria-invalid` and `data-invalid`.
 
 <ComponentExample
   name="select/invalid"
-  caption="Press Order without selecting a fruit to show the error. Choose a fruit and submit again to see the submitted value."
+  caption="Press Continue without choosing a shipping method to show the error. Choose one and continue; the console logs the submitted value."
 />
 
-### Forms
+## Forms
 
 Set `name` to include a select in form submission. `required` blocks submission until something is selected; resetting the form restores `defaultValue`. Multiple values submit as separate entries under the same name.
 
-The example also uses `autoComplete="country"` for autofill and `form="select-order"` to associate the Size select with a form it sits outside.
+The example also uses `autoComplete="country"` for autofill and `form="select-newsletter"` to associate the Frequency select with a form it sits outside.
 
 <ComponentExample
   name="select/form"
-  caption="Choose a country and some fruits, change Size, then Submit to inspect all three fields. Reset restores the initial choices and clears the result."
+  caption="Choose a country and some topics, change Frequency, then press Save; the console logs all three fields. Reset restores the initial choices."
 />
 
-### Presentation
+## Presentation
 
 Use `presentation="sheet"` to open the options in a bottom sheet, or `"auto"` to use a sheet on small touch screens. Choosing an item still selects it and closes the single-select list.
 
@@ -266,44 +279,48 @@ The content gets `data-presentation`, and its render state includes `presentatio
 
 <ComponentExample
   name="select/presentation"
-  caption="Open Fruit to show the bottom sheet. Choose an option to close it, or drag down to dismiss it without changing the value."
+  caption="Open Status to show the bottom sheet. Choose an option to close it, or drag down to dismiss it without changing the value."
 />
 
 A sheet makes the page behind it inert and locks scrolling unless `modal={false}`. [Popups](../popups#modals-and-sheets) explains the shared presentation options.
 
-### Controlled
+## Controlled
 
 Use `bind:value` to own the selection and `bind:open` to own the popup state. A single value is `T | null`; with `multiple`, it is `T[]`. `onValueChange` and `onOpenChange` receive the requested value first and change details second. Call `details.cancel()` to refuse a change.
 
 [State and Events](../state-and-events) explains this pattern. The [reason tables](#reasons) list Select's reasons, including `item-press`, `list-navigation`, and `clear-press`.
 
-### Controller
+## Controller
 
 `createSelectController()` can open, read, or change the select from outside its component. It can also connect a separate trigger. See [Controllers](../controllers) for setup and waiting for a popup to close, and the [Select controller reference](#controller-1) for its methods.
 
-### Custom Rendering
-
-Use a `render` snippet to choose a part's element, or a `children` snippet to customize its content from state. [Parts and Composition](../parts-and-composition#choose-the-element) explains how props merge. Select's part states are listed under [State](#state).
-
-### Positioning
+## Positioning
 
 Use `side`, `align`, and offsets to place the popup. `SelectArrow` follows the side it lands on. [Popups](../popups#place-the-content) covers anchoring and collisions.
 
-### Modal
+## Modal
 
 By default, pressing outside closes the list without activating the element behind it. `modal={true}` also locks scrolling and makes the page inert. `modal={false}` allows outside presses through. See [Control Dismissal](../popups#control-dismissal).
 
-### Container
+## Container
 
 The popup uses the top layer without a portal. Use `container` when it must render in another DOM container. [Mounting and Containers](../popups#mounting-and-containers) covers the shared setup.
 
-### Animation
+## Animation
 
 Select keeps closing content mounted until its exit animation finishes. `onOpenChangeComplete` runs afterward. Use `keepMounted` when your animation library needs the closed content to remain in the DOM. [Styling and Animation](../styling-and-animation) covers the lifecycle attributes.
 
+## Custom Rendering
+
+Use a `render` snippet to choose a part's element, or a `children` snippet to customize its content from state. [Parts and Composition](../parts-and-composition#choose-the-element) explains how props merge. Select's part states are listed under [State](#state).
+
 ## Styling
 
-Style the parts with the attributes below. The popup also exposes variables such as `--anchor-width` and `--available-height` for sizing.
+Use `data-highlighted` for the active item, `data-selected` for chosen items, and `data-placeholder` on the trigger and value while nothing is selected. `data-modality="keyboard"` on the content tells a keyboard highlight from a pointer one.
+
+`--anchor-width` matches the trigger's width, and `--available-height` says how much room the popup has. Use them to size the content.
+
+Each part has a `data-slot`, such as `select-trigger`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### SelectContent [#styling-selectcontent]
 
@@ -314,6 +331,8 @@ Style the parts with the attributes below. The popup also exposes variables such
 <CssVariables component="select" part="viewport" />
 
 ## Data Attributes
+
+`SelectList`, `SelectInput`, `SelectGroup`, `SelectGroupLabel`, `SelectSeparator` and `SelectValueIcon` have no state attributes.
 
 ### SelectLabel [#data-attributes-selectlabel]
 
@@ -369,8 +388,7 @@ Style the parts with the attributes below. The popup also exposes variables such
 
 ## API Reference
 
-Props and callbacks are the same as below, as Svelte props. `value`, `open` and `query` can be bound with
-`bind:`.
+Props and callbacks are the same as below, as Svelte props. `value`, `open` and `query` can be bound with `bind:`.
 
 ### Select
 
@@ -520,7 +538,15 @@ Callbacks get the new state first, then the details. A bound value only updates 
 
 ## Accessibility
 
-The select follows the [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/). Every line below is an automated test.
+The select follows the [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/). The trigger has the `combobox` role and the popup is a `listbox`. If you don't need a visible label, give `SelectTrigger` an `aria-label` instead.
+
+### Keyboard
+
+Arrow keys move through the open list; Home and End reach its first and last items. Set `loop={false}` to stop arrow keys at either end. The popup follows the trigger's inherited text direction; use logical CSS properties for spacing in right-to-left layouts.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="select" />
 

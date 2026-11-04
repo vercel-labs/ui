@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
 const languages = [
   { value: "ar", label: "العربية" },
@@ -21,22 +21,22 @@ const languages = [
 
 <template>
   <div dir="rtl">
-    <Select placeholder="اختر لغة">
-      <div data-slot="stack">
-        <SelectLabel>اللغة</SelectLabel>
+    <Field>
+      <FieldLabel>اللغة</FieldLabel>
+      <Select placeholder="اختر لغة">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectItem v-for="language in languages" :key="language.value" :value="language.value">
-          {{ language.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectItem v-for="language in languages" :key="language.value" :value="language.value">
+            {{ language.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
   </div>
 </template>

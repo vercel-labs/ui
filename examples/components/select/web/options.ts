@@ -1,42 +1,49 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
-import type { ListData } from "@ui-sdk/core/select"
+import type { ListData } from "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
 
-const sizeGroups: ListData = [
+const sizeGroups = [
   { type: "group", label: "Common", items: ["Small", "Medium", "Large"] },
   { type: "group", label: "Extended", items: ["Extra small", "Extra large"] },
-]
+] satisfies ListData
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <ui-select name="size" default-value="Medium">
-      ${sizeGroups
-        .map((group) =>
-          typeof group === "object" && "items" in group
-            ? `<optgroup label="${group.label}">${group.items.map((size) => `<option>${size}</option>`).join("")}</optgroup>`
-            : "",
-        )
-        .join("")}
-      <div data-slot="stack">
-        <ui-select-label>Size</ui-select-label>
+    <ui-field>
+      <ui-field-label>Size</ui-field-label>
+      <ui-select name="size" default-value="Medium">
         <ui-select-trigger>
           <button>
             <ui-select-value></ui-select-value>
             ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
           </button>
         </ui-select-trigger>
-      </div>
-      <template>
         <ui-select-content>
-          <ui-select-group>
-            <ui-select-group-label></ui-select-group-label>
-            <ui-select-item>
-              <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
-            </ui-select-item>
-          </ui-select-group>
+          ${sizeGroups
+            .map(
+              (group) => `
+                <ui-select-group>
+                  <ui-select-group-label>${group.label}</ui-select-group-label>
+                  ${group.items
+                    .map(
+                      (size) => `
+                        <ui-select-item value="${size}">
+                          ${size}
+                          <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
+                        </ui-select-item>
+                      `,
+                    )
+                    .join("")}
+                </ui-select-group>
+              `,
+            )
+            .join("")}
         </ui-select-content>
-      </template>
-    </ui-select>
+      </ui-select>
+    </ui-field>
   `
-  const select = root.querySelector("ui-select")
+  root.querySelector("ui-select")!.items = sizeGroups
 }
+
+export { mount }

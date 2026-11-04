@@ -11,14 +11,14 @@
 </script>
 
 <ScrollArea>
-  <ScrollAreaViewport>
+  <ScrollAreaViewport role="region" aria-label="Tags">
     <ScrollAreaContent>
-      <h4>Tags</h4>
-      {#each tags as tag (tag)}
-        <div>
-          {tag}
-        </div>
-      {/each}
+      <h3>Tags</h3>
+      <ul>
+        {#each tags as tag (tag)}
+          <li>{tag}</li>
+        {/each}
+      </ul>
     </ScrollAreaContent>
   </ScrollAreaViewport>
   <ScrollAreaScrollbar>

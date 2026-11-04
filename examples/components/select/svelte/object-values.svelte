@@ -1,48 +1,50 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
+  import { useLog } from "../../../shared/svelte/log"
 
   type Member = { id: number; name: string; email: string }
 
   const members: Member[] = [
-    { id: 1, name: "Ada Lovelace", email: "ada@example.com" },
-    { id: 2, name: "Grace Hopper", email: "grace@example.com" },
-    { id: 3, name: "Alan Turing", email: "alan@example.com" },
-    { id: 4, name: "Margaret Hamilton", email: "margaret@example.com" },
+    { id: 1, name: "Hollis Grant", email: "hollis@example.com" },
+    { id: 2, name: "Inès Moreau", email: "ines@example.com" },
+    { id: 3, name: "Kofi Mensah", email: "kofi@example.com" },
+    { id: 4, name: "Wren Takahashi", email: "wren@example.com" },
   ]
 
-  let assignee = $state<Member | null>({ ...members[1] })
+  const log = useLog()
 </script>
 
-<div data-slot="stack">
+<Field>
+  <FieldLabel>Assignee</FieldLabel>
   <Select
-    bind:value={assignee}
+    defaultValue={{ ...members[1] }}
+    onValueChange={(member) => log(`Submits assignee=${member ? member.id : ""}`)}
     name="assignee"
-    itemToValue={(member: Member) => String(member.id)}
-    itemToLabel={(member: Member) => member.name}
-    isItemEqualToValue={(item: Member, value: Member) => item.id === value.id}
+    itemToValue={(member) => String(member.id)}
+    itemToLabel={(member) => member.name}
+    isItemEqualToValue={(item, value) => item.id === value.id}
     placeholder="Unassigned"
   >
-    <div data-slot="stack">
-      <SelectLabel>Assignee</SelectLabel>
-      <SelectTrigger>
-        <SelectValue />
-        <ChevronDownIcon />
-      </SelectTrigger>
-    </div>
+    <SelectTrigger>
+      <SelectValue />
+      <ChevronDownIcon />
+    </SelectTrigger>
     <SelectContent>
       {#each members as member (member.id)}
         <SelectItem value={member}>
-          <span>{member.name}</span>
-          <span data-slot="hint">{member.email}</span>
+          <span data-slot="stack">
+            {member.name}
+            <span data-slot="hint">{member.email}</span>
+          </span>
           <SelectItemIndicator>
             <CheckIcon />
           </SelectItemIndicator>
@@ -50,5 +52,4 @@
       {/each}
     </SelectContent>
   </Select>
-  <output data-slot="output">Submits assignee={assignee ? assignee.id : ""}</output>
-</div>
+</Field>

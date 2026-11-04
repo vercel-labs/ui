@@ -1,9 +1,9 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
@@ -17,12 +17,12 @@ const languages = [
   { value: "de", label: "الألمانية" },
 ]
 
-export function Example() {
+function Example() {
   return (
     <div dir="rtl">
-      <Select placeholder="اختر لغة">
-        <div data-slot="stack">
-          <SelectLabel>اللغة</SelectLabel>
+      <Field>
+        <FieldLabel>اللغة</FieldLabel>
+        <Select placeholder="اختر لغة">
           <SelectTrigger>
             <SelectValue />
             <svg
@@ -37,30 +37,32 @@ export function Example() {
               <path d="m6 9 6 6 6-6" />
             </svg>
           </SelectTrigger>
-        </div>
-        <SelectContent>
-          <For each={languages}>
-            {(language) => (
-              <SelectItem value={language.value}>
-                {language.label}
-                <SelectItemIndicator>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                </SelectItemIndicator>
-              </SelectItem>
-            )}
-          </For>
-        </SelectContent>
-      </Select>
+          <SelectContent>
+            <For each={languages}>
+              {(language) => (
+                <SelectItem value={language.value}>
+                  {language.label}
+                  <SelectItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </SelectItemIndicator>
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </Select>
+      </Field>
     </div>
   )
 }
+
+export { Example }

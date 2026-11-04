@@ -1,52 +1,53 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon, XIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectClear,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon, XIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const people = [
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
-const value = ref<string | null>("banana")
+const log = useLog()
 </script>
 
 <template>
-  <div data-slot="stack">
-    <Select v-model:value="value" placeholder="Select a fruit">
-      <div data-slot="stack">
-        <SelectLabel>Fruit</SelectLabel>
-        <div data-slot="row">
-          <SelectTrigger>
-            <SelectValue />
-            <ChevronDownIcon />
-          </SelectTrigger>
-          <SelectClear aria-label="Clear fruit">
-            <XIcon />
-          </SelectClear>
-        </div>
+  <Field>
+    <FieldLabel>Assignee</FieldLabel>
+    <Select
+      default-value="ines"
+      placeholder="Unassigned"
+      @value-change="(value, details) => log(`value: ${JSON.stringify(value)} (${details.reason})`)"
+    >
+      <div data-slot="row">
+        <SelectTrigger>
+          <SelectValue />
+          <ChevronDownIcon />
+        </SelectTrigger>
+        <SelectClear aria-label="Clear assignee">
+          <XIcon />
+        </SelectClear>
       </div>
       <SelectContent>
-        <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-          {{ fruit.label }}
+        <SelectItem v-for="person in people" :key="person.value" :value="person.value">
+          {{ person.label }}
           <SelectItemIndicator>
             <CheckIcon />
           </SelectItemIndicator>
         </SelectItem>
       </SelectContent>
     </Select>
-    <output data-slot="output">Value: {{ JSON.stringify(value) }}</output>
-  </div>
+  </Field>
 </template>

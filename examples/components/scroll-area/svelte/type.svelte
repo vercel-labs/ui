@@ -20,9 +20,11 @@
       <ScrollArea {type}>
         <ScrollAreaViewport>
           <ScrollAreaContent>
-            {#each tags as tag (tag)}
-              <div>{tag}</div>
-            {/each}
+            <ul>
+              {#each tags as tag (tag)}
+                <li>{tag}</li>
+              {/each}
+            </ul>
           </ScrollAreaContent>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar>

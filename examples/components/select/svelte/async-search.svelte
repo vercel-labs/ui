@@ -1,5 +1,7 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { useAsyncOptions } from "@ui-sdk/svelte/async-options"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -7,13 +9,11 @@
     SelectInput,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectList,
     SelectStatus,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
-  import { useAsyncOptions } from "@ui-sdk/svelte/async-options"
 
   const countryList = [
     { value: "ar", label: "Argentina" },
@@ -57,48 +57,52 @@
   }
 
   let query = $state("")
-  const countries = useAsyncOptions(searchCountries, { immediate: true })
+  const results = useAsyncOptions(searchCountries, { immediate: true })
 </script>
 
-<Select
-  bind:query
-  items={countries.state.items}
-  filter={false}
-  status={countries.state.status}
-  placeholder="Select a country"
-  onQueryChange={(next) => countries.setQuery(next)}
-  onLoadMore={countries.loadMore}
->
-  <div data-slot="stack">
-    <SelectLabel>Country</SelectLabel>
+<Field>
+  <FieldLabel>Country</FieldLabel>
+  <Select
+    items={results.state.items}
+    filter={false}
+    status={results.state.status}
+    bind:query
+    onQueryChange={(next) => results.setQuery(next)}
+    onLoadMore={results.loadMore}
+    placeholder="Select a country"
+  >
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-    <SelectEmpty>
-      {#snippet children(state)}
-        {#if state.empty && !state.loading}No countries match “{state.query}”.{/if}
-      {/snippet}
-    </SelectEmpty>
-    <SelectList>
-      {#snippet children(state)}
-        {#each (state.items as { value: string; label: string; disabled?: boolean }[]) as item (item.value)}
-          <SelectItem value={item.value} label={item.label} disabled={item.disabled}>
-            {item.label}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        {/each}
-      {/snippet}
-    </SelectList>
-    <SelectStatus>
-      {#snippet children(state)}
-        {state.loading ? "Loading…" : state.status === "error" ? "Couldn't load countries." : `${state.count} shown`}
-      {/snippet}
-    </SelectStatus>
-  </SelectContent>
-</Select>
+    <SelectContent>
+      <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+      <SelectEmpty>
+        {#snippet children(state)}
+          {#if state.empty && !state.loading}No countries match “{state.query}”.{/if}
+        {/snippet}
+      </SelectEmpty>
+      <SelectList>
+        {#snippet children(state)}
+          {#each (state.items as { value: string; label: string; disabled?: boolean }[]) as item (item.value)}
+            <SelectItem value={item.value} label={item.label} disabled={item.disabled}>
+              {item.label}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          {/each}
+        {/snippet}
+      </SelectList>
+      <SelectStatus>
+        {#snippet children(state)}
+          {state.loading
+            ? "Loading…"
+            : state.status === "error"
+              ? "Couldn't load countries."
+              : `${state.count} shown`}
+        {/snippet}
+      </SelectStatus>
+    </SelectContent>
+  </Select>
+</Field>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
@@ -8,46 +9,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const methods = [
+  { value: "standard", label: "Standard" },
+  { value: "express", label: "Express" },
+  { value: "overnight", label: "Overnight" },
 ]
 
-const submitted = ref("")
+const log = useLog()
 
 function submit(event: Event) {
-  submitted.value = `Ordered ${new FormData(event.currentTarget as HTMLFormElement).get("fruit")}.`
+  log(`Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`)
 }
 </script>
 
 <template>
   <form data-slot="stack" @submit.prevent="submit">
-    <Field name="fruit">
-      <FieldLabel> Fruit </FieldLabel>
-      <Select required placeholder="Select a fruit">
+    <Field name="shipping">
+      <FieldLabel>Shipping method</FieldLabel>
+      <Select required placeholder="Select a shipping method">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-            {{ fruit.label }}
+          <SelectItem v-for="method in methods" :key="method.value" :value="method.value">
+            {{ method.label }}
             <SelectItemIndicator>
               <CheckIcon />
             </SelectItemIndicator>
           </SelectItem>
         </SelectContent>
       </Select>
-      <FieldDescription>We deliver it tomorrow.</FieldDescription>
-      <FieldError match="valueMissing">Pick a fruit to order.</FieldError>
+      <FieldDescription>Express arrives in two business days.</FieldDescription>
+      <FieldError match="valueMissing">Choose a shipping method.</FieldError>
     </Field>
-    <button type="submit">Order</button>
-    <output data-slot="output">{{ submitted }}</output>
+    <button type="submit" data-variant="solid">Continue</button>
   </form>
 </template>

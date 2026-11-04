@@ -1,40 +1,39 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const roles = [
+    { value: "viewer", label: "Viewer" },
+    { value: "commenter", label: "Commenter" },
+    { value: "editor", label: "Editor" },
+    { value: "admin", label: "Admin" },
   ]
 </script>
 
-<Select placeholder="Select a fruit">
-  <div data-slot="stack">
-    <SelectLabel>Fruit</SelectLabel>
+<Field>
+  <FieldLabel>Role</FieldLabel>
+  <Select placeholder="Select a role">
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    {#each fruits as fruit (fruit.value)}
-      <SelectItem value={fruit.value}>
-        {fruit.label}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    {/each}
-  </SelectContent>
-</Select>
+    <SelectContent>
+      {#each roles as role (role.value)}
+        <SelectItem value={role.value}>
+          {role.label}
+          <SelectItemIndicator>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

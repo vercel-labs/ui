@@ -1,48 +1,48 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon, MinusIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectSelectAll,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon, MinusIcon } from "@lucide/vue"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const regions = [
+  { value: "us-east", label: "US East" },
+  { value: "us-west", label: "US West" },
+  { value: "europe", label: "Europe" },
+  { value: "asia-pacific", label: "Asia Pacific" },
+  { value: "south-america", label: "South America" },
 ]
 </script>
 
 <template>
-  <Select multiple :default-value="['apple', 'banana', 'grapes']" placeholder="Select fruits">
-    <div data-slot="stack">
-      <SelectLabel>Fruits</SelectLabel>
+  <Field>
+    <FieldLabel>Regions</FieldLabel>
+    <Select multiple :default-value="['us-east', 'europe', 'asia-pacific']" placeholder="Select regions">
       <SelectTrigger>
         <SelectValue :max-labels="2" :get-more-label="(count: number) => `${count} more`" />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <SelectSelectAll v-slot="{ state }">
-        Select all
-        <CheckIcon v-if="state.checked" />
-        <MinusIcon v-if="state.indeterminate" />
-      </SelectSelectAll>
-      <SelectSeparator />
-      <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-        {{ fruit.label }}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectSelectAll v-slot="{ state }">
+          Select all
+          <CheckIcon v-if="state.checked" />
+          <MinusIcon v-if="state.indeterminate" />
+        </SelectSelectAll>
+        <SelectSeparator />
+        <SelectItem v-for="region in regions" :key="region.value" :value="region.value">
+          {{ region.label }}
+          <SelectItemIndicator>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

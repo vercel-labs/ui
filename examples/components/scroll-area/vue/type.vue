@@ -15,12 +15,14 @@ const tags = Array.from({ length: 20 }, (_, index) => `v1.2.0-beta.${50 - index}
 
 <template>
   <div data-slot="grid">
-    <div data-slot="stack" v-for="type in types" :key="type">
+    <div v-for="type in types" :key="type" data-slot="stack">
       <code>type="{{ type }}"</code>
       <ScrollArea :type="type">
         <ScrollAreaViewport>
           <ScrollAreaContent>
-            <div v-for="tag in tags" :key="tag">{{ tag }}</div>
+            <ul>
+              <li v-for="tag in tags" :key="tag">{{ tag }}</li>
+            </ul>
           </ScrollAreaContent>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar>

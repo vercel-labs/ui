@@ -1,14 +1,16 @@
 import { Separator } from "@ui-sdk/solid/separator"
 
-export function Example() {
+function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="stack">
-        <p>Account</p>
-        <p data-slot="hint">Manage your profile and preferences.</p>
+        <h3>Hollis Grant</h3>
+        <p data-slot="hint">hollis@example.com</p>
       </div>
       <Separator />
-      <p>Your changes are saved automatically.</p>
+      <p>Designs the billing and onboarding flows, and reviews every new pricing page.</p>
     </div>
   )
 }
+
+export { Example }

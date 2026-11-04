@@ -1,21 +1,43 @@
 <script setup lang="ts">
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableLayoutChangeDetails,
+} from "@ui-sdk/vue/resizable"
 import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
+const format = (layout: number[]) => layout.map(Math.round).join(" / ")
+
+const log = useLog()
 const layout = ref([30, 70])
+
+function onLayoutChange(next: number[], details: ResizableLayoutChangeDetails) {
+  if (format(next) !== format(layout.value)) log(`${format(next)} (${details.reason})`)
+}
 </script>
 
 <template>
   <div data-slot="stack">
-    <Resizable v-model:layout="layout">
-      <ResizablePanel :min-size="20">Files</ResizablePanel>
-      <ResizableHandle aria-label="Resize files" />
-      <ResizablePanel :min-size="20">Editor</ResizablePanel>
-    </Resizable>
-    <div data-slot="row">
-      <button data-variant="secondary" type="button" @click="layout = [20, 80]">Narrow</button>
-      <button data-variant="secondary" type="button" @click="layout = [50, 50]">Even</button>
+    <div data-slot="controls">
+      <button type="button" @click="layout = [50, 50]">Split Evenly</button>
+      <button type="button" @click="layout = [30, 70]">Reset</button>
     </div>
-    <output data-slot="output">{{ layout.map(Math.round).join(" / ") }}</output>
+    <Resizable v-model:layout="layout" @layout-change="onLayoutChange">
+      <ResizablePanel :min-size="20">
+        <h3>Files</h3>
+        <ul>
+          <li>page.tsx</li>
+          <li>layout.tsx</li>
+          <li>globals.css</li>
+        </ul>
+      </ResizablePanel>
+      <ResizableHandle aria-label="Resize files" />
+      <ResizablePanel :min-size="20">
+        <h3>page.tsx</h3>
+        <span data-slot="hint">Saved just now</span>
+      </ResizablePanel>
+    </Resizable>
   </div>
 </template>

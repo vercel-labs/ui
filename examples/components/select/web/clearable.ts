@@ -1,40 +1,38 @@
+import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
-import { Check, ChevronDown, X, createElement } from "lucide"
+import { Check, ChevronDown, createElement, X } from "lucide"
+import { log } from "../../../shared/web/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const people = [
+  { value: "hollis", label: "Hollis Grant" },
+  { value: "ines", label: "Inès Moreau" },
+  { value: "kofi", label: "Kofi Mensah" },
+  { value: "wren", label: "Wren Takahashi" },
+  { value: "tomasz", label: "Tomasz Wójcik" },
 ]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="stack">
-      <ui-select default-value="banana" placeholder="Select a fruit">
-        <div data-slot="stack">
-          <ui-select-label>Fruit</ui-select-label>
-          <div data-slot="row">
-            <ui-select-trigger>
-              <button>
-                <ui-select-value></ui-select-value>
-                ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
-              </button>
-            </ui-select-trigger>
-            <ui-select-clear>
-              <button aria-label="Clear fruit">
-                ${createElement(X, { "aria-hidden": "true" }).outerHTML}
-              </button>
-            </ui-select-clear>
-          </div>
+    <ui-field>
+      <ui-field-label>Assignee</ui-field-label>
+      <ui-select default-value="ines" placeholder="Unassigned">
+        <div data-slot="row">
+          <ui-select-trigger>
+            <button>
+              <ui-select-value></ui-select-value>
+              ${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}
+            </button>
+          </ui-select-trigger>
+          <ui-select-clear>
+            <button aria-label="Clear assignee">${createElement(X, { "aria-hidden": "true" }).outerHTML}</button>
+          </ui-select-clear>
         </div>
         <ui-select-content>
-          ${fruits
+          ${people
             .map(
-              (fruit) => `
-                <ui-select-item value="${fruit.value}">
-                  ${fruit.label}
+              (person) => `
+                <ui-select-item value="${person.value}">
+                  ${person.label}
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
               `,
@@ -42,12 +40,10 @@ function mount(root: HTMLElement) {
             .join("")}
         </ui-select-content>
       </ui-select>
-      <output data-slot="output">Value: "banana"</output>
-    </div>
+    </ui-field>
   `
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
-    const { value } = (event as CustomEvent<{ value: string | null }>).detail
-    root.querySelector("output")!.textContent = `Value: ${JSON.stringify(value)}`
+    log(root, `value: ${JSON.stringify(event.detail.value)} (${event.detail.reason})`)
   })
 }
 

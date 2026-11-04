@@ -1,47 +1,42 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
+  import { useLog } from "../../../shared/svelte/log"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const roles = [
+    { value: "viewer", label: "Viewer" },
+    { value: "commenter", label: "Commenter" },
+    { value: "editor", label: "Editor" },
+    { value: "admin", label: "Admin" },
   ]
 
-  let status = $state("Closed")
+  const log = useLog()
 </script>
 
-<Select
-  defaultValue="banana"
-  onOpenChange={(open) => (status = open ? "Opening…" : "Closing…")}
-  onOpenChangeComplete={(open) => (status = open ? "Open" : "Closed")}
->
-  <div data-slot="stack">
-    <SelectLabel>Fruit</SelectLabel>
+<Field>
+  <FieldLabel>Role</FieldLabel>
+  <Select defaultValue="editor" onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-    <output data-slot="output">{status}</output>
-  </div>
-  <SelectContent>
-    {#each fruits as fruit (fruit.value)}
-      <SelectItem value={fruit.value}>
-        {fruit.label}
-        <SelectItemIndicator keepMounted>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    {/each}
-  </SelectContent>
-</Select>
+    <SelectContent>
+      {#each roles as role (role.value)}
+        <SelectItem value={role.value}>
+          {role.label}
+          <SelectItemIndicator keepMounted>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

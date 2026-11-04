@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -7,7 +8,6 @@
     SelectGroupLabel,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
     type ListData,
@@ -17,30 +17,29 @@
     { type: "group", label: "Common", items: ["Small", "Medium", "Large"] },
     { type: "group", label: "Extended", items: ["Extra small", "Extra large"] },
   ] satisfies ListData
-
 </script>
 
-<Select items={sizeGroups} name="size" defaultValue="Medium">
-  <div data-slot="stack">
-    <SelectLabel>Size</SelectLabel>
+<Field>
+  <FieldLabel>Size</FieldLabel>
+  <Select items={sizeGroups} name="size" defaultValue="Medium">
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    {#each sizeGroups as group (group.label)}
-      <SelectGroup>
-        <SelectGroupLabel>{group.label}</SelectGroupLabel>
-        {#each group.items as size (size)}
-          <SelectItem value={size}>
-            {size}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        {/each}
-      </SelectGroup>
-    {/each}
-  </SelectContent>
-</Select>
+    <SelectContent>
+      {#each sizeGroups as group (group.label)}
+        <SelectGroup>
+          <SelectGroupLabel>{group.label}</SelectGroupLabel>
+          {#each group.items as size (size)}
+            <SelectItem value={size}>
+              {size}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          {/each}
+        </SelectGroup>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

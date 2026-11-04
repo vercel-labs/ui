@@ -1,42 +1,40 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const priorities = [
+    { value: "urgent", label: "Urgent" },
+    { value: "high", label: "High" },
+    { value: "medium", label: "Medium" },
+    { value: "low", label: "Low" },
+    { value: "none", label: "No priority" },
   ]
-
 </script>
 
-<Select loop={false} defaultValue="pineapple">
-  <div data-slot="stack">
-    <SelectLabel>Fruit</SelectLabel>
+<Field>
+  <FieldLabel>Priority</FieldLabel>
+  <Select loop={false} defaultValue="none">
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-    <p data-slot="hint">Open it and press ArrowDown.</p>
-  </div>
-  <SelectContent>
-    {#each fruits as fruit (fruit.value)}
-      <SelectItem value={fruit.value}>
-        {fruit.label}
-        <SelectItemIndicator>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    {/each}
-  </SelectContent>
-</Select>
+    <SelectContent>
+      {#each priorities as priority (priority.value)}
+        <SelectItem value={priority.value}>
+          {priority.label}
+          <SelectItemIndicator>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

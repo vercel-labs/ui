@@ -1,20 +1,21 @@
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
 import { createSignal, For } from "solid-js"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const priorities = [
+  { value: "urgent", label: "Urgent" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+  { value: "none", label: "No priority" },
 ]
 
 function Example() {
@@ -22,9 +23,29 @@ function Example() {
 
   return (
     <div data-slot="stack">
-      <Select defaultValue="blueberry">
-        <div data-slot="stack">
-          <SelectLabel>Fruit</SelectLabel>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Checkbox checked={aligned()} onCheckedChange={(next) => setAligned(next === true)}>
+            <CheckboxIndicator>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </CheckboxIndicator>
+          </Checkbox>
+          Align item with trigger
+        </label>
+      </div>
+      <Field>
+        <FieldLabel>Priority</FieldLabel>
+        <Select defaultValue="medium">
           <SelectTrigger>
             <SelectValue />
             <svg
@@ -39,38 +60,30 @@ function Example() {
               <path d="m6 9 6 6 6-6" />
             </svg>
           </SelectTrigger>
-        </div>
-        <SelectContent alignItemWithTrigger={aligned()}>
-          <For each={fruits}>
-            {(fruit) => (
-              <SelectItem value={fruit.value}>
-                {fruit.label}
-                <SelectItemIndicator>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                </SelectItemIndicator>
-              </SelectItem>
-            )}
-          </For>
-        </SelectContent>
-      </Select>
-      <label data-slot="label">
-        <input
-          type="checkbox"
-          checked={aligned()}
-          onChange={(event) => setAligned(event.currentTarget.checked)}
-        />
-        Align item with trigger
-      </label>
+          <SelectContent alignItemWithTrigger={aligned()}>
+            <For each={priorities}>
+              {(priority) => (
+                <SelectItem value={priority.value}>
+                  {priority.label}
+                  <SelectItemIndicator>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </SelectItemIndicator>
+                </SelectItem>
+              )}
+            </For>
+          </SelectContent>
+        </Select>
+      </Field>
     </div>
   )
 }

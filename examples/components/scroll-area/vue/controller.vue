@@ -7,44 +7,39 @@ import {
   ScrollAreaThumb,
   ScrollAreaViewport,
 } from "@ui-sdk/vue/scroll-area"
-import { ref } from "vue"
+import { useLog } from "../../../shared/vue/log"
 
 const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}`)
 
+const log = useLog()
 const controller = createScrollAreaController()
-const position = ref("At the start")
-const read = () =>
-  (position.value = controller.isAtEnd()
-    ? "At the end"
-    : controller.isAtStart()
-      ? "At the start"
-      : "In between")
+let edge: string | null = "start"
+
+function read() {
+  const next = controller.isAtEnd() ? "end" : controller.isAtStart() ? "start" : null
+  if (next && next !== edge) log(`At the ${next}`)
+  edge = next
+}
 </script>
 
 <template>
   <div data-slot="stack">
+    <div data-slot="controls">
+      <button type="button" @click="controller.scrollToStart({ behavior: 'smooth' })">Back to Top</button>
+      <button type="button" @click="controller.scrollToEnd({ behavior: 'instant' })">Jump to the End</button>
+    </div>
     <ScrollArea :controller="controller">
-      <ScrollAreaViewport @scroll="read">
+      <ScrollAreaViewport role="region" aria-label="Tags" @scroll="read">
         <ScrollAreaContent>
-          <div v-for="tag in tags" :key="tag">{{ tag }}</div>
+          <h3>Tags</h3>
+          <ul>
+            <li v-for="tag in tags" :key="tag">{{ tag }}</li>
+          </ul>
         </ScrollAreaContent>
       </ScrollAreaViewport>
       <ScrollAreaScrollbar>
         <ScrollAreaThumb />
       </ScrollAreaScrollbar>
     </ScrollArea>
-    <div data-slot="stack">
-      <button
-        data-variant="secondary"
-        type="button"
-        @click="controller.scrollToStart({ behavior: 'smooth' })"
-      >
-        Back to top
-      </button>
-      <button data-variant="secondary" type="button" @click="controller.scrollToEnd({ behavior: 'instant' })">
-        Jump to the end
-      </button>
-      <output data-slot="output">{{ position }}</output>
-    </div>
   </div>
 </template>

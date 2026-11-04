@@ -3,9 +3,11 @@ title: Scroll Area
 description: Add styled scrollbars, edge indicators, and follow-to-end behavior to native scrolling.
 ---
 
+Use a scroll area when content needs its own scrolling region with scrollbars that match your design. The browser still does the scrolling, so the wheel, touch, keyboard and find in page work as usual.
+
 <ComponentExample
   name="scroll-area/basic"
-  caption="Scroll the release tags with the wheel, keyboard, or scrollbar thumb."
+  caption="Scroll the tags with the wheel, the keyboard or the scrollbar thumb. The scrollbar shows while the pointer is over the list."
 />
 
 ## Installation
@@ -28,74 +30,72 @@ ScrollArea
 
 Put the content inside a viewport, then add a scrollbar for each axis you want to style.
 
-The viewport is the real scroller. Give the root a size and the viewport `size-full`. Scrollbars sit over the viewport's edges. A thumb appears when its axis overflows; [`type`](#when-scrollbars-show) controls when the scrollbar is visible. Render only the scrollbars you want: with none, the browser's own scrollbars stay.
+The viewport is the real scroller. Give the root a size, and the viewport the root's full width and height. Scrollbars sit over the viewport's edges. A thumb appears when its axis overflows; [`type`](#when-scrollbars-show) controls when the scrollbar is visible. Render only the scrollbars you want: with none, the browser's own scrollbars stay.
 
-## Examples
+## Usage
 
-### Horizontal
+Import the parts and put them together:
 
-A horizontal scrollbar scrolls the inline axis. With one, the content grows as wide as it needs instead of wrapping.
+```svelte
+<script lang="ts">
+  import {
+    ScrollArea,
+    ScrollAreaViewport,
+    ScrollAreaContent,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+  } from "@ui-sdk/svelte/scroll-area"
+</script>
+
+<ScrollArea>
+  <ScrollAreaViewport role="region" aria-label="Release notes">
+    <ScrollAreaContent>Content to scroll</ScrollAreaContent>
+  </ScrollAreaViewport>
+  <ScrollAreaScrollbar orientation="vertical">
+    <ScrollAreaThumb />
+  </ScrollAreaScrollbar>
+</ScrollArea>
+```
+
+## Horizontal
+
+A horizontal scrollbar scrolls the inline axis. With one, the content grows as wide as it needs instead of wrapping. Here `type="auto"` keeps the scrollbar in view, so the row reads as one that scrolls.
 
 <ComponentExample
   name="scroll-area/horizontal"
-  caption="Scroll across the artwork cards using the horizontal scrollbar."
+  caption="Drag the scrollbar, or use Shift and the wheel, to scroll the palette from Sand to Ink."
 />
 
-### Both Axes
+## Both Axes
 
 With both scrollbars, each stops short of the corner where they meet, which `ScrollAreaCorner` fills.
 
 <ComponentExample
   name="scroll-area/both-axes"
-  caption="Scroll the release list vertically and horizontally."
+  caption="Scroll the releases down and across. The header row stays in place, and the scrollbars stop short of the corner."
 />
 
-### Chat and Streaming
-
-Set `stickToEnd` for a chat, a log, or a streamed answer. The scroll area starts at the bottom and keeps it in view while content grows: new messages, words streaming into the last one, and images that load late, whose size it watches.
-
-- Scroll away from the end to stop following. This happens as soon as you wheel, press a scroll key, touch, or drag upward, so incoming content cannot pull you back in the same frame.
-- Scroll to the bottom or press `ScrollAreaScrollToEnd` to follow again. The root has `data-sticking` while it follows.
-- Following pauses while you hold a pointer in the viewport, including when selecting text, and catches up when you release it.
-
-Following scrolls only this viewport, without flashing the scrollbars. Jump to latest animates toward the end as content grows and moves immediately when reduced motion is requested.
-
-`ScrollAreaScrollToEnd`, follows again. `data-sticking` is on the root while it follows.
-
-- **It never moves anything else.** It scrolls the viewport itself, never the page around it, and doesn't mark the scrollbars as scrolling, so they don't flash while text streams in.
-- **It waits for you.** While a mouse button is down in the viewport, like while selecting text, or a finger is on it, growth doesn't move the content. It catches up when you let go.
-- **Smooth scrolling.** `scroll-behavior: smooth` on the viewport doesn't slow it down. "Jump to latest" eases there, following content that keeps growing, and jumps at once for people who prefer reduced motion.
-
-`ScrollAreaScrollToEnd` is a button that has `data-visible` while the view is away from the end, and is inert otherwise, so it can fade out without taking focus. Name it with its content. When it's pressed from the keyboard, focus moves to the viewport, since the button goes inert.
-
-<ComponentExample
-  name="scroll-area/chat"
-  caption="Ask for more to stream a reply. Scroll up to pause following it, then use Jump to latest."
-/>
-
-### Edge Fades
+## Edge Fades
 
 The root holds how far the content reaches past each edge, as `--scroll-area-overflow-y-start`, `--scroll-area-overflow-y-end` and their `x` versions, and how far along the view is, as `--scroll-area-progress-y` and `-x`. A fade as tall as `min(2rem, var(--scroll-area-overflow-y-start))` is gone at the top and full once there's more above. For a fade that only switches, use `data-at-y-start` and `data-at-y-end`.
 
-These variables aren't inherited, so scrolling restyles the root and never the content. An element that reads one takes it from the root with `inherit`, like the fades here, which are children of the root: `[--scroll-area-overflow-y-start:inherit]`. The first scroll area registers the six names for the whole page with `CSS.registerProperty`. A page that needs them to inherit calls it first, with `inherits: true`. An `@property` rule can't, since a registration in script wins.
+These variables aren't inherited, so scrolling restyles the root and never the content. An element that reads one takes it from the root with `inherit`, like the fades here, which are children of the root: `--scroll-area-overflow-y-start: inherit`. The first scroll area registers the six names for the whole page with `CSS.registerProperty`. A page that needs them to inherit calls it first, with `inherits: true`. An `@property` rule can't, since a registration in script wins.
 
 <ComponentExample
   name="scroll-area/edge-fade"
-  caption="Scroll the tags and watch the edge fades track how much content remains."
+  caption="Scroll the release notes. The top fade grows in as you leave the top, and the bottom fade shrinks away at the end."
 />
 
-### Native Scrollbars
+## Native Scrollbars
 
 Leave out the Scrollbar parts to keep the browser's own scrollbars, with everything else: data attributes, edge variables, sticking to the end and the controller.
 
 <ComponentExample
   name="scroll-area/native-scrollbars"
-  caption="Scroll using the browser's own scrollbars while keeping the scroll area behavior."
+  caption="Scroll the inbox with the browser's own scrollbar. The scroll area still tracks its edges and state."
 />
 
-## Behavior and Options
-
-### When Scrollbars Show
+## When Scrollbars Show
 
 `type` decides when each scrollbar gets `data-visible`:
 
@@ -106,45 +106,56 @@ Leave out the Scrollbar parts to keep the browser's own scrollbars, with everyth
 | `"auto"`            | Whenever the content overflows on its axis                    |
 | `"always"`          | Always, even when the content fits, with no thumb then        |
 
-Style the attribute, like `opacity-0 data-visible:opacity-100`. A hidden scrollbar ignores the pointer, so it never catches presses meant for the content under it.
+Style the attribute: give the scrollbar `opacity: 0`, and `opacity: 1` under `[data-visible]`. A hidden scrollbar ignores the pointer, so it never catches presses meant for the content under it.
 
 <ComponentExample
   name="scroll-area/type"
-  caption="Hover and scroll each area to compare when its scrollbar appears."
+  caption="Hover and scroll each list to compare. The auto and always scrollbars show from the start; hover waits for the pointer and scroll for scrolling."
 />
 
-### Hide Delay
+## Hide Delay
 
 With `"scroll"` and `"hover"`, `scrollHideDelay` keeps a scrollbar for a while after scrolling stops or the pointer leaves, in ms. It defaults to 600.
 
 <ComponentExample
   name="scroll-area/hide-delay"
-  caption="Scroll or move the pointer away. The scrollbar waits 2000 milliseconds before hiding."
+  caption="Scroll each list and stop. The scrollbar on the left hides at once; the one on the right waits 2000 milliseconds."
 />
 
-### Pointer
+## Controller
+
+A [controller](#controller-1), from `createScrollAreaController()`, scrolls the area from anywhere and reads where it is. Pass it as `controller`.
+
+<ComponentExample
+  name="scroll-area/controller"
+  caption="Press Jump to the End, then Back to Top. The console logs each end of the list as the view reaches it."
+/>
+
+For a chat or a log, set `stickToEnd` to start at the bottom and keep new content in view until the user scrolls up; `ScrollAreaScrollToEnd` is a button that brings it back.
+
+## Pointer
 
 - **Dragging the thumb** moves the content as far along as the thumb moves along its track. Text doesn't get selected, scroll snapping pauses until the pointer lifts, and Escape puts the content back where the drag started.
 - **Pressing the track** pages toward the pointer, by most of a viewport, like a native scrollbar, and keeps paging while it's held until the thumb reaches the pointer. With Alt (Option on a Mac), it jumps there and drags instead.
 - **A wheel over a scrollbar** scrolls the viewport as far as it would over the content, and the page once the viewport can't scroll further.
 - **Pressing a scrollbar** never moves focus.
 
-### Keyboard and Screen Readers
+## Custom Rendering
 
-The viewport scrolls natively, so arrow keys, Page Up and Down, Home, End and Space work once focus is inside it. A viewport that scrolls and holds nothing focusable is a tab stop itself, so keyboard users can reach it; one with links or fields inside isn't, since Tab reaches them and they scroll it. Scrollbars and the corner are hidden from screen readers, which scroll the viewport themselves. Make the viewport a landmark with `role="region"` and an `aria-label` when it's worth finding, or give a chat `role="log"`.
+Every part takes a `render` snippet, to render a different element or component in its place: spread the supplied `props` onto it and render `children` inside. The `children` snippet receives the part's state, like `{#snippet children(state)}`.
 
-### Controller
-
-A [controller](#controller-1), from `createScrollAreaController()`, scrolls the area from anywhere and reads where it is. Pass it as `controller`.
+Here the root renders a `section` and the viewport an `article`, and the root's `children` snippet reads its state to show a hint until you reach the end. See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
 
 <ComponentExample
-  name="scroll-area/controller"
-  caption="Use Back to top and Jump to the end to scroll through the controller."
+  name="scroll-area/render"
+  caption="Scroll the releases. The hint under the list reads the root's state, changes once you leave the top, and disappears at the end."
 />
 
 ## Styling
 
-Parts are unstyled. Style them through the attributes they render, which are the same in every framework.
+Give the root a size and the viewport its full width and height; the parts set the positioning and overflow they need. Give each scrollbar a width or height and show it under `data-visible`. The thumb sizes and moves itself. Fades and shadows read the root's CSS variables.
+
+Each part has a `data-slot`, such as `scroll-area-thumb`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### ScrollArea [#styling-scrollarea]
 
@@ -155,6 +166,8 @@ Parts are unstyled. Style them through the attributes they render, which are the
 <CssVariables component="scroll-area" part="scrollbar" />
 
 ## Data Attributes
+
+`ScrollAreaCorner` has no state attributes.
 
 ### ScrollArea [#data-attributes-scrollarea]
 
@@ -180,21 +193,9 @@ Parts are unstyled. Style them through the attributes they render, which are the
 
 <DataAttributes component="scroll-area" part="scroll-to-end" />
 
-## Custom Rendering
-
-To render your own element, use the `render` snippet, which receives the props to spread and the part's state. The `children` snippet
-receives the state.
-
-Read a part's state to update its content or styles when that state changes. See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
-
-<ComponentExample
-  name="scroll-area/render"
-  caption="Scroll the releases to see the status and scrollbar respond to their state."
-/>
-
 ## API Reference
 
-Props and callbacks are the same as below, as Svelte props.
+Props are the same as below, as Svelte props.
 
 ### ScrollArea
 
@@ -213,26 +214,25 @@ These take no options of their own, only the props of the element they render. A
 
 ### State
 
-What `render` and `children` snippets receive. The root, the viewport and the content receive the scroll
-area's state.
+What render functions, state-based class names and slots receive. The root, the viewport and the content receive the scroll area's state.
 
 <StateTable path="../../packages/core/src/components/scroll-area/scroll-area.ts" name="ScrollAreaState" />
 
-#### ScrollAreaScrollbar
+`ScrollAreaScrollbar`:
 
 <StateTable
   path="../../packages/core/src/components/scroll-area/scroll-area.ts"
   name="ScrollAreaScrollbarState"
 />
 
-#### ScrollAreaThumb
+`ScrollAreaThumb`:
 
 <StateTable
   path="../../packages/core/src/components/scroll-area/scroll-area.ts"
   name="ScrollAreaThumbState"
 />
 
-#### ScrollAreaScrollToEnd
+`ScrollAreaScrollToEnd`:
 
 <StateTable
   path="../../packages/core/src/components/scroll-area/scroll-area.ts"
@@ -257,7 +257,15 @@ Create one with `createScrollAreaController()` and pass it as `controller`.
 
 ## Accessibility
 
-No WAI-ARIA pattern covers scroll areas: the viewport is a native scroller, and keyboard access follows axe's [scrollable-region-focusable](https://dequeuniversity.com/rules/axe/4.10/scrollable-region-focusable) rule. Every line below is an automated test.
+No WAI-ARIA pattern covers scroll areas: the viewport is a native scroller, and keyboard access follows axe's [scrollable-region-focusable](https://dequeuniversity.com/rules/axe/4.10/scrollable-region-focusable) rule. Scrollbars and the corner are hidden from screen readers, which scroll the viewport themselves. Make the viewport a landmark with `role="region"` and an `aria-label` when it's worth finding, or give a chat `role="log"`.
+
+### Keyboard
+
+The viewport scrolls natively, so arrow keys, Page Up and Down, Home, End and Space work once focus is inside it. A viewport that scrolls and holds nothing focusable is a tab stop itself, so keyboard users can reach it; one with links or fields inside isn't, since Tab reaches them and they scroll it.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="scroll-area" />
 

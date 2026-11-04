@@ -7,30 +7,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const methods = [
+  { value: "standard", label: "Standard" },
+  { value: "express", label: "Express" },
+  { value: "overnight", label: "Overnight" },
 ]
 
 function Example() {
-  const [submitted, setSubmitted] = createSignal("")
+  const log = useLog()
 
   return (
     <form
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        setSubmitted(`Ordered ${new FormData(event.currentTarget).get("fruit")}.`)
+        log(`Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`)
       }}
     >
-      <Field name="fruit">
-        <FieldLabel>Fruit</FieldLabel>
-        <Select required placeholder="Select a fruit">
+      <Field name="shipping">
+        <FieldLabel>Shipping method</FieldLabel>
+        <Select required placeholder="Select a shipping method">
           <SelectTrigger>
             <SelectValue />
             <svg
@@ -46,10 +45,10 @@ function Example() {
             </svg>
           </SelectTrigger>
           <SelectContent>
-            <For each={fruits}>
-              {(fruit) => (
-                <SelectItem value={fruit.value}>
-                  {fruit.label}
+            <For each={methods}>
+              {(method) => (
+                <SelectItem value={method.value}>
+                  {method.label}
                   <SelectItemIndicator>
                     <svg
                       viewBox="0 0 24 24"
@@ -68,11 +67,12 @@ function Example() {
             </For>
           </SelectContent>
         </Select>
-        <FieldDescription>We deliver it tomorrow.</FieldDescription>
-        <FieldError match="valueMissing">Pick a fruit to order.</FieldError>
+        <FieldDescription>Express arrives in two business days.</FieldDescription>
+        <FieldError match="valueMissing">Choose a shipping method.</FieldError>
       </Field>
-      <button type="submit">Order</button>
-      <output data-slot="output">{submitted()}</output>
+      <button type="submit" data-variant="solid">
+        Continue
+      </button>
     </form>
   )
 }

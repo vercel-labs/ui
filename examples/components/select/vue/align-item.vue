@@ -1,22 +1,23 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
 import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const priorities = [
+  { value: "urgent", label: "Urgent" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+  { value: "none", label: "No priority" },
 ]
 
 const aligned = ref(true)
@@ -24,26 +25,32 @@ const aligned = ref(true)
 
 <template>
   <div data-slot="stack">
-    <Select default-value="blueberry">
-      <div data-slot="stack">
-        <SelectLabel>Fruit</SelectLabel>
+    <div data-slot="controls">
+      <label data-slot="label">
+        <Checkbox :checked="aligned" @checked-change="(next) => (aligned = next === true)">
+          <CheckboxIndicator>
+            <CheckIcon />
+          </CheckboxIndicator>
+        </Checkbox>
+        Align item with trigger
+      </label>
+    </div>
+    <Field>
+      <FieldLabel>Priority</FieldLabel>
+      <Select default-value="medium">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent :align-item-with-trigger="aligned">
-        <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-          {{ fruit.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
-    <label data-slot="label">
-      <input v-model="aligned" type="checkbox" />
-      Align item with trigger
-    </label>
+        <SelectContent :align-item-with-trigger="aligned">
+          <SelectItem v-for="priority in priorities" :key="priority.value" :value="priority.value">
+            {{ priority.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
   </div>
 </template>

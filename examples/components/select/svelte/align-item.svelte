@@ -1,48 +1,55 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
     SelectItemIndicator,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const fruits = [
-    { value: "apple", label: "Apple" },
-    { value: "banana", label: "Banana" },
-    { value: "blueberry", label: "Blueberry" },
-    { value: "grapes", label: "Grapes" },
-    { value: "pineapple", label: "Pineapple" },
+  const priorities = [
+    { value: "urgent", label: "Urgent" },
+    { value: "high", label: "High" },
+    { value: "medium", label: "Medium" },
+    { value: "low", label: "Low" },
+    { value: "none", label: "No priority" },
   ]
 
   let aligned = $state(true)
 </script>
 
 <div data-slot="stack">
-  <Select defaultValue="blueberry">
-    <div data-slot="stack">
-      <SelectLabel>Fruit</SelectLabel>
+  <div data-slot="controls">
+    <label data-slot="label">
+      <Checkbox checked={aligned} onCheckedChange={(next) => (aligned = next === true)}>
+        <CheckboxIndicator>
+          <CheckIcon />
+        </CheckboxIndicator>
+      </Checkbox>
+      Align item with trigger
+    </label>
+  </div>
+  <Field>
+    <FieldLabel>Priority</FieldLabel>
+    <Select defaultValue="medium">
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent alignItemWithTrigger={aligned}>
-      {#each fruits as fruit (fruit.value)}
-        <SelectItem value={fruit.value}>
-          {fruit.label}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      {/each}
-    </SelectContent>
-  </Select>
-  <label data-slot="label">
-    <input bind:checked={aligned} type="checkbox" />
-    Align item with trigger
-  </label>
+      <SelectContent alignItemWithTrigger={aligned}>
+        {#each priorities as priority (priority.value)}
+          <SelectItem value={priority.value}>
+            {priority.label}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        {/each}
+      </SelectContent>
+    </Select>
+  </Field>
 </div>

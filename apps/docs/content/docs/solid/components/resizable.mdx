@@ -3,9 +3,11 @@ title: Resizable
 description: Resize, collapse, and save panel layouts with pointer and keyboard controls.
 ---
 
+Use a resizable group to let people size the panes of a layout, like a file list beside an editor, by dragging the handle between them or with the keyboard.
+
 <ComponentExample
   name="resizable/basic"
-  caption="Resize the side-by-side panels, then resize the two panels nested on the right."
+  caption="Drag the handle beside Files, then the one between page.tsx and Terminal."
 />
 
 ## Installation
@@ -25,149 +27,228 @@ Resizable
 └── ResizablePanel
 ```
 
-Put a handle between the panels you want to resize.
+Put a handle between the panels you want to resize, and name it with `aria-label`, like "Resize files". The group lays its panels out in a row, so give it a size, and each panel's size is a percentage of the space the panels share. A group can sit inside a panel, like an editor above a terminal.
 
-- **Resizable** is the group. It lays its panels out in a row, or a column with `orientation="vertical"`, so give it a size: a vertical group needs a height.
-- **ResizablePanel** is one region. Its size is a percentage of the space panels share, written to `--resizable-panel-size` and used as its flex basis.
-- **ResizableHandle** sits between two panels. It's a focusable separator whose value is the size of the panel before it, and dragging it or pressing arrow keys resizes the panels on either side.
+## Usage
 
-A group nests inside a panel, for layouts like an editor beside a terminal. Name each handle with `aria-label`, like "Resize sidebar".
+Import the parts and put them together:
 
-## Examples
+```tsx
+import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
 
-### Vertical
+function Example() {
+  return (
+    <Resizable>
+      <ResizablePanel defaultSize={30}>Files</ResizablePanel>
+      <ResizableHandle aria-label="Resize files" />
+      <ResizablePanel>Editor</ResizablePanel>
+    </Resizable>
+  )
+}
 
-Set `orientation="vertical"` to stack the panels. ArrowUp and ArrowDown move the handle. Every part gets `data-orientation`, and the handle's `aria-orientation` is the other direction, since it runs across the group, so style a horizontal handle with `aria-[orientation=horizontal]:`.
+export { Example }
+```
+
+The panel without `defaultSize` takes what's left, here 70%.
+
+## Build Your Own
+
+`@ui-sdk/solid/resizable` comes with a ready-made Resizable. If you'd like to build your own, with your own names, start from the `resizable` primitive in `@ui-sdk/core`:
+
+```ts title="split-view.ts"
+import { resizable } from "@ui-sdk/core/resizable"
+import { createParts } from "@ui-sdk/solid/primitive"
+
+const {
+  Root: SplitView,
+  Panel: SplitViewPane,
+  Handle: SplitViewDivider,
+} = createParts(resizable, { root: "div", panel: "div", handle: "div" })
+
+export { SplitView, SplitViewDivider, SplitViewPane }
+```
+
+```tsx
+<SplitView>
+  <SplitViewPane defaultSize={30}>Files</SplitViewPane>
+  <SplitViewDivider aria-label="Resize files" />
+  <SplitViewPane>Editor</SplitViewPane>
+</SplitView>
+```
+
+Each part keeps the behavior, state and data attributes of its ready-made counterpart: the root lays the panels out, each pane writes its size to `--resizable-panel-size`, and the divider is the focusable separator. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Vertical
+
+Set `orientation="vertical"` to stack the panels, and give the group a height. ArrowUp and ArrowDown move the handle. Every part gets `data-orientation` with the group's direction, so a vertical group's handle is `[data-slot="resizable-handle"][data-orientation="vertical"]`.
 
 <ComponentExample
   name="resizable/vertical"
-  caption="Drag the horizontal handle or focus it and use ArrowUp and ArrowDown."
+  caption="Drag the handle between Inbox and Quarterly report, or focus it and use ArrowUp and ArrowDown."
 />
 
-### Handle
+## Handle
 
 Put anything inside a handle, like a grip that shows it can be dragged. The handle can stay a thin line: its hit area is at least 10 pixels across, centered on it, and 24 for touch, without any styles.
 
 <ComponentExample
   name="resizable/handle"
-  caption="Grab the visible grip or focus the handle and use the arrow keys."
+  caption="Grab the grip beside Channels, or focus the handle and use the arrow keys."
 />
 
-### Collapsible
+## Collapsible
 
 `collapsible` lets a panel collapse below its `minSize` to `collapsedSize`, 0 by default: by dragging past the midpoint to its collapsed size, with Enter or a double-click on its handle, or through the controller. Dragging back past the same point opens it at its minimum, and Enter restores the size it had. A collapsed panel gets `data-collapsed`, and at size 0 its content leaves the tab order and the accessibility tree.
 
 <ComponentExample
   name="resizable/collapsible"
-  caption="Drag the sidebar closed, or focus its handle and press Enter to collapse and restore it."
+  caption="Drag the sidebar closed to leave only its icons, or focus its handle and press Enter to collapse and restore it."
 />
 
-### Sizes in Pixels
+## Sizes in Pixels
 
 Sizes are percentages as numbers, or strings with `%`, `px` or `rem`. Pixel and rem bounds hold as the group resizes, so a navigation with `minSize="160px"` never gets narrower, and a change they cause reports the `resize` reason.
 
 <ComponentExample
   name="resizable/sizes"
-  caption="Resize the navigation. Its pixel bounds stay in place as the group changes size."
+  caption="Resize Docs. It stays between 160 and 320 pixels wide, whatever the width of the group."
 />
 
-### Default Layout
+## Default Layout
 
-`defaultLayout` sets every panel's size at once, in order. Panels without `defaultSize` share what's left evenly otherwise.
+`defaultLayout` sets every panel's size at once, in order. Otherwise panels without `defaultSize` share what's left evenly.
 
 <ComponentExample
   name="resizable/default-layout"
-  caption="Start with the supplied layout, then resize any panel."
+  caption="The three mail panels start at 25, 35 and 40 percent. Resize any of them."
 />
 
-## Behavior and Options
+## Controlled
 
-### Controlled
-
-Pass `layout` and `onLayoutChange` to control the group.
-The layout is one percentage per panel, in order, adding up to 100. Every change carries a reason, like
-`drag`, `step-key` or `collapse`, and `details.cancel()` keeps the current layout.
+Pass `layout` and `onLayoutChange` to control the group. The layout is one percentage per panel, in order, adding up to 100. Every change carries a [reason](#reasons), like `drag`, `step-key` or `collapse`, and `details.cancel()` keeps the current layout.
 
 <ComponentExample
   name="resizable/controlled"
-  caption="Resize a panel to see the layout values held by the application."
+  caption="Resize Files to log the layout and its reason. Split Evenly and Reset set the layout from outside."
 />
 
-### Saving on Complete
+## Saving on Complete
 
-`onLayoutChange` runs on every frame of a drag. `onLayoutCommit` runs
-once, when the interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel
-collapses. Save there.
+`onLayoutChange` runs on every frame of a drag. `onLayoutCommit` runs once, when the interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. Save there.
 
 <ComponentExample
   name="resizable/complete"
-  caption="Resize a panel, then release the pointer or key. The saved layout updates when the interaction ends."
+  caption="Drag the handle and release it, or press an arrow key. The console logs the layout once, when you let go."
 />
 
-### Persistence
+## Persistence
 
 `autoSaveId` saves the layout in `localStorage` when an interaction completes and restores it when the group attaches in the browser. Server markup starts with the default sizes. Each set of panels keeps its own layout, so a panel that comes and goes gets its sizes back. Give panels an `id` so the saved layout survives changes elsewhere on the page.
 
+It's the same idea as [Preferences](./preferences), which saves one choice between visits, like a theme. Resizable saves the whole layout, under its `autoSaveId`.
+
 <ComponentExample
   name="resizable/persistence"
-  caption="Resize the sidebar, then reload this page to restore its saved layout."
+  caption="Resize Outline, then reload this page to restore its saved width."
 />
 
-### Storage
+## Storage
 
-`storage` takes anything with `getItem` and `setItem`. A server can't read `localStorage`, so it renders each panel's `defaultSize` and the saved layout arrives when the page hydrates. To render the saved layout on the first paint, keep it in a cookie, named by `resizableStorageKey(autoSaveId)`, and pass the sizes back as each panel's `defaultSize`. This example keeps the layout for the tab's session instead:
+`storage` takes anything with `getItem` and `setItem`, like `sessionStorage` or a cookie. That's the browser's storage shape, not the [storage](./preferences#save-the-value) helpers Preferences takes, such as `createLocalStorage`, which each keep one value. Choose between local storage, session storage and a cookie as you would for a preference, under [Remember the Choice](../../core/behaviors/preferences#remember-the-choice).
+
+This example keeps the layout in `sessionStorage`, for the tab's session:
 
 <ComponentExample
   name="resizable/storage"
-  caption="Resize the panels. The layout is stored for this browser tab using sessionStorage."
+  caption="Resize Messages, then reload. The width comes back in this tab, but not in a new one."
 />
 
-### Controller
+A server can't read `localStorage`, so it renders each panel's `defaultSize` and the saved layout arrives when the page hydrates. To render the saved layout on the first paint, keep it in a cookie and pass the sizes back as each panel's `defaultSize`. Here the server passes the request's `Cookie` header to the app, as in [Read a Cookie on the Server](../server-rendering#read-a-cookie-on-the-server), and the app reads the saved sizes from it. It imports `resizableStorageKey`, which names the cookie:
+
+```tsx title="app.tsx"
+import { resizableStorageKey } from "@ui-sdk/solid/resizable"
+import { Editor, readCookie } from "./editor"
+
+function App(props: { cookie: string | null }) {
+  const saved = JSON.parse(readCookie(props.cookie ?? "", resizableStorageKey("editor")) ?? "{}")
+  const [sidebar = 25, main = 75] = saved["sidebar,main"] ?? []
+  return <Editor sidebar={sidebar} main={main} />
+}
+
+export { App }
+```
+
+```tsx title="editor.tsx"
+import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/solid/resizable"
+
+const readCookie = (cookie: string, key: string) => {
+  const value = cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`))?.[1]
+  return value === undefined ? null : decodeURIComponent(value)
+}
+
+const cookieStorage: ResizableStorage = {
+  getItem: (key) => readCookie(document.cookie, key),
+  setItem: (key, value) => {
+    document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000`
+  },
+}
+
+function Editor(props: { sidebar: number; main: number }) {
+  return (
+    <Resizable autoSaveId="editor" storage={cookieStorage}>
+      <ResizablePanel id="sidebar" defaultSize={props.sidebar} />
+      <ResizableHandle aria-label="Resize sidebar" />
+      <ResizablePanel id="main" defaultSize={props.main} />
+    </Resizable>
+  )
+}
+
+export { Editor, readCookie }
+```
+
+## Controller
 
 A controller, from `createResizableController()`, collapses, expands and resizes panels from anywhere, by id or index, and reads the layout with `getLayout()`. Changes it makes report the `imperative` reason.
 
 <ComponentExample
   name="resizable/controller"
-  caption="Use Collapse, Expand, 240px, and Read to operate the panels through their controller."
+  caption="Use Collapse, Expand and 240px to move Files from outside the group, and Read to log its sizes."
 />
 
-### Keyboard
+## Step Size
 
-Focus a handle and press the arrow keys along the group's axis to move it by `step`, 1% by default, or with Shift by `largeStep`, 10%. Home and End move it as far as the panels allow, and Enter collapses or restores the panel beside it. A panel at its minimum passes the rest of a move on to the next one.
+`step` sets how far an arrow key moves a handle, 1% by default, and `largeStep` how far Shift with an arrow moves it, 10% by default.
 
 <ComponentExample
   name="resizable/keyboard"
-  caption="Focus a handle and try arrows, Shift with an arrow, Home, and End."
+  caption="Focus the handle between Original and Changes. The arrow keys move it 5%, Shift with an arrow 25%, and Home and End as far as it goes."
 />
 
-### Disabled
+## Disabled
 
 `disabled` on a handle fixes it in place. On the group it fixes every handle. Disabled handles leave the tab order, and their panels keep their sizes. A disabled `<fieldset>` around the group fixes every handle too.
 
 <ComponentExample
   name="resizable/disabled"
-  caption="The first handle stays fixed. Use the other handle to resize the remaining panels."
+  caption="The handle after Pinned stays fixed. Drag the one after Inbox, then check Lock layout to fix it too."
 />
 
-### Render Functions
+## Custom Rendering
 
-`render`, `class` and `children` can be functions of the part's state, like a panel's `size` and whether
-it's `collapsed`, or whether a handle is `dragging` or `hovering`.
+`render`, `class` and `children` can be functions of the part's state, like a panel's `size` and whether it's `collapsed`, or whether a handle is `dragging` or `hovering`. See [Parts and Composition](../parts-and-composition) for the rendering contract.
 
 <ComponentExample
   name="resizable/render"
-  caption="Resize Files or collapse it to see its size and state in the panel."
+  caption="Resize Files to see both panels report their size, or collapse it to see Collapsed."
 />
 
-The primitive writes drag sizes directly to panel styles. Reading `size` or `layout` in a render function, slot, or snippet also subscribes that part to updates during the drag.
+The primitive writes drag sizes directly to panel styles. Reading `size` or `layout` in a render function also updates that part on every frame of the drag.
 
 ## Styling
 
-Parts are unstyled, apart from the layout they need: the group is a flex row or column, panels take their size as a flex basis, and handles don't shrink and take `touch-action: none`. While a handle is hovered or dragged, its cursor shows over the whole page, and points the only way it can go at a limit.
+Parts are unstyled, apart from the layout they need: the group is a flex row or column, panels take their size as a flex basis, and handles don't shrink and take `touch-action: none`. Give the group a size, the handle a width or height and a background, and style it with `data-hovering`, `data-dragging` and `:focus-visible`. While a handle is hovered or dragged, its cursor shows over the whole page, and points the only way it can go at a limit.
 
-```tsx
-<ResizableHandle class="relative flex w-px items-center justify-center bg-neutral-200 outline-none focus-visible:ring-3 focus-visible:ring-neutral-400/50 data-hovering:bg-neutral-400 data-dragging:bg-neutral-400 aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full" />
-```
+Each part has a `data-slot`, such as `resizable-handle`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### ResizablePanel [#styling-resizablepanel]
 
@@ -198,6 +279,7 @@ Props and callbacks are the same as below, as Solid props.
 ### ResizablePanel
 
 <TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+
 ### ResizableHandle
 
 <TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
@@ -247,6 +329,14 @@ Callbacks get the new layout first, then the details.
 
 ## Accessibility
 
-Handles follow the [WAI-ARIA window splitter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/). Each is a focusable `separator` whose `aria-valuenow` is the size of the panel before it, with `aria-valuemin` and `aria-valuemax` as far as the panels allow, `aria-controls` pointing at that panel, and `aria-orientation` running across the group. Every line below is an automated test.
+Handles follow the [WAI-ARIA window splitter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/). Each is a focusable `separator` whose `aria-valuenow` is the size of the panel before it, with `aria-valuemin` and `aria-valuemax` as far as the panels allow, `aria-controls` pointing at that panel, and `aria-orientation` running across the group. Name each handle with `aria-label`.
+
+### Keyboard
+
+Focus a handle and press the arrow keys along the group's axis to move it by `step`, or with Shift by `largeStep`. Home and End move it as far as the panels allow, and Enter collapses or restores a collapsible panel beside it. A panel at its minimum passes the rest of a move on to the next one. Disabled handles leave the tab order.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="resizable" />

@@ -1,48 +1,45 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const roles = [
+  { value: "viewer", label: "Viewer" },
+  { value: "commenter", label: "Commenter" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
 ]
 
-const status = ref("Closed")
+const log = useLog()
 </script>
 
 <template>
-  <Select
-    default-value="banana"
-    @open-change="(open: boolean) => (status = open ? 'Opening…' : 'Closing…')"
-    @open-change-complete="(open: boolean) => (status = open ? 'Open' : 'Closed')"
-  >
-    <div data-slot="stack">
-      <SelectLabel>Fruit</SelectLabel>
+  <Field>
+    <FieldLabel>Role</FieldLabel>
+    <Select
+      default-value="editor"
+      @open-change-complete="(open) => log(open ? 'Finished opening' : 'Finished closing')"
+    >
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-      <output data-slot="output">{{ status }}</output>
-    </div>
-    <SelectContent>
-      <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-        {{ fruit.label }}
-        <SelectItemIndicator keep-mounted>
-          <CheckIcon />
-        </SelectItemIndicator>
-      </SelectItem>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectItem v-for="role in roles" :key="role.value" :value="role.value">
+          {{ role.label }}
+          <SelectItemIndicator keep-mounted>
+            <CheckIcon />
+          </SelectItemIndicator>
+        </SelectItem>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

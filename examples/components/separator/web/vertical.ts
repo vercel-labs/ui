@@ -1,13 +1,15 @@
 import "@ui-sdk/web/separator"
 
-export function mount(root: HTMLElement) {
+function mount(root: HTMLElement) {
   root.innerHTML = `
-    <div data-slot="row">
-      <span>Profile</span>
+    <nav aria-label="Legal" data-slot="row">
+      <a href="#">Privacy</a>
       <ui-separator orientation="vertical"></ui-separator>
-      <span>Billing</span>
+      <a href="#">Terms</a>
       <ui-separator orientation="vertical"></ui-separator>
-      <span>Settings</span>
-    </div>
+      <a href="#">Cookies</a>
+    </nav>
   `
 }
+
+export { mount }

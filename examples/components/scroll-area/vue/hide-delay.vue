@@ -7,17 +7,24 @@ import {
   ScrollAreaViewport,
 } from "@ui-sdk/vue/scroll-area"
 
+const delays = [
+  { value: 0, label: "No delay" },
+  { value: 2000, label: "2000 ms delay" },
+]
+
 const tags = Array.from({ length: 20 }, (_, index) => `v1.2.0-beta.${50 - index}`)
 </script>
 
 <template>
-  <div data-slot="row">
-    <div data-slot="stack" v-for="delay in [0, 2000]" :key="delay">
-      <code>scrollHideDelay={{ delay }}</code>
-      <ScrollArea type="scroll" :scroll-hide-delay="delay">
+  <div data-slot="grid">
+    <div v-for="delay in delays" :key="delay.value" data-slot="stack">
+      <span data-slot="hint">{{ delay.label }}</span>
+      <ScrollArea type="scroll" :scroll-hide-delay="delay.value">
         <ScrollAreaViewport>
           <ScrollAreaContent>
-            <div v-for="tag in tags" :key="tag">{{ tag }}</div>
+            <ul>
+              <li v-for="tag in tags" :key="tag">{{ tag }}</li>
+            </ul>
           </ScrollAreaContent>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar>

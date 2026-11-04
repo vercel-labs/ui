@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -12,49 +13,55 @@
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const produce = [
+  const fonts = [
     {
-      label: "Fruits",
+      label: "Sans serif",
       items: [
-        { value: "apple", label: "Apple" },
-        { value: "banana", label: "Banana" },
-        { value: "orange", label: "Orange" },
+        { value: "inter", label: "Inter" },
+        { value: "geist", label: "Geist" },
       ],
     },
     {
-      label: "Vegetables",
+      label: "Serif",
       items: [
-        { value: "carrot", label: "Carrot" },
-        { value: "broccoli", label: "Broccoli" },
-        { value: "spinach", label: "Spinach" },
+        { value: "source-serif", label: "Source Serif" },
+        { value: "lora", label: "Lora" },
+      ],
+    },
+    {
+      label: "Monospace",
+      items: [
+        { value: "geist-mono", label: "Geist Mono" },
+        { value: "jetbrains-mono", label: "JetBrains Mono" },
       ],
     },
   ]
 </script>
 
-<Select placeholder="Select produce">
-  <SelectTrigger aria-label="Produce">
-    <SelectValue />
-    <ChevronDownIcon />
-  </SelectTrigger>
-  <SelectContent>
-    {#each produce as group, index (group.label)}
-      {#if index > 0}
-        <SelectSeparator />
-      {/if}
-      <SelectGroup>
-        <SelectGroupLabel>
-          {group.label}
-        </SelectGroupLabel>
-        {#each group.items as item (item.value)}
-          <SelectItem value={item.value}>
-            {item.label}
-            <SelectItemIndicator>
-              <CheckIcon />
-            </SelectItemIndicator>
-          </SelectItem>
-        {/each}
-      </SelectGroup>
-    {/each}
-  </SelectContent>
-</Select>
+<Field>
+  <FieldLabel>Font</FieldLabel>
+  <Select placeholder="Select a font">
+    <SelectTrigger>
+      <SelectValue />
+      <ChevronDownIcon />
+    </SelectTrigger>
+    <SelectContent>
+      {#each fonts as group, index (group.label)}
+        {#if index > 0}
+          <SelectSeparator />
+        {/if}
+        <SelectGroup>
+          <SelectGroupLabel>{group.label}</SelectGroupLabel>
+          {#each group.items as item (item.value)}
+            <SelectItem value={item.value}>
+              {item.label}
+              <SelectItemIndicator>
+                <CheckIcon />
+              </SelectItemIndicator>
+            </SelectItem>
+          {/each}
+        </SelectGroup>
+      {/each}
+    </SelectContent>
+  </Select>
+</Field>

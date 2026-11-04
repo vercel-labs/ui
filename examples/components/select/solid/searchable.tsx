@@ -1,3 +1,4 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
@@ -8,7 +9,6 @@ import {
   SelectItem,
   SelectItemIndicator,
   SelectItemText,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
@@ -46,21 +46,21 @@ const popularCountries = [
   { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
 ]
 
-export function Example() {
+function Example() {
   return (
-    <Select
-      items={countries}
-      emptyItems={popularCountries}
-      placeholder="Select a country"
-      filter="contains"
-      announcement={(change) =>
-        change.type === "results"
-          ? `${change.count} ${change.count === 1 ? "country" : "countries"} found`
-          : null
-      }
-    >
-      <div data-slot="stack">
-        <SelectLabel>Country</SelectLabel>
+    <Field>
+      <FieldLabel>Country</FieldLabel>
+      <Select
+        items={countries}
+        emptyItems={popularCountries}
+        placeholder="Select a country"
+        filter="contains"
+        announcement={(change) =>
+          change.type === "results"
+            ? `${change.count} ${change.count === 1 ? "country" : "countries"} found`
+            : null
+        }
+      >
         <SelectTrigger>
           <SelectValue />
           <svg
@@ -75,42 +75,28 @@ export function Example() {
             <path d="m6 9 6 6 6-6" />
           </svg>
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <div data-slot="row">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m21 21-4.34-4.34" />
-            <circle cx="11" cy="11" r="8" />
-          </svg>
+        <SelectContent>
           <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-        </div>
-        <SelectEmpty>No countries found.</SelectEmpty>
-        <SelectList>
-          {(state) => (
-            <For each={state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]}>
-              {(entry) =>
-                "items" in entry ? (
-                  <SelectGroup>
-                    <SelectGroupLabel>{entry.label}</SelectGroupLabel>
-                    <For each={entry.items}>{(country) => <CountryItem country={country} />}</For>
-                  </SelectGroup>
-                ) : (
-                  <CountryItem country={entry} />
-                )
-              }
-            </For>
-          )}
-        </SelectList>
-      </SelectContent>
-    </Select>
+          <SelectEmpty>No countries found.</SelectEmpty>
+          <SelectList>
+            {(state) => (
+              <For each={state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]}>
+                {(entry) =>
+                  "items" in entry ? (
+                    <SelectGroup>
+                      <SelectGroupLabel>{entry.label}</SelectGroupLabel>
+                      <For each={entry.items}>{(country) => <CountryItem country={country} />}</For>
+                    </SelectGroup>
+                  ) : (
+                    <CountryItem country={entry} />
+                  )
+                }
+              </For>
+            )}
+          </SelectList>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 
@@ -134,3 +120,5 @@ function CountryItem(props: { country: { value: string; label: string } }) {
     </SelectItem>
   )
 }
+
+export { Example }

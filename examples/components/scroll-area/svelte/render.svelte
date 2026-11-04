@@ -11,35 +11,27 @@
 </script>
 
 <ScrollArea>
-  {#snippet render({ props, state })}
-    <section {...props}>
-      <ScrollAreaViewport aria-label="Releases">
-        {#snippet render({ props })}
-          <article {...props}>
-            <ScrollAreaContent>
-              {#each tags as tag (tag)}
-                <p>{tag}</p>
-              {/each}
-            </ScrollAreaContent>
-          </article>
-        {/snippet}
-      </ScrollAreaViewport>
-      <p data-slot="hint" aria-hidden="true">
-        {state.atStart ? "Scroll for older releases" : "Keep going"}
-      </p>
-      <ScrollAreaScrollbar>
-        {#snippet render({ props })}
-          <div data-slot="row" {...props}>
-            <ScrollAreaThumb>
-              {#snippet render({ props: thumbProps })}
-                <div
-                  {...thumbProps}
-                ></div>
-              {/snippet}
-            </ScrollAreaThumb>
-          </div>
-        {/snippet}
-      </ScrollAreaScrollbar>
-    </section>
+  {#snippet render({ props, state, children })}
+    <section {...props}>{@render children?.(state)}</section>
+  {/snippet}
+  {#snippet children(state)}
+    <ScrollAreaViewport aria-label="Releases">
+      {#snippet render({ props, state, children })}
+        <article {...props}>{@render children?.(state)}</article>
+      {/snippet}
+      <ScrollAreaContent>
+        <ul>
+          {#each tags as tag (tag)}
+            <li>{tag}</li>
+          {/each}
+        </ul>
+      </ScrollAreaContent>
+    </ScrollAreaViewport>
+    <p data-slot="hint" aria-hidden="true">
+      {state.atStart ? "Scroll for older releases" : "More releases below"}
+    </p>
+    <ScrollAreaScrollbar>
+      <ScrollAreaThumb />
+    </ScrollAreaScrollbar>
   {/snippet}
 </ScrollArea>

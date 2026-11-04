@@ -1,22 +1,22 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
 import { ref } from "vue"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { useLog } from "../../../shared/vue/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const statuses = [
+  { value: "backlog", label: "Backlog" },
+  { value: "todo", label: "Todo" },
+  { value: "in-progress", label: "In Progress" },
+  { value: "done", label: "Done" },
 ]
 
 const modes = [
@@ -26,12 +26,12 @@ const modes = [
 ] as const
 
 const modal = ref<boolean | "pointer">("pointer")
-const presses = ref(0)
+const log = useLog()
 </script>
 
 <template>
   <div data-slot="stack">
-    <div role="group" aria-label="Modal" data-slot="row">
+    <div data-slot="controls" role="group" aria-label="Modal">
       <button
         v-for="mode in modes"
         :key="mode.label"
@@ -42,23 +42,23 @@ const presses = ref(0)
         {{ mode.label }}
       </button>
     </div>
-    <Select :modal="modal" default-value="apple">
-      <div data-slot="stack">
-        <SelectLabel>Fruit</SelectLabel>
+    <Field>
+      <FieldLabel>Status</FieldLabel>
+      <Select :modal="modal" default-value="todo">
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value">
-          {{ fruit.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectContent>
-    </Select>
-    <button type="button" @click="presses++">Pressed {{ presses }} times</button>
+        <SelectContent>
+          <SelectItem v-for="status in statuses" :key="status.value" :value="status.value">
+            {{ status.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </Field>
+    <button type="button" @click="log('Pressed Save Draft')">Save Draft</button>
   </div>
 </template>

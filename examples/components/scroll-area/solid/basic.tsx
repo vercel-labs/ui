@@ -12,10 +12,12 @@ const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}
 function Example() {
   return (
     <ScrollArea>
-      <ScrollAreaViewport>
+      <ScrollAreaViewport role="region" aria-label="Tags">
         <ScrollAreaContent>
-          <h4>Tags</h4>
-          <For each={tags}>{(tag) => <div>{tag}</div>}</For>
+          <h3>Tags</h3>
+          <ul>
+            <For each={tags}>{(tag) => <li>{tag}</li>}</For>
+          </ul>
         </ScrollAreaContent>
       </ScrollAreaViewport>
       <ScrollAreaScrollbar>

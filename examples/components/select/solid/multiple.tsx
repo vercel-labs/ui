@@ -1,58 +1,63 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
-import { createSignal, For } from "solid-js"
+import { For } from "solid-js"
+import { useLog } from "../../../shared/solid/log"
 
-const fruits = [
-  { value: "apple", label: "Apple" },
-  { value: "banana", label: "Banana" },
-  { value: "blueberry", label: "Blueberry" },
-  { value: "grapes", label: "Grapes" },
-  { value: "pineapple", label: "Pineapple" },
+const languages = [
+  { value: "en", label: "English" },
+  { value: "fr", label: "French" },
+  { value: "de", label: "German" },
+  { value: "ja", label: "Japanese" },
+  { value: "pt", label: "Portuguese" },
+  { value: "es", label: "Spanish" },
 ]
 
 function Example() {
-  const [value, setValue] = createSignal<string[]>(["apple", "grapes"])
+  const log = useLog()
 
   return (
-    <div data-slot="stack">
-      <Select multiple value={value()} onValueChange={setValue} placeholder="Select fruits">
-        <div data-slot="stack">
-          <SelectLabel>Fruits</SelectLabel>
-          <SelectTrigger>
-            <SelectValue>
-              {(state) =>
-                state.placeholder
-                  ? "Select fruits"
-                  : state.labels.length > 2
-                    ? `${state.labels[0]} and ${state.labels.length - 1} more`
-                    : state.label
-              }
-            </SelectValue>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </SelectTrigger>
-        </div>
+    <Field>
+      <FieldLabel>Languages</FieldLabel>
+      <Select
+        multiple
+        defaultValue={["en", "ja"]}
+        placeholder="Select languages"
+        onValueChange={(value) => log(`value: ${JSON.stringify(value)}`)}
+      >
+        <SelectTrigger>
+          <SelectValue>
+            {(state) =>
+              state.placeholder
+                ? "Select languages"
+                : state.labels.length > 2
+                  ? `${state.labels[0]} and ${state.labels.length - 1} more`
+                  : state.label
+            }
+          </SelectValue>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </SelectTrigger>
         <SelectContent>
-          <For each={fruits}>
-            {(fruit) => (
-              <SelectItem value={fruit.value}>
-                {fruit.label}
+          <For each={languages}>
+            {(language) => (
+              <SelectItem value={language.value}>
+                {language.label}
                 <SelectItemIndicator>
                   <svg
                     viewBox="0 0 24 24"
@@ -71,8 +76,7 @@ function Example() {
           </For>
         </SelectContent>
       </Select>
-      <output data-slot="output">Value: {JSON.stringify(value())}</output>
-    </div>
+    </Field>
   )
 }
 

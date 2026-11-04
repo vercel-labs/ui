@@ -1,3 +1,4 @@
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import {
   Select,
   SelectContent,
@@ -8,37 +9,44 @@ import {
   SelectItem,
   SelectItemIndicator,
   SelectItemText,
-  SelectLabel,
   SelectList,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
 import { For } from "solid-js"
 
-const produce = [
+const regions = [
   {
-    label: "Fruits",
+    label: "Americas",
     items: [
-      { value: "apple", label: "Apple" },
-      { value: "banana", label: "Banana" },
-      { value: "orange", label: "Orange" },
+      { value: "br", label: "Brazil" },
+      { value: "ca", label: "Canada" },
+      { value: "mx", label: "Mexico" },
     ],
   },
   {
-    label: "Vegetables",
+    label: "Europe",
     items: [
-      { value: "carrot", label: "Carrot" },
-      { value: "broccoli", label: "Broccoli" },
-      { value: "spinach", label: "Spinach" },
+      { value: "fr", label: "France" },
+      { value: "de", label: "Germany" },
+      { value: "es", label: "Spain" },
+    ],
+  },
+  {
+    label: "Asia Pacific",
+    items: [
+      { value: "au", label: "Australia" },
+      { value: "jp", label: "Japan" },
+      { value: "sg", label: "Singapore" },
     ],
   },
 ]
 
 function Example() {
   return (
-    <Select placeholder="Select produce">
-      <div data-slot="stack">
-        <SelectLabel>Produce</SelectLabel>
+    <Field>
+      <FieldLabel>Country</FieldLabel>
+      <Select placeholder="Select a country">
         <SelectTrigger>
           <SelectValue />
           <svg
@@ -53,47 +61,47 @@ function Example() {
             <path d="m6 9 6 6 6-6" />
           </svg>
         </SelectTrigger>
-      </div>
-      <SelectContent>
-        <SelectInput aria-label="Search produce" placeholder="Search…" />
-        <SelectEmpty>Nothing found.</SelectEmpty>
-        <SelectList>
-          <For each={produce}>
-            {(group) => (
-              <SelectGroup>
-                <SelectGroupLabel>{group.label}</SelectGroupLabel>
-                <For each={group.items}>
-                  {(item) => (
-                    <SelectItem value={item.value} label={item.label}>
-                      <SelectItemText>
-                        {(state) =>
-                          state.segments.map((segment, index) =>
-                            segment.match ? <b>{segment.text}</b> : segment.text,
-                          )
-                        }
-                      </SelectItemText>
-                      <SelectItemIndicator>
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M20 6 9 17l-5-5" />
-                        </svg>
-                      </SelectItemIndicator>
-                    </SelectItem>
-                  )}
-                </For>
-              </SelectGroup>
-            )}
-          </For>
-        </SelectList>
-      </SelectContent>
-    </Select>
+        <SelectContent>
+          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectEmpty>No countries found.</SelectEmpty>
+          <SelectList>
+            <For each={regions}>
+              {(group) => (
+                <SelectGroup>
+                  <SelectGroupLabel>{group.label}</SelectGroupLabel>
+                  <For each={group.items}>
+                    {(item) => (
+                      <SelectItem value={item.value} label={item.label}>
+                        <SelectItemText>
+                          {(state) => (
+                            <For each={state.segments}>
+                              {(segment) => (segment.match ? <b>{segment.text}</b> : segment.text)}
+                            </For>
+                          )}
+                        </SelectItemText>
+                        <SelectItemIndicator>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        </SelectItemIndicator>
+                      </SelectItem>
+                    )}
+                  </For>
+                </SelectGroup>
+              )}
+            </For>
+          </SelectList>
+        </SelectContent>
+      </Select>
+    </Field>
   )
 }
 

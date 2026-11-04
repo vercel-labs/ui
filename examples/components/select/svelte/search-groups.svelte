@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -10,71 +11,76 @@
     SelectItem,
     SelectItemIndicator,
     SelectItemText,
-    SelectLabel,
     SelectList,
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
 
-  const produce = [
+  const regions = [
     {
-      label: "Fruits",
+      label: "Americas",
       items: [
-        { value: "apple", label: "Apple" },
-        { value: "banana", label: "Banana" },
-        { value: "orange", label: "Orange" },
+        { value: "br", label: "Brazil" },
+        { value: "ca", label: "Canada" },
+        { value: "mx", label: "Mexico" },
       ],
     },
     {
-      label: "Vegetables",
+      label: "Europe",
       items: [
-        { value: "carrot", label: "Carrot" },
-        { value: "broccoli", label: "Broccoli" },
-        { value: "spinach", label: "Spinach" },
+        { value: "fr", label: "France" },
+        { value: "de", label: "Germany" },
+        { value: "es", label: "Spain" },
+      ],
+    },
+    {
+      label: "Asia Pacific",
+      items: [
+        { value: "au", label: "Australia" },
+        { value: "jp", label: "Japan" },
+        { value: "sg", label: "Singapore" },
       ],
     },
   ]
 </script>
 
-<Select placeholder="Select produce">
-  <div data-slot="stack">
-    <SelectLabel>Produce</SelectLabel>
+<Field>
+  <FieldLabel>Country</FieldLabel>
+  <Select placeholder="Select a country">
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    <SelectInput aria-label="Search produce" placeholder="Search…" />
-    <SelectEmpty>Nothing found.</SelectEmpty>
-    <SelectList>
-      {#each produce as group (group.label)}
-        <SelectGroup>
-          <SelectGroupLabel>
-            {group.label}
-          </SelectGroupLabel>
-          {#each group.items as item (item.value)}
-            <SelectItem value={item.value} label={item.label}>
-              <SelectItemText>
-                {#snippet render({ props, state })}
-                  <span {...props}>
-                    {#each state.segments as segment, index (index)}
-                      {#if segment.match}
-                        <b>{segment.text}</b>
-                      {:else}
-                        {segment.text}
-                      {/if}
-                    {/each}
-                  </span>
-                {/snippet}
-              </SelectItemText>
-              <SelectItemIndicator>
-                <CheckIcon />
-              </SelectItemIndicator>
-            </SelectItem>
-          {/each}
-        </SelectGroup>
-      {/each}
-    </SelectList>
-  </SelectContent>
-</Select>
+    <SelectContent>
+      <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+      <SelectEmpty>No countries found.</SelectEmpty>
+      <SelectList>
+        {#each regions as group (group.label)}
+          <SelectGroup>
+            <SelectGroupLabel>{group.label}</SelectGroupLabel>
+            {#each group.items as item (item.value)}
+              <SelectItem value={item.value} label={item.label}>
+                <SelectItemText>
+                  {#snippet render({ props, state })}
+                    <span {...props}>
+                      {#each state.segments as segment, index (index)}
+                        {#if segment.match}
+                          <b>{segment.text}</b>
+                        {:else}
+                          {segment.text}
+                        {/if}
+                      {/each}
+                    </span>
+                  {/snippet}
+                </SelectItemText>
+                <SelectItemIndicator>
+                  <CheckIcon />
+                </SelectItemIndicator>
+              </SelectItem>
+            {/each}
+          </SelectGroup>
+        {/each}
+      </SelectList>
+    </SelectContent>
+  </Select>
+</Field>

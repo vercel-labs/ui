@@ -7,13 +7,23 @@ const session: ResizableStorage = {
 }
 
 function mount(root: HTMLElement) {
-  const group = document.createElement("ui-resizable") as HTMLElement & { storage?: ResizableStorage }
+  const group = document.createElement("ui-resizable")
   group.storage = session
   group.setAttribute("auto-save-id", "docs-storage")
   group.innerHTML = `
-    <ui-resizable-panel id="session-files" default-size="30">Files</ui-resizable-panel>
-    <ui-resizable-handle aria-label="Resize files"></ui-resizable-handle>
-    <ui-resizable-panel id="session-editor">Editor</ui-resizable-panel>
+    <ui-resizable-panel id="session-chats" default-size="35" min-size="20">
+      <h3>Messages</h3>
+      <ul>
+        <li>Inès Moreau</li>
+        <li>Kofi Mensah</li>
+        <li>Wren Takahashi</li>
+      </ul>
+    </ui-resizable-panel>
+    <ui-resizable-handle aria-label="Resize messages"></ui-resizable-handle>
+    <ui-resizable-panel id="session-thread" min-size="20">
+      <h3>Inès Moreau</h3>
+      <span data-slot="hint">Can we move the review to Friday?</span>
+    </ui-resizable-panel>
   `
   root.replaceChildren(group)
 }

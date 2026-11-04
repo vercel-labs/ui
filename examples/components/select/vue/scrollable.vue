@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -9,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
 
 const timezones = [
   {
@@ -59,23 +60,24 @@ const timezones = [
 </script>
 
 <template>
-  <Select placeholder="Select a timezone">
-    <SelectTrigger aria-label="Timezone">
-      <SelectValue />
-      <ChevronDownIcon />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectGroup v-for="group in timezones" :key="group.label">
-        <SelectGroupLabel>
-          {{ group.label }}
-        </SelectGroupLabel>
-        <SelectItem v-for="item in group.items" :key="item.value" :value="item.value">
-          {{ item.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectGroup>
-    </SelectContent>
-  </Select>
+  <Field>
+    <FieldLabel>Time zone</FieldLabel>
+    <Select placeholder="Select a time zone">
+      <SelectTrigger>
+        <SelectValue />
+        <ChevronDownIcon />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup v-for="group in timezones" :key="group.label">
+          <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
+          <SelectItem v-for="item in group.items" :key="item.value" :value="item.value">
+            {{ item.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

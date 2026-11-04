@@ -8,7 +8,7 @@ Use a Select when someone needs to choose from a set of options. It handles open
 <ComponentExample
   name="select/demo"
   inspect
-  caption="Open Fruit and choose Blueberry. The list closes and the trigger shows your choice."
+  caption="Open Role and choose Editor. The list closes and the trigger shows your choice."
 />
 
 ## Installation
@@ -38,13 +38,32 @@ ui-select
     └── ui-select-item
 ```
 
-Start with a label, a trigger, and a list of items. `ui-select-value` shows the selected item's label inside the trigger.
+Start with a label, a trigger, and a list of items. `ui-select-value` shows the selected item's label inside the trigger. `ui-select-label` names the trigger; inside a [Field](./field), use its `ui-field-label` instead, as the examples do.
 
-The trigger has the `combobox` role, and the popup is a `listbox`. `ui-select-label` names the trigger. If you don't need a visible label, give its button an `aria-label` instead.
+## Usage
 
-## Examples
+Import the elements and put them together:
 
-### Items as Data
+```html
+<script type="module">
+  import "@ui-sdk/web/select"
+</script>
+
+<ui-select placeholder="Select a role">
+  <ui-select-label>Role</ui-select-label>
+  <ui-select-trigger>
+    <button>
+      <ui-select-value></ui-select-value>
+    </button>
+  </ui-select-trigger>
+  <ui-select-content>
+    <ui-select-item value="viewer">Viewer</ui-select-item>
+    <ui-select-item value="editor">Editor</ui-select-item>
+  </ui-select-content>
+</ui-select>
+```
+
+## Items as Data
 
 Pass an array to `items` when your options come from data. A string is both the value and the label. Use an object when they differ:
 
@@ -58,7 +77,7 @@ select.items = [{ value: "pro", label: "Pro plan" }]
 These are option examples; add the label and trigger shown above. `items` can also include groups and separators, checked with `ListData`:
 
 ```ts
-import type { ListData } from "@ui-sdk/core/select"
+import type { ListData } from "@ui-sdk/web/select"
 
 const plans: ListData = [
   { value: "free", label: "Free" },
@@ -67,7 +86,7 @@ const plans: ListData = [
 ]
 ```
 
-The element renders items from the `items` property. Put a styled item, group, and separator inside a `<template>` to control their markup, as the example does. Set properties such as `items` from JavaScript; attributes only hold text. For server-rendered options, write the item elements in your HTML.
+The select can render bare items from this data. To style them, set `items` on `ui-select` and write `ui-select-item` elements inside `ui-select-content`, as the example does. Set properties such as `items` from JavaScript; attributes only hold text. Keeping the data on the root also makes labels available before the list opens, and written-out items render on the server.
 
 <ComponentExample
   name="select/data"
@@ -76,18 +95,16 @@ The element renders items from the `items` property. Put a styled item, group, a
 
 Items can change while the list is open. Navigation follows the new order, and selection and highlight stay with their values while those items remain. Removing the highlighted item clears the highlight. [Lists and Menus](../lists-and-menus) covers shared data shapes.
 
-<span id="options" />
-
-### Groups
+## Groups
 
 Put related items inside `ui-select-group` and name each group with `ui-select-group-label`. `ui-select-separator` adds a visual break without becoming an option.
 
 <ComponentExample
   name="select/groups"
-  caption="Open Produce and choose from Fruits or Vegetables. Each group has a label that screen readers can announce."
+  caption="Open Font and choose from Sans serif, Serif or Monospace. Each group has a label that screen readers announce."
 />
 
-### Icons
+## Icons
 
 `ui-select-item-icon` keeps an icon separate from the item's text, so it doesn't affect its accessible name, typeahead, or search. Add `ui-select-value-icon` to the trigger to show the selected item's icon there too.
 
@@ -107,7 +124,7 @@ The full example marks directional icons with `mirror`, so they flip in right-to
   caption="Choose Center or End. Both the label and the icon in the trigger update to match the selected item."
 />
 
-### Typeahead
+## Typeahead
 
 With the trigger focused and closed, typing selects the next matching option without opening the list. With the list open, typing moves the highlight; Enter chooses the highlighted item.
 
@@ -115,26 +132,19 @@ Set an item's `label` when its content includes extra text that shouldn't be mat
 
 <ComponentExample
   name="select/typeahead"
-  caption="Focus Country and type “sw” to select Sweden without opening the list. Open it and type “g” to highlight a matching country, then press Enter."
+  caption="Focus Country and type “sw” to select Sweden without opening the list. Open it and type “g” to highlight Germany, then press Enter."
 />
 
-<span id="loop" />
-<span id="rtl" />
-
-Arrow keys move through the open list; Home and End reach its first and last items. Set `loop="false"` to stop arrow keys at either end. The popup follows the trigger's inherited text direction; use logical CSS properties for spacing in right-to-left layouts.
-
-### Disabled
+## Disabled
 
 A disabled select can't be focused or changed and doesn't submit a value. A read-only select stays focusable and submits its value, but can't change. Keyboard navigation skips disabled items, and they can't be chosen.
 
 <ComponentExample
   name="select/disabled"
-  caption="Tab through the controls to compare disabled and read-only behavior. Open Disabled item and press the arrow keys: the highlight skips Grapes, which can't be chosen."
+  caption="Billing country is disabled and Shipping from is read-only. Open Shipping to and press the arrow keys: the highlight skips Denmark, which can't be chosen."
 />
 
-<span id="placeholder" />
-
-### Clear Button
+## Clear Button
 
 `placeholder` appears while nothing is selected. Add `ui-select-clear` to return to that state. Clearing sets a single value to `null`, or multiple values to an empty array, and returns focus to the trigger.
 
@@ -142,25 +152,25 @@ Keep the clear button beside the trigger: a button can't contain another button.
 
 <ComponentExample
   name="select/clearable"
-  caption="Press Clear fruit. The trigger shows its placeholder, focus returns to it, and the value below becomes null. Choose another fruit to restore the clear button."
+  caption="Press the clear button. The trigger shows Unassigned, focus returns to it, and the console logs null. Choose someone to bring the button back."
 />
 
-### Multiple
+## Multiple
 
 Set `multiple` to select more than one value. The value becomes an array, and choosing an item toggles it while keeping the list open.
 
 ```html
-<ui-select multiple default-value="apple, grapes"></ui-select>
+<ui-select multiple default-value="en, ja"></ui-select>
 ```
 
 Listen for `valuechange` and update a child of `ui-select-value` to summarize a long selection, as this example does.
 
 <ComponentExample
   name="select/multiple"
-  caption="Choose several fruits, then choose one again to remove it. The list stays open and the array below follows your selection."
+  caption="Choose several languages, then choose one again to remove it. The list stays open, and the console logs the array."
 />
 
-### Select All
+## Select All
 
 Add `ui-select-select-all` to select or clear every enabled item. It shows a mixed state when only some are selected. Inside a `ui-select-group`, it applies to that group.
 
@@ -168,19 +178,17 @@ Add `ui-select-select-all` to select or clear every enabled item. It shows a mix
 
 <ComponentExample
   name="select/select-all"
-  caption="Open Fruits and press Select all. Press it again to clear the selection, then choose one fruit to see the mixed state."
+  caption="Open Regions and press Select all. Press it again to clear the selection, then choose one region to see the mixed state."
 />
 
-<span id="searchable" />
-
-### Search with Groups
+## Search with Groups
 
 Add `ui-select-input` inside `ui-select-content` to filter the options. Put the items in `ui-select-list`, so the search field stays outside the scrollable list. `ui-select-empty` shows when nothing matches.
 
 ```html
 <ui-select-content>
-  <ui-select-input><input aria-label="Search produce" /></ui-select-input>
-  <ui-select-empty>Nothing found.</ui-select-empty>
+  <ui-select-input><input aria-label="Search countries" /></ui-select-input>
+  <ui-select-empty>No countries found.</ui-select-empty>
   <ui-select-list><!-- Items go here. --></ui-select-list>
 </ui-select-content>
 ```
@@ -189,12 +197,12 @@ Groups with no matching items hide automatically. `ui-select-item-text` can high
 
 <ComponentExample
   name="select/search-groups"
-  caption="Open Produce and type “car”. Only Vegetables and Carrot remain. Try “zz” to see the empty message, then clear the search to show every option."
+  caption="Open Country and type “ja”. Only Asia Pacific and Japan remain. Try “zz” to see the empty message, then clear the search to show every country."
 />
 
 Arrow keys move the highlight while focus stays in the search field. On a touch screen reader, focus moves into the items instead. To show recent choices before a search, pass `emptyItems` alongside `items`. [Lists and Menus](../lists-and-menus#search-and-load-items) covers filtering options.
 
-### Async Search
+## Async Search
 
 Use `filter="false"` when the server already filters your options. Listen for `querychange` to update your loader, and set the select's `items` and `status` properties.
 
@@ -205,22 +213,23 @@ This example uses [Async Options](../utilities/async-options) to replace stale r
   caption="Open Country and type “an”. Results arrive after a short delay. Clear the search and move or scroll to the last result to load another page."
 />
 
-### Object Values
+## Object Values
 
-A value can be an object. Tell Select how to identify it, display it, and compare it with another copy:
+A value can be an object. Set the select's `items` with the objects as values, and tell it how to identify and display one:
 
-| Prop                 | What It Does                                                          |
-| -------------------- | --------------------------------------------------------------------- |
-| `itemToValue`        | Returns the string used to identify and submit the value.             |
-| `itemToLabel`        | Returns the text shown in the trigger.                                |
-| `isItemEqualToValue` | Matches an item with a selected value that may be a different object. |
+| Property      | What It Does                                              |
+| ------------- | --------------------------------------------------------- |
+| `itemToValue` | Returns the string used to identify and submit the value. |
+| `itemToLabel` | Returns the text shown in the trigger.                    |
+
+A `ui-select-item` holds that string as its `value`, so a copy of an object, like the initial value here, matches its item through `itemToValue`.
 
 <ComponentExample
   name="select/object-values"
-  caption="Grace starts selected even though the initial value is a copy of her item. Choose another assignee to see the submitted ID change."
+  caption="Inès starts selected even though the initial value is a copy of her item. Choose another assignee; the console logs the ID the form submits."
 />
 
-### Virtualized
+## Virtualized
 
 For a large list, pass every option through `items` and render only the visible rows. The `highlight` event tells your virtualizer which row to bring into view. Give each rendered item its full-list `index` so the accessibility attributes describe its position correctly.
 
@@ -231,45 +240,45 @@ The example includes its own small row-windowing helpers. You can use the same p
   caption="Open Item and press End to reach Item 10000, then Home to return to the beginning. Scroll through the list; only nearby rows render."
 />
 
-### Align Item with Trigger
+## Align Item with Trigger
 
 Set `align-item-with-trigger` on `ui-select-content` to place the selected item over the trigger. It falls back to normal popup placement when opened by touch or when there isn't enough room.
 
 <ComponentExample
   name="select/align-item"
-  caption="Open Fruit with Align item with trigger checked, then close it, uncheck the setting, and open it again to compare placement."
+  caption="Open Priority: Medium sits over the trigger. Close it, uncheck Align item with trigger, and open it again to compare placement."
 />
 
-### Scrollable
+## Scrollable
 
 Limit the content's height and allow vertical scrolling. `--available-height` tells you how much room the popup has; the highlighted item scrolls into view as you move with the keyboard.
 
 <ComponentExample
   name="select/scrollable"
-  caption="Open Timezone and move down with the arrow keys. The list scrolls to keep the highlighted option visible, and group labels stay at the top."
+  caption="Open Time zone and move down with the arrow keys. The list scrolls to keep the highlighted option visible."
 />
 
-### Invalid
+## Invalid
 
 Inside a [Field](./field), the field's label names the trigger, and its description and errors describe it. Set `name` on `ui-select` itself for submission. After invalid submission, the trigger gets `aria-invalid` and `data-invalid`.
 
 <ComponentExample
   name="select/invalid"
-  caption="Press Order without selecting a fruit to show the error. Choose a fruit and submit again to see the submitted value."
+  caption="Press Continue without choosing a shipping method to show the error. Choose one and continue; the console logs the submitted value."
 />
 
-### Forms
+## Forms
 
 Set `name` to include a select in form submission. `required` blocks submission until something is selected; resetting the form restores `default-value`. Multiple values submit as separate entries under the same name.
 
-The example also uses `auto-complete="country"` for autofill and `form="select-order"` to associate the Size select with a form it sits outside.
+The example also uses `auto-complete="country"` for autofill and `form="select-newsletter"` to associate the Frequency select with a form it sits outside.
 
 <ComponentExample
   name="select/form"
-  caption="Choose a country and some fruits, change Size, then Submit to inspect all three fields. Reset restores the initial choices and clears the result."
+  caption="Choose a country and some topics, change Frequency, then press Save; the console logs all three fields. Reset restores the initial choices."
 />
 
-### Presentation
+## Presentation
 
 Use `presentation="sheet"` to open the options in a bottom sheet, or `"auto"` to use a sheet on small touch screens. Choosing an item still selects it and closes the single-select list.
 
@@ -277,44 +286,48 @@ The content gets `data-presentation`. Use it to give sheet items more space. Kee
 
 <ComponentExample
   name="select/presentation"
-  caption="Open Fruit to show the bottom sheet. Choose an option to close it, or drag down to dismiss it without changing the value."
+  caption="Open Status to show the bottom sheet. Choose an option to close it, or drag down to dismiss it without changing the value."
 />
 
 A sheet makes the page behind it inert and locks scrolling unless `modal="false"`. [Popups](../popups#modals-and-sheets) explains the shared presentation options.
 
-### Controlled
+## Controlled
 
 Read or set the element's `value` and `open` properties. A single value is `T | null`; with `multiple`, it is `T[]`. Listen for `valuechange` and `openchange` on the select itself. The requested value is in `event.detail.value`; call `event.preventDefault()` to refuse the change.
 
 [State and Events](../state-and-events) explains this pattern. The [reason tables](#reasons) list Select's reasons, including `item-press`, `list-navigation`, and `clear-press`.
 
-### Controller
+## Controller
 
 The element's `api` property can open, read, or change the select. A trigger outside it connects with `for="select-id"`. See [Controllers](../controllers) for setup and waiting for a popup to close, and the [Select controller reference](#controller-1) for its methods.
 
-### Custom Rendering
-
-The trigger and clear parts wrap your own `<button>`; the input part wraps your own `<input>`. Other parts can use `as-child` to bind your element. [Parts and Composition](../parts-and-composition#choose-the-element) explains the markup.
-
-### Positioning
+## Positioning
 
 Use `side`, `align`, and offsets to place the popup. `ui-select-arrow` follows the side it lands on. [Popups](../popups#place-the-content) covers anchoring and collisions.
 
-### Modal
+## Modal
 
 By default, pressing outside closes the list without activating the element behind it. `modal="true"` also locks scrolling and makes the page inert. `modal="false"` allows outside presses through. See [Control Dismissal](../popups#control-dismissal).
 
-### Container
+## Container
 
 The popup uses the top layer without a portal. Use `container` when it must render in another DOM container. [Hidden Content and Containers](../popups#hidden-content-and-containers) covers the shared setup.
 
-### Animation
+## Animation
 
 Select keeps closing content mounted until its exit animation finishes. `openchangecomplete` runs afterward. Use `keep-mounted` when your animation library needs the closed content to remain in the DOM. [Styling and Animation](../styling-and-animation) covers the lifecycle attributes.
 
+## Custom Rendering
+
+The trigger and clear parts wrap your own `<button>`; the input part wraps your own `<input>`. Other parts can use `as-child` to bind your element. [Parts and Composition](../parts-and-composition#choose-the-element) explains the markup. Select's part states show as the attributes under [Data Attributes](#data-attributes).
+
 ## Styling
 
-Style the parts with the attributes below. The popup also exposes variables such as `--anchor-width` and `--available-height` for sizing.
+Use `data-highlighted` for the active item, `data-selected` for chosen items, and `data-placeholder` on the trigger and value while nothing is selected. `data-modality="keyboard"` on the content tells a keyboard highlight from a pointer one.
+
+`--anchor-width` matches the trigger's width, and `--available-height` says how much room the popup has. Use them to size the content.
+
+Each part has a `data-slot`, such as `select-trigger`, and its state attributes are listed under [Data Attributes](#data-attributes).
 
 ### `<ui-select-content>` [#styling-selectcontent]
 
@@ -325,6 +338,8 @@ Style the parts with the attributes below. The popup also exposes variables such
 <CssVariables component="select" part="viewport" />
 
 ## Data Attributes
+
+`<ui-select-list>`, `<ui-select-input>`, `<ui-select-group>`, `<ui-select-group-label>`, `<ui-select-separator>` and `<ui-select-value-icon>` have no state attributes.
 
 ### `<ui-select-label>` [#data-attributes-selectlabel]
 
@@ -533,7 +548,15 @@ Events fire on their own element and don't bubble, with the new state in `event.
 
 ## Accessibility
 
-The select follows the [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/). Every line below is an automated test.
+The select follows the [WAI-ARIA select-only combobox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-select-only/). The trigger has the `combobox` role and the popup is a `listbox`. If you don't need a visible label, give its button an `aria-label` instead.
+
+### Keyboard
+
+Arrow keys move through the open list; Home and End reach its first and last items. Set `loop="false"` to stop arrow keys at either end. The popup follows the trigger's inherited text direction; use logical CSS properties for spacing in right-to-left layouts.
+
+### Tested Behavior
+
+Every line below is an automated test.
 
 <SpecList spec="select" />
 

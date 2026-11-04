@@ -1,10 +1,10 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
     SelectItem,
-    SelectLabel,
     SelectList,
     SelectTrigger,
     SelectValue,
@@ -34,47 +34,49 @@
   let scroller: HTMLDivElement | undefined = $state()
   let scrollTop = $state(0)
 
-  function onHighlight(_value: unknown, { index }: { index: number }) {
-    const el = scroller
-    if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
-  }
-
   function visible(items: { value: string; label: string }[]) {
     const { start, end } = visibleRows(scrollTop, height, items.length, row)
     return items.slice(start, end).map((item, offset) => ({ item, index: start + offset }))
   }
 </script>
 
-<Select items={manyItems} placeholder="Select an item" {onHighlight}>
-  <div data-slot="stack">
-    <SelectLabel>Item</SelectLabel>
+<Field>
+  <FieldLabel>Item</FieldLabel>
+  <Select
+    items={manyItems}
+    placeholder="Select an item"
+    onHighlight={(value, { index }) => {
+      const el = scroller
+      if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
+    }}
+  >
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
-  </div>
-  <SelectContent>
-    <div
-      bind:this={scroller}
-      style="height: {height}px"
-      onscroll={(event) => (scrollTop = event.currentTarget.scrollTop)}
-    >
-      <SelectList>
-        {#snippet children(state)}
-          <div style="height: {state.items.length * row}px">
-            {#each visible(state.items as { value: string; label: string }[]) as { item, index } (item.value)}
-              <SelectItem
-                value={item.value}
-                label={item.label}
-                {index}
-                style="top: {index * row}px; height: {row}px"
-              >
-                {item.label}
-              </SelectItem>
-            {/each}
-          </div>
-        {/snippet}
-      </SelectList>
-    </div>
-  </SelectContent>
-</Select>
+    <SelectContent>
+      <div
+        bind:this={scroller}
+        style:height="{height}px"
+        onscroll={(event) => (scrollTop = event.currentTarget.scrollTop)}
+      >
+        <SelectList>
+          {#snippet children(state)}
+            <div style:height="{state.items.length * row}px">
+              {#each visible(state.items as { value: string; label: string }[]) as { item, index } (item.value)}
+                <SelectItem
+                  value={item.value}
+                  label={item.label}
+                  {index}
+                  style="top: {index * row}px; height: {row}px"
+                >
+                  {item.label}
+                </SelectItem>
+              {/each}
+            </div>
+          {/snippet}
+        </SelectList>
+      </div>
+    </SelectContent>
+  </Select>
+</Field>

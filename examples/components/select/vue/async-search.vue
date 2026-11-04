@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
+import { useAsyncOptions } from "@ui-sdk/vue/async-options"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -7,13 +9,11 @@ import {
   SelectInput,
   SelectItem,
   SelectItemIndicator,
-  SelectLabel,
   SelectList,
   SelectStatus,
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { useAsyncOptions } from "@ui-sdk/vue/async-options"
 import { ref } from "vue"
 
 const countryList = [
@@ -62,50 +62,50 @@ const { state: results, setQuery, loadMore } = useAsyncOptions(searchCountries, 
 </script>
 
 <template>
-  <Select
-    v-model:query="query"
-    :items="results.items"
-    :filter="false"
-    :status="results.status"
-    placeholder="Select a country"
-    @query-change="(next: string) => setQuery(next)"
-    @load-more="loadMore"
-  >
-    <div data-slot="stack">
-      <SelectLabel>Country</SelectLabel>
+  <Field>
+    <FieldLabel>Country</FieldLabel>
+    <Select
+      v-model:query="query"
+      :items="results.items"
+      :filter="false"
+      :status="results.status"
+      placeholder="Select a country"
+      @query-change="(next) => setQuery(next)"
+      @load-more="loadMore"
+    >
       <SelectTrigger>
         <SelectValue />
         <ChevronDownIcon />
       </SelectTrigger>
-    </div>
-    <SelectContent>
-      <SelectInput aria-label="Search countries" placeholder="Search countries…" />
-      <SelectEmpty v-slot="{ state }">
-        <template v-if="state.empty && !state.loading">No countries match “{{ state.query }}”.</template>
-      </SelectEmpty>
-      <SelectList v-slot="{ state }">
-        <SelectItem
-          v-for="item in state.items as { value: string; label: string; disabled?: boolean }[]"
-          :key="item.value"
-          :value="item.value"
-          :label="item.label"
-          :disabled="item.disabled"
-        >
-          {{ item.label }}
-          <SelectItemIndicator>
-            <CheckIcon />
-          </SelectItemIndicator>
-        </SelectItem>
-      </SelectList>
-      <SelectStatus v-slot="{ state }">
-        {{
-          state.loading
-            ? "Loading…"
-            : state.status === "error"
-              ? "Couldn't load countries."
-              : `${state.count} shown`
-        }}
-      </SelectStatus>
-    </SelectContent>
-  </Select>
+      <SelectContent>
+        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+        <SelectEmpty v-slot="{ state }">
+          <template v-if="state.empty && !state.loading">No countries match “{{ state.query }}”.</template>
+        </SelectEmpty>
+        <SelectList v-slot="{ state }">
+          <SelectItem
+            v-for="item in state.items as { value: string; label: string; disabled?: boolean }[]"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+            :disabled="item.disabled"
+          >
+            {{ item.label }}
+            <SelectItemIndicator>
+              <CheckIcon />
+            </SelectItemIndicator>
+          </SelectItem>
+        </SelectList>
+        <SelectStatus v-slot="{ state }">
+          {{
+            state.loading
+              ? "Loading…"
+              : state.status === "error"
+                ? "Couldn't load countries."
+                : `${state.count} shown`
+          }}
+        </SelectStatus>
+      </SelectContent>
+    </Select>
+  </Field>
 </template>

@@ -22,7 +22,9 @@ function Example() {
             <ScrollArea type={type}>
               <ScrollAreaViewport>
                 <ScrollAreaContent>
-                  <For each={tags}>{(tag) => <div>{tag}</div>}</For>
+                  <ul>
+                    <For each={tags}>{(tag) => <li>{tag}</li>}</For>
+                  </ul>
                 </ScrollAreaContent>
               </ScrollAreaViewport>
               <ScrollAreaScrollbar>

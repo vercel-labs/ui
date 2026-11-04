@@ -1,15 +1,31 @@
 <script lang="ts">
   import { ScrollArea, ScrollAreaContent, ScrollAreaViewport } from "@ui-sdk/svelte/scroll-area"
 
-  const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}`)
+  const messages = [
+    { from: "Hollis Grant", subject: "Launch checklist for Thursday" },
+    { from: "Inès Moreau", subject: "Updated pricing page copy" },
+    { from: "Kofi Mensah", subject: "Design review notes" },
+    { from: "Wren Takahashi", subject: "Q4 roadmap draft" },
+    { from: "Tomasz Wójcik", subject: "Re: Staging deploy failed" },
+    { from: "Hollis Grant", subject: "Invoices for October" },
+    { from: "Inès Moreau", subject: "Customer interview recordings" },
+    { from: "Kofi Mensah", subject: "New icons for the dashboard" },
+    { from: "Wren Takahashi", subject: "Offsite agenda" },
+    { from: "Tomasz Wójcik", subject: "Database migration plan" },
+  ]
 </script>
 
 <ScrollArea>
-  <ScrollAreaViewport>
+  <ScrollAreaViewport role="region" aria-label="Inbox">
     <ScrollAreaContent>
-      {#each tags as tag (tag)}
-        <div>{tag}</div>
-      {/each}
+      <ul>
+        {#each messages as message (message.subject)}
+          <li>
+            {message.from}
+            <span data-slot="hint">{message.subject}</span>
+          </li>
+        {/each}
+      </ul>
     </ScrollAreaContent>
   </ScrollAreaViewport>
 </ScrollArea>
