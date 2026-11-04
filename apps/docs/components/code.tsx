@@ -53,7 +53,14 @@ function Pre({
           "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[13px] leading-[1.7] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]",
         )}
       />
-      {!title && !prompt && copy && <CopyButton className="absolute top-frame end-frame bg-background" />}
+      {!title && !prompt && copy && (
+        <div
+          data-copy-float=""
+          className="absolute top-0 end-0 ps-4 pt-frame pe-frame bg-[linear-gradient(to_right,transparent,var(--gutter-bg)_1rem)] rtl:bg-[linear-gradient(to_left,transparent,var(--gutter-bg)_1rem)]"
+        >
+          <CopyButton />
+        </div>
+      )}
     </Frame>
   )
 }
