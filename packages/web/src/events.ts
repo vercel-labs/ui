@@ -1404,8 +1404,11 @@ type TriggerMenuEvents = {
     string,
     ChangeDetails<TriggerMenuQueryChangeReason> & { trigger: string; argument?: string }
   >
-  /** An item was chosen. `preventDefault()` skips the insertion, and `detail.waitUntil(promise)` inserts a pending token. */
-  select: CustomEvent<
+  /**
+   * An item was chosen. `preventDefault()` skips the insertion, and `detail.waitUntil(promise)` inserts a pending token.
+   * Not `select`, which the field fires for selected text.
+   */
+  itemselect: CustomEvent<
     Omit<TriggerMenuSelectDetails<string>, "preventDefault" | "defaultPrevented"> & { value: string }
   >
   dismissattempt: UiDismissAttemptEvent<TriggerMenuDismissReason>
@@ -1973,7 +1976,7 @@ declare global {
       | "keepMounted"
     >
     "ui-trigger-menu-list": UiPartElement<typeof triggerMenu, "list">
-    // Its `select` event fires on the trigger menu.
+    // Its `itemselect` event fires on the trigger menu.
     "ui-trigger-menu-item": UiPartElement<
       typeof triggerMenu,
       "item",

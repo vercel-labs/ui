@@ -65,7 +65,7 @@ function mount(root: HTMLElement) {
     { char: "@", type: "file", items: files },
     { char: "/", boundary: "start", type: "skill", items: skills },
   ]
-  menu.addEventListener("select", (event) => {
+  menu.addEventListener("itemselect", (event) => {
     if (event.detail.trigger === "@") event.detail.waitUntil(loadFile())
   })
 

@@ -292,6 +292,7 @@ function withEvents<T extends object>(
   target: T,
   silent: string[] = [],
   actions: string[] = [],
+  names: Record<string, string> = {},
 ) {
   return new Proxy(target, {
     get(target, key) {
@@ -311,7 +312,7 @@ function withEvents<T extends object>(
         // the change of a dialog inside it for its own. A listener on an
         // ancestor hears every element inside it with `{ capture: true }`.
         // Composed, so a page that renders the element in a shadow root hears it on the host.
-        const event = new CustomEvent(key.slice(2).toLowerCase(), {
+        const event = new CustomEvent(names[key] ?? key.slice(2).toLowerCase(), {
           detail,
           bubbles: false,
           // Only a change with details or an event to cancel is cancelable.
@@ -728,6 +729,11 @@ type OwnerConfig<P extends Primitive> = {
   /** Callbacks whose event hands listeners `waitUntil()`, from the schema's `"action"` kind. */
   actions?: string[]
   /**
+   * Event names for callbacks whose own name a native event that bubbles in
+   * already takes, like `{ onSelect: "itemselect" }` beside a text field's `select`.
+   */
+  events?: Record<string, string>
+  /**
    * Runs once the instance exists, and again when a property is set, with
    * the element and its instance, which only this hook sees. Data elements
    * render their parts here. A returned cleanup runs before the next render
@@ -887,6 +893,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
             { ...optionsOf(this, this.#properties, this.#rendered), ...defaults, id: this.#instance.id },
             config.silent,
             config.actions,
+            config.events,
           ),
         )
       }
@@ -975,6 +982,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
               },
               config.silent,
               config.actions,
+              config.events,
             ),
           ) as ReturnType<P>
           instances.set(this, instance)

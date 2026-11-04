@@ -60,6 +60,8 @@ function defineTriggerMenuElements() {
       },
       state: popupState,
       api: ["isOpen", "setOpen", "open", "close", "getQuery", "getMatch", "insert", "focus"],
+      // The field's own `select`, for selected text, bubbles up here.
+      events: { onSelect: "itemselect" },
       portal: popupPortal,
       // Data items follow the trigger, the level and the query.
       render(el, { api, subscribe }) {

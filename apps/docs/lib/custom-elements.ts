@@ -565,15 +565,15 @@ async function describeElements() {
     if (config.formAssociated && !elementMethods.some(({ name }) => name === "checkValidity"))
       missing.push(label("form members, like checkValidity()"))
 
-    // Callbacks fire as events, named in lowercase without `on`. A part fires
-    // the events its type lists: its slot's callbacks, unless its define call
-    // fires others, like a dialog close's `action` prop.
+    // Callbacks fire as events, in lowercase without `on` or as the define call's
+    // `events` names them. A part fires the events its type lists: its slot's
+    // callbacks, unless its define call fires others, like a dialog close's `action`.
     const typedPart = partEvents.get(tagName)
     const events: Field[] = []
     for (const symbol of fields ? checker.getPropertiesOfType(fields) : []) {
       const name = symbol.name
       const callback = /^on[A-Z]/.test(name)
-      const event = callback ? name.slice(2).toLowerCase() : name
+      const event = callback ? (config.events?.[name] ?? name.slice(2).toLowerCase()) : name
       if (typedPart ? !property(typedPart, event) : !callback || config.silent?.includes(name)) continue
       const field = fieldOf(event, property(fields, name), generics, label(`event ${event}`))
       const typed = property(typedPart ?? element?.events, event)
