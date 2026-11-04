@@ -378,11 +378,16 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // client, which would skip a handler the framework attaches. A listener on
   // the element hears the click either way, so the menu closes on route changes.
   function bindLink(el: HTMLElement, key: string) {
-    return on(el, "click", (event) =>
-      afterDispatch(el, event, () =>
+    let cancelPress = () => {}
+    const unlisten = on(el, "click", (event) => {
+      cancelPress = afterDispatch(el, event, () =>
         linkPress(event, context.props<NavigationMenuLinkProps>("link", key)?.closeOnSelect),
-      ),
-    )
+      )
+    })
+    return () => {
+      unlisten()
+      cancelPress()
+    }
   }
 
   // The viewport takes the open content's size.
@@ -662,17 +667,22 @@ function isShown(state: NavigationMenuStoreState, key: string) {
 // handler delegated higher up, like React's, hears the click.
 function afterDispatch(el: HTMLElement, event: Event, run: () => void) {
   const view = el.ownerDocument.defaultView
-  if (!view) return run()
-  let done = false
-  const finish = () => {
-    if (done) return
-    done = true
+  // A click on a detached element never reaches the window.
+  if (!view || !el.isConnected) {
+    run()
+    return () => {}
+  }
+  const cancel = () => {
     view.removeEventListener(event.type, finish)
     view.clearTimeout(timer)
+  }
+  const finish = () => {
+    cancel()
     run()
   }
   const timer = view.setTimeout(finish)
   view.addEventListener(event.type, finish, { once: true })
+  return cancel
 }
 
 export {

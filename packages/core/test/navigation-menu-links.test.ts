@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, expect, test } from "vitest"
+import { afterEach, expect, test, vi } from "vitest"
 import { navigationMenu } from "../src/components/navigation-menu/navigation-menu"
 import { mount } from "../src/testing/mount"
 
@@ -10,8 +10,8 @@ const markup = `<root aria-label="Main"><list>
 const mounts: { unmount: () => void }[] = []
 afterEach(() => mounts.splice(0).forEach((mounted) => mounted.unmount()))
 
-function render() {
-  const view = mount(navigationMenu, { defaultValue: "learn" }, markup)
+function render(options: { onValueChange?: () => void } = {}) {
+  const view = mount(navigationMenu, { defaultValue: "learn", ...options }, markup)
   mounts.push(view)
   const link = view.root.querySelector<HTMLElement>('[data-slot="navigation-menu-link"]')!
   return { view, link }
@@ -39,4 +39,20 @@ test("a pressed link still closes the menu when a handler stops the click", asyn
   link.click()
   await new Promise((resolve) => setTimeout(resolve))
   expect(view.api.isOpen()).toBe(false)
+})
+
+// Vue Test Utils mounts outside the page by default.
+test("a pressed link closes a menu outside the page right away", () => {
+  const { view, link } = render()
+  view.root.parentElement!.remove()
+  link.click()
+  expect(view.api.isOpen()).toBe(false)
+})
+
+test("a link whose own handler unmounts the menu doesn't close it afterward", () => {
+  const onValueChange = vi.fn()
+  const { link } = render({ onValueChange })
+  link.addEventListener("click", () => mounts.pop()!.unmount())
+  link.click()
+  expect(onValueChange).not.toHaveBeenCalled()
 })
