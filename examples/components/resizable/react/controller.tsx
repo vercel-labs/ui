@@ -7,46 +7,49 @@ import {
   ResizablePanel,
 } from "@ui-sdk/react/resizable"
 import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
+  const log = useLog()
   const [editor] = React.useState(createResizableController)
-  const [reading, setReading] = React.useState("")
   return (
     <div data-slot="stack">
-      <Resizable controller={editor}>
-        <ResizablePanel id="controller-sidebar" defaultSize={30} minSize={20} collapsible>
-          Sidebar
-        </ResizablePanel>
-        <ResizableHandle aria-label="Resize sidebar" />
-        <ResizablePanel>Editor</ResizablePanel>
-      </Resizable>
-      <div data-slot="row">
-        <button data-variant="secondary" type="button" onClick={() => editor.collapse("controller-sidebar")}>
+      <div data-slot="controls">
+        <button type="button" onClick={() => editor.collapse("controller-sidebar")}>
           Collapse
         </button>
-        <button data-variant="secondary" type="button" onClick={() => editor.expand("controller-sidebar")}>
+        <button type="button" onClick={() => editor.expand("controller-sidebar")}>
           Expand
         </button>
-        <button
-          data-variant="secondary"
-          type="button"
-          onClick={() => editor.resize("controller-sidebar", "240px")}
-        >
+        <button type="button" onClick={() => editor.resize("controller-sidebar", "240px")}>
           240px
         </button>
         <button
-          data-variant="secondary"
           type="button"
           onClick={() =>
-            setReading(
-              `${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed(0) ? ", collapsed" : ""}`,
+            log(
+              `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`,
             )
           }
         >
           Read
         </button>
       </div>
-      {reading && <output data-slot="output">{reading}</output>}
+      <Resizable controller={editor}>
+        <ResizablePanel id="controller-sidebar" defaultSize={30} minSize={20} collapsible>
+          <h3>Files</h3>
+          <ul>
+            <li>page.tsx</li>
+            <li>layout.tsx</li>
+            <li>globals.css</li>
+          </ul>
+        </ResizablePanel>
+        <ResizableHandle aria-label="Resize files" />
+        <ResizablePanel minSize={30}>
+          <h3>page.tsx</h3>
+          <span data-slot="hint">Saved just now</span>
+        </ResizablePanel>
+      </Resizable>
     </div>
   )
 }

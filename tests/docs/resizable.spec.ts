@@ -1,71 +1,108 @@
-import { expect, test } from "@playwright/test"
-import { readdirSync } from "node:fs"
-import path from "node:path"
-import { onPage } from "./docs-helpers"
+import { expect, type Locator } from "@playwright/test"
+import { testExamples, type Check } from "./docs-helpers"
 
-const frameworks = ["react", "vue", "svelte", "solid", "web-components"]
-// Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/components/resizable")
-const folders = ["react", "vue", "svelte", "solid", "web"]
-const examplesIn = (folder: string) =>
-  readdirSync(path.join(root, folder), { withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name.replace(/\.\w+$/, ""))
+// The newest line in an example's console.
+const lastLog = (preview: Locator) =>
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
-// The order examples appear on the Resizable page, a handle in each, the key
-// that grows the panel before it, and by how much.
-const handles: Record<string, { name: string; key: string; by: number }> = {
-  basic: { name: "Resize one", key: "ArrowRight", by: 1 },
-  vertical: { name: "Resize header", key: "ArrowDown", by: 1 },
-  handle: { name: "Resize sidebar", key: "ArrowRight", by: 1 },
-  rtl: { name: "تغيير حجم واحد", key: "ArrowLeft", by: 1 },
-  collapsible: { name: "Resize sidebar", key: "ArrowRight", by: 1 },
-  sizes: { name: "Resize navigation", key: "ArrowRight", by: 1 },
-  "default-layout": { name: "Resize files", key: "ArrowRight", by: 1 },
-  controlled: { name: "Resize files", key: "ArrowRight", by: 1 },
-  complete: { name: "Resize files", key: "ArrowRight", by: 1 },
-  persistence: { name: "Resize sidebar", key: "ArrowRight", by: 1 },
-  storage: { name: "Resize files", key: "ArrowRight", by: 1 },
-  controller: { name: "Resize sidebar", key: "ArrowRight", by: 1 },
-  keyboard: { name: "Resize left", key: "ArrowRight", by: 5 },
-  disabled: { name: "Resize two", key: "ArrowRight", by: 1 },
-  render: { name: "Resize files", key: "ArrowRight", by: 1 },
-}
-const fixtures = Object.keys(handles)
-const order = fixtures.filter(onPage)
+const handle = (preview: Locator, name: string) => preview.getByRole("separator", { name, exact: true })
 
-for (const framework of frameworks) {
-  test(`every resizable example works in ${framework}`, async ({ page }) => {
-    const errors: string[] = []
-    page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
-    await page.goto(`/docs/${framework}/components/resizable`)
-    const previews = page.locator("[data-example]")
-    await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+// Focuses a handle, presses a key, and checks the panel before it grew by `by`.
+const moves =
+  (name: string, key = "ArrowRight", by = 1): Check =>
+  async (preview) => {
+    const separator = handle(preview, name)
+    await expect(separator, `${name} lays its panels out`).toHaveAttribute("aria-valuenow", /^\d+$/)
+    const from = Number(await separator.getAttribute("aria-valuenow"))
+    await separator.focus()
+    await preview.page().keyboard.press(key)
+    await expect(separator, `${name} after ${key}`).toHaveAttribute("aria-valuenow", String(from + by))
+  }
 
-    for (const [index, name] of order.entries()) {
-      const { name: label, key, by } = handles[name]
-      const handle = previews.nth(index).getByRole("separator", { name: label, exact: true })
-      await expect(handle, `${name} lays its panels out`).toHaveAttribute("aria-valuenow", /^\d+$/)
-      const from = Number(await handle.getAttribute("aria-valuenow"))
-      await handle.focus()
-      await page.keyboard.press(key)
-      await expect(handle, `${name} after ${key}`).toHaveAttribute("aria-valuenow", String(from + by))
-    }
-
-    // The controller collapses the sidebar from outside.
-    const controller = previews.nth(order.indexOf("controller"))
-    await controller.getByRole("button", { name: "Collapse" }).click()
-    await expect(controller.getByRole("separator")).toHaveAttribute("aria-valuenow", "0")
-
+// Each example's check, in the order they appear on the Resizable page.
+const checks: Record<string, Check> = {
+  basic: async (preview, framework) => {
+    await moves("Resize files")(preview, framework)
+    await moves("Resize editor", "ArrowDown")(preview, framework)
+  },
+  vertical: moves("Resize inbox", "ArrowDown"),
+  handle: moves("Resize channels"),
+  collapsible: async (preview, framework) => {
+    await moves("Resize sidebar")(preview, framework)
+    const sidebar = preview.locator('[data-slot="resizable-panel"]').first()
+    await preview.page().keyboard.press("Enter")
+    await expect(sidebar, "Enter collapses the sidebar").toHaveAttribute("data-collapsed")
+    await expect(sidebar.getByText("Files")).toBeHidden()
+    await preview.page().keyboard.press("Enter")
+    await expect(sidebar).not.toHaveAttribute("data-collapsed")
+  },
+  sizes: moves("Resize navigation"),
+  "default-layout": async (preview, framework) => {
+    await expect(handle(preview, "Resize folders")).toHaveAttribute("aria-valuenow", "25")
+    await expect(handle(preview, "Resize inbox")).toHaveAttribute("aria-valuenow", "35")
+    await moves("Resize folders")(preview, framework)
+  },
+  controlled: async (preview, framework) => {
+    await moves("Resize files")(preview, framework)
+    await expect(lastLog(preview)).toHaveText("31 / 69 (step-key)")
+    await preview.getByRole("button", { name: "Split Evenly" }).click()
+    await expect(handle(preview, "Resize files"), "the application sets the layout").toHaveAttribute(
+      "aria-valuenow",
+      "50",
+    )
+    await preview.getByRole("button", { name: "Reset" }).click()
+    await expect(handle(preview, "Resize files")).toHaveAttribute("aria-valuenow", "30")
+  },
+  complete: async (preview, framework) => {
+    await moves("Resize files")(preview, framework)
     // Completing saves once, after the key comes up.
-    const complete = previews.nth(order.indexOf("complete"))
-    await expect(complete.getByText("1 changes, saved 41 / 59 after step-key")).toBeVisible()
+    await expect(lastLog(preview)).toHaveText("Saved 41 / 59 (step-key)")
+  },
+  persistence: moves("Resize outline"),
+  storage: moves("Resize messages"),
+  controller: async (preview, framework) => {
+    await moves("Resize files")(preview, framework)
+    // The controller collapses the sidebar from outside.
+    await preview.getByRole("button", { name: "Collapse" }).click()
+    await expect(handle(preview, "Resize files")).toHaveAttribute("aria-valuenow", "0")
+    await preview.getByRole("button", { name: "Read", exact: true }).click()
+    await expect(lastLog(preview)).toHaveText("Layout 0 / 100, collapsed")
+    await preview.getByRole("button", { name: "Expand" }).click()
+    await expect(handle(preview, "Resize files")).toHaveAttribute("aria-valuenow", "31")
+  },
+  keyboard: async (preview, framework) => {
+    await moves("Resize original", "ArrowRight", 5)(preview, framework)
+    await preview.page().keyboard.press("Shift+ArrowLeft")
+    await expect(handle(preview, "Resize original")).toHaveAttribute("aria-valuenow", "30")
+  },
+  disabled: async (preview, framework) => {
     // A disabled handle is out of the tab order.
-    const disabled = previews.nth(order.indexOf("disabled"))
-    await expect(disabled.getByRole("separator", { name: "Resize fixed" })).not.toHaveAttribute("tabindex")
-
-    expect(errors).toEqual([])
-  })
+    await expect(handle(preview, "Resize pinned")).not.toHaveAttribute("tabindex")
+    await moves("Resize inbox")(preview, framework)
+    await preview.getByRole("checkbox", { name: "Lock layout" }).click()
+    await expect(handle(preview, "Resize inbox"), "locking fixes every handle").toHaveAttribute(
+      "aria-disabled",
+      "true",
+    )
+  },
+  render: async (preview, framework) => {
+    await expect(preview.getByText("35%")).toBeVisible()
+    await moves("Resize files")(preview, framework)
+    await expect(preview.getByText("36%")).toBeVisible()
+    await preview.page().keyboard.press("Enter")
+    await expect(preview.getByText("Collapsed")).toBeAttached()
+  },
 }
+
+// Every check reads its own example, since each example's Code panel stays mounted.
+const scoped = Object.fromEntries(
+  Object.entries(checks).map(([name, check]): [string, Check] => [
+    name,
+    (preview, framework) => check(preview.page().locator(`[data-example="resizable/${name}"]`), framework),
+  ]),
+)
+
+testExamples("resizable", scoped, "components", [...Object.keys(checks), "rtl"])

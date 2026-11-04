@@ -1,27 +1,30 @@
 "use client"
 
 import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
-import * as React from "react"
+import { useLog } from "../../../shared/react/log"
 
 function Example() {
-  const [moves, setMoves] = React.useState(0)
-  const [saved, setSaved] = React.useState("nothing yet")
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Resizable
-        onLayoutChange={() => setMoves((count) => count + 1)}
-        onLayoutCommit={(layout, details) =>
-          setSaved(`${layout.map(Math.round).join(" / ")} after ${details.reason}`)
-        }
-      >
-        <ResizablePanel defaultSize={40}>Files</ResizablePanel>
-        <ResizableHandle aria-label="Resize files" />
-        <ResizablePanel>Editor</ResizablePanel>
-      </Resizable>
-      <output data-slot="output">
-        {moves} changes, saved {saved}
-      </output>
-    </div>
+    <Resizable
+      onLayoutCommit={(layout, details) =>
+        log(`Saved ${layout.map(Math.round).join(" / ")} (${details.reason})`)
+      }
+    >
+      <ResizablePanel defaultSize={40} minSize={20}>
+        <h3>Files</h3>
+        <ul>
+          <li>page.tsx</li>
+          <li>layout.tsx</li>
+          <li>globals.css</li>
+        </ul>
+      </ResizablePanel>
+      <ResizableHandle aria-label="Resize files" />
+      <ResizablePanel minSize={20}>
+        <h3>page.tsx</h3>
+        <span data-slot="hint">Saved just now</span>
+      </ResizablePanel>
+    </Resizable>
   )
 }
 
