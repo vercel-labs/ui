@@ -86,7 +86,7 @@ Dialogs, alert dialogs, drawers, and popovers move focus into their content when
 
 `modal` decides whether Tab can leave. With `true` or `"trap-focus"`, Tab and Shift+Tab wrap inside the content. With `false`, Tab moves from the trigger into a popover and on to the page after it, and focus leaving closes the popover. A non-modal dialog stays open.
 
-When a popup closes while focus is inside it, focus returns to the trigger. If the trigger is gone or can't take focus, focus goes to the element focused before the popup opened, then to the nearest focusable element after where the trigger was. A popup a controller opened returns to the element focused before it first. Set `finalFocus` to `"none"` to leave focus alone, or to a selector, an element, or a function to send it somewhere else. Closing because focus moved away never moves it back, and neither does pressing something focusable outside a non-modal popup.
+When a popup closes while focus is inside it, focus returns to the trigger. If the trigger is gone or can't take focus, focus goes to the element focused before the popup opened, then where the popup it was opened from would return focus, then to the nearest focusable element after where the trigger was. A popup a controller opened returns to the element focused before it first. Set `finalFocus` to `"none"` to leave focus alone, or to a selector, an element, or a function to send it somewhere else. Closing because focus moved away never moves it back, and neither does pressing something focusable outside a non-modal popup.
 
 Menus, selects, and comboboxes handle focus within their own lists, and tooltips never move it. Each component's page covers its own.
 

@@ -88,7 +88,7 @@ Each part keeps the behavior, state and data attributes of its ready-made counte
 
 ## Bounds
 
-`min` and `max` set the range. They default to 0 and 100, and values outside the range are clamped. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
+`min` and `max` set the range. They default to 0 and 100. A value outside the range is clamped for the fill, the percentage and `aria-valuenow`, but the state's `value` and a format other than percent keep it as you passed it. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
 
 <ComponentExample
   name="meter/min-max"

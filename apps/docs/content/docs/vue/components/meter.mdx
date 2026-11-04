@@ -90,7 +90,7 @@ Each part keeps the behavior, state and data attributes of its ready-made counte
 
 ## Bounds
 
-`min` and `max` set the range. They default to 0 and 100, and values outside the range are clamped. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
+`min` and `max` set the range. They default to 0 and 100. A value outside the range is clamped for the fill, the percentage and `aria-valuenow`, but the state's `value` and a format other than percent keep it as you passed it. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
 
 <ComponentExample
   name="meter/min-max"
@@ -114,7 +114,7 @@ Set `dir="rtl"` on the surrounding content to fill the track from the right.
 
 ## Value Label
 
-Use `getValueLabel` when a screen reader needs more context than the visible number. It receives the value and details containing `formatted`, `percent`, `min`, and `max`.
+Use `get-value-label` when a screen reader needs more context than the visible number. It receives the value and details containing `formatted`, `percent`, `min`, and `max`.
 
 <ComponentExample
   name="meter/value-label"
@@ -123,7 +123,7 @@ Use `getValueLabel` when a screen reader needs more context than the visible num
 
 ## Changing the Value
 
-Pass a new `value` when your reading changes. Meter follows your state and has no `onValueChange` callback.
+Pass a new `value` when your reading changes. Meter follows your state and has no `@value-change` event.
 
 Use [Progress](./progress) for a task that is working toward completion, such as an upload.
 
@@ -163,7 +163,7 @@ What render functions, state-based class names and slots receive. Every part get
 
 ## Accessibility
 
-Name the component with `MeterLabel` or `aria-label`. It exposes the range and formatted value through the `meter` role. Use `getValueLabel` when that value needs more explanation.
+Name the component with `MeterLabel` or `aria-label`. It exposes the range and formatted value through the `meter` role. Use `get-value-label` when that value needs more explanation.
 
 ### Tested Behavior
 

@@ -112,7 +112,7 @@ Progress displays your state; it emits no `value-change` event.
 
 ## Bounds
 
-`min` and `max` default to 0 and 100. Values outside that range are clamped. A value of 3 between 1 and 5 fills half the track.
+`min` and `max` default to 0 and 100. A value outside that range is clamped for the fill, the percentage and `aria-valuenow`, but the state's `value` and a format other than percent keep it as you passed it. A value of 3 between 1 and 5 fills half the track.
 
 <ComponentExample
   name="progress/min-max"
@@ -136,7 +136,7 @@ Set `dir="rtl"` on the surrounding content to fill the track from the right.
 
 ## Value Label
 
-Use `getValueLabel` to give screen readers more context than the visible number. Its details include `formatted`, `percent`, `min`, and `max`. Handle a `null` value when the task can be indeterminate; `percent` is also `null` and `formatted` is empty then.
+Use `get-value-label` to give screen readers more context than the visible number. Its details include `formatted`, `percent`, `min`, and `max`. Handle a `null` value when the task can be indeterminate; `percent` is also `null` and `formatted` is empty then.
 
 <ComponentExample
   name="progress/value-label"
@@ -203,7 +203,7 @@ What render functions, state-based class names and slots receive. Every part get
 
 ## Accessibility
 
-Name the component with `ProgressLabel` or `aria-label`. It exposes the range and formatted value through the `progressbar` role. Use `getValueLabel` when that value needs more explanation.
+Name the component with `ProgressLabel` or `aria-label`. It exposes the range and formatted value through the `progressbar` role. Use `get-value-label` when that value needs more explanation.
 
 ### Tested Behavior
 

@@ -128,7 +128,7 @@ A form with `method="dialog"` closes the dialog on a valid submission. The submi
 
 ## Focus
 
-Use `initial-focus` to pick where focus starts, and `final-focus` to choose where it goes after closing. Each takes a selector, an element or a function returning one. The default returns to the trigger, or to the element focused before a controller opened the dialog. See [popup focus](../popups) for the shared focus rules.
+Use `initial-focus` to pick where focus starts, and `final-focus` to choose where it goes after closing. Each takes a selector, an element or a function returning one. The default returns to the trigger, or to the element focused before a controller opened the dialog. See [popup focus](../popups#focus) for the shared focus rules.
 
 ```vue
 <DialogContent initial-focus="#invite-email" :final-focus="() => nextStep" />
@@ -195,12 +195,12 @@ The content and backdrop have `data-starting-style` while they open and `data-en
 `modal` controls how the dialog shares the page:
 
 - `true`, the default, makes the page inert, locks scrolling, and keeps Tab inside.
-- `"trap-focus"` keeps Tab inside while the page can still scroll and receive clicks.
-- `false` lets focus leave the dialog. Escape closes it while focus is inside; outside presses close it only when `close-on-outside-press` is enabled.
+- `"trap-focus"` keeps Tab inside while the page can still scroll and receive clicks. A click on the page also closes the dialog, unless `close-on-outside-press` is false.
+- `false` puts the dialog beside the page and lets focus leave it. Escape closes it while focus is inside; outside presses close it only when `close-on-outside-press` is enabled.
 
 To keep a small part of the page usable while a modal dialog is open, like a chat launcher, pass it to `persistent-elements`: an array of elements or selectors, or a function returning elements when the dialog opens. Persistent elements don't change stacking on their own.
 
-Dialogs render where you put them and use the browser's top layer. Set `container` when their DOM needs to live elsewhere, like a shadow root. The [popup guide](../popups) covers containers and iframes.
+Dialogs render where you put them and use the browser's top layer. Set `container` when their DOM needs to live elsewhere, like a shadow root. The [popup guide](../popups#mounting-and-containers) covers containers and iframes.
 
 <ComponentExample
   name="dialog/modal"

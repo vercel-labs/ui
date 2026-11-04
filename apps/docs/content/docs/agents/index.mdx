@@ -75,12 +75,12 @@ You can give these tools to your own agent, or register them with a supported br
 
 In a project-settings benchmark, agents renamed a project, updated members and notification settings, then saved. One used browser tools on a page built with another component library; the other used the agent bridge on the same screen built with ui-sdk.
 
-|            | Browser tools           | ui-sdk + agent bridge | Delta |
-| ---------- | ----------------------- | --------------------- | ----- |
-| Tool calls | 16                      | <Won>5</Won>          | −69%  |
-| Text read  | 39.8k                   | <Won>6.8k</Won>       | −83%  |
-| Time       | 41 s                    | <Won>16 s</Won>       | −61%  |
-| Cost       | $0.073                  | <Won>$0.032</Won>     | −56%  |
+|            | Browser tools | ui-sdk + agent bridge | Delta |
+| ---------- | ------------- | --------------------- | ----- |
+| Tool calls | 16            | <Won>5</Won>          | −69%  |
+| Text read  | 39.8k         | <Won>6.8k</Won>       | −83%  |
+| Time       | 41 s          | <Won>16 s</Won>       | −61%  |
+| Cost       | $0.073        | <Won>$0.032</Won>     | −56%  |
 
 These are medians from three runs per approach. Both agents used Sonnet through Claude Code with the same task and system prompt, plus instructions for their available tools. Every run completed the task. Text read counts characters returned by the tools. Time and cost are what Claude Code reported for those runs.
 

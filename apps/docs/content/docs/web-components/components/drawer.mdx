@@ -143,7 +143,7 @@ With `dismissible="false"`, Escape, outside presses, back gestures, and swipes l
 
 Set `modal-above` when the page should stay usable beside a small sheet. At or below that point there is no dim, inert page, scroll lock, or `aria-modal`. Above it, `modal` applies. The switch happens when the drawer settles and does not move focus; `data-interactive` exposes the usable-page state.
 
-`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A non-modal drawer closes on an outside press only when `close-on-outside-press` is enabled.
+`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A click on the page also closes a `"trap-focus"` drawer, while a non-modal drawer closes on an outside press only when `close-on-outside-press` is enabled.
 
 <ComponentExample
   name="drawer/non-modal"
@@ -161,7 +161,7 @@ A drawer opened inside another joins its stack. Escape and outside presses affec
 
 ## Forms
 
-A Close part with the `action` attribute fires an `action` event; pass a Promise to `event.detail.waitUntil()`. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Dialog’s async actions](./dialog#forms) for the shared pending and error contract.
+A Close part with the `action` attribute fires an `action` event; pass a Promise to `event.detail.waitUntil()`. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Alert Dialog’s async action](./alert-dialog#async-action) for the shared pending and error contract.
 
 `keep-mounted` preserves unfinished fields, and `final-focus` returns focus to the updated profile.
 
@@ -278,7 +278,7 @@ Override part of `sheetPhysics.ios` with the `physics` property to tune the poin
 
 `theme-color` dims an existing `<meta name="theme-color">` with the backdrop, so the browser's toolbars can follow it; pages without that tag are left alone. `persistent-elements` keeps selected elements usable while the drawer is modal: a comma-separated list of selectors, or assign the `persistentElements` property an array of elements or a function returning elements. Something that must stay above the backdrop also needs its own top-layer surface.
 
-Drawers render in place and use the top layer. `container` takes a selector and moves the backdrop and viewport there, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups).
+Drawers render in place and use the top layer. `container` takes a selector and moves the backdrop and viewport there, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups#hidden-content-and-containers).
 
 ```html
 <ui-drawer theme-color persistent-elements="#chat-launcher" container="#drawer-host"></ui-drawer>

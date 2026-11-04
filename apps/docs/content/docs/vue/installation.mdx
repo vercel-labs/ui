@@ -50,7 +50,7 @@ export default defineNuxtConfig({
 })
 ```
 
-Every named export of those entries becomes an auto-imported component, like `<DialogTrigger>`. Pass `prefix` if the names clash with your own components.
+Each part of those entries becomes an auto-imported component, like `<DialogTrigger>`. Functions such as `createDialogController` still need an import in `<script>`. Pass `prefix` if the names clash with your own components.
 
 ## Add Your Styles
 
