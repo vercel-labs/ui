@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -22,11 +22,15 @@ const people = [
   <TriggerMenu :triggers="[{ char: '@', items: people }]" :auto-highlight="false" :loop="false">
     <Field>
       <FieldLabel>Task</FieldLabel>
-      <TriggerMenuInput placeholder="Type @ to assign someone">
+      <FieldControl>
         <template #render="{ props }">
-          <input v-bind="props" />
+          <TriggerMenuInput v-bind="props" placeholder="Type @ to assign someone">
+            <template #render="{ props: inputProps }">
+              <input v-bind="inputProps" />
+            </template>
+          </TriggerMenuInput>
         </template>
-      </TriggerMenuInput>
+      </FieldControl>
     </Field>
     <TriggerMenuContent>
       <TriggerMenuList v-slot="{ state }">

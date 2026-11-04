@@ -26,6 +26,7 @@ function mount(root: HTMLElement) {
         align-offset="-5"
         collision-padding="16"
         anchor="#${id}"
+        container="#${id}"
         keep-mounted
       >
         <ui-trigger-menu-list></ui-trigger-menu-list>
