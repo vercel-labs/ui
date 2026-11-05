@@ -109,6 +109,7 @@ const components: Record<string, Group[]> = {
     { part: "swatch", variables: ["--color-picker-color"] },
     { part: "swatch-item", variables: ["--color-picker-color"] },
   ],
+  "image-cropper": [{ part: "viewport", variables: ["--image-cropper-aspect-ratio"] }],
   tree: [
     { part: "item", variables: ["--tree-level"] },
     { part: "group", variables: ["--tree-group-height"] },
@@ -181,6 +182,8 @@ const meaning: Record<string, string> = {
   "--color-slider-background":
     "A gradient through the slider's channel, with the other channels as they are.",
   "--color-slider-thumb-position": "Where the thumb is along the slider, as a percentage.",
+  "--image-cropper-aspect-ratio":
+    "The image's width over its height as it shows, turned, once it loads. Give the viewport `aspect-ratio: var(--image-cropper-aspect-ratio)` to fit the image.",
   "--active-tab-left": "Distance from the tab list's left edge to the selected tab.",
   "--active-tab-right": "Distance from the tab list's right edge to the selected tab.",
   "--active-tab-top": "Distance from the tab list's top edge to the selected tab.",

@@ -1,0 +1,279 @@
+---
+title: Image Cropper
+description: Choose the part of an image to keep by moving and resizing a selection, or by panning and zooming the image under it.
+---
+
+Use an image cropper to choose the part of a photo to keep, like a profile picture or a cover image. The crop is a box in the image's own pixels, with a quarter-turn rotation and a flip, ready to pass to [`cropImage`](../../core/image).
+
+<ComponentExample
+  name="image-cropper/basic"
+  inspect
+  caption="Drag the selection or one of its corners. Tab to it and use the arrow keys, with Shift to move further."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/web @ui-sdk/core
+```
+
+Import the component to register its elements. The import is safe on the server.
+
+```ts
+import "@ui-sdk/web/image-cropper"
+```
+
+## Composition
+
+Use the following composition to build a `ui-image-cropper`:
+
+```text
+ui-image-cropper
+├── ui-image-cropper-viewport
+│   ├── ui-image-cropper-image
+│   └── ui-image-cropper-selection
+│       ├── ui-image-cropper-grid
+│       └── ui-image-cropper-handle
+├── ui-image-cropper-zoom
+├── ui-image-cropper-rotate
+└── ui-image-cropper-flip
+```
+
+- **ui-image-cropper** holds the crop and the image's `src`, and is a group around the parts.
+- **ui-image-cropper-viewport** is the area the image shows in. Give it a size, and its padding keeps the image off its edges.
+- **ui-image-cropper-image** wraps your `<img>`, with its `alt`, and turns and flips it.
+- **ui-image-cropper-selection** shows the crop over the image. It's a slider you drag or move with the arrow keys.
+- **ui-image-cropper-grid** draws lines across the selection, in thirds, for you to style.
+- **ui-image-cropper-handle** resizes the selection from one edge or corner, its `position`, like `"se"` for the bottom right.
+- **ui-image-cropper-zoom** wraps a range input from 1, the largest crop, to `max-zoom`.
+- **ui-image-cropper-rotate** turns the image a quarter clockwise.
+- **ui-image-cropper-flip** mirrors the image left to right, or top to bottom with `direction="vertical"`.
+
+The viewport, image and selection are needed. The rest are optional. The zoom, rotate and flip use the `<input>` or `<button>` you put inside them, or make one.
+
+## Usage
+
+Import the parts and put them together:
+
+```html
+<script type="module">
+  import "@ui-sdk/web/image-cropper"
+</script>
+
+<ui-image-cropper aria-label="Cover photo" src="cover.jpg" aspect-ratio="3">
+  <ui-image-cropper-viewport>
+    <ui-image-cropper-image>
+      <img alt="Your cover photo" />
+    </ui-image-cropper-image>
+    <ui-image-cropper-selection>
+      <ui-image-cropper-handle position="nw"></ui-image-cropper-handle>
+      <ui-image-cropper-handle position="se"></ui-image-cropper-handle>
+    </ui-image-cropper-selection>
+  </ui-image-cropper-viewport>
+</ui-image-cropper>
+```
+
+Name the cropper with `aria-label`. Until the image loads, the root has `data-loading` and `aria-busy`, and the selection is hidden. The crop then starts as the largest box at `aspectRatio`, in the middle, unless you set the `defaultCrop` property:
+
+```ts
+const cropper = document.querySelector("ui-image-cropper")!
+cropper.defaultCrop = { x: 40, y: 40, width: 320, height: 240 }
+```
+
+## Aspect Ratio
+
+Set `aspect-ratio` to keep the crop's width over its height, like `1` for a square or `16 / 9`. Changing it fits the crop to the new ratio about its middle. Without one, the crop is free, and holding Shift while dragging a handle keeps its current ratio. `min-width` and `min-height` stop it getting too small, in image pixels.
+
+<ComponentExample
+  name="image-cropper/aspect-ratio"
+  caption="Choose Square or Wide, then drag an edge. Flip mirrors the image and the crop with it."
+/>
+
+## Frame Mode
+
+Set `mode="frame"` for an avatar editor. The selection stays still and as large as it fits, and you pan the image under it with a drag, and zoom with the wheel, a pinch or the zoom input. Handles don't show in a frame.
+
+`shape="circle"` rounds the selection, but the crop is still its box, so pass `shape: "circle"` to `cropImage` too. Here, Save Avatar crops a 128 pixel round file:
+
+<ComponentExample
+  name="image-cropper/avatar"
+  caption="Drag the image or move the zoom, then press Save Avatar. The new avatar shows beside the button."
+/>
+
+## Rotate and Flip
+
+`ui-image-cropper-rotate` turns the image a quarter clockwise, and R does the same from the keyboard, with Shift to turn it back. `ui-image-cropper-flip` mirrors the image. The crop turns and flips with the image, so it keeps the same part of the photo. Its `x` and `y` count from the top left of the image as it shows, turned and flipped, which is what `cropImage` takes.
+
+## Disabled
+
+Set `disabled`. The selection and handles can't be focused or dragged, and the zoom input and buttons are disabled.
+
+```html
+<ui-image-cropper aria-label="Photo" src="photo.jpg" disabled>
+  <!-- … -->
+</ui-image-cropper>
+```
+
+## Controlled
+
+Listen to `cropchange` for each change. Each change carries a [reason](#reasons), like `drag`, `step-key` or `zoom-input`. Call `event.preventDefault()` to keep the current crop.
+
+`cropchange` fires on every step of a drag and once the image loads. `cropcommit` fires once, when the drag, key press or wheel ends, so listen to it to save. The element's `crop` property reads the crop, and its `api` property sets it from anywhere:
+
+```ts
+import "@ui-sdk/web/image-cropper"
+
+const cropper = document.querySelector("ui-image-cropper")!
+
+cropper.addEventListener("cropcommit", (event) => {
+  console.log(event.detail.value, event.detail.reason)
+})
+
+document.querySelector("#zoom-in")!.addEventListener("click", () => cropper.api.setZoom(2))
+```
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Styling
+
+Parts are unstyled, apart from the positions they need: the viewport is `position: relative` with `overflow: hidden`, and the image and selection get their place as inline styles in pixels. Give the viewport a size, and the handles a size and a place on their edge or corner of the selection.
+
+A box viewport fits the whole image, so set its `aspect-ratio` to `--image-cropper-aspect-ratio`. A wide `box-shadow` on the selection dims the image outside it. Show the grid only while `data-dragging` is on it.
+
+Each part has a `data-slot`, such as `image-cropper-selection`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### ui-image-cropper-viewport [#styling-imagecropperviewport]
+
+<CssVariables component="image-cropper" part="viewport" />
+
+## Data Attributes
+
+### ui-image-cropper [#data-attributes-imagecropper]
+
+<DataAttributes component="image-cropper" part="root" />
+
+### ui-image-cropper-viewport [#data-attributes-imagecropperviewport]
+
+<DataAttributes component="image-cropper" part="viewport" />
+
+### ui-image-cropper-image [#data-attributes-imagecropperimage]
+
+<DataAttributes component="image-cropper" part="image" />
+
+### ui-image-cropper-selection [#data-attributes-imagecropperselection]
+
+<DataAttributes component="image-cropper" part="selection" />
+
+### ui-image-cropper-grid [#data-attributes-imagecroppergrid]
+
+<DataAttributes component="image-cropper" part="grid" />
+
+### ui-image-cropper-handle [#data-attributes-imagecropperhandle]
+
+<DataAttributes component="image-cropper" part="handle" />
+
+### ui-image-cropper-zoom [#data-attributes-imagecropperzoom]
+
+<DataAttributes component="image-cropper" part="zoom" />
+
+### ui-image-cropper-rotate [#data-attributes-imagecropperrotate]
+
+<DataAttributes component="image-cropper" part="rotate" />
+
+### ui-image-cropper-flip [#data-attributes-imagecropperflip]
+
+<DataAttributes component="image-cropper" part="flip" />
+
+## API Reference
+
+Props are attributes in kebab case, like `aspect-ratio` and `max-zoom`. `defaultCrop` and `controller` are properties. `crop` is a live property. Callbacks are DOM events.
+
+### ui-image-cropper
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperOptions"
+/>
+
+### ui-image-cropper-handle
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperHandleProps"
+/>
+
+### ui-image-cropper-flip
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperFlipProps"
+/>
+
+### State
+
+The same state shows as data attributes on each element.
+
+<StateTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperState"
+/>
+
+<StateTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperHandleState"
+/>
+
+### Reasons
+
+`event.detail.reason` says why the crop changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperCropChangeReason"
+/>
+
+### Controller
+
+The element's `api` property has the same methods. The `crop` property reads and sets the crop.
+
+Each write method takes an optional `{ reason, event }`, fires the change event like a drag, and returns `false` when nothing changed or the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperController"
+/>
+
+### Events
+
+Events fire on their own element and don't bubble, with the new crop in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `cropchange` cancels the change.
+
+| Member             | On                 | Description                                                   |
+| ------------------ | ------------------ | ------------------------------------------------------------- |
+| `crop` property    | `ui-image-cropper` | The crop, or `null` until the image loads                     |
+| `api` property     | `ui-image-cropper` | The [controller](#controller)                                 |
+| `cropchange` event | `ui-image-cropper` | `detail: { value, reason, event }`                            |
+| `cropcommit` event | `ui-image-cropper` | `detail: { value, reason, event }`, once the interaction ends |
+
+## Accessibility
+
+No WAI-ARIA pattern covers an image cropper, so it's built from ones that do. The cropper is a group. The selection and each handle follow the [WAI-ARIA slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), and say the crop in words, like "300 by 300 pixels, at 50, 0". The zoom is a native range input that says its level, like "125%".
+
+The selection, handles and zoom are named in English by default. Pass `aria-label` to name them in another language.
+
+### Keyboard
+
+| Key                 | Does                                                     |
+| ------------------- | -------------------------------------------------------- |
+| Arrow keys          | Move the selection, or on a handle, move its edges       |
+| Shift with an arrow | Moves ten times as far                                   |
+| Plus or Minus       | Zooms in or out, about the crop's middle                 |
+| R                   | Turns the image a quarter clockwise, or back with Shift  |
+| Escape              | During a drag, puts the crop back where the drag started |
+
+Each key press commits, like the end of a drag.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="image-cropper" />

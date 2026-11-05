@@ -390,6 +390,49 @@
     gap: 4px;
   }
 
+  [data-slot="image-cropper-viewport"] {
+    width: 400px;
+    height: 300px;
+    background: #111;
+  }
+
+  [data-slot="image-cropper-selection"] {
+    outline: 1px solid #fff;
+    box-shadow: 0 0 0 9999px #0008;
+  }
+
+  [data-slot="image-cropper-selection"][data-shape="circle"] {
+    border-radius: 50%;
+  }
+
+  [data-slot="image-cropper-handle"] {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    margin: -6px;
+    background: #fff;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="n"] {
+    top: 0;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="s"] {
+    top: 100%;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="w"] {
+    left: 0;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="e"] {
+    left: 100%;
+  }
+
+  [data-slot="image-cropper-handle"][data-position="e"] {
+    top: 50%;
+  }
+
   .panel,
   [data-slot="tabs-panel"] {
     padding: 8px;

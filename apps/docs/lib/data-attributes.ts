@@ -2,6 +2,7 @@ import type { Framework } from "./frameworks"
 import { accordion } from "@ui-sdk/core/accordion"
 import { collapsible } from "@ui-sdk/core/collapsible"
 import { colorPicker } from "@ui-sdk/core/color-picker"
+import { imageCropper } from "@ui-sdk/core/image-cropper"
 import { checkbox, checkboxGroup } from "@ui-sdk/core/checkbox"
 import { switchPrimitive } from "@ui-sdk/core/switch"
 import { autocomplete } from "@ui-sdk/core/autocomplete"
@@ -647,6 +648,52 @@ const components: Record<
         text: "Present while the panel animates closed. Style the state you animate to.",
       },
     },
+  },
+  "image-cropper": {
+    instances: () => [
+      imageCropper({ id: "docs", src: "photo.jpg", mode: "frame", shape: "circle", disabled: true }),
+      imageCropper({ id: "docs-box", src: "photo.jpg" }),
+    ],
+    samples: {
+      root: [{}],
+      viewport: [{}],
+      image: [{}],
+      selection: [{}],
+      grid: [{}],
+      handle: [{ position: "nw" }, { position: "e" }],
+      zoom: [{}],
+      rotate: [{}],
+      flip: [{}, { direction: "vertical" }],
+    },
+    interactive: [],
+    extra: {
+      ...Object.fromEntries(
+        ["root", "viewport", "selection", "grid", "handle"].map((slot) => [
+          slot,
+          ["data-error", "data-dragging"],
+        ]),
+      ),
+      ...Object.fromEntries(["image", "zoom", "rotate", "flip"].map((slot) => [slot, ["data-error"]])),
+    },
+    descriptions: {
+      "data-mode": { text: "How the crop changes.", values: ["box", "frame"] },
+      "data-shape": { text: "The selection's shape.", values: ["rectangle", "circle"] },
+      "data-loading": { text: "Present until the image loads, while nothing can change." },
+      "data-error": { text: "Present when the image failed to load." },
+      "data-disabled": { text: "Present when the cropper is disabled." },
+      "data-dragging": {
+        text: "Present while a pointer drags the selection, the image or, on a handle, that handle. Show the grid with it.",
+      },
+      "data-position": {
+        text: "The edge or corner the handle resizes.",
+        values: ["n", "e", "s", "w", "ne", "nw", "se", "sw"],
+      },
+      "data-direction": {
+        text: "Which way the button mirrors the image.",
+        values: ["horizontal", "vertical"],
+      },
+    },
+    parts: { root: { react: "ImageCropper", web: "<ui-image-cropper>" } },
   },
   "color-picker": {
     instances: () => [

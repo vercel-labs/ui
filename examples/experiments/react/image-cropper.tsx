@@ -51,7 +51,7 @@ function fitAspect(box: ResizeBox, aspect: number, size: { width: number; height
 }
 
 const imageCropper = /* @__PURE__ */ definePrimitive({
-  name: "image-cropper",
+  name: "crop-box",
   options: {
     size: "value",
     crop: "value",
@@ -223,14 +223,14 @@ function Example() {
         aria-label="Photo"
         style={
           {
-            "--image-cropper-width": `${size.width}px`,
-            "--image-cropper-height": `${size.height}px`,
+            "--crop-box-width": `${size.width}px`,
+            "--crop-box-height": `${size.height}px`,
           } as React.CSSProperties
         }
       >
-        <Landscape data-slot="image-cropper-image" />
+        <Landscape data-slot="crop-box-image" />
         <ImageCropperBox>
-          <span data-slot="image-cropper-grid" aria-hidden="true">
+          <span data-slot="crop-box-grid" aria-hidden="true">
             {Array.from({ length: 9 }, (_, i) => (
               <span key={i} />
             ))}
@@ -250,7 +250,7 @@ function Example() {
       <div data-slot="row">
         <span
           aria-hidden="true"
-          data-slot="image-cropper-preview"
+          data-slot="crop-box-preview"
           style={{ height: (96 * crop.height) / crop.width }}
         >
           <Landscape

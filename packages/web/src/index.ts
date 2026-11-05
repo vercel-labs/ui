@@ -143,6 +143,7 @@ export { createColorPickerController } from "@ui-sdk/core/color-picker"
 export { createComboboxController } from "@ui-sdk/core/combobox"
 export { createCommandController } from "@ui-sdk/core/command"
 export { createHoverCardController } from "@ui-sdk/core/hover-card"
+export { createImageCropperController } from "@ui-sdk/core/image-cropper"
 export { createInputController } from "@ui-sdk/core/input"
 export { createListboxController } from "@ui-sdk/core/listbox"
 export { createMenubarController } from "@ui-sdk/core/menubar"
@@ -283,6 +284,7 @@ export type {
   DialogEvents,
   DrawerEvents,
   HoverCardEvents,
+  ImageCropperEvents,
   InputEvents,
   ListboxEvents,
   OTPInputEvents,
@@ -336,6 +338,7 @@ export type {
   UiFieldSetElement,
   UiHighlightEvent,
   UiHoverCardElement,
+  UiImageCropperElement,
   UiInputElement,
   UiInputGroupElement,
   UiListboxElement,

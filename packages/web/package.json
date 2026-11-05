@@ -27,6 +27,7 @@
     "./label": "./src/entries/label.ts",
     "./file-input": "./src/entries/file-input.ts",
     "./hover-card": "./src/entries/hover-card.ts",
+    "./image-cropper": "./src/entries/image-cropper.ts",
     "./input": "./src/entries/input.ts",
     "./listbox": "./src/entries/listbox.ts",
     "./tree": "./src/entries/tree.ts",
@@ -167,6 +168,10 @@
       "./hover-card": {
         "types": "./dist/entries/hover-card.d.ts",
         "default": "./dist/entries/hover-card.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/entries/image-cropper.d.ts",
+        "default": "./dist/entries/image-cropper.js"
       },
       "./input": {
         "types": "./dist/entries/input.d.ts",

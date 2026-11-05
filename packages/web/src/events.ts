@@ -55,6 +55,12 @@ import type {
   HoverCardOpenChangeReason,
   HoverCardPayloadChangeReason,
 } from "@ui-sdk/core/hover-card"
+import type {
+  ImageCrop,
+  ImageCropperController,
+  ImageCropperCropChangeDetails,
+  ImageCropperCropCommitDetails,
+} from "@ui-sdk/core/image-cropper"
 import type { NavigationMenuController, NavigationMenuValueChangeReason } from "@ui-sdk/core/navigation-menu"
 import type { InputController, InputValueChangeReason } from "@ui-sdk/core/input"
 import type {
@@ -212,6 +218,7 @@ import type { drawer } from "@ui-sdk/core/drawer"
 import type { field, fieldGroup, fieldSet } from "@ui-sdk/core/field"
 import type { fileInput } from "@ui-sdk/core/file-input"
 import type { hoverCard } from "@ui-sdk/core/hover-card"
+import type { imageCropper } from "@ui-sdk/core/image-cropper"
 import type { input, inputGroup, textarea } from "@ui-sdk/core/input"
 import type { listbox } from "@ui-sdk/core/listbox"
 import type { menu } from "@ui-sdk/core/menu"
@@ -1228,6 +1235,27 @@ interface UiAvatarElement
   extends UiElement<AvatarEvents>, AttributeProperties<typeof avatar, "api" | "pressed"> {}
 
 /**
+ * The events of `<ui-image-cropper>`. `cropchange` fires on every step of a drag, and `cropcommit` once the interaction ends.
+ * @experimental
+ */
+type ImageCropperEvents = {
+  cropchange: UiDetailedChangeEvent<Required<ImageCrop>, ImageCropperCropChangeDetails>
+  cropcommit: UiDetailedChangeEvent<Required<ImageCrop>, ImageCropperCropCommitDetails>
+}
+/**
+ * `<ui-image-cropper>`: `crop`, the controller's methods on `api`, and typed events.
+ * @experimental
+ */
+interface UiImageCropperElement
+  extends
+    UiElement<ImageCropperEvents>,
+    AttributeProperties<typeof imageCropper, "api" | "controller" | "crop"> {
+  crop: Required<ImageCrop> | null
+  api: ImageCropperController
+  controller?: ImageCropperController
+}
+
+/**
  * The events of `<ui-button>`.
  * @stable
  */
@@ -1619,6 +1647,7 @@ declare global {
     "ui-popover": UiPopoverElement
     "ui-tooltip": UiTooltipElement
     "ui-hover-card": UiHoverCardElement
+    "ui-image-cropper": UiImageCropperElement
     "ui-menu": UiMenuElement
     "ui-menu-sub": UiMenuSubElement
     "ui-dialog": UiDialogElement
@@ -1864,6 +1893,14 @@ declare global {
     "ui-file-input-item": UiPartElement<typeof fileInput, "item", never, "file">
     "ui-file-input-item-remove": UiPartElement<typeof fileInput, "item-remove">
     "ui-hover-card-trigger": UiPartElement<typeof hoverCard, "trigger", never, "payload">
+    "ui-image-cropper-viewport": UiPartElement<typeof imageCropper, "viewport">
+    "ui-image-cropper-image": UiPartElement<typeof imageCropper, "image">
+    "ui-image-cropper-selection": UiPartElement<typeof imageCropper, "selection">
+    "ui-image-cropper-grid": UiPartElement<typeof imageCropper, "grid">
+    "ui-image-cropper-handle": UiPartElement<typeof imageCropper, "handle", "position">
+    "ui-image-cropper-zoom": UiPartElement<typeof imageCropper, "zoom">
+    "ui-image-cropper-rotate": UiPartElement<typeof imageCropper, "rotate">
+    "ui-image-cropper-flip": UiPartElement<typeof imageCropper, "flip", "direction">
     "ui-hover-card-content": UiPartElement<
       typeof hoverCard,
       "content",
@@ -2202,6 +2239,7 @@ export {
   type DrawerEvents,
   type FileInputEvents,
   type HoverCardEvents,
+  type ImageCropperEvents,
   type InputEvents,
   type ListboxEvents,
   type MenuEvents,
@@ -2257,6 +2295,7 @@ export {
   type UiGaugeElement,
   type UiHighlightEvent,
   type UiHoverCardElement,
+  type UiImageCropperElement,
   type UiInputElement,
   type UiInputGroupElement,
   type UiLabelElement,

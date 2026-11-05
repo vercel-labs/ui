@@ -29,6 +29,7 @@
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.tsx",
     "./image": "./src/image.ts",
+    "./image-cropper": "./src/image-cropper.tsx",
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx",
     "./listbox": "./src/listbox.tsx",
@@ -173,6 +174,10 @@
       "./image": {
         "types": "./dist/image.d.ts",
         "default": "./dist/image.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/image-cropper.d.ts",
+        "default": "./dist/image-cropper.js"
       },
       "./input": {
         "types": "./dist/input.d.ts",

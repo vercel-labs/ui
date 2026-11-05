@@ -33,6 +33,7 @@
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.ts",
     "./image": "./src/image.ts",
+    "./image-cropper": "./src/image-cropper.ts",
     "./input": "./src/input.ts",
     "./label": "./src/label.ts",
     "./listbox": "./src/listbox.ts",
@@ -206,6 +207,11 @@
         "types": "./dist/image.d.ts",
         "svelte": "./dist/image.js",
         "default": "./dist/image.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/image-cropper.d.ts",
+        "svelte": "./dist/image-cropper.js",
+        "default": "./dist/image-cropper.js"
       },
       "./input": {
         "types": "./dist/input.d.ts",

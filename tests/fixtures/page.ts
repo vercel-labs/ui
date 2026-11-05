@@ -102,6 +102,22 @@ function colorPickerOptions() {
   }
 }
 
+// Image cropper options a spec can set through the URL: ?mode=frame,
+// ?aspect=1, ?shape=circle, ?default=x,y,width,height, ?disabled, and
+// ?cancel cancels every change.
+function imageCropperOptions() {
+  const params = new URLSearchParams(location.search)
+  const crop = params.get("default")?.split(",").map(Number)
+  return {
+    mode: (params.get("mode") ?? "box") as "box" | "frame",
+    shape: (params.get("shape") ?? "rectangle") as "rectangle" | "circle",
+    disabled: params.has("disabled"),
+    cancel: params.has("cancel"),
+    ...(params.get("aspect") && { aspectRatio: Number(params.get("aspect")) }),
+    ...(crop && { defaultCrop: { x: crop[0], y: crop[1], width: crop[2], height: crop[3] } }),
+  }
+}
+
 // Accordion options a spec can set through the URL: ?multiple&collapsible=false.
 // ?default=none renders without a default value, ?keep-mounted and
 // ?hidden-until-found keep closed panels, ?disabled disables the root and
@@ -187,6 +203,7 @@ function treeOptions() {
 
 export {
   colorPickerOptions,
+  imageCropperOptions,
   accordionOptions,
   applyFixtureOptions,
   changedValue,

@@ -93,6 +93,21 @@ const components: Record<string, Component> = {
       required: "ColorPickerOptions",
     },
   },
+  "image-cropper": {
+    source: "image-cropper/image-cropper.ts",
+    examples: "image-cropper",
+    types: [
+      "ImageCropperOptions",
+      "ImageCropperHandleProps",
+      "ImageCropperFlipProps",
+      "ImageCropperState",
+      "ImageCropperHandleState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "ImageCropperOptions",
+    },
+  },
   menu: {
     source: "menu/menu.ts",
     examples: "menu",

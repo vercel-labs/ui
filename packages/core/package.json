@@ -49,6 +49,7 @@
     "./input": "./src/components/input/input.ts",
     "./slider": "./src/components/slider/slider.ts",
     "./color-picker": "./src/components/color-picker/color-picker.ts",
+    "./image-cropper": "./src/components/image-cropper/image-cropper.ts",
     "./number-input": "./src/components/number-input/number-input.ts",
     "./file-input": "./src/components/file-input/file-input.ts",
     "./trigger-menu": "./src/components/trigger-menu/trigger-menu.ts",
@@ -249,6 +250,10 @@
       "./color-picker": {
         "types": "./dist/components/color-picker/color-picker.d.ts",
         "default": "./dist/components/color-picker/color-picker.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/components/image-cropper/image-cropper.d.ts",
+        "default": "./dist/components/image-cropper/image-cropper.js"
       },
       "./number-input": {
         "types": "./dist/components/number-input/number-input.d.ts",

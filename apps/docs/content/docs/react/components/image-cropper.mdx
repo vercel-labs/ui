@@ -1,0 +1,331 @@
+---
+title: Image Cropper
+description: Choose the part of an image to keep by moving and resizing a selection, or by panning and zooming the image under it.
+---
+
+Use an image cropper to choose the part of a photo to keep, like a profile picture or a cover image. The crop is a box in the image's own pixels, with a quarter-turn rotation and a flip, ready to pass to [`cropImage`](../../core/image).
+
+<ComponentExample
+  name="image-cropper/basic"
+  inspect
+  caption="Drag the selection or one of its corners. Tab to it and use the arrow keys, with Shift to move further."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/react @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build an `ImageCropper`:
+
+```text
+ImageCropper
+├── ImageCropperViewport
+│   ├── ImageCropperImage
+│   └── ImageCropperSelection
+│       ├── ImageCropperGrid
+│       └── ImageCropperHandle
+├── ImageCropperZoom
+├── ImageCropperRotate
+└── ImageCropperFlip
+```
+
+- **ImageCropper** holds the crop and the image's `src`, and is a group around the parts.
+- **ImageCropperViewport** is the area the image shows in. Give it a size, and its padding keeps the image off its edges.
+- **ImageCropperImage** is the image, turned and flipped. Give it `alt`.
+- **ImageCropperSelection** shows the crop over the image. It's a slider you drag or move with the arrow keys.
+- **ImageCropperGrid** draws lines across the selection, in thirds, for you to style.
+- **ImageCropperHandle** resizes the selection from one edge or corner, its `position`, like `"se"` for the bottom right.
+- **ImageCropperZoom** is a range input from 1, the largest crop, to `maxZoom`.
+- **ImageCropperRotate** turns the image a quarter clockwise.
+- **ImageCropperFlip** mirrors the image left to right, or top to bottom with `direction="vertical"`.
+
+The viewport, image and selection are needed. The rest are optional.
+
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+"use client"
+
+import {
+  ImageCropper,
+  ImageCropperHandle,
+  ImageCropperImage,
+  ImageCropperSelection,
+  ImageCropperViewport,
+} from "@ui-sdk/react/image-cropper"
+
+function CoverPhoto({ src }: { src: string }) {
+  return (
+    <ImageCropper aria-label="Cover photo" src={src} aspectRatio={3}>
+      <ImageCropperViewport>
+        <ImageCropperImage alt="Your cover photo" />
+        <ImageCropperSelection>
+          <ImageCropperHandle position="nw" />
+          <ImageCropperHandle position="se" />
+        </ImageCropperSelection>
+      </ImageCropperViewport>
+    </ImageCropper>
+  )
+}
+
+export { CoverPhoto }
+```
+
+Name the cropper with `aria-label`. Until the image loads, the root has `data-loading` and `aria-busy`, and the selection is hidden. The crop then starts as the largest box at `aspectRatio`, in the middle, unless you pass `defaultCrop`:
+
+```tsx
+<ImageCropper aria-label="Photo" src={src} defaultCrop={{ x: 40, y: 40, width: 320, height: 240 }}>
+  {/* … */}
+</ImageCropper>
+```
+
+## Aspect Ratio
+
+Set `aspectRatio` to keep the crop's width over its height, like `1` for a square or `16 / 9`. Changing it fits the crop to the new ratio about its middle. Without one, the crop is free, and holding Shift while dragging a handle keeps its current ratio. `minWidth` and `minHeight` stop it getting too small, in image pixels.
+
+<ComponentExample
+  name="image-cropper/aspect-ratio"
+  caption="Choose Square or Wide, then drag an edge. Flip mirrors the image and the crop with it."
+/>
+
+## Frame Mode
+
+Set `mode="frame"` for an avatar editor. The selection stays still and as large as it fits, and you pan the image under it with a drag, and zoom with the wheel, a pinch or the zoom input. Handles don't show in a frame.
+
+`shape="circle"` rounds the selection, but the crop is still its box, so pass `shape: "circle"` to `cropImage` too. Here, Save Avatar crops a 128 pixel round file:
+
+<ComponentExample
+  name="image-cropper/avatar"
+  caption="Drag the image or move the zoom, then press Save Avatar. The new avatar shows beside the button."
+/>
+
+## Rotate and Flip
+
+`ImageCropperRotate` turns the image a quarter clockwise, and R does the same from the keyboard, with Shift to turn it back. `ImageCropperFlip` mirrors the image. The crop turns and flips with the image, so it keeps the same part of the photo. Its `x` and `y` count from the top left of the image as it shows, turned and flipped, which is what `cropImage` takes.
+
+## Disabled
+
+Set `disabled`. The selection and handles can't be focused or dragged, and the zoom input and buttons are disabled.
+
+```tsx
+<ImageCropper aria-label="Photo" src={src} disabled>
+  {/* … */}
+</ImageCropper>
+```
+
+## Controlled
+
+Pass `crop` and update it in `onCropChange`. Each change carries a [reason](#reasons), like `drag`, `step-key` or `zoom-input`. Call `details.cancel()` in the callback to keep the current crop.
+
+`onCropChange` runs on every step of a drag and once the image loads. `onCropCommit` runs once, when the drag, key press or wheel ends, so use it to save. A controller from `createImageCropperController()` sets the crop from anywhere:
+
+```tsx
+"use client"
+
+import {
+  createImageCropperController,
+  ImageCropper,
+  ImageCropperImage,
+  ImageCropperSelection,
+  ImageCropperViewport,
+} from "@ui-sdk/react/image-cropper"
+
+const controller = createImageCropperController()
+
+function Photo({ src }: { src: string }) {
+  return (
+    <>
+      <ImageCropper
+        aria-label="Photo"
+        src={src}
+        controller={controller}
+        onCropCommit={(crop, details) => console.log(crop, details.reason)}
+      >
+        <ImageCropperViewport>
+          <ImageCropperImage alt="Your photo" />
+          <ImageCropperSelection />
+        </ImageCropperViewport>
+      </ImageCropper>
+      <button type="button" onClick={() => controller.setZoom(2)}>
+        Zoom In
+      </button>
+    </>
+  )
+}
+
+export { Photo }
+```
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Custom Rendering
+
+Every part takes `render`, to render a different element or component in its place. `render`, `className` and `children` can be functions of the part's state. Every part has the `crop`, the `zoom`, and whether it's `loading`, has an `error` or is `dragging`:
+
+```tsx
+<ImageCropper aria-label="Photo" src={src}>
+  {({ loading, error, zoom }) => (
+    <>
+      <ImageCropperViewport>
+        <ImageCropperImage alt="Your photo" />
+        <ImageCropperSelection />
+      </ImageCropperViewport>
+      {loading && <p>Loading…</p>}
+      {error && <p>The image didn't load.</p>}
+      <output>{Math.round(zoom * 100)}%</output>
+    </>
+  )}
+</ImageCropper>
+```
+
+See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
+
+## Styling
+
+Parts are unstyled, apart from the positions they need: the viewport is `position: relative` with `overflow: hidden`, and the image and selection get their place as inline styles in pixels. Give the viewport a size, and the handles a size and a place on their edge or corner of the selection.
+
+A box viewport fits the whole image, so set its `aspect-ratio` to `--image-cropper-aspect-ratio`. A wide `box-shadow` on the selection dims the image outside it. Show the grid only while `data-dragging` is on it.
+
+Each part has a `data-slot`, such as `image-cropper-selection`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### ImageCropperViewport [#styling-imagecropperviewport]
+
+<CssVariables component="image-cropper" part="viewport" />
+
+## Data Attributes
+
+### ImageCropper [#data-attributes-imagecropper]
+
+<DataAttributes component="image-cropper" part="root" />
+
+### ImageCropperViewport [#data-attributes-imagecropperviewport]
+
+<DataAttributes component="image-cropper" part="viewport" />
+
+### ImageCropperImage [#data-attributes-imagecropperimage]
+
+<DataAttributes component="image-cropper" part="image" />
+
+### ImageCropperSelection [#data-attributes-imagecropperselection]
+
+<DataAttributes component="image-cropper" part="selection" />
+
+### ImageCropperGrid [#data-attributes-imagecroppergrid]
+
+<DataAttributes component="image-cropper" part="grid" />
+
+### ImageCropperHandle [#data-attributes-imagecropperhandle]
+
+<DataAttributes component="image-cropper" part="handle" />
+
+### ImageCropperZoom [#data-attributes-imagecropperzoom]
+
+<DataAttributes component="image-cropper" part="zoom" />
+
+### ImageCropperRotate [#data-attributes-imagecropperrotate]
+
+<DataAttributes component="image-cropper" part="rotate" />
+
+### ImageCropperFlip [#data-attributes-imagecropperflip]
+
+<DataAttributes component="image-cropper" part="flip" />
+
+## API Reference
+
+Props and callbacks are the same as below, as React props.
+
+### ImageCropper
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperOptions"
+/>
+
+### ImageCropperHandle
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperHandleProps"
+/>
+
+### ImageCropperFlip
+
+<TypeTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperFlipProps"
+/>
+
+### State
+
+What render functions, state-based class names and slots receive. Every part gets the cropper's state.
+
+<StateTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperState"
+/>
+
+Handles add their own:
+
+<StateTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperHandleState"
+/>
+
+### Reasons
+
+`details.reason` says why the crop changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperCropChangeReason"
+/>
+
+### Controller
+
+Create one with `createImageCropperController()` and pass it as `controller`.
+
+Each write method takes an optional `{ reason, event }`, runs the change callback like a drag, and returns `false` when nothing changed or the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/image-cropper/image-cropper.ts"
+  name="ImageCropperController"
+/>
+
+### Events
+
+Callbacks get the new crop first, then the details.
+
+| Prop           | On             | Receives                                                          |
+| -------------- | -------------- | ----------------------------------------------------------------- |
+| `onCropChange` | `ImageCropper` | `(crop, details)`: the new crop and the [reason](#reasons)        |
+| `onCropCommit` | `ImageCropper` | `(crop, details)`: the crop once the interaction ends, its reason |
+
+## Accessibility
+
+No WAI-ARIA pattern covers an image cropper, so it's built from ones that do. The cropper is a group. The selection and each handle follow the [WAI-ARIA slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), and say the crop in words, like "300 by 300 pixels, at 50, 0". The zoom is a native range input that says its level, like "125%".
+
+The selection, handles and zoom are named in English by default. Pass `aria-label` to name them in another language.
+
+### Keyboard
+
+| Key                 | Does                                                     |
+| ------------------- | -------------------------------------------------------- |
+| Arrow keys          | Move the selection, or on a handle, move its edges       |
+| Shift with an arrow | Moves ten times as far                                   |
+| Plus or Minus       | Zooms in or out, about the crop's middle                 |
+| R                   | Turns the image a quarter clockwise, or back with Shift  |
+| Escape              | During a drag, puts the crop back where the drag started |
+
+Each key press commits, like the end of a drag.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="image-cropper" />
