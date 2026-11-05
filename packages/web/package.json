@@ -46,6 +46,7 @@
     "./resizable": "./src/entries/resizable.ts",
     "./scroll-area": "./src/entries/scroll-area.ts",
     "./select": "./src/entries/select.ts",
+    "./segmented-control": "./src/entries/segmented-control.ts",
     "./separator": "./src/entries/separator.ts",
     "./slider": "./src/entries/slider.ts",
     "./switch": "./src/entries/switch.ts",
@@ -237,6 +238,10 @@
       "./select": {
         "types": "./dist/entries/select.d.ts",
         "default": "./dist/entries/select.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/entries/segmented-control.d.ts",
+        "default": "./dist/entries/segmented-control.js"
       },
       "./separator": {
         "types": "./dist/entries/separator.d.ts",

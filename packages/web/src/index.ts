@@ -150,6 +150,7 @@ export { createPasswordInputController } from "@ui-sdk/core/password-input"
 export { createPopoverController } from "@ui-sdk/core/popover"
 export { createRadioGroupController } from "@ui-sdk/core/radio"
 export { createScrollAreaController } from "@ui-sdk/core/scroll-area"
+export { createSegmentedControlController } from "@ui-sdk/core/segmented-control"
 export { createSelectController } from "@ui-sdk/core/select"
 export { createSliderController } from "@ui-sdk/core/slider"
 export { createSwitchController } from "@ui-sdk/core/switch"
@@ -265,6 +266,7 @@ export type {
   PopoverEvents,
   RadioGroupEvents,
   ResizableEvents,
+  SegmentedControlEvents,
   SelectEvents,
   SliderEvents,
   SwitchEvents,
@@ -320,6 +322,8 @@ export type {
   UiRadioElement,
   UiRadioGroupElement,
   UiResizableElement,
+  UiSegmentedControlElement,
+  UiSegmentedControlItemElement,
   UiSelectElement,
   UiSeparatorElement,
   UiSliderElement,

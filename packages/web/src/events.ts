@@ -107,6 +107,10 @@ import type {
 } from "@ui-sdk/core/popover"
 import type { RadioGroupController, RadioGroupValueChangeReason } from "@ui-sdk/core/radio"
 import type { ScrollAreaController } from "@ui-sdk/core/scroll-area"
+import type {
+  SegmentedControlController,
+  SegmentedControlValueChangeReason,
+} from "@ui-sdk/core/segmented-control"
 import type { SeparatorOptions } from "@ui-sdk/core/separator"
 import type {
   SelectController,
@@ -211,6 +215,7 @@ import type { progress } from "@ui-sdk/core/progress"
 import type { radioGroup } from "@ui-sdk/core/radio"
 import type { resizable } from "@ui-sdk/core/resizable"
 import type { scrollArea } from "@ui-sdk/core/scroll-area"
+import type { segmentedControl } from "@ui-sdk/core/segmented-control"
 import type { select } from "@ui-sdk/core/select"
 import type { slider } from "@ui-sdk/core/slider"
 import type { switchPrimitive } from "@ui-sdk/core/switch"
@@ -782,6 +787,33 @@ interface UiRadioGroupElement
 interface UiRadioElement
   extends
     UiPartElement<typeof radioGroup, "root", "value" | "disabled">,
+    Omit<FormAssociatedMembers, "name"> {}
+
+/**
+ * The events of `<ui-segmented-control>`.
+ * @experimental
+ */
+type SegmentedControlEvents = {
+  valuechange: UiChangeEvent<string | null, SegmentedControlValueChangeReason>
+}
+/**
+ * `<ui-segmented-control>`: `value`, form members like a native input, and typed events.
+ * @experimental
+ */
+interface UiSegmentedControlElement
+  extends UiElement<SegmentedControlEvents>, FormControlProperties<typeof segmentedControl, "api" | "value"> {
+  value: string | null
+  api: SegmentedControlController
+}
+
+/**
+ * `<ui-segmented-control-item>`: `value` and `disabled`, and form members like a native radio.
+ * Its control's `name` names the value.
+ * @experimental
+ */
+interface UiSegmentedControlItemElement
+  extends
+    UiPartElement<typeof segmentedControl, "item", "value" | "disabled">,
     Omit<FormAssociatedMembers, "name"> {}
 
 /**
@@ -1502,6 +1534,8 @@ declare global {
     "ui-checkbox-group": UiCheckboxGroupElement
     "ui-radio-group": UiRadioGroupElement
     "ui-radio": UiRadioElement
+    "ui-segmented-control": UiSegmentedControlElement
+    "ui-segmented-control-item": UiSegmentedControlItemElement
     "ui-input": UiInputElement
     "ui-input-group": UiInputGroupElement
     "ui-textarea": UiTextareaElement
@@ -1927,6 +1961,7 @@ declare global {
     "ui-slider-thumb-input": UiPartElement<typeof slider, "thumb-input">
     "ui-slider-value": UiPartElement<typeof slider, "value">
     "ui-switch-thumb": UiPartElement<typeof switchPrimitive, "thumb">
+    "ui-segmented-control-indicator": UiPartElement<typeof segmentedControl, "indicator">
     "ui-tabs-list": UiPartElement<typeof tabs, "list">
     "ui-tabs-tab": UiPartElement<typeof tabs, "tab", "value" | "disabled">
     "ui-tabs-tab-icon": UiPartElement<typeof tabs, "tab-icon", "mirror">
@@ -2058,6 +2093,7 @@ export {
   type PopoverEvents,
   type RadioGroupEvents,
   type ResizableEvents,
+  type SegmentedControlEvents,
   type SelectEvents,
   type SliderEvents,
   type SwitchEvents,
@@ -2117,6 +2153,8 @@ export {
   type UiRadioGroupElement,
   type UiResizableElement,
   type UiScrollAreaElement,
+  type UiSegmentedControlElement,
+  type UiSegmentedControlItemElement,
   type UiSelectElement,
   type UiSeparatorElement,
   type UiSliderElement,

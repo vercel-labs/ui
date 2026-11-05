@@ -10,6 +10,7 @@ import { fileInput } from "@ui-sdk/core/file-input"
 import { field, fieldSet } from "@ui-sdk/core/field"
 import { input, inputGroup, textarea } from "@ui-sdk/core/input"
 import { radioGroup } from "@ui-sdk/core/radio"
+import { segmentedControl } from "@ui-sdk/core/segmented-control"
 import { menu } from "@ui-sdk/core/menu"
 import { numberInput } from "@ui-sdk/core/number-input"
 import { alertDialog, dialog } from "@ui-sdk/core/dialog"
@@ -890,6 +891,27 @@ const components: Record<
       group: { react: "RadioGroup", web: "<ui-radio-group>", slot: "radio-group" },
       root: { react: "Radio", web: "<ui-radio>", slot: "radio-root" },
       indicator: { react: "RadioIndicator", web: "<ui-radio-indicator>", slot: "radio-indicator" },
+    },
+  },
+  "segmented-control": {
+    instances: () => [
+      segmentedControl({ id: "docs", defaultValue: "a", readOnly: true, required: true }),
+      segmentedControl({ id: "docs-disabled", disabled: true, orientation: "vertical" }),
+    ],
+    samples: { root: [{}], item: [{ value: "a" }, { value: "b" }], indicator: [{}] },
+    interactive: [],
+    descriptions: {
+      "data-orientation": { text: "Which way the items run." },
+      "data-checked": { text: "Present on the checked item." },
+      "data-unchecked": { text: "Present on items that aren't checked." },
+      "data-disabled": { text: "Present when disabled, by its own prop, the control or a `<fieldset>`." },
+      "data-readonly": { text: "Present when the control is read-only." },
+      "data-required": { text: "Present when the control is required." },
+    },
+    parts: {
+      root: { react: "SegmentedControl", web: "<ui-segmented-control>" },
+      item: { react: "SegmentedControlItem", web: "<ui-segmented-control-item>" },
+      indicator: { react: "SegmentedControlIndicator", web: "<ui-segmented-control-indicator>" },
     },
   },
   field: {

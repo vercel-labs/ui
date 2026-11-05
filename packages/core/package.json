@@ -40,6 +40,7 @@
     "./menubar": "./src/components/menubar/menubar.ts",
     "./separator": "./src/components/separator/separator.ts",
     "./select": "./src/components/select/select.ts",
+    "./segmented-control": "./src/components/segmented-control/segmented-control.ts",
     "./combobox": "./src/components/combobox/combobox.ts",
     "./command": "./src/components/command/command.ts",
     "./autocomplete": "./src/components/autocomplete/autocomplete.ts",
@@ -205,6 +206,10 @@
       "./select": {
         "types": "./dist/components/select/select.d.ts",
         "default": "./dist/components/select/select.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/components/segmented-control/segmented-control.d.ts",
+        "default": "./dist/components/segmented-control/segmented-control.js"
       },
       "./combobox": {
         "types": "./dist/components/combobox/combobox.d.ts",
