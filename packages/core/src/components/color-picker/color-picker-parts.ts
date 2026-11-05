@@ -70,6 +70,10 @@ const sliderKeys = [
   "End",
 ] as const
 
+// A number input's value on its step, which the input would otherwise call invalid.
+const onStep = (value: number, step: number) =>
+  Number(value.toFixed(Math.max(0, -Math.floor(Math.log10(step)))))
+
 const percentOf = (value: number, spec: Channel) => Math.round((value / spec.max) * 1e4) / 100
 
 // The slot declares the role the area's attributes carry.
@@ -173,6 +177,9 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
         const { x, y } = channelNames(state, props)
         return {
           ...thumb,
+          tabindex: isDisabled(state) ? "-1" : "0",
+          "aria-disabled": isDisabled(state) ? "true" : undefined,
+          "aria-readonly": state.readOnly ? "true" : undefined,
           // English by default. Pass `aria-label` in another language.
           "aria-label": `${api.internal.channel(x).label} and ${api.internal.channel(y).label.toLowerCase()}`,
           ...dataAttrs(state),
@@ -340,7 +347,7 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           min: "0",
           max: String(spec.max),
           step: String(spec.step),
-          value: String(readChannel(state.color, spec)),
+          value: String(onStep(readChannel(state.color, spec), spec.step)),
           // English by default. Pass `aria-label` in another language.
           "aria-label": spec.label,
           disabled: isDisabled(state) ? "" : undefined,
@@ -353,13 +360,13 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
         change: (event, { api, el, props }) => {
           const input = el as HTMLInputElement
           api.internal.setChannelValue(props.channel, input.valueAsNumber, event)
-          input.value = String(api.internal.sliderValue(props.channel))
+          input.value = String(onStep(api.internal.sliderValue(props.channel), Number(input.step)))
         },
       },
       bind(el, { api, store, props }) {
         const input = el as HTMLInputElement
         const write = () => {
-          const next = String(api.internal.sliderValue(props.channel))
+          const next = String(onStep(api.internal.sliderValue(props.channel), Number(input.step)))
           if (input.ownerDocument.activeElement !== input && input.value !== next) input.value = next
         }
         write()

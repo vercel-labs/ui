@@ -131,6 +131,14 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
   const areas = new Map<string, Area>()
   // The value an interaction started from, so it commits only what it changed.
   let start: string | undefined
+  // The last value a change asked for. A controlled value only arrives with
+  // the owner's next render, after a key or a swatch has already committed.
+  let changed: string | undefined
+
+  const begin = () => {
+    start = store.get().value
+    changed = undefined
+  }
 
   const channel = (name: ColorChannel | undefined) => channelOf(store.get().space, name)
 
@@ -151,7 +159,10 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
     if (value === state.value) return true
     const done = change("value", value, { ...details, color: publicColor(color) })
     if (!done) store.set({ color: before })
-    else if (notify) dispatchChange(formElement(), ["input"])
+    else {
+      changed = value
+      if (notify) dispatchChange(formElement(), ["input"])
+    }
     return done
   }
 
@@ -163,15 +174,17 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
     const state = store.get()
     if (state.gamut && !isInGamut(state.color, state.gamut))
       store.set({ color: toGamut(state.color, state.gamut) })
-    if (from === undefined || from === store.get().value) return
-    commitValue("value", store.get().value, { ...details, color: publicColor(store.get().color) })
+    const value = changed ?? store.get().value
+    changed = undefined
+    if (from === undefined || from === value) return
+    commitValue("value", value, { ...details, color: publicColor(store.get().color) })
     dispatchChange(formElement(), ["change"])
   }
 
   // A change made in one go, like a swatch press, which commits at once.
   function choose(color: Color, details: Details) {
     if (isLocked(store.get())) return false
-    start = store.get().value
+    begin()
     const done = setColor(color, details)
     commit(details)
     return done
@@ -261,11 +274,11 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
       isSelected,
       setRTL: (el: HTMLElement) => store.set({ rtl: isRTL(el) }),
       areaPointerdown(event: PointerEvent, el: HTMLElement, x?: ColorChannel, y?: ColorChannel) {
-        start = store.get().value
+        begin()
         area(x, y).pointerdown(event, el)
       },
       areaKeydown(event: KeyboardEvent, x?: ColorChannel, y?: ColorChannel) {
-        start = store.get().value
+        begin()
         area(x, y).keydown(event)
       },
       // A press on a slider's track moves its thumb there and follows the pointer.
@@ -286,7 +299,7 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
           if (!vertical && rtl) fraction = 1 - fraction
           return Math.min(1, Math.max(0, fraction)) * channel(name).max
         }
-        start = store.get().value
+        begin()
         let reason: "track-press" | "drag" = "track-press"
         setChannel(name, at(event.clientX, event.clientY), { reason, event })
         el.querySelector<HTMLElement>('[role="slider"]')?.focus({ preventScroll: true })
@@ -318,13 +331,13 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
         }
         if (!(event.key in keys)) return
         event.preventDefault()
-        start = store.get().value
+        begin()
         setChannel(name, keys[event.key], { reason: "step-key", event })
         commit({ reason: "step-key", event })
       },
       setChannelValue(name: ColorChannel | undefined, value: number, event: Event) {
         if (isLocked(store.get()) || !Number.isFinite(value)) return
-        start = store.get().value
+        begin()
         setChannel(name, value, { reason: "input-commit", event })
         commit({ reason: "input-commit", event })
       },

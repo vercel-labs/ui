@@ -161,7 +161,7 @@ function describeColor(color: Color) {
   }
   const tone = lightness < 0.45 ? "dark " : lightness > 0.82 ? "light " : ""
   const strength = chroma < 0.02 ? "" : chroma < 0.08 ? "grayish " : chroma > 0.2 ? "vivid " : ""
-  const name = chroma < 0.02 ? "gray" : hueNames.find(([end]) => angle < end)![1]
+  const name = chroma < 0.02 ? "gray" : hueNames.find(([end]) => angle % 360 < end)![1]
   return `${tone}${strength}${name}${opacity}`
 }
 

@@ -53,6 +53,16 @@ describe("color picker", () => {
     expect(onValueChange.mock.lastCall![0]).toBe("#bf6000")
   })
 
+  test("a controlled picker commits a key, a swatch and typed text before its owner renders", () => {
+    const onValueCommit = vi.fn()
+    const picker = make({ value: "#ff0000", onValueCommit })
+    picker.api.internal.sliderKeydown(key("ArrowRight", true), "hue")
+    picker.api.internal.choose("#00ff00", { reason: "item-press" })
+    picker.api.internal.setText("#0000ff")
+    picker.api.internal.commitText()
+    expect(onValueCommit.mock.calls.map(([value]) => value)).toEqual(["#ff2a00", "#00ff00", "#0000ff"])
+  })
+
   test("sliders step by one, by ten with Shift, and jump to their ends", () => {
     const picker = make({ defaultValue: "hsl(10 100% 50%)" })
     const hue = () => attrs(picker.part("slider-thumb", { channel: "hue" }))["aria-valuenow"]
@@ -88,6 +98,8 @@ describe("color picker", () => {
     expect(attrs(picker.part("slider-thumb", { channel: "hue" }))["aria-valuenow"]).toBe("150")
     picker.api.internal.sliderKeydown(key("ArrowRight"), "hue")
     expect(picker.api.getValue()).toBe("oklch(0.7 0.1 151)")
+    picker.api.internal.sliderKeydown(key("End"), "hue")
+    expect(attrs(picker.part("swatch", {}))["aria-label"]).toBe("pink")
   })
 
   test("with no gamut, the value is any color", () => {
@@ -118,6 +130,8 @@ describe("color picker", () => {
     })
     picker.api.internal.setChannelValue("red", 255, new Event("change"))
     expect(picker.api.getValue()).toBe("rgb(255 20 30)")
+    const hue = make({ defaultValue: "#3b82f6" }).part("channel-input", { channel: "hue" })
+    expect(attrs(hue)).toMatchObject({ step: "1", value: "217" })
   })
 
   test("a swatch is selected by the color it shows, whatever it's written in", () => {
@@ -151,5 +165,9 @@ describe("color picker", () => {
       picker.api.internal.choose("#00ff00", { reason: "item-press" })
       expect(picker.api.getValue()).toBe("#ff0000")
     }
+    expect(attrs(make({ readOnly: true }).part("area-thumb", {}))).toMatchObject({
+      tabindex: "0",
+      "aria-readonly": "true",
+    })
   })
 })
