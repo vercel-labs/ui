@@ -1,0 +1,55 @@
+---
+title: Images
+description: Cut a region out of an image into a new file, turned, flipped, scaled or round.
+---
+
+`@ui-sdk/core/image` cuts a region out of an image and returns it as a new image file. Use it after someone picks a crop, like an avatar from a photo, and submit or upload the file it returns.
+
+## Crop an Image
+
+`cropImage` takes an image, the region to keep and options for the file it writes. The region is in the image's own pixels, whatever size the image shows at on the page:
+
+```ts
+import { cropImage } from "@ui-sdk/core/image"
+
+const file = await cropImage(photo, { x: 120, y: 40, width: 600, height: 600 })
+
+file.name // "photo.png", from the photo's name
+file.type // "image/png"
+```
+
+The image can be a file from an `<input type="file">`, a URL, an `<img>`, a `<canvas>` or an `ImageBitmap`. A URL from another origin needs CORS, or the browser won't let the page read its pixels. The promise resolves with a `File`, so `FormData` and `fetch` take it as it is.
+
+## Turn and Flip
+
+Set `rotation` to turn the image a quarter turn clockwise at a time, and `flipX` or `flipY` to mirror it. The region's `x` and `y` count from the top left of the image as it shows after it's turned and flipped:
+
+```ts
+const file = await cropImage(photo, { x: 0, y: 0, width: 300, height: 400, rotation: 90, flipX: true })
+```
+
+So a 400 by 300 photo turned by 90 is 300 wide and 400 tall, and the region above keeps all of it.
+
+<ComponentExample
+  name="behaviors/image-crop"
+  caption="Turn or flip the image, then press Crop. The top-left square of the turned image becomes a 96 pixel file. Check Circle for round corners."
+/>
+
+## The File
+
+| Option    | What it sets                                                                                     |
+| --------- | ------------------------------------------------------------------------------------------------ |
+| `type`    | `"image/png"` by default, or `"image/jpeg"` or `"image/webp"`                                    |
+| `quality` | From 0 to 1, for JPEG and WebP                                                                   |
+| `width`   | The width in pixels. Left out, it follows `height` at the region's ratio, or the region's width  |
+| `height`  | The height in pixels. Left out, it follows `width` at the region's ratio, or the region's height |
+| `shape`   | `"circle"` keeps the ellipse inside the region and leaves the corners transparent                |
+| `name`    | The file's name, instead of the source's name with the new extension                             |
+
+Pass `width` alone to scale the crop, like a 256 pixel avatar from a much larger photo:
+
+```ts
+const avatar = await cropImage(photo, crop, { type: "image/webp", quality: 0.9, width: 256, shape: "circle" })
+```
+
+A browser that can't write the type you ask for writes PNG instead, and the file's `type` and name say which it wrote. JPEG has no transparency, so a circle's corners turn black there. Use PNG or WebP for round crops.

@@ -248,6 +248,10 @@ export type {
   ColorSpace,
 } from "@ui-sdk/core/color"
 
+// Cut a region out of an image into a new file. `await cropImage(file, { x: 0, y: 0, width: 512, height: 512 })` is a 512 by 512 PNG.
+export { cropImage } from "@ui-sdk/core/image"
+export type { CropImageOptions, ImageCrop, ImageRotation, ImageSource } from "@ui-sdk/core/image"
+
 // Keyboard shortcuts scoped to open layers. `registerShortcut("mod+k", open)` returns an unregister function.
 export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
 export type {

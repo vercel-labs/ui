@@ -24,6 +24,7 @@ const pages = [
   ["/core/behaviors/canvas", "Canvas"],
   ["/core/date", "Dates"],
   ["/core/color", "Colors"],
+  ["/core/image", "Images"],
   ["/core/testing", "Testing"],
   ["/core/observe", "Observe"],
   ["/react/custom-parts", "Custom Parts"],

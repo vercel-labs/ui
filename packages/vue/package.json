@@ -27,6 +27,7 @@
     "./file-input": "./src/file-input.ts",
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.ts",
+    "./image": "./src/image.ts",
     "./input": "./src/input.ts",
     "./label": "./src/label.ts",
     "./listbox": "./src/listbox.ts",
@@ -163,6 +164,10 @@
       "./hover-card": {
         "types": "./dist/hover-card.d.ts",
         "default": "./dist/hover-card.js"
+      },
+      "./image": {
+        "types": "./dist/image.d.ts",
+        "default": "./dist/image.js"
       },
       "./input": {
         "types": "./dist/input.d.ts",

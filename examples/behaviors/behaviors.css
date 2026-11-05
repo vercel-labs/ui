@@ -3843,4 +3843,22 @@
     color: var(--ink);
     font-weight: 500;
   }
+
+  [data-slot="image-crop-stage"] {
+    display: grid;
+    place-items: center;
+    width: 220px;
+    height: 220px;
+
+    & > canvas {
+      width: 200px;
+      height: 150px;
+      transition: transform var(--duration) ease-out;
+    }
+  }
+
+  [data-slot="image-crop-result"] {
+    width: 96px;
+    height: 96px;
+  }
 }

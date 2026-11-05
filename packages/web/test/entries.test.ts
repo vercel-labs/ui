@@ -17,6 +17,7 @@ const helpers = [
   "./async-options",
   "./color",
   "./date",
+  "./image",
   "./number",
   "./primitive",
   "./shortcuts",
