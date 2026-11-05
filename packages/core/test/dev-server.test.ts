@@ -131,3 +131,51 @@ test("answers a body that isn't a JSON object without failing", async () => {
   expect((await post("mcp", null as never)).status).toBe(202)
   expect((await post("page", null as never)).status).toBe(400)
 })
+
+test("answers only this machine, whatever the headers say", async () => {
+  const { handle } = createDevServer()
+  const status = async (path: string, remoteAddress: string) => {
+    const res = {
+      statusCode: 0,
+      writableEnded: false,
+      setHeader() {},
+      on() {},
+      end() {
+        this.writableEnded = true
+      },
+    }
+    const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping", page: "a" })
+    await handle(
+      Object.assign([body], {
+        method: "POST",
+        url: `/__ui-sdk/${path}`,
+        headers: {
+          host: "localhost:5173",
+          "content-type": "application/json",
+          "x-forwarded-for": "127.0.0.1",
+        },
+        socket: { remoteAddress },
+      }) as never,
+      res,
+    )
+    return res.statusCode
+  }
+  expect(await status("mcp", "192.168.1.20")).toBe(403)
+  expect(await status("page", "::ffff:192.168.1.20")).toBe(403)
+  expect(await status("mcp", "::ffff:127.0.0.1")).toBe(200)
+})
+
+test("turns away a body over a megabyte", async () => {
+  const { post } = await start()
+  expect((await post("mcp", { pad: "x".repeat(1_100_000) })).status).toBe(413)
+})
+
+test("moves to a free port when another server has localhost's ::1", async () => {
+  const taken = createServer()
+  await new Promise<void>((resolve) => taken.listen(0, "::1", resolve))
+  const { port } = taken.address() as AddressInfo
+  const { startDevServer } = await import("../src/page/agent/dev-server")
+  const actual = await startDevServer(port)
+  taken.close()
+  expect(actual).not.toBe(port)
+})

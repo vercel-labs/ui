@@ -8,7 +8,8 @@ const manifest = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"
 const react = JSON.parse(readFileSync(path.join(root, "../react/package.json"), "utf8"))
 const entries = readdirSync(path.join(root, "src/entries")).map((file) => file.replace(/\.ts$/, ""))
 // React entries for helpers, not components. Web serves them from its root, the agent bridge from its own
-// `./agent`, the timeline from `./timeline`, and the gesture blocks from `@ui-sdk/core/gesture`.
+// `./agent`, the timeline from `./timeline`, and the gesture blocks from `@ui-sdk/core/gesture`. `./next`
+// is the Next.js dev server config.
 const helpers = [
   "./agent",
   "./gesture",
@@ -22,6 +23,7 @@ const helpers = [
   "./primitive",
   "./shortcuts",
   "./text-match",
+  "./next",
 ]
 
 describe("entries", () => {

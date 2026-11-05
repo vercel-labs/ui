@@ -7,7 +7,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 ## Settled
 
 - **One tab polls the dev server at a time**, through a Web Lock: the newest top-level page steals it, the others queue to take over, and frames wait for the page around them.
-- **The dev server takes JSON only, on a local host or an IP, from its own origin or a page on another port of this machine** (answered with CORS, for Next.js). MCP clients send no `Origin`.
+- **The dev server answers only loopback connections** (the socket's address, never headers), so `vite --host` and `nuxt dev --host` don't open it to the network. It takes JSON only, up to 1 MB, on a local host, from its own origin or a page on another port of this machine (answered with CORS, for Next.js). MCP clients send no `Origin`.
 - **Light DOM.** The elements render into the user's light DOM; inside a user's shadow root the hiding rules are adopted into that root.
 - **Every attribute option reflects as a property**, by the built-ins' rules: default-off booleans by presence, default-on as `"true"`/`"false"`, text as written, rich data property-only. ("I want it to feel like HTML, not a new API", shadcn 2026-10-24, on main as `bc22dedb`)
 - **Events don't bubble**; listen with `{ capture: true }`. Public events are `composed`.
