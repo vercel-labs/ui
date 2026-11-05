@@ -5,7 +5,6 @@
 //
 // Every response allows other sites, as the docs site's do. In `.html`
 // files, `{{name}}` becomes its value, so a page can name the other server.
-// It listens on 127.0.0.1 only and serves files inside `<folder>` only.
 import { readFile, realpath } from "node:fs/promises"
 import { createServer } from "node:http"
 import path from "node:path"
