@@ -24,7 +24,7 @@ export default async function Layout({ children, params }: LayoutProps<"/docs/[s
 
   return (
     <div className="container flex flex-1 max-lg:px-0">
-      <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 lg:block">
+      <aside className="sticky top-25 hidden h-[calc(100dvh-6.25rem)] w-64 shrink-0 lg:block">
         <Sidebar tree={tree} componentsTree={componentsTree} tocs={tocs} />
       </aside>
       <div className="min-w-0 flex-1">

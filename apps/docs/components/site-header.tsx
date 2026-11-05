@@ -6,7 +6,7 @@ import { HeaderMenu } from "./header-menu"
 
 function SiteHeader({ urls }: { urls: string[] }) {
   return (
-    <header className="sticky top-0 z-10 hidden bg-canvas/85 backdrop-blur-md lg:block">
+    <header className="sticky top-9 z-10 hidden bg-canvas/85 backdrop-blur-md lg:block">
       <div className="container flex h-16 items-center">
         <div className="flex shrink-0 items-center gap-4">
           <a

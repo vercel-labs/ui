@@ -26,7 +26,7 @@ import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tabl
 function heading(Tag: "h2" | "h3" | "h4", className: string) {
   return function Heading({ id, children, className: _, ...props }: ComponentProps<"h2">) {
     return (
-      <Tag id={id} className={cn("group scroll-mt-20 text-foreground", className)} {...props}>
+      <Tag id={id} className={cn("group scroll-mt-29 text-foreground", className)} {...props}>
         {id ? (
           <a
             href={`#${id}`}
