@@ -192,11 +192,12 @@ function text(value: string, isError = false) {
 async function read(req: NodeRequest) {
   const decoder = new TextDecoder()
   let body = ""
-  for await (const chunk of req)
-    body += typeof chunk === "string" ? chunk : decoder.decode(chunk, { stream: true })
-  body += decoder.decode()
   try {
-    return JSON.parse(body || "{}")
+    for await (const chunk of req)
+      body += typeof chunk === "string" ? chunk : decoder.decode(chunk, { stream: true })
+    body += decoder.decode()
+    const value: unknown = JSON.parse(body || "{}")
+    return typeof value === "object" && value !== null ? value : {}
   } catch {
     return {}
   }

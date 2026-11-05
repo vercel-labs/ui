@@ -14,7 +14,7 @@ type Config = { rewrites?: () => Rewrites | Promise<Rewrites> }
  * export default withUiSdk(nextConfig)
  * @experimental
  */
-function withUiSdk<C extends Config>(
+function withUiSdk<C extends object>(
   config: C | ((phase: string, context: { defaultConfig: C }) => C | Promise<C>),
 ) {
   return async (phase: string, context: { defaultConfig: C }) => {
@@ -29,7 +29,7 @@ function withUiSdk<C extends Config>(
     return {
       ...resolved,
       async rewrites() {
-        const own = (await resolved.rewrites?.()) ?? []
+        const own = (await (resolved as Config).rewrites?.()) ?? []
         if (Array.isArray(own)) return { beforeFiles: [relay], afterFiles: own }
         return { ...own, beforeFiles: [relay, ...(own.beforeFiles ?? [])] }
       },

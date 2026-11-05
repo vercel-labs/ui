@@ -93,3 +93,9 @@ test("takes a call's answer only from the page it went to", async () => {
   post("page", { page: "a", answer: { id: call.id, result: [] } })
   expect((await result).content[0].text).toBe("[]")
 })
+
+test("answers a body that isn't a JSON object without failing", async () => {
+  const { post } = await start()
+  expect((await post("mcp", null as never)).status).toBe(202)
+  expect((await post("page", null as never)).status).toBe(400)
+})
