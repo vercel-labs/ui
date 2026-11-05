@@ -162,12 +162,15 @@ function CodeView({
     if (!code || !spot || spot.file !== file) return setAnchor(null)
     setAnchor(code.querySelector(`[data-line="${lastLine(spot)}"]`))
     if (!spot.endLine) return
-    const rows: (Element | null)[] = []
-    for (let row = spot.line; row <= spot.endLine; row++)
-      rows.push(code.querySelector(`[data-line="${row}"]`))
-    for (const row of rows) row?.classList.add("ranged")
+    const from = spot.line
+    const to = spot.endLine
+    const rows = [...code.querySelectorAll<HTMLElement>("[data-line]")].filter((row) => {
+      const number = Number(row.dataset.line)
+      return number >= from && number <= to
+    })
+    for (const row of rows) row.classList.add("ranged")
     return () => {
-      for (const row of rows) row?.classList.remove("ranged")
+      for (const row of rows) row.classList.remove("ranged")
     }
   }, [code, source, file, spot])
 
