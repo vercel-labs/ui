@@ -231,7 +231,7 @@ async function pageMarkdown(
       )
 
     out = await replaceAsync(out, tag("TypeTable"), async (_, attrs: string) => {
-      const { path: file, name, events, examples, type, types } = attributes(attrs)
+      const { path: file, name, events, examples, type, types, descriptions } = attributes(attrs)
       const tables = await typeRows({
         path: file,
         name,
@@ -240,6 +240,7 @@ async function pageMarkdown(
         events: events !== "false",
         examples: objectOf(examples),
         types: objectOf(types),
+        descriptions: objectOf(descriptions),
       })
       return tables.map((table) => rows(table.rows)).join("\n\n")
     })

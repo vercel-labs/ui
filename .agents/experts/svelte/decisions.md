@@ -30,13 +30,12 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Data lists key separators and groups by index** (`command-items.svelte`, `listbox-items.svelte`), so a separator that comes back shifts the keys and a `CommandGroup` instance can be reused for another group.
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **Select, Combobox, Autocomplete and TokenInput take no `readonly`**: they render no element and have no `...rest`, so `svelte-check` reports it. `readOnly` is the prop.
-- **An author id on a control in a Field** (`NumberInputControl id`, `PasswordInputControl id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
-- **A range Slider in a Field** renders the label's `for` at the root `div[role=group]` on the server, which a label can't target. The client drops it once bound; the group keeps `aria-labelledby`.
-- **`NumberInputControl` drops an author `id` inside a Field**: it passes `control.attrs.id` to `field.control()` (`number-input-control.svelte`), while `PasswordInputControl` keeps it.
+- **An author id on a control in a Field** (every control that joins one, like `NumberInputControl id`, `Checkbox id` or a range `Slider id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
 - **A submit shortcut also submits a read-only Textarea.**
 - **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
 - **`submitShortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
 - **A Slider in a Field without a FieldDescription** points the range input's `aria-describedby` at a description id that isn't rendered, in server markup until hydration. The server can't know which parts render after the control.
+- **A Slider in a Field that switches between a range and one thumb** keeps the field's control it started with (`slider.svelte` decides `isRange` once). Range to one thumb gives the root and the thumb's input the same id and the label no `for`; one thumb to a range points the label at the last thumb's input. Same on main.
 
 ## Revisit
 

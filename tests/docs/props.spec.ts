@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "./docs-test"
 import { existsSync, globSync, readdirSync, readFileSync, statSync } from "node:fs"
 import path from "node:path"
 import ts from "typescript"

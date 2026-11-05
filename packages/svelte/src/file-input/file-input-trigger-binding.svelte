@@ -18,7 +18,7 @@
     "trigger",
   )
   const control = field?.control(
-    () => trigger.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>

@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
+import { test } from "./docs-test"
 
 // Follows a sidebar link, a client-side navigation, so the page's previews
 // unmount without a page load. The dev server compiles a page on its first

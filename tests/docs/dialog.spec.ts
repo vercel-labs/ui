@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
+import { test } from "./docs-test"
 import { readdirSync } from "node:fs"
 import path from "node:path"
 

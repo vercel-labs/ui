@@ -1,4 +1,5 @@
-import { expect, test, type Locator } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
+import { test } from "./docs-test"
 import { testExamples, type Check } from "./docs-helpers"
 
 // Scrolls an example to its end with the wheel, over its first item, as a user would.

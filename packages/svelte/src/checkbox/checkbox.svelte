@@ -80,7 +80,7 @@ The control and the hidden native input that takes part in the form.
   const root = useHandlePart(checkbox, "root")
   const input = useHandlePart(checkbox, "input")
   const control = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>

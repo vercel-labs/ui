@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "./docs-test"
 import { docsFolder, frameworks } from "./docs-helpers"
 
 // The page shows Combobox's async examples, which combobox.spec.ts exercises.
