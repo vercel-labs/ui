@@ -31,7 +31,7 @@ A submenu. Put its `MenuSubTrigger` and `MenuSubContent` inside, in a menu's con
     delay?: number
     /** Whether arrow keys wrap from the last item to the first. */
     loop?: boolean
-    /** Opens, closes and inspects the submenu from anywhere. Create one with `createMenuController()`. */
+    /** Opens, closes and inspects the submenu. Create one with `createMenuController()`. Triggers outside the menu can't connect to it. */
     controller?: MenuController<any>
     /** Logs every state change with its reason. */
     debug?: boolean

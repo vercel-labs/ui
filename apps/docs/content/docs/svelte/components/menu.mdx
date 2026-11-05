@@ -344,7 +344,11 @@ Props and callbacks are the same as below, as Svelte props. `open`, `checked` an
 
 ### Menu
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOptions" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuOptions"
+  types={{ controller: "MenuController" }}
+/>
 
 ### MenuTrigger
 
@@ -391,9 +395,12 @@ A trigger outside the menu also takes `controller`.
   name="MenuSubProps"
   type="Pick<MenuOptions, 'open' | 'defaultOpen' | 'onOpenChange' | 'onOpenChangeComplete' | 'loop' | 'delay' | 'controller' | 'debug'>"
   descriptions={{
+    open: "Whether the submenu is open. Bind it with `bind:open` to control the submenu.",
+    defaultOpen: "Whether the submenu starts open, when uncontrolled.",
     controller:
       "Opens, closes and inspects the submenu. Create one with `createMenuController()`. Triggers outside the menu can't connect to it.",
   }}
+  types={{ controller: "MenuController" }}
 />
 
 ### MenuSubTrigger
