@@ -36,6 +36,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
 - **`submitShortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
 - **A Slider in a Field without a FieldDescription** points the range input's `aria-describedby` at a description id that isn't rendered, in server markup until hydration. The server can't know which parts render after the control.
+- **A Slider in a Field that switches between a range and one thumb** keeps the field's control it started with (`slider.svelte` decides `isRange` once). Range to one thumb gives the root and the thumb's input the same id and the label no `for`; one thumb to a range points the label at the last thumb's input. Same on main.
 
 ## Revisit
 
