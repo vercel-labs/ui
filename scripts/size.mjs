@@ -17,6 +17,8 @@ const coreFile = (module) =>
   `packages/core/src/${foundation.has(module.split("/")[0]) ? "foundation" : "components"}/${module}.ts`
 const budgetFile = path.join(root, "size-budget.json")
 const tolerance = 0.03
+// The dev server's entries run only under a framework's dev server, never in an app.
+const devEntries = new Set(["./dev", "./dev-server", "./vite", "./next", "./nuxt"])
 
 const { values: flags } = parseArgs({
   options: { update: { type: "boolean", default: false }, strict: { type: "boolean", default: false } },
@@ -211,6 +213,7 @@ function adapterEntries(adapter) {
       key !== "./renderer" &&
       key !== "./testing" &&
       !key.includes("*") &&
+      !devEntries.has(key) &&
       !adapterExports[key],
   )
   if (missing.length)
@@ -221,7 +224,7 @@ function adapterEntries(adapter) {
 // Every subpath of an adapter but its root.
 function entriesOf(adapter) {
   return Object.entries(readManifest(`packages/${adapter}`).exports)
-    .filter(([key]) => key !== ".")
+    .filter(([key]) => key !== "." && !devEntries.has(key))
     .map(([key, file]) => ({
       name: `@ui-sdk/${adapter}/${key.slice(2)}`,
       file: path.join(root, `packages/${adapter}`, file),

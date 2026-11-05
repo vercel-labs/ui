@@ -1,11 +1,20 @@
 /// <reference types="node" />
-import type { IncomingMessage, ServerResponse } from "node:http"
-import type { AddressInfo } from "node:net"
 import { agentTools } from "./tools.ts"
+
+// Node's request and response, as much of them as the server reads, so the
+// declarations need no Node types.
+type NodeRequest = AsyncIterable<string | Uint8Array> & { method?: string; url?: string }
+type NodeResponse = {
+  statusCode: number
+  writableEnded: boolean
+  setHeader: (name: string, value: string) => unknown
+  end: (body?: string) => unknown
+  on: (event: "close", listener: () => void) => unknown
+}
 
 type Call = { id: number; name: string; input: unknown }
 type Answer = { id: number; result?: unknown; error?: string }
-type Page = { id: string; since: number; seen: number; poll?: ServerResponse }
+type Page = { id: string; since: number; seen: number; poll?: NodeResponse }
 type Message = { jsonrpc: "2.0"; id?: number | string; method: string; params?: Record<string, unknown> }
 
 const base = "/__ui-sdk"
@@ -62,7 +71,7 @@ function createDevServer() {
       if (page) send(page)
     })
 
-  const poll = (body: { page?: string; answer?: Answer }, res: ServerResponse) => {
+  const poll = (body: { page?: string; answer?: Answer }, res: NodeResponse) => {
     if (body.answer) {
       waiting.get(body.answer.id)?.(body.answer)
       waiting.delete(body.answer.id)
@@ -117,7 +126,7 @@ function createDevServer() {
     throw new Error(`Unknown method: ${method}`)
   }
 
-  const handle = async (req: IncomingMessage, res: ServerResponse, next?: () => void) => {
+  const handle = async (req: NodeRequest, res: NodeResponse, next?: () => void) => {
     const path = req.url?.split("?")[0]
     if (path === `${base}/mcp`) {
       if (req.method !== "POST") return reply(res, 405)
@@ -145,9 +154,12 @@ function text(value: string, isError = false) {
   return { content: [{ type: "text", text: value }], isError }
 }
 
-async function read(req: IncomingMessage) {
+async function read(req: NodeRequest) {
+  const decoder = new TextDecoder()
   let body = ""
-  for await (const chunk of req) body += chunk
+  for await (const chunk of req)
+    body += typeof chunk === "string" ? chunk : decoder.decode(chunk, { stream: true })
+  body += decoder.decode()
   try {
     return JSON.parse(body || "{}")
   } catch {
@@ -155,7 +167,7 @@ async function read(req: IncomingMessage) {
   }
 }
 
-function reply(res: ServerResponse, status: number, body?: unknown) {
+function reply(res: NodeResponse, status: number, body?: unknown) {
   if (res.writableEnded) return
   res.statusCode = status
   if (body === undefined) return res.end()
@@ -181,7 +193,7 @@ function startDevServer() {
         server.once("error", reject)
         server.listen(0, "127.0.0.1", () => {
           server.unref()
-          resolve((server.address() as AddressInfo).port)
+          resolve((server.address() as { port: number }).port)
         })
       }),
   )

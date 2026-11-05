@@ -3,6 +3,9 @@ import { createDevServer } from "@ui-sdk/core/dev-server"
 import { addDevServerHandler, addPluginTemplate, defineNuxtModule } from "nuxt/kit"
 
 type Event = { node: { req: IncomingMessage; res: ServerResponse } }
+// Typed by shape, since Nuxt's own type names `@nuxt/schema`, which an app
+// may not resolve from here.
+type Module = (this: void, options: unknown, nuxt: unknown) => Promise<void>
 
 /**
  * Lets a coding agent read and operate the ui-sdk components on the page
@@ -34,6 +37,6 @@ const nuxtModule = defineNuxtModule({
       getContents: () => 'import "@ui-sdk/core/dev"\nexport default () => {}\n',
     })
   },
-})
+}) as unknown as Module
 
 export default nuxtModule

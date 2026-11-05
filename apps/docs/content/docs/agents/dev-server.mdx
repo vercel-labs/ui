@@ -92,30 +92,32 @@ Start your dev server and open the app in your browser. Then add the server to y
 claude mcp add --transport http ui-sdk http://localhost:3000/__ui-sdk/mcp
 ```
 
-For Codex:
-
-```bash
-codex mcp add ui-sdk --url http://localhost:3000/__ui-sdk/mcp
-```
-
 For fx:
 
 ```bash
 fx mcp add ui-sdk http://localhost:3000/__ui-sdk/mcp
 ```
 
+`fx mcp show ui-sdk` checks the connection and lists the three tools.
+
+For Codex:
+
+```bash
+codex mcp add ui-sdk --url http://localhost:3000/__ui-sdk/mcp
+```
+
 Other agents take the same URL wherever they add an MCP server. Use your dev server's port: `3000` for Next.js and Nuxt, `5173` for Vite and SvelteKit.
 
 ## Try It
 
-Ask the agent to use what it built:
+Ask the agent to build something small, then use it:
 
 ```text
-Open the settings page in the browser tab. Use the ui-sdk tools to
-choose Asia Pacific in the Region select, then tell me what the
-page shows.
+Add a settings form with a Region select that offers North America,
+Europe and Asia Pacific. Open it in the browser tab, use the ui-sdk
+tools to choose Asia Pacific, then tell me what the form shows.
 ```
 
-The agent calls `query` to find the Region select and its options, then `act` to choose one. The result lists every field's value after the change, so the agent can check its work in the same step. You see the select change in your browser as it happens.
+The agent builds the form, then calls `query` to find the Region select and its options, then `act` to choose one. The result lists every field's value after the change, so the agent can check its work in the same step. You see the select change in your browser as it happens.
 
 With more than one tab open, the tab you opened last answers. A component marked with `data-agent-confirm` stays yours to change: the agent gets a note to ask you instead. [Permissions](./connect-an-agent/permissions) covers the marks.
