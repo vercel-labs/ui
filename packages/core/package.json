@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "imports": {
     "#dev": {
       "development": "./src/foundation/kernel/dev.ts",
