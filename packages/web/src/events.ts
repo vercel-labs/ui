@@ -1940,7 +1940,7 @@ declare global {
     "ui-progress-value": UiPartElement<typeof progress, "value">
     "ui-radio-indicator": UiPartElement<typeof radioGroup, "indicator", "keepMounted">
     "ui-rating-item": UiPartElement<typeof rating, "item", "index">
-    "ui-rating-radio": UiPartElement<typeof rating, "radio", "value">
+    "ui-rating-radio": UiPartElement<typeof rating, "radio", "value" | "disabled">
     "ui-resizable-panel": UiPartElement<
       typeof resizable,
       "panel",
