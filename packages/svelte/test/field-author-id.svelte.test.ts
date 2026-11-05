@@ -48,4 +48,6 @@ test.each([
   const named =
     label.htmlFor === "mine" || !!control?.getAttribute("aria-labelledby")?.split(" ").includes(label.id)
   expect(named).toBe(true)
+  const ids = [...document.querySelectorAll("[id]")].map((el) => el.id)
+  expect(ids.filter((id, index) => ids.indexOf(id) !== index)).toEqual([])
 })
