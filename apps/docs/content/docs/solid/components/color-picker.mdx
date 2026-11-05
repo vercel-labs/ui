@@ -201,7 +201,13 @@ Every part takes `render`, to render a different element or component in its pla
     {(state) => <span>{Math.round(state.channelValue)}%</span>}
   </ColorPickerSliderThumb>
 </ColorPickerSlider>
-<ColorPickerSwatch>{(state) => (state.color.alpha < 1 ? <span>Transparent</span> : null)}</ColorPickerSwatch>
+<ColorPickerSwatch>
+  {(state) => (
+    <Show when={state.color.alpha < 1}>
+      <span>Transparent</span>
+    </Show>
+  )}
+</ColorPickerSwatch>
 ```
 
 See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.

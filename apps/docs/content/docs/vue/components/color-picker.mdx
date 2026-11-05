@@ -195,8 +195,8 @@ Every part takes `render`, to render a different element or component in its pla
 
 ```vue
 <ColorPickerSlider channel="alpha">
-  <ColorPickerSliderThumb v-slot="{ state }" :class="{ dashed: state.outOfGamut }">
-    <span>{{ Math.round(state.channelValue) }}%</span>
+  <ColorPickerSliderThumb v-slot="{ state }">
+    <span :class="{ dashed: state.outOfGamut }">{{ Math.round(state.channelValue) }}%</span>
   </ColorPickerSliderThumb>
 </ColorPickerSlider>
 <ColorPickerSwatch v-slot="{ state }">

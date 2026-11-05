@@ -11,6 +11,7 @@ import {
 import { defineComponent, h, useId, type PropType } from "vue"
 import { createParts, withElement } from "./create-parts"
 import { useFieldControl } from "./field-context"
+import { readOnlyOf } from "./text-control"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
 
 const parts = createParts(colorPicker, {
@@ -26,7 +27,7 @@ const parts = createParts(colorPicker, {
 })
 
 // The hidden input the form submits. Its value changes on every move, so it
-// renders on its own, and the root and its content don't render again.
+// renders on its own.
 const ColorPickerHiddenInput = defineComponent({
   name: "ColorPickerHiddenInput",
   setup() {
@@ -66,7 +67,7 @@ const ColorPicker = withElement(
       valueCommit: (_value: string, _details: ColorPickerValueCommitDetails) => true,
     },
     slots: Object as PartSlots<typeof colorPicker, "root">,
-    setup(props, { slots, emit }) {
+    setup(props, { slots, emit, attrs }) {
       const field = useFieldControl()
       const picker = usePrimitive(colorPicker, () => ({
         value: orModel(props.value, props.modelValue),
@@ -75,7 +76,7 @@ const ColorPicker = withElement(
         format: props.format,
         gamut: props.gamut,
         disabled: props.disabled || field?.disabled(),
-        readOnly: props.readOnly,
+        readOnly: readOnlyOf(props, attrs),
         required: props.required,
         name: props.name ?? field?.name(),
         form: props.form,
