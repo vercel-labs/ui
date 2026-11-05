@@ -2,10 +2,12 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and the dev server MCP (2026-11-05, branch shadcn/dev-server-mcp).
 
 ## Settled
 
+- **One tab polls the dev server at a time**, through a Web Lock: the newest top-level page steals it, the others queue to take over, and frames wait for the page around them.
+- **The dev server takes JSON only, from its own origin, on a local host or an IP.** MCP clients send no `Origin`.
 - **Light DOM.** The elements render into the user's light DOM; inside a user's shadow root the hiding rules are adopted into that root.
 - **Every attribute option reflects as a property**, by the built-ins' rules: default-off booleans by presence, default-on as `"true"`/`"false"`, text as written, rich data property-only. ("I want it to feel like HTML, not a new API", shadcn 2026-10-24, on main as `bc22dedb`)
 - **Events don't bubble**; listen with `{ capture: true }`. Public events are `composed`.
@@ -24,6 +26,12 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 
 ## Known and open (don't report again, check whether fixed)
 
+- **A call that navigates the page loses its answer** and the agent waits out the 25 s timeout. `pagehide` could beacon an error answer.
+- **Backend-integration setups** (Laravel, Rails, Django with Vite) never connect: the page polls `/__ui-sdk/page` on the backend's origin.
+- **Vite in middleware mode behind `express.json()`** has already read the body, so the dev server sees none.
+- **MSW in the browser** warns about each poll.
+- **`vite` aliased to `rolldown-vite`**: the client path doesn't end in `/vite/dist/client/client.mjs`, so pages never connect.
+- **Protocol nits**: an unknown tool answers -32601 (the spec's example uses -32602), unparseable JSON gets 202, and 405 has no `Allow` header.
 - **`<ui-trigger-menu>`'s `editor`** has no accessor, so setting it after the menu connects does nothing until it reconnects.
 - **`<ui-otp-input>`'s `input-mode`** can't reflect: every element has `inputMode`.
 - **Text options read `undefined`**, not the default, without the attribute.

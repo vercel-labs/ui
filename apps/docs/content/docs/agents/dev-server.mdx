@@ -9,7 +9,7 @@ It uses the same three tools as [Connect an Agent](./connect-an-agent): `snapsho
 
 ## Set Up Your Framework
 
-Each framework needs two things: the MCP server on its dev server, and a connection from the page. Both run only in development, so your production build stays the same.
+Each setup adds the MCP server to your dev server and connects the pages you open to it. Both run only in development, so your production build stays the same.
 
 ### Next.js
 
@@ -24,10 +24,20 @@ const nextConfig: NextConfig = {}
 export default withUiSdk(nextConfig)
 ```
 
-Under `next dev`, it starts the server and serves it from your app's own port. Then connect the page from `instrumentation-client.ts`, which runs in the browser before your app starts:
+Under `next dev`, it starts the server and serves it from your app's own port. Like the rest of your app under `next dev`, the address is reachable from other devices on your network. If another function wraps your config too, put `withUiSdk` outside it, like `withUiSdk(withMDX(nextConfig))`, so it gets your finished config.
+
+Then connect the page from `instrumentation-client.ts`, which runs in the browser before your app starts. It needs Next.js 15.3 or later. If you already have the file, add the line to it:
 
 ```ts title="instrumentation-client.ts"
 if (process.env.NODE_ENV === "development") import("@ui-sdk/core/dev")
+```
+
+If your app has a `proxy.ts` or `middleware.ts` that redirects requests, like to a sign-in page, leave `__ui-sdk` out of its matcher so your agent's calls reach the server:
+
+```ts title="proxy.ts"
+export const config = {
+  matcher: ["/((?!__ui-sdk|_next/static|_next/image|favicon.ico).*)"],
+}
 ```
 
 ### Vite
@@ -73,7 +83,7 @@ export default defineConfig({
 
 ### Other Frameworks on Vite
 
-SolidStart, Astro and other frameworks built on Vite take the same plugin, even when they render their own pages. In Astro, it goes in the Vite plugins of your config:
+Astro and other frameworks built on Vite take the same plugin, even when they render their own pages. In Astro, it goes in the Vite plugins of your config:
 
 ```js title="astro.config.mjs"
 import { uiSdk } from "@ui-sdk/core/vite"
@@ -120,4 +130,4 @@ tools to choose Asia Pacific, then tell me what the form shows.
 
 The agent builds the form, then calls `query` to find the Region select and its options, then `act` to choose one. The result lists every field's value after the change, so the agent can check its work in the same step. You see the select change in your browser as it happens.
 
-With more than one tab open, the tab you opened last answers. A component marked with `data-agent-confirm` stays yours to change: the agent gets a note to ask you instead. [Permissions](./connect-an-agent/permissions) covers the marks.
+With more than one tab open, the tab you opened last answers, and another takes over when you close it. A component marked with `data-agent-confirm` stays yours to change: the agent gets a note to ask you instead. [Permissions](./connect-an-agent/permissions) covers the marks.

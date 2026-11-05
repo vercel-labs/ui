@@ -1,6 +1,6 @@
 import { startDevServer } from "@ui-sdk/core/dev-server"
 
-type Rewrite = { source: string; destination: string }
+type Rewrite = { source: string; destination: string; basePath?: false }
 type Rewrites = Rewrite[] | { beforeFiles?: Rewrite[]; afterFiles?: Rewrite[]; fallback?: Rewrite[] }
 type Config = { rewrites?: () => Rewrites | Promise<Rewrites> }
 
@@ -14,12 +14,18 @@ type Config = { rewrites?: () => Rewrites | Promise<Rewrites> }
  * export default withUiSdk(nextConfig)
  * @experimental
  */
-function withUiSdk<C extends Config>(config: C | ((phase: string, context: never) => C | Promise<C>)) {
-  return async (phase: string, context: never) => {
+function withUiSdk<C extends Config>(
+  config: C | ((phase: string, context: { defaultConfig: C }) => C | Promise<C>),
+) {
+  return async (phase: string, context: { defaultConfig: C }) => {
     const resolved = typeof config === "function" ? await config(phase, context) : config
     if (phase !== "phase-development-server") return resolved
     const port = await startDevServer()
-    const relay = { source: "/__ui-sdk/:path*", destination: `http://127.0.0.1:${port}/__ui-sdk/:path*` }
+    const relay = {
+      source: "/__ui-sdk/:path*",
+      destination: `http://127.0.0.1:${port}/__ui-sdk/:path*`,
+      basePath: false as const,
+    }
     return {
       ...resolved,
       async rewrites() {

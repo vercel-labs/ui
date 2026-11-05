@@ -18,3 +18,14 @@ test("leaves other modules and server rendering alone", () => {
   expect(plugin.transform("export {}", "/app/src/main.ts")).toBeUndefined()
   expect(plugin.transform("export {}", client, { ssr: true })).toBeUndefined()
 })
+
+test("runs under the dev server, not under Vitest", () => {
+  const { apply } = uiSdk()
+  expect(apply(undefined, { command: "serve", mode: "development" })).toBe(true)
+  expect(apply(undefined, { command: "serve", mode: "test" })).toBe(false)
+  expect(apply(undefined, { command: "build", mode: "production" })).toBe(false)
+})
+
+test("leaves a linked core out of prebundling", () => {
+  expect(uiSdk().config()).toBeUndefined()
+})

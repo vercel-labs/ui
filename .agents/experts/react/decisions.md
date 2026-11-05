@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and the dev server MCP (2026-11-05, branch shadcn/dev-server-mcp).
 
 
 ## Settled
@@ -23,6 +23,9 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 
 ## Known and open (don't report again, check whether fixed)
 
+- **`next dev` exposes the dev server on the network**: Next listens on every interface and the relay serves `/__ui-sdk/*` there, so a non-browser client on the LAN can fake `Host`. Closing it means agents connect to `startDevServer`'s loopback port instead, which changes the documented URL.
+- **`act` reports a router-synced control's old value**: a select whose value comes from search params shows the previous value in `act`'s result until the navigation commits.
+- **`output: "export"` warns about rewrites** under `next dev` with `withUiSdk`. The relay still works.
 - **Hidden popup's later siblings**: the hidden-tree bridge tracks the nodes a portal appends when it mounts, so an element a popup's `render` adds beside it later, or a text or SVG node, stays shown in a hidden `<Activity>`.
 - **Api reads in custom parts**: `handle.state` shows the preview, `handle.api` reads committed state.
 - **Split `use-primitive.tsx`** (~920 lines) into previews and lifecycle modules.

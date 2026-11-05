@@ -25,14 +25,13 @@ The bridge finds the components already on the page when you create it, and regi
 
 Create it in browser code that runs once. Each framework has a place for that:
 
-| Framework  | Create It In                                    |
-| ---------- | ----------------------------------------------- |
-| Next.js    | `instrumentation-client.ts`                     |
-| Vite       | `src/main.ts`                                   |
-| Nuxt       | a client plugin, like `plugins/agent.client.ts` |
-| SvelteKit  | `src/hooks.client.ts`                           |
-| SolidStart | `src/entry-client.tsx`                          |
-| Astro      | a `<script>` in your layout                     |
+| Framework | Create It In                                    |
+| --------- | ----------------------------------------------- |
+| Next.js   | `instrumentation-client.ts`                     |
+| Vite      | `src/main.ts`                                   |
+| Nuxt      | a client plugin, like `plugins/agent.client.ts` |
+| SvelteKit | `src/hooks.client.ts`                           |
+| Astro     | a `<script>` in your layout                     |
 
 In Next.js, for example, import the file from `instrumentation-client.ts`:
 

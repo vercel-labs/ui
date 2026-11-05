@@ -3,7 +3,11 @@ import { agentTools } from "./tools.ts"
 
 // Node's request and response, as much of them as the server reads, so the
 // declarations need no Node types.
-type NodeRequest = AsyncIterable<string | Uint8Array> & { method?: string; url?: string }
+type NodeRequest = AsyncIterable<string | Uint8Array> & {
+  method?: string
+  url?: string
+  headers: Record<string, string | string[] | undefined>
+}
 type NodeResponse = {
   statusCode: number
   writableEnded: boolean
@@ -12,15 +16,16 @@ type NodeResponse = {
   on: (event: "close", listener: () => void) => unknown
 }
 
-type Call = { id: number; name: string; input: unknown }
-type Answer = { id: number; result?: unknown; error?: string }
+type Call = { id: string; name: string; input: unknown }
+type Answer = { id: string; result?: unknown; error?: string }
 type Page = { id: string; since: number; seen: number; poll?: NodeResponse }
 type Message = { jsonrpc: "2.0"; id?: number | string; method: string; params?: Record<string, unknown> }
 
 const base = "/__ui-sdk"
 const pollFor = 20_000
 const pageGone = pollFor + 5_000
-const callFor = 60_000
+// Under the 30 seconds Next.js gives a proxied request.
+const callFor = 25_000
 
 /**
  * The MCP server behind the framework integrations, as Node middleware: a
@@ -31,8 +36,7 @@ const callFor = 60_000
 function createDevServer() {
   const pages = new Map<string, Page>()
   const queue: Call[] = []
-  const waiting = new Map<number, (answer: Answer) => void>()
-  let nextId = 1
+  const waiting = new Map<string, { page?: string; resolve: (answer: Answer) => void }>()
 
   const activePage = () => {
     let active: Page | undefined
@@ -46,13 +50,15 @@ function createDevServer() {
   const send = (page: Page) => {
     if (!page.poll || page !== activePage() || !queue.length) return
     const call = queue.shift()!
+    const pending = waiting.get(call.id)
+    if (pending) pending.page = page.id
     reply(page.poll, 200, call)
     page.poll = undefined
   }
 
   const call = (name: string, input: unknown) =>
     new Promise<Answer>((resolve) => {
-      const id = nextId++
+      const id = crypto.randomUUID()
       const timer = setTimeout(() => {
         waiting.delete(id)
         const index = queue.findIndex((queued) => queued.id === id)
@@ -62,9 +68,11 @@ function createDevServer() {
           error: "The page didn't answer. Check that the app is open in a browser tab, then try again.",
         })
       }, callFor)
-      waiting.set(id, (answer) => {
-        clearTimeout(timer)
-        resolve(answer)
+      waiting.set(id, {
+        resolve: (answer) => {
+          clearTimeout(timer)
+          resolve(answer)
+        },
       })
       queue.push({ id, name, input })
       const page = activePage()
@@ -72,9 +80,11 @@ function createDevServer() {
     })
 
   const poll = (body: { page?: string; answer?: Answer }, res: NodeResponse) => {
-    if (body.answer) {
-      waiting.get(body.answer.id)?.(body.answer)
-      waiting.delete(body.answer.id)
+    const { answer } = body
+    const pending = answer && waiting.get(answer.id)
+    if (answer && pending && pending.page === body.page) {
+      waiting.delete(answer.id)
+      pending.resolve(answer)
     }
     if (typeof body.page !== "string") return reply(res, 400, { error: "page is required" })
     const page = pages.get(body.page) ?? { id: body.page, since: Date.now(), seen: 0 }
@@ -130,6 +140,7 @@ function createDevServer() {
     const path = req.url?.split("?")[0]
     if (path === `${base}/mcp`) {
       if (req.method !== "POST") return reply(res, 405)
+      if (!trusted(req)) return reply(res, 403)
       const message = (await read(req)) as Message
       if (message.id === undefined) return reply(res, 202)
       try {
@@ -142,12 +153,36 @@ function createDevServer() {
         })
       }
     }
-    if (path === `${base}/page` && req.method === "POST") return poll((await read(req)) as never, res)
+    if (path === `${base}/page` && req.method === "POST") {
+      if (!trusted(req)) return reply(res, 403)
+      return poll((await read(req)) as never, res)
+    }
     if (next) next()
     else reply(res, 404)
   }
 
   return { handle }
+}
+
+// Another site's page can send a simple POST, and a rebound domain can reach
+// localhost: JSON forces a preflight, and the origin and host checks turn the
+// rest away. MCP clients send no origin.
+function trusted({ headers }: NodeRequest) {
+  if (!String(headers["content-type"]).startsWith("application/json")) return false
+  const host = String(headers["x-forwarded-host"] ?? headers.host)
+  if (!local(host)) return false
+  const { origin } = headers
+  if (origin === undefined) return true
+  try {
+    return new URL(String(origin)).host === host
+  } catch {
+    return false
+  }
+}
+
+function local(host: string) {
+  const name = host.replace(/:\d+$/, "").replace(/^\[|\]$/g, "")
+  return name === "localhost" || name.endsWith(".localhost") || /^[\d.]+$/.test(name) || name.includes(":")
 }
 
 function text(value: string, isError = false) {

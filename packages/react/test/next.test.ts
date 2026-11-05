@@ -20,6 +20,7 @@ test("proxies /__ui-sdk/* to the dev server before the app's own rewrites", asyn
       {
         source: "/__ui-sdk/:path*",
         destination: expect.stringMatching(/^http:\/\/127\.0\.0\.1:\d+\/__ui-sdk\/:path\*$/),
+        basePath: false,
       },
     ],
     afterFiles: [own],

@@ -67,3 +67,29 @@ test("sends calls to the page that opened last", async () => {
   expect((await second).status).toBe(200)
   result.catch(() => {})
 })
+
+test("turns away other sites, rebound domains and simple requests", async () => {
+  await start()
+  const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}/__ui-sdk/mcp`
+  const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" })
+  const status = async (headers: Record<string, string>) =>
+    (await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body }))
+      .status
+  expect(await status({})).toBe(200)
+  expect(await status({ "Content-Type": "text/plain" })).toBe(403)
+  expect(await status({ Origin: "https://example.com" })).toBe(403)
+  expect(await status({ Origin: `http://127.0.0.1:${(server.address() as AddressInfo).port}` })).toBe(200)
+  expect(await status({ "X-Forwarded-Host": "example.com" })).toBe(403)
+})
+
+test("takes a call's answer only from the page it went to", async () => {
+  const { post, rpc } = await start()
+  const poll = post("page", { page: "a" })
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  const result = rpc("tools/call", { name: "snapshot", arguments: {} })
+  const call = await (await poll).json()
+  post("page", { page: "b", answer: { id: call.id, result: "forged" } })
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  post("page", { page: "a", answer: { id: call.id, result: [] } })
+  expect((await result).content[0].text).toBe("[]")
+})

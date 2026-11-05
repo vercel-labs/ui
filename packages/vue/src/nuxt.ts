@@ -17,7 +17,7 @@ type Module = (this: void, options: unknown, nuxt: unknown) => Promise<void>
  * @experimental
  */
 const nuxtModule = defineNuxtModule({
-  meta: { name: "@ui-sdk/vue", compatibility: { nuxt: ">=3.13" } },
+  meta: { name: "@ui-sdk/vue", compatibility: { nuxt: "^3.13.0 || ^4.0.0" } },
   setup(_, nuxt) {
     if (!nuxt.options.dev) return
     const { handle } = createDevServer()

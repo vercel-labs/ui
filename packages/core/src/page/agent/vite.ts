@@ -14,7 +14,15 @@ const connect = "virtual:ui-sdk-dev"
 function uiSdk() {
   return {
     name: "ui-sdk",
-    apply: "serve" as const,
+    apply: (_: unknown, env: { command: string; mode: string }) =>
+      env.command === "serve" && env.mode !== "test",
+    // Only Vite's client imports the bridge, so the dependency scan misses it
+    // and the first visit reloads. A linked package isn't prebundled, and
+    // including it would give the bridge its own copy of core.
+    config: () =>
+      import.meta.url.includes("/node_modules/")
+        ? { optimizeDeps: { include: ["@ui-sdk/core/dev"] } }
+        : undefined,
     configureServer(server: {
       middlewares: { use: (handle: ReturnType<typeof createDevServer>["handle"]) => void }
     }) {
