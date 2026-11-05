@@ -147,6 +147,28 @@ describe("server rendering form controls", () => {
     expect(dangling(html)).toEqual([])
   })
 
+  test("a field's label points at a range slider's first input and names its group", () => {
+    const html = renderToString(
+      <Field>
+        <FieldLabel>Price</FieldLabel>
+        <Slider defaultValue={[20, 80]}>
+          <SliderControl>
+            <SliderTrack>
+              <SliderThumb index={0} />
+              <SliderThumb index={1} />
+            </SliderTrack>
+          </SliderControl>
+        </Slider>
+      </Field>,
+    )
+    const label = tags(html).find((tag) => tag.includes('data-slot="field-label"'))
+    const target = tags(html).find((tag) => attribute(tag, "id") === attribute(label, "for"))
+    expect(target).toMatch(/^<input[^>]*type="range"/)
+    const group = tags(html).find((tag) => tag.includes('role="group"'))
+    expect(attribute(group, "aria-labelledby")).toBe(attribute(label, "id"))
+    expect(dangling(html)).toEqual([])
+  })
+
   test.each([
     ["FieldControl", <FieldControl aria-describedby="hint" />],
     ["Input", <Input aria-describedby="hint" />],

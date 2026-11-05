@@ -72,6 +72,16 @@ describe("server rendering form controls", () => {
     },
   )
 
+  test("a field's label points at a range slider's first input and names its group", () => {
+    const body = render(FieldControlsApp, { props: { kind: "range-slider" } }).body
+    const label = tags(body).find((tag) => tag.includes('data-slot="field-label"'))
+    const target = tags(body).find((tag) => attribute(tag, "id") === attribute(label, "for"))
+    expect(target).toMatch(/^<input[^>]*type="range"/)
+    const group = tags(body).find((tag) => tag.includes('role="group"'))
+    expect(attribute(group, "aria-labelledby")).toBe(attribute(label, "id"))
+    expect(dangling(body)).toEqual([])
+  })
+
   test.each(["field-control", "input", "textarea", "checkbox", "slider", "date-picker"] as const)(
     "a %s keeps its own description ahead of the field's",
     (control) => {
