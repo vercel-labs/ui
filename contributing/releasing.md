@@ -31,7 +31,7 @@ npm sets up a trusted publisher only for a package that exists, so the first ver
 3. From an up-to-date main, signed in to npm with publish rights on `@ui-sdk`:
 
    ```bash
-   pnpm install && pnpm build && pnpm check:packages && pnpm changeset publish && git push --follow-tags
+   pnpm install && pnpm build && pnpm docs:packages && pnpm check:packages && pnpm changeset publish && git push --follow-tags
    ```
 
 4. On npmjs.com, add a trusted publisher to each of the six packages: GitHub Actions, repository `vercel-labs/ui`, workflow `release.yml`.

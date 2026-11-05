@@ -92,11 +92,15 @@ jobs:
       - name: Build examples
         run: pnpm --filter examples build
 
-      # The packed packages installed in a scratch app, every entry typechecked
-      # strictly against the emitted declarations, from scripts/check-packages.mjs.
       - name: Build packages
         run: pnpm build
 
+      # The docs as Markdown each package ships, from scripts/package-docs.mjs.
+      - name: Package docs
+        run: pnpm docs:packages
+
+      # The packed packages installed in a scratch app, every entry typechecked
+      # strictly against the emitted declarations, from scripts/check-packages.mjs.
       - name: Packed packages
         run: pnpm check:packages
 

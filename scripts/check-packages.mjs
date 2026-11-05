@@ -4,7 +4,7 @@
 // pass, like a type that names something its file can't reach.
 //
 //   pnpm check:packages           Checks the current builds in packages/*/dist.
-//   pnpm check:packages --build   Runs `pnpm build` first.
+//   pnpm check:packages --build   Runs `pnpm build` and `pnpm docs:packages` first.
 //
 // `pnpm pack` packs each package as it's published, with `publishConfig`'s
 // exports pointing at `dist`, and every tarball is unpacked into the app's
@@ -27,8 +27,10 @@
 // Every package is unpacked side by side, as an app installs an adapter with
 // `@ui-sdk/core` beside it. A package that needs another `@ui-sdk` package
 // takes it as a peer, never a dependency, so an app ends up with one copy.
+// Every package ships `docs/llms.txt`, which the setup prompts and the skill
+// point agents at, from `pnpm docs:packages`.
 //
-// The release (apps/registry/scripts/release.mjs) and CI run it.
+// The release workflow and CI run it.
 import { execFileSync, spawnSync } from "node:child_process"
 import {
   cpSync,
@@ -82,10 +84,11 @@ const frameworkOptions = {
   solid: { jsx: "preserve", jsxImportSource: "@solidjs/web" },
 }
 
-if (flags.build) {
-  const build = spawnSync("pnpm", ["build"], { cwd: root, stdio: "inherit" })
-  if (build.status !== 0) process.exit(build.status ?? 1)
-}
+if (flags.build)
+  for (const script of ["build", "docs:packages"]) {
+    const run = spawnSync("pnpm", [script], { cwd: root, stdio: "inherit" })
+    if (run.status !== 0) process.exit(run.status ?? 1)
+  }
 
 const names = readdirSync(path.join(root, "packages")).filter((name) =>
   existsSync(path.join(root, "packages", name, "package.json")),
@@ -160,6 +163,7 @@ function checkPackage(name, manifest, manifests, reported) {
   const { subpaths, missing } = listEntries(manifest)
   const consumers = copyConsumers(name)
   const errors = [
+    ...findMissingDocs(name, manifest),
     ...findBundledSiblings(name, manifest),
     ...findUnpublishedImports(name, manifest, manifests),
   ]
@@ -206,6 +210,11 @@ function listEntries(manifest) {
     else missing.push({ subpath, types })
   }
   return { subpaths, missing }
+}
+
+function findMissingDocs(name, manifest) {
+  if (existsSync(path.join(app, "node_modules", manifest.name, "docs/llms.txt"))) return []
+  return [`packages/${name} packs no docs/llms.txt. Run \`pnpm docs:packages\`.`]
 }
 
 // Each `@ui-sdk` package the packed manifest lists as a dependency, which
