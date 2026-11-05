@@ -138,6 +138,13 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
       ...disabledAttrs(state),
       "data-empty": state.value === null && !isPartial(state) ? "" : undefined,
     }),
+    on: {
+      // Keeps focus in the field until the click below picks a segment.
+      mousedown(event, { api }) {
+        if (api.internal.nearestSegment(event)) event.preventDefault()
+      },
+      click: (event, { api }) => api.internal.nearestSegment(event)?.focus({ preventScroll: true }),
+    },
     bind(el, { api, store }) {
       // A native segment carries the input's problems, unless the root reports them itself.
       let carrier: HTMLInputElement | undefined

@@ -414,6 +414,21 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
     target?.el.focus()
   }
 
+  // A press on the box around the segments, or on the text between them, goes
+  // to the nearest segment, so the whole field takes a tap like a native one.
+  function nearestSegment(event: MouseEvent) {
+    const list = segmentElements()
+    if (!editable() || list.some(({ el }) => el.contains(event.target as Node))) return
+    const distance = (el: HTMLElement) => {
+      const { left, right } = el.getBoundingClientRect()
+      return Math.max(left - event.clientX, event.clientX - right, 0)
+    }
+    return list.reduce<HTMLElement | undefined>(
+      (best, { el }) => (!best || distance(el) < distance(best) ? el : best),
+      undefined,
+    )
+  }
+
   function blur(event?: Event) {
     advancedTo = null
     finish(event)
@@ -446,6 +461,7 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
       reset,
       restore,
       segmentElement,
+      nearestSegment,
       firstSegment: () => segmentElements()[0]?.el as HTMLInputElement | undefined,
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
       bindRoot(el: HTMLElement) {

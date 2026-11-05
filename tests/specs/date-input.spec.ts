@@ -27,6 +27,18 @@ test("typing fills each segment, moves on and reports the date once", async ({ p
   await expect.poll(() => lastAction(page)).toBe(dateInputAction.change("date", "2026-11-04", "input-change"))
 })
 
+test("a press on the box or between segments focuses the nearest segment", async ({ page, open }) => {
+  await open("date-input", { date: "2026-11-02" })
+  const box = (await group(page).boundingBox())!
+  await page.mouse.click(box.x + 2, box.y + box.height / 2)
+  await expect(segment(page, "month")).toBeFocused()
+  const day = (await segment(page, "day").boundingBox())!
+  await page.mouse.click(day.x + day.width / 2, box.y + 1)
+  await expect(segment(page, "day")).toBeFocused()
+  await page.mouse.click(box.x + box.width - 2, box.y + box.height / 2)
+  await expect(segment(page, "year")).toBeFocused()
+})
+
 test("a digit that can't start a longer number moves on at once", async ({ page, open }) => {
   await open("date-input")
   await segment(page, "month").click()

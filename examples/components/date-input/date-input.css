@@ -11,6 +11,10 @@
   [data-slot="field-root"]:has(> :is([data-slot="date-input-root"], [data-slot="time-input-root"])) {
     width: max-content;
     max-width: 20rem;
+
+    & > [data-slot="field-description"] {
+      contain: inline-size;
+    }
   }
 
   /* Stacks of date and time fields shrink to their fields, so they stay centered. */
