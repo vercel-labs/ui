@@ -4,9 +4,8 @@ import { cn } from "cn"
 import type * as PageTree from "fumadocs-core/page-tree"
 import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-core/toc"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import * as React from "react"
-import { useActiveTree } from "./section-nav"
+import { useActiveTree, useCurrentUrl } from "./section-nav"
 
 function Sidebar({
   tree,
@@ -18,11 +17,12 @@ function Sidebar({
   tocs: Record<string, TableOfContents>
 }) {
   const active = useActiveTree(tree, componentsTree) ?? tree
+  const current = useCurrentUrl(active)
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-6 pe-4 pb-8 scrollbar-none">
         <nav aria-label="Docs">
-          <Nodes nodes={active.children} tocs={tocs} />
+          <Nodes nodes={active.children} tocs={tocs} current={current} />
         </nav>
       </div>
     </div>
@@ -31,7 +31,15 @@ function Sidebar({
 
 const groupLabel = "mb-2 text-xs font-medium text-foreground"
 
-function Nodes({ nodes, tocs }: { nodes: PageTree.Node[]; tocs: Record<string, TableOfContents> }) {
+function Nodes({
+  nodes,
+  tocs,
+  current,
+}: {
+  nodes: PageTree.Node[]
+  tocs: Record<string, TableOfContents>
+  current?: string
+}) {
   return (
     <ul className="flex flex-col">
       {nodes.map((node, index) => {
@@ -44,12 +52,12 @@ function Nodes({ nodes, tocs }: { nodes: PageTree.Node[]; tocs: Record<string, T
         if (node.type === "folder")
           return (
             <li key={index}>
-              <Folder folder={node} tocs={tocs} />
+              <Folder folder={node} tocs={tocs} current={current} />
             </li>
           )
         return (
           <li key={node.url}>
-            <PageLink page={node} toc={tocs[node.url]} />
+            <PageLink page={node} toc={tocs[node.url]} active={node.url === current} />
           </li>
         )
       })}
@@ -57,14 +65,21 @@ function Nodes({ nodes, tocs }: { nodes: PageTree.Node[]; tocs: Record<string, T
   )
 }
 
-function Folder({ folder, tocs }: { folder: PageTree.Folder; tocs: Record<string, TableOfContents> }) {
-  const pathname = usePathname()
+function Folder({
+  folder,
+  tocs,
+  current,
+}: {
+  folder: PageTree.Folder
+  tocs: Record<string, TableOfContents>
+  current?: string
+}) {
   return (
     <div className="mt-8">
       {folder.index ? (
         <Link
           href={folder.index.url}
-          aria-current={folder.index.url === pathname ? "page" : undefined}
+          aria-current={folder.index.url === current ? "page" : undefined}
           className={cn(
             groupLabel,
             "block w-fit rounded-md underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/30",
@@ -75,14 +90,12 @@ function Folder({ folder, tocs }: { folder: PageTree.Folder; tocs: Record<string
       ) : (
         <div className={groupLabel}>{folder.name}</div>
       )}
-      <Nodes nodes={folder.children} tocs={tocs} />
+      <Nodes nodes={folder.children} tocs={tocs} current={current} />
     </div>
   )
 }
 
-function PageLink({ page, toc }: { page: PageTree.Item; toc?: TableOfContents }) {
-  const pathname = usePathname()
-  const active = page.url === pathname
+function PageLink({ page, toc, active }: { page: PageTree.Item; toc?: TableOfContents; active: boolean }) {
   const items = toc?.filter((item) => item.depth <= 2) ?? []
 
   return (
