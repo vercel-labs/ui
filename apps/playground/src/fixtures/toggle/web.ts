@@ -10,13 +10,13 @@ const toggles = (items: ToggleFixtureItem[]) =>
     )
     .join("")
 
-function markup(alignment: string[]) {
+function markup() {
   const { form, docs } = toggleFixture
   return `
     <div class="fixture">
       <button>Before</button>
       <ui-toggle id="bookmark"><button class="toggle">${toggleFixture.toggle.label}</button></ui-toggle>
-      <ui-toggle-group class="toggle-group" name="alignment" aria-label="${toggleFixture.alignment.label}" default-value="${alignment}">
+      <ui-toggle-group class="toggle-group" name="alignment" aria-label="${toggleFixture.alignment.label}">
         ${toggles(toggleFixture.alignment.items)}
       </ui-toggle-group>
       <ui-separator class="rule" orientation="vertical"></ui-separator>
@@ -59,7 +59,7 @@ function gate() {
 
 async function mount(root: HTMLElement) {
   const { cancel, defaultPressed, disabled, alignment, orientation, deselectable, loop } = toggleOptions()
-  root.innerHTML = markup(alignment ? [alignment] : toggleFixture.alignment.defaultValue)
+  root.innerHTML = markup()
   const output = root.querySelector('output[aria-label="Last action"]')!
   const say = (text: string) => (output.textContent = text)
 
@@ -70,6 +70,10 @@ async function mount(root: HTMLElement) {
     if (!deselectable) group.setAttribute("deselectable", "false")
     if (!loop) group.setAttribute("loop", "false")
   }
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  root
+    .querySelector('[name="alignment"]')!
+    .setAttribute("default-value", alignment || toggleFixture.alignment.defaultValue.join(","))
   const formatting = root.querySelector<UiToggleGroupElement>('[name="formatting"]')!
   if (disabled) formatting.setAttribute("disabled", "")
 

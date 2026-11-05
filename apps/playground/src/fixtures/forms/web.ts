@@ -40,7 +40,7 @@ function markup(options: ReturnType<typeof formsOptions>) {
 
         <ui-field>
           <ui-field-label>${f.plan.label}</ui-field-label>
-          <ui-radio-group class="form" name="${f.plan.name}" required${options.plan ? ` default-value="${options.plan}"` : ""}${attr("read-only", options.readOnly)}${attr("disabled", options.disabled)}${options.loop === false ? ` loop="false"` : ""}>
+          <ui-radio-group class="form" name="${f.plan.name}" required${attr("read-only", options.readOnly)}${attr("disabled", options.disabled)}${options.loop === false ? ` loop="false"` : ""}>
             ${f.plan.items
               .map(
                 (item) =>
@@ -90,7 +90,12 @@ ${
 
 async function mount(root: HTMLElement) {
   const options = formsOptions()
-  root.innerHTML = markup(options)
+  const template = document.createElement("template")
+  template.innerHTML = markup(options)
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  if (options.plan)
+    template.content.querySelector("ui-radio-group")!.setAttribute("default-value", options.plan)
+  root.replaceChildren(template.content)
   await import("@ui-sdk/web/checkbox")
   await import("@ui-sdk/web/switch")
   await import("@ui-sdk/web/radio")

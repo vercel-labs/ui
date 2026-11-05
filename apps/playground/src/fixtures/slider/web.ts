@@ -2,10 +2,8 @@ import { serialize, sliderFixture as f, sliderOptions } from "tests/fixtures/sli
 
 function markup(options: ReturnType<typeof sliderOptions>) {
   const shared = [
-    options.orientation && ` orientation="${options.orientation}"`,
     options.disabled && " disabled",
     options.largeStep !== undefined && ` large-step="${options.largeStep}"`,
-    options.locale && ` locale="${options.locale}"`,
   ]
     .filter(Boolean)
     .join("")
@@ -59,7 +57,14 @@ function markup(options: ReturnType<typeof sliderOptions>) {
 
 async function mount(root: HTMLElement) {
   const options = sliderOptions()
-  root.innerHTML = markup(options)
+  const template = document.createElement("template")
+  template.innerHTML = markup(options)
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  for (const slider of template.content.querySelectorAll("ui-slider")) {
+    if (options.orientation) slider.setAttribute("orientation", options.orientation)
+    if (options.locale) slider.setAttribute("locale", options.locale)
+  }
+  root.replaceChildren(template.content)
   // Rich options are properties, set before the elements upgrade.
   const volume = root.querySelector("#volume") as HTMLElement & { format?: unknown }
   const price = root.querySelector("#price") as HTMLElement & { format?: unknown }

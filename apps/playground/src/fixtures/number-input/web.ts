@@ -5,7 +5,6 @@ function markup(options: ReturnType<typeof numberInputOptions>) {
     options.wheel && " wheel",
     options.disabled && " disabled",
     options.readOnly && " read-only",
-    ` locale="${options.locale}"`,
   ]
     .filter(Boolean)
     .join("")
@@ -56,7 +55,12 @@ function markup(options: ReturnType<typeof numberInputOptions>) {
 
 async function mount(root: HTMLElement) {
   const options = numberInputOptions()
-  root.innerHTML = markup(options)
+  const template = document.createElement("template")
+  template.innerHTML = markup(options)
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  for (const input of template.content.querySelectorAll("ui-number-input"))
+    input.setAttribute("locale", options.locale)
+  root.replaceChildren(template.content)
   // Rich options are properties, set before the elements upgrade.
   const amount = root.querySelector("#amount") as HTMLElement & { format?: Intl.NumberFormatOptions }
   amount.format = { style: "currency", currency: f.amount.currency }
