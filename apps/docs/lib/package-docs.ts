@@ -101,7 +101,7 @@ The ui-sdk docs for the framework-free core, as Markdown, for the release this p
 ${llms}${shared}
 ## Skills
 
-- [ui-sdk-create-component](../skills/ui-sdk-create-component/SKILL.md): builds a component ui-sdk doesn't ship, from the behaviors in this package.
+- [ui-sdk](../skills/ui-sdk/SKILL.md): builds interfaces with ui-sdk, components it doesn't ship from the behaviors in this package, agent support and tests.
 `
   const list = (folder: string) =>
     frameworkFiles(framework)

@@ -1,0 +1,167 @@
+# Build an interface from ui-sdk components
+
+## 1. Find the components
+
+Read `node_modules/@ui-sdk/<framework>/docs/llms.txt` for the list, then pick from this table. Read each picked component's page, `docs/components/<name>.md`, before writing it: its Composition shows the parts and how they nest, and its API lists props, state attributes and change reasons.
+
+| The person needs to                                  | Use                                                                      |
+| ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| Run an action                                        | Button                                                                   |
+| Turn a setting on or off                             | Switch                                                                   |
+| Keep a button pressed, or a group of pressed buttons | Toggle                                                                   |
+| Choose one or more independent options               | Checkbox                                                                 |
+| Choose one of a few options, all visible             | Radio, or Segmented Control for a compact row                            |
+| Choose one or several from a popup list              | Select                                                                   |
+| Choose from an always-visible list                   | Listbox                                                                  |
+| Search a list and choose one or several              | Combobox                                                                 |
+| Type free text with suggestions                      | Autocomplete                                                             |
+| Search and run commands                              | Command                                                                  |
+| Mention or tag with @, / or # while typing           | Trigger Menu                                                             |
+| Mix text with tokens for people, files or tags       | Token Input                                                              |
+| Enter text                                           | Input, or Textarea for several lines                                     |
+| Enter a number                                       | Number Input                                                             |
+| Enter a password                                     | Password Input                                                           |
+| Enter a one-time code                                | OTP Input                                                                |
+| Enter a date                                         | Date Input, or Date Picker with a calendar                               |
+| Pick dates from a month grid                         | Calendar                                                                 |
+| Enter a time                                         | Time Input                                                               |
+| Pick a number or range by dragging                   | Slider                                                                   |
+| Pick a score                                         | Rating                                                                   |
+| Pick a color                                         | Color Picker                                                             |
+| Choose, drop or paste files                          | File Input                                                               |
+| Crop an image                                        | Image Cropper                                                            |
+| Label a control, with a description and errors       | Field, with Label                                                        |
+| Confirm before an action                             | Alert Dialog (`AlertDialogClose value="confirm"` is the agreeing answer) |
+| Do a focused task over the page                      | Dialog, or Drawer from an edge                                           |
+| Edit or explore something beside its trigger         | Popover                                                                  |
+| Choose actions from a button or a right click        | Menu                                                                     |
+| An application menu bar                              | Menubar                                                                  |
+| Group buttons and toggles with one tab stop          | Toolbar                                                                  |
+| Name a control or add a short hint                   | Tooltip                                                                  |
+| Preview a link                                       | Hover Card                                                               |
+| Site navigation with panels                          | Navigation Menu                                                          |
+| Switch between panels                                | Tabs                                                                     |
+| Show and hide sections                               | Accordion, or Collapsible for one                                        |
+| Browse a hierarchy                                   | Tree                                                                     |
+| Page through results                                 | Pagination                                                               |
+| Page through slides                                  | Carousel                                                                 |
+| Resizable panels                                     | Resizable                                                                |
+| Styled scrolling                                     | Scroll Area                                                              |
+| Notifications                                        | Toast                                                                    |
+| Progress of a task                                   | Progress                                                                 |
+| A measurement in a range                             | Meter                                                                    |
+| A user's image with a fallback                       | Avatar                                                                   |
+| Divide content                                       | Separator                                                                |
+
+If nothing fits, build that one piece with [create-component.md](create-component.md). Don't hand-roll it in markup.
+
+## 2. Put the parts together
+
+- Nest the parts as the page's Composition shows. Roots like `Popover` share state without rendering an element; others like `Tabs` render one.
+- Use `render` to change a part's element, like a menu item that's a link. A custom component passed to `render` must forward its props and ref.
+- For content that depends on state, pass a function as `children` (React, Solid), or use the slot props the page shows.
+- Options from data: most list components take `items`, as strings or `{ value, label }` objects.
+- To change a component from outside its tree, use its controller (see the Controllers page).
+
+## 3. State
+
+Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, `defaultPressed`). Control it only when the app needs the value:
+
+| Framework      | Controlled value                                     | Change callback                         |
+| -------------- | ---------------------------------------------------- | --------------------------------------- |
+| React          | `value={value} onValueChange={setValue}`             | `onValueChange(value, details)`         |
+| Vue            | `v-model="value"`, or `v-model:open` for another key | `@value-change="(value, details) => …"` |
+| Svelte         | `bind:value` on `$state`                             | `onValueChange(value, details)`         |
+| Solid          | `value={value()} onValueChange={setValue}`           | `onValueChange(value, details)`         |
+| Web components | `element.value = …`                                  | `valuechange` event, `event.detail`     |
+
+`details.reason` says what asked for the change (`outside-press`, `escape-key`, `item-press`…), `details.source` says how (`keyboard`, `mouse`, `agent`…), and `details.cancel()` refuses it. In web components, call `event.preventDefault()` instead. Select, Tabs and Radio report `null` when nothing is selected; multiple Select and Combobox use arrays.
+
+## 4. Forms
+
+- Give a control a `name` and it submits with its form, Select and Combobox included.
+- Wrap controls in `Field` with `FieldLabel`, `FieldDescription` and `FieldError`. `FieldControl` is a native input. A Checkbox, Switch, Radio Group or Select inside a Field takes its place and uses the Field's label; the Field page shows how each connects.
+- `required`, `disabled`, `readOnly` and `form` work like native ones. For a server error, pass `invalid` to the Field and show the message in `FieldError`.
+
+## 5. Styles
+
+- Every part has `data-slot`. State shows as attributes like `data-open`, `data-pressed`, `data-disabled`, `data-side="top"`. Each component page lists its attributes and CSS variables.
+- Tailwind: `data-pressed:bg-neutral-100`. CSS: `[data-slot="select-trigger"][data-open]`.
+- Popups get `data-starting-style` before they enter and `data-ending-style` while they exit, and stay mounted until the exit finishes. Put exit styles on `data-ending-style`.
+- Popups expose `--anchor-width`, `--available-height` and `--transform-origin`.
+- `@layer ui-sdk;` goes at the top of the global stylesheet so your styles win.
+
+## 6. Framework rules
+
+**React.** Components work in server components; their modules already say `"use client"`. Your own file needs `"use client"` when it uses state, effects or event handlers, or calls `createParts`.
+
+**Vue.** Props and events are kebab-case in templates (`default-value`, `@open-change`). Use `v-model` for the main value.
+
+**Svelte.** Use `bind:` for values the parent keeps. Share state between components through `setContext` and `getContext`, created in a parent. Never put `$state` at module level: on the server it's shared across every request.
+
+**Solid.** Keep reads reactive: read signals and props in JSX or a getter, never save their value in a variable first. `@ui-sdk/solid` needs Solid 2.
+
+**Web components.** `import "@ui-sdk/web/<name>"` defines its elements, like `<ui-select>`. Many parts wrap a native element you write, like `<ui-toggle><button>Bold</button></ui-toggle>`. Read and set state through properties after the element upgrades (`await customElements.whenDefined("ui-select")`). Change events are lowercase (`valuechange`, `openchange`) and don't bubble: listen on the element, or with `{ capture: true }` on an ancestor. [web-components.md](web-components.md) covers tag names and required inner markup.
+
+## 7. Example
+
+A settings form in React:
+
+```tsx
+"use client"
+
+import {
+  AlertDialog,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@ui-sdk/react/alert-dialog"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
+
+function ProjectSettings() {
+  return (
+    <form>
+      <Field name="name">
+        <FieldLabel>Project name</FieldLabel>
+        <FieldControl defaultValue="Apollo" required />
+      </Field>
+      <Field>
+        <FieldLabel>Visibility</FieldLabel>
+        <Select name="visibility" defaultValue="private">
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="private">Private</SelectItem>
+            <SelectItem value="internal">Internal</SelectItem>
+            <SelectItem value="public">Public</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
+      <Field>
+        <Switch name="digest" defaultChecked>
+          <SwitchThumb />
+        </Switch>
+        <FieldLabel>Weekly digest</FieldLabel>
+      </Field>
+      <AlertDialog>
+        <AlertDialogTrigger data-agent-confirm="Deletes the project and all its data">
+          Delete project
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogTitle>Delete Apollo?</AlertDialogTitle>
+          <AlertDialogClose>Cancel</AlertDialogClose>
+          <AlertDialogClose value="confirm">Delete</AlertDialogClose>
+        </AlertDialogContent>
+      </AlertDialog>
+    </form>
+  )
+}
+
+export { ProjectSettings }
+```
+
+Check each part name against the component pages; they're the source of truth.

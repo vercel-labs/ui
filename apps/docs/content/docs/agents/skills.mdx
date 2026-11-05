@@ -3,24 +3,24 @@ title: Skills
 description: Help your agent build custom components with @ui-sdk/core.
 ---
 
-`ui-sdk-create-component` helps your agent build a component ui-sdk doesn't ship, such as a rating, a stepper, or an emoji picker.
+`ui-sdk` helps your agent build a component ui-sdk doesn't ship, such as a rating, a stepper, or an emoji picker.
 
 ## Install the Skill
 
 If your agent supports skills, install it with:
 
 ```bash
-npx skills add vercel-labs/ui --skill ui-sdk-create-component
+npx skills add vercel-labs/ui --skill ui-sdk
 ```
 
-The skill also ships inside `@ui-sdk/core`, at `node_modules/@ui-sdk/core/skills/ui-sdk-create-component/SKILL.md`. That copy always matches the version you installed. If your agent doesn't support skills, point it there instead.
+The skill also ships inside `@ui-sdk/core`, at `node_modules/@ui-sdk/core/skills/ui-sdk/SKILL.md`. That copy always matches the version you installed. If your agent doesn't support skills, point it there instead.
 
 ## Use the Skill
 
 Mention the skill, your framework, and the interaction you want:
 
 ```text
-Use ui-sdk-create-component to build a five-star rating in React.
+Use ui-sdk to build a five-star rating in React.
 Arrow keys should move between stars and choose a rating.
 Use our existing styles and test the keyboard behavior.
 ```

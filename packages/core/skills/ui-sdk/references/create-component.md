@@ -1,15 +1,10 @@
----
-name: ui-sdk-create-component
-description: Builds a headless component ui-sdk doesn't ship, from the public @ui-sdk/core kit, and renders it in React, Vue, Svelte, Solid or web components. Use when asked for a component, widget or control that no @ui-sdk package exports, like a rating, stepper, data grid, transfer list, emoji picker or splitter, or one that extends ours, like an input that clears on Escape.
----
-
 # Build a component from @ui-sdk/core
 
 ui-sdk ships its behavior layer as public API. A component it doesn't have is one primitive, written once with `definePrimitive`, and one small file per framework that renders it. It gets the same keyboard handling, focus, server rendering and right to left layout as ui-sdk's own components.
 
 ## Read first
 
-1. **The Core docs.** Every package ships them in `docs/`: `docs/core.md` is the whole Core section in one file, the same in every package, since no framework changes it. Each framework's package adds `docs/rendering.md`, how its adapter renders a primitive, and `docs/components/<name>.md` and `docs/utilities/<name>.md` (React's are `docs/hooks/<name>.md`) for the rest. Read `docs/core.md` and `docs/rendering.md` from the package of the framework you render in, like `node_modules/@ui-sdk/react/docs/`. A `core.md` in the project, if there is one, wins. Read the overview, "Build a component" (a star rating, the template to copy), "Popups and layers" under Behaviors if anything opens, and the Behaviors page for each one you use. For another framework, see [Other frameworks](#other-frameworks).
+1. **The Core docs.** Every package ships them in `docs/`: `docs/core.md` is the whole Core section in one file, the same in every package, since no framework changes it. Each framework's package adds `docs/rendering.md`, how its adapter renders a primitive, and `docs/components/<name>.md` and `docs/utilities/<name>.md` (React's are `docs/hooks/<name>.md`) for the rest. Read `docs/core.md` and `docs/rendering.md` from the package of the framework you render in, like `node_modules/@ui-sdk/react/docs/`. A `core.md` in the project, if there is one, wins. In `core.md`, read the overview, "Build a component" (a star rating, the template to copy), "Popups and layers" under Behaviors if anything opens, and the Behaviors page for each one you use. Search it by heading rather than reading it top to bottom. For another framework, see [Other frameworks](#other-frameworks).
 2. **The types.** Every export has JSDoc in `node_modules/@ui-sdk/core/dist/**/*.d.ts` and in each framework's `.d.ts`. A component entry's types point into its folder, like `dist/components/input/input.d.ts`. Read them there.
 3. **What ui-sdk already has.** List the entries in `node_modules/@ui-sdk/<framework>/package.json`. If one covers part of what you're building, compose it (see [Compose ours](#compose-ours)) rather than rewriting its behavior. If the user named the blocks to use, like "this tests `createSelection`", build from those blocks and record in GAPS.md that composing was possible.
 
@@ -20,7 +15,7 @@ Don't read compiled JavaScript in `dist/*.js`. When the docs and types don't say
 Write a throwaway test that renders our component in jsdom, fires events, and logs the DOM and the callbacks' arguments. Run it with `--silent=false` to see the logs, then delete it. This is how to learn, for example, whether a part hides when it's empty, which reason a change reports, where focus goes, or which tag names a web components entry defines. Two things every probe needs:
 
 - **Wait a tick after mounting.** Some state, like an input group's `filled`, arrives after mount: `await act(() => new Promise((r) => setTimeout(r, 0)))`.
-- **Stub what jsdom lacks before anything opens:** see the stubs on the Primitives page's Testing section (popover API, `getAnimations`, a `[popover]` display rule).
+- **Stub what jsdom lacks before anything opens:** see [testing.md](testing.md#jsdom).
 
 ## Steps
 
@@ -35,6 +30,7 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 - **Declare it on the slots.** Each part's role goes on its slot (`role: "option"`), never in `attrs`. TypeScript then requires what the role needs: `focus` for roles that take it, `press` for roles that activate, `keys` with an `on.keydown` for roles that move with keys, or `{ none: "why" }` when another element does it. Its `attrs` returns the role's required states, like `aria-checked`, and only the ARIA the role takes. Don't cast past these errors; set `globalThis.__UI_SDK_STRICT__ = true` in tests so development warnings fail them.
 - **Controls that stop applying.** A button that can't act right now should be `aria-disabled`, not `disabled`, if it may hold focus at the time. `disabled` drops focus to the page.
 - **Keys with no APG rule.** Like Enter to move items between lists. Pick one and document it on the api.
+- **What an agent may call.** Which api methods are actions a person takes, like `rate` or `moveToTarget`? They go in `agent.actions` (step 2).
 
 ### 2. Write the primitive in `<name>.ts`
 
@@ -46,22 +42,23 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 - **Slots:** `attrs` for ARIA and `data-*` (pure, server safe), `press` for activation, `on` for other events, `bind` for anything that touches the DOM (return a cleanup).
 - **`press` hears only clicks on parts that aren't buttons.** For a `div` or `td` part, handle Space and Enter in `on.keydown`.
 - **Every element gets its `data-slot` from a slot.** Don't write one by hand in the adapter. Wrappers, like a row of buttons, get a slot of their own.
-- **Agents:** end the definition with `agent: { actions: [...] }`, the api methods an agent may call, so `@ui-sdk/core/agent` can drive it. Add `closed: true` when its value is always one of its items. Keep it after `slots`.
+- **Agents:** end the definition with `agent: { actions: [...] }`, the api methods an agent may call. Keep it after `slots`. [agent-ready.md](agent-ready.md) covers `closed`, `items`, `reveals`, `shown` and `secret`.
 
 ### 3. Use the blocks, don't rewrite them
 
-`createRovingFocus` for one tab stop and arrow keys (`move` for grids and trees), `createSelection`, `createTypeahead`, `createFocusRecovery`, `bindPanel`, `announce` for screen reader messages, `createReorder` for reordering by drag and keyboard, `bindDrag` for a drag of your own, `elements`, `selects`, `isRTL`, `idPart`, `@ui-sdk/core/text-match`, `@ui-sdk/core/date`, `createTreeCollection`. The Behaviors page's "Which behavior for which job" tables map jobs to them, with a demo for each. [references/patterns.md](references/patterns.md) has tested snippets for what the blocks leave to you: grid `move`, derived state, internal selection, a `createFocusRecovery` fallback, and more.
+`createRovingFocus` for one tab stop and arrow keys (`move` for grids and trees), `createSelection`, `createTypeahead`, `createFocusRecovery`, `bindPanel`, `announce` for screen reader messages, `createReorder` for reordering by drag and keyboard, `bindDrag` for a drag of your own, `createPopup` with `popupState`, `popupTrigger` and `popupContent` for anything that opens, `elements`, `selects`, `isRTL`, `idPart`, `@ui-sdk/core/text-match`, `@ui-sdk/core/date`, `createTreeCollection`. The Behaviors page's "Which behavior for which job" tables map jobs to them, with a demo for each. [patterns.md](patterns.md) has tested snippets for what the blocks leave to you: grid `move`, derived state, internal selection, a `createFocusRecovery` fallback, and more.
+
+### A new behavior
+
+When the same interaction repeats across several components, like a "press and hold to repeat" or a "drag to select a range", write it once as a behavior shaped like ours instead of copying it into each primitive: a `create<Thing>(context, options)` function that returns what the api needs, and binds to elements through a slot's `bind` with a cleanup. Read two of ours on the Behaviors pages first and copy their shape: options in, an object of methods and slot pieces out, no framework code. Give it its own tests with `mount`.
 
 ### 4. Render it
 
-`createParts(primitive, { root: "div", item: "div" })` from `@ui-sdk/<framework>/primitive` returns `Root` and one part per tagged slot, typed from the primitive (`@ui-sdk/web` has `createParts`). Write a part by hand with `usePart` only when it renders something of its own, like a list from data, and a root with `usePrimitive`. The adapter only renders: no key handlers, focus moves, ARIA or `data-slot` in it.
+`createParts(primitive, { root: "div", item: "div" })` from `@ui-sdk/<framework>/primitive` returns `Root` and one part per tagged slot, typed from the primitive (`@ui-sdk/web` has `createParts`). Write a part by hand with `usePart` only when it renders something of its own, like a list from data, and a root with `usePrimitive`. The adapter only renders: no key handlers, focus moves, ARIA or `data-slot` in it. In React, the file that calls `createParts` starts with `"use client"`.
 
-### 5. Test it
+### 5. Make it agent-ready and test it
 
-- **Prove it with the testing kit.** `mount(primitive, options, markup)` from `@ui-sdk/core/testing` renders every slot from markup whose tags are slot names, with no framework, in jsdom. `keys("Tab", "ArrowDown")`, `type`, `click` and `drag` send what a browser sends, Tab included, and `changes` and `announced` show what changed, why, from which input, and what screen readers heard.
-- **The primitive, without a DOM:** `instance.get()`, the api, and `partAttrs` and `partState` from `@ui-sdk/core/testing` on `instance.part(slot, props)`. Check server markup has exactly one tab stop in each collection. Stand in for events with plain objects, since node has no `MouseEvent`: `({ shiftKey: true }) as unknown as MouseEvent`.
-- **Mutation-check.** For each key behavior, break it on purpose (return early, skip a call), run the tests, confirm one fails, then restore the file. A test that still passes is testing nothing.
-- **Check it in a real browser** for what jsdom can't show: a key that moves focus so the typed character lands in another field, typeahead timing, layout, top layer popups. A browser tool's "type" may insert text without key events, so press real keys to test keyboard handling.
+Follow [agent-ready.md](agent-ready.md), then [testing.md](testing.md). The mutation check there is not optional for a new component.
 
 ## Compose ours
 
@@ -74,24 +71,22 @@ Never bind a slot of yours to an element one of ours already binds. In React our
 
 ## Rules
 
-- Import only `@ui-sdk/core`, `@ui-sdk/core/<entry>`, each framework's primitive entry, and component entries. Never `@ui-sdk/core/internal/*`: only this repo resolves it. A type you can see only under `dist/foundation/<layer>/*.d.ts` and not in an entry, like `fuzzyFilter` in `foundation/text/fuzzy`, isn't public: rewrite it and record it as a gap.
+- Import only `@ui-sdk/core`, `@ui-sdk/core/<entry>`, each framework's primitive entry, and component entries. Never `@ui-sdk/core/internal/*`: only the ui-sdk repo resolves it. A type you can see only under `dist/foundation/<layer>/*.d.ts` and not in an entry, like `fuzzyFilter` in `foundation/text/fuzzy`, isn't public: rewrite it and record it as a gap.
 - Key collection parts by a string `value` or `id` prop, never an index. Composite keys, like a grid cell's, join ids with a separator ids can't contain. Structural parts, like rows, need keys too.
 - Expose state as ARIA and `data-*` attributes, never inline styles.
 - No direction provider: read `isRTL(el)` when a key is pressed. `createRovingFocus` passes `rtl` to `move`.
 
 ## Other frameworks
 
-Each needs its own adapter package at the same version as `@ui-sdk/core`, from the registry in `.npmrc`. Install it if it's missing, and say so. Its `docs/rendering.md` shows how that adapter renders a primitive.
+Each needs its own adapter package at the same version as `@ui-sdk/core`. Install it if it's missing, and say so. Its `docs/rendering.md` shows how that adapter renders a primitive.
 
-**Web components** have no `primitive` entry. `createParts` comes from `@ui-sdk/web` itself. [references/web-components.md](references/web-components.md) covers what the types don't: component entries define their elements on import, how to find tag names and required inner markup, and how hidden parts differ from React.
+**Web components** have no `primitive` entry. `createParts` comes from `@ui-sdk/web` itself. [web-components.md](web-components.md) covers what the types don't: component entries define their elements on import, how to find tag names and required inner markup, and how hidden parts differ from React.
 
 ## When you're done
 
-1. **Typecheck.** If the root `tsconfig.json` has `"files": []` and `references`, `npx tsc --noEmit` checks nothing: run `npx tsc -b` or `npx tsc --noEmit -p <app config>`. Report each command you ran and its exit code.
-2. **Run the tests** and report the exit code and the count.
-3. **Write the gaps to `GAPS.md`** at the project root. Add a section per component and keep earlier runs. One line each:
-   - anything you needed that only `@ui-sdk/core/internal/*` or `dist/*.js` had;
-   - behavior you rewrote that a block should have covered, with its measured line count;
-   - docs or types that were wrong, missing or misleading, and what it cost: a failed test, a probe, a guess.
+Besides SKILL.md's checklist, add to `GAPS.md`, in a section for this component:
 
-   End with a one-line verdict on each block you used. Write "No gaps" if there were none.
+- anything you needed that only `@ui-sdk/core/internal/*` or `dist/*.js` had;
+- behavior you rewrote that a block should have covered, with its measured line count.
+
+End the section with a one-line verdict on each block you used.

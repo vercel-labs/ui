@@ -13,4 +13,4 @@ For code, write with `ui-sdk-write-code`, finish with `ui-sdk-unslop`, then run 
 
 The skills live in `.agents/skills/`, where Codex, Cursor, Gemini CLI and GitHub Copilot find them, and `.claude/skills` links to the same folder for Claude Code. Type a skill's name as a slash command, or describe the task and the skill loads on its own. In a harness that doesn't load skills, ask your agent to read the skill's `SKILL.md` and follow it.
 
-Building an app with ui-sdk rather than working on it? The skill for that is [`ui-sdk-create-component`](../../packages/core/skills/ui-sdk-create-component/SKILL.md). It builds a component ui-sdk doesn't ship from `@ui-sdk/core`.
+Building an app with ui-sdk rather than working on it? The skill for that is [`ui-sdk`](../../packages/core/skills/ui-sdk/SKILL.md). It builds a component ui-sdk doesn't ship from `@ui-sdk/core`.
