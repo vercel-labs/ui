@@ -1,6 +1,6 @@
 // A color picker's parts and their attributes. State and what the parts do
 // live in color-picker-api.ts.
-import { convertColor } from "../../foundation/color/convert"
+import { convertColor, type Color } from "../../foundation/color/convert"
 import { isInGamut } from "../../foundation/color/gamut"
 import { parseColor } from "../../foundation/color/parse"
 import { bindInternals, bindValueInput, isDisabled } from "../../foundation/forms/form"
@@ -98,20 +98,54 @@ function paintArea(canvas: HTMLCanvasElement, state: State, x: Channel, y: Chann
   if (canvas.height !== height) canvas.height = height
   const image = context.createImageData(width, height, { colorSpace: p3 ? "display-p3" : "srgb" })
   const base = { ...state.color, alpha: 1 }
+  const target = p3 ? "display-p3" : "srgb"
+  const rowColor = (row: number) => withChannel(base, y, (1 - row / (height - 1)) * y.max)
+  const colorAt = (atRow: Color, column: number) => {
+    const along = column / (width - 1)
+    return convertColor(withChannel(atRow, x, (state.rtl ? 1 - along : along) * x.max), target).coords
+  }
+  // Tighter than isInGamut, whose tolerance near black would paint a sliver
+  // of colors past the edge.
+  const fits = (coords: Color["coords"]) => {
+    for (let index = 0; index < 3; index++) {
+      const value = coords[index] ?? 0
+      if (value < -0.000001 || value > 1.000001) return false
+    }
+    return true
+  }
+  const inside = new Uint8Array(width * height)
   for (let row = 0; row < height; row++) {
-    const atRow = withChannel(base, y, (1 - row / (height - 1)) * y.max)
+    const atRow = rowColor(row)
     for (let column = 0; column < width; column++) {
-      const along = column / (width - 1)
-      const color = withChannel(atRow, x, (state.rtl ? 1 - along : along) * x.max)
-      const coords = convertColor(color, p3 ? "display-p3" : "srgb").coords
-      const at = (row * width + column) * 4
-      let inside = true
-      for (let index = 0; index < 3; index++) {
-        const value = coords[index] ?? 0
-        if (value < -0.0001 || value > 1.0001) inside = false
-        image.data[at + index] = Math.round(Math.min(1, Math.max(0, value)) * 255)
+      const coords = colorAt(atRow, column)
+      const pixel = row * width + column
+      inside[pixel] = fits(coords) ? 1 : 0
+      for (let index = 0; index < 3; index++)
+        image.data[pixel * 4 + index] = Math.round(Math.min(1, Math.max(0, coords[index] ?? 0)) * 255)
+    }
+  }
+  // The canvas is smaller than the area, so a hard edge would show as steps.
+  // A pixel on the edge is as opaque as the share of it inside.
+  const offsets = [-1 / 3, 0, 1 / 3]
+  for (let row = 0; row < height; row++) {
+    for (let column = 0; column < width; column++) {
+      const pixel = row * width + column
+      const own = inside[pixel]
+      const edge =
+        (column > 0 && inside[pixel - 1] !== own) ||
+        (column < width - 1 && inside[pixel + 1] !== own) ||
+        (row > 0 && inside[pixel - width] !== own) ||
+        (row < height - 1 && inside[pixel + width] !== own)
+      let share = own
+      if (edge) {
+        let count = 0
+        for (const down of offsets) {
+          const atRow = rowColor(row + down)
+          for (const across of offsets) count += fits(colorAt(atRow, column + across)) ? 1 : 0
+        }
+        share = count / (offsets.length * offsets.length)
       }
-      image.data[at + 3] = inside ? 255 : 0
+      image.data[pixel * 4 + 3] = Math.round(share * 255)
     }
   }
   context.putImageData(image, 0, 0)

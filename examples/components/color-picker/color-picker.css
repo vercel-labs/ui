@@ -94,6 +94,11 @@
 
   [data-slot="color-picker-slider-thumb"] {
     top: 50%;
+    translate: calc(var(--color-slider-thumb-position) * -1) -50%;
+
+    &:is([dir="rtl"], [dir="rtl"] *) {
+      translate: var(--color-slider-thumb-position) -50%;
+    }
   }
 
   :is([data-slot="color-picker-swatch"], [data-slot="color-picker-swatch-item"]) {
