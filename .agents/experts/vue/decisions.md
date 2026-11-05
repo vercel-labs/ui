@@ -7,6 +7,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 
 ## Settled
 
+- **`@ui-sdk/vue/nuxt` from the workspace needs `pnpm build` first.** Its list of entries is written by the build, and the source module reads the copy in `dist/nuxt`.
 - **`render` is the only way to render your own element**; `#render` slots hand over the part's own content as `children`. No `as`.
 - **Vue >=3.5** only.
 - **Form component dropped.**
@@ -18,7 +19,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 
 ## Known and open (don't report again, check whether fixed)
 
-- **`@ui-sdk/vue/nuxt` needs a build.** The workspace's `./nuxt` export points at `nuxt/module.ts`, which reads `entries.json` from `dist/nuxt`, so an app linking the unbuilt package can't load the module.
 - **Wide change types**: Tabs' `onValueChange` passes `string | null`, Checkbox's `boolean | "indeterminate"`.
 - **Suspense internals**: the deferral reads `instance.suspense`, which Vue's public types leave out.
 - **`bind` runs in a render**: `useConnectedPart` calls it there, so a bind must not call lifecycle hooks, `provide` or `useId`.

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs"
+import { existsSync, readFileSync } from "node:fs"
 import { addComponent, addImportsSources, defineNuxtModule } from "nuxt/kit"
 import type { NuxtModule } from "nuxt/schema"
 import { type NuxtEntry, nuxtRegistrations } from "./registrations"
@@ -28,9 +28,12 @@ const uiSdk: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOptions>({
   },
 })
 
-// The build writes it beside this module, from each entry's exports.
+// The build writes it beside the built module. An app linking the workspace
+// runs this file from `nuxt/`, so it reads the build's copy in `dist`.
 function readEntries() {
-  return JSON.parse(readFileSync(new URL("./entries.json", import.meta.url), "utf8")) as NuxtEntry[]
+  const built = new URL("./entries.json", import.meta.url)
+  const file = existsSync(built) ? built : new URL("../dist/nuxt/entries.json", import.meta.url)
+  return JSON.parse(readFileSync(file, "utf8")) as NuxtEntry[]
 }
 
 export type { ModuleOptions }
