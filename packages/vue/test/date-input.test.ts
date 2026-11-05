@@ -116,3 +116,14 @@ test("slots that render nothing fall back to the segments and their text", async
   await nextTick()
   expect(literal.querySelector('[data-type="literal"]')!.textContent).toBe("/")
 })
+
+test("the native readonly attribute keeps the date as it is", async () => {
+  const root = mount(() => h(DateInput, { defaultValue: "2026-11-02", locale: "en-US", readonly: "" }))
+  await nextTick()
+  segment(root, "month").focus()
+  document.activeElement!.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }),
+  )
+  await nextTick()
+  expect(segment(root, "month").value).toBe("11")
+})

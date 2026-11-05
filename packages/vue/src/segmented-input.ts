@@ -13,6 +13,7 @@ import { defineComponent, h, type ExtractPropTypes, type PropType, type SetupCon
 import { slotContent } from "./children"
 import { useFieldControl } from "./field-context"
 import { withElement } from "./create-parts"
+import { readOnlyOf } from "./text-control"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
 
 // Time Input's primitive has the same slots and state.
@@ -49,7 +50,7 @@ function setupRoot(
   primitive: Segmented,
   Segment: ReturnType<typeof defineSegment>,
   props: RootProps,
-  { slots, emit }: SetupContext<typeof rootEmits, PartSlots<Segmented, "root">>,
+  { attrs, slots, emit }: SetupContext<typeof rootEmits, PartSlots<Segmented, "root">>,
 ) {
   const field = useFieldControl()
   const handle = usePrimitive(primitive, () => ({
@@ -62,7 +63,7 @@ function setupRoot(
     unavailable: props.unavailable,
     locale: props.locale,
     disabled: props.disabled || field?.disabled(),
-    readOnly: props.readOnly,
+    readOnly: readOnlyOf(props, attrs),
     required: props.required,
     name: props.name ?? field?.name(),
     form: props.form,

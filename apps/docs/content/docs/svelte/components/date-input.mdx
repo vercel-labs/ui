@@ -121,11 +121,11 @@ A partly typed date stops the form too, with "Enter a valid date." Set `form` to
 
 ## Controlled
 
-Use `bind:value` to bind the value. `onValueChange` also receives the change details. It runs when a whole date forms, and with `null` when one is emptied.
+Use `bind:value` to bind the value. `onValueChange` also receives the change details. It runs when a whole date forms, and with `null` when one is emptied. A half-typed date's value is already `null`, so to empty its segments too, call `clear()` on a [controller](#controller).
 
 <ComponentExample
   name="date-input/controlled"
-  caption="Change Due date: the console logs each whole date. Clear sets the value to null and empties every segment."
+  caption="Change Due date: the console logs each whole date. Clear sets the value to null."
 />
 
 See [State and Events](../state-and-events) for the shared conventions and [Reasons](#reasons) for why each change happened.

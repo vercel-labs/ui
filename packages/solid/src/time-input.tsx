@@ -16,7 +16,7 @@ const primitive = timeInput as unknown as Segmented
  * The root: a group of segments, hours and minutes, with seconds and AM/PM
  * when shown, and the hidden input the time submits with. Without children it
  * renders every segment; its children can be a function of its state that
- * renders `state.segments`.
+ * renders `state.segments` in a keyed `<For>`.
  * @stable
  */
 function TimeInput(props: TimeInputOptions & RootProps) {

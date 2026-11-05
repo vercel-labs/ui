@@ -103,3 +103,23 @@ test("a read-only input is barred from validation, like a native one", async () 
   const flags = setValidity.mock.calls.at(-1)?.[0] ?? {}
   expect(Object.values(flags).some(Boolean)).toBe(false)
 })
+
+test("setting the value later clears a partly typed date, and an empty string clears it too", async () => {
+  mount(`<ui-date-input value="2026-11-02" locale="en-US"></ui-date-input>`)
+  await wait()
+  const root = document.querySelector<UiDateInputElement>("ui-date-input")!
+  segment("day").focus()
+  document.activeElement!.dispatchEvent(
+    new InputEvent("beforeinput", { inputType: "deleteContentForward", bubbles: true, cancelable: true }),
+  )
+  await wait()
+  root.value = null
+  await wait()
+  expect([segment("month").value, segment("day").value, segment("year").value]).toEqual(["", "", ""])
+  root.value = "2026-11-02"
+  await wait()
+  root.value = "" as never
+  await wait()
+  expect(root.value).toBe(null)
+  expect(segment("month").value).toBe("")
+})
