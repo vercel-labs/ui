@@ -9,6 +9,7 @@ import {
   NumberInputIncrement,
 } from "../src/number-input"
 import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../src/password-input"
+import { Slider, SliderControl, SliderThumb, SliderTrack } from "../src/slider"
 
 const settle = async () => {
   await nextTick()
@@ -43,6 +44,36 @@ test.each([
   expect(pointed.length).toBeGreaterThan(0)
   expect(pointed.every((target) => target === id)).toBe(true)
   expect(root.querySelector('[data-slot="field-label"]')!.getAttribute("for")).toBe(id)
+  app.unmount()
+  root.remove()
+})
+
+test.each([
+  ["a range", "one thumb", [20, 80], 30],
+  ["one thumb", "a range", 30, [20, 80]],
+])("a slider in a field switched from %s to %s points its label at an input or nowhere", async (_from, _to, before, after) => {
+  const value = ref<number | number[]>(before)
+  const thumbs = () => (Array.isArray(value.value) ? value.value : [value.value])
+  const root = document.createElement("div")
+  document.body.append(root)
+  const app = createApp(() =>
+    h(Field, null, () => [
+      h(FieldLabel, null, () => "Price"),
+      h(Slider, { modelValue: value.value }, () =>
+        h(SliderControl, null, () =>
+          h(SliderTrack, null, () => thumbs().map((_, index) => h(SliderThumb, { key: index, index }))),
+        ),
+      ),
+    ]),
+  )
+  app.mount(root)
+  await settle()
+  value.value = after
+  await settle()
+  const target = root.querySelector('[data-slot="field-label"]')!.getAttribute("for")
+  if (target !== null) expect(document.getElementById(target)?.tagName).toBe("INPUT")
+  const ids = [...root.querySelectorAll("[id]")].map((el) => el.id)
+  expect(new Set(ids).size).toBe(ids.length)
   app.unmount()
   root.remove()
 })
