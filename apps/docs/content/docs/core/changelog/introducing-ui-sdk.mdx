@@ -1,6 +1,6 @@
 ---
 title: Introducing UI SDK
-description: The pieces that make an interface work, for you and your agents.
+description: A library of behaviors to build your components. Made for agents.
 date: "2026-11-10"
 ---
 
@@ -193,6 +193,10 @@ function Example() {
 <FrameworkTab value="web-components">
 
 ```html title="pages/index.html"
+<script type="module">
+  import "@/components/ui/share"
+</script>
+
 <share-popover>
   <share-trigger><button>Share</button></share-trigger>
   <share-content>Anyone with the link can view.</share-content>
