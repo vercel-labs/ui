@@ -26,11 +26,11 @@
     "./dialog": "./src/dialog.ts",
     "./drawer": "./src/drawer.ts",
     "./field": "./src/field.ts",
-    "./label": "./src/label.ts",
     "./file-input": "./src/file-input.ts",
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.ts",
     "./input": "./src/input.ts",
+    "./label": "./src/label.ts",
     "./listbox": "./src/listbox.ts",
     "./menu": "./src/menu.ts",
     "./menubar": "./src/menubar.ts",
@@ -166,11 +166,6 @@
         "svelte": "./dist/field.js",
         "default": "./dist/field.js"
       },
-      "./label": {
-        "types": "./dist/label.d.ts",
-        "svelte": "./dist/label.js",
-        "default": "./dist/label.js"
-      },
       "./file-input": {
         "types": "./dist/file-input.d.ts",
         "svelte": "./dist/file-input.js",
@@ -190,6 +185,11 @@
         "types": "./dist/input.d.ts",
         "svelte": "./dist/input.js",
         "default": "./dist/input.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "svelte": "./dist/label.js",
+        "default": "./dist/label.js"
       },
       "./listbox": {
         "types": "./dist/listbox.d.ts",

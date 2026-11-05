@@ -23,11 +23,11 @@
     "./dialog": "./src/dialog.ts",
     "./drawer": "./src/drawer.ts",
     "./field": "./src/field.ts",
-    "./label": "./src/label.ts",
     "./file-input": "./src/file-input.ts",
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.ts",
     "./input": "./src/input.ts",
+    "./label": "./src/label.ts",
     "./listbox": "./src/listbox.ts",
     "./tree": "./src/tree.ts",
     "./menu": "./src/menu.ts",
@@ -146,10 +146,6 @@
         "types": "./dist/field.d.ts",
         "default": "./dist/field.js"
       },
-      "./label": {
-        "types": "./dist/label.d.ts",
-        "default": "./dist/label.js"
-      },
       "./file-input": {
         "types": "./dist/file-input.d.ts",
         "default": "./dist/file-input.js"
@@ -165,6 +161,10 @@
       "./input": {
         "types": "./dist/input.d.ts",
         "default": "./dist/input.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "default": "./dist/label.js"
       },
       "./listbox": {
         "types": "./dist/listbox.d.ts",
