@@ -81,10 +81,19 @@ function initialState(options: ImageCropperOptions): State {
   }
 }
 
+// Handing the same crop over twice must not read as a change, which would render again.
+const completed = new WeakMap<ImageCrop, Crop>()
+
+function completeOnce(crop: ImageCrop) {
+  let full = completed.get(crop)
+  if (!full) completed.set(crop, (full = complete(crop)))
+  return full
+}
+
 function syncState(options: ImageCropperOptions) {
   return {
     ...settings(options),
-    ...(options.crop === undefined ? {} : { crop: complete(options.crop) }),
+    ...(options.crop === undefined ? {} : { crop: completeOnce(options.crop) }),
   }
 }
 
