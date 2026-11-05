@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "./docs-test"
 import { frameworks } from "./docs-helpers"
 
 // Core and Agents are one section each, for every framework.

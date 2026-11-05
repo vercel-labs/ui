@@ -42,6 +42,7 @@ async function ComponentExample({
       name={name}
       src={modules?.src}
       mount={modules?.mount}
+      html={modules?.html}
       compact={compact}
       tall={tall}
       log={sources.log}

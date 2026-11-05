@@ -13,6 +13,7 @@ function ExamplePreview({
   name,
   src,
   mount,
+  html,
   compact = false,
   tall = false,
   log = false,
@@ -20,12 +21,14 @@ function ExamplePreview({
   name: string
   src?: string
   mount?: string
+  html?: string
   compact?: boolean
   tall?: boolean
   log?: boolean
 }) {
   const host = React.useRef<HTMLDivElement>(null)
   const [run, setRun] = React.useState(0)
+  const [live, setLive] = React.useState(false)
   const [entries, setEntries] = React.useState<string[]>([])
 
   // Examples log through `useLog()`; the mount turns each message into an event on the host.
@@ -68,8 +71,14 @@ function ExamplePreview({
     let cancelled = false
     Promise.all([load(src), load(mount)])
       .then(([module, framework]: [unknown, { mount: Mount }]) => {
-        if (cancelled || !host.current) return
-        cleanup = framework.mount(module, host.current)
+        const element = host.current
+        if (cancelled || !element) return
+        // Cleared in the same task the example mounts, so no frame shows an empty preview.
+        element.replaceChildren()
+        element.inert = false
+        element.removeAttribute("aria-hidden")
+        cleanup = framework.mount(module, element)
+        setLive(true)
       })
       .catch((error) => {
         if (!cancelled) console.error(`The ${name} example didn't load. Reload after a rebuild.`, error)
@@ -88,7 +97,13 @@ function ExamplePreview({
         compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
       )}
     >
-      <div ref={host} className="flex w-full max-w-full min-w-0 flex-col items-start gap-3" />
+      <div
+        ref={host}
+        inert={!live}
+        aria-hidden={!live || undefined}
+        dangerouslySetInnerHTML={html ? { __html: html } : undefined}
+        className="flex w-full max-w-full min-w-0 flex-col items-start gap-3"
+      />
     </div>
   )
   if (!log) return preview

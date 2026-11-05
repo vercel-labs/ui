@@ -5,19 +5,17 @@ import { frameworks, type Framework } from "./frameworks"
 
 type Manifest = Record<string, { file: string; name?: string; isEntry?: boolean; imports?: string[] }>
 
-const readManifest = cache(async (folder: string) => {
-  const file = path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "public/examples",
-    folder,
-    "manifest.json",
-  )
-  return JSON.parse(await readFile(file, "utf8").catch(() => "{}")) as Manifest
+const readBuilt = cache(async (folder: string, name: string) => {
+  const file = path.join(/* turbopackIgnore: true */ process.cwd(), "public/examples", folder, name)
+  return JSON.parse(await readFile(file, "utf8").catch(() => "{}"))
 })
 
 async function readExampleModules(name: string, framework: Framework) {
   const folder = frameworks[framework].example
-  const manifest = await readManifest(folder)
+  const [manifest, prerendered]: [Manifest, Record<string, string>] = await Promise.all([
+    readBuilt(folder, "manifest.json"),
+    readBuilt(folder, "prerender.json"),
+  ])
   const entries = Object.entries(manifest)
   const find = (entry: string) => entries.find(([, chunk]) => chunk.isEntry && chunk.name === entry)?.[0]
   const example = find(name)
@@ -38,6 +36,7 @@ async function readExampleModules(name: string, framework: Framework) {
     src: url(manifest[example].file),
     mount: url(manifest[mount].file),
     preload: [...files].map(url),
+    html: prerendered[name],
   }
 }
 
