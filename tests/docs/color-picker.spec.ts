@@ -4,11 +4,15 @@ import { testExamples } from "./docs-helpers"
 // Each example's check, in the order they appear on the Color Picker page.
 testExamples("color-picker", {
   basic: async (preview) => {
-    const input = preview.getByRole("textbox", { name: "Hex" })
+    const input = preview.getByRole("textbox", { name: "Color" })
     await expect(input).toHaveValue("#0ea5e9")
     await input.fill("rebeccapurple")
     await input.press("Enter")
     await expect(input).toHaveValue("#663399")
+    await preview.getByRole("combobox", { name: "Format" }).selectOption("HSL")
+    await expect(input).toHaveValue(/^hsl\(/)
+    await preview.getByRole("option", { name: "vivid red" }).click()
+    await expect(input).toHaveValue(/^hsl\(0 /)
   },
   oklch: async (preview) => {
     await expect(preview.getByRole("slider", { name: "Chroma and lightness" })).toBeVisible()
