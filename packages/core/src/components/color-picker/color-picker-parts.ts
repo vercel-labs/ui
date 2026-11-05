@@ -470,7 +470,7 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           // English by default. Pass `aria-label` in another language.
           "aria-label": color ? describeColor(color) : props.value,
           "aria-disabled": isLocked(state) ? "true" : undefined,
-          tabindex: api.internal.roving.tabIndex(state, { key, props }),
+          tabindex: isDisabled(state) ? "-1" : api.internal.roving.tabIndex(state, { key, props }),
           "data-selected": selected ? "" : undefined,
           "data-disabled": isDisabled(state) ? "" : undefined,
           "data-readonly": state.readOnly ? "" : undefined,

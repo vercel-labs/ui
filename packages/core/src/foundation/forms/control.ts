@@ -35,7 +35,11 @@ function activateControl(control: HTMLElement, event?: Event) {
   const plainButton = control instanceof HTMLButtonElement && !role
   if (checkable || plainButton || role === "radiogroup") control.click()
   // A group, like a range slider, focuses its first control.
-  else if (role === "group") control.querySelector<HTMLElement>("input:not([type='hidden'])")?.focus()
+  else if (role === "group")
+    (
+      control.querySelector<HTMLElement>("input:not([type='hidden'])") ??
+      control.querySelector<HTMLElement>('[tabindex="0"]')
+    )?.focus()
   else control.focus()
   event?.preventDefault()
 }
