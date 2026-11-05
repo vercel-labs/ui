@@ -54,6 +54,10 @@ test("an entry with no components only adds imports", () => {
   expect(importsFrom("@ui-sdk/vue/date")).toContain("parseDate")
 })
 
+test("auto-imports rank below the app's and its layers' own", () => {
+  for (const { priority } of nuxtRegistrations(entries, "").imports) expect(priority).toBeLessThan(-100)
+})
+
 test("an entry with nothing to register adds neither components nor imports", () => {
   const empty = [{ from: "@ui-sdk/vue/empty", components: [], imports: [] }]
   expect(nuxtRegistrations(empty, "")).toEqual({ components: [], imports: [] })

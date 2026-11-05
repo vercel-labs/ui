@@ -40,11 +40,11 @@ export default defineNuxtConfig({
 })
 ```
 
-Nuxt finds the module at `@ui-sdk/vue/nuxt`. It registers each part of every entry as an auto-imported component, like `<DialogTrigger>`, and auto-imports the functions those entries export, like `createDialogController`, in `<script>`. Each one is still imported from its own entry, so a page bundles only what it uses. `confirm` is left out because it would replace the browser's `confirm()` in your code, so import it from `@ui-sdk/vue/alert-dialog`.
+Nuxt finds the module at `@ui-sdk/vue/nuxt`. It registers each part of every entry as an auto-imported component, like `<DialogTrigger>`, and auto-imports their other exports, like `createDialogController`, in `<script>`. Each one is still imported from its own entry, so a page bundles only what it uses. When a name clashes, your own component or `utils/` export wins. `confirm` is left out because it would replace the browser's `confirm()` in your code, so import it from `@ui-sdk/vue/alert-dialog`.
 
 The module adds no plugin and no styles. Components render on the server and hydrate in the browser without one, so importing them from their entries, as above, works in Nuxt too.
 
-Pass `prefix` if the names clash with your own components:
+Pass `prefix` to use ui-sdk's components beside your own of the same name:
 
 ```ts title="nuxt.config.ts"
 export default defineNuxtConfig({
@@ -53,7 +53,7 @@ export default defineNuxtConfig({
 })
 ```
 
-With that prefix, `<DialogTrigger>` becomes `<UiDialogTrigger>`. Functions keep their names.
+With that prefix, `<DialogTrigger>` becomes `<UiDialogTrigger>`. Other exports keep their names.
 
 ## Add Your Styles
 

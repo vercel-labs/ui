@@ -13,7 +13,11 @@ function nuxtRegistrations(entries: NuxtEntry[], prefix: string) {
     components: entries.flatMap(({ from, components }) =>
       components.map((name) => ({ name: `${prefix}${name}`, export: name, filePath: from })),
     ),
-    imports: entries.filter(({ imports }) => imports.length).map(({ from, imports }) => ({ from, imports })),
+    // Below the app's own imports and every layer's (0, -1, -2…), so their
+    // `utils/` win over a ui-sdk name like `clamp` instead of losing silently.
+    imports: entries
+      .filter(({ imports }) => imports.length)
+      .map(({ from, imports }) => ({ from, imports, priority: Number.MIN_SAFE_INTEGER })),
   }
 }
 
