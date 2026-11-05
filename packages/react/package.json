@@ -22,6 +22,7 @@
     "./dialog": "./src/dialog.tsx",
     "./drawer": "./src/drawer.tsx",
     "./field": "./src/field.tsx",
+    "./label": "./src/label.tsx",
     "./file-input": "./src/file-input.tsx",
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.tsx",
@@ -137,6 +138,10 @@
       "./field": {
         "types": "./dist/field.d.ts",
         "default": "./dist/field.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "default": "./dist/label.js"
       },
       "./file-input": {
         "types": "./dist/file-input.d.ts",

@@ -34,6 +34,7 @@
     "./switch": "./src/components/switch/switch.ts",
     "./radio": "./src/components/radio/radio.ts",
     "./field": "./src/components/field/field.ts",
+    "./label": "./src/components/label/label.ts",
     "./button": "./src/components/button/button.ts",
     "./toggle": "./src/components/toggle/toggle.ts",
     "./toolbar": "./src/components/toolbar/toolbar.ts",
@@ -181,6 +182,10 @@
       "./field": {
         "types": "./dist/components/field/field.d.ts",
         "default": "./dist/components/field/field.js"
+      },
+      "./label": {
+        "types": "./dist/components/label/label.d.ts",
+        "default": "./dist/components/label/label.js"
       },
       "./button": {
         "types": "./dist/components/button/button.d.ts",

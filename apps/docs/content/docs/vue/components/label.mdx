@@ -1,0 +1,113 @@
+---
+title: Label
+description: Name any control with a label, and let a press on the label reach it.
+---
+
+A plain `<label>` only reaches inputs, buttons and selects. Label names any control by its `for`, including a radio group or a slider, and a press on the label moves focus into it.
+
+<ComponentExample
+  name="label/basic"
+  caption="Press Shipping speed. Focus moves to the checked option, and a screen reader names the group Shipping speed."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/vue @ui-sdk/core
+```
+
+## Usage
+
+Import the label and point its `for` at the control's `id`:
+
+```vue
+<script setup lang="ts">
+import { Label } from "@ui-sdk/vue/label"
+import { Radio, RadioGroup } from "@ui-sdk/vue/radio"
+</script>
+
+<template>
+  <Label for="plan">Plan</Label>
+  <RadioGroup id="plan" default-value="pro">
+    <Radio value="free">Free</Radio>
+    <Radio value="pro">Pro</Radio>
+  </RadioGroup>
+</template>
+```
+
+Label renders a native `<label>`. When the browser can reach the control on its own, like an input, it does. For anything else, the control takes the label as its name, and a press on the label focuses it, checks it or clicks it, as a native label would.
+
+Inside a [Field](./field), use `FieldLabel`, which also ties the field's description and errors to the control.
+
+## Build Your Own
+
+`@ui-sdk/vue/label` comes with a ready-made Label. If you'd like to build your own, with your own name, start from the `label` primitive in `@ui-sdk/core`:
+
+```ts title="caption.ts"
+import { label } from "@ui-sdk/core/label"
+import { createParts } from "@ui-sdk/vue/primitive"
+
+const { Root: Caption } = createParts(label, { root: "label" })
+
+export { Caption }
+```
+
+```vue
+<template>
+  <Caption for="plan">Plan</Caption>
+</template>
+```
+
+`Caption` keeps the behavior of the ready-made Label: it names the control and reaches it on a press. See [Rendering](../rendering) and [Custom Parts](../custom-parts) for more.
+
+## Slider
+
+A label for a slider names its thumb, so the thumb reads as **Volume**, and a press on the label focuses it.
+
+<ComponentExample
+  name="label/slider"
+  caption="Press Volume, then use the arrow keys. The thumb moves, and a screen reader reads it as Volume."
+/>
+
+## Switch
+
+Point the label at a switch beside it. A press on the label turns the switch on and off.
+
+<ComponentExample name="label/switch" caption="Press Email me product updates. The switch turns on." />
+
+## Wrapping a Control
+
+Put the control inside the label instead of pointing at it, and you need no `id`.
+
+<ComponentExample
+  name="label/wrap"
+  caption="Press Accept terms and conditions. The checkbox checks, and a double click doesn't select the text."
+/>
+
+## Custom Rendering
+
+Use the `#render` slot to use a different element, such as a `<span>`, and bind the supplied `props` to it. A label that isn't a `<label>` still names its control and reaches it on a press. See [Parts and Composition](../parts-and-composition) for more.
+
+## Styling
+
+The label is unstyled. It has a `data-slot` of `label-root`.
+
+A double click on the label doesn't select its text, so you don't need `user-select: none` for that.
+
+## API Reference
+
+Props are the same as below, along with a native label's `for`.
+
+### Label
+
+<TypeTable path="../../packages/core/src/components/label/label.ts" name="LabelOptions" />
+
+## Accessibility
+
+A native `<label>` names the element its `for` points at only when that element is labelable, like an input or a button. Label names any other control through `aria-labelledby`, unless the control has an `aria-label` or an `aria-labelledby` of its own, which win. Its press does what a native label's does: it checks a checkbox, a switch or a radio, focuses a group's checked radio, and focuses anything else. A press on a disabled control does nothing.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="label" />

@@ -581,6 +581,11 @@ const components: Record<string, Component> = {
       debug: "MenubarOptions",
     },
   },
+  label: {
+    source: "label/label.ts",
+    examples: "label",
+    types: ["LabelOptions"],
+  },
   separator: {
     source: "separator/separator.ts",
     examples: "separator",

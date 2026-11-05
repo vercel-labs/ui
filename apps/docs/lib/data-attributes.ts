@@ -50,6 +50,7 @@ import { tabs } from "@ui-sdk/core/tabs"
 import { tokenInput } from "@ui-sdk/core/token-input"
 import { triggerMenu } from "@ui-sdk/core/trigger-menu"
 import { button } from "@ui-sdk/core/button"
+import { label } from "@ui-sdk/core/label"
 import { separator } from "@ui-sdk/core/separator"
 import { toggle, toggleGroup } from "@ui-sdk/core/toggle"
 import { toolbar } from "@ui-sdk/core/toolbar"
@@ -852,6 +853,13 @@ const components: Record<
       },
     },
     parts: { root: { react: "Menubar", web: "<ui-menubar>" } },
+  },
+  label: {
+    instances: () => [label({ id: "docs" })],
+    samples: { root: [{}] },
+    interactive: [],
+    descriptions: {},
+    parts: { root: { react: "Label", web: "<ui-label>" } },
   },
   separator: {
     instances: () => [separator({ id: "docs" })],

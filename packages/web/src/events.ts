@@ -108,6 +108,7 @@ import type {
 import type { RadioGroupController, RadioGroupValueChangeReason } from "@ui-sdk/core/radio"
 import type { ScrollAreaController } from "@ui-sdk/core/scroll-area"
 import type { SeparatorOptions } from "@ui-sdk/core/separator"
+import type { label } from "@ui-sdk/core/label"
 import type {
   SelectController,
   SelectDismissReason,
@@ -1041,6 +1042,12 @@ interface UiSeparatorElement
     Required<Pick<SeparatorOptions, "decorative">> {}
 
 /**
+ * `<ui-label>`: its options as properties.
+ * @experimental
+ */
+interface UiLabelElement extends HTMLElement, AttributeProperties<typeof label> {}
+
+/**
  * `<ui-field>`: `invalid` as a property, three-way like the attribute.
  * @stable
  */
@@ -1533,6 +1540,7 @@ declare global {
     "ui-separator": UiSeparatorElement
     "ui-progress": UiGaugeElement
     "ui-field": UiFieldElement
+    "ui-label": UiLabelElement
     "ui-field-set": UiFieldSetElement
     "ui-field-group": UiFieldGroupElement
     "ui-slider": UiSliderElement
@@ -2097,6 +2105,7 @@ export {
   type UiHoverCardElement,
   type UiInputElement,
   type UiInputGroupElement,
+  type UiLabelElement,
   type UiListboxElement,
   type UiLoadMoreEvent,
   type UiMenubarElement,

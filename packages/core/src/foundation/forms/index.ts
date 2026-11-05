@@ -13,6 +13,7 @@ export {
   setRelativePath,
   validateFiles,
 } from "./files"
+export { activateControl, findControl } from "./control"
 export {
   associate,
   bindHiddenInput,

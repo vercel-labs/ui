@@ -25,6 +25,7 @@ export * from "./token-input"
 export * from "./checkbox"
 export * from "./switch"
 export * from "./field"
+export * from "./label"
 export * from "./radio"
 export * from "./input"
 // Textarea's entry re-exports createInputController like input's does; two star
