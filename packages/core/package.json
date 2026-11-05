@@ -1,9 +1,16 @@
 {
   "name": "@ui-sdk/core",
   "version": "0.0.0",
-  "private": true,
+  "description": "A library of behaviors to build your components. Made for agents.",
   "type": "module",
   "license": "Apache-2.0",
+  "homepage": "https://ui-sdk.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vercel-labs/ui.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/vercel-labs/ui/issues",
   "imports": {
     "#dev": {
       "development": "./src/foundation/kernel/dev.ts",

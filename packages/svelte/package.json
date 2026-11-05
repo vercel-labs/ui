@@ -1,9 +1,16 @@
 {
   "name": "@ui-sdk/svelte",
   "version": "0.0.0",
-  "private": true,
+  "description": "UI SDK for Svelte.",
   "type": "module",
   "license": "Apache-2.0",
+  "homepage": "https://ui-sdk.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vercel-labs/ui.git",
+    "directory": "packages/svelte"
+  },
+  "bugs": "https://github.com/vercel-labs/ui/issues",
   "exports": {
     ".": {
       "svelte": "./src/index.ts",
