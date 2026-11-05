@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs"
-import { addComponent, addImportsSources, defineNuxtModule } from "nuxt/kit"
-import type { NuxtModule } from "nuxt/schema"
+import { addComponent, addImportsSources, defineNuxtModule } from "@nuxt/kit"
+import type { NuxtModule } from "@nuxt/schema"
 import { type NuxtEntry, nuxtRegistrations } from "./registrations"
 
 /**
@@ -8,7 +8,7 @@ import { type NuxtEntry, nuxtRegistrations } from "./registrations"
  * @experimental
  */
 interface ModuleOptions {
-  /** Prepended to every component's name, so `"Ui"` registers `<UiDialogTrigger>`. Empty by default. */
+  /** Prepended to every component's name, so `"U"` registers `<UDialogTrigger>`. Empty by default. */
   prefix?: string
 }
 

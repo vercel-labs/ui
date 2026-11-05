@@ -40,12 +40,12 @@ test("controllers and helpers are auto-imported, and components aren't", () => {
 })
 
 test("the prefix renames components but keeps the name they're imported by", () => {
-  expect(componentOf("UiDialogTrigger", "Ui")).toEqual({
-    name: "UiDialogTrigger",
+  expect(componentOf("UDialogTrigger", "U")).toEqual({
+    name: "UDialogTrigger",
     export: "DialogTrigger",
     filePath: "@ui-sdk/vue/dialog",
   })
-  expect(nuxtRegistrations(entries, "Ui").imports).toEqual(nuxtRegistrations(entries, "").imports)
+  expect(nuxtRegistrations(entries, "U").imports).toEqual(nuxtRegistrations(entries, "").imports)
 })
 
 test("an entry with no components only adds imports", () => {
