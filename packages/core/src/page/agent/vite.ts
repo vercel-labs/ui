@@ -1,4 +1,6 @@
-import { createDevServer } from "./dev-server"
+import { createDevServer } from "./dev-server.ts"
+
+const connect = "virtual:ui-sdk-dev"
 
 /**
  * Lets a coding agent read and operate the ui-sdk components on the page
@@ -18,16 +20,17 @@ function uiSdk() {
     }) {
       server.middlewares.use(createDevServer().handle)
     },
-    transformIndexHtml: {
-      order: "pre" as const,
-      handler: () => [
-        {
-          tag: "script",
-          attrs: { type: "module" },
-          children: 'import "@ui-sdk/core/dev"',
-          injectTo: "head" as const,
-        },
-      ],
+    resolveId(id: string) {
+      if (id === connect) return `\0${connect}`
+    },
+    load(id: string) {
+      if (id === `\0${connect}`) return 'import "@ui-sdk/core/dev"'
+    },
+    // Every Vite framework loads Vite's client on every page, even those that
+    // render their own HTML, like SvelteKit and Astro.
+    transform(code: string, id: string, options?: { ssr?: boolean }) {
+      if (options?.ssr || !id.endsWith("/vite/dist/client/client.mjs")) return
+      return `${code}\nimport("${connect}")\n`
     },
   }
 }

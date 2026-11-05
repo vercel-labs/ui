@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import type { IncomingMessage, ServerResponse } from "node:http"
 import type { AddressInfo } from "node:net"
-import { agentTools } from "./tools"
+import { agentTools } from "./tools.ts"
 
 type Call = { id: number; name: string; input: unknown }
 type Answer = { id: number; result?: unknown; error?: string }

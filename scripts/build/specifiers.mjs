@@ -6,9 +6,11 @@ import path from "node:path"
  * the path Node's ESM resolver needs: `./menu.js`, `./dom/index.js` or
  * `./index.js`. Sources import without extensions, which only bundlers
  * accept. `extensions` are the files that may sit behind the specifier, like
- * `[".ts", ".tsx"]` in `src` or `[".d.ts"]` in `dist`.
+ * `[".ts", ".tsx"]` in `src` or `[".d.ts"]` in `dist`. Code Node loads from
+ * `src`, like a Vite plugin, imports with `.ts`, which becomes `.js` too.
  */
 function withJsExtension(specifier, fromDir, extensions) {
+  if (/\.tsx?$/.test(specifier)) return specifier.replace(/\.tsx?$/, ".js")
   const target = path.resolve(fromDir, specifier)
   const namesDirectory = /(^|\/)\.\.?$|\/$/.test(specifier)
   if (!namesDirectory && extensions.some((extension) => existsSync(target + extension)))

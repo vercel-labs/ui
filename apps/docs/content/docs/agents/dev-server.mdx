@@ -11,21 +11,6 @@ It uses the same three tools as [Connect an Agent](./connect-an-agent): `snapsho
 
 Each framework needs two things: the MCP server on its dev server, and a connection from the page. Both run only in development, so your production build stays the same.
 
-### Vite
-
-For React, Vue, Svelte, Solid and web components on Vite, add the plugin:
-
-```ts title="vite.config.ts"
-import { uiSdk } from "@ui-sdk/core/vite"
-import { defineConfig } from "vite"
-
-export default defineConfig({
-  plugins: [uiSdk()],
-})
-```
-
-The plugin adds the server and connects every page Vite serves from `index.html`. Keep your framework's own plugin in the list beside it.
-
 ### Next.js
 
 Wrap your config with `withUiSdk`:
@@ -44,6 +29,21 @@ Under `next dev`, it starts the server and serves it from your app's own port. T
 ```ts title="instrumentation-client.ts"
 if (process.env.NODE_ENV === "development") import("@ui-sdk/core/dev")
 ```
+
+### Vite
+
+For React, Vue, Svelte, Solid and web components on Vite, add the plugin:
+
+```ts title="vite.config.ts"
+import { uiSdk } from "@ui-sdk/core/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [uiSdk()],
+})
+```
+
+The plugin adds the server and connects every page Vite serves. Keep your framework's own plugin in the list beside it.
 
 ### Nuxt
 
@@ -71,15 +71,9 @@ export default defineConfig({
 })
 ```
 
-SvelteKit renders its pages itself, so connect them from `src/hooks.client.ts`:
-
-```ts title="src/hooks.client.ts"
-if (import.meta.env.DEV) import("@ui-sdk/core/dev")
-```
-
 ### Other Frameworks on Vite
 
-SolidStart, Astro and other frameworks built on Vite take the same plugin. Add `uiSdk()` to the Vite plugins in your config, then import `@ui-sdk/core/dev` in development from code that runs on every page. In Astro, both go in the config and the layout:
+SolidStart, Astro and other frameworks built on Vite take the same plugin, even when they render their own pages. In Astro, it goes in the Vite plugins of your config:
 
 ```js title="astro.config.mjs"
 import { uiSdk } from "@ui-sdk/core/vite"
@@ -90,21 +84,21 @@ export default defineConfig({
 })
 ```
 
-```astro title="src/layouts/Layout.astro"
-<script>
-  if (import.meta.env.DEV) import("@ui-sdk/core/dev")
-</script>
-```
-
 ## Connect Your Agent
 
 Start your dev server and open the app in your browser. Then add the server to your agent with your dev server's address. For Claude Code:
 
 ```bash
-claude mcp add --transport http ui-sdk http://localhost:5173/__ui-sdk/mcp
+claude mcp add --transport http ui-sdk http://localhost:3000/__ui-sdk/mcp
 ```
 
-Other agents take the same URL wherever they add an MCP server. Use your own port, like `3000` for Next.js.
+For Codex:
+
+```bash
+codex mcp add ui-sdk --url http://localhost:3000/__ui-sdk/mcp
+```
+
+Other agents take the same URL wherever they add an MCP server. Use your dev server's port: `3000` for Next.js and Nuxt, `5173` for Vite and SvelteKit.
 
 ## Try It
 
