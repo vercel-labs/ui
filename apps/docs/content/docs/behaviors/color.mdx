@@ -1,0 +1,169 @@
+---
+title: Colors
+description: Read, convert and write CSS colors, fit them to what a screen can show, and check their contrast.
+---
+
+`@ui-sdk/core/color` reads CSS colors, converts them between color spaces, writes them back as CSS, fits them to a screen's gamut and compares two colors.
+
+The helpers are plain functions on plain data, and they run without a DOM. A color input, a swatch list or a theme editor of your own reads and writes colors with them.
+
+## Colors as Data
+
+### Read a CSS Color
+
+`parseColor` reads any CSS color into its space, three channels and an alpha. It returns null for text that isn't a color:
+
+```ts
+import { parseColor } from "@ui-sdk/core/color"
+
+parseColor("#ff0000") // { space: "srgb", coords: [1, 0, 0], alpha: 1 }
+parseColor("oklch(0.7 0.15 250 / 50%)") // { space: "oklch", coords: [0.7, 0.15, 250], alpha: 0.5 }
+parseColor("rebeccapurple") // { space: "srgb", coords: [0.4, 0.2, 0.6], alpha: 1 }
+parseColor("not a color") // null
+```
+
+It reads hex, named colors, `transparent`, `rgb()`, `hsl()`, `hwb()`, `lab()`, `lch()`, `oklab()`, `oklch()`, and `color()` in the `srgb`, `srgb-linear`, `display-p3` and `xyz` spaces, with the older comma syntax like `rgba(255, 0, 0, 0.5)` too. A color keeps the space it was written in, and its channels use the ranges CSS gives them: 0 to 1 for sRGB and Display P3, 0 to 100 for percentages like HSL's saturation, and degrees for hues. Values past a range that CSS clamps, like `rgb(300 0 0)`, are clamped the same way.
+
+### Missing Channels
+
+A channel written as `none` is missing, and reads as null. A grey has no hue, so converting one to a space with a hue leaves the hue missing too:
+
+```ts
+import { convertColor, parseColor } from "@ui-sdk/core/color"
+
+parseColor("oklch(0.7 0.1 none)")!.coords // [0.7, 0.1, null]
+convertColor(parseColor("white")!, "oklch").coords // [1, 0, null]
+```
+
+A missing channel counts as 0 when the color converts. Keep the last hue yourself while someone drags to grey and back, so it doesn't jump to red.
+
+## Converting
+
+### Between Spaces
+
+`convertColor` returns the same color in another space:
+
+```ts
+import { convertColor, parseColor } from "@ui-sdk/core/color"
+
+const red = parseColor("red")!
+
+convertColor(red, "hsl").coords // [0, 100, 50]
+convertColor(red, "oklch").coords // [0.628, 0.258, 29.234], rounded
+convertColor(red, "srgb") === red // true, it's already sRGB
+```
+
+The spaces are CSS's: `"srgb"`, `"srgb-linear"`, `"display-p3"`, `"hsl"`, `"hwb"`, `"lab"`, `"lch"`, `"oklab"`, `"oklch"`, `"xyz-d65"` and `"xyz-d50"`, plus `"hsv"`, the space most pickers draw their square in. OKLCH's lightness, chroma and hue change the way people see them change, so stepping its lightness keeps the hue, and two colors with the same lightness look equally light.
+
+## Writing CSS
+
+### Formats
+
+`formatColor` writes a color as CSS, in its own space or in the format you pass:
+
+```ts
+import { formatColor, parseColor } from "@ui-sdk/core/color"
+
+const red = parseColor("red")!
+
+formatColor(red) // "rgb(255 0 0)"
+formatColor(red, "hex") // "#ff0000"
+formatColor(red, "oklch") // "oklch(0.628 0.2577 29.23)"
+formatColor(red, "display-p3") // "color(display-p3 0.9175 0.2003 0.1386)"
+formatColor(red, "oklch", { precision: 3 }) // "oklch(0.63 0.26 29)"
+```
+
+`"srgb"` writes `rgb()`, and the spaces with no function of their own write `color()`. An alpha below 1 goes after a slash, or into a fourth byte in hex. HSV has no CSS syntax, so an HSV color writes `hsl()`.
+
+`precision` sets the significant digits per channel, 5 by default, counted against each channel's range: `rgb()` gets two decimals and OKLCH's lightness four. Hex, `rgb()`, `hsl()` and `hwb()` only hold sRGB colors, so a wider color is clipped to fit. Map it with [`toGamut`](#fit-a-screen) first to keep it closer.
+
+<ComponentExample
+  name="behaviors/color-formats"
+  caption="Type any CSS color, like #7654cd or lab(60 40 -60), and each format updates. The line below says which screens can show it. Try oklch(0.7 0.35 150) to go past P3."
+/>
+
+## Gamut
+
+### Fit a Screen
+
+A gamut is the range of colors a screen can show. Every screen shows sRGB, and most phones and laptops show the wider P3. `isInGamut` says whether a color fits, and `toGamut` returns the closest color that does, in the color's own space:
+
+```ts
+import { formatColor, isInGamut, parseColor, toGamut } from "@ui-sdk/core/color"
+
+const green = parseColor("oklch(0.7 0.25 150)")!
+
+isInGamut(green) // false
+isInGamut(green, "p3") // true
+formatColor(toGamut(green)) // "oklch(0.7091 0.2103 147.07)"
+formatColor(toGamut(green), "hex") // "#00c248"
+toGamut(green, "p3") === green // true, it already fits
+```
+
+`toGamut` maps the way CSS Color 4 and browsers do: it lowers the chroma in OKLCH, keeping the lightness and hue, until clipping what's left is too small to see. That keeps a vivid green green, where clipping each channel can shift its hue.
+
+## Mixing
+
+### Mix Two Colors
+
+`mixColor` mixes two colors the way CSS `color-mix()` does. Pass how much of the second color you want, from 0 to 1:
+
+```ts
+import { formatColor, mixColor, parseColor } from "@ui-sdk/core/color"
+
+const blue = parseColor("#2563eb")!
+const yellow = parseColor("#facc15")!
+
+formatColor(mixColor(blue, yellow), "hex") // "#90a3ad", halfway in Oklab
+formatColor(mixColor(blue, yellow, 0.25, { space: "srgb" })) // "rgb(90.25 125.25 181.5)"
+```
+
+Colors mix in Oklab by default, where the steps between two colors look even. Set `space` to mix in another one, and the result is in that space. Translucent colors mix by their alpha, as `color-mix()` does, so a transparent color doesn't darken the other.
+
+<ComponentExample
+  name="behaviors/color-mix"
+  caption="Pick two colors to see the steps between them. Choose sRGB and the middle turns darker, or OKLCH and it stays vivid, passing through green."
+/>
+
+### Hues
+
+In a space with a hue, like OKLCH or HSL, the hue takes the shorter way around the color wheel. Set `hue` to `"longer"`, `"increasing"` or `"decreasing"` to go another way:
+
+```ts
+const red = parseColor("oklch(0.63 0.26 29)")!
+const violet = parseColor("oklch(0.55 0.25 300)")!
+
+mixColor(red, violet, 0.5, { space: "oklch" }).coords[2] // 344.5, through pink
+mixColor(red, violet, 0.5, { space: "oklch", hue: "longer" }).coords[2] // 164.5, through green
+```
+
+## Comparing
+
+### Contrast
+
+`contrastRatio` gives the WCAG 2 contrast ratio between two colors, from 1 to 21. Text needs 4.5 against its background, or 3 when it's large:
+
+```ts
+import { contrastRatio, parseColor } from "@ui-sdk/core/color"
+
+contrastRatio(parseColor("#767676")!, parseColor("white")!) // 4.54
+```
+
+The order doesn't matter, and alpha doesn't count, so blend a translucent color over its background first.
+
+<ComponentExample
+  name="behaviors/color-contrast"
+  caption="Pick a text color and a background. The ratio says whether the text passes WCAG's 4.5 for text or 3 for large text. Darken the gray until it passes for all text."
+/>
+
+### Distance
+
+`colorDistance` measures how different two colors look, as the distance between them in Oklab. About 0.02 is the smallest difference most people notice:
+
+```ts
+import { colorDistance, parseColor } from "@ui-sdk/core/color"
+
+colorDistance(parseColor("red")!, parseColor("#fe0000")!) // 0.002, too small to see
+```
+
+Use it to tell whether a swatch already holds a color, or to find the nearest one in a palette.

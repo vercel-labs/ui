@@ -176,7 +176,7 @@ function defineSelectElements() {
         return { id: selectAllKey(group ? autoId(group) : undefined) }
       },
     },
-    item: { tag: "ui-select-item", display: "block" },
+    item: { tag: "ui-select-item", display: "block", properties: ["value"] },
     "item-indicator": "ui-select-item-indicator",
     // An icon inside an item. Screen readers, typeahead and the search skip it.
     "item-icon": { tag: "ui-select-item-icon", feature: selectItemIcons },

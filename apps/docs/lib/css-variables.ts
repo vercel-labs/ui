@@ -59,6 +59,20 @@ const components: Record<string, Group[]> = {
       ],
     },
   ],
+  rating: [{ part: "item", variables: ["--rating-fill"] }],
+  "segmented-control": [
+    {
+      part: "indicator",
+      variables: [
+        "--segmented-control-indicator-left",
+        "--segmented-control-indicator-right",
+        "--segmented-control-indicator-top",
+        "--segmented-control-indicator-bottom",
+        "--segmented-control-indicator-width",
+        "--segmented-control-indicator-height",
+      ],
+    },
+  ],
   slider: [
     { part: "indicator", variables: ["--slider-indicator-start", "--slider-indicator-size"] },
     { part: "thumb", variables: ["--slider-thumb-position"] },
@@ -86,6 +100,16 @@ const components: Record<string, Group[]> = {
   ],
   resizable: [{ part: "panel", variables: ["--resizable-panel-size"] }],
   carousel: [{ part: "root", variables: ["--carousel-interval", "--carousel-progress"] }],
+  "color-picker": [
+    { part: "root", variables: ["--color-picker-color"] },
+    { part: "area", variables: ["--color-area-background"] },
+    { part: "area-thumb", variables: ["--area-x", "--area-y"] },
+    { part: "slider", variables: ["--color-slider-background"] },
+    { part: "slider-thumb", variables: ["--color-slider-thumb-position"] },
+    { part: "swatch", variables: ["--color-picker-color"] },
+    { part: "swatch-item", variables: ["--color-picker-color"] },
+  ],
+  "image-cropper": [{ part: "viewport", variables: ["--image-cropper-aspect-ratio"] }],
   tree: [
     { part: "item", variables: ["--tree-level"] },
     { part: "group", variables: ["--tree-group-height"] },
@@ -149,12 +173,30 @@ const meaning: Record<string, string> = {
   "--transform-origin": "The point on the anchor the popup opens from. Use it to scale from the right place.",
   "--arrow-offset":
     "Where the anchor's center falls along the popup's edge, kept `arrowPadding` from the corners. Position a ::before arrow with it.",
+  "--color-picker-color":
+    "The color as CSS, inside the gamut. On a swatch item, its own color. Use it to fill a thumb or a swatch.",
+  "--color-area-background":
+    "Gradients that draw the area, when its channels are saturation and brightness or lightness. Unset for others, which a canvas paints.",
+  "--area-x": "Where the thumb is across the area, from 0 to 1.",
+  "--area-y": "Where the thumb is up the area, from 0 at the bottom to 1 at the top.",
+  "--color-slider-background":
+    "A gradient through the slider's channel, with the other channels as they are.",
+  "--color-slider-thumb-position": "Where the thumb is along the slider, as a percentage.",
+  "--image-cropper-aspect-ratio":
+    "The image's width over its height as it shows, turned, once it loads. Give the viewport `aspect-ratio: var(--image-cropper-aspect-ratio)` to fit the image.",
   "--active-tab-left": "Distance from the tab list's left edge to the selected tab.",
   "--active-tab-right": "Distance from the tab list's right edge to the selected tab.",
   "--active-tab-top": "Distance from the tab list's top edge to the selected tab.",
   "--active-tab-bottom": "Distance from the tab list's bottom edge to the selected tab.",
   "--active-tab-width": "Width of the selected tab.",
   "--active-tab-height": "Height of the selected tab.",
+  "--rating-fill": "How much of the star the shown score covers, from 0 to 1.",
+  "--segmented-control-indicator-left": "Distance from the control's left edge to the checked item.",
+  "--segmented-control-indicator-right": "Distance from the control's right edge to the checked item.",
+  "--segmented-control-indicator-top": "Distance from the control's top edge to the checked item.",
+  "--segmented-control-indicator-bottom": "Distance from the control's bottom edge to the checked item.",
+  "--segmented-control-indicator-width": "Width of the checked item.",
+  "--segmented-control-indicator-height": "Height of the checked item.",
   "--viewport-width":
     "The open content's width plus the viewport's own border. Transition width for a viewport that resizes as it switches.",
   "--viewport-height": "The open content's height plus the viewport's own border.",

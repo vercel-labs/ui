@@ -33,18 +33,23 @@
     "./checkbox": "./src/components/checkbox/checkbox.ts",
     "./switch": "./src/components/switch/switch.ts",
     "./radio": "./src/components/radio/radio.ts",
+    "./rating": "./src/components/rating/rating.ts",
     "./field": "./src/components/field/field.ts",
+    "./label": "./src/components/label/label.ts",
     "./button": "./src/components/button/button.ts",
     "./toggle": "./src/components/toggle/toggle.ts",
     "./toolbar": "./src/components/toolbar/toolbar.ts",
     "./menubar": "./src/components/menubar/menubar.ts",
     "./separator": "./src/components/separator/separator.ts",
     "./select": "./src/components/select/select.ts",
+    "./segmented-control": "./src/components/segmented-control/segmented-control.ts",
     "./combobox": "./src/components/combobox/combobox.ts",
     "./command": "./src/components/command/command.ts",
     "./autocomplete": "./src/components/autocomplete/autocomplete.ts",
     "./input": "./src/components/input/input.ts",
     "./slider": "./src/components/slider/slider.ts",
+    "./color-picker": "./src/components/color-picker/color-picker.ts",
+    "./image-cropper": "./src/components/image-cropper/image-cropper.ts",
     "./number-input": "./src/components/number-input/number-input.ts",
     "./file-input": "./src/components/file-input/file-input.ts",
     "./trigger-menu": "./src/components/trigger-menu/trigger-menu.ts",
@@ -65,6 +70,10 @@
     "./text-match": "./src/foundation/text/text-match.ts",
     "./date": "./src/foundation/date/date.ts",
     "./number": "./src/foundation/number/number.ts",
+    "./date-input": "./src/components/date-input/date-input.ts",
+    "./time-input": "./src/components/date-input/time-input.ts",
+    "./color": "./src/foundation/color/color.ts",
+    "./image": "./src/foundation/image/image.ts",
     "./date-picker": "./src/components/date-picker/date-picker.ts",
     "./agent": "./src/page/agent/agent.ts",
     "./observe": "./src/page/observe/observe.ts",
@@ -178,9 +187,17 @@
         "types": "./dist/components/radio/radio.d.ts",
         "default": "./dist/components/radio/radio.js"
       },
+      "./rating": {
+        "types": "./dist/components/rating/rating.d.ts",
+        "default": "./dist/components/rating/rating.js"
+      },
       "./field": {
         "types": "./dist/components/field/field.d.ts",
         "default": "./dist/components/field/field.js"
+      },
+      "./label": {
+        "types": "./dist/components/label/label.d.ts",
+        "default": "./dist/components/label/label.js"
       },
       "./button": {
         "types": "./dist/components/button/button.d.ts",
@@ -206,6 +223,10 @@
         "types": "./dist/components/select/select.d.ts",
         "default": "./dist/components/select/select.js"
       },
+      "./segmented-control": {
+        "types": "./dist/components/segmented-control/segmented-control.d.ts",
+        "default": "./dist/components/segmented-control/segmented-control.js"
+      },
       "./combobox": {
         "types": "./dist/components/combobox/combobox.d.ts",
         "default": "./dist/components/combobox/combobox.js"
@@ -225,6 +246,14 @@
       "./slider": {
         "types": "./dist/components/slider/slider.d.ts",
         "default": "./dist/components/slider/slider.js"
+      },
+      "./color-picker": {
+        "types": "./dist/components/color-picker/color-picker.d.ts",
+        "default": "./dist/components/color-picker/color-picker.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/components/image-cropper/image-cropper.d.ts",
+        "default": "./dist/components/image-cropper/image-cropper.js"
       },
       "./number-input": {
         "types": "./dist/components/number-input/number-input.d.ts",
@@ -305,6 +334,22 @@
       "./number": {
         "types": "./dist/foundation/number/number.d.ts",
         "default": "./dist/foundation/number/number.js"
+      },
+      "./date-input": {
+        "types": "./dist/components/date-input/date-input.d.ts",
+        "default": "./dist/components/date-input/date-input.js"
+      },
+      "./time-input": {
+        "types": "./dist/components/date-input/time-input.d.ts",
+        "default": "./dist/components/date-input/time-input.js"
+      },
+      "./color": {
+        "types": "./dist/foundation/color/color.d.ts",
+        "default": "./dist/foundation/color/color.js"
+      },
+      "./image": {
+        "types": "./dist/foundation/image/image.d.ts",
+        "default": "./dist/foundation/image/image.js"
       },
       "./date-picker": {
         "types": "./dist/components/date-picker/date-picker.d.ts",

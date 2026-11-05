@@ -48,9 +48,7 @@ async function mount(root: HTMLElement) {
     menu.addEventListener("openchange", (event) => {
       output("Open").textContent = `${event.detail.value}:${event.detail.reason}`
     })
-    menu.addEventListener("select", (event) => {
-      // Selecting text in the field fires the browser's own `select`, which bubbles here without a detail.
-      if (!(event instanceof CustomEvent)) return
+    menu.addEventListener("itemselect", (event) => {
       output("Last action").textContent = selectAction(event.detail.value, event.detail.arguments)
     })
   }

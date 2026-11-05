@@ -202,7 +202,7 @@ The highlighted command, search text, and page stack are separate:
 | `query` | The search text.                    | `@query-change`     |
 | `pages` | An array of page values.            | `@pages-change`     |
 
-Bind them with `v-model:value`, `v-model:query` and `v-model:pages`, or use `default-value`, `default-query`, and `default-pages` for starting state. Change events receive details; call `details.cancel()` to reject a change. `@action` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
+Bind them with `v-model:value`, `v-model:query` and `v-model:pages`, or use `default-value`, `default-query`, and `default-pages` for starting state. Change events receive details; call `details.cancel()` to reject a change. `value` is the highlighted command, not a chosen one, and it changes as the highlight moves. `@action` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
 
 <ComponentExample
   name="command/controlled"

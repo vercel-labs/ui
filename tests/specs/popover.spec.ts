@@ -688,7 +688,7 @@ test.describe("animation", () => {
   })
 
   test(
-    "a press on a popover animating out doesn't reach what's beneath it",
+    "a press on a popover animating out reaches what's beneath it",
     { tag: "@enhancement" },
     async ({ page, open }) => {
       await open("popover", { animate: "" })
@@ -713,7 +713,10 @@ test.describe("animation", () => {
         page.locator('[data-slot="popover-content"][data-ending-style], .popup[data-ending-style]'),
       ).toHaveCount(1)
       await page.mouse.click(point.x, point.y)
-      await expect(page.locator("button", { hasText: "Beneath" })).not.toHaveAttribute("data-clicked")
+      await expect(page.locator("button", { hasText: "Beneath" })).toHaveAttribute("data-clicked", "")
+      await expect(
+        page.locator('[data-slot="popover-content"][data-ending-style], .popup[data-ending-style]'),
+      ).toHaveCount(1)
     },
   )
 

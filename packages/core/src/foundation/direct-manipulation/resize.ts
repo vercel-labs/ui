@@ -115,6 +115,73 @@ const fromHandle = (event: Event, handle: ResizeHandle) =>
   handle === "move" && !!(event.target as Element | null)?.closest?.("[data-resize-handle]")
 
 /**
+ * The limits `resizeBox` keeps a box within.
+ */
+type ResizeLimits = {
+  /** The area the box stays inside. */
+  bounds?: { left: number; top: number; right: number; bottom: number }
+  /** The smallest it gets. Defaults to 1 by 1. */
+  min?: { width: number; height: number }
+  /** The largest it gets. */
+  max?: { width: number; height: number }
+  /** Width over height, kept while it resizes. */
+  aspect?: number
+}
+
+/**
+ * The box a handle makes when its edges move by `dx` and `dy` from `from`,
+ * within the limits, as a drag of that handle makes it.
+ */
+function resizeBox(from: ResizeBox, handle: ResizeHandle, dx: number, dy: number, limits: ResizeLimits = {}) {
+  const area = limits.bounds
+  const left = area?.left ?? -Infinity
+  const top = area?.top ?? -Infinity
+  const right = area?.right ?? Infinity
+  const bottom = area?.bottom ?? Infinity
+  if (handle === "move")
+    return {
+      ...from,
+      x: clamp(from.x + dx, left, Math.max(left, right - from.width)),
+      y: clamp(from.y + dy, top, Math.max(top, bottom - from.height)),
+    }
+  const min = limits.min ?? { width: 1, height: 1 }
+  const max = limits.max ?? { width: Infinity, height: Infinity }
+  const west = handle.includes("w")
+  const east = handle.includes("e")
+  const north = handle.includes("n")
+  const south = handle.includes("s")
+  // The edges that stay put, and how far the moving ones may go.
+  const anchorX = west ? from.x + from.width : from.x
+  const anchorY = north ? from.y + from.height : from.y
+  const roomX = Math.min(max.width, west ? anchorX - left : right - anchorX)
+  const roomY = Math.min(max.height, north ? anchorY - top : bottom - anchorY)
+  let width = west ? from.width - dx : east ? from.width + dx : from.width
+  let height = north ? from.height - dy : south ? from.height + dy : from.height
+  const ratio = limits.aspect
+  if (ratio) {
+    // A corner follows whichever edge moved further; an edge sets the other side.
+    if ((west || east) && (north || south)) {
+      if (Math.abs(width / from.width - 1) >= Math.abs(height / from.height - 1)) height = width / ratio
+      else width = height * ratio
+    } else if (west || east) height = width / ratio
+    else width = height * ratio
+    // An edge grows the other side about the box's middle, so it has room on both sides of it.
+    const middleY = from.y + from.height / 2
+    const middleX = from.x + from.width / 2
+    const fitY = north || south ? roomY : 2 * Math.min(middleY - top, bottom - middleY, max.height / 2)
+    const fitX = west || east ? roomX : 2 * Math.min(middleX - left, right - middleX, max.width / 2)
+    width = clamp(width, Math.max(min.width, min.height * ratio), Math.min(fitX, fitY * ratio))
+    height = width / ratio
+  } else {
+    width = clamp(width, min.width, Math.max(min.width, roomX))
+    height = clamp(height, min.height, Math.max(min.height, roomY))
+  }
+  const x = west ? anchorX - width : east ? anchorX : from.x + (from.width - width) / 2
+  const y = north ? anchorY - height : south ? anchorY : from.y + (from.height - height) / 2
+  return { x, y, width, height }
+}
+
+/**
  * Lets users resize a slot's parts by handles on their edges and corners, and
  * move them by dragging the box. Call it once in `api`, keep it on the api,
  * and wire the box and its handles:
@@ -149,63 +216,20 @@ function createResize<State extends object>(
   const setDraft = (draft: ResizeDraft | null) => store.set({ [options.draft]: draft } as Partial<State>)
   const drags = createDragSession(context.onDestroy)
 
-  // The box a handle makes when its edges move by `dx` and `dy` from `from`,
-  // within the size limits, the bounds and the ratio.
-  function fit(
+  const fit = (
     key: string,
     from: ResizeBox,
     handle: ResizeHandle,
     dx: number,
     dy: number,
     keepRatio: boolean,
-  ) {
-    const area = options.bounds?.(key)
-    const left = area?.left ?? -Infinity
-    const top = area?.top ?? -Infinity
-    const right = area?.right ?? Infinity
-    const bottom = area?.bottom ?? Infinity
-    if (handle === "move")
-      return {
-        ...from,
-        x: clamp(from.x + dx, left, Math.max(left, right - from.width)),
-        y: clamp(from.y + dy, top, Math.max(top, bottom - from.height)),
-      }
-    const min = options.min?.(key) ?? { width: 1, height: 1 }
-    const max = options.max?.(key) ?? { width: Infinity, height: Infinity }
-    const west = handle.includes("w")
-    const east = handle.includes("e")
-    const north = handle.includes("n")
-    const south = handle.includes("s")
-    // The edges that stay put, and how far the moving ones may go.
-    const anchorX = west ? from.x + from.width : from.x
-    const anchorY = north ? from.y + from.height : from.y
-    const roomX = Math.min(max.width, west ? anchorX - left : right - anchorX)
-    const roomY = Math.min(max.height, north ? anchorY - top : bottom - anchorY)
-    let width = west ? from.width - dx : east ? from.width + dx : from.width
-    let height = north ? from.height - dy : south ? from.height + dy : from.height
-    const ratio = options.aspect?.(key) ?? (keepRatio ? from.width / from.height : undefined)
-    if (ratio) {
-      // A corner follows whichever edge moved further; an edge sets the other side.
-      if ((west || east) && (north || south)) {
-        if (Math.abs(width / from.width - 1) >= Math.abs(height / from.height - 1)) height = width / ratio
-        else width = height * ratio
-      } else if (west || east) height = width / ratio
-      else width = height * ratio
-      // An edge grows the other side about the box's middle, so it has room on both sides of it.
-      const middleY = from.y + from.height / 2
-      const middleX = from.x + from.width / 2
-      const fitY = north || south ? roomY : 2 * Math.min(middleY - top, bottom - middleY, max.height / 2)
-      const fitX = west || east ? roomX : 2 * Math.min(middleX - left, right - middleX, max.width / 2)
-      width = clamp(width, Math.max(min.width, min.height * ratio), Math.min(fitX, fitY * ratio))
-      height = width / ratio
-    } else {
-      width = clamp(width, min.width, Math.max(min.width, roomX))
-      height = clamp(height, min.height, Math.max(min.height, roomY))
-    }
-    const x = west ? anchorX - width : east ? anchorX : from.x + (from.width - width) / 2
-    const y = north ? anchorY - height : south ? anchorY : from.y + (from.height - height) / 2
-    return { x, y, width, height }
-  }
+  ) =>
+    resizeBox(from, handle, dx, dy, {
+      bounds: options.bounds?.(key),
+      min: options.min?.(key),
+      max: options.max?.(key),
+      aspect: options.aspect?.(key) ?? (keepRatio ? from.width / from.height : undefined),
+    })
 
   const round = (box: ResizeBox, size: number) => ({
     x: Math.round(box.x / size) * size,
@@ -349,9 +373,11 @@ export {
   createResize,
   type Resize,
   type ResizeBox,
+  resizeBox,
   resizeCursors,
   type ResizeDraft,
   type ResizeHandle,
+  type ResizeLimits,
   resizeMessage,
   type ResizeMessage,
   type ResizeOptions,

@@ -766,8 +766,10 @@ function createPopupLayer<State extends { open: boolean; mounted: boolean }, Rea
         (el.contains(target) && !pressedBackdrop(target, event)) ||
         persistent.some((node) => node.contains(target)) ||
         (options.contains ? options.contains(target, event) : !!options.trigger()?.contains(target)),
-      hit: (x, y) =>
-        [el, shown?.backdrop].some((part) => part && !outsideBox({ x, y }, part.getBoundingClientRect())),
+      overBackdrop: (x, y) =>
+        !!shown?.backdrop &&
+        !outsideBox({ x, y }, shown.backdrop.getBoundingClientRect()) &&
+        outsideBox({ x, y }, el.getBoundingClientRect()),
       returnTarget,
       onOutsidePress: (event) => {
         const target = event.composedPath()[0] as Element | undefined

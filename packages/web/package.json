@@ -15,15 +15,19 @@
     "./carousel": "./src/entries/carousel.ts",
     "./checkbox": "./src/entries/checkbox.ts",
     "./collapsible": "./src/entries/collapsible.ts",
+    "./color-picker": "./src/entries/color-picker.ts",
     "./combobox": "./src/entries/combobox.ts",
     "./command": "./src/entries/command.ts",
     "./date-picker": "./src/entries/date-picker.ts",
+    "./date-input": "./src/entries/date-input.ts",
     "./dialog": "./src/entries/dialog.ts",
     "./drawer": "./src/entries/drawer.ts",
     "./events": "./src/events.ts",
     "./field": "./src/entries/field.ts",
+    "./label": "./src/entries/label.ts",
     "./file-input": "./src/entries/file-input.ts",
     "./hover-card": "./src/entries/hover-card.ts",
+    "./image-cropper": "./src/entries/image-cropper.ts",
     "./input": "./src/entries/input.ts",
     "./listbox": "./src/entries/listbox.ts",
     "./tree": "./src/entries/tree.ts",
@@ -43,14 +47,17 @@
     "./preferences": "./src/entries/preferences.ts",
     "./progress": "./src/entries/progress.ts",
     "./radio": "./src/entries/radio.ts",
+    "./rating": "./src/entries/rating.ts",
     "./resizable": "./src/entries/resizable.ts",
     "./scroll-area": "./src/entries/scroll-area.ts",
     "./select": "./src/entries/select.ts",
+    "./segmented-control": "./src/entries/segmented-control.ts",
     "./separator": "./src/entries/separator.ts",
     "./slider": "./src/entries/slider.ts",
     "./switch": "./src/entries/switch.ts",
     "./tabs": "./src/entries/tabs.ts",
     "./textarea": "./src/entries/textarea.ts",
+    "./time-input": "./src/entries/time-input.ts",
     "./toast": "./src/entries/toast.ts",
     "./toggle": "./src/entries/toggle.ts",
     "./token-input": "./src/entries/token-input.ts",
@@ -114,6 +121,10 @@
         "types": "./dist/entries/collapsible.d.ts",
         "default": "./dist/entries/collapsible.js"
       },
+      "./color-picker": {
+        "types": "./dist/entries/color-picker.d.ts",
+        "default": "./dist/entries/color-picker.js"
+      },
       "./combobox": {
         "types": "./dist/entries/combobox.d.ts",
         "default": "./dist/entries/combobox.js"
@@ -125,6 +136,10 @@
       "./date-picker": {
         "types": "./dist/entries/date-picker.d.ts",
         "default": "./dist/entries/date-picker.js"
+      },
+      "./date-input": {
+        "types": "./dist/entries/date-input.d.ts",
+        "default": "./dist/entries/date-input.js"
       },
       "./dialog": {
         "types": "./dist/entries/dialog.d.ts",
@@ -142,6 +157,10 @@
         "types": "./dist/entries/field.d.ts",
         "default": "./dist/entries/field.js"
       },
+      "./label": {
+        "types": "./dist/entries/label.d.ts",
+        "default": "./dist/entries/label.js"
+      },
       "./file-input": {
         "types": "./dist/entries/file-input.d.ts",
         "default": "./dist/entries/file-input.js"
@@ -149,6 +168,10 @@
       "./hover-card": {
         "types": "./dist/entries/hover-card.d.ts",
         "default": "./dist/entries/hover-card.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/entries/image-cropper.d.ts",
+        "default": "./dist/entries/image-cropper.js"
       },
       "./input": {
         "types": "./dist/entries/input.d.ts",
@@ -226,6 +249,10 @@
         "types": "./dist/entries/radio.d.ts",
         "default": "./dist/entries/radio.js"
       },
+      "./rating": {
+        "types": "./dist/entries/rating.d.ts",
+        "default": "./dist/entries/rating.js"
+      },
       "./resizable": {
         "types": "./dist/entries/resizable.d.ts",
         "default": "./dist/entries/resizable.js"
@@ -237,6 +264,10 @@
       "./select": {
         "types": "./dist/entries/select.d.ts",
         "default": "./dist/entries/select.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/entries/segmented-control.d.ts",
+        "default": "./dist/entries/segmented-control.js"
       },
       "./separator": {
         "types": "./dist/entries/separator.d.ts",
@@ -257,6 +288,10 @@
       "./textarea": {
         "types": "./dist/entries/textarea.d.ts",
         "default": "./dist/entries/textarea.js"
+      },
+      "./time-input": {
+        "types": "./dist/entries/time-input.d.ts",
+        "default": "./dist/entries/time-input.js"
       },
       "./toast": {
         "types": "./dist/entries/toast.d.ts",

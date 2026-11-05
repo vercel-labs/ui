@@ -6,6 +6,7 @@ import * as Vue from "vue"
 import { compileTemplate } from "vue/compiler-sfc"
 import { createApp, defineComponent, h, nextTick, ref, type App, type FunctionalComponent } from "vue"
 import { Accordion, AccordionHeader, AccordionItem, AccordionTrigger } from "../src/accordion"
+import { Rating, RatingItem } from "../src/rating"
 import { Slider, SliderControl, SliderThumb } from "../src/slider"
 
 Element.prototype.getAnimations ??= () => []
@@ -102,4 +103,20 @@ test("a focused input in a #render slot's children keeps focus when the content 
   label.value = "Bass"
   await nextTick()
   expect(document.activeElement).toBe(input)
+})
+
+test("a rating star rendered through #render keeps its radios inside it", () => {
+  const el = mount(
+    defineComponent({
+      setup: () => () =>
+        h(Rating, null, () =>
+          h(RatingItem, null, {
+            render: ({ props, children }: RenderScope) => h("span", { ...props, class: "star" }, h(children)),
+          }),
+        ),
+    }),
+  )
+  const radios = [...el.querySelectorAll('[role="radio"]')]
+  expect(radios).toHaveLength(5)
+  expect(radios.every((radio) => radio.closest(".star"))).toBe(true)
 })

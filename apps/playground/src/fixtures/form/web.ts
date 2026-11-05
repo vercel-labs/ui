@@ -26,7 +26,7 @@ function markup(options: ReturnType<typeof formOptions>) {
               </ui-field>
               <ui-field name="${f.bio.name}">
                 <ui-field-label class="label">${f.bio.label}</ui-field-label>
-                <ui-textarea auto-resize${options.submitShortcut ? ` submit-shortcut="${options.submitShortcut}"` : ""}><textarea class="textarea"></textarea></ui-textarea>
+                <ui-textarea auto-resize><textarea class="textarea"></textarea></ui-textarea>
                 <ui-field-description>${f.bio.description}</ui-field-description>
                 <ui-field-error class="field-error"></ui-field-error>
               </ui-field>
@@ -87,7 +87,12 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/field")
   await import("@ui-sdk/web/input")
   const options = formOptions()
-  root.innerHTML = markup(options)
+  const template = document.createElement("template")
+  template.innerHTML = markup(options)
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  if (options.submitShortcut)
+    template.content.querySelector("ui-textarea")!.setAttribute("submit-shortcut", options.submitShortcut)
+  root.replaceChildren(template.content)
   const form = root.querySelector("form")!
   const [lastAction, submitted] = Array.from(root.querySelectorAll("output"))
   let errors = options.errors

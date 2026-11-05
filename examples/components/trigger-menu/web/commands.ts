@@ -33,8 +33,7 @@ function mount(root: HTMLElement) {
   const form = root.querySelector("form")!
   const menu = root.querySelector("ui-trigger-menu")!
   menu.triggers = [{ char: "/", boundary: "start", type: "command", items: commands }]
-  menu.addEventListener("select", (event) => {
-    if (event.target !== menu) return
+  menu.addEventListener("itemselect", (event) => {
     log(root, ["Chose", `/${event.detail.value}`, ...Object.values(event.detail.arguments)].join(" "))
   })
   form.addEventListener("submit", (event) => {

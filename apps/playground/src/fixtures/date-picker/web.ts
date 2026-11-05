@@ -1,6 +1,17 @@
 import type { UiDatePickerElement } from "@ui-sdk/web"
 import { datePickerAction, datePickerFixture as f, datePickerOptions } from "tests/fixtures/date-picker.ts"
 
+// URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+function setAttributes(
+  el: Element,
+  attributes: Record<string, string | number | boolean | null | undefined>,
+) {
+  for (const [name, value] of Object.entries(attributes)) {
+    if (value === undefined || value === null || value === false) continue
+    el.setAttribute(name, value === true ? "" : String(value))
+  }
+}
+
 async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/date-picker")
   // Web components have no controlled mode: `default-value` sets where the value starts.
@@ -9,37 +20,14 @@ async function mount(root: HTMLElement) {
   const preset = range ? f.rangePreset : f.preset
   const list = (value: string | string[] | null | undefined) =>
     Array.isArray(value) ? value.join(",") : value
-  const attribute = (name: string, setting: string | number | boolean | null | undefined) =>
-    setting === undefined || setting === null || setting === false
-      ? ""
-      : setting === true
-        ? ` ${name}`
-        : ` ${name}="${setting}"`
-  const attributes = [
-    attribute("today", f.today),
-    attribute("mode", options.mode),
-    attribute("name", range ? undefined : f.name),
-    attribute("start-name", range ? "start" : undefined),
-    attribute("end-name", range ? "end" : undefined),
-    attribute("default-value", list(options.defaultValue)),
-    attribute("min", options.min),
-    attribute("max", options.max),
-    attribute("unavailable", list(options.unavailable)),
-    attribute("required", options.required),
-    attribute("disabled", options.disabled),
-    attribute("read-only", options.readOnly),
-    attribute("close-on-select", options.closeOnSelect === false ? "false" : undefined),
-    attribute("min-days", options.minDays),
-    attribute("max-days", options.maxDays),
-    attribute("container", container ? `#${container.id}` : undefined),
-  ].join("")
-  root.innerHTML = `
-    <div class="fixture"${attribute("lang", lang)}>
+  const template = document.createElement("template")
+  template.innerHTML = `
+    <div class="fixture">
       <button>Before</button>
       <form>
         <label for="date-start">${range ? "Stay" : "Due date"}</label>
-        <ui-date-picker class="date-picker"${attributes}>
-          <ui-date-picker-input><input id="date-start"${attribute("aria-label", range ? "Start date" : undefined)} /></ui-date-picker-input>
+        <ui-date-picker class="date-picker">
+          <ui-date-picker-input><input id="date-start"${range ? ' aria-label="Start date"' : ""} /></ui-date-picker-input>
           ${range ? '<ui-date-picker-input end><input aria-label="End date" /></ui-date-picker-input>' : ""}
           <ui-date-picker-trigger></ui-date-picker-trigger>
           <ui-date-picker-clear><button>Clear</button></ui-date-picker-clear>
@@ -61,6 +49,27 @@ async function mount(root: HTMLElement) {
       <output role="status" aria-label="Last action"></output>
       <output role="status" aria-label="Submitted"></output>
     </div>`
+  // Set before the elements reach the page, so they start with these options.
+  setAttributes(template.content.querySelector(".fixture")!, { lang })
+  setAttributes(template.content.querySelector("ui-date-picker")!, {
+    today: f.today,
+    mode: options.mode,
+    name: range ? undefined : f.name,
+    "start-name": range ? "start" : undefined,
+    "end-name": range ? "end" : undefined,
+    "default-value": list(options.defaultValue),
+    min: options.min,
+    max: options.max,
+    unavailable: list(options.unavailable),
+    required: options.required,
+    disabled: options.disabled,
+    "read-only": options.readOnly,
+    "close-on-select": options.closeOnSelect === false ? "false" : undefined,
+    "min-days": options.minDays,
+    "max-days": options.maxDays,
+    container: container ? `#${container.id}` : undefined,
+  })
+  root.replaceChildren(template.content)
   const picker = root.querySelector<UiDatePickerElement>("ui-date-picker")!
   const form = root.querySelector("form")!
   const [action, submitted] = root.querySelectorAll("output")

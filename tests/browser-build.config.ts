@@ -14,20 +14,20 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   reporter: isCI ? [["github"], ["dot"]] : [["list"]],
   use: {
-    baseURL: `http://localhost:${pagesPort}`,
+    baseURL: `http://127.0.0.1:${pagesPort}`,
     browserName: "chromium",
     trace: isCI ? "on-first-retry" : "off",
   },
   webServer: [
     {
       command: `pnpm --filter @ui-sdk/web build && node browser-build/serve.mjs ../packages/web/browser ${filesPort}`,
-      url: `http://localhost:${filesPort}/web.js`,
+      url: `http://127.0.0.1:${filesPort}/web.js`,
       reuseExistingServer: !isCI,
       timeout: 300_000,
     },
     {
-      command: `node browser-build/serve.mjs browser-build/pages ${pagesPort} files=http://localhost:${filesPort}`,
-      url: `http://localhost:${pagesPort}/tabs.html`,
+      command: `node browser-build/serve.mjs browser-build/pages ${pagesPort} files=http://127.0.0.1:${filesPort}`,
+      url: `http://127.0.0.1:${pagesPort}/tabs.html`,
       reuseExistingServer: !isCI,
     },
   ],

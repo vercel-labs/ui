@@ -13,7 +13,7 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 
 ## Installation
 
-```package-install
+```bash
 npm install @ui-sdk/vue @ui-sdk/core
 ```
 
@@ -55,7 +55,7 @@ import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
 
 ## Submenus
 
-Nest a Sub, SubTrigger, and SubContent to add another level. Hover or press the arrow key toward a submenu to open it. The menu lets a pointer travel diagonally into the submenu without accidentally choosing an item it passes over.
+Nest a Sub, SubTrigger, and SubContent to add another level. Hover or press the arrow key toward a submenu to open it. The menu lets a pointer travel diagonally into the submenu without accidentally choosing an item it passes over. Escape closes only the submenu and returns focus to its trigger, as the menu pattern asks.
 
 <ComponentExample
   name="menu/submenu"
@@ -390,9 +390,25 @@ A trigger outside the menu also takes `controller`.
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIconProps" />
 
+### MenuSub
+
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuSubProps"
+  type="Pick<MenuOptions, 'open' | 'defaultOpen' | 'onOpenChange' | 'onOpenChangeComplete' | 'loop' | 'delay' | 'controller' | 'debug'>"
+/>
+
 ### MenuSubTrigger
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuSubTriggerProps" />
+
+### MenuSubContent
+
+It takes the same props as `MenuContent`.
+
+### MenuGroup, MenuGroupLabel and MenuSeparator
+
+These take no props of their own, only the props of the element they render.
 
 ### State
 

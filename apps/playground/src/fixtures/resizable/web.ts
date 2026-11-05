@@ -5,22 +5,19 @@ import { formatLayout, resizableFixture as f, resizableOptions } from "tests/fix
 const { sidebar, main, preview } = f.editor.panels
 const { code, terminal } = f.main.panels
 
+// URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+function setAttributes(el: Element, attributes: Record<string, string | number | boolean | undefined>) {
+  for (const [name, value] of Object.entries(attributes)) {
+    if (value === undefined || value === false) continue
+    el.setAttribute(name, value === true ? "" : String(value))
+  }
+}
+
 function markup(options: ReturnType<typeof resizableOptions>) {
-  const attributes = [
-    options.orientation && ` orientation="${options.orientation}"`,
-    options.disabled && " disabled",
-    options.step !== undefined && ` step="${options.step}"`,
-    options.largeStep !== undefined && ` large-step="${options.largeStep}"`,
-    options.autoSaveId && ` auto-save-id="${options.autoSaveId}"`,
-    options.defaultLayout && ` default-layout="${options.defaultLayout.join(",")}"`,
-    options.controlled && ` layout="25,50,25"`,
-  ]
-    .filter(Boolean)
-    .join("")
   return `
     <div class="fixture">
       <button>Before</button>
-      <ui-resizable id="${f.editor.id}" class="resizable"${attributes}>
+      <ui-resizable id="${f.editor.id}" class="resizable">
         <ui-resizable-panel id="${sidebar.id}" default-size="${sidebar.defaultSize}" min-size="${sidebar.minSize}" max-size="${sidebar.maxSize}" collapsible class="resizable-panel" role="group" aria-label="${sidebar.label}">
           <button>Sidebar action</button>
         </ui-resizable-panel>
@@ -49,7 +46,19 @@ function markup(options: ReturnType<typeof resizableOptions>) {
 
 function mount(root: HTMLElement) {
   const options = resizableOptions()
-  root.innerHTML = markup(options)
+  const template = document.createElement("template")
+  template.innerHTML = markup(options)
+  // Set before the element reaches the page, so it starts with these options.
+  setAttributes(template.content.querySelector(`#${f.editor.id}`)!, {
+    orientation: options.orientation,
+    disabled: options.disabled,
+    step: options.step,
+    "large-step": options.largeStep,
+    "auto-save-id": options.autoSaveId,
+    "default-layout": options.defaultLayout?.join(","),
+    layout: options.controlled ? "25,50,25" : undefined,
+  })
+  root.replaceChildren(template.content)
   const editor = root.querySelector<UiResizableElement>(`#${f.editor.id}`)!
   const action = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
   const committed = root.querySelector<HTMLOutputElement>('output[aria-label="Committed"]')!

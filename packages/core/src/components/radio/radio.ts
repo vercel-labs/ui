@@ -1,26 +1,13 @@
-import { moveIndex, radioStep } from "../../foundation/focus/collection"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
-import { createRovingFocus } from "../../foundation/focus/roving-focus"
-import {
-  bindHiddenInput,
-  bindInternals,
-  dispatchChange,
-  formInternals,
-  hiddenInputStyle,
-  isDisabled,
-  nameFromLabels,
-  submitImplicitly,
-  valueMissingMessage,
-} from "../../foundation/forms/form"
+import { isDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
-import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveContext, PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
-import { createChange } from "../../foundation/kernel/input-source"
-import { elements } from "../../foundation/kernel/elements"
 import { subscribe } from "../../foundation/kernel/part"
+import { itemData, itemState, radioGroupApi, radioGroupState, syncRadioGroup } from "./radio-api"
+import { radioSlots } from "./radio-parts"
 import type { RadioGroupGeneric } from "./radio-generic"
 
 /**
@@ -153,173 +140,12 @@ type RadioState = {
  */
 type RadioIndicatorState = RadioState
 
-type RadioGroupState_ = {
-  value: string | null
-  // What a form reset returns to: the first value.
-  initial: string | null
-  disabled: boolean
-  readOnly: boolean
-  required: boolean
-  name: string | undefined
-  form: string | undefined
-  formDisabled: boolean
-  // The item Tab lands on: the checked one, or the first enabled one when that
-  // can't take focus. Null until items bind.
-  stop: string | null
-  // Indicators animating out.
-  exiting: string[]
-}
-
-const isNativeButton = (el: HTMLElement | undefined) => el instanceof HTMLButtonElement
-
-function radioGroupApi(context: PrimitiveContext<RadioGroupOptions, RadioGroupState_, string>) {
-  const { id, store, options, element, props } = context
-  const change = createChange(context)
-  let changed = false
-
-  const enabled = (item: { props: ItemProps | undefined }) =>
-    !item.props?.disabled && !isDisabled(store.get())
-  // Like native radios: both axes move, disabled items are skipped, and Tab
-  // lands on the checked item. Before items bind, the checked item holds the
-  // stop, or with nothing checked, the first enabled one claims it. Disabling
-  // the group is a change of state, which moves the stop on its own.
-  const roving = createRovingFocus<RadioGroupState_, ItemProps>(context, {
-    slot: "root",
-    key: "stop",
-    remember: false,
-    disabled: (item) => !enabled(item),
-    focusable: enabled,
-    preferred: (item) => store.get().value === item.key,
-    claims: (state, item) => (state.value ?? item.key) === item.key,
-    move(event, { from, items, rtl }) {
-      if (event.shiftKey) return
-      const step = radioStep(event.key, rtl)
-      if (step === undefined) return
-      return items[moveIndex(items.indexOf(from), step, items.length, options().loop ?? true)].key
-    },
-  })
-  // The indicators animating out once `value` replaces `from`.
-  const exitingAfter = (from: string | null, value: string | null, exiting: string[]) => [
-    ...exiting.filter((key) => key !== value),
-    ...(from !== null && hasIndicator(from) && !exiting.includes(from) ? [from] : []),
-  ]
-
-  // A controlled `value` moves the indicator and the tab stop in the same pass.
-  deriveFromOptions(context, ["exiting", "stop"], (synced, state) => {
-    if (!("value" in synced) || synced.value === state.value) return
-    const value = (synced.value ?? null) as string | null
-    const stop = roving.stopFor((item) => item.key === value)
-    return { exiting: exitingAfter(state.value, value, state.exiting), ...(stop !== undefined && { stop }) }
-  })
-
-  let previous = store.get().value
-  store.subscribe(() => {
-    const { value, exiting } = store.get()
-    if (value === previous) return
-    const from = previous
-    previous = value
-    changed = true
-    store.set({ exiting: exitingAfter(from, value, exiting) })
-    roving.check()
-  })
-
-  // Indicators are keyed by their item's value, so this is a lookup, not a sort.
-  const hasIndicator = (value: string) => !!element("indicator", value)?.isConnected
-
-  const formElement = () => {
-    const root = element("group")
-    if (formInternals(root)) return root
-    const { value } = store.get()
-    return value === null ? undefined : element("input", value)
-  }
-
-  const api = {
-    id,
-    getValue: () => store.get().value,
-    isChanged: () => changed,
-    // Checks a radio, as a user would. Disabled radios and read-only groups ignore it.
-    setValue(value: string | null, { reason = "imperative", event }: Details = {}) {
-      const details = { reason, event }
-      const state = store.get()
-      if (isDisabled(state) || state.readOnly) return false
-      if (value !== null && (props("root", value) as ItemProps | undefined)?.disabled) return false
-      const done = change("value", value, details)
-      if (done && reason !== "restore") dispatchChange(formElement())
-      return done
-    },
-    // Moves focus to the item that holds the tab stop, the checked one if it is enabled.
-    focus: () => roving.focus(),
-    form: () =>
-      formInternals(element("group"))?.form ??
-      (elements(context, "input")[0]?.el as HTMLInputElement | undefined)?.form ??
-      null,
-    internal: {
-      reset() {
-        change("value", store.get().initial, { reason: "reset" })
-      },
-      // The browser restores a disabled or read-only group too, as a native one.
-      restore(saved: string) {
-        change("value", saved || null, { reason: "restore" })
-      },
-      setFormDisabled(formDisabled: boolean) {
-        store.set({ formDisabled })
-      },
-      finishExit(key: string) {
-        store.set({ exiting: store.get().exiting.filter((value) => value !== key) })
-      },
-      roving,
-      radio: (key: string) => element("root", key),
-      // The props its item rendered with, for parts inside an item.
-      itemProps: (key: string) => (props("root", key) ?? {}) as { disabled?: boolean },
-      anchor: () => (roving.items()[0] ?? elements(context, "root")[0])?.el,
-      onKeyDown(event: KeyboardEvent, el: HTMLElement) {
-        if (event.altKey || event.ctrlKey || event.metaKey) return
-        if (event.key === "Enter") {
-          // Enter submits the form, like on a native radio.
-          event.preventDefault()
-          if (!event.repeat) submitImplicitly(api.form())
-          return
-        }
-        if (event.key === " ") {
-          if (!isNativeButton(el)) event.preventDefault()
-          return
-        }
-        const moved = roving.keydown(event, el)
-        // Like native radios, moving checks the item.
-        if (moved && moved.key !== moved.from && !store.get().readOnly)
-          api.setValue(moved.key, { reason: "list-navigation", event })
-      },
-    },
-  }
-  return api
-}
-
 /**
  * `radioGroup`'s api, which its slots and controller call.
  * Adapters expose it as `api`.
  * @stable
  */
 type RadioGroupApi = ReturnType<typeof radioGroupApi>
-
-function itemState(state: RadioGroupState_, key: string, props: { disabled?: boolean }) {
-  return {
-    checked: state.value === key,
-    disabled: !!props.disabled || isDisabled(state),
-    readOnly: state.readOnly,
-    required: state.required,
-  }
-}
-
-function itemData(state: RadioGroupState_, key: string, props: { disabled?: boolean }) {
-  const { checked, disabled } = itemState(state, key, props)
-  return {
-    "data-checked": checked ? "" : undefined,
-    "data-unchecked": checked ? undefined : "",
-    "data-disabled": disabled ? "" : undefined,
-    "data-readonly": state.readOnly ? "" : undefined,
-    "data-required": state.required ? "" : undefined,
-  }
-}
 
 const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
   name: "radio",
@@ -335,227 +161,64 @@ const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
     loop: "boolean",
     controller: "value",
   },
-  state: (options: RadioGroupOptions): RadioGroupState_ => {
-    const value = options.value !== undefined ? options.value : (options.defaultValue ?? null)
+  state: radioGroupState,
+  sync: syncRadioGroup,
+  api: (context) => radioGroupApi(context),
+  slots: (slot) => {
+    const { group, item, input } = radioSlots(slot, (state) => ({
+      value: state.value,
+      disabled: isDisabled(state),
+      readOnly: state.readOnly,
+      required: state.required,
+    }))
     return {
-      value,
-      initial: value,
-      disabled: !!options.disabled,
-      readOnly: !!options.readOnly,
-      required: !!options.required,
-      name: options.name,
-      form: options.form,
-      formDisabled: false,
-      stop: null,
-      exiting: [],
+      group,
+      root: item,
+      input,
+      indicator: slot<IndicatorProps, RadioIndicatorState>({
+        props: { value: { kind: "string", from: "root" }, keepMounted: "boolean" },
+        // Every renderer fills the value from the item around it. Indicators skip
+        // the tab stop, which moves with every arrow key, and only ask whether
+        // their own value is exiting.
+        selects: selects({
+          value: ({ props }) => [props.value!],
+          stop: [],
+          exiting: ({ props }) => [props.value!],
+        }),
+        present: (state, { props: { value, keepMounted } }) =>
+          !!keepMounted || state.value === value || state.exiting.includes(value!),
+        state: (state, { props: { value }, api }) => itemState(state, value!, api.internal.itemProps(value!)),
+        attrs: (state, { props: { value }, api }) => itemData(state, value!, api.internal.itemProps(value!)),
+        bind(el, part) {
+          const { api, store, props } = part
+          const key = props.value!
+          let stop: (() => void) | undefined
+          let shown = store.get().value === key
+          if (shown && api.isChanged()) stop = animateIn(el)
+          const unsubscribe = subscribe(part, () => {
+            const { value, exiting } = store.get()
+            if ((value === key) === shown) return
+            shown = value === key
+            stop?.()
+            stop = undefined
+            // Ahead of the render, for exit keyframes keyed on the state.
+            el.toggleAttribute("data-checked", shown)
+            el.toggleAttribute("data-unchecked", !shown)
+            if (shown) stop = animateIn(el)
+            else if (exiting.includes(key) || props.keepMounted)
+              stop = animateOut(el, () => {
+                stop = undefined
+                api.internal.finishExit(key)
+              })
+          })
+          return () => {
+            unsubscribe()
+            stop?.()
+          }
+        },
+      }),
     }
   },
-  sync: (options) => ({
-    disabled: !!options.disabled,
-    readOnly: !!options.readOnly,
-    required: !!options.required,
-    name: options.name,
-    form: options.form,
-    // Like a native radio's `defaultChecked`, changing it changes what a reset returns to.
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
-    ...(options.value === undefined ? {} : { value: options.value }),
-  }),
-  api: radioGroupApi,
-  slots: (slot) => ({
-    group: slot<{}, RadioGroupState>({
-      role: "radiogroup",
-      keys: { none: "Focus stays on a radio, whose keydown handles them." },
-      state: (state) => ({
-        value: state.value,
-        disabled: isDisabled(state),
-        readOnly: state.readOnly,
-        required: state.required,
-      }),
-      attrs: (state) => ({
-        "aria-required": state.required ? "true" : undefined,
-        "aria-readonly": state.readOnly ? "true" : undefined,
-        "aria-disabled": isDisabled(state) ? "true" : undefined,
-        "data-disabled": isDisabled(state) ? "" : undefined,
-        "data-readonly": state.readOnly ? "" : undefined,
-        "data-required": state.required ? "" : undefined,
-      }),
-      bind: (el, { api, store }) => {
-        const unbind = bindInternals(el, {
-          value: () => store.get().value,
-          state: () => store.get().value ?? "",
-          restore: api.internal.restore,
-          valueMissing: () => store.get().required && store.get().value === null,
-          message: () => valueMissingMessage("radio"),
-          anchor: api.internal.anchor,
-          focus: api.focus,
-          reset: api.internal.reset,
-          disabled: api.internal.setFormDisabled,
-          subscribe: store.subscribe,
-        })
-        // A label pointing at the group moves focus into it.
-        const onClick = (event: MouseEvent) => {
-          if (event.target === el) api.focus()
-        }
-        // A press on a label would focus a radio the group disables, which
-        // stays focusable to scripts. Like a disabled native radio, it doesn't
-        // take focus. Browsers send no mouse events into a disabled form
-        // element, like a web component group, so this listens for focus. An
-        // enabled group never looks for the label.
-        let pressedLabel: HTMLLabelElement | null = null
-        const onPointerDown = (event: PointerEvent) => {
-          pressedLabel = isDisabled(store.get())
-            ? ((event.target as Element | null)?.closest?.("label") ?? null)
-            : null
-        }
-        const onFocusIn = (event: FocusEvent) => {
-          const label = pressedLabel
-          pressedLabel = null
-          const target = event.target as HTMLElement
-          if (label?.control === target && target !== el) target.blur()
-        }
-        const doc = el.ownerDocument
-        el.addEventListener("click", onClick)
-        el.addEventListener("focusin", onFocusIn)
-        doc.addEventListener("pointerdown", onPointerDown, true)
-        return () => {
-          unbind()
-          el.removeEventListener("click", onClick)
-          el.removeEventListener("focusin", onFocusIn)
-          doc.removeEventListener("pointerdown", onPointerDown, true)
-        }
-      },
-    }),
-
-    root: slot<ItemProps, RadioState>({
-      role: "radio",
-      focus: "roving",
-      keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", " "],
-      props: { value: "string", disabled: "boolean" },
-      // Until there's a stop, the checked item holds it, or with nothing
-      // checked, the first enabled one claims it: those hear a change to null.
-      // Radios never read which indicators are exiting.
-      selects: selects({ value: ({ key }) => [key, null], stop: ({ key }) => [key, null], exiting: [] }),
-      state: (state, { key, props }) => itemState(state, key, props),
-      attrs: (state, { key, props, api }) => {
-        const { checked, disabled } = itemState(state, key, props)
-        return {
-          type: "button",
-          "aria-checked": String(checked),
-          // Disabled items are skipped, like native radios.
-          disabled: props.disabled ? "" : undefined,
-          "aria-disabled": disabled ? "true" : undefined,
-          tabindex: disabled
-            ? props.disabled
-              ? undefined
-              : "-1"
-            : api.internal.roving.tabIndex(state, { key, props }),
-          ...itemData(state, key, props),
-        }
-      },
-      press({ api, key, props }, event) {
-        // A click inside the radio would make a <label> around it click it again
-        // in Firefox and Safari.
-        event?.preventDefault()
-        if (props.disabled) return
-        api.setValue(key, { reason: "item-press", event })
-      },
-      on: {
-        // A group's disabled leaves the item focusable to scripts, so a press
-        // mustn't focus it either, like a disabled native radio.
-        mousedown: (event, { store, key, props }) => {
-          if (itemState(store.get(), key, props).disabled) event.preventDefault()
-        },
-        keydown: (event, { api, el }) => api.internal.onKeyDown(event, el!),
-        keyup: (event, { api, el, key, props }) => {
-          if (event.key === " " && !isNativeButton(el) && !props.disabled)
-            api.setValue(key, { reason: "item-press", event })
-        },
-      },
-      bind(el, part) {
-        const unregister = part.api.internal.roving.bind(el, part)
-        const unname = nameFromLabels(el)
-        return () => {
-          unname()
-          unregister()
-        }
-      },
-    }),
-
-    // React and Vue: a native radio per item, so the form submits, resets and validates them.
-    input: slot<ItemProps>({
-      props: { value: "string", disabled: "boolean" },
-      attrs: (state, { id, key, props }) => ({
-        type: "radio",
-        // Required radios need a group to validate as one.
-        name: state.name ?? (state.required ? id : undefined),
-        value: key,
-        form: state.form,
-        checked: state.initial === key ? "" : undefined,
-        required: state.required ? "" : undefined,
-        disabled: state.disabled || props.disabled ? "" : undefined,
-        "aria-hidden": "true",
-        tabindex: "-1",
-        style: hiddenInputStyle,
-      }),
-      bind: (el, { api, store, key }) =>
-        bindHiddenInput(el as HTMLInputElement, {
-          checked: () => store.get().value === key,
-          subscribe: store.subscribe,
-          // The browser focuses an invalid radio on submit. Focus goes to the group's tab stop.
-          focus: api.focus,
-          control: () => api.internal.radio(key),
-          activate: (event) => {
-            if (!api.internal.itemProps(key).disabled) api.setValue(key, { reason: "item-press", event })
-          },
-          reset: api.internal.reset,
-          disabled: api.internal.setFormDisabled,
-        }),
-    }),
-
-    indicator: slot<IndicatorProps, RadioIndicatorState>({
-      props: { value: { kind: "string", from: "root" }, keepMounted: "boolean" },
-      // Keyed by the item's value, which every renderer fills from the item
-      // around it, so it's set by now. Indicators never read the tab stop,
-      // which moves with every arrow key, and only ask whether their own value
-      // is exiting.
-      selects: selects({
-        value: ({ props }) => [props.value!],
-        stop: [],
-        exiting: ({ props }) => [props.value!],
-      }),
-      present: (state, { props: { value, keepMounted } }) =>
-        !!keepMounted || state.value === value || state.exiting.includes(value!),
-      state: (state, { props: { value }, api }) => itemState(state, value!, api.internal.itemProps(value!)),
-      attrs: (state, { props: { value }, api }) => itemData(state, value!, api.internal.itemProps(value!)),
-      bind(el, part) {
-        const { api, store, props } = part
-        const key = props.value!
-        let stop: (() => void) | undefined
-        let shown = store.get().value === key
-        if (shown && api.isChanged()) stop = animateIn(el)
-        const unsubscribe = subscribe(part, () => {
-          const { value, exiting } = store.get()
-          if ((value === key) === shown) return
-          shown = value === key
-          stop?.()
-          stop = undefined
-          // Ahead of the render, for exit keyframes keyed on the state.
-          el.toggleAttribute("data-checked", shown)
-          el.toggleAttribute("data-unchecked", !shown)
-          if (shown) stop = animateIn(el)
-          else if (exiting.includes(key) || props.keepMounted)
-            stop = animateOut(el, () => {
-              stop = undefined
-              api.internal.finishExit(key)
-            })
-        })
-        return () => {
-          unsubscribe()
-          stop?.()
-        }
-      },
-    }),
-  }),
   agent: { actions: ["setValue"], closed: true },
 })
 /**

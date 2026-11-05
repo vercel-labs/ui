@@ -27,7 +27,7 @@ function mount(root: HTMLElement) {
           ${members
             .map(
               (member) => `
-                <ui-select-item value="${member.id}">
+                <ui-select-item>
                   <span data-slot="stack">
                     ${member.name}
                     <span data-slot="hint">${member.email}</span>
@@ -44,7 +44,8 @@ function mount(root: HTMLElement) {
   const select = root.querySelector("ui-select")!
   select.itemToValue = (member) => String((member as Member).id)
   select.itemToLabel = (member) => (member as Member).name
-  select.items = members.map((member) => ({ value: member, label: member.name }))
+  select.isItemEqualToValue = (item, value) => (item as Member).id === (value as Member).id
+  root.querySelectorAll("ui-select-item").forEach((item, index) => (item.value = members[index]))
   select.value = { ...members[1] }
   select.addEventListener("valuechange", (event) => {
     const member = event.detail.value as Member | null

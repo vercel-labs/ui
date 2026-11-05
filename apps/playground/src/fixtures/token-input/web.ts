@@ -11,22 +11,12 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/trigger-menu")
   const { value, pending, fail, tokenDeletion, submitShortcut, copy, disabled, readOnly, otherForm } =
     tokenInputOptions()
-  const attributes = [
-    `name="${f.name}"`,
-    otherForm && `form="other"`,
-    tokenDeletion && `token-deletion="${tokenDeletion}"`,
-    submitShortcut && `submit-shortcut="${submitShortcut}"`,
-    copy && `copy="${copy}"`,
-    disabled && "disabled",
-    readOnly && "read-only",
-  ]
-    .filter(Boolean)
-    .join(" ")
-  root.innerHTML = `
+  const template = document.createElement("template")
+  template.innerHTML = `
     <div class="fixture">
       <button>Before</button>
       <form class="composer" aria-label="${f.formLabel}">
-        <ui-token-input ${attributes}>
+        <ui-token-input name="${f.name}"${otherForm ? ' form="other"' : ""}${disabled ? " disabled" : ""}${readOnly ? " read-only" : ""}>
           <label class="label" id="prompt-label">${f.label}</label>
           <ui-token-input-editor class="editor" aria-labelledby="prompt-label" placeholder="${f.placeholder}"></ui-token-input-editor>
           <template><ui-token-input-token class="token"><span data-token-label></span><ui-token-input-token-remove> ×</ui-token-input-token-remove></ui-token-input-token></template>
@@ -46,11 +36,17 @@ async function mount(root: HTMLElement) {
       <output role="status" aria-label="Last action"></output>
       <output role="status" aria-label="Submitted"></output>
     </div>`
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  const tokens = template.content.querySelector("ui-token-input")!
+  if (tokenDeletion) tokens.setAttribute("token-deletion", tokenDeletion)
+  if (submitShortcut) tokens.setAttribute("submit-shortcut", submitShortcut)
+  if (copy) tokens.setAttribute("copy", copy)
+  root.replaceChildren(template.content)
   const input = root.querySelector("ui-token-input")!
   if (value) input.setAttribute("value", value)
   const menu = root.querySelector("ui-trigger-menu")!
   menu.triggers = tokenTriggers()
-  menu.addEventListener("select", (event) => {
+  menu.addEventListener("itemselect", (event) => {
     if (pending && event.detail.trigger === "@") event.detail.waitUntil(pendingSelect({ fail }))
   })
   const output = (name: string) => root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!

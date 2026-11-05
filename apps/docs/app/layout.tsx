@@ -1,3 +1,4 @@
+import { BetaBanner } from "@/components/beta-banner"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { SitePreferences } from "@/components/site-preferences"
@@ -5,6 +6,7 @@ import { source } from "@/lib/source"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./global.css"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
@@ -31,11 +33,13 @@ export default function Layout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col bg-canvas font-sans text-foreground">
         <SitePreferences>
+          <BetaBanner />
           <SiteHeader urls={urls} />
           {children}
           <SiteFooter />
         </SitePreferences>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

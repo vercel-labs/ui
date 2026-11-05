@@ -16,17 +16,23 @@
     "./carousel": "./src/carousel.tsx",
     "./checkbox": "./src/checkbox.tsx",
     "./collapsible": "./src/collapsible.tsx",
+    "./color": "./src/color.ts",
+    "./color-picker": "./src/color-picker.tsx",
     "./combobox": "./src/combobox.tsx",
     "./command": "./src/command.tsx",
     "./date": "./src/date.ts",
     "./date-picker": "./src/date-picker.tsx",
+    "./date-input": "./src/date-input.tsx",
     "./dialog": "./src/dialog.tsx",
     "./drawer": "./src/drawer.tsx",
     "./field": "./src/field.tsx",
     "./file-input": "./src/file-input.tsx",
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.tsx",
+    "./image": "./src/image.ts",
+    "./image-cropper": "./src/image-cropper.tsx",
     "./input": "./src/input.tsx",
+    "./label": "./src/label.tsx",
     "./listbox": "./src/listbox.tsx",
     "./menu": "./src/menu.tsx",
     "./menubar": "./src/menubar.tsx",
@@ -43,8 +49,10 @@
     "./preferences": "./src/preferences.tsx",
     "./progress": "./src/progress.tsx",
     "./radio": "./src/radio.tsx",
+    "./rating": "./src/rating.tsx",
     "./resizable": "./src/resizable.tsx",
     "./scroll-area": "./src/scroll-area.tsx",
+    "./segmented-control": "./src/segmented-control.tsx",
     "./select": "./src/select.tsx",
     "./separator": "./src/separator.tsx",
     "./shortcuts": "./src/shortcuts.ts",
@@ -56,6 +64,7 @@
     "./observe": "./src/observe.ts",
     "./timeline": "./src/timeline.ts",
     "./textarea": "./src/textarea.tsx",
+    "./time-input": "./src/time-input.tsx",
     "./toast": "./src/toast.tsx",
     "./toggle": "./src/toggle.tsx",
     "./token-input": "./src/token-input.tsx",
@@ -126,6 +135,15 @@
         "solid": "./dist/solid/collapsible.jsx",
         "default": "./dist/collapsible.js"
       },
+      "./color": {
+        "types": "./dist/color.d.ts",
+        "default": "./dist/color.js"
+      },
+      "./color-picker": {
+        "types": "./dist/color-picker.d.ts",
+        "solid": "./dist/solid/color-picker.jsx",
+        "default": "./dist/color-picker.js"
+      },
       "./combobox": {
         "types": "./dist/combobox.d.ts",
         "solid": "./dist/solid/combobox.jsx",
@@ -144,6 +162,11 @@
         "types": "./dist/date-picker.d.ts",
         "solid": "./dist/solid/date-picker.jsx",
         "default": "./dist/date-picker.js"
+      },
+      "./date-input": {
+        "types": "./dist/date-input.d.ts",
+        "solid": "./dist/solid/date-input.jsx",
+        "default": "./dist/date-input.js"
       },
       "./dialog": {
         "types": "./dist/dialog.d.ts",
@@ -175,10 +198,24 @@
         "solid": "./dist/solid/hover-card.jsx",
         "default": "./dist/hover-card.js"
       },
+      "./image": {
+        "types": "./dist/image.d.ts",
+        "default": "./dist/image.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/image-cropper.d.ts",
+        "solid": "./dist/solid/image-cropper.jsx",
+        "default": "./dist/image-cropper.js"
+      },
       "./input": {
         "types": "./dist/input.d.ts",
         "solid": "./dist/solid/input.jsx",
         "default": "./dist/input.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "solid": "./dist/solid/label.jsx",
+        "default": "./dist/label.js"
       },
       "./listbox": {
         "types": "./dist/listbox.d.ts",
@@ -259,6 +296,11 @@
         "solid": "./dist/solid/radio.jsx",
         "default": "./dist/radio.js"
       },
+      "./rating": {
+        "types": "./dist/rating.d.ts",
+        "solid": "./dist/solid/rating.jsx",
+        "default": "./dist/rating.js"
+      },
       "./resizable": {
         "types": "./dist/resizable.d.ts",
         "solid": "./dist/solid/resizable.jsx",
@@ -268,6 +310,11 @@
         "types": "./dist/scroll-area.d.ts",
         "solid": "./dist/solid/scroll-area.jsx",
         "default": "./dist/scroll-area.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control.d.ts",
+        "solid": "./dist/solid/segmented-control.jsx",
+        "default": "./dist/segmented-control.js"
       },
       "./select": {
         "types": "./dist/select.d.ts",
@@ -323,6 +370,11 @@
         "types": "./dist/textarea.d.ts",
         "solid": "./dist/solid/textarea.jsx",
         "default": "./dist/textarea.js"
+      },
+      "./time-input": {
+        "types": "./dist/time-input.d.ts",
+        "solid": "./dist/solid/time-input.jsx",
+        "default": "./dist/time-input.js"
       },
       "./toast": {
         "types": "./dist/toast.d.ts",

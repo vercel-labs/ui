@@ -369,6 +369,68 @@
     margin-top: var(--space-2);
   }
 
+  /* ─── Behaviors: Color ────────────────────────────────────────────── */
+
+  [data-slot="color-field"] {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  [data-slot="color-swatch"] {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-row);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  [data-slot="color-formats"] {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    font-size: var(--text-sm);
+
+    & > dt {
+      color: var(--muted);
+    }
+
+    & > dd {
+      margin: 0;
+      font-family: var(--font-geist-mono), ui-monospace, monospace;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  [data-slot="color-field"] > select {
+    width: auto;
+  }
+
+  [data-slot="color-steps"] {
+    display: grid;
+    width: 20rem;
+    max-width: 100%;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    & > li {
+      aspect-ratio: 1;
+      border-radius: var(--radius-row);
+      box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+    }
+  }
+
+  [data-slot="contrast-preview"] {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-surface);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
   /* ─── Behaviors: Color scheme ─────────────────────────────────────── */
 
   [data-slot="scheme-picker-root"] {
@@ -3780,5 +3842,23 @@
   [data-slot="virtualizer-term"] {
     color: var(--ink);
     font-weight: 500;
+  }
+
+  [data-slot="image-crop-stage"] {
+    display: grid;
+    place-items: center;
+    width: 220px;
+    height: 220px;
+
+    & > canvas {
+      width: 200px;
+      height: 150px;
+      transition: transform var(--duration) ease-out;
+    }
+  }
+
+  [data-slot="image-crop-result"] {
+    width: 96px;
+    height: 96px;
   }
 }

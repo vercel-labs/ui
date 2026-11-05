@@ -13,7 +13,7 @@ Start with a trigger and a few actions. Add groups, checkboxes, radio choices, o
 
 ## Installation
 
-```package-install
+```bash
 npm install @ui-sdk/web @ui-sdk/core
 ```
 
@@ -56,7 +56,7 @@ Import the parts and put them together:
 
 ## Submenus
 
-Nest a Sub, SubTrigger, and SubContent to add another level. Hover or press the arrow key toward a submenu to open it. The menu lets a pointer travel diagonally into the submenu without accidentally choosing an item it passes over.
+Nest a Sub, SubTrigger, and SubContent to add another level. Hover or press the arrow key toward a submenu to open it. The menu lets a pointer travel diagonally into the submenu without accidentally choosing an item it passes over. Escape closes only the submenu and returns focus to its trigger, as the menu pattern asks.
 
 <ComponentExample
   name="menu/submenu"
@@ -398,9 +398,25 @@ A trigger outside the menu names it with `for="menu-id"`, and takes `payload` as
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIconProps" />
 
+### MenuSub
+
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuSubProps"
+  type="Pick<MenuOptions, 'open' | 'defaultOpen' | 'onOpenChange' | 'onOpenChangeComplete' | 'loop' | 'delay' | 'debug'>"
+/>
+
 ### MenuSubTrigger
 
 <TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuSubTriggerProps" />
+
+### MenuSubContent
+
+It takes the same attributes as `ui-menu-content`.
+
+### MenuGroup, MenuGroupLabel and MenuSeparator
+
+These take no attributes of their own.
 
 ### State
 

@@ -19,17 +19,23 @@
     "./carousel": "./src/carousel.ts",
     "./checkbox": "./src/checkbox.ts",
     "./collapsible": "./src/collapsible.ts",
+    "./color": "./src/color.ts",
+    "./color-picker": "./src/color-picker.ts",
     "./combobox": "./src/combobox.ts",
     "./command": "./src/command.ts",
     "./date": "./src/date.ts",
     "./date-picker": "./src/date-picker.ts",
+    "./date-input": "./src/date-input.ts",
     "./dialog": "./src/dialog.ts",
     "./drawer": "./src/drawer.ts",
     "./field": "./src/field.ts",
     "./file-input": "./src/file-input.ts",
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.ts",
+    "./image": "./src/image.ts",
+    "./image-cropper": "./src/image-cropper.ts",
     "./input": "./src/input.ts",
+    "./label": "./src/label.ts",
     "./listbox": "./src/listbox.ts",
     "./menu": "./src/menu.ts",
     "./menubar": "./src/menubar.ts",
@@ -46,8 +52,10 @@
     "./preferences": "./src/preferences.ts",
     "./progress": "./src/progress.ts",
     "./radio": "./src/radio.ts",
+    "./rating": "./src/rating.ts",
     "./resizable": "./src/resizable.ts",
     "./scroll-area": "./src/scroll-area.ts",
+    "./segmented-control": "./src/segmented-control.ts",
     "./select": "./src/select.ts",
     "./separator": "./src/separator.ts",
     "./shortcuts": "./src/shortcuts.ts",
@@ -59,6 +67,7 @@
     "./observe": "./src/observe.ts",
     "./timeline": "./src/timeline.ts",
     "./textarea": "./src/textarea.ts",
+    "./time-input": "./src/time-input.ts",
     "./toast": "./src/toast.ts",
     "./toggle": "./src/toggle.ts",
     "./token-input": "./src/token-input.ts",
@@ -130,6 +139,15 @@
         "svelte": "./dist/collapsible.js",
         "default": "./dist/collapsible.js"
       },
+      "./color": {
+        "types": "./dist/color.d.ts",
+        "default": "./dist/color.js"
+      },
+      "./color-picker": {
+        "types": "./dist/color-picker.d.ts",
+        "svelte": "./dist/color-picker.js",
+        "default": "./dist/color-picker.js"
+      },
       "./date": {
         "types": "./dist/date.d.ts",
         "svelte": "./dist/date.js",
@@ -139,6 +157,11 @@
         "types": "./dist/date-picker.d.ts",
         "svelte": "./dist/date-picker.js",
         "default": "./dist/date-picker.js"
+      },
+      "./date-input": {
+        "types": "./dist/date-input.d.ts",
+        "svelte": "./dist/date-input.js",
+        "default": "./dist/date-input.js"
       },
       "./dialog": {
         "types": "./dist/dialog.d.ts",
@@ -180,10 +203,25 @@
         "svelte": "./dist/hover-card.js",
         "default": "./dist/hover-card.js"
       },
+      "./image": {
+        "types": "./dist/image.d.ts",
+        "svelte": "./dist/image.js",
+        "default": "./dist/image.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/image-cropper.d.ts",
+        "svelte": "./dist/image-cropper.js",
+        "default": "./dist/image-cropper.js"
+      },
       "./input": {
         "types": "./dist/input.d.ts",
         "svelte": "./dist/input.js",
         "default": "./dist/input.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "svelte": "./dist/label.js",
+        "default": "./dist/label.js"
       },
       "./listbox": {
         "types": "./dist/listbox.d.ts",
@@ -265,6 +303,11 @@
         "svelte": "./dist/radio.js",
         "default": "./dist/radio.js"
       },
+      "./rating": {
+        "types": "./dist/rating.d.ts",
+        "svelte": "./dist/rating.js",
+        "default": "./dist/rating.js"
+      },
       "./resizable": {
         "types": "./dist/resizable.d.ts",
         "svelte": "./dist/resizable.js",
@@ -274,6 +317,11 @@
         "types": "./dist/scroll-area.d.ts",
         "svelte": "./dist/scroll-area.js",
         "default": "./dist/scroll-area.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control.d.ts",
+        "svelte": "./dist/segmented-control.js",
+        "default": "./dist/segmented-control.js"
       },
       "./select": {
         "types": "./dist/select.d.ts",
@@ -304,6 +352,11 @@
         "types": "./dist/textarea.d.ts",
         "svelte": "./dist/textarea.js",
         "default": "./dist/textarea.js"
+      },
+      "./time-input": {
+        "types": "./dist/time-input.d.ts",
+        "svelte": "./dist/time-input.js",
+        "default": "./dist/time-input.js"
       },
       "./toast": {
         "types": "./dist/toast.d.ts",

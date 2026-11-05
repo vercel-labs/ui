@@ -16,7 +16,8 @@
 
   [data-slot="number-input-group"] {
     gap: 0;
-    width: 11rem;
+    width: 20rem;
+    max-width: 100%;
     padding: 3px;
 
     &:not(:has(button)) {
@@ -24,9 +25,9 @@
     }
   }
 
-  /* A field around a number input takes the input's compact width, so its description wraps under it. */
   [data-slot="field-root"]:has(> [data-slot="number-input-root"]) {
-    width: 11rem;
+    width: 20rem;
+    max-width: 100%;
   }
 
   /* Stacks of number fields shrink to their fields, so they stay centered. */

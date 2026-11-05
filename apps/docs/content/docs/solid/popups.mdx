@@ -71,10 +71,29 @@ Use `onDismissAttempt` to hear each refused dismissal. [State and Events](./stat
 
 Menu, Select, Combobox, Autocomplete, Popover, and Dialog support `presentation="auto"` to become a sheet on small touch screens. Use `presentation="sheet"` to always show a sheet.
 
+## Focus
+
+Dialogs, alert dialogs, drawers, and popovers move focus into their content when they open. Where it lands depends on how they opened:
+
+| Opened With                                  | Focus Goes To                                                |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| Keyboard, screen reader, mouse, pen, or code | The element `initialFocus` picks.                            |
+| Touch                                        | The content itself, so no on-screen keyboard appears.        |
+| Hover                                        | Nowhere. Focus stays where it is.                            |
+| Rendered open                                | Nowhere, except in a dialog, which takes focus as it mounts. |
+
+`initialFocus` defaults to `"auto"`: the first focusable element, or the content when it has none. A dialog tries an element with `autofocus` first, and an alert dialog tries its first Close part. Pass `"content"` to focus the content itself, `"none"` to leave focus alone, or a CSS selector, an element, or a function that returns one.
+
+`modal` decides whether Tab can leave. With `true` or `"trap-focus"`, Tab and Shift+Tab wrap inside the content. With `false`, Tab moves from the trigger into a popover and on to the page after it, and focus leaving closes the popover. A non-modal dialog stays open.
+
+When a popup closes while focus is inside it, focus returns to the trigger. If the trigger is gone or can't take focus, focus goes to the element focused before the popup opened, then where the popup it was opened from would return focus, then to the nearest focusable element after where the trigger was. A popup a controller opened returns to the element focused before it first. Set `finalFocus` to `"none"` to leave focus alone, or to a selector, an element, or a function to send it somewhere else. Closing because focus moved away never moves it back, and neither does pressing something focusable outside a non-modal popup.
+
+Menus, selects, and comboboxes handle focus within their own lists, and tooltips never move it. Each component's page covers its own.
+
 ## Mounting and Containers
 
 Closed content unmounts after its exit animation. `keepMounted` leaves it in the page, hidden. `onOpenChangeComplete` runs when opening or closing finishes, including animations.
 
-Use `container` to render into another element. Keep a dialog containing a form outside any surrounding form, or move its content with `container`, to avoid nested forms.
+Use `container` to render into another element, a shadow root, or an element in an iframe. Focus, Escape, and scroll locking then work in the document and shadow root the content renders in. Keep a dialog containing a form outside any surrounding form, or move its content with `container`, to avoid nested forms.
 
 [Styling and Animation](./styling-and-animation) covers transitions. For toasts and confirms, mount `OverlayHost` once near your app's root; [Toast](./components/toast) and [Alert Dialog](./components/alert-dialog) show the setup.

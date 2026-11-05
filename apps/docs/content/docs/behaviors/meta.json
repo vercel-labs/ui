@@ -23,6 +23,8 @@
     "text",
     "number",
     "date",
+    "color",
+    "image",
     "platform",
     "mobile",
     "storage",

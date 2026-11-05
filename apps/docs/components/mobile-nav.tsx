@@ -34,7 +34,7 @@ function MobileNav({
   return (
     <header
       data-mobile-header
-      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
+      className="container sticky top-9 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
       <a
         href="https://vercel.com"

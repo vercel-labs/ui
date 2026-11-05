@@ -19,7 +19,7 @@ import { defineTriggerMenuElements } from "../src/trigger-menu"
 
 // The parts this file presses: every part whose type lists events, and two
 // whose owner fires their slot's callback instead, the combobox's `create`
-// and the trigger menu's `select`.
+// and the trigger menu's `itemselect`.
 const pressed = [
   "ui-accordion-item",
   "ui-menu-item",
@@ -144,6 +144,9 @@ test("a part's event listener gets its typed detail", () => {
   document.createElement("ui-command-item").addEventListener("select", (event) => {
     expectTypeOf(event.detail.waitUntil).toEqualTypeOf<(promise: Promise<unknown>) => void>()
   })
+  document.createElement("ui-trigger-menu").addEventListener("itemselect", (event) => {
+    expectTypeOf(event.detail.value).toEqualTypeOf<string>()
+  })
   document.createElement("ui-dialog-close").addEventListener("action", (event) => {
     expectTypeOf(event.detail.waitUntil).toEqualTypeOf<(promise: Promise<unknown>) => void>()
   })
@@ -206,16 +209,14 @@ test("a trigger menu item fires nothing itself", async () => {
   menu.triggers = [{ char: "@" }]
   await wait()
   const selected: unknown[] = []
-  // Selecting text in the field fires the browser's own `select`, which bubbles here without a detail.
-  menu.addEventListener(
-    "select",
-    (event) => event instanceof CustomEvent && selected.push(event.detail.value),
-  )
+  menu.addEventListener("itemselect", (event) => selected.push(event.detail))
   void menu.api.open({ trigger: "@" })
   await wait()
   pressable("Ada").click()
   await wait()
-  expect(selected).toEqual(["ada"])
+  // The browser's own `select`, for selected text, bubbles up from the field.
+  document.querySelector("textarea")!.select()
+  expect(selected).toEqual([expect.objectContaining({ value: "ada", trigger: "@" })])
   expectFires("ui-trigger-menu-item")
 })
 

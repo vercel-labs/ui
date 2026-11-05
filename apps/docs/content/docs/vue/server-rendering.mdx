@@ -3,7 +3,7 @@ title: Server Rendering
 description: Render initial HTML on the server and add interactions in the browser.
 ---
 
-ui-sdk parts render HTML with Vue's server renderer. Their initial attributes include ARIA state and the group's tab stop.
+ui-sdk parts render HTML with Vue's server renderer. Their initial attributes include ARIA state and the group's tab stop. In Nuxt, pages and components render this way with no plugin or module.
 
 ## Render the Initial State
 
@@ -97,6 +97,31 @@ provide("skin-tone", skinTone)
 ```
 
 The server reads the value from `cookie`, and the browser from `document.cookie`, so both render it and hydration matches.
+
+Nuxt creates the app for you, so read the header with `useRequestHeader` in `app.vue` instead of taking a prop:
+
+```vue title="app.vue"
+<script setup lang="ts">
+import { createCookieStorage, createPreference } from "@ui-sdk/core"
+import { Preferences } from "@ui-sdk/vue/preferences"
+
+const skinTone = createPreference({
+  values: ["default", "light", "medium", "dark"],
+  defaultValue: "default",
+  attribute: "data-skin-tone",
+  storage: createCookieStorage("skin-tone", { cookie: useRequestHeader("cookie") }),
+})
+provide("skin-tone", skinTone)
+</script>
+
+<template>
+  <Preferences :preferences="[skinTone]">
+    <NuxtPage />
+  </Preferences>
+</template>
+```
+
+`useRequestHeader` returns the whole `Cookie` header on the server and undefined in the browser, where the storage reads `document.cookie` instead. `useCookie` doesn't fit here, since it reads one cookie by name and the storage takes the header.
 
 ### Render the Storage Script Yourself
 

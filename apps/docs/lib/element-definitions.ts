@@ -21,6 +21,7 @@ type Definition = {
     defaults?: Record<string, boolean | ((el: HTMLElement) => boolean)>
     api?: string[]
     silent?: string[]
+    events?: Record<string, string>
     owner?: string
     slot?: string
     target?: unknown

@@ -185,6 +185,10 @@ html {
   padding-inline: var(--pad-start) var(--code-pad);
 }
 
+[data-code-frame]:not([data-copy-scope] *):has(> [data-copy-float]) pre code {
+  padding-inline-end: calc(var(--code-pad) + 2.5rem);
+}
+
 [data-code-frame] pre[data-text] {
   white-space: pre-wrap;
   overflow-wrap: anywhere;

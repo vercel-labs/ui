@@ -18,30 +18,25 @@ const message = (text: string) => `<p class="scroll-area-message">${text}</p>`
 
 function mount(root: HTMLElement) {
   const { native, type, scrollHideDelay } = scrollAreaOptions()
-  const options = [
-    type && `type="${type}"`,
-    scrollHideDelay !== undefined && `scroll-hide-delay="${scrollHideDelay}"`,
-  ]
-    .filter(Boolean)
-    .join(" ")
-  root.innerHTML = `
+  const template = document.createElement("template")
+  template.innerHTML = `
     <div class="fixture scroll-fixture">
       <button>Before</button>
-      <ui-scroll-area class="scroll-area" ${options}>
+      <ui-scroll-area class="scroll-area">
         ${viewport(tags.label, items(tags.items))}
         ${native ? "" : scrollbar()}
       </ui-scroll-area>
-      <ui-scroll-area class="scroll-area is-wide" ${options}>
+      <ui-scroll-area class="scroll-area is-wide">
         ${viewport(gallery.label, gallery.items.map((item) => `<a href="#${item}">${item}</a>`).join(""), "scroll-area-grid")}
         ${scrollbar()}
         ${scrollbar("horizontal")}
         <ui-scroll-area-corner class="scroll-area-corner"></ui-scroll-area-corner>
       </ui-scroll-area>
-      <ui-scroll-area class="scroll-area" ${options}>
+      <ui-scroll-area class="scroll-area">
         ${viewport(short.label, items(short.items))}
         ${scrollbar()}
       </ui-scroll-area>
-      <ui-scroll-area class="scroll-area is-chat" stick-to-end ${options}>
+      <ui-scroll-area class="scroll-area is-chat" stick-to-end>
         ${viewport(chat.label, chat.messages.map(message).join(""))}
         ${scrollbar()}
         <ui-scroll-area-scroll-to-end class="scroll-area-end"><button>${chat.jump}</button></ui-scroll-area-scroll-to-end>
@@ -55,6 +50,12 @@ function mount(root: HTMLElement) {
       <div class="scroll-fixture-spacer"></div>
     </div>
   `
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  for (const area of template.content.querySelectorAll("ui-scroll-area")) {
+    if (type) area.setAttribute("type", type)
+    if (scrollHideDelay !== undefined) area.setAttribute("scroll-hide-delay", String(scrollHideDelay))
+  }
+  root.replaceChildren(template.content)
   const content = root.querySelector(`[aria-label="${chat.label}"] ui-scroll-area-content`)!
   const button = (id: string) => root.querySelector<HTMLButtonElement>(`#${id}`)!
   const add = (html: string) => content.insertAdjacentHTML("beforeend", html)

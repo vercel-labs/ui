@@ -10,14 +10,9 @@ function mount(root: HTMLElement) {
   const groups = code.groups
     .map((size) => `<ui-otp-input-group class="otp-group">${slots(size)}</ui-otp-input-group>`)
     .join('<ui-otp-input-separator class="otp-separator">-</ui-otp-input-separator>')
-  const flags = [
-    defaultValue && `default-value="${defaultValue}"`,
-    disabled && "disabled",
-    required && "required",
-  ]
-    .filter(Boolean)
-    .join(" ")
-  root.innerHTML = `
+  const flags = [disabled && "disabled", required && "required"].filter(Boolean).join(" ")
+  const template = document.createElement("template")
+  template.innerHTML = `
     <div class="fixture">
       <button>Before</button>
       <form aria-label="${form.label}">
@@ -35,6 +30,9 @@ function mount(root: HTMLElement) {
       <output id="submitted" aria-label="Submitted"></output>
     </div>
   `
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  if (defaultValue) template.content.querySelector("#code")!.setAttribute("default-value", defaultValue)
+  root.replaceChildren(template.content)
   const otp = root.querySelector<UiOTPInputElement>("#code")!
   const status = root.querySelector("output")!
   otp.addEventListener("valuechange", (event) => {

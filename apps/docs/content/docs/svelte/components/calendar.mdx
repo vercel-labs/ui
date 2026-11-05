@@ -117,7 +117,7 @@ Unavailable dates cannot be selected, but stay focusable so keyboard and screen 
 
 ## Deselect
 
-`deselectable` lets a second press on the selected date clear it, in single mode.
+`deselectable` lets a second press on the selected date clear it, in single mode. Without it, a second press keeps the date selected.
 
 ## Min and Max
 
@@ -184,7 +184,7 @@ The month and year selects are native `select` elements. To use your own select,
 
 ## Language
 
-`locale` controls month names, weekday headers, and full date labels. Without it, Calendar uses the surrounding page’s `lang`, then the browser’s language. The first weekday follows the locale unless `weekStartsOn` overrides it. `weekdayFormat` accepts `"narrow"`, `"short"`, or `"long"`.
+`locale` controls month names, weekday headers, and full date labels. If you omit it, Calendar reads the surrounding page’s `lang` after it mounts, with the browser’s language as a fallback. The initial server and client render use English, so they always match. The first weekday follows the locale, and so changes after mount too, unless `weekStartsOn` sets it. `weekdayFormat` accepts `"narrow"`, `"short"`, or `"long"`.
 
 Previous and Next are named "Previous month" and "Next month". Pass `aria-label` to name them in another language. Dates remain Gregorian. Localized year systems, such as Buddhist or Japanese era years, can still appear in the labels.
 

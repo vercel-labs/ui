@@ -1,6 +1,8 @@
 import type { Framework } from "./frameworks"
 import { accordion } from "@ui-sdk/core/accordion"
 import { collapsible } from "@ui-sdk/core/collapsible"
+import { colorPicker } from "@ui-sdk/core/color-picker"
+import { imageCropper } from "@ui-sdk/core/image-cropper"
 import { checkbox, checkboxGroup } from "@ui-sdk/core/checkbox"
 import { switchPrimitive } from "@ui-sdk/core/switch"
 import { autocomplete } from "@ui-sdk/core/autocomplete"
@@ -10,6 +12,8 @@ import { fileInput } from "@ui-sdk/core/file-input"
 import { field, fieldSet } from "@ui-sdk/core/field"
 import { input, inputGroup, textarea } from "@ui-sdk/core/input"
 import { radioGroup } from "@ui-sdk/core/radio"
+import { rating } from "@ui-sdk/core/rating"
+import { segmentedControl } from "@ui-sdk/core/segmented-control"
 import { menu } from "@ui-sdk/core/menu"
 import { numberInput } from "@ui-sdk/core/number-input"
 import { alertDialog, dialog } from "@ui-sdk/core/dialog"
@@ -40,6 +44,8 @@ import { progress } from "@ui-sdk/core/progress"
 import { meter } from "@ui-sdk/core/meter"
 import { scrollArea } from "@ui-sdk/core/scroll-area"
 import { otpInput } from "@ui-sdk/core/otp-input"
+import { dateInput, type DateInputSegmentData } from "@ui-sdk/core/date-input"
+import { timeInput } from "@ui-sdk/core/time-input"
 import { listbox } from "@ui-sdk/core/listbox"
 import { pagination } from "@ui-sdk/core/pagination"
 import { calendar } from "@ui-sdk/core/calendar"
@@ -50,6 +56,7 @@ import { tabs } from "@ui-sdk/core/tabs"
 import { tokenInput } from "@ui-sdk/core/token-input"
 import { triggerMenu } from "@ui-sdk/core/trigger-menu"
 import { button } from "@ui-sdk/core/button"
+import { label } from "@ui-sdk/core/label"
 import { separator } from "@ui-sdk/core/separator"
 import { toggle, toggleGroup } from "@ui-sdk/core/toggle"
 import { toolbar } from "@ui-sdk/core/toolbar"
@@ -69,6 +76,28 @@ const coreSource = (file: string) => {
 }
 
 type Description = { text: string; values?: string[] }
+
+// Date Input and Time Input set the same attributes.
+const segmentedDescriptions = (kind: "date" | "time"): Record<string, Description> => ({
+  "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+  "data-readonly": { text: "Present when read-only." },
+  "data-required": { text: "Present when required." },
+  "data-invalid": {
+    text:
+      kind === "date"
+        ? "Present while the date is before `min`, after `max` or unavailable."
+        : "Present while the time is before `min` or after `max`.",
+  },
+  "root:data-empty": { text: "Present while every segment is empty." },
+  "segment:data-empty": { text: "Present while the segment is empty. It shows its placeholder." },
+  "segment:data-type": {
+    text: "The segment's unit, or `literal` for the text between segments.",
+    values:
+      kind === "date"
+        ? ["year", "month", "day", "hour", "minute", "second", "dayPeriod", "literal"]
+        : ["hour", "minute", "second", "dayPeriod", "literal"],
+  },
+})
 
 // An instance with the features that register its optional parts, the way
 // an adapter registers one when its part renders.
@@ -620,6 +649,107 @@ const components: Record<
       },
     },
   },
+  "image-cropper": {
+    instances: () => [
+      imageCropper({ id: "docs", src: "photo.jpg", mode: "frame", shape: "circle", disabled: true }),
+      imageCropper({ id: "docs-box", src: "photo.jpg" }),
+    ],
+    samples: {
+      root: [{}],
+      viewport: [{}],
+      image: [{}],
+      selection: [{}],
+      grid: [{}],
+      handle: [{ position: "nw" }, { position: "e" }],
+      zoom: [{}],
+      rotate: [{}],
+      flip: [{}, { direction: "vertical" }],
+    },
+    interactive: [],
+    extra: {
+      ...Object.fromEntries(
+        ["root", "viewport", "selection", "grid", "handle"].map((slot) => [
+          slot,
+          ["data-error", "data-dragging"],
+        ]),
+      ),
+      ...Object.fromEntries(["image", "zoom", "rotate", "flip"].map((slot) => [slot, ["data-error"]])),
+    },
+    descriptions: {
+      "data-mode": { text: "How the crop changes.", values: ["box", "frame"] },
+      "data-shape": { text: "The selection's shape.", values: ["rectangle", "circle"] },
+      "data-loading": { text: "Present until the image loads, while nothing can change." },
+      "data-error": { text: "Present when the image failed to load." },
+      "data-disabled": { text: "Present when the cropper is disabled." },
+      "data-dragging": {
+        text: "Present while a pointer drags the selection, the image or, on a handle, that handle. Show the grid with it.",
+      },
+      "data-position": {
+        text: "The edge or corner the handle resizes.",
+        values: ["n", "e", "s", "w", "ne", "nw", "se", "sw"],
+      },
+      "data-direction": {
+        text: "Which way the button mirrors the image.",
+        values: ["horizontal", "vertical"],
+      },
+    },
+    parts: { root: { react: "ImageCropper", web: "<ui-image-cropper>" } },
+  },
+  "color-picker": {
+    instances: () => [
+      colorPicker({ id: "docs", defaultValue: "#0ea5e9", disabled: true, readOnly: true, required: true }),
+      colorPicker({ id: "docs-enabled", defaultValue: "#0ea5e9" }),
+    ],
+    samples: {
+      root: [{}],
+      area: [{}],
+      "area-thumb": [{}],
+      slider: [{ channel: "hue" }, { channel: "alpha", orientation: "vertical" }],
+      "slider-thumb": [{ channel: "hue" }, { channel: "alpha", orientation: "vertical" }],
+      input: [{}],
+      "channel-input": [{ channel: "red" }],
+      swatch: [{}],
+      "eye-dropper": [{}],
+      swatches: [{}],
+      "swatch-item": [{ value: "#0ea5e9" }, { value: "#ef4444" }],
+    },
+    interactive: [],
+    extra: {
+      ...Object.fromEntries(
+        [
+          "root",
+          "area",
+          "area-thumb",
+          "slider",
+          "slider-thumb",
+          "input",
+          "channel-input",
+          "swatch",
+          "swatches",
+        ].map((slot) => [slot, ["data-out-of-gamut"]]),
+      ),
+      "eye-dropper": ["data-out-of-gamut", "data-unsupported"],
+    },
+    descriptions: {
+      "data-disabled": { text: "Present when the picker is disabled, by its own prop or a `<fieldset>`." },
+      "data-readonly": { text: "Present when the picker shows its color but can't change it." },
+      "data-required": { text: "Present when the picker is required." },
+      "data-out-of-gamut": {
+        text: "Present while a drag or a key holds a color outside the gamut. The value is the closest color inside, and the parts move there once the change commits.",
+      },
+      "data-channel": {
+        text: "The channel the part edits.",
+        values: ["hue", "saturation", "brightness", "lightness", "chroma", "red", "green", "blue", "alpha"],
+      },
+      "data-area-thumb": {
+        text: "Present on the area's thumb, which a press on the area moves and focuses.",
+      },
+      "data-orientation": { text: "The slider's axis.", values: ["horizontal", "vertical"] },
+      "data-selected": { text: "Present on the swatch item whose color is the value." },
+      "data-unsupported": { text: "Present when the browser can't pick a color from the screen." },
+    },
+    parts: { root: { react: "ColorPicker", web: "<ui-color-picker>" } },
+  },
   checkbox: {
     instances: () =>
       ([true, false, "indeterminate"] as const).map((checked) =>
@@ -853,6 +983,13 @@ const components: Record<
     },
     parts: { root: { react: "Menubar", web: "<ui-menubar>" } },
   },
+  label: {
+    instances: () => [label({ id: "docs" })],
+    samples: { root: [{}] },
+    interactive: [],
+    descriptions: {},
+    parts: { root: { react: "Label", web: "<ui-label>" } },
+  },
   separator: {
     instances: () => [separator({ id: "docs" })],
     samples: { root: [{}] },
@@ -890,6 +1027,45 @@ const components: Record<
       group: { react: "RadioGroup", web: "<ui-radio-group>", slot: "radio-group" },
       root: { react: "Radio", web: "<ui-radio>", slot: "radio-root" },
       indicator: { react: "RadioIndicator", web: "<ui-radio-indicator>", slot: "radio-indicator" },
+    },
+  },
+  rating: {
+    instances: () => [
+      rating({ id: "docs", defaultValue: 2.5, step: 0.5, required: true }),
+      rating({ id: "docs-read-only", value: 3, readOnly: true, disabled: true }),
+    ],
+    samples: { root: [{}], item: [{ index: 1 }, { index: 3 }, { index: 4 }] },
+    interactive: [],
+    extra: { item: ["data-highlighted"] },
+    descriptions: {
+      "data-filled": { text: "Present on stars the shown score covers whole." },
+      "data-partial": { text: "Present on the star the shown score covers part of, like the last of 2.5." },
+      "data-checked": { text: "Present on the star the score ends in." },
+      "data-highlighted": { text: "Present on the stars up to the score a pointer previews." },
+      "data-disabled": { text: "Present when the rating is disabled, by its own prop or a `<fieldset>`." },
+      "data-readonly": { text: "Present when the rating only shows its score." },
+      "data-required": { text: "Present when the rating is required." },
+    },
+  },
+  "segmented-control": {
+    instances: () => [
+      segmentedControl({ id: "docs", defaultValue: "a", readOnly: true, required: true }),
+      segmentedControl({ id: "docs-disabled", disabled: true, orientation: "vertical" }),
+    ],
+    samples: { root: [{}], item: [{ value: "a" }, { value: "b" }], indicator: [{}] },
+    interactive: [],
+    descriptions: {
+      "data-orientation": { text: "Which way the items run." },
+      "data-checked": { text: "Present on the checked item." },
+      "data-unchecked": { text: "Present on items that aren't checked." },
+      "data-disabled": { text: "Present when disabled, by its own prop, the control or a `<fieldset>`." },
+      "data-readonly": { text: "Present when the control is read-only." },
+      "data-required": { text: "Present when the control is required." },
+    },
+    parts: {
+      root: { react: "SegmentedControl", web: "<ui-segmented-control>" },
+      item: { react: "SegmentedControlItem", web: "<ui-segmented-control-item>" },
+      indicator: { react: "SegmentedControlIndicator", web: "<ui-segmented-control-indicator>" },
     },
   },
   field: {
@@ -1122,6 +1298,46 @@ const components: Record<
       group: { react: "OTPInputGroup", web: "<ui-otp-input-group>" },
       slot: { react: "OTPInputSlot", web: "<ui-otp-input-slot>" },
       separator: { react: "OTPInputSeparator", web: "<ui-otp-input-separator>" },
+    },
+  },
+  "date-input": {
+    instances: () => [
+      dateInput({ id: "docs", defaultValue: "2026-11-02", disabled: true, readOnly: true, required: true }),
+      dateInput({ id: "docs-invalid", defaultValue: "2026-12-02", max: "2026-11-30" }),
+      dateInput({ id: "docs-empty" }),
+    ],
+    samples: {
+      root: [{}],
+      segment: [
+        { segment: { key: "month" } as DateInputSegmentData },
+        { segment: { key: "literal-0" } as DateInputSegmentData },
+      ],
+    },
+    interactive: [],
+    descriptions: segmentedDescriptions("date"),
+    parts: {
+      root: { react: "DateInput", web: "<ui-date-input>" },
+      segment: { react: "DateInputSegment", web: "<ui-date-input-segment>" },
+    },
+  },
+  "time-input": {
+    instances: () => [
+      timeInput({ id: "docs", defaultValue: "14:30", disabled: true, readOnly: true, required: true }),
+      timeInput({ id: "docs-invalid", defaultValue: "18:00", max: "17:00" }),
+      timeInput({ id: "docs-empty" }),
+    ],
+    samples: {
+      root: [{}],
+      segment: [
+        { segment: { key: "hour" } as DateInputSegmentData },
+        { segment: { key: "literal-0" } as DateInputSegmentData },
+      ],
+    },
+    interactive: [],
+    descriptions: segmentedDescriptions("time"),
+    parts: {
+      root: { react: "TimeInput", web: "<ui-time-input>" },
+      segment: { react: "TimeInputSegment", web: "<ui-time-input-segment>" },
     },
   },
   "password-input": {

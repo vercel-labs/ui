@@ -112,7 +112,7 @@ For ranges, `minDays` and `maxDays` count both endpoints. `allowUnavailable` per
 
 ## Language
 
-`locale` sets the input’s format, hint, month names, and date labels. Without it, Date Picker follows the surrounding page’s `lang`, then the browser’s language. Date strings remain Gregorian ISO dates.
+`locale` sets the input’s format, hint, month names, and date labels. If you omit it, Date Picker reads the surrounding page’s `lang` after it mounts, with the browser’s language as a fallback. The initial server and client render use English, so they always match. Date strings remain Gregorian ISO dates.
 
 The trigger, popup, and calendar navigation have English accessible labels by default. Pass `aria-label` to translate those controls too.
 

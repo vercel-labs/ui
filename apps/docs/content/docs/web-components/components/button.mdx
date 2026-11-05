@@ -185,7 +185,7 @@ Set `type="submit"` on the inner button to submit a form or `type="reset"` to re
   caption="Edit the email and choose Subscribe, or press Enter in the field. The console logs each submission, and Reset restores the original email."
 />
 
-Button tracks Promises passed to its own `action` event's `waitUntil()`. An async form submission needs its own pending state; see [Forms](/docs/web-components/forms).
+Button tracks Promises passed to its own `action` event's `waitUntil()`, not the form’s `submit` handler. For an async submit handler, set `disabled` on `<ui-button>` while it runs, with [`focusable-when-disabled`](#focusable-when-disabled) so the button keeps focus while it waits.
 
 ## Styling
 

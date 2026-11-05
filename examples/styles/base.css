@@ -136,6 +136,33 @@
     margin: 0;
   }
 
+  input[type="color"] {
+    flex: none;
+    width: var(--size);
+    height: var(--size);
+    padding: 3px;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: pointer;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    /* One rule each: a browser drops a whole list holding a pseudo-element it doesn't know. */
+    &::-webkit-color-swatch {
+      border: 0;
+      border-radius: calc(var(--radius-control) - 3px);
+    }
+
+    &::-moz-color-swatch {
+      border: 0;
+      border-radius: calc(var(--radius-control) - 3px);
+    }
+  }
+
   svg[data-disabled] {
     color: var(--line-faint);
   }
@@ -312,7 +339,7 @@
     font-weight: 500;
   }
 
-  [data-slot="label"]:has(> input:not([type="checkbox"], [type="radio"])) {
+  [data-slot="label"]:has(> input:not([type="checkbox"], [type="radio"], [type="color"])) {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-1);
@@ -558,7 +585,16 @@
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],
     [data-slot="toolbar-input"],
-    :where(input):not([data-slot], [type="checkbox"], [type="radio"], [type="range"], [type="hidden"]),
+    [data-slot="color-picker-input"],
+    [data-slot="color-picker-channel-input"],
+    :where(input):not(
+      [data-slot],
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="hidden"],
+      [type="color"]
+    ),
     :where(textarea, select):not([data-slot])
   ):where(
     :not(
@@ -572,7 +608,9 @@
     [data-slot="input-group"],
     [data-slot="password-input-root"],
     [data-slot="number-input-group"],
-    [data-slot="combobox-chips"]
+    [data-slot="combobox-chips"],
+    [data-slot="date-input-root"],
+    [data-slot="time-input-root"]
   ) {
     box-sizing: border-box;
     width: 20rem;
@@ -762,6 +800,7 @@
     :where(button):not([data-slot]):where(:not([data-slot="input-group"] > *)),
     [data-slot="menu-trigger"]:where(:not([data-slot="menu-content"] *)),
     [data-slot="popover-trigger"],
+    [data-slot="color-picker-eye-dropper"],
     [data-slot="popover-close"]:where(:not(a)),
     [data-slot="select-trigger"],
     [data-slot="select-clear"],
@@ -803,6 +842,8 @@
     [data-slot="notes-expand"],
     [data-slot="copy-root"],
     [data-slot="color-reset"],
+    [data-slot="image-cropper-rotate"],
+    [data-slot="image-cropper-flip"],
     [data-slot="book-bookmark"],
     [data-slot="prices-copyAll"],
     [data-slot="ledger-grid-shortcut"],

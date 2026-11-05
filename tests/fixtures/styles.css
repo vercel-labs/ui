@@ -286,6 +286,153 @@
       height 200ms;
   }
 
+  [data-slot="rating-root"] {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  [data-slot="rating-item"] {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(
+      to right,
+      #f5a524 calc(var(--rating-fill) * 100%),
+      #e5e5e5 calc(var(--rating-fill) * 100%)
+    );
+  }
+
+  [data-slot="rating-item"] .star {
+    visibility: hidden;
+  }
+
+  [data-slot="segmented-control-root"] {
+    position: relative;
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 8px;
+    background: #f5f5f5;
+    isolation: isolate;
+  }
+
+  [data-slot="segmented-control-root"][data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  [data-slot="segmented-control-item"] {
+    padding: 4px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    font: inherit;
+  }
+
+  [data-slot="segmented-control-item"][data-disabled] {
+    opacity: 0.5;
+  }
+
+  [data-slot="segmented-control-indicator"] {
+    position: absolute;
+    z-index: -1;
+    left: var(--segmented-control-indicator-left);
+    top: var(--segmented-control-indicator-top);
+    width: var(--segmented-control-indicator-width);
+    height: var(--segmented-control-indicator-height);
+    border-radius: 6px;
+    background: #fff;
+    pointer-events: none;
+  }
+
+  [data-slot="color-picker-root"] {
+    display: grid;
+    gap: 8px;
+    width: 200px;
+  }
+
+  [data-slot="color-picker-area"] {
+    height: 150px;
+    background: var(--color-area-background);
+  }
+
+  [data-slot="color-picker-area-thumb"],
+  [data-slot="color-picker-slider-thumb"] {
+    width: 12px;
+    height: 12px;
+    margin-inline-start: -6px;
+    margin-top: -6px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px #0006;
+    background: var(--color-picker-color);
+  }
+
+  [data-slot="color-picker-slider"] {
+    height: 12px;
+    background: var(--color-slider-background);
+  }
+
+  [data-slot="color-picker-slider-thumb"] {
+    top: 50%;
+  }
+
+  [data-slot="color-picker-swatch"],
+  [data-slot="color-picker-swatch-item"] {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #0003;
+    background: var(--color-picker-color);
+  }
+
+  [data-slot="color-picker-swatches"] {
+    display: flex;
+    gap: 4px;
+  }
+
+  [data-slot="image-cropper-viewport"] {
+    width: 400px;
+    height: 300px;
+    background: #111;
+  }
+
+  [data-slot="image-cropper-selection"] {
+    outline: 1px solid #fff;
+    box-shadow: 0 0 0 9999px #0008;
+  }
+
+  [data-slot="image-cropper-selection"][data-shape="circle"] {
+    border-radius: 50%;
+  }
+
+  [data-slot="image-cropper-handle"] {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    margin: -6px;
+    background: #fff;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="n"] {
+    top: 0;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="s"] {
+    top: 100%;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="w"] {
+    left: 0;
+  }
+
+  [data-slot="image-cropper-handle"][data-position*="e"] {
+    left: 100%;
+  }
+
+  [data-slot="image-cropper-handle"][data-position="e"] {
+    top: 50%;
+  }
+
   .panel,
   [data-slot="tabs-panel"] {
     padding: 8px;

@@ -131,15 +131,19 @@ export {
 export { createCarouselController } from "@ui-sdk/core/carousel"
 export { createCalendarController } from "@ui-sdk/core/calendar"
 export { createDatePickerController } from "@ui-sdk/core/date-picker"
+export { createDateInputController } from "@ui-sdk/core/date-input"
+export { createTimeInputController } from "@ui-sdk/core/time-input"
 // Every component's controller, like in the other frameworks' packages.
 export { createAccordionController } from "@ui-sdk/core/accordion"
 export { createAlertDialogController } from "@ui-sdk/core/alert-dialog"
 export { createAutocompleteController } from "@ui-sdk/core/autocomplete"
 export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
 export { createCollapsibleController } from "@ui-sdk/core/collapsible"
+export { createColorPickerController } from "@ui-sdk/core/color-picker"
 export { createComboboxController } from "@ui-sdk/core/combobox"
 export { createCommandController } from "@ui-sdk/core/command"
 export { createHoverCardController } from "@ui-sdk/core/hover-card"
+export { createImageCropperController } from "@ui-sdk/core/image-cropper"
 export { createInputController } from "@ui-sdk/core/input"
 export { createListboxController } from "@ui-sdk/core/listbox"
 export { createMenubarController } from "@ui-sdk/core/menubar"
@@ -149,7 +153,9 @@ export { createOTPInputController } from "@ui-sdk/core/otp-input"
 export { createPasswordInputController } from "@ui-sdk/core/password-input"
 export { createPopoverController } from "@ui-sdk/core/popover"
 export { createRadioGroupController } from "@ui-sdk/core/radio"
+export { createRatingController } from "@ui-sdk/core/rating"
 export { createScrollAreaController } from "@ui-sdk/core/scroll-area"
+export { createSegmentedControlController } from "@ui-sdk/core/segmented-control"
 export { createSelectController } from "@ui-sdk/core/select"
 export { createSliderController } from "@ui-sdk/core/slider"
 export { createSwitchController } from "@ui-sdk/core/switch"
@@ -226,6 +232,31 @@ export type {
   StepRange,
 } from "@ui-sdk/core/number"
 
+// CSS colors as plain data: read, convert, write, fit to a gamut, mix and compare. `formatColor(parseColor("red")!, "oklch")` is "oklch(0.628 0.2577 29.23)".
+export {
+  colorDistance,
+  contrastRatio,
+  convertColor,
+  formatColor,
+  isInGamut,
+  mixColor,
+  parseColor,
+  toGamut,
+} from "@ui-sdk/core/color"
+export type {
+  Color,
+  ColorFormat,
+  ColorFormatOptions,
+  ColorGamut,
+  ColorHueInterpolation,
+  ColorMixOptions,
+  ColorSpace,
+} from "@ui-sdk/core/color"
+
+// Cut a region out of an image into a new file. `await cropImage(file, { x: 0, y: 0, width: 512, height: 512 })` is a 512 by 512 PNG.
+export { cropImage } from "@ui-sdk/core/image"
+export type { CropImageOptions, ImageCrop, ImageRotation, ImageSource } from "@ui-sdk/core/image"
+
 // Keyboard shortcuts scoped to open layers. `registerShortcut("mod+k", open)` returns an unregister function.
 export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
 export type {
@@ -245,12 +276,15 @@ export type {
   CheckboxGroupEvents,
   CollapsibleEvents,
   AutocompleteEvents,
+  ColorPickerEvents,
   ComboboxEvents,
   CommandEvents,
+  DateInputEvents,
   DatePickerEvents,
   DialogEvents,
   DrawerEvents,
   HoverCardEvents,
+  ImageCropperEvents,
   InputEvents,
   ListboxEvents,
   OTPInputEvents,
@@ -264,11 +298,14 @@ export type {
   PasswordInputEvents,
   PopoverEvents,
   RadioGroupEvents,
+  RatingEvents,
   ResizableEvents,
+  SegmentedControlEvents,
   SelectEvents,
   SliderEvents,
   SwitchEvents,
   TabsEvents,
+  TimeInputEvents,
   TokenInputEvents,
   ToggleEvents,
   ToggleGroupEvents,
@@ -285,8 +322,10 @@ export type {
   UiCheckboxGroupElement,
   UiCollapsibleElement,
   UiAutocompleteElement,
+  UiColorPickerElement,
   UiComboboxElement,
   UiCommandElement,
+  UiDateInputElement,
   UiDatePickerElement,
   UiDetailedChangeEvent,
   UiDialogElement,
@@ -299,6 +338,7 @@ export type {
   UiFieldSetElement,
   UiHighlightEvent,
   UiHoverCardElement,
+  UiImageCropperElement,
   UiInputElement,
   UiInputGroupElement,
   UiListboxElement,
@@ -319,13 +359,17 @@ export type {
   UiPopoverElement,
   UiRadioElement,
   UiRadioGroupElement,
+  UiRatingElement,
   UiResizableElement,
+  UiSegmentedControlElement,
+  UiSegmentedControlItemElement,
   UiSelectElement,
   UiSeparatorElement,
   UiSliderElement,
   UiSwitchElement,
   UiTabsElement,
   UiTextareaElement,
+  UiTimeInputElement,
   UiToastRegionElement,
   UiTokenInputElement,
   UiTreeElement,

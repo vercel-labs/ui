@@ -494,7 +494,7 @@
 
   /* ─── Experiments: Color picker ───────────────────────────────────── */
 
-  [data-slot="color-picker-root"] {
+  [data-slot="hsv-picker-root"] {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -526,7 +526,7 @@
     }
   }
 
-  [data-slot="color-picker-area"] {
+  [data-slot="hsv-picker-area"] {
     box-sizing: border-box;
     width: 100%;
     height: 160px;
@@ -535,7 +535,7 @@
     cursor: crosshair;
   }
 
-  [data-slot="color-picker-thumb"] {
+  [data-slot="hsv-picker-thumb"] {
     box-sizing: border-box;
     width: var(--size-icon);
     height: var(--size-icon);
@@ -546,12 +546,12 @@
       var(--shadow-drop);
   }
 
-  [data-slot="color-picker-input"] {
+  [data-slot="hsv-picker-input"] {
     flex: 1;
     font-size: var(--text-sm);
   }
 
-  [data-slot="color-picker-swatch"] {
+  [data-slot="hsv-picker-swatch"] {
     box-sizing: border-box;
     width: 24px;
     height: 24px;
@@ -1058,14 +1058,14 @@
 
   /* ─── Experiments: Image cropper ──────────────────────────────────── */
 
-  [data-slot="image-cropper-root"] {
-    width: var(--image-cropper-width);
+  [data-slot="crop-box-root"] {
+    width: var(--crop-box-width);
     max-width: 100%;
-    height: var(--image-cropper-height);
+    height: var(--crop-box-height);
     outline: 1px solid var(--line);
   }
 
-  svg[data-slot="image-cropper-image"] {
+  svg[data-slot="crop-box-image"] {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -1073,7 +1073,7 @@
   }
 
   /* The shade and frame sit on a photo, so they use fixed black and white. */
-  [data-slot="image-cropper-box"] {
+  [data-slot="crop-box-box"] {
     box-shadow: 0 0 0 9999px rgb(0 0 0 / 0.5);
     outline: 1px solid #fff;
 
@@ -1083,7 +1083,7 @@
     }
   }
 
-  [data-slot="image-cropper-grid"] {
+  [data-slot="crop-box-grid"] {
     position: absolute;
     inset: 0;
     display: grid;
@@ -1110,7 +1110,7 @@
     }
   }
 
-  [data-slot="image-cropper-handle"] {
+  [data-slot="crop-box-handle"] {
     position: absolute;
     box-sizing: border-box;
     width: 12px;
@@ -1152,7 +1152,7 @@
     }
   }
 
-  [data-slot="image-cropper-preview"] {
+  [data-slot="crop-box-preview"] {
     position: relative;
     display: block;
     flex-shrink: 0;

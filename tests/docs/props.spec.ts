@@ -71,6 +71,43 @@ const components: Record<string, Component> = {
     examples: "toast",
     types: ["ConfirmOptions"],
   },
+  "color-picker": {
+    source: "color-picker/color-picker.ts",
+    examples: "color-picker",
+    types: [
+      "ColorPickerOptions",
+      "ColorPickerAreaProps",
+      "ColorPickerSliderProps",
+      "ColorPickerChannelInputProps",
+      "ColorPickerSwatchItemProps",
+      "ColorPickerState",
+      "ColorPickerSliderState",
+      "ColorPickerSwatchItemState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "ColorPickerOptions",
+      // It works as every form control's does, which Slider's form example shows.
+      form: "ColorPickerOptions",
+      // A color picker always has a value, so it only adds data-required.
+      required: "ColorPickerOptions",
+    },
+  },
+  "image-cropper": {
+    source: "image-cropper/image-cropper.ts",
+    examples: "image-cropper",
+    types: [
+      "ImageCropperOptions",
+      "ImageCropperHandleProps",
+      "ImageCropperFlipProps",
+      "ImageCropperState",
+      "ImageCropperHandleState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "ImageCropperOptions",
+    },
+  },
   menu: {
     source: "menu/menu.ts",
     examples: "menu",
@@ -581,6 +618,11 @@ const components: Record<string, Component> = {
       debug: "MenubarOptions",
     },
   },
+  label: {
+    source: "label/label.ts",
+    examples: "label",
+    types: ["LabelOptions"],
+  },
   separator: {
     source: "separator/separator.ts",
     examples: "separator",
@@ -602,6 +644,37 @@ const components: Record<string, Component> = {
       "RadioState",
       "RadioIndicatorState",
     ],
+  },
+  rating: {
+    source: "rating/rating.ts",
+    examples: "rating",
+    types: ["RatingOptions", "RatingState", "RatingItemState"],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "RatingOptions",
+      // It works as Radio's does, which its form example shows.
+      form: "RatingOptions",
+      // Rating numbers its stars itself, so no example needs the number.
+      index: "RatingItemState",
+    },
+  },
+  "segmented-control": {
+    source: "segmented-control/segmented-control.ts",
+    examples: "segmented-control",
+    types: [
+      "SegmentedControlOptions",
+      "SegmentedControlItemProps",
+      "SegmentedControlState",
+      "SegmentedControlItemState",
+      "SegmentedControlIndicatorState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "SegmentedControlOptions",
+      // They work as Radio's do, which its read-only and form examples show.
+      readOnly: "SegmentedControlOptions",
+      form: "SegmentedControlOptions",
+    },
   },
   slider: {
     source: "slider/slider.ts",
@@ -657,6 +730,33 @@ const components: Record<string, Component> = {
     allowed: {
       // Logs every change to the console, which no example should do.
       debug: "ScrollAreaOptions",
+    },
+  },
+  "date-input": {
+    source: "date-input/date-input.ts",
+    examples: "date-input",
+    types: ["DateInputOptions", "DateInputSegmentProps", "DateInputState", "DateInputSegmentState"],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "DateInputOptions",
+      // Names a form elsewhere in the page, as on a native input. The Forms section says so.
+      form: "DateInputOptions",
+      // What a segment renders by itself: its text, placeholder, name and element.
+      text: "DateInputSegmentState",
+      empty: "DateInputSegmentState",
+      label: "DateInputSegmentState",
+      editable: "DateInputSegmentState",
+    },
+  },
+  "time-input": {
+    source: "date-input/time-input.ts",
+    examples: "date-input",
+    types: ["TimeInputOptions"],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "TimeInputOptions",
+      // Names a form elsewhere in the page, as on a native input. The Forms section says so.
+      form: "TimeInputOptions",
     },
   },
   "otp-input": {

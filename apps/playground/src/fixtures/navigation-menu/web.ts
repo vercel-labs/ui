@@ -18,9 +18,6 @@ const links = (list: { label: string; href: string }[]) =>
 function markup() {
   const layout = navigationMenuLayout()
   const vertical = navigationMenuOptions().orientation === "vertical"
-  const placement = Object.entries(layout.placement)
-    .map(([name, value]) => ` ${name}="${value}"`)
-    .join("")
   const kept = `${layout.keepMounted ? " keep-mounted" : ""}${layout.hiddenUntilFound ? " hidden-until-found" : ""}`
   const nested = fixture.nested
   const nestedMenu = `
@@ -37,7 +34,7 @@ function markup() {
       (item, index) => `
       <ui-navigation-menu-item value="${item.value}">
         <ui-navigation-menu-trigger><button class="nav-trigger">${item.trigger}</button></ui-navigation-menu-trigger>
-        <ui-navigation-menu-content class="${index === 0 ? "nav-content" : "nav-content narrow"}"${kept}${placement}>
+        <ui-navigation-menu-content class="${index === 0 ? "nav-content" : "nav-content narrow"}"${kept}>
           ${links(item.links)}
           ${index === 1 && layout.nested ? nestedMenu : ""}
         </ui-navigation-menu-content>
@@ -55,7 +52,7 @@ function markup() {
           </ui-navigation-menu-item>
         </ui-navigation-menu-list>
         <ui-navigation-menu-indicator class="nav-indicator"></ui-navigation-menu-indicator>
-        ${layout.viewport ? `<ui-navigation-menu-viewport class="nav-viewport"${placement}></ui-navigation-menu-viewport>` : ""}
+        ${layout.viewport ? `<ui-navigation-menu-viewport class="nav-viewport"></ui-navigation-menu-viewport>` : ""}
       </ui-navigation-menu>
       <button>After</button>
       <output role="status" aria-label="Last action"></output>
@@ -64,13 +61,21 @@ function markup() {
 }
 
 async function mount(root: HTMLElement) {
-  root.innerHTML = markup()
-  const menu = root.querySelector("ui-navigation-menu")!
+  const template = document.createElement("template")
+  template.innerHTML = markup()
+  const menu = template.content.querySelector("ui-navigation-menu")!
+  // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
+  // The side and align place the outer menu's panels and viewport, not the nested menu's.
+  const { placement } = navigationMenuLayout()
+  for (const part of menu.querySelectorAll("ui-navigation-menu-content, ui-navigation-menu-viewport"))
+    if (part.closest("ui-navigation-menu") === menu)
+      for (const [name, value] of Object.entries(placement)) part.setAttribute(name, value)
   for (const [name, value] of Object.entries(navigationMenuOptions())) {
     if (name === "container") menu.setAttribute("container", `#${(value as HTMLElement).id}`)
     else if (value === true) menu.setAttribute(kebab(name), "")
     else menu.setAttribute(kebab(name), String(value))
   }
+  root.replaceChildren(template.content)
   await import("@ui-sdk/web/navigation-menu")
   menu.addEventListener("valuechange", (event) => {
     const { value, reason } = (event as CustomEvent<{ value: string | null; reason: string }>).detail

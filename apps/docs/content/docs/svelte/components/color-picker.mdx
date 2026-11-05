@@ -1,0 +1,400 @@
+---
+title: Color Picker
+description: Choose a color by dragging across an area and along sliders, typing any CSS color, or picking a preset.
+---
+
+Use a color picker to choose a color, like a brand or theme color. The value is a CSS color string, and every part edits it: an area for two channels at once, a slider per channel, a text input that reads any CSS color, and presets.
+
+<ComponentExample
+  name="color-picker/basic"
+  inspect
+  caption="Drag across the area or along the sliders, or choose a preset. Choose HSL to write the color another way, or type one like rebeccapurple and press Enter."
+/>
+
+## Installation
+
+```bash
+npm install @ui-sdk/svelte @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build a `ColorPicker`:
+
+```text
+ColorPicker
+├── ColorPickerArea
+│   ├── ColorPickerAreaCanvas
+│   └── ColorPickerAreaThumb
+├── ColorPickerSlider
+│   └── ColorPickerSliderThumb
+├── ColorPickerSlider
+│   └── ColorPickerSliderThumb
+├── ColorPickerSwatch
+├── ColorPickerInput
+├── ColorPickerChannelInput
+├── ColorPickerEyeDropper
+└── ColorPickerSwatches
+    ├── ColorPickerSwatchItem
+    └── ColorPickerSwatchItem
+```
+
+Every part is optional, so use the ones your picker needs.
+
+- **ColorPicker** holds the value and is a group around the parts.
+- **ColorPickerArea** edits two channels, like saturation across and brightness up. A press moves the thumb there and starts a drag. Its background is `--color-area-background`, so give it a size and that background.
+- **ColorPickerAreaCanvas** paints the area pixel by pixel, for channels no gradient can draw, like OKLCH's chroma and lightness.
+- **ColorPickerAreaThumb** shows where the color sits in the area. It's a slider that screen readers hear as both channels.
+- **ColorPickerSlider** edits one `channel`, like `hue` or `alpha`, drawn by `--color-slider-background`.
+- **ColorPickerSliderThumb** shows where the channel sits along its slider.
+- **ColorPickerSwatch** shows the color, named for screen readers, like "vivid blue".
+- **ColorPickerInput** reads any CSS color when you press Enter or leave it. Text that isn't a color goes back to the value.
+- **ColorPickerChannelInput** edits one `channel` as a number, in the units people read it in, like 0 to 255 for red.
+- **ColorPickerEyeDropper** picks a color from anywhere on the screen, where the browser can.
+- **ColorPickerSwatches** and **ColorPickerSwatchItem** are a list of preset colors.
+
+Each part writes the color as `--color-picker-color`, so a thumb or a swatch fills itself with `background: var(--color-picker-color)`. The picker also renders a hidden input that the form submits.
+
+## Usage
+
+Import the parts and put them together:
+
+```svelte
+<script lang="ts">
+  import {
+    ColorPicker,
+    ColorPickerArea,
+    ColorPickerAreaThumb,
+    ColorPickerInput,
+    ColorPickerSlider,
+    ColorPickerSliderThumb,
+  } from "@ui-sdk/svelte/color-picker"
+</script>
+
+<ColorPicker aria-label="Brand color" defaultValue="#0ea5e9">
+  <ColorPickerArea>
+    <ColorPickerAreaThumb />
+  </ColorPickerArea>
+  <ColorPickerSlider channel="hue">
+    <ColorPickerSliderThumb />
+  </ColorPickerSlider>
+  <ColorPickerInput aria-label="Hex" />
+</ColorPicker>
+```
+
+Name the picker with `aria-label`, or put it in a [Field](./field) whose label names it. Without `defaultValue`, it starts at black.
+
+## Spaces and Channels
+
+`space` decides which channels the parts edit, and what the value is written in:
+
+| `space` | Area, across and up    | Slider | Value written as              |
+| ------- | ---------------------- | ------ | ----------------------------- |
+| `hsv`   | saturation, brightness | hue    | hex, like `#0ea5e9`           |
+| `hsl`   | saturation, lightness  | hue    | `hsl(198.63 88.66% 48.43%)`   |
+| `srgb`  | red, green             | blue   | `rgb(14 165 233)`             |
+| `oklch` | chroma, lightness      | hue    | `oklch(0.6847 0.1479 237.32)` |
+
+Set `format` to write the value another way, like `format="hex"` in any space. Every space has an `alpha` channel too. Set `x` and `y` on the area, or `channel` on a slider, to edit other channels:
+
+```svelte
+<ColorPicker aria-label="Background" space="hsl" defaultValue="hsl(220 60% 50%)">
+  <ColorPickerArea x="hue" y="lightness">
+    <ColorPickerAreaCanvas />
+    <ColorPickerAreaThumb />
+  </ColorPickerArea>
+  <ColorPickerSlider channel="saturation" orientation="vertical">
+    <ColorPickerSliderThumb />
+  </ColorPickerSlider>
+</ColorPicker>
+```
+
+The parts keep a hue while the color turns gray or black, so dragging back out of a corner returns to the same hue.
+
+## OKLCH
+
+OKLCH spaces its colors evenly for the eye, so two colors with the same lightness look equally bright. Its edge with the colors a screen can show is a curve, which no gradient can draw. Add `ColorPickerAreaCanvas` to the area, and it paints the colors inside that edge and leaves the rest clear.
+
+<ComponentExample
+  name="color-picker/oklch"
+  caption="Drag the thumb right, past the painted edge, and let go. The thumb moves back to the closest color inside."
+/>
+
+While a drag holds a color past the edge, the value is already the closest color inside it, and every part has `data-out-of-gamut`. Once the drag ends, the thumb moves to that color. Colors stay inside sRGB by default. Set `gamut="p3"` for wide-gamut screens, or `gamut={false}` to allow any color:
+
+```svelte
+<ColorPicker aria-label="Accent" space="oklch" gamut="p3" defaultValue="oklch(0.7 0.25 150)">
+  <!-- … -->
+</ColorPicker>
+```
+
+## Presets and Channel Inputs
+
+Put `ColorPickerSwatchItem`s inside `ColorPickerSwatches` for preset colors. Each one is selected while the value is its color, however either is written, so `#0000ff` selects `rgb(0 0 255)`. The list is one tab stop, and the arrow keys move between the presets.
+
+`ColorPickerChannelInput` edits one channel as a number and sets it on Enter, when you leave it, or with its arrows. `ColorPickerEyeDropper` picks from the screen in browsers that can. Elsewhere it's disabled, with `data-unsupported`, so you can hide it.
+
+<ComponentExample
+  name="color-picker/swatches"
+  caption="Choose a preset, or use the arrow keys between them. Type 255 into the first number to set red."
+/>
+
+## Popover
+
+Put a `Popover` inside the picker to open it from a swatch. The parts inside the popup edit the same color, and the swatch in the trigger shows it.
+
+<ComponentExample
+  name="color-picker/popover"
+  caption="Press the Background swatch to open the picker, then drag to change the color."
+/>
+
+## Disabled
+
+Set `disabled`. A disabled picker can't be focused or changed, and isn't submitted. A disabled `<fieldset>` around it disables it too.
+
+<ComponentExample name="color-picker/disabled" caption="The thumbs can't be focused or dragged." />
+
+Set `readOnly` to keep the parts focusable and the value submitted, while drags, keys and typing leave the color alone:
+
+```svelte
+<ColorPicker aria-label="Theme color" defaultValue="#0ea5e9" readOnly>
+  <ColorPickerSwatch />
+  <ColorPickerInput aria-label="Hex" />
+</ColorPicker>
+```
+
+## Controlled
+
+Bind `value` with `bind:value`, and pass `onValueChange` for the details. Each change carries a [reason](#reasons), like `drag`, `step-key` or `input-commit`, and `details.color`, the color the parts hold, which keeps a hue while the value turns gray. Call `details.cancel()` in the callback to keep the current value.
+
+`onValueChange` runs on every step of a drag. `onValueCommit` runs once, when the drag, key press or typed color ends, so use it to save. A controller from `createColorPickerController()` sets the color from anywhere with `setValue()`, like the Use Purple button below.
+
+<ComponentExample
+  name="color-picker/controlled"
+  caption="Drag across the area and let go, or press Use Purple. The console logs each committed color and its reason."
+/>
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Form
+
+The hidden input submits the value under `name`, like `#f97316`, and a disabled picker submits nothing. A form reset returns it to `defaultValue`. Set `form` to join a form by its id.
+
+<ComponentExample
+  name="color-picker/form"
+  caption="Change the color and press Save to log the submitted value. Reset restores the orange."
+/>
+
+A color picker always has a value, so `required` only adds `data-required`.
+
+## Custom Rendering
+
+Every part takes `render`, a snippet that renders your own element with the part's props and state, and its `children` snippet gets the state. A slider thumb's state has its `channelValue`, a preset's has whether it's `selected`, and every part has the `color` and whether it's `outOfGamut`:
+
+```svelte
+<ColorPickerSlider channel="alpha">
+  <ColorPickerSliderThumb>
+    {#snippet children(state)}
+      <span class:dashed={state.outOfGamut}>{Math.round(state.channelValue)}%</span>
+    {/snippet}
+  </ColorPickerSliderThumb>
+</ColorPickerSlider>
+<ColorPickerSwatch>
+  {#snippet children(state)}
+    {#if state.color.alpha < 1}<span>Transparent</span>{/if}
+  {/snippet}
+</ColorPickerSwatch>
+```
+
+See [Parts and Composition](../parts-and-composition) for the rendering contract and [State](#state) for each part's fields.
+
+## Styling
+
+Parts are unstyled, apart from the positions they need: thumbs get `position: absolute` and their place in percent, as inline styles. Give the area and sliders a size and their background variable, and center each thumb on its point with `translate: -50% -50%`.
+
+Each part has a `data-slot`, such as `color-picker-area`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### ColorPicker [#styling-colorpicker]
+
+<CssVariables component="color-picker" part="root" />
+
+### ColorPickerArea [#styling-colorpickerarea]
+
+<CssVariables component="color-picker" part="area" />
+
+### ColorPickerAreaThumb [#styling-colorpickerareathumb]
+
+<CssVariables component="color-picker" part="area-thumb" />
+
+### ColorPickerSlider [#styling-colorpickerslider]
+
+<CssVariables component="color-picker" part="slider" />
+
+### ColorPickerSliderThumb [#styling-colorpickersliderthumb]
+
+<CssVariables component="color-picker" part="slider-thumb" />
+
+### ColorPickerSwatch [#styling-colorpickerswatch]
+
+<CssVariables component="color-picker" part="swatch" />
+
+### ColorPickerSwatchItem [#styling-colorpickerswatchitem]
+
+<CssVariables component="color-picker" part="swatch-item" />
+
+## Data Attributes
+
+### ColorPicker [#data-attributes-colorpicker]
+
+<DataAttributes component="color-picker" part="root" />
+
+### ColorPickerArea [#data-attributes-colorpickerarea]
+
+<DataAttributes component="color-picker" part="area" />
+
+### ColorPickerAreaThumb [#data-attributes-colorpickerareathumb]
+
+<DataAttributes component="color-picker" part="area-thumb" />
+
+### ColorPickerSlider [#data-attributes-colorpickerslider]
+
+<DataAttributes component="color-picker" part="slider" />
+
+### ColorPickerSliderThumb [#data-attributes-colorpickersliderthumb]
+
+<DataAttributes component="color-picker" part="slider-thumb" />
+
+### ColorPickerInput [#data-attributes-colorpickerinput]
+
+<DataAttributes component="color-picker" part="input" />
+
+### ColorPickerChannelInput [#data-attributes-colorpickerchannelinput]
+
+<DataAttributes component="color-picker" part="channel-input" />
+
+### ColorPickerSwatch [#data-attributes-colorpickerswatch]
+
+<DataAttributes component="color-picker" part="swatch" />
+
+### ColorPickerEyeDropper [#data-attributes-colorpickereyedropper]
+
+<DataAttributes component="color-picker" part="eye-dropper" />
+
+### ColorPickerSwatches [#data-attributes-colorpickerswatches]
+
+<DataAttributes component="color-picker" part="swatches" />
+
+### ColorPickerSwatchItem [#data-attributes-colorpickerswatchitem]
+
+<DataAttributes component="color-picker" part="swatch-item" />
+
+## API Reference
+
+Props and callbacks are the same as below, as Svelte props. `value` can be bound with `bind:value`.
+
+### ColorPicker
+
+<TypeTable path="../../packages/core/src/components/color-picker/color-picker.ts" name="ColorPickerOptions" />
+
+### ColorPickerArea
+
+<TypeTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerAreaProps"
+/>
+
+### ColorPickerSlider
+
+<TypeTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerSliderProps"
+/>
+
+### ColorPickerChannelInput
+
+<TypeTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerChannelInputProps"
+/>
+
+### ColorPickerSwatchItem
+
+<TypeTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerSwatchItemProps"
+/>
+
+### State
+
+What render functions, state-based class names and slots receive. Every part gets the picker's state.
+
+<StateTable path="../../packages/core/src/components/color-picker/color-picker.ts" name="ColorPickerState" />
+
+Sliders and their thumbs add their channel:
+
+<StateTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerSliderState"
+/>
+
+Preset items have their own:
+
+<StateTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerSwatchItemState"
+/>
+
+### Reasons
+
+`details.reason` says why the value changed.
+
+<ReasonTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerValueChangeReason"
+/>
+
+### Controller
+
+Create one with `createColorPickerController()` and pass it as `controller`.
+
+`setValue()` takes any CSS color and an optional `{ reason, event }`, runs the change callback like a drag, and returns `false` when the color can't be read or the change is canceled.
+
+<ControllerTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerController"
+/>
+
+### Events
+
+Callbacks get the new value first, then the details. A bound `value` only updates when `onValueChange` wasn't canceled.
+
+| Prop            | On            | Receives                                                                                |
+| --------------- | ------------- | --------------------------------------------------------------------------------------- |
+| `bind:value`    | `ColorPicker` | The value                                                                               |
+| `onValueChange` | `ColorPicker` | `(value, details)`: the new value, the [reason](#reasons) and `details.color`           |
+| `onValueCommit` | `ColorPicker` | `(value, details)`: the value once the interaction ends, its reason and `details.color` |
+
+## Accessibility
+
+No WAI-ARIA pattern covers a color picker, so it's built from ones that do. The picker is a group. The area's thumb and each slider's thumb follow the [WAI-ARIA slider pattern](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), and the area's thumb names both of its channels, like "Saturation 76%, Brightness 96%". The presets follow the [listbox pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/), and each one is named by its color, like "vivid red", as is `ColorPickerSwatch`.
+
+The thumbs, inputs and presets are named in English by default. Pass `aria-label` to name them in another language.
+
+### Keyboard
+
+| Key                  | Does                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| Arrow keys           | Move a thumb one step. On the area, Left and Right move across, Up and Down move up and down. |
+| Shift with an arrow  | Moves ten steps                                                                               |
+| Page Up or Page Down | Moves a tenth of the range, up the area or along a slider                                     |
+| Home or End          | Moves to the start or end, across the area or along a slider                                  |
+| Enter                | Reads the text in the input, or picks the focused preset                                      |
+| Escape               | Puts the input's text back to the value                                                       |
+
+Each key press commits, like the end of a drag.
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="color-picker" />

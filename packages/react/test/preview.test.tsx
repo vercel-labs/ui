@@ -11,6 +11,7 @@ import { Listbox, ListboxItem, ListboxItemIndicator } from "../src/listbox"
 import { Menu, MenuContent, MenuItemIndicator, MenuRadioGroup, MenuRadioItem, MenuTrigger } from "../src/menu"
 import { usePart, usePrimitive, type PrimitiveHandle } from "../src/primitive"
 import { Radio, RadioGroup, RadioIndicator } from "../src/radio"
+import { Rating } from "../src/rating"
 import { createResizableController, Resizable, ResizablePanel } from "../src/resizable"
 import { Select } from "../src/select"
 import { Separator } from "../src/separator"
@@ -474,4 +475,18 @@ test("a controlled toggle renders once when its pressed state changes", async ()
   renders = 0
   await rerender(toggle(true))
   expect(renders).toBe(1)
+})
+
+test("a rating's stars take a new getValueLabel or max in the same render", async () => {
+  const seen: unknown[] = []
+  const names = () => [...document.querySelectorAll('[role="radio"]')].map((radio) => radio.ariaLabel)
+  const view = (unit: string, max: number) => (
+    <>
+      <Rating defaultValue={2} max={max} getValueLabel={(value, of) => `${value} ${unit} of ${of}`} />
+      <Probe seen={seen} read={names} />
+    </>
+  )
+  await render(view("stars", 5))
+  await rerender(view("hearts", 3))
+  expect(seen.at(-1)).toEqual(["1 hearts of 3", "2 hearts of 3", "3 hearts of 3"])
 })

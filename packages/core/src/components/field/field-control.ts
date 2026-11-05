@@ -73,40 +73,9 @@ function validityOf(el: HTMLElement) {
   return { willValidate: target.willValidate, validity: target.validity, message: target.validationMessage }
 }
 
-// The element a field wires to its label and messages: a control of this
-// package, or the first native one. A radio is the control of a field around
-// it alone. A field around its whole group finds the group first, since it
-// comes first in the page.
-const controlSelector =
-  '[data-slot="slider-root"],input:not([type="hidden"]):not([aria-hidden="true"]),select,textarea,[data-slot="checkbox-group"],[role="checkbox"],[role="switch"],[role="radiogroup"],[role="radio"],[role="combobox"],[role="slider"],[role="spinbutton"],[role="textbox"],[role="listbox"],[data-slot="file-input-trigger"]'
-
-// A slider with several thumbs is a group the label names, ahead of its
-// thumbs. One thumb is the control itself. Checked here rather than with
-// `:has()`, which would make the whole selector throw where it's unsupported.
-const isSingleSlider = (el: HTMLElement) =>
-  el.matches('[data-slot="slider-root"]') && !el.querySelector('[data-slot="slider-thumb"][data-index="1"]')
-
-/**
- * The control a field wires to its label and messages: a ui-sdk control inside
- * `root`, or its first native one.
- */
-function findControl(root: HTMLElement) {
-  for (const el of Array.from(root.querySelectorAll<HTMLElement>(controlSelector)))
-    if (el.closest('[data-slot="field-root"]') === root && !isSingleSlider(el)) return el
-}
-
 // Whether a control says it's required. Our own controls mark the hidden input
 // or the element, and groups say `aria-required`.
 const isRequired = (el: HTMLElement) =>
   el.hasAttribute("required") || el.getAttribute("aria-required") === "true"
 
-export {
-  controlsIn,
-  findControl,
-  isRequired,
-  valid,
-  type Validity,
-  type ValidityKey,
-  validityKeys,
-  validityOf,
-}
+export { controlsIn, isRequired, valid, type Validity, type ValidityKey, validityKeys, validityOf }

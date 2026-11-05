@@ -55,6 +55,12 @@ import type {
   HoverCardOpenChangeReason,
   HoverCardPayloadChangeReason,
 } from "@ui-sdk/core/hover-card"
+import type {
+  ImageCrop,
+  ImageCropperController,
+  ImageCropperCropChangeDetails,
+  ImageCropperCropCommitDetails,
+} from "@ui-sdk/core/image-cropper"
 import type { NavigationMenuController, NavigationMenuValueChangeReason } from "@ui-sdk/core/navigation-menu"
 import type { InputController, InputValueChangeReason } from "@ui-sdk/core/input"
 import type {
@@ -89,6 +95,8 @@ import type {
   DatePickerValue,
   DatePickerValueChangeReason,
 } from "@ui-sdk/core/date-picker"
+import type { DateInputController, DateInputValueChangeReason } from "@ui-sdk/core/date-input"
+import type { TimeInputController, TimeInputValueChangeReason } from "@ui-sdk/core/time-input"
 import type {
   CarouselController,
   CarouselPageChangeReason,
@@ -106,8 +114,14 @@ import type {
   PopoverPayloadChangeReason,
 } from "@ui-sdk/core/popover"
 import type { RadioGroupController, RadioGroupValueChangeReason } from "@ui-sdk/core/radio"
+import type { RatingController, RatingOptions, RatingValueChangeReason } from "@ui-sdk/core/rating"
 import type { ScrollAreaController } from "@ui-sdk/core/scroll-area"
+import type {
+  SegmentedControlController,
+  SegmentedControlValueChangeReason,
+} from "@ui-sdk/core/segmented-control"
 import type { SeparatorOptions } from "@ui-sdk/core/separator"
+import type { label } from "@ui-sdk/core/label"
 import type {
   SelectController,
   SelectDismissReason,
@@ -116,6 +130,11 @@ import type {
   SelectQueryChangeReason,
   SelectValueChangeReason,
 } from "@ui-sdk/core/select"
+import type {
+  ColorPickerController,
+  ColorPickerValueChangeDetails,
+  ColorPickerValueCommitDetails,
+} from "@ui-sdk/core/color-picker"
 import type {
   ComboboxController,
   ComboboxDismissReason,
@@ -188,14 +207,18 @@ import type { calendar } from "@ui-sdk/core/calendar"
 import type { carousel } from "@ui-sdk/core/carousel"
 import type { checkbox, checkboxGroup } from "@ui-sdk/core/checkbox"
 import type { collapsible } from "@ui-sdk/core/collapsible"
+import type { colorPicker } from "@ui-sdk/core/color-picker"
 import type { combobox } from "@ui-sdk/core/combobox"
 import type { command } from "@ui-sdk/core/command"
+import type { dateInput } from "@ui-sdk/core/date-input"
 import type { datePicker } from "@ui-sdk/core/date-picker"
+import type { timeInput } from "@ui-sdk/core/time-input"
 import type { dialog } from "@ui-sdk/core/dialog"
 import type { drawer } from "@ui-sdk/core/drawer"
 import type { field, fieldGroup, fieldSet } from "@ui-sdk/core/field"
 import type { fileInput } from "@ui-sdk/core/file-input"
 import type { hoverCard } from "@ui-sdk/core/hover-card"
+import type { imageCropper } from "@ui-sdk/core/image-cropper"
 import type { input, inputGroup, textarea } from "@ui-sdk/core/input"
 import type { listbox } from "@ui-sdk/core/listbox"
 import type { menu } from "@ui-sdk/core/menu"
@@ -209,8 +232,10 @@ import type { passwordInput } from "@ui-sdk/core/password-input"
 import type { popover } from "@ui-sdk/core/popover"
 import type { progress } from "@ui-sdk/core/progress"
 import type { radioGroup } from "@ui-sdk/core/radio"
+import type { rating } from "@ui-sdk/core/rating"
 import type { resizable } from "@ui-sdk/core/resizable"
 import type { scrollArea } from "@ui-sdk/core/scroll-area"
+import type { segmentedControl } from "@ui-sdk/core/segmented-control"
 import type { select } from "@ui-sdk/core/select"
 import type { slider } from "@ui-sdk/core/slider"
 import type { switchPrimitive } from "@ui-sdk/core/switch"
@@ -785,6 +810,51 @@ interface UiRadioElement
     Omit<FormAssociatedMembers, "name"> {}
 
 /**
+ * The events of `<ui-rating>`.
+ * @experimental
+ */
+type RatingEvents = { valuechange: UiChangeEvent<number | null, RatingValueChangeReason> }
+/**
+ * `<ui-rating>`: `value`, `getValueLabel`, form members like a native input, and typed events.
+ * @experimental
+ */
+interface UiRatingElement
+  extends
+    UiElement<RatingEvents>,
+    FormControlProperties<typeof rating, "api" | "value">,
+    Pick<RatingOptions, "getValueLabel"> {
+  value: number | null
+  api: RatingController
+}
+
+/**
+ * The events of `<ui-segmented-control>`.
+ * @experimental
+ */
+type SegmentedControlEvents = {
+  valuechange: UiChangeEvent<string | null, SegmentedControlValueChangeReason>
+}
+/**
+ * `<ui-segmented-control>`: `value`, form members like a native input, and typed events.
+ * @experimental
+ */
+interface UiSegmentedControlElement
+  extends UiElement<SegmentedControlEvents>, FormControlProperties<typeof segmentedControl, "api" | "value"> {
+  value: string | null
+  api: SegmentedControlController
+}
+
+/**
+ * `<ui-segmented-control-item>`: `value` and `disabled`, and form members like a native radio.
+ * Its control's `name` names the value.
+ * @experimental
+ */
+interface UiSegmentedControlItemElement
+  extends
+    UiPartElement<typeof segmentedControl, "item", "value" | "disabled">,
+    Omit<FormAssociatedMembers, "name"> {}
+
+/**
  * The events of `<ui-input>` and `<ui-textarea>`.
  * @stable
  */
@@ -955,6 +1025,48 @@ interface UiDatePickerElement
 }
 
 /**
+ * The events of `<ui-date-input>`. `valuechange` fires as a whole value forms, and with `null` as one empties.
+ * @stable
+ */
+type DateInputEvents = {
+  valuechange: UiChangeEvent<string | null, DateInputValueChangeReason>
+}
+/**
+ * `<ui-date-input>`: `value`, the controller's methods on `api`, form members like a native input, and typed events.
+ * @stable
+ */
+interface UiDateInputElement
+  extends
+    UiElement<DateInputEvents>,
+    FormControlProperties<typeof dateInput, "api" | "controller" | "unavailable" | "value"> {
+  value: string | null
+  api: DateInputController
+  controller?: DateInputController
+  /** Dates that can't be chosen, as any matcher, like `{ weekday: [0, 6] }`. The attribute takes a list of dates. */
+  unavailable?: DateMatchers
+}
+
+/**
+ * The events of `<ui-time-input>`. `valuechange` fires as a whole time forms, and with `null` as one empties.
+ * @stable
+ */
+type TimeInputEvents = {
+  valuechange: UiChangeEvent<string | null, TimeInputValueChangeReason>
+}
+/**
+ * `<ui-time-input>`: `value`, the controller's methods on `api`, form members like a native input, and typed events.
+ * @stable
+ */
+interface UiTimeInputElement
+  extends
+    UiElement<TimeInputEvents>,
+    FormControlProperties<typeof timeInput, "api" | "controller" | "value"> {
+  value: string | null
+  api: TimeInputController
+  controller?: TimeInputController
+}
+
+/**
  * The events of `<ui-otp-input>`. `valuecommit` fires when a change fills every slot.
  * @stable
  */
@@ -992,6 +1104,27 @@ interface UiSliderElement
   value: number | number[]
   api: SliderController
   controller?: SliderController
+}
+
+/**
+ * The events of `<ui-color-picker>`. `valuechange` fires on every step of a drag, and `valuecommit` once the interaction ends.
+ * @experimental
+ */
+type ColorPickerEvents = {
+  valuechange: UiDetailedChangeEvent<string, ColorPickerValueChangeDetails>
+  valuecommit: UiDetailedChangeEvent<string, ColorPickerValueCommitDetails>
+}
+/**
+ * `<ui-color-picker>`: `value`, the controller's methods on `api`, form members like a native input, and typed events.
+ * @experimental
+ */
+interface UiColorPickerElement
+  extends
+    UiElement<ColorPickerEvents>,
+    FormControlProperties<typeof colorPicker, "api" | "controller" | "value"> {
+  value: string
+  api: ColorPickerController
+  controller?: ColorPickerController
 }
 
 /**
@@ -1039,6 +1172,12 @@ interface UiSeparatorElement
     HTMLElement,
     Pick<SeparatorOptions, "orientation">,
     Required<Pick<SeparatorOptions, "decorative">> {}
+
+/**
+ * `<ui-label>`: its options as properties.
+ * @experimental
+ */
+interface UiLabelElement extends HTMLElement, AttributeProperties<typeof label> {}
 
 /**
  * `<ui-field>`: `invalid` as a property, three-way like the attribute.
@@ -1094,6 +1233,27 @@ type AvatarEvents = {
  */
 interface UiAvatarElement
   extends UiElement<AvatarEvents>, AttributeProperties<typeof avatar, "api" | "pressed"> {}
+
+/**
+ * The events of `<ui-image-cropper>`. `cropchange` fires on every step of a drag, and `cropcommit` once the interaction ends.
+ * @experimental
+ */
+type ImageCropperEvents = {
+  cropchange: UiDetailedChangeEvent<Required<ImageCrop>, ImageCropperCropChangeDetails>
+  cropcommit: UiDetailedChangeEvent<Required<ImageCrop>, ImageCropperCropCommitDetails>
+}
+/**
+ * `<ui-image-cropper>`: `crop`, the controller's methods on `api`, and typed events.
+ * @experimental
+ */
+interface UiImageCropperElement
+  extends
+    UiElement<ImageCropperEvents>,
+    AttributeProperties<typeof imageCropper, "api" | "controller" | "crop"> {
+  crop: Required<ImageCrop> | null
+  api: ImageCropperController
+  controller?: ImageCropperController
+}
 
 /**
  * The events of `<ui-button>`.
@@ -1404,8 +1564,11 @@ type TriggerMenuEvents = {
     string,
     ChangeDetails<TriggerMenuQueryChangeReason> & { trigger: string; argument?: string }
   >
-  /** An item was chosen. `preventDefault()` skips the insertion, and `detail.waitUntil(promise)` inserts a pending token. */
-  select: CustomEvent<
+  /**
+   * An item was chosen. `preventDefault()` skips the insertion, and `detail.waitUntil(promise)` inserts a pending token.
+   * Not `select`, which the field fires for selected text.
+   */
+  itemselect: CustomEvent<
     Omit<TriggerMenuSelectDetails<string>, "preventDefault" | "defaultPrevented"> & { value: string }
   >
   dismissattempt: UiDismissAttemptEvent<TriggerMenuDismissReason>
@@ -1484,6 +1647,7 @@ declare global {
     "ui-popover": UiPopoverElement
     "ui-tooltip": UiTooltipElement
     "ui-hover-card": UiHoverCardElement
+    "ui-image-cropper": UiImageCropperElement
     "ui-menu": UiMenuElement
     "ui-menu-sub": UiMenuSubElement
     "ui-dialog": UiDialogElement
@@ -1499,6 +1663,9 @@ declare global {
     "ui-checkbox-group": UiCheckboxGroupElement
     "ui-radio-group": UiRadioGroupElement
     "ui-radio": UiRadioElement
+    "ui-rating": UiRatingElement
+    "ui-segmented-control": UiSegmentedControlElement
+    "ui-segmented-control-item": UiSegmentedControlItemElement
     "ui-input": UiInputElement
     "ui-input-group": UiInputGroupElement
     "ui-textarea": UiTextareaElement
@@ -1506,6 +1673,8 @@ declare global {
     "ui-pagination": UiPaginationElement
     "ui-calendar": UiCalendarElement
     "ui-calendar-weeks": HTMLElement
+    "ui-date-input": UiDateInputElement
+    "ui-time-input": UiTimeInputElement
     "ui-date-picker": UiDatePickerElement
     "ui-carousel": UiCarouselElement
     "ui-listbox": UiListboxElement
@@ -1515,6 +1684,7 @@ declare global {
     "ui-toolbar": UiToolbarElement
     "ui-menubar": UiMenubarElement
     "ui-select": UiSelectElement
+    "ui-color-picker": UiColorPickerElement
     "ui-combobox": UiComboboxElement
     "ui-command": UiCommandElement
     "ui-autocomplete": UiAutocompleteElement
@@ -1530,6 +1700,7 @@ declare global {
     "ui-separator": UiSeparatorElement
     "ui-progress": UiGaugeElement
     "ui-field": UiFieldElement
+    "ui-label": UiLabelElement
     "ui-field-set": UiFieldSetElement
     "ui-field-group": UiFieldGroupElement
     "ui-slider": UiSliderElement
@@ -1666,6 +1837,8 @@ declare global {
     "ui-command-separator": UiPartElement<typeof command, "separator">
     "ui-command-empty": UiPartElement<typeof command, "empty">
     "ui-command-status": UiPartElement<typeof command, "status">
+    "ui-date-input-segment": UiPartElement<typeof dateInput, "segment", "segment">
+    "ui-time-input-segment": UiPartElement<typeof timeInput, "segment", "segment">
     "ui-date-picker-input": UiPartElement<typeof datePicker, "input", "end">
     "ui-date-picker-trigger": UiPartElement<typeof datePicker, "trigger">
     "ui-date-picker-content": UiPartElement<
@@ -1720,6 +1893,14 @@ declare global {
     "ui-file-input-item": UiPartElement<typeof fileInput, "item", never, "file">
     "ui-file-input-item-remove": UiPartElement<typeof fileInput, "item-remove">
     "ui-hover-card-trigger": UiPartElement<typeof hoverCard, "trigger", never, "payload">
+    "ui-image-cropper-viewport": UiPartElement<typeof imageCropper, "viewport">
+    "ui-image-cropper-image": UiPartElement<typeof imageCropper, "image">
+    "ui-image-cropper-selection": UiPartElement<typeof imageCropper, "selection">
+    "ui-image-cropper-grid": UiPartElement<typeof imageCropper, "grid">
+    "ui-image-cropper-handle": UiPartElement<typeof imageCropper, "handle", "position">
+    "ui-image-cropper-zoom": UiPartElement<typeof imageCropper, "zoom">
+    "ui-image-cropper-rotate": UiPartElement<typeof imageCropper, "rotate">
+    "ui-image-cropper-flip": UiPartElement<typeof imageCropper, "flip", "direction">
     "ui-hover-card-content": UiPartElement<
       typeof hoverCard,
       "content",
@@ -1873,6 +2054,8 @@ declare global {
     "ui-progress-label": UiPartElement<typeof progress, "label">
     "ui-progress-value": UiPartElement<typeof progress, "value">
     "ui-radio-indicator": UiPartElement<typeof radioGroup, "indicator", "keepMounted">
+    "ui-rating-item": UiPartElement<typeof rating, "item", "index">
+    "ui-rating-radio": UiPartElement<typeof rating, "radio", "value" | "disabled">
     "ui-resizable-panel": UiPartElement<
       typeof resizable,
       "panel",
@@ -1909,7 +2092,7 @@ declare global {
     "ui-select-status": UiPartElement<typeof select, "status">
     "ui-select-item-text": UiPartElement<typeof select, "item-text">
     "ui-select-select-all": UiPartElement<typeof select, "select-all">
-    "ui-select-item": UiPartElement<typeof select, "item", "label" | "disabled" | "index" | "value">
+    "ui-select-item": UiPartElement<typeof select, "item", "label" | "disabled" | "index", "value">
     "ui-select-item-indicator": UiPartElement<typeof select, "item-indicator", "keepMounted">
     "ui-select-item-icon": UiPartElement<typeof select, "item-icon", "mirror">
     "ui-select-value-icon": UiPartElement<typeof select, "value-icon">
@@ -1917,6 +2100,17 @@ declare global {
     "ui-select-group-label": UiPartElement<typeof select, "group-label">
     "ui-select-separator": UiPartElement<typeof select, "separator">
     "ui-select-arrow": UiPartElement<typeof select, "arrow">
+    "ui-color-picker-area": UiPartElement<typeof colorPicker, "area", "x" | "y">
+    "ui-color-picker-area-thumb": UiPartElement<typeof colorPicker, "area-thumb">
+    "ui-color-picker-area-canvas": UiPartElement<typeof colorPicker, "area-canvas">
+    "ui-color-picker-slider": UiPartElement<typeof colorPicker, "slider", "channel" | "orientation">
+    "ui-color-picker-slider-thumb": UiPartElement<typeof colorPicker, "slider-thumb">
+    "ui-color-picker-input": UiPartElement<typeof colorPicker, "input">
+    "ui-color-picker-channel-input": UiPartElement<typeof colorPicker, "channel-input", "channel">
+    "ui-color-picker-swatch": UiPartElement<typeof colorPicker, "swatch">
+    "ui-color-picker-eye-dropper": UiPartElement<typeof colorPicker, "eye-dropper">
+    "ui-color-picker-swatches": UiPartElement<typeof colorPicker, "swatches">
+    "ui-color-picker-swatch-item": UiPartElement<typeof colorPicker, "swatch-item", "value">
     "ui-slider-control": UiPartElement<typeof slider, "control">
     "ui-slider-track": UiPartElement<typeof slider, "track">
     "ui-slider-indicator": UiPartElement<typeof slider, "indicator">
@@ -1924,6 +2118,7 @@ declare global {
     "ui-slider-thumb-input": UiPartElement<typeof slider, "thumb-input">
     "ui-slider-value": UiPartElement<typeof slider, "value">
     "ui-switch-thumb": UiPartElement<typeof switchPrimitive, "thumb">
+    "ui-segmented-control-indicator": UiPartElement<typeof segmentedControl, "indicator">
     "ui-tabs-list": UiPartElement<typeof tabs, "list">
     "ui-tabs-tab": UiPartElement<typeof tabs, "tab", "value" | "disabled">
     "ui-tabs-tab-icon": UiPartElement<typeof tabs, "tab-icon", "mirror">
@@ -1973,7 +2168,7 @@ declare global {
       | "keepMounted"
     >
     "ui-trigger-menu-list": UiPartElement<typeof triggerMenu, "list">
-    // Its `select` event fires on the trigger menu.
+    // Its `itemselect` event fires on the trigger menu.
     "ui-trigger-menu-item": UiPartElement<
       typeof triggerMenu,
       "item",
@@ -2035,26 +2230,32 @@ export {
   type CheckboxEvents,
   type CheckboxGroupEvents,
   type CollapsibleEvents,
+  type ColorPickerEvents,
   type ComboboxEvents,
   type CommandEvents,
+  type DateInputEvents,
   type DatePickerEvents,
   type DialogEvents,
   type DrawerEvents,
   type FileInputEvents,
   type HoverCardEvents,
+  type ImageCropperEvents,
   type InputEvents,
   type ListboxEvents,
   type MenuEvents,
   type NavigationMenuEvents,
   type NumberInputEvents,
   type OTPInputEvents,
+  type TimeInputEvents,
   type PaginationEvents,
   type PartEvents,
   type PartProperties,
   type PasswordInputEvents,
   type PopoverEvents,
   type RadioGroupEvents,
+  type RatingEvents,
   type ResizableEvents,
+  type SegmentedControlEvents,
   type SelectEvents,
   type SliderEvents,
   type SwitchEvents,
@@ -2077,8 +2278,10 @@ export {
   type UiCheckboxElement,
   type UiCheckboxGroupElement,
   type UiCollapsibleElement,
+  type UiColorPickerElement,
   type UiComboboxElement,
   type UiCommandElement,
+  type UiDateInputElement,
   type UiDatePickerElement,
   type UiDetailedChangeEvent,
   type UiDialogElement,
@@ -2092,8 +2295,10 @@ export {
   type UiGaugeElement,
   type UiHighlightEvent,
   type UiHoverCardElement,
+  type UiImageCropperElement,
   type UiInputElement,
   type UiInputGroupElement,
+  type UiLabelElement,
   type UiListboxElement,
   type UiLoadMoreEvent,
   type UiMenubarElement,
@@ -2104,6 +2309,7 @@ export {
   type UiNumberInputElement,
   type UiOpenChangeCompleteEvent,
   type UiOTPInputElement,
+  type UiTimeInputElement,
   type UiOverlayHostElement,
   type UiPaginationElement,
   type UiPartElement,
@@ -2112,8 +2318,11 @@ export {
   type UiPreferencesElement,
   type UiRadioElement,
   type UiRadioGroupElement,
+  type UiRatingElement,
   type UiResizableElement,
   type UiScrollAreaElement,
+  type UiSegmentedControlElement,
+  type UiSegmentedControlItemElement,
   type UiSelectElement,
   type UiSeparatorElement,
   type UiSliderElement,
