@@ -6,7 +6,7 @@ import {
   type RatingState,
 } from "@ui-sdk/core/rating"
 import type { JSX } from "@solidjs/web"
-import { createContext, For, omit, useContext } from "solid-js"
+import { createContext, For, merge, omit, useContext } from "solid-js"
 import { joinField, useFieldControl } from "./field-context"
 import { createParts, usePart, type PartProps } from "./use-primitive"
 
@@ -45,14 +45,13 @@ function Rating(
   )
   const stars = () => Array.from({ length: props.max ?? 5 }, (_, at) => at + 1)
   const step = () => props.step ?? 1
-  const root = {
-    ...joinField(field, rest, "div"),
+  const root = merge(joinField(field, rest, "div"), {
     children: () => (
       <For each={stars()}>
         {(index) => <ItemContext value={{ index, step }}>{props.children ?? <RatingItem />}</ItemContext>}
       </For>
     ),
-  }
+  })
   return (
     <parts.Root {...props} disabled={props.disabled || field?.disabled()} name={props.name ?? field?.name()}>
       {usePart(rating, "root", undefined, root, "div")}
@@ -86,7 +85,7 @@ function RatingItem(props: PartProps<"span", RatingItemState>) {
   )
   const content = (state: RatingItemState) =>
     [typeof props.children === "function" ? props.children(state) : props.children, radios] as JSX.Element
-  return usePart(rating, "item", () => ({ index: item.index }), { ...rest, children: content }, "span")
+  return usePart(rating, "item", () => ({ index: item.index }), merge(rest, { children: content }), "span")
 }
 
 export { createRatingController } from "@ui-sdk/core/rating"
