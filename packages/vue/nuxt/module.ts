@@ -19,7 +19,7 @@ interface ModuleOptions {
  * @experimental
  */
 const uiSdk: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOptions>({
-  meta: { name: "@ui-sdk/vue", configKey: "uiSdk", compatibility: { nuxt: "^4.0.0" } },
+  meta: { name: "@ui-sdk/vue", configKey: "uiSdk", compatibility: { nuxt: "^4.0.0 || ^5.0.0-0" } },
   defaults: { prefix: "" },
   setup(options) {
     const { components, imports } = nuxtRegistrations(readEntries(), options.prefix ?? "")

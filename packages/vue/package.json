@@ -364,10 +364,10 @@
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@nuxt/kit": "^4.0.0",
-    "@nuxt/schema": "^4.0.0",
+    "@nuxt/kit": "^4.0.0 || ^5.0.0-0",
+    "@nuxt/schema": "^4.0.0 || ^5.0.0-0",
     "@ui-sdk/core": "workspace:^",
-    "nuxt": "^4.0.0",
+    "nuxt": "^4.0.0 || ^5.0.0-0",
     "vue": ">=3.5"
   },
   "peerDependenciesMeta": {
