@@ -148,6 +148,13 @@ describe("color picker", () => {
     expect(attrs(picker.part("swatch", {}))).toMatchObject({ role: "img", "aria-label": "vivid red" })
   })
 
+  test("a swatch outside the gamut is selected once chosen", () => {
+    const picker = make({ space: "oklch", format: "oklch" })
+    const vivid = "oklch(0.7 0.3 150)"
+    picker.api.internal.choose(vivid, { reason: "item-press" })
+    expect(attrs(picker.part("swatch-item", { value: vivid }))["aria-selected"]).toBe("true")
+  })
+
   test("a canceled change leaves the value and the parts as they were", () => {
     const picker = make({
       defaultValue: "hsl(120 100% 50%)",

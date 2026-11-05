@@ -226,7 +226,7 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
 
   function isSelected(value: string | undefined) {
     const color = value === undefined ? null : parseColor(value)
-    return !!color && isSameColor(color, publicColor(store.get().color))
+    return !!color && isSameColor(publicColor(color), publicColor(store.get().color))
   }
 
   const roving = createRovingFocus<State, { value: string }>(context, {
