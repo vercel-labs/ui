@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 241 (2026-11-05, date input and time input).
 
 ## Settled
 
@@ -20,6 +20,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 - **`value` reads `null` for a microtask after append** while the first tab already shows as selected through the claim. It catches up once the tabs bind, in the same task.
+- **A half-typed date reads `null`.** Writing `null` back leaves its segments, so a controlled value can't empty them; `clear()` does. Same in every framework.
 
 ## Known and open (don't report again, check whether fixed)
 
@@ -50,6 +51,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **`<ui-tooltip-trigger><ui-toggle><button>`** flips the button's `data-slot` after a click: the rule that gives the inner part's `data-slot` to an element two parts share (`innerPart`) misses owners that bind their own element.
 - **`pressedText` doesn't see `user-select: none` across a shadow root**: it walks `parentElement`, which stops at the root, so a toast in one doesn't swipe from text its host makes unselectable.
 - **`ui-token-input` gets no `disabled` or `data-disabled` from a disabled field**, though its editor does.
+- **Date input segments** removed by a page morph stay gone until the locale or the clock changes (BACKLOG.md).
 
 ## Revisit
 

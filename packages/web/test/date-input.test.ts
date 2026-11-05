@@ -104,7 +104,7 @@ test("a read-only input is barred from validation, like a native one", async () 
   expect(Object.values(flags).some(Boolean)).toBe(false)
 })
 
-test("setting the value later clears a partly typed date, and an empty string clears it too", async () => {
+test("clear() empties a partly typed date, and an empty string clears the value", async () => {
   mount(`<ui-date-input value="2026-11-02" locale="en-US"></ui-date-input>`)
   await wait()
   const root = document.querySelector<UiDateInputElement>("ui-date-input")!
@@ -114,6 +114,9 @@ test("setting the value later clears a partly typed date, and an empty string cl
   )
   await wait()
   root.value = null
+  await wait()
+  expect([segment("month").value, segment("day").value, segment("year").value]).toEqual(["11", "", "2026"])
+  root.api.clear()
   await wait()
   expect([segment("month").value, segment("day").value, segment("year").value]).toEqual(["", "", ""])
   root.value = "2026-11-02"

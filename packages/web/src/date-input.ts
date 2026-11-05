@@ -7,10 +7,6 @@ import { copy } from "./list"
 
 const rendered = new WeakMap<Element, string>()
 
-// The value each element last reported, until the task ends. Frameworks write
-// it back within that task, and that write mustn't clear a partly typed date.
-const echoes = new WeakMap<DateInputApi, string | null>()
-
 // Made again only when the locale, the clock or the granularity changes the
 // segments. Each copies the <template>'s segment, so authors can style them.
 function renderSegments(el: HTMLElement, instance: PrimitiveInstance, tag: string) {
@@ -43,23 +39,15 @@ function defineSegmented(primitive: typeof dateInput, tag: string, dates: boolea
         value: {
           get: (api: DateInputApi) => api.getValue(),
           set: (api: DateInputApi, value: string | null) => {
+            // Frameworks write back the null a half-typed date reports; clear() empties it.
             const next = value || null
-            if (!echoes.has(api) || echoes.get(api) !== next) api.setValue(next)
+            if (next !== api.getValue()) api.setValue(next)
           },
         },
       },
       api: ["getValue", "setValue", "clear", "focus"],
       render(el, instance) {
-        const api = instance.api as DateInputApi
-        let last = api.getValue()
-        const update = () => {
-          renderSegments(el, instance, tag)
-          const value = api.getValue()
-          if (value === last) return
-          last = value
-          echoes.set(api, value)
-          setTimeout(() => echoes.get(api) === value && echoes.delete(api))
-        }
+        const update = () => renderSegments(el, instance, tag)
         update()
         return instance.subscribe(update)
       },
