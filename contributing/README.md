@@ -13,7 +13,6 @@ Everything you need to work on ui-sdk, for people and agents alike. Start with t
 | [examples.md](examples.md)               | How the docs examples are styled                                                                    |
 | [releasing.md](releasing.md)             | Changesets, the version pull request and publishing to npm                                          |
 | [../tests/README.md](../tests/README.md) | Every kind of test, where it runs and the exact command                                             |
-| [../BACKLOG.md](../BACKLOG.md)           | Open work: bugs, follow-ups and ideas                                                               |
 
 ## The repo
 
@@ -28,7 +27,7 @@ Everything you need to work on ui-sdk, for people and agents alike. Start with t
 
 ## Where things stand
 
-Every component in `packages/core/src/components/` ships in all five frameworks: React, Vue, Svelte 5, Solid 2 and web components. Each has specs, a kitchen sink, docs and examples in every framework. What's next is in [BACKLOG.md](../BACKLOG.md): finishing what exists comes before new components.
+Every component in `packages/core/src/components/` ships in all five frameworks: React, Vue, Svelte 5, Solid 2 and web components. Each has specs, a kitchen sink, docs and examples in every framework. Finishing what exists comes before new components.
 
 ## How we work
 

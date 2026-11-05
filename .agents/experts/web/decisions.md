@@ -51,7 +51,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **`<ui-tooltip-trigger><ui-toggle><button>`** flips the button's `data-slot` after a click: the rule that gives the inner part's `data-slot` to an element two parts share (`innerPart`) misses owners that bind their own element.
 - **`pressedText` doesn't see `user-select: none` across a shadow root**: it walks `parentElement`, which stops at the root, so a toast in one doesn't swipe from text its host makes unselectable.
 - **`ui-token-input` gets no `disabled` or `data-disabled` from a disabled field**, though its editor does.
-- **Date input segments** removed by a page morph stay gone until the locale or the clock changes (BACKLOG.md).
+- **Date input segments** removed by a page morph stay gone until the locale or the clock changes.
 - **A rating filled after it connects has no stars.** `createElement("ui-rating")`, appended, then given its `<template>` renders once at connect and never sees the template. Rare; a fix would watch `childList` for a `:scope > template`.
 - **A label for a Color Picker with no text input focuses nothing.** `activateControl` focuses a group's first input. Same in every framework; focusing the area thumb would be more useful.
 
