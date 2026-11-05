@@ -5,17 +5,21 @@
 //
 // Every response allows other sites, as the docs site's do. In `.html`
 // files, `{{name}}` becomes its value, so a page can name the other server.
-import { readFile } from "node:fs/promises"
+// It listens on 127.0.0.1 only and serves files inside `<folder>` only.
+import { readFile, realpath } from "node:fs/promises"
 import { createServer } from "node:http"
 import path from "node:path"
 
 const [folder, port, ...pairs] = process.argv.slice(2)
+const root = await realpath(folder)
 const values = Object.fromEntries(pairs.map((pair) => pair.split("=")))
 const types = { ".html": "text/html", ".js": "text/javascript" }
 
 createServer(async (request, response) => {
-  const file = path.join(folder, decodeURIComponent(new URL(request.url, "http://host").pathname))
   try {
+    const requested = decodeURIComponent(new URL(request.url, "http://host").pathname)
+    const file = await realpath(path.join(root, requested))
+    if (!file.startsWith(root + path.sep)) throw new Error("Outside the served folder.")
     let body = await readFile(file)
     if (file.endsWith(".html"))
       body = body.toString().replace(/\{\{(\w+)\}\}/g, (_, name) => values[name] ?? "")
@@ -27,4 +31,4 @@ createServer(async (request, response) => {
   } catch {
     response.writeHead(404).end()
   }
-}).listen(Number(port))
+}).listen(Number(port), "127.0.0.1")
