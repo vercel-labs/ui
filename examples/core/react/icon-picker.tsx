@@ -109,6 +109,8 @@ const iconPicker = definePrimitive({
     const popup = createPopup(context, { preset: popoverPreset })
     const change = createChange(context)
     let searched = false
+    const highlightBest = () =>
+      store.set({ highlighted: store.get().query.trim() ? (roving.items()[0]?.key ?? null) : null })
     const roving = createRovingFocus<IconPickerState, IconProps>(context, {
       slot: "icon",
       key: "stop",
@@ -116,7 +118,7 @@ const iconPicker = definePrimitive({
       onItemsChange: () => {
         if (!searched) return
         const items = roving.items()
-        store.set({ highlighted: store.get().query.trim() ? (items[0]?.key ?? null) : null })
+        highlightBest()
         announce(
           items.length === 0 ? "No icons found" : items.length === 1 ? "1 icon" : `${items.length} icons`,
         )
@@ -140,7 +142,8 @@ const iconPicker = definePrimitive({
       setFocused: (icon: string | null) => store.set({ focused: icon }),
       search(query: string) {
         searched = true
-        store.set({ query, highlighted: query.trim() ? (roving.items()[0]?.key ?? null) : null })
+        store.set({ query })
+        requestAnimationFrame(highlightBest)
       },
       pick(icon: string, reason: IconPickerPickReason, event?: Event) {
         change("value", icon, { reason, event })
@@ -151,9 +154,9 @@ const iconPicker = definePrimitive({
         if (event.key === "ArrowDown" && first) {
           event.preventDefault()
           roving.focus(first.key)
-        } else if (event.key === "Enter" && store.get().highlighted) {
+        } else if (event.key === "Enter" && first && store.get().query.trim()) {
           event.preventDefault()
-          api.pick(store.get().highlighted!, "search-enter", event)
+          api.pick(first.key, "search-enter", event)
         }
       },
       iconKeydown(event: KeyboardEvent, el: HTMLElement) {
