@@ -144,6 +144,15 @@ describe("image cropper", () => {
     expect(cropper.api.getCrop()).toMatchObject({ x: 0 })
   })
 
+  test("a controlled crop changed in place moves the cropper", () => {
+    const crop = { x: 0, y: 0, width: 100, height: 100 }
+    const cropper = make({ crop })
+    load(cropper)
+    crop.x = 40
+    cropper.setOptions({ id: "c", src: "photo.png", crop })
+    expect(cropper.api.getCrop()).toMatchObject({ x: 40 })
+  })
+
   test("a new ratio fits the crop about its middle", async () => {
     const onCropChange = vi.fn()
     const cropper = make({ onCropChange })

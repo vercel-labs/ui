@@ -82,11 +82,14 @@ function initialState(options: ImageCropperOptions): State {
 }
 
 // Handing the same crop over twice must not read as a change, which would render again.
+// Fields are compared too, since Vue and Svelte change a reactive crop in place.
 const completed = new WeakMap<ImageCrop, Crop>()
 
 function completeOnce(crop: ImageCrop) {
-  let full = completed.get(crop)
-  if (!full) completed.set(crop, (full = complete(crop)))
+  const full = complete(crop)
+  const last = completed.get(crop)
+  if (last && sameCrop(last, full)) return last
+  completed.set(crop, full)
   return full
 }
 
