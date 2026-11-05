@@ -24,20 +24,12 @@ const nextConfig: NextConfig = {}
 export default withUiSdk(nextConfig)
 ```
 
-Under `next dev`, it starts the server and serves it from your app's own port. Like the rest of your app under `next dev`, the address is reachable from other devices on your network. If another function wraps your config too, put `withUiSdk` outside it, like `withUiSdk(withMDX(nextConfig))`, so it gets your finished config.
+Under `next dev`, it starts the server at `http://localhost:3399/__ui-sdk/mcp`, on your machine only, and prints the address. Pass `port` to use another, like `withUiSdk(nextConfig, { port: 4000 })`. If another function wraps your config too, put `withUiSdk` outside it, like `withUiSdk(withMDX(nextConfig))`, so it gets your finished config.
 
 Then connect the page from `instrumentation-client.ts`, which runs in the browser before your app starts. It needs Next.js 15.3 or later. If you already have the file, add the line to it:
 
 ```ts title="instrumentation-client.ts"
 if (process.env.NODE_ENV === "development") import("@ui-sdk/core/dev")
-```
-
-If your app has a `proxy.ts` or `middleware.ts` that redirects requests, like to a sign-in page, leave `__ui-sdk` out of its matcher so your agent's calls reach the server:
-
-```ts title="proxy.ts"
-export const config = {
-  matcher: ["/((?!__ui-sdk|_next/static|_next/image|favicon.ico).*)"],
-}
 ```
 
 ### Vite
@@ -99,13 +91,13 @@ export default defineConfig({
 Start your dev server and open the app in your browser. Then add the server to your agent with your dev server's address. For Claude Code:
 
 ```bash
-claude mcp add --transport http ui-sdk http://localhost:3000/__ui-sdk/mcp
+claude mcp add --transport http ui-sdk http://localhost:3399/__ui-sdk/mcp
 ```
 
 For fx:
 
 ```bash
-fx mcp add ui-sdk http://localhost:3000/__ui-sdk/mcp
+fx mcp add ui-sdk http://localhost:3399/__ui-sdk/mcp
 ```
 
 `fx mcp show ui-sdk` checks the connection and lists the three tools.
@@ -113,10 +105,10 @@ fx mcp add ui-sdk http://localhost:3000/__ui-sdk/mcp
 For Codex:
 
 ```bash
-codex mcp add ui-sdk --url http://localhost:3000/__ui-sdk/mcp
+codex mcp add ui-sdk --url http://localhost:3399/__ui-sdk/mcp
 ```
 
-Other agents take the same URL wherever they add an MCP server. Use your dev server's port: `3000` for Next.js and Nuxt, `5173` for Vite and SvelteKit.
+Other agents take the same URL wherever they add an MCP server. Next.js uses `3399`. Vite, Nuxt and SvelteKit serve it from your dev server's own port, like `5173` for Vite and SvelteKit or `3000` for Nuxt.
 
 ## Try It
 

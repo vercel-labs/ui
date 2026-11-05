@@ -4,14 +4,19 @@ type Agent = ReturnType<typeof createAgent>
 type Call = { id: string; name: "snapshot" | "act" | "query"; input: never }
 type Answer = { id: string; result?: unknown; error?: string }
 
+declare const process: { env: Record<string, string | undefined> }
+
 const key = Symbol.for("ui-sdk.dev")
+// Next.js serves the bridge on its own port and names it at build time.
+const server = typeof process === "undefined" ? "" : (process.env.UI_SDK_DEV_SERVER ?? "")
 
 async function connect(agent: Agent, page: string, signal?: AbortSignal) {
   let answer: Answer | undefined
   let wait = 0
+  let failed = 0
   while (!signal?.aborted) {
     try {
-      const response = await fetch("/__ui-sdk/page", {
+      const response = await fetch(`${server}/__ui-sdk/page`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ page, answer }),
@@ -21,6 +26,7 @@ async function connect(agent: Agent, page: string, signal?: AbortSignal) {
       if (response.status !== 200 && response.status !== 204) throw response
       answer = undefined
       wait = 0
+      failed = 0
       if (response.status === 204) continue
       const call = (await response.json()) as Call
       try {
@@ -29,6 +35,8 @@ async function connect(agent: Agent, page: string, signal?: AbortSignal) {
         answer = { id: call.id, error: String((error as Error)?.message ?? error) }
       }
     } catch {
+      // Like the app opened from another device, where the server isn't local.
+      if (++failed === 12) return
       wait = Math.min(wait + 1_000, 5_000)
       await new Promise((resolve) => setTimeout(resolve, wait))
     }

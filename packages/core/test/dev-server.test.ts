@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { createServer, type Server } from "node:http"
+import { createServer, request, type Server } from "node:http"
 import type { AddressInfo } from "node:net"
 import { afterEach, expect, test } from "vitest"
 import { createDevServer } from "../src/page/agent/dev-server"
@@ -79,7 +79,39 @@ test("turns away other sites, rebound domains and simple requests", async () => 
   expect(await status({ "Content-Type": "text/plain" })).toBe(403)
   expect(await status({ Origin: "https://example.com" })).toBe(403)
   expect(await status({ Origin: `http://127.0.0.1:${(server.address() as AddressInfo).port}` })).toBe(200)
-  expect(await status({ "X-Forwarded-Host": "example.com" })).toBe(403)
+})
+
+test("answers a page on another local port, and no other site", async () => {
+  await start()
+  const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}/__ui-sdk/page`
+  const preflight = (origin: string) =>
+    fetch(url, {
+      method: "OPTIONS",
+      headers: { Origin: origin, "Access-Control-Request-Method": "POST" },
+    })
+  const local = await preflight("http://localhost:3000")
+  expect(local.status).toBe(204)
+  expect(local.headers.get("access-control-allow-origin")).toBe("http://localhost:3000")
+  expect((await preflight("https://example.com")).status).toBe(403)
+})
+
+test("turns away a host that isn't this machine", async () => {
+  await start()
+  const { port } = server.address() as AddressInfo
+  const status = await new Promise<number>((resolve) => {
+    const req = request(
+      {
+        port,
+        host: "127.0.0.1",
+        path: "/__ui-sdk/mcp",
+        method: "POST",
+        headers: { Host: "example.com", "Content-Type": "application/json" },
+      },
+      (res) => resolve(res.statusCode!),
+    )
+    req.end(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "ping" }))
+  })
+  expect(status).toBe(403)
 })
 
 test("takes a call's answer only from the page it went to", async () => {

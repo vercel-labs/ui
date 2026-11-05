@@ -7,6 +7,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 
 ## Settled
 
+- **Next.js serves the dev server on its own port, on this machine only** (`3399`, `withUiSdk(config, { port })`), and passes the address to the page as `process.env.UI_SDK_DEV_SERVER`. Nothing goes through Next's port, so the network can't reach the bridge.
 - **A handle has no `slot` or `present`.** A custom part renders through `usePart` or `renderElement`; the package's own markup uses the internal `slotIn` and `presentIn`.
 - **`render` is the only way to render your own element.** No `as`, no `asChild`.
 - **No `useSyncExternalStore`.** Parts subscribe in effects plus a layout-effect check before paint, so store updates can join a transition. A part that mounted during a store change can render one value behind until that check.
@@ -23,7 +24,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 
 ## Known and open (don't report again, check whether fixed)
 
-- **`next dev` exposes the dev server on the network**: Next listens on every interface and the relay serves `/__ui-sdk/*` there, so a non-browser client on the LAN can fake `Host`. Closing it means agents connect to `startDevServer`'s loopback port instead, which changes the documented URL.
 - **`act` reports a router-synced control's old value**: a select whose value comes from search params shows the previous value in `act`'s result until the navigation commits.
 - **`output: "export"` warns about rewrites** under `next dev` with `withUiSdk`. The relay still works.
 - **Hidden popup's later siblings**: the hidden-tree bridge tracks the nodes a portal appends when it mounts, so an element a popup's `render` adds beside it later, or a text or SVG node, stays shown in a hidden `<Activity>`.

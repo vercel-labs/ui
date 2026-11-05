@@ -24,8 +24,8 @@ type Message = { jsonrpc: "2.0"; id?: number | string; method: string; params?: 
 const base = "/__ui-sdk"
 const pollFor = 20_000
 const pageGone = pollFor + 5_000
-// Under the 30 seconds Next.js gives a proxied request.
-const callFor = 25_000
+// Under the 60 seconds MCP clients wait for a tool call by default.
+const callFor = 45_000
 
 /**
  * The MCP server behind the framework integrations, as Node middleware: a
@@ -138,43 +138,48 @@ function createDevServer() {
 
   const handle = async (req: NodeRequest, res: NodeResponse, next?: () => void) => {
     const path = req.url?.split("?")[0]
-    if (path === `${base}/mcp`) {
-      if (req.method !== "POST") return reply(res, 405)
-      if (!trusted(req)) return reply(res, 403)
-      const message = (await read(req)) as Message
-      if (message.id === undefined) return reply(res, 202)
-      try {
-        return reply(res, 200, { jsonrpc: "2.0", id: message.id, result: await mcp(message) })
-      } catch (error) {
-        return reply(res, 200, {
-          jsonrpc: "2.0",
-          id: message.id,
-          error: { code: -32601, message: (error as Error).message },
-        })
-      }
+    if (path !== `${base}/mcp` && path !== `${base}/page`) return next ? next() : reply(res, 404)
+    const origin = allowedOrigin(req)
+    if (origin === false) return reply(res, 403)
+    if (origin) {
+      res.setHeader("Access-Control-Allow-Origin", origin)
+      res.setHeader("Vary", "Origin")
     }
-    if (path === `${base}/page` && req.method === "POST") {
-      if (!trusted(req)) return reply(res, 403)
-      return poll((await read(req)) as never, res)
+    if (req.method === "OPTIONS") {
+      res.setHeader("Access-Control-Allow-Methods", "POST")
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type")
+      return reply(res, 204)
     }
-    if (next) next()
-    else reply(res, 404)
+    if (req.method !== "POST") return reply(res, 405)
+    if (!String(req.headers["content-type"]).startsWith("application/json")) return reply(res, 403)
+    if (path === `${base}/page`) return poll((await read(req)) as never, res)
+    const message = (await read(req)) as Message
+    if (message.id === undefined) return reply(res, 202)
+    try {
+      return reply(res, 200, { jsonrpc: "2.0", id: message.id, result: await mcp(message) })
+    } catch (error) {
+      return reply(res, 200, {
+        jsonrpc: "2.0",
+        id: message.id,
+        error: { code: -32601, message: (error as Error).message },
+      })
+    }
   }
 
   return { handle }
 }
 
 // Another site's page can send a simple POST, and a rebound domain can reach
-// localhost: JSON forces a preflight, and the origin and host checks turn the
-// rest away. MCP clients send no origin.
-function trusted({ headers }: NodeRequest) {
-  if (!String(headers["content-type"]).startsWith("application/json")) return false
-  const host = String(headers["x-forwarded-host"] ?? headers.host)
+// localhost: requiring JSON forces a preflight, and only the page's own origin
+// or another port on this machine gets an answer. MCP clients send no origin.
+function allowedOrigin({ headers }: NodeRequest) {
+  const host = String(headers.host)
   if (!local(host)) return false
-  const { origin } = headers
-  if (origin === undefined) return true
+  if (headers.origin === undefined) return undefined
+  const origin = String(headers.origin)
   try {
-    return new URL(String(origin)).host === host
+    const { host: from, hostname } = new URL(origin)
+    return from === host || ["localhost", "127.0.0.1", "[::1]"].includes(hostname) ? origin : false
   } catch {
     return false
   }
@@ -215,24 +220,32 @@ function reply(res: NodeResponse, status: number, body?: unknown) {
 const started = Symbol.for("ui-sdk.dev-server")
 
 /**
- * Starts `createDevServer` on its own port, once per process, for frameworks
- * whose dev server takes no middleware. Resolves to the port, which the
- * framework proxies `/__ui-sdk/*` to.
+ * Starts `createDevServer` on its own port on this machine only, once per
+ * process, for frameworks whose dev server takes no middleware. Resolves to
+ * the port, `port` unless it's taken. The page connects to it across ports.
  * @experimental
  */
-function startDevServer() {
+function startDevServer(port = 3399) {
   const scope = globalThis as { [started]?: Promise<number> }
-  scope[started] ??= import("node:http").then(
-    ({ createServer }) =>
+  scope[started] ??= import("node:http").then(async ({ createServer }) => {
+    const { handle } = createDevServer()
+    const listen = (address: string, at: number) =>
       new Promise<number>((resolve, reject) => {
-        const server = createServer(createDevServer().handle)
+        const server = createServer(handle)
         server.once("error", reject)
-        server.listen(0, "127.0.0.1", () => {
+        server.listen(at, address, () => {
           server.unref()
           resolve((server.address() as { port: number }).port)
         })
-      }),
-  )
+      })
+    const actual = await listen("127.0.0.1", port).catch(() => listen("127.0.0.1", 0))
+    // Some clients try localhost as ::1 first.
+    await listen("::1", actual).catch(() => {})
+    const url = `http://localhost:${actual}${base}/mcp`
+    if (actual === port || !port) console.log(`ui-sdk: MCP for coding agents at ${url}`)
+    else console.warn(`ui-sdk: port ${port} is in use, so the MCP for coding agents is at ${url}`)
+    return actual
+  })
   return scope[started]
 }
 

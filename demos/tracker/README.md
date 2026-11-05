@@ -25,4 +25,4 @@ Open http://localhost:5600. For another framework, swap in `tracker-svelte`, `tr
 - Open an issue to edit it in the side panel. Drag the divider to resize it; the size is kept, in a cookie for the server-rendered versions.
 - Type @ in a comment to mention someone, then hover the mention.
 - On a phone, filters open in a drawer.
-- With the dev server running, connect a coding agent to the page: `claude mcp add --transport http ui-sdk http://localhost:5600/__ui-sdk/mcp`, with the port of the version you started. Then ask it to use the page, like "Filter the list to High priority and tell me which issues are left."
+- With the dev server running, connect a coding agent to the page: `claude mcp add --transport http ui-sdk http://localhost:3399/__ui-sdk/mcp` for the Next.js version, or with the port of the version you started for the others. Then ask it to use the page, like "Filter the list to High priority and tell me which issues are left."
