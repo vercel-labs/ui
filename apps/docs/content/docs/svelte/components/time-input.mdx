@@ -113,10 +113,10 @@ Props are the same as below. `value` is bindable.
 
 Callbacks get the new value first, then the details. A bound `value` only updates when `onValueChange` didn't cancel the change.
 
-| Prop            | On          | Receives                                                                       |
-| --------------- | ----------- | ------------------------------------------------------------------------------ |
-| `bind:value`    | `TimeInput` | The time, or null while empty or partly typed                                  |
-| `onValueChange` | `TimeInput` | `(value, details)`: the time, or null when emptied, and the [reason](#reasons) |
+| Prop            | On          | Receives                                                                           |
+| --------------- | ----------- | ---------------------------------------------------------------------------------- |
+| `bind:value`    | `TimeInput` | The time, or null while empty or partly typed                                      |
+| `onValueChange` | `TimeInput` | `(value, details)`: the time, or null once it's erased, and the [reason](#reasons) |
 
 ## Accessibility
 

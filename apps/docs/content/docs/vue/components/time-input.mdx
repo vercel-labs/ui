@@ -115,10 +115,10 @@ Props are the same as below, in kebab case in templates, and callbacks are event
 
 Events get the new value first, then the details. `v-model:value` only updates when the change wasn't canceled.
 
-| Binding         | On          | Receives                                                                       |
-| --------------- | ----------- | ------------------------------------------------------------------------------ |
-| `v-model:value` | `TimeInput` | The time, or null while empty or partly typed                                  |
-| `@value-change` | `TimeInput` | `(value, details)`: the time, or null when emptied, and the [reason](#reasons) |
+| Binding         | On          | Receives                                                                           |
+| --------------- | ----------- | ---------------------------------------------------------------------------------- |
+| `v-model:value` | `TimeInput` | The time, or null while empty or partly typed                                      |
+| `@value-change` | `TimeInput` | `(value, details)`: the time, or null once it's erased, and the [reason](#reasons) |
 
 ## Accessibility
 

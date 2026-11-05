@@ -121,11 +121,11 @@ Props are attributes in kebab case, like `default-value`, `hour-cycle` and `read
 
 Events fire on their own element and don't bubble, with the value in `event.detail.value` and the `reason` and `event` beside it. Calling `preventDefault()` on `valuechange` cancels the change.
 
-| Member              | On                | Description                                                           |
-| ------------------- | ----------------- | --------------------------------------------------------------------- |
-| `value` property    | `<ui-time-input>` | The time, or null while empty or partly typed                         |
-| `api` property      | `<ui-time-input>` | The [controller](#controller)                                         |
-| `valuechange` event | `<ui-time-input>` | `detail: { value, reason, event }`, as a whole value forms or empties |
+| Member              | On                | Description                                                             |
+| ------------------- | ----------------- | ----------------------------------------------------------------------- |
+| `value` property    | `<ui-time-input>` | The time, or null while empty or partly typed                           |
+| `api` property      | `<ui-time-input>` | The [controller](#controller)                                           |
+| `valuechange` event | `<ui-time-input>` | `detail: { value, reason, event }`, as a whole value forms or is erased |
 
 ## Accessibility
 

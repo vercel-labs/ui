@@ -48,13 +48,13 @@ function Example() {
 export { Example }
 ```
 
-The value is an ISO date string like `"2026-11-02"`, the same as a native date input's. It stays `null` until every segment holds something, so a half-typed date never reaches your app.
+The value is an ISO date string like `"2026-11-02"`, the same as a native date input's. It stays `null` until every segment holds something, so your app only sees whole dates.
 
 Type digits and each segment fills, then moves on. A month that can't take another digit, like 4, moves on at once. Typing a separator, like `/` or `.`, moves on too. The day is kept within its month: moving from January 31 to February shows the 28th. Paste a whole date into any segment, as `2026-11-02` or written the way the locale writes it.
 
 ## Field
 
-The Field's label names the group, and pressing it focuses the first segment. A description stays with the input.
+The Field's label names the group, and clicking it focuses the first segment. Its description is read with the input.
 
 <ComponentExample
   name="date-input/field"
@@ -101,11 +101,14 @@ The input reads its order, separators and clock from `locale`, or from the page'
 
 Set `disabled` on the input, or on its Field or fieldset, to keep it from focus and from its form.
 
-<ComponentExample name="date-input/disabled" caption="Try to focus Start date. It stays November 2, 2026." />
+<ComponentExample
+  name="date-input/disabled"
+  caption="Click Start date or press Tab to reach it. Focus skips it, and the date stays November 2, 2026."
+/>
 
 ## Read-Only
 
-Set `readOnly` to let people focus and read the date, and submit it, without changing it.
+Set `readOnly` for a date people can focus, read and submit as it is.
 
 <ComponentExample
   name="date-input/read-only"
@@ -125,7 +128,7 @@ A partly typed date stops the form too, with "Enter a valid date." Set `form` to
 
 ## Controlled
 
-Pass `value` and update it in `onValueChange`. The callback runs when a whole date forms, and with `null` when one is emptied. A half-typed date's value is already `null`, so to empty its segments too, call `clear()` on a [controller](#controller).
+Pass `value` and update it in `onValueChange`. The callback runs with each whole date, and with `null` once any part of it is erased. A half-typed date already reads `null`, so setting the value to `null` leaves it as typed. Call `clear()` on a [controller](#controller) to empty every segment.
 
 <ComponentExample
   name="date-input/controlled"
@@ -224,9 +227,9 @@ Every write method takes an optional `{ reason, event }`, runs the change callba
 
 Callbacks get the new value first, then the details.
 
-| Prop            | On          | Receives                                                                           |
-| --------------- | ----------- | ---------------------------------------------------------------------------------- |
-| `onValueChange` | `DateInput` | `(value, details)`: the ISO date, or null when emptied, and the [reason](#reasons) |
+| Prop            | On          | Receives                                                                               |
+| --------------- | ----------- | -------------------------------------------------------------------------------------- |
+| `onValueChange` | `DateInput` | `(value, details)`: the ISO date, or null once it's erased, and the [reason](#reasons) |
 
 ## Accessibility
 
