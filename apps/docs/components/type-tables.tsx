@@ -94,6 +94,7 @@ async function TypeTable(props: {
   examples?: Record<string, string>
   type?: string
   types?: Record<string, string>
+  descriptions?: Record<string, string>
 }) {
   const tables = await typeRows(props)
   return tables.map((table) => <Rows key={table.id} label={table.label} rows={table.rows} />)

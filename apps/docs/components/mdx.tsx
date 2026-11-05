@@ -186,6 +186,7 @@ function getMDXComponents(
       examples?: Record<string, string>
       type?: string
       types?: Record<string, string>
+      descriptions?: Record<string, string>
     }) => <TypeTable {...props} framework={framework} />,
   } satisfies MDXComponents
 }
