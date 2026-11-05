@@ -31,5 +31,7 @@ packages/web/html-custom-data.json
 packages/web/browser/
 # The @ui-sdk/web releases apps/docs/scripts/web-releases.mjs copies in before a build.
 apps/docs/public/web@*
+# The compiled examples, written by examples/vite.config.ts.
+apps/docs/public/examples/
 # Git worktrees agents work in, inside the workspace.
 .claude/worktrees/

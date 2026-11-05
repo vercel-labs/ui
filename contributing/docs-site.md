@@ -35,8 +35,9 @@
   examples/components/<name>/web/<example>.ts        exports mount(root)
   ```
 
-- Next never compiles the examples. `examples/vite.config.ts` builds each framework's, with the framework and the SDK bundled, to `examples/dist/<framework>` (`pnpm --filter examples build`, or `node examples/scripts/build.mjs react vue` for some). `apps/docs/app/examples/[...path]/route.ts` serves them, and `ExamplePreview` imports one and its framework's `mount.js` in the browser. A web example's `mount(root)` may return a cleanup, which the preview calls.
-- `examples/dist` is gitignored, so a deploy runs `pnpm --filter examples build` before `next build`, and `next.config.mjs` traces `examples/dist` into the examples route's function.
+- Next never compiles the examples. `examples/vite.config.ts` builds each framework's, with the framework and the SDK bundled, to `apps/docs/public/examples/<framework>` (`pnpm --filter examples build`, or `node examples/scripts/build.mjs react vue` for some). Every file name carries a hash, so the site serves them as immutable static files.
+- `ComponentExample` looks the example and its framework's mount up in the build's `manifest.json` (`lib/example-modules.ts`) and preloads every chunk they import with `<link rel="modulepreload">`, so the files download while the page parses instead of one import at a time after hydration. `ExamplePreview` then imports both in the browser. A web example's `mount(root)` may return a cleanup, which the preview calls.
+- `apps/docs/public/examples` is gitignored, so a deploy runs `pnpm --filter examples build` before `next build`. A page reads the manifest when it renders, so rebuilding the examples under `next dev` needs a reload.
 - Examples render in the page, not in an iframe, so overlays and focus behave as they do in apps.
 - Example code renders as Shiki's HTML, one element per block.
 - How to style them is in [examples.md](examples.md).

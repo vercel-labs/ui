@@ -31,18 +31,19 @@ export default defineConfig(({ mode }) => {
     ...config,
     define: { ...config.define, "process.env.NODE_ENV": JSON.stringify("production") },
     build: {
-      outDir: `dist/${framework}`,
+      outDir: `../apps/docs/public/examples/${framework}`,
       emptyOutDir: true,
       lib: {
         entry: { ...entries, mount: `mount/${framework}.ts` },
         formats: ["es"],
-        fileName: (_, name) => `${name}.js`,
+        fileName: (_, name) => `${name}-[hash].js`,
       },
       rolldownOptions: {
         output: { minify: true, chunkFileNames: "chunks/[name]-[hash].js" },
         onLog: (level, log, handler) => log.code !== "MODULE_LEVEL_DIRECTIVE" && handler(level, log),
       },
       cssCodeSplit: false,
+      manifest: "manifest.json",
     },
   }
 })

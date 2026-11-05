@@ -11,14 +11,9 @@ const config = {
   // on a busy machine, which fails the whole build.
   staticPageGenerationTimeout: 300,
   // Workspace packages ship TypeScript source. The examples aren't bundled:
-  // examples/vite.config.ts compiles them, and the browser loads them.
+  // examples/vite.config.ts compiles them into public/examples.
   transpilePackages: ["@ui-sdk/core", "@ui-sdk/react"],
   turbopack: { root: path.resolve(import.meta.dirname, "../..") },
-  // The examples route reads examples/dist at runtime, so those files ship
-  // with its function.
-  outputFileTracingIncludes: {
-    "/examples/**": ["../../examples/dist/**/*.js"],
-  },
   // The newest `@ui-sdk/web` release of each major, like `{"1":"1.3.0"}`, for `proxy.ts`.
   env: {
     WEB_RELEASES: JSON.stringify(
@@ -26,7 +21,14 @@ const config = {
     ),
   },
   async headers() {
-    return webReleaseHeaders()
+    return [
+      ...webReleaseHeaders(),
+      // Every compiled example's file name carries its hash.
+      {
+        source: "/examples/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ]
   },
   // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
   // Agents' own `.md` files are the whole section, and they win.
