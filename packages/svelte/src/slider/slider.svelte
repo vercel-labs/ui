@@ -128,7 +128,7 @@ The root: a group around the thumbs, and the hidden input the form submits.
   // The hidden input the form submits. Its value changes on every move.
   const input = useHandlePart(slider, "input")
   const control = isRange ? field?.control(
-        () => rest.id,
+        () => rest.id ?? root.attrs.id,
         () => rest["aria-describedby"],
       ) : undefined
 </script>
