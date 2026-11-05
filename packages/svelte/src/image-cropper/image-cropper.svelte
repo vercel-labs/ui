@@ -39,7 +39,7 @@ The root: a group around the image and its controls, busy until the image loads.
     src?: string
     /** The crop, in the image's own pixels, with its `rotation`, `flipX` and `flipY`. Bind it with `bind:crop` to control the cropper. */
     crop?: ImageCrop
-    /** The crop at first, when uncontrolled. Without one, the largest crop at `aspectRatio`, in the middle. */
+    /** The crop at first, when uncontrolled. Without one, a crop at `aspectRatio` in the middle: four fifths of the largest in a box, the largest in a frame. */
     defaultCrop?: ImageCrop
     /** `"box"` moves and resizes a selection over the image; `"frame"` pans and zooms the image under a still one. */
     mode?: ImageCropperMode

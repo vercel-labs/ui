@@ -15,7 +15,7 @@ const key = (key: string, shiftKey = false) =>
 const plain = { rotation: 0, flipX: false, flipY: false } as const
 
 describe("image cropper", () => {
-  test("shows no crop until the image loads, then crops the largest box at the ratio", () => {
+  test("shows no crop until the image loads, then crops four fifths of the largest box at the ratio", () => {
     const onCropChange = vi.fn()
     const onCropCommit = vi.fn()
     const cropper = make({ aspectRatio: 1, onCropChange, onCropCommit })
@@ -23,17 +23,26 @@ describe("image cropper", () => {
     expect(attrs(cropper.part("selection", {}))).toMatchObject({ hidden: "" })
     expect(cropper.api.getCrop()).toBe(null)
     load(cropper)
-    const crop = { x: 50, y: 0, width: 300, height: 300, ...plain }
+    const crop = { x: 80, y: 30, width: 240, height: 240, ...plain }
     expect(cropper.api.getCrop()).toEqual(crop)
     expect(onCropChange).toHaveBeenCalledOnce()
     expect(onCropChange.mock.lastCall![1].reason).toBe("image-load")
     expect(onCropCommit).toHaveBeenCalledWith(crop, expect.objectContaining({ reason: "image-load" }))
     expect(attrs(cropper.part("selection", {}))).toMatchObject({ role: "slider", tabindex: "0" })
     expect(liveAttrs(cropper.part("selection", {}))).toMatchObject({
-      "aria-valuenow": "50",
-      "aria-valuemax": "100",
-      "aria-valuetext": "300 by 300 pixels, at 50, 0",
+      "aria-valuenow": "80",
+      "aria-valuemax": "160",
+      "aria-valuetext": "240 by 240 pixels, at 80, 30",
     })
+  })
+
+  test("a frame starts with the largest crop, and a box never below its minimum", () => {
+    const frame = make({ mode: "frame", aspectRatio: 1 })
+    load(frame)
+    expect(frame.api.getCrop()).toEqual({ x: 50, y: 0, width: 300, height: 300, ...plain })
+    const box = make({ minWidth: 380 })
+    load(box)
+    expect(box.api.getCrop()).toMatchObject({ width: 380, height: 285 })
   })
 
   test("arrows move the crop inside the image, ten times as far with Shift, and commit each press", () => {
@@ -65,7 +74,7 @@ describe("image cropper", () => {
   test("zoom shrinks the crop about its middle, from 1 to maxZoom", () => {
     const cropper = make({ aspectRatio: 1, maxZoom: 3 })
     load(cropper)
-    expect(cropper.api.getZoom()).toBe(1)
+    expect(cropper.api.getZoom()).toBe(1.25)
     cropper.api.setZoom(2)
     expect(cropper.api.getCrop()).toMatchObject({ x: 125, y: 75, width: 150, height: 150 })
     cropper.api.setZoom(8)
@@ -139,7 +148,7 @@ describe("image cropper", () => {
     load(cropper)
     cropper.setOptions({ id: "c", src: "photo.png", onCropChange, aspectRatio: 1 })
     await Promise.resolve()
-    expect(cropper.api.getCrop()).toMatchObject({ x: 50, y: 0, width: 300, height: 300 })
+    expect(cropper.api.getCrop()).toMatchObject({ x: 80, y: 30, width: 240, height: 240 })
     expect(onCropChange.mock.lastCall![1].reason).toBe("aspect-ratio-change")
   })
 
@@ -149,7 +158,7 @@ describe("image cropper", () => {
     cropper.setOptions({ id: "c", src: "other.png" })
     expect(attrs(cropper.part("root", {}))).toMatchObject({ "data-loading": "" })
     load(cropper, 200, 100)
-    expect(cropper.api.getCrop()).toEqual({ x: 0, y: 0, width: 200, height: 100, ...plain })
+    expect(cropper.api.getCrop()).toEqual({ x: 20, y: 10, width: 160, height: 80, ...plain })
   })
 
   test("nothing changes while disabled, and the buttons are disabled", () => {

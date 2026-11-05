@@ -115,7 +115,7 @@ type ImageCropperOptions = {
   crop?: ImageCrop
   /**
    * The crop at first, when uncontrolled.
-   * @defaultValue the largest crop at `aspectRatio`, in the middle, once the image loads
+   * @defaultValue once the image loads, a crop at `aspectRatio` in the middle: four fifths of the largest in a box, the largest in a frame
    */
   defaultCrop?: ImageCrop
   /** Runs while the crop changes: on every step of a drag, a key or the wheel, and once an image loads. `details.cancel()` stops it. */

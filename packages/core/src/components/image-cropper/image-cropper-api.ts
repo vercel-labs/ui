@@ -212,7 +212,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
         if (context.options().crop !== undefined || (state.crop && state.cropFor === state.src)) return
         store.set({ cropFor: state.src })
         start = null
-        setCrop(initialCrop(natural, limitsOf(state)), { reason: "image-load" })
+        setCrop(initialCrop(natural, limitsOf(state), state.mode), { reason: "image-load" })
         commit({ reason: "image-load" })
       },
       failed() {

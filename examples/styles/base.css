@@ -842,6 +842,8 @@
     [data-slot="notes-expand"],
     [data-slot="copy-root"],
     [data-slot="color-reset"],
+    [data-slot="image-cropper-rotate"],
+    [data-slot="image-cropper-flip"],
     [data-slot="book-bookmark"],
     [data-slot="prices-copyAll"],
     [data-slot="ledger-grid-shortcut"],

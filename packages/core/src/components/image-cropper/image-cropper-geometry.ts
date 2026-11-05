@@ -81,9 +81,16 @@ function centered(size: Size, center: { x: number; y: number }, shown: Size) {
   }
 }
 
-/** The crop an image starts with: the largest at the ratio, in the middle. */
-function initialCrop(natural: Size, limits: Limits) {
-  const size = largest(natural, limits.aspect)
+/**
+ * The crop an image starts with, in the middle: in a box, most of the image
+ * at the ratio, so its edges show; in a frame, the largest.
+ */
+function initialCrop(natural: Size, limits: Limits, mode: "box" | "frame") {
+  const full = largest(natural, limits.aspect)
+  const min = smallest(natural, limits)
+  const inset =
+    mode === "frame" ? 1 : Math.min(1, Math.max(0.8, min.width / full.width, min.height / full.height))
+  const size = { width: full.width * inset, height: full.height * inset }
   const box = centered(size, { x: natural.width / 2, y: natural.height / 2 }, natural)
   return round({ ...box, rotation: 0, flipX: false, flipY: false })
 }

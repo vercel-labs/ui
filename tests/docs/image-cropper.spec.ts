@@ -5,15 +5,18 @@ import { testExamples } from "./docs-helpers"
 testExamples("image-cropper", {
   basic: async (preview) => {
     const selection = preview.getByRole("slider", { name: "Crop" })
-    await expect(selection).toHaveAttribute("aria-valuetext", "640 by 420 pixels, at 0, 0")
-    await preview.getByRole("slider", { name: "Bottom right corner" }).press("Shift+ArrowLeft")
-    await expect(selection).not.toHaveAttribute("aria-valuetext", "640 by 420 pixels, at 0, 0")
+    await expect(selection).toHaveAttribute("aria-valuetext", "512 by 336 pixels, at 64, 42")
+    await preview.getByRole("combobox", { name: "Aspect ratio" }).click()
+    await preview.getByRole("option", { name: "Square" }).click()
+    await expect(selection).toHaveAttribute("aria-valuetext", "336 by 336 pixels, at 152, 42")
+    await preview.getByRole("button", { name: "Crop", exact: true }).click()
+    await expect(preview.getByRole("img", { name: "Your crop" })).toBeVisible()
   },
   "aspect-ratio": async (preview) => {
     await preview.getByRole("button", { name: "Square" }).click()
     await expect(preview.getByRole("slider", { name: "Crop" })).toHaveAttribute(
       "aria-valuetext",
-      "420 by 420 pixels, at 110, 0",
+      "336 by 336 pixels, at 152, 42",
     )
   },
   avatar: async (preview) => {

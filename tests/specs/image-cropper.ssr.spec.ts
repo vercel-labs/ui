@@ -26,7 +26,7 @@ test("an image cropper hydrates without mismatches", async ({ page, open }) => {
   const selection = page.getByRole("slider", { name: "Crop" })
   await selection.focus()
   await page.keyboard.press("ArrowRight")
-  await expect(selection).toHaveAttribute("aria-valuetext", "300 by 300 pixels, at 51, 0")
+  await expect(selection).toHaveAttribute("aria-valuetext", "240 by 240 pixels, at 81, 30")
   expect(await hydrationErrors(page)).toEqual([])
 })
 

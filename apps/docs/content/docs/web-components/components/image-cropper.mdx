@@ -8,7 +8,7 @@ Use an image cropper to choose the part of a photo to keep, like a profile pictu
 <ComponentExample
   name="image-cropper/basic"
   inspect
-  caption="Drag the selection or one of its corners. Tab to it and use the arrow keys, with Shift to move further."
+  caption="Pick a ratio, drag the selection or one of its handles, then press Crop. Tab to the selection and use the arrow keys, with Shift to move further."
 />
 
 ## Installation
@@ -73,7 +73,7 @@ Import the parts and put them together:
 </ui-image-cropper>
 ```
 
-Name the cropper with `aria-label`. Until the image loads, the root has `data-loading` and `aria-busy`, and the selection is hidden. The crop then starts as the largest box at `aspectRatio`, in the middle, unless you set the `defaultCrop` property:
+Name the cropper with `aria-label`. Until the image loads, the root has `data-loading` and `aria-busy`, and the selection is hidden. The crop then starts in the middle at `aspectRatio`, four fifths as large as the image allows so its edges show, or as large as it allows in a frame, unless you set the `defaultCrop` property:
 
 ```ts
 const cropper = document.querySelector("ui-image-cropper")!

@@ -23,16 +23,19 @@ async function centerOf(locator: ReturnType<Page["locator"]>) {
 }
 
 test.describe("loading", () => {
-  test("the crop starts once the image loads, as the largest at the ratio", async ({ page, open }) => {
+  test("the crop starts once the image loads, as four fifths of the largest at the ratio", async ({
+    page,
+    open,
+  }) => {
     await open("image-cropper", { aspect: "1" })
     await expect(cropper(page)).not.toHaveAttribute("aria-busy")
-    await expect(selection(page)).toHaveAttribute("aria-valuetext", "300 by 300 pixels, at 50, 0")
-    expect(await lastAction(page)).toBe("50,0,300,300 r0:image-load")
-    expect(await committed(page)).toBe("50,0,300,300 r0:image-load")
+    await expect(selection(page)).toHaveAttribute("aria-valuetext", "240 by 240 pixels, at 80, 30")
+    expect(await lastAction(page)).toBe("80,30,240,240 r0:image-load")
+    expect(await committed(page)).toBe("80,30,240,240 r0:image-load")
     const box = (await selection(page).boundingBox())!
     const frame = (await viewport(page).boundingBox())!
-    expect(Math.round(box.x - frame.x)).toBe(50)
-    expect(Math.round(box.width)).toBe(300)
+    expect(Math.round(box.x - frame.x)).toBe(80)
+    expect(Math.round(box.width)).toBe(240)
   })
 })
 
@@ -101,12 +104,12 @@ test.describe("keyboard", () => {
     await open("image-cropper", { aspect: "1" })
     await selection(page).focus()
     await page.keyboard.press("+")
-    await expect(selection(page)).toHaveAttribute("aria-valuetext", "240 by 240 pixels, at 80, 30")
-    await expect(zoom(page)).toHaveAttribute("aria-valuetext", "125%")
+    await expect(selection(page)).toHaveAttribute("aria-valuetext", "192 by 192 pixels, at 104, 54")
+    await expect(zoom(page)).toHaveAttribute("aria-valuetext", "156%")
     await page.keyboard.press("-")
-    await expect(selection(page)).toHaveAttribute("aria-valuetext", "300 by 300 pixels, at 50, 0")
+    await expect(selection(page)).toHaveAttribute("aria-valuetext", "240 by 240 pixels, at 80, 30")
     await page.keyboard.press("r")
-    expect(await lastAction(page)).toBe("0,50,300,300 r90:rotate-key")
+    expect(await lastAction(page)).toBe("30,80,240,240 r90:rotate-key")
   })
 })
 
