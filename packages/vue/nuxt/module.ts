@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs"
-import { addComponent, addImportsSources, defineNuxtModule } from "@nuxt/kit"
-import type { NuxtModule } from "@nuxt/schema"
+import { addComponent, addImportsSources, defineNuxtModule } from "nuxt/kit"
+import type { NuxtModule } from "nuxt/schema"
 import { type NuxtEntry, nuxtRegistrations } from "./registrations"
 
 /**

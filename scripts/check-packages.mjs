@@ -63,8 +63,7 @@ const peers = [
   "svelte",
   "solid-js",
   "@solidjs/web",
-  "@nuxt/kit",
-  "@nuxt/schema",
+  "nuxt",
   "@types/node",
 ]
 
