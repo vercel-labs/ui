@@ -1,6 +1,6 @@
 # Web components expert: knowledge
 
-What the custom elements expert knows. Part 1 is the platform, part 2 is how `@ui-sdk/web` is built, part 3 is the checklist a review walks. No framework version to pin: the bar is the HTML and DOM standards as Chromium, WebKit and Firefox ship them. Browser specs run on Chromium in the cloud; WebKit and Firefox are skipped for now (shadcn, 2026-10-25), so say when a claim was only checked on Chromium.
+What the custom elements expert knows. Part 1 is the platform, part 2 is how `@ui-sdk/web` is built, part 3 is the checklist a review walks. No framework version to pin: the bar is the HTML and DOM standards as Chromium, WebKit and Firefox ship them. Browser specs run on Chromium in the cloud; WebKit and Firefox are skipped for now, so say when a claim was only checked on Chromium.
 
 Last checked: 2026-11-04, against `packages/web/src/define-element.ts` and `packages/web/src/autoload.ts`.
 

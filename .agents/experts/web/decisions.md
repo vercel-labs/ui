@@ -2,22 +2,22 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
 
 ## Settled
 
 - **Light DOM.** The elements render into the user's light DOM; inside a user's shadow root the hiding rules are adopted into that root.
-- **Every attribute option reflects as a property**, by the built-ins' rules: default-off booleans by presence, default-on as `"true"`/`"false"`, text as written, rich data property-only. ("I want it to feel like HTML, not a new API", shadcn 2026-10-24, on main as `bc22dedb`)
+- **Every attribute option reflects as a property**, by the built-ins' rules: default-off booleans by presence, default-on as `"true"`/`"false"`, text as written, rich data property-only.
 - **Events don't bubble**; listen with `{ capture: true }`. Public events are `composed`.
 - **Form component dropped.**
-- **`createParts`, like every adapter** (shadcn 2026-10-29). It defines an element per part and returns their classes, `Root` and one per part in Pascal case, `undefined` on the server. `definePart` is internal, for the package's own components.
-- **Button parts wrap a written `<button>`** (shadcn 2026-10-29). A custom element can't be a native button and Safari has no customized built-ins, so the package never creates the button for the user.
-- **State set from script fires no events** (shadcn 2026-10-30). A live property or state attribute commits quietly, like a native input's `value`, so a page that renders state back never hears its own write. The `api`, people and agents still fire events.
+- **`createParts`, like every adapter**. It defines an element per part and returns their classes, `Root` and one per part in Pascal case, `undefined` on the server. `definePart` is internal, for the package's own components.
+- **Button parts wrap a written `<button>`**. A custom element can't be a native button and Safari has no customized built-ins, so the package never creates the button for the user.
+- **State set from script fires no events**. A live property or state attribute commits quietly, like a native input's `value`, so a page that renders state back never hears its own write. The `api`, people and agents still fire events.
 - **The instance is private.** An owner element's public surface is `api`, the controller's methods, plus its attribute and live properties. The primitive instance lives in a module-private `WeakMap` that the package's modules read through `instanceOf(el)`, and a custom root's `render(el, instance)` receives it.
 - **`web.js` loads by tag, from the folder beside it**, and imports each component once. A failed download isn't tried again: the browser keeps a failed module for its URL, so only a new URL could retry it, and that would load a second copy of shared code. (PR 25, 2026-10-29)
-- **The docs site serves each deploy's own build** as `<version>-g<commit>` until releases are published, so `/web@0.js` works before anything is on npm (shadcn 2026-10-29: no npm release yet). An exact version from a commit build lasts until the next deploy.
-- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
-- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **The docs site serves each deploy's own build** as `<version>-g<commit>` until releases are published, so `/web@0.js` works before anything is on npm. An exact version from a commit build lasts until the next deploy.
+- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28.)
+- **Popups flip to the opposite side only**, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 - **`value` reads `null` for a microtask after append** while the first tab already shows as selected through the claim. It catches up once the tabs bind, in the same task.
 - **A half-typed date reads `null`.** Writing `null` back leaves its segments, so a controlled value can't empty them; `clear()` does. Same in every framework.
@@ -32,7 +32,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Focus inside shadow roots**: a popover in a closed root dismisses on inside presses and Escape drops focus to `body`; a modal popup's Tab loop skips slotted content, and shadow-root stops before its first or after its last light DOM stop (probed 2026-10-28 and 2026-11-01 in Chromium).
 - **Payload types**: a popup content's payload type is asserted by the user, not tied to the controller's type.
 - **Clicking a `<ui-field-label>`** checks its checkbox or radio but doesn't focus it.
-- **No-bundler pages can't reach the package's functions** (`toast()`, `confirm()`, the controllers, `createParts`): the browser files are side-effect entries with no exports. Waiting on shadcn for a URL (2026-10-29).
+- **No-bundler pages can't reach the package's functions** (`toast()`, `confirm()`, the controllers, `createParts`): the browser files are side-effect entries with no exports. Needs a URL for an importable build.
 - **A closed shadow root, or one attached after its host was scanned**, is invisible to `web.js`. Load the component's own file there.
 - **Listed component files can mix releases** across a release boundary: each `web@0/<entry>.js` follows its own redirect. `web.js` doesn't, since it imports from one release.
 - **A `disabled` on the `<button>` inside a Number Input step part** is read once per button; toggling it on the same button later does nothing.
