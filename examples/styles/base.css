@@ -136,6 +136,33 @@
     margin: 0;
   }
 
+  input[type="color"] {
+    flex: none;
+    width: var(--size);
+    height: var(--size);
+    padding: 3px;
+    border: 0;
+    border-radius: var(--radius-control);
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: pointer;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    /* One rule each: a browser drops a whole list holding a pseudo-element it doesn't know. */
+    &::-webkit-color-swatch {
+      border: 0;
+      border-radius: calc(var(--radius-control) - 3px);
+    }
+
+    &::-moz-color-swatch {
+      border: 0;
+      border-radius: calc(var(--radius-control) - 3px);
+    }
+  }
+
   svg[data-disabled] {
     color: var(--line-faint);
   }
@@ -312,7 +339,7 @@
     font-weight: 500;
   }
 
-  [data-slot="label"]:has(> input:not([type="checkbox"], [type="radio"])) {
+  [data-slot="label"]:has(> input:not([type="checkbox"], [type="radio"], [type="color"])) {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-1);
@@ -558,7 +585,14 @@
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],
     [data-slot="toolbar-input"],
-    :where(input):not([data-slot], [type="checkbox"], [type="radio"], [type="range"], [type="hidden"]),
+    :where(input):not(
+      [data-slot],
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="hidden"],
+      [type="color"]
+    ),
     :where(textarea, select):not([data-slot])
   ):where(
     :not(
