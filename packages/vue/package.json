@@ -41,6 +41,7 @@
     "./navigation-menu": "./src/navigation-menu.ts",
     "./number": "./src/number.ts",
     "./number-input": "./src/number-input.ts",
+    "./nuxt": "./src/nuxt.ts",
     "./otp-input": "./src/otp-input.ts",
     "./overlays": "./src/overlays.ts",
     "./pagination": "./src/pagination.ts",
@@ -226,6 +227,10 @@
         "types": "./dist/number-input.d.ts",
         "default": "./dist/number-input.js"
       },
+      "./nuxt": {
+        "types": "./dist/nuxt.d.ts",
+        "default": "./dist/nuxt.js"
+      },
       "./otp-input": {
         "types": "./dist/otp-input.d.ts",
         "default": "./dist/otp-input.js"
@@ -360,11 +365,18 @@
   },
   "peerDependencies": {
     "@ui-sdk/core": "workspace:^",
+    "nuxt": ">=3.13",
     "vue": ">=3.5"
+  },
+  "peerDependenciesMeta": {
+    "nuxt": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@ui-sdk/core": "workspace:*",
     "@vue/server-renderer": "^3.5.43",
+    "nuxt": "~4.5.2",
     "typescript": "catalog:",
     "vitest": "^5.0.3",
     "vue": "catalog:",

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --port ${TRACKER_PORT:-5604}",
+    "dev": "vite --port ${TRACKER_PORT:-5604} --configLoader runner",
     "build": "vite build",
     "preview": "vite preview --port ${TRACKER_PORT:-5604}",
     "typecheck": "node ../../../scripts/tsgo.mjs --noEmit"

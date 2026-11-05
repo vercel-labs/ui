@@ -1,0 +1,69 @@
+// @vitest-environment node
+import { createServer, type Server } from "node:http"
+import type { AddressInfo } from "node:net"
+import { afterEach, expect, test } from "vitest"
+import { createDevServer } from "../src/page/agent/dev-server"
+
+let server: Server
+
+const start = async () => {
+  server = createServer(createDevServer().handle)
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
+  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/__ui-sdk`
+  // A page's poll stays open until the server closes, after the test.
+  const post = (path: string, body: object) => {
+    const response = fetch(`${base}/${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+    response.catch(() => {})
+    return response
+  }
+  const rpc = async (method: string, params?: object) =>
+    (await (await post("mcp", { jsonrpc: "2.0", id: 1, method, params })).json()).result
+  return { post, rpc }
+}
+
+afterEach(() => {
+  server.closeAllConnections()
+  server.close()
+})
+
+test("lists the bridge's three tools", async () => {
+  const { rpc } = await start()
+  expect((await rpc("tools/list")).tools.map((tool: { name: string }) => tool.name)).toEqual([
+    "snapshot",
+    "act",
+    "query",
+  ])
+})
+
+test("answers a tool call with an error while no page is open", async () => {
+  const { rpc } = await start()
+  const result = await rpc("tools/call", { name: "snapshot", arguments: {} })
+  expect(result.isError).toBe(true)
+  expect(result.content[0].text).toMatch(/Open the app/)
+})
+
+test("runs a tool call in the page and returns its result", async () => {
+  const { post, rpc } = await start()
+  const poll = post("page", { page: "a" })
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  const result = rpc("tools/call", { name: "query", arguments: { text: "Region" } })
+  const call = await (await poll).json()
+  expect(call).toMatchObject({ name: "query", input: { text: "Region" } })
+  post("page", { page: "a", answer: { id: call.id, result: [{ ref: "c1" }] } })
+  expect((await result).content[0].text).toBe('[{"ref":"c1"}]')
+})
+
+test("sends calls to the page that opened last", async () => {
+  const { post, rpc } = await start()
+  post("page", { page: "a" })
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  const second = post("page", { page: "b" })
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  const result = rpc("tools/call", { name: "snapshot", arguments: {} })
+  expect((await second).status).toBe(200)
+  result.catch(() => {})
+})

@@ -32,25 +32,41 @@ Each [component page](./components) lists the parts you can use.
 
 ## Use with Nuxt
 
-Install the same two packages in a Nuxt app. There's no Nuxt module or plugin to add: import components from their entries as above, and they render on the server and hydrate in the browser.
-
-Nuxt auto-imports the components in your `components/` directory, not those of a package. To use ui-sdk parts in templates without importing them, register an entry's exports with `addComponentExports` from an inline module:
+Install the same two packages in a Nuxt app, then add the module:
 
 ```ts title="nuxt.config.ts"
-import { addComponentExports } from "nuxt/kit"
-
 export default defineNuxtConfig({
-  modules: [
-    () => {
-      for (const entry of ["dialog", "select"]) {
-        addComponentExports({ filePath: `@ui-sdk/vue/${entry}` })
-      }
-    },
-  ],
+  modules: ["@ui-sdk/vue/nuxt"],
 })
 ```
 
-Each part of those entries becomes an auto-imported component, like `<DialogTrigger>`. Functions such as `createDialogController` still need an import in `<script>`. Pass `prefix` if the names clash with your own components.
+Every part is now available in your templates without an import, like `<DialogTrigger>`, and so is every controller, like `createDialogController`:
+
+```vue title="app.vue"
+<script setup lang="ts">
+const dialog = createDialogController()
+</script>
+
+<template>
+  <Dialog :controller="dialog">
+    <DialogTrigger>Open</DialogTrigger>
+    <DialogContent>
+      <DialogTitle>Hello</DialogTitle>
+    </DialogContent>
+  </Dialog>
+</template>
+```
+
+Components render on the server and hydrate in the browser, and your build includes only the parts your templates use. Your own components win over a part with the same name, so a `components/Dialog.vue` that wraps the Dialog stays yours. To give the parts a prefix instead, set `prefix`:
+
+```ts title="nuxt.config.ts"
+export default defineNuxtConfig({
+  modules: ["@ui-sdk/vue/nuxt"],
+  uiSdk: { prefix: "Ui" },
+})
+```
+
+Then the trigger is `<UiDialogTrigger>`. Helpers like `formatDate` still come from their entries with an import. Under `nuxt dev`, the module also lets your coding agent use the page, as [Dev Server](/docs/agents/dev-server) shows.
 
 ## Add Your Styles
 

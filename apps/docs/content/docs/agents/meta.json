@@ -1,4 +1,4 @@
 {
   "title": "Agents",
-  "pages": ["build-with-an-agent", "skills", "connect-an-agent"]
+  "pages": ["build-with-an-agent", "skills", "dev-server", "connect-an-agent"]
 }

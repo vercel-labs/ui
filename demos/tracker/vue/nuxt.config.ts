@@ -3,6 +3,7 @@ import { vueSourceLocations } from "../review/lib/vue-source-locations"
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-10-01",
+  modules: ["@ui-sdk/vue/nuxt"],
   css: ["~/assets/css/main.css"],
   components: { dirs: [] },
   app: {

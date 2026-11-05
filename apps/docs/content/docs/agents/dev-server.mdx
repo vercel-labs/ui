@@ -1,0 +1,121 @@
+---
+title: Dev Server
+description: Let the agent building your app read and use its page while you develop.
+---
+
+An agent that writes your UI usually works from the code alone. Add ui-sdk to your dev server, and the agent can try the page too: open the dialog it just built, choose an option in a select, and read what changed.
+
+It uses the same three tools as [Connect an Agent](./connect-an-agent): `snapshot`, `act` and `query`. Your dev server answers them at `/__ui-sdk/mcp`, an MCP server your agent connects to like any other. Each call runs in the page you have open in the browser, on the real components, and the result goes back to the agent.
+
+## Set Up Your Framework
+
+Each framework needs two things: the MCP server on its dev server, and a connection from the page. Both run only in development, so your production build stays the same.
+
+### Vite
+
+For React, Vue, Svelte, Solid and web components on Vite, add the plugin:
+
+```ts title="vite.config.ts"
+import { uiSdk } from "@ui-sdk/core/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [uiSdk()],
+})
+```
+
+The plugin adds the server and connects every page Vite serves from `index.html`. Keep your framework's own plugin in the list beside it.
+
+### Next.js
+
+Wrap your config with `withUiSdk`:
+
+```ts title="next.config.ts"
+import type { NextConfig } from "next"
+import { withUiSdk } from "@ui-sdk/react/next"
+
+const nextConfig: NextConfig = {}
+
+export default withUiSdk(nextConfig)
+```
+
+Under `next dev`, it starts the server and serves it from your app's own port. Then connect the page from `instrumentation-client.ts`, which runs in the browser before your app starts:
+
+```ts title="instrumentation-client.ts"
+if (process.env.NODE_ENV === "development") import("@ui-sdk/core/dev")
+```
+
+### Nuxt
+
+Add the module:
+
+```ts title="nuxt.config.ts"
+export default defineNuxtConfig({
+  modules: ["@ui-sdk/vue/nuxt"],
+})
+```
+
+Under `nuxt dev`, the module adds the server and connects every page. It also makes the components available in your templates without imports, as [Installation](/docs/vue/installation#use-with-nuxt) shows.
+
+### SvelteKit
+
+Add the plugin beside `sveltekit()`:
+
+```ts title="vite.config.ts"
+import { sveltekit } from "@sveltejs/kit/vite"
+import { uiSdk } from "@ui-sdk/core/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [sveltekit(), uiSdk()],
+})
+```
+
+SvelteKit renders its pages itself, so connect them from `src/hooks.client.ts`:
+
+```ts title="src/hooks.client.ts"
+if (import.meta.env.DEV) import("@ui-sdk/core/dev")
+```
+
+### Other Frameworks on Vite
+
+SolidStart, Astro and other frameworks built on Vite take the same plugin. Add `uiSdk()` to the Vite plugins in your config, then import `@ui-sdk/core/dev` in development from code that runs on every page. In Astro, both go in the config and the layout:
+
+```js title="astro.config.mjs"
+import { uiSdk } from "@ui-sdk/core/vite"
+import { defineConfig } from "astro/config"
+
+export default defineConfig({
+  vite: { plugins: [uiSdk()] },
+})
+```
+
+```astro title="src/layouts/Layout.astro"
+<script>
+  if (import.meta.env.DEV) import("@ui-sdk/core/dev")
+</script>
+```
+
+## Connect Your Agent
+
+Start your dev server and open the app in your browser. Then add the server to your agent with your dev server's address. For Claude Code:
+
+```bash
+claude mcp add --transport http ui-sdk http://localhost:5173/__ui-sdk/mcp
+```
+
+Other agents take the same URL wherever they add an MCP server. Use your own port, like `3000` for Next.js.
+
+## Try It
+
+Ask the agent to use what it built:
+
+```text
+Open the settings page in the browser tab. Use the ui-sdk tools to
+choose Asia Pacific in the Region select, then tell me what the
+page shows.
+```
+
+The agent calls `query` to find the Region select and its options, then `act` to choose one. The result lists every field's value after the change, so the agent can check its work in the same step. You see the select change in your browser as it happens.
+
+With more than one tab open, the tab you opened last answers. A component marked with `data-agent-confirm` stays yours to change: the agent gets a note to ask you instead. [Permissions](./connect-an-agent/permissions) covers the marks.

@@ -1,5 +1,6 @@
 import solid from "@solidjs/vite-plugin"
 import tailwindcss from "@tailwindcss/vite"
+import { uiSdk } from "@ui-sdk/core/vite"
 import { fileURLToPath } from "node:url"
 import { defineConfig, type Plugin } from "vite"
 import { jsxLocations } from "../review/lib/source-locations.mjs"
@@ -13,6 +14,6 @@ const sourceLocations: Plugin = {
 }
 
 export default defineConfig({
-  plugins: [...(process.env.TRACKER_REVIEW ? [sourceLocations] : []), solid(), tailwindcss()],
+  plugins: [...(process.env.TRACKER_REVIEW ? [sourceLocations] : []), solid(), tailwindcss(), uiSdk()],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
 })

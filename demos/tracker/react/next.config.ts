@@ -1,5 +1,6 @@
 import type { NextConfig } from "next"
 import path from "node:path"
+import { withUiSdk } from "@ui-sdk/react/next"
 
 const config: NextConfig = {
   cacheComponents: true,
@@ -29,4 +30,4 @@ const config: NextConfig = {
   },
 }
 
-export default config
+export default withUiSdk(config)

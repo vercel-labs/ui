@@ -23,6 +23,23 @@ export { agent }
 
 The bridge finds the components already on the page when you create it, and registers new ones as they're created, so you can create it at startup or later, when an assistant opens.
 
+Create it in browser code that runs once. Each framework has a place for that:
+
+| Framework  | Create It In                                    |
+| ---------- | ----------------------------------------------- |
+| Vite       | `src/main.ts`                                   |
+| Next.js    | `instrumentation-client.ts`                     |
+| Nuxt       | a client plugin, like `plugins/agent.client.ts` |
+| SvelteKit  | `src/hooks.client.ts`                           |
+| SolidStart | `src/entry-client.tsx`                          |
+| Astro      | a `<script>` in your layout                     |
+
+In Next.js, for example, import the file from `instrumentation-client.ts`:
+
+```ts title="instrumentation-client.ts"
+import "./agent"
+```
+
 Use the agent entry from the same package as your components:
 
 | Framework      | Import From            |
