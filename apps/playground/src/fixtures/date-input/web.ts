@@ -8,7 +8,10 @@ import { dateInputAction, dateInputFixture as f, dateInputOptions } from "tests/
 function setAttributes(el: Element, options: Record<string, unknown>) {
   for (const [key, value] of Object.entries(options)) {
     if (value === undefined || value === false) continue
-    el.setAttribute(key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`), value === true ? "" : String(value))
+    el.setAttribute(
+      key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
+      value === true ? "" : String(value),
+    )
   }
 }
 
