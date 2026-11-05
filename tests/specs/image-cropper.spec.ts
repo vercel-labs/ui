@@ -165,6 +165,15 @@ test.describe("frame", () => {
     expect(await selection(page).boundingBox()).toEqual(before)
   })
 
+  test("Escape during a pan puts the image back", async ({ page, open }) => {
+    await open("image-cropper", { mode: "frame", aspect: "1" })
+    await drag(page, await centerOf(viewport(page)), { x: 40, y: 0 })
+    await page.keyboard.press("Escape")
+    await page.mouse.up()
+    await expect(selection(page)).toHaveAttribute("aria-valuenow", "50")
+    expect(await committed(page)).toBe("50,0,300,300 r0:image-load")
+  })
+
   test("the wheel zooms at the pointer and commits after a pause", async ({ page, open }) => {
     await open("image-cropper", { mode: "frame", aspect: "1" })
     const frame = (await viewport(page).boundingBox())!

@@ -131,19 +131,30 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
   const drags = createDragSession(context.onDestroy)
   // The crop an interaction started from, so it commits only what it changed.
   let start: Crop | null | undefined
+  // The last crop a change asked for. A controlled crop only arrives with
+  // the owner's next render, after a key or a press has already committed.
+  let changed: Crop | undefined
   let wheelTimer: ReturnType<typeof setTimeout> | undefined
   context.onDestroy(() => clearTimeout(wheelTimer))
 
   function setCrop(next: Crop, details: Details) {
     const now = store.get().crop
     if (now && sameCrop(now, next)) return false
-    return change("crop", next, details)
+    const done = change("crop", next, details)
+    if (done) changed = next
+    return done
+  }
+
+  function startFrom(crop: Crop | null) {
+    start = crop
+    changed = undefined
   }
 
   function commit(details: Details) {
     const from = start
     start = undefined
-    const now = store.get().crop
+    const now = changed ?? store.get().crop
+    changed = undefined
     if (from === undefined || !now || (from && sameCrop(from, now))) return
     commitCrop("crop", now, details)
   }
@@ -152,7 +163,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
   function step(next: (crop: Crop, natural: Size) => Crop, details: Details) {
     const state = store.get()
     if (isLocked(state)) return false
-    start = state.crop
+    startFrom(state.crop)
     const done = setCrop(next(state.crop!, state.natural!), details)
     commit(details)
     return done
@@ -211,7 +222,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
         store.set({ natural, status: "loaded" })
         if (context.options().crop !== undefined || (state.crop && state.cropFor === state.src)) return
         store.set({ cropFor: state.src })
-        start = null
+        startFrom(null)
         setCrop(initialCrop(natural, limitsOf(state), state.mode), { reason: "image-load" })
         commit({ reason: "image-load" })
       },
@@ -255,7 +266,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
           threshold: dragThreshold,
           cancelOnEscape: true,
           onStart: () => {
-            start = from
+            startFrom(from)
             store.set({ dragging: handle })
           },
           onMove: ({ x, y, event: move }) => {
@@ -285,7 +296,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
         pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
         begin()
         if (pointers.size > 1) return
-        start = state.crop
+        startFrom(state.crop)
         store.set({ dragging: "pan" })
         let reason: "drag" | "pinch" = "drag"
         const move = (moved: PointerEvent) => {
@@ -335,15 +346,26 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
           store.set({ dragging: null })
           commit({ reason, event: lifted })
         }
+        // Escape, or the browser taking the pointer, puts the crop back.
+        const cancel = (canceled: Event) => {
+          if (canceled instanceof KeyboardEvent && canceled.key !== "Escape") return
+          stop?.()
+          store.set({ dragging: null })
+          if (state.crop) setCrop(state.crop, { reason, event: canceled })
+          commit({ reason, event: canceled })
+        }
+        const doc = el.ownerDocument
         el.addEventListener("pointermove", move)
         el.addEventListener("pointerup", up)
-        el.addEventListener("pointercancel", up)
+        el.addEventListener("pointercancel", cancel)
+        doc.addEventListener("keydown", cancel)
         stop = () => {
           pointers.clear()
           gesture = null
           el.removeEventListener("pointermove", move)
           el.removeEventListener("pointerup", up)
-          el.removeEventListener("pointercancel", up)
+          el.removeEventListener("pointercancel", cancel)
+          doc.removeEventListener("keydown", cancel)
           stop = undefined
         }
       },
@@ -354,7 +376,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
         event.preventDefault()
         const delta = Math.max(-50, Math.min(50, event.deltaY * wheelUnit(event, el)))
         const at = imagePoint(event.clientX, event.clientY)
-        if (start === undefined) start = state.crop
+        if (start === undefined) startFrom(state.crop)
         setCrop(
           zoomCrop(
             state.crop!,
@@ -405,7 +427,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
       zoomInput(event: Event, el: HTMLInputElement) {
         const state = store.get()
         if (isLocked(state)) return
-        if (start === undefined) start = state.crop
+        if (start === undefined) startFrom(state.crop)
         if (Number.isFinite(el.valueAsNumber))
           setCrop(zoomCrop(state.crop!, state.natural!, el.valueAsNumber, limitsOf(state)), {
             reason: "zoom-input",

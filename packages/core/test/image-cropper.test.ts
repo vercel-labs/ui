@@ -133,12 +133,14 @@ describe("image cropper", () => {
 
   test("a controlled crop changes only when the owner passes it back", () => {
     const onCropChange = vi.fn()
+    const onCropCommit = vi.fn()
     const crop = { x: 0, y: 0, width: 100, height: 100 }
-    const cropper = make({ crop, onCropChange })
+    const cropper = make({ crop, onCropChange, onCropCommit })
     load(cropper)
     expect(onCropChange).not.toHaveBeenCalled()
     cropper.api.internal.keydown(key("ArrowRight"), "move")
     expect(onCropChange.mock.lastCall![0]).toMatchObject({ x: 1 })
+    expect(onCropCommit.mock.lastCall![0]).toMatchObject({ x: 1 })
     expect(cropper.api.getCrop()).toMatchObject({ x: 0 })
   })
 
