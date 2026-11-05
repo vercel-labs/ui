@@ -7,6 +7,8 @@ A library of UI behaviors for building accessible interfaces: keyboard navigatio
   <img alt="An environment selector split into three behaviors: createPopup, createListbox and createTypeahead." src="./assets/behaviors-light.svg">
 </picture>
 
+**[Read the docs](https://ui-sdk.dev/docs)**
+
 ## Example
 
 Every component in ui-sdk is built from behaviors. You start by creating the primitive with behaviors.

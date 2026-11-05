@@ -2,9 +2,15 @@
 
 The behavior of every ui-sdk component, with no framework and no markup. Each component is a primitive defined here and rendered by a thin adapter in React, Vue, Solid, Svelte and web components. The same pieces are public, so you can build a component ui-sdk doesn't ship and render it in all five.
 
+```bash
+npm install @ui-sdk/core
+```
+
+Read the docs at [ui-sdk.dev/docs/core](https://ui-sdk.dev/docs/core).
+
 This page is for whoever builds one, people and coding agents alike. Every export has JSDoc, so your editor or a read of the `.d.ts` files tells you the rest.
 
-The whole Core section of the docs ships with this package as one file, [`docs/core.md`](./docs/core.md). It's framework-free, so every adapter ships the same file, like `@ui-sdk/vue/docs/core.md`, beside a page for every component in its `docs` folder.
+The whole Core section of the docs ships with this package as one file, `docs/core.md`. It's framework-free, so every adapter ships the same file, like `@ui-sdk/vue/docs/core.md`, beside a page for every component in its `docs` folder.
 
 ## What's public
 
@@ -16,7 +22,7 @@ The whole Core section of the docs ships with this package as one file, [`docs/c
 | `@ui-sdk/vue/primitive`, `@ui-sdk/solid/primitive`, `@ui-sdk/svelte/primitive` | The same, for each framework.                                                                                                                                      |
 | `@ui-sdk/web`                                                                  | `createParts`, which turns a primitive into custom elements.                                                                                                       |
 
-The modules these entries are built from aren't exports, so they can change in any release. If a component needs something no entry has, that's a gap in the public kit worth reporting.
+The modules these entries are built from aren't exports, so they can change in any release. If a component needs something no entry has, [open an issue](https://github.com/vercel-labs/ui/issues).
 
 ## How a primitive works
 
@@ -72,7 +78,7 @@ export const DisclosureTrigger = parts.Trigger
 export const DisclosurePanel = parts.Panel
 ```
 
-`Disclosure` takes the options as props and shares the instance with the parts inside it. A part with logic of its own is written by hand with `usePart`. The docs' Core section (`/docs/core`, or `/docs/core.md` as one Markdown file) builds a whole component step by step, shows how to render it on each framework's Rendering page and each block of the kit on the Behaviors pages, and lists every export on Reference.
+`Disclosure` takes the options as props and shares the instance with the parts inside it. A part with logic of its own is written by hand with `usePart`. The docs' [Core section](https://ui-sdk.dev/docs/core) (or [`/docs/core.md`](https://ui-sdk.dev/docs/core.md) as one Markdown file) builds a whole component step by step, shows how to render it on each framework's Rendering page and each block of the kit on the Behaviors pages, and lists every export on Reference.
 
 ## Building a component, step by step
 
