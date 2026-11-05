@@ -1,7 +1,6 @@
 {
   "title": "Core",
   "pages": [
-    "request-access",
     "build-a-component",
     "compose-behaviors",
     "reference",
