@@ -1,4 +1,5 @@
-import { expect, test, type Locator } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
+import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
 
 test("every example renders without errors", async ({ page }) => {

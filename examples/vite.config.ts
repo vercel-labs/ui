@@ -5,19 +5,37 @@ import { globSync } from "node:fs"
 import { defineConfig, type UserConfig } from "vite"
 
 const solidFiles = ["**/packages/solid/**", "**/examples/*/solid/**", "**/examples/components/*/solid/**"]
-const builds: Record<string, { ext: string; config?: UserConfig }> = {
+const builds: Record<string, { ext: string; config?: (ssr: boolean) => UserConfig }> = {
   react: { ext: "tsx" },
-  vue: { ext: "vue", config: { plugins: [vue()] } },
-  svelte: { ext: "svelte", config: { plugins: [svelte()] } },
-  solid: { ext: "tsx", config: { plugins: [solid({ include: solidFiles })] } },
+  vue: { ext: "vue", config: () => ({ plugins: [vue()] }) },
+  svelte: { ext: "svelte", config: () => ({ plugins: [svelte()] }) },
+  solid: { ext: "tsx", config: (ssr) => ({ plugins: [solid({ include: solidFiles, ssr })] }) },
   web: { ext: "ts" },
 }
 
 const only = process.env.EXAMPLES_ONLY?.split(",")
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, isSsrBuild = false }) => {
   const framework = mode in builds ? mode : "vue"
-  const { ext, config = {} } = builds[framework]
+  const { ext } = builds[framework]
+  const config = builds[framework].config?.(isSsrBuild) ?? {}
+  const define = { ...config.define, "process.env.NODE_ENV": JSON.stringify("production") }
+
+  if (isSsrBuild)
+    return {
+      ...config,
+      define,
+      ssr: { noExternal: true },
+      build: {
+        outDir: `node_modules/.prerender/${framework}`,
+        emptyOutDir: true,
+        rolldownOptions: {
+          input: { [framework]: `prerender/${framework}.ts` },
+          onLog: (level, log, handler) => log.code !== "MODULE_LEVEL_DIRECTIVE" && handler(level, log),
+        },
+      },
+    }
+
   const entries = Object.fromEntries(
     globSync([`*/${framework}/*.${ext}`, `components/*/${framework}/*.${ext}`])
       .map((file) => [
@@ -29,20 +47,21 @@ export default defineConfig(({ mode }) => {
 
   return {
     ...config,
-    define: { ...config.define, "process.env.NODE_ENV": JSON.stringify("production") },
+    define,
     build: {
-      outDir: `dist/${framework}`,
+      outDir: `../apps/docs/public/examples/${framework}`,
       emptyOutDir: true,
       lib: {
         entry: { ...entries, mount: `mount/${framework}.ts` },
         formats: ["es"],
-        fileName: (_, name) => `${name}.js`,
+        fileName: (_, name) => `${name}-[hash].js`,
       },
       rolldownOptions: {
         output: { minify: true, chunkFileNames: "chunks/[name]-[hash].js" },
         onLog: (level, log, handler) => log.code !== "MODULE_LEVEL_DIRECTIVE" && handler(level, log),
       },
       cssCodeSplit: false,
+      manifest: "manifest.json",
     },
   }
 })

@@ -1,4 +1,5 @@
-import { expect, test, type Locator, type Page } from "@playwright/test"
+import { expect, type Locator, type Page } from "@playwright/test"
+import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
 
 // Presses the middle of an element and moves the pointer by dx, dy, without letting go.

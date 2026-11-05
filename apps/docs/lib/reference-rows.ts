@@ -97,6 +97,7 @@ async function typeRows({
   examples,
   type,
   types,
+  descriptions,
 }: {
   path: string
   name: string
@@ -104,6 +105,8 @@ async function typeRows({
   type?: string
   /** Each field's type as the table shows it, where the declared one reads worse, like a generic's. */
   types?: Record<string, string>
+  /** Each field's description as the table shows it, where the declared one fits another part, like a submenu's `controller`. */
+  descriptions?: Record<string, string>
   framework?: Framework
   events?: boolean
   /**
@@ -126,7 +129,10 @@ async function typeRows({
           isEvent && framework === "web-components" ? undefined : (types?.[entry.name] ?? shortType(entry)),
         detail: fallback ? `Default ${fallback.replace(/^`|`$/g, "")}` : undefined,
         text: callbacksIn(
-          (entry.description || (type?.includes("typeof import(") ? exportDocs(file, entry.name) : ""))
+          (
+            descriptions?.[entry.name] ??
+            (entry.description || (type?.includes("typeof import(") ? exportDocs(file, entry.name) : ""))
+          )
             .replace(/\s+/g, " ")
             .trim(),
           events ? framework : "react",

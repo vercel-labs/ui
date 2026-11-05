@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "../../docs-test"
 import { openExamples } from "../behaviors/helpers"
 
 const url = "/docs/core/kernel/state-and-changes"

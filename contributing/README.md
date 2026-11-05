@@ -20,7 +20,7 @@ Everything you need to work on ui-sdk, for people and agents alike. Start with t
 - `apps/docs`: the docs site, which also serves the compiled examples.
 - `apps/registry`: the private package registry ([REGISTRY.md](../apps/registry/REGISTRY.md)).
 - `apps/playground`: the fixtures the browser specs open, one folder per component and framework.
-- `examples`: every docs example, in every framework, compiled by Vite into `examples/dist`.
+- `examples`: every docs example, in every framework, compiled by Vite into `apps/docs/public/examples`.
 - `tests`: the Playwright specs, fixtures and perf budgets.
 - `.claude`: one expert per framework, and the skill that runs their review.
 - `scripts`: lint, formatting, the test plan, package checks and docs generation.

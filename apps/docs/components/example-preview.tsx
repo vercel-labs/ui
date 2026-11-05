@@ -1,30 +1,34 @@
 "use client"
 
-import { frameworks, type Framework } from "@/lib/frameworks"
 import { ChevronRightIcon } from "lucide-react"
 import * as React from "react"
 import { cn } from "cn"
 
 type Mount = (module: unknown, host: HTMLElement) => () => void
 
-// Imports a compiled example from examples/dist, which app/examples serves. This is a workaround to avoid bundling the examples in the docs app.
+// Imports a compiled example from public/examples, so the docs app never bundles the examples.
 const load = (url: string) => import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url)
 
 function ExamplePreview({
   name,
-  framework,
+  src,
+  mount,
+  html,
   compact = false,
   tall = false,
   log = false,
 }: {
   name: string
-  framework: Framework
+  src?: string
+  mount?: string
+  html?: string
   compact?: boolean
   tall?: boolean
   log?: boolean
 }) {
   const host = React.useRef<HTMLDivElement>(null)
   const [run, setRun] = React.useState(0)
+  const [live, setLive] = React.useState(false)
   const [entries, setEntries] = React.useState<string[]>([])
 
   // Examples log through `useLog()`; the mount turns each message into an event on the host.
@@ -59,31 +63,31 @@ function ExamplePreview({
 
   React.useEffect(() => {
     setEntries([])
-    const base = `/examples/${frameworks[framework].example}`
+    if (!src || !mount) {
+      console.error(`The ${name} example isn't built. Run \`pnpm --filter examples build\`.`)
+      return
+    }
     let cleanup = () => {}
     let cancelled = false
-    const url = `${base}/${name}.js`
-    Promise.all([load(url), load(`${base}/mount.js`)])
-      .then(([module, { mount }]: [unknown, { mount: Mount }]) => {
-        if (cancelled || !host.current) return
-        cleanup = mount(module, host.current)
+    Promise.all([load(src), load(mount)])
+      .then(([module, framework]: [unknown, { mount: Mount }]) => {
+        const element = host.current
+        if (cancelled || !element) return
+        // Cleared in the same task the example mounts, so no frame shows an empty preview.
+        element.replaceChildren()
+        element.inert = false
+        element.removeAttribute("aria-hidden")
+        cleanup = framework.mount(module, element)
+        setLive(true)
       })
-      // Safari also rejects imports cut short by leaving the page, so only a missing file means
-      // the examples need building.
-      .catch((error) =>
-        fetch(url, { method: "HEAD" }).then((response) => {
-          if (cancelled) return
-          if (!response.ok)
-            console.error(`The ${name} example isn't built. Run \`pnpm --filter examples build\`.`)
-          else console.error(`The ${name} example didn't load.`, error)
-        }),
-      )
-      .catch(() => {})
+      .catch((error) => {
+        if (!cancelled) console.error(`The ${name} example didn't load. Reload after a rebuild.`, error)
+      })
     return () => {
       cancelled = true
       cleanup()
     }
-  }, [name, framework, run])
+  }, [name, src, mount, run])
 
   const preview = (
     <div
@@ -93,7 +97,13 @@ function ExamplePreview({
         compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
       )}
     >
-      <div ref={host} className="flex w-full max-w-full min-w-0 flex-col items-start gap-3" />
+      <div
+        ref={host}
+        inert={!live}
+        aria-hidden={!live || undefined}
+        dangerouslySetInnerHTML={html ? { __html: html } : undefined}
+        className="flex w-full max-w-full min-w-0 flex-col items-start gap-3"
+      />
     </div>
   )
   if (!log) return preview

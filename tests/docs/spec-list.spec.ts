@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "./docs-test"
 
 // The lists of tests on each page say where those tests run: the playground
 // runs React, Vue and web components.
