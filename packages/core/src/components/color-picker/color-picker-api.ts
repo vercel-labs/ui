@@ -9,7 +9,6 @@ import { colorDistance } from "../../foundation/color/compare"
 import type { Color } from "../../foundation/color/convert"
 import { formatColor, type ColorFormat } from "../../foundation/color/format"
 import { isInGamut, toGamut, type ColorGamut } from "../../foundation/color/gamut"
-import { parseColor } from "../../foundation/color/parse"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import { createChange, createCommit } from "../../foundation/kernel/input-source"
@@ -225,7 +224,7 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
   }
 
   function isSelected(value: string | undefined) {
-    const color = value === undefined ? null : parseColor(value)
+    const color = value === undefined ? null : colorIn(value, store.get().space)
     return !!color && isSameColor(publicColor(color), publicColor(store.get().color))
   }
 

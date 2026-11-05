@@ -153,6 +153,9 @@ describe("color picker", () => {
     const vivid = "oklch(0.7 0.3 150)"
     picker.api.internal.choose(vivid, { reason: "item-press" })
     expect(attrs(picker.part("swatch-item", { value: vivid }))["aria-selected"]).toBe("true")
+    const hsv = make({ gamut: "p3" })
+    hsv.api.internal.choose(vivid, { reason: "item-press" })
+    expect(attrs(hsv.part("swatch-item", { value: vivid }))["aria-selected"]).toBe("true")
   })
 
   test("a canceled change leaves the value and the parts as they were", () => {
