@@ -1,25 +1,13 @@
 # @ui-sdk/solid
 
-UI SDK for Solid: accessible components built from the behaviors in `@ui-sdk/core`. Parts have no styles: each one exposes its state as ARIA and `data-*` attributes and CSS variables, so your CSS or Tailwind decides the look. Popups need no portal and right to left needs no provider.
+UI SDK for Solid. A library of behaviors to build your components.
 
 ```bash
 npm install @ui-sdk/solid @ui-sdk/core
 ```
 
-Read the docs at [ui-sdk.dev/docs/solid](https://ui-sdk.dev/docs/solid). It needs Solid 2 (`solid-js` and `@solidjs/web` 2.0.0-rc.14 or later).
+It needs Solid 2: `solid-js` and `@solidjs/web` 2.0.0-rc.14 or later.
 
-```tsx
-import { Popover, PopoverContent, PopoverTrigger } from "@ui-sdk/solid/popover"
-```
+[Read the docs](https://ui-sdk.dev/docs/solid)
 
-Each component is its own entry, so you pay only for what you import.
-
-## Docs
-
-The docs ship in this package as Markdown, with Solid code, generated from the same source as the docs site for the release you installed:
-
-- `docs/README.md` lists every page.
-- `docs/components/<name>.md` covers one component: its anatomy, examples, every styling hook (data attributes and CSS variables), the API reference and the keyboard and screen reader behavior its tests check.
-- `docs/core.md` is how to build a component ui-sdk doesn't ship, from the same core, in one file.
-
-Hover a component or a prop in your editor for the same descriptions.
+The docs also ship in this package as Markdown, starting at `docs/llms.txt`, for your editor and your agent.
