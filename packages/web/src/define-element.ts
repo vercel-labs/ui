@@ -292,6 +292,7 @@ function withEvents<T extends object>(
   target: T,
   silent: string[] = [],
   actions: string[] = [],
+  names: Record<string, string> = {},
 ) {
   return new Proxy(target, {
     get(target, key) {
@@ -311,7 +312,7 @@ function withEvents<T extends object>(
         // the change of a dialog inside it for its own. A listener on an
         // ancestor hears every element inside it with `{ capture: true }`.
         // Composed, so a page that renders the element in a shadow root hears it on the host.
-        const event = new CustomEvent(key.slice(2).toLowerCase(), {
+        const event = new CustomEvent(names[key] ?? key.slice(2).toLowerCase(), {
           detail,
           bubbles: false,
           // Only a change with details or an event to cancel is cancelable.
@@ -489,6 +490,7 @@ type Part = {
   sync?: () => void
   // Reads its props again, for parts whose props come from their surroundings.
   reread?: () => Record<string, unknown>
+  keyed?: boolean
   // Watches a native child's attributes that its props follow.
   observer?: MutationObserver
 }
@@ -573,12 +575,19 @@ const registered = new WeakSet<Part>()
 // a part whose `for` names it, like a native label's control.
 const findOwnerAgain = new WeakMap<Element, () => void>()
 
+type ListApi = { internal: { keyOf: (value: unknown) => string } }
+
+const hasRichValue = (props: Record<string, unknown>) =>
+  props.value !== undefined && typeof props.value !== "string"
+
 // The props of the nearest part of `slot` around `el` that has the same owner,
 // so a part of another component in between, with a slot of the same name, is skipped.
 function propsAround(el: Element, slot: string, owner?: OwnerElement) {
   for (let node = el.parentElement; node; node = node.parentElement) {
     const part = slotParts.get(node)
-    if (part?.slot === slot && partOwners.get(node) === owner) return part.props
+    if (part?.slot !== slot || partOwners.get(node) !== owner) continue
+    // An item gives the parts inside it its key as its value, as in the other frameworks.
+    return part.keyed && hasRichValue(part.props) ? { ...part.props, value: part.props.id } : part.props
   }
 }
 
@@ -727,6 +736,11 @@ type OwnerConfig<P extends Primitive> = {
   silent?: string[]
   /** Callbacks whose event hands listeners `waitUntil()`, from the schema's `"action"` kind. */
   actions?: string[]
+  /**
+   * Event names for callbacks whose own name a native event that bubbles in
+   * already takes, like `{ onSelect: "itemselect" }` beside a text field's `select`.
+   */
+  events?: Record<string, string>
   /**
    * Runs once the instance exists, and again when a property is set, with
    * the element and its instance, which only this hook sees. Data elements
@@ -887,6 +901,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
             { ...optionsOf(this, this.#properties, this.#rendered), ...defaults, id: this.#instance.id },
             config.silent,
             config.actions,
+            config.events,
           ),
         )
       }
@@ -975,6 +990,7 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
               },
               config.silent,
               config.actions,
+              config.events,
             ),
           ) as ReturnType<P>
           instances.set(this, instance)
@@ -1366,6 +1382,8 @@ type SlotConfig = {
   alone?: (el: HTMLElement, host: HTMLElement) => void
   /** Callbacks whose event hands listeners `waitUntil()`, from the schema's `"action"` kind. */
   actions?: string[]
+  /** Whether its `value` keys it, like a list item's, from the schema's `"key"` kind. */
+  keyed?: boolean
 }
 
 // Defines a part element, like <ui-menu-item>. It finds its owner, reads its
@@ -1394,7 +1412,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
         for (const name of config.properties ?? [])
           Object.defineProperty(PartElement.prototype, name, {
             get(this: PartElement) {
-              return this.#properties[name]
+              return this.#properties[name] ?? (schema[name] && readAttribute(this, name, schema[name]))
             },
             set(this: PartElement, value: unknown) {
               this.#properties[name] = value
@@ -1415,6 +1433,9 @@ function definePartElement(tagName: string, config: SlotConfig) {
         for (const name of config.ids ?? []) props[name] ??= autoId(this)
         // Parts without a value, their own or from their surroundings, still need a stable key.
         if (props.value === undefined && props.id === undefined) props.id = autoId(this)
+        // The core keys a part by `String(value)`, so a rich value takes its list's key.
+        if (config.keyed && hasRichValue(props))
+          props.id ??= instanceOf<ListApi>(this.#owner)?.api.internal.keyOf(props.value)
         return withEvents(this, props, [], config.actions)
       }
 
@@ -1461,6 +1482,7 @@ function definePartElement(tagName: string, config: SlotConfig) {
           el,
           props: this.#props(),
           reread: (config.context || config.from) && (() => this.#props()),
+          keyed: config.keyed,
         }
         partOwners.set(this, owner)
         slotParts.set(this, this.#part)
@@ -1561,7 +1583,7 @@ type PartOptions<P extends Primitive = Primitive> = {
   kinds?: Kinds
   /** Properties beyond the schema's, read as props. */
   properties?: string[]
-} & Omit<SlotConfig, "slot" | "owner" | "props" | "properties" | "from" | "ids" | "actions">
+} & Omit<SlotConfig, "slot" | "owner" | "props" | "properties" | "from" | "ids" | "actions" | "keyed">
 
 /**
  * How `createParts` and `definePart` define the root's element, the one that owns an instance, beyond its tag.
@@ -1611,6 +1633,7 @@ function elementProps(props: Record<string, PropSpec>, schema: PrimitiveSchema, 
   const properties: string[] = []
   const ids: string[] = []
   const actions: string[] = []
+  let keyed = false
   const from: Record<string, { slot: string; prop: string }> = {}
   for (const [name, spec] of Object.entries({ ...props, ...kinds })) {
     if (!spec) continue
@@ -1626,10 +1649,11 @@ function elementProps(props: Record<string, PropSpec>, schema: PrimitiveSchema, 
     if (kind === "value") properties.push(name)
     else if (kind === "action") actions.push(name)
     else if (kind === "id") ids.push(name)
+    else if (kind === "key") keyed = true
     if (kind === "value" || kind === "action" || kind === "callback") continue
     if (name !== "id" || name in kinds) attributes[name] = kind === "id" || kind === "key" ? "string" : kind
   }
-  return { attributes, properties, ids, actions, from: Object.keys(from).length ? from : undefined }
+  return { attributes, properties, ids, actions, keyed, from: Object.keys(from).length ? from : undefined }
 }
 
 const tagOf = <T extends { tag: string }>(tagOrOptions: string | T) =>

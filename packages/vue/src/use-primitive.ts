@@ -544,7 +544,9 @@ function renderElement(
   const own = children ? () => children(state) : () => slots.default?.({ state })
   if (slots.render) {
     const rendered = slots.render({ props, state, children: contentOf(slots, own) })
-    return hidden ? [...rendered, hidden()] : rendered
+    if (hidden) return [...rendered, hidden()]
+    // One element, not a fragment, so a ref to the part's component gets it as `$el`.
+    return rendered.length === 1 ? rendered[0] : rendered
   }
   const content = hidden ? () => [own(), hidden()] : own
   return h(tag, props, content() as never)

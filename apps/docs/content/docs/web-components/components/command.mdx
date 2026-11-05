@@ -200,7 +200,7 @@ The highlighted command, search text, and page stack are separate:
 | `query` | The search text.                    | `querychange`       |
 | `pages` | An array of page values.            | `pageschange`       |
 
-Read or write these properties on the element, and use `default-value`, `default-query`, and `default-pages` for starting state. Change events carry the new value in `event.detail.value` and the reason beside it; call `event.preventDefault()` to reject a change. `action` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
+Read or write these properties on the element, and use `default-value`, `default-query`, and `default-pages` for starting state. Change events carry the new value in `event.detail.value` and the reason beside it; call `event.preventDefault()` to reject a change. `value` is the highlighted command, not a chosen one, and it changes as the highlight moves. `action` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
 
 <ComponentExample
   name="command/controlled"

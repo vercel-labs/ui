@@ -35,20 +35,18 @@ function mount(root: HTMLElement) {
           </button>
         </ui-select-trigger>
         <ui-select-content>
-          <div style="height: ${height}px"></div>
+          <div style="height: ${height}px">
+            <ui-select-list>
+              <div style="height: ${manyItems.length * row}px"></div>
+            </ui-select-list>
+          </div>
         </ui-select-content>
       </ui-select>
     </ui-field>
   `
   const select = root.querySelector("ui-select")!
   const scroller = root.querySelector<HTMLElement>("ui-select-content > div")!
-  select.items = manyItems
-  scroller.innerHTML = `
-    <ui-select-list>
-      <div style="height: ${manyItems.length * row}px"></div>
-    </ui-select-list>
-  `
-  const rows = scroller.querySelector<HTMLElement>("ui-select-list > div")!
+  const rows = root.querySelector<HTMLElement>("ui-select-list > div")!
 
   const rendered = new Map<number, Element>()
   const render = () => {
@@ -69,6 +67,7 @@ function mount(root: HTMLElement) {
     }
   }
   render()
+  select.items = manyItems
   scroller.addEventListener("scroll", render)
   select.addEventListener("highlight", (event) => {
     const { index } = event.detail

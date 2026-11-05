@@ -108,7 +108,7 @@ Progress displays your state; it fires no `valuechange` event.
 
 ## Bounds
 
-`min` and `max` default to 0 and 100. Values outside that range are clamped. A value of 3 between 1 and 5 fills half the track.
+`min` and `max` default to 0 and 100. A value outside that range is clamped for the fill, the percentage and `aria-valuenow`, but the state's `value` and a format other than percent keep it as you passed it. A value of 3 between 1 and 5 fills half the track.
 
 <ComponentExample
   name="progress/min-max"

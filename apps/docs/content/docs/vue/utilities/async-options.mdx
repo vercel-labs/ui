@@ -51,7 +51,7 @@ The second argument sets the starting behavior:
 | `query`     | The starting search text.                               | `""`    |
 | `immediate` | Loads that text as soon as the component mounts.        | `false` |
 
-For initial choices, add `{ immediate: true, debounce: 300 }` after the loader. Until that first load starts, `status` is already `"loading"`, so the list never flashes an empty state. If you set `query`, use the same starting text for the component's `defaultQuery`.
+For initial choices, add `{ immediate: true, debounce: 300 }` after the loader. Until that first load starts, `status` is already `"loading"`, so the list never flashes an empty state. If you set `query`, use the same starting text for the component's `default-query`.
 
 ## Load More
 

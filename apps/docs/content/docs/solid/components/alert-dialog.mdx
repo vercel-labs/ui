@@ -329,7 +329,7 @@ Use `createAlertDialogController<Payload, Result>()` for direct control. `create
 
 Give the dialog a title and a description, and put the least destructive answer first. It follows the [WAI-ARIA alert dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/).
 
-The dialog uses the `alertdialog` role and keeps the rest of the page inert while it's open. Screen readers announce its title and description. A keyboard open focuses the first Close part, so put Cancel first. Escape closes the dialog, but pressing outside never does. [Dialog](./dialog#focus) covers other initial and final focus targets.
+The dialog uses the `alertdialog` role and keeps the rest of the page inert while it's open. Screen readers announce its title and description. Opening it focuses the first Close part, so put Cancel first. A touch open focuses the content instead, so no on-screen keyboard appears. Escape closes the dialog, but pressing outside never does. [Dialog](./dialog#focus) covers other initial and final focus targets.
 
 These behaviors are covered by automated tests:
 

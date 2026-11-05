@@ -165,9 +165,10 @@
 
   /* ─── Layout slots ─── */
 
-  /* Every demo sits centered in the preview; its own content stays start-aligned. */
+  /* Every demo sits centered in the preview; its own content stays start-aligned. A demo
+     wider than the preview starts at its edge and scrolls, instead of spilling past both. */
   :scope > * {
-    align-items: center;
+    align-items: safe center;
   }
 
   [data-slot="stack"] {

@@ -311,7 +311,9 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       bind: (el, { api, store }) => {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
         return bindInternals(el, {
-          value: api.internal.submitted,
+          // A field can disable it without the `disabled` attribute the browser
+          // leaves a control out of the form by, so disabled it submits nothing.
+          value: () => (isDisabled(store.get()) ? null : api.internal.submitted()),
           state: () => String(store.get().value ?? ""),
           restore: api.internal.restore,
           // The input inside validates itself, so the field reports only its value.

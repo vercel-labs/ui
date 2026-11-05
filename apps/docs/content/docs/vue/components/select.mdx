@@ -170,7 +170,7 @@ Set `multiple` to select more than one value. The value becomes an array, and ch
 
 Add `SelectSelectAll` to select or clear every enabled item. It shows a mixed state when only some are selected. Inside a `SelectGroup`, it applies to that group.
 
-`<SelectValue :max-labels="2">` shows up to two labels and summarizes the remaining values. `getMoreLabel` lets you write that summary.
+`<SelectValue :max-labels="2">` shows up to two labels and summarizes the remaining values. `get-more-label` lets you write that summary.
 
 <ComponentExample
   name="select/select-all"
@@ -196,7 +196,7 @@ Groups with no matching items hide automatically. `SelectItemText` can highlight
   caption="Open Country and type “ja”. Only Asia Pacific and Japan remain. Try “zz” to see the empty message, then clear the search to show every country."
 />
 
-Arrow keys move the highlight while focus stays in the search field. On a touch screen reader, focus moves into the items instead. To show recent choices before a search, pass `emptyItems` alongside `items`. [Lists and Menus](../lists-and-menus#search-and-load-items) covers filtering options.
+Arrow keys move the highlight while focus stays in the search field. On a touch screen reader, focus moves into the items instead. To show recent choices before a search, pass `empty-items` alongside `items`. [Lists and Menus](../lists-and-menus#search-and-load-items) covers filtering options.
 
 ## Async Search
 
@@ -213,11 +213,11 @@ This example uses [Async Options](../utilities/async-options) to replace stale r
 
 A value can be an object. Tell Select how to identify it, display it, and compare it with another copy:
 
-| Prop                 | What It Does                                                          |
-| -------------------- | --------------------------------------------------------------------- |
-| `itemToValue`        | Returns the string used to identify and submit the value.             |
-| `itemToLabel`        | Returns the text shown in the trigger.                                |
-| `isItemEqualToValue` | Matches an item with a selected value that may be a different object. |
+| Prop                     | What It Does                                                          |
+| ------------------------ | --------------------------------------------------------------------- |
+| `item-to-value`          | Returns the string used to identify and submit the value.             |
+| `item-to-label`          | Returns the text shown in the trigger.                                |
+| `is-item-equal-to-value` | Matches an item with a selected value that may be a different object. |
 
 <ComponentExample
   name="select/object-values"

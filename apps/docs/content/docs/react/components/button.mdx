@@ -181,7 +181,7 @@ Set `type="submit"` to submit a form or `type="reset"` to restore its default va
   caption="Edit the email and choose Subscribe, or press Enter in the field. The console logs each submission, and Reset restores the original email."
 />
 
-Button tracks the Promise returned by its own `onClick`. An async form submission needs its own pending state; see [Forms](/docs/react/forms).
+Button tracks the Promise returned by its own `onClick`, not one from the form’s submit handler. For an async submit handler, keep your own pending flag and set `disabled` on the button while it runs, with [`focusableWhenDisabled`](#focusable-when-disabled) so the button keeps focus while it waits.
 
 ## Styling
 

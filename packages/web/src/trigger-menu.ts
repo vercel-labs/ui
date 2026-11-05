@@ -60,6 +60,8 @@ function defineTriggerMenuElements() {
       },
       state: popupState,
       api: ["isOpen", "setOpen", "open", "close", "getQuery", "getMatch", "insert", "focus"],
+      // The field's own `select`, for selected text, bubbles up here.
+      events: { onSelect: "itemselect" },
       portal: popupPortal,
       // Data items follow the trigger, the level and the query.
       render(el, { api, subscribe }) {
@@ -94,20 +96,20 @@ function tokenInputEditor(el: HTMLElement) {
 // Items a data menu rendered, and the data each list last rendered.
 const generatedItems = new WeakSet<Element>()
 const rendered = new WeakMap<Element, unknown>()
-const generated = new WeakMap<HTMLElement, HTMLElement>()
+// Remembered, since a container moves the content away.
+const contents = new WeakMap<HTMLElement, Element>()
 
 // The current trigger's data items, in a list without items of its own. A
 // menu without content gets one.
 function renderData(el: HTMLElement, api: TriggerMenuApi) {
-  const markup = el.querySelector(":scope > ui-trigger-menu-content")
   const template = templateOf(el)
-  let content = markup ?? generated.get(el)
+  let content = el.querySelector(":scope > ui-trigger-menu-content") ?? contents.get(el)
   if (!content) {
     content = copy(template, "ui-trigger-menu-content", false)
     content.append(copy(template, "ui-trigger-menu-list", false))
-    generated.set(el, content as HTMLElement)
     el.append(content)
   }
+  contents.set(el, content)
   const list = content.querySelector("ui-trigger-menu-list")
   if (!list) return
   // Items of its own, in groups too, keep a list from rendering data.

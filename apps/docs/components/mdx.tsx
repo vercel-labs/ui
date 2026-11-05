@@ -43,9 +43,14 @@ function heading(Tag: "h2" | "h3" | "h4", className: string) {
 }
 
 function InlineCode(props: ComponentProps<"code">) {
+  // Long code, like a file path, still has to wrap on a phone.
+  const short = typeof props.children === "string" && props.children.length <= 30
   return (
     <code
-      className="rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.15em] font-mono text-[0.85em] text-foreground"
+      className={cn(
+        "rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.15em] font-mono text-[0.85em] text-foreground",
+        short && "whitespace-nowrap",
+      )}
       {...props}
     />
   )

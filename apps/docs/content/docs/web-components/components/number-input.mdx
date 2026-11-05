@@ -82,7 +82,7 @@ Use `min` and `max` to set bounds. A step button disables at its bound. Typed va
 
 ## Step and Large Step
 
-`step` sets the usual increment, and defaults to 1. Steps are measured from `min`, or from zero when no minimum is set. Shift, Page Up and Page Down use `large-step`, ten steps by default, and Alt (Option) with an arrow key uses `small-step`, a tenth of a step. [Keyboard](#keyboard) lists every key.
+`step` sets the usual increment, and defaults to 1. Steps are measured from `min`, or from zero when no minimum is set. When they don't land on `max`, End and the increment button stop at the highest step below it, so stepping keeps the value on the step grid, as [Slider](./slider#step-and-bounds) does. Shift, Page Up and Page Down use `large-step`, ten steps by default, and Alt (Option) with an arrow key uses `small-step`, a tenth of a step. [Keyboard](#keyboard) lists every key.
 
 <ComponentExample
   name="number-input/step"

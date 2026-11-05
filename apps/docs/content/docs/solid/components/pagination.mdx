@@ -131,7 +131,7 @@ A step at its end loses its `href` and leaves the tab order, but keeps focus if 
 
 ## Router Links
 
-Render your router's link to page on the client. Pass it to `render`, like `render={(props) => <A {...props} />}`; it receives the part's props, `href` included. The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
+Render your router's link to page on the client. Pass it to `render`, like `render={(props) => <A {...props} />}`; it receives the part's props, with the `href` from [`getHref`](#links). The pagination's click handler runs first: when a change is canceled or a step is at its end, it calls `preventDefault()`, and the router leaves the link alone.
 
 Read the page from the URL, like your router's search params, so the route [controls](#controlled) the pagination.
 

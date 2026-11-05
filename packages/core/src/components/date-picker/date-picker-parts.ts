@@ -71,11 +71,14 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       "data-readonly": state.readOnly ? "" : undefined,
       "data-invalid": invalidAt(state, 0) || invalidAt(state, 1) ? "" : undefined,
     }),
+    // A field can disable it without the `disabled` attribute the browser
+    // leaves a control out of the form by, so disabled it submits and
+    // validates nothing.
     bind(el, { api, store }) {
       const cleanups = [
         api.internal.bindRoot(el),
         bindInternals(el, {
-          value: api.internal.submitted,
+          value: () => (isDisabled(store.get()) ? null : api.internal.submitted()),
           state: () => valueKey(store.get().value),
           restore: api.internal.restore,
           valueMissing: () => false,
@@ -83,7 +86,7 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           // Text that isn't a date is a bad input, like a native date input's.
           invalid: () => {
             const state = store.get()
-            if (!invalidAt(state, 0) && !invalidAt(state, 1)) return undefined
+            if (isDisabled(state) || (!invalidAt(state, 0) && !invalidAt(state, 1))) return undefined
             return {
               flags: { badInput: true },
               message: invalidDateMessage,

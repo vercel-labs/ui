@@ -141,6 +141,13 @@ describe("custom elements manifest", () => {
     })
   })
 
+  test("names a renamed event as the define call does", () => {
+    const menu = declarations().find((declaration) => declaration.tagName === "ui-trigger-menu")!
+    const names = menu.events.map((event) => event.name)
+    expect(names).toContain("itemselect")
+    expect(names).not.toContain("select")
+  })
+
   test("VS Code's data has the same tags and attributes", () => {
     const byTag = (a: [string, string[]], b: [string, string[]]) => a[0].localeCompare(b[0])
     expect(

@@ -145,7 +145,7 @@ With `dismissible` false, Escape, outside presses, back gestures, and swipes lea
 
 Set `modalAbove` when the page should stay usable beside a small sheet. At or below that point there is no dim, inert page, scroll lock, or `aria-modal`. Above it, `modal` applies. The switch happens when the drawer settles and does not move focus; `data-interactive` exposes the usable-page state.
 
-`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A non-modal drawer closes on an outside press only when `closeOnOutsidePress` is enabled.
+`modal` has the same choices as [Dialog](./dialog#modal): `true` blocks the page, `"trap-focus"` keeps Tab inside while leaving the page usable, and `false` allows focus to leave. A click on the page also closes a `"trap-focus"` drawer, while a non-modal drawer closes on an outside press only when `closeOnOutsidePress` is enabled.
 
 <ComponentExample
   name="drawer/non-modal"
@@ -163,7 +163,7 @@ A drawer opened inside another joins its stack. Escape and outside presses affec
 
 ## Forms
 
-A Close part’s `action` can return a Promise. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Dialog’s async actions](./dialog#forms) for the shared pending and error contract.
+A Close part’s `action` can return a Promise. The sheet stays open while it runs, including through Escape or a swipe. A rejection leaves the action’s error state available for a retry. See [Alert Dialog’s async action](./alert-dialog#async-action) for the shared pending and error contract.
 
 `keepMounted` preserves unfinished fields, and `finalFocus` returns focus to the updated profile.
 
@@ -264,7 +264,7 @@ Override part of `sheetPhysics.ios` with `physics` to tune the pointer driver: `
 
 `themeColor` dims an existing `<meta name="theme-color">` with the backdrop, so the browser's toolbars can follow it; pages without that tag are left alone. `persistentElements` keeps selected elements usable while the drawer is modal: an array of elements or selectors, or a function returning elements. Something that must stay above the backdrop also needs its own top-layer surface.
 
-Drawers render in place and use the top layer. `container` moves the backdrop and viewport elsewhere, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups).
+Drawers render in place and use the top layer. `container` moves the backdrop and viewport elsewhere, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups#mounting-and-containers).
 
 ```tsx
 <Drawer themeColor persistentElements={["#chat-launcher"]}>

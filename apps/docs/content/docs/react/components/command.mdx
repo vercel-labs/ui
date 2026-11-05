@@ -204,7 +204,7 @@ The highlighted command, search text, and page stack are separate:
 | `query` | The search text.                    | `onQueryChange`     |
 | `pages` | An array of page values.            | `onPagesChange`     |
 
-Supply a value and its change callback to control it, or use `defaultValue`, `defaultQuery`, and `defaultPages` for starting state. Change callbacks receive details; call `details.cancel()` to reject a change. `onAction` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
+Supply a value and its change callback to control it, or use `defaultValue`, `defaultQuery`, and `defaultPages` for starting state. Change callbacks receive details; call `details.cancel()` to reject a change. `value` is the highlighted command, not a chosen one, and it changes as the highlight moves. `onAction` reports activation, so moving the highlight alone does not run a command. [State and Events](../state-and-events) covers the shared binding pattern.
 
 <ComponentExample
   name="command/controlled"

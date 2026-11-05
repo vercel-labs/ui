@@ -62,14 +62,23 @@ function ExamplePreview({
     const base = `/examples/${frameworks[framework].example}`
     let cleanup = () => {}
     let cancelled = false
-    Promise.all([load(`${base}/${name}.js`), load(`${base}/mount.js`)])
+    const url = `${base}/${name}.js`
+    Promise.all([load(url), load(`${base}/mount.js`)])
       .then(([module, { mount }]: [unknown, { mount: Mount }]) => {
         if (cancelled || !host.current) return
         cleanup = mount(module, host.current)
       })
-      .catch((error) => {
-        console.error(`The ${name} example didn't load. Run \`pnpm --filter examples build\`.`, error)
-      })
+      // Safari also rejects imports cut short by leaving the page, so only a missing file means
+      // the examples need building.
+      .catch((error) =>
+        fetch(url, { method: "HEAD" }).then((response) => {
+          if (cancelled) return
+          if (!response.ok)
+            console.error(`The ${name} example isn't built. Run \`pnpm --filter examples build\`.`)
+          else console.error(`The ${name} example didn't load.`, error)
+        }),
+      )
+      .catch(() => {})
     return () => {
       cancelled = true
       cleanup()
@@ -80,7 +89,7 @@ function ExamplePreview({
     <div
       data-example={name}
       className={cn(
-        "flex min-w-0 flex-1 flex-col items-center justify-center px-6 text-foreground sm:px-10",
+        "flex min-w-0 flex-1 flex-col items-center justify-center overflow-x-auto px-6 text-foreground sm:px-10",
         compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
       )}
     >

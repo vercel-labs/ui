@@ -12,6 +12,21 @@
   }
 }
 
+/* A tap target at least 32px square around a smaller control, without changing how it looks or
+   where it sits. */
+@utility hit-area {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 2rem);
+    height: max(100%, 2rem);
+    translate: -50% -50%;
+  }
+}
+
 @utility container {
   margin-inline: auto;
   width: 100%;
@@ -168,6 +183,10 @@ html {
   min-width: 100%;
   padding-block: 0;
   padding-inline: var(--pad-start) var(--code-pad);
+}
+
+[data-code-frame]:has(> [data-copy-float]) pre code {
+  padding-inline-end: calc(var(--code-pad) + 2.5rem);
 }
 
 [data-code-frame] pre[data-text] {

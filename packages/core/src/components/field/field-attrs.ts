@@ -126,7 +126,8 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
   let gave: { el: Element; name: string | undefined } | undefined
   const write = () => {
     const control = current
-    if (!control || control.isConnected === false || api.internal.hasControlPart()) return
+    // A control moved out, maybe into another field, is no longer this one's to write.
+    if (!control || !root.contains(control) || api.internal.hasControlPart()) return
     const state = store.get()
     const describedBy = (control.getAttribute("aria-describedby") ?? "")
       .split(/\s+/)

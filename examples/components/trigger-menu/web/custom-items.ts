@@ -55,8 +55,8 @@ function mount(root: HTMLElement) {
       insert: (item) => `@${item.label.split(" ")[0]} `,
     },
   ]
-  menu.addEventListener("select", (event) => {
-    if (event.target === menu && event.detail.value === "here") event.detail.insert("@here ")
+  menu.addEventListener("itemselect", (event) => {
+    if (event.detail.value === "here") event.detail.insert("@here ")
   })
 }
 

@@ -128,7 +128,7 @@ A disabled combobox cannot be focused or changed and submits nothing. A read-onl
 
 ## Clear and Trigger
 
-`ComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. Clearing the text by hand also clears a single selection. Escape brings the selection back while the list is still open.
+`ComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. Deleting all the text by hand clears a single selection at once, not when the list closes. Escape brings the selection back while the list is still open; closing it any other way leaves it cleared.
 
 <ComponentExample
   name="combobox/clear"
@@ -241,7 +241,7 @@ Use `item-to-value` for an object’s string identity and form value, `item-to-l
 
 Add `multiple` to make the value an array. Choosing an option toggles it, keeps the list open, and clears the query. Put `ComboboxValue` and the input inside `ComboboxChips`, then render each value as a chip with a removal button.
 
-Backspace in an empty input removes the last chip. Arrow keys move between chips. Supply `item-to-label` when starting with values whose labels are not yet known from rendered items.
+Backspace in an empty input removes the last chip in one press. Unlike [Token Input](./token-input#deleting-tokens), there is no `token-deletion` option to select it first. Arrow keys move between chips. Supply `item-to-label` when starting with values whose labels are not yet known from rendered items.
 
 Add `keep-query` to choose several matches without retyping the query.
 

@@ -115,7 +115,7 @@ A trigger's `items` can be a loader, called with the query and an `AbortSignal` 
 
 ## Custom Items
 
-Compose `ui-trigger-menu-item`s with any content, in groups. `label` is what's matched and inserted, `keywords` adds words to match, and `disabled` keeps an item in the list without letting it be chosen. A trigger's `spaces`, `pattern` and `maxLength` decide what its query may hold, `filter` how it narrows the items, and `insert` what replaces the trigger and query. The menu's `select` event names the chosen item first and can insert something else with `event.detail.insert()`.
+Compose `ui-trigger-menu-item`s with any content, in groups. `label` is what's matched and inserted, `keywords` adds words to match, and `disabled` keeps an item in the list without letting it be chosen. A trigger's `spaces`, `pattern` and `maxLength` decide what its query may hold, `filter` how it narrows the items, and `insert` what replaces the trigger and query. The menu's `itemselect` event names the chosen item first and can insert something else with `event.detail.insert()`.
 
 <ComponentExample
   name="trigger-menu/custom-items"
@@ -372,7 +372,7 @@ The element's `api` property has the same methods. Or create one with `createTri
 
 ### Events
 
-Events fire on `<ui-trigger-menu>` and don't bubble, with the new state in `event.detail.value` and the details beside it. An item's `select` fires on the menu too.
+Events fire on `<ui-trigger-menu>` and don't bubble, with the new state in `event.detail.value` and the details beside it. Choosing an item fires `itemselect` on the menu, not `select`, which the field fires for selected text.
 
 | Member                     | On                | Description                                                                                          |
 | -------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------- |
@@ -384,9 +384,9 @@ Events fire on `<ui-trigger-menu>` and don't bubble, with the new state in `even
 | `openchangecomplete` event | `ui-trigger-menu` | `detail: { value: open }`, after the animation                                                       |
 | `querychange` event        | `ui-trigger-menu` | `detail: { value: query, reason, trigger, argument }`: the text after the trigger, and the argument  |
 | `dismissattempt` event     | `ui-trigger-menu` | `detail: { reason, event }`, when a dismissal was refused                                            |
-| `select` event             | `ui-trigger-menu` | `detail: { value, arguments, insert(), waitUntil(promise) }`. `preventDefault()` skips the insertion |
+| `itemselect` event         | `ui-trigger-menu` | `detail: { value, arguments, insert(), waitUntil(promise) }`. `preventDefault()` skips the insertion |
 
-When a `select` listener passes a Promise to `event.detail.waitUntil()` and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so people keep typing.
+When an `itemselect` listener passes a Promise to `event.detail.waitUntil()` and the editor takes tokens, the token is inserted at once with `data-pending`, updated with what the Promise resolves to, and removed if it rejects. The menu closes either way, so people keep typing.
 
 ## Accessibility
 

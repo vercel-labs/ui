@@ -33,6 +33,9 @@ function defineNumberInputElements() {
       formAssociated: true,
       // The framework adapters pass it, never an attribute or a property.
       kinds: { controlId: null },
+      // A disabled <ui-field> around it disables it, as a disabled Field does
+      // in the other frameworks.
+      options: (el) => ({ ...(el.closest("ui-field")?.hasAttribute("disabled") && { disabled: true }) }),
       state: {
         value: {
           get: (api: NumberInputApi) => api.getValue(),

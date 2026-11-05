@@ -44,7 +44,7 @@ function MobileNav({
         target="_blank"
         rel="noreferrer"
         aria-label="Vercel"
-        className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+        className="hit-area rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
       >
         <VercelLogo className="h-[18px] w-auto" />
       </a>
@@ -54,7 +54,7 @@ function MobileNav({
       <Link
         href="/"
         aria-label="ui-sdk home"
-        className="rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
+        className="hit-area rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
       >
         <Logo className="h-[18px] w-auto" />
       </Link>

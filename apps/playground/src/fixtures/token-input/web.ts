@@ -50,7 +50,7 @@ async function mount(root: HTMLElement) {
   if (value) input.setAttribute("value", value)
   const menu = root.querySelector("ui-trigger-menu")!
   menu.triggers = tokenTriggers()
-  menu.addEventListener("select", (event) => {
+  menu.addEventListener("itemselect", (event) => {
     if (pending && event.detail.trigger === "@") event.detail.waitUntil(pendingSelect({ fail }))
   })
   const output = (name: string) => root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!

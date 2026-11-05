@@ -40,7 +40,7 @@ function ExportRows({ label, entries }: { label: string; entries: CoreExport[] }
 function CoreEntries() {
   return (
     <Frame variant="flat" className="my-6 overflow-x-auto">
-      <table className="w-full border-collapse text-start text-sm [&_tr:last-child>td]:border-0">
+      <table className="w-full border-collapse text-start text-[15px] sm:text-sm [&_tr:last-child>td]:border-0">
         <thead>
           <tr>
             <th className={th}>Entry</th>

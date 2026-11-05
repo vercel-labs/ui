@@ -1,9 +1,9 @@
 const frameworks = {
-  react: { label: "React", example: "react", ext: "tsx", lang: "tsx" },
-  vue: { label: "Vue", example: "vue", ext: "vue", lang: "vue" },
-  svelte: { label: "Svelte", example: "svelte", ext: "svelte", lang: "svelte" },
-  "web-components": { label: "Web Components", example: "web", ext: "ts", lang: "ts" },
-  solid: { label: "Solid", example: "solid", ext: "tsx", lang: "tsx" },
+  react: { label: "React", short: "React", example: "react", ext: "tsx", lang: "tsx" },
+  vue: { label: "Vue", short: "Vue", example: "vue", ext: "vue", lang: "vue" },
+  svelte: { label: "Svelte", short: "Svelte", example: "svelte", ext: "svelte", lang: "svelte" },
+  "web-components": { label: "Web Components", short: "Web", example: "web", ext: "ts", lang: "ts" },
+  solid: { label: "Solid", short: "Solid", example: "solid", ext: "tsx", lang: "tsx" },
 } as const
 
 type Framework = keyof typeof frameworks

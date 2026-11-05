@@ -3,6 +3,8 @@ title: Meter
 description: Show a measurement within a known range, such as storage used or an account quota.
 ---
 
+Use a Meter for a value within a known range, such as storage used, a battery level or an account quota. It fills a track to show the value, and screen readers announce the same value.
+
 <ComponentExample
   name="meter/basic"
   caption="Read the storage meter. The label names it, and both the visible value and screen reader value report 68%."
@@ -88,7 +90,7 @@ Each part keeps the behavior, state and data attributes of its ready-made counte
 
 ## Bounds
 
-`min` and `max` set the range. They default to 0 and 100, and values outside the range are clamped. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
+`min` and `max` set the range. They default to 0 and 100. A value outside the range is clamped for the fill, the percentage and `aria-valuenow`, but the state's `value` and a format other than percent keep it as you passed it. Here, 720 sits about 76% of the way from 300 to 850. Decimal formatting keeps the visible value as 720.
 
 <ComponentExample
   name="meter/min-max"

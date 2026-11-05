@@ -61,6 +61,10 @@ const checks: Record<string, Check> = {
     await item(preview, "Dialog").click()
     await expect(item(preview, "Dialog")).toHaveAttribute("aria-current", "page")
     expect(preview.page().url()).toBe(url)
+    // A link row the keyboard reaches shows the focus ring, whatever element the link sits in.
+    await preview.page().keyboard.press("ArrowDown")
+    const label = item(preview, "Tree").locator('[data-slot="tree-label"]')
+    await expect(label).not.toHaveCSS("box-shadow", "none")
   },
   disabled: async (preview, framework) => {
     await roves("Plans")(preview, framework)

@@ -45,6 +45,29 @@ describe("searchIndex", () => {
     ])
   })
 
+  test("lists a heading once, and not when it repeats the page title", () => {
+    const menubar = createSearchIndex([
+      {
+        url: "/docs/react/components/menubar",
+        title: "Menubar",
+        headings: [
+          { id: "controller", content: "Controller" },
+          { id: "data-attributes-menubar", content: "Menubar" },
+          { id: "menubar", content: "Menubar" },
+          { id: "controller-1", content: "Controller" },
+        ],
+        contents: [],
+      },
+    ])
+    expect(searchIndex(menubar, "menubar").map((result) => result.url)).toEqual([
+      "/docs/react/components/menubar",
+    ])
+    expect(searchIndex(menubar, "controller").map((result) => result.url)).toEqual([
+      "/docs/react/components/menubar",
+      "/docs/react/components/menubar#controller",
+    ])
+  })
+
   test("finds nothing for an empty query", () => {
     expect(searchIndex(index, "  ")).toEqual([])
   })
