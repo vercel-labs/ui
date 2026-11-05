@@ -6,6 +6,7 @@
     "react",
     "ui",
     "ui-sdk",
+    "shadcn",
     "behaviors",
     "accessibility",
     "a11y",
