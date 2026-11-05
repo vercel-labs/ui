@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import {
   SegmentedControl,
   SegmentedControlIndicator,
@@ -7,10 +8,13 @@ import {
 </script>
 
 <template>
-  <SegmentedControl aria-label="Vertical alignment" orientation="vertical" default-value="middle">
-    <SegmentedControlIndicator />
-    <SegmentedControlItem value="top">Top</SegmentedControlItem>
-    <SegmentedControlItem value="middle">Middle</SegmentedControlItem>
-    <SegmentedControlItem value="bottom">Bottom</SegmentedControlItem>
-  </SegmentedControl>
+  <Field>
+    <FieldLabel>Vertical alignment</FieldLabel>
+    <SegmentedControl orientation="vertical" default-value="middle">
+      <SegmentedControlIndicator />
+      <SegmentedControlItem value="top">Top</SegmentedControlItem>
+      <SegmentedControlItem value="middle">Middle</SegmentedControlItem>
+      <SegmentedControlItem value="bottom">Bottom</SegmentedControlItem>
+    </SegmentedControl>
+  </Field>
 </template>

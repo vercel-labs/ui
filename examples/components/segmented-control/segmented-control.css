@@ -2,7 +2,6 @@
   [data-slot="segmented-control-root"] {
     position: relative;
     display: inline-flex;
-    align-self: flex-start;
     gap: 2px;
     padding: 2px;
     border-radius: calc(var(--radius-control) + 2px);
@@ -11,6 +10,18 @@
 
     &[data-orientation="vertical"] {
       flex-direction: column;
+    }
+
+    [data-slot="field-root"] > & {
+      display: flex;
+
+      &[data-orientation="vertical"] {
+        align-self: flex-start;
+      }
+
+      &:not([data-orientation="vertical"]) > [data-slot="segmented-control-item"] {
+        flex: 1;
+      }
     }
 
     &[data-disabled] {

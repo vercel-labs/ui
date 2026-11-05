@@ -7,7 +7,7 @@ Use a segmented control to switch between a few views or settings, like List and
 
 <ComponentExample
   name="segmented-control/basic"
-  caption="Choose Grid, then use the arrow keys to move between views."
+  caption="Choose Grid, then use the arrow keys to move between views. The label above names the control, as in any field."
 />
 
 ## Installation
@@ -59,6 +59,8 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 
 `SegmentedControlIndicator` measures the checked item. Position it inside the control and use its [CSS variables](#styling-indicator) to draw the background that slides to the choice. It measures again when an item or the control changes size, and has no box while nothing is checked.
 
+<StyleTabs>
+
 ```css
 [data-slot="segmented-control-root"] {
   position: relative;
@@ -77,6 +79,16 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
   transition-duration: 200ms;
 }
 ```
+
+```tsx
+<SegmentedControl aria-label="View" defaultValue="list" className="relative isolate inline-flex">
+  <SegmentedControlIndicator className="absolute -z-1 top-(--segmented-control-indicator-top) left-(--segmented-control-indicator-left) w-(--segmented-control-indicator-width) h-(--segmented-control-indicator-height) transition-[top,left,width,height] duration-200" />
+  <SegmentedControlItem value="list">List</SegmentedControlItem>
+  <SegmentedControlItem value="grid">Grid</SegmentedControlItem>
+</SegmentedControl>
+```
+
+</StyleTabs>
 
 ## Vertical
 
@@ -113,7 +125,7 @@ Each item renders a hidden native radio, so the control takes part in forms. Set
 
 <ComponentExample
   name="segmented-control/form"
-  caption="Choose Yearly and press Continue. The console logs the submitted value, and Reset returns the choice to Monthly."
+  caption="Choose Dark and Compact, then press Save. The console logs both values, and Reset returns each control to its default."
 />
 
 ## Read-Only

@@ -1,5 +1,6 @@
 "use client"
 
+import { Field, FieldLabel } from "@ui-sdk/react/field"
 import {
   SegmentedControl,
   SegmentedControlIndicator,
@@ -8,12 +9,15 @@ import {
 
 function Example() {
   return (
-    <SegmentedControl aria-label="View" defaultValue="list">
-      <SegmentedControlIndicator />
-      <SegmentedControlItem value="list">List</SegmentedControlItem>
-      <SegmentedControlItem value="grid">Grid</SegmentedControlItem>
-      <SegmentedControlItem value="board">Board</SegmentedControlItem>
-    </SegmentedControl>
+    <Field>
+      <FieldLabel>View</FieldLabel>
+      <SegmentedControl defaultValue="list">
+        <SegmentedControlIndicator />
+        <SegmentedControlItem value="list">List</SegmentedControlItem>
+        <SegmentedControlItem value="grid">Grid</SegmentedControlItem>
+        <SegmentedControlItem value="board">Board</SegmentedControlItem>
+      </SegmentedControl>
+    </Field>
   )
 }
 

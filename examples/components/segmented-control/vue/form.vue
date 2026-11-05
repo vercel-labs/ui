@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
 import {
   SegmentedControl,
   SegmentedControlIndicator,
@@ -10,22 +10,33 @@ import { useLog } from "../../../shared/vue/log"
 const log = useLog()
 
 function submit(event: Event) {
-  log(`Submitted billing=${new FormData(event.currentTarget as HTMLFormElement).get("billing")}`)
+  const data = new FormData(event.currentTarget as HTMLFormElement)
+  log(`Saved theme=${data.get("theme")}, density=${data.get("density")}`)
 }
 </script>
 
 <template>
   <form data-slot="stack" @submit.prevent="submit">
     <Field>
-      <FieldLabel>Billing period</FieldLabel>
-      <SegmentedControl name="billing" required default-value="monthly">
+      <FieldLabel>Theme</FieldLabel>
+      <SegmentedControl name="theme" required default-value="system">
         <SegmentedControlIndicator />
-        <SegmentedControlItem value="monthly">Monthly</SegmentedControlItem>
-        <SegmentedControlItem value="yearly">Yearly</SegmentedControlItem>
+        <SegmentedControlItem value="light">Light</SegmentedControlItem>
+        <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
+        <SegmentedControlItem value="system">System</SegmentedControlItem>
+      </SegmentedControl>
+      <FieldDescription>System follows your device's setting.</FieldDescription>
+    </Field>
+    <Field>
+      <FieldLabel>Density</FieldLabel>
+      <SegmentedControl name="density" default-value="comfortable">
+        <SegmentedControlIndicator />
+        <SegmentedControlItem value="compact">Compact</SegmentedControlItem>
+        <SegmentedControlItem value="comfortable">Comfortable</SegmentedControlItem>
       </SegmentedControl>
     </Field>
     <div data-slot="row">
-      <button type="submit" data-variant="solid">Continue</button>
+      <button type="submit" data-variant="solid">Save</button>
       <button type="reset">Reset</button>
     </div>
   </form>

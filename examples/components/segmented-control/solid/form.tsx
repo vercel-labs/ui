@@ -1,4 +1,4 @@
-import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import {
   SegmentedControl,
   SegmentedControlIndicator,
@@ -14,20 +14,31 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        log(`Submitted billing=${new FormData(event.currentTarget).get("billing")}`)
+        const data = new FormData(event.currentTarget)
+        log(`Saved theme=${data.get("theme")}, density=${data.get("density")}`)
       }}
     >
       <Field>
-        <FieldLabel>Billing period</FieldLabel>
-        <SegmentedControl name="billing" required defaultValue="monthly">
+        <FieldLabel>Theme</FieldLabel>
+        <SegmentedControl name="theme" required defaultValue="system">
           <SegmentedControlIndicator />
-          <SegmentedControlItem value="monthly">Monthly</SegmentedControlItem>
-          <SegmentedControlItem value="yearly">Yearly</SegmentedControlItem>
+          <SegmentedControlItem value="light">Light</SegmentedControlItem>
+          <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
+          <SegmentedControlItem value="system">System</SegmentedControlItem>
+        </SegmentedControl>
+        <FieldDescription>System follows your device's setting.</FieldDescription>
+      </Field>
+      <Field>
+        <FieldLabel>Density</FieldLabel>
+        <SegmentedControl name="density" defaultValue="comfortable">
+          <SegmentedControlIndicator />
+          <SegmentedControlItem value="compact">Compact</SegmentedControlItem>
+          <SegmentedControlItem value="comfortable">Comfortable</SegmentedControlItem>
         </SegmentedControl>
       </Field>
       <div data-slot="row">
         <button type="submit" data-variant="solid">
-          Continue
+          Save
         </button>
         <button type="reset">Reset</button>
       </div>

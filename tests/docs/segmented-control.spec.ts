@@ -30,9 +30,11 @@ testExamples("segmented-control", {
     await expect(preview.getByRole("radio", { name: "Month" })).toBeChecked()
   },
   form: async (preview) => {
-    await expect(preview.getByRole("radiogroup", { name: "Billing period" })).toBeVisible()
-    await preview.getByRole("radio", { name: "Yearly" }).click()
+    await expect(preview.getByRole("radiogroup", { name: "Theme" })).toBeVisible()
+    await preview.getByRole("radio", { name: "Dark" }).click()
+    await preview.getByRole("radio", { name: "Compact" }).click()
     await preview.getByRole("button", { name: "Reset" }).click()
-    await expect(preview.getByRole("radio", { name: "Monthly" })).toBeChecked()
+    await expect(preview.getByRole("radio", { name: "System" })).toBeChecked()
+    await expect(preview.getByRole("radio", { name: "Comfortable" })).toBeChecked()
   },
 })
