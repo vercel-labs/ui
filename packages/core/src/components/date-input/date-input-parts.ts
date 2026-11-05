@@ -252,11 +252,18 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
       if (!segment.editable || !(el instanceof HTMLInputElement)) return
       const type = segment.type as EditableType
       const input = el
+      // iOS scrolls the page to the top when a segment selects its text while
+      // it handles a key, so the selection waits a frame.
+      let frame = 0
+      const select = () => {
+        cancelAnimationFrame(frame)
+        frame = requestAnimationFrame(() => input.matches(":focus") && input.select())
+      }
       // The text is written here, so the framework never fights the caret.
       const write = () => {
         const text = segmentFor(store.get(), type)?.text ?? ""
         if (input.value !== text) input.value = text
-        if (input.matches(":focus")) input.select()
+        if (input.matches(":focus")) select()
       }
       // Digits typed before the page ran fill the segment.
       api.internal.adopt(type, input, input.value)
@@ -270,16 +277,16 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
         api.internal.adopt(type, input, input.value, event)
         write()
       }
-      const onFocus = () => input.select()
       input.addEventListener("beforeinput", onBeforeInput)
       input.addEventListener("input", onInput)
-      input.addEventListener("focus", onFocus)
+      input.addEventListener("focus", select)
       const unsubscribe = store.subscribe(write)
       return () => {
         unsubscribe()
+        cancelAnimationFrame(frame)
         input.removeEventListener("beforeinput", onBeforeInput)
         input.removeEventListener("input", onInput)
-        input.removeEventListener("focus", onFocus)
+        input.removeEventListener("focus", select)
       }
     },
   }),
