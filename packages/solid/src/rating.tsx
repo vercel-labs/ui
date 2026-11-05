@@ -84,7 +84,12 @@ function RatingItem(props: PartProps<"span", RatingItemState>) {
     </For>
   )
   const content = (state: RatingItemState) =>
-    [typeof props.children === "function" ? props.children(state) : props.children, radios] as JSX.Element
+    [
+      typeof props.children === "function" && props.children.length > 0
+        ? props.children(state)
+        : props.children,
+      radios,
+    ] as JSX.Element
   return usePart(rating, "item", () => ({ index: item.index }), merge(rest, { children: content }), "span")
 }
 

@@ -2,7 +2,12 @@ import { isDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+  SlotFactory,
+} from "../../foundation/kernel/primitive-types"
 import type { RadioGroupOptions } from "../radio/radio"
 import { radioGroupApi, radioGroupState, syncRadioGroup, type RadioGroupStore } from "../radio/radio-api"
 import { bindRadioGroup, radioGroupAttrs, radioSlots } from "../radio/radio-parts"
@@ -187,9 +192,22 @@ function itemState(state: RadioGroupStore, index: number) {
   }
 }
 
+type RatingStore = RadioGroupStore & {
+  max: number
+  getValueLabel: RatingOptions["getValueLabel"]
+}
+
+// Labels live in state so a new `getValueLabel` or `max` renames the stars.
+const labelSettings = (options: RatingOptions) => ({
+  max: options.max ?? 5,
+  getValueLabel: options.getValueLabel,
+})
+
+const labelOf = (state: RatingStore, value: number) => (state.getValueLabel ?? defaultLabel)(value, state.max)
+
 const interactive = (state: RadioGroupStore) => !isDisabled(state) && !state.readOnly
 
-function ratingApi(context: PrimitiveContext<RatingOptions, RadioGroupStore, string>) {
+function ratingApi(context: PrimitiveContext<RatingOptions, RatingStore, string>) {
   const { store, options } = context
   const radio = radioGroupApi(
     {
@@ -199,10 +217,6 @@ function ratingApi(context: PrimitiveContext<RatingOptions, RadioGroupStore, str
     },
     slotNames,
   )
-  const label = (value: number) => {
-    const { getValueLabel = defaultLabel, max = 5 } = options()
-    return getValueLabel(value, max)
-  }
   return {
     ...radio,
     getValue: () => scoreOf(radio.getValue()),
@@ -215,7 +229,6 @@ function ratingApi(context: PrimitiveContext<RatingOptions, RadioGroupStore, str
       highlight(key: string | null) {
         if (store.get().highlighted !== key) store.set({ highlighted: key })
       },
-      label,
       max: () => options().max ?? 5,
       partsPerStar: () => partsPerStar(options().step ?? 1),
       values: (index: number) => ratingItemValues(index, options().step ?? 1),
@@ -247,19 +260,22 @@ const ratingPrimitive = /* @__PURE__ */ definePrimitive({
     getValueLabel: "value",
     controller: "value",
   },
-  state: (options: RatingOptions) => radioGroupState(radioOptions(options), { highlighted: null }),
-  sync: (options) => syncRadioGroup(radioOptions(options)),
+  state: (options: RatingOptions): RatingStore => ({
+    ...radioGroupState(radioOptions(options), { highlighted: null }),
+    ...labelSettings(options),
+  }),
+  sync: (options) => ({ ...syncRadioGroup(radioOptions(options)), ...labelSettings(options) }),
   api: ratingApi,
   slots: (slot) => {
     const { item, input } = radioSlots(
-      slot,
+      slot as unknown as SlotFactory<RadioGroupStore, RatingApi>,
       () => ({}),
       (state, key, api) => {
         const parts = api.internal.partsPerStar()
         const value = Number(key)
         const part = Math.round((value - Math.ceil(value) + 1) * parts)
         return {
-          "aria-label": api.internal.label(value),
+          "aria-label": labelOf(state as RatingStore, value),
           // The radios split their star between them, under its icon.
           style: `position:absolute;inset-block:0;inset-inline-start:${((part - 1) / parts) * 100}%;width:${100 / parts}%;margin:0;padding:0;border:0;background:none`,
           // A read-only rating is one image, which names the score itself.
@@ -282,7 +298,7 @@ const ratingPrimitive = /* @__PURE__ */ definePrimitive({
         attrs: (state, { api }) =>
           state.readOnly
             ? {
-                "aria-label": api.internal.label(scoreOf(state.value) ?? 0),
+                "aria-label": labelOf(state, scoreOf(state.value) ?? 0),
                 "data-readonly": "",
                 "data-disabled": isDisabled(state) ? "" : undefined,
                 "data-required": state.required ? "" : undefined,

@@ -6,7 +6,7 @@ import {
   type RatingState,
   type RatingValueChangeReason,
 } from "@ui-sdk/core/rating"
-import { defineComponent, Fragment, h, inject, provide, type InjectionKey, type PropType } from "vue"
+import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
 import { withElement } from "./create-parts"
 import { useFieldControl } from "./field-context"
 import { readOnlyOf } from "./text-control"
@@ -120,7 +120,7 @@ const RatingItem = withElement(
     name: "RatingItem",
     inheritAttrs: false,
     slots: Object as PartSlots<typeof rating, "item">,
-    setup() {
+    setup(_, { slots }) {
       const item = inject(ItemKey, null)
       if (!item) throw new Error("RatingItem must be used inside <Rating>.")
       const radios = () =>
@@ -129,7 +129,7 @@ const RatingItem = withElement(
         )
       return usePart(rating, "item", () => ({ index: item.index }), undefined, {
         tag: "span",
-        hidden: () => h(Fragment, radios()),
+        children: (state) => [slots.default?.({ state }), radios()],
       })
     },
   }),
