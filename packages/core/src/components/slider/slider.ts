@@ -301,9 +301,9 @@ const rangeInputStyle = css({
   "pointer-events": "none",
 })
 
-// The first thumb's input takes the field's id even in a range, whose group
-// is the control: the label renders before the slider knows it's one, and a
-// <label for> can't point at the group. The root takes an id of its own.
+// The first thumb's input takes the field's id even in a range, whose root
+// is the control: the label renders first, and a <label for> can't point at
+// a div. So a range's root takes an id of its own.
 const thumbInputId = (state: State, id: string, index: number) =>
   (index === 0 && state.thumbInputId) || `${id}-thumb-${index}`
 
@@ -358,7 +358,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     root: slot<{}, SliderState>({
       role: "group",
       state: sliderState,
-      attrs: (state, { id }) => ({ id: state.thumbInputId ? `${id}-group` : undefined, ...dataAttrs(state) }),
+      attrs: (state, { id }) => ({
+        id: state.thumbInputId && valuesOf(state.value).length > 1 ? `${id}-group` : undefined,
+        ...dataAttrs(state),
+      }),
       bind: (el, { api, store }) => {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
         return bindInternals(el, {
