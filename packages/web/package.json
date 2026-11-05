@@ -322,6 +322,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-package.mjs && node ../../scripts/build/browser.mjs",
+    "prepack": "cp ../../LICENSE LICENSE",
     "typecheck": "node ../../scripts/tsgo.mjs --noEmit && node ../../scripts/tsgo.mjs --noEmit -p tsconfig.test.json",
     "test": "vitest run"
   },

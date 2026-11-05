@@ -355,6 +355,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-package.mjs",
+    "prepack": "cp ../../LICENSE LICENSE",
     "typecheck": "vue-tsc --noEmit && vue-tsc --noEmit -p test/types",
     "test": "vitest run"
   },

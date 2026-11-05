@@ -423,6 +423,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-svelte-package.mjs",
+    "prepack": "cp ../../LICENSE LICENSE",
     "typecheck": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
     "test": "vitest run"
   },
