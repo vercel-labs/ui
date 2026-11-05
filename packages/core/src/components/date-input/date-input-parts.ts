@@ -159,12 +159,13 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
           restore: api.internal.restore,
           valueMissing: () => {
             const state = store.get()
-            return state.required && state.value === null && !isPartial(state)
+            return state.required && !state.readOnly && state.value === null && !isPartial(state)
           },
           message: () => valueMissingMessage("text"),
           invalid: () => {
             const state = store.get()
-            const problem = isPartial(state) ? "badInput" : problemOf(state)
+            // A read-only control is barred from validation, like a native one.
+            const problem = state.readOnly ? undefined : isPartial(state) ? "badInput" : problemOf(state)
             if (!problem) return undefined
             return {
               flags: { [problem === "unavailable" ? "customError" : problem]: true },
@@ -248,7 +249,7 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
       const write = () => {
         const text = segmentFor(store.get(), type)?.text ?? ""
         if (input.value !== text) input.value = text
-        if (input.ownerDocument.activeElement === input) input.select()
+        if (input.matches(":focus")) input.select()
       }
       // Digits typed before the page ran fill the segment.
       api.internal.adopt(type, input, input.value)

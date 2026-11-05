@@ -6,7 +6,7 @@ import { Field, FieldLabel } from "@ui-sdk/vue/field"
 <template>
   <Field>
     <FieldLabel>Start date</FieldLabel>
-    <DateInput default-value="2026-11-02" v-slot="{ state }">
+    <DateInput v-slot="{ state }" default-value="2026-11-02">
       <template v-for="segment in state.segments" :key="segment.key">
         <DateInputSegment v-if="segment.editable" :segment="segment" />
         <DateInputSegment v-else :segment="segment">–</DateInputSegment>

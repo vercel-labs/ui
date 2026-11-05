@@ -6,7 +6,7 @@
   let {
     which,
     onValueChange,
-  }: { which: "date" | "time" | "field" | "children"; onValueChange?: (value: string | null) => void } = $props()
+  }: { which: "date" | "time" | "field" | "children" | "readonly"; onValueChange?: (value: string | null) => void } = $props()
 
   let time = $state<string | null>("09:30")
 </script>
@@ -16,6 +16,8 @@
 {:else if which === "time"}
   <TimeInput bind:value={time} hourCycle={24} locale="en-US" />
   <output>{time}</output>
+{:else if which === "readonly"}
+  <DateInput readonly defaultValue="2026-11-02" locale="en-US" />
 {:else if which === "field"}
   <Field>
     <FieldLabel>Start date</FieldLabel>

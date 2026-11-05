@@ -23,24 +23,19 @@ type SegmentProps = Omit<PartProps<"input", DateInputSegmentState>, "value" | "d
 type Segmented = typeof dateInput
 
 // The core writes an input's text as it changes, so React only renders where it starts.
-function renderSegment(primitive: Segmented, { segment, render, children, ...props }: SegmentProps) {
+function useSegment(primitive: Segmented, { segment, render, children, ...props }: SegmentProps) {
   const own = { segment, id: segment.key }
-  if (!segment.editable)
-    return usePart(
-      primitive,
-      "segment",
-      own,
-      { ...props, render, children: children ?? segment.text } as object,
-      "span",
-    )
   const input = (merged: Record<string, any>, state: DateInputSegmentState) => {
     const { value, ...rest } = merged
     return renderElement("input", { ...rest, defaultValue: value }, render, state)
   }
-  return usePart(primitive, "segment", own, { ...props, render: input }, "input")
+  const part = segment.editable
+    ? { ...props, render: input }
+    : { ...props, render, children: children ?? segment.text }
+  return usePart(primitive, "segment", own, part as object, segment.editable ? "input" : "span")
 }
 
-function renderRoot(
+function useSegmentedRoot(
   primitive: Segmented,
   instance: ReturnType<typeof usePrimitive<Segmented>>,
   field: ReturnType<typeof useFieldControl>,
@@ -69,4 +64,4 @@ function HiddenInput({ primitive }: { primitive: Segmented }) {
   return usePart(primitive, "hidden-input", {}, {}, "input")
 }
 
-export { renderRoot, renderSegment, type RootProps, type SegmentProps, type Segmented }
+export { useSegment, useSegmentedRoot, type RootProps, type SegmentProps, type Segmented }

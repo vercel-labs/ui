@@ -64,3 +64,13 @@ test("children can render the segments themselves", () => {
   expect(document.querySelector(".segment-month")).toBe(segment("month"))
   expect(document.querySelector(".segment-literal")!.textContent).toBe("/")
 })
+
+test("the native readonly attribute keeps the date as it is", () => {
+  render({ which: "readonly" })
+  segment("day").focus()
+  document.activeElement!.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }),
+  )
+  flushSync()
+  expect(segment("day").value).toBe("02")
+})

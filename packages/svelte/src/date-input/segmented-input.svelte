@@ -16,6 +16,7 @@ names, its segments, and the hidden input the value submits with.
   import { useFieldControl } from "../field/context"
   import { provideInstance } from "../instance"
   import Part from "../part.svelte"
+  import { readOnlyOf } from "../text-control"
   import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
 
   // Time Input's primitive has the same slots and state.
@@ -63,7 +64,7 @@ names, its segments, and the hidden input the value submits with.
     unavailable,
     locale,
     disabled: disabled || field?.disabled(),
-    readOnly,
+    readOnly: readOnlyOf(readOnly, rest),
     required,
     name: name ?? field?.name(),
     form,

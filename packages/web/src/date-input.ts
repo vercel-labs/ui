@@ -38,7 +38,9 @@ function defineSegmented(primitive: typeof dateInput, tag: string, dates: boolea
       state: {
         value: {
           get: (api: DateInputApi) => api.getValue(),
-          set: (api: DateInputApi, value: string | null) => api.setValue(value ?? null),
+          set: (api: DateInputApi, value: string | null) => {
+            if ((value ?? null) !== api.getValue()) api.setValue(value ?? null)
+          },
         },
       },
       api: ["getValue", "setValue", "clear", "focus"],

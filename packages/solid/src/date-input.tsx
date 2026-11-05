@@ -8,7 +8,7 @@ import { usePrimitive } from "./use-primitive"
  * The root: a group of segments the locale orders, like month, day and year,
  * and the hidden input the ISO value submits with. Without children it renders
  * every segment; its children can be a function of its state that renders
- * `state.segments`.
+ * `state.segments` in a keyed `<For>`.
  * @stable
  */
 function DateInput(props: DateInputOptions & RootProps) {

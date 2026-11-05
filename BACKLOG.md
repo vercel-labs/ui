@@ -15,3 +15,6 @@ Open work, bugs and ideas. Add what you find; delete what lands.
 - Calendars other than the Gregorian one, and the locale's own digits.
 - A range: two date inputs that read as one start and end.
 - Date Picker with a segmented input in place of its text input.
+- Changing `hourCycle` or `granularity` while a date is half typed keeps the old clock's fields, and going back to `"day"` keeps submitting the time.
+- Web components: removing the segments, as a page morph does, leaves them gone until the locale or the clock changes.
+- Text typed over a server-rendered value before hydration is reset when the page hydrates. Typing into an empty segment is kept.

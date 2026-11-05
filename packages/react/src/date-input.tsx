@@ -1,6 +1,6 @@
 import { dateInput, type DateInputOptions } from "@ui-sdk/core/date-input"
 import { useFieldControl } from "./field-context"
-import { renderRoot, renderSegment, type RootProps, type SegmentProps } from "./segmented-input"
+import { useSegmentedRoot, useSegment, type RootProps, type SegmentProps } from "./segmented-input"
 import { usePrimitive } from "./use-primitive"
 
 /**
@@ -48,7 +48,7 @@ function DateInput({
     controller,
     debug,
   })
-  return renderRoot(dateInput, instance, field, props, DateInputSegment)
+  return useSegmentedRoot(dateInput, instance, field, props, DateInputSegment)
 }
 
 /**
@@ -57,7 +57,7 @@ function DateInput({
  * @stable
  */
 function DateInputSegment(props: SegmentProps) {
-  return renderSegment(dateInput, props)
+  return useSegment(dateInput, props)
 }
 
 export { createDateInputController } from "@ui-sdk/core/date-input"

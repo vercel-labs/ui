@@ -1,8 +1,8 @@
 import { timeInput, type TimeInputOptions } from "@ui-sdk/core/time-input"
 import { useFieldControl } from "./field-context"
 import {
-  renderRoot,
-  renderSegment,
+  useSegmentedRoot,
+  useSegment,
   type RootProps,
   type Segmented,
   type SegmentProps,
@@ -54,7 +54,7 @@ function TimeInput({
     controller,
     debug,
   })
-  return renderRoot(primitive, instance as never, field, props, TimeInputSegment)
+  return useSegmentedRoot(primitive, instance as never, field, props, TimeInputSegment)
 }
 
 /**
@@ -63,7 +63,7 @@ function TimeInput({
  * @stable
  */
 function TimeInputSegment(props: SegmentProps) {
-  return renderSegment(primitive, props)
+  return useSegment(primitive, props)
 }
 
 export { createTimeInputController } from "@ui-sdk/core/time-input"

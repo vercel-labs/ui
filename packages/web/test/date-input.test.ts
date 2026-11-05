@@ -78,3 +78,28 @@ test("a new granularity renders its segments again", async () => {
   expect(segment("hour")).toBeTruthy()
   expect(segment("minute")).toBeTruthy()
 })
+
+test("writing the value back from valuechange keeps a partly typed date", async () => {
+  mount(`<ui-date-input value="2026-11-02" locale="en-US"></ui-date-input>`)
+  await wait()
+  const root = document.querySelector<UiDateInputElement>("ui-date-input")!
+  root.addEventListener("valuechange", (event) => {
+    const { value } = (event as CustomEvent).detail
+    queueMicrotask(() => (root.value = value))
+  })
+  segment("day").focus()
+  document.activeElement!.dispatchEvent(
+    new InputEvent("beforeinput", { inputType: "deleteContentForward", bubbles: true, cancelable: true }),
+  )
+  await wait()
+  expect([segment("month").value, segment("day").value, segment("year").value]).toEqual(["11", "", "2026"])
+})
+
+test("a read-only input is barred from validation, like a native one", async () => {
+  const setValidity = vi.fn()
+  ElementInternals.prototype.setValidity = setValidity
+  mount(`<form><ui-date-input name="date" required read-only locale="en-US"></ui-date-input></form>`)
+  await wait()
+  const flags = setValidity.mock.calls.at(-1)?.[0] ?? {}
+  expect(Object.values(flags).some(Boolean)).toBe(false)
+})

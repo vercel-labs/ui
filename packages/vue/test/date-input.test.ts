@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { renderToString } from "@vue/server-renderer"
 import { afterEach, expect, test } from "vitest"
-import { createApp, createSSRApp, h, nextTick, ref, type App } from "vue"
+import { createApp, createCommentVNode, createSSRApp, h, nextTick, ref, type App } from "vue"
 import { DateInput, DateInputSegment } from "../src/date-input"
 import { Field, FieldLabel } from "../src/field"
 import { TimeInput } from "../src/time-input"
@@ -89,4 +89,30 @@ test("the default slot can render the segments itself", async () => {
   await nextTick()
   expect(root.querySelector(".segment-month")).toBe(segment(root, "month"))
   expect(root.querySelector(".segment-literal")!.textContent).toBe("/")
+})
+
+test("slots that render nothing fall back to the segments and their text", async () => {
+  const root = mount(() =>
+    h(
+      DateInput,
+      { defaultValue: "2026-11-02", locale: "en-US" },
+      { default: () => [createCommentVNode("v-if")] },
+    ),
+  )
+  await nextTick()
+  expect(root.querySelectorAll('[role="spinbutton"]')).toHaveLength(3)
+  const literal = mount(() =>
+    h(
+      DateInput,
+      { defaultValue: "2026-11-02", locale: "en-US" },
+      {
+        default: ({ state }: { state: { segments: { key: string }[] } }) =>
+          state.segments.map((item) =>
+            h(DateInputSegment, { key: item.key, segment: item }, () => [createCommentVNode("v-if")]),
+          ),
+      },
+    ),
+  )
+  await nextTick()
+  expect(literal.querySelector('[data-type="literal"]')!.textContent).toBe("/")
 })

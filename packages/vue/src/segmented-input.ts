@@ -10,6 +10,7 @@ import type {
   HourCycle,
 } from "@ui-sdk/core/date-input"
 import { defineComponent, h, type ExtractPropTypes, type PropType, type SetupContext } from "vue"
+import { slotContent } from "./children"
 import { useFieldControl } from "./field-context"
 import { withElement } from "./create-parts"
 import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
@@ -79,9 +80,8 @@ function setupRoot(
   return usePart(handle, "root", undefined, undefined, {
     tag: "div",
     children: (state) => [
-      slots.default
-        ? slots.default({ state })
-        : state.segments.map((segment) => h(Segment, { key: segment.key, segment })),
+      slotContent(slots.default, { state }) ??
+        state.segments.map((segment) => h(Segment, { key: segment.key, segment })),
       hidden(),
     ],
     extend: (root) => (field ? field.props(root) : root),
@@ -104,7 +104,7 @@ function defineSegment(primitive: Segmented, name: string) {
           return usePart(useHandle(primitive), "segment", part, undefined, { tag: "input" })
         return usePart(useHandle(primitive), "segment", part, undefined, {
           tag: "span",
-          children: (state) => slots.default?.({ state }) ?? state.text,
+          children: (state) => slotContent(slots.default, { state }) ?? state.text,
         })
       },
     }),

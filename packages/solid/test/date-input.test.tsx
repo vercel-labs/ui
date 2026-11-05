@@ -1,5 +1,5 @@
 import { render } from "@solidjs/web"
-import { createSignal, flush } from "solid-js"
+import { createSignal, flush, For } from "solid-js"
 import { afterEach, expect, test, vi } from "vitest"
 import { DateInput, DateInputSegment } from "../src/date-input"
 import { Field, FieldLabel } from "../src/field"
@@ -83,9 +83,11 @@ test("a field's label names the group and focuses its first segment", () => {
 test("children can render the segments themselves", () => {
   const root = mount(() => (
     <DateInput defaultValue="2026-11-02" locale="en-US">
-      {(state) =>
-        state.segments.map((item) => <DateInputSegment segment={item} class={`segment-${item.type}`} />)
-      }
+      {(state) => (
+        <For each={state.segments} keyed={(item) => item.key}>
+          {(item) => <DateInputSegment segment={item()} class={`segment-${item().type}`} />}
+        </For>
+      )}
     </DateInput>
   ))
   expect(root.querySelector(".segment-month")).toBe(segment(root, "month"))
