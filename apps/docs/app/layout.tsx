@@ -16,6 +16,7 @@ const DESCRIPTION =
   "An open source library of behaviors that an agent can use to build components. Written in TypeScript. Available for all frameworks."
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ui-sdk.dev"),
   title: { default: "UI SDK", template: "%s · UI SDK" },
   description: DESCRIPTION,
   openGraph: {
