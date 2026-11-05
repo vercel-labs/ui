@@ -218,10 +218,11 @@ function adapterEntries(adapter) {
   return entriesOf(adapter)
 }
 
-// Every subpath of an adapter but its root.
+// Every subpath of an adapter but its root. An entry outside `src`, like
+// `@ui-sdk/vue/nuxt`, runs in a build tool, not in an app.
 function entriesOf(adapter) {
   return Object.entries(readManifest(`packages/${adapter}`).exports)
-    .filter(([key]) => key !== ".")
+    .filter(([key, file]) => key !== "." && file.startsWith("./src/"))
     .map(([key, file]) => ({
       name: `@ui-sdk/${adapter}/${key.slice(2)}`,
       file: path.join(root, `packages/${adapter}`, file),
