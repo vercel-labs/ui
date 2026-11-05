@@ -125,6 +125,11 @@ import type {
   SelectValueChangeReason,
 } from "@ui-sdk/core/select"
 import type {
+  ColorPickerController,
+  ColorPickerValueChangeDetails,
+  ColorPickerValueCommitDetails,
+} from "@ui-sdk/core/color-picker"
+import type {
   ComboboxController,
   ComboboxDismissReason,
   ComboboxOpenChangeReason,
@@ -196,6 +201,7 @@ import type { calendar } from "@ui-sdk/core/calendar"
 import type { carousel } from "@ui-sdk/core/carousel"
 import type { checkbox, checkboxGroup } from "@ui-sdk/core/checkbox"
 import type { collapsible } from "@ui-sdk/core/collapsible"
+import type { colorPicker } from "@ui-sdk/core/color-picker"
 import type { combobox } from "@ui-sdk/core/combobox"
 import type { command } from "@ui-sdk/core/command"
 import type { dateInput } from "@ui-sdk/core/date-input"
@@ -1094,6 +1100,27 @@ interface UiSliderElement
 }
 
 /**
+ * The events of `<ui-color-picker>`. `valuechange` fires on every step of a drag, and `valuecommit` once the interaction ends.
+ * @experimental
+ */
+type ColorPickerEvents = {
+  valuechange: UiDetailedChangeEvent<string, ColorPickerValueChangeDetails>
+  valuecommit: UiDetailedChangeEvent<string, ColorPickerValueCommitDetails>
+}
+/**
+ * `<ui-color-picker>`: `value`, the controller's methods on `api`, form members like a native input, and typed events.
+ * @experimental
+ */
+interface UiColorPickerElement
+  extends
+    UiElement<ColorPickerEvents>,
+    FormControlProperties<typeof colorPicker, "api" | "controller" | "value"> {
+  value: string
+  api: ColorPickerController
+  controller?: ColorPickerController
+}
+
+/**
  * The events of `<ui-number-input>`. `valuechange` fires on every change, and `valuecommit` once the interaction ends.
  * @stable
  */
@@ -1628,6 +1655,7 @@ declare global {
     "ui-toolbar": UiToolbarElement
     "ui-menubar": UiMenubarElement
     "ui-select": UiSelectElement
+    "ui-color-picker": UiColorPickerElement
     "ui-combobox": UiComboboxElement
     "ui-command": UiCommandElement
     "ui-autocomplete": UiAutocompleteElement
@@ -2035,6 +2063,17 @@ declare global {
     "ui-select-group-label": UiPartElement<typeof select, "group-label">
     "ui-select-separator": UiPartElement<typeof select, "separator">
     "ui-select-arrow": UiPartElement<typeof select, "arrow">
+    "ui-color-picker-area": UiPartElement<typeof colorPicker, "area", "x" | "y">
+    "ui-color-picker-area-thumb": UiPartElement<typeof colorPicker, "area-thumb">
+    "ui-color-picker-area-canvas": UiPartElement<typeof colorPicker, "area-canvas">
+    "ui-color-picker-slider": UiPartElement<typeof colorPicker, "slider", "channel" | "orientation">
+    "ui-color-picker-slider-thumb": UiPartElement<typeof colorPicker, "slider-thumb">
+    "ui-color-picker-input": UiPartElement<typeof colorPicker, "input">
+    "ui-color-picker-channel-input": UiPartElement<typeof colorPicker, "channel-input", "channel">
+    "ui-color-picker-swatch": UiPartElement<typeof colorPicker, "swatch">
+    "ui-color-picker-eye-dropper": UiPartElement<typeof colorPicker, "eye-dropper">
+    "ui-color-picker-swatches": UiPartElement<typeof colorPicker, "swatches">
+    "ui-color-picker-swatch-item": UiPartElement<typeof colorPicker, "swatch-item", "value">
     "ui-slider-control": UiPartElement<typeof slider, "control">
     "ui-slider-track": UiPartElement<typeof slider, "track">
     "ui-slider-indicator": UiPartElement<typeof slider, "indicator">
@@ -2154,6 +2193,7 @@ export {
   type CheckboxEvents,
   type CheckboxGroupEvents,
   type CollapsibleEvents,
+  type ColorPickerEvents,
   type ComboboxEvents,
   type CommandEvents,
   type DateInputEvents,
@@ -2200,6 +2240,7 @@ export {
   type UiCheckboxElement,
   type UiCheckboxGroupElement,
   type UiCollapsibleElement,
+  type UiColorPickerElement,
   type UiComboboxElement,
   type UiCommandElement,
   type UiDateInputElement,

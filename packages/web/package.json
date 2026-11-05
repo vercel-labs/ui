@@ -15,6 +15,7 @@
     "./carousel": "./src/entries/carousel.ts",
     "./checkbox": "./src/entries/checkbox.ts",
     "./collapsible": "./src/entries/collapsible.ts",
+    "./color-picker": "./src/entries/color-picker.ts",
     "./combobox": "./src/entries/combobox.ts",
     "./command": "./src/entries/command.ts",
     "./date-picker": "./src/entries/date-picker.ts",
@@ -118,6 +119,10 @@
       "./collapsible": {
         "types": "./dist/entries/collapsible.d.ts",
         "default": "./dist/entries/collapsible.js"
+      },
+      "./color-picker": {
+        "types": "./dist/entries/color-picker.d.ts",
+        "default": "./dist/entries/color-picker.js"
       },
       "./combobox": {
         "types": "./dist/entries/combobox.d.ts",

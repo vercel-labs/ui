@@ -585,6 +585,8 @@
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],
     [data-slot="toolbar-input"],
+    [data-slot="color-picker-input"],
+    [data-slot="color-picker-channel-input"],
     :where(input):not(
       [data-slot],
       [type="checkbox"],
@@ -798,6 +800,7 @@
     :where(button):not([data-slot]):where(:not([data-slot="input-group"] > *)),
     [data-slot="menu-trigger"]:where(:not([data-slot="menu-content"] *)),
     [data-slot="popover-trigger"],
+    [data-slot="color-picker-eye-dropper"],
     [data-slot="popover-close"]:where(:not(a)),
     [data-slot="select-trigger"],
     [data-slot="select-clear"],

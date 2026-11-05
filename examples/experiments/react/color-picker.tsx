@@ -63,7 +63,7 @@ type ColorPickerRootState = { color: Hsv; hex: string }
 type ColorPickerSwatchState = { selected: boolean }
 
 const colorPicker = /* @__PURE__ */ definePrimitive({
-  name: "color-picker",
+  name: "hsv-picker",
   options: { color: "value", defaultColor: "value", onColorChange: "callback" },
   state: (options: ColorPickerOptions): ColorPickerState => ({
     color: options.color ?? options.defaultColor ?? { h: 0, s: 0, v: 0 },

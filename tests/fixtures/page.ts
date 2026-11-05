@@ -85,6 +85,23 @@ function segmentedControlOptions() {
   }
 }
 
+// Color picker options a spec can set through the URL: ?default=<color>,
+// ?space=oklch, ?gamut=false or p3, ?format=<format>, ?disabled, ?readonly,
+// and ?cancel cancels every change.
+function colorPickerOptions() {
+  const params = new URLSearchParams(location.search)
+  const gamut = params.get("gamut")
+  return {
+    defaultValue: params.get("default") ?? "#3b82f6",
+    disabled: params.has("disabled"),
+    readOnly: params.has("readonly"),
+    cancel: params.has("cancel"),
+    ...(params.get("space") && { space: params.get("space") as "hsv" | "hsl" | "srgb" | "oklch" }),
+    ...(params.get("format") && { format: params.get("format") as "hex" }),
+    ...(gamut && { gamut: gamut === "false" ? (false as const) : (gamut as "srgb" | "p3") }),
+  }
+}
+
 // Accordion options a spec can set through the URL: ?multiple&collapsible=false.
 // ?default=none renders without a default value, ?keep-mounted and
 // ?hidden-until-found keep closed panels, ?disabled disables the root and
@@ -169,6 +186,7 @@ function treeOptions() {
 }
 
 export {
+  colorPickerOptions,
   accordionOptions,
   applyFixtureOptions,
   changedValue,

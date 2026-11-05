@@ -48,6 +48,7 @@
     "./autocomplete": "./src/components/autocomplete/autocomplete.ts",
     "./input": "./src/components/input/input.ts",
     "./slider": "./src/components/slider/slider.ts",
+    "./color-picker": "./src/components/color-picker/color-picker.ts",
     "./number-input": "./src/components/number-input/number-input.ts",
     "./file-input": "./src/components/file-input/file-input.ts",
     "./trigger-menu": "./src/components/trigger-menu/trigger-menu.ts",
@@ -243,6 +244,10 @@
       "./slider": {
         "types": "./dist/components/slider/slider.d.ts",
         "default": "./dist/components/slider/slider.js"
+      },
+      "./color-picker": {
+        "types": "./dist/components/color-picker/color-picker.d.ts",
+        "default": "./dist/components/color-picker/color-picker.js"
       },
       "./number-input": {
         "types": "./dist/components/number-input/number-input.d.ts",

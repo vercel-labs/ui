@@ -71,6 +71,28 @@ const components: Record<string, Component> = {
     examples: "toast",
     types: ["ConfirmOptions"],
   },
+  "color-picker": {
+    source: "color-picker/color-picker.ts",
+    examples: "color-picker",
+    types: [
+      "ColorPickerOptions",
+      "ColorPickerAreaProps",
+      "ColorPickerSliderProps",
+      "ColorPickerChannelInputProps",
+      "ColorPickerSwatchItemProps",
+      "ColorPickerState",
+      "ColorPickerSliderState",
+      "ColorPickerSwatchItemState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "ColorPickerOptions",
+      // It works as every form control's does, which Slider's form example shows.
+      form: "ColorPickerOptions",
+      // A color picker always has a value, so it only adds data-required.
+      required: "ColorPickerOptions",
+    },
+  },
   menu: {
     source: "menu/menu.ts",
     examples: "menu",

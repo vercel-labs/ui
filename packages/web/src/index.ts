@@ -139,6 +139,7 @@ export { createAlertDialogController } from "@ui-sdk/core/alert-dialog"
 export { createAutocompleteController } from "@ui-sdk/core/autocomplete"
 export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
 export { createCollapsibleController } from "@ui-sdk/core/collapsible"
+export { createColorPickerController } from "@ui-sdk/core/color-picker"
 export { createComboboxController } from "@ui-sdk/core/combobox"
 export { createCommandController } from "@ui-sdk/core/command"
 export { createHoverCardController } from "@ui-sdk/core/hover-card"
@@ -270,6 +271,7 @@ export type {
   CheckboxGroupEvents,
   CollapsibleEvents,
   AutocompleteEvents,
+  ColorPickerEvents,
   ComboboxEvents,
   CommandEvents,
   DateInputEvents,
@@ -314,6 +316,7 @@ export type {
   UiCheckboxGroupElement,
   UiCollapsibleElement,
   UiAutocompleteElement,
+  UiColorPickerElement,
   UiComboboxElement,
   UiCommandElement,
   UiDateInputElement,

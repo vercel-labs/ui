@@ -1,6 +1,7 @@
 import type { Framework } from "./frameworks"
 import { accordion } from "@ui-sdk/core/accordion"
 import { collapsible } from "@ui-sdk/core/collapsible"
+import { colorPicker } from "@ui-sdk/core/color-picker"
 import { checkbox, checkboxGroup } from "@ui-sdk/core/checkbox"
 import { switchPrimitive } from "@ui-sdk/core/switch"
 import { autocomplete } from "@ui-sdk/core/autocomplete"
@@ -646,6 +647,61 @@ const components: Record<
         text: "Present while the panel animates closed. Style the state you animate to.",
       },
     },
+  },
+  "color-picker": {
+    instances: () => [
+      colorPicker({ id: "docs", defaultValue: "#0ea5e9", disabled: true, readOnly: true, required: true }),
+      colorPicker({ id: "docs-enabled", defaultValue: "#0ea5e9" }),
+    ],
+    samples: {
+      root: [{}],
+      area: [{}],
+      "area-thumb": [{}],
+      slider: [{ channel: "hue" }, { channel: "alpha", orientation: "vertical" }],
+      "slider-thumb": [{ channel: "hue" }, { channel: "alpha", orientation: "vertical" }],
+      input: [{}],
+      "channel-input": [{ channel: "red" }],
+      swatch: [{}],
+      "eye-dropper": [{}],
+      swatches: [{}],
+      "swatch-item": [{ value: "#0ea5e9" }, { value: "#ef4444" }],
+    },
+    interactive: [],
+    extra: {
+      ...Object.fromEntries(
+        [
+          "root",
+          "area",
+          "area-thumb",
+          "slider",
+          "slider-thumb",
+          "input",
+          "channel-input",
+          "swatch",
+          "swatches",
+        ].map((slot) => [slot, ["data-out-of-gamut"]]),
+      ),
+      "eye-dropper": ["data-out-of-gamut", "data-unsupported"],
+    },
+    descriptions: {
+      "data-disabled": { text: "Present when the picker is disabled, by its own prop or a `<fieldset>`." },
+      "data-readonly": { text: "Present when the picker shows its color but can't change it." },
+      "data-required": { text: "Present when the picker is required." },
+      "data-out-of-gamut": {
+        text: "Present while a drag or a key holds a color outside the gamut. The value is the closest color inside, and the parts move there once the change commits.",
+      },
+      "data-channel": {
+        text: "The channel the part edits.",
+        values: ["hue", "saturation", "brightness", "lightness", "chroma", "red", "green", "blue", "alpha"],
+      },
+      "data-area-thumb": {
+        text: "Present on the area's thumb, which a press on the area moves and focuses.",
+      },
+      "data-orientation": { text: "The slider's axis.", values: ["horizontal", "vertical"] },
+      "data-selected": { text: "Present on the swatch item whose color is the value." },
+      "data-unsupported": { text: "Present when the browser can't pick a color from the screen." },
+    },
+    parts: { root: { react: "ColorPicker", web: "<ui-color-picker>" } },
   },
   checkbox: {
     instances: () =>
