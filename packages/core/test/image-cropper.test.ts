@@ -120,6 +120,11 @@ describe("image cropper", () => {
     expect(crop.width / crop.height).toBeCloseTo(4 / 3, 1)
     expect(cropper.api.getZoom()).toBeCloseTo(2, 1)
     expect(crop.x + crop.width).toBeLessThanOrEqual(300)
+    const least = make({ aspectRatio: 4 / 3, minWidth: 100 })
+    load(least, 400, 300)
+    least.api.setZoom(4)
+    least.api.rotate()
+    expect(least.api.getCrop()).toMatchObject({ width: 100, height: 75 })
   })
 
   test("a flip mirrors the crop across the image", () => {

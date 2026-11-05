@@ -155,7 +155,7 @@ function rotateCrop(crop: Crop, natural: Size, direction: 1 | -1, limits: Limits
   if (!limits.aspect) return round(next)
   const turnedShown = shownSize(natural, rotation)
   const full = largest(turnedShown, limits.aspect)
-  const zoom = zoomOf(crop, natural)
+  const zoom = Math.min(zoomOf(crop, natural), full.width / smallest(turnedShown, limits).width)
   const size = { width: full.width / zoom, height: full.height / zoom }
   const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 }
   return round({ ...next, ...centered(size, center, turnedShown) })
