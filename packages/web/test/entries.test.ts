@@ -15,6 +15,7 @@ const helpers = [
   "./timeline",
   "./observe",
   "./async-options",
+  "./color",
   "./date",
   "./number",
   "./primitive",

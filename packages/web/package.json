@@ -23,6 +23,7 @@
     "./drawer": "./src/entries/drawer.ts",
     "./events": "./src/events.ts",
     "./field": "./src/entries/field.ts",
+    "./label": "./src/entries/label.ts",
     "./file-input": "./src/entries/file-input.ts",
     "./hover-card": "./src/entries/hover-card.ts",
     "./input": "./src/entries/input.ts",
@@ -47,6 +48,7 @@
     "./resizable": "./src/entries/resizable.ts",
     "./scroll-area": "./src/entries/scroll-area.ts",
     "./select": "./src/entries/select.ts",
+    "./segmented-control": "./src/entries/segmented-control.ts",
     "./separator": "./src/entries/separator.ts",
     "./slider": "./src/entries/slider.ts",
     "./switch": "./src/entries/switch.ts",
@@ -148,6 +150,10 @@
         "types": "./dist/entries/field.d.ts",
         "default": "./dist/entries/field.js"
       },
+      "./label": {
+        "types": "./dist/entries/label.d.ts",
+        "default": "./dist/entries/label.js"
+      },
       "./file-input": {
         "types": "./dist/entries/file-input.d.ts",
         "default": "./dist/entries/file-input.js"
@@ -243,6 +249,10 @@
       "./select": {
         "types": "./dist/entries/select.d.ts",
         "default": "./dist/entries/select.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/entries/segmented-control.d.ts",
+        "default": "./dist/entries/segmented-control.js"
       },
       "./separator": {
         "types": "./dist/entries/separator.d.ts",

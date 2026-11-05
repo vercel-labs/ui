@@ -581,6 +581,11 @@ const components: Record<string, Component> = {
       debug: "MenubarOptions",
     },
   },
+  label: {
+    source: "label/label.ts",
+    examples: "label",
+    types: ["LabelOptions"],
+  },
   separator: {
     source: "separator/separator.ts",
     examples: "separator",
@@ -602,6 +607,24 @@ const components: Record<string, Component> = {
       "RadioState",
       "RadioIndicatorState",
     ],
+  },
+  "segmented-control": {
+    source: "segmented-control/segmented-control.ts",
+    examples: "segmented-control",
+    types: [
+      "SegmentedControlOptions",
+      "SegmentedControlItemProps",
+      "SegmentedControlState",
+      "SegmentedControlItemState",
+      "SegmentedControlIndicatorState",
+    ],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "SegmentedControlOptions",
+      // They work as Radio's do, which its read-only and form examples show.
+      readOnly: "SegmentedControlOptions",
+      form: "SegmentedControlOptions",
+    },
   },
   slider: {
     source: "slider/slider.ts",

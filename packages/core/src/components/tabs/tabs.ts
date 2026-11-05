@@ -4,6 +4,7 @@ import type { TabsGeneric } from "./tabs-generic"
 import { bindFindable, hiddenAttrs } from "../../foundation/disclosure/disclosure"
 import { buttonElement, opensElsewhere, type ButtonElement } from "../../foundation/platform/button"
 import { layoutBox } from "../../foundation/platform/layout"
+import { bindIndicator } from "../../foundation/selection/indicator"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
@@ -562,50 +563,29 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
       }),
-      // Positions itself over the selected tab through CSS variables, without a render.
       bind(el, { api, store }) {
-        const observed = new Set<Element>()
-        const update = () => {
-          const list = api.internal.listElement() ?? el.parentElement
-          const value = store.get().value
-          const tab = value === null ? undefined : api.internal.tabElement(value)
-          writeIndicator(el, tab && list ? layoutBox(tab, list) : undefined)
-        }
-        // A tab or the list changing size moves the selected tab.
-        const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update)
-        const observe = () => {
-          const list = api.internal.listElement()
-          const targets = new Set([list, ...Array.from(list?.querySelectorAll('[role="tab"]') ?? [])])
-          // The watched set holds what it watches, so tabs that left leave it, or closed tabs stay alive.
-          for (const target of observed)
-            if (!targets.has(target)) {
-              observed.delete(target)
-              observer?.unobserve(target)
-            }
-          for (const target of targets) {
-            if (!target || observed.has(target)) continue
-            observed.add(target)
-            observer?.observe(target)
-          }
-        }
-        const remeasure = () => {
-          observe()
-          update()
-        }
         let value = store.get().value
-        const unsubscribe = store.subscribe(() => {
-          if (store.get().value === value) return
-          value = store.get().value
-          remeasure()
+        return bindIndicator({
+          list: () => api.internal.listElement() ?? el.parentElement,
+          active: () => {
+            const { value } = store.get()
+            return value === null ? undefined : api.internal.tabElement(value)
+          },
+          itemSelector: '[role="tab"]',
+          subscribe(remeasure) {
+            const unsubscribe = store.subscribe(() => {
+              if (store.get().value === value) return
+              value = store.get().value
+              remeasure()
+            })
+            const offTabsChange = api.internal.onTabsChange(remeasure)
+            return () => {
+              unsubscribe()
+              offTabsChange()
+            }
+          },
+          write: (box) => writeIndicator(el, box),
         })
-        const offTabsChange = api.internal.onTabsChange(remeasure)
-        // Tabs bind in the same commit. Measure once they have.
-        queueMicrotask(remeasure)
-        return () => {
-          unsubscribe()
-          offTabsChange()
-          observer?.disconnect()
-        }
       },
     }),
 

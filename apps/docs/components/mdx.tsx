@@ -49,7 +49,7 @@ function InlineCode(props: ComponentProps<"code">) {
     <code
       className={cn(
         "rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.15em] font-mono text-[0.85em] text-foreground",
-        short && "whitespace-nowrap",
+        short ? "whitespace-nowrap" : "[overflow-wrap:anywhere]",
       )}
       {...props}
     />

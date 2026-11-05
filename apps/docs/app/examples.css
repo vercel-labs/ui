@@ -19,6 +19,7 @@
 @import "../../../examples/components/file-input/file-input.css";
 @import "../../../examples/components/hover-card/hover-card.css";
 @import "../../../examples/components/input/input.css";
+@import "../../../examples/components/label/label.css";
 @import "../../../examples/components/listbox/listbox.css";
 @import "../../../examples/components/menu/menu.css";
 @import "../../../examples/components/menubar/menubar.css";
@@ -34,6 +35,7 @@
 @import "../../../examples/components/radio/radio.css";
 @import "../../../examples/components/resizable/resizable.css";
 @import "../../../examples/components/scroll-area/scroll-area.css";
+@import "../../../examples/components/segmented-control/segmented-control.css";
 @import "../../../examples/components/select/select.css";
 @import "../../../examples/components/separator/separator.css";
 @import "../../../examples/components/slider/slider.css";

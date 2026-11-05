@@ -67,7 +67,7 @@ function CodeBlockTab({ value, children }: { value: string; children: React.Reac
   return (
     <TabsPanel
       value={value}
-      className="outline-none [&>[data-code-frame]>button]:hidden [&>[data-code-frame]]:my-0 [&>[data-code-frame]]:rounded-none [&>[data-code-frame]]:bg-transparent [&>[data-code-frame]]:shadow-none [&>[data-code-frame]]:ring-0"
+      className="outline-none [&>[data-code-frame]>[data-copy-float]]:hidden [&>[data-code-frame]]:my-0 [&>[data-code-frame]]:rounded-none [&>[data-code-frame]]:bg-transparent [&>[data-code-frame]]:shadow-none [&>[data-code-frame]]:ring-0"
     >
       {children}
     </TabsPanel>

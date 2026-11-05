@@ -111,6 +111,8 @@ const importLayersAllowlist = {
     "Date Input matches unavailable dates the way Calendar does.",
   "components/date-picker -> components/calendar": "Date Picker is a field over Calendar.",
   "components/drawer -> components/dialog": "Drawer is a dialog with a sheet.",
+  "components/segmented-control -> components/radio":
+    "Segmented Control is a radio group with a sliding indicator.",
   "components/menu -> components/menubar": "A menu inside a menubar hands focus across.",
   "components/menubar -> components/menu": "Menubar's menus are Menus.",
   "components/dialog -> page/overlays": "`confirm()` renders through the overlay host.",

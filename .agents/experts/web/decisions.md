@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/web`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
 
 ## Settled
 
@@ -52,7 +52,9 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **`pressedText` doesn't see `user-select: none` across a shadow root**: it walks `parentElement`, which stops at the root, so a toast in one doesn't swipe from text its host makes unselectable.
 - **`ui-token-input` gets no `disabled` or `data-disabled` from a disabled field**, though its editor does.
 - **Date input segments** removed by a page morph stay gone until the locale or the clock changes (BACKLOG.md).
+- **A rating filled after it connects has no stars.** `createElement("ui-rating")`, appended, then given its `<template>` renders once at connect and never sees the template. Rare; a fix would watch `childList` for a `:scope > template`.
+- **A label for a Color Picker with no text input focuses nothing.** `activateControl` focuses a group's first input. Same in every framework; focusing the area thumb would be more useful.
 
 ## Revisit
 
-Nothing yet.
+- `ownInput` in `image-cropper.ts` repeats `own("input")` in `color-picker.ts`; one helper next to `ownButton` in `define-element.ts` could serve both.

@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/react`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
 
 
 ## Settled
@@ -45,6 +45,9 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
 - **`submitShortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
 - **Date input `SegmentProps`** types its ref for an input or a span, though `render` only takes an input.
+- **A controlled Image Cropper keeps its crop when `src` changes.** With `crop` passed, a new image shows the old image's crop until the owner sets `crop` to `undefined`. Same in every framework; undecided whether a new `src` should start a fresh crop.
+- **Pure-utility entries are client modules.** `color.ts`, like `date.ts`, builds with `"use client"`, so a Server Component can't call `formatColor` or `parseColor`. Adding them to the build's `--server` list would fix it.
+- **Indicator remeasure after cleanup.** `foundation/selection/indicator.ts` queues a microtask `remeasure` that can run after cleanup and observe again with the disconnected `ResizeObserver`, as Tabs did before it was extracted.
 
 ## Revisit
 

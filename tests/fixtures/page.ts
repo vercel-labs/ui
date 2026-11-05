@@ -62,6 +62,21 @@ function tabsOptions() {
   }
 }
 
+// Segmented control options a spec can set through the URL: ?default=<value>,
+// or none for no default value, ?orientation=vertical, ?disabled, and
+// ?cancel=<value> cancels the change to that value.
+function segmentedControlOptions() {
+  const params = new URLSearchParams(location.search)
+  const orientation = params.get("orientation")
+  const defaultValue = params.get("default") ?? "list"
+  return {
+    defaultValue: defaultValue === "none" ? undefined : defaultValue,
+    disabled: params.has("disabled"),
+    cancel: params.get("cancel"),
+    ...(orientation && { orientation: orientation as "horizontal" | "vertical" }),
+  }
+}
+
 // Accordion options a spec can set through the URL: ?multiple&collapsible=false.
 // ?default=none renders without a default value, ?keep-mounted and
 // ?hidden-until-found keep closed panels, ?disabled disables the root and
@@ -153,6 +168,7 @@ export {
   formatShortcut,
   loadScreenReader,
   menuOptions,
+  segmentedControlOptions,
   tabsOptions,
   toggleOptions,
   treeOptions,

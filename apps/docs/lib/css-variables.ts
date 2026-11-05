@@ -59,6 +59,19 @@ const components: Record<string, Group[]> = {
       ],
     },
   ],
+  "segmented-control": [
+    {
+      part: "indicator",
+      variables: [
+        "--segmented-control-indicator-left",
+        "--segmented-control-indicator-right",
+        "--segmented-control-indicator-top",
+        "--segmented-control-indicator-bottom",
+        "--segmented-control-indicator-width",
+        "--segmented-control-indicator-height",
+      ],
+    },
+  ],
   slider: [
     { part: "indicator", variables: ["--slider-indicator-start", "--slider-indicator-size"] },
     { part: "thumb", variables: ["--slider-thumb-position"] },
@@ -155,6 +168,12 @@ const meaning: Record<string, string> = {
   "--active-tab-bottom": "Distance from the tab list's bottom edge to the selected tab.",
   "--active-tab-width": "Width of the selected tab.",
   "--active-tab-height": "Height of the selected tab.",
+  "--segmented-control-indicator-left": "Distance from the control's left edge to the checked item.",
+  "--segmented-control-indicator-right": "Distance from the control's right edge to the checked item.",
+  "--segmented-control-indicator-top": "Distance from the control's top edge to the checked item.",
+  "--segmented-control-indicator-bottom": "Distance from the control's bottom edge to the checked item.",
+  "--segmented-control-indicator-width": "Width of the checked item.",
+  "--segmented-control-indicator-height": "Height of the checked item.",
   "--viewport-width":
     "The open content's width plus the viewport's own border. Transition width for a viewport that resizes as it switches.",
   "--viewport-height": "The open content's height plus the viewport's own border.",

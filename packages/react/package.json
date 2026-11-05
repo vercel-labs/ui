@@ -15,6 +15,7 @@
     "./carousel": "./src/carousel.tsx",
     "./checkbox": "./src/checkbox.tsx",
     "./collapsible": "./src/collapsible.tsx",
+    "./color": "./src/color.ts",
     "./combobox": "./src/combobox.tsx",
     "./command": "./src/command.tsx",
     "./date": "./src/date.ts",
@@ -27,6 +28,7 @@
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.tsx",
     "./input": "./src/input.tsx",
+    "./label": "./src/label.tsx",
     "./listbox": "./src/listbox.tsx",
     "./menu": "./src/menu.tsx",
     "./menubar": "./src/menubar.tsx",
@@ -45,6 +47,7 @@
     "./radio": "./src/radio.tsx",
     "./resizable": "./src/resizable.tsx",
     "./scroll-area": "./src/scroll-area.tsx",
+    "./segmented-control": "./src/segmented-control.tsx",
     "./select": "./src/select.tsx",
     "./separator": "./src/separator.tsx",
     "./shortcuts": "./src/shortcuts.ts",
@@ -112,6 +115,10 @@
         "types": "./dist/collapsible.d.ts",
         "default": "./dist/collapsible.js"
       },
+      "./color": {
+        "types": "./dist/color.d.ts",
+        "default": "./dist/color.js"
+      },
       "./combobox": {
         "types": "./dist/combobox.d.ts",
         "default": "./dist/combobox.js"
@@ -159,6 +166,10 @@
       "./input": {
         "types": "./dist/input.d.ts",
         "default": "./dist/input.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "default": "./dist/label.js"
       },
       "./listbox": {
         "types": "./dist/listbox.d.ts",
@@ -231,6 +242,10 @@
       "./scroll-area": {
         "types": "./dist/scroll-area.d.ts",
         "default": "./dist/scroll-area.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control.d.ts",
+        "default": "./dist/segmented-control.js"
       },
       "./select": {
         "types": "./dist/select.d.ts",

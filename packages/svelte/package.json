@@ -19,6 +19,7 @@
     "./carousel": "./src/carousel.ts",
     "./checkbox": "./src/checkbox.ts",
     "./collapsible": "./src/collapsible.ts",
+    "./color": "./src/color.ts",
     "./combobox": "./src/combobox.ts",
     "./command": "./src/command.ts",
     "./date": "./src/date.ts",
@@ -31,6 +32,7 @@
     "./gesture": "./src/gesture.ts",
     "./hover-card": "./src/hover-card.ts",
     "./input": "./src/input.ts",
+    "./label": "./src/label.ts",
     "./listbox": "./src/listbox.ts",
     "./menu": "./src/menu.ts",
     "./menubar": "./src/menubar.ts",
@@ -49,6 +51,7 @@
     "./radio": "./src/radio.ts",
     "./resizable": "./src/resizable.ts",
     "./scroll-area": "./src/scroll-area.ts",
+    "./segmented-control": "./src/segmented-control.ts",
     "./select": "./src/select.ts",
     "./separator": "./src/separator.ts",
     "./shortcuts": "./src/shortcuts.ts",
@@ -132,6 +135,10 @@
         "svelte": "./dist/collapsible.js",
         "default": "./dist/collapsible.js"
       },
+      "./color": {
+        "types": "./dist/color.d.ts",
+        "default": "./dist/color.js"
+      },
       "./date": {
         "types": "./dist/date.d.ts",
         "svelte": "./dist/date.js",
@@ -191,6 +198,11 @@
         "types": "./dist/input.d.ts",
         "svelte": "./dist/input.js",
         "default": "./dist/input.js"
+      },
+      "./label": {
+        "types": "./dist/label.d.ts",
+        "svelte": "./dist/label.js",
+        "default": "./dist/label.js"
       },
       "./listbox": {
         "types": "./dist/listbox.d.ts",
@@ -281,6 +293,11 @@
         "types": "./dist/scroll-area.d.ts",
         "svelte": "./dist/scroll-area.js",
         "default": "./dist/scroll-area.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control.d.ts",
+        "svelte": "./dist/segmented-control.js",
+        "default": "./dist/segmented-control.js"
       },
       "./select": {
         "types": "./dist/select.d.ts",

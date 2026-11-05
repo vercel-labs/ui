@@ -152,6 +152,7 @@ export { createPasswordInputController } from "@ui-sdk/core/password-input"
 export { createPopoverController } from "@ui-sdk/core/popover"
 export { createRadioGroupController } from "@ui-sdk/core/radio"
 export { createScrollAreaController } from "@ui-sdk/core/scroll-area"
+export { createSegmentedControlController } from "@ui-sdk/core/segmented-control"
 export { createSelectController } from "@ui-sdk/core/select"
 export { createSliderController } from "@ui-sdk/core/slider"
 export { createSwitchController } from "@ui-sdk/core/switch"
@@ -228,6 +229,27 @@ export type {
   StepRange,
 } from "@ui-sdk/core/number"
 
+// CSS colors as plain data: read, convert, write, fit to a gamut, mix and compare. `formatColor(parseColor("red")!, "oklch")` is "oklch(0.628 0.2577 29.23)".
+export {
+  colorDistance,
+  contrastRatio,
+  convertColor,
+  formatColor,
+  isInGamut,
+  mixColor,
+  parseColor,
+  toGamut,
+} from "@ui-sdk/core/color"
+export type {
+  Color,
+  ColorFormat,
+  ColorFormatOptions,
+  ColorGamut,
+  ColorHueInterpolation,
+  ColorMixOptions,
+  ColorSpace,
+} from "@ui-sdk/core/color"
+
 // Keyboard shortcuts scoped to open layers. `registerShortcut("mod+k", open)` returns an unregister function.
 export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
 export type {
@@ -268,6 +290,7 @@ export type {
   PopoverEvents,
   RadioGroupEvents,
   ResizableEvents,
+  SegmentedControlEvents,
   SelectEvents,
   SliderEvents,
   SwitchEvents,
@@ -325,6 +348,8 @@ export type {
   UiRadioElement,
   UiRadioGroupElement,
   UiResizableElement,
+  UiSegmentedControlElement,
+  UiSegmentedControlItemElement,
   UiSelectElement,
   UiSeparatorElement,
   UiSliderElement,

@@ -8,9 +8,9 @@ import {
   watchFieldsets,
 } from "../../foundation/forms/form"
 import { afterReset } from "../../foundation/forms/value"
+import { activateControl, findControl } from "../../foundation/forms/control"
 import {
   controlsIn,
-  findControl,
   isRequired,
   valid,
   validityKeys,
@@ -135,6 +135,9 @@ function registerById(el: HTMLElement, register: (id: string) => () => void) {
   }
 }
 
+// A control inside a nested field belongs to that field.
+const ownControl = (root: HTMLElement) => (el: HTMLElement) => el.closest('[data-slot="field-root"]') === root
+
 function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
   const { id, store, element, parts } = context
   let root: HTMLElement | undefined
@@ -189,24 +192,10 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     disabled,
     invalid,
     // The element labels and messages are wired to.
-    control: () => element("control") ?? (root ? findControl(root) : undefined),
-    // Activates the control the way a native label does.
+    control: () => element("control") ?? (root ? findControl(root, ownControl(root)) : undefined),
     activate(event?: Event) {
       const control = api.control()
-      if (!control || disabled()) return
-      const role = control.getAttribute("role")
-      const checkable =
-        role === "checkbox" ||
-        role === "switch" ||
-        role === "radio" ||
-        (control instanceof HTMLInputElement && (control.type === "checkbox" || control.type === "radio"))
-      // A native label clicks a plain button it names, like a FileInputTrigger's.
-      const plainButton = control instanceof HTMLButtonElement && !role
-      if (checkable || plainButton || role === "radiogroup") control.click()
-      // A group, like a range slider, focuses its first control.
-      else if (role === "group") control.querySelector<HTMLElement>("input:not([type='hidden'])")?.focus()
-      else control.focus()
-      event?.preventDefault()
+      if (control && !disabled()) activateControl(control, event)
     },
     internal: {
       bindRoot(el: HTMLElement) {
