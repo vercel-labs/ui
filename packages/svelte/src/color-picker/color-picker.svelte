@@ -96,7 +96,7 @@ The root: a group around the picker's parts, and the hidden input the form submi
   // The hidden input the form submits. Its value changes on every move.
   const input = useHandlePart(picker, "hidden-input")
   const fieldControl = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>

@@ -88,7 +88,7 @@ buttons, with an indicator that slides to the checked item.
   provideInstance(segmentedControl, control)
   const root = useHandlePart(control, "root")
   const fieldControl = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>

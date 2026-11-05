@@ -84,7 +84,7 @@ each checkbox, sits in a field.
   const root = useHandlePart(group, "group")
   const input = useHandlePart(group, "group-input")
   const control = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>
