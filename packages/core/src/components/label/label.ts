@@ -20,7 +20,7 @@ function forTarget(el: HTMLElement, id: string) {
 function ownControl(el: HTMLElement) {
   const id = el.getAttribute("for")
   const native = el instanceof HTMLLabelElement
-  const target = id ? forTarget(el, id) : native ? null : el
+  const target = id ? forTarget(el, id) : native && el.control ? null : el
   if (!target || (native && el.control === target)) return
   return findControl(target)
 }
@@ -94,8 +94,8 @@ function bindLabel(el: HTMLElement) {
       control = next
       unname = control && nameControl(control, el)
     }
-    // A native label that only wraps its control never needs to look for it.
-    const looks = el.hasAttribute("for") || !(el instanceof HTMLLabelElement)
+    // A native label that wraps a labelable control never needs to look for it.
+    const looks = el.hasAttribute("for") || !(el instanceof HTMLLabelElement) || !el.control
     if (looks && !unwatch)
       unwatch = watchTree(el.getRootNode(), () => {
         if (!control?.isConnected) update()
