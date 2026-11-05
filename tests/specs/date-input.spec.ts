@@ -207,7 +207,7 @@ test("resetting the form brings back the default date", async ({ page, open }) =
   await segment(page, "month").click()
   await page.keyboard.press("ArrowUp")
   await page.getByRole("button", { name: "Reset" }).click()
-  expect(await shown(page)).toBe("11/02/2026")
+  await expect.poll(() => shown(page)).toBe("11/02/2026")
 })
 
 test("a partly filled date can't be submitted", async ({ page, open }) => {
