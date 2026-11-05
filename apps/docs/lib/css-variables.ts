@@ -59,6 +59,7 @@ const components: Record<string, Group[]> = {
       ],
     },
   ],
+  rating: [{ part: "item", variables: ["--rating-fill"] }],
   "segmented-control": [
     {
       part: "indicator",
@@ -168,6 +169,7 @@ const meaning: Record<string, string> = {
   "--active-tab-bottom": "Distance from the tab list's bottom edge to the selected tab.",
   "--active-tab-width": "Width of the selected tab.",
   "--active-tab-height": "Height of the selected tab.",
+  "--rating-fill": "How much of the star the shown score covers, from 0 to 1.",
   "--segmented-control-indicator-left": "Distance from the control's left edge to the checked item.",
   "--segmented-control-indicator-right": "Distance from the control's right edge to the checked item.",
   "--segmented-control-indicator-top": "Distance from the control's top edge to the checked item.",

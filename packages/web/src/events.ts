@@ -106,6 +106,7 @@ import type {
   PopoverPayloadChangeReason,
 } from "@ui-sdk/core/popover"
 import type { RadioGroupController, RadioGroupValueChangeReason } from "@ui-sdk/core/radio"
+import type { RatingController, RatingOptions, RatingValueChangeReason } from "@ui-sdk/core/rating"
 import type { ScrollAreaController } from "@ui-sdk/core/scroll-area"
 import type {
   SegmentedControlController,
@@ -214,6 +215,7 @@ import type { passwordInput } from "@ui-sdk/core/password-input"
 import type { popover } from "@ui-sdk/core/popover"
 import type { progress } from "@ui-sdk/core/progress"
 import type { radioGroup } from "@ui-sdk/core/radio"
+import type { rating } from "@ui-sdk/core/rating"
 import type { resizable } from "@ui-sdk/core/resizable"
 import type { scrollArea } from "@ui-sdk/core/scroll-area"
 import type { segmentedControl } from "@ui-sdk/core/segmented-control"
@@ -789,6 +791,24 @@ interface UiRadioElement
   extends
     UiPartElement<typeof radioGroup, "root", "value" | "disabled">,
     Omit<FormAssociatedMembers, "name"> {}
+
+/**
+ * The events of `<ui-rating>`.
+ * @experimental
+ */
+type RatingEvents = { valuechange: UiChangeEvent<number | null, RatingValueChangeReason> }
+/**
+ * `<ui-rating>`: `value`, `getValueLabel`, form members like a native input, and typed events.
+ * @experimental
+ */
+interface UiRatingElement
+  extends
+    UiElement<RatingEvents>,
+    FormControlProperties<typeof rating, "api" | "value">,
+    Pick<RatingOptions, "getValueLabel"> {
+  value: number | null
+  api: RatingController
+}
 
 /**
  * The events of `<ui-segmented-control>`.
@@ -1541,6 +1561,7 @@ declare global {
     "ui-checkbox-group": UiCheckboxGroupElement
     "ui-radio-group": UiRadioGroupElement
     "ui-radio": UiRadioElement
+    "ui-rating": UiRatingElement
     "ui-segmented-control": UiSegmentedControlElement
     "ui-segmented-control-item": UiSegmentedControlItemElement
     "ui-input": UiInputElement
@@ -1918,6 +1939,8 @@ declare global {
     "ui-progress-label": UiPartElement<typeof progress, "label">
     "ui-progress-value": UiPartElement<typeof progress, "value">
     "ui-radio-indicator": UiPartElement<typeof radioGroup, "indicator", "keepMounted">
+    "ui-rating-item": UiPartElement<typeof rating, "item", "index">
+    "ui-rating-radio": UiPartElement<typeof rating, "radio", "value">
     "ui-resizable-panel": UiPartElement<
       typeof resizable,
       "panel",
@@ -2100,6 +2123,7 @@ export {
   type PasswordInputEvents,
   type PopoverEvents,
   type RadioGroupEvents,
+  type RatingEvents,
   type ResizableEvents,
   type SegmentedControlEvents,
   type SelectEvents,
@@ -2160,6 +2184,7 @@ export {
   type UiPreferencesElement,
   type UiRadioElement,
   type UiRadioGroupElement,
+  type UiRatingElement,
   type UiResizableElement,
   type UiScrollAreaElement,
   type UiSegmentedControlElement,

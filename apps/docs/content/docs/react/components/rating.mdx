@@ -1,0 +1,215 @@
+---
+title: Rating
+description: Pick a score from a row of stars, whole or half, with a preview as the pointer moves over them.
+---
+
+Use a rating to collect a score, like how a stay went, or to show one, like an average. Each star is a radio, so it works like a radio group, with one value and a single tab stop.
+
+<ComponentExample name="rating/basic" caption="Choose a star, then use the arrow keys to change the score." />
+
+## Installation
+
+```bash
+npm install @ui-sdk/react @ui-sdk/core
+```
+
+## Composition
+
+Use the following composition to build a `Rating`:
+
+```text
+Rating
+└── RatingItem
+```
+
+`Rating` renders its children once per star, so put one `RatingItem` inside it. Without children, it renders a `RatingItem` with no icon.
+
+## Usage
+
+Import the parts and put them together:
+
+```tsx
+import { Rating, RatingItem } from "@ui-sdk/react/rating"
+import { StarIcon } from "lucide-react"
+
+function Example() {
+  return (
+    <Rating aria-label="Rating" defaultValue={3}>
+      <RatingItem>
+        <StarIcon aria-hidden="true" />
+      </RatingItem>
+    </Rating>
+  )
+}
+
+export { Example }
+```
+
+Name the rating with `aria-label`, or put it in a [Field](./field) whose label names it. Without `defaultValue`, nothing starts checked and Tab enters on the first star.
+
+## Stars
+
+Put your icon in `RatingItem`. Each item says how much of its star the shown score covers: `--rating-fill` goes from 0 to 1, `data-filled` marks a whole star and `data-partial` the star a score ends partway through. The radios that pick the score sit over the icon, so it needs no events of its own.
+
+```css
+[data-slot="rating-item"] {
+  color: lightgray;
+}
+
+[data-slot="rating-item"][data-filled] {
+  color: gold;
+}
+```
+
+For half stars and averages, paint the icon up to `calc(var(--rating-fill) * 100%)`, like with a gradient behind a star-shaped mask.
+
+Pass a function as the item's children to render from its state, like an icon that fills once the score covers the star:
+
+```tsx
+<RatingItem>
+  {({ fill }) => <StarIcon aria-hidden="true" fill={fill === 1 ? "currentColor" : "none"} />}
+</RatingItem>
+```
+
+## Half Stars
+
+Set `step={0.5}` to split each star in two. Each half is its own radio, named like "2.5 stars", and a press on the first half of a star picks the half score.
+
+<ComponentExample
+  name="rating/half-stars"
+  caption="Choose the first half of a star. Its star fills halfway."
+/>
+
+## Preview
+
+While a pointer moves over the stars, they show the score under it: `--rating-fill` follows the pointer, and `data-highlighted` marks the stars up to it. Leaving the stars shows the score again. Touch has no preview, since a tap picks the score at once.
+
+## Deselectable
+
+Set `deselectable` to let people clear their score: a press on the checked star, or Space on it, sets the score back to `null`.
+
+<ComponentExample name="rating/deselectable" caption="Press the fourth star. The score clears." />
+
+## Read-Only
+
+Set `readOnly` to show a score that can't change, like an average. Any score shows, like 4.2, which fills a fifth of the last star. The rating becomes one image for screen readers, and its radios are hidden from them.
+
+Name a read-only rating with `getValueLabel`, so its name includes the score. An `aria-label` would replace it.
+
+<ComponentExample name="rating/read-only" caption="An average of 4.2, named Rated 4.2 out of 5." />
+
+## Disabled
+
+Set `disabled` to stop every star from being focused or changed. A disabled rating submits nothing.
+
+<ComponentExample
+  name="rating/disabled"
+  caption="The rating is disabled, so the stars can't be focused or pressed."
+/>
+
+## Controlled
+
+Pass `value` and update it in `onValueChange`. Call `details.cancel()` in the callback to keep the current score. A [controller](#controller) from `createRatingController()` sets the score from anywhere, like the Clear Rating button below. Create one controller per mounted rating.
+
+<ComponentExample
+  name="rating/controlled"
+  caption="Choose a star, then press Clear Rating. The console logs each change and its reason."
+/>
+
+See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
+
+## Form
+
+Each radio renders a hidden native radio, so the rating takes part in forms. Set `name` to submit the score; nothing submits without a name or a score. `required` blocks submission until there's a score, and a reset returns to `defaultValue`.
+
+<ComponentExample
+  name="rating/form"
+  caption="Press Send Review without a score to see the browser's message. Choose a star and send it again."
+/>
+
+## Stars and Labels
+
+Set `max` for the number of stars, and `loop` to let the arrow keys wrap from the last star to the first. Each radio is named by `getValueLabel`, which gets the score and `max` and says "1 star" or "3 stars" by default.
+
+```tsx
+<Rating aria-label="Difficulty" max={10} loop getValueLabel={(value, max) => `${value} of ${max}`}>
+  <RatingItem />
+</Rating>
+```
+
+## Styling
+
+Parts are unstyled. Use `data-filled`, `data-partial`, `data-checked` and `data-highlighted` on each star, and `--rating-fill` for how full it is. `data-disabled`, `data-readonly` and `data-required` are on the rating and its stars.
+
+Each part has a `data-slot`, such as `rating-item`, and its state attributes are listed under [Data Attributes](#data-attributes).
+
+### RatingItem [#styling-item]
+
+<CssVariables component="rating" part="item" />
+
+## Data Attributes
+
+### Rating [#data-attributes-root]
+
+<DataAttributes component="rating" part="root" />
+
+### RatingItem [#data-attributes-item]
+
+<DataAttributes component="rating" part="item" />
+
+## API Reference
+
+Props and callbacks are the same as below, as React props.
+
+### Rating
+
+<TypeTable path="../../packages/core/src/components/rating/rating.ts" name="RatingOptions" />
+
+### State
+
+What render functions, state-based class names and slots receive.
+
+<StateTable path="../../packages/core/src/components/rating/rating.ts" name="RatingState" />
+
+<StateTable path="../../packages/core/src/components/rating/rating.ts" name="RatingItemState" />
+
+### Reasons
+
+`details.reason` says why the score changed.
+
+<ReasonTable path="../../packages/core/src/components/rating/rating.ts" name="RatingValueChangeReason" />
+
+### Controller
+
+Create one with `createRatingController()` and pass it as `controller`.
+
+Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
+
+<ControllerTable path="../../packages/core/src/components/rating/rating.ts" name="RatingController" />
+
+### Events
+
+Callbacks get the new score first, then the details.
+
+| Prop            | On       | Receives                                                            |
+| --------------- | -------- | ------------------------------------------------------------------- |
+| `onValueChange` | `Rating` | `(value, details)`: the score or `null`, and the [reason](#reasons) |
+
+## Accessibility
+
+A rating is a radio group, so it follows the [WAI-ARIA radio group pattern](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) and behaves like native radios that share a name. Each star holds a button with the `radio` role per score it can pick, and a hidden native radio that takes part in forms. Icons inside the stars should be hidden from screen readers with `aria-hidden`, since each radio is already named. A read-only rating has the `img` role instead, named by `getValueLabel`.
+
+### Keyboard
+
+| Key        | Does                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| Tab        | Moves into the rating, onto the checked star or the first one                              |
+| Arrow keys | Move to the next or previous score and check it, stopping at the ends unless `loop` is set |
+| Space      | Checks the focused star, or clears it when it's checked and `deselectable`                 |
+| Enter      | Submits its form                                                                           |
+
+### Tested Behavior
+
+Every line below is an automated test.
+
+<SpecList spec="rating" />

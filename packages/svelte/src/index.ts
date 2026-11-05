@@ -28,6 +28,7 @@ export * from "./switch"
 export * from "./field"
 export * from "./label"
 export * from "./radio"
+export * from "./rating"
 export * from "./input"
 // Textarea's entry re-exports createInputController like input's does; two star
 // exports of one external binding are ambiguous to a bundler, so this one is named.

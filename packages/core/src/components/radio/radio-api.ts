@@ -28,11 +28,13 @@ type RadioGroupStore = {
   exiting: string[]
   // Only a segmented control has one.
   orientation?: "horizontal" | "vertical"
+  // The radio a pointer previews, which only a rating shows.
+  highlighted?: string | null
 }
 
 function radioGroupState(
   options: RadioGroupOptions,
-  orientation?: RadioGroupStore["orientation"],
+  extra: Pick<RadioGroupStore, "orientation" | "highlighted"> = {},
 ): RadioGroupStore {
   const value = options.value !== undefined ? options.value : (options.defaultValue ?? null)
   return {
@@ -46,7 +48,7 @@ function radioGroupState(
     formDisabled: false,
     stop: null,
     exiting: [],
-    orientation,
+    ...extra,
   }
 }
 
@@ -151,6 +153,8 @@ function radioGroupApi(
       (elements(context, "input")[0]?.el as HTMLInputElement | undefined)?.form ??
       null,
     internal: {
+      // Checks the radio a press landed on. Rating unchecks a checked one.
+      check: (key: string, details?: Details) => api.setValue(key, details),
       reset() {
         change("value", store.get().initial, { reason: "reset" })
       },

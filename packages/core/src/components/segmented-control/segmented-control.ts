@@ -170,7 +170,8 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
     orientation: "string",
     controller: "value",
   },
-  state: (options: SegmentedControlOptions) => radioGroupState(options, orientation(options)),
+  state: (options: SegmentedControlOptions) =>
+    radioGroupState(options, { orientation: orientation(options) }),
   sync: (options) => ({ ...syncRadioGroup(options), orientation: orientation(options) }),
   api: (context) => radioGroupApi(context, slotNames),
   slots: (slot) => {

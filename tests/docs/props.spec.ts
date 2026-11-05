@@ -608,6 +608,19 @@ const components: Record<string, Component> = {
       "RadioIndicatorState",
     ],
   },
+  rating: {
+    source: "rating/rating.ts",
+    examples: "rating",
+    types: ["RatingOptions", "RatingState", "RatingItemState"],
+    allowed: {
+      // Logs every change to the console, which no example should do.
+      debug: "RatingOptions",
+      // It works as Radio's does, which its form example shows.
+      form: "RatingOptions",
+      // Rating numbers its stars itself, so no example needs the number.
+      index: "RatingItemState",
+    },
+  },
   "segmented-control": {
     source: "segmented-control/segmented-control.ts",
     examples: "segmented-control",

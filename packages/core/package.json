@@ -33,6 +33,7 @@
     "./checkbox": "./src/components/checkbox/checkbox.ts",
     "./switch": "./src/components/switch/switch.ts",
     "./radio": "./src/components/radio/radio.ts",
+    "./rating": "./src/components/rating/rating.ts",
     "./field": "./src/components/field/field.ts",
     "./label": "./src/components/label/label.ts",
     "./button": "./src/components/button/button.ts",
@@ -179,6 +180,10 @@
       "./radio": {
         "types": "./dist/components/radio/radio.d.ts",
         "default": "./dist/components/radio/radio.js"
+      },
+      "./rating": {
+        "types": "./dist/components/rating/rating.d.ts",
+        "default": "./dist/components/rating/rating.js"
       },
       "./field": {
         "types": "./dist/components/field/field.d.ts",

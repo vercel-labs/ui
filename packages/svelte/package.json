@@ -47,6 +47,7 @@
     "./preferences": "./src/preferences.ts",
     "./progress": "./src/progress.ts",
     "./radio": "./src/radio.ts",
+    "./rating": "./src/rating.ts",
     "./resizable": "./src/resizable.ts",
     "./scroll-area": "./src/scroll-area.ts",
     "./segmented-control": "./src/segmented-control.ts",
@@ -271,6 +272,11 @@
         "types": "./dist/radio.d.ts",
         "svelte": "./dist/radio.js",
         "default": "./dist/radio.js"
+      },
+      "./rating": {
+        "types": "./dist/rating.d.ts",
+        "svelte": "./dist/rating.js",
+        "default": "./dist/rating.js"
       },
       "./resizable": {
         "types": "./dist/resizable.d.ts",

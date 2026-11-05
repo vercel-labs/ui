@@ -286,6 +286,26 @@
       height 200ms;
   }
 
+  [data-slot="rating-root"] {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  [data-slot="rating-item"] {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(
+      to right,
+      #f5a524 calc(var(--rating-fill) * 100%),
+      #e5e5e5 calc(var(--rating-fill) * 100%)
+    );
+  }
+
+  [data-slot="rating-item"] .star {
+    visibility: hidden;
+  }
+
   [data-slot="segmented-control-root"] {
     position: relative;
     display: inline-flex;

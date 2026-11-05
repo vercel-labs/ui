@@ -10,6 +10,7 @@ import { fileInput } from "@ui-sdk/core/file-input"
 import { field, fieldSet } from "@ui-sdk/core/field"
 import { input, inputGroup, textarea } from "@ui-sdk/core/input"
 import { radioGroup } from "@ui-sdk/core/radio"
+import { rating } from "@ui-sdk/core/rating"
 import { segmentedControl } from "@ui-sdk/core/segmented-control"
 import { menu } from "@ui-sdk/core/menu"
 import { numberInput } from "@ui-sdk/core/number-input"
@@ -899,6 +900,24 @@ const components: Record<
       group: { react: "RadioGroup", web: "<ui-radio-group>", slot: "radio-group" },
       root: { react: "Radio", web: "<ui-radio>", slot: "radio-root" },
       indicator: { react: "RadioIndicator", web: "<ui-radio-indicator>", slot: "radio-indicator" },
+    },
+  },
+  rating: {
+    instances: () => [
+      rating({ id: "docs", defaultValue: 2.5, step: 0.5, required: true }),
+      rating({ id: "docs-read-only", value: 3, readOnly: true, disabled: true }),
+    ],
+    samples: { root: [{}], item: [{ index: 1 }, { index: 3 }, { index: 4 }] },
+    interactive: [],
+    extra: { item: ["data-highlighted"] },
+    descriptions: {
+      "data-filled": { text: "Present on stars the shown score covers whole." },
+      "data-partial": { text: "Present on the star the shown score covers part of, like the last of 2.5." },
+      "data-checked": { text: "Present on the star the score ends in." },
+      "data-highlighted": { text: "Present on the stars up to the score a pointer previews." },
+      "data-disabled": { text: "Present when the rating is disabled, by its own prop or a `<fieldset>`." },
+      "data-readonly": { text: "Present when the rating only shows its score." },
+      "data-required": { text: "Present when the rating is required." },
     },
   },
   "segmented-control": {

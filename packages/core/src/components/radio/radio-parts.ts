@@ -7,74 +7,89 @@ import {
   valueMissingMessage,
 } from "../../foundation/forms/form"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
+import type { Store } from "../../foundation/kernel/store"
 import { selects } from "../../foundation/kernel/selects"
 import type { RadioProps, RadioState } from "./radio"
 import { isNativeButton, itemData, itemState, type radioGroupApi, type RadioGroupStore } from "./radio-api"
 
 type ItemProps = RadioProps
 
-function radioSlots<Public extends object>(
-  slot: SlotFactory<RadioGroupStore, ReturnType<typeof radioGroupApi>>,
+type RadioSlotsApi = Pick<ReturnType<typeof radioGroupApi>, "focus" | "internal">
+
+// The group's form value, and a label pointing at it, for Radio, Segmented
+// Control and Rating.
+function bindRadioGroup(el: HTMLElement, api: RadioSlotsApi, store: Store<RadioGroupStore>) {
+  const unbind = bindInternals(el, {
+    value: () => store.get().value,
+    state: () => store.get().value ?? "",
+    restore: api.internal.restore,
+    valueMissing: () => store.get().required && store.get().value === null,
+    message: () => valueMissingMessage("radio"),
+    anchor: api.internal.anchor,
+    focus: api.focus,
+    reset: api.internal.reset,
+    disabled: api.internal.setFormDisabled,
+    subscribe: store.subscribe,
+  })
+  // A label pointing at the group moves focus into it.
+  const onClick = (event: MouseEvent) => {
+    if (event.target === el) api.focus()
+  }
+  // Like a disabled native radio, one the group disables doesn't take focus
+  // from a label press. Browsers send no mouse events into a disabled form
+  // element, like a web component group, so this listens for focus.
+  let pressedLabel: HTMLLabelElement | null = null
+  const onPointerDown = (event: PointerEvent) => {
+    pressedLabel = isDisabled(store.get())
+      ? ((event.target as Element | null)?.closest?.("label") ?? null)
+      : null
+  }
+  const onFocusIn = (event: FocusEvent) => {
+    const label = pressedLabel
+    pressedLabel = null
+    const target = event.target as HTMLElement
+    if (label?.control === target && target !== el) target.blur()
+  }
+  const doc = el.ownerDocument
+  el.addEventListener("click", onClick)
+  el.addEventListener("focusin", onFocusIn)
+  doc.addEventListener("pointerdown", onPointerDown, true)
+  return () => {
+    unbind()
+    el.removeEventListener("click", onClick)
+    el.removeEventListener("focusin", onFocusIn)
+    doc.removeEventListener("pointerdown", onPointerDown, true)
+  }
+}
+
+const radioGroupAttrs = (state: RadioGroupStore) => ({
+  "aria-orientation": state.orientation,
+  "data-orientation": state.orientation,
+  "aria-required": state.required ? "true" : undefined,
+  "aria-readonly": state.readOnly ? "true" : undefined,
+  "aria-disabled": isDisabled(state) ? "true" : undefined,
+  "data-disabled": isDisabled(state) ? "" : undefined,
+  "data-readonly": state.readOnly ? "" : undefined,
+  "data-required": state.required ? "" : undefined,
+})
+
+function radioSlots<Api extends RadioSlotsApi, Public extends object>(
+  slot: SlotFactory<RadioGroupStore, Api>,
   groupState: (state: RadioGroupStore) => Public,
+  // What a component adds to each radio, like Rating's names and hit areas.
+  radioAttrs: (
+    state: RadioGroupStore,
+    key: string,
+    api: Api,
+  ) => Record<string, string | undefined> = () => ({}),
 ) {
   return {
     group: slot<{}, Public>({
       role: "radiogroup",
       keys: { none: "Focus stays on a radio, whose keydown handles them." },
       state: groupState,
-      attrs: (state) => ({
-        "aria-orientation": state.orientation,
-        "data-orientation": state.orientation,
-        "aria-required": state.required ? "true" : undefined,
-        "aria-readonly": state.readOnly ? "true" : undefined,
-        "aria-disabled": isDisabled(state) ? "true" : undefined,
-        "data-disabled": isDisabled(state) ? "" : undefined,
-        "data-readonly": state.readOnly ? "" : undefined,
-        "data-required": state.required ? "" : undefined,
-      }),
-      bind: (el, { api, store }) => {
-        const unbind = bindInternals(el, {
-          value: () => store.get().value,
-          state: () => store.get().value ?? "",
-          restore: api.internal.restore,
-          valueMissing: () => store.get().required && store.get().value === null,
-          message: () => valueMissingMessage("radio"),
-          anchor: api.internal.anchor,
-          focus: api.focus,
-          reset: api.internal.reset,
-          disabled: api.internal.setFormDisabled,
-          subscribe: store.subscribe,
-        })
-        // A label pointing at the group moves focus into it.
-        const onClick = (event: MouseEvent) => {
-          if (event.target === el) api.focus()
-        }
-        // Like a disabled native radio, one the group disables doesn't take focus
-        // from a label press. Browsers send no mouse events into a disabled form
-        // element, like a web component group, so this listens for focus.
-        let pressedLabel: HTMLLabelElement | null = null
-        const onPointerDown = (event: PointerEvent) => {
-          pressedLabel = isDisabled(store.get())
-            ? ((event.target as Element | null)?.closest?.("label") ?? null)
-            : null
-        }
-        const onFocusIn = (event: FocusEvent) => {
-          const label = pressedLabel
-          pressedLabel = null
-          const target = event.target as HTMLElement
-          if (label?.control === target && target !== el) target.blur()
-        }
-        const doc = el.ownerDocument
-        el.addEventListener("click", onClick)
-        el.addEventListener("focusin", onFocusIn)
-        doc.addEventListener("pointerdown", onPointerDown, true)
-        return () => {
-          unbind()
-          el.removeEventListener("click", onClick)
-          el.removeEventListener("focusin", onFocusIn)
-          doc.removeEventListener("pointerdown", onPointerDown, true)
-        }
-      },
+      attrs: radioGroupAttrs,
+      bind: (el, { api, store }) => bindRadioGroup(el, api, store),
     }),
 
     item: slot<ItemProps, RadioState>({
@@ -101,6 +116,7 @@ function radioSlots<Public extends object>(
               : "-1"
             : api.internal.roving.tabIndex(state, { key, props }),
           ...itemData(state, key, props),
+          ...radioAttrs(state, key, api),
         }
       },
       press({ api, key, props }, event) {
@@ -108,7 +124,7 @@ function radioSlots<Public extends object>(
         // in Firefox and Safari.
         event?.preventDefault()
         if (props.disabled) return
-        api.setValue(key, { reason: "item-press", event })
+        api.internal.check(key, { reason: "item-press", event })
       },
       on: {
         // A group's disabled leaves the item focusable to scripts, so a press
@@ -119,7 +135,7 @@ function radioSlots<Public extends object>(
         keydown: (event, { api, el }) => api.internal.onKeyDown(event, el!),
         keyup: (event, { api, el, key, props }) => {
           if (event.key === " " && !isNativeButton(el) && !props.disabled)
-            api.setValue(key, { reason: "item-press", event })
+            api.internal.check(key, { reason: "item-press", event })
         },
       },
       bind(el, part) {
@@ -156,7 +172,8 @@ function radioSlots<Public extends object>(
           focus: api.focus,
           control: () => api.internal.radio(key),
           activate: (event) => {
-            if (!api.internal.itemProps(key).disabled) api.setValue(key, { reason: "item-press", event })
+            if (!api.internal.itemProps(key).disabled)
+              api.internal.check(key, { reason: "item-press", event })
           },
           reset: api.internal.reset,
           disabled: api.internal.setFormDisabled,
@@ -165,4 +182,4 @@ function radioSlots<Public extends object>(
   }
 }
 
-export { radioSlots }
+export { bindRadioGroup, radioGroupAttrs, radioSlots, type RadioSlotsApi }

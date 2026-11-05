@@ -149,6 +149,7 @@ export { createOTPInputController } from "@ui-sdk/core/otp-input"
 export { createPasswordInputController } from "@ui-sdk/core/password-input"
 export { createPopoverController } from "@ui-sdk/core/popover"
 export { createRadioGroupController } from "@ui-sdk/core/radio"
+export { createRatingController } from "@ui-sdk/core/rating"
 export { createScrollAreaController } from "@ui-sdk/core/scroll-area"
 export { createSegmentedControlController } from "@ui-sdk/core/segmented-control"
 export { createSelectController } from "@ui-sdk/core/select"
@@ -265,6 +266,7 @@ export type {
   PasswordInputEvents,
   PopoverEvents,
   RadioGroupEvents,
+  RatingEvents,
   ResizableEvents,
   SegmentedControlEvents,
   SelectEvents,
@@ -321,6 +323,7 @@ export type {
   UiPopoverElement,
   UiRadioElement,
   UiRadioGroupElement,
+  UiRatingElement,
   UiResizableElement,
   UiSegmentedControlElement,
   UiSegmentedControlItemElement,

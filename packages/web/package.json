@@ -44,6 +44,7 @@
     "./preferences": "./src/entries/preferences.ts",
     "./progress": "./src/entries/progress.ts",
     "./radio": "./src/entries/radio.ts",
+    "./rating": "./src/entries/rating.ts",
     "./resizable": "./src/entries/resizable.ts",
     "./scroll-area": "./src/entries/scroll-area.ts",
     "./select": "./src/entries/select.ts",
@@ -231,6 +232,10 @@
       "./radio": {
         "types": "./dist/entries/radio.d.ts",
         "default": "./dist/entries/radio.js"
+      },
+      "./rating": {
+        "types": "./dist/entries/rating.d.ts",
+        "default": "./dist/entries/rating.js"
       },
       "./resizable": {
         "types": "./dist/entries/resizable.d.ts",

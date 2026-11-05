@@ -62,6 +62,14 @@ function tabsOptions() {
   }
 }
 
+// Rating options a spec can set through the URL: ?disabled, and ?cancel=<score>
+// cancels the change to that score.
+function ratingOptions() {
+  const params = new URLSearchParams(location.search)
+  const cancel = params.get("cancel")
+  return { disabled: params.has("disabled"), cancel: cancel === null ? null : Number(cancel) }
+}
+
 // Segmented control options a spec can set through the URL: ?default=<value>,
 // or none for no default value, ?orientation=vertical, ?disabled, and
 // ?cancel=<value> cancels the change to that value.
@@ -168,6 +176,7 @@ export {
   formatShortcut,
   loadScreenReader,
   menuOptions,
+  ratingOptions,
   segmentedControlOptions,
   tabsOptions,
   toggleOptions,
