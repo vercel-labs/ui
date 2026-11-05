@@ -44,8 +44,8 @@
     "./radio": "./src/radio.tsx",
     "./resizable": "./src/resizable.tsx",
     "./scroll-area": "./src/scroll-area.tsx",
-    "./select": "./src/select.tsx",
     "./segmented-control": "./src/segmented-control.tsx",
+    "./select": "./src/select.tsx",
     "./separator": "./src/separator.tsx",
     "./shortcuts": "./src/shortcuts.ts",
     "./slider": "./src/slider.tsx",
@@ -227,13 +227,13 @@
         "types": "./dist/scroll-area.d.ts",
         "default": "./dist/scroll-area.js"
       },
-      "./select": {
-        "types": "./dist/select.d.ts",
-        "default": "./dist/select.js"
-      },
       "./segmented-control": {
         "types": "./dist/segmented-control.d.ts",
         "default": "./dist/segmented-control.js"
+      },
+      "./select": {
+        "types": "./dist/select.d.ts",
+        "default": "./dist/select.js"
       },
       "./separator": {
         "types": "./dist/separator.d.ts",
