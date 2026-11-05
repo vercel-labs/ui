@@ -226,6 +226,18 @@ export type {
   StepRange,
 } from "@ui-sdk/core/number"
 
+// CSS colors as plain data: read, convert, write, fit to a gamut and compare. `formatColor(parseColor("red")!, "oklch")` is "oklch(0.628 0.2577 29.23)".
+export {
+  colorDistance,
+  contrastRatio,
+  convertColor,
+  formatColor,
+  isInGamut,
+  parseColor,
+  toGamut,
+} from "@ui-sdk/core/color"
+export type { Color, ColorFormat, ColorFormatOptions, ColorGamut, ColorSpace } from "@ui-sdk/core/color"
+
 // Keyboard shortcuts scoped to open layers. `registerShortcut("mod+k", open)` returns an unregister function.
 export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
 export type {

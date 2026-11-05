@@ -16,6 +16,7 @@
     "./carousel": "./src/carousel.ts",
     "./checkbox": "./src/checkbox.ts",
     "./collapsible": "./src/collapsible.ts",
+    "./color": "./src/color.ts",
     "./combobox": "./src/combobox.ts",
     "./command": "./src/command.ts",
     "./date": "./src/date.ts",
@@ -116,6 +117,10 @@
       "./collapsible": {
         "types": "./dist/collapsible.d.ts",
         "default": "./dist/collapsible.js"
+      },
+      "./color": {
+        "types": "./dist/color.d.ts",
+        "default": "./dist/color.js"
       },
       "./combobox": {
         "types": "./dist/combobox.d.ts",
