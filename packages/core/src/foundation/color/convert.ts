@@ -145,7 +145,7 @@ function srgbToHsl(rgb: Coords) {
   const lightness = (max + min) / 2
   let hue = rgbHue(rgb, max, max - min)
   let saturation =
-    Number.isNaN(hue) || lightness <= 0 || lightness >= 1
+    Number.isNaN(hue) || lightness === 0 || lightness === 1
       ? 0
       : (max - lightness) / Math.min(lightness, 1 - lightness)
   if (saturation < 0) {

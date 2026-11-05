@@ -117,6 +117,11 @@ describe("converting", () => {
       expectCoords(convertColor(convertColor(start, space), "srgb").coords, start.coords, 6)
   })
 
+  test("keeps an out-of-gamut color through HSL", () => {
+    const light = { space: "srgb", coords: [1.2, 1.1, 1], alpha: 1 } satisfies Color
+    expectCoords(convertColor(convertColor(light, "hsl"), "srgb").coords, light.coords, 6)
+  })
+
   test("marks the hue of a grey as missing", () => {
     expect(coordsOf("white", "oklch")[2]).toBeNull()
     expect(coordsOf("#808080", "hsl")[0]).toBeNull()
