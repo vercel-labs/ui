@@ -263,7 +263,8 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   function moveFocus(from: HTMLElement, offset: number) {
     const list = segmentElements().map(({ el }) => el)
     const target = list[list.indexOf(from) + offset]
-    target?.focus()
+    // The next segment sits beside this one, and iOS would scroll the page on every move.
+    target?.focus({ preventScroll: true })
     return !!target
   }
 
@@ -330,7 +331,7 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
         finish(event)
         return false
       }
-      following.el.focus()
+      following.el.focus({ preventScroll: true })
       target = following.el
       current = following.type
       return true
