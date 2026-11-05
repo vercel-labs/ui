@@ -5,6 +5,7 @@ import {
   convertColor,
   formatColor,
   isInGamut,
+  mixColor,
   parseColor,
   toGamut,
   type Color,
@@ -211,5 +212,35 @@ describe("comparing", () => {
     expect(colorDistance(color("red"), color("red"))).toBe(0)
     expect(colorDistance(color("red"), color("#fe0000"))).toBeLessThan(0.02)
     expect(colorDistance(color("black"), color("white"))).toBeCloseTo(1, 5)
+  })
+})
+
+describe("mixing", () => {
+  test("mixes halfway in Oklab by default, like color-mix()", () => {
+    const mixed = mixColor(color("white"), color("black"))
+    expect(mixed.space).toBe("oklab")
+    expectCoords(mixed.coords, [0.5, 0, 0])
+    expect(formatColor(mixColor(color("red"), color("blue"), 0.25, { space: "srgb" }))).toBe(
+      "rgb(191.25 0 63.75)",
+    )
+  })
+
+  test("takes the shorter way around the hue wheel, or the one asked for", () => {
+    const red = color("hsl(350 100% 50%)")
+    const orange = color("hsl(30 100% 50%)")
+    expect(mixColor(red, orange, 0.5, { space: "hsl" }).coords[0]).toBeCloseTo(10)
+    expect(mixColor(red, orange, 0.5, { space: "hsl", hue: "longer" }).coords[0]).toBeCloseTo(190)
+    expect(mixColor(orange, red, 0.5, { space: "hsl", hue: "increasing" }).coords[0]).toBeCloseTo(190)
+    expect(mixColor(orange, red, 0.5, { space: "hsl", hue: "decreasing" }).coords[0]).toBeCloseTo(10)
+  })
+
+  test("mixes premultiplied by alpha, and a missing channel takes the other's", () => {
+    const mixed = mixColor(color("rgb(255 0 0 / 0)"), color("rgb(0 0 255)"), 0.5, { space: "srgb" })
+    expect(mixed.alpha).toBe(0.5)
+    expectCoords(mixed.coords, [0, 0, 1])
+    expectCoords(
+      mixColor(color("oklch(0.6 0 none)"), color("oklch(0.8 0.2 120)"), 0.5, { space: "oklch" }).coords,
+      [0.7, 0.1, 120],
+    )
   })
 })

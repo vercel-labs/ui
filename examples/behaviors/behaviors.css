@@ -403,6 +403,27 @@
     }
   }
 
+  [data-slot="color-field"] > select {
+    width: auto;
+  }
+
+  [data-slot="color-steps"] {
+    display: grid;
+    width: 20rem;
+    max-width: 100%;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    & > li {
+      aspect-ratio: 1;
+      border-radius: var(--radius-row);
+      box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.1);
+    }
+  }
+
   [data-slot="contrast-preview"] {
     margin: 0;
     padding: var(--space-3) var(--space-4);

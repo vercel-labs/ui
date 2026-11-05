@@ -3,8 +3,8 @@ import { openExamples } from "./behaviors/helpers"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, "/docs/core/color")
-  await expect(page.locator("[data-example]")).toHaveCount(2)
-  await expect(page.locator("figure > figcaption")).toHaveCount(2)
+  await expect(page.locator("[data-example]")).toHaveCount(3)
+  await expect(page.locator("figure > figcaption")).toHaveCount(3)
   expect(errors).toEqual([])
 })
 
@@ -26,6 +26,15 @@ test("formats: a typed color shows in each format, mapped into sRGB where a form
   await input.fill("blurple")
   await expect(input).toHaveAttribute("aria-invalid", "true")
   await expect(example.locator("[data-gamut]")).toHaveText("Not a color")
+})
+
+test("mix: the steps between two colors follow the space", async ({ page }) => {
+  await openExamples(page, "/docs/core/color")
+  const example = page.locator('[data-example="behaviors/color-mix"]')
+  await expect(example.locator('[data-slot="color-steps"] > li')).toHaveCount(7)
+  await expect(example.locator("[data-middle]")).toHaveText("#90a3ad halfway")
+  await example.getByRole("combobox", { name: "Space" }).selectOption("sRGB")
+  await expect(example.locator("[data-middle]")).toHaveText("#909880 halfway")
 })
 
 test("contrast: the ratio and its verdict follow the picked colors", async ({ page }) => {

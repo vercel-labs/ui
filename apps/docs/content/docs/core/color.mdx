@@ -102,6 +102,41 @@ toGamut(green, "p3") === green // true, it already fits
 
 `toGamut` maps the way CSS Color 4 and browsers do: it lowers the chroma in OKLCH, keeping the lightness and hue, until clipping what's left is too small to see. That keeps a vivid green green, where clipping each channel can shift its hue.
 
+## Mixing
+
+### Mix Two Colors
+
+`mixColor` mixes two colors the way CSS `color-mix()` does. Pass how much of the second color you want, from 0 to 1:
+
+```ts
+import { formatColor, mixColor, parseColor } from "@ui-sdk/core/color"
+
+const blue = parseColor("#2563eb")!
+const yellow = parseColor("#facc15")!
+
+formatColor(mixColor(blue, yellow), "hex") // "#90a3ad", halfway in Oklab
+formatColor(mixColor(blue, yellow, 0.25, { space: "srgb" })) // "rgb(90.25 125.25 181.5)"
+```
+
+Colors mix in Oklab by default, where the steps between two colors look even. Set `space` to mix in another one, and the result is in that space. Translucent colors mix by their alpha, as `color-mix()` does, so a transparent color doesn't darken the other.
+
+<ComponentExample
+  name="behaviors/color-mix"
+  caption="Pick two colors to see the steps between them. Choose sRGB and the middle turns darker, or OKLCH and it stays vivid, passing through green."
+/>
+
+### Hues
+
+In a space with a hue, like OKLCH or HSL, the hue takes the shorter way around the color wheel. Set `hue` to `"longer"`, `"increasing"` or `"decreasing"` to go another way:
+
+```ts
+const red = parseColor("oklch(0.63 0.26 29)")!
+const violet = parseColor("oklch(0.55 0.25 300)")!
+
+mixColor(red, violet, 0.5, { space: "oklch" }).coords[2] // 344.5, through pink
+mixColor(red, violet, 0.5, { space: "oklch", hue: "longer" }).coords[2] // 164.5, through green
+```
+
 ## Comparing
 
 ### Contrast
