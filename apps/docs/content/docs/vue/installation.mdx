@@ -34,7 +34,7 @@ Each [component page](./components) lists the parts you can use.
 
 Install the same two packages in a Nuxt app. There's no Nuxt module or plugin to add: import components from their entries as above, and they render on the server and hydrate in the browser.
 
-Nuxt auto-imports the components in your `components/` directory, not those of a package. To use ui-sdk parts in templates without importing them, register an entry's exports with `addComponentExports` from an inline module:
+Nuxt auto-imports the components in your `components/` directory, not those of a package. To use ui-sdk parts in templates without importing them, register an entry's exports with `addComponentExports` from an inline module. It needs Nuxt 3.17 or later:
 
 ```ts title="nuxt.config.ts"
 import { addComponentExports } from "nuxt/kit"
@@ -50,7 +50,15 @@ export default defineNuxtConfig({
 })
 ```
 
-Each part of those entries becomes an auto-imported component, like `<DialogTrigger>`. Functions such as `createDialogController` still need an import in `<script>`. Pass `prefix` if the names clash with your own components.
+Every export of those entries is registered as a component, so parts like `<DialogTrigger>` work in templates without an import. Pass `prefix` if the names clash with your own components. Functions such as `createDialogController` aren't auto-imported in `<script>`: import them, or list them in `imports.presets`:
+
+```ts title="nuxt.config.ts"
+export default defineNuxtConfig({
+  imports: {
+    presets: [{ from: "@ui-sdk/vue/dialog", imports: ["createDialogController"] }],
+  },
+})
+```
 
 ## Add Your Styles
 
