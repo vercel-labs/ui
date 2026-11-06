@@ -4,6 +4,8 @@
 
 Test what you built, not what ui-sdk already tests: for an interface, check that the right components are wired with names, values and callbacks; for a new component, check every key and state.
 
+Wiring includes what a person does with the keyboard: press Space on each switch or checkbox you placed, and check that closing a dialog or menu returns focus where it should. Assert every button's name in the page's own markup, not in a fixture, and assert that state attributes you don't set, like `aria-disabled`, are absent. The same goes when you're asked to add tests to existing code: tests that pass on a broken page don't count.
+
 ## Which tool for what
 
 | You built                                                   | Test with                                                                                                                                                                                                                    |
@@ -65,10 +67,13 @@ For a composite widget, test both arrow directions, that exactly one item is tab
 Framework renderers don't fill jsdom's gaps. Before anything opens, add these to the test setup:
 
 ```ts
-HTMLElement.prototype.showPopover ??= function () {}
-HTMLElement.prototype.hidePopover ??= function () {}
-Element.prototype.getAnimations ??= () => []
-Element.prototype.scrollIntoView ??= function () {}
+HTMLElement.prototype.showPopover = function () {}
+HTMLElement.prototype.hidePopover = function () {}
+Element.prototype.getAnimations = () => []
+Element.prototype.scrollIntoView = function () {}
+Element.prototype.checkVisibility = () => true
+Element.prototype.getClientRects = () => [] as unknown as DOMRectList
+document.elementsFromPoint = () => []
 globalThis.ResizeObserver ??= class {
   observe() {}
   unobserve() {}
@@ -79,7 +84,7 @@ document.head.append(
 )
 ```
 
-Web components in jsdom also need `ElementInternals`: if `attachInternals` is missing or lacks `setFormValue` and `setValidity`, stub them as no-ops. Stub `URL.createObjectURL` for file previews. `mount` already does the popover and animation stubs. Some state arrives a tick after mounting; wait with `await new Promise((r) => setTimeout(r, 0))` (inside `act` in React).
+Assign these rather than using `??=`: jsdom has some of them without the parts that matter. Web components in jsdom also need `ElementInternals`: jsdom's `attachInternals` lacks `setFormValue` and `setValidity`, so wrap `HTMLElement.prototype.attachInternals` and add them as no-ops. Stub `URL.createObjectURL` for file previews. `mount` already does the popover and animation stubs, and it keeps a part that isn't present as a detached node, so `view.part()` still returns it: check `isConnected` to tell whether it's on the page. Some state arrives a tick after mounting; wait with `await new Promise((r) => setTimeout(r, 0))` (inside `act` in React).
 
 ## A real browser
 

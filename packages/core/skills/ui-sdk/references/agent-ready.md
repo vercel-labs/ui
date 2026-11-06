@@ -6,14 +6,14 @@ The full docs are the Agents pages: `docs/agents.md` in each package, or https:/
 
 ## The checklist
 
-1. **Every control has a name.** The bridge's `label` is the accessible name: `FieldLabel`, the component's label part, or `aria-label`. Labels should be unique where they sit, because a step finds its component by label (`{ ref: "Project name", … }`). Two "Name" fields in two sections are fine only if a step can still tell them apart by ref or row text. Components that only support another still show up: give a shared Tooltip or an Avatar its own `aria-label`, or put `data-agent-hidden` on it. A Trigger Menu takes its field's label, so give it an `aria-label` of its own, like "Mention suggestions".
+1. **Every control has a name.** The bridge's `label` is the accessible name: `FieldLabel`, the component's label part, or `aria-label`. Labels should be unique where they sit, because a step finds its component by label (`{ ref: "Project name", … }`). Two "Name" fields in two sections are fine only if a step can still tell them apart by ref or row text. Components that only support another still show up: give a shared Tooltip, an Avatar, a toast region or a Menu shared by several triggers its own `aria-label`, or put `data-agent-hidden` on it. Labels inside a dialog should differ from the page's too: the bridge still sees the page behind an open modal.
 2. **Every control an agent should use is one of our parts.** `snapshot()` lists only ui-sdk components. These are invisible, so an agent can't fill or press them:
    - a plain `<button>`: use `Button` (`<ui-button><button>…</button></ui-button>` in web components), including submit buttons and a wizard's Back and Continue;
    - a bare `<input>`, `<textarea>` or `<select>`, and `FieldControl`: use `Input`, `Textarea`, `NumberInput` or `Select` inside a `Field`. In web components that's `<ui-field>` with `<ui-input><input /></ui-input>` inside, never a bare `<input>`;
    - a custom primitive's step it can't take, like a linear stepper's next step: make the action that completes it (the Continue button) one of ours too.
 3. **State flows through change callbacks.** Keep app state in sync through `onValueChange` (and the other `on<Key>Change` callbacks), not through DOM listeners. Agent changes call the component's API, not keyboard or pointer handlers, so checks in `onKeyDown` or `onClick` never see them. In the callback, `details.source === "agent"` tells an agent's change apart, and `details.cancel()` refuses it.
 4. **Mark what needs a person.** Three attributes, and only these three:
-   - `data-agent-confirm="<what it does>"` on anything an agent must not do alone, like delete, pay or send. It covers the element and everything inside it. Write the sentence for the person who'll be asked: "Deletes the project and all its files".
+   - `data-agent-confirm="<what it does>"` on anything an agent must not do alone, like delete, pay or send. It covers the element and everything inside it. Write the sentence for the person who'll be asked: "Deletes the project and all its files". For a confirm dialog, put it on the button that confirms, `<AlertDialogClose value="confirm">`, not on the trigger (opening the dialog is harmless) or the content (that gates Cancel too). Give that button text that isn't part of the trigger's, like "Delete forever" for a "Delete project" trigger: a press looks among the buttons already on the page first, so "Delete" would match the trigger.
    - `data-agent-secret` on a field whose value an agent may fill but never read. Password, card and one-time-code fields are already secret.
    - `data-agent-hidden` on a region an agent shouldn't see at all, like recovery codes.
 5. **Your own primitives say what they do.** Every `definePrimitive` ends with an `agent` key:
@@ -55,7 +55,7 @@ export { agent }
 
 - `agent.snapshot()` lists the components, their state and their `actions`. `agent.act({ steps })` runs steps in order. `agent.query({ text, within, kind })` finds components and list items.
 - **Your own model:** `agentTools` has the three tools' names, descriptions and JSON Schemas. Route each tool call to the matching method on `agent` and return its result.
-- **A browser agent (WebMCP):** `const unregister = registerTools(agent, { allow })`. It does nothing in a browser without `document.modelContext`. `allow` is required here, since you didn't write that agent.
+- **A browser agent (WebMCP):** `const unregister = registerTools(agent, { allow })`. It does nothing in a browser without `document.modelContext`. `allow` is required here, since you didn't write that agent. Ask the person in one place: when the bridge's own `allow` already asks, as above, pass `allow: () => true` here, or every marked step asks twice.
 - `allow` returns `true`, `false`, or a `Promise<boolean>` for your own confirmation UI. Without it, steps on `data-agent-confirm` fail with "Needs a person".
 - In Next.js and other server rendering setups, create the bridge in client code only, like a `"use client"` module imported by a client component.
 
@@ -93,9 +93,22 @@ test("an agent can find and change every setting", async () => {
 })
 ```
 
-- Create one bridge per test file: it has no `destroy`, and it remembers components earlier tests removed as `offPage`.
+- Create one bridge per test file: it has no `destroy`, and it remembers components earlier tests removed as `offPage`. Unmount between tests: with Vitest, Testing Library only cleans up when `globals: true` is set, so otherwise add `afterEach(cleanup)`.
+- Don't filter entries out of the label check. An unnamed entry is a control an agent can't find: name it or hide it.
 - List every control the task names in the `labels` check, so a control the bridge can't see fails the test. Add one `act` step for every control the task names, using the words a person would use. If a step fails, its `error.message` says why, like an ambiguous label with each match's ref.
-- For a `data-agent-confirm` control, assert the step fails without `allow`, then passes with `allow: () => true`.
+- For a `data-agent-confirm` control, give the file's one bridge an `allow` you can flip, and assert the step is refused, then runs:
+
+  ```ts
+  let approve = false
+  const agent = createAgent({ allow: (step) => !step.confirm || approve })
+  const remove = { steps: [{ ref: "Delete project", action: "press", args: ["Delete forever"] }] }
+
+  expect((await agent.act(remove)).ok).toBe(false)
+  approve = true
+  expect((await agent.act(remove)).ok).toBe(true)
+  ```
+
+- `press` with a button's text opens a closed dialog or menu to find it. `press` with no text on a closed dialog fails today, so always name the button. Once a dialog is open, its label is its title, not the trigger's text.
 - `act` can return `ok: true` while a change callback cancelled a value. Check `result.values` or the DOM, not only `ok`.
 
 Also look at the snapshot once by hand (`console.log(JSON.stringify(agent.snapshot(), null, 2))`): every entry should have a label a person would recognize, the actions you expect, and no `"actions": []` on a custom primitive that should do something.

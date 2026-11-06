@@ -13,8 +13,8 @@ The docs for the installed version ship in each package, as Markdown:
 
 - `node_modules/@ui-sdk/<framework>/docs/llms.txt` is the index. Read it first. `<framework>` is `react`, `vue`, `svelte`, `solid` or `web`.
 - Then read only the pages your task needs, like `docs/components/select.md`. Don't read the whole `docs/` folder; it's large.
-- An interface built from our components doesn't need `docs/core.md`. Only path 2 below does, and even then you search it by heading: it's over 300 KB.
-- Don't read compiled JavaScript in `dist/*.js`. The docs and the `.d.ts` types are the API.
+- An interface built from our components doesn't need `docs/core.md`. Only path 2 below does, and even then you search it by heading: it's over 300 KB. If the project's AGENTS.md asks you to read `core.md`, search it by heading the same way. `docs/rendering.md` sits next to it in the same `docs/` folder.
+- Don't read compiled JavaScript in `dist/*.js`, even to debug. The docs and the `.d.ts` types are the API; when they don't answer, write a small test that tries it, and note the gap in GAPS.md.
 
 The same docs are online at https://ui-sdk.dev/docs. Prefer the installed copy: it matches the version in the project.
 
@@ -48,6 +48,6 @@ Every path ends the same way:
 ## When you're done
 
 1. **Typecheck.** If the root `tsconfig.json` has `"files": []` and `references`, `npx tsc --noEmit` checks nothing: run `npx tsc -b` or `npx tsc --noEmit -p <app config>`. For Svelte, run `svelte-check`; for Vue, `vue-tsc`.
-2. **Write and run tests** (see testing.md). Every task gets tests, and every interface gets at least the agent test from agent-ready.md.
+2. **Write and run tests** (see testing.md). Every task gets tests, and every interface gets at least the agent test from agent-ready.md. If a test finds a bug in code you were asked only to test, mark it `test.fails` (or `it.fails`) with a one-line reason, report the bug, and leave the suite green.
 3. **Report** each command you ran with its exit code, and anything you couldn't check.
 4. **Write gaps to `GAPS.md`** at the project root, one line each: anything the docs or types got wrong or left out, and what it cost you (a failed test, a probe, a guess). Write "No gaps" if there were none.

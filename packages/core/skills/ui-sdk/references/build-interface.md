@@ -124,41 +124,43 @@ import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 
 function ProjectSettings() {
   return (
-    <form>
-      <Field name="name">
-        <FieldLabel>Project name</FieldLabel>
-        <Input defaultValue="Apollo" required />
-      </Field>
-      <Field>
-        <FieldLabel>Visibility</FieldLabel>
-        <Select name="visibility" defaultValue="private">
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="private">Private</SelectItem>
-            <SelectItem value="internal">Internal</SelectItem>
-            <SelectItem value="public">Public</SelectItem>
-          </SelectContent>
-        </Select>
-      </Field>
-      <Field>
-        <Switch name="digest" defaultChecked>
-          <SwitchThumb />
-        </Switch>
-        <FieldLabel>Weekly digest</FieldLabel>
-      </Field>
+    <>
+      <form>
+        <Field name="name">
+          <FieldLabel>Project name</FieldLabel>
+          <Input defaultValue="Apollo" required />
+        </Field>
+        <Field>
+          <FieldLabel>Visibility</FieldLabel>
+          <Select name="visibility" defaultValue="private">
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="private">Private</SelectItem>
+              <SelectItem value="internal">Internal</SelectItem>
+              <SelectItem value="public">Public</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field>
+          <Switch name="digest" defaultChecked>
+            <SwitchThumb />
+          </Switch>
+          <FieldLabel>Weekly digest</FieldLabel>
+        </Field>
+      </form>
       <AlertDialog>
-        <AlertDialogTrigger data-agent-confirm="Deletes the project and all its data">
-          Delete project
-        </AlertDialogTrigger>
+        <AlertDialogTrigger>Delete project</AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogTitle>Delete Apollo?</AlertDialogTitle>
           <AlertDialogClose>Cancel</AlertDialogClose>
-          <AlertDialogClose value="confirm">Delete</AlertDialogClose>
+          <AlertDialogClose value="confirm" data-agent-confirm="Deletes the project and all its data">
+            Delete forever
+          </AlertDialogClose>
         </AlertDialogContent>
       </AlertDialog>
-    </form>
+    </>
   )
 }
 
