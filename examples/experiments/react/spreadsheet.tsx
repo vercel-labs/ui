@@ -78,7 +78,11 @@ const functions: Record<string, (values: number[]) => number> = {
   COUNT: (values) => values.length,
 }
 
-function evaluate(formula: string, read: (name: string) => number | string) {
+function evaluate(
+  formula: string,
+  read: (name: string) => number | string,
+  size: { rows: number; cols: number },
+) {
   const tokens = formula.toUpperCase().match(/\d+(\.\d+)?|[A-Z]+\d+(:[A-Z]+\d+)?|[A-Z]+|[-+*/(),]/g) ?? []
   let at = 0
   const next = () => tokens[at++]
@@ -93,8 +97,10 @@ function evaluate(formula: string, read: (name: string) => number | string) {
     if (!token.includes(":")) return [number(read(token))]
     const [from, to] = token.split(":").map(parseName)
     const values: number[] = []
-    for (let row = Math.min(from.row, to.row); row <= Math.max(from.row, to.row); row++)
-      for (let col = Math.min(from.col, to.col); col <= Math.max(from.col, to.col); col++) {
+    const bottom = Math.min(size.rows - 1, Math.max(from.row, to.row))
+    const right = Math.min(size.cols - 1, Math.max(from.col, to.col))
+    for (let row = Math.min(from.row, to.row); row <= bottom; row++)
+      for (let col = Math.min(from.col, to.col); col <= right; col++) {
         const value = read(cellName({ row, col }))
         if (typeof value === "number") values.push(value)
       }
@@ -180,11 +186,15 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
       if (raw.startsWith("=")) {
         values.set(name, "#CYCLE!")
         try {
-          value = evaluate(raw.slice(1), (ref) => {
-            const result = valueOf(ref)
-            if (typeof result === "string" && result.startsWith("#")) throw new Error(result)
-            return result
-          })
+          value = evaluate(
+            raw.slice(1),
+            (ref) => {
+              const result = valueOf(ref)
+              if (typeof result === "string" && result.startsWith("#")) throw new Error(result)
+              return result
+            },
+            { rows: rows(), cols: cols() },
+          )
         } catch (error) {
           const message = (error as Error).message
           value = message.startsWith("#") ? message : message === "value" ? "#VALUE!" : "#ERROR!"
