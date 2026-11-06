@@ -31,11 +31,13 @@ const written = new WeakMap<HTMLElement, string>()
 function writeName(control: HTMLElement) {
   const current = control.getAttribute("aria-labelledby")
   const ours = written.get(control)
-  if (control.hasAttribute("aria-label") || (current !== null && current !== ours)) return
-  const ids = (labelsByControl.get(control) ?? [])
-    .sort(documentOrder)
-    .map((label) => label.id)
-    .join(" ")
+  if (current !== null && current !== ours) return
+  const ids = control.hasAttribute("aria-label")
+    ? ""
+    : (labelsByControl.get(control) ?? [])
+        .sort(documentOrder)
+        .map((label) => label.id)
+        .join(" ")
   if (ids) {
     written.set(control, ids)
     if (current !== ids) control.setAttribute("aria-labelledby", ids)
@@ -79,6 +81,9 @@ function watchTree(root: Node, check: () => void) {
   }
 }
 
+// Attributes on the label or its control that change which control it names, or whether it names one.
+const naming = { attributeFilter: ["for", "id", "role", "type", "aria-hidden", "aria-label"] }
+
 function bindLabel(el: HTMLElement) {
   let control: HTMLElement | undefined
   let unname: (() => void) | undefined
@@ -93,6 +98,9 @@ function bindLabel(el: HTMLElement) {
       unname?.()
       control = next
       unname = control && nameControl(control, el)
+      changes.disconnect()
+      changes.observe(el, naming)
+      if (control) changes.observe(control, naming)
     }
     // A native label that wraps a labelable control never needs to look for it.
     const looks = el.hasAttribute("for") || !(el instanceof HTMLLabelElement) || !el.control
@@ -108,7 +116,7 @@ function bindLabel(el: HTMLElement) {
   // Controls after the label bind after it.
   queueMicrotask(update)
   const changes = new MutationObserver(update)
-  changes.observe(el, { attributeFilter: ["for", "id"] })
+  changes.observe(el, naming)
   return () => {
     active = false
     changes.disconnect()

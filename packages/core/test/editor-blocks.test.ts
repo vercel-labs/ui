@@ -564,6 +564,35 @@ describe("createCellRange", () => {
     expect(instance.api.grid.active()).toEqual({ row: 1, col: 1 })
   })
 
+  test("Control+A announces every cell when the range is controlled", () => {
+    const controlled = definePrimitive({
+      name: "sheet",
+      state: (_options: {}): SheetState => ({ active: null, range: null }),
+      api: (context) => {
+        const grid = createGridFocus<SheetState>(context, { key: "active", rows: () => 5, cols: () => 4 })
+        const range = createCellRange<SheetState>(context, {
+          key: "range",
+          grid,
+          rows: () => 5,
+          cols: () => 4,
+          set: () => true,
+        })
+        return { grid, range }
+      },
+      slots: (slot) => ({ cell: slot({}) }),
+    })
+    const instance = controlled({ id: "s" })
+    const heard: string[] = []
+    setAnnouncer((text) => heard.push(text))
+    cleanups.push(
+      () => instance.destroy(),
+      () => setAnnouncer(undefined),
+    )
+    instance.api.grid.focus({ row: 1, col: 1 })
+    instance.api.range.keydown(key("a", { ctrlKey: true }))
+    expect(heard).toEqual(["5 rows by 4 columns selected"])
+  })
+
   test("cells say whether they're selected and which sides of the range they sit on", () => {
     const instance = mount()
     const { range } = instance.api

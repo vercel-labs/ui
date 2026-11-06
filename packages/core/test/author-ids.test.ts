@@ -4,7 +4,7 @@
 import { expect, test, vi } from "vitest"
 import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
 import { applyAttrs, live } from "../src/foundation/kernel/live"
-import { field } from "../src/components/field/field"
+import { field, fieldSet } from "../src/components/field/field"
 import { attrs, bind, liveAttrs, subscribe, takeOwnId } from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { fakeEditor } from "./fake-editor"
@@ -98,6 +98,27 @@ test("references follow an author's id that changes or goes while its element is
   el.id = "t-tab-a"
   await settleChange()
   expect(attrs(panel)["aria-labelledby"]).toBe("t-tab-a")
+})
+
+test("a field set points at its legend's and description's author ids as they change", async () => {
+  const instance = fieldSet({ id: "s" })
+  const set = instance.part("set")
+  const legend = element("profile-title")
+  const description = element("profile-help")
+  bind(instance.part("legend", { id: "profile-title" }), legend)
+  bind(instance.part("description", { id: "profile-help" }), description)
+  await settleChange()
+  expect(attrs(set)).toMatchObject({
+    "aria-labelledby": "profile-title",
+    "aria-describedby": "profile-help",
+  })
+  legend.id = "account-title"
+  description.id = "account-help"
+  await settleChange()
+  expect(attrs(set)).toMatchObject({
+    "aria-labelledby": "account-title",
+    "aria-describedby": "account-help",
+  })
 })
 
 test("live references follow an author's id too", async () => {

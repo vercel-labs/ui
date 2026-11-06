@@ -20,3 +20,22 @@ test("a native label around a group names it, and leaves a native control to the
   expect(terms.querySelector("input")!.hasAttribute("aria-labelledby")).toBe(false)
   unbind.forEach((each) => each())
 })
+
+test("a label stops naming a control its author names, or that stops being the one it's for", async () => {
+  document.body.innerHTML = `<span id="plan" for="plans">Plan</span><div id="plans" role="radiogroup"></div>`
+  const group = document.querySelector<HTMLElement>("[role=radiogroup]")!
+  const unbind = bind(label({ id: "plan" }).part("root"), document.getElementById("plan")!)
+  const settle = () => new Promise((resolve) => setTimeout(resolve))
+  await settle()
+  expect(group.getAttribute("aria-labelledby")).toBe("plan")
+  group.setAttribute("aria-label", "Billing plan")
+  await settle()
+  expect(group.hasAttribute("aria-labelledby")).toBe(false)
+  group.removeAttribute("aria-label")
+  await settle()
+  expect(group.getAttribute("aria-labelledby")).toBe("plan")
+  group.id = "other"
+  await settle()
+  expect(group.hasAttribute("aria-labelledby")).toBe(false)
+  unbind()
+})
