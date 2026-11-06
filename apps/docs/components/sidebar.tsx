@@ -5,25 +5,19 @@ import type * as PageTree from "fumadocs-core/page-tree"
 import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-core/toc"
 import Link from "next/link"
 import * as React from "react"
-import { useActiveTree, useCurrentUrl } from "./section-nav"
+import { BetaCard } from "./beta-banner"
+import { useCurrentUrl } from "./section-nav"
 
-function Sidebar({
-  tree,
-  componentsTree,
-  tocs,
-}: {
-  tree: PageTree.Root
-  componentsTree?: PageTree.Root
-  tocs: Record<string, TableOfContents>
-}) {
-  const active = useActiveTree(tree, componentsTree) ?? tree
-  const current = useCurrentUrl(active)
+function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, TableOfContents> }) {
+  const current = useCurrentUrl(tree)
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-6 pe-4 pb-8 scrollbar-none">
+      <div className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-10 pe-4 pb-8 scrollbar-none">
         <nav aria-label="Docs">
-          <Nodes nodes={active.children} tocs={tocs} current={current} />
+          <Nodes nodes={tree.children} tocs={tocs} current={current} />
         </nav>
+        {/* The page's own column shows it from xl, beside the contents. */}
+        <BetaCard className="mt-8 xl:hidden" />
       </div>
     </div>
   )

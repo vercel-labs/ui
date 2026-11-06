@@ -1,38 +1,31 @@
 import { DocsArticle } from "@/components/docs-article"
 import { DocsLayout } from "@/components/docs-layout"
 import { getMDXComponents } from "@/components/mdx"
-import { getStarted } from "@/lib/get-started"
+import { getStarted, source } from "@/lib/source"
 import type { Metadata } from "next"
-
-export const metadata: Metadata = {
-  title: getStarted.title,
-  description: getStarted.description,
-}
+import { notFound } from "next/navigation"
 
 export default function GetStartedPage() {
-  const { h2: H2, p: P, Cards, Card } = getMDXComponents()
+  const page = source.getPage(getStarted.slugs)
+  if (!page) notFound()
+  const MDX = page.data.body
 
   return (
     <DocsLayout section="core">
       <DocsArticle
-        title={getStarted.title}
-        description={getStarted.description}
+        title={page.data.title}
+        description={page.data.description}
         next={{ name: "Introduction", url: "/docs/core" }}
-        toc={getStarted.toc}
-        url="/docs"
+        toc={page.data.toc}
+        url={getStarted.url}
       >
-        {getStarted.questions.map((question) => (
-          <section key={question.id}>
-            <H2 id={question.id}>{question.title}</H2>
-            <P>{question.description}</P>
-            <Cards>
-              {question.tiles.map((tile) => (
-                <Card key={tile.href} {...tile} />
-              ))}
-            </Cards>
-          </section>
-        ))}
+        <MDX components={getMDXComponents()} />
       </DocsArticle>
     </DocsLayout>
   )
+}
+
+export function generateMetadata(): Metadata {
+  const page = source.getPage(getStarted.slugs)
+  return { title: page?.data.title, description: page?.data.description }
 }

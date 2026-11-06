@@ -15,8 +15,8 @@ for (const theme of ["light", "dark"]) {
       )
     }
     expect(await scan()).toEqual([])
-    await page.getByRole("combobox", { name: "Framework", exact: true }).click()
-    await expect(page.getByRole("option", { name: "Vue", exact: true })).toBeVisible()
+    await page.getByRole("button", { name: "Frameworks", exact: true }).click()
+    await expect(page.getByRole("link", { name: "Vue", exact: true })).toBeVisible()
     expect(await scan()).toEqual([])
     await page.keyboard.press("Escape")
     await page.keyboard.press("ControlOrMeta+k")
@@ -32,12 +32,20 @@ for (const [label, width] of [
   test(`the ${label} docs list the sections, and Components opens the React catalog`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto("/docs/core")
-    // On a phone the sections open from the menu.
+    // On a phone the sections open from the menu, which lists the frameworks on their own.
     if (label === "mobile") await page.getByRole("button", { name: "Menu", exact: true }).click()
     const sections = page.getByRole("navigation", { name: "Sections" }).filter({ visible: true })
     await expect(sections).toHaveCount(1)
-    await expect(sections.getByRole("listitem")).toHaveText(menu.map((item) => item.title))
-    await expect(sections.getByRole("link", { name: "Core", exact: true })).toHaveAttribute(
+    const items = menu.filter((item) =>
+      label === "mobile" ? item.href !== "/docs/frameworks" : !item.href.startsWith("http"),
+    )
+    await expect(sections.getByRole("listitem").filter({ hasNot: page.locator("li li") })).toHaveText(
+      label === "mobile"
+        ? [...items.map((item) => item.title), "React", "Vue", "Svelte", "Web Components", "Solid"]
+        : items.map((item) => item.title),
+    )
+    // Core shares its sidebar with Get Started, so Docs covers it.
+    await expect(sections.getByRole("link", { name: "Docs", exact: true })).toHaveAttribute(
       "aria-current",
       "page",
     )
@@ -49,46 +57,81 @@ for (const [label, width] of [
       "page",
     )
     const docs = page.getByRole("navigation", { name: "Docs" }).filter({ visible: true })
-    await expect(docs.getByRole("link", { name: "Overview", exact: true })).toBeVisible()
     await expect(docs.getByRole("link", { name: "Button", exact: true })).toBeVisible()
-    await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toHaveCount(0)
+    await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toBeVisible()
   })
 }
 
-test("the header's framework picker opens the same page in another framework", async ({ page }) => {
+test("Get Started is the docs home, in Core's sidebar under Overview", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  const picker = page.getByRole("combobox", { name: "Framework", exact: true })
-  await page.goto("/docs/frameworks")
-  await expect(page).toHaveURL(/\/docs\/react$/)
-  await expect(picker).toContainText("React")
-  await page.goto("/docs/react/components/button")
-  await expect(picker).toContainText("React")
-  await picker.click()
-  await page.getByRole("option", { name: "Vue", exact: true }).click()
-  await expect(page).toHaveURL(/\/docs\/vue\/components\/button$/)
-  await expect(picker).toContainText("Vue")
+  await page.goto("/docs")
+  await expect(page.getByRole("heading", { name: "Get Started", level: 1 })).toBeVisible()
+  const docs = page.getByRole("navigation", { name: "Docs" })
+  await expect(docs.getByRole("link", { name: "Get Started", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  )
+  await expect(docs.getByText("Overview", { exact: true })).toBeVisible()
+  await expect(docs.getByText("Core", { exact: true })).toBeVisible()
+  await expect(
+    page.getByRole("navigation", { name: "Sections" }).getByRole("link", { name: "Docs", exact: true }),
+  ).toHaveAttribute("aria-current", "page")
+  const markdown = await (await page.request.get("/docs.md")).text()
+  expect(markdown).toContain("# Get Started")
+  expect(markdown).not.toContain("<include>")
 })
 
-test("the header's framework picker stays on Core and Agents pages and changes the framework", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1280, height: 900 })
-  const picker = page.getByRole("combobox", { name: "Framework", exact: true })
-  for (const path of ["/docs/core", "/docs/agents"]) {
-    await page.goto(path)
-    // Nothing picked yet.
-    await expect(picker).toHaveText("Framework", { useInnerText: true })
-  }
+test("the framework dropdowns stay in step and remember the choice", async ({ page }) => {
+  await page.goto("/docs/core")
+  const picker = page.getByRole("combobox", { name: "Framework", exact: true }).first()
+  await expect(picker).toContainText("React")
   await picker.click()
   await page.getByRole("option", { name: "Svelte", exact: true }).click()
-  await expect(picker).toHaveText("Svelte", { useInnerText: true })
-  await expect(page).toHaveURL(/\/docs\/agents$/)
-  const sections = page.getByRole("navigation", { name: "Sections" })
-  await sections.getByRole("link", { name: "Components", exact: true }).click()
+  await expect(picker).toContainText("Svelte")
+  await expect(page.locator("html")).toHaveAttribute("data-framework", "svelte")
+  await page.goto("/docs")
+  await expect(page.getByRole("combobox", { name: "Framework", exact: true }).first()).toContainText("Svelte")
+})
+
+test("the header's Frameworks menu opens the same page in another framework", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto("/docs/frameworks")
+  await expect(page).toHaveURL(/\/docs\/react$/)
+  await page.goto("/docs/react/components/button")
+  await page.getByRole("button", { name: "Frameworks", exact: true }).click()
+  await page.getByRole("link", { name: "Vue", exact: true }).click()
+  await expect(page).toHaveURL(/\/docs\/vue\/components\/button$/)
+})
+
+test("the Frameworks menu checks the current framework, else the saved one, else React", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  const checked = async () => {
+    await page.getByRole("button", { name: "Frameworks", exact: true }).click()
+    const links = page
+      .getByRole("navigation", { name: "Sections" })
+      .filter({ visible: true })
+      .getByRole("link", { name: /^(React|Vue|Svelte|Web Components|Solid)$/ })
+    await expect(links).toHaveCount(5)
+    const names = []
+    for (const link of await links.all())
+      if (await link.locator("svg").isVisible()) names.push(await link.textContent())
+    await page.keyboard.press("Escape")
+    return names
+  }
+  await page.goto("/docs/agents")
+  expect(await checked()).toEqual(["React"])
+  await page.goto("/docs/svelte")
+  expect(await checked()).toEqual(["Svelte"])
+  await page.goto("/docs/agents")
+  expect(await checked()).toEqual(["Svelte"])
+  await page
+    .getByRole("navigation", { name: "Sections" })
+    .getByRole("link", { name: "Components", exact: true })
+    .click()
   await expect(page).toHaveURL(/\/docs\/svelte\/components$/)
 })
 
-test("the header shows the saved framework and framework-less links before the page hydrates", async ({
+test("the saved framework and framework-less links are in place before the page hydrates", async ({
   page,
 }) => {
   await page.context().addCookies([{ name: "framework", value: "vue", url: "http://localhost" }])
@@ -96,9 +139,7 @@ test("the header shows the saved framework and framework-less links before the p
   await page.route(/\.js(\?|$)/, (route) => route.abort())
   for (const path of ["/", "/docs/core"]) {
     await page.goto(path)
-    await expect(page.getByRole("combobox", { name: "Framework", exact: true })).toHaveText("Vue", {
-      useInnerText: true,
-    })
+    await expect(page.locator("html")).toHaveAttribute("data-framework", "vue")
   }
   const sections = page.getByRole("navigation", { name: "Sections" }).first()
   await expect(sections.getByRole("link", { name: "Components", exact: true })).toHaveAttribute(
@@ -107,42 +148,47 @@ test("the header shows the saved framework and framework-less links before the p
   )
 })
 
-test("Get Started and Components split a framework's docs, each with its own sidebar", async ({ page }) => {
+test("a framework's guides and components share one sidebar", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto("/docs/frameworks")
   await expect(page).toHaveURL(/\/docs\/react$/)
   const sections = page.getByRole("navigation", { name: "Sections" })
   const docs = page.getByRole("navigation", { name: "Docs" })
-  const frameworks = sections.getByRole("button", { name: "Get Started", exact: true })
+  const frameworks = sections.getByRole("button", { name: "Frameworks", exact: true })
   const components = sections.getByRole("link", { name: "Components", exact: true })
   await expect(frameworks).toHaveAttribute("data-current", "")
   await expect(components).not.toHaveAttribute("aria-current", "page")
-  await expect(components).not.toHaveAttribute("aria-haspopup")
   await expect(docs.getByText("Using Components", { exact: true })).toBeVisible()
   await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toBeVisible()
-  await expect(docs.getByRole("link", { name: "Button", exact: true })).toHaveCount(0)
+  await expect(docs.getByRole("link", { name: "Button", exact: true })).toBeVisible()
 
   await components.click()
   await expect(page).toHaveURL(/\/docs\/react\/components$/)
   await expect(components).toHaveAttribute("aria-current", "page")
   await expect(frameworks).not.toHaveAttribute("data-current")
-  await expect(docs.getByRole("link", { name: "Overview", exact: true })).toBeVisible()
-  await expect(docs.getByRole("link", { name: "Button", exact: true })).toBeVisible()
-  await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toHaveCount(0)
+  await expect(docs.getByRole("link", { name: "Parts and Composition", exact: true })).toBeVisible()
 
-  await page.getByRole("combobox", { name: "Framework", exact: true }).click()
-  await page.getByRole("option", { name: "Vue", exact: true }).click()
-  await expect(page).toHaveURL(/\/docs\/vue\/components$/)
   await frameworks.click()
-  const list = sections.getByRole("link", { name: /^(React|Vue|Svelte|Web Components|Solid)$/ })
-  await expect(list).toHaveText(["React", "Vue", "Svelte", "Web Components", "Solid"])
-  await sections.getByRole("link", { name: "Solid", exact: true }).click()
-  await expect(page).toHaveURL(/\/docs\/solid$/)
-  await expect(frameworks).toHaveAttribute("data-current", "")
-  await expect(page.getByRole("combobox", { name: "Framework", exact: true })).toContainText("Solid")
-  await expect(page.locator("html")).toHaveAttribute("data-framework", "solid")
+  await page.getByRole("link", { name: "Vue", exact: true }).click()
+  await expect(page).toHaveURL(/\/docs\/vue\/components$/)
+  await expect(page.locator("html")).toHaveAttribute("data-framework", "vue")
   await page.goto("/docs/frameworks")
-  await expect(page).toHaveURL(/\/docs\/solid$/)
+  await expect(page).toHaveURL(/\/docs\/vue$/)
+})
+
+test("docs pages show the beta notice beside the page, and the homepage keeps the banner", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1600 })
+  await page.goto("/docs/core/changelog")
+  await expect(page.getByRole("complementary", { name: "Beta notice" })).toHaveCount(0)
+  await expect(
+    page.getByRole("navigation", { name: "On this page" }).getByText(/UI SDK is in beta/),
+  ).toBeVisible()
+  // The sidebar doesn't stretch a short page past the window.
+  expect(await page.evaluate(() => document.scrollingElement!.scrollHeight)).toBe(1600)
+  await page.goto("/")
+  await expect(page.getByRole("complementary", { name: "Beta notice" })).toBeVisible()
 })
 
 test("install commands keep the reader's package manager after a reload", async ({ page }) => {

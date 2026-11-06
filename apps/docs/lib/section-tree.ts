@@ -22,16 +22,20 @@ function sectionTree(section: Section) {
   return tree
 }
 
-function frameworkTrees(tree: Root, framework: Framework) {
+// A framework's sidebar, with its components in A to Z order under their own group.
+function frameworkTree(tree: Root, framework: Framework): Root {
   const home = `/docs/${framework}/components`
-  const folder = tree.children.find((node) => node.type === "folder" && node.index?.url === home)
-  if (folder?.type !== "folder" || !folder.index) return { guides: tree, components: undefined }
-  const pages = folder.children
-    .filter((node) => node.type === "page")
-    .sort((a, b) => String(a.name).localeCompare(String(b.name)))
   return {
-    guides: { name: tree.name, children: tree.children.filter((node) => node !== folder) },
-    components: { name: "Components", children: [{ ...folder.index, name: "Overview" }, ...pages] },
+    ...tree,
+    children: tree.children.map((node) =>
+      node.type === "folder" && node.index?.url === home
+        ? {
+            ...node,
+            name: "Components",
+            children: [...node.children].sort((a, b) => String(a.name).localeCompare(String(b.name))),
+          }
+        : node,
+    ),
   }
 }
 
@@ -40,4 +44,4 @@ function sectionPages(tree: Root) {
   return flattenTree(tree.children).map((page) => ({ name: String(page.name), url: page.url }))
 }
 
-export { frameworkTrees, sectionPages, sectionTree }
+export { frameworkTree, sectionPages, sectionTree }

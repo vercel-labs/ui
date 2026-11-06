@@ -9,7 +9,7 @@ import { CssVariables, DataAttributes } from "./data-attributes"
 import { Pre } from "./code"
 import { Collapsible } from "./collapsible"
 import { ChangelogPosts } from "./changelog-posts"
-import { Card, ComponentGrid } from "./component-grid"
+import { Card, ComponentCards, ComponentGrid } from "./component-grid"
 import { Frame } from "./frame"
 import { FrameworkContent, FrameworkLink } from "./site-preferences"
 import {
@@ -27,7 +27,11 @@ import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tabl
 function heading(Tag: "h2" | "h3" | "h4", className: string) {
   return function Heading({ id, children, className: _, ...props }: ComponentProps<"h2">) {
     return (
-      <Tag id={id} className={cn("group scroll-mt-29 text-foreground", className)} {...props}>
+      <Tag
+        id={id}
+        className={cn("group scroll-mt-[calc(var(--banner-height)+5rem)] text-foreground", className)}
+        {...props}
+      >
         {id ? (
           <a
             href={`#${id}`}
@@ -161,6 +165,7 @@ function getMDXComponents(
       <Card {...props} href={resolve(props.href)} />
     ),
     ComponentGrid: () => <ComponentGrid framework={framework} />,
+    ComponentCards: (props: { names: string }) => <ComponentCards {...props} framework={framework} />,
     ChangelogPosts,
     ComponentExample: (props: {
       name: string

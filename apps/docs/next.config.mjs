@@ -33,12 +33,17 @@ const config = {
   // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
   // Agents' own `.md` files are the whole section, and they win.
   async rewrites() {
-    return [{ source: "/docs/:path*.md", destination: "/md/:path*" }]
+    return [
+      { source: "/docs.md", destination: "/md/core/start" },
+      { source: "/docs/:path*.md", destination: "/md/:path*" },
+    ]
   },
   async redirects() {
     const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
     const pages = "components|utilities|rendering|server-rendering"
     return [
+      // Get Started is Core's page by its file, and lives at /docs.
+      { source: "/docs/core/start", destination: "/docs", permanent: true },
       {
         source: `/docs/:framework(${frameworks.join("|")})/:folder(hooks|utilities)/observe`,
         destination: "/docs/core/observe",

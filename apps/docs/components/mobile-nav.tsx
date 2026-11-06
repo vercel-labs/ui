@@ -10,28 +10,26 @@ import { ArrowUpRightIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
+import { BetaCard } from "./beta-banner"
 import { GitHubLink } from "./github-link"
 import { FrameworkCheck } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
-import { useActiveTree, useCurrentUrl, useFrameworkLink, useMenuLink } from "./section-nav"
+import { useCurrentUrl, useFrameworkLink, useMenuLink } from "./section-nav"
 
 // The header on small screens. The menu fills the screen below it. Pages outside
 // the docs, like the homepage, have no section and list only the menu.
 function MobileNav({
   section,
   tree,
-  componentsTree,
   urls = [],
 }: {
   section?: Section
   tree?: PageTree.Root
-  componentsTree?: PageTree.Root
   urls?: string[]
 }) {
   const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
-  const active = useActiveTree(tree, componentsTree)
 
   // Search can navigate while the menu is open, so the menu closes on any navigation.
   React.useEffect(() => setOpen(false), [pathname])
@@ -39,7 +37,7 @@ function MobileNav({
   return (
     <header
       data-mobile-header
-      className="container sticky top-9 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
+      className="container sticky top-(--banner-height) z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
       <a
         href="https://vercel.com"
@@ -83,7 +81,7 @@ function MobileNav({
             className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas/90 outline-none backdrop-blur-md [scrollbar-width:none] lg:hidden"
           >
             <PopoverTitle className="sr-only">Menu</PopoverTitle>
-            <MobileMenu section={section} tree={active} urls={urls} onNavigate={() => setOpen(false)} />
+            <MobileMenu section={section} tree={tree} urls={urls} onNavigate={() => setOpen(false)} />
           </PopoverContent>
         </Popover>
       </div>
@@ -188,6 +186,7 @@ function MobileMenu({
           ))}
         </nav>
       )}
+      {section && <BetaCard />}
     </div>
   )
 }

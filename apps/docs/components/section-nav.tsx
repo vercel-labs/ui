@@ -15,8 +15,9 @@ function useMenuLink(section?: Section) {
   const framework = current ?? saved
   const onComponents = !!current && pathname.startsWith(`/docs/${current}/components`)
   return (href: string) => {
+    // Get Started and Core share a sidebar, so Docs covers both.
     if (href === "/docs") {
-      return { href, current: pathname === "/docs" }
+      return { href, current: pathname === "/docs" || section === "core" }
     }
     if (href === "/docs/frameworks") {
       return { href: framework ? `/docs/${framework}` : href, current: !!current && !onComponents }
@@ -37,14 +38,6 @@ function useFrameworkLink(urls: string[]) {
     onFramework ? frameworkHref(pathname, framework, urls) : `/docs/${framework}`
 }
 
-function useActiveTree(tree?: Root, componentsTree?: Root) {
-  const pathname = usePathname()
-  if (!componentsTree) return tree
-  const home = componentsTree.children.find((node) => node.type === "page")?.url
-  if (!home) return tree
-  return pathname === home || pathname.startsWith(`${home}/`) ? componentsTree : tree
-}
-
 // The sidebar link for the page being read. A page the sidebar doesn't list,
 // like a changelog post, gets the closest link above it.
 function useCurrentUrl(tree?: Root) {
@@ -54,4 +47,4 @@ function useCurrentUrl(tree?: Root) {
   return urls.filter((url) => pathname.startsWith(`${url}/`)).sort((a, b) => b.length - a.length)[0]
 }
 
-export { useActiveTree, useCurrentUrl, useFrameworkLink, useMenuLink }
+export { useCurrentUrl, useFrameworkLink, useMenuLink }

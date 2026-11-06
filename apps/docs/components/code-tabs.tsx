@@ -118,13 +118,6 @@ function FrameworkTabs({
         className="flex flex-col [&_[data-prompt-bar]]:hidden"
       >
         <TabBar>
-          <TabsList aria-label="Framework" className="max-sm:hidden">
-            {frameworkIds.map((id) => (
-              <TabsTab key={id} value={id}>
-                {frameworks[id].label}
-              </TabsTab>
-            ))}
-          </TabsList>
           <Select
             items={frameworkItems}
             value={framework}
@@ -133,7 +126,7 @@ function FrameworkTabs({
             <SelectTrigger
               variant="ghost"
               aria-label="Framework"
-              className="mx-0 h-8 rounded-frame-control bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted sm:hidden"
+              className="mx-0 h-8 rounded-frame-control bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted"
             >
               <SelectValue />
             </SelectTrigger>

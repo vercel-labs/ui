@@ -132,7 +132,7 @@ A disabled combobox cannot be focused or changed and submits nothing. A read-onl
 
 ## Clear and Trigger
 
-`ComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. Deleting all the text by hand clears a single selection at once, not when the list closes. Escape brings the selection back while the list is still open; closing it any other way leaves it cleared.
+`ComboboxClear` clears both the selection and the query, then keeps focus in the input. It appears while either has a value. When someone deletes all the text, a single selection clears right away instead of when the list closes. Escape brings the selection back while the list is still open; closing it any other way leaves it cleared.
 
 <ComponentExample
   name="combobox/clear"
@@ -199,7 +199,7 @@ Show useful context beside a label, such as a username or role. Set `label` expl
 
 ## Items as Data
 
-Pass `items` when the combobox needs the whole collection, such as recent items, server results, or virtualization. It can render bare parts for you, or you can render the parts yourself from the list's `state.items`. Each item's `label` supplies the text for filtering and the input; `keywords` and `disabled` work the same as with handwritten items. [Lists and Menus](../lists-and-menus) covers the `ListData` format.
+Pass `items` when the combobox needs the whole collection, such as recent items, server results, or virtualization. It can render bare parts for you, or you can render the parts yourself from the list's `state.items`. Each item's `label` supplies the text for filtering and the input; `keywords` and `disabled` work the same as with items you render yourself. [Lists and Menus](../lists-and-menus) covers the `ListData` format.
 
 ```tsx
 const fruits = [

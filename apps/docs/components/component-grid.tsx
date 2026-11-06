@@ -31,4 +31,25 @@ function ComponentGrid({ framework }: { framework: Framework }) {
   )
 }
 
-export { Card, ComponentGrid }
+// A few components by name, like `names="select dialog"`. Their links name no framework,
+// so they go to the one the reader last read.
+function ComponentCards({ names, framework }: { names: string; framework: Framework }) {
+  return (
+    <div className="my-6 grid gap-3 sm:grid-cols-2">
+      {names.split(" ").map((name) => {
+        const page = source.getPage([framework, "components", name])
+        if (!page) return null
+        return (
+          <Card
+            key={name}
+            title={page.data.title}
+            description={page.data.description}
+            href={`/docs/components/${name}`}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+export { Card, ComponentCards, ComponentGrid }

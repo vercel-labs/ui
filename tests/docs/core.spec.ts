@@ -58,7 +58,7 @@ for (const [slug, title] of pages) {
 
 test("each framework's rendering guide explains its helpers", async ({ page }) => {
   await page.goto("/docs/react/custom-parts")
-  await expect(page.getByRole("heading", { name: "Write a Part by Hand" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Write a Root Part" })).toBeVisible()
   await expect(page.getByText("usePrimitive", { exact: true }).first()).toBeVisible()
   await page.goto("/docs/web-components/rendering")
   await expect(page.getByRole("heading", { name: "Define the Elements" })).toBeVisible()
@@ -108,8 +108,6 @@ test("old framework copies of Core and Agents redirect", async ({ page }) => {
 })
 
 test("pages that moved in the foundation docs redirect", async ({ page }) => {
-  await page.goto("/docs")
-  await expect(page).toHaveURL(/\/docs\/core$/)
   await page.goto("/docs/core/get-started")
   await expect(page).toHaveURL(/\/docs\/core\/build-a-component$/)
   await page.goto("/docs/behaviors/focus")
@@ -144,7 +142,7 @@ test("links from Core go to the framework read last", async ({ page }) => {
   await expect(page).toHaveURL(/\/docs\/vue\/utilities\/shortcuts$/)
 })
 
-test("Components opens the framework read last, and the picker keeps the page", async ({ page }) => {
+test("Components opens the framework read last, and the Frameworks menu keeps the page", async ({ page }) => {
   await page.goto("/docs/vue")
   await expect
     .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value)
@@ -158,9 +156,10 @@ test("Components opens the framework read last, and the picker keeps the page", 
     "page",
   )
 
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto("/docs/react/hooks/shortcuts")
-  await page.getByRole("combobox", { name: "Framework", exact: true }).click()
-  await page.getByRole("option", { name: "Vue", exact: true }).click()
+  await page.getByRole("button", { name: "Frameworks", exact: true }).click()
+  await page.getByRole("link", { name: "Vue", exact: true }).click()
   await expect(page).toHaveURL(/\/docs\/vue\/utilities\/shortcuts$/)
 })
 

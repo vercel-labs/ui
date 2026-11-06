@@ -18,12 +18,19 @@ type DocPage = {
   date?: string
 }
 
+// An included file can include others, like the setup prompt each framework's tab includes.
+// check-code: allow return-type recursive, so TypeScript cannot infer it.
+function withIncludes(text: string, dir: string): string {
+  return text.replace(/<include>(.+?)<\/include>/g, (_, included: string) => {
+    const file = path.resolve(dir, included)
+    return withIncludes(readFileSync(file, "utf8").trimEnd(), path.dirname(file))
+  })
+}
+
 /** A page's frontmatter and the content after it, with each `<include>` replaced by the file it names. */
 function readPage(file: string) {
   const [, frontmatter, source] = readFileSync(file, "utf8").match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)!
-  const body = source.replace(/<include>(.+?)<\/include>/g, (_, included: string) =>
-    readFileSync(path.resolve(path.dirname(file), included), "utf8").trimEnd(),
-  )
+  const body = withIncludes(source, path.dirname(file))
   return {
     title: frontmatter.match(/^title: (.*)$/m)![1],
     description: frontmatter.match(/^description: (.*)$/m)?.[1],
