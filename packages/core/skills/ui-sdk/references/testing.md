@@ -6,11 +6,11 @@ Test what you built, not what ui-sdk already tests: for an interface, check that
 
 ## Which tool for what
 
-| You built                                                   | Test with                                                                                                                              |
-| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| An interface from our components                            | The framework's testing library, `checkPattern` on each widget you composed, and the [agent test](agent-ready.md#prove-it-with-a-test) |
-| A primitive                                                 | `mount` with `keys`, `type`, `click`, `hover` and `drag`, then `checkPattern`, `checkServer` and `checkDirection`                      |
-| Anything with popups, layout or focus moving between fields | Also a real browser                                                                                                                    |
+| You built                                                   | Test with                                                                                                                                                                                                                    |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| An interface from our components                            | The framework's testing library for what you wired (names, values, callbacks, what submits), and the [agent test](agent-ready.md#prove-it-with-a-test). Our components are tested already: don't run `checkPattern` on them. |
+| A primitive                                                 | `mount` with `keys`, `type`, `click`, `hover` and `drag`, then `checkPattern`, `checkServer` and `checkDirection`                                                                                                            |
+| Anything with popups, layout or focus moving between fields | Also a real browser                                                                                                                                                                                                          |
 
 ## Check a pattern
 
@@ -22,7 +22,7 @@ import { checkPattern } from "@ui-sdk/core/testing"
 await checkPattern(screen.getByRole("tablist").parentElement!, "tabs")
 ```
 
-Patterns: `listbox`, `menu`, `menubar`, `tabs`, `radio-group`, `toolbar`, `tree`, `grid`, `dialog`, `alertdialog`, `disclosure`, `accordion`, `combobox`, `slider`, `switch`, `checkbox`. Open a menu or dialog before checking it. A menu check activates an item, so use safe actions in tests.
+Patterns: `listbox`, `menu`, `menubar`, `tabs`, `radio-group`, `toolbar`, `tree`, `dialog`, `alertdialog`, `disclosure`, `accordion`, `combobox`, `slider`, `switch`, `checkbox`. Open a menu or dialog before checking it. A menu check activates an item, so use safe actions in tests.
 
 ## Test a primitive
 
@@ -58,6 +58,8 @@ test("renders on the server and works in both directions", async () => {
 
 For each key behavior of a new component, break it (return early, skip a call), run the tests, confirm one fails, then restore the file. A test that still passes is testing nothing. Report how many breaks your tests caught.
 
+For a composite widget, test both arrow directions, that exactly one item is tabbable, Space and Enter, and every state attribute you set, like `aria-current` or `aria-disabled`.
+
 ## jsdom
 
 Framework renderers don't fill jsdom's gaps. Before anything opens, add these to the test setup:
@@ -66,12 +68,18 @@ Framework renderers don't fill jsdom's gaps. Before anything opens, add these to
 HTMLElement.prototype.showPopover ??= function () {}
 HTMLElement.prototype.hidePopover ??= function () {}
 Element.prototype.getAnimations ??= () => []
+Element.prototype.scrollIntoView ??= function () {}
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
 document.head.append(
   Object.assign(document.createElement("style"), { textContent: "[popover] { display: block !important }" }),
 )
 ```
 
-`mount` already does this. Some state arrives a tick after mounting; wait with `await new Promise((r) => setTimeout(r, 0))` (inside `act` in React).
+Web components in jsdom also need `ElementInternals`: if `attachInternals` is missing or lacks `setFormValue` and `setValidity`, stub them as no-ops. Stub `URL.createObjectURL` for file previews. `mount` already does the popover and animation stubs. Some state arrives a tick after mounting; wait with `await new Promise((r) => setTimeout(r, 0))` (inside `act` in React).
 
 ## A real browser
 

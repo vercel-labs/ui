@@ -80,7 +80,7 @@ Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, 
 ## 4. Forms
 
 - Give a control a `name` and it submits with its form, Select and Combobox included.
-- Wrap controls in `Field` with `FieldLabel`, `FieldDescription` and `FieldError`. `FieldControl` is a native input. A Checkbox, Switch, Radio Group or Select inside a Field takes its place and uses the Field's label; the Field page shows how each connects.
+- Wrap controls in `Field` with `FieldLabel`, `FieldDescription` and `FieldError`. For text, put an `Input` (or `Textarea`, `NumberInput`, `PasswordInput`) inside the Field. Don't use `FieldControl` for text: it's a plain native input, so agents can't see or change it. A Checkbox, Switch, Radio Group or Select inside a Field uses the Field's label the same way; the Field page shows how each connects.
 - `required`, `disabled`, `readOnly` and `form` work like native ones. For a server error, pass `invalid` to the Field and show the message in `FieldError`.
 
 ## 5. Styles
@@ -99,9 +99,9 @@ Use the default prop to start (`defaultValue`, `defaultOpen`, `defaultChecked`, 
 
 **Svelte.** Use `bind:` for values the parent keeps. Share state between components through `setContext` and `getContext`, created in a parent. Never put `$state` at module level: on the server it's shared across every request.
 
-**Solid.** Keep reads reactive: read signals and props in JSX or a getter, never save their value in a variable first. `@ui-sdk/solid` needs Solid 2.
+**Solid.** Keep reads reactive: read signals and props in JSX or a getter, never save their value in a variable first. `@ui-sdk/solid` needs Solid 2. With Vite, add `optimizeDeps: { exclude: ["@ui-sdk/core"] }` to the config, so the app and `@ui-sdk/solid` share one copy of the core in development.
 
-**Web components.** `import "@ui-sdk/web/<name>"` defines its elements, like `<ui-select>`. Many parts wrap a native element you write, like `<ui-toggle><button>Bold</button></ui-toggle>`. Read and set state through properties after the element upgrades (`await customElements.whenDefined("ui-select")`). Change events are lowercase (`valuechange`, `openchange`) and don't bubble: listen on the element, or with `{ capture: true }` on an ancestor. [web-components.md](web-components.md) covers tag names and required inner markup.
+**Web components.** `import "@ui-sdk/web/<name>"` defines its elements, like `<ui-select>`. Many parts wrap a native element you write, like `<ui-toggle><button>Bold</button></ui-toggle>`. A text field is `<ui-field>` with `<ui-field-label>` and `<ui-input><input /></ui-input>`; a button is `<ui-button><button>Save</button></ui-button>`. Never leave a bare `<input>` or `<button>` where an agent or a Field should see it. Read and set state through properties after the element upgrades (`await customElements.whenDefined("ui-select")`). Change events are lowercase (`valuechange`, `openchange`) and don't bubble: listen on the element, or with `{ capture: true }` on an ancestor. [web-components.md](web-components.md) covers tag names and required inner markup.
 
 ## 7. Example
 
@@ -117,7 +117,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@ui-sdk/react/alert-dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 
@@ -126,7 +127,7 @@ function ProjectSettings() {
     <form>
       <Field name="name">
         <FieldLabel>Project name</FieldLabel>
-        <FieldControl defaultValue="Apollo" required />
+        <Input defaultValue="Apollo" required />
       </Field>
       <Field>
         <FieldLabel>Visibility</FieldLabel>
