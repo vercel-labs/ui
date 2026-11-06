@@ -1,6 +1,9 @@
 function BetaBanner() {
   return (
-    <div className="sticky top-0 z-20 flex h-9 items-center justify-center bg-muted px-4 dark:bg-canvas text-center text-xs text-muted-foreground sm:text-sm">
+    <aside
+      aria-label="Beta notice"
+      className="sticky top-0 z-20 flex h-9 items-center justify-center bg-muted px-4 dark:bg-canvas text-center text-xs text-muted-foreground sm:text-sm"
+    >
       <p>
         UI SDK is in beta.{" "}
         <a
@@ -13,7 +16,7 @@ function BetaBanner() {
         </a>
         .
       </p>
-    </div>
+    </aside>
   )
 }
 
