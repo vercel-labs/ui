@@ -23,6 +23,7 @@ import {
   sameValue,
   toLabel,
   toText,
+  tokenAt,
   tokensOf,
   valueLength,
   type TokenInputValue,
@@ -263,11 +264,13 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       return false
     if (token) say(`Inserted ${describe(token)} ${token.label}`)
     if (!token || !pending) return true
+    // An id the value already had is given to its first token, so read the one it ended up with.
+    const tokenId = tokenAt(committed, range.start)!.id!
     pending.then(
-      (patch) => updateToken(token.id!, { ...(patch ?? {}), status: patch?.status }),
+      (patch) => updateToken(tokenId, { ...(patch ?? {}), status: patch?.status }),
       () => {
         say(`Couldn't add ${token.label}`)
-        removeToken(token.id!, { reason: "imperative", record: false })
+        removeToken(tokenId, { reason: "imperative", record: false })
       },
     )
     return true

@@ -28,6 +28,38 @@ describe("pending tokens", () => {
   })
 })
 
+describe("token ids", () => {
+  test("a repeated id names one token, so updating or removing it touches only that one", () => {
+    const instance = tokenInput({ id: "x", defaultValue: [{ ...file, id: "a" }, " ", { ...file, id: "a" }] })
+    const ids = tokens(instance.api.getValue()).map((token) => token.id)
+    expect(new Set(ids).size).toBe(2)
+    instance.api.updateToken("a", { label: "b.ts" })
+    expect(tokens(instance.api.getValue()).map((token) => token.label)).toEqual(["b.ts", "a.ts"])
+    instance.api.removeToken("a")
+    expect(tokens(instance.api.getValue())).toHaveLength(1)
+  })
+
+  test("a token that fails to load leaves a supplied token with the id it would have generated", async () => {
+    const generated = tokens(tokenInput({ id: "y", defaultValue: [file] }).api.getValue())[0].id!
+    const next = `t${Number(generated.slice(1)) + 1}`
+    const instance = tokenInput({ id: "z", defaultValue: [{ ...file, label: "b.ts", id: next }] })
+    const failed = Promise.reject(new Error("offline"))
+    instance.api.insert(file, { at: "end", resolve: failed })
+    await failed.catch(() => {})
+    await Promise.resolve()
+    expect(tokens(instance.api.getValue()).map((token) => token.label)).toEqual(["b.ts"])
+  })
+
+  test("a loading token inserted with an id the value has settles itself, not the other token", async () => {
+    const instance = tokenInput({ id: "w", defaultValue: [{ ...file, label: "b.ts", id: "a" }] })
+    const failed = Promise.reject(new Error("offline"))
+    instance.api.insert({ ...file, id: "a" }, { at: "end", resolve: failed })
+    await failed.catch(() => {})
+    await Promise.resolve()
+    expect(tokens(instance.api.getValue()).map((token) => token.label)).toEqual(["b.ts"])
+  })
+})
+
 describe("static markup", () => {
   test("text that reads like the sentinel attribute stays text", () => {
     const html = renderStaticHtml(["data-ui-sentinel"], () => "")

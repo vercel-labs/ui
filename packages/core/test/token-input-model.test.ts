@@ -31,6 +31,23 @@ describe("values and offsets", () => {
     expect(normalizeValue([alice])[0]).toBe(alice)
   })
 
+  test("a repeated id stays with the first token, and the next gets a new one", () => {
+    const [first, second] = normalizeValue([alice, alice]) as Token[]
+    expect(first).toBe(alice)
+    expect(second.id).not.toBe("a")
+  })
+
+  test("a generated id skips one a token supplies", () => {
+    const [generated] = normalizeValue([{ ...file, id: undefined }]) as Token[]
+    const next = `t${Number(generated.id!.slice(1)) + 1}`
+    const [made, supplied] = normalizeValue([
+      { ...file, id: undefined },
+      { ...file, id: next },
+    ]) as Token[]
+    expect(supplied.id).toBe(next)
+    expect(made.id).not.toBe(next)
+  })
+
   test("a token counts as one offset", () => {
     const value = normalizeValue(["hi ", alice, " and ", file])
     expect(valueLength(value)).toBe(10)

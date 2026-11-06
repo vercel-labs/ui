@@ -130,6 +130,8 @@ function dialogApi(
   announcePending(context, () => store.get().pending !== null)
 
   const modal = () => store.get().modal
+  // Counts closes, so a Close action that outlives the open it started in changes nothing.
+  let session = 0
   const closesOnOutsidePress = () => !alert && (options().closeOnOutsidePress ?? modal() !== false)
 
   // Dialogs nested inside this one, and the one this is nested in.
@@ -194,6 +196,8 @@ function dialogApi(
           }
           return
         }
+        session++
+        store.set({ pending: null })
         // Nested dialogs close first, so their focus returns inside this one before it leaves.
         for (const child of [...children]) child.close("parent-close")
         parent?.remove(nesting)
@@ -239,15 +243,20 @@ function dialogApi(
     const source = changeSource("action", event)
     // A close after waiting has no event: the press is long over.
     let waited = false
+    const started = session
     runAction((details) => action(event, details), source, {
       pending(pending) {
+        if (started !== session) return
         waited = true
         store.set({ pending: pending ? key : null })
         log(context, "pending", pending, { reason: "action", source })
       },
-      done: () =>
-        control.hide({ reason: "action", event: waited ? undefined : event, returnValue: props.value }),
+      done() {
+        if (started !== session) return
+        control.hide({ reason: "action", event: waited ? undefined : event, returnValue: props.value })
+      },
       failed: (error) => {
+        if (started !== session) return
         store.set({ errors: { ...store.get().errors, [key]: error } })
         log(context, "error", error, { reason: "action", source })
       },
