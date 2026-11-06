@@ -184,6 +184,26 @@ function movedRows(rows: readonly TreeReorderRow[], key: string, before: string 
   return rest
 }
 
+// `movedRows` with the depth held where the block fits between its new neighbors.
+function placedRows(
+  rows: readonly TreeReorderRow[],
+  key: string,
+  before: string | null,
+  depth: number,
+  maxDepth?: number,
+) {
+  const from = rows.findIndex((row) => row.key === key)
+  if (from < 0) return rows as TreeReorderRow[]
+  const block = new Set(rows.slice(from, subtreeEnd(rows, from)).map((row) => row.key))
+  const rest = rows.filter((row) => !block.has(row.key))
+  const at = before === null ? rest.length : rest.findIndex((row) => row.key === before)
+  const range = depthRange(rest[at - 1], rest[at], blockMaxDepth(rows, block, maxDepth))
+  return movedRows(rows, key, before, Math.max(range.min, Math.min(range.max, depth)))
+}
+
+const sameRows = (a: readonly TreeReorderRow[], b: readonly TreeReorderRow[]) =>
+  a.length === b.length && a.every((row, i) => row.key === b[i].key && row.depth === b[i].depth)
+
 /**
  * Lets users reorder and nest a tree's rows by dragging them and with the
  * keyboard. Render the rows from `rows(state)`, each indented by its depth,
@@ -219,7 +239,26 @@ function createTreeReorder<State extends object>(
     draft: options.draft,
     value: options.key,
     shown: (current: TreeReorderDraft) => current.rows,
-    same: (a, b) => a === b,
+    same: sameRows,
+    rebase(current, now, moved) {
+      const index = now.findIndex((row) => row.key === current.key)
+      if (index < 0) return null
+      const keys = now.slice(index, subtreeEnd(now, index)).map((row) => row.key)
+      if (!moved) return { ...current, keys, rows: now }
+      const present = new Set(now.map((row) => row.key))
+      const at = current.rows.findIndex((row) => row.key === current.key)
+      const before = current.rows
+        .slice(at)
+        .find((row) => present.has(row.key) && !current.keys.includes(row.key) && !keys.includes(row.key))
+      const rows = placedRows(
+        now,
+        current.key,
+        before?.key ?? null,
+        current.rows[at].depth,
+        options.maxDepth?.(),
+      )
+      return { ...current, keys, rows }
+    },
     commit: (current, details) => commit(current.rows, current.key, details),
     say: (type, current, rows) => say(type, current.key, rows),
     element: (key) => elements.get(key),
@@ -451,14 +490,7 @@ function createTreeReorder<State extends object>(
      */
     move(key: string, before: string | null, depth: number) {
       const rows = value()
-      const from = rows.findIndex((row) => row.key === key)
-      if (from < 0) return false
-      const block = new Set(rows.slice(from, subtreeEnd(rows, from)).map((row) => row.key))
-      if (before !== null && block.has(before)) return false
-      const rest = rows.filter((row) => !block.has(row.key))
-      const at = before === null ? rest.length : rest.findIndex((row) => row.key === before)
-      const range = depthRange(rest[at - 1], rest[at], blockMaxDepth(rows, block, options.maxDepth?.()))
-      const next = movedRows(rows, key, before, Math.max(range.min, Math.min(range.max, depth)))
+      const next = placedRows(rows, key, before, depth, options.maxDepth?.())
       if (next === rows || !commit(next, key, { reason: "imperative" })) return false
       say("drop", key, next)
       return true

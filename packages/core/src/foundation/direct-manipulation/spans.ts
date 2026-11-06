@@ -6,6 +6,7 @@
 // the ranges live in a draft while a pointer drags, which renders as it
 // changes, and only the drop commits, so a drag is one change and one undo.
 // From the keyboard each arrow commits at once, as a slider's does.
+import { deriveState } from "../kernel/derive"
 import { settleDraft } from "../kernel/draft"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { announce } from "../platform/announce"
@@ -294,6 +295,23 @@ function createSpans<State extends object, S extends Span = Span>(
     return true
   }
 
+  let held = false
+  let moved = false
+
+  // The owner can change the spans mid-drag. The draft takes the spans they
+  // have now, with the held one where the drag put it, or ends when it's gone.
+  deriveState(context, [options.draft], (state) => {
+    const current = state[options.draft] as SpansDraft<S> | null
+    const now = state[options.key] as S[]
+    if (!current || !held) return
+    if (current.action !== "draw" && !now.some((span) => span.id === current.id))
+      return { [options.draft]: null } as Partial<State>
+    const span = current.spans.find((other) => other.id === current.id)
+    const spans = moved && span ? replaced(now, span) : now
+    if (spans.length === current.spans.length && spans.every((other, i) => other === current.spans[i])) return
+    return { [options.draft]: { ...current, spans } } as Partial<State>
+  })
+
   const drags = createDragSession(context.onDestroy)
 
   // Follows a pointer that pressed `el`, building the draft from `next` on each move.
@@ -315,6 +333,7 @@ function createSpans<State extends object, S extends Span = Span>(
       if (!span || !current) return
       const spans = replaced(current.spans, span)
       if (!allowed(spans, span)) return
+      moved = true
       setDraft({ id, action, spans })
     }
     const scroller =
@@ -327,7 +346,9 @@ function createSpans<State extends object, S extends Span = Span>(
       onStart: () => {
         if (draft()) return false
         dragging = true
-        setDraft({ id, action, spans: before })
+        held = true
+        moved = false
+        setDraft({ id, action, spans: value() })
       },
       onMove: ({ x, y, event: moveEvent }) => {
         moveEvent.preventDefault()
@@ -340,17 +361,19 @@ function createSpans<State extends object, S extends Span = Span>(
         const dragged = dragging
         scroller?.stop()
         dragging = false
+        held = false
         if (!dragged) return canceled ? undefined : click?.()
         const current = draft()
         if (canceled && action !== "draw") {
           const span = before.find((other) => other.id === id)
           if (span) say("cancel", span)
         }
-        if (!current || canceled || current.spans === before) return setDraft(null)
+        if (!current || canceled || !moved) return setDraft(null)
+        const base = value()
         if (!commit(current.spans, { reason: "drag", event: last ?? endEvent, id, action })) setDraft(null)
         // Keeps the draft until a controlled value's new spans arrive.
         else
-          settleDraft(store, value, before, () => {
+          settleDraft(store, value, base, () => {
             if (draft() === current) setDraft(null)
           })
       },

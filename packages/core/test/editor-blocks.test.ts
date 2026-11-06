@@ -82,6 +82,7 @@ describe("createSpans", () => {
       events: options.events,
       draft: null,
     }),
+    sync: (options) => ({ events: options.events }),
     api: (context) => {
       const set = vi.fn((value: Event[], _details: object) => {
         context.store.set({ events: value })
@@ -164,6 +165,32 @@ describe("createSpans", () => {
     expect(set).toHaveBeenCalledTimes(1)
     expect(set.mock.calls[0][1]).toMatchObject({ reason: "drag", id: "a", action: "move" })
     expect(instance.get().events[0]).toMatchObject({ track: "tue", start: 600, end: 630 })
+  })
+
+  test("a drop keeps the spans the owner changed during the drag, and a deleted span ends it", () => {
+    const review: Event = { id: "b", track: "wed", start: 600, end: 660, title: "Review" }
+    const instance = calendar({ id: "c", events: [standup] })
+    cleanups.push(() => instance.destroy())
+    const { spans, set } = instance.api
+    const days = ["mon", "tue", "wed"].map((day, i) => {
+      const el = box(i * 100, 0, 100, 1440)
+      cleanups.push(spans.bindTrack(el, day))
+      return el
+    })
+    cleanups.push(spans.bindSpan(box(0, 540, 100, 30, days[0]), "a"))
+    spans.spanPointerdown(pointer("pointerdown", 50, 550), "a")
+    document.dispatchEvent(pointer("pointermove", 150, 612))
+    instance.setOptions({ id: "c", events: [standup, review] })
+    document.dispatchEvent(pointer("pointerup", 150, 612))
+    expect(set.mock.calls[0][0]).toEqual([{ ...standup, track: "tue", start: 600, end: 630 }, review])
+
+    spans.spanPointerdown(pointer("pointerdown", 150, 610), "a")
+    document.dispatchEvent(pointer("pointermove", 250, 700))
+    instance.setOptions({ id: "c", events: [review] })
+    expect(instance.get().draft).toBeNull()
+    document.dispatchEvent(pointer("pointerup", 250, 700))
+    expect(set).toHaveBeenCalledTimes(1)
+    expect(instance.get().events).toEqual([review])
   })
 
   test("a drag on an edge resizes, and Escape puts it back", () => {
