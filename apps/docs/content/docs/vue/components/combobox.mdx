@@ -281,7 +281,7 @@ Add `ComboboxChipsOverflow` to keep chips on one line. It measures which chips f
 
 `ComboboxCreate` offers the query when no label matches it exactly and it meets `min-length`. Use `on-create` to save it; return a promise for asynchronous work. Creation does not change the selection itself: add the new item and select it after saving.
 
-While saving, the option reports `data-pending` and `aria-busy`. A rejected promise is available through its error state.
+While saving, the option reports `data-pending`, `aria-busy` and `aria-disabled`. A rejected promise is available through its error state.
 
 <ComponentExample
   name="combobox/create"

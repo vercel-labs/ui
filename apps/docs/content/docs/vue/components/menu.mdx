@@ -31,7 +31,7 @@ Menu
 
 Give items a `value` and handle `@action` on the menu to run the selected command. A Group and GroupLabel can organize related actions; a Separator divides them without becoming a focus stop.
 
-Return a promise from `@action` or an item’s `@select` to keep the item pending. It gets `data-pending` and `aria-busy`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pending-announcement`, “Loading” by default.
+Return a promise from `@action` or an item’s `@select` to keep the item pending. It gets `data-pending`, `aria-busy` and `aria-disabled`, the menu stays open, and choosing it again does nothing until the promise settles. The menu closes once it resolves. A rejection keeps it open and puts the reason in the item’s `error` state until the next try. After a second, screen readers hear `pending-announcement`, “Loading” by default.
 
 ## Usage
 

@@ -172,7 +172,7 @@ Use [async options](../utilities/async-options) to wait for typing to pause and 
 
 ## Pending Actions
 
-Pass a promise to `event.detail.waitUntil()` in an `action` listener. The command gets `data-pending` and `aria-busy` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
+Pass a promise to `event.detail.waitUntil()` in an `action` listener. The command gets `data-pending`, `aria-busy` and `aria-disabled` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
 
 An item’s `select` event fires before `action`. Call `preventDefault()` on it to stop the action.
 

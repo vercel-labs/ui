@@ -263,7 +263,7 @@ Add `ui-combobox-chips-overflow` to keep chips on one line. It measures which ch
 
 `ui-combobox-create` offers the query when no label matches it exactly and it meets `min-length`. Handle its `create` event to save it; pass a promise to `event.detail.waitUntil()` for asynchronous work. Creation does not change the selection itself: add the new item and select it after saving.
 
-While saving, the option reports `data-pending` and `aria-busy`. A rejected promise is available through its error state.
+While saving, the option reports `data-pending`, `aria-busy` and `aria-disabled`. A rejected promise is available through its error state.
 
 <ComponentExample
   name="combobox/create"

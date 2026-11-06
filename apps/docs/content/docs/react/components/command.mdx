@@ -176,7 +176,7 @@ Use [async options](../hooks/async-options) to wait for typing to pause and disc
 
 ## Pending Actions
 
-Return a promise from `onAction` or an item’s `onSelect`. The command gets `data-pending` and `aria-busy` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
+Return a promise from `onAction` or an item’s `onSelect`. The command gets `data-pending`, `aria-busy` and `aria-disabled` until it settles; further presses do not start another run. A rejection becomes the command’s `error` state, which clears when it runs again.
 
 An item’s `onSelect` runs before `onAction`. Call `preventDefault()` on its event to stop the action.
 

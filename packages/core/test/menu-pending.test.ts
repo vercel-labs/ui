@@ -21,7 +21,7 @@ describe("a menu item whose action returns a Promise", () => {
     instance.api.open()
     const item = () => instance.part("item", { value: "save" })
     press(item())?.()
-    expect(attrs(item())).toMatchObject({ "aria-busy": "true", "data-pending": "" })
+    expect(attrs(item())).toMatchObject({ "aria-busy": "true", "aria-disabled": "true", "data-pending": "" })
     expect(partState(item())).toMatchObject({ pending: true })
     expect(instance.get().open).toBe(true)
     press(item())?.()
@@ -30,6 +30,7 @@ describe("a menu item whose action returns a Promise", () => {
     await save.promise
     await Promise.resolve()
     expect(partState(item())).toMatchObject({ pending: false })
+    expect(attrs(item())["aria-disabled"]).toBeUndefined()
     expect(instance.get().open).toBe(false)
   })
 

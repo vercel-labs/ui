@@ -3,6 +3,7 @@ import { command, type CommandData } from "../src/components/command/command"
 import { commandShortcuts, findCommand, pageItems } from "../src/components/command/command-data"
 import { fuzzyFilter, fuzzyScore } from "../src/foundation/text/fuzzy"
 import { createListbox, filterData, itemKey, type ListData } from "../src/foundation/lists/listbox"
+import { attrs } from "../src/foundation/kernel/part"
 import { createStore } from "../src/foundation/kernel/store"
 import { fakeElement } from "./selects"
 
@@ -214,6 +215,10 @@ describe("command headless", () => {
     instance.api.internal.onInputKeyDown(key("Enter"))
     expect(onAction).toHaveBeenCalledWith("calendar", expect.anything())
     expect(instance.get()).toMatchObject({ pending: ["calendar"] })
+    expect(attrs(instance.part("item", { value: "calendar" }))).toMatchObject({
+      "aria-busy": "true",
+      "aria-disabled": "true",
+    })
     instance.api.run("calendar")
     expect(onAction).toHaveBeenCalledTimes(1)
     finish()

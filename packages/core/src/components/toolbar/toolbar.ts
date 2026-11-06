@@ -145,6 +145,8 @@ type ToolbarButtonState = {
  * @stable
  */
 type ToolbarLinkState = {
+  /** Whether the link is disabled, by its group or the toolbar. */
+  disabled: boolean
   /** The toolbar's `orientation` option: `"vertical"`, or `"horizontal"` for anything else. */
   orientation: ToolbarOrientation
 }
@@ -413,7 +415,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     link: slot<Pick<ItemProps, "groupDisabled">, ToolbarLinkState>({
       props: { id: "id", groupDisabled: { kind: "boolean", from: "group.disabled" } },
       selects: selects({ stop: ({ key }) => [key, null], elements: [] }),
-      state: (state) => ({ orientation: state.orientation }),
+      state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
         return { tabindex: item.tabindex, "aria-disabled": item.disabled ? "true" : undefined, ...item.data }

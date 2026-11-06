@@ -382,7 +382,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     attrs: (state, { id, key, props }) => ({
       id: `${id}-item-${idPart(key)}`,
       tabindex: "-1",
-      "aria-disabled": props.disabled ? "true" : undefined,
+      "aria-disabled": props.disabled || state.pending.includes(key) ? "true" : undefined,
       "aria-busy": state.pending.includes(key) ? "true" : undefined,
       "data-disabled": props.disabled ? "" : undefined,
       "data-pending": state.pending.includes(key) ? "" : undefined,
