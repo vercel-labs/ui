@@ -125,6 +125,37 @@ describe("a submenu that refuses to close", () => {
   })
 })
 
+describe("closing a menu with focus in its submenu", () => {
+  test("returns focus to its trigger when the submenu renders elsewhere", () => {
+    const root = menu({ id: "file" })
+    const share = menu({ id: "share", parent: root.api })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.textContent = "File"
+    bind(root.part("trigger", { id: "file-trigger" }), trigger)
+    const content = document.body.appendChild(document.createElement("div"))
+    bind(root.part("content"), content)
+    const shareTrigger = content.appendChild(document.createElement("div"))
+    shareTrigger.id = "share-trigger"
+    shareTrigger.textContent = "Share"
+    bind(share.part("trigger", { id: "share-trigger" }), shareTrigger)
+    const shareContent = document.body.appendChild(document.createElement("div"))
+    bind(share.part("content"), shareContent)
+    const email = shareContent.appendChild(document.createElement("div"))
+    email.textContent = "Email"
+    email.tabIndex = -1
+    bind(share.part("item", { id: "email" }), email)
+    root.api.open()
+    share.api.open()
+    // jsdom hides the nested popover, which a browser would show.
+    shareContent.style.display = "block"
+    email.focus()
+    expect(document.activeElement).toBe(email)
+    root.api.close()
+    expect(share.get().open).toBe(false)
+    expect(document.activeElement).toBe(trigger)
+  })
+})
+
 describe("a menubar menu that refuses to close", () => {
   function setup(editDisabled: boolean) {
     const bar = menubar({ id: "bar" })

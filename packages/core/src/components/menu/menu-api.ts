@@ -385,6 +385,8 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       // A context area counts as inside only for the secondary button, which
       // moves the open menu instead of closing it.
       contains(target, event) {
+        // Submenus close first, so focus in one rendered elsewhere still returns with this menu's.
+        if ([...children].some((child) => child.treeContains(target))) return true
         // A press on another trigger of the menubar switches menus instead.
         if (bar()?.internal.onTrigger(target)) return true
         // So does a press on another trigger of this menu, which takes it over
@@ -757,7 +759,8 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   }
 
   function treeContains(target: Node) {
-    const el = popup.element()
+    // A submenu that just closed, before its parent, still holds focus until the page updates.
+    const el = popup.element() ?? element("content")
     if (el && composedContains(el, target)) return true
     return [...children].some((child) => child.treeContains(target))
   }
