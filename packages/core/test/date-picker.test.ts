@@ -318,6 +318,17 @@ describe("datePicker", () => {
     expect(range.setValue(["2026-10-20", "2026-10-22"])).toBe(true)
   })
 
+  test("a controller can't change a disabled or read-only picker, but the browser's restore can", () => {
+    for (const locked of [{ disabled: true }, { readOnly: true }]) {
+      const controller = createDatePickerController()
+      const picker = mount({ controller, defaultValue: "2026-10-16", ...locked })
+      expect(controller.setValue("2026-10-20")).toBe(false)
+      expect(picker.instance.get().value).toBe("2026-10-16")
+      picker.instance.api.internal.restore(JSON.stringify("2026-10-21"))
+      expect(picker.instance.get().value).toBe("2026-10-21")
+    }
+  })
+
   test("a form reset puts the default value back", async () => {
     const picker = mount({ defaultValue: "2026-10-16" })
     await picker.type("11/01/2026")

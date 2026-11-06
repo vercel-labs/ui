@@ -6,7 +6,6 @@ import {
   calendarApi,
   calendarState,
   calendarSync,
-  isDisabled,
   isPickable,
   localeOf,
   preferredDate,
@@ -237,7 +236,7 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
   function pickValue(value: DatePickerValue, reason: DatePickerValueChangeReason, event?: Event) {
     const state = store.get()
     const normalized = normalizeValue(state.mode, value) as DatePickerValue
-    if (isDisabled(state) || state.readOnly || !isPickable(state, normalized)) return false
+    if (!isPickable(state, normalized)) return false
     store.set({ anchor: null, hover: null })
     clearDrafts()
     const changed = setValue(normalized, reason, event)

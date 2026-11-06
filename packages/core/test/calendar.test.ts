@@ -734,6 +734,15 @@ describe("calendar", () => {
     expect(instance.api.setValue("2026-10-23")).toBe(true)
   })
 
+  test("a controller can't select on a disabled or read-only calendar", () => {
+    for (const locked of [{ disabled: true }, { readOnly: true }]) {
+      const { instance } = mount(locked)
+      expect(instance.api.setValue("2026-10-20")).toBe(false)
+      expect(instance.api.getValue()).toBeNull()
+      document.body.replaceChildren()
+    }
+  })
+
   test("disabled leaves no tab stop and picks nothing; read only focuses but picks nothing", async () => {
     const disabled = mount({ disabled: true })
     expect(disabled.stops()).toEqual([])

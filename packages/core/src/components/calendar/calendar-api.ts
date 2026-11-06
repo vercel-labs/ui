@@ -129,8 +129,9 @@ const rangeRules = (state: State) => ({
   allowUnavailable: state.allowUnavailable,
   isUnavailable: (date: ISODate) => unavailableDate(state, date),
 })
-// Whether people could pick a value's dates. Disabled and read-only are checked apart.
+// Whether people could pick a value now: the calendar isn't disabled or read-only, no date is blocked, and the rules allow a range.
 function isPickable(state: State, value: CalendarValue) {
+  if (isDisabled(state) || state.readOnly) return false
   const dates = selectedDates(value)
   if (dates.some((date) => blockedDate(state, date))) return false
   return state.mode !== "range" || !dates.length || isAllowedRange(dates[0], dates[1], rangeRules(state))
