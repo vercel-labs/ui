@@ -53,7 +53,7 @@ function Example() {
   return (
     <div data-slot="stack">
       <button type="button" data-variant="solid" onClick={async () => setChecks(await test())}>
-        Run the tests
+        Run the Tests
       </button>
       {checks && (
         <ul aria-label="Results" data-slot="list">

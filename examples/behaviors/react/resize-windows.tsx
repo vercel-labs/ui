@@ -8,6 +8,7 @@ import {
   type ResizeDraft,
 } from "@ui-sdk/core"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
+import { LockIcon } from "lucide-react"
 
 type DesktopState = { windows: Record<string, ResizeBox>; draft: ResizeDraft | null }
 
@@ -18,7 +19,7 @@ const desktop = definePrimitive({
   state: (): DesktopState => ({
     windows: {
       mail: { x: 20, y: 20, width: 160, height: 100 },
-      notes: { x: 220, y: 100, width: 140, height: 100 },
+      notes: { x: 200, y: 100, width: 140, height: 100 },
     },
     draft: null,
   }),
@@ -29,7 +30,7 @@ const desktop = definePrimitive({
       draft: "draft",
       set: (value, details) => change("windows", value, details),
       min: () => ({ width: 100, height: 60 }),
-      bounds: () => ({ left: 0, top: 0, right: 400, bottom: 240 }),
+      bounds: () => ({ left: 0, top: 0, right: 360, bottom: 220 }),
       scale: () => 0.75,
       disabled: (key) => key === "notes",
       label: (key) => titles[key],
@@ -39,7 +40,7 @@ const desktop = definePrimitive({
     return {
       resize,
       act(action: string) {
-        if (action === "maximize") resize.resizeTo("mail", { x: 0, y: 0, width: 400, height: 240 })
+        if (action === "maximize") resize.resizeTo("mail", { x: 0, y: 0, width: 360, height: 220 })
         else if (action === "grow") resize.resizeBy("mail", "se", 40, 40)
       },
     }
@@ -52,8 +53,8 @@ const desktop = definePrimitive({
       attrs: () => ({
         style: css({
           position: "relative",
-          width: "400px",
-          height: "240px",
+          width: "360px",
+          height: "220px",
           transform: "scale(0.75)",
           "transform-origin": "0 0",
         }),
@@ -102,29 +103,32 @@ function Example() {
     <Desktop>
       {({ mail }) => (
         <>
-          <div data-slot="resize-stage">
-            <DesktopScreen>
-              {Object.entries(titles).map(([key, title]) => (
-                <DesktopWindow key={key} value={key}>
-                  <div data-slot="resize-titlebar">
-                    {title}
-                    {key === "notes" && " 🔒"}
-                  </div>
-                  <DesktopCorner box={key} />
-                </DesktopWindow>
-              ))}
-            </DesktopScreen>
-          </div>
-          <div data-slot="row">
+          <div data-slot="controls">
             <DesktopAction data-size="sm" value="maximize">
               Maximize
             </DesktopAction>
             <DesktopAction data-size="sm" value="grow">
               Grow
             </DesktopAction>
-            <p data-slot="output">
-              Mail {Math.round(mail!.width)} × {Math.round(mail!.height)}
-            </p>
+          </div>
+          <div data-slot="resize-stage">
+            <DesktopScreen>
+              {Object.entries(titles).map(([key, title]) => (
+                <DesktopWindow key={key} value={key}>
+                  <div data-slot="resize-titlebar">
+                    {title}
+                    {key === "mail" ? (
+                      <span data-slot="hint">
+                        {Math.round(mail!.width)} × {Math.round(mail!.height)}
+                      </span>
+                    ) : (
+                      <LockIcon aria-hidden="true" />
+                    )}
+                  </div>
+                  <DesktopCorner box={key} />
+                </DesktopWindow>
+              ))}
+            </DesktopScreen>
           </div>
         </>
       )}
@@ -132,13 +136,4 @@ function Example() {
   )
 }
 
-export {
-  Desktop,
-  desktop,
-  DesktopAction,
-  DesktopCorner,
-  DesktopScreen,
-  type DesktopState,
-  DesktopWindow,
-  Example,
-}
+export { Example }

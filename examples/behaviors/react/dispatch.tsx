@@ -1,6 +1,7 @@
 import * as React from "react"
 import { definePrimitive, dispatch, type ChangeDetails } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type FileListState = { files: string[] }
 
@@ -45,32 +46,27 @@ const FileListItem = parts.File
 const FileListDelete = parts.Delete
 
 function Example() {
-  const [note, setNote] = React.useState("")
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <FileList
-        aria-label="Files"
-        defaultFiles={["README.md", "notes.txt", "draft.md"]}
-        onDelete={(file, details) => {
-          if (file === "README.md") {
-            details.cancel()
-            setNote("The readme stays.")
-          } else setNote(`Deleted ${file}.`)
-        }}
-      >
-        {({ files }) =>
-          files.map((file) => (
-            <FileListItem key={file} value={file}>
-              {file}
-              <FileListDelete value={file}>Delete</FileListDelete>
-            </FileListItem>
-          ))
-        }
-      </FileList>
-      <p data-note data-slot="output">
-        {note || "Delete a file."}
-      </p>
-    </div>
+    <FileList
+      aria-label="Files"
+      defaultFiles={["README.md", "notes.txt", "draft.md"]}
+      onDelete={(file, details) => {
+        if (file === "README.md") {
+          details.cancel()
+          log("Canceled: the readme stays")
+        } else log(`Deleted ${file}`)
+      }}
+    >
+      {({ files }) =>
+        files.map((file) => (
+          <FileListItem key={file} value={file}>
+            {file}
+            <FileListDelete value={file}>Delete</FileListDelete>
+          </FileListItem>
+        ))
+      }
+    </FileList>
   )
 }
 

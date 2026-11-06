@@ -12,6 +12,8 @@ import {
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
+const names: Record<string, string> = { closet: "Closet", bag: "Bag" }
+
 type PackingState = { lists: TransferLists; focused: string | null; moving: TransferDraft | null }
 
 type PackingOptions = {
@@ -87,8 +89,8 @@ function Example() {
       {({ lists }) =>
         Object.entries(lists).map(([list, items]) => (
           <div key={list} data-slot="transfer-lane">
-            <span data-slot="transfer-label">{list}</span>
-            <PackingList value={list} aria-label={list}>
+            <span data-slot="transfer-label">{names[list]}</span>
+            <PackingList value={list} aria-label={names[list]}>
               {items.map((item) => (
                 <PackingItem key={item} value={item}>
                   {item}
@@ -102,4 +104,4 @@ function Example() {
   )
 }
 
-export { Example, packing, Packing, PackingItem, PackingList, type PackingOptions, type PackingState }
+export { Example }

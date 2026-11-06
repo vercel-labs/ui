@@ -74,6 +74,10 @@ const cells = Array.from({ length: 36 }, (_, index) => `${Math.floor(index / 6)}
 function Example() {
   return (
     <Pixels>
+      <div data-slot="controls">
+        <PixelsUndo data-size="sm">Undo</PixelsUndo>
+        <PixelsRedo data-size="sm">Redo</PixelsRedo>
+      </div>
       <div role="group" aria-label="Pixels" data-slot="history-grid">
         {cells.map((cell) => (
           <PixelsCell
@@ -82,10 +86,6 @@ function Example() {
             aria-label={`Row ${Number(cell[0]) + 1}, column ${Number(cell[2]) + 1}`}
           />
         ))}
-      </div>
-      <div data-slot="row">
-        <PixelsUndo data-size="sm">Undo</PixelsUndo>
-        <PixelsRedo data-size="sm">Redo</PixelsRedo>
       </div>
     </Pixels>
   )

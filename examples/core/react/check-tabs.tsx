@@ -19,19 +19,9 @@ function Example() {
 
   return (
     <div data-slot="check">
-      <Tabs ref={root} defaultValue="overview">
-        <TabsList aria-label={named ? "Project" : undefined}>
-          <TabsTab value="overview">Overview</TabsTab>
-          <TabsTab value="activity">Activity</TabsTab>
-          <TabsTab value="files">Files</TabsTab>
-        </TabsList>
-        <TabsPanel value="overview">The project plan and upcoming milestones.</TabsPanel>
-        <TabsPanel value="activity">Recent updates from the project team.</TabsPanel>
-        <TabsPanel value="files">Briefs, mockups and other project files.</TabsPanel>
-      </Tabs>
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" data-variant="solid" onClick={check}>
-          Check the tabs pattern
+          Check the Tabs Pattern
         </button>
         <label data-slot="label">
           <input
@@ -45,6 +35,16 @@ function Example() {
           Leave the tab list unnamed
         </label>
       </div>
+      <Tabs ref={root} defaultValue="overview">
+        <TabsList aria-label={named ? "Project" : undefined}>
+          <TabsTab value="overview">Overview</TabsTab>
+          <TabsTab value="activity">Activity</TabsTab>
+          <TabsTab value="files">Files</TabsTab>
+        </TabsList>
+        <TabsPanel value="overview">The project plan and upcoming milestones.</TabsPanel>
+        <TabsPanel value="activity">Recent updates from the project team.</TabsPanel>
+        <TabsPanel value="files">Briefs, mockups and other project files.</TabsPanel>
+      </Tabs>
       {result && (
         <p role="status" data-slot="check-result" data-status={result.ok ? "pass" : "fail"}>
           {result.text}

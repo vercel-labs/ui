@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createChange, definePrimitive, isDismissal, type ChangeDetails } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type NoticeOptions = {
   defaultOpen?: boolean
@@ -45,34 +46,31 @@ const Notice = parts.Root
 const NoticeClose = parts.Close
 
 function Example() {
+  const log = useLog()
   const [round, setRound] = React.useState(0)
   const [strict, setStrict] = React.useState(false)
-  const [last, setLast] = React.useState("")
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={strict} onChange={(event) => setStrict(event.target.checked)} />
-        Close only with the button
-      </label>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={strict} onChange={(event) => setStrict(event.target.checked)} />
+          Close only with the button
+        </label>
+        <button type="button" onClick={() => setRound((count) => count + 1)}>
+          Show Tip Again
+        </button>
+      </div>
       <Notice
         key={round}
         aria-label="Tip"
         onOpenChange={(_open, details) => {
           if (strict && isDismissal(details.reason)) details.cancel()
-          setLast(`${details.reason}${details.canceled ? ", canceled" : ""}`)
+          log(`Close: ${details.reason}${details.canceled ? ", canceled" : ""}`)
         }}
       >
         <p>Press Escape here, or use the button, to close this tip.</p>
-        <NoticeClose data-size="sm">Got it</NoticeClose>
+        <NoticeClose data-size="sm">Got It</NoticeClose>
       </Notice>
-      <div data-slot="row">
-        <button type="button" onClick={() => setRound((count) => count + 1)}>
-          Show the tip again
-        </button>
-        <span data-slot="hint" data-last>
-          {last && `Last: ${last}`}
-        </span>
-      </div>
     </div>
   )
 }

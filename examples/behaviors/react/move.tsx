@@ -13,6 +13,9 @@ import {
   type MoveReason,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
+
+const emoji: Record<string, string> = { Cactus: "🌵", Lemon: "🍋", Rocket: "🚀" }
 
 type StickersState = {
   positions: Record<string, MovePoint>
@@ -47,7 +50,7 @@ const stickers = definePrimitive({
         draft: "moving",
         set: (value, details) => change("positions", value, details),
         step: () => 4,
-        bounds: () => ({ minX: 0, minY: 0, maxX: 264, maxY: 144 }),
+        bounds: () => ({ minX: 0, minY: 0, maxX: 216, maxY: 120 }),
       }),
     }
   },
@@ -82,25 +85,32 @@ const Stickers = parts.Root
 const StickersItem = parts.Sticker
 
 function Example() {
-  const [positions, setPositions] = React.useState<Record<string, MovePoint>>({
-    "🌵": { x: 20, y: 24 },
-    "🍋": { x: 120, y: 80 },
-    "🚀": { x: 210, y: 16 },
+  const log = useLog()
+  const positions = React.useRef<Record<string, MovePoint>>({
+    Cactus: { x: 24, y: 28 },
+    Lemon: { x: 108, y: 96 },
+    Rocket: { x: 192, y: 20 },
   })
   return (
-    <div data-slot="stack">
-      <Stickers aria-label="Stickers" defaultPositions={positions} onPositionsChange={setPositions}>
-        {Object.keys(positions).map((sticker) => (
-          <StickersItem key={sticker} value={sticker} aria-label={`Sticker ${sticker}`}>
-            {sticker}
-          </StickersItem>
-        ))}
-      </Stickers>
-      <p data-slot="output">
-        🍋 at {positions["🍋"].x}, {positions["🍋"].y}
-      </p>
-    </div>
+    <Stickers
+      aria-label="Stickers"
+      defaultPositions={positions.current}
+      onPositionsChange={(next, details) => {
+        for (const [sticker, at] of Object.entries(next)) {
+          const was = positions.current[sticker]
+          if (was.x !== at.x || was.y !== at.y)
+            log(`${sticker} moved to ${at.x}, ${at.y} (${details.reason})`)
+        }
+        positions.current = next
+      }}
+    >
+      {Object.keys(positions.current).map((sticker) => (
+        <StickersItem key={sticker} value={sticker} aria-label={sticker}>
+          {emoji[sticker]}
+        </StickersItem>
+      ))}
+    </Stickers>
   )
 }
 
-export { Example, stickers, Stickers, StickersItem, type StickersOptions, type StickersState }
+export { Example }

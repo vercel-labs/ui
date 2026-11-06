@@ -5,6 +5,12 @@ import {
   createSessionStorage,
   type ValueStorage,
 } from "@ui-sdk/core"
+import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import {
+  SegmentedControl,
+  SegmentedControlIndicator,
+  SegmentedControlItem,
+} from "@ui-sdk/react/segmented-control"
 
 const storages: { label: string; storage: ValueStorage; lasts: string }[] = [
   {
@@ -27,40 +33,40 @@ const storages: { label: string; storage: ValueStorage; lasts: string }[] = [
 const noServerValue = () => null
 
 function Example() {
-  const [picked, setPicked] = React.useState(0)
-  const { storage, lasts } = storages[picked]
+  const [picked, setPicked] = React.useState("localStorage")
+  const { storage, lasts } = storages.find(({ label }) => label === picked)!
   const note = React.useSyncExternalStore(storage.subscribe, storage.get, noServerValue)
   const [available, setAvailable] = React.useState(true)
   React.useEffect(() => setAvailable(storage.available()), [storage])
 
   return (
     <div data-slot="stack">
-      <div role="group" aria-label="Keep the note in" data-slot="row">
-        {storages.map(({ label }, index) => (
-          <button
-            key={label}
-            type="button"
-            aria-pressed={picked === index}
-            data-size="sm"
-            onClick={() => setPicked(index)}
-          >
-            {label}
-          </button>
-        ))}
+      <div data-slot="controls">
+        <SegmentedControl
+          aria-label="Keep the note in"
+          value={picked}
+          onValueChange={(next) => next && setPicked(next)}
+        >
+          <SegmentedControlIndicator />
+          {storages.map(({ label }) => (
+            <SegmentedControlItem key={label} value={label}>
+              {label}
+            </SegmentedControlItem>
+          ))}
+        </SegmentedControl>
       </div>
-      <label data-slot="label">
-        <span>Note</span>
-        <input
-          value={note ?? ""}
-          onChange={(event) => storage.set(event.target.value)}
-          placeholder={available ? "Type, then reload the page" : "Unavailable here"}
-          disabled={!available}
-        />
-      </label>
-      <div data-slot="row">
-        <p data-slot="hint">{available ? lasts : "This browser blocks it here."}</p>
-        <button type="button" data-size="sm" onClick={() => storage.remove()} disabled={note === null}>
-          Clear
+      <div data-slot="stack">
+        <Field disabled={!available}>
+          <FieldLabel>Note</FieldLabel>
+          <FieldControl
+            value={note ?? ""}
+            onChange={(event) => storage.set(event.target.value)}
+            placeholder={available ? "Type, then reload the page" : "Unavailable here"}
+          />
+          <FieldDescription>{available ? lasts : "This browser blocks it here."}</FieldDescription>
+        </Field>
+        <button type="button" onClick={() => storage.remove()} disabled={note === null}>
+          Clear Note
         </button>
       </div>
     </div>

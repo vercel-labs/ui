@@ -8,6 +8,7 @@ import {
   type ChangeDetails,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type FilesState = { value: string[]; focused: string | null }
 
@@ -89,22 +90,27 @@ const FilesItem = parts.File
 const names = ["notes.md", "budget.xlsx", "photo.jpg", "slides.key", "draft.docx", "logo.svg"]
 
 function Example() {
-  const [selected, setSelected] = React.useState<string[]>([])
+  const log = useLog()
   const [replace, setReplace] = React.useState(false)
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={replace} onChange={(event) => setReplace(event.target.checked)} />
-        Ranges replace the selection
-      </label>
-      <Files aria-label="Files" replaceRanges={replace} onValueChange={setSelected}>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={replace} onChange={(event) => setReplace(event.target.checked)} />
+          Ranges replace the selection
+        </label>
+      </div>
+      <Files
+        aria-label="Files"
+        replaceRanges={replace}
+        onValueChange={(value: string[]) => log(`${value.length} selected: ${value.join(", ") || "none"}`)}
+      >
         {names.map((name) => (
           <FilesItem key={name} value={name}>
             {name}
           </FilesItem>
         ))}
       </Files>
-      <p data-slot="output">{selected.length} selected</p>
     </div>
   )
 }

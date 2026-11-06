@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createTypeahead, definePrimitive, elements, idPart, isTypeaheadKey, labelOf } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { Trash2Icon } from "lucide-react"
 
 type CommandListState = { command: string }
 
@@ -73,9 +74,7 @@ function Example() {
         </kbd>
       </CommandListCommand>
       <CommandListCommand value="delete" aria-label="Delete">
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-          <path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13" />
-        </svg>
+        <Trash2Icon aria-hidden="true" />
       </CommandListCommand>
     </CommandList>
   )

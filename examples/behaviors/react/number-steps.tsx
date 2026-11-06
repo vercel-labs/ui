@@ -1,5 +1,6 @@
 import * as React from "react"
 import { formatNumber, parseNumber, scrubTo, stepBy, stepFromKey } from "@ui-sdk/core/number"
+import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 
 const range = { min: 0, max: 20, step: 0.5, largeStep: 5, smallStep: 0.1 }
 
@@ -16,35 +17,32 @@ function Example() {
     setTyped(null)
   }
   return (
-    <div>
-      <div>
-        <label htmlFor="quantity">Quantity in kg</label>
-        <input
-          id="quantity"
-          role="spinbutton"
-          inputMode="decimal"
-          autoComplete="off"
-          aria-valuemin={range.min}
-          aria-valuemax={range.max}
-          aria-valuenow={value}
-          aria-valuetext={`${shown} kg`}
-          value={typed ?? shown}
-          onChange={(event) => setTyped(event.target.value)}
-          onBlur={commit}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") return commit()
-            const move = stepFromKey(event, { arrows: "vertical" })
-            if (!move) return
-            event.preventDefault()
-            setValue(stepBy(current(), move, range))
-            setTyped(null)
-          }}
-        />
-      </div>
-      <p>
-        Arrows step by 0.5, Shift by 5, Alt by 0.1. Home and End go to 0 and 20. Typed weights snap to 0.5.
-      </p>
-    </div>
+    <Field>
+      <FieldLabel>Quantity in kg</FieldLabel>
+      <FieldControl
+        role="spinbutton"
+        inputMode="decimal"
+        autoComplete="off"
+        aria-valuemin={range.min}
+        aria-valuemax={range.max}
+        aria-valuenow={value}
+        aria-valuetext={`${shown} kg`}
+        value={typed ?? shown}
+        onChange={(event) => setTyped(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") return commit()
+          const move = stepFromKey(event, { arrows: "vertical" })
+          if (!move) return
+          event.preventDefault()
+          setValue(stepBy(current(), move, range))
+          setTyped(null)
+        }}
+      />
+      <FieldDescription>
+        Arrows step by 0.5, Shift by 5 and Alt by 0.1. Home and End go to 0 and 20.
+      </FieldDescription>
+    </Field>
   )
 }
 

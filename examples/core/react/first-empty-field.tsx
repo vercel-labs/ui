@@ -1,5 +1,6 @@
 import * as React from "react"
 import { definePrimitive, elements } from "@ui-sdk/core"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type CheckoutState = { missing: string | null }
@@ -36,15 +37,26 @@ const CheckoutField = parts.Field
 
 const CheckoutNext = parts.Next
 
+const fields = [
+  { value: "name", label: "Name", defaultValue: "Hollis Grant" },
+  { value: "email", label: "Email" },
+  { value: "address", label: "Address" },
+]
+
 function Example() {
   return (
     <Checkout>
       <div data-slot="stack">
-        <CheckoutField value="name" aria-label="Name" placeholder="Name" defaultValue="Ada" />
-        <CheckoutField value="email" aria-label="Email" placeholder="Email" />
-        <CheckoutField value="address" aria-label="Address" placeholder="Address" />
+        {fields.map(({ value, label, defaultValue }) => (
+          <Field key={value}>
+            <FieldLabel>{label}</FieldLabel>
+            <FieldControl render={<CheckoutField value={value} />} defaultValue={defaultValue} />
+          </Field>
+        ))}
         <CheckoutNext data-variant="solid">
-          {({ missing }) => (missing ? `Fill in ${missing}` : "Find the first empty field")}
+          {({ missing }) =>
+            missing ? `Fill In ${missing[0].toUpperCase()}${missing.slice(1)}` : "Find Empty Field"
+          }
         </CheckoutNext>
       </div>
     </Checkout>

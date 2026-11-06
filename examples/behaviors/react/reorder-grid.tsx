@@ -83,4 +83,4 @@ function Example() {
   )
 }
 
-export { Album, album, AlbumPhoto, type AlbumState, Example }
+export { Example }

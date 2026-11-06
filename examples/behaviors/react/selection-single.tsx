@@ -8,6 +8,7 @@ import {
   type ChangeDetails,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type PlansState = { value: string[]; focused: string | null }
 
@@ -69,24 +70,27 @@ const Plans = parts.Root
 
 const PlansPlan = parts.Plan
 
-const names = ["Free", "Pro", "Team"]
+const options = [
+  { name: "Free", price: "$0" },
+  { name: "Pro", price: "$12 / month" },
+  { name: "Team", price: "$30 / month" },
+]
 
 function Example() {
-  const [chosen, setChosen] = React.useState<string[]>([])
-  const [going, setGoing] = React.useState<string | null>(null)
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Plans aria-label="Plan" onValueChange={setChosen} onContinue={setGoing}>
-        {names.map((name) => (
-          <PlansPlan key={name} value={name}>
-            {name}
-          </PlansPlan>
-        ))}
-      </Plans>
-      <p data-chosen data-slot="output">
-        {going ? `Continuing with ${going}` : chosen.length ? `Chosen: ${chosen[0]}` : "No plan chosen"}
-      </p>
-    </div>
+    <Plans
+      aria-label="Plan"
+      onValueChange={(value: string[]) => log(value.length ? `Chose ${value[0]}` : "Cleared the plan")}
+      onContinue={(plan: string) => log(`Continuing with ${plan}`)}
+    >
+      {options.map(({ name, price }) => (
+        <PlansPlan key={name} value={name}>
+          {name}
+          <span data-slot="hint">{price}</span>
+        </PlansPlan>
+      ))}
+    </Plans>
   )
 }
 

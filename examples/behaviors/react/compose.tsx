@@ -3,6 +3,7 @@ import { createChange, definePrimitive, type ChangeDetails, type ChangeSource } 
 import type { PopoverOpenChangeReason } from "@ui-sdk/core/popover"
 import { Popover, PopoverContent, PopoverTrigger } from "@ui-sdk/react/popover"
 import { createParts, usePart, usePrimitive } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type EmojiPickerOpenReason = PopoverOpenChangeReason | "item-press"
 
@@ -69,23 +70,18 @@ const EmojiPickerItem = parts.Emoji
 const emojis = ["🎉", "👍", "❤️", "😂", "👀", "🚀"]
 
 function Example() {
-  const [reactions, setReactions] = React.useState<string[]>([])
+  const log = useLog()
   return (
-    <div data-slot="row">
-      <EmojiPicker onPick={(emoji) => setReactions((current) => [...current, emoji])}>
-        <PopoverTrigger>React</PopoverTrigger>
-        <PopoverContent>
-          {emojis.map((emoji) => (
-            <EmojiPickerItem key={emoji} value={emoji}>
-              {emoji}
-            </EmojiPickerItem>
-          ))}
-        </PopoverContent>
-      </EmojiPicker>
-      <span data-reactions data-slot="hint">
-        {reactions.length ? reactions.join(" ") : "No reactions yet"}
-      </span>
-    </div>
+    <EmojiPicker onPick={(emoji) => log(`Reacted with ${emoji}`)}>
+      <PopoverTrigger>React</PopoverTrigger>
+      <PopoverContent>
+        {emojis.map((emoji) => (
+          <EmojiPickerItem key={emoji} value={emoji}>
+            {emoji}
+          </EmojiPickerItem>
+        ))}
+      </PopoverContent>
+    </EmojiPicker>
   )
 }
 

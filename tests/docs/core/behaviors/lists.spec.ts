@@ -2,6 +2,13 @@ import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
 
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "lists")
   await expect(page.locator("[data-example]")).toHaveCount(9)
@@ -120,11 +127,11 @@ test("virtualizer measure: rows take their own heights, sizes follow a flip, and
   expect(await stacked(list)).toBe(true)
   const size = async () => Number(await list.getAttribute("data-size"))
   const before = await size()
-  await page.locator('[data-slot="notebook-action"]', { hasText: "Larger text" }).click()
+  await page.locator('[data-slot="notebook-action"]', { hasText: "Larger Text" }).click()
   await expect.poll(size).toBeGreaterThan(before)
   expect(await stacked(list)).toBe(true)
-  await page.locator('[data-slot="notebook-action"]', { hasText: "Newest first" }).click()
-  await expect(list.getByRole("listitem").first()).toHaveText(/^Note 500:/)
+  await page.locator('[data-slot="notebook-action"]', { hasText: "Newest First" }).click()
+  await expect(list.getByRole("listitem").first()).toHaveText(/^500\. /)
   await expect.poll(() => stacked(list)).toBe(true)
 })
 
@@ -137,21 +144,21 @@ test("virtualizer jump: rows scroll into view below the header, more load near t
   const action = (text: string) => page.locator('[data-slot="contacts-action"]', { hasText: text })
   await scroller.scrollIntoViewIfNeeded()
   await action("Center 50").click()
-  const row = list.getByRole("listitem").filter({ hasText: /^June 50$/ })
+  const row = list.getByRole("listitem").filter({ hasText: /^Tomasz 50$/ })
   await expect(row).toBeInViewport()
   await action("Show 80").click()
-  await expect(list.getByRole("listitem").filter({ hasText: /^June 80$/ })).toBeInViewport()
+  await expect(list.getByRole("listitem").filter({ hasText: /^Tomasz 80$/ })).toBeInViewport()
   await action("Last").click()
   await expect(scroller.getByText("200 contacts")).toBeVisible()
   await action("First").click()
-  const first = list.getByRole("listitem").filter({ hasText: /^Ada 1$/ })
+  const first = list.getByRole("listitem").filter({ hasText: /^Hollis 1$/ })
   const header = (await scroller.getByText(/contacts$/).boundingBox())!
   await expect
     .poll(async () => (await first.boundingBox())!.y)
     .toBeGreaterThanOrEqual(header.y + header.height - 1)
   await first.click()
   await scroller.evaluate((el) => (el.scrollTop = 2400))
-  await expect(list.getByRole("listitem").filter({ hasText: /^Ada 81$/ })).toBeAttached()
+  await expect(list.getByRole("listitem").filter({ hasText: /^Hollis 81$/ })).toBeAttached()
   await expect(first).toBeAttached()
   await expect(first).toBeFocused()
 })
@@ -172,12 +179,11 @@ test("stick chat: opens at the top, follows once at the end, keeps the view on o
 }) => {
   await openBehaviors(page, "lists")
   const log = page.getByRole("log", { name: "Thread" })
-  const status = page.locator("[data-log-state]")
+  const status = lastLog(log)
   const action = (text: string) => page.locator('[data-slot="thread-action"]', { hasText: text })
   const gap = () => log.evaluate((el) => el.scrollHeight - el.clientHeight - el.scrollTop)
   await log.scrollIntoViewIfNeeded()
   expect(await log.evaluate((el) => el.scrollTop)).toBe(0)
-  await expect(status).toHaveText("Not following")
   await log.evaluate((el) => (el.scrollTop = el.scrollHeight))
   await expect(status).toHaveText("Following, at the end")
   await action("Send").click()
@@ -187,14 +193,14 @@ test("stick chat: opens at the top, follows once at the end, keeps the view on o
   const top = await log
     .getByText("Message 3", { exact: true })
     .evaluate((el) => el.getBoundingClientRect().top)
-  await action("Load older").click()
+  await action("Load Older").click()
   await expect(log.getByText("Older 5")).toBeAttached()
   await expect
     .poll(() => log.getByText("Message 3", { exact: true }).evaluate((el) => el.getBoundingClientRect().top))
     .toBeCloseTo(top, 0)
   await log.evaluate((el) => (el.scrollTop = el.scrollHeight))
   await expect(status).toHaveText("Following, at the end")
-  await action("Let go").click()
+  await action("Let Go").click()
   await expect(status).toHaveText("Not following, at the end")
   // Within 48 pixels of the end still counts as there, so it takes two.
   await action("Send").click()

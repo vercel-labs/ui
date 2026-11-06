@@ -48,7 +48,7 @@ function Example() {
   const log = useLog()
   return (
     <ConfirmButton onConfirm={() => log("Deleted")}>
-      {({ armed }) => (armed ? "Press again to delete" : "Delete")}
+      {({ armed }) => (armed ? "Press Again to Delete" : "Delete")}
     </ConfirmButton>
   )
 }

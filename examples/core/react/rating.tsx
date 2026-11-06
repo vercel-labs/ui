@@ -92,9 +92,12 @@ function Example() {
   const [value, setValue] = React.useState(3)
   return (
     <div data-slot="stack">
-      <output data-slot="rating-value" data-value aria-label="Rating out of 5">
-        {value}
-      </output>
+      <div data-slot="rating-readout">
+        <output data-slot="rating-value" data-value aria-label="Rating out of 5">
+          {value}
+        </output>
+        <span data-slot="hint">out of 5</span>
+      </div>
       <Rating value={value} onValueChange={setValue} aria-label="Rating">
         {Array.from({ length: 5 }, (_, index) => (
           <RatingStar

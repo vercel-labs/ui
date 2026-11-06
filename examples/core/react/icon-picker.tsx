@@ -306,7 +306,7 @@ function Example() {
             {value}
           </>
         ) : (
-          "Pick an icon"
+          "Pick an Icon"
         )}
       </IconPickerTrigger>
       <IconPickerContent sideOffset={6} aria-label="Choose an icon">

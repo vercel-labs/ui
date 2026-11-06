@@ -33,9 +33,10 @@ test("mix: the steps between two colors follow the space", async ({ page }) => {
   await openExamples(page, "/docs/core/color")
   const example = page.locator('[data-example="behaviors/color-mix"]')
   await expect(example.locator('[data-slot="color-steps"] > li')).toHaveCount(7)
-  await expect(example.locator("[data-middle]")).toHaveText("#90a3ad halfway")
+  const middle = example.locator('[data-slot="color-steps"] > li').nth(3)
+  await expect(middle).toHaveAttribute("title", "#90a3ad")
   await example.getByRole("combobox", { name: "Space" }).selectOption("sRGB")
-  await expect(example.locator("[data-middle]")).toHaveText("#909880 halfway")
+  await expect(middle).toHaveAttribute("title", "#909880")
 })
 
 test("contrast: the ratio and its verdict follow the picked colors", async ({ page }) => {

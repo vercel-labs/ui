@@ -55,7 +55,7 @@ function Example() {
       {({ shown, findable }) => (
         <>
           <p data-slot="label">Tomato soup</p>
-          <RecipeToggle data-size="sm">{shown ? "Hide method" : "Show method"}</RecipeToggle>
+          <RecipeToggle data-size="sm">{shown ? "Hide Method" : "Show Method"}</RecipeToggle>
           <div data-slot="findable-method">
             <RecipeMethod>
               Soften the onion in butter, add the tomatoes and stock, and simmer for twenty minutes. Blend

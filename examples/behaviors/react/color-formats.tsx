@@ -1,5 +1,6 @@
 import * as React from "react"
 import { formatColor, isInGamut, parseColor, toGamut, type Color, type ColorFormat } from "@ui-sdk/core/color"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 
 const formats: [ColorFormat, string][] = [
   ["hex", "Hex"],
@@ -23,16 +24,13 @@ function Example() {
   const color = parseColor(text)
   return (
     <div data-slot="stack">
-      <div data-slot="color-field">
-        <span data-slot="color-swatch" style={{ background: color ? formatColor(color) : undefined }} />
-        <input
-          aria-label="Color"
-          value={text}
-          aria-invalid={!color}
-          spellCheck={false}
-          onChange={(event) => setText(event.target.value)}
-        />
-      </div>
+      <Field invalid={!color}>
+        <FieldLabel>Color</FieldLabel>
+        <div data-slot="color-field">
+          <span data-slot="color-swatch" style={{ background: color ? formatColor(color) : undefined }} />
+          <FieldControl value={text} spellCheck={false} onChange={(event) => setText(event.target.value)} />
+        </div>
+      </Field>
       {color ? (
         <>
           <dl data-slot="color-formats">
@@ -43,10 +41,14 @@ function Example() {
               </React.Fragment>
             ))}
           </dl>
-          <p data-gamut>{gamutOf(isInGamut(color), isInGamut(color, "p3"))}</p>
+          <p data-gamut data-slot="hint">
+            {gamutOf(isInGamut(color), isInGamut(color, "p3"))}
+          </p>
         </>
       ) : (
-        <p data-gamut>Not a color</p>
+        <p data-gamut data-slot="hint">
+          Not a color
+        </p>
       )}
     </div>
   )

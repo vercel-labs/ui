@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "selection")
@@ -19,9 +26,9 @@ test("selection: clicks choose, Shift-clicks take a range, Control-clicks toggle
   await expect(list.locator('[aria-selected="true"]')).toHaveCount(3)
   await file("photo.jpg").click({ modifiers: ["ControlOrMeta"] })
   await expect(file("photo.jpg")).toHaveAttribute("aria-selected", "false")
-  await expect(page.getByText("2 selected")).toBeVisible()
+  await expect(lastLog(list)).toContainText("2 selected")
   await page.keyboard.press("ControlOrMeta+a")
-  await expect(page.getByText("6 selected")).toBeVisible()
+  await expect(lastLog(list)).toContainText("6 selected")
 })
 
 test("selection: Shift with the arrows extends from the focused file", async ({ page }) => {
@@ -30,7 +37,7 @@ test("selection: Shift with the arrows extends from the focused file", async ({ 
   await list.getByRole("option", { name: "notes.md" }).click()
   await page.keyboard.press("Shift+ArrowDown")
   await page.keyboard.press("Shift+ArrowDown")
-  await expect(page.getByText("3 selected")).toBeVisible()
+  await expect(lastLog(list)).toContainText("3 selected")
 })
 
 test("lasso: a rectangle selects the shapes it touches, and Escape lets go", async ({ page }) => {
@@ -42,13 +49,13 @@ test("lasso: a rectangle selects the shapes it touches, and Escape lets go", asy
   await page.mouse.down()
   await page.mouse.move(box.x + 200, box.y + 70, { steps: 8 })
   await page.mouse.up()
-  await expect(page.getByText("Selected: Circle, Square")).toBeVisible()
+  await expect(lastLog(surface)).toHaveText("Selected: Circle, Square")
   await page.mouse.move(box.x + 300, box.y + 200)
   await page.mouse.down()
   await page.mouse.move(box.x + 40, box.y + 100, { steps: 8 })
   await page.keyboard.press("Escape")
   await page.mouse.up()
-  await expect(page.getByText("Selected: Circle, Square")).toBeVisible()
+  await expect(lastLog(surface)).toHaveText("Selected: Circle, Square")
 })
 
 test("cell range: Shift with the arrows grows the range, and the total follows", async ({ page }) => {
@@ -80,15 +87,15 @@ test("choose one: a click chooses, Space clears the chosen plan, and Enter goes 
 }) => {
   await openBehaviors(page, "selection")
   const list = page.getByRole("listbox", { name: "Plan" })
-  const chosen = page.locator("[data-chosen]")
+  const chosen = lastLog(list)
   await list.getByRole("option", { name: "Pro" }).click()
-  await expect(chosen).toHaveText("Chosen: Pro")
+  await expect(chosen).toHaveText("Chose Pro")
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Space")
-  await expect(chosen).toHaveText("Chosen: Team")
+  await expect(chosen).toHaveText("Chose Team")
   await expect(list.locator('[aria-selected="true"]')).toHaveCount(1)
   await page.keyboard.press("Space")
-  await expect(chosen).toHaveText("No plan chosen")
+  await expect(chosen).toHaveText("Cleared the plan")
   await page.keyboard.press("Space")
   await page.keyboard.press("Enter")
   await expect(chosen).toHaveText("Continuing with Team")
@@ -127,13 +134,13 @@ test("selectable: owners stay selected through clicks and select all", async ({ 
   const list = page.getByRole("listbox", { name: "Members" })
   const selected = list.locator('[aria-selected="true"]')
   await expect(selected).toHaveCount(1)
-  await list.getByRole("option", { name: /^Ana/ }).click({ force: true })
+  await list.getByRole("option", { name: /^Hollis Grant/ }).click({ force: true })
   await expect(selected).toHaveCount(1)
   await page.keyboard.press("ControlOrMeta+a")
   await expect(selected).toHaveCount(5)
   await page.keyboard.press("ControlOrMeta+a")
   await expect(selected).toHaveCount(1)
-  await expect(list.getByRole("option", { name: /^Ana/ })).toHaveAttribute("aria-selected", "true")
+  await expect(list.getByRole("option", { name: /^Hollis Grant/ })).toHaveAttribute("aria-selected", "true")
 })
 
 test("lasso: locked photos stay out, and screen readers hear how many were selected", async ({ page }) => {
@@ -175,18 +182,18 @@ test("cell range clipboard: copy the range as tabs, and paste it from another ce
   await context.grantPermissions(["clipboard-read", "clipboard-write"])
   await openBehaviors(page, "selection")
   const grid = page.getByRole("grid", { name: "Prices" })
-  const copied = page.locator("[data-copied]")
+  const copied = lastLog(grid)
   await grid.getByRole("gridcell", { name: "Tea" }).click()
   await page.keyboard.press("Shift+ArrowRight")
   await page.keyboard.press("Shift+ArrowDown")
   await page.keyboard.press("ControlOrMeta+c")
-  await expect(copied).toHaveText("Tea → 3\nCoffee → 4")
+  await expect(copied).toHaveText('Copied "Tea\\t3\\nCoffee\\t4"')
   const rows = grid.getByRole("row")
   await rows.nth(3).getByRole("gridcell").first().click()
   await page.keyboard.press("ControlOrMeta+v")
   await expect(rows.nth(3).getByRole("gridcell")).toHaveText(["Tea", "3", ""])
-  await page.getByRole("button", { name: "Copy the whole sheet" }).click()
-  await expect(copied).toContainText("Cake → 5 → 4")
+  await page.getByRole("button", { name: "Copy Whole Sheet" }).click()
+  await expect(copied).toContainText("Cake\\t5\\t4")
 })
 
 test("every option links to its explanation", async ({ page }) => {

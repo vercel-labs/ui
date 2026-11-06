@@ -11,6 +11,8 @@ import {
   type MovePoint,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { PinIcon } from "lucide-react"
+import { useLog } from "../../shared/react/log"
 
 type BoardState = {
   positions: Record<string, MovePoint>
@@ -43,6 +45,7 @@ const board = definePrimitive({
       set: (value, details) => change("positions", value, details),
       group: (key) => (store.get().selected.includes(key) ? store.get().selected : [key]),
       step: () => 20,
+      bounds: () => ({ minX: 0, minY: 0, maxX: 180, maxY: 140 }),
       disabled: (key) => key === "ship",
       label: (key) => titles[key],
       message: ({ keys, label, at }) =>
@@ -119,26 +122,32 @@ const Board = parts.Root
 const BoardNote = parts.Note
 
 function Example() {
-  const [positions, setPositions] = React.useState<Record<string, MovePoint>>({
+  const log = useLog()
+  const positions = React.useRef<Record<string, MovePoint>>({
     plan: { x: 20, y: 20 },
-    draft: { x: 120, y: 60 },
-    ship: { x: 220, y: 100 },
+    draft: { x: 100, y: 60 },
+    ship: { x: 180, y: 120 },
   })
   return (
-    <div data-slot="stack">
-      <Board aria-label="Notes" defaultPositions={positions} onPositionsChange={setPositions}>
-        {Object.entries(titles).map(([key, title]) => (
-          <BoardNote key={key} value={key}>
-            {title}
-            {key === "ship" && " 📌"}
-          </BoardNote>
-        ))}
-      </Board>
-      <p data-slot="output">
-        Plan at {positions.plan.x}, {positions.plan.y} · Draft at {positions.draft.x}, {positions.draft.y}
-      </p>
-    </div>
+    <Board
+      aria-label="Notes"
+      defaultPositions={positions.current}
+      onPositionsChange={(next) => {
+        for (const [key, at] of Object.entries(next)) {
+          const was = positions.current[key]
+          if (was.x !== at.x || was.y !== at.y) log(`${titles[key]} moved to ${at.x}, ${at.y}`)
+        }
+        positions.current = next
+      }}
+    >
+      {Object.entries(titles).map(([key, title]) => (
+        <BoardNote key={key} value={key}>
+          {title}
+          {key === "ship" && <PinIcon aria-hidden="true" />}
+        </BoardNote>
+      ))}
+    </Board>
   )
 }
 
-export { Board, board, BoardNote, type BoardState, Example }
+export { Example }

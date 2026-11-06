@@ -2,19 +2,25 @@ import * as React from "react"
 import { bindDrag, css, definePrimitive, live } from "@ui-sdk/core"
 import { createVelocityTracker, rubberBand, solveSpring } from "@ui-sdk/core/gesture"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type InboxState = {
   pull: number
   refreshing: boolean
-  speed: number | null
   refreshed: number
+}
+
+type InboxOptions = {
+  onRelease?: (speed: number) => void
+  onRefresh?: (count: number) => void
 }
 
 const hold = 48
 
 const inbox = definePrimitive({
   name: "inbox",
-  state: (): InboxState => ({ pull: 0, refreshing: false, speed: null, refreshed: 0 }),
+  options: { onRelease: "callback", onRefresh: "callback" },
+  state: (_options: InboxOptions): InboxState => ({ pull: 0, refreshing: false, refreshed: 0 }),
   live: ["pull"],
   api: (context) => {
     const { store } = context
@@ -40,7 +46,9 @@ const inbox = definePrimitive({
       store.set({ refreshing: true })
       springTo(hold, speed)
       timer = setTimeout(() => {
-        store.set({ refreshing: false, refreshed: store.get().refreshed + 1 })
+        const refreshed = store.get().refreshed + 1
+        store.set({ refreshing: false, refreshed })
+        context.options().onRefresh?.(refreshed)
         springTo(0, 0)
       }, 800)
     }
@@ -68,7 +76,7 @@ const inbox = definePrimitive({
           onEnd: (end, canceled) => {
             stop = undefined
             const speed = canceled ? 0 : velocity.velocity(end.timeStamp)
-            store.set({ speed })
+            context.options().onRelease?.(speed)
             if (!canceled && (store.get().pull > hold || speed > 0.6)) refresh(speed)
             else springTo(0, speed)
           },
@@ -77,8 +85,8 @@ const inbox = definePrimitive({
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { refreshing: boolean; speed: number | null; refreshed: number }>({
-      state: (state) => ({ refreshing: state.refreshing, speed: state.speed, refreshed: state.refreshed }),
+    root: slot<{}, { refreshing: boolean }>({
+      state: (state) => ({ refreshing: state.refreshing }),
     }),
     list: slot({
       attrs: (state) => ({ role: "list", "aria-busy": state.refreshing ? "true" : undefined }),
@@ -103,10 +111,17 @@ const InboxRefresh = parts.Refresh
 const messages = ["Lunch on Friday?", "Your invoice is ready", "Design review notes", "Welcome aboard"]
 
 function Example() {
+  const log = useLog()
   return (
-    <Inbox>
-      {({ refreshing, speed, refreshed }) => (
+    <Inbox
+      onRelease={(speed) => log(`Let go at ${speed.toFixed(2)} px/ms`)}
+      onRefresh={(count) => log(`Refreshed ${count} ${count === 1 ? "time" : "times"}`)}
+    >
+      {({ refreshing }) => (
         <>
+          <div data-slot="controls">
+            <InboxRefresh data-size="sm">Refresh</InboxRefresh>
+          </div>
           <div data-slot="gesture-frame">
             <p>{refreshing ? "Refreshing…" : "Pull to refresh"}</p>
             <InboxList aria-label="Inbox">
@@ -117,17 +132,10 @@ function Example() {
               ))}
             </InboxList>
           </div>
-          <div data-slot="row">
-            <InboxRefresh data-size="sm">Refresh</InboxRefresh>
-            <span data-pull-state data-slot="hint">
-              {speed === null ? "" : `Let go at ${speed.toFixed(2)} px/ms, `}
-              refreshed {refreshed} {refreshed === 1 ? "time" : "times"}
-            </span>
-          </div>
         </>
       )}
     </Inbox>
   )
 }
 
-export { Example, inbox, Inbox, InboxList, InboxRefresh, type InboxState }
+export { Example, inbox, Inbox, InboxList, type InboxOptions, InboxRefresh, type InboxState }

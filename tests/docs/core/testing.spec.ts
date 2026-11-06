@@ -13,7 +13,7 @@ test("every example renders without errors", async ({ page }) => {
 
 test("check a pattern: the tabs pass, and fail once unnamed", async ({ page }) => {
   await openExamples(page, url)
-  const run = page.getByRole("button", { name: "Check the tabs pattern" })
+  const run = page.getByRole("button", { name: "Check the Tabs Pattern" })
   await run.click()
   await expect(page.getByRole("status")).toHaveText(/^Passes/)
   await page.getByRole("checkbox", { name: "Leave the tab list unnamed" }).check()
@@ -22,8 +22,8 @@ test("check a pattern: the tabs pass, and fail once unnamed", async ({ page }) =
 })
 
 for (const [name, button, count] of [
-  ["mount a primitive", "Run the test", 6],
-  ["typing, hovering and announcements", "Run the tests", 4],
+  ["mount a primitive", "Run the Test", 6],
+  ["typing, hovering and announcements", "Run the Tests", 4],
 ] as const) {
   test(`${name}: every check passes in the page`, async ({ page }) => {
     const { errors } = await openExamples(page, url)
@@ -40,7 +40,7 @@ for (const [name, button, count] of [
 
 test("the server's HTML: read-more passes, and a clock in attrs fails", async ({ page }) => {
   await openExamples(page, url)
-  const run = page.getByRole("button", { name: "Check the server HTML" })
+  const run = page.getByRole("button", { name: "Check the Server HTML" })
   await run.click()
   await expect(page.getByRole("status")).toContainText('data-slot="read-more-trigger"')
   await page.getByRole("checkbox", { name: "Read the clock in attrs" }).check()
@@ -50,7 +50,7 @@ test("the server's HTML: read-more passes, and a clock in attrs fails", async ({
 
 test("both directions: the pager passes, and one that ignores direction fails", async ({ page }) => {
   await openExamples(page, url)
-  const run = page.getByRole("button", { name: "Check both directions" })
+  const run = page.getByRole("button", { name: "Check Both Directions" })
   await run.click()
   await expect(page.getByRole("status")).toHaveText(/^Passes/)
   await page.getByRole("checkbox", { name: "Ignore the direction" }).check()

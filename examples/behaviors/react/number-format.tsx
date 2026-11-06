@@ -21,8 +21,8 @@ function Example() {
   const [value, end] = values[style]
   const format = styles[style]
   return (
-    <div>
-      <div>
+    <div data-slot="stack">
+      <div data-slot="controls">
         <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
           {locales.map((option) => (
             <option key={option}>{option}</option>
@@ -34,19 +34,21 @@ function Example() {
           ))}
         </select>
       </div>
-      <p data-formatted>
-        {formatNumberToParts(value, locale, format).map((part, index) => (
-          <span key={index} data-type={part.type}>
-            {part.value}
-          </span>
-        ))}
-      </p>
-      <dl>
-        <dt>Plain</dt>
-        <dd data-plain>{formatNumber(value, locale, format)}</dd>
-        <dt>Range</dt>
-        <dd data-range>{formatNumberRange(value, end, locale, format)}</dd>
-      </dl>
+      <div data-slot="number-format-result">
+        <p data-formatted data-slot="number-format-value">
+          {formatNumberToParts(value, locale, format).map((part, index) => (
+            <span key={index} data-type={part.type}>
+              {part.value}
+            </span>
+          ))}
+        </p>
+        <dl>
+          <dt>Plain</dt>
+          <dd data-plain>{formatNumber(value, locale, format)}</dd>
+          <dt>Range</dt>
+          <dd data-range>{formatNumberRange(value, end, locale, format)}</dd>
+        </dl>
+      </div>
     </div>
   )
 }

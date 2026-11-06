@@ -43,7 +43,7 @@ This plan picker uses both. `selection.isSelected(key)` lets its Enter handler c
 
 <ComponentExample
   name="behaviors/selection-single"
-  caption="Click a plan, or use the arrows and Space to choose one. Space on the chosen plan clears it; Enter continues with it."
+  caption="Click a plan, or use the arrows and Space to choose one. Space on the chosen plan clears it; Enter continues with it, and the console logs each step."
 />
 
 For a listbox, give the root `role="listbox"`, each item `role="option"`, and set its `aria-selected` from `state.value.includes(key)`. Keep the focus wiring from [Focus and Keys](./focus#roving-focus).
@@ -122,7 +122,7 @@ In this member list, owners start selected. The demo uses `toggle` and `toggleAl
 
 <ComponentExample
   name="behaviors/selection-selectable"
-  caption="Focus a member and press Control or Command+A twice. Ana stays selected while the other members are selected, then cleared."
+  caption="Focus a member and press Control or Command+A twice. Hollis Grant stays selected while the other members are selected, then cleared."
 />
 
 This doesn't pin an item in the selection: `choose` and a range with `additive: false` can replace the whole value. If some keys must always stay selected, enforce that in your `set` callback.
@@ -165,7 +165,7 @@ lasso: slot({
 
 <ComponentExample
   name="behaviors/lasso"
-  caption="Drag from empty space to select shapes. Hold Shift to add to the selection; press Escape before releasing to cancel the rectangle."
+  caption="Drag from empty space to select shapes; the console logs the selection. Hold Shift to add to it; press Escape before releasing to cancel the rectangle."
 />
 
 `lasso.touches(state, key)` tells you which items belong to the preview selection. With Shift, that includes items selected before the drag. Use it for a `data-lassoed` highlight.

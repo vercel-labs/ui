@@ -314,7 +314,7 @@ disabled: () => context.store.get().locked,
 
 <ComponentExample
   name="behaviors/area-color"
-  caption="Drag to adjust saturation and brightness. The swatch follows immediately; Saved updates on release or a keyboard change. Lock disables the picker, and Reset sets its value from code."
+  caption="Drag to adjust saturation and brightness. The swatch follows immediately; the saved value is logged on release or after a keyboard change. Lock disables the picker, and Reset sets its value from code."
 />
 
 `onCommit` runs at the end of pointer tracking or after a successful keyboard change. `disabled` prevents user input and removes the thumb from the tab order.

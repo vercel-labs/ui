@@ -8,6 +8,7 @@ import {
   type CommitDetails,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type Reason = "track-press" | "step-key"
 
@@ -91,11 +92,15 @@ const VolumeFill = parts.Fill
 const VolumeThumb = parts.Thumb
 
 function Example() {
+  const log = useLog()
   const [value, setValue] = React.useState(50)
-  const [saved, setSaved] = React.useState(50)
   return (
     <div data-slot="stack">
-      <Volume onValueChange={setValue} onValueCommit={setSaved}>
+      <p aria-hidden="true" data-slot="volume-label">
+        <span>Volume</span>
+        <span data-value>{value}</span>
+      </p>
+      <Volume onValueChange={setValue} onValueCommit={(saved) => log(`Saved ${saved}`)}>
         <VolumeTrack>
           <div data-slot="volume-rail">
             <VolumeFill />
@@ -103,14 +108,6 @@ function Example() {
           <VolumeThumb aria-label="Volume" />
         </VolumeTrack>
       </Volume>
-      <p data-slot="row">
-        <span data-slot="hint" data-value>
-          Volume {value}
-        </span>
-        <span data-slot="hint" data-saved>
-          Saved {saved}
-        </span>
-      </p>
     </div>
   )
 }

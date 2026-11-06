@@ -580,7 +580,7 @@
 
   :is(
     [data-slot="input-root"],
-    :where([data-slot="field-control"]:not([type="checkbox"], [type="radio"])),
+    :where([data-slot="field-control"]:not([type="checkbox"], [type="radio"], [type="range"])),
     [data-slot="textarea-root"],
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],
@@ -837,6 +837,7 @@
     [data-slot="timer-trigger"],
     [data-slot="timer-done"],
     [data-slot="product-rename"],
+    [data-slot="file-list-expand"],
     [data-slot="canvas-action"],
     [data-slot="city-map-arrow"],
     [data-slot="notes-expand"],

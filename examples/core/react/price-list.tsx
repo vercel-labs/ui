@@ -1,7 +1,6 @@
 import * as React from "react"
 import { definePrimitive, pageLocale, userLocale } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
-import { ChevronDownIcon } from "lucide-react"
 
 const priceList = definePrimitive({
   name: "price-list",
@@ -48,7 +47,7 @@ function Example() {
   const [lang, setLang] = React.useState("en-US")
   return (
     <div data-slot="stack">
-      <div data-slot="price-list-picker">
+      <div data-slot="controls">
         <select aria-label="Language" value={lang} onChange={(event) => setLang(event.target.value)}>
           {Object.entries(languages).map(([tag, name]) => (
             <option key={tag} value={tag}>
@@ -56,7 +55,6 @@ function Example() {
             </option>
           ))}
         </select>
-        <ChevronDownIcon aria-hidden="true" />
       </div>
       <div lang={lang}>
         <PriceList key={lang}>

@@ -9,6 +9,7 @@ import {
   type MovePoint,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type CanvasState = { positions: Record<string, MovePoint>; zoom: number; moving: MoveDraft | null }
 
@@ -21,7 +22,7 @@ const canvas = definePrimitive({
   name: "canvas",
   options: { zoom: "number", onPositionsChange: "callback" },
   state: (options: CanvasOptions): CanvasState => ({
-    positions: { circle: { x: 40, y: 40 }, square: { x: 160, y: 80 } },
+    positions: { circle: { x: 40, y: 40 }, square: { x: 168, y: 88 } },
     zoom: options.zoom ?? 1,
     moving: null,
   }),
@@ -34,11 +35,12 @@ const canvas = definePrimitive({
       draft: "moving",
       set: (value, details) => change("positions", value, details),
       scale: () => context.store.get().zoom,
+      bounds: () => ({ minX: 0, minY: 0, maxX: 224, maxY: 128 }),
     })
     return {
       move,
       act(action: string) {
-        if (action === "center") move.moveTo("circle", { x: 100, y: 60 })
+        if (action === "center") move.moveTo("circle", { x: 112, y: 64 })
         else if (action === "nudge") move.moveBy(["circle"], 10, 0)
       },
     }
@@ -49,8 +51,8 @@ const canvas = definePrimitive({
       attrs: (state) => ({
         style: css({
           position: "relative",
-          width: "240px",
-          height: "160px",
+          width: "272px",
+          height: "176px",
           transform: `scale(${state.zoom})`,
           "transform-origin": "0 0",
         }),
@@ -92,11 +94,17 @@ const CanvasShape = parts.Shape
 const CanvasAction = parts.Action
 
 function Example() {
+  const log = useLog()
   const [zoom, setZoom] = React.useState(1)
-  const [positions, setPositions] = React.useState<Record<string, MovePoint>>({ circle: { x: 40, y: 40 } })
   return (
-    <div data-slot="stack">
-      <div data-slot="row">
+    <Canvas
+      aria-label="Canvas"
+      zoom={zoom}
+      onPositionsChange={({ circle, square }) =>
+        log(`Circle at ${circle.x}, ${circle.y} · Square at ${square.x}, ${square.y}`)
+      }
+    >
+      <div data-slot="controls">
         {[0.5, 1, 1.5].map((option) => (
           <button
             key={option}
@@ -109,37 +117,21 @@ function Example() {
             {option * 100}%
           </button>
         ))}
+        <CanvasAction value="center" data-size="sm">
+          Center
+        </CanvasAction>
+        <CanvasAction value="nudge" data-size="sm">
+          Nudge
+        </CanvasAction>
       </div>
-      <Canvas aria-label="Canvas" zoom={zoom} onPositionsChange={setPositions}>
-        <div data-slot="move-area">
-          <CanvasSurface>
-            <CanvasShape value="circle" aria-label="Circle" data-shape="round" />
-            <CanvasShape value="square" aria-label="Square" />
-          </CanvasSurface>
-        </div>
-        <div data-slot="row">
-          <CanvasAction value="center" data-size="sm">
-            Center
-          </CanvasAction>
-          <CanvasAction value="nudge" data-size="sm">
-            Nudge right
-          </CanvasAction>
-          <p data-slot="output">
-            Circle at {positions.circle.x}, {positions.circle.y}
-          </p>
-        </div>
-      </Canvas>
-    </div>
+      <div data-slot="move-area">
+        <CanvasSurface>
+          <CanvasShape value="circle" aria-label="Circle" data-shape="round" />
+          <CanvasShape value="square" aria-label="Square" />
+        </CanvasSurface>
+      </div>
+    </Canvas>
   )
 }
 
-export {
-  Canvas,
-  canvas,
-  CanvasAction,
-  type CanvasOptions,
-  CanvasShape,
-  type CanvasState,
-  CanvasSurface,
-  Example,
-}
+export { Example }

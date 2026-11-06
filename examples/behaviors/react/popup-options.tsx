@@ -11,6 +11,7 @@ import {
 } from "@ui-sdk/core"
 import { popoverPreset } from "@ui-sdk/core/popover"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type CartOptions = {
   open?: boolean
@@ -60,7 +61,7 @@ function Example() {
   const [modal, setModal] = React.useState(false)
   const [openOnHover, setOpenOnHover] = React.useState(false)
   const [dismissible, setDismissible] = React.useState(true)
-  const [status, setStatus] = React.useState("Closed")
+  const log = useLog()
   const [count, setCount] = React.useState(0)
   return (
     <div data-slot="stack">
@@ -69,19 +70,19 @@ function Example() {
           open={open}
           onOpenChange={(next: boolean, details: ChangeDetails<string>) => {
             setOpen(next)
-            setStatus(`${next ? "Opened" : "Closed"} by ${details.reason}`)
+            log(`${next ? "Opened" : "Closed"} by ${details.reason}`)
           }}
           modal={modal}
           openOnHover={openOnHover}
           delay={200}
           dismissible={dismissible}
-          onDismissAttempt={(details: { reason: string }) => setStatus(`Kept open: ${details.reason}`)}
+          onDismissAttempt={(details: { reason: string }) => log(`Kept open: ${details.reason}`)}
         >
           <CartTrigger>Cart</CartTrigger>
           <CartContent sideOffset={6}>
             <p>2 items, $48</p>
             <CartClose data-variant="solid" data-size="sm">
-              Check out
+              Check Out
             </CartClose>
           </CartContent>
         </Cart>
@@ -111,9 +112,6 @@ function Example() {
           Dismissible
         </label>
       </div>
-      <p data-cart-status data-slot="output">
-        {status}
-      </p>
     </div>
   )
 }

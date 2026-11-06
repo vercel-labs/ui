@@ -12,18 +12,22 @@ function Example() {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
   return (
-    <dl>
+    <ul aria-label="Today" data-slot="list">
       {zones.map(([zone, city]) => (
-        <React.Fragment key={zone}>
-          <dt>{city}</dt>
-          <dd data-zone={zone}>
+        <li key={zone} data-slot="row">
+          {city}
+          <span data-slot="hint" data-zone={zone}>
             {mounted ? formatDate(todayDate(zone), "en-US", { dateStyle: "medium" }) : ""}
-          </dd>
-        </React.Fragment>
+          </span>
+        </li>
       ))}
-      <dt>Here</dt>
-      <dd data-zone="here">{mounted ? todayDate() : ""}</dd>
-    </dl>
+      <li data-slot="row">
+        Here
+        <span data-slot="hint" data-zone="here">
+          {mounted ? formatDate(todayDate(), "en-US", { dateStyle: "medium" }) : ""}
+        </span>
+      </li>
+    </ul>
   )
 }
 

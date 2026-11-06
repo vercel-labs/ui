@@ -88,7 +88,7 @@ function Example() {
             ))}
           </parts.World>
         </parts.Pane>
-        <parts.Reset data-size="sm">Reset view</parts.Reset>
+        <parts.Reset data-size="sm">Reset View</parts.Reset>
       </parts.Root>
     </div>
   )

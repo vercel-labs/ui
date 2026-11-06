@@ -68,22 +68,17 @@ function Example() {
   return (
     <Timetable>
       {({ first }) => (
-        <>
-          <TimetableBody aria-label="Departures">
-            {Array.from({ length: shown }, (_, offset) => first + offset).map((row) => (
-              <TimetableRow key={row} index={row}>
-                {[0, 1, 2].map((col) => (
-                  <TimetableCell key={col} row={row} col={col}>
-                    {cellText(row, col)}
-                  </TimetableCell>
-                ))}
-              </TimetableRow>
-            ))}
-          </TimetableBody>
-          <p data-window data-slot="output">
-            Rows {first + 1} to {first + shown} of {count}
-          </p>
-        </>
+        <TimetableBody aria-label="Departures">
+          {Array.from({ length: shown }, (_, offset) => first + offset).map((row) => (
+            <TimetableRow key={row} index={row}>
+              {[0, 1, 2].map((col) => (
+                <TimetableCell key={col} row={row} col={col}>
+                  {cellText(row, col)}
+                </TimetableCell>
+              ))}
+            </TimetableRow>
+          ))}
+        </TimetableBody>
       )}
     </Timetable>
   )

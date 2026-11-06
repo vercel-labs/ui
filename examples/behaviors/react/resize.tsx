@@ -11,6 +11,7 @@ import {
   type ResizeReason,
 } from "@ui-sdk/core"
 import { usePart, usePrimitive, type PartProps } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type FrameState = { boxes: Record<string, ResizeBox>; draft: ResizeDraft | null }
 
@@ -32,7 +33,7 @@ const frame = definePrimitive({
         draft: "draft",
         set: (value, details) => change("boxes", value, details),
         min: () => ({ width: 60, height: 40 }),
-        bounds: () => ({ left: 0, top: 0, right: 320, bottom: 200 }),
+        bounds: () => ({ left: 0, top: 0, right: 272, bottom: 176 }),
         step: () => 4,
       }),
     }
@@ -59,28 +60,38 @@ function Frame({ defaultBox, onBoxesChange, ...props }: FrameOptions & PartProps
   return usePart(handle, "box", {}, props, "div")
 }
 
-function FrameHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<"div">) {
-  return usePart(frame, "handle", { id: handle, handle }, props, "div")
+function FrameHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<"button">) {
+  return usePart(frame, "handle", { id: handle, handle }, { type: "button", ...props }, "button")
 }
 
-const handles: Exclude<ResizeHandle, "move">[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"]
+const handles: Partial<Record<ResizeHandle, string>> = {
+  nw: "top left",
+  n: "top",
+  ne: "top right",
+  e: "right",
+  se: "bottom right",
+  s: "bottom",
+  sw: "bottom left",
+  w: "left",
+}
 
 function Example() {
-  const [box, setBox] = React.useState({ x: 88, y: 48, width: 140, height: 92 })
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <div data-slot="resize-stage">
-        <Frame aria-label="Frame" defaultBox={box} onBoxesChange={(boxes) => setBox(boxes.frame)}>
-          {handles.map((name) => (
-            <FrameHandle key={name} handle={name} />
-          ))}
-        </Frame>
-      </div>
-      <p data-slot="output">
-        {box.width} × {box.height} at {box.x}, {box.y}
-      </p>
+    <div data-slot="resize-stage">
+      <Frame
+        aria-label="Frame"
+        defaultBox={{ x: 68, y: 40, width: 136, height: 96 }}
+        onBoxesChange={({ frame }, details) =>
+          log(`${frame.width} × ${frame.height} at ${frame.x}, ${frame.y} (${details.reason})`)
+        }
+      >
+        {(Object.keys(handles) as ResizeHandle[]).map((name) => (
+          <FrameHandle key={name} handle={name} aria-label={`Resize ${handles[name]}`} />
+        ))}
+      </Frame>
     </div>
   )
 }
 
-export { Example, frame, Frame, FrameHandle, type FrameOptions, type FrameState }
+export { Example }

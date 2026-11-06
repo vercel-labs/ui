@@ -32,7 +32,7 @@ test("collapse: below the minimum the sidebar eases toward collapsing or the min
     await page.mouse.move(box.x + box.width / 2, y)
     await page.mouse.down()
   }
-  await expect(divider).toHaveAttribute("aria-valuenow", "200")
+  await expect(divider).toHaveAttribute("aria-valuenow", "160")
   // At 120 pixels the sidebar is on its way back to 160, at 140; at 40 it's on its way to collapsing, at 20.
   await press()
   await page.mouse.move(root.x + 120, y, { steps: 6 })
@@ -138,8 +138,8 @@ test("transfer: a drag moves an item to the other list, and Right does from the 
   page,
 }) => {
   await openBehaviors(page, "drag-and-drop")
-  const closet = page.getByRole("listbox", { name: "closet" })
-  const bag = page.getByRole("listbox", { name: "bag" })
+  const closet = page.getByRole("listbox", { name: "Closet" })
+  const bag = page.getByRole("listbox", { name: "Bag" })
   await drag(page, closet.getByRole("option", { name: "Boots" }), bag, { x: 0.5, y: 0.9 })
   await page.mouse.up()
   await expect(bag.getByRole("option")).toHaveText(["Passport", "Charger", "Boots"])
@@ -161,10 +161,10 @@ test("drag preview: a copy follows the pointer, and letting go over the note add
   await expect(note).toHaveAttribute("data-over", "")
   await page.mouse.up()
   await expect(page.locator("[data-drag-preview]")).toHaveCount(0)
-  await expect(note).toContainText("Tags: Design")
+  await expect(note.locator('[data-slot="badge"]')).toHaveText(["Design"])
   await page.getByRole("button", { name: "Urgent" }).focus()
   await page.keyboard.press("Enter")
-  await expect(note).toContainText("Tags: Design, Urgent")
+  await expect(note.locator('[data-slot="badge"]')).toHaveText(["Design", "Urgent"])
 })
 
 test("reorder preview: holding a drag near the bottom edge scrolls the queue", async ({ page }) => {
@@ -249,14 +249,14 @@ test("reorder from code: move to top, and the toolbar's pick up, move, drop and 
   await page.getByRole("button", { name: "Move Serve to top" }).click()
   await expect(steps.first()).toContainText("Serve")
   await steps.filter({ hasText: "Drain" }).focus()
-  await page.getByRole("button", { name: "Pick up" }).click()
-  await page.getByRole("button", { name: "Up", exact: true }).click()
-  await page.getByRole("button", { name: "Up", exact: true }).click()
+  await page.getByRole("button", { name: "Pick Up" }).click()
+  await page.getByRole("button", { name: "Move up" }).click()
+  await page.getByRole("button", { name: "Move up" }).click()
   await page.getByRole("button", { name: "Drop" }).click()
   await expect(steps.nth(2)).toContainText("Drain")
   await steps.filter({ hasText: "Serve" }).focus()
-  await page.getByRole("button", { name: "Pick up" }).click()
-  await page.getByRole("button", { name: "Down", exact: true }).click()
+  await page.getByRole("button", { name: "Pick Up" }).click()
+  await page.getByRole("button", { name: "Move down" }).click()
   await page.getByRole("button", { name: "Cancel" }).click()
   await expect(steps.first()).toContainText("Serve")
 })
@@ -337,7 +337,7 @@ test("auto scroll: a bookmark held near the bottom scrolls the chapters and land
 }) => {
   await openBehaviors(page, "drag-and-drop")
   const chapters = page.getByRole("list", { name: "Chapters" })
-  const bookmark = page.getByRole("button", { name: "🔖 Bookmark" })
+  const bookmark = page.getByRole("button", { name: "Bookmark" })
   await chapters.scrollIntoViewIfNeeded()
   const from = (await bookmark.boundingBox())!
   const box = (await chapters.boundingBox())!
@@ -347,8 +347,13 @@ test("auto scroll: a bookmark held near the bottom scrolls the chapters and land
   await expect.poll(() => chapters.evaluate((el) => el.scrollTop)).toBeGreaterThan(100)
   await expect(chapters.locator("[data-over]")).toHaveCount(1)
   await page.mouse.up()
-  await expect(page.locator("[data-bookmark]")).not.toHaveText("Drag the bookmark onto a chapter.")
-  await expect(page.locator("[data-bookmark]")).not.toHaveText("Bookmarked Chapter 5")
+  const log = page
+    .locator('[data-example="behaviors/auto-scroll"]')
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+  await expect(log).toHaveText(/^Bookmarked Chapter \d+$/)
+  await expect(log).not.toHaveText("Bookmarked Chapter 5")
 })
 
 test("every option links to the example that shows it", async ({ page }) => {

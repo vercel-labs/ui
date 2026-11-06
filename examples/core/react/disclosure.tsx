@@ -53,10 +53,12 @@ function Example() {
   const [open, setOpen] = React.useState(false)
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
-        Open from outside
-      </label>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          Open from outside
+        </label>
+      </div>
       <Disclosure open={open} onOpenChange={setOpen}>
         <DisclosureTrigger>Shipping details</DisclosureTrigger>
         <DisclosurePanel>Ships in two days, free over $50.</DisclosurePanel>

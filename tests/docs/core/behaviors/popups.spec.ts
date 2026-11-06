@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "popups")
@@ -59,10 +66,10 @@ test("presets: a popover, a modal dialog and a tooltip from the same primitive",
 
 test("options: reasons, modal, open on hover and refusing a dismissal", async ({ page }) => {
   await openBehaviors(page, "popups")
-  const example = page.locator("[data-example]").filter({ has: page.locator("[data-cart-status]") })
+  const example = page.locator('[data-example="behaviors/popup-options"]')
   const cart = example.getByRole("button", { name: "Cart", exact: true })
   await cart.scrollIntoViewIfNeeded()
-  const status = page.locator("[data-cart-status]")
+  const status = lastLog(example)
   const count = example.getByRole("button", { name: /^Likes/ })
   const content = page.getByRole("dialog", { name: "Cart" })
   await cart.click()
@@ -86,7 +93,7 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
   await page.keyboard.press("Escape")
   await expect(status).toHaveText("Kept open: escape-key")
   await expect(content).toBeVisible()
-  await content.getByRole("button", { name: "Check out" }).click()
+  await content.getByRole("button", { name: "Check Out" }).click()
   await expect(status).toHaveText("Closed by close-press")
   await expect(content).toBeHidden()
   await example.getByRole("checkbox", { name: "Dismissible" }).check()
@@ -97,7 +104,7 @@ test("options: reasons, modal, open on hover and refusing a dismissal", async ({
 
 test("options: a press on a control under the cart as it fades out reaches the control", async ({ page }) => {
   await openBehaviors(page, "popups")
-  const example = page.locator("[data-example]").filter({ has: page.locator("[data-cart-status]") })
+  const example = page.locator('[data-example="behaviors/popup-options"]')
   const cart = example.getByRole("button", { name: "Cart", exact: true })
   await cart.scrollIntoViewIfNeeded()
   const content = page.locator('[data-slot="cart-content"]')
@@ -118,26 +125,26 @@ test("options: a press on a control under the cart as it fades out reaches the c
 
 test("payload: every avatar opens the same card with its own person", async ({ page }) => {
   await openBehaviors(page, "popups")
-  const ada = page.getByRole("button", { name: "Ada Lovelace" })
-  await ada.scrollIntoViewIfNeeded()
-  await ada.click()
-  const card = page.getByRole("dialog", { name: "Ada Lovelace" })
+  const hollis = page.getByRole("button", { name: "Hollis Grant" })
+  await hollis.scrollIntoViewIfNeeded()
+  await hollis.click()
+  const card = page.getByRole("dialog", { name: "Hollis Grant" })
   await expect(card).toBeVisible()
   await expect(card).toHaveAccessibleDescription("Engineering")
-  await expect(page.locator("[data-team-shown]")).toHaveText("Ada Lovelace, by trigger-press")
+  await expect(lastLog(hollis)).toHaveText("Hollis Grant, by trigger-press")
   await expect(card.locator("[data-slot=team-card-arrow]")).toHaveAttribute("data-side", "bottom")
-  const grace = page.getByRole("button", { name: "Grace Hopper" })
-  await grace.click()
-  const moved = page.getByRole("dialog", { name: "Grace Hopper" })
+  const ines = page.getByRole("button", { name: "Inès Moreau" })
+  await ines.click()
+  const moved = page.getByRole("dialog", { name: "Inès Moreau" })
   await expect(moved).toBeVisible()
-  await expect(moved).toHaveAccessibleDescription("Compilers")
+  await expect(moved).toHaveAccessibleDescription("Design")
   const offset = async () => {
     const at = (await moved.boundingBox())!
-    const from = (await grace.boundingBox())!
+    const from = (await ines.boundingBox())!
     return Math.abs(at.x + at.width / 2 - (from.x + from.width / 2))
   }
   await expect.poll(offset).toBeLessThan(2)
-  await expect(page.locator("[data-team-shown]")).toHaveText("Grace Hopper, by trigger-press")
+  await expect(lastLog(hollis)).toHaveText("Inès Moreau, by trigger-press")
 })
 
 test("link preview: resting on a link previews its page, with its image", async ({ page }) => {
@@ -163,7 +170,7 @@ test("compose: our Popover opens your picker, and a pick closes it", async ({ pa
   await expect(picker).toBeVisible()
   await picker.getByRole("button", { name: "🚀" }).click()
   await expect(picker).toBeHidden()
-  await expect(page.locator("[data-reactions]")).toHaveText("🚀")
+  await expect(lastLog(trigger)).toHaveText("Reacted with 🚀")
   await trigger.click()
   await page.keyboard.press("Escape")
   await expect(picker).toBeHidden()
@@ -229,15 +236,15 @@ test("controller: open() places our Popover at the pointer, hands it a payload a
   const at = (await popover.boundingBox())!
   expect(Math.abs(at.x - (box.x + 40))).toBeLessThan(2)
   await page.keyboard.press("Escape")
-  await expect(page.locator("[data-note-status]")).toHaveText("Closed by escape-key (keyboard)")
+  await expect(lastLog(card)).toHaveText("Closed by escape-key (keyboard)")
   await page.mouse.click(box.x + 60, box.y + 60)
   await popover.getByRole("button", { name: "Keep" }).click()
-  await expect(page.locator("[data-note-status]")).toHaveText(/^Closed by imperative \(\w+\), kept$/)
+  await expect(lastLog(card)).toHaveText(/^Closed by imperative \(\w+\), kept$/)
   await page.getByRole("checkbox", { name: "Close by itself" }).check()
   await page.mouse.click(box.x + 60, box.y + 60)
   await expect(popover).toBeVisible()
   await expect(popover).toBeHidden({ timeout: 4000 })
-  await expect(page.locator("[data-note-status]")).toHaveText(/^Closed by imperative/)
+  await expect(lastLog(card)).toHaveText(/^Closed by imperative/)
 })
 
 test("position options: the hint lands on the side asked, follows new options, and flips near the edge", async ({
@@ -274,11 +281,11 @@ test("modal layer: a press outside only closes it, the window blurring closes it
   page,
 }) => {
   await openBehaviors(page, "popups")
-  const example = page.locator("[data-example]").filter({ has: page.locator("[data-last-close]") })
+  const example = page.locator('[data-example="behaviors/layer-modal"]')
   const trigger = page.locator('[data-slot="timer-trigger"]')
   const panel = page.locator('[data-slot="timer-panel"]')
   const counter = page.getByRole("button", { name: /^Count \d+$/ })
-  const closed = page.locator("[data-last-close]")
+  const closed = lastLog(example)
   await trigger.scrollIntoViewIfNeeded()
   await trigger.click()
   await expect(panel).toBeVisible()

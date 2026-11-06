@@ -9,6 +9,9 @@ import {
   type ResizeHandle,
 } from "@ui-sdk/core"
 import { usePart, usePrimitive, type PartProps } from "@ui-sdk/react/primitive"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { CheckIcon, PlayIcon } from "lucide-react"
+import { useLog } from "../../shared/react/log"
 
 type VideoState = { boxes: Record<string, ResizeBox>; locked: boolean; draft: ResizeDraft | null }
 
@@ -18,7 +21,7 @@ const video = definePrimitive({
   name: "video",
   options: { locked: "boolean", onBoxesChange: "callback" },
   state: (options: VideoOptions): VideoState => ({
-    boxes: { video: { x: 40, y: 40, width: 160, height: 90 } },
+    boxes: { video: { x: 56, y: 43, width: 160, height: 90 } },
     locked: options.locked ?? true,
     draft: null,
   }),
@@ -34,7 +37,7 @@ const video = definePrimitive({
         aspect: () => (context.store.get().locked ? 16 / 9 : undefined),
         min: () => ({ width: 96, height: 54 }),
         max: () => ({ width: 256, height: 144 }),
-        bounds: () => ({ left: 0, top: 0, right: 320, bottom: 200 }),
+        bounds: () => ({ left: 0, top: 0, right: 272, bottom: 176 }),
         largeStep: () => 16,
       }),
     }
@@ -61,43 +64,48 @@ function Video({ locked, onBoxesChange, ...props }: VideoOptions & PartProps<"di
   return usePart(handle, "box", {}, props, "div")
 }
 
-function VideoHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<"div">) {
-  return usePart(video, "handle", { id: handle, handle }, props, "div")
+function VideoHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<"button">) {
+  return usePart(video, "handle", { id: handle, handle }, { type: "button", ...props }, "button")
 }
 
 const places: Partial<Record<ResizeHandle, string>> = {
-  nw: "Top left",
-  ne: "Top right",
-  e: "Right",
-  se: "Bottom right",
-  sw: "Bottom left",
-  w: "Left",
+  nw: "top left",
+  ne: "top right",
+  e: "right",
+  se: "bottom right",
+  sw: "bottom left",
+  w: "left",
 }
 
 function Example() {
+  const log = useLog()
   const [locked, setLocked] = React.useState(true)
-  const [box, setBox] = React.useState({ width: 160, height: 90 })
   return (
     <div data-slot="stack">
-      <div data-slot="resize-stage">
-        <Video aria-label="Video" locked={locked} onBoxesChange={(boxes) => setBox(boxes.video)}>
-          ▶
-          {(Object.keys(places) as ResizeHandle[]).map((name) => (
-            <VideoHandle key={name} handle={name} aria-label={`${places[name]} handle`} tabIndex={0} />
-          ))}
-        </Video>
-      </div>
-      <div data-slot="row">
+      <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
+          <Checkbox checked={locked} onCheckedChange={(next) => setLocked(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
           Keep 16:9
         </label>
-        <span data-slot="hint">
-          {Math.round(box.width)} × {Math.round(box.height)}
-        </span>
+      </div>
+      <div data-slot="resize-stage">
+        <Video
+          aria-label="Video"
+          locked={locked}
+          onBoxesChange={({ video }) => log(`${Math.round(video.width)} × ${Math.round(video.height)}`)}
+        >
+          <PlayIcon aria-hidden="true" />
+          {(Object.keys(places) as ResizeHandle[]).map((name) => (
+            <VideoHandle key={name} handle={name} aria-label={`Resize ${places[name]}`} />
+          ))}
+        </Video>
       </div>
     </div>
   )
 }
 
-export { Example, video, Video, VideoHandle, type VideoOptions, type VideoState }
+export { Example }

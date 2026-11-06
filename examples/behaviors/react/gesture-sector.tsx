@@ -1,9 +1,19 @@
 import * as React from "react"
+import { FlameIcon, FrownIcon, HeartIcon, LaughIcon, PartyPopperIcon, ThumbsUpIcon } from "lucide-react"
 import { bindDrag, css, definePrimitive } from "@ui-sdk/core"
 import { sectorOf } from "@ui-sdk/core/gesture"
 import { createParts } from "@ui-sdk/react/primitive"
 
-const reactions = ["👍", "🎉", "😂", "😮", "😢", "❤️"]
+const icons = {
+  Like: ThumbsUpIcon,
+  Celebrate: PartyPopperIcon,
+  Laugh: LaughIcon,
+  Fire: FlameIcon,
+  Sad: FrownIcon,
+  Love: HeartIcon,
+}
+
+const reactions = Object.keys(icons) as (keyof typeof icons)[]
 
 const start = 1 / 12
 
@@ -60,17 +70,17 @@ const react = definePrimitive({
     reaction: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, { props }) => {
-        const index = reactions.indexOf(props.value)
+        const index = reactions.indexOf(props.value as keyof typeof icons)
         const { x, y } = sectorPoint(index, reactions.length, 72, start)
         return {
           type: "button",
-          "aria-label": `React with ${props.value}`,
+          "aria-label": props.value,
           "aria-pressed": String(state.picked === props.value),
           "data-pointing": state.pointing === index ? "" : undefined,
           style: css({ position: "absolute", left: "50%", top: "50%", translate: `${x}px ${y}px` }),
         }
       },
-      press: ({ api, props }) => api.pick(reactions.indexOf(props.value)),
+      press: ({ api, props }) => api.pick(reactions.indexOf(props.value as keyof typeof icons)),
     }),
   }),
 })
@@ -86,16 +96,22 @@ const Reaction = parts.Reaction
 function Example() {
   return (
     <ReactionRing>
-      {({ picked }) => (
-        <>
-          <ReactionHandle>{picked ?? "·"}</ReactionHandle>
-          {reactions.map((reaction) => (
-            <Reaction key={reaction} value={reaction}>
-              {reaction}
-            </Reaction>
-          ))}
-        </>
-      )}
+      {({ picked }) => {
+        const Picked = picked ? icons[picked as keyof typeof icons] : null
+        return (
+          <>
+            <ReactionHandle>{Picked ? <Picked aria-hidden="true" /> : null}</ReactionHandle>
+            {reactions.map((reaction) => {
+              const Icon = icons[reaction]
+              return (
+                <Reaction key={reaction} value={reaction}>
+                  <Icon aria-hidden="true" />
+                </Reaction>
+              )
+            })}
+          </>
+        )
+      }}
     </ReactionRing>
   )
 }

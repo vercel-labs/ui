@@ -9,6 +9,8 @@ import {
   type ChangeDetails,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { BookmarkIcon } from "lucide-react"
+import { useLog } from "../../shared/react/log"
 
 type BookState = { bookmark: string | null; over: string | null }
 
@@ -96,11 +98,14 @@ const BookChapter = parts.Chapter
 const chapters = Array.from({ length: 24 }, (_, index) => `Chapter ${index + 1}`)
 
 function Example() {
-  const [bookmark, setBookmark] = React.useState<string | null>(null)
+  const log = useLog()
   return (
-    <Book onBookmarkChange={setBookmark}>
+    <Book onBookmarkChange={(bookmark) => log(bookmark ? `Bookmarked ${bookmark}` : "Removed the bookmark")}>
       <div data-slot="stack">
-        <BookBookmark data-size="sm">🔖 Bookmark</BookBookmark>
+        <BookBookmark data-size="sm">
+          <BookmarkIcon aria-hidden="true" />
+          Bookmark
+        </BookBookmark>
         <BookChapters aria-label="Chapters">
           {chapters.map((chapter) => (
             <BookChapter key={chapter} value={chapter}>
@@ -108,12 +113,9 @@ function Example() {
             </BookChapter>
           ))}
         </BookChapters>
-        <p data-bookmark data-slot="output">
-          {bookmark ? `Bookmarked ${bookmark}` : "Drag the bookmark onto a chapter."}
-        </p>
       </div>
     </Book>
   )
 }
 
-export { Book, book, BookBookmark, BookChapter, BookChapters, type BookOptions, type BookState, Example }
+export { Example }

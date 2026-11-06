@@ -22,10 +22,7 @@ function Example() {
   ]
   return (
     <div data-slot="stack">
-      <p data-date data-slot="date-value">
-        {date}
-      </p>
-      <div data-slot="row">
+      <div data-slot="controls">
         {steps.map(([value, text, next]) => (
           <button key={value} type="button" data-size="sm" onClick={() => setDate(next())}>
             {text}
@@ -34,15 +31,19 @@ function Example() {
         <button type="button" data-size="sm" onClick={() => setDate("2026-01-31")}>
           Reset
         </button>
-      </div>
-      <label data-slot="label">
-        Weeks start on
-        <select value={weekStartsOn} onChange={(event) => setWeekStartsOn(Number(event.target.value))}>
-          <option value={0}>Sunday</option>
-          <option value={1}>Monday</option>
-          <option value={6}>Saturday</option>
+        <select
+          aria-label="Weeks start on"
+          value={weekStartsOn}
+          onChange={(event) => setWeekStartsOn(Number(event.target.value))}
+        >
+          <option value={0}>Weeks start on Sunday</option>
+          <option value={1}>Weeks start on Monday</option>
+          <option value={6}>Weeks start on Saturday</option>
         </select>
-      </label>
+      </div>
+      <p data-date data-slot="date-value">
+        {date}
+      </p>
       <dl>
         <dt>Week</dt>
         <dd data-this-week>

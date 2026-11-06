@@ -1,6 +1,7 @@
 import * as React from "react"
 import { definePrimitive } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { XIcon } from "lucide-react"
 
 type SearchFieldOptions = {
   onQueryChange?: (query: string) => void
@@ -56,7 +57,9 @@ function Example() {
     <div data-slot="stack">
       <SearchField onQueryChange={setQuery}>
         <SearchFieldInput aria-label="Search fruit" placeholder="Search fruit" />
-        <SearchFieldClear>✕</SearchFieldClear>
+        <SearchFieldClear>
+          <XIcon aria-hidden="true" />
+        </SearchFieldClear>
       </SearchField>
       <p data-slot="hint">{matches.join(", ") || "No fruit matches."}</p>
     </div>

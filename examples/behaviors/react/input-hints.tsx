@@ -1,5 +1,6 @@
 import * as React from "react"
 import { inputHints, type EnterKeyHint, type InputHintKind } from "@ui-sdk/core"
+import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 
 const fields: { label: string; kind: InputHintKind; enter?: EnterKeyHint }[] = [
   { label: "Email", kind: "email", enter: "next" },
@@ -33,20 +34,20 @@ const returns: Record<EnterKeyHint, string> = {
 
 function Example() {
   return (
-    <form onSubmit={(event) => event.preventDefault()}>
+    <form data-slot="stack" onSubmit={(event) => event.preventDefault()}>
       {fields.map(({ label, kind, enter }) => {
         const hints = inputHints(kind, { enter })
         return (
-          <label key={kind}>
-            <span>{label}</span>
-            <input {...hints} />
-            <span>
+          <Field key={kind}>
+            <FieldLabel>{label}</FieldLabel>
+            <FieldControl {...hints} />
+            <FieldDescription>
               {keys[hints.inputMode ?? "text"]}
               {pads.has(hints.inputMode ?? "")
                 ? ""
                 : ` · Return says ${returns[hints.enterKeyHint ?? "enter"]}`}
-            </span>
-          </label>
+            </FieldDescription>
+          </Field>
         )
       })}
     </form>

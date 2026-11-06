@@ -11,7 +11,7 @@ test("the introduction's examples render without errors", async ({ page }) => {
 test("icon picker: opens in a popover, search, then arrows and Enter pick an icon", async ({ page }) => {
   await openExamples(page, "/docs/core")
   const example = page.locator('[data-example="core/icon-picker"]')
-  const trigger = example.getByRole("button", { name: "Pick an icon" })
+  const trigger = example.getByRole("button", { name: "Pick an Icon" })
   await trigger.click()
   const search = page.getByRole("searchbox", { name: "Search icons" })
   await expect(search).toBeFocused()
@@ -54,7 +54,7 @@ test.describe("on a phone", () => {
   test("icon picker: the arrows follow the columns that fit, and a tap picks", async ({ page }) => {
     await openExamples(page, "/docs/core")
     const example = page.locator('[data-example="core/icon-picker"]')
-    await example.getByRole("button", { name: "Pick an icon" }).tap()
+    await example.getByRole("button", { name: "Pick an Icon" }).tap()
     const grid = page.getByRole("group", { name: "Icons" })
     const buttons = grid.getByRole("button")
     const tops = await buttons.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top))

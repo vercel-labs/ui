@@ -48,10 +48,12 @@ function Example() {
   const [rtl, setRtl] = React.useState(false)
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={rtl} onChange={(event) => setRtl(event.target.checked)} />
-        Right to left
-      </label>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={rtl} onChange={(event) => setRtl(event.target.checked)} />
+          Right to left
+        </label>
+      </div>
       <Pager dir={rtl ? "rtl" : "ltr"} aria-label="Page">
         {({ page }) => (
           <>

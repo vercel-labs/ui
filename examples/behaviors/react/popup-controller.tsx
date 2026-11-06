@@ -1,5 +1,6 @@
 import * as React from "react"
 import { createPopoverController, Popover, PopoverContent } from "@ui-sdk/react/popover"
+import { useLog } from "../../shared/react/log"
 
 type Spot = { x: number; y: number }
 
@@ -7,9 +8,15 @@ const note = createPopoverController<Spot>()
 
 function Example() {
   const [timed, setTimed] = React.useState(false)
-  const [status, setStatus] = React.useState("Click anywhere on the card")
+  const log = useLog()
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={timed} onChange={(event) => setTimed(event.target.checked)} />
+          Close by itself
+        </label>
+      </div>
       <div
         role="button"
         tabIndex={0}
@@ -21,7 +28,7 @@ function Example() {
             payload: { x: Math.round(event.clientX - box.left), y: Math.round(event.clientY - box.top) },
             signal: timed ? AbortSignal.timeout(2000) : undefined,
           })
-          setStatus(
+          log(
             `Closed by ${result.reason} (${result.source})${result.returnValue ? `, ${result.returnValue}` : ""}`,
           )
         }}
@@ -49,13 +56,6 @@ function Example() {
           }}
         </PopoverContent>
       </Popover>
-      <label data-slot="label">
-        <input type="checkbox" checked={timed} onChange={(event) => setTimed(event.target.checked)} />
-        Close by itself
-      </label>
-      <p data-note-status data-slot="output">
-        {status}
-      </p>
     </div>
   )
 }

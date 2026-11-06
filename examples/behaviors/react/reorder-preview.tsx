@@ -77,4 +77,4 @@ function Example() {
   )
 }
 
-export { Example, queue, Queue, type QueueState, QueueSong }
+export { Example }

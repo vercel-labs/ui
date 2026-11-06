@@ -13,7 +13,7 @@ function Example() {
   const ratio = contrastRatio(parseColor(text)!, parseColor(background)!)
   return (
     <div data-slot="stack">
-      <div data-slot="color-field">
+      <div data-slot="controls">
         <label data-slot="label">
           <input type="color" value={text} onChange={(event) => setText(event.target.value)} />
           Text
@@ -26,7 +26,7 @@ function Example() {
       <p data-slot="contrast-preview" style={{ color: text, background }}>
         Your order ships tomorrow.
       </p>
-      <p data-ratio>
+      <p data-ratio data-slot="hint">
         {ratio.toFixed(2)}:1, {verdictOf(ratio)}
       </p>
     </div>

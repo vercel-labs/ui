@@ -320,7 +320,7 @@ listLabel: (list) => columns[list],
 
 <ComponentExample
   name="behaviors/transfer-board"
-  caption="Move cards between columns. Doing holds at most two cards, Billing can't be picked up, and Done on a card moves it straight to that column."
+  caption="Move cards between columns. Doing holds at most two cards, Billing can't be picked up, and the check on a card moves it straight to Done."
 />
 
 `transfer.move("Search", "done", 0)` makes an immediate move. For a staged move, use `grab`, `moveTo(list, index)`, then `drop` or `cancel`.

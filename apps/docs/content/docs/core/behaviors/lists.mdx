@@ -63,7 +63,7 @@ bind: (el, { api, props }) => api.virtual.measure(props.index, el),
 
 <ComponentExample
   name="behaviors/virtualizer-measure"
-  caption="Scroll through the notes, then try Newest first and Larger text. Row positions adjust to their measured heights."
+  caption="Scroll through the notes, then try Newest First and Larger Text. Row positions adjust to their measured heights."
 />
 
 Call `virtual.reset()` to discard cached measurements after a change that affects every row, such as a new text size. `overscan` keeps a few extra rows beyond each edge; it defaults to four. Fixed-height rows can skip measurement.
@@ -179,7 +179,6 @@ The element holds the very text find in page searches, so the browser highlights
 
 <ComponentExample
   name="behaviors/virtualizer-find"
-  tall
   caption="Press ⌘F or Ctrl+F and search for Acme. The find bar counts every Acme invoice, rendered or not; press Enter to step through them, and the list scrolls to each one."
 />
 
@@ -271,7 +270,7 @@ addOlderMessages()
 
 <ComponentExample
   name="behaviors/stick-chat"
-  caption="Scroll to the end and Send a message. Load older adds messages above without moving your view. Let go stops following new messages."
+  caption="Scroll to the end and Send a message. Load Older adds messages above without moving your view. Let Go stops following new messages. The console logs whether the thread is following."
 />
 
 `stick.release()` stops following from code. Scrolling back to the end or calling `scrollToBottom()` resumes it. The helper manages scroll anchoring while connected so the browser doesn't apply a second adjustment.

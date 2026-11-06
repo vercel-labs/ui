@@ -7,6 +7,7 @@ import {
   type ReorderDraft,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 
 type RecipeState = { value: string[]; focused: string | null; moving: ReorderDraft | null }
 
@@ -101,25 +102,36 @@ const RecipeToTop = parts.ToTop
 
 const RecipeAction = parts.Action
 
-const actions = { grab: "Pick up", up: "Up", down: "Down", drop: "Drop", cancel: "Cancel" }
-
 function Example() {
   return (
     <Recipe>
       {({ order }) => (
         <>
-          <div data-slot="row">
-            {Object.entries(actions).map(([value, label]) => (
-              <RecipeAction data-size="sm" key={value} value={value}>
-                {label}
-              </RecipeAction>
-            ))}
+          <div data-slot="controls">
+            <RecipeAction data-size="sm" value="grab">
+              Pick Up
+            </RecipeAction>
+            <RecipeAction data-size="sm" value="up" aria-label="Move up">
+              <ArrowUpIcon aria-hidden="true" />
+            </RecipeAction>
+            <RecipeAction data-size="sm" value="down" aria-label="Move down">
+              <ArrowDownIcon aria-hidden="true" />
+            </RecipeAction>
+            <RecipeAction data-size="sm" value="drop">
+              Drop
+            </RecipeAction>
+            <RecipeAction data-size="sm" value="cancel">
+              Cancel
+            </RecipeAction>
           </div>
           <RecipeList aria-label="Recipe">
             {order.map((step) => (
               <RecipeStep key={step} value={step}>
                 {step}
-                <RecipeToTop value={step}>↑ Top</RecipeToTop>
+                <RecipeToTop value={step}>
+                  <ArrowUpIcon aria-hidden="true" />
+                  Top
+                </RecipeToTop>
               </RecipeStep>
             ))}
           </RecipeList>
@@ -129,4 +141,4 @@ function Example() {
   )
 }
 
-export { Example, recipe, Recipe, RecipeAction, RecipeList, type RecipeState, RecipeStep, RecipeToTop }
+export { Example }

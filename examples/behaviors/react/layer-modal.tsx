@@ -9,6 +9,7 @@ import {
   position,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type TimerOptions = {
   modal?: boolean
@@ -86,16 +87,22 @@ function Example() {
   const [modal, setModal] = React.useState(true)
   const [count, setCount] = React.useState(0)
   const [playing, setPlaying] = React.useState(true)
-  const [closed, setClosed] = React.useState("")
+  const log = useLog()
   return (
     <Timer
       modal={modal}
       onClose={(reason: string) =>
-        setClosed(isDismissal(reason) ? `Dismissed by ${reason}` : `Closed by ${reason}`)
+        log(isDismissal(reason) ? `Dismissed by ${reason}` : `Closed by ${reason}`)
       }
     >
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={modal} onChange={(event) => setModal(event.target.checked)} />
+          Modal
+        </label>
+      </div>
       <div data-slot="row">
-        <TimerTrigger>Set a timer</TimerTrigger>
+        <TimerTrigger>Set a Timer</TimerTrigger>
         <button type="button" onClick={() => setCount(count + 1)}>
           Count {count}
         </button>
@@ -112,13 +119,6 @@ function Example() {
           {playing ? "Pause" : "Play"}
         </button>
       </TimerPlayer>
-      <label data-slot="label">
-        <input type="checkbox" checked={modal} onChange={(event) => setModal(event.target.checked)} />
-        Modal
-      </label>
-      <p data-last-close data-slot="output">
-        {closed}
-      </p>
     </Timer>
   )
 }

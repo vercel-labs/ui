@@ -48,16 +48,16 @@ test("working with the element: the textarea grows as you type", async ({ page }
 
 test("reading parts in the api: the button finds the first empty field in page order", async ({ page }) => {
   await openExamples(page, url)
-  const next = page.getByRole("button", { name: "Find the first empty field" })
+  const next = page.getByRole("button", { name: "Find Empty Field" })
   await next.click()
   await expect(page.getByRole("textbox", { name: "Email" })).toBeFocused()
-  await expect(page.getByRole("button", { name: "Fill in email" })).toBeVisible()
-  await page.getByRole("textbox", { name: "Email" }).fill("ada@example.com")
-  await page.getByRole("button", { name: "Fill in email" }).click()
+  await expect(page.getByRole("button", { name: "Fill In Email" })).toBeVisible()
+  await page.getByRole("textbox", { name: "Email" }).fill("hollis@example.com")
+  await page.getByRole("button", { name: "Fill In Email" }).click()
   await expect(page.getByRole("textbox", { name: "Address" })).toBeFocused()
   await page.getByRole("textbox", { name: "Address" }).fill("1 Main Street")
-  await page.getByRole("button", { name: "Fill in address" }).click()
-  await expect(page.getByRole("button", { name: "Find the first empty field" })).toBeVisible()
+  await page.getByRole("button", { name: "Fill In Address" }).click()
+  await expect(page.getByRole("button", { name: "Find Empty Field" })).toBeVisible()
 })
 
 test("every field in the API reference links to the example that shows it", async ({ page }) => {

@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "focus")
@@ -54,11 +61,10 @@ test("roving focus: the arrows skip the labels under a closed Labels row", async
 test("roving focus: a new tag takes focus once it renders, and the count follows", async ({ page }) => {
   await openBehaviors(page, "focus")
   const tags = page.getByRole("group", { name: "Tags" })
-  await expect(page.getByText("2 tags")).toBeVisible()
   await page.getByRole("textbox", { name: "New tag" }).fill("release")
   await page.keyboard.press("Enter")
   await expect(tags.getByRole("button", { name: "release" })).toBeFocused()
-  await expect(page.getByText("3 tags")).toBeVisible()
+  await expect(lastLog(tags)).toHaveText("3 tags")
   await expect(tags.locator('[tabindex="0"]')).toHaveText("release")
   await page.keyboard.press("Home")
   await expect(tags.getByRole("button", { name: "design" })).toBeFocused()
@@ -109,7 +115,7 @@ test("roving focus: a custom move goes a row at a time on the keypad", async ({ 
 test("spatial focus: arrows go to the nearest note that way", async ({ page }) => {
   await openBehaviors(page, "focus")
   const board = page.getByRole("group", { name: "Notes" })
-  await board.getByRole("button", { name: "Call Ana" }).focus()
+  await board.getByRole("button", { name: "Call Hollis" }).focus()
   await page.keyboard.press("ArrowDown")
   await expect(board.getByRole("button", { name: "Review" })).toBeFocused()
   await page.keyboard.press("ArrowRight")
@@ -247,17 +253,17 @@ test("grid focus: the window slides to rows that aren't rendered, and Page Down 
 }) => {
   await openBehaviors(page, "focus")
   const grid = page.getByRole("grid", { name: "Departures" })
-  const window = page.locator("[data-window]")
+  const firstRow = grid.getByRole("row").first()
   await expect(grid.getByRole("row")).toHaveCount(6)
   await grid.getByRole("gridcell", { name: "06:35" }).click()
   await page.keyboard.press("ArrowDown")
   await expect(grid.getByRole("gridcell", { name: "06:42" })).toBeFocused()
-  await expect(window).toHaveText("Rows 2 to 7 of 100")
+  await expect(firstRow).toHaveAttribute("aria-rowindex", "2")
   await page.keyboard.press("PageDown")
   await expect(grid.getByRole("gridcell", { name: "07:24" })).toBeFocused()
-  await expect(window).toHaveText("Rows 8 to 13 of 100")
+  await expect(firstRow).toHaveAttribute("aria-rowindex", "8")
   await page.keyboard.press("Control+End")
-  await expect(window).toHaveText("Rows 95 to 100 of 100")
+  await expect(firstRow).toHaveAttribute("aria-rowindex", "95")
   await expect(grid.getByRole("row").last()).toHaveAttribute("aria-rowindex", "100")
   await expect(grid.locator(":focus")).toHaveText("Platform 4")
 })

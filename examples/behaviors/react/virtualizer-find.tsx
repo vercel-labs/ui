@@ -22,27 +22,22 @@ function Example() {
   React.useEffect(() => virtual.connect(scroller.current!, { findable: true }), [])
 
   return (
-    <div data-slot="stack">
-      <p data-slot="hint">
-        Search <span data-slot="virtualizer-term">Acme</span> with ⌘F or Ctrl+F
-      </p>
-      <div ref={scroller} role="list" aria-label="Invoices" data-slot="virtualizer-scroller">
-        <div data-slot="virtualizer-body" style={{ height: virtual.size() }}>
-          {items.map((item) => (
-            <div
-              key={item.key}
-              ref={(el) => virtual.measure(item.index, el)}
-              role="listitem"
-              aria-setsize={invoices.length}
-              aria-posinset={item.index + 1}
-              data-slot="virtualizer-row"
-              style={{ transform: `translateY(${item.start}px)` }}
-            >
-              <span ref={(el) => virtual.findableText(item.index, el, 0)} data-slot="virtualizer-id" />{" "}
-              <span ref={(el) => virtual.findableText(item.index, el, 1)} data-slot="hint" />
-            </div>
-          ))}
-        </div>
+    <div ref={scroller} role="list" aria-label="Invoices" data-slot="virtualizer-scroller">
+      <div data-slot="virtualizer-body" style={{ height: virtual.size() }}>
+        {items.map((item) => (
+          <div
+            key={item.key}
+            ref={(el) => virtual.measure(item.index, el)}
+            role="listitem"
+            aria-setsize={invoices.length}
+            aria-posinset={item.index + 1}
+            data-slot="virtualizer-row"
+            style={{ transform: `translateY(${item.start}px)` }}
+          >
+            <span ref={(el) => virtual.findableText(item.index, el, 0)} data-slot="virtualizer-id" />{" "}
+            <span ref={(el) => virtual.findableText(item.index, el, 1)} data-slot="hint" />
+          </div>
+        ))}
       </div>
     </div>
   )

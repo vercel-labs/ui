@@ -90,4 +90,4 @@ function Example() {
   )
 }
 
-export { Example, split, Split, SplitDivider, type SplitOptions, type SplitState }
+export { Example }

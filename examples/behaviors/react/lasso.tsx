@@ -8,6 +8,7 @@ import {
   type LassoDraft,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type ShapesState = { selected: string[]; lasso: LassoDraft | null }
 
@@ -60,30 +61,28 @@ const ShapesLasso = parts.Lasso
 
 const items = [
   { key: "Circle", x: 24, y: 24, round: true },
-  { key: "Square", x: 150, y: 40, round: false },
+  { key: "Square", x: 134, y: 36, round: false },
   { key: "Dot", x: 70, y: 130, round: true },
-  { key: "Tile", x: 230, y: 120, round: false },
+  { key: "Tile", x: 206, y: 116, round: false },
 ]
 
 function Example() {
-  const [selected, setSelected] = React.useState<string[]>([])
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Shapes aria-label="Shapes" onSelectedChange={setSelected}>
-        {items.map((item) => (
-          <ShapesItem
-            key={item.key}
-            value={item.key}
-            data-shape={item.round ? "round" : undefined}
-            style={{ left: item.x, top: item.y }}
-          />
-        ))}
-        <ShapesLasso />
-      </Shapes>
-      <p data-slot="output">
-        {selected.length ? `Selected: ${selected.join(", ")}` : "Drag on the surface to select."}
-      </p>
-    </div>
+    <Shapes
+      aria-label="Shapes"
+      onSelectedChange={(selected: string[]) => log(`Selected: ${selected.join(", ") || "none"}`)}
+    >
+      {items.map((item) => (
+        <ShapesItem
+          key={item.key}
+          value={item.key}
+          data-shape={item.round ? "round" : undefined}
+          style={{ left: item.x, top: item.y }}
+        />
+      ))}
+      <ShapesLasso />
+    </Shapes>
   )
 }
 

@@ -1,12 +1,16 @@
 import * as React from "react"
 import { createStickToBottom, css, definePrimitive, type StickToBottomState } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
+
+type ThreadOptions = { onStickChange?: (state: StickToBottomState) => void }
 
 type ThreadState = StickToBottomState & { messages: string[]; older: number }
 
 const thread = definePrimitive({
   name: "thread",
-  state: (): ThreadState => ({
+  options: { onStickChange: "callback" },
+  state: (_options: ThreadOptions): ThreadState => ({
     messages: Array.from({ length: 12 }, (_, index) => `Message ${index + 1}`),
     older: 0,
     following: false,
@@ -16,7 +20,12 @@ const thread = definePrimitive({
   api: (context) => {
     const { store } = context
     const stick = createStickToBottom({ initial: false, threshold: 48 })
-    context.onDestroy(stick.subscribe(() => store.set(stick.get())))
+    context.onDestroy(
+      stick.subscribe(() => {
+        store.set(stick.get())
+        context.options().onStickChange?.(stick.get())
+      }),
+    )
     return {
       stick,
       act(action: string) {
@@ -34,14 +43,7 @@ const thread = definePrimitive({
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { messages: string[]; following: boolean; atBottom: boolean; unseen: boolean }>({
-      state: (state) => ({
-        messages: state.messages,
-        following: state.following,
-        atBottom: state.atBottom,
-        unseen: state.unseen,
-      }),
-    }),
+    root: slot<{}, { messages: string[] }>({ state: (state) => ({ messages: state.messages }) }),
     log: slot({
       attrs: () => ({ role: "log", tabindex: "0", style: css({ overflow: "auto" }) }),
       bind: (el, { api }) => api.stick.connect(el),
@@ -63,10 +65,28 @@ const ThreadLog = parts.Log
 const ThreadAction = parts.Action
 
 function Example() {
+  const log = useLog()
+  const last = React.useRef("")
+  const report = ({ following, atBottom, unseen }: StickToBottomState) => {
+    const text = `${following ? "Following" : "Not following"}${atBottom ? ", at the end" : ""}${unseen ? ", new below" : ""}`
+    if (text !== last.current) log(text)
+    last.current = text
+  }
   return (
-    <Thread>
-      {({ messages, following, atBottom, unseen }) => (
-        <>
+    <Thread onStickChange={report}>
+      {({ messages }) => (
+        <div data-slot="stack">
+          <div data-slot="controls">
+            {[
+              ["send", "Send"],
+              ["older", "Load Older"],
+              ["release", "Let Go"],
+            ].map(([value, text]) => (
+              <ThreadAction data-size="sm" key={value} value={value}>
+                {text}
+              </ThreadAction>
+            ))}
+          </div>
           <ThreadLog aria-label="Thread">
             {messages.map((message) => (
               <div key={message} data-slot="stick-message">
@@ -74,26 +94,10 @@ function Example() {
               </div>
             ))}
           </ThreadLog>
-          <div data-slot="row">
-            {[
-              ["send", "Send"],
-              ["older", "Load older"],
-              ["release", "Let go"],
-            ].map(([value, text]) => (
-              <ThreadAction data-size="sm" key={value} value={value}>
-                {text}
-              </ThreadAction>
-            ))}
-          </div>
-          <p data-log-state data-slot="output">
-            {following ? "Following" : "Not following"}
-            {atBottom ? ", at the end" : ""}
-            {unseen ? ", new below" : ""}
-          </p>
-        </>
+        </div>
       )}
     </Thread>
   )
 }
 
-export { Example, thread, Thread, ThreadAction, ThreadLog, type ThreadState }
+export { Example, thread, Thread, ThreadAction, ThreadLog, type ThreadOptions, type ThreadState }

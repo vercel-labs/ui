@@ -1,8 +1,16 @@
-import { expect } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openExamples } from "../behaviors/helpers"
 
 const url = "/docs/core/kernel/handle-changes"
+
+// The newest line in an example's console.
+const lastLog = (page: Page, name: string) =>
+  page
+    .locator(`[data-example="${name}"]`)
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
@@ -43,9 +51,9 @@ test("dispatch: a delete goes through unless the callback cancels it", async ({ 
   await files.scrollIntoViewIfNeeded()
   await page.getByRole("button", { name: "Delete notes.txt" }).click()
   await expect(files.getByRole("listitem")).toHaveCount(2)
-  await expect(page.locator("[data-note]")).toHaveText("Deleted notes.txt.")
+  await expect(lastLog(page, "behaviors/dispatch")).toHaveText("Deleted notes.txt")
   await page.getByRole("button", { name: "Delete README.md" }).click()
-  await expect(page.locator("[data-note]")).toHaveText("The readme stays.")
+  await expect(lastLog(page, "behaviors/dispatch")).toHaveText("Canceled: the readme stays")
   await expect(files.getByRole("listitem")).toHaveCount(2)
   await expect(files.getByText("README.md")).toBeVisible()
 })
@@ -54,7 +62,7 @@ test("changes: the first press arms the button, the second confirms", async ({ p
   await openExamples(page, url)
   const button = page.locator(`[data-slot="confirm-button-root"]`).first()
   await button.click()
-  await expect(button).toHaveText("Press again to delete")
+  await expect(button).toHaveText("Press Again to Delete")
   await expect(button).toHaveAttribute("data-armed", "")
   await button.click()
   await expect(button).toHaveText("Delete")
@@ -63,12 +71,9 @@ test("changes: the first press arms the button, the second confirms", async ({ p
 
 test("what a change reports: the reason, the source, and a cancel", async ({ page }) => {
   await openExamples(page, url)
-  const example = page
-    .locator("[data-example]")
-    .filter({ has: page.locator("[data-last]") })
-    .first()
+  const example = page.locator('[data-example="core/confirm-button-details"]')
   const button = example.locator(`[data-slot="confirm-button-root"]`)
-  const last = example.locator("[data-last]")
+  const last = lastLog(page, "core/confirm-button-details")
   await button.click()
   await expect(last).toHaveText("Arm: press, from mouse")
   await expect(last).toHaveText("Disarm: timeout, from programmatic", { timeout: 4000 })
@@ -85,20 +90,21 @@ test("what a change reports: the reason, the source, and a cancel", async ({ pag
 test("reasons: Escape and the button each report theirs, and dismissals can be refused", async ({ page }) => {
   await openExamples(page, url)
   const tip = page.getByRole("region", { name: "Tip" })
-  const again = page.getByRole("button", { name: "Show the tip again" })
-  await tip.getByRole("button", { name: "Got it" }).focus()
+  const again = page.getByRole("button", { name: "Show Tip Again" })
+  const last = lastLog(page, "core/notice")
+  await tip.getByRole("button", { name: "Got It" }).focus()
   await page.keyboard.press("Escape")
   await expect(tip).toHaveCount(0)
-  await expect(page.getByText("Last: escape-key")).toBeVisible()
+  await expect(last).toHaveText("Close: escape-key")
   await again.click()
   await page.getByRole("checkbox", { name: "Close only with the button" }).check()
-  await tip.getByRole("button", { name: "Got it" }).focus()
+  await tip.getByRole("button", { name: "Got It" }).focus()
   await page.keyboard.press("Escape")
-  await expect(page.getByText("Last: escape-key, canceled")).toBeVisible()
+  await expect(last).toHaveText("Close: escape-key, canceled")
   await expect(tip).toBeVisible()
-  await tip.getByRole("button", { name: "Got it" }).click()
+  await tip.getByRole("button", { name: "Got It" }).click()
   await expect(tip).toHaveCount(0)
-  await expect(page.getByText("Last: close-press")).toBeVisible()
+  await expect(last).toHaveText("Close: close-press")
 })
 
 test("state a user controls: the trigger and the page change the same open state", async ({ page }) => {
@@ -127,14 +133,18 @@ test("commits: a drag changes the value on every step and commits once, keys com
   await page.mouse.move(box.x + box.width / 2, y)
   await page.mouse.down()
   await page.mouse.move(box.x + box.width * 0.8, y, { steps: 4 })
-  await expect(page.locator("[data-value]")).toHaveText("Volume 80")
-  await expect(page.locator("[data-saved]")).toHaveText("Saved 50")
+  const saves = page
+    .locator('[data-example="core/volume"]')
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+  await expect(page.locator('[data-example="core/volume"] [data-value]')).toHaveText("80")
+  await expect(saves).toHaveCount(0)
   await page.mouse.up()
-  await expect(page.locator("[data-saved]")).toHaveText("Saved 80")
+  await expect(saves).toHaveText(["Saved 80"])
   await expect(thumb).toHaveAttribute("style", /left: 80%/)
   await thumb.press("ArrowLeft")
   await expect(thumb).toHaveAttribute("aria-valuenow", "75")
-  await expect(page.locator("[data-saved]")).toHaveText("Saved 75")
+  await expect(saves.last()).toHaveText("Saved 75")
 })
 
 test("live state: hovering writes data-hovered, and choosing presses one seat", async ({ page }) => {
@@ -167,7 +177,7 @@ test("controllers: buttons outside start and stop the countdown", async ({ page 
   await openExamples(page, url)
   const timer = page.getByRole("timer", { name: "Tea" })
   await expect(timer).toHaveText("0:00")
-  await page.getByRole("button", { name: "Start 30 seconds" }).click()
+  await page.getByRole("button", { name: "Start 30 Seconds" }).click()
   await expect(timer).toHaveText("0:30")
   await page.clock.runFor(2000)
   await expect(timer).toHaveText("0:28")
@@ -204,14 +214,14 @@ test("how people are working: the save says how it was pressed, and the hint sho
   const example = page.locator('[data-example="core/input-source"]')
   const save = page.getByRole("button", { name: "Save", exact: true })
   await save.click()
-  await expect(page.getByRole("status").filter({ hasText: "Saved" })).toHaveText("Saved with mouse")
+  await expect(lastLog(page, "core/input-source")).toHaveText("Saved with mouse")
   await expect(example.getByText("Enter or Space saves")).toHaveCount(0)
   await page.keyboard.press("Shift+Tab")
   await page.keyboard.press("Tab")
   await expect(save).toBeFocused()
   await expect(example.getByText("Enter or Space saves")).toBeVisible()
   await page.keyboard.press("Enter")
-  await expect(page.getByRole("status").filter({ hasText: "Saved" })).toHaveText("Saved with keyboard")
+  await expect(lastLog(page, "core/input-source")).toHaveText("Saved with keyboard")
 })
 
 test("every field in the API reference links to the example that shows it", async ({ page }) => {

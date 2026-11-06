@@ -50,12 +50,7 @@ export { rating, type RatingOptions }
 
 Before we add stars, let's try changing the value. These buttons call `rate(3)` and `rate(0)`:
 
-<ComponentExample
-  name="core/rating-state"
-  hideCode={true}
-  compact={true}
-  caption="Press Set to 3, then Reset to return to 0."
-/>
+<ComponentExample name="core/rating-state" caption="Press Set to 3, then Reset to return to 0." />
 
 ## Add a Star
 
@@ -82,8 +77,6 @@ star: slot<{ value: string }>({
 
 <ComponentExample
   name="core/rating-star"
-  hideCode={true}
-  compact={true}
   caption="Press the star. The rating becomes 1 and the star fills in."
 />
 
@@ -234,8 +227,6 @@ Use `data-filled` to color the stars, the way [Style a Component](./kernel/style
 
 <ComponentExample
   name="core/rating-stars"
-  hideCode={true}
-  compact={true}
   caption="Hover to preview a rating, then click to choose it. Try Tab: each star still has its own Tab stop."
 />
 
@@ -299,8 +290,6 @@ star: slot<{ value: string }>({
 
 <ComponentExample
   name="core/rating-focus"
-  hideCode={true}
-  compact={true}
   caption="Choose a star. Tab leaves the group; Shift+Tab returns to your selection."
 />
 
@@ -362,8 +351,6 @@ on: {
 
 <ComponentExample
   name="core/rating"
-  hideCode={true}
-  compact={true}
   caption="Use the arrows to change the rating. Home and End jump to the first and last star."
 />
 

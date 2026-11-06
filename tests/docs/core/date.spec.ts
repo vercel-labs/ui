@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
 import { test } from "../docs-test"
 import { openExamples } from "./behaviors/helpers"
+
+// Every line in an example's console.
+const logs = (page: Page, name: string) =>
+  page
+    .locator(`[data-example="${name}"]`)
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, "/docs/core/date")
@@ -11,31 +18,36 @@ test("every example renders without errors", async ({ page }) => {
 
 test("values: real dates build, February 30 doesn't, and a picked date comes apart", async ({ page }) => {
   await openExamples(page, "/docs/core/date")
-  await expect(page.locator("[data-built]")).toHaveText("No such day")
-  await page.getByLabel("Day", { exact: true }).fill("28")
-  await expect(page.locator("[data-built]")).toHaveText("2026-02-28")
-  await expect(page.locator("[data-parts]")).toHaveText("year 2026, month 10, day 16")
+  const day = page.getByLabel("Day", { exact: true })
+  const last = logs(page, "behaviors/date-values").last()
+  await expect(day).toHaveAttribute("aria-invalid", "true")
+  await day.fill("28")
+  await expect(last).toHaveText("isoDate(2026, 2, 28): 2026-02-28")
+  await expect(day).not.toHaveAttribute("aria-invalid", "true")
   await page.getByLabel("Picked date").fill("2028-02-29")
-  await expect(page.locator("[data-parts]")).toHaveText("year 2028, month 2, day 29")
+  await expect(last).toHaveText("2028-02-29: year 2028, month 2, day 29")
   await page.getByRole("button", { name: "Today" }).click()
   const today = await page.evaluate(() => {
     const now = new Date()
     return `year ${now.getFullYear()}, month ${now.getMonth() + 1}, day ${now.getDate()}`
   })
-  await expect(page.locator("[data-parts]")).toHaveText(today)
+  await expect(last).toHaveText(new RegExp(`: ${today}$`))
 })
 
 test("days: check-out and the weekday follow, and a date outside the season moves into it", async ({
   page,
 }) => {
   await openExamples(page, "/docs/core/date")
-  await expect(page.locator("[data-check-in]")).toHaveText("Thursday, 2026-12-24")
-  await expect(page.locator("[data-check-out]")).toHaveText("Sunday, 2026-12-27")
-  await expect(page.locator("[data-away]")).toHaveText("69 days after Oct 16")
+  const checkOut = page.getByLabel("Check-out")
+  const lines = logs(page, "behaviors/date-days")
+  await expect(page.locator("[data-check-in]")).toHaveText("Check-in Thursday, December 24")
+  await expect(checkOut).toHaveValue("2026-12-27")
   await page.getByLabel("Nights").fill("10")
-  await expect(page.locator("[data-check-out]")).toHaveText("Sunday, 2027-01-03")
+  await expect(checkOut).toHaveValue("2027-01-03")
+  await expect(lines.last()).toHaveText("Thursday to Sunday, 69 days after Oct 16")
   await page.getByLabel("Check-in").fill("2026-10-20")
-  await expect(page.locator("[data-check-in]")).toHaveText("Sunday, 2026-11-01 (moved into the season)")
+  await expect(page.locator("[data-check-in]")).toHaveText("Check-in Sunday, November 1")
+  await expect(lines.nth(-2)).toHaveText("Moved into the season: 2026-11-01")
 })
 
 test("months: a month on from January 31 is February 28, and the week follows its first day", async ({
@@ -96,7 +108,7 @@ test("today: each city shows its own date", async ({ page }) => {
     )
     await expect(page.locator(`[data-zone="${zone}"]`)).toHaveText(expected)
   }
-  await expect(page.locator('[data-zone="here"]')).toHaveText(/^\d{4}-\d\d-\d\d$/)
+  await expect(page.locator('[data-zone="here"]')).toHaveText(/^[A-Z][a-z]{2} \d{1,2}, \d{4}$/)
 })
 
 test("parse: typed text reads in the locale's order, and a two-digit year follows the reference", async ({
@@ -104,18 +116,19 @@ test("parse: typed text reads in the locale's order, and a two-digit year follow
 }) => {
   await openExamples(page, "/docs/core/date")
   const input = page.getByRole("textbox", { name: "Date", exact: true })
-  const parsed = page.locator("[data-parsed]")
-  await expect(parsed).toHaveText("2026-10-16, Friday, October 16, 2026")
+  const parsed = logs(page, "behaviors/date-parse").last()
   await expect(input).toHaveAttribute("placeholder", "MM/DD/YYYY")
   await expect(page.locator("[data-pattern]")).toHaveText("month / day / year")
+  await input.fill("10/16/2026")
+  await expect(parsed).toHaveText("“10/16/2026”: 2026-10-16, Friday, October 16, 2026")
   await input.fill("Feb 30")
-  await expect(parsed).toHaveText(/^Type a date, like 12\/31\/\d{4}$/)
+  await expect(parsed).toHaveText("“Feb 30”: not a date")
   await page.getByRole("combobox", { name: "Locale" }).last().selectOption("de-DE")
   await expect(input).toHaveAttribute("placeholder", "TT.MM.JJJJ")
   await input.fill("16 10 70")
-  await expect(parsed).toHaveText(/^1970-10-16/)
+  await expect(parsed).toHaveText(/^“16 10 70”: 1970-10-16/)
   await page.getByLabel("Reference date").fill("2060-01-01")
-  await expect(parsed).toHaveText(/^2070-10-16/)
+  await expect(parsed).toHaveText(/^“16 10 70”: 2070-10-16/)
 })
 
 test("the date lookup links to each focused example", async ({ page }) => {

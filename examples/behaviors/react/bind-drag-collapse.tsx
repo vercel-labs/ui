@@ -122,7 +122,7 @@ const SidebarDivider = parts.Divider
 
 function Example() {
   return (
-    <Sidebar>
+    <Sidebar defaultWidth={160}>
       <nav aria-label="Files" data-slot="sidebar-nav">
         <ul>
           {["README.md", "package.json", "src", "tests"].map((file) => (
@@ -141,4 +141,4 @@ function Example() {
   )
 }
 
-export { Example, sidebar, Sidebar, SidebarDivider, type SidebarOptions, type SidebarState }
+export { Example }

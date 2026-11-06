@@ -61,6 +61,9 @@ const rooms = definePrimitive({
         const booking = api.spans.spans(state).find((other) => other.id === key)
         return {
           tabindex: "0",
+          "aria-label": booking
+            ? `${booking.title}, ${booking.track}, ${hour(booking.start)} to ${hour(booking.end)}`
+            : undefined,
           ...api.spans.spanAttrs(state, key),
           style: booking ? api.spans.spanStyle(booking) : undefined,
         }
@@ -86,29 +89,39 @@ function Example() {
   return (
     <Rooms
       defaultBookings={[
-        { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 10 * 60 + 30, title: "Standup" },
+        { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 11 * 60, title: "Standup" },
         { id: "review", track: "Birch", start: 13 * 60, end: 15 * 60, title: "Review" },
       ]}
     >
-      {({ bookings }) =>
-        ["Atlas", "Birch"].map((room) => (
-          <div key={room} data-slot="spans-lane">
-            <span data-slot="spans-label">{room}</span>
-            <RoomsRoom value={room} aria-label={room}>
-              {bookings
-                .filter((booking) => booking.track === room)
-                .map((booking) => (
-                  <RoomsBooking key={booking.id} value={booking.id}>
-                    {booking.title} {hour(booking.start)}
-                    <span data-span-edge="end" />
-                  </RoomsBooking>
-                ))}
-            </RoomsRoom>
+      {({ bookings }) => (
+        <>
+          <div data-slot="spans-lane">
+            <span data-slot="spans-label" />
+            <div data-slot="spans-axis" aria-hidden="true">
+              <span>9:00</span>
+              <span>13:00</span>
+              <span>17:00</span>
+            </div>
           </div>
-        ))
-      }
+          {["Atlas", "Birch"].map((room) => (
+            <div key={room} data-slot="spans-lane">
+              <span data-slot="spans-label">{room}</span>
+              <RoomsRoom value={room} aria-label={room}>
+                {bookings
+                  .filter((booking) => booking.track === room)
+                  .map((booking) => (
+                    <RoomsBooking key={booking.id} value={booking.id}>
+                      {booking.title}
+                      <span data-span-edge="end" />
+                    </RoomsBooking>
+                  ))}
+              </RoomsRoom>
+            </div>
+          ))}
+        </>
+      )}
     </Rooms>
   )
 }
 
-export { Example, rooms, Rooms, RoomsBooking, RoomsRoom, type Booking, type RoomsOptions, type RoomsState }
+export { Example }

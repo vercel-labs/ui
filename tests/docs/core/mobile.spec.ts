@@ -38,24 +38,26 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("bind viewport: the readout follows the keyboard as it opens and closes", async ({ page }) => {
+test("bind viewport: the console follows the keyboard as it opens and closes", async ({ page }) => {
   await withKeyboard(page)
   await openExamples(page, url)
   const example = page.locator('[data-example="behaviors/viewport-bind"]')
-  const keyboard = page.locator('[data-row="Keyboard"]')
-  await keyboard.scrollIntoViewIfNeeded()
-  await expect(keyboard).toHaveText("0px")
-  await expect(example.getByText("No keyboard open")).toBeVisible()
+  const keyboard = example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+  await example.scrollIntoViewIfNeeded()
+  await expect(keyboard).toHaveText(/^Keyboard 0px/)
   // A smaller viewport without a focused field is zoom, not a keyboard.
   await openKeyboard(page, 300)
-  await expect(keyboard).toHaveText("0px")
+  await expect(keyboard).toHaveText(/^Keyboard 0px/)
   await openKeyboard(page, 0)
   await page.getByPlaceholder("Tap here on a phone").focus()
   await openKeyboard(page, 300)
-  await expect(keyboard).toHaveText("300px")
-  await expect(example.getByText("The keyboard covers the bottom of the page")).toBeVisible()
+  await expect(keyboard).toHaveText(/^Keyboard 300px/)
+  await expect(example.locator('[data-slot="stack"]')).toHaveAttribute("data-keyboard", "")
   await openKeyboard(page, 0)
-  await expect(keyboard).toHaveText("0px")
+  await expect(keyboard).toHaveText(/^Keyboard 0px/)
 })
 
 test("avoid keyboard: the pill under the list rises above the keyboard, and settles back when it closes", async ({
