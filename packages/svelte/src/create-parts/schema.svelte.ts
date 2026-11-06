@@ -6,8 +6,11 @@ import type { ChangeDetails, Primitive, PropSpec } from "@ui-sdk/core"
 import { sameValue, type schemaOf } from "@ui-sdk/core/renderer"
 import { getContext, setContext } from "svelte"
 import { changeOf } from "../bindable.svelte"
+import { useHandle } from "../instance"
 
 type Schema = Record<string, PropSpec>
+
+type ListApi = { internal: { keyOf: (value: unknown) => string } }
 
 // A spec is a kind, a kind with `from`, or a parser function for custom
 // elements' attributes, which is never an id here.
@@ -46,17 +49,27 @@ type PartConfig = {
  * `"id"` props left out made from `id`, the part's `$props.id()`, and those
  * it takes `from` another slot filled in from the nearest part of that slot:
  * `"item"` reads the item's prop of the same name, `"group.id"` the group's
- * `id`. A part others take from provides its props to the parts inside it,
- * and a root starts its parts with nothing around them, so a nested root's
- * parts never read an outer one's. Call it in a part's script.
+ * `id`. A `"key"` prop keys the part by the list's `keyOf`, and a part left
+ * outside the part a `required` prop needs throws. A part others take from
+ * provides its props to the parts inside it, and a root starts its parts
+ * with nothing around them, so a nested root's parts never read an outer
+ * one's. Call it in a part's script.
  */
 function slotPropsOf(
-  { schema: key, slot, provides }: PartConfig,
+  { primitive, schema: key, slot, provides }: PartConfig,
   props: Record<string, unknown>,
   id: string,
 ) {
   const schema: Schema = key.slots[slot] ?? {}
   const around = slot === "root" ? {} : (getContext<Around | undefined>(key) ?? {})
+  for (const spec of Object.values(schema)) {
+    const from = typeof spec === "object" && spec.required && spec.from.split(".")[0]
+    if (from && !around[from])
+      throw new Error(`A ${primitive.name} ${slot} part must be used inside its ${from}.`)
+  }
+  const keyOf = Object.values(schema).some((spec) => kindOf(spec) === "key")
+    ? (useHandle(primitive).api as ListApi).internal.keyOf
+    : undefined
   const own = () => {
     const result: Record<string, unknown> = { id: props.id }
     for (const name in schema) {
@@ -68,6 +81,7 @@ function slotPropsOf(
       }
       if (value === undefined && kindOf(spec) === "id") value = name === "id" ? id : `${id}-${name}`
       result[name] = value
+      if (keyOf && kindOf(spec) === "key") result.id ??= keyOf(value)
     }
     return result
   }
@@ -90,7 +104,10 @@ function rootOptions(options: Schema, props: Record<string, any>, id: string) {
 
   const current = (key: string) => {
     const changed = local[key]
-    return changed && sameValue(changed.parent, props[key]) ? changed.value : props[key]
+    if (changed && sameValue(changed.parent, props[key])) return changed.value
+    // Deleted in place: this runs inside a `$derived`, where writing state throws.
+    delete local[key]
+    return props[key]
   }
 
   // One callback per bindable option for the root's life.
