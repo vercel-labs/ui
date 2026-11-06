@@ -79,6 +79,12 @@ describe("parsing", () => {
     ])
       expect(parseColor(text)).toBeNull()
   })
+
+  test("rejects a long number with a bad suffix in linear time", () => {
+    const start = performance.now()
+    expect(parseColor(`rgb(${"1".repeat(50_000)}x 0 0)`)).toBeNull()
+    expect(performance.now() - start).toBeLessThan(100)
+  })
 })
 
 describe("converting", () => {

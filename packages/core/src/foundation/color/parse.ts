@@ -51,7 +51,7 @@ const predefined: Record<string, ColorSpace> = {
 
 const angles: Record<string, number> = { "": 1, deg: 1, grad: 0.9, rad: 180 / Math.PI, turn: 360 }
 
-const token = /^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)(%|deg|grad|rad|turn)?$/
+const token = /^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)(%|deg|grad|rad|turn)?$/
 
 // One channel's text as a number, null for `none`, or undefined when the
 // channel can't take it, like an angle on a lightness.
