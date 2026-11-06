@@ -17,8 +17,10 @@ import { switchPrimitive } from "../src/components/switch/switch"
 import { tabs } from "../src/components/tabs/tabs"
 import { toolbar } from "../src/components/toolbar/toolbar"
 import { tree } from "../src/components/tree/tree"
+import { danglingReferences } from "../src/testing/aria"
 import { checkPattern } from "../src/testing/check-pattern"
 import { mount } from "../src/testing/mount"
+import { popupOf, triggerOf } from "../src/testing/pattern-context"
 
 const mounts: { unmount: () => void }[] = []
 afterEach(() => {
@@ -214,6 +216,17 @@ describe("our primitives pass", () => {
     expect(checkboxView.state.checked).toBe(false)
   })
 
+  test("an indeterminate checkbox, which Space never makes indeterminate again", async () => {
+    const checkboxView = view(
+      mount(
+        checkbox,
+        { defaultChecked: "indeterminate" },
+        `<root aria-label="All"><indicator></indicator></root>`,
+      ),
+    )
+    await checkPattern(checkboxView.root, "checkbox")
+  })
+
   test("slider", async () => {
     const sliderView = view(
       mount(
@@ -357,6 +370,97 @@ test("a hand-made menubar passes", async () => {
   await checkPattern(root, "menubar")
 })
 
+test("a hand-made vertical menubar passes, its menus opening with ArrowRight", async () => {
+  const root = render(`
+    <div>
+      <div role="menubar" aria-label="App" aria-orientation="vertical">
+        <div role="menuitem" tabindex="0" aria-haspopup="menu" aria-expanded="false" aria-controls="file-menu">File</div>
+        <div role="menuitem" tabindex="-1">Edit</div>
+        <div role="menuitem" tabindex="-1">View</div>
+      </div>
+      <div role="menu" id="file-menu" aria-label="File" hidden>
+        <div role="menuitem" tabindex="-1">New</div>
+        <div role="menuitem" tabindex="-1">Open</div>
+      </div>
+    </div>`)
+  const bar = root.querySelector<HTMLElement>("[role=menubar]")!
+  const file = bar.querySelector<HTMLElement>("[aria-haspopup]")!
+  const fileMenu = root.querySelector<HTMLElement>("#file-menu")!
+  rove(bar, "[role=menuitem]")
+  const openMenu = (open: boolean) => {
+    fileMenu.hidden = !open
+    file.setAttribute("aria-expanded", String(open))
+    ;(open ? fileMenu.querySelector<HTMLElement>("[role=menuitem]")! : file).focus()
+  }
+  file.addEventListener("keydown", (event) => event.key === "ArrowRight" && openMenu(true))
+  fileMenu.addEventListener("keydown", (event) => event.key === "Escape" && openMenu(false))
+  await checkPattern(root, "menubar")
+})
+
+test("a hand-made slider with a range past a hundred steps gets its value back", async () => {
+  const root = render(`
+    <div role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="500"></div>`)
+  const moves: Record<string, (value: number) => number> = {
+    ArrowRight: (value) => value + 1,
+    ArrowUp: (value) => value + 1,
+    ArrowLeft: (value) => value - 1,
+    ArrowDown: (value) => value - 1,
+    PageUp: (value) => value + 100,
+    PageDown: (value) => value - 100,
+    Home: () => 0,
+    End: () => 1000,
+  }
+  root.addEventListener("keydown", (event) => {
+    const move = moves[event.key]
+    if (!move) return
+    event.preventDefault()
+    const value = Math.min(1000, Math.max(0, move(Number(root.getAttribute("aria-valuenow")))))
+    root.setAttribute("aria-valuenow", String(value))
+  })
+  await checkPattern(root, "slider")
+  expect(root.getAttribute("aria-valuenow")).toBe("500")
+})
+
+// A combobox whose popup is a grid, like a date picker's: ArrowDown opens it
+// and Escape closes it, with focus on the input throughout.
+function gridCombobox(haspopup: string) {
+  const root = render(`
+    <div>
+      <input role="combobox" aria-label="Date" aria-expanded="false" aria-controls="dates" ${haspopup}>
+      <div role="grid" id="dates" aria-label="Dates" hidden><div role="row"><div role="gridcell">1</div></div></div>
+    </div>`)
+  const input = root.querySelector("input")!
+  const grid = root.querySelector<HTMLElement>("[role=grid]")!
+  input.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowDown" && event.key !== "Escape") return
+    grid.hidden = event.key === "Escape"
+    input.setAttribute("aria-expanded", String(!grid.hidden))
+  })
+  return root
+}
+
+test("a hand-made combobox with a grid popup passes with aria-haspopup naming it", async () => {
+  await checkPattern(gridCombobox(`aria-haspopup="grid"`), "combobox")
+})
+
+test("id references inside a shadow root resolve in that shadow root", () => {
+  const host = render(`<div></div>`)
+  const shadow = host.attachShadow({ mode: "open" })
+  shadow.innerHTML = `
+    <span id="fruit-label">Fruit</span>
+    <input role="combobox" aria-labelledby="fruit-label" aria-expanded="true" aria-controls="fruits">
+    <div role="listbox" id="fruits"><div role="option" aria-selected="false">Apple</div></div>`
+  const input = shadow.querySelector("input")!
+  const list = shadow.querySelector("[role=listbox]")!
+  expect(danglingReferences(input)).toEqual([])
+  expect(popupOf(input, ["listbox"])).toBe(list)
+  expect(triggerOf(list)).toBe(input)
+  const lookalike = render(`<div><span id="other"></span></div>`)
+  input.setAttribute("aria-describedby", "other")
+  expect(danglingReferences(input)).toMatchObject([{ attribute: "aria-describedby", id: "other" }])
+  lookalike.remove()
+})
+
 test("a hand-made listbox passes when its styles hide an option, which arrows skip", async () => {
   // Names that start alike, so typeahead has no single target and stays out of it.
   const root = render(`
@@ -460,6 +564,46 @@ describe("broken markup fails", () => {
     })
     root.querySelector<HTMLElement>("#one")!.focus()
     await expect(checkPattern(root, "dialog")).rejects.toThrow(/is modal but has no aria-modal="true"/)
+  })
+
+  test("a modal dialog whose Tab keeps focus where it is", async () => {
+    const root = render(`<div>
+      <div role="dialog" aria-modal="true" aria-label="Box"><button id="one">One</button><button id="two">Two</button></div>
+    </div>`)
+    const box = root.querySelector<HTMLElement>("[role=dialog]")!
+    box.addEventListener("keydown", (event) => {
+      if (event.key === "Tab") event.preventDefault()
+      if (event.key === "Escape") box.hidden = true
+    })
+    root.querySelector<HTMLElement>("#one")!.focus()
+    const error = await checkPattern(root, "dialog").catch((caught: Error) => caught)
+    expect(String(error)).toContain(
+      "checkPattern found 2 problems with the dialog pattern:\n- div[role=dialog]: Tab keeps focus on button#one",
+    )
+    expect(String(error)).toContain("- div[role=dialog]: Shift+Tab keeps focus on button#one")
+  })
+
+  test("a combobox with a grid popup and no aria-haspopup", async () => {
+    await expect(checkPattern(gridCombobox(""), "combobox")).rejects.toThrow(
+      `checkPattern found 1 problem with the combobox pattern:\n- input[role=combobox]: controls a grid, so it has aria-haspopup="grid"`,
+    )
+  })
+
+  test("an accordion header button with no name", async () => {
+    const root = render(`
+      <div>
+        <h3><button type="button" aria-expanded="false" aria-controls="panel"></button></h3>
+        <div id="panel" hidden>Ships in a day.</div>
+      </div>`)
+    const button = root.querySelector("button")!
+    button.addEventListener("click", () => {
+      const expanded = button.getAttribute("aria-expanded") === "true"
+      button.setAttribute("aria-expanded", String(!expanded))
+      root.querySelector<HTMLElement>("#panel")!.hidden = expanded
+    })
+    await expect(checkPattern(root, "accordion")).rejects.toThrow(
+      "checkPattern found 1 problem with the accordion pattern:\n- button: has no accessible name",
+    )
   })
 
   test("a tablist with two tab stops", async () => {

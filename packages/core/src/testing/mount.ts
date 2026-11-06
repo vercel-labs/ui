@@ -124,13 +124,36 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
   const changes: ObservedChange[] = []
   const settled: ObservedChange[] = []
   const announced: string[] = []
-  const stopAnnouncing = listenToAnnouncements((text) => announced.push(text))
   const cleanups: (() => void)[] = [
     listen((change) => change.id === id && changes.push(change), true),
     listen((change) => change.id === id && settled.push(change)),
   ]
+  const teardown = [listenToAnnouncements((text) => announced.push(text))]
+  // A cleanup that throws doesn't stop the rest, so nothing a mount made outlives it.
+  function unmount() {
+    const errors: unknown[] = []
+    for (const step of [...cleanups.splice(0), ...teardown.splice(0)])
+      try {
+        step()
+      } catch (error) {
+        errors.push(error)
+      }
+    if (errors.length) throw errors[0]
+  }
+  function unmountingOnError<T>(run: () => T) {
+    try {
+      return run()
+    } catch (error) {
+      unmount()
+      throw error
+    }
+  }
+  const container = doc.createElement("div")
+  doc.body.append(container)
+  teardown.unshift(() => container.remove())
   let current: Record<string, unknown> = { ...options, id }
-  const instance = primitive(current as never)
+  const instance = unmountingOnError(() => primitive(current as never))
+  teardown.unshift(() => instance.destroy())
   const parts: {
     slot: string
     key: string
@@ -142,8 +165,6 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
     shows: () => boolean
   }[] = []
   const syncs: (() => void)[] = []
-  const container = doc.createElement("div")
-  doc.body.append(container)
 
   // Renders a markup node into `parent`, with the props of the parts around it
   // for props a nested part takes from its parent, like an item's `value`.
@@ -230,8 +251,10 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
 
   // Parts bind once every element is in the page, parents first, as custom elements do.
   const binds: (() => void)[] = []
-  for (const node of parseMarkup(markup)) render(node, container, {})
-  binds.forEach((bindPart) => bindPart())
+  unmountingOnError(() => {
+    for (const node of parseMarkup(markup)) render(node, container, {})
+    binds.forEach((bindPart) => bindPart())
+  })
   const root = (container.firstElementChild as HTMLElement | null) ?? container
 
   const view = {
@@ -265,12 +288,7 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
     /** Waits for what the primitive scheduled: microtasks, a timer and two frames. */
     settle,
     /** Unbinds every part, destroys the instance and removes the markup. */
-    unmount() {
-      cleanups.forEach((cleanup) => cleanup())
-      instance.destroy()
-      container.remove()
-      stopAnnouncing()
-    },
+    unmount,
   }
   rerenders.set(view, {
     setOptions(patch) {

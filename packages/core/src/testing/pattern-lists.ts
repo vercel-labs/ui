@@ -278,7 +278,7 @@ const ownItems = (container: Element) =>
     (item) => item.parentElement?.closest('[role="menu"], [role="menubar"]') === container,
   )
 
-/** Menubar: one tab stop, wrapping arrows, Home and End, and Down opening an item's menu. */
+/** Menubar: one tab stop, wrapping arrows, Home and End, and the arrow across it opening an item's menu. */
 async function menubar(context: PatternContext) {
   const bar = findWidget(context, ["menubar"])
   if (!bar) return missing(context, "menubar", "menubar")
@@ -290,7 +290,8 @@ async function menubar(context: PatternContext) {
     if (item.hasAttribute("aria-haspopup") && !hasBoolean(item, "aria-expanded"))
       context.problem(item, `opens a menu but has no aria-expanded, "true" or "false" (APG menubar).`)
   const composite: Composite = { container: bar, items: () => ownItems(bar), noun: "item", source: "menubar" }
-  const arrows = arrowsFor(orientationOf(context, bar), isRtl(bar))
+  const orientation = orientationOf(context, bar)
+  const arrows = arrowsFor(orientation, isRtl(bar))
   checkTabStop(context, composite)
   if (items.length < 2) return
   const start = await enter(context, composite)
@@ -305,19 +306,21 @@ async function menubar(context: PatternContext) {
     .find((item) => item.hasAttribute("aria-haspopup") && !isDisabledElement(item))
   if (opener) {
     await returnTo(context, composite, opener, arrows)
-    await checkSubmenu(context, opener)
+    // A vertical menubar swaps the arrows, so the one across it opens a menu (APG menubar, note 5).
+    const opens = orientation === "vertical" ? arrowsFor("horizontal", isRtl(bar)).next : "ArrowDown"
+    await checkSubmenu(context, opener, opens)
   }
   await returnTo(context, composite, start, arrows)
 }
 
-// Down on a menubar item opens its menu with focus inside; Escape closes it
-// with focus back on the item.
-async function checkSubmenu(context: PatternContext, item: Element) {
+// The arrow across a menubar opens an item's menu with focus inside; Escape
+// closes it with focus back on the item.
+async function checkSubmenu(context: PatternContext, item: Element, key: string) {
   if (context.doc.activeElement !== item) return
-  await context.press("ArrowDown")
+  await context.press(key)
   const menu = popupOf(item, ["menu"])
   if (!menu || !isShown(menu) || item.getAttribute("aria-expanded") !== "true") {
-    context.problem(item, 'ArrowDown should open its menu, with aria-expanded="true" (APG menubar).')
+    context.problem(item, `${key} should open its menu, with aria-expanded="true" (APG menubar).`)
     return
   }
   context.watch(menu)

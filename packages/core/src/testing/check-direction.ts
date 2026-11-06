@@ -4,21 +4,22 @@
 import { mount } from "./mount"
 import type { OptionsOf, Primitive } from "../foundation/kernel/primitive-types"
 
-// What a press changed, comparable across directions: the focused part's slot
-// and key, and the state, with ids, which differ per mount, left out. Right to
-// left, physical sides in state swap, like a tab indicator moving `"left"` to
-// the next tab, so they're mirrored back to compare.
+// The state with each mount's own ids left out or made alike. Right to left, a
+// physical `direction` or `side`, like a tab indicator's, swaps, so it's
+// mirrored back to compare; a value like an alignment's `"left"` isn't.
 function outcome(view: ReturnType<typeof mount>, dir: "ltr" | "rtl") {
   const focused = document.activeElement as HTMLElement | null
   const slot = focused?.getAttribute("data-slot") ?? ""
   const key = focused?.getAttribute("data-value") ?? focused?.textContent?.trim() ?? ""
   const mirrored: Record<string, string> = { left: "right", right: "left" }
   const state = JSON.stringify(view.state, (name, value) =>
-    name === "id" || name.endsWith("Id")
+    name === "id"
       ? undefined
-      : dir === "rtl" && typeof value === "string" && value in mirrored
-        ? mirrored[value]
-        : value,
+      : typeof value !== "string"
+        ? value
+        : dir === "rtl" && (name === "direction" || name === "side") && value in mirrored
+          ? mirrored[value]
+          : value.replace(/^mount-\d+/, "mount"),
   )
   return { focus: `${slot} ${key}`, state }
 }
@@ -27,18 +28,24 @@ async function press(primitive: Primitive, options: object, markup: string, dir:
   const html = document.documentElement
   const before = html.getAttribute("dir")
   html.setAttribute("dir", dir)
-  const view = mount(primitive, options as never, markup)
   try {
-    await view.keys("Tab")
-    const start = outcome(view, dir)
-    await view.keys(key)
-    return { start, end: outcome(view, dir) }
+    const view = mount(primitive, options as never, markup)
+    try {
+      await view.keys("Tab")
+      const start = outcome(view, dir)
+      await view.keys(key)
+      return { start, end: outcome(view, dir) }
+    } finally {
+      view.unmount()
+    }
   } finally {
-    view.unmount()
     if (before === null) html.removeAttribute("dir")
     else html.setAttribute("dir", before)
   }
 }
+
+// The page has one direction and one focus, so checks take turns.
+let running = Promise.resolve()
 
 /**
  * Mounts a primitive left to right and right to left, Tabs into it, and
@@ -52,7 +59,13 @@ async function press(primitive: Primitive, options: object, markup: string, dir:
  *
  * @experimental
  */
-async function checkDirection<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup: string) {
+function checkDirection<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup: string) {
+  const check = running.then(() => compareDirections(primitive, options, markup))
+  running = check.catch(() => {})
+  return check
+}
+
+async function compareDirections(primitive: Primitive, options: object, markup: string) {
   const problems: string[] = []
   for (const [forward, mirrored] of [
     ["ArrowRight", "ArrowLeft"],

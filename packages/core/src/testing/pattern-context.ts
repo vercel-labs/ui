@@ -3,6 +3,7 @@
 // rules several patterns hold, like names, orientation and owned roles.
 import {
   accessibleName,
+  byId,
   danglingReferences,
   describe,
   ids,
@@ -117,13 +118,13 @@ type PatternContext = ReturnType<typeof createContext>
 
 /** The pattern's element: the root, one inside it, or a popup its root or a part of it controls. */
 function findWidget(context: PatternContext, roles: string[]) {
-  const { root, doc } = context
+  const { root } = context
   if (roles.includes(roleOf(root))) return root
   const inside = withRole(root, roles)[0]
   if (inside) return inside
   for (const el of [root, ...root.querySelectorAll("[aria-controls]")])
     for (const id of ids(el, "aria-controls")) {
-      const popup = doc.getElementById(id)
+      const popup = byId(el, id)
       if (popup && roles.includes(roleOf(popup))) return popup
     }
 }
@@ -172,7 +173,7 @@ function checkOwned(context: PatternContext, container: Element, allowed: string
 /** The element whose `aria-controls` names a popup, outside the popup itself. */
 function triggerOf(popup: Element) {
   if (!popup.id) return undefined
-  return [...popup.ownerDocument.querySelectorAll("[aria-controls]")].find(
+  return [...(popup.getRootNode() as ParentNode).querySelectorAll("[aria-controls]")].find(
     (el) => !popup.contains(el) && ids(el, "aria-controls").includes(popup.id),
   )
 }
@@ -180,7 +181,7 @@ function triggerOf(popup: Element) {
 /** The popup with one of `roles` that an element's `aria-controls` names. */
 function popupOf(el: Element, roles: string[]) {
   return ids(el, "aria-controls")
-    .map((id) => el.ownerDocument.getElementById(id))
+    .map((id) => byId(el, id))
     .find((popup) => !!popup && roles.includes(roleOf(popup)))
 }
 

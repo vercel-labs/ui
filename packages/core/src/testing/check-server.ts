@@ -37,37 +37,53 @@ function toHtml(tag: string, attributes: Record<string, unknown>, children: stri
 // Runs `read` with the DOM, the clock and randomness unavailable: each read
 // is recorded as `what`, and the clock and randomness throw.
 function isolated<T>(what: (reading: string) => void, read: () => T) {
-  const global = globalThis as Record<string, unknown>
-  // A browser's own `document` and `window` can't be replaced, so there only the rest are hidden.
-  const hidden = ["document", "window", "navigator", "localStorage", "matchMedia"].filter(
-    (name) => Object.getOwnPropertyDescriptor(global, name)?.configurable !== false,
-  )
-  const saved = hidden.map((name) => [name, Object.getOwnPropertyDescriptor(global, name)] as const)
-  for (const name of hidden)
-    Object.defineProperty(global, name, {
-      configurable: true,
-      get() {
-        what(`reads \`${name}\``)
-        return undefined
-      },
-    })
-  const clock = { now: Date.now, performance: globalThis.performance?.now, random: Math.random }
+  const restores: (() => void)[] = []
+  const replace = (target: object, name: string, replacement: PropertyDescriptor) => {
+    const saved = Object.getOwnPropertyDescriptor(target, name)
+    Object.defineProperty(target, name, { configurable: true, ...replacement })
+    restores.push(() =>
+      saved ? Object.defineProperty(target, name, saved) : delete (target as Record<string, unknown>)[name],
+    )
+  }
   const stop = (name: string) => () => {
     what(`reads the clock or randomness (\`${name}\`)`)
     throw new Error(`${name} isn't available on a server.`)
   }
-  Date.now = stop("Date.now")
-  if (globalThis.performance) globalThis.performance.now = stop("performance.now")
-  Math.random = stop("Math.random")
+  const globals = [
+    "document",
+    "window",
+    "navigator",
+    "location",
+    "localStorage",
+    "sessionStorage",
+    "matchMedia",
+  ]
+  // A browser's own `document` and `window` can't be replaced, so there only the rest are hidden.
+  for (const name of globals)
+    if (Object.getOwnPropertyDescriptor(globalThis, name)?.configurable !== false)
+      replace(globalThis, name, {
+        get() {
+          what(`reads \`${name}\``)
+          return undefined
+        },
+      })
+  replace(Date, "now", { writable: true, value: stop("Date.now") })
+  // `new Date()` reads the clock without `Date.now`; a date from a value doesn't.
+  const date = new Proxy(Date, {
+    apply: stop("Date()"),
+    construct: (target, args, newTarget) =>
+      args.length ? Reflect.construct(target, args, newTarget) : stop("new Date()")(),
+  })
+  replace(globalThis, "Date", { writable: true, value: date })
+  if (globalThis.performance) replace(performance, "now", { writable: true, value: stop("performance.now") })
+  replace(Math, "random", { writable: true, value: stop("Math.random") })
+  if (globalThis.crypto)
+    for (const name of ["randomUUID", "getRandomValues"])
+      replace(crypto, name, { writable: true, value: stop(`crypto.${name}`) })
   try {
     return read()
   } finally {
-    for (const [name, descriptor] of saved)
-      if (descriptor) Object.defineProperty(global, name, descriptor)
-      else delete global[name]
-    Date.now = clock.now
-    if (globalThis.performance && clock.performance) globalThis.performance.now = clock.performance
-    Math.random = clock.random
+    restores.reverse().forEach((restore) => restore())
   }
 }
 

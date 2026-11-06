@@ -195,11 +195,20 @@ async function modal(context: PatternContext, role: "dialog" | "alertdialog") {
   )
   const stops = tabStops(popup).length
   let trapped = true
-  for (const key of ["Tab", "Shift+Tab"])
+  for (const key of ["Tab", "Shift+Tab"]) {
+    const from = context.doc.activeElement
+    let moved = false
     for (let press = 0; press <= stops && trapped; press++) {
       await context.press(key)
       if (!inside()) trapped = false
+      if (context.doc.activeElement !== from) moved = true
     }
+    if (trapped && !moved && stops > 1)
+      context.problem(
+        popup,
+        `${key} keeps focus on ${describe(from)}; it moves through the dialog's ${stops} tab stops, wrapping at the ends (APG ${source}).`,
+      )
+  }
   const modal = trapped || pageInert || popup.getAttribute("aria-modal") === "true"
   if (modal && !trapped)
     context.problem(
@@ -252,7 +261,14 @@ async function combobox(context: PatternContext) {
     return
   }
   context.watch(popup)
-  if (roleOf(popup) === "listbox") await checkActiveOption(context, box, popup)
+  const kind = roleOf(popup)
+  // A combobox's popup is a listbox unless aria-haspopup says otherwise (ARIA: combobox).
+  if (kind !== "listbox" && box.getAttribute("aria-haspopup") !== kind)
+    context.problem(
+      box,
+      `controls a ${kind}, so it has aria-haspopup="${kind}"; only a listbox popup goes without it (APG combobox).`,
+    )
+  if (kind === "listbox") await checkActiveOption(context, box, popup)
   await context.press("Escape")
   if (expanded()) context.problem(box, "Escape should close its popup (APG combobox).")
   if (context.doc.activeElement !== box)
