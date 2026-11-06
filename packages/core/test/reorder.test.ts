@@ -871,3 +871,13 @@ test("an order the owner changes mid-move keeps the moved item where the user pu
   instance.api.reorder.drop()
   expect(onValueChange.mock.calls[0][0]).toEqual(["d", "a", "c", "b", "e"])
 })
+
+test("a group the owner reverses mid-move stays where the user put it", () => {
+  const onValueChange = vi.fn()
+  const { instance } = render({ value: ["a", "b", "c", "d"], group: ["a", "b"], onValueChange })
+  instance.api.reorder.grab("a")
+  instance.api.reorder.moveTo(1)
+  instance.setOptions({ value: ["b", "a", "c", "d"], group: ["a", "b"], onValueChange })
+  instance.api.reorder.drop()
+  expect(onValueChange.mock.calls[0][0]).toEqual(["c", "b", "a", "d"])
+})

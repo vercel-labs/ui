@@ -166,7 +166,7 @@ function createTransfer<State extends object>(
       if (from === undefined) return null
       if (!moved) return { ...current, from, lists: now }
       const list = listWith(current.lists, current.key)!
-      if (!now[list]) return null
+      if (!now[list] || (list !== from && options.accepts && !options.accepts(current.key, list))) return null
       const keys = current.lists[list]
       const index = keys.slice(0, keys.indexOf(current.key)).filter((key) => now[list].includes(key)).length
       return { ...current, from, lists: transferred(now, current.key, list, index) }

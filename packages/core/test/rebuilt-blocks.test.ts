@@ -541,6 +541,18 @@ describe("createTransfer", () => {
     expect(set).not.toHaveBeenCalled()
   })
 
+  test("a list the owner fills mid-move ends the move into it", () => {
+    const instance = board({ id: "k", lists: { todo: ["a", "b"], done: [] }, limit: 1 })
+    cleanups.push(() => instance.destroy())
+    const { transfer, set } = instance.api
+    transfer.grab("a")
+    transfer.moveTo("done", 0)
+    instance.setOptions({ id: "k", lists: { todo: ["a", "b"], done: ["c"] }, limit: 1 })
+    expect(instance.get().moving).toBeNull()
+    transfer.drop()
+    expect(set).not.toHaveBeenCalled()
+  })
+
   test("move commits at once, and the messages name the list", () => {
     const instance = board({ id: "k", lists: { todo: ["a"], done: [] } })
     cleanups.push(() => instance.destroy())

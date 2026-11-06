@@ -299,15 +299,17 @@ function createSpans<State extends object, S extends Span = Span>(
   let moved = false
 
   // The owner can change the spans mid-drag. The draft takes the spans they
-  // have now, with the held one where the drag put it, or ends when it's gone.
+  // have now, with the held one where the drag put it, or ends when it's gone
+  // or would overlap one the owner put there.
   deriveState(context, [options.draft], (state) => {
     const current = state[options.draft] as SpansDraft<S> | null
     const now = state[options.key] as S[]
     if (!current || !held) return
     if (current.action !== "draw" && !now.some((span) => span.id === current.id))
       return { [options.draft]: null } as Partial<State>
-    const span = current.spans.find((other) => other.id === current.id)
-    const spans = moved && span ? replaced(now, span) : now
+    const span = moved ? current.spans.find((other) => other.id === current.id) : undefined
+    const spans = span ? replaced(now, span) : now
+    if (span && !allowed(spans, span)) return { [options.draft]: null } as Partial<State>
     if (spans.length === current.spans.length && spans.every((other, i) => other === current.spans[i])) return
     return { [options.draft]: { ...current, spans } } as Partial<State>
   })

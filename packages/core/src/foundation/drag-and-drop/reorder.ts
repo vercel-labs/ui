@@ -210,7 +210,7 @@ function createReorder<State extends object, Props = any>(
     same: isSameKeys,
     rebase(current, now, moved) {
       if (!now.includes(current.key)) return null
-      const keys = current.keys.filter((key) => now.includes(key))
+      const keys = now.filter((key) => current.keys.includes(key))
       const order = gathered(now, current.key, keys)
       if (!moved) return { ...current, keys, order }
       const at = current.order.indexOf(current.keys[0])
