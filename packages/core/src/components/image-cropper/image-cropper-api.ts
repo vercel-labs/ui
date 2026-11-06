@@ -289,7 +289,7 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
           },
           onEnd: (end, canceled) => {
             store.set({ dragging: null })
-            if (canceled) setCrop(from, { reason: "drag", event: end })
+            if (canceled && !isLocked(store.get())) setCrop(from, { reason: "drag", event: end })
             commit({ reason: "drag", event: end })
           },
         })
@@ -351,12 +351,15 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
             })
           }
         }
+        const release = (event?: Event) => {
+          stop?.()
+          store.set({ dragging: null })
+          commit({ reason, event })
+        }
         const up = (lifted: PointerEvent) => {
           pointers.delete(lifted.pointerId)
           if (pointers.size) return begin()
-          stop?.()
-          store.set({ dragging: null })
-          commit({ reason, event: lifted })
+          release(lifted)
         }
         // Escape, or the browser taking the pointer, puts the crop back.
         const cancel = (canceled: Event) => {
@@ -379,7 +382,9 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
           el.removeEventListener("pointercancel", cancel)
           doc.removeEventListener("keydown", cancel)
           stop = undefined
+          endPan = undefined
         }
+        endPan = release
       },
       // The wheel zooms a frame at the pointer. A wheel has no release, so a pause commits.
       wheel(event: WheelEvent, el: HTMLElement) {
@@ -463,7 +468,14 @@ function imageCropperApi(context: PrimitiveContext<ImageCropperOptions, State, s
     selection: Rect
   } | null = null
   let stop: (() => void) | undefined
+  let endPan: (() => void) | undefined
   context.onDestroy(() => stop?.())
+  // Disabling it mid-drag ends the drag where it is, like a slider's.
+  store.subscribe(() => {
+    if (!isLocked(store.get())) return
+    drags.cancel()
+    endPan?.()
+  })
 
   function begin() {
     const state = store.get()

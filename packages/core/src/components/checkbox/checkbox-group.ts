@@ -129,12 +129,17 @@ type GroupState = {
   formDisabled: boolean
   // Values of the checkboxes in the group, in document order.
   children: string[]
+  // The ones that aren't disabled.
+  enabled: string[]
   // Their ids, for a parent's aria-controls.
   ids: string
 }
 
 const same = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((value, index) => value === b[index])
+
+// What the form gets, like native checkboxes: the checked ones on the page that aren't disabled.
+const submitted = (state: GroupState) => state.enabled.filter((value) => state.value.includes(value))
 
 function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupState, string>) {
   const { id, store, element } = context
@@ -165,8 +170,14 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
       .filter(([, child]) => child.el.isConnected)
       .sort(([, a], [, b]) => documentOrder(a.el, b.el))
       .map(([value]) => value)
+    const enabled = ordered.filter((value) => !children.get(value)!.disabled())
     const ids = ordered.map((value) => children.get(value)!.el.id).join(" ")
-    store.set({ ...(same(ordered, store.get().children) ? {} : { children: ordered }), ids })
+    const state = store.get()
+    store.set({
+      ...(same(ordered, state.children) ? {} : { children: ordered }),
+      ...(same(enabled, state.enabled) ? {} : { enabled }),
+      ids,
+    })
   }
 
   const api = {
@@ -250,6 +261,8 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },
+      // A checkbox in the group was disabled or enabled.
+      refreshChildren: () => queueMicrotask(refreshChildren),
       anchor: firstEnabled,
     },
   }
@@ -300,6 +313,7 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
       form: options.form,
       formDisabled: false,
       children: [],
+      enabled: [],
       ids: "",
     }
   },
@@ -333,11 +347,11 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
       }),
       bind: (el, { api, store }) =>
         bindInternals(el, {
-          value: () => store.get().value,
+          value: () => submitted(store.get()),
           name: () => store.get().name,
           state: () => store.get().value.join("\n"),
           restore: api.internal.restore,
-          valueMissing: () => store.get().required && store.get().value.length === 0,
+          valueMissing: () => store.get().required && submitted(store.get()).length === 0,
           message: () => valueMissingMessage("checkbox"),
           anchor: api.internal.anchor,
           focus: api.focus,
@@ -364,7 +378,7 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
       }),
       bind: (el, { api, store }) =>
         bindHiddenInput(el as HTMLInputElement, {
-          checked: () => store.get().value.length > 0,
+          checked: () => submitted(store.get()).length > 0,
           subscribe: store.subscribe,
           focus: api.focus,
           reset: api.internal.reset,

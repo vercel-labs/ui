@@ -2,7 +2,7 @@
 import { describe, expect, test, vi } from "vitest"
 import { imageCropper, type ImageCropperOptions } from "../src/components/image-cropper/image-cropper"
 import { layoutOf } from "../src/components/image-cropper/image-cropper-geometry"
-import { attrs, liveAttrs } from "../src/foundation/kernel/part"
+import { attrs, bind, liveAttrs } from "../src/foundation/kernel/part"
 
 const make = (options: ImageCropperOptions = {}) => imageCropper({ id: "c", src: "photo.png", ...options })
 
@@ -186,6 +186,47 @@ describe("image cropper", () => {
     expect(cropper.api.getCrop()).toEqual(before)
     expect(attrs(cropper.part("rotate", {}))).toMatchObject({ disabled: "" })
     expect(attrs(cropper.part("selection", {})).tabindex).toBeUndefined()
+  })
+
+  test("a drag or a pan stops where it is once the cropper is disabled", async () => {
+    const pointer = (type: string, clientX: number) =>
+      new PointerEvent(type, {
+        pointerId: 1,
+        pointerType: "mouse",
+        button: 0,
+        buttons: type === "pointerup" ? 0 : 1,
+        clientX,
+        clientY: 150,
+        bubbles: true,
+        cancelable: true,
+      })
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+    for (const mode of ["box", "frame"] as const) {
+      const onCropCommit = vi.fn()
+      const options = { mode, defaultCrop: { x: 100, y: 100, width: 100, height: 100 }, onCropCommit }
+      const cropper = make(options)
+      const viewport = document.body.appendChild(document.createElement("div"))
+      Object.defineProperties(viewport, { clientWidth: { value: 400 }, clientHeight: { value: 300 } })
+      viewport.getBoundingClientRect = () => new DOMRect(0, 0, 400, 300)
+      const unbind = bind(cropper.part("viewport", {}), viewport)
+      load(cropper)
+      if (mode === "box")
+        cropper.api.internal.selectionPointerdown(pointer("pointerdown", 150), viewport, "move")
+      else cropper.api.internal.viewportPointerdown(pointer("pointerdown", 150), viewport)
+      viewport.dispatchEvent(pointer("pointermove", 170))
+      await frame()
+      const held = cropper.api.getCrop()
+      expect(held!.x).not.toBe(100)
+      cropper.setOptions({ id: "c", src: "photo.png", ...options, disabled: true })
+      expect(onCropCommit).toHaveBeenCalledTimes(1)
+      viewport.dispatchEvent(pointer("pointermove", 220))
+      await frame()
+      viewport.dispatchEvent(pointer("pointerup", 220))
+      expect(cropper.api.getCrop()).toEqual(held)
+      expect(onCropCommit).toHaveBeenCalledTimes(1)
+      unbind?.()
+      cropper.destroy()
+    }
   })
 
   test("a box shows the whole image, and a frame shows the crop as large as it fits", () => {

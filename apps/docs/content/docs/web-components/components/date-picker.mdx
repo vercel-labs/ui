@@ -103,7 +103,7 @@ For two months side by side, set `months="2"` and add a second `ui-calendar-grid
 
 ## Min, Max and Unavailable Dates
 
-`min`, `max`, and `unavailable` apply to both typing and calendar selection. A date outside those rules is invalid when typed. [Calendar](./calendar#unavailable-dates) explains the available matchers and how unavailable dates differ from the bounds.
+`min`, `max`, and `unavailable` apply to typing, calendar selection, presets, and the controller. A date outside those rules is invalid when typed, a preset that holds one is disabled, and the controller refuses it. [Calendar](./calendar#unavailable-dates) explains the available matchers and how unavailable dates differ from the bounds.
 
 For ranges, `min-days` and `max-days` count both endpoints. `allow-unavailable` permits unavailable dates between them, but never as an endpoint. See [Range Limits](./calendar#range-limits).
 

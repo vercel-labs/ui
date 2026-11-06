@@ -124,6 +124,15 @@ describe("slider", () => {
     expect(onValueChange.mock.calls[0][1].reason).toBe("imperative")
   })
 
+  test("a controller can't change a disabled or read-only slider", () => {
+    for (const locked of [{ disabled: true }, { readOnly: true }]) {
+      const controller = createSliderController()
+      const instance = kept(slider({ id: "s", defaultValue: 10, controller, ...locked }))
+      expect(controller.setValue(50)).toBe(false)
+      expect(instance.get().value).toBe(10)
+    }
+  })
+
   test("keeps an uncontrolled value inside its range when the bounds change", () => {
     const single = kept(slider({ id: "s", name: "volume", defaultValue: 80 }))
     single.setOptions({ id: "s", name: "volume", defaultValue: 80, max: 50 })

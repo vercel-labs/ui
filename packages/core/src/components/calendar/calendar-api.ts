@@ -3,6 +3,7 @@
 import {
   addMonthsTo,
   gridWeeks,
+  isAllowedRange,
   isISOMonth,
   matchesDate,
   monthOf,
@@ -128,6 +129,12 @@ const rangeRules = (state: State) => ({
   allowUnavailable: state.allowUnavailable,
   isUnavailable: (date: ISODate) => unavailableDate(state, date),
 })
+// Whether people could pick a value's dates. Disabled and read-only are checked apart.
+function isPickable(state: State, value: CalendarValue) {
+  const dates = selectedDates(value)
+  if (dates.some((date) => blockedDate(state, date))) return false
+  return state.mode !== "range" || !dates.length || isAllowedRange(dates[0], dates[1], rangeRules(state))
+}
 const refusedEnd = (state: State, date: ISODate) =>
   state.mode === "range" &&
   state.anchor !== null &&
@@ -449,7 +456,7 @@ function calendarApi<
     setValue: (
       value: CalendarValue,
       { reason = "imperative", event }: CalendarChangeOptions<ValueChangeReason> = {},
-    ) => setValue(value, reason, event),
+    ) => isPickable(store.get(), normalizeValue(store.get().mode, value)) && setValue(value, reason, event),
     getMonth: () => store.get().month,
     setMonth: (
       month: ISOMonth,
@@ -749,6 +756,7 @@ export {
   calendarState,
   calendarSync,
   isDisabled,
+  isPickable,
   localeOf,
   preferredDate,
   rangeRules,

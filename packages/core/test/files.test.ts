@@ -98,6 +98,13 @@ describe("validateFiles", () => {
   test("maxFiles of 0 rejects every file, for a list that's full", () => {
     expect(validateFiles([file("a")], { maxFiles: 0 }).rejected[0].reasons).toEqual(["too-many-files"])
   })
+
+  test("maxFiles of 0 rejects every file without multiple too", () => {
+    const { accepted, rejected } = validateFiles([file("a")], { multiple: false, maxFiles: 0 })
+    expect(accepted).toEqual([])
+    expect(rejected[0].reasons).toEqual(["too-many-files"])
+    expect(dragStatus(["image/png"], { multiple: false, maxFiles: 0 })).toBe("reject")
+  })
 })
 
 describe("drag status", () => {

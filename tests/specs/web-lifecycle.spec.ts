@@ -576,6 +576,35 @@ test('disabled="false" disables and required="false" requires, like on native co
   expect(result).toEqual({ ariaDisabled: "true", matches: true, value: null, valid: false })
 })
 
+test("a checkbox group submits only its checked checkboxes that aren't disabled, like native ones", async ({
+  page,
+}) => {
+  const result = await page.evaluate(async () => {
+    const form = document.createElement("form")
+    form.innerHTML = `
+      <ui-checkbox-group name="toppings" aria-label="Toppings" default-value="cheese,olives,ghost" required>
+        <ui-checkbox value="cheese" aria-label="Cheese"></ui-checkbox>
+        <ui-checkbox value="olives" aria-label="Olives" disabled></ui-checkbox>
+      </ui-checkbox-group>`
+    document.querySelector("#stage")!.append(form)
+    const tick = () => new Promise((done) => setTimeout(done))
+    const read = () => ({ submitted: new FormData(form).getAll("toppings"), valid: form.checkValidity() })
+    await tick()
+    const start = read()
+    form.querySelector<HTMLElement & { value: string[] }>("ui-checkbox-group")!.value = ["olives"]
+    await tick()
+    const disabledOnly = read()
+    form.querySelector("ui-checkbox[value=olives]")!.removeAttribute("disabled")
+    await tick()
+    return { start, disabledOnly, enabled: read() }
+  })
+  expect(result).toEqual({
+    start: { submitted: ["cheese"], valid: true },
+    disabledOnly: { submitted: [], valid: false },
+    enabled: { submitted: ["olives"], valid: true },
+  })
+})
+
 test("a checkbox group disabled at the start and enabled later enables its checkboxes", async ({ page }) => {
   const result = await page.evaluate(async () => {
     const form = document.createElement("form")

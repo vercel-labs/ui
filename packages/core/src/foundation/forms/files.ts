@@ -135,7 +135,7 @@ function acceptsType(type: string, tokens: readonly string[]) {
 
 /** How many files the rules accept at a time. */
 function fileLimit(rules: Pick<FileRules<FileLike>, "multiple" | "maxFiles">) {
-  if (rules.multiple === false) return 1
+  if (rules.multiple === false) return Math.min(1, rules.maxFiles ?? 1)
   return rules.maxFiles ?? Infinity
 }
 

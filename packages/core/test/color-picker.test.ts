@@ -180,4 +180,28 @@ describe("color picker", () => {
       "aria-readonly": "true",
     })
   })
+
+  test("a drag on the area or a slider stops once the picker turns read-only", async () => {
+    const pointer = (type: string, clientX: number) =>
+      new PointerEvent(type, { pointerId: 1, button: 0, buttons: 1, clientX, clientY: 50, cancelable: true })
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+    for (const press of ["areaPointerdown", "sliderPointerdown"] as const) {
+      const onValueCommit = vi.fn()
+      const options = { defaultValue: "hsl(0 100% 50%)", onValueCommit }
+      const picker = make(options)
+      const el = document.body.appendChild(document.createElement("div"))
+      el.getBoundingClientRect = () => new DOMRect(0, 0, 100, 100)
+      picker.api.internal[press](pointer("pointerdown", 20), el, "hue")
+      document.dispatchEvent(pointer("pointermove", 40))
+      await frame()
+      const held = picker.api.getValue()
+      picker.setOptions({ id: "c", ...options, readOnly: true })
+      document.dispatchEvent(pointer("pointermove", 90))
+      await frame()
+      document.dispatchEvent(pointer("pointerup", 90))
+      expect(picker.api.getValue()).toBe(held)
+      expect(onValueCommit).toHaveBeenCalledTimes(1)
+      picker.destroy()
+    }
+  })
 })

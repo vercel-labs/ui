@@ -280,6 +280,44 @@ describe("datePicker", () => {
     expect(picker.get("clear").hasAttribute("data-empty")).toBe(true)
   })
 
+  test("a preset with a date people can't pick is disabled and selects nothing", async () => {
+    const onValueChange = vi.fn()
+    for (const options of [{ max: "2026-11-30" }, { unavailable: ["2026-12-25"] }]) {
+      const picker = mount({ defaultOpen: true, onValueChange, ...options })
+      await tick()
+      const preset = picker.get("preset")
+      expect(preset.hasAttribute("disabled")).toBe(true)
+      preset.click()
+      await tick()
+      expect(picker.instance.get().value).toBe(null)
+      expect(picker.instance.get().open).toBe(true)
+      document.body.replaceChildren()
+    }
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  test("a range preset the range rules don't allow is disabled and selects nothing", async () => {
+    const picker = mount({ mode: "range", defaultOpen: true, maxDays: 7 })
+    await tick()
+    expect(picker.get("preset").hasAttribute("disabled")).toBe(true)
+    picker.get("preset").click()
+    await tick()
+    expect(picker.instance.get().value).toBe(null)
+  })
+
+  test("a controller can't set a date people can't pick", () => {
+    const controller = createDatePickerController()
+    const picker = mount({ controller, max: "2026-11-30", unavailable: ["2026-10-24"] })
+    expect(controller.setValue("2026-12-25")).toBe(false)
+    expect(controller.setValue("2026-10-24")).toBe(false)
+    expect(picker.instance.get().value).toBe(null)
+    expect(controller.setValue("2026-10-23")).toBe(true)
+    const range = createDatePickerController()
+    mount({ controller: range, mode: "range", minDays: 3 })
+    expect(range.setValue(["2026-10-20", "2026-10-21"])).toBe(false)
+    expect(range.setValue(["2026-10-20", "2026-10-22"])).toBe(true)
+  })
+
   test("a form reset puts the default value back", async () => {
     const picker = mount({ defaultValue: "2026-10-16" })
     await picker.type("11/01/2026")
