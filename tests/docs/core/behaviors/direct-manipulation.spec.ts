@@ -15,7 +15,7 @@ async function press(page: Page, target: Locator, dx: number, dy: number, at = {
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "direct-manipulation")
-  await expect(page.locator("[data-example]")).toHaveCount(17)
+  await expect(page.locator("[data-example]")).toHaveCount(19)
   expect(errors).toEqual([])
 })
 
@@ -382,6 +382,47 @@ test("preview tabs: dragging a tab moves it into the nearest place, Escape cance
   expect(await names()).toEqual(["Drafts", "Spam", "Sent mail", "Scheduled sends", "Inbox"])
   await page.keyboard.press("ArrowRight")
   await expect(tablist.getByRole("tab", { name: "Sent mail" })).toHaveAttribute("aria-selected", "true")
+})
+
+test("hold confirm: letting go early keeps the project, and a held press deletes it without clicking Restore", async ({
+  page,
+}) => {
+  await openBehaviors(page, "direct-manipulation")
+  const example = page.locator('[data-example="behaviors/hold-confirm"]')
+  const remove = example.getByRole("button", { name: "Delete Project" })
+  await expect(remove).toHaveAccessibleDescription("Press and hold to delete")
+  await press(page, remove, 0, 0)
+  await expect(remove).toHaveAttribute("data-holding", "")
+  await page.mouse.up()
+  await expect(page.getByText("Released before it filled", { exact: true })).toBeVisible()
+  await press(page, remove, 0, 0)
+  await expect(example.getByText("Launch site deleted.")).toBeVisible()
+  await page.mouse.up()
+  await expect(example.getByText("Launch site deleted.")).toBeVisible()
+  await example.getByRole("button", { name: "Restore" }).click()
+  await remove.focus()
+  await page.keyboard.down("Space")
+  await expect(example.getByText("Launch site deleted.")).toBeVisible()
+  await page.keyboard.up("Space")
+})
+
+test("hold repeat: a press steps once, and holding keeps stepping from the pointer and Space", async ({
+  page,
+}) => {
+  await openBehaviors(page, "direct-manipulation")
+  const example = page.locator('[data-example="behaviors/hold-repeat"]')
+  const zoom = example.getByRole("status")
+  const level = async () => parseInt((await zoom.textContent())!)
+  await example.getByRole("button", { name: "Zoom In" }).click()
+  await expect(zoom).toHaveText("105%")
+  await press(page, example.getByRole("button", { name: "Zoom In" }), 0, 0)
+  await expect.poll(level).toBeGreaterThanOrEqual(150)
+  await page.mouse.up()
+  const held = await level()
+  await example.getByRole("button", { name: "Zoom Out" }).focus()
+  await page.keyboard.down("Space")
+  await expect.poll(level).toBeLessThanOrEqual(held - 25)
+  await page.keyboard.up("Space")
 })
 
 test("every option links to the example that shows it", async ({ page }) => {

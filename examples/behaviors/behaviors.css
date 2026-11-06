@@ -1127,6 +1127,38 @@
     }
   }
 
+  /* ─── Behaviors: Hold ─────────────────────────────────────────────── */
+
+  [data-slot="hold-button"] {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    & [data-slot="hold-fill"] {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: color-mix(in oklab, var(--danger) 25%, transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+
+      &:dir(rtl) {
+        transform-origin: right;
+      }
+    }
+
+    &[data-holding] [data-slot="hold-fill"] {
+      transform: scaleX(1);
+      transition: transform var(--hold-delay) linear;
+    }
+  }
+
+  [data-slot="hold-zoom"] {
+    min-width: 4ch;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
   /* ─── Behaviors: Inline edit ──────────────────────────────────────── */
 
   [data-slot="product-root"] {

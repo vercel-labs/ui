@@ -1,11 +1,7 @@
 // A number input's state and what it does: typing, keys, buttons, the wheel,
 // scrubs and commits. The parts and their attributes are in number-input.ts.
-import {
-  createDragSession,
-  isDrag,
-  repeatWhileHeld,
-  type PointerSample,
-} from "../../foundation/drag-and-drop/pointer"
+import { createDragSession, isDrag, type PointerSample } from "../../foundation/drag-and-drop/pointer"
+import { bindHold } from "../../foundation/direct-manipulation/hold"
 import { isBrowser, isIOS } from "../../foundation/platform/env"
 import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
 import { displayOptions, formatNumber, numberFormatter } from "../../foundation/number/format"
@@ -307,60 +303,36 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         clearTimeout(wheelTimer)
         wheelTimer = setTimeout(() => commit(event), 300)
       },
-      // Steps once now, then repeats while held. A tap with a finger steps on
-      // release instead, so a scroll that starts on a button doesn't step.
-      pressButton(event: PointerEvent, el: HTMLElement, direction: number) {
-        if (!drags.accepts(event) || !canStep(store.get(), direction)) return
-        // Keeps focus where it is, so a phone's keyboard stays as it was.
-        event.preventDefault()
-        if (event.pointerType === "mouse") input()?.focus({ preventScroll: true })
-        const release = api.internal.hold(direction, {
-          large: event.shiftKey,
-          touch: event.pointerType !== "mouse",
-          event,
-          // The button can be disabled while it's held, and stops there.
-          blocked: () => el.hasAttribute("disabled"),
-        })
-        const blockMenu = (menu: Event) => menu.preventDefault()
-        el.ownerDocument.addEventListener("contextmenu", blockMenu)
-        drags.start(el, event, {
-          onMove: () => {},
-          onEnd: (end, canceled) => {
-            el.ownerDocument.removeEventListener("contextmenu", blockMenu)
-            release(canceled, end)
+      // A mouse steps at once, then repeats while held. A finger waits, so a
+      // scroll that starts on the button never steps; a tap steps on release.
+      bindButton(el: HTMLElement, direction: number, disabled: () => boolean) {
+        const reason = direction > 0 ? "increment-press" : "decrement-press"
+        const blocked = () => disabled() || el.hasAttribute("disabled")
+        let size: "large" | "step" = "step"
+        const step = (event: Event) =>
+          stepBy(direction, size, reason, event) && canStep(store.get(), direction)
+        return bindHold(el, {
+          delay: 400,
+          repeat: 60,
+          tolerance: Infinity,
+          keys: [],
+          disabled: blocked,
+          onPress: (press) => {
+            const event = press.event as PointerEvent
+            if (!drags.accepts(event) || !canStep(store.get(), direction)) return false
+            // Keeps focus where it is, so a phone's keyboard stays as it was.
+            event.preventDefault()
+            size = event.shiftKey ? "large" : "step"
+            if (press.input !== "mouse") return
+            input()?.focus({ preventScroll: true })
+            step(event)
+          },
+          onHold: ({ event }) => step(event),
+          onEnd: (end) => {
+            if (end.input !== "mouse" && !end.held && !end.canceled && !blocked()) step(end.event)
+            commit(end.event)
           },
         })
-      },
-      // A held button: a mouse steps at once, then repeats. A finger waits, so
-      // a scroll that starts on the button never steps; a tap steps on release.
-      // Returns the release, which commits and says whether the press repeated.
-      hold(
-        direction: number,
-        {
-          large = false,
-          touch = false,
-          event,
-          blocked = () => false,
-        }: { large?: boolean; touch?: boolean; event?: Event; blocked?: () => boolean } = {},
-      ) {
-        const reason = direction > 0 ? "increment-press" : "decrement-press"
-        const size = large ? "large" : "step"
-        let held = !touch
-        let stopRepeat = () => {}
-        // Repeats until the value reaches its bound.
-        const startRepeat = () =>
-          (stopRepeat = repeatWhileHeld(
-            () => !blocked() && stepBy(direction, size, reason, event) && canStep(store.get(), direction),
-          ))
-        const timer = touch ? setTimeout(() => ((held = true), startRepeat()), 400) : undefined
-        if (!touch) startRepeat()
-        return (canceled = false, end?: Event) => {
-          clearTimeout(timer)
-          stopRepeat()
-          if (touch && !held && !canceled && !blocked()) stepBy(direction, size, reason, end)
-          commit(end)
-          return held
-        }
       },
       // Keyboard and screen reader presses, which carry no pointer.
       clickButton(event: MouseEvent, direction: number) {

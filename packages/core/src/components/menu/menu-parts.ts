@@ -1,5 +1,6 @@
 import { dev, warn } from "#dev"
 import { checkName } from "#name-check"
+import { bindHold } from "../../foundation/direct-manipulation/hold"
 import { isPromise } from "../../foundation/kernel/action"
 import { keyWhileBound } from "../../foundation/kernel/bound-keys"
 import { opensElsewhere } from "../../foundation/platform/button"
@@ -54,9 +55,6 @@ const menuGroupLabelledBy = (state: MenuState, id: string, group: string) =>
 // a controller's open without a trigger isn't. A submenu's trigger always names it.
 const namedByTrigger = (state: MenuState, nested: boolean) =>
   nested || (state.trigger === null ? state.triggers.length > 0 : state.triggers.includes(state.trigger))
-
-// A long press on a touch screen opens a context menu, like a right-click.
-const longPress = 500
 
 // The menu's slots, which its features' slots join.
 const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
@@ -478,35 +476,20 @@ const menuContextTrigger = /* @__PURE__ */ (() => ({
             payload: props.payload,
           })
         },
-        // iOS fires no context menu event, so a long press opens it.
-        pointerdown(event, { api, key, props, el }) {
-          if (event.pointerType !== "touch" || props.disabled) return
-          const start = { x: event.clientX, y: event.clientY }
-          const timer = setTimeout(() => {
-            stop()
-            api.internal.contextOpen(start, { event, by: "touch", key, payload: props.payload })
-          }, longPress)
-          const cancel = (move: PointerEvent) => {
-            if (
-              move.type !== "pointermove" ||
-              Math.hypot(move.clientX - start.x, move.clientY - start.y) > 10
-            )
-              stop()
-          }
-          const stop = () => {
-            clearTimeout(timer)
-            for (const type of ["pointermove", "pointerup", "pointercancel"] as const)
-              el!.removeEventListener(type, cancel)
-          }
-          for (const type of ["pointermove", "pointerup", "pointercancel"] as const)
-            el!.addEventListener(type, cancel)
-        },
       },
-      bind(el, { store, key }) {
+      // iOS fires no context menu event, so a long press opens it.
+      bind(el, part) {
+        const { api, store, key } = part
         if (store.get().trigger === null) store.set({ trigger: key })
-        // A long press would select text and show the system's callout.
-        el.style.setProperty("-webkit-touch-callout", "none")
-        return () => el.style.removeProperty("-webkit-touch-callout")
+        return bindHold(el, {
+          keys: [],
+          disabled: () => !!part.props.disabled,
+          onPress: ({ input }) => input === "touch",
+          onHold: ({ event }) => {
+            const { clientX: x, clientY: y } = event as PointerEvent
+            api.internal.contextOpen({ x, y }, { event, by: "touch", key, payload: part.props.payload })
+          },
+        })
       },
     }),
   },
