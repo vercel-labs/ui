@@ -191,14 +191,12 @@ test("the beta notice sits beside the docs, with no banner anywhere", async ({ p
 
 test("install commands keep the reader's package manager after a reload", async ({ page }) => {
   await page.goto("/docs/svelte/installation")
-  const managers = page.getByRole("tablist", { name: "Package manager" }).first()
-  await managers.getByRole("tab", { name: "pnpm", exact: true }).click()
+  const managers = page.getByRole("combobox", { name: "Package manager" }).first()
+  await managers.click()
+  await page.getByRole("option", { name: "pnpm", exact: true }).click()
   await expect(page.locator("html")).toHaveAttribute("data-package-manager", "pnpm")
   await page.reload()
-  await expect(managers.getByRole("tab", { name: "pnpm", exact: true })).toHaveAttribute(
-    "aria-selected",
-    "true",
-  )
+  await expect(managers).toHaveText("pnpm")
   await expect(page.getByText("pnpm add @ui-sdk/svelte @ui-sdk/core")).toBeVisible()
   expect(await page.evaluate(() => localStorage.getItem("tabs:package-manager"))).toBe("pnpm")
 })

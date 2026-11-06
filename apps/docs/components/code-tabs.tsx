@@ -35,9 +35,44 @@ function CodeBlockTabsList({
   children: React.ReactNode
   label?: string
 }) {
+  if (label === "Package manager") return <PackageManagerSelect>{children}</PackageManagerSelect>
   return (
     <TabBar>
       <TabsList aria-label={label}>{children}</TabsList>
+      <CopyButton className="ms-auto" />
+    </TabBar>
+  )
+}
+
+function PackageManagerSelect({ children }: { children: React.ReactNode }) {
+  const { value } = usePreference(packageManager)
+  const items = React.Children.toArray(children)
+    .filter(React.isValidElement<{ value: string; children: React.ReactNode }>)
+    .map(({ props }) => ({ value: props.value, label: String(props.children) }))
+  return (
+    <TabBar>
+      <Select
+        items={items}
+        value={value}
+        onValueChange={(next, details) => {
+          if (next) packageManager.set(next as typeof value, details)
+        }}
+      >
+        <SelectTrigger
+          variant="ghost"
+          aria-label="Package manager"
+          className="mx-0 h-8 rounded-frame-control bg-muted px-3 font-mono text-xs hover:bg-muted data-open:bg-muted"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="start" sideOffset={6} className="min-w-32">
+          {items.map((item) => (
+            <SelectItem key={item.value} value={item.value} className="font-mono text-xs">
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <CopyButton className="ms-auto" />
     </TabBar>
   )
