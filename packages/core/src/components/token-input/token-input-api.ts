@@ -260,12 +260,12 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     const following = offsetText(value)[range.end]
     if (token && (following === undefined || !/\s/.test(following))) inserted.push(" ")
     const end = range.start + valueLength(inserted)
-    if (!commit(replaceRange(value, range, inserted), { reason, event, selection: caretAt(end) }))
-      return false
+    const next = replaceRange(value, range, inserted)
+    if (!commit(next, { reason, event, selection: caretAt(end) })) return false
     if (token) say(`Inserted ${describe(token)} ${token.label}`)
     if (!token || !pending) return true
     // An id the value already had is given to its first token, so read the one it ended up with.
-    const tokenId = tokenAt(committed, range.start)!.id!
+    const tokenId = tokenAt(next, range.start)!.id!
     pending.then(
       (patch) => updateToken(tokenId, { ...(patch ?? {}), status: patch?.status }),
       () => {

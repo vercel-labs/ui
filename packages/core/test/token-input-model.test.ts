@@ -48,6 +48,13 @@ describe("values and offsets", () => {
     expect(made.id).not.toBe(next)
   })
 
+  test("a supplied id too large to count past leaves generated ids unique", () => {
+    normalizeValue([{ ...file, id: "t99999999999999999999" }])
+    const [first] = normalizeValue([{ ...file, id: undefined }]) as Token[]
+    const [second] = normalizeValue([{ ...file, id: undefined }]) as Token[]
+    expect(first.id).not.toBe(second.id)
+  })
+
   test("a token counts as one offset", () => {
     const value = normalizeValue(["hi ", alice, " and ", file])
     expect(valueLength(value)).toBe(10)

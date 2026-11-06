@@ -29,8 +29,9 @@ const TOKEN_CHAR = "\uFFFC"
 let lastId = 0
 const nextId = () => `t${++lastId}`
 // A supplied id shaped like a generated one moves the count past it, so no generated id repeats it.
+// Past 15 digits the count would lose precision and stall, and it never gets that far itself.
 const reserveId = (id: string) => {
-  if (/^t\d+$/.test(id)) lastId = Math.max(lastId, Number(id.slice(1)))
+  if (/^t\d{1,15}$/.test(id)) lastId = Math.max(lastId, Number(id.slice(1)))
 }
 
 const isToken = (segment: string | Token | undefined): segment is Token =>

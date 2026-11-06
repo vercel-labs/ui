@@ -58,6 +58,23 @@ describe("token ids", () => {
     await Promise.resolve()
     expect(tokens(instance.api.getValue()).map((token) => token.label)).toEqual(["b.ts"])
   })
+
+  test("a loading token settles itself when onValueChange replaces the value as it's inserted", async () => {
+    let replaced = false
+    const instance = tokenInput({
+      id: "v",
+      onValueChange() {
+        if (replaced) return
+        replaced = true
+        instance.api.setValue([{ ...file, label: "b.ts", id: "b" }])
+      },
+    })
+    const failed = Promise.reject(new Error("offline"))
+    instance.api.insert(file, { at: "end", resolve: failed })
+    await failed.catch(() => {})
+    await Promise.resolve()
+    expect(tokens(instance.api.getValue()).map((token) => token.label)).toEqual(["b.ts"])
+  })
 })
 
 describe("static markup", () => {
