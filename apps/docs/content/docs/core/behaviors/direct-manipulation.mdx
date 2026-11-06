@@ -293,7 +293,7 @@ It works with a mouse, a finger, a pen, and Space or Enter while the button has 
   caption="Press and hold Delete Project until it fills. Let go early and nothing is deleted. From the keyboard, focus it and hold Space."
 />
 
-`onEnd` runs once the press ends, with `held` and `canceled`. A press is canceled when the pointer moves more than `tolerance` pixels before it's held, 10 by default, when a finger starts to scroll, when Escape is pressed, or when focus leaves. Escape doesn't reach a dialog or popup around the button. Say that the button needs holding in its label or description, as the hint does here.
+`onEnd` runs once the press ends, with `held` and `canceled`. A press is canceled when the pointer moves more than `tolerance` pixels before it's held, 10 by default, when a finger starts to scroll, when Escape is pressed, or when focus leaves the button or the window. A canceled press doesn't click, and Escape doesn't reach a dialog or popup around the button. Say that the button needs holding in its label or description, as the hint does here.
 
 ### Repeat While Held
 
@@ -307,7 +307,7 @@ bindHold(button, {
 })
 ```
 
-A short press still clicks, so keep a click handler for one step. A press that's held doesn't click, so its release doesn't add another step. A short press of Space or Enter clicks once, however long the keyboard repeats the key.
+A short press still clicks, so keep a click handler for one step. A press that's held or canceled doesn't click, so its release doesn't add another step. A short press of Space or Enter clicks once, however long the keyboard repeats the key.
 
 <ComponentExample
   name="behaviors/hold-repeat"

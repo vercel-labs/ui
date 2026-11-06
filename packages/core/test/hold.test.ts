@@ -112,6 +112,85 @@ describe("bindHold", () => {
     document.removeEventListener("keydown", outside)
   })
 
+  test("a press canceled with Escape doesn't click when it's released, held or not", () => {
+    const { el, onClick } = setup()
+    for (const wait of [100, 500]) {
+      el.dispatchEvent(pointer("pointerdown"))
+      vi.advanceTimersByTime(wait)
+      document.body.dispatchEvent(key("keydown", { key: "Escape" }))
+      el.dispatchEvent(pointer("pointerup"))
+      el.dispatchEvent(new PointerEvent("click", { pointerId: 1, bubbles: true, cancelable: true }))
+      vi.runAllTimers()
+    }
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a press that moved past the tolerance doesn't click when it's released", () => {
+    const { el, onClick } = setup()
+    el.dispatchEvent(pointer("pointerdown", { clientX: 0, clientY: 0 }))
+    document.dispatchEvent(pointer("pointermove", { clientX: 30, clientY: 0 }))
+    el.dispatchEvent(pointer("pointerup"))
+    el.dispatchEvent(new PointerEvent("click", { pointerId: 1, bubbles: true, cancelable: true }))
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("a pointer press is canceled when the element loses focus", () => {
+    const { el, onHold, onEnd } = setup()
+    el.focus()
+    el.dispatchEvent(pointer("pointerdown"))
+    el.blur()
+    vi.advanceTimersByTime(500)
+    expect(onHold).not.toHaveBeenCalled()
+    expect(onEnd).toHaveBeenCalledWith(expect.objectContaining({ canceled: true }))
+  })
+
+  test("a key press is canceled when the window loses focus", () => {
+    const { el, onHold, onEnd } = setup()
+    el.focus()
+    el.dispatchEvent(key("keydown"))
+    window.dispatchEvent(new FocusEvent("blur"))
+    vi.advanceTimersByTime(500)
+    expect(onHold).not.toHaveBeenCalled()
+    expect(onEnd).toHaveBeenCalledWith(expect.objectContaining({ input: "keyboard", canceled: true }))
+  })
+
+  test("a Space press canceled with Escape keeps its keyup from clicking", () => {
+    const { el, onClick } = setup()
+    el.focus()
+    el.dispatchEvent(key("keydown"))
+    el.dispatchEvent(key("keydown", { key: "Escape" }))
+    const up = key("keyup")
+    el.dispatchEvent(up)
+    expect(up.defaultPrevented).toBe(true)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  test("an onHold that unbinds or moves focus mid-repeat stops the repeats", () => {
+    const { el, onHold } = setup({
+      repeat: 50,
+      onHold: ({ count }) => {
+        if (count === 2) el.blur()
+      },
+    })
+    el.focus()
+    el.dispatchEvent(key("keydown"))
+    expect(() => vi.advanceTimersByTime(500 + 50 * 4)).not.toThrow()
+    expect(onHold).toHaveBeenCalledTimes(2)
+    const unbinding = setup({ repeat: 50, onHold: () => cleanup?.() })
+    unbinding.el.dispatchEvent(pointer("pointerdown"))
+    expect(() => vi.advanceTimersByTime(500 + 50 * 4)).not.toThrow()
+    expect(unbinding.onHold).toHaveBeenCalledOnce()
+  })
+
+  test("a keydown another handler prevented doesn't start a press", () => {
+    const { el, onHold } = setup()
+    el.addEventListener("keydown", (event) => event.preventDefault(), { capture: true })
+    el.dispatchEvent(key("keydown"))
+    vi.advanceTimersByTime(500)
+    expect(onHold).not.toHaveBeenCalled()
+    expect(el.hasAttribute("data-holding")).toBe(false)
+  })
+
   test("ignores a press onPress turns down", () => {
     const { el, onHold } = setup({ onPress: ({ input }) => input === "touch" })
     el.dispatchEvent(pointer("pointerdown", { pointerType: "mouse" }))

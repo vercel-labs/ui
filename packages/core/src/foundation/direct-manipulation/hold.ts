@@ -34,7 +34,8 @@ type HoldEndDetails = {
   held: boolean
   /**
    * Whether it ended without a release: the pointer moved past `tolerance`, a
-   * finger started to scroll, Escape was pressed, or focus left.
+   * finger started to scroll, Escape was pressed, or focus left the element or
+   * the window. A canceled press doesn't click.
    */
   canceled: boolean
 }
@@ -76,6 +77,8 @@ type BindHoldOptions = {
 
 type Press = {
   input: HoldInput
+  pointerId?: number
+  key?: string
   held: boolean
   timer?: number
   unlisten: () => void
@@ -84,8 +87,8 @@ type Press = {
 /**
  * Makes `el` respond to a press that's held: after `delay`, `onHold` runs, and
  * runs again every `repeat` milliseconds when set. Works with a mouse, touch,
- * a pen, and Space or Enter while `el` has focus. A press that was held
- * doesn't click; a short one does, so a held button keeps its click.
+ * a pen, and Space or Enter while `el` has focus. Only a short press that's
+ * released clicks, so a held button keeps its click; a held or canceled one doesn't.
  *
  * While pressed, `el` has `data-holding`, and `data-held` once held, and
  * `--hold-delay` is `delay`, so CSS can fill a hold-to-confirm button over it.
@@ -110,19 +113,27 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   el.style.setProperty("--hold-delay", `${delay}ms`)
   el.style.setProperty("-webkit-touch-callout", "none")
 
-  function start(details: HoldDetails, listen: () => (() => void)[]) {
+  function start(
+    details: HoldDetails,
+    extra: Pick<Press, "pointerId" | "key">,
+    listen: () => (() => void)[],
+  ) {
     if (press || options.disabled?.() || options.onPress?.(details) === false) return false
     let count = 0
     const tick = () => {
-      if (!press || options.disabled?.()) return
-      press.held = true
+      const current = press
+      if (!current || options.disabled?.()) return
+      current.held = true
       el.setAttribute("data-held", "")
       const repeats = options.onHold?.({ ...details, count: ++count }) !== false
-      if (repeats && options.repeat) press.timer = view.setTimeout(tick, options.repeat)
+      // onHold may have ended the press, like by unbinding or moving focus.
+      if (repeats && options.repeat && press === current)
+        current.timer = view.setTimeout(tick, options.repeat)
     }
     const listeners = listen()
     press = {
       input: details.input,
+      ...extra,
       held: false,
       timer: view.setTimeout(tick, delay),
       unlisten: () => listeners.forEach((remove) => remove()),
@@ -145,19 +156,46 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   function end(event: Event, canceled: boolean) {
     const current = stop()
     if (!current) return
-    const { input, held } = current
-    if (held && !canceled && input !== "keyboard") swallowNextClick(doc)
+    const { input, pointerId, key, held } = current
+    // A release still to come, after Escape or focus leaving, waits for it.
+    if (pointerId !== undefined && (held || canceled) && event.type !== "pointercancel") {
+      const released = event.type === "pointerup"
+      swallowNextClick(doc, !released, released ? undefined : pointerId)
+    }
+    if (key !== undefined && canceled && doc.activeElement === el) swallowKeyUp(key)
     options.onEnd?.({ event, input, held, canceled })
-    if (input === "keyboard" && !held && !canceled) el.click()
+    if (key !== undefined && !held && !canceled) el.click()
   }
 
-  // Escape cancels a press without reaching a popup or dialog around it.
-  const onEscape = (event: KeyboardEvent) => {
-    if (event.key !== "Escape") return
-    event.preventDefault()
-    event.stopPropagation()
-    end(event, true)
+  // A button clicks on Space's keyup, so a canceled press keeps that one.
+  function swallowKeyUp(key: string) {
+    const listeners = [
+      on(el, "keyup", (up) => {
+        if (up.key !== key) return
+        up.preventDefault()
+        listeners.forEach((remove) => remove())
+      }),
+      on(el, "blur", () => listeners.forEach((remove) => remove())),
+    ]
   }
+
+  // Escape cancels a press without reaching a popup or dialog around it, and
+  // so does focus leaving the element or the window.
+  const cancels = () => [
+    on(
+      doc,
+      "keydown",
+      (event) => {
+        if (event.key !== "Escape") return
+        event.preventDefault()
+        event.stopPropagation()
+        end(event, true)
+      },
+      { capture: true },
+    ),
+    on(el, "blur", (blur) => end(blur, true)),
+    on(view, "blur", (blur) => end(blur, true)),
+  ]
 
   const onPointerDown = (event: PointerEvent) => {
     // A mouse is always primary; a second finger or pen joins no press.
@@ -165,7 +203,7 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
     if (event.button !== 0 || secondary || event.defaultPrevented) return
     const input = (event.pointerType || "mouse") as HoldInput
     const ours = (move: PointerEvent) => move.pointerId === event.pointerId
-    start({ event, input }, () => [
+    start({ event, input }, { pointerId: event.pointerId }, () => [
       on(doc, "pointermove", (move) => {
         if (!ours(move)) return
         // A mouse released outside a frame that missed the pointerup.
@@ -176,8 +214,7 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
       on(doc, "pointerup", (up) => ours(up) && end(up, false)),
       on(doc, "pointercancel", (cancel) => ours(cancel) && end(cancel, true)),
       on(doc, "contextmenu", (menu) => input !== "mouse" && menu.preventDefault()),
-      on(doc, "keydown", onEscape, { capture: true }),
-      on(view, "blur", (blur) => end(blur, true)),
+      ...cancels(),
     ])
   }
 
@@ -185,15 +222,14 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
     if (event.target !== el || !keys.includes(event.key)) return
     // The keyboard's own repeats would click a button again and again.
     if (press?.input === "keyboard") return event.preventDefault()
-    if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) return
-    const started = start({ event, input: "keyboard" }, () => [
+    if (event.repeat || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
+    const started = start({ event, input: "keyboard" }, { key: event.key }, () => [
       on(el, "keyup", (up) => {
         if (up.key !== event.key) return
         up.preventDefault()
         end(up, false)
       }),
-      on(el, "blur", (blur) => end(blur, true)),
-      on(doc, "keydown", onEscape, { capture: true }),
+      ...cancels(),
     ])
     if (started) event.preventDefault()
   }
