@@ -98,9 +98,13 @@ function bindLabel(el: HTMLElement) {
       unname?.()
       control = next
       unname = control && nameControl(control, el)
-      changes.disconnect()
-      changes.observe(el, naming)
-      if (control) changes.observe(control, naming)
+      // The last control stays watched until another takes its place, so it's
+      // named again once its id or role comes back.
+      if (control) {
+        changes.disconnect()
+        changes.observe(el, naming)
+        changes.observe(control, naming)
+      }
     }
     // A native label that wraps a labelable control never needs to look for it.
     const looks = el.hasAttribute("for") || !(el instanceof HTMLLabelElement) || !el.control

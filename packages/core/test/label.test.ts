@@ -39,3 +39,23 @@ test("a label stops naming a control its author names, or that stops being the o
   expect(group.hasAttribute("aria-labelledby")).toBe(false)
   unbind()
 })
+
+test("a label names its control again once the control's id or role comes back", async () => {
+  document.body.innerHTML = `<span id="plan" for="plans">Plan</span><div id="plans" role="radiogroup"></div>`
+  const group = document.querySelector<HTMLElement>("[role=radiogroup]")!
+  const unbind = bind(label({ id: "plan" }).part("root"), document.getElementById("plan")!)
+  const settle = () => new Promise((resolve) => setTimeout(resolve))
+  await settle()
+  group.id = "other"
+  await settle()
+  group.id = "plans"
+  await settle()
+  expect(group.getAttribute("aria-labelledby")).toBe("plan")
+  group.removeAttribute("role")
+  await settle()
+  expect(group.hasAttribute("aria-labelledby")).toBe(false)
+  group.setAttribute("role", "radiogroup")
+  await settle()
+  expect(group.getAttribute("aria-labelledby")).toBe("plan")
+  unbind()
+})
