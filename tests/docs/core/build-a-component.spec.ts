@@ -14,7 +14,7 @@ async function paintAt(page: Page, x: number, y: number) {
 
 test("Build a component's examples render without errors", async ({ page }) => {
   const { errors } = await openExamples(page, "/docs/core/build-a-component")
-  await expect(page.locator("[data-example]")).toHaveCount(2)
+  await expect(page.locator("[data-example]")).toHaveCount(1)
   expect(errors).toEqual([])
 })
 
@@ -31,7 +31,7 @@ test("Mute toggles its pressed state with a click, Enter and Space", async ({ pa
 })
 
 test("highlighted lines span the code block's full scrollable width", async ({ page }) => {
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/core/kernel/handle-changes")
   const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
   await pre.scrollIntoViewIfNeeded()
   const { clientWidth, scrollWidth, bands } = await pre.evaluate((el) => ({
@@ -45,7 +45,7 @@ test("highlighted lines span the code block's full scrollable width", async ({ p
 })
 
 test("line numbers stay pinned while the code scrolls", async ({ page }) => {
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/core/kernel/handle-changes")
   const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
   await pre.scrollIntoViewIfNeeded()
   const hits = await pre.evaluate((el) => {
@@ -61,7 +61,7 @@ test("line numbers stay pinned while the code scrolls", async ({ page }) => {
 })
 
 test("a highlighted gutter matches its band, and the block keeps its end padding", async ({ page }) => {
-  await page.goto("/docs/core/build-a-component")
+  await page.goto("/docs/core/kernel/handle-changes")
   const pre = page.locator("pre").filter({ hasText: 'onMutedChange: "callback"' }).first()
   await pre.scrollIntoViewIfNeeded()
   for (const theme of ["light", "dark"] as const) {

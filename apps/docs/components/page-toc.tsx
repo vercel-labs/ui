@@ -3,7 +3,7 @@
 import { cn } from "cn"
 import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-core/toc"
 import { ArrowUpRight, CircleArrowUp } from "lucide-react"
-import { BetaCard } from "./beta-banner"
+import { BetaCard } from "./beta-card"
 
 function PageToc({ toc, url }: { toc: TableOfContents; url: string }) {
   const items = toc.filter((item) => item.depth <= 3)
@@ -11,7 +11,7 @@ function PageToc({ toc, url }: { toc: TableOfContents; url: string }) {
   return (
     <nav
       aria-label="On this page"
-      className="sticky p-1 -m-1 top-[calc(var(--banner-height)+3.5rem)] ms-auto hidden max-h-[calc(100dvh-4rem-var(--banner-height))] w-64 shrink-0 overflow-y-auto overscroll-contain pt-10 pb-8 scrollbar-none xl:block"
+      className="sticky p-1 -m-1 top-14 ms-auto hidden max-h-[calc(100dvh-4rem)] w-64 shrink-0 overflow-y-auto overscroll-contain pt-10 pb-8 scrollbar-none xl:block"
     >
       {items.length > 1 && (
         <AnchorProvider toc={items} single>

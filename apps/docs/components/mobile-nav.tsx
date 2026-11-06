@@ -10,7 +10,7 @@ import { ArrowUpRightIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
-import { BetaCard } from "./beta-banner"
+import { BetaCard } from "./beta-card"
 import { GitHubLink } from "./github-link"
 import { FrameworkCheck } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
@@ -37,7 +37,7 @@ function MobileNav({
   return (
     <header
       data-mobile-header
-      className="container sticky top-(--banner-height) z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
+      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
       <a
         href="https://vercel.com"

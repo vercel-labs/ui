@@ -75,9 +75,10 @@ function CodeBlockTab({ value, children }: { value: string; children: React.Reac
 }
 
 // Two code blocks for the same styles: plain CSS first, then Tailwind classes.
+// The Tailwind tab can hold one block per framework, each in a FrameworkContent.
 function StyleTabs({ children }: { children: React.ReactNode }) {
   const { value } = usePreference(styling)
-  const [css, tailwind] = React.Children.toArray(children)
+  const [css, ...tailwind] = React.Children.toArray(children)
   return (
     <Frame className="my-5 overflow-hidden">
       <Tabs

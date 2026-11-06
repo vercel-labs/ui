@@ -8,7 +8,9 @@ const pages = [
   ["/core/build-a-component", "Build a Component"],
   ["/core/compose-behaviors", "Compose Behaviors"],
   ["/core/kernel/define-a-primitive", "Define a Primitive"],
-  ["/core/kernel/state-and-changes", "State and Changes"],
+  ["/core/kernel/render-a-primitive", "Render a Primitive"],
+  ["/core/kernel/style-a-component", "Style a Component"],
+  ["/core/kernel/handle-changes", "Handle Changes"],
   ["/core/platform", "Platform"],
   ["/core/storage", "Storage"],
   ["/core/reference", "Reference"],
@@ -121,9 +123,9 @@ test("pages that moved in the foundation docs redirect", async ({ page }) => {
   await page.goto("/docs/core/primitives")
   await expect(page).toHaveURL(/\/docs\/core\/kernel\/define-a-primitive$/)
   await page.goto("/docs/core/behaviors/state-and-events")
-  await expect(page).toHaveURL(/\/docs\/core\/kernel\/state-and-changes$/)
-  await page.goto("/docs/core/kernel/state-and-events")
-  await expect(page).toHaveURL(/\/docs\/core\/kernel\/state-and-changes$/)
+  await expect(page).toHaveURL(/\/docs\/core\/kernel\/handle-changes$/)
+  await page.goto("/docs/core/kernel/state-and-changes")
+  await expect(page).toHaveURL(/\/docs\/core\/kernel\/handle-changes$/)
   await page.goto("/docs/vue/primitives")
   await expect(page).toHaveURL(/\/docs\/vue\/rendering$/)
 })
@@ -183,7 +185,7 @@ test("the reference points to focused guides", async ({ page }) => {
   await page.goto("/docs/core/reference")
   for (const [name, href] of [
     ["Define a Primitive", "/docs/core/kernel/define-a-primitive"],
-    ["State and Changes", "/docs/core/kernel/state-and-changes"],
+    ["Handle Changes", "/docs/core/kernel/handle-changes"],
     ["Focus and Keys", "/docs/core/behaviors/focus#roving-focus"],
     ["Selection", "/docs/core/behaviors/selection"],
     ["Popups and Layers", "/docs/core/behaviors/popups"],

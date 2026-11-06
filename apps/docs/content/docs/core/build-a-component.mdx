@@ -21,11 +21,11 @@ Start by installing `@ui-sdk/core`.
 npm add @ui-sdk/core
 ```
 
-## Define the Button
+## Define a Primitive
 
-The button has one piece of state: `muted`, which is `true` when mute is on.
+A **primitive** describes a component's behavior: its state, the functions that change it, and the parts that use it. It doesn't render anything on its own.
 
-A **primitive** keeps that state, the functions that change it, and the parts that use it together. Ours has just one part: the button.
+Ours is the mute button's. It has one piece of state, `muted`, which is `true` when mute is on, and one part.
 
 ```ts title="lib/mute-button.ts"
 import { definePrimitive } from "@ui-sdk/core"
@@ -49,11 +49,11 @@ export { muteButton }
 
 - `state` starts `muted` at `false`.
 - `api` defines `toggle`, which switches `muted` between `true` and `false`.
-- `slots` describes the component's parts. Our only **slot** is `root`, the button.
-- `attrs` turns state into HTML attributes. When `muted` is `true`, the button gets `aria-pressed="true"`.
-- `press` calls `toggle` when the button is activated.
+- `slots` describes the component's parts. Our only **slot** is `root`, which becomes the button when we render it.
+- `attrs` turns state into HTML attributes. When `muted` is `true`, the root gets `aria-pressed="true"`.
+- `press` calls `toggle` when the root is activated.
 
-That's the whole behavior. Now let's put it on the page.
+That's the whole behavior. [Define a Primitive](./kernel/define-a-primitive) goes through each field in more detail. Now let's put it on the page.
 
 ## Render It
 
@@ -110,7 +110,7 @@ const { Root: MuteButton } = createParts(muteButton, { root: "button" })
 export { MuteButton }
 ```
 
-Then import it wherever you want to use it:
+`{ root: "button" }` says the root part of `MuteButton` renders a `<button>`. Then import it wherever you want to use it:
 
 ```tsx title="pages/index.tsx"
 import { MuteButton } from "@/components/ui/mute-button"
@@ -132,7 +132,7 @@ const { Root: MuteButton } = createParts(muteButton, { root: "button" })
 export { MuteButton }
 ```
 
-Then import it wherever you want to use it:
+`{ root: "button" }` says the root part of `MuteButton` renders a `<button>`. Then import it wherever you want to use it:
 
 ```vue title="pages/index.vue"
 <script setup lang="ts">
@@ -156,7 +156,7 @@ const { Root: MuteButton } = createParts(muteButton, { root: "button" })
 export { MuteButton }
 ```
 
-Then import it wherever you want to use it:
+`{ root: "button" }` says the root part of `MuteButton` renders a `<button>`. Then import it wherever you want to use it:
 
 ```svelte title="pages/index.svelte"
 <script lang="ts">
@@ -178,7 +178,7 @@ const { Root: MuteButton } = createParts(muteButton, { root: "button" })
 export { MuteButton }
 ```
 
-Then import it wherever you want to use it:
+`{ root: "button" }` says the root part of `MuteButton` renders a `<button>`. Then import it wherever you want to use it:
 
 ```tsx title="pages/index.tsx"
 import { MuteButton } from "@/components/ui/mute-button"
@@ -204,7 +204,7 @@ createParts(muteButton, {
 })
 ```
 
-Import `@/components/ui/mute-button` from your app's browser entry point, then use it in your HTML. The primitive connects to the native button inside:
+This registers a `<mute-button>` element for the root part, and `wrappedButton` puts the root's behavior and attributes on the `<button>` inside it. Import `@/components/ui/mute-button` from your app's browser entry point, then use it in your HTML:
 
 ```html title="pages/index.html"
 <mute-button>
@@ -216,41 +216,69 @@ Import `@/components/ui/mute-button` from your app's browser entry point, then u
 
 Because we use a native `<button>`, clicks, Enter and Space all reach the primitive's `press` handler. Screen readers get its pressed state from `aria-pressed`.
 
-The behavior stays in `mute-button.ts`. Changing frameworks changes how you render it, but the behavior stays the same.
+The behavior stays in `mute-button.ts`. Changing frameworks changes how you render it, but the behavior stays the same. [Render a Primitive](./kernel/render-a-primitive) covers options, state in your content and server rendering.
 
-## Style the Pressed State
+## Style the Component
 
-The button exposes `aria-pressed`, so your styles can follow its state. You can use Tailwind or CSS.
+Parts render without styles. Here's a complete look for the button, with hover, focus and pressed states:
 
-### Tailwind CSS
+<StyleTabs>
 
-Use the `aria-pressed:` variant to style the button when mute is on:
+```css
+[data-slot="mute-button-root"] {
+  border: 1px solid #e5e5e5;
+  border-radius: 0.5rem;
+  background: white;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #a3a3a3;
+    outline-offset: 2px;
+  }
+
+  &[aria-pressed="true"] {
+    background: #171717;
+    color: white;
+  }
+}
+```
 
 <FrameworkContent value="react">
 
 ```tsx
-<MuteButton className="aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</MuteButton>
+<MuteButton className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white">
+  Mute
+</MuteButton>
 ```
 
 </FrameworkContent>
 <FrameworkContent value="vue">
 
 ```vue
-<MuteButton class="aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</MuteButton>
+<MuteButton
+  class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+>Mute</MuteButton>
 ```
 
 </FrameworkContent>
 <FrameworkContent value="svelte">
 
 ```svelte
-<MuteButton class="aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</MuteButton>
+<MuteButton class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</MuteButton>
 ```
 
 </FrameworkContent>
 <FrameworkContent value="solid">
 
 ```tsx
-<MuteButton class="aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</MuteButton>
+<MuteButton class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white">
+  Mute
+</MuteButton>
 ```
 
 </FrameworkContent>
@@ -258,253 +286,65 @@ Use the `aria-pressed:` variant to style the button when mute is on:
 
 ```html
 <mute-button>
-  <button class="aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</button>
-</mute-button>
-```
-
-</FrameworkContent>
-
-### CSS
-
-You can target the same attribute in a stylesheet:
-
-```css
-[data-slot="mute-button-root"][aria-pressed="true"] {
-  background: #171717;
-  color: white;
-}
-```
-
-`data-slot` identifies the part. `aria-pressed` says whether it's on. These attributes are the same in every framework, so this CSS works for all five versions.
-
-## Control the State
-
-So far, the button manages its own state. Let's control it from a parent component and use that state to change its icon and label.
-
-We'll use another helper from `@ui-sdk/core`: `createChange`. Update `lib/mute-button.ts` with the highlighted changes:
-
-```ts title="lib/mute-button.ts" {1,5-19,22-23}
-import { createChange, definePrimitive } from "@ui-sdk/core"
-
-const muteButton = definePrimitive({
-  name: "mute-button",
-  options: { muted: "boolean", onMutedChange: "callback" },
-  controlled: ["muted"],
-  state: (options: { muted?: boolean; onMutedChange?: (muted: boolean) => void }) => ({
-    muted: options.muted ?? false,
-  }),
-  sync: (options) => (options.muted === undefined ? {} : { muted: options.muted }),
-  api: (context) => {
-    const change = createChange(context)
-
-    return {
-      toggle: (event?: Event) => {
-        change("muted", !context.store.get().muted, { reason: "press", event })
-      },
-    }
-  },
-  slots: (slot) => ({
-    root: slot({
-      attrs: () => ({ type: "button" }),
-      press: ({ api }, event) => api.toggle(event),
-    }),
-  }),
-})
-
-export { muteButton }
-```
-
-- `options` adds the value and callback. `controlled` marks `muted` as a state value that can be controlled.
-- `state` sets the initial value. `sync` keeps it up to date when a new `muted` value comes in.
-- `createChange` calls `onMutedChange` with the next value and waits for it to come back through `muted`. If you leave out `muted`, it updates the button's own state.
-
-The label now describes the next action, so this version doesn't need `aria-pressed`.
-
-### Connect the State
-
-Now use `muted` for the button, its icon and its label:
-
-<FrameworkContent value="react">
-
-```tsx title="pages/index.tsx"
-"use client"
-
-import * as React from "react"
-import { Volume2Icon, VolumeXIcon } from "lucide-react"
-import { MuteButton } from "@/components/ui/mute-button"
-
-function Example() {
-  const [muted, setMuted] = React.useState(false)
-
-  return (
-    <MuteButton muted={muted} onMutedChange={setMuted}>
-      {muted ? <VolumeXIcon aria-hidden="true" /> : <Volume2Icon aria-hidden="true" />}
-      {muted ? "Unmute" : "Mute"}
-    </MuteButton>
-  )
-}
-
-export { Example }
-```
-
-</FrameworkContent>
-<FrameworkContent value="vue">
-
-```vue title="pages/index.vue"
-<script setup lang="ts">
-import { ref } from "vue"
-import { MuteButton } from "@/components/ui/mute-button"
-
-const muted = ref(false)
-</script>
-
-<template>
-  <MuteButton v-model:muted="muted">
-    <svg
-      aria-hidden="true"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="m11 5-6 4H2v6h3l6 4z" />
-      <path :d="muted ? 'm16 9 6 6m0-6-6 6' : 'M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12'" />
-    </svg>
-    {{ muted ? "Unmute" : "Mute" }}
-  </MuteButton>
-</template>
-```
-
-`v-model:muted` passes the value and listens for updates.
-
-</FrameworkContent>
-<FrameworkContent value="svelte">
-
-```svelte title="pages/index.svelte"
-<script lang="ts">
-  import { MuteButton } from "@/components/ui/mute-button"
-
-  let muted = $state(false)
-</script>
-
-<MuteButton bind:muted>
-  <svg
-    aria-hidden="true"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+  <button
+    class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white"
   >
-    <path d="m11 5-6 4H2v6h3l6 4z" />
-    <path d={muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"} />
-  </svg>
-  {muted ? "Unmute" : "Mute"}
-</MuteButton>
-```
-
-`bind:muted` keeps the button and the parent component's state in sync.
-
-</FrameworkContent>
-<FrameworkContent value="solid">
-
-```tsx title="pages/index.tsx"
-import { createSignal } from "solid-js"
-import { MuteButton } from "@/components/ui/mute-button"
-
-function Example() {
-  const [muted, setMuted] = createSignal(false)
-
-  return (
-    <MuteButton muted={muted()} onMutedChange={setMuted}>
-      <svg
-        aria-hidden="true"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="m11 5-6 4H2v6h3l6 4z" />
-        <path d={muted() ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"} />
-      </svg>
-      {muted() ? "Unmute" : "Mute"}
-    </MuteButton>
-  )
-}
-
-export { Example }
-```
-
-</FrameworkContent>
-<FrameworkContent value="web-components">
-
-Pass the initial value through the `muted` attribute:
-
-```html title="pages/index.html"
-<mute-button muted="false">
-  <button>
-    <svg
-      aria-hidden="true"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="m11 5-6 4H2v6h3l6 4z" />
-      <path data-volume d="M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
-    </svg>
-    <span data-label>Mute</span>
+    Mute
   </button>
 </mute-button>
 ```
 
-Then listen for `mutedchange` from your browser entry point, after the button's markup is on the page:
-
-```ts title="main.ts"
-import "@/components/ui/mute-button"
-
-let muted = false
-const button = document.querySelector("mute-button")
-const icon = button?.querySelector("[data-volume]")
-const label = button?.querySelector("[data-label]")
-
-if (button && icon && label) {
-  button.addEventListener("mutedchange", (event) => {
-    muted = (event as CustomEvent<{ value: boolean }>).detail.value
-    button.setAttribute("muted", String(muted))
-    icon.setAttribute("d", muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12")
-    label.textContent = muted ? "Unmute" : "Mute"
-  })
-}
-```
-
-The adapter reads `muted="false"` as the boolean `false`. Each event updates the value, icon and label together.
-
 </FrameworkContent>
 
-<ComponentExample
-  name="core/mute-button-controlled"
-  hideCode={true}
-  caption="Click to switch between Mute and Unmute. The parent component controls the value, icon and label."
-/>
+</StyleTabs>
 
-Pressing **Mute** updates `muted` in the parent component. The button receives the new value, and the icon and label update with it.
+The pressed look comes from `aria-pressed`. While `muted` is `true`, the root part renders `aria-pressed="true"`, from the `attrs` you wrote when you defined the primitive. In the CSS tab, the `&[aria-pressed="true"]` rule selects it. In the Tailwind tab, the `aria-pressed:` classes do the same.
 
-## Build on It
+`data-slot` identifies the part, and these attributes are the same in every framework, so this CSS works for all five versions. [Style a Component](./kernel/style-a-component) covers more state attributes, CSS variables and parts that come and go.
 
-You've defined a primitive, rendered it, styled it, and connected it to component state. Next, [Compose Behaviors](./compose-behaviors) combines several parts with focus and keyboard navigation to build a star rating.
+## Next
+
+You've defined a primitive, rendered it and styled it. The Core guides take each step further:
+
+<Cards>
+  <Card
+    title="Define a Primitive"
+    href="./kernel/define-a-primitive"
+    description="Give your primitive options, expose state to its parts, and work with elements."
+  />
+  <Card
+    title="Render a Primitive"
+    href="./kernel/render-a-primitive"
+    description="Turn a primitive's slots into parts in your framework, pass options, and read state."
+  />
+  <Card
+    title="Style a Component"
+    href="./kernel/style-a-component"
+    description="Style each part from its data-slot and the attributes its state sets, with CSS or Tailwind."
+  />
+  <Card
+    title="Compose Behaviors"
+    href="./compose-behaviors"
+    description="Build a star rating with shared state and keyboard navigation."
+  />
+  <Card
+    title="Handle Changes"
+    href="./kernel/handle-changes"
+    description="Report changes, let the app accept or cancel them, and choose how state updates reach the page."
+  />
+</Cards>
+
+Or start from what's already built:
+
+<Cards>
+  <Card
+    title="Components"
+    href="/docs/components"
+    description="Use ready-made components like Select, Dialog and Tabs in your framework."
+  />
+  <Card
+    title="All Behaviors"
+    href="./behaviors"
+    description="Focus, selection, popups and the other pieces your components are made of."
+  />
+</Cards>

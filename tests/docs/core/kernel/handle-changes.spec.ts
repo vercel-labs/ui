@@ -2,11 +2,11 @@ import { expect } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openExamples } from "../behaviors/helpers"
 
-const url = "/docs/core/kernel/state-and-changes"
+const url = "/docs/core/kernel/handle-changes"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
-  await expect(page.locator("[data-example]")).toHaveCount(12)
+  await expect(page.locator("[data-example]")).toHaveCount(13)
   expect(errors).toEqual([])
 })
 
@@ -58,7 +58,7 @@ test("changes: the first press arms the button, the second confirms", async ({ p
   await expect(button).toHaveAttribute("data-armed", "")
   await button.click()
   await expect(button).toHaveText("Delete")
-  await expect(page.locator("[data-deleted]")).toHaveText("Deleted 1 time")
+  await expect(page.getByRole("group", { name: "Console" }).filter({ hasText: "Deleted" })).toHaveCount(1)
 })
 
 test("what a change reports: the reason, the source, and a cancel", async ({ page }) => {

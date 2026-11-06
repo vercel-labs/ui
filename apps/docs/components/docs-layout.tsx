@@ -9,21 +9,26 @@ import type { Node, Root } from "fumadocs-core/page-tree"
 import { notFound } from "next/navigation"
 import type { ReactNode } from "react"
 
-// Core's sidebar opens with an overview of the whole site, Get Started and the
-// changelog, then Core's own pages under its name.
+// Core's sidebar opens with an overview of the whole site: Get Started, Core's
+// introduction, the tutorial and the changelog. Core's guides follow under its name.
+const overview = ["/docs/core", "/docs/core/build-a-component", "/docs/core/changelog"]
+
 function withGetStarted(tree: Root): Root {
   const page = source.getPage(getStarted.slugs)
   if (!page) return tree
-  const changelog = (node: Node) => node.type === "page" && node.url === "/docs/core/changelog"
+  const inOverview = (node: Node) => node.type === "page" && overview.includes(node.url)
+  const pages = overview.flatMap((url) =>
+    tree.children.filter((node) => node.type === "page" && node.url === url),
+  )
   return {
     ...tree,
     name: "",
     children: [
       { type: "separator", name: "Overview" },
       { type: "page", name: page.data.title, url: getStarted.url },
-      ...tree.children.filter(changelog),
+      ...pages,
       { type: "separator", name: tree.name },
-      ...tree.children.filter((node) => !changelog(node)),
+      ...tree.children.filter((node) => !inOverview(node)),
     ],
   }
 }
@@ -47,7 +52,7 @@ function DocsLayout({ section, children }: { section: Section; children: ReactNo
     <div className="container flex flex-1 max-lg:px-0">
       {/* Size containment keeps the sidebar from making a short page taller than the window. */}
       <aside className="hidden w-64 shrink-0 contain-size lg:block">
-        <div className="sticky top-[calc(var(--banner-height)+4rem)] h-full max-h-[calc(100dvh-4rem-var(--banner-height))]">
+        <div className="sticky top-16 h-full max-h-[calc(100dvh-4rem)]">
           <Sidebar tree={tree} tocs={tocs} />
         </div>
       </aside>

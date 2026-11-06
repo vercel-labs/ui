@@ -111,7 +111,7 @@ async function typeRows({
   events?: boolean
   /**
    * Each field's example, by the text of the heading above it, like `{ loop: "Disabled items and wrapping" }`.
-   * A heading on another page follows its path: `"../kernel/state-and-changes#Controlled state"`.
+   * A heading on another page follows its path: `"../kernel/handle-changes#Controlled state"`.
    */
   examples?: Record<string, string>
 }) {

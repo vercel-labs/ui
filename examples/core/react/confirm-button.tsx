@@ -1,6 +1,6 @@
-import * as React from "react"
 import { createChange, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type ConfirmButtonOptions = {
   onConfirm?: () => void
@@ -45,16 +45,11 @@ const parts = createParts(confirmButton, { root: "button" })
 const ConfirmButton = parts.Root
 
 function Example() {
-  const [deleted, setDeleted] = React.useState(0)
+  const log = useLog()
   return (
-    <div data-slot="row">
-      <ConfirmButton onConfirm={() => setDeleted((count) => count + 1)}>
-        {({ armed }) => (armed ? "Press again to delete" : "Delete")}
-      </ConfirmButton>
-      <span data-deleted data-slot="hint">
-        Deleted {deleted} {deleted === 1 ? "time" : "times"}
-      </span>
-    </div>
+    <ConfirmButton onConfirm={() => log("Deleted")}>
+      {({ armed }) => (armed ? "Press again to delete" : "Delete")}
+    </ConfirmButton>
   )
 }
 

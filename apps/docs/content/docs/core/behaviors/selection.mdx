@@ -22,7 +22,7 @@ const selection = createSelection(context, {
 })
 ```
 
-Start `value` at `[]` and return `selection` from `api`. The `set` callback uses the same [change pattern](../kernel/state-and-changes#changes) as the guides.
+Start `value` at `[]` and return `selection` from `api`. The `set` callback uses the same [change pattern](../kernel/handle-changes#changes) as the guides.
 
 The behavior gives you methods to call from your event handlers. For example, a pointer press can choose one item:
 
@@ -131,7 +131,7 @@ This doesn't pin an item in the selection: `choose` and a range with `additive: 
 
 ### Draw a Rectangle
 
-`createLasso` selects items touched by a rectangle. Start with `selected: string[]` and `lasso: LassoDraft | null` in state, with `lasso` set to `null`. Add `lasso` to the primitive's `live` fields, as covered in [Live State](../kernel/state-and-changes#live-state).
+`createLasso` selects items touched by a rectangle. Start with `selected: string[]` and `lasso: LassoDraft | null` in state, with `lasso` set to `null`. Add `lasso` to the primitive's `live` fields, as covered in [Live State](../kernel/handle-changes#live-state).
 
 Create the behavior in `api` and return it as `lasso`:
 

@@ -81,16 +81,17 @@ test("Get Started is the docs home, in Core's sidebar under Overview", async ({ 
   expect(markdown).not.toContain("<include>")
 })
 
-test("the framework dropdowns stay in step and remember the choice", async ({ page }) => {
-  await page.goto("/docs/core")
-  const picker = page.getByRole("combobox", { name: "Framework", exact: true }).first()
+test("the setup prompt's framework dropdown remembers the choice", async ({ page }) => {
+  await page.goto("/docs")
+  const picker = page.getByRole("combobox", { name: "Framework", exact: true })
   await expect(picker).toContainText("React")
   await picker.click()
   await page.getByRole("option", { name: "Svelte", exact: true }).click()
   await expect(picker).toContainText("Svelte")
+  await expect(page.getByRole("main")).toContainText("Set up ui-sdk in this Svelte project")
   await expect(page.locator("html")).toHaveAttribute("data-framework", "svelte")
-  await page.goto("/docs")
-  await expect(page.getByRole("combobox", { name: "Framework", exact: true }).first()).toContainText("Svelte")
+  await page.reload()
+  await expect(picker).toContainText("Svelte")
 })
 
 test("the header's Frameworks menu opens the same page in another framework", async ({ page }) => {
@@ -176,19 +177,16 @@ test("a framework's guides and components share one sidebar", async ({ page }) =
   await expect(page).toHaveURL(/\/docs\/vue$/)
 })
 
-test("docs pages show the beta notice beside the page, and the homepage keeps the banner", async ({
-  page,
-}) => {
+test("the beta notice sits beside the docs, with no banner anywhere", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1600 })
   await page.goto("/docs/core/changelog")
-  await expect(page.getByRole("complementary", { name: "Beta notice" })).toHaveCount(0)
   await expect(
     page.getByRole("navigation", { name: "On this page" }).getByText(/UI SDK is in beta/),
   ).toBeVisible()
   // The sidebar doesn't stretch a short page past the window.
   expect(await page.evaluate(() => document.scrollingElement!.scrollHeight)).toBe(1600)
   await page.goto("/")
-  await expect(page.getByRole("complementary", { name: "Beta notice" })).toBeVisible()
+  await expect(page.getByText(/UI SDK is in beta/)).toHaveCount(0)
 })
 
 test("install commands keep the reader's package manager after a reload", async ({ page }) => {

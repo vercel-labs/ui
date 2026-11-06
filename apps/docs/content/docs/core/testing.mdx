@@ -34,7 +34,7 @@ It requires Home and End for listboxes, tabs, and toolbars, a name for every tab
 
 Use `mount` when you want to test the primitive itself. Pass its definition, options, and a little markup. Tags that match slots become parts; their attributes supply the part props.
 
-This test uses the [confirm button](./kernel/state-and-changes#changes). The first press arms it. The next confirms and disarms it:
+This test uses the [confirm button](./kernel/handle-changes#changes). The first press arms it. The next confirms and disarms it:
 
 ```ts
 import { expect, test } from "vitest"

@@ -5,17 +5,41 @@ import type * as PageTree from "fumadocs-core/page-tree"
 import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-core/toc"
 import Link from "next/link"
 import * as React from "react"
-import { BetaCard } from "./beta-banner"
+import { BetaCard } from "./beta-card"
 import { useCurrentUrl } from "./section-nav"
+
+// A long sidebar opens at its top, so this brings the page's link into view when it's out of sight.
+// It runs as an inline script too, so it uses nothing from outside its own body.
+function revealCurrent(list: Element) {
+  const link = list.querySelector('[aria-current="page"]')
+  if (!link) return
+  const box = list.getBoundingClientRect()
+  const item = link.getBoundingClientRect()
+  if (item.top >= box.top && item.bottom <= box.bottom) return
+  list.scrollTop += item.top - box.top - (box.height - item.height) / 2
+}
 
 function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, TableOfContents> }) {
   const current = useCurrentUrl(tree)
+  const scroller = React.useRef<HTMLDivElement>(null)
+
+  React.useLayoutEffect(() => {
+    if (scroller.current) revealCurrent(scroller.current)
+  }, [current])
+
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-10 pe-4 pb-8 scrollbar-none">
+      <div
+        ref={scroller}
+        className="min-h-0 flex-1 p-1 -m-1 overflow-y-auto overscroll-contain pt-10 pe-4 pb-8 scrollbar-none"
+      >
         <nav aria-label="Docs">
           <Nodes nodes={tree.children} tocs={tocs} current={current} />
         </nav>
+        {/* Runs as the HTML arrives, so the list is already in place when the page first paints. */}
+        <script
+          dangerouslySetInnerHTML={{ __html: `(${revealCurrent})(document.currentScript.parentElement)` }}
+        />
         {/* The page's own column shows it from xl, beside the contents. */}
         <BetaCard className="mt-8 xl:hidden" />
       </div>

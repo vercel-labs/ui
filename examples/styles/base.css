@@ -981,7 +981,14 @@
       text-underline-offset: 3px;
     }
 
-    &:hover:not(:disabled, [data-disabled], [aria-disabled="true"], [aria-pressed="true"], [data-copied]) {
+    &:hover:not(
+        :disabled,
+        [data-disabled],
+        [aria-disabled="true"],
+        [aria-pressed="true"],
+        [data-copied],
+        [data-armed]
+      ) {
       background: var(--tint);
 
       &[data-variant="solid"] {

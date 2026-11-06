@@ -1,5 +1,6 @@
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
+import { frameworkPages } from "@/lib/sections"
 import type { MDXComponents } from "mdx/types"
 import Link from "next/link"
 import type { ComponentProps, ReactNode } from "react"
@@ -27,11 +28,7 @@ import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tabl
 function heading(Tag: "h2" | "h3" | "h4", className: string) {
   return function Heading({ id, children, className: _, ...props }: ComponentProps<"h2">) {
     return (
-      <Tag
-        id={id}
-        className={cn("group scroll-mt-[calc(var(--banner-height)+5rem)] text-foreground", className)}
-        {...props}
-      >
+      <Tag id={id} className={cn("group scroll-mt-20 text-foreground", className)} {...props}>
         {id ? (
           <a
             href={`#${id}`}
@@ -61,6 +58,9 @@ function InlineCode(props: ComponentProps<"code">) {
   )
 }
 
+// Links that name no framework, like /docs/rendering, go to the reader's.
+const frameworkHref = new RegExp(`^/docs/(${frameworkPages.join("|")})\\b`)
+
 // Every element MDX renders, styled here instead of with a prose plugin.
 // `framework` is the section's, for tables and examples that differ by
 // framework. Core and Agents pages have none.
@@ -82,8 +82,7 @@ function getMDXComponents(
       const url = resolve(href)
       const className =
         "font-normal text-foreground underline decoration-foreground/25 underline-offset-[3px] transition-colors hover:decoration-foreground"
-      if (/^\/docs\/(components|utilities|rendering|server-rendering)\b/.test(url))
-        return <FrameworkLink href={url} className={className} {...props} />
+      if (frameworkHref.test(url)) return <FrameworkLink href={url} className={className} {...props} />
       return url.startsWith("/") || url.startsWith("#") ? (
         <Link href={url} className={className} {...props} />
       ) : (

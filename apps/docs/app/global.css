@@ -60,12 +60,6 @@
 
 :root {
   color-scheme: light dark;
-  --banner-height: 0rem;
-}
-
-/* The sticky header and everything placed under it sit below the beta banner, where there is one. */
-:root:has([data-beta-banner]) {
-  --banner-height: 2.25rem;
 }
 
 [data-color-scheme="system"] {
