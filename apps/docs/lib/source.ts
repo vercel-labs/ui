@@ -11,7 +11,8 @@ import { textBlocks } from "./text-blocks"
 const docs = defineDocs({
   dir: "content/docs",
   docs: {
-    schema: pageSchema,
+    // A changelog post's date is a quoted string, like "2026-11-05", so YAML keeps it text.
+    schema: pageSchema.extend({ date: pageSchema.shape.title.optional() }),
     // The default GitHub themes' comments and strings miss 4.5:1 on our code frames.
     mdxOptions: applyMdxPreset({
       rehypeCodeOptions: {

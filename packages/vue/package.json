@@ -1,9 +1,33 @@
 {
   "name": "@ui-sdk/vue",
   "version": "0.0.0",
-  "private": true,
+  "description": "UI SDK for Vue and Nuxt.",
+  "keywords": [
+    "vue",
+    "nuxt",
+    "ui",
+    "ui-sdk",
+    "shadcn",
+    "behaviors",
+    "accessibility",
+    "a11y",
+    "aria",
+    "keyboard",
+    "focus",
+    "headless",
+    "unstyled",
+    "components",
+    "agents"
+  ],
   "type": "module",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "homepage": "https://ui-sdk.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vercel-labs/ui.git",
+    "directory": "packages/vue"
+  },
+  "bugs": "https://github.com/vercel-labs/ui/issues",
   "exports": {
     ".": "./src/index.ts",
     "./accordion": "./src/accordion.ts",
@@ -360,6 +384,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-package.mjs --nuxt",
+    "prepack": "cp ../../LICENSE LICENSE",
     "typecheck": "vue-tsc --noEmit && vue-tsc --noEmit -p test/types && vue-tsc --noEmit -p nuxt",
     "test": "vitest run"
   },

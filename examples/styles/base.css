@@ -853,6 +853,7 @@
     [data-slot="cart-trigger"],
     [data-slot="cart-close"],
     [data-slot="invite-trigger"],
+    [data-slot="icon-picker-trigger"],
     [data-slot="invite-close"],
     [data-slot="filters-trigger"],
     [data-slot="filters-close"],

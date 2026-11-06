@@ -13,7 +13,7 @@ import { ArrowUpRight, X } from "lucide-react"
 import type { ReactNode } from "react"
 import { frameworks, type Framework } from "@/lib/frameworks"
 
-const docs = "https://ui.labs.vercel.dev/docs"
+const docs = "https://ui-sdk.dev/docs"
 
 const docsSlug: Record<Framework, string> = {
   svelte: "svelte",

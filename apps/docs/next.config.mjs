@@ -79,6 +79,7 @@ const config = {
         permanent: false,
       })),
       { source: `/docs/:page(${pages})/:rest*`, destination: "/docs/react/:page/:rest*", permanent: false },
+      { source: "/docs/core/request-access", destination: "/docs/core", permanent: true },
       {
         source: "/docs/core/get-started",
         destination: "/docs/core/build-a-component",

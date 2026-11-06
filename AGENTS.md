@@ -23,8 +23,7 @@ Component libraries cover familiar patterns like menus, dialogs and tabs. Real p
 ## Read first
 
 1. [contributing/README.md](contributing/README.md): the repo, where things stand and how we work, with links to the architecture, the API guide, the code standard, the pitfalls and the docs site.
-2. [BACKLOG.md](BACKLOG.md): open work, bugs and ideas. Add what you find; delete what lands.
-3. [tests/README.md](tests/README.md): every kind of test and the exact command.
+2. [tests/README.md](tests/README.md): every kind of test and the exact command.
 
 ## Rules
 

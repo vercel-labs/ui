@@ -38,10 +38,10 @@ const version = `0.0.0-${stamp}.g${run("git", ["rev-parse", "--short=8", "HEAD"]
 const names = readdirSync(path.join(root, "packages"))
 
 execFileSync("pnpm", ["build"], { cwd: root, stdio: "inherit" })
-// A declaration that fails in a consumer's typecheck stops the release before anything uploads.
-execFileSync("pnpm", ["check:packages"], { cwd: root, stdio: "inherit" })
 // Every package ships the docs as Markdown, since the site isn't public.
 execFileSync("node", ["scripts/package-docs.mjs"], { cwd: root, stdio: "inherit" })
+// A declaration that fails in a consumer's typecheck stops the release before anything uploads.
+execFileSync("pnpm", ["check:packages"], { cwd: root, stdio: "inherit" })
 
 const work = mkdtempSync(path.join(tmpdir(), "ui-sdk-release-"))
 try {

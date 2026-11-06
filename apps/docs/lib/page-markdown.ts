@@ -168,7 +168,7 @@ async function pageMarkdown(
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
-      .replace(/<\/?FrameworkTabs>\n?/g, "")
+      .replace(/<\/?FrameworkTabs\b[^>]*>\n?/g, "")
       .replace(/<Framework(?:Content|Tab)\s+value="([^"]+)">/g, (_, value: string) => {
         const label = frameworks[value as Framework]?.label ?? value
         return `**${label}**\n`
@@ -191,6 +191,16 @@ async function pageMarkdown(
           .map(
             (page) =>
               `- [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
+          )
+          .join("\n"),
+      )
+      .replace(tag("ChangelogPosts"), () =>
+        docPages("core/changelog")
+          .filter((page) => page.slugs.length === 3 && page.date)
+          .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+          .map(
+            (page) =>
+              `- ${page.date}: [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
           )
           .join("\n"),
       )

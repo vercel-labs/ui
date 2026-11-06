@@ -8,6 +8,7 @@ import { CoreEntries, CoreExports } from "./core-reference"
 import { CssVariables, DataAttributes } from "./data-attributes"
 import { Pre } from "./code"
 import { Collapsible } from "./collapsible"
+import { ChangelogPosts } from "./changelog-posts"
 import { Card, ComponentGrid } from "./component-grid"
 import { Frame } from "./frame"
 import { FrameworkContent, FrameworkLink } from "./site-preferences"
@@ -160,6 +161,7 @@ function getMDXComponents(
       <Card {...props} href={resolve(props.href)} />
     ),
     ComponentGrid: () => <ComponentGrid framework={framework} />,
+    ChangelogPosts,
     ComponentExample: (props: {
       name: string
       caption?: string

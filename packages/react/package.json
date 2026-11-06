@@ -1,9 +1,32 @@
 {
   "name": "@ui-sdk/react",
   "version": "0.0.0",
-  "private": true,
+  "description": "UI SDK for React.",
+  "keywords": [
+    "react",
+    "ui",
+    "ui-sdk",
+    "shadcn",
+    "behaviors",
+    "accessibility",
+    "a11y",
+    "aria",
+    "keyboard",
+    "focus",
+    "headless",
+    "unstyled",
+    "components",
+    "agents"
+  ],
   "type": "module",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "homepage": "https://ui-sdk.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vercel-labs/ui.git",
+    "directory": "packages/react"
+  },
+  "bugs": "https://github.com/vercel-labs/ui/issues",
   "exports": {
     "./accordion": "./src/accordion.tsx",
     "./alert-dialog": "./src/alert-dialog.tsx",
@@ -348,6 +371,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-package.mjs --use-client --server primitive.ts --server render-element.ts",
+    "prepack": "cp ../../LICENSE LICENSE",
     "typecheck": "node ../../scripts/tsgo.mjs --noEmit && node ../../scripts/tsgo.mjs --noEmit -p tsconfig.test.json",
     "test": "vitest run"
   },

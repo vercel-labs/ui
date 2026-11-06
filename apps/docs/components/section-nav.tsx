@@ -4,7 +4,7 @@ import { isFramework } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
 import { useSavedFramework } from "@/lib/preferences"
 import type { Section } from "@/lib/sections"
-import type { Root } from "fumadocs-core/page-tree"
+import { flattenTree, type Root } from "fumadocs-core/page-tree"
 import { usePathname } from "next/navigation"
 
 function useMenuLink(section?: Section) {
@@ -33,4 +33,13 @@ function useActiveTree(tree?: Root, componentsTree?: Root) {
   return pathname === home || pathname.startsWith(`${home}/`) ? componentsTree : tree
 }
 
-export { useActiveTree, useMenuLink }
+// The sidebar link for the page being read. A page the sidebar doesn't list,
+// like a changelog post, gets the closest link above it.
+function useCurrentUrl(tree?: Root) {
+  const pathname = usePathname()
+  const urls = tree ? flattenTree(tree.children).map((page) => page.url) : []
+  if (urls.includes(pathname)) return pathname
+  return urls.filter((url) => pathname.startsWith(`${url}/`)).sort((a, b) => b.length - a.length)[0]
+}
+
+export { useActiveTree, useCurrentUrl, useMenuLink }
