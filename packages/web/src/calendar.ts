@@ -370,7 +370,7 @@ function matchMonths(calendar: HTMLElement) {
   const container = defaultContainers.get(calendar)
   if (!container) return
   const months = parseAttribute("number", calendar.getAttribute("months")) as number | undefined
-  const count = Math.max(1, Math.floor(months ?? 1) || 1)
+  const count = Number.isFinite(months) ? Math.max(1, Math.floor(months!)) : 1
   const grids = container.querySelectorAll(":scope > ui-calendar-grid")
   for (let offset = grids.length; offset < count; offset++)
     container.append(element("ui-calendar-grid", { offset: String(offset) }))

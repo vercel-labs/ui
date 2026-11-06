@@ -821,3 +821,8 @@ describe("calendar", () => {
     expect(heading()).toBe("March 2027")
   })
 })
+
+test("months that aren't a finite number show one month", () => {
+  for (const months of [Infinity, Number.NaN, -2])
+    expect((calendar({ id: "c", months }) as unknown as PrimitiveInstance).get()).toMatchObject({ months: 1 })
+})
