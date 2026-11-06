@@ -39,7 +39,7 @@ function Pre({
       {!title && prompt && (
         <div
           data-prompt-bar=""
-          className="flex items-center border-b border-border/60 p-frame ps-4 text-[13px] text-subtle"
+          className="flex items-center border-b border-border/60 p-frame ps-4 text-[14px] text-subtle sm:text-[13px]"
         >
           Prompt
           <CopyButton label="Copy prompt" className="ms-auto" />
@@ -50,7 +50,7 @@ function Pre({
         style={{ ...style, backgroundColor: undefined }}
         className={cn(
           className,
-          "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[13px] leading-[1.7] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]",
+          "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[14px] leading-[1.7] sm:text-[13px] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]",
         )}
       />
       {!title && !prompt && copy && (
