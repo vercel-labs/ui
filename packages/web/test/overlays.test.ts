@@ -9,15 +9,19 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 50))
 
 afterEach(() => document.body.replaceChildren())
 
-async function hostAsking() {
+function mountHost(overlays = createOverlays()) {
   ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
   HTMLElement.prototype.showPopover ??= function () {}
   HTMLElement.prototype.hidePopover ??= function () {}
   defineOverlayHostElements()
-  const overlays = createOverlays()
   const host = document.createElement("ui-overlay-host") as UiOverlayHostElement
   host.overlays = overlays
   document.body.append(host)
+  return { host, overlays }
+}
+
+async function hostAsking() {
+  const { host, overlays } = mountHost()
   let answer: boolean | undefined
   createConfirm({ overlays })({ title: "Delete the file?" }).then((value) => (answer = value))
   await wait()
@@ -38,6 +42,21 @@ test("an overlay host taken off the page answers its open confirm with no", asyn
   host.remove()
   await wait()
   expect(answer()).toBe(false)
+})
+
+test("an overlay host taken off the page before its confirm opens answers it with no, and asks the next", async () => {
+  const { host, overlays } = mountHost()
+  const confirm = createConfirm({ overlays })
+  let answer: boolean | undefined
+  confirm({ title: "Delete the file?" }).then((value) => (answer = value))
+  await Promise.resolve()
+  host.remove()
+  await wait()
+  expect(answer).toBe(false)
+  const next = mountHost(overlays).host
+  confirm({ title: "Discard the draft?" })
+  await wait()
+  expect(next.querySelector("ui-alert-dialog")?.textContent).toContain("Discard the draft?")
 })
 
 test("an overlay host given other overlays as it moves in one go renders theirs", async () => {

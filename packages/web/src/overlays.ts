@@ -66,8 +66,17 @@ function confirmDialog(host: UiOverlayHostElement, entry: ConfirmEntry) {
   })
   host.append(dialog)
   // Its parts register a microtask after it connects. Then it can open.
-  requestAnimationFrame(() => entry.open())
-  return () => dialog.remove()
+  let opening = true
+  const frame = requestAnimationFrame(() => {
+    opening = false
+    entry.open()
+  })
+  return () => {
+    dialog.remove()
+    if (!opening) return
+    cancelAnimationFrame(frame)
+    entry.done()
+  }
 }
 
 // <ui-overlay-host> renders what toast() and confirm() open, from anywhere.
