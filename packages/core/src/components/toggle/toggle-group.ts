@@ -269,6 +269,8 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
       scope,
       // Whether a toolbar around the group holds the tab stop.
       inToolbar: () => scope() !== own,
+      // Each toggle is its own instance, so the agent bridge reads a toggle's marks here.
+      elementOf: (key: string) => items.get(key)?.el,
       // A toggle joins by its value, and the roving group by a key of its own,
       // which stays unique in a toolbar that holds several groups.
       register(key: string, rovingKey: string, el: HTMLElement, disabled: () => boolean) {

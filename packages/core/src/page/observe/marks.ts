@@ -22,7 +22,21 @@ const isOffLimits = (elements: Element[]) => elements.some((el) => el.closest("[
 
 const isSecret = (elements: Element[]) => elements.some((el) => el.closest("[data-agent-secret]"))
 
+// An element's text as it reads, with its spaces collapsed, and without the
+// text of the elements in `skip`, like a tree branch's child items, or inside `data-agent-hidden`.
+function textOf(el: Element, skip: Element[] = []) {
+  let text = ""
+  const walk = (node: Node) => {
+    for (const child of node.childNodes)
+      if (child.nodeType === Node.TEXT_NODE) text += child.textContent
+      else if (child instanceof Element && !skip.includes(child) && !child.hasAttribute("data-agent-hidden"))
+        walk(child)
+  }
+  walk(el)
+  return text.replace(/\s+/g, " ").trim()
+}
+
 // A misspelled mark does nothing, so development warns about one.
 const checkMarks = (elements: Element[]) => warnMarks(elements, marks)
 
-export { checkMarks, confirmOf, isOffLimits, isSecret }
+export { checkMarks, confirmOf, isOffLimits, isSecret, textOf }
