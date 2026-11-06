@@ -165,6 +165,21 @@ describe("bindHold", () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  test("an Enter press canceled with Escape keeps the key's repeats from clicking", () => {
+    const { el, onClick } = setup()
+    el.focus()
+    el.dispatchEvent(key("keydown", { key: "Enter" }))
+    el.dispatchEvent(key("keydown", { key: "Escape" }))
+    const repeat = key("keydown", { key: "Enter", repeat: true })
+    el.dispatchEvent(repeat)
+    expect(repeat.defaultPrevented).toBe(true)
+    el.dispatchEvent(key("keyup", { key: "Enter" }))
+    expect(onClick).not.toHaveBeenCalled()
+    el.dispatchEvent(key("keydown", { key: "Enter" }))
+    el.dispatchEvent(key("keyup", { key: "Enter" }))
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+
   test("an onHold that unbinds or moves focus mid-repeat stops the repeats", () => {
     const { el, onHold } = setup({
       repeat: 50,

@@ -162,14 +162,16 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
       const released = event.type === "pointerup"
       swallowNextClick(doc, !released, released ? undefined : pointerId)
     }
-    if (key !== undefined && canceled && doc.activeElement === el) swallowKeyUp(key)
+    if (key !== undefined && canceled && doc.activeElement === el) swallowKey(key)
     options.onEnd?.({ event, input, held, canceled })
     if (key !== undefined && !held && !canceled) el.click()
   }
 
-  // A button clicks on Space's keyup, so a canceled press keeps that one.
-  function swallowKeyUp(key: string) {
+  // A button clicks on Enter's repeats and Space's keyup, so a canceled press
+  // keeps both until its key comes up.
+  function swallowKey(key: string) {
     const listeners = [
+      on(el, "keydown", (down) => down.key === key && down.preventDefault()),
       on(el, "keyup", (up) => {
         if (up.key !== key) return
         up.preventDefault()
