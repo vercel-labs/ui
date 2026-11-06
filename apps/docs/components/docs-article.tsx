@@ -37,7 +37,7 @@ function DocsArticle({
             )}
             <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">{title}</h1>
             {description && (
-              <p className="mt-3 text-base leading-relaxed sm:text-[15px] text-pretty text-subtle">
+              <p className="mt-3 text-[17px] leading-relaxed sm:text-[15px] text-pretty text-subtle">
                 {description}
               </p>
             )}

@@ -73,10 +73,10 @@ function getMDXComponents(
       "h2",
       "mt-14 mb-4 flex items-center gap-4 text-lg leading-snug font-medium tracking-[-0.01em] after:h-px after:flex-1 after:bg-border/70",
     ),
-    h3: heading("h3", "mt-10 mb-3 text-base leading-snug font-medium sm:text-[15px]"),
+    h3: heading("h3", "mt-10 mb-3 text-[17px] leading-snug font-medium sm:text-[15px]"),
     h4: heading("h4", "mt-8 mb-2 text-sm font-medium"),
     p: (props) => (
-      <p className="my-4 text-base leading-[1.65] text-foreground/75 sm:text-[15px]" {...props} />
+      <p className="my-4 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px]" {...props} />
     ),
     a: ({ href = "", ...props }) => {
       const url = resolve(href)
@@ -92,13 +92,13 @@ function getMDXComponents(
     strong: (props) => <strong className="font-medium text-foreground" {...props} />,
     ul: (props) => (
       <ul
-        className="my-4 flex list-disc flex-col gap-1.5 ps-5 text-base leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/25"
+        className="my-4 flex list-disc flex-col gap-1.5 ps-5 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/25"
         {...props}
       />
     ),
     ol: (props) => (
       <ol
-        className="my-4 flex list-decimal flex-col gap-1.5 ps-5 text-base leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/40"
+        className="my-4 flex list-decimal flex-col gap-1.5 ps-5 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/40"
         {...props}
       />
     ),
