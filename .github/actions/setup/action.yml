@@ -21,8 +21,27 @@ runs:
       shell: bash
       run: pnpm install --frozen-lockfile
 
+    # The apt mirror can take minutes for the few font packages Playwright adds, so their
+    # downloads are kept between runs.
+    - name: Keep apt downloads
+      if: inputs.browsers != ''
+      shell: bash
+      run: |
+        mkdir -p "$RUNNER_TEMP/apt-archives/partial"
+        printf '%s\n' "Dir::Cache::Archives \"$RUNNER_TEMP/apt-archives\";" \
+          'Binary::apt::APT::Keep-Downloaded-Packages "true";' 'APT::Sandbox::User "root";' |
+          sudo tee /etc/apt/apt.conf.d/99playwright-archives > /dev/null
+
+    - name: Restore apt downloads
+      id: apt-cache
+      if: inputs.browsers != ''
+      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ${{ runner.temp }}/apt-archives/*.deb
+        key: playwright-apt-${{ runner.os }}-${{ inputs.browsers }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: playwright-apt-${{ runner.os }}-${{ inputs.browsers }}-
+
     # Runs from tests/ so the browsers match the version that package's Playwright expects.
-    # Browsers aren't cached: restoring them still leaves the slow part, the apt dependencies.
     - name: Install Playwright browsers
       if: inputs.browsers != ''
       shell: bash
@@ -41,3 +60,10 @@ runs:
           sudo dpkg --configure -a || true
         done
         exit 1
+
+    - name: Save apt downloads
+      if: inputs.browsers != '' && steps.apt-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ${{ runner.temp }}/apt-archives/*.deb
+        key: playwright-apt-${{ runner.os }}-${{ inputs.browsers }}-${{ hashFiles('pnpm-lock.yaml') }}
