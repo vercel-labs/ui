@@ -186,12 +186,18 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
         const unsubscribe = owner.subscribe(follow)
         follow()
         if (isParent()) return unsubscribe
-        const leave = owner.register(store.get().value, el, () => isDisabled(store.get()))
+        const join = () => owner.register(store.get().value, el, () => isDisabled(store.get()))
+        let leave = join()
+        let { value } = store.get()
         let disabled = isDisabled(store.get())
         const unsubscribeSelf = store.subscribe(() => {
-          if (isDisabled(store.get()) === disabled) return
-          disabled = !disabled
-          owner.internal.refreshChildren()
+          const state = store.get()
+          if (state.value !== value) {
+            value = state.value
+            leave()
+            leave = join()
+          } else if (isDisabled(state) !== disabled) owner.internal.refreshChildren()
+          disabled = isDisabled(state)
         })
         return () => {
           unsubscribe()

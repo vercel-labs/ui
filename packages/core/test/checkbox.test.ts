@@ -71,6 +71,23 @@ describe("checkbox group", () => {
     unbind?.()
     document.body.replaceChildren()
   })
+
+  test("a checkbox whose value changes counts under its new value", async () => {
+    const group = checkboxGroup({ id: "g", required: true, defaultValue: ["olives"] })
+    const input = document.body.appendChild(document.createElement("input"))
+    const unbind = bind(group.part("group-input"), input)
+    const options = { id: "c", value: "cheese", group: () => group.api }
+    const child = checkbox(options)
+    const unbindChild = bind(child.part("root"), document.body.appendChild(document.createElement("button")))
+    await flush()
+    expect(input.checked).toBe(false)
+    child.setOptions({ ...options, value: "olives" })
+    await flush()
+    expect(input.checked).toBe(true)
+    unbindChild?.()
+    unbind?.()
+    document.body.replaceChildren()
+  })
 })
 
 describe("checkbox group debug", () => {
