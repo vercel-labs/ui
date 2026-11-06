@@ -4,6 +4,7 @@
 // puts it back. Focus follows a keyboard move, since the framework moving the
 // focused element drops its focus.
 import { keepFocus } from "../focus/keep-focus"
+import { deriveState } from "../kernel/derive"
 import { settleDraft } from "../kernel/draft"
 import type { Store } from "../kernel/store"
 
@@ -16,18 +17,22 @@ function createDraftMove<State extends object, Draft extends { key: string; poin
   value: valueKey,
   shown,
   same,
+  rebase,
   commit,
   say,
   element,
 }: {
   store: Store<State>
   // The state keys of the draft and of the value it commits.
-  draft: keyof State
-  value: keyof State
+  draft: keyof State & string
+  value: keyof State & string
   // The value as the draft shows it.
   shown: (draft: Draft) => Value
   // Whether two values are the same, so a drop that moved nothing commits nothing.
   same: (a: Value, b: Value) => boolean
+  // The draft over a value the owner changed mid-move: picked up from it again,
+  // put where the user moved it if they did, or null when the item is gone.
+  rebase: (draft: Draft, value: Value, moved: boolean) => Draft | null
   // Commits a moved draft. Returns false when the change was canceled.
   commit: (draft: Draft, details: { reason: DropReason; event?: Event }) => boolean
   // Tells screen readers the item dropped or went back, in the value it's shown in.
@@ -36,21 +41,37 @@ function createDraftMove<State extends object, Draft extends { key: string; poin
 }) {
   const draft = () => store.get()[draftKey] as Draft | null
   const value = () => store.get()[valueKey] as Value
-  const setDraft = (next: Draft | null) => store.set({ [draftKey]: next } as Partial<State>)
+  // A dropped draft waits for its value without being held.
+  let held = false
+  let moved = false
+  const setDraft = (next: Draft | null) => {
+    moved = !!next && !!draft()
+    held = !!next
+    store.set({ [draftKey]: next } as Partial<State>)
+  }
   const focusLater = (key: string) => keepFocus(() => element(key))
+
+  deriveState({ store }, [draftKey], (state) => {
+    const current = state[draftKey] as Draft | null
+    if (!current || !held) return
+    const next = rebase(current, state[valueKey] as Value, moved)
+    if (next && same(shown(next), shown(current))) return
+    return { [draftKey]: next } as Partial<State>
+  })
 
   function drop(reason: DropReason, event?: Event) {
     const current = draft()
     if (!current) return
+    held = false
     const before = value()
-    const moved = !same(shown(current), before)
-    if (moved && !commit(current, { reason, event })) {
+    const changed = !same(shown(current), before)
+    if (changed && !commit(current, { reason, event })) {
       setDraft(null)
       say("cancel", current, value())
     } else {
       say("drop", current, shown(current))
       // Keeps the draft until a controlled value's new value arrives.
-      if (!moved) setDraft(null)
+      if (!changed) setDraft(null)
       else
         settleDraft(store, value, before, () => {
           if (draft()?.key === current.key) setDraft(null)

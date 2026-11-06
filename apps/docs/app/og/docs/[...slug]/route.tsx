@@ -49,6 +49,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   )
 }
 
+export const dynamicParams = false
+
 export function generateStaticParams() {
   return source.getPages().map((page) => ({ slug: [...page.slugs, "image.png"] }))
 }

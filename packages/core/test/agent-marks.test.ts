@@ -5,8 +5,14 @@
 // stands in for an adapter.
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { button } from "../src/components/button/button"
+import { dialog } from "../src/components/dialog/dialog"
 import { input } from "../src/components/input/input"
-import { bind } from "../src/foundation/kernel/part"
+import { listbox } from "../src/components/listbox/listbox-root"
+import { select } from "../src/components/select/select"
+import { toggle } from "../src/components/toggle/toggle"
+import { toggleGroup } from "../src/components/toggle/toggle-group"
+import { tree } from "../src/components/tree/tree"
+import { attrs, bind } from "../src/foundation/kernel/part"
 import { createAgent, registerTools } from "../src/page/agent/agent"
 import { observe, type ObservedChange } from "../src/page/observe/observe"
 
@@ -161,6 +167,151 @@ describe("data-agent-confirm", () => {
   })
 })
 
+describe("data-agent-confirm on items", () => {
+  // A list with one item per value, the last marked, in an element named `label`.
+  function mountList(
+    label: string,
+    instance: { part: (slot: never, props?: never) => never; destroy: () => void },
+    values: string[],
+    slot = "item",
+  ) {
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", label)
+    cleanups.push(bind(instance.part("root" as never), root), () => instance.destroy())
+    for (const value of values) {
+      const el = root.appendChild(document.createElement("div"))
+      el.textContent = value
+      if (value === values.at(-1)) el.setAttribute("data-agent-confirm", `Grants ${value}`)
+      cleanups.push(bind(instance.part(slot as never, { value } as never), el))
+    }
+  }
+
+  test("a listbox step that picks a marked option among others, or every option, needs a person", async () => {
+    const agent = createAgent()
+    const instance = listbox({ id: "roles", multiple: true })
+    mountList("Roles", instance as never, ["viewer", "admin"])
+    for (const step of [
+      { ref: "Roles", action: "setValue", args: [["viewer", "admin"]] },
+      { ref: "Roles", action: "selectAll" },
+    ]) {
+      const outcome = await agent.act({ steps: [step] })
+      expect(outcome.error?.message).toBe(
+        'Needs a person: "Grants admin". Ask them to make this change themselves.',
+      )
+    }
+    const unknown = await agent.act({ steps: [{ ref: "Roles", action: "setValue", args: [["owner"]] }] })
+    expect(unknown.error?.message).toMatch(/^No item "owner" in Roles/)
+    expect(instance.get().value).toEqual([])
+  })
+
+  test("a tree's setChecked with a marked row needs a person, and refuses a disabled one", async () => {
+    const agent = createAgent()
+    const instance = tree({
+      id: "permissions",
+      checkable: true,
+      items: [
+        { value: "read", label: "read" },
+        { value: "locked", label: "locked", disabled: true },
+        { value: "delete", label: "delete" },
+      ],
+    })
+    mountList("Permissions", instance as never, ["read", "delete"])
+    const marked = await agent.act({
+      steps: [{ ref: "Permissions", action: "setChecked", args: [["read", "delete"]] }],
+    })
+    expect(marked.error?.message).toMatch(/^Needs a person: "Grants delete"/)
+    const disabled = await agent.act({
+      steps: [{ ref: "Permissions", action: "setChecked", args: [["locked"]] }],
+    })
+    expect(disabled.error?.message).toMatch(/^"locked" in Permissions \(c\d+\) is disabled now\.$/)
+    expect(instance.get().checked).toEqual([])
+  })
+
+  test("a toggle group's step reads each toggle's own mark and disabled state", async () => {
+    const agent = createAgent()
+    const group = toggleGroup({ id: "format", multiple: true })
+    const root = document.body.appendChild(document.createElement("div"))
+    root.setAttribute("aria-label", "Format")
+    cleanups.push(bind(group.part("group"), root), () => group.destroy())
+    for (const [value, mark] of [
+      ["bold", undefined],
+      ["publish", "data-agent-confirm"],
+      ["locked", "disabled"],
+    ] as const) {
+      const instance = toggle({ id: value, value, disabled: mark === "disabled", group: () => group.api })
+      const el = root.appendChild(document.createElement("button"))
+      el.textContent = value
+      if (mark === "data-agent-confirm") el.setAttribute(mark, "Publishes the post")
+      for (const [name, value] of Object.entries(attrs(instance.part("root"))))
+        if (value !== undefined) el.setAttribute(name, String(value))
+      cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    }
+    const marked = await agent.act({
+      steps: [{ ref: "Format", action: "setValue", args: [["bold", "publish"]] }],
+    })
+    expect(marked.error?.message).toMatch(/^Needs a person: "Publishes the post"/)
+    const disabled = await agent.act({ steps: [{ ref: "Format", action: "setValue", args: [["locked"]] }] })
+    expect(disabled.error?.message).toMatch(/^"locked" in Format \(c\d+\) is disabled now\.$/)
+    expect(group.get().value).toEqual([])
+  })
+
+  test("a marked option that renders only while its select is open needs a person", async () => {
+    const agent = createAgent()
+    const content = document.body.appendChild(document.createElement("div"))
+    const unbindItems: (() => void)[] = []
+    const instance: ReturnType<typeof select> = select({
+      id: "plan",
+      onOpenChange: (open) => {
+        unbindItems.splice(0).forEach((unbind) => unbind())
+        content.replaceChildren()
+        if (!open) return
+        for (const value of ["Free", "Pro"]) {
+          const item = content.appendChild(document.createElement("div"))
+          item.textContent = value
+          if (value === "Pro") item.setAttribute("data-agent-confirm", "Charges $20 a month")
+          unbindItems.push(bind(instance.part("item", { value }), item))
+        }
+      },
+    })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    trigger.setAttribute("aria-label", "Plan")
+    cleanups.push(bind(instance.part("trigger"), trigger), () => {
+      unbindItems.forEach((unbind) => unbind())
+      instance.destroy()
+    })
+    const outcome = await agent.act({ steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }] })
+    expect(outcome.error?.message).toMatch(/^Needs a person: "Charges \$20 a month"/)
+    expect(instance.get().value).toBeNull()
+  })
+})
+
+describe("while allow decides", () => {
+  test("a mark the page adds asks again, and a field disabled meanwhile refuses the step", async () => {
+    const section = region("data-other")
+    const onValueChange = vi.fn()
+    mountInput("Billing email", section, onValueChange)
+    const steps: { confirm?: string }[] = []
+    const marking = createAgent({
+      allow: (step) => {
+        steps.push(step)
+        section.setAttribute("data-agent-confirm", "Changes where invoices go")
+        return true
+      },
+    })
+    await marking.act({ steps: [{ ref: "Billing email", action: "setValue", args: ["a@example.com"] }] })
+    expect(steps.map((step) => step.confirm)).toEqual([undefined, "Changes where invoices go"])
+    section.removeAttribute("data-agent-confirm")
+    onValueChange.mockClear()
+    const field = section.querySelector("input")!
+    const disabling = createAgent({ allow: () => !!(field.disabled = true) })
+    const outcome = await disabling.act({
+      steps: [{ ref: "Billing email", action: "setValue", args: ["b@example.com"] }],
+    })
+    expect(outcome.error?.message).toMatch(/is disabled now\.$/)
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+})
+
 describe("data-agent-hidden", () => {
   test("a component inside is left out of the snapshot, and a step that names it is told so", async () => {
     const agent = createAgent()
@@ -197,6 +348,23 @@ describe("data-agent-hidden", () => {
   })
 })
 
+describe("data-agent-hidden inside a component", () => {
+  test("text inside a marked element doesn't reach the agent", () => {
+    const agent = createAgent()
+    const instance = dialog({ id: "recovery", defaultOpen: true })
+    const content = document.body.appendChild(document.createElement("div"))
+    const description = content.appendChild(document.createElement("p"))
+    description.innerHTML = 'Save your codes. <span data-agent-hidden="">ABCD-1234</span>'
+    cleanups.push(
+      bind(instance.part("content"), content),
+      bind(instance.part("description"), description),
+      () => instance.destroy(),
+    )
+    expect(JSON.stringify(agent.snapshot())).not.toContain("ABCD-1234")
+    expect(onPage(agent)[0].text).toEqual(["Save your codes."])
+  })
+})
+
 describe("data-agent-secret", () => {
   test("the agent sees a value is filled, never what it is, and can still type it", async () => {
     const agent = createAgent()
@@ -207,6 +375,28 @@ describe("data-agent-secret", () => {
     expect(onValueChange).toHaveBeenCalledWith("12-345", expect.anything())
     expect(JSON.stringify(outcome)).not.toContain("12-345")
     expect(outcome.values).toMatchObject({ [`${outcome.steps[0].ref} Tax ID`]: "[redacted]" })
+    expect(onPage(agent)[0].value).toBe("[redacted]")
+  })
+
+  test("a failed action's error stays out of the snapshot and the step", async () => {
+    const agent = createAgent()
+    const instance = button({
+      id: "Reveal",
+      action: () => Promise.reject(new Error("Token sk-live-42 expired")),
+    } as Parameters<typeof button>[0])
+    const el = region("data-agent-secret").appendChild(document.createElement("button"))
+    el.textContent = "Reveal"
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const outcome = await agent.act({ steps: [{ ref: "Reveal", action: "press" }] })
+    expect(outcome.error?.message).toBe('Pressed "Reveal", and its action failed: [redacted]')
+    expect(JSON.stringify(agent.snapshot())).not.toContain("sk-live-42")
+  })
+
+  test("a password field is secret whatever the case of its type", () => {
+    const agent = createAgent()
+    const { instance } = mountInput("Password")
+    document.querySelector("input")!.setAttribute("type", "PassWord")
+    instance.api.setValue("hunter2")
     expect(onPage(agent)[0].value).toBe("[redacted]")
   })
 

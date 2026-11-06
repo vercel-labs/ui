@@ -52,7 +52,8 @@ function createPointerDriver(options: SheetDriverOptions) {
   let frame = 0
   let animation: Animation | null = null
   let fade: Animation | null = null
-  let closing = false
+  // A swipe's close holds until the popup confirms it: a refused one snaps back.
+  let closing: "swipe" | "close" | null = null
   let coast: { velocity: number; startTime: number; startScroll: number; area: HTMLElement } | null = null
   let area: HTMLElement | null = null
   let touch: { id: number; originX: number; originY: number } | null = null
@@ -115,9 +116,9 @@ function createPointerDriver(options: SheetDriverOptions) {
         targetId = effect.id
         return options.onSnap(effect.id, effect.reason, source)
       case "dismiss":
-        closing = true
-        if (effect.reason === "swipe") options.onDismiss(source)
-        return
+        if (effect.reason !== "swipe") return
+        closing = "swipe"
+        return options.onDismiss(source)
       case "attempt-dismiss":
         return options.onDismissAttempt(source)
     }
@@ -192,7 +193,7 @@ function createPointerDriver(options: SheetDriverOptions) {
     dispatch({ type: "settled" })
     if (state.phase !== "idle") return
     if (state.restingIndex < 0) {
-      closing = false
+      closing = null
       targetId = null
       return options.onRest(null)
     }
@@ -366,7 +367,7 @@ function createPointerDriver(options: SheetDriverOptions) {
 
   return {
     open(id, animate) {
-      closing = false
+      closing = null
       targetId = id
       stopAnimation()
       const index = options.config().snapPoints.findIndex((point) => point.id === id)
@@ -388,12 +389,13 @@ function createPointerDriver(options: SheetDriverOptions) {
       })
     },
     close() {
-      if (closing) return
-      closing = true
-      dispatch({ type: "close", time: performance.now() })
+      const wasClosing = closing
+      closing = "close"
+      if (!wasClosing) dispatch({ type: "close", time: performance.now() })
     },
     snapTo(id, reason) {
-      if (closing) return
+      if (closing === "close") return
+      closing = null
       dispatch({ type: "snap-to", time: performance.now(), id, reason })
     },
     nudge() {

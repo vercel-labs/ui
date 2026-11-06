@@ -7,7 +7,7 @@ import type { ChangeSource } from "../../foundation/kernel/details"
 import type { AgentSurface, Part, PrimitiveInstance, PropSpec } from "../../foundation/kernel/primitive-types"
 import { watchEarlier, watchers } from "../../foundation/kernel/watchers"
 import { accessibleName } from "../../foundation/text/accessible-name"
-import { checkMarks, isOffLimits, isSecret } from "./marks"
+import { checkMarks, isOffLimits, isSecret, textOf } from "./marks"
 
 /**
  * A change a person or an agent made to a component, as `observe` and `agent.subscribe` report it.
@@ -140,7 +140,7 @@ function retire(entry: Entry) {
 }
 
 // Fields a browser tool stops seeing when they close, so the bridge doesn't keep them either.
-const secret = /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/
+const secret = /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/i
 
 const stateKeys = (entry: Entry, state: Record<string, unknown>) =>
   entry.controlled ?? ["open", "value", "checked"].filter((key) => key in state)
@@ -188,8 +188,7 @@ function componentLabel(parts: Bound[]) {
       ? found[0].el
       : found.find((part) => !part.key)?.el
   }
-  const text = (el: Element | undefined) =>
-    el?.textContent?.replace(/\s+/g, " ").trim().slice(0, 80) || undefined
+  const text = (el: Element | undefined) => (el && textOf(el).slice(0, 80)) || undefined
   const label = text(first("label"))
   if (label) return label
   // A group's own element names it before its items do.
@@ -230,7 +229,12 @@ function rowOf(parts: Bound[]) {
   const words: string[] = []
   const walker = row.ownerDocument.createTreeWalker(row, NodeFilter.SHOW_TEXT)
   for (let node = walker.nextNode(); node; node = walker.nextNode())
-    if (!own.some((el) => el.contains(node)) && node.textContent?.trim()) words.push(node.textContent.trim())
+    if (
+      !own.some((el) => el.contains(node)) &&
+      !isOffLimits([node.parentElement!]) &&
+      node.textContent?.trim()
+    )
+      words.push(node.textContent.trim())
   return words.join(" ").slice(0, 80) || undefined
 }
 

@@ -11,7 +11,7 @@ import { partState } from "../../foundation/kernel/part"
 import type { PrimitiveInstance } from "../../foundation/kernel/primitive-types"
 import { accessibleName } from "../../foundation/text/accessible-name"
 import { foldText } from "../../foundation/text/match"
-import { confirmOf } from "../observe/marks"
+import { confirmOf, isOffLimits, isSecret, textOf } from "../observe/marks"
 import { guardedActions } from "./guard"
 import {
   bound,
@@ -126,16 +126,23 @@ const frames = () =>
 // contents, since every object reads "[object Object]".
 const keyOf = (value: unknown) =>
   value !== null && typeof value === "object" ? JSON.stringify(value) : String(value)
-const keyFor = (instance: PrimitiveInstance) =>
-  (instance.api as { internal?: { keyOf?: (value: unknown) => string } }).internal?.keyOf ?? keyOf
+const internalOf = (instance: PrimitiveInstance) =>
+  (
+    instance.api as {
+      internal?: { keyOf?: (value: unknown) => string; elementOf?: (key: string) => Element | undefined }
+    }
+  ).internal
+const keyFor = (instance: PrimitiveInstance) => internalOf(instance)?.keyOf ?? keyOf
 
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
-function fromData(items: unknown, disabled?: Set<string>, key = keyOf) {
+function fromData(items: unknown, disabled?: Set<string>, key = keyOf, known?: Set<string>) {
   if (!Array.isArray(items)) return
   const out: { value: string; label: string }[] = []
   const add = (item: unknown) => {
-    if (typeof item === "string") out.push({ value: item, label: item })
-    else if (item && typeof item === "object") {
+    if (typeof item === "string") {
+      out.push({ value: item, label: item })
+      known?.add(key(item))
+    } else if (item && typeof item === "object") {
       const entry = item as {
         type?: string
         items?: unknown[]
@@ -147,6 +154,7 @@ function fromData(items: unknown, disabled?: Set<string>, key = keyOf) {
       if (entry.type === "group") entry.items?.forEach(add)
       else if (entry.type !== "separator") {
         out.push({ value: String(entry.value), label: entry.label ?? "" })
+        known?.add(key(entry.value))
         if (entry.disabled === true) disabled?.add(key(entry.value))
         // A tree's branches, whose rows aren't rendered while they're closed.
         entry.children?.forEach(add)
@@ -158,11 +166,12 @@ function fromData(items: unknown, disabled?: Set<string>, key = keyOf) {
 }
 
 // A component's items as data, from its state's `items` unless its `agent` key says where they are.
-function dataOf(entry: Entry, instance: PrimitiveInstance, disabled?: Set<string>) {
+function dataOf(entry: Entry, instance: PrimitiveInstance, disabled?: Set<string>, known?: Set<string>) {
   return fromData(
     entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items,
     disabled,
     keyFor(instance),
+    known,
   )
 }
 
@@ -225,19 +234,6 @@ function valueFor(entry: Entry, action: string, value: unknown) {
   if (typeof parsed === "boolean" && typeof value !== "boolean") return refuse("true or false")
   if (typeof value !== "string") return value
   return parsed == null || Number.isNaN(parsed) ? refuse() : parsed
-}
-
-// An element's text as it reads, with its spaces collapsed, and without the
-// text of the elements in `skip`, like a tree branch's child items.
-function textOf(el: Element, skip: Element[] = []) {
-  let text = ""
-  const walk = (node: Node) => {
-    for (const child of node.childNodes)
-      if (child.nodeType === Node.TEXT_NODE) text += child.textContent
-      else if (child instanceof Element && !skip.includes(child)) walk(child)
-  }
-  walk(el)
-  return text.replace(/\s+/g, " ").trim()
 }
 
 // The items on the page, named by their trigger when they have one, like an
@@ -373,7 +369,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   }
   // A button's action while it runs, and why it failed.
   if (state.pending === true) out.pending = true
-  if (state.error != null) out.error = messageOf(state.error)
+  if (state.error != null) out.error = entry.secret ? "[redacted]" : messageOf(state.error)
   // The items `setValue` takes. A list that opens shows them from its data
   // when they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
@@ -662,7 +658,7 @@ function createAgent(
     entry: Entry,
     instance: PrimitiveInstance,
     text: string | undefined,
-    beforeOpen: () => Promise<void>,
+    beforeOpen: () => Promise<unknown>,
   ) {
     const api = instance.api as { setOpen?: (open: boolean) => void }
     const match = () => {
@@ -831,7 +827,7 @@ function createAgent(
     const ask = async (stepArgs: unknown[], targets: Element[], what: string) => {
       const confirm = confirmOf(targets)
       const key = JSON.stringify([stepArgs, confirm])
-      if (asked.has(key)) return
+      if (asked.has(key)) return false
       const step: AgentAction = {
         ref: entry.ref,
         component: entry.component,
@@ -847,10 +843,30 @@ function createAgent(
           confirm ? `The person said no to "${confirm}".` : `The app refused ${action} on ${entry.ref}.`,
         )
       asked.add(key)
+      return true
     }
-    // The component's own elements and the item an argument names, which a step's confirm comes from.
-    const targetsOf = (item?: unknown) =>
-      parts.filter((part) => !part.key || part.key === String(item)).map((part) => part.el)
+    // The items a list renders only while it's open, as this step saw them when it opened it.
+    let openParts: { key: string; el: HTMLElement }[] = []
+    // The component's own elements and the items an argument names, which a step's confirm comes
+    // from: each value of a list, or every item for a step like `selectAll`.
+    const targetsOf = (item?: unknown) => {
+      const keys = new Set(
+        (Array.isArray(item) ? item : [item]).map((value) =>
+          value !== null && typeof value === "object" ? keyFor(instance)(value) : String(value),
+        ),
+      )
+      const every = /All$/.test(action)
+      // A part unbound since the step began has no element.
+      const elements: Element[] = [...parts, ...bound(instance), ...openParts]
+        .filter((part) => part.el && (!part.key || every || keys.has(part.key)))
+        .map((part) => part.el)
+      for (const key of keys) {
+        const el = internalOf(instance)?.elementOf?.(key)
+        if (el) elements.push(el)
+      }
+      return [...new Set(elements)]
+    }
+    let refuseBlocked: (() => void) | undefined
     let run: () => unknown
     let press: Awaited<ReturnType<typeof pressing>> | undefined
     if (action === "press") {
@@ -876,7 +892,10 @@ function createAgent(
       }
       // The disabled items this step saw while it opened the list, if it did.
       let whileOpen: Set<string> | undefined
-      const seeOpen = (found: Set<string>) => (whileOpen = found)
+      const seeOpen = (found: Set<string>, open: Bound[]) => {
+        whileOpen = found
+        openParts = open.map(({ key, el }) => ({ key, el }))
+      }
       const askToOpen = () => ask(args, targetsOf(args[0]), "make this change")
       // Whether a label already named the item, so its key isn't keyed again.
       let named = false
@@ -911,40 +930,75 @@ function createAgent(
             )
         }
       }
+      // A closed list refuses values it doesn't have in a list or an object too.
+      const elementOf = internalOf(instance)?.elementOf
+      if (action === "setValue" && entry.agent?.closed && args[0] != null && typeof args[0] !== "string") {
+        const known = new Set<string>()
+        dataOf(entry, instance, undefined, known)
+        const items = await listItems(entry, instance, askToOpen, seeOpen)
+        for (const item of items) known.add(item.value)
+        const key = keyFor(instance)
+        const unknown = (Array.isArray(args[0]) ? args[0] : [args[0]]).find(
+          (value) => !known.has(key(value)) && !elementOf?.(key(value)),
+        )
+        if ((items.length || elementOf) && unknown !== undefined)
+          throw new Error(
+            `No item ${JSON.stringify(unknown)} in ${entry.label ?? entry.component} (${entry.ref}).`,
+          )
+      }
       if (/^set[A-Z]/.test(action)) args = [valueFor(entry, action, args[0]), ...args.slice(1)]
       // The api takes a disabled item, which a person can't choose. One already chosen stays, and
       // an autocomplete's value is text, which a person can still type. Opening names no item.
       if (
         entry.component !== "autocomplete" &&
         args[0] !== undefined &&
-        ["setValue", "select", "open", "toggle"].includes(action)
+        ["setValue", "setChecked", "select", "open", "toggle"].includes(action)
       ) {
-        const value = (instance.get() as { value?: unknown }).value
+        const value = (instance.get() as Record<string, unknown>)[
+          action === "setChecked" ? "checked" : "value"
+        ]
         const key = keyFor(instance)
         const held = (Array.isArray(value) ? value : [value]).map(key)
         // Options that render only while the list is open are read by opening it, now. Only
         // a choice opens it: a popup's open() takes a payload, not an item.
         if (!whileOpen && (action === "setValue" || action === "select"))
           await listItems(entry, instance, askToOpen, seeOpen)
-        const disabled = whileOpen ?? disabledItems(entry, instance)
-        const blocked = (
-          named ? [args[0] as string] : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
-        ).find((item) => disabled.has(item) && !held.includes(item))
-        if (blocked !== undefined) {
+        const chosen = named ? [args[0] as string] : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
+        // Read again once `allow` answers, since an item can turn disabled while the person decides.
+        refuseBlocked = () => {
+          const disabled = new Set([...(whileOpen ?? []), ...disabledItems(entry, instance)])
+          const blocked = chosen.find((item) => {
+            const el = elementOf?.(item)
+            return !held.includes(item) && (disabled.has(item) || (!!el && isDisabledElement(el)))
+          })
+          if (blocked === undefined) return
           const items = dataOf(entry, instance) ?? renderedItems(bound(instance))
           const label = items.find((item) => item.value === blocked)?.label || blocked
           throw new Error(`"${label}" in ${entry.label ?? entry.component} (${entry.ref}) is disabled now.`)
         }
+        refuseBlocked()
       }
       run = () => fn(...args)
     }
     // A press asks the button it clicks, and any other step the component's
     // own elements and the item it names, so a marked change has no unmarked
     // way around it, like choosing a marked menu item by its value.
+    const targets = () => (press ? [press.button, ...targetsOf()] : targetsOf(args[0]))
+    const askToRun = () =>
+      press
+        ? ask(args, [press.button], `press "${textOf(press.button) || accessibleName(press.button)}"`)
+        : ask(args, targets(), "make this change")
     try {
-      if (press)
-        await ask(args, [press.button], `press "${textOf(press.button) || accessibleName(press.button)}"`)
-      else await ask(args, targetsOf(args[0]), "make this change")
+      // What `allow` saw can change while it decides, like a mark the page adds, which asks again.
+      let asking = await askToRun()
+      for (let asked = 1; asking; asked++) {
+        if (asked === 3) throw new Error(`${entry.ref} kept changing while it was being approved.`)
+        asking = await askToRun()
+      }
+      if (isOffLimits(targets())) throw new Error(`${entry.ref} isn't available to agents now.`)
+      if (!press && isComponentDisabled(instance.get() as Record<string, unknown>, bound(instance)))
+        throw new Error(`${entry.component} ${entry.ref} is disabled now.`)
+      refuseBlocked?.()
     } catch (refused) {
       // A popup the press opened to find its button closes again, as it was.
       if (press?.opened) press.close()
@@ -955,7 +1009,15 @@ function createAgent(
     if (guard && !guard()) {
       throw new Error(`The restoration of ${entry.ref} was superseded by a newer change.`)
     }
-    let result = asAgent(run)
+    const secret = entry.secret || (!!press && isSecret([press.button]))
+    const failure = (error: unknown) => (secret ? "[redacted]" : messageOf(error))
+    let result: unknown
+    try {
+      result = asAgent(run)
+    } catch (error) {
+      if (!secret) throw error
+      throw new Error(`${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: [redacted]`)
+    }
     // Some calls settle later, like a popup's `open()`, which resolves once it
     // closes. One that fails before the step ends fails the step. One that
     // fails later is the page's, unhandled as if the page had made the call.
@@ -967,7 +1029,7 @@ function createAgent(
         rejected = { error }
       })
       result = "pending"
-    }
+    } else if (secret && typeof result !== "boolean") result = redact(entry, result)
     await frames()
     if (!press) {
       // A component's own work, like a button's action, finishes before the step does.
@@ -976,7 +1038,7 @@ function createAgent(
       const failed = rejected ?? (settled.error != null ? { error: settled.error } : undefined)
       if (failed)
         throw new Error(
-          `${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: ${messageOf(failed.error)}`,
+          `${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: ${failure(failed.error)}`,
         )
       if (settled.pending) return { ref: entry.ref, result: `${action} is still running.` }
       return { ref: entry.ref, result: result ?? null }
@@ -991,8 +1053,7 @@ function createAgent(
         ),
     )
     ended = true
-    if (settled.error != null)
-      throw new Error(`${pressed}, and its action failed: ${messageOf(settled.error)}`)
+    if (settled.error != null) throw new Error(`${pressed}, and its action failed: ${failure(settled.error)}`)
     if (settled.pending) return { ref: entry.ref, result: `${pressed}. Its action is still running.` }
     await frames()
     const closed = (instance.get() as { open?: boolean }).open === false
@@ -1004,8 +1065,8 @@ function createAgent(
   async function listItems(
     entry: Entry,
     instance: PrimitiveInstance,
-    beforeOpen?: () => Promise<void>,
-    whileOpen?: (disabled: Set<string>) => void,
+    beforeOpen?: () => Promise<unknown>,
+    whileOpen?: (disabled: Set<string>, parts: Bound[]) => void,
   ) {
     const state = instance.get() as Record<string, unknown>
     const api = instance.api as { setOpen?: (open: boolean) => void }
@@ -1015,7 +1076,7 @@ function createAgent(
       asAgent(() => api.setOpen!(true))
       for (let tries = 0; tries < 60 && !(items = renderedItems(bound(instance))).length; tries++)
         await frames()
-      if (items.length) whileOpen?.(disabledItems(entry, instance))
+      if (items.length) whileOpen?.(disabledItems(entry, instance), bound(instance))
       asAgent(() => api.setOpen!(false))
       await frames()
     }

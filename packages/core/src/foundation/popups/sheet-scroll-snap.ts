@@ -56,7 +56,8 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   // The browser's scroll ended before the page heard the finger lift.
   let restMissed = false
   let dragging = false
-  let closing = false
+  // A swipe's close holds until the popup confirms it: a refused one snaps back.
+  let closing: "swipe" | "close" | null = null
   let restTimer = 0
   let frame = 0
   let targetId: string | null = null
@@ -193,7 +194,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   function onVisibility(entries: IntersectionObserverEntry[]) {
     const entry = entries[entries.length - 1]
     if (entry.isIntersecting || flip || closing || targetId === null || !options.config().dismissible) return
-    closing = true
+    closing = "swipe"
     targetId = null
     options.onDismiss()
   }
@@ -269,7 +270,8 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
 
   function moveTo(id: string, reason: SheetSnapReason) {
     const point = options.config().snapPoints.find((entry) => entry.id === id)
-    if (!point || closing) return
+    if (!point || closing === "close") return
+    closing = null
     if (id !== targetId) {
       targetId = id
       options.onSnap(id, reason)
@@ -280,7 +282,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
 
   return {
     open(id, animate) {
-      closing = false
+      closing = null
       targetId = id
       layout()
       const point = options.config().snapPoints.find((entry) => entry.id === id)
@@ -299,8 +301,9 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       })
     },
     close() {
-      if (closing) return
-      closing = true
+      const wasClosing = closing
+      closing = "close"
+      if (wasClosing) return
       targetId = null
       const from = flip ? flip.extentAt(performance.now() - flip.startTime) : scrollExtent()
       animateTo(-toolbarBleed, from, performance.now(), () => options.onRest(null))

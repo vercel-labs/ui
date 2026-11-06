@@ -157,6 +157,10 @@ function createCellRange<State extends object>(
     row: Math.max(0, Math.min(options.rows() - 1, cell.row)),
     col: Math.max(0, Math.min(options.cols() - 1, cell.col)),
   })
+  const everyCell = () => ({
+    anchor: { row: 0, col: 0 },
+    end: { row: options.rows() - 1, col: options.cols() - 1 },
+  })
   const say = (range: CellRange | null) => {
     const bounds = api.bounds({ [options.key]: range } as State)
     if (bounds) announce((options.message ?? cellRangeMessage)(bounds))
@@ -224,10 +228,7 @@ function createCellRange<State extends object>(
     },
     /** Selects every cell, keeping the active one. */
     selectAll(details?: { reason: CellRangeReason; event?: Event }) {
-      return api.select(
-        { anchor: { row: 0, col: 0 }, end: { row: options.rows() - 1, col: options.cols() - 1 } },
-        details,
-      )
+      return api.select(everyCell(), details)
     },
     /** Selects whole rows, from one to another. */
     selectRows(from: number, to = from, details?: { reason: CellRangeReason; event?: Event }) {
@@ -264,11 +265,7 @@ function createCellRange<State extends object>(
         if (api.select(next, { reason: "list-navigation", event })) say(next)
         return true
       }
-      if (mod && !event.shiftKey && event.key.toLowerCase() === "a") {
-        event.preventDefault()
-        if (api.selectAll({ reason: "list-navigation", event })) say(current())
-        return true
-      }
+      if (mod && !event.shiftKey && event.key.toLowerCase() === "a") return done(everyCell())
       if (event.key === " " && event.shiftKey && !mod) {
         const { top, bottom } = range ? boundsOf(range) : { top: active.row, bottom: active.row }
         return done({ anchor: { row: top, col: 0 }, end: { row: bottom, col: options.cols() - 1 } })

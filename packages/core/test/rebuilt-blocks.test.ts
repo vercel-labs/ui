@@ -455,6 +455,7 @@ describe("createTransfer", () => {
       lists: options.lists,
       moving: null,
     }),
+    sync: (options) => ({ lists: options.lists }),
     api: (context) => {
       const set = vi.fn((value: TransferLists, _details: object) => {
         context.store.set({ lists: value })
@@ -510,6 +511,45 @@ describe("createTransfer", () => {
     transfer.keydown(key("Escape"), "a")
     expect(instance.get().moving).toBeNull()
     expect(instance.get().lists.todo).toEqual(["a"])
+    expect(set).not.toHaveBeenCalled()
+  })
+
+  test("lists the owner changes mid-move stay changed, with the moved item where the user put it", () => {
+    const instance = board({ id: "k", lists: { todo: ["a", "b"], done: [] } })
+    cleanups.push(() => instance.destroy())
+    const { transfer, set } = instance.api
+    transfer.grab("a")
+    instance.setOptions({ id: "k", lists: { todo: ["a", "b"], done: ["c"] } })
+    transfer.drop()
+    expect(set).not.toHaveBeenCalled()
+    transfer.grab("a")
+    transfer.moveTo("done", 0)
+    instance.setOptions({ id: "k", lists: { todo: ["a", "b", "z"], done: ["c"] } })
+    transfer.drop()
+    expect(set.mock.calls[0][0]).toEqual({ todo: ["b", "z"], done: ["a", "c"] })
+  })
+
+  test("an item the owner deletes mid-move ends the move", () => {
+    const instance = board({ id: "k", lists: { todo: ["a", "b"], done: [] } })
+    cleanups.push(() => instance.destroy())
+    const { transfer, set } = instance.api
+    transfer.grab("a")
+    transfer.moveTo("done", 0)
+    instance.setOptions({ id: "k", lists: { todo: ["b"], done: [] } })
+    expect(instance.get().moving).toBeNull()
+    transfer.drop()
+    expect(set).not.toHaveBeenCalled()
+  })
+
+  test("a list the owner fills mid-move ends the move into it", () => {
+    const instance = board({ id: "k", lists: { todo: ["a", "b"], done: [] }, limit: 1 })
+    cleanups.push(() => instance.destroy())
+    const { transfer, set } = instance.api
+    transfer.grab("a")
+    transfer.moveTo("done", 0)
+    instance.setOptions({ id: "k", lists: { todo: ["a", "b"], done: ["c"] }, limit: 1 })
+    expect(instance.get().moving).toBeNull()
+    transfer.drop()
     expect(set).not.toHaveBeenCalled()
   })
 

@@ -91,7 +91,17 @@ function HostedConfirm(props: { entry: ConfirmEntry }) {
   createEffect(
     () => props.entry,
     (entry) => {
-      queueMicrotask(() => entry.open())
+      let opening = true
+      queueMicrotask(() => {
+        if (!opening) return
+        opening = false
+        entry.open()
+      })
+      return () => {
+        if (!opening) return
+        opening = false
+        entry.done()
+      }
     },
   )
   const question = () => (props.entry.payload ?? {}) as Partial<ConfirmOptions>

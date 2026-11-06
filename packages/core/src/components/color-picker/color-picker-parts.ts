@@ -474,7 +474,7 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           "data-selected": selected ? "" : undefined,
           "data-disabled": isDisabled(state) ? "" : undefined,
           "data-readonly": state.readOnly ? "" : undefined,
-          style: css({ "--color-picker-color": props.value }),
+          style: css({ "--color-picker-color": color ? props.value : undefined }),
         }
       },
       press: ({ api, props }, event) => api.internal.choose(props.value, { reason: "item-press", event }),

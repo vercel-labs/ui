@@ -15,6 +15,7 @@ import { bind } from "../src/foundation/kernel/part"
 import { depthRange, movedRows, placeOf, subtreeEnd } from "../src/foundation/drag-and-drop/tree-reorder"
 
 type Options = {
+  rows?: TreeReorderRow[]
   defaultRows: TreeReorderRow[]
   onRowsChange?: (rows: TreeReorderRow[], details: ChangeDetails<"drag" | "move-key" | "imperative">) => void
   maxDepth?: number
@@ -23,8 +24,9 @@ type State = { rows: TreeReorderRow[]; moving: TreeReorderDraft | null }
 
 const outline = definePrimitive({
   name: "outline",
-  options: { defaultRows: "value", onRowsChange: "callback", maxDepth: "number" },
-  state: (options: Options): State => ({ rows: options.defaultRows, moving: null }),
+  options: { rows: "value", defaultRows: "value", onRowsChange: "callback", maxDepth: "number" },
+  state: (options: Options): State => ({ rows: options.rows ?? options.defaultRows, moving: null }),
+  sync: (options) => (options.rows === undefined ? {} : { rows: options.rows }),
   api: (context) => {
     const change = createChange(context)
     const tree = createTreeReorder<State>(context, {
@@ -315,5 +317,59 @@ describe("createTreeReorder with a pointer", () => {
     pointer("pointerup", { x: 10, y: 90 })
     expect(onRowsChange).not.toHaveBeenCalled()
     expect(instance.get().moving).toBeNull()
+  })
+})
+
+describe("createTreeReorder with rows the owner changes mid-move", () => {
+  test("a row dropped where it was keeps the owner's rows", () => {
+    const onRowsChange = vi.fn()
+    const { instance, shown } = render({ rows: notes, defaultRows: notes, onRowsChange })
+    instance.api.tree.grab("site")
+    const next = notes.filter((row) => row.key !== "inbox")
+    instance.setOptions({ rows: next, defaultRows: notes, onRowsChange })
+    expect(shown()).toBe(outlineOf(next))
+    instance.api.tree.drop()
+    expect(onRowsChange).not.toHaveBeenCalled()
+  })
+
+  test("a moved row lands where the user put it, among the owner's rows", () => {
+    const onRowsChange = vi.fn()
+    const { instance } = render({ rows: notes, defaultRows: notes, onRowsChange })
+    instance.api.tree.grab("app")
+    instance.api.tree.place(0, 0)
+    const next = rows(`
+inbox
+projects
+  site
+  app
+archive
+todo
+`)
+    instance.setOptions({ rows: next, defaultRows: notes, onRowsChange })
+    instance.api.tree.drop()
+    expect(outlineOf(onRowsChange.mock.calls[0][0])).toBe(
+      outlineOf(
+        rows(`
+app
+inbox
+projects
+  site
+archive
+todo
+`),
+      ),
+    )
+  })
+
+  test("a row the owner deletes ends the move", () => {
+    const onRowsChange = vi.fn()
+    const { instance } = render({ rows: notes, defaultRows: notes, onRowsChange })
+    instance.api.tree.grab("site")
+    instance.api.tree.place(0, 0)
+    const next = notes.filter((row) => row.key !== "site" && row.key !== "copy")
+    instance.setOptions({ rows: next, defaultRows: notes, onRowsChange })
+    expect(instance.get().moving).toBeNull()
+    instance.api.tree.drop()
+    expect(onRowsChange).not.toHaveBeenCalled()
   })
 })

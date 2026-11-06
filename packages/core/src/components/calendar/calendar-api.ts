@@ -98,7 +98,7 @@ const calendarSettings = (options: CalendarOptions) => ({
   disabled: !!options.disabled,
   readOnly: !!options.readOnly,
   deselectable: !!options.deselectable,
-  months: Math.max(1, Math.floor(options.months ?? 1) || 1),
+  months: Number.isFinite(options.months) ? Math.max(1, Math.floor(options.months!)) : 1,
   pageBy: options.pageBy ?? "month",
   locale: options.locale ?? null,
   weekStartsOn: options.weekStartsOn === undefined ? null : ((options.weekStartsOn % 7) + 7) % 7,

@@ -148,6 +148,14 @@ describe("color picker", () => {
     expect(attrs(picker.part("swatch", {}))).toMatchObject({ role: "img", "aria-label": "vivid red" })
   })
 
+  test("a swatch writes its color variable only when the value is a color", () => {
+    const picker = make()
+    expect(attrs(picker.part("swatch-item", { value: "rgb(0 0 255)" })).style).toBe(
+      "--color-picker-color:rgb(0 0 255)",
+    )
+    expect(attrs(picker.part("swatch-item", { value: "red;position:fixed;inset:0" })).style).toBe("")
+  })
+
   test("a swatch outside the gamut is selected once chosen", () => {
     const picker = make({ space: "oklch", format: "oklch" })
     const vivid = "oklch(0.7 0.3 150)"

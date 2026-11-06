@@ -30,9 +30,15 @@ function sheetPortal(viewportTag: string, slots = popupPortal.slots) {
         return target
       let viewport = viewports.get(el)
       if (!viewport) {
-        viewport = el.ownerDocument.createElement(viewportTag)
-        viewport.setAttribute("data-slot", attrs(instance.part("viewport", {}))["data-slot"] ?? "")
-        viewports.set(el, viewport)
+        const created = el.ownerDocument.createElement(viewportTag)
+        created.setAttribute("data-slot", attrs(instance.part("viewport", {}))["data-slot"] ?? "")
+        // An owner taken off the page while open empties it without hiding it,
+        // so it would stay in the top layer, dimming the page.
+        new MutationObserver(() => created.hasChildNodes() || created.remove()).observe(created, {
+          childList: true,
+        })
+        viewports.set(el, created)
+        viewport = created
       }
       const container = portalTarget(target)
       const parent = container ?? el

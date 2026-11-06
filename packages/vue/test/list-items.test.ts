@@ -52,3 +52,12 @@ test("groups that share a label keep their own rows as a filter changes", async 
     "blueberry",
   ])
 })
+
+test("an item's other fields stay off its element", async () => {
+  const items = [{ value: "a", label: "Apple", innerHTML: "<img src=x>", title: "Injected" }]
+  await mount(() => h(Combobox, { items, defaultOpen: true }, () => h(ComboboxInput)))
+  const option = document.querySelector('[role="option"]')!
+  expect(option.textContent).toBe("Apple")
+  expect(option.querySelector("img")).toBeNull()
+  expect(option.hasAttribute("title")).toBe(false)
+})

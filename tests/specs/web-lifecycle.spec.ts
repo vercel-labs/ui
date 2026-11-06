@@ -158,6 +158,22 @@ test("a popover in a shadow root stays open when focus moves into it from outsid
   await expect(page.getByRole("button", { name: "Open" })).toHaveAttribute("aria-expanded", "true")
 })
 
+test("an open sheet taken off the page takes its viewport with it", async ({ page }) => {
+  await page.evaluate(() => {
+    const stage = document.querySelector("#stage")!
+    stage.innerHTML = `
+      <div id="sheets"></div>
+      <ui-popover presentation="sheet" container="#sheets">
+        <ui-popover-trigger><button>Open</button></ui-popover-trigger>
+        <ui-popover-content>Popup</ui-popover-content>
+      </ui-popover>`
+  })
+  await page.getByRole("button", { name: "Open" }).click()
+  await expect(page.locator("#sheets > ui-popover-viewport")).toHaveCount(1)
+  await page.evaluate(() => document.querySelector("ui-popover")!.remove())
+  await expect(page.locator("ui-popover-viewport")).toHaveCount(0)
+})
+
 // Like Lit, which replaces a root's sheets when its styles change, or a page
 // that changes them in place.
 for (const change of ["replaces its shadow root's sheets", "changes its shadow root's sheets in place"]) {
