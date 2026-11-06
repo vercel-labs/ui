@@ -15,14 +15,19 @@ type DocPage = {
   file: string
   title: string
   description?: string
+  date?: string
 }
 
-/** A page's frontmatter and the content after it. */
+/** A page's frontmatter and the content after it, with each `<include>` replaced by the file it names. */
 function readPage(file: string) {
-  const [, frontmatter, body] = readFileSync(file, "utf8").match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)!
+  const [, frontmatter, source] = readFileSync(file, "utf8").match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)!
+  const body = source.replace(/<include>(.+?)<\/include>/g, (_, included: string) =>
+    readFileSync(path.resolve(path.dirname(file), included), "utf8").trimEnd(),
+  )
   return {
     title: frontmatter.match(/^title: (.*)$/m)![1],
     description: frontmatter.match(/^description: (.*)$/m)?.[1],
+    date: frontmatter.match(/^date: "(.*)"$/m)?.[1],
     body,
   }
 }
@@ -32,8 +37,8 @@ function docPage(slugs: string[]) {
   const base = path.join(contentDir, ...slugs)
   const file = [`${base}.mdx`, path.join(base, "index.mdx")].find((candidate) => existsSync(candidate))
   if (!file) return undefined
-  const { title, description } = readPage(file)
-  return { slugs, file, title, description } satisfies DocPage
+  const { title, description, date } = readPage(file)
+  return { slugs, file, title, description, date } satisfies DocPage
 }
 
 /**

@@ -151,7 +151,7 @@ type SliderOptions<Value extends number | number[] = number | number[]> = {
   controller?: SliderController<Value>
 } & PrimitiveOptions
 
-/** What adapters pass on top: the id the field around a single thumb gives its input. */
+/** What adapters pass on top: the id the field around it gives its first thumb's input. */
 type SliderInternalOptions = SliderOptions & { thumbInputId?: string }
 
 // Reads a `value` or `default-value` attribute: "50" is one thumb, "20/80" a
@@ -301,9 +301,11 @@ const rangeInputStyle = css({
   "pointer-events": "none",
 })
 
-// A range is the field's control itself, so only a single thumb's input takes the field's id.
+// The first thumb's input takes the field's id even in a range, whose root
+// is the control: the label renders first, and a <label for> can't point at
+// a div. So a range's root takes an id of its own.
 const thumbInputId = (state: State, id: string, index: number) =>
-  (valuesOf(state.value).length === 1 && state.thumbInputId) || `${id}-thumb-${index}`
+  (index === 0 && state.thumbInputId) || `${id}-thumb-${index}`
 
 const sliderPrimitive = /* @__PURE__ */ definePrimitive({
   name: "slider",
@@ -356,7 +358,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     root: slot<{}, SliderState>({
       role: "group",
       state: sliderState,
-      attrs: (state) => dataAttrs(state),
+      attrs: (state, { id }) => ({
+        id: state.thumbInputId && valuesOf(state.value).length > 1 ? `${id}-group` : undefined,
+        ...dataAttrs(state),
+      }),
       bind: (el, { api, store }) => {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
         return bindInternals(el, {

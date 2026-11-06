@@ -1,4 +1,5 @@
-import { expect, test, type Locator } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
+import { test } from "./docs-test"
 import { frameworks, testExamples, type Check } from "./docs-helpers"
 
 // Opens a menubar's first menu by pressing its trigger, checks the menu shows,

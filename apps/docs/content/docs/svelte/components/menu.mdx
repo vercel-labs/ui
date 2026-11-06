@@ -344,7 +344,11 @@ Props and callbacks are the same as below, as Svelte props. `open`, `checked` an
 
 ### Menu
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOptions" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuOptions"
+  types={{ controller: "MenuController" }}
+/>
 
 ### MenuTrigger
 
@@ -390,6 +394,13 @@ A trigger outside the menu also takes `controller`.
   path="../../packages/core/src/components/menu/menu.ts"
   name="MenuSubProps"
   type="Pick<MenuOptions, 'open' | 'defaultOpen' | 'onOpenChange' | 'onOpenChangeComplete' | 'loop' | 'delay' | 'controller' | 'debug'>"
+  descriptions={{
+    open: "Whether the submenu is open. Bind it with `bind:open` to control the submenu.",
+    defaultOpen: "Whether the submenu starts open, when uncontrolled.",
+    controller:
+      "Opens, closes and inspects the submenu. Create one with `createMenuController()`. Triggers outside the menu can't connect to it.",
+  }}
+  types={{ controller: "MenuController" }}
 />
 
 ### MenuSubTrigger
@@ -481,6 +492,7 @@ Callbacks get the new state first, then the details. A bound `open`, `checked` o
 | `onCheckedChange`      | `Menu`             | `(checked, details)`, with the item's value in `details.value`. For data menus |
 | `onValueChange`        | `Menu`             | `(value, details)`, with the group's name in `details.group`. For data menus   |
 | `onDismissAttempt`     | `Menu`             | `({ reason, event })`, when a dismissal was refused                            |
+| `bind:open`            | `MenuSub`          | Whether the submenu is open                                                    |
 | `onSelect`             | `MenuItem`         | `(event)`, before the menu closes. `event.preventDefault()` keeps it open      |
 | `bind:checked`         | `MenuCheckboxItem` | Whether the item is checked. `onCheckedChange` has the details                 |
 | `bind:value`           | `MenuRadioGroup`   | The selected value. `onValueChange` has the details                            |

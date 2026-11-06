@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "./docs-test"
 import { frameworks } from "./docs-helpers"
 
 // Behaviors and Agents are one section each, for every framework.
@@ -26,6 +27,8 @@ const pages = [
   ["/behaviors/image", "Images"],
   ["/behaviors/testing", "Testing"],
   ["/behaviors/observe", "Observe"],
+  ["/behaviors/changelog", "Changelog"],
+  ["/behaviors/changelog/introducing-ui-sdk", "Introducing UI SDK"],
   ["/react/custom-parts", "Custom Parts"],
   ["/react/hooks/async-options", "Async Options"],
   ["/react/hooks/shortcuts", "Shortcuts"],

@@ -1,0 +1,393 @@
+---
+title: Introducing UI SDK
+description: A library of behaviors to build your components. Made for agents.
+date: "2026-11-10"
+---
+
+Today we're releasing UI SDK.
+
+UI SDK is a TypeScript library of UI behaviors, the layers that make up a component library. It provides building blocks for keyboard navigation, focus, selection, popups, drag and drop, and the ARIA attributes those interactions need.
+
+For example, `createRovingFocus` moves focus with the arrow keys, `createTypeahead` finds an option as you type, and `createPopup` opens a popup next to its button.
+
+We built more than 40 of them. You, or your agent, combine them to build your own components.
+
+## Build a component
+
+Here's a small popover. You define it once with `@ui-sdk/core`, and `createPopup` does the hard part: it opens next to its button, closes on Escape or a click outside, and puts focus back where it was.
+
+```ts title="lib/share.ts"
+import { createPopup, definePrimitive, popupContent, popupState, popupTrigger } from "@ui-sdk/core"
+import { popoverPreset } from "@ui-sdk/core/popover"
+
+const share = definePrimitive({
+  name: "share",
+  options: { defaultOpen: "boolean" },
+  state: (options: { defaultOpen?: boolean }) => popupState(options),
+  api: (context) => createPopup(context, { preset: popoverPreset }),
+  slots: (slot) => ({
+    trigger: popupTrigger(slot),
+    content: popupContent(slot),
+  }),
+})
+
+export { share }
+```
+
+<Callout>
+
+Don't worry, you don't have to learn to write this. We taught agents how to do it, and they're really good at it. Ask yours for the component you need.
+
+</Callout>
+
+Then make it a component in your framework:
+
+<FrameworkTabs copyLabel="Copy">
+<FrameworkTab value="react">
+
+```ts title="components/ui/share.ts"
+"use client"
+
+import { createParts } from "@ui-sdk/react/primitive"
+import { share } from "@/lib/share"
+
+const parts = createParts(share, { trigger: "button", content: "div" })
+
+const Share = parts.Root
+const ShareTrigger = parts.Trigger
+const ShareContent = parts.Content
+
+export { Share, ShareContent, ShareTrigger }
+```
+
+</FrameworkTab>
+<FrameworkTab value="vue">
+
+```ts title="components/ui/share.ts"
+import { createParts } from "@ui-sdk/vue/primitive"
+import { share } from "@/lib/share"
+
+const parts = createParts(share, { trigger: "button", content: "div" })
+
+const Share = parts.Root
+const ShareTrigger = parts.Trigger
+const ShareContent = parts.Content
+
+export { Share, ShareContent, ShareTrigger }
+```
+
+</FrameworkTab>
+<FrameworkTab value="svelte">
+
+```ts title="components/ui/share.ts"
+import { createParts } from "@ui-sdk/svelte/primitive"
+import { share } from "@/lib/share"
+
+const parts = createParts(share, { trigger: "button", content: "div" })
+
+const Share = parts.Root
+const ShareTrigger = parts.Trigger
+const ShareContent = parts.Content
+
+export { Share, ShareContent, ShareTrigger }
+```
+
+</FrameworkTab>
+<FrameworkTab value="solid">
+
+```ts title="components/ui/share.ts"
+import { createParts } from "@ui-sdk/solid/primitive"
+import { share } from "@/lib/share"
+
+const parts = createParts(share, { trigger: "button", content: "div" })
+
+const Share = parts.Root
+const ShareTrigger = parts.Trigger
+const ShareContent = parts.Content
+
+export { Share, ShareContent, ShareTrigger }
+```
+
+</FrameworkTab>
+<FrameworkTab value="web-components">
+
+```ts title="components/ui/share.ts"
+import { createParts, wrappedButton } from "@ui-sdk/web"
+import { share } from "@/lib/share"
+
+createParts(share, {
+  root: "share-popover",
+  trigger: { tag: "share-trigger", target: wrappedButton },
+  content: "share-content",
+})
+```
+
+</FrameworkTab>
+</FrameworkTabs>
+
+Then use it like any other component:
+
+<FrameworkTabs copyLabel="Copy">
+<FrameworkTab value="react">
+
+```tsx title="pages/index.tsx"
+import { Share, ShareContent, ShareTrigger } from "@/components/ui/share"
+
+function Example() {
+  return (
+    <Share>
+      <ShareTrigger>Share</ShareTrigger>
+      <ShareContent>Anyone with the link can view.</ShareContent>
+    </Share>
+  )
+}
+```
+
+</FrameworkTab>
+<FrameworkTab value="vue">
+
+```vue title="pages/index.vue"
+<script setup lang="ts">
+import { Share, ShareContent, ShareTrigger } from "@/components/ui/share"
+</script>
+
+<template>
+  <Share>
+    <ShareTrigger>Share</ShareTrigger>
+    <ShareContent>Anyone with the link can view.</ShareContent>
+  </Share>
+</template>
+```
+
+</FrameworkTab>
+<FrameworkTab value="svelte">
+
+```svelte title="pages/index.svelte"
+<script lang="ts">
+  import { Share, ShareContent, ShareTrigger } from "@/components/ui/share"
+</script>
+
+<Share>
+  <ShareTrigger>Share</ShareTrigger>
+  <ShareContent>Anyone with the link can view.</ShareContent>
+</Share>
+```
+
+</FrameworkTab>
+<FrameworkTab value="solid">
+
+```tsx title="pages/index.tsx"
+import { Share, ShareContent, ShareTrigger } from "@/components/ui/share"
+
+function Example() {
+  return (
+    <Share>
+      <ShareTrigger>Share</ShareTrigger>
+      <ShareContent>Anyone with the link can view.</ShareContent>
+    </Share>
+  )
+}
+```
+
+</FrameworkTab>
+<FrameworkTab value="web-components">
+
+```html title="pages/index.html"
+<script type="module">
+  import "@/components/ui/share"
+</script>
+
+<share-popover>
+  <share-trigger><button>Share</button></share-trigger>
+  <share-content>Anyone with the link can view.</share-content>
+</share-popover>
+```
+
+</FrameworkTab>
+</FrameworkTabs>
+
+To combine several behaviors in one component, see [Compose Behaviors](/docs/behaviors/compose-behaviors).
+
+## Component libraries
+
+We used the same behaviors to build a component library for every framework: 53 ready-made components, from a Select to a Date Picker, with the same parts in React, Vue, Svelte, Solid and Web Components. You bring the styles.
+
+<FrameworkTabs copyLabel="Copy">
+<FrameworkTab value="react">
+
+```tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+
+function Example() {
+  return (
+    <Select placeholder="Select a role">
+      <SelectLabel>Role</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="viewer">Viewer</SelectItem>
+        <SelectItem value="editor">Editor</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+</FrameworkTab>
+<FrameworkTab value="vue">
+
+```vue
+<script setup lang="ts">
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue/select"
+</script>
+
+<template>
+  <Select placeholder="Select a role">
+    <SelectLabel>Role</SelectLabel>
+    <SelectTrigger>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="viewer">Viewer</SelectItem>
+      <SelectItem value="editor">Editor</SelectItem>
+    </SelectContent>
+  </Select>
+</template>
+```
+
+</FrameworkTab>
+<FrameworkTab value="svelte">
+
+```svelte
+<script lang="ts">
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
+</script>
+
+<Select placeholder="Select a role">
+  <SelectLabel>Role</SelectLabel>
+  <SelectTrigger>
+    <SelectValue />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="viewer">Viewer</SelectItem>
+    <SelectItem value="editor">Editor</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+</FrameworkTab>
+<FrameworkTab value="solid">
+
+```tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
+
+function Example() {
+  return (
+    <Select placeholder="Select a role">
+      <SelectLabel>Role</SelectLabel>
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="viewer">Viewer</SelectItem>
+        <SelectItem value="editor">Editor</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+</FrameworkTab>
+<FrameworkTab value="web-components">
+
+```html
+<script type="module">
+  import "@ui-sdk/web/select"
+</script>
+
+<ui-select placeholder="Select a role">
+  <ui-select-label>Role</ui-select-label>
+  <ui-select-trigger>
+    <button>
+      <ui-select-value></ui-select-value>
+    </button>
+  </ui-select-trigger>
+  <ui-select-content>
+    <ui-select-item value="viewer">Viewer</ui-select-item>
+    <ui-select-item value="editor">Editor</ui-select-item>
+  </ui-select-content>
+</ui-select>
+```
+
+</FrameworkTab>
+</FrameworkTabs>
+
+## Agents
+
+These days, agents build our interfaces. And more and more, agents use them too. So we built UI SDK for both.
+
+Everything you build with UI SDK is easy for an agent to use. It can read what's on the page and press, type and pick, just like a person would, within the permissions you set.
+
+Give an agent your page with `createAgent`:
+
+```ts
+import { createAgent } from "@ui-sdk/react/agent"
+
+const agent = createAgent({
+  allow: ({ component, label, action }) =>
+    component === "select" && label === "Region" && action === "setValue",
+})
+
+agent.snapshot()
+
+await agent.act({
+  steps: [{ ref: "Region", action: "setValue", args: ["north-america"] }],
+})
+```
+
+WebMCP lets a page give tools to the agent built into a browser. Call `registerTools` and the browser's agent can read your components and call their actions too. See [WebMCP](/docs/agents/webmcp).
+
+## Get started
+
+Pick your framework, then copy this prompt into your agent.
+
+<include>../../../shared/setup-prompt.mdx</include>
+
+Want to learn more? Read the [introduction](/docs).
+
+UI SDK is currently in beta. Try it, and tell us what you think on [GitHub](https://github.com/vercel-labs/ui).
+
+## Thank you
+
+Before building UI SDK, we spent years using and building component libraries on top of [Radix](https://www.radix-ui.com) and [Base UI](https://base-ui.com), and using other libraries like [React Aria](https://react-spectrum.adobe.com/react-aria/) and [Nuxt UI](https://ui.nuxt.com). UI SDK is everything we learned from that.
+
+Thank you to the teams behind Radix, Base UI, React Aria, [shadcn/ui](https://ui.shadcn.com), Nuxt UI and [Geist](https://vercel.com/geist), and to the [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/).

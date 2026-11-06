@@ -10,6 +10,7 @@ import { rmSync } from "node:fs"
 import path from "node:path"
 import { parseArgs } from "node:util"
 import { emitDeclarations } from "./declarations.mjs"
+import { buildNuxtModule } from "./nuxt-module.mjs"
 import { findPublishProblems } from "./publish-manifest.mjs"
 import { findServerModuleProblems } from "./server-modules.mjs"
 import { transpile } from "./transpile.mjs"
@@ -20,6 +21,7 @@ const { values: flags } = parseArgs({
     "use-client": { type: "boolean", default: false },
     server: { type: "string", multiple: true, default: [] },
     solid: { type: "boolean", default: false },
+    nuxt: { type: "boolean", default: false },
   },
 })
 
@@ -31,6 +33,8 @@ rmSync(outDir, { recursive: true, force: true })
 if (flags.solid) await transpileSolid({ packageDir, sourceDir, outDir })
 else await transpile({ sourceDir, outDir, useClient: flags["use-client"], serverModules: flags.server })
 emitDeclarations({ packageDir, sourceDir, outDir })
+// --nuxt builds the Nuxt module in `nuxt/` into `dist/nuxt`, for Vue.
+if (flags.nuxt) await buildNuxtModule({ packageDir, outDir })
 
 const problems = findPublishProblems(packageDir)
 if (problems.length) {

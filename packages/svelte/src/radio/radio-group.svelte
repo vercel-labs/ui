@@ -84,7 +84,7 @@ Radios that share one value, with one tab stop and arrow keys between them.
   setContext(RadioGroupKey, group)
   const root = useHandlePart(group, "group")
   const control = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>

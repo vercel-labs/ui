@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs"
 import path from "node:path"
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "../docs-test"
 
 // Every Behaviors page, by its path under /docs, from the content folder.
 const content = path.resolve(import.meta.dirname, "../../../apps/docs/content/docs")
@@ -26,7 +27,7 @@ test("every link to a heading on a Behaviors page lands on one", async ({ page }
   for (const from of pages) {
     await page.goto(from, { waitUntil: "domcontentloaded", timeout: 120_000 })
     const hrefs = await page
-      .locator("article a[href*='#']")
+      .locator("article a[href*='#']:not([data-example] a)")
       .evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href)))
       .then((urls) =>
         urls.map((url) => ({ path: url.pathname, hash: decodeURIComponent(url.hash.slice(1)) })),

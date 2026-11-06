@@ -64,6 +64,8 @@
 // - internal-exports: nothing a public entry exports says `@internal`. A
 //   declaration only renderers need goes through `@ui-sdk/core/renderer` or
 //   a module that isn't an entry; one people may use drops the tag.
+// - nuxt-imports: nothing in packages/*/src imports Nuxt. Every Vue app runs
+//   that code and Nuxt is an optional peer, so only `packages/vue/nuxt` may.
 // - api-files: core's function that builds an api, like `comboboxApi`, is
 //   declared in its component's own file, or in `<name>-api.ts` once it moves
 //   out of it, so every component splits the same way. An exported `*Api`
@@ -171,6 +173,7 @@ checkInternalStability()
 checkExportsAtEnd()
 checkPublicNames()
 checkRendererImports()
+checkNuxtImports()
 checkApiFiles()
 checkInternalExports()
 checkEntryTypes()
@@ -732,6 +735,22 @@ function checkRendererImports() {
             })
         })
   }
+}
+
+function checkNuxtImports() {
+  const nuxtImport = /\b(?:from|import)\s*\(?\s*["'](?:nuxt|@nuxt\/[\w-]+|#app|#imports)(?:\/[^"']*)?["']/
+  for (const file of packageSources())
+    readFileSync(file, "utf8")
+      .split("\n")
+      .forEach((text, index) => {
+        if (nuxtImport.test(text))
+          violations.push({
+            file: path.relative(root, file),
+            line: index + 1,
+            rule: "nuxt-imports",
+            message: "only the Nuxt module in `packages/vue/nuxt` may import Nuxt.",
+          })
+      })
 }
 
 function checkApiFiles() {

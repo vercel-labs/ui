@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "../docs-test"
 import { openExamples } from "./behaviors/helpers"
 
 test("the rating's agent key lets an agent read it and rate", async ({ page }) => {

@@ -101,7 +101,13 @@ function StyleTabs({ children }: { children: React.ReactNode }) {
 
 const frameworkItems = frameworkIds.map((value) => ({ value, label: frameworks[value].label }))
 
-function FrameworkTabs({ children }: { children: React.ReactNode }) {
+function FrameworkTabs({
+  children,
+  copyLabel = "Copy prompt",
+}: {
+  children: React.ReactNode
+  copyLabel?: string
+}) {
   const [framework, setFramework] = useFramework()
   return (
     <Frame className="my-5 overflow-hidden">
@@ -139,7 +145,7 @@ function FrameworkTabs({ children }: { children: React.ReactNode }) {
               ))}
             </SelectContent>
           </Select>
-          <CopyButton label="Copy prompt" className="ms-auto max-sm:[&>span]:sr-only" />
+          <CopyButton label={copyLabel} className="ms-auto max-sm:[&>span]:sr-only" />
         </TabBar>
         {children}
       </Tabs>

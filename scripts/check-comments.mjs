@@ -14,6 +14,7 @@ const exampleCode = /^examples\/(?!scripts\/|experiments\/)[^/]+\/[^/]+\//
 // Files comment-length leaves alone, each with why.
 const commentLengthSkips = {
   "scripts/check-code.mjs": "Its header documents every rule it checks.",
+  "scripts/check-packages.mjs": "Its header documents everything it checks in the packed packages.",
 }
 
 const root = path.resolve(import.meta.dirname, "..")

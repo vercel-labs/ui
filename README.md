@@ -7,6 +7,8 @@ A library of UI behaviors for building accessible interfaces: keyboard navigatio
   <img alt="An environment selector split into three behaviors: createPopup, createListbox and createTypeahead." src="./assets/behaviors-light.svg">
 </picture>
 
+**[Read the docs](https://ui-sdk.dev/docs)**
+
 ## Example
 
 Every component in ui-sdk is built from behaviors. You start by creating the primitive with behaviors.
@@ -158,7 +160,7 @@ Then use them in your HTML:
 
 ## Contributing
 
-Contributions are welcome. See [contributing](./contributing) to get the repo
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) to get the repo
 running locally and land a change, and use
 [issues](https://github.com/vercel-labs/ui/issues) for issues. By
 participating, you agree to our [Code of Conduct](CODE_OF_CONDUCT.md).

@@ -32,25 +32,28 @@ Each [component page](./components) lists the parts you can use.
 
 ## Use with Nuxt
 
-Install the same two packages in a Nuxt app. There's no Nuxt module or plugin to add: import components from their entries as above, and they render on the server and hydrate in the browser.
-
-Nuxt auto-imports the components in your `components/` directory, not those of a package. To use ui-sdk parts in templates without importing them, register an entry's exports with `addComponentExports` from an inline module:
+Install the same two packages in a Nuxt app, then add `@ui-sdk/vue` to its modules:
 
 ```ts title="nuxt.config.ts"
-import { addComponentExports } from "nuxt/kit"
-
 export default defineNuxtConfig({
-  modules: [
-    () => {
-      for (const entry of ["dialog", "select"]) {
-        addComponentExports({ filePath: `@ui-sdk/vue/${entry}` })
-      }
-    },
-  ],
+  modules: ["@ui-sdk/vue"],
 })
 ```
 
-Each part of those entries becomes an auto-imported component, like `<DialogTrigger>`. Functions such as `createDialogController` still need an import in `<script>`. Pass `prefix` if the names clash with your own components.
+Nuxt finds the module at `@ui-sdk/vue/nuxt`. It registers each part of every entry as an auto-imported component, like `<DialogTrigger>`, and auto-imports their other exports, like `createDialogController`, in `<script>`. Each one is still imported from its own entry, so a page bundles only what it uses. When a name clashes, your own component or `utils/` export wins. `confirm` is left out because it would replace the browser's `confirm()` in your code, so import it from `@ui-sdk/vue/alert-dialog`.
+
+The module adds no plugin and no styles. Components render on the server and hydrate in the browser without one, so importing them from their entries, as above, works in Nuxt too.
+
+Pass `prefix` to use ui-sdk's components beside your own of the same name:
+
+```ts title="nuxt.config.ts"
+export default defineNuxtConfig({
+  modules: ["@ui-sdk/vue"],
+  uiSdk: { prefix: "U" },
+})
+```
+
+With that prefix, `<DialogTrigger>` becomes `<UDialogTrigger>`. Other exports keep their names.
 
 ## Add Your Styles
 

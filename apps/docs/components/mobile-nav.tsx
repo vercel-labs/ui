@@ -12,7 +12,7 @@ import * as React from "react"
 import { FrameworkPicker } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
-import { useMenuLink } from "./section-nav"
+import { useCurrentUrl, useMenuLink } from "./section-nav"
 
 // The header on small screens. The menu fills the screen below it. Pages outside
 // the docs, like the homepage, have no section and list only the menu.
@@ -115,7 +115,7 @@ function MobileMenu({
   tree?: PageTree.Root
   onNavigate: () => void
 }) {
-  const pathname = usePathname()
+  const currentUrl = useCurrentUrl(tree)
   const link = useMenuLink(section)
   const groups = tree ? groupPages(tree.children, String(tree.name)) : []
 
@@ -157,7 +157,7 @@ function MobileMenu({
                 <MenuLink
                   key={page.url}
                   href={page.url}
-                  current={page.url === pathname}
+                  current={page.url === currentUrl}
                   onNavigate={onNavigate}
                 >
                   {page.name}

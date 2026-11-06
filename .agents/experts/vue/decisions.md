@@ -2,16 +2,17 @@
 
 What's already decided about `@ui-sdk/vue`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and the Nuxt module branch (2026-11-05, `@ui-sdk/vue/nuxt`).
 
 
 ## Settled
 
+- **`@ui-sdk/vue/nuxt` from the workspace needs `pnpm build` first.** Its list of entries is written by the build, and the source module reads the copy in `dist/nuxt`.
 - **`render` is the only way to render your own element**; `#render` slots hand over the part's own content as `children`. No `as`.
 - **Vue >=3.5** only.
 - **Form component dropped.**
-- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
-- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28.)
+- **Popups flip to the opposite side only**, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 - **A package `Checkbox` or `Toggle` joins only a package `CheckboxGroup` or `ToggleGroup`**, through the group's own context. A group root built with `createParts` or `usePart` doesn't reach it. This matches Svelte and keeps the group out of a standalone control's bundle.
 - **A half-typed date reads `null`.** Writing `null` back leaves its segments, so a controlled value can't empty them; `clear()` does. Same in every framework.
@@ -32,8 +33,6 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **A native `readonly` also lands on the root element** of Switch, Checkbox (`<button>`), RadioGroup and Listbox (`<div>`), where it means nothing. Harmless to assistive technology; an HTML validator flags it on a button.
 - **An author id on a control in a Field** (`NumberInputControl id`, `PasswordInputControl id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
-- **A range Slider in a Field** renders the label's `for` at the root `div[role=group]` on the server, which a label can't target. The client drops it once bound; the group keeps `aria-labelledby`.
-- **A Slider switched from a range back to one thumb** in a Field leaves the label with no `for` after the switch, while the thumb input takes the field's id again.
 - **A submit shortcut also submits a read-only Textarea.**
 - **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
 - **`submit-shortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.

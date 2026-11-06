@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test"
+import { expect } from "@playwright/test"
+import { test } from "../docs-test"
 import { openExamples } from "./behaviors/helpers"
 
 test("the introduction's examples render without errors", async ({ page }) => {
@@ -7,41 +8,54 @@ test("the introduction's examples render without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("emoji picker: search, then arrows and Enter pick an emoji", async ({ page }) => {
+test("icon picker: opens in a popover, search, then arrows and Enter pick an icon", async ({ page }) => {
   await openExamples(page, "/docs/react")
-  const example = page.locator('[data-example="core/emoji-picker"]')
-  const grid = page.getByRole("group", { name: "Emoji" })
-  const footer = page.locator("[data-footer]")
+  const example = page.locator('[data-example="core/icon-picker"]')
+  const trigger = example.getByRole("button", { name: "Pick an icon" })
+  await trigger.click()
+  const search = page.getByRole("searchbox", { name: "Search icons" })
+  await expect(search).toBeFocused()
+  const grid = page.getByRole("group", { name: "Icons" })
+  const preview = page.locator('[data-slot="icon-picker-preview"]')
   await expect(grid.locator('[tabindex="0"]')).toHaveCount(1)
-  const search = page.getByRole("searchbox", { name: "Search emoji" })
-  await search.fill("party")
-  await expect(grid.getByRole("button")).toHaveCount(2)
-  await expect(grid.getByRole("button").first()).toHaveAccessibleName("party popper")
-  // Enter in the search picks the best match.
+  await search.fill("idea")
+  await expect(grid.getByRole("button").first()).toHaveAccessibleName("Lightbulb")
+  await expect(grid.getByRole("button", { name: "Lightbulb" })).toHaveAttribute("data-highlighted", "")
+  await expect(preview).toHaveText("Lightbulb")
+  // Enter in the search picks the highlighted match, closes the popover and returns focus.
   await search.press("Enter")
-  await expect(footer).toHaveText("🎉Picked party popper")
+  await expect(search).toBeHidden()
+  await expect(example.getByRole("button", { name: "Lightbulb" })).toBeFocused()
+  // Reopening clears the search.
+  await page.keyboard.press("Enter")
+  await expect(search).toBeFocused()
+  await expect(search).toHaveValue("")
+  await expect(grid.getByRole("button", { name: "Lightbulb" })).toHaveAttribute("aria-pressed", "true")
+  await expect(grid.locator("[data-highlighted]")).toHaveCount(0)
   await search.press("ArrowDown")
-  await expect(grid.getByRole("button", { name: "party popper" })).toBeFocused()
+  await expect(grid.getByRole("button", { name: "Rocket" })).toBeFocused()
   await page.keyboard.press("ArrowRight")
-  await expect(grid.getByRole("button", { name: "partying face" })).toBeFocused()
-  await expect(footer).toHaveText("🥳partying face")
+  await expect(grid.getByRole("button", { name: "Star" })).toBeFocused()
+  await expect(preview).toHaveText("Star")
   // A letter in the grid goes back to the search.
   await page.keyboard.type("s")
   await expect(search).toBeFocused()
-  await expect(search).toHaveValue("partys")
-  await search.fill("ship")
-  await expect(grid.getByRole("button")).toHaveCount(1)
-  await expect(grid.getByRole("button")).toHaveAccessibleName("rocket")
+  await expect(search).toHaveValue("s")
   await search.fill("zzzzzz")
-  await expect(example.getByText("No emoji found.")).toBeVisible()
+  await expect(grid.getByText("No icons found.")).toBeVisible()
+  await page.keyboard.press("Escape")
+  await expect(search).toBeHidden()
+  await expect(example.getByRole("button", { name: "Lightbulb" })).toBeFocused()
 })
 
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 375, height: 800 }, hasTouch: true })
 
-  test("emoji picker: the arrows follow the columns that fit, and a tap picks", async ({ page }) => {
+  test("icon picker: the arrows follow the columns that fit, and a tap picks", async ({ page }) => {
     await openExamples(page, "/docs/react")
-    const grid = page.getByRole("group", { name: "Emoji" })
+    const example = page.locator('[data-example="core/icon-picker"]')
+    await example.getByRole("button", { name: "Pick an icon" }).tap()
+    const grid = page.getByRole("group", { name: "Icons" })
     const buttons = grid.getByRole("button")
     const tops = await buttons.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top))
     const columns = tops.filter((top) => top === tops[0]).length
@@ -51,7 +65,8 @@ test.describe("on a phone", () => {
     await expect(buttons.nth(columns)).toBeFocused()
     await page.keyboard.press("ArrowRight")
     await expect(buttons.nth(columns + 1)).toBeFocused()
-    await grid.getByRole("button", { name: "fire" }).tap()
-    await expect(page.locator("[data-footer]")).toContainText("fire")
+    await grid.getByRole("button", { name: "Flame" }).tap()
+    await expect(grid).toBeHidden()
+    await expect(example.getByRole("button", { name: "Flame" })).toBeVisible()
   })
 })

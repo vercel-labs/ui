@@ -2,7 +2,7 @@
 
 What's already decided about `@ui-sdk/svelte`, and what's known and open. The expert never re-raises a **Settled** item as a finding.
 
-Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
+Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input).
 
 
 ## Settled
@@ -12,8 +12,8 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Bindable props are controlled whenever defined**; a value passed without `bind:` only sets where the component starts.
 - **Handlers go on the component**, not on the `render` snippet's element: Svelte's delegation runs markup handlers after the built-in one, so they can't cancel it. Not fixable without Svelte's private symbol.
 - **Form component dropped.**
-- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28; shadcn left the call to the reviewers.)
-- **Popups flip to the opposite side only**, like Floating UI's default `flip`, never to a perpendicular one.
+- **CSP nonce**: a page sets it with `<meta property="csp-nonce" nonce="…">`. A tag with no nonce switches injected styles to constructed sheets, and the page declares `@layer ui-sdk;` first. (Chosen for PR 17, 2026-10-28.)
+- **Popups flip to the opposite side only**, never to a perpendicular one.
 - **`tests/specs/position.spec.ts` runs once per engine**, on `react` in Chromium and `web` elsewhere: the placement math is core's and doesn't depend on the framework.
 - **A half-typed date reads `null`.** Writing `null` back leaves its segments, so a controlled value can't empty them; `clear()` does. Same in every framework.
 
@@ -30,13 +30,12 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the Nuxt UI audit fixes), 158 and 159 (
 - **Data lists key separators and groups by index** (`command-items.svelte`, `listbox-items.svelte`), so a separator that comes back shifts the keys and a `CommandGroup` instance can be reused for another group.
 - **Tabs with panels before the list** (a bottom tab bar) render the first tab selected and no panel on the server. A panel renders before its tab has props, so it can't tell it's the one shown. It appears once the tabs bind.
 - **Select, Combobox, Autocomplete and TokenInput take no `readonly`**: they render no element and have no `...rest`, so `svelte-check` reports it. `readOnly` is the prop.
-- **An author id on a control in a Field** (`NumberInputControl id`, `PasswordInputControl id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
-- **A range Slider in a Field** renders the label's `for` at the root `div[role=group]` on the server, which a label can't target. The client drops it once bound; the group keeps `aria-labelledby`.
-- **`NumberInputControl` drops an author `id` inside a Field**: it passes `control.attrs.id` to `field.control()` (`number-input-control.svelte`), while `PasswordInputControl` keeps it.
+- **An author id on a control in a Field** (every control that joins one, like `NumberInputControl id`, `Checkbox id` or a range `Slider id`) isn't in the server HTML's label `for`, nor in a step button rendered before it: they can't read an id that renders after them. Putting the `id` on the `Field` works. It's right once the field binds.
 - **A submit shortcut also submits a read-only Textarea.**
 - **Holding Enter submits on every key repeat** with a submit shortcut: it doesn't skip `event.repeat`.
 - **`submitShortcut="enter"` leaves phones no way to add a line**: a soft keyboard has no Shift+Enter, and the textarea sets no `enterkeyhint`.
 - **A Slider in a Field without a FieldDescription** points the range input's `aria-describedby` at a description id that isn't rendered, in server markup until hydration. The server can't know which parts render after the control.
+- **A Slider in a Field that switches between a range and one thumb** keeps the field's control it started with (`slider.svelte` decides `isRange` once). Range to one thumb gives the root and the thumb's input the same id and the label no `for`; one thumb to a range points the label at the last thumb's input. Same on main.
 
 ## Revisit
 

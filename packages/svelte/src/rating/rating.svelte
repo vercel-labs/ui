@@ -102,7 +102,7 @@ preview while a pointer moves over them. Its content renders once per star.
   provideInstance(rating, control)
   const root = useHandlePart(control, "root")
   const fieldControl = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
   const stars = $derived(Array.from({ length: max }, (_, at) => at + 1))

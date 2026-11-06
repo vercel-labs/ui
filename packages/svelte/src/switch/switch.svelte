@@ -72,7 +72,7 @@ A control that turns a setting on or off, with the hidden native input that take
   const root = useHandlePart(control, "root")
   const input = useHandlePart(control, "input")
   const inField = field?.control(
-    () => root.attrs.id,
+    () => rest.id,
     () => rest["aria-describedby"],
   )
 </script>

@@ -1,7 +1,9 @@
 import { Tabs, TabsList, TabsPanel, TabsStackedPanel, TabsTab } from "@/components/ui/tabs"
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
+import { readExampleModules } from "@/lib/example-modules"
 import { readExampleSources } from "@/lib/example-sources"
+import { preloadModule } from "react-dom"
 import { CodeBlock } from "./code"
 import { ExamplePreview } from "./example-preview"
 import { FileIcon } from "lucide-react"
@@ -28,11 +30,23 @@ async function ComponentExample({
   compact?: boolean
   tall?: boolean
 }) {
-  const sources = await readExampleSources(name, framework)
+  const [sources, modules] = await Promise.all([
+    readExampleSources(name, framework),
+    readExampleModules(name, framework),
+  ])
   if (!sources) return null
+  modules?.preload.forEach((url) => preloadModule(url))
 
   const preview = (
-    <ExamplePreview name={name} framework={framework} compact={compact} tall={tall} log={sources.log} />
+    <ExamplePreview
+      name={name}
+      src={modules?.src}
+      mount={modules?.mount}
+      html={modules?.html}
+      compact={compact}
+      tall={tall}
+      log={sources.log}
+    />
   )
   const single = sources.files.length === 1
   // Several files show one at a time, so the code panel stays as tall as one file.

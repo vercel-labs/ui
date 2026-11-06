@@ -36,23 +36,24 @@ It installs ui-sdk and points your `AGENTS.md` at the docs that ship with the pa
 Then ask your agent to build a component:
 
 ```text prompt
-Build an emoji picker with ui-sdk: a search field above a grid of emoji. Typing filters the grid, the arrow keys move between emoji, and Enter picks one. Use our existing styles.
+Build an icon picker with ui-sdk: a button that opens a popover with a search field above a grid of icons. Typing filters the grid, the arrow keys move between icons, and Enter picks one. Use our existing styles.
 ```
 
-Here's an emoji picker an agent built from ui-sdk's behaviors:
+Here's an icon picker an agent built from ui-sdk's behaviors:
 
 <ComponentExample
-  name="core/emoji-picker"
+  name="core/icon-picker"
   hideCode
-  caption="Click an emoji to pick it, or type to search. Press Down to enter the results, use the arrow keys to move, and press Enter to pick."
+  caption="Click Pick an icon to open the picker, then click an icon or type to search. The best match is highlighted, so Enter picks it. Press Down to enter the results and use the arrow keys to move."
 />
 
-It uses four behaviors:
+It uses five behaviors:
 
-- **One Tab stop.** [`createRovingFocus`](/docs/behaviors/focus#roving-focus) lets Tab enter the grid once. The arrow keys move between emoji, and the next Tab leaves it.
-- **Arrows that follow the layout.** [`spatialMove`](/docs/behaviors/focus#spatial-focus) chooses the nearest emoji in the direction you press. Down still goes down when the grid fits fewer columns on a small screen.
-- **Search results.** [`fuzzyScore`](/docs/behaviors/text#rank-what-someone-searches-for) ranks each emoji's name and keywords against what you type. "party" finds the party popper, and "ship" finds the rocket.
-- **Announcements.** [`announce`](/docs/behaviors/platform#announcements) tells screen readers how many emoji match and which one you picked.
+- **A popover.** [`createPopup`](/docs/behaviors/popups#a-popup-of-your-own) with the popover preset opens the picker beside its button, moves focus to the search field, and closes on Escape or a click outside. Picking an icon closes it and puts focus back on the button.
+- **One Tab stop.** [`createRovingFocus`](/docs/behaviors/focus#roving-focus) lets Tab enter the grid once. The arrow keys move between icons, and the next Tab leaves it.
+- **Arrows that follow the layout.** [`spatialMove`](/docs/behaviors/focus#spatial-focus) chooses the nearest icon in the direction you press. Down still goes down when the grid fits fewer columns on a small screen.
+- **Search results.** [`fuzzyScore`](/docs/behaviors/text#rank-what-someone-searches-for) ranks each icon's name and keywords against what you type. "idea" finds the lightbulb, and "launch" finds the rocket.
+- **Announcements.** [`announce`](/docs/behaviors/platform#announcements) tells screen readers how many icons match what you type.
 
 Your agent picks behaviors like these for whatever you ask it to build.
 

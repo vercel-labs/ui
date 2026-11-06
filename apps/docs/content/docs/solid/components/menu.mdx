@@ -344,7 +344,11 @@ Props and callbacks are the same as below, as Solid props.
 
 ### Menu
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOptions" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuOptions"
+  types={{ controller: "MenuController" }}
+/>
 
 ### MenuTrigger
 
@@ -387,9 +391,16 @@ A trigger outside the menu also takes `controller`.
 ### MenuSub
 
 <TypeTable
-  path="../../packages/core/src/components/menu/menu.ts"
-  name="MenuSubProps"
-  type="Pick<MenuOptions, 'open' | 'defaultOpen' | 'onOpenChange' | 'onOpenChangeComplete' | 'loop' | 'delay' | 'controller' | 'debug'>"
+  path="../../packages/solid/src/menu.tsx"
+  name="MenuSubOptions"
+  type="Omit<MenuSubProps, 'children'>"
+  descriptions={{
+    open: "Whether the submenu is open. Pass it to control the submenu.",
+    defaultOpen: "Whether the submenu starts open, when uncontrolled.",
+    controller:
+      "Opens, closes and inspects the submenu. Create one with `createMenuController()`. Triggers outside the menu can't connect to it.",
+  }}
+  types={{ controller: "MenuController" }}
 />
 
 ### MenuSubTrigger

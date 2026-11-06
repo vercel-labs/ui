@@ -1,9 +1,32 @@
 {
   "name": "@ui-sdk/svelte",
   "version": "0.0.0",
-  "private": true,
+  "description": "UI SDK for Svelte.",
+  "keywords": [
+    "svelte",
+    "ui",
+    "ui-sdk",
+    "shadcn",
+    "behaviors",
+    "accessibility",
+    "a11y",
+    "aria",
+    "keyboard",
+    "focus",
+    "headless",
+    "unstyled",
+    "components",
+    "agents"
+  ],
   "type": "module",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "homepage": "https://ui-sdk.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vercel-labs/ui.git",
+    "directory": "packages/svelte"
+  },
+  "bugs": "https://github.com/vercel-labs/ui/issues",
   "exports": {
     ".": {
       "svelte": "./src/index.ts",
@@ -423,6 +446,7 @@
   },
   "scripts": {
     "build": "node ../../scripts/build/build-svelte-package.mjs",
+    "prepack": "cp ../../LICENSE LICENSE",
     "typecheck": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
     "test": "vitest run"
   },

@@ -9,7 +9,7 @@ When your agent builds a component with ui-sdk, it uses three pieces. Let's look
 
 A **behavior** is one thing an interface does. Moving between items with the arrow keys is a behavior. So is ranking search results, or telling a screen reader what changed.
 
-The emoji picker from the [Introduction](./index) uses four: `createRovingFocus` for one Tab stop and the arrow keys, `spatialMove` for arrows that follow the grid, `fuzzyScore` for search, and `announce` for screen readers. Behaviors come from `@ui-sdk/core`, and they work the same in every framework.
+The icon picker from the [Introduction](./index) uses five: `createPopup` for the popover, `createRovingFocus` for one Tab stop and the arrow keys, `spatialMove` for arrows that follow the grid, `fuzzyScore` for search, and `announce` for screen readers. Behaviors come from `@ui-sdk/core`, and they work the same in every framework.
 
 [All Behaviors](/docs/behaviors) lists them by the job they do.
 
@@ -39,7 +39,7 @@ export { muteButton }
 
 Pressing the button calls `toggle`, which flips `muted`, and `aria-pressed` follows it. The primitive holds the behavior. The markup and styles come from you.
 
-The emoji picker's primitive is bigger, with a search field, a grid and a button per emoji, but it has the same shape.
+The icon picker's primitive is bigger, with a button that opens it, a search field, a grid and a button per icon, but it has the same shape.
 
 ## Parts in Vue
 

@@ -1,6 +1,7 @@
 import { PageToc } from "@/components/page-toc"
 import { getMDXComponents } from "@/components/mdx"
 import { isFramework } from "@/lib/frameworks"
+import { pageDate } from "@/lib/page-date"
 import { isSection, sectionLabel } from "@/lib/sections"
 import { source } from "@/lib/source"
 import { findNeighbour } from "fumadocs-core/page-tree"
@@ -18,8 +19,9 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
   const MDX = page.data.body
   const neighbours = findNeighbour(source.getPageTree(), page.url)
   const inSection = (url?: string) => url === `/docs/${section}` || url?.startsWith(`/docs/${section}/`)
-  const previous = inSection(neighbours.previous?.url) ? neighbours.previous : undefined
-  const next = inSection(neighbours.next?.url) ? neighbours.next : undefined
+  const changelog = section === "behaviors" && slug[0] === "changelog"
+  const previous = !changelog && inSection(neighbours.previous?.url) ? neighbours.previous : undefined
+  const next = !changelog && inSection(neighbours.next?.url) ? neighbours.next : undefined
 
   const resolve = (href: string) => {
     if (!href.startsWith("./") && !href.startsWith("../")) return href
@@ -36,6 +38,11 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
       <div className="min-w-0 flex-1">
         <article className="w-full xl:max-w-2xl px-6 pt-8 pb-24 sm:px-8 lg:px-10">
           <header className="mb-10">
+            {page.data.date && (
+              <time dateTime={page.data.date} className="mb-3 block text-[13px] text-subtle">
+                {pageDate(page.data.date)}
+              </time>
+            )}
             <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
               {page.data.title}
             </h1>

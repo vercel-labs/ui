@@ -14,7 +14,7 @@ The text field, which shows the formatted number and takes typing.
   const numberInput = useNumberInput("NumberInputControl")
   const control = useHandlePart(numberInput, "control")
   const field = numberInput.field?.control(
-    () => control.attrs.id as string | undefined,
+    () => props.id,
     () => props["aria-describedby"],
   )
 </script>

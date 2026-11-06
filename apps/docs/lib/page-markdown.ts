@@ -168,7 +168,7 @@ async function pageMarkdown(
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
-      .replace(/<\/?FrameworkTabs>\n?/g, "")
+      .replace(/<\/?FrameworkTabs\b[^>]*>\n?/g, "")
       .replace(/<Framework(?:Content|Tab)\s+value="([^"]+)">/g, (_, value: string) => {
         const label = frameworks[value as Framework]?.label ?? value
         return `**${label}**\n`
@@ -191,6 +191,16 @@ async function pageMarkdown(
           .map(
             (page) =>
               `- [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
+          )
+          .join("\n"),
+      )
+      .replace(tag("ChangelogPosts"), () =>
+        docPages("behaviors/changelog")
+          .filter((page) => page.slugs.length === 3 && page.date)
+          .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+          .map(
+            (page) =>
+              `- ${page.date}: [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
           )
           .join("\n"),
       )
@@ -231,7 +241,7 @@ async function pageMarkdown(
       )
 
     out = await replaceAsync(out, tag("TypeTable"), async (_, attrs: string) => {
-      const { path: file, name, events, examples, type, types } = attributes(attrs)
+      const { path: file, name, events, examples, type, types, descriptions } = attributes(attrs)
       const tables = await typeRows({
         path: file,
         name,
@@ -240,6 +250,7 @@ async function pageMarkdown(
         events: events !== "false",
         examples: objectOf(examples),
         types: objectOf(types),
+        descriptions: objectOf(descriptions),
       })
       return tables.map((table) => rows(table.rows)).join("\n\n")
     })
