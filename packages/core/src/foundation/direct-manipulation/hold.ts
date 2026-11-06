@@ -6,13 +6,13 @@ import { on } from "../kernel/events"
 
 /**
  * What pressed: a pointer's type, or `keyboard` for a key.
- * @experimental
+ * @stable
  */
 type HoldInput = "mouse" | "touch" | "pen" | "keyboard"
 
 /**
  * What `bindHold`'s callbacks receive.
- * @experimental
+ * @stable
  */
 type HoldDetails = {
   /** The event that started the press: its `pointerdown` or `keydown`. */
@@ -23,7 +23,7 @@ type HoldDetails = {
 
 /**
  * What `bindHold` reports when a press ends.
- * @experimental
+ * @stable
  */
 type HoldEndDetails = {
   /** The event that ended the press. */
@@ -41,7 +41,7 @@ type HoldEndDetails = {
 
 /**
  * How `bindHold` treats a press.
- * @experimental
+ * @stable
  */
 type BindHoldOptions = {
   /** How long a press lasts before it's held, in milliseconds. @defaultValue 500 */
@@ -99,7 +99,7 @@ type Press = {
  *   onHold: () => deleteProject(),
  * })
  * ```
- * @experimental
+ * @stable
  */
 function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   const doc = el.ownerDocument
