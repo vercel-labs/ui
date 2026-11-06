@@ -2,6 +2,7 @@
 
 import { cn } from "cn"
 import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/react/popover"
+import { frameworkIds, frameworks } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
 import type { Section } from "@/lib/sections"
 import type * as PageTree from "fumadocs-core/page-tree"
@@ -9,10 +10,11 @@ import { ArrowUpRightIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
-import { FrameworkPicker } from "./site-preferences"
+import { GitHubLink } from "./github-link"
+import { FrameworkCheck } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
 import { SearchTrigger } from "./search"
-import { useActiveTree, useCurrentUrl, useMenuLink } from "./section-nav"
+import { useActiveTree, useCurrentUrl, useFrameworkLink, useMenuLink } from "./section-nav"
 
 // The header on small screens. The menu fills the screen below it. Pages outside
 // the docs, like the homepage, have no section and list only the menu.
@@ -58,13 +60,10 @@ function MobileNav({
       >
         <Logo className="h-[18px] w-auto" />
       </Link>
-      <span aria-hidden className="text-lg font-light text-foreground/20">
-        /
-      </span>
-      <FrameworkPicker urls={urls} />
       <div className="ms-auto flex items-center gap-1">
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger className="flex size-8 items-center justify-center rounded-2xl bg-foreground/[0.045] text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
+        <GitHubLink />
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             aria-label="Menu"
@@ -84,7 +83,7 @@ function MobileNav({
             className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas/90 outline-none backdrop-blur-md [scrollbar-width:none] lg:hidden"
           >
             <PopoverTitle className="sr-only">Menu</PopoverTitle>
-            <MobileMenu section={section} tree={active} onNavigate={() => setOpen(false)} />
+            <MobileMenu section={section} tree={active} urls={urls} onNavigate={() => setOpen(false)} />
           </PopoverContent>
         </Popover>
       </div>
@@ -112,22 +111,26 @@ function groupPages(nodes: PageTree.Node[], label?: string) {
 function MobileMenu({
   section,
   tree,
+  urls,
   onNavigate,
 }: {
   section?: Section
   tree?: PageTree.Root
+  urls: string[]
   onNavigate: () => void
 }) {
   const currentUrl = useCurrentUrl(tree)
   const link = useMenuLink(section)
+  const frameworkLink = useFrameworkLink(urls)
   const groups = tree ? groupPages(tree.children, String(tree.name)) : []
 
   return (
     // Two landmarks, like the header and sidebar on large screens.
     <div className="flex flex-col gap-12 px-6 pt-6 pb-12 sm:px-8">
-      <nav aria-label="Sections">
+      <nav aria-label="Sections" className="flex flex-col gap-12">
         <MenuGroup label="Menu">
           {menu.map((item) => {
+            if (item.href === "/docs/frameworks") return null
             if (item.href.startsWith("http")) {
               return (
                 <li key={item.href}>
@@ -150,6 +153,21 @@ function MobileMenu({
               </MenuLink>
             )
           })}
+        </MenuGroup>
+        <MenuGroup label="Frameworks">
+          {frameworkIds.map((framework) => (
+            <MenuLink
+              key={framework}
+              href={frameworkLink(framework)}
+              current={section === framework}
+              onNavigate={onNavigate}
+            >
+              <span className="flex items-center gap-3">
+                {frameworks[framework].label}
+                <FrameworkCheck framework={framework} className="size-6" />
+              </span>
+            </MenuLink>
+          ))}
         </MenuGroup>
       </nav>
       {groups.length > 0 && (

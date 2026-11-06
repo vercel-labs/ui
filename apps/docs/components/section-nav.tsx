@@ -1,9 +1,9 @@
 "use client"
 
-import { isFramework } from "@/lib/frameworks"
+import { type Framework, isFramework } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
 import { useSavedFramework } from "@/lib/preferences"
-import type { Section } from "@/lib/sections"
+import { frameworkHref, type Section } from "@/lib/sections"
 import { flattenTree, type Root } from "fumadocs-core/page-tree"
 import { usePathname } from "next/navigation"
 
@@ -15,6 +15,9 @@ function useMenuLink(section?: Section) {
   const framework = current ?? saved
   const onComponents = !!current && pathname.startsWith(`/docs/${current}/components`)
   return (href: string) => {
+    if (href === "/docs") {
+      return { href, current: pathname === "/docs" }
+    }
     if (href === "/docs/frameworks") {
       return { href: framework ? `/docs/${framework}` : href, current: !!current && !onComponents }
     }
@@ -23,6 +26,15 @@ function useMenuLink(section?: Section) {
     }
     return { href, current: href === activeLink?.href }
   }
+}
+
+// Each framework's link from the page being read: the same page in that framework
+// on a framework's page, else the framework's introduction.
+function useFrameworkLink(urls: string[]) {
+  const pathname = usePathname()
+  const onFramework = isFramework(pathname.split("/")[2] ?? "")
+  return (framework: Framework) =>
+    onFramework ? frameworkHref(pathname, framework, urls) : `/docs/${framework}`
 }
 
 function useActiveTree(tree?: Root, componentsTree?: Root) {
@@ -42,4 +54,4 @@ function useCurrentUrl(tree?: Root) {
   return urls.filter((url) => pathname.startsWith(`${url}/`)).sort((a, b) => b.length - a.length)[0]
 }
 
-export { useActiveTree, useCurrentUrl, useMenuLink }
+export { useActiveTree, useCurrentUrl, useFrameworkLink, useMenuLink }

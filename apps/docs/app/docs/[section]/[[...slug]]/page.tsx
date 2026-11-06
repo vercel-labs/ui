@@ -1,12 +1,10 @@
-import { PageToc } from "@/components/page-toc"
+import { DocsArticle } from "@/components/docs-article"
 import { getMDXComponents } from "@/components/mdx"
 import { isFramework } from "@/lib/frameworks"
-import { pageDate } from "@/lib/page-date"
 import { isSection, sectionLabel } from "@/lib/sections"
 import { source } from "@/lib/source"
 import { findNeighbour } from "fumadocs-core/page-tree"
 import type { Metadata } from "next"
-import Link from "next/link"
 import { notFound } from "next/navigation"
 import path from "node:path"
 
@@ -34,55 +32,17 @@ export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]
   }
 
   return (
-    <>
-      <div className="min-w-0 flex-1">
-        <article className="w-full xl:max-w-2xl px-6 pt-8 pb-24 sm:px-8 lg:px-10">
-          <header className="mb-10">
-            {page.data.date && (
-              <time dateTime={page.data.date} className="mb-3 block text-[13px] text-subtle">
-                {pageDate(page.data.date)}
-              </time>
-            )}
-            <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
-              {page.data.title}
-            </h1>
-            {page.data.description && (
-              <p className="mt-3 text-base leading-relaxed sm:text-[15px] text-pretty text-subtle">
-                {page.data.description}
-              </p>
-            )}
-          </header>
-          <MDX components={getMDXComponents(isFramework(section) ? section : undefined, resolve)} />
-          {(previous || next) && (
-            <nav aria-label="Pages" className="mt-20 grid grid-cols-2 gap-4 border-t border-border/70 pt-6">
-              {previous ? (
-                <Link
-                  href={previous.url}
-                  className="group flex flex-col gap-1 rounded-md text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-                >
-                  <span className="text-[13px] text-subtle">Previous</span>
-                  <span className="group-hover:underline group-hover:underline-offset-4">
-                    {previous.name}
-                  </span>
-                </Link>
-              ) : (
-                <span />
-              )}
-              {next && (
-                <Link
-                  href={next.url}
-                  className="group flex flex-col items-end gap-1 rounded-md text-end text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
-                >
-                  <span className="text-[13px] text-subtle">Next</span>
-                  <span className="group-hover:underline group-hover:underline-offset-4">{next.name}</span>
-                </Link>
-              )}
-            </nav>
-          )}
-        </article>
-      </div>
-      <PageToc toc={page.data.toc} url={page.url} />
-    </>
+    <DocsArticle
+      title={page.data.title}
+      description={page.data.description}
+      date={page.data.date}
+      previous={previous}
+      next={next}
+      toc={page.data.toc}
+      url={page.url}
+    >
+      <MDX components={getMDXComponents(isFramework(section) ? section : undefined, resolve)} />
+    </DocsArticle>
   )
 }
 
