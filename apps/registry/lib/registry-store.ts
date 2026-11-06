@@ -24,7 +24,8 @@ let client: ReturnType<typeof createClient> | undefined
 // Created on first use, so a missing connection fails token checks, not the plain root page.
 function tokenConfig() {
   // Stores connected since the rename set GLOBAL_CONFIG, older ones EDGE_CONFIG.
-  client ??= createClient(process.env.GLOBAL_CONFIG ?? process.env.EDGE_CONFIG)
+  // No stale reads on errors, so an outage can't bring back a revoked token.
+  client ??= createClient(process.env.GLOBAL_CONFIG ?? process.env.EDGE_CONFIG, { staleIfError: false })
   return client
 }
 
