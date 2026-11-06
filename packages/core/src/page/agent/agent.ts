@@ -141,7 +141,7 @@ function fromData(items: unknown, disabled?: Set<string>, key = keyOf, known?: S
   const add = (item: unknown) => {
     if (typeof item === "string") {
       out.push({ value: item, label: item })
-      known?.add(item)
+      known?.add(key(item))
     } else if (item && typeof item === "object") {
       const entry = item as {
         type?: string
