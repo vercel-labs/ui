@@ -991,7 +991,10 @@ function createAgent(
     try {
       // What `allow` saw can change while it decides, like a mark the page adds, which asks again.
       let asking = await askToRun()
-      while (asking) asking = await askToRun()
+      for (let asked = 1; asking; asked++) {
+        if (asked === 3) throw new Error(`${entry.ref} kept changing while it was being approved.`)
+        asking = await askToRun()
+      }
       if (isOffLimits(targets())) throw new Error(`${entry.ref} isn't available to agents now.`)
       if (!press && isComponentDisabled(instance.get() as Record<string, unknown>, bound(instance)))
         throw new Error(`${entry.component} ${entry.ref} is disabled now.`)
