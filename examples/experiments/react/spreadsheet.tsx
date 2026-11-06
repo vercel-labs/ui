@@ -175,10 +175,13 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
     const rows = () => context.options().rows
     const cols = () => Math.min(26, context.options().cols)
 
-    let cache: { cells: SpreadsheetCells; values: Map<string, number | string> } | undefined
+    let cache:
+      | { cells: SpreadsheetCells; rows: number; cols: number; values: Map<string, number | string> }
+      | undefined
     const valueOf = (name: string): number | string => {
       const { cells } = store.get()
-      if (cache?.cells !== cells) cache = { cells, values: new Map() }
+      if (cache?.cells !== cells || cache.rows !== rows() || cache.cols !== cols())
+        cache = { cells, rows: rows(), cols: cols(), values: new Map() }
       const values = cache.values
       if (values.has(name)) return values.get(name)!
       const raw = cells[name] ?? ""

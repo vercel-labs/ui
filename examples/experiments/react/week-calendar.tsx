@@ -81,7 +81,9 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
     const syncHistory = () => store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
     // Events set from outside start the history over, so undo never brings back older ones.
     const catchUp = () => {
-      if (store.get().events !== recorded) history.reset((recorded = store.get().events))
+      const current = store.get().events
+      if (current !== recorded && JSON.stringify(current) !== JSON.stringify(recorded))
+        history.reset((recorded = current))
     }
     const commit = (
       events: CalendarEvent[],
