@@ -56,6 +56,7 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await create.click()
     await expect(create).toHaveAttribute("data-pending", "")
     await expect(create).toHaveAttribute("aria-busy", "true")
+    await expect(create).toHaveAttribute("aria-disabled", "true")
     await expect(listbox(page)).toBeHidden()
   })
 

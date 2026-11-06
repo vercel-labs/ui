@@ -12,7 +12,7 @@ import { placementOptions } from "../../foundation/popups/popup-features"
 import { animateIn } from "../../foundation/motion/presence"
 import { labelOf } from "../../foundation/text/typeahead"
 import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { checkedAttrs, openAttrs } from "../../foundation/kernel/attrs"
+import { checkedAttrs, idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { on, selectEvent } from "../../foundation/kernel/events"
 import { onProps } from "../../foundation/kernel/part"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
@@ -49,7 +49,7 @@ import {
 
 // A group is named by its label only while one is in the page, so an unlabeled group points at no missing id.
 const menuGroupLabelledBy = (state: MenuState, id: string, group: string) =>
-  state.groupLabels.includes(group) ? `${id}-label-${group}` : undefined
+  state.groupLabels.includes(group) ? `${id}-label-${idPart(group)}` : undefined
 
 // The content is named by the trigger that opened it, which a context area or
 // a controller's open without a trigger isn't. A submenu's trigger always names it.
@@ -380,7 +380,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
       error: state.error?.key === key ? state.error.reason : undefined,
     }),
     attrs: (state, { id, key, props }) => ({
-      id: `${id}-item-${key}`,
+      id: `${id}-item-${idPart(key)}`,
       tabindex: "-1",
       "aria-disabled": props.disabled ? "true" : undefined,
       "aria-busy": state.pending.includes(key) ? "true" : undefined,
@@ -423,7 +423,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
     // Internal: passed by renderers, the group's `id` or the radio group's `name`.
     props: { group: "string" },
     selects: selects({ values: [] }),
-    attrs: (state, { id, props }) => ({ id: `${id}-label-${props.group}` }),
+    attrs: (state, { id, props }) => ({ id: `${id}-label-${idPart(props.group ?? "")}` }),
     bind: (el, { store, props }) => keyWhileBound(store, "groupLabels", props.group),
   }),
 
@@ -519,7 +519,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       attrs: (state, { id, key, props, api }) => {
         const checked = api.checkboxValue(props)
         return {
-          id: `${id}-item-${key}`,
+          id: `${id}-item-${idPart(key)}`,
           tabindex: "-1",
           "aria-checked": String(checked),
           "aria-disabled": props.disabled ? "true" : undefined,
@@ -575,7 +575,7 @@ const menuCheckable = /* @__PURE__ */ (() => ({
       attrs: (state, { id, key, props, api }) => {
         const checked = api.radioValue(props.group!) === props.value
         return {
-          id: `${id}-item-${props.group}-${key}`,
+          id: `${id}-item-${idPart(props.group ?? "")}-${idPart(key)}`,
           tabindex: "-1",
           "aria-checked": String(checked),
           "aria-disabled": props.disabled ? "true" : undefined,

@@ -21,7 +21,7 @@
   let action = $state("")
   const controller = createToolbarController()
   const options = toolbarOptions()
-  // For ?locked: disabled groups around Text style, Spellcheck and History until Unlock.
+  // For ?locked: disabled groups around Text style, Spellcheck, History and Help until Unlock.
   const lockable = toolbarLocked()
   let locked = $state(lockable)
   const groups = [
@@ -35,6 +35,9 @@
   <Toggle class="toggle" onPressedChange={(pressed) => (action = `spellcheck: ${pressed ? "on" : "off"}`)}>
     {f.spellcheck.label}
   </Toggle>
+{/snippet}
+{#snippet helpLink()}
+  <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>
 {/snippet}
 
 <div class="fixture">
@@ -100,7 +103,11 @@
     {:else}
       {@render spellcheckToggle()}
     {/if}
-    <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>
+    {#if lockable}
+      <ToolbarGroup aria-label="Locked help" disabled={locked}>{@render helpLink()}</ToolbarGroup>
+    {:else}
+      {@render helpLink()}
+    {/if}
   </Toolbar>
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>

@@ -53,7 +53,7 @@ const toolbarItems = [
 ]
 
 // With ?locked, disabled toolbar groups hold the Text style toggle group, the
-// Spellcheck toggle and History, until the Unlock button outside enables them.
+// Spellcheck toggle, History and Help, until the Unlock button outside enables them.
 const toolbarLocked = () => new URLSearchParams(location.search).has("locked")
 
 // Toolbar options a spec can set through the URL: ?orientation=vertical&loop=false&disabled.

@@ -410,14 +410,14 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
       },
     }),
 
-    link: slot<{}, ToolbarLinkState>({
-      props: { id: "id" },
+    link: slot<Pick<ItemProps, "groupDisabled">, ToolbarLinkState>({
+      props: { id: "id", groupDisabled: { kind: "boolean", from: "group.disabled" } },
       selects: selects({ stop: ({ key }) => [key, null], elements: [] }),
       state: (state) => ({ orientation: state.orientation }),
-      attrs: (state, { key, api }) => ({
-        tabindex: api.internal.isStop(key, true) ? "0" : "-1",
-        "data-orientation": state.orientation,
-      }),
+      attrs: (state, { key, props, api }) => {
+        const item = itemAttrs(state, key, props, api)
+        return { tabindex: item.tabindex, "aria-disabled": item.disabled ? "true" : undefined, ...item.data }
+      },
       bind: (el, part) => part.api.internal.join(part, el),
     }),
 

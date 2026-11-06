@@ -186,6 +186,7 @@ test("a disabled toolbar keeps one tab stop, and every item says it's disabled",
   await expectFocus(page, "Bold")
   await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-disabled", "true")
   await expect(page.getByRole("button", { name: "Undo" })).toHaveAttribute("aria-disabled", "true")
+  await expect(page.getByRole("link", { name: "Help" })).toHaveAttribute("aria-disabled", "true")
   await page.keyboard.press("Space")
   await page.keyboard.press("ArrowRight")
   await expectFocus(page, "Italic")
@@ -206,6 +207,18 @@ test.describe("disabled groups", () => {
     await page.getByRole("button", { name: "Italic" }).click({ force: true })
     expect(await lastAction(page)).toBe("")
     await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "false")
+  })
+
+  test("a link in a disabled group is disabled, and follows its href once enabled", async ({ page }) => {
+    const help = page.getByRole("link", { name: "Help" })
+    await expect(help).toHaveAttribute("aria-disabled", "true")
+    await expect(help).toHaveAttribute("data-disabled", "")
+    await help.click({ force: true })
+    await expect(page).not.toHaveURL(/#help$/)
+    await page.getByRole("button", { name: "Unlock" }).click()
+    await expect(help).not.toHaveAttribute("aria-disabled", "true")
+    await help.click()
+    await expect(page).toHaveURL(/#help$/)
   })
 
   test("enabling a group enables the toggles and buttons in it", async ({ page }) => {

@@ -76,5 +76,12 @@ describe("toolbar", () => {
     expect(partAttrs(toolbar({ id: "t" }).part("button", { id: "a", groupDisabled: true }))).toMatchObject({
       "aria-disabled": "true",
     })
+    const disabledLink = { "aria-disabled": "true", "data-disabled": "" }
+    expect(partAttrs(toolbar({ id: "t" }).part("link", { id: "l", groupDisabled: true }))).toMatchObject(
+      disabledLink,
+    )
+    expect(partAttrs(toolbar({ id: "t", disabled: true }).part("link", { id: "l" }))).toMatchObject(
+      disabledLink,
+    )
   })
 })

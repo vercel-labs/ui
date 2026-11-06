@@ -97,7 +97,9 @@ function Fixture() {
             {f.spellcheck.label}
           </Toggle>
         ))}
-        <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>
+        {lock("Locked help", () => (
+          <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>
+        ))}
       </Toolbar>
       <button>After</button>
       <output role="status" aria-label="Last action">

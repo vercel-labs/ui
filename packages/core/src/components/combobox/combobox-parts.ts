@@ -429,6 +429,7 @@ const comboboxCreate = /* @__PURE__ */ (() => ({
       attrs: (state, { id }) => ({
         id: `${id}-create`,
         "aria-selected": "false",
+        "aria-disabled": state.pending ? "true" : undefined,
         "aria-busy": state.pending ? "true" : undefined,
         "data-pending": state.pending ? "" : undefined,
       }),

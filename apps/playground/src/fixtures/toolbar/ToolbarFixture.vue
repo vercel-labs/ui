@@ -22,7 +22,7 @@ import { ref, type SetupContext } from "vue"
 const action = ref("")
 const controller = createToolbarController()
 const options = toolbarOptions()
-// For ?locked: disabled groups around Text style, Spellcheck and History until Unlock.
+// For ?locked: disabled groups around Text style, Spellcheck, History and Help until Unlock.
 const lockable = toolbarLocked()
 const locked = ref(lockable)
 // Renders its children alone, where a locked fixture has a group.
@@ -104,7 +104,12 @@ const groups = [
           {{ f.spellcheck.label }}
         </Toggle>
       </component>
-      <ToolbarLink :href="f.help.href">{{ f.help.label }}</ToolbarLink>
+      <component
+        :is="lockable ? ToolbarGroup : Plain"
+        v-bind="lockable ? { 'aria-label': 'Locked help', disabled: locked } : {}"
+      >
+        <ToolbarLink :href="f.help.href">{{ f.help.label }}</ToolbarLink>
+      </component>
     </Toolbar>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>

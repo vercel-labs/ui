@@ -222,6 +222,20 @@ describe("command headless", () => {
     expect(instance.get()).toMatchObject({ pending: [] })
   })
 
+  test("a click on a disabled or pending command is canceled, so one rendered as a link stays put", () => {
+    const instance = command({ id: "c", items: commands, onAction: () => new Promise(() => {}) })
+    const click = () => new Event("click", { cancelable: true })
+    const disabled = click()
+    instance.api.internal.press("calculator", disabled)
+    expect(disabled.defaultPrevented).toBe(true)
+    const first = click()
+    instance.api.internal.press("calendar", first)
+    expect(first.defaultPrevented).toBe(false)
+    const pending = click()
+    instance.api.internal.press("calendar", pending)
+    expect(pending.defaultPrevented).toBe(true)
+  })
+
   test("a controller's run() hands onSelect a real select Event, whose preventDefault() skips onAction", () => {
     const onAction = vi.fn()
     const instance = command({ id: "c", items: commands, onAction })
