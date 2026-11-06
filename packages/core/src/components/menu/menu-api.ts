@@ -1,7 +1,7 @@
 import { type Layer } from "../../foundation/platform/layers"
 import type { MenubarApi } from "../menubar/menubar"
 import { isRTL } from "../../foundation/platform/env"
-import { composedClosest, composedContains } from "../../foundation/platform/platform"
+import { activeElement, composedClosest, composedContains } from "../../foundation/platform/platform"
 import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
 import { contentAnchor } from "../../foundation/popups/popup-features"
 import { menuPreset } from "../../foundation/popups/popup-presets"
@@ -441,10 +441,16 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         pendingFocus = (request.focus as Focus | undefined) ?? "first"
         runPendingFocus()?.focus({ preventScroll: true })
       },
-      // Submenus close first, so one that refuses keeps its parent open.
+      // Submenus close first, so one that refuses keeps its parent open. One
+      // closing with its parent moves focus to its trigger item: a portalled
+      // submenu isn't inside the parent, which then wouldn't return focus.
       close({ reason, event }, close) {
         const child = openChild()
-        if (!child || withSource(changeSource(reason, event), () => closes(child, "parent-close"))) close()
+        if (child && !withSource(changeSource(reason, event), () => closes(child, "parent-close"))) return
+        const el = popup.element()
+        const active = el && activeElement(el.ownerDocument)
+        const held = reason === "parent-close" && !!active && composedContains(el, active)
+        if (close() && held) focusTriggerItem()
       },
     }),
   })

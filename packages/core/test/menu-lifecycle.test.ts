@@ -155,3 +155,43 @@ describe("a menubar menu that refuses to close", () => {
     expect(document.activeElement).not.toBe(triggers[1])
   })
 })
+
+describe("a root menu closing with focus in a portalled submenu", () => {
+  function tree() {
+    const style = document.head.appendChild(document.createElement("style"))
+    style.textContent = "[popover] { display: block !important }"
+    const root = menu({ id: "root" })
+    const share = menu({ id: "share", parent: root.api })
+    const trigger = document.body.appendChild(document.createElement("button"))
+    bind(root.part("trigger", { id: "root-trigger" }), trigger)
+    const content = document.body.appendChild(document.createElement("div"))
+    bind(root.part("content"), content)
+    const shareTrigger = content.appendChild(document.createElement("div"))
+    shareTrigger.tabIndex = -1
+    bind(share.part("trigger", { id: "share-trigger" }), shareTrigger)
+    const shareContent = document.body.appendChild(document.createElement("div"))
+    bind(share.part("content"), shareContent)
+    const item = shareContent.appendChild(document.createElement("div"))
+    item.tabIndex = -1
+    bind(share.part("item", { id: "link" }), item)
+    trigger.focus()
+    root.api.open()
+    share.api.open()
+    item.focus()
+    return { root, share, trigger }
+  }
+
+  test("returns focus to its trigger", () => {
+    const { root, share, trigger } = tree()
+    root.api.close()
+    expect(share.get().open).toBe(false)
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  test("returns focus to its trigger after an item runs", async () => {
+    const { share, trigger } = tree()
+    share.api.action("link")
+    await settle()
+    expect(document.activeElement).toBe(trigger)
+  })
+})
