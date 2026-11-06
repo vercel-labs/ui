@@ -241,7 +241,8 @@ async function pressToward(context: PatternContext, value: () => number, target:
     await context.press(key)
     const moved = below ? value() - before : before - value()
     if (moved <= 0) return
-    if (!press) presses = Math.floor(distance / moved)
+    // Fractional steps can divide to just under a whole number, like 0.3 / 0.1.
+    if (!press) presses = Math.floor(distance / moved + 1e-9)
   }
 }
 

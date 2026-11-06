@@ -421,6 +421,30 @@ test("a hand-made slider with a range past a hundred steps gets its value back",
   expect(root.getAttribute("aria-valuenow")).toBe("500")
 })
 
+test("a hand-made slider with fractional steps gets its value back", async () => {
+  const root = render(`
+    <div role="slider" tabindex="0" aria-label="Opacity" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0.5"></div>`)
+  const moves: Record<string, (value: number) => number> = {
+    ArrowRight: (value) => value + 0.1,
+    ArrowUp: (value) => value + 0.1,
+    ArrowLeft: (value) => value - 0.1,
+    ArrowDown: (value) => value - 0.1,
+    PageUp: (value) => value + 0.3,
+    PageDown: (value) => value - 0.3,
+    Home: () => 0,
+    End: () => 1,
+  }
+  root.addEventListener("keydown", (event) => {
+    const move = moves[event.key]
+    if (!move) return
+    event.preventDefault()
+    const value = Math.min(1, Math.max(0, move(Number(root.getAttribute("aria-valuenow")))))
+    root.setAttribute("aria-valuenow", String(Number(value.toFixed(6))))
+  })
+  await checkPattern(root, "slider")
+  expect(root.getAttribute("aria-valuenow")).toBe("0.5")
+})
+
 // A combobox whose popup is a grid, like a date picker's: ArrowDown opens it
 // and Escape closes it, with focus on the input throughout.
 function gridCombobox(haspopup: string) {
