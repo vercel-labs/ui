@@ -4,6 +4,12 @@ import type { Issue, Settings } from "./types"
 
 type Store = { issues: Issue[]; settings: Settings; nextId: number }
 
+// Anyone can write to the demo, so the oldest issues and comments make room.
+const maxIssues = 1000
+const maxComments = 200
+const maxComment = 5000
+const maxSubtasks = 500
+
 const cache = globalThis as typeof globalThis & { tracker?: Store }
 
 const store = (cache.tracker ??= {
@@ -31,6 +37,7 @@ function createIssue(input: Pick<Issue, "title" | "description" | "status" | "pr
     comments: [],
   }
   store.issues.unshift(issue)
+  store.issues.length = Math.min(store.issues.length, maxIssues)
   return issue
 }
 
@@ -44,16 +51,19 @@ function deleteIssues(ids: string[]) {
 
 function setSubtasksDone(id: string, done: string[]) {
   const issue = getIssue(id)
-  if (issue) issue.subtasks = markSubtasks(issue.subtasks, done)
+  if (issue) issue.subtasks = markSubtasks(issue.subtasks, done.slice(0, maxSubtasks))
 }
 
 function addComment(id: string, author: string, body: string) {
-  getIssue(id)?.comments.push({
+  const issue = getIssue(id)
+  if (!issue) return
+  issue.comments.push({
     id: crypto.randomUUID(),
     author,
-    body,
+    body: body.slice(0, maxComment),
     createdAt: new Date().toISOString(),
   })
+  issue.comments.splice(0, issue.comments.length - maxComments)
 }
 
 function getSettings() {

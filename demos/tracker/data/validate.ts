@@ -15,8 +15,10 @@ function fieldsOf(input: unknown): Fields | null {
   return input && typeof input === "object" && !Array.isArray(input) ? (input as Fields) : null
 }
 
+const limits = { title: 200, description: 10_000, ids: 1000 }
+
 function title(value: unknown) {
-  return typeof value === "string" && value.trim() ? value.trim() : invalid
+  return typeof value === "string" && value.trim() ? value.trim().slice(0, limits.title) : invalid
 }
 
 function status(value: unknown) {
@@ -47,7 +49,7 @@ function labelIds(value: unknown) {
 
 const readers = {
   title,
-  description: (value: unknown) => (typeof value === "string" ? value : invalid),
+  description: (value: unknown) => (typeof value === "string" ? value.slice(0, limits.description) : invalid),
   status,
   priority,
   assignee,
@@ -75,7 +77,8 @@ function readNewIssue(input: unknown): NewIssue | { error: string } {
   const owner = assignee(fields.assignee ?? null)
   return {
     title: value,
-    description: typeof fields.description === "string" ? fields.description.trim() : "",
+    description:
+      typeof fields.description === "string" ? fields.description.trim().slice(0, limits.description) : "",
     status: (status(fields.status) === invalid ? "todo" : status(fields.status)) as Status,
     priority: (priority(fields.priority) === invalid ? "none" : priority(fields.priority)) as Priority,
     assignee: owner === invalid ? null : owner,
@@ -83,7 +86,10 @@ function readNewIssue(input: unknown): NewIssue | { error: string } {
 }
 
 function readIds(input: unknown) {
-  return Array.isArray(input) && input.length > 0 && input.every((id) => typeof id === "string")
+  return Array.isArray(input) &&
+    input.length > 0 &&
+    input.length <= limits.ids &&
+    input.every((id) => typeof id === "string")
     ? (input as string[])
     : null
 }
