@@ -1,7 +1,7 @@
 import { DocsArticle } from "@/components/docs-article"
 import { getMDXComponents } from "@/components/mdx"
 import { isFramework } from "@/lib/frameworks"
-import { isSection, sectionLabel } from "@/lib/sections"
+import { isSection } from "@/lib/sections"
 import { source } from "@/lib/source"
 import { findNeighbour } from "fumadocs-core/page-tree"
 import type { Metadata } from "next"
@@ -56,7 +56,7 @@ export async function generateMetadata(props: PageProps<"/docs/[section]/[[...sl
   const page = source.getPage([section, ...slug])
   if (!page) notFound()
 
-  const title = isFramework(section) ? `${page.data.title} for ${sectionLabel(section)}` : page.data.title
+  const title = page.data.title
   const description = page.data.description
   const image = `/og${page.url}/image.png`
   return {

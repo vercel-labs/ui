@@ -1,4 +1,4 @@
-import { frameworkIds, frameworks, isFramework, type Framework } from "./frameworks"
+import { frameworkIds, isFramework, type Framework } from "./frameworks"
 
 // The docs' sections: Core and Agents, which no framework changes, then one per framework.
 
@@ -13,10 +13,6 @@ const sectionIds = [...(Object.keys(sharedSections) as Section[]), ...frameworkI
 
 function isSection(value: string): value is Section {
   return value in sharedSections || isFramework(value)
-}
-
-function sectionLabel(section: Section) {
-  return isFramework(section) ? frameworks[section].label : sharedSections[section]
 }
 
 /** The folder a framework keeps its utilities in: React's are hooks. */
@@ -48,13 +44,4 @@ const frameworkPages = [
   "styling-and-animation",
 ]
 
-export {
-  frameworkHref,
-  frameworkPages,
-  isSection,
-  type Section,
-  sectionIds,
-  sectionLabel,
-  sharedSections,
-  utilitiesFolder,
-}
+export { frameworkHref, frameworkPages, isSection, type Section, sectionIds, sharedSections, utilitiesFolder }
