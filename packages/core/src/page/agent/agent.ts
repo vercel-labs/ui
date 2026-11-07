@@ -680,6 +680,14 @@ function createAgent(
     }
     let found = match()
     let opened = false
+    const closed = new Set(bound(instance).map((part) => part.el))
+    // A refusal returns once what the press opened has left, so the next step
+    // finds the component by its own label again, not its open dialog's title.
+    const close = async () => {
+      asAgent(() => api.setOpen?.(false))
+      for (let tries = 0; tries < 60 && bound(instance).some((part) => !closed.has(part.el)); tries++)
+        await frames()
+    }
     if (!found.button && text !== undefined && api.setOpen && !(instance.get() as { open?: boolean }).open) {
       await beforeOpen()
       opened = true
@@ -695,15 +703,14 @@ function createAgent(
       throw new Error(
         `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
       )
-    const refuseDisabled = () => {
+    const refuseDisabled = async () => {
       if (!button.matches(":disabled") && button.getAttribute("aria-disabled") !== "true") return
-      if (opened) asAgent(() => api.setOpen!(false))
+      if (opened) await close()
       throw new Error(`"${textOf(button) || accessibleName(button)}" in ${entry.ref} is disabled now.`)
     }
-    refuseDisabled()
+    await refuseDisabled()
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
     const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
-    const close = () => asAgent(() => api.setOpen?.(false))
     return { click: () => button.click(), button, pressed, opened, close, refuseDisabled }
   }
 
@@ -1001,11 +1008,11 @@ function createAgent(
       refuseBlocked?.()
     } catch (refused) {
       // A popup the press opened to find its button closes again, as it was.
-      if (press?.opened) press.close()
+      if (press?.opened) await press.close()
       throw refused
     }
     // The button can turn disabled while the person decides.
-    press?.refuseDisabled()
+    await press?.refuseDisabled()
     if (guard && !guard()) {
       throw new Error(`The restoration of ${entry.ref} was superseded by a newer change.`)
     }
