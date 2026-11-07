@@ -20,7 +20,6 @@
     "build": "pnpm -r --filter \"./packages/**\" build",
     "check:packages": "node scripts/check-packages.mjs",
     "release": "pnpm --filter registry release",
-    "invite": "pnpm --silent --filter registry invite",
     "size": "node scripts/size.mjs",
     "docs:packages": "node scripts/package-docs.mjs",
     "docs:perf": "node scripts/perf-docs.mjs",
