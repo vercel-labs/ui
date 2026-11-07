@@ -1,4 +1,5 @@
 import { track } from "@vercel/analytics/server"
+import { createDocsProxy } from "@/lib/docs-proxy"
 import { createRegistry } from "@/lib/registry"
 import { registryStore } from "@/lib/registry-store"
 
@@ -11,8 +12,15 @@ const handle = createRegistry({
   onDownload: ({ name, version, request }) => track("download", { package: name, version }, { request }),
 })
 
-function GET(request: Request) {
-  return handle(request)
+// Public copies of some docs paths while the docs site is protected; see REGISTRY.md.
+const proxy = createDocsProxy({
+  origin: process.env.DOCS_URL ?? "https://ui.labs.vercel.dev",
+  bypass: process.env.DOCS_PROTECTION_BYPASS,
+  paths: ["/web.js", "/web/*", "/web@*"],
+})
+
+async function GET(request: Request) {
+  return (await proxy(request)) ?? handle(request)
 }
 
 export { GET }

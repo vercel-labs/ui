@@ -32,6 +32,12 @@ pnpm add @ui-sdk/react @ui-sdk/core      # pnpm update --latest picks up new rel
 
 An older `.npmrc` with an `_authToken` line for the registry keeps working. The registry ignores the token.
 
+## Docs paths
+
+While the docs site is behind Deployment Protection, the registry serves a few of its paths publicly, like `/web.js`, `/web@0.js` and `/web@0/tabs.js`, so a plain HTML page anywhere can load the web components. To serve another path, add it to `paths` in `app/[[...path]]/route.ts`. A path ending in `*` covers everything under it.
+
+The registry fetches each one from the docs site with the docs project's Protection Bypass for Automation secret, in `DOCS_PROTECTION_BYPASS` on the registry project. Without it, those paths answer 404. `DOCS_URL` overrides the docs site, `https://ui.labs.vercel.dev` by default.
+
 ## How it works
 
-`app/[[...path]]/route.ts` hands every request to `lib/registry.ts`, which answers the requests installers make: a package's versions (`/@ui-sdk%2f<name>`) and a version's tarball (`/@ui-sdk/<name>/-/<file>.tgz`), streamed from the private store. `lib/registry-store.ts` reads the Blob store. `scripts/release.mjs` writes the layout the registry reads: `packages/@ui-sdk/<name>/index.json` beside each tarball.
+`app/[[...path]]/route.ts` hands the docs paths to `lib/docs-proxy.ts` and every other request to `lib/registry.ts`, which answers the requests installers make: a package's versions (`/@ui-sdk%2f<name>`) and a version's tarball (`/@ui-sdk/<name>/-/<file>.tgz`), streamed from the private store. `lib/registry-store.ts` reads the Blob store. `scripts/release.mjs` writes the layout the registry reads: `packages/@ui-sdk/<name>/index.json` beside each tarball.
