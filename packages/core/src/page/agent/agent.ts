@@ -376,12 +376,13 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   // A button's action while it runs, and why it failed.
   if (state.pending === true) out.pending = true
   if (state.error != null) out.error = entry.secret ? "[redacted]" : messageOf(state.error)
-  // The items `setValue` takes. A list that opens shows them from its data
-  // when they're few, and through `query` when they may be many.
+  // The items its actions take: the ones on the page, else its data when
+  // they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
-  if (typeof api.setValue === "function") {
-    const data = dataOf(entry, instance)
-    const items = !opens ? renderedItems(parts) : data && data.length <= 10 ? data : []
+  if (typeof api.setValue === "function" || entry.agent?.items) {
+    const rendered = opens ? [] : renderedItems(parts)
+    const data = rendered.length ? undefined : dataOf(entry, instance)
+    const items = data ? (data.length <= 10 ? data : []) : rendered
     if (items.length) out.items = items
   }
   const text = parts

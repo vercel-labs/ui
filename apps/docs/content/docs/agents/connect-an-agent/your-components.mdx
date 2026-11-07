@@ -85,6 +85,8 @@ The bridge reads the items from your state's `items`. If they live somewhere els
 agent: { actions: ["setValue"], items: (api) => api.allItems() },
 ```
 
+The snapshot shows the items with the component when there are 10 or fewer and none are on the page. That works for any action, not only `setValue`, so a stepper's `goTo` shows its steps. Longer lists come back from `query({ within })`.
+
 ## Content Behind Items
 
 Tabs and accordions hide other components behind their closed items. Add `reveals: true` and, when an agent looks for something it can't find, the error lists the closed items it might be behind, so the agent can open one first:

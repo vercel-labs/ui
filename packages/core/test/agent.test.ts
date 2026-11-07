@@ -1730,6 +1730,40 @@ describe("a primitive's agent key", () => {
     expect(agent.snapshot()[0].actions).toEqual(["setValue", "resetSizes"])
   })
 
+  test("its items show in the snapshot when none are on the page", () => {
+    const agent = createAgent()
+    mount(sizes())
+    expect(agent.snapshot()[0].items).toEqual([
+      { value: "s", label: "s" },
+      { value: "m", label: "m" },
+      { value: "l", label: "l" },
+    ])
+  })
+
+  test("the items its agent key gives show in the snapshot for any action", async () => {
+    const steps = [
+      { value: "account", label: "Account" },
+      { value: "profile", label: "Profile" },
+    ]
+    const stepper = definePrimitive({
+      name: "stepper",
+      state: () => ({ value: "account" }),
+      api: ({ store }) => ({ goTo: (value: string) => store.set({ value }) }),
+      slots: (slot) => ({ root: slot({ attrs: () => ({ "aria-label": "Signup" }) }) }),
+      agent: { actions: ["goTo"], items: () => steps },
+    })
+    const instance = stepper({ id: "signup" })
+    const el = document.createElement("div")
+    el.setAttribute("aria-label", "Signup")
+    document.body.append(el)
+    cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
+    const agent = createAgent()
+    const [{ ref, items }] = agent.snapshot()
+    expect(items).toEqual(steps)
+    expect((await agent.act({ steps: [{ ref, action: "goTo", args: [items![1].value] }] })).ok).toBe(true)
+    expect(instance.get()).toMatchObject({ value: "profile" })
+  })
+
   test("its actions are the only ones an agent sees and takes", async () => {
     const agent = createAgent()
     mount(sizes({ actions: ["setValue"] }))
