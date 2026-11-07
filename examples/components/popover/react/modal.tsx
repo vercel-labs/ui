@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Textarea } from "@ui-sdk/react/textarea"
 import {
   Popover,
   PopoverClose,
@@ -67,7 +68,7 @@ function Example() {
           <PopoverDescription>{notes[mode]}</PopoverDescription>
           <Field>
             <FieldLabel>Comment</FieldLabel>
-            <FieldControl render={<textarea />} defaultValue="Looks good to me." />
+            <Textarea defaultValue="Looks good to me." />
           </Field>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>

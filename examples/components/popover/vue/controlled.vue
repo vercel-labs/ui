@@ -2,7 +2,8 @@
 import { CheckIcon } from "@lucide/vue"
 import type { ChangeDetails } from "@ui-sdk/core"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import {
   Popover,
   PopoverClose,
@@ -45,7 +46,7 @@ function onOpenChange(next: boolean, details: ChangeDetails) {
         <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
         <Field>
           <FieldLabel>Status</FieldLabel>
-          <FieldControl default-value="In a meeting" />
+          <Input default-value="In a meeting" />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

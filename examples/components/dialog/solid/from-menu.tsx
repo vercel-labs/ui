@@ -7,7 +7,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@ui-sdk/solid/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
 
 function Example() {
@@ -72,7 +73,7 @@ function Example() {
           </div>
           <Field>
             <FieldLabel>Name</FieldLabel>
-            <FieldControl defaultValue="report.pdf" />
+            <Input defaultValue="report.pdf" />
           </Field>
           <div data-slot="row">
             <DialogClose>Cancel</DialogClose>

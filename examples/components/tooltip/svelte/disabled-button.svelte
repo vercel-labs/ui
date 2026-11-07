@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
   import { useLog } from "../../../shared/svelte/log"
 
@@ -11,7 +12,7 @@
 <div data-slot="stack">
   <Field>
     <FieldLabel>Post title</FieldLabel>
-    <FieldControl value={title} oninput={(event) => (title = event.currentTarget.value)} />
+    <Input bind:value={title} />
   </Field>
   <Tooltip disabled={!blocked}>
     <TooltipTrigger

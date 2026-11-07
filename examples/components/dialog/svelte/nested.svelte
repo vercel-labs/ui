@@ -8,7 +8,8 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
 </script>
 
 <Dialog>
@@ -34,7 +35,7 @@
           </div>
           <Field>
             <FieldLabel>New password</FieldLabel>
-            <FieldControl type="password" />
+            <Input type="password" />
           </Field>
           <div data-slot="row">
             <DialogClose>Cancel</DialogClose>

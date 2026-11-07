@@ -1,6 +1,7 @@
 "use client"
 
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
 import { InfoIcon } from "lucide-react"
 import * as React from "react"
@@ -12,7 +13,7 @@ function Example() {
     <Field>
       <FieldLabel>Webhook URL</FieldLabel>
       <div data-slot="row" ref={setField}>
-        <FieldControl placeholder="https://" />
+        <Input placeholder="https://" />
         <Tooltip>
           <TooltipTrigger aria-label="About webhooks">
             <InfoIcon aria-hidden="true" />

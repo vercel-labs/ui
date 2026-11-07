@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
@@ -13,7 +14,7 @@ function submit(event: Event) {
   <form data-slot="stack" @submit.prevent="submit">
     <Field name="email">
       <FieldLabel>Email</FieldLabel>
-      <FieldControl type="email" required placeholder="hollis@example.com" />
+      <Input type="email" required placeholder="hollis@example.com" />
       <FieldDescription v-slot="{ state }">
         {{ state.valid ? "Looks good." : "We'll send you a confirmation link." }}
       </FieldDescription>
@@ -22,7 +23,7 @@ function submit(event: Event) {
     </Field>
     <Field name="website">
       <FieldLabel>Website</FieldLabel>
-      <FieldControl type="url" required placeholder="https://example.com" />
+      <Input type="url" required placeholder="https://example.com" />
       <FieldError />
     </Field>
     <button type="submit" data-variant="solid">Subscribe</button>

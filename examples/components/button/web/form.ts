@@ -1,5 +1,6 @@
 import "@ui-sdk/web/button"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
@@ -7,7 +8,9 @@ function mount(root: HTMLElement) {
     <form data-slot="stack">
       <ui-field>
         <ui-field-label>Email</ui-field-label>
-        <input name="email" type="email" value="ada@example.com" />
+        <ui-input>
+          <input name="email" type="email" value="ada@example.com" />
+        </ui-input>
       </ui-field>
       <div data-slot="row">
         <ui-button><button type="submit">Subscribe</button></ui-button>

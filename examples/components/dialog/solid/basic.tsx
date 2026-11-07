@@ -7,7 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
 function Example() {
   return (
@@ -21,7 +22,7 @@ function Example() {
         </div>
         <Field>
           <FieldLabel>Link</FieldLabel>
-          <FieldControl defaultValue="https://example.com/project" readonly />
+          <Input defaultValue="https://example.com/project" readonly />
         </Field>
         <div data-slot="row">
           <DialogClose data-variant="solid">Done</DialogClose>

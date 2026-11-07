@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/textarea"
 import "@ui-sdk/web/tabs"
 
 function mount(root: HTMLElement) {
@@ -16,7 +17,9 @@ function mount(root: HTMLElement) {
       <ui-tabs-panel value="reply" keep-mounted>
         <ui-field>
           <ui-field-label>Message</ui-field-label>
-          <textarea rows="3" placeholder="Write a reply…"></textarea>
+          <ui-textarea>
+            <textarea rows="3" placeholder="Write a reply…"></textarea>
+          </ui-textarea>
         </ui-field>
       </ui-tabs-panel>
       <ui-tabs-panel value="formatting">

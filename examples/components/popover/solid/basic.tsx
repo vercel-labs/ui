@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import {
   Popover,
   PopoverClose,
@@ -17,7 +18,7 @@ function Example() {
         <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
         <Field>
           <FieldLabel>Link</FieldLabel>
-          <FieldControl readonly defaultValue="acme.app/d/q3-roadmap" />
+          <Input readonly defaultValue="acme.app/d/q3-roadmap" />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

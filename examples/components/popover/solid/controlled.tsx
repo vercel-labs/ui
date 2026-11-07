@@ -1,5 +1,6 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import {
   Popover,
   PopoverClose,
@@ -54,7 +55,7 @@ function Example() {
           <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
           <Field>
             <FieldLabel>Status</FieldLabel>
-            <FieldControl defaultValue="In a meeting" />
+            <Input defaultValue="In a meeting" />
           </Field>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>

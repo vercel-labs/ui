@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Textarea } from "@ui-sdk/vue/textarea"
 import {
   Popover,
   PopoverClose,
@@ -64,11 +65,7 @@ const modal = computed(() => (mode.value === "true" ? true : mode.value === "fal
         <PopoverDescription>{{ notes[mode] }}</PopoverDescription>
         <Field>
           <FieldLabel>Comment</FieldLabel>
-          <FieldControl default-value="Looks good to me.">
-            <template #render="{ props }">
-              <textarea v-bind="props" />
-            </template>
-          </FieldControl>
+          <Textarea default-value="Looks good to me." />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

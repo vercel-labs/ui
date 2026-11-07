@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
 </script>
 
@@ -13,7 +14,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
     <TabsPanel value="code">
       <Field>
         <FieldLabel>Source</FieldLabel>
-        <FieldControl value='<Welcome name="Hollis" unread={3} />' />
+        <Input default-value='<Welcome name="Hollis" unread={3} />' />
       </Field>
     </TabsPanel>
   </Tabs>

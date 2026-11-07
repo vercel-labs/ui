@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from "@ui-sdk/svelte/button"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -12,7 +13,7 @@
 <div data-slot="stack">
   <Field>
     <FieldLabel>Title</FieldLabel>
-    <FieldControl value={title} oninput={(event) => (title = event.currentTarget.value)} />
+    <Input bind:value={title} />
   </Field>
   <div data-slot="row">
     <Button

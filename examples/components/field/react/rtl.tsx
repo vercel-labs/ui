@@ -1,5 +1,6 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
-import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { CheckIcon } from "lucide-react"
 
 function Example() {
@@ -7,11 +8,11 @@ function Example() {
     <div data-slot="stack" dir="rtl">
       <Field>
         <FieldLabel>الاسم على البطاقة</FieldLabel>
-        <FieldControl name="card-name" autoComplete="cc-name" placeholder="ليلى حسن" />
+        <Input name="card-name" autoComplete="cc-name" placeholder="ليلى حسن" />
       </Field>
       <Field>
         <FieldLabel>رقم البطاقة</FieldLabel>
-        <FieldControl
+        <Input
           name="card-number"
           inputMode="numeric"
           autoComplete="cc-number"

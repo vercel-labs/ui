@@ -1,5 +1,6 @@
 import "@ui-sdk/web/collapsible"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/textarea"
 import { ChevronDown, createElement } from "lucide"
 
 function mount(root: HTMLElement) {
@@ -17,7 +18,9 @@ function mount(root: HTMLElement) {
       <ui-collapsible-panel keep-mounted hidden>
         <ui-field>
           <ui-field-label>Delivery note</ui-field-label>
-          <textarea placeholder="Leave it with the front desk…"></textarea>
+          <ui-textarea>
+            <textarea placeholder="Leave it with the front desk…"></textarea>
+          </ui-textarea>
         </ui-field>
       </ui-collapsible-panel>
     </ui-collapsible>

@@ -1,17 +1,18 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
   import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
-  import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
 </script>
 
 <div data-slot="stack" dir="rtl">
   <Field>
     <FieldLabel>الاسم على البطاقة</FieldLabel>
-    <FieldControl name="card-name" autocomplete="cc-name" placeholder="ليلى حسن" />
+    <Input name="card-name" autocomplete="cc-name" placeholder="ليلى حسن" />
   </Field>
   <Field>
     <FieldLabel>رقم البطاقة</FieldLabel>
-    <FieldControl
+    <Input
       name="card-number"
       inputmode="numeric"
       autocomplete="cc-number"

@@ -1,5 +1,6 @@
 import "@ui-sdk/web/dialog"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { createElement, X } from "lucide"
 
 function mount(root: HTMLElement) {
@@ -16,7 +17,9 @@ function mount(root: HTMLElement) {
         </div>
         <ui-field>
           <ui-field-label>Link</ui-field-label>
-          <input value="https://example.com/project" readonly />
+          <ui-input>
+            <input value="https://example.com/project" readonly />
+          </ui-input>
         </ui-field>
         <div data-slot="row">
           <ui-dialog-close>

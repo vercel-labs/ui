@@ -106,11 +106,28 @@ function emit(event: DevEvent) {
  * `globalThis.__UI_SDK_STRICT__ = true`, as tests do, to throw them instead.
  */
 function warn(message: string, from?: { component: string; id?: string }, detail?: unknown) {
+  say(message, from, detail, true)
+}
+
+/**
+ * Like `warn`, for what the app meant to happen, like an action that failed:
+ * it's logged and reported, but never thrown in strict mode.
+ */
+function note(message: string, from?: { component: string; id?: string }, detail?: unknown) {
+  say(message, from, detail, false)
+}
+
+function say(
+  message: string,
+  from: { component: string; id?: string } | undefined,
+  detail: unknown,
+  strict: boolean,
+) {
   const flags = globalThis as { __UI_SDK_DEV__?: boolean; __UI_SDK_STRICT__?: boolean }
   if (flags.__UI_SDK_DEV__ === false) return
   const name = from ? `${from.component}${from.id ? `#${from.id}` : ""}: ` : ""
   emit({ type: "warn", message, component: from?.component, id: from?.id })
-  if (flags.__UI_SDK_STRICT__) throw new Error(`[ui-sdk] ${name}${message}`, { cause: detail })
+  if (strict && flags.__UI_SDK_STRICT__) throw new Error(`[ui-sdk] ${name}${message}`, { cause: detail })
   // A detail like an error is logged as itself, so the console shows its stack.
   if (detail === undefined) console.warn(`[ui-sdk] ${name}${message}`)
   else console.warn(`[ui-sdk] ${name}${message}`, detail)
@@ -574,6 +591,7 @@ export {
   heardControlled,
   isMeasuring,
   measured,
+  note,
   warn,
   warnMissing,
 }

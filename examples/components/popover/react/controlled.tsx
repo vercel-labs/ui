@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import {
   Popover,
   PopoverClose,
@@ -47,7 +48,7 @@ function Example() {
           <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
           <Field>
             <FieldLabel>Status</FieldLabel>
-            <FieldControl defaultValue="In a meeting" />
+            <Input defaultValue="In a meeting" />
           </Field>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>

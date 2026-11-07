@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import {
   Popover,
   PopoverClose,
@@ -18,7 +19,7 @@ import {
       <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
       <Field>
         <FieldLabel>Link</FieldLabel>
-        <FieldControl readonly default-value="acme.app/d/q3-roadmap" />
+        <Input readonly default-value="acme.app/d/q3-roadmap" />
       </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>

@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
@@ -6,7 +7,9 @@ function mount(root: HTMLElement) {
     <form data-slot="stack">
       <ui-field name="email">
         <ui-field-label>Email</ui-field-label>
-        <input type="email" required placeholder="hollis@example.com" />
+        <ui-input>
+          <input type="email" required placeholder="hollis@example.com" />
+        </ui-input>
         <ui-field-description>
           <span data-hide="valid">We'll send you a confirmation link.</span>
           <span data-show="valid">Looks good.</span>
@@ -16,7 +19,9 @@ function mount(root: HTMLElement) {
       </ui-field>
       <ui-field name="website">
         <ui-field-label>Website</ui-field-label>
-        <input type="url" required placeholder="https://example.com" />
+        <ui-input>
+          <input type="url" required placeholder="https://example.com" />
+        </ui-input>
         <ui-field-error></ui-field-error>
       </ui-field>
       <button type="submit" data-variant="solid">Subscribe</button>

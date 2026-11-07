@@ -72,13 +72,14 @@ Uncheck the box, then press Reset. `defaultChecked` supplies the reset value, an
 `Field` connects a control to its label, description, and error message:
 
 ```tsx
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 
 function Example() {
   return (
     <Field name="email">
       <FieldLabel>Email</FieldLabel>
-      <FieldControl type="email" required />
+      <Input type="email" required />
       <FieldDescription>We'll only use it for receipts.</FieldDescription>
       <FieldError />
     </Field>
@@ -88,7 +89,7 @@ function Example() {
 export { Example }
 ```
 
-You can replace `FieldControl` with a Checkbox, Switch, Radio Group, or Select. See [Field](./components/field) for how each connects.
+You can use a Textarea, Checkbox, Switch, Radio Group, or Select in place of the Input. [Field](./components/field) shows how they connect.
 
 These props follow native form conventions on controls that support them:
 
@@ -109,7 +110,8 @@ Your server may still reject a valid-looking value. Pass `invalid` to the field 
 ```tsx
 "use client"
 
-import { Field, FieldControl, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import * as React from "react"
 
 function Example() {
@@ -128,7 +130,7 @@ function Example() {
     <form onSubmit={save}>
       <Field name="email" invalid={error ? true : undefined}>
         <FieldLabel>Email</FieldLabel>
-        <FieldControl type="email" required onChange={() => setError("")} />
+        <Input type="email" required onValueChange={() => setError("")} />
         <FieldError>{(state) => error || state.message}</FieldError>
       </Field>
       <button type="submit">Save</button>

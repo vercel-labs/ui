@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import {
   Popover,
   PopoverClose,
@@ -22,7 +23,7 @@ import {
       <PopoverDescription>They'll get an email with a link to join.</PopoverDescription>
       <Field>
         <FieldLabel>Email</FieldLabel>
-        <FieldControl type="email" placeholder="wren@example.com" />
+        <Input type="email" placeholder="wren@example.com" />
       </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>

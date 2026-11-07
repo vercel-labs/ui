@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/popover"
 
 function mount(root: HTMLElement) {
@@ -12,7 +13,9 @@ function mount(root: HTMLElement) {
         <ui-popover-description>We'll notify you at the time you pick.</ui-popover-description>
         <ui-field>
           <ui-field-label>Remind me to</ui-field-label>
-          <input value="Send the Q3 roadmap" />
+          <ui-input>
+            <input value="Send the Q3 roadmap" />
+          </ui-input>
         </ui-field>
         <div data-slot="row">
           <ui-popover-close>

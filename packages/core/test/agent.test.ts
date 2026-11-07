@@ -1378,7 +1378,14 @@ describe("agent act", () => {
     disabled,
     ariaDisabled,
     inDisabledFieldset,
-  }: { confirm?: string; disabled?: boolean; ariaDisabled?: boolean; inDisabledFieldset?: boolean } = {}) {
+    triggerId,
+  }: {
+    confirm?: string
+    disabled?: boolean
+    ariaDisabled?: boolean
+    inDisabledFieldset?: boolean
+    triggerId?: string
+  } = {}) {
     const { popover } = await import("../src/components/popover/popover")
     const onClick = vi.fn()
     const changes: [boolean, string][] = []
@@ -1404,8 +1411,10 @@ describe("agent act", () => {
     const trigger = document.createElement("button")
     trigger.setAttribute("aria-label", "Actions for Tom Becker")
     document.body.append(trigger, content)
-    cleanups.push(bind(instance.part("trigger"), trigger), bind(instance.part("content"), content), () =>
-      instance.destroy(),
+    cleanups.push(
+      bind(instance.part("trigger", triggerId ? { id: triggerId } : undefined), trigger),
+      bind(instance.part("content"), content),
+      () => instance.destroy(),
     )
     return { instance, onClick, changes }
   }
@@ -1420,6 +1429,22 @@ describe("agent act", () => {
       steps: [{ result: expect.stringMatching(/^Pressed "Remove", after opening c\d+\.$/) }],
     })
     expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  test("press with no text clicks a closed popup's trigger, which opens it", async () => {
+    const agent = createAgent()
+    const { instance } = await mountActions()
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press" }] })
+    expect(outcome).toMatchObject({ ok: true })
+    expect(instance.get().open).toBe(true)
+  })
+
+  test("press with no text opens a popup whose one trigger has a key, like a web component's id", async () => {
+    const agent = createAgent()
+    const { instance } = await mountActions({ triggerId: "auto-1" })
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press" }] })
+    expect(outcome).toMatchObject({ ok: true })
+    expect(instance.get().open).toBe(true)
   })
 
   test("a press on a disabled button fails, and closes the popup it opened", async () => {

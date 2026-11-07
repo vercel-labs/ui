@@ -7,7 +7,8 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -28,7 +29,7 @@
     <form data-slot="stack" method="dialog">
       <Field>
         <FieldLabel>Title</FieldLabel>
-        <FieldControl required defaultValue="Shipping updates for spring" />
+        <Input required defaultValue="Shipping updates for spring" />
       </Field>
       <div data-slot="row">
         <button type="submit" value="draft">Save Draft</button>

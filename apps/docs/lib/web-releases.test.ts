@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { compareVersions, newestByMajor } from "./web-releases.mjs"
+import { compareVersions, newestByMajor, newestRelease } from "./web-releases.mjs"
 
 describe("web releases", () => {
   test("orders versions by semver precedence", () => {
@@ -26,5 +26,10 @@ describe("web releases", () => {
   test("points a major with only prereleases at the newest one", () => {
     const stamps = ["0.0.0-20261029071500.gb318f40a", "0.0.0-20261101090000.g1234abcd"]
     expect(newestByMajor(stamps)).toEqual(new Map([["0", stamps[1]]]))
+  })
+
+  test("points latest at the newest release of all, past prereleases", () => {
+    expect(newestRelease(["0.9.0", "1.0.0-beta.1", "0.10.0"])).toBe("0.10.0")
+    expect(newestRelease(["0.9.0", "1.0.0"])).toBe("1.0.0")
   })
 })

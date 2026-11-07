@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/popover"
 import { log } from "../../../shared/web/log"
 
@@ -14,7 +15,9 @@ function mount(root: HTMLElement) {
         <form data-slot="stack">
           <ui-field>
             <ui-field-label>Name</ui-field-label>
-            <input name="name" required value="Hollis Grant" />
+            <ui-input>
+              <input name="name" required value="Hollis Grant" />
+            </ui-input>
           </ui-field>
           <div data-slot="row">
             <ui-popover-close>

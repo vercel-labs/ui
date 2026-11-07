@@ -20,7 +20,7 @@ Use the following composition to build a `Field`:
 ```text
 Field
 ├── FieldLabel
-├── FieldControl
+├── Input
 ├── FieldDescription
 └── FieldError
 ```
@@ -29,18 +29,19 @@ Field
 
 ```svelte
 <script lang="ts">
-  import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
 </script>
 
 <Field name="username">
   <FieldLabel>Username</FieldLabel>
-  <FieldControl autocomplete="username" required />
+  <Input autocomplete="username" required />
   <FieldDescription>This is your public name.</FieldDescription>
   <FieldError />
 </Field>
 ```
 
-`FieldControl` is a native `<input>`, or a `<textarea>` or `<select>` through custom rendering. A `Checkbox`, `Switch`, `RadioGroup` or `CheckboxGroup` inside a field wires itself to it, in place of `FieldControl`.
+The control is one of ours, like an [Input](./input), a [Textarea](./textarea), a [Select](./select) or a [Checkbox](./checkbox), and it wires itself to the field.
 
 The label names the control, and the description and any error that shows describe it.
 
@@ -59,18 +60,18 @@ Group related fields in a [field set](#field-sets):
 
 ## Controls
 
-`FieldControl` renders an `<input>`. Render it as a `<textarea>` or a native `<select>` with the `render` snippet, and put the options inside:
+Use an [Input](./input) for a line of text and a [Textarea](./textarea) for more:
 
 ```svelte
 <Field>
   <FieldLabel>Feedback</FieldLabel>
-  <FieldControl name="feedback">
-    {#snippet render({ props })}
-      <textarea {...props}></textarea>
-    {/snippet}
-  </FieldControl>
+  <Textarea name="feedback" />
 </Field>
+```
 
+For a control we don't ship, like a native `<select>`, use `FieldControl`. It renders an `<input>`, or another element with the `render` snippet, and connects it to the field the same way. An [agent](/docs/agents) sees only our components, so it can't fill a `FieldControl`: use ours where there is one.
+
+```svelte
 <Field>
   <FieldLabel>Department</FieldLabel>
   <FieldControl name="department">
@@ -84,7 +85,7 @@ Group related fields in a [field set](#field-sets):
 </Field>
 ```
 
-A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field takes the place of `FieldControl` and uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
+A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
 
 ```svelte
 <Field>
@@ -128,7 +129,7 @@ Give this error its own text and set `match` to `true`. Named matches such as `v
 ```svelte
 <Field name="email" invalid={serverError ? true : undefined}>
   <FieldLabel>Email</FieldLabel>
-  <FieldControl type="email" required oninput={() => (serverError = null)} />
+  <Input type="email" required onValueChange={() => (serverError = null)} />
   <FieldError match="valueMissing">Enter your email address.</FieldError>
   {#if serverError}
     <FieldError match>{serverError}</FieldError>
@@ -149,15 +150,7 @@ Keep the text in state and show its length in the description. Set `maxlength` o
 ```svelte
 <Field>
   <FieldLabel>Bio</FieldLabel>
-  <FieldControl
-    maxlength={280}
-    value={bio}
-    oninput={(event) => (bio = event.currentTarget.value)}
-  >
-    {#snippet render({ props })}
-      <textarea {...props}></textarea>
-    {/snippet}
-  </FieldControl>
+  <Textarea bind:value={bio} maxlength={280} />
   <FieldDescription>{bio.length} / 280</FieldDescription>
 </Field>
 ```
@@ -188,7 +181,7 @@ Disabling the set disables its controls and nested field sets. The form leaves t
   <FieldLegend>Billing address</FieldLegend>
   <Field name="billing-street">
     <FieldLabel>Street address</FieldLabel>
-    <FieldControl autocomplete="billing street-address" />
+    <Input autocomplete="billing street-address" />
   </Field>
 </FieldSet>
 ```
@@ -215,7 +208,7 @@ The legend names a [checkbox group](./checkbox#group) or a [radio group](./radio
 
 ## Custom Rendering
 
-Every part takes a `render` snippet, to render a different element or component in its place, like a `<textarea>` for `FieldControl`. It receives the props to spread and the field's state:
+Every part takes a `render` snippet, to render a different element or component in its place, like a `<select>` for `FieldControl`. It receives the props to spread and the field's state:
 
 ```svelte
 <FieldDescription>

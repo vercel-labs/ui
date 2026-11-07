@@ -10,7 +10,8 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
 </script>
 
 <Dialog>
@@ -28,11 +29,11 @@
     <form data-slot="stack" method="dialog">
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <FieldControl name="name" required placeholder="Kofi Mensah" />
+        <Input name="name" required placeholder="Kofi Mensah" />
       </Field>
       <Field>
         <FieldLabel>Email</FieldLabel>
-        <FieldControl name="email" type="email" required placeholder="kofi@example.com" />
+        <Input name="email" type="email" required placeholder="kofi@example.com" />
       </Field>
       <div data-slot="row">
         <DialogClose>Cancel</DialogClose>

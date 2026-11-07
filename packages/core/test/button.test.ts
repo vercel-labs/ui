@@ -80,6 +80,28 @@ describe("button", () => {
     ])
   })
 
+  test("a failed action keeps its error in strict mode instead of throwing", async () => {
+    const flags = globalThis as { __UI_SDK_STRICT__?: boolean }
+    flags.__UI_SDK_STRICT__ = true
+    vi.spyOn(console, "warn").mockImplementation(() => {})
+    try {
+      const thrown = button({
+        id: "b",
+        action: () => {
+          throw "broken"
+        },
+      })
+      thrown.api.internal.press()
+      const rejected = button({ id: "c", action: () => Promise.reject("Offline") })
+      rejected.api.internal.press()
+      await settle()
+      expect(partState(thrown.part("root"))).toMatchObject({ error: "broken" })
+      expect(partState(rejected.part("root"))).toMatchObject({ pending: false, error: "Offline" })
+    } finally {
+      delete flags.__UI_SDK_STRICT__
+    }
+  })
+
   test("a successful action warns nothing", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     button({ id: "b", action: () => Promise.resolve() }).api.internal.press()

@@ -2,7 +2,7 @@
 // pending until it settles (API guide §2, G6). Button, a dialog's Close part
 // and a toast's buttons share this. Only `ActionDetails` is public, from
 // `@ui-sdk/core` and under each component's own name for it.
-import { warn } from "#dev"
+import { note } from "#dev"
 import { withSource, type ChangeSource } from "./details"
 
 // What a pending part says by default, in English, once it has been pending
@@ -54,7 +54,7 @@ function runAction(
   handlers: { pending: (pending: boolean) => void; done: () => void; failed: (error: unknown) => void },
 ) {
   const failed = (error: unknown) => {
-    warn("an action failed. The error is in its part's `error` state.", undefined, error)
+    note("an action failed. The error is in its part's `error` state.", undefined, error)
     handlers.failed(error)
   }
   const done = () => withSource(source, handlers.done)

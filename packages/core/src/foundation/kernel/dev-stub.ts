@@ -10,6 +10,8 @@ function emit(_event: DevEvent) {}
 
 function warn(_message: string, _from?: { component: string; id?: string }, _detail?: unknown) {}
 
+function note(_message: string, _from?: { component: string; id?: string }, _detail?: unknown) {}
+
 function warnMissing<T>(slots: T, _from: { component: string; id?: string }) {
   return slots
 }
@@ -79,6 +81,7 @@ export {
   heardControlled,
   isMeasuring,
   measured,
+  note,
   warn,
   warnMissing,
 }

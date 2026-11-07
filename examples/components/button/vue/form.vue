@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@ui-sdk/vue/button"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
@@ -15,7 +16,7 @@ function onSubmit(event: Event) {
   <form data-slot="stack" @submit.prevent="onSubmit">
     <Field>
       <FieldLabel>Email</FieldLabel>
-      <FieldControl name="email" type="email" defaultValue="ada@example.com" />
+      <Input name="email" type="email" defaultValue="ada@example.com" />
     </Field>
     <div data-slot="row">
       <Button type="submit">Subscribe</Button>

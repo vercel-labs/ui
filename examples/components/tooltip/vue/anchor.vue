@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { InfoIcon } from "@lucide/vue"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
 import { useTemplateRef } from "vue"
 
@@ -11,7 +12,7 @@ const field = useTemplateRef<HTMLDivElement>("field")
   <Field>
     <FieldLabel>Webhook URL</FieldLabel>
     <div ref="field" data-slot="row">
-      <FieldControl placeholder="https://" />
+      <Input placeholder="https://" />
       <Tooltip>
         <TooltipTrigger aria-label="About webhooks">
           <InfoIcon aria-hidden="true" />

@@ -9,7 +9,9 @@
     DrawerTitle,
     DrawerTrigger,
   } from "@ui-sdk/svelte/drawer"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Textarea } from "@ui-sdk/svelte/textarea"
+  import { Input } from "@ui-sdk/svelte/input"
 
   const messages = [
     { from: "Inès", text: "The proofs are back from the printer." },
@@ -45,15 +47,11 @@
     </div>
     <Field>
       <FieldLabel>To</FieldLabel>
-      <FieldControl defaultValue="Design team" />
+      <Input defaultValue="Design team" />
     </Field>
     <Field>
       <FieldLabel>Message</FieldLabel>
-      <FieldControl>
-        {#snippet render({ props })}
-          <textarea {...props} placeholder="What's new?"></textarea>
-        {/snippet}
-      </FieldControl>
+      <Textarea placeholder="What's new?" />
     </Field>
     <div data-slot="stack">
       <DrawerClose data-variant="solid" value="send">Send</DrawerClose>

@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
 
 function Example() {
@@ -12,7 +13,7 @@ function Example() {
       <TabsPanel value="code">
         <Field>
           <FieldLabel>Source</FieldLabel>
-          <FieldControl value='<Welcome name="Hollis" unread={3} />' />
+          <Input defaultValue='<Welcome name="Hollis" unread={3} />' />
         </Field>
       </TabsPanel>
     </Tabs>

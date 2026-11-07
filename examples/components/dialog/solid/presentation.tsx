@@ -6,7 +6,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
 function Example() {
   return (
@@ -19,11 +20,11 @@ function Example() {
         </div>
         <Field>
           <FieldLabel>Name</FieldLabel>
-          <FieldControl defaultValue="Hollis Grant" />
+          <Input defaultValue="Hollis Grant" />
         </Field>
         <Field>
           <FieldLabel>Username</FieldLabel>
-          <FieldControl defaultValue="@hollis" />
+          <Input defaultValue="@hollis" />
         </Field>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>

@@ -1,6 +1,7 @@
 "use client"
 
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import {
   Popover,
   PopoverClose,
@@ -19,7 +20,7 @@ function Example() {
         <PopoverDescription>We'll notify you at the time you pick.</PopoverDescription>
         <Field>
           <FieldLabel>Remind me to</FieldLabel>
-          <FieldControl defaultValue="Send the Q3 roadmap" />
+          <Input defaultValue="Send the Q3 roadmap" />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

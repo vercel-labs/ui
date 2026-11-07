@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import {
   Popover,
   PopoverClose,
@@ -29,7 +30,7 @@ function onSubmit(event: Event) {
       <form data-slot="stack" @submit.prevent="onSubmit">
         <Field>
           <FieldLabel>Name</FieldLabel>
-          <FieldControl name="name" required default-value="Hollis Grant" />
+          <Input name="name" required default-value="Hollis Grant" />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

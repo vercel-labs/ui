@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/popover"
 
 function mount(root: HTMLElement) {
@@ -13,7 +14,9 @@ function mount(root: HTMLElement) {
           <ui-popover-description>Focus starts in the first field.</ui-popover-description>
           <ui-field>
             <ui-field-label>Name</ui-field-label>
-            <input value="Q3 roadmap.pdf" />
+            <ui-input>
+              <input value="Q3 roadmap.pdf" />
+            </ui-input>
           </ui-field>
           <div data-slot="row">
             <ui-popover-close>

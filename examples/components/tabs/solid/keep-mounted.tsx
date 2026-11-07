@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Textarea } from "@ui-sdk/solid/textarea"
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
 
 function Example() {
@@ -12,7 +13,7 @@ function Example() {
       <TabsPanel value="reply" keepMounted>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl render={(props) => <textarea {...props} rows={3} />} placeholder="Write a reply…" />
+          <Textarea rows={3} placeholder="Write a reply…" />
         </Field>
       </TabsPanel>
       <TabsPanel value="formatting">

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import {
     Popover,
     PopoverClose,
@@ -17,7 +18,7 @@
     <PopoverDescription>We'll notify you at the time you pick.</PopoverDescription>
     <Field>
       <FieldLabel>Remind me to</FieldLabel>
-      <FieldControl defaultValue="Send the Q3 roadmap" />
+      <Input defaultValue="Send the Q3 roadmap" />
     </Field>
     <div data-slot="row">
       <PopoverClose>Cancel</PopoverClose>

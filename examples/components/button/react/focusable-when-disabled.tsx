@@ -2,7 +2,8 @@
 
 import * as React from "react"
 import { Button } from "@ui-sdk/react/button"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {
@@ -15,7 +16,7 @@ function Example() {
     <div data-slot="stack">
       <Field>
         <FieldLabel>Title</FieldLabel>
-        <FieldControl value={title} onChange={(event) => setTitle(event.target.value)} />
+        <Input value={title} onValueChange={(value) => setTitle(value)} />
       </Field>
       <div data-slot="row">
         <Button

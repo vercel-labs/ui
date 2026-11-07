@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {
@@ -29,7 +30,7 @@ function Example() {
         <form data-slot="stack" method="dialog">
           <Field>
             <FieldLabel>Title</FieldLabel>
-            <FieldControl required defaultValue="Shipping updates for spring" />
+            <Input required defaultValue="Shipping updates for spring" />
           </Field>
           <div data-slot="row">
             <button type="submit" value="draft">

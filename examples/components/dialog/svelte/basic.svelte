@@ -9,7 +9,8 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
 </script>
 
 <Dialog>
@@ -22,7 +23,7 @@
     </div>
     <Field>
       <FieldLabel>Link</FieldLabel>
-      <FieldControl defaultValue="https://example.com/project" readonly />
+      <Input defaultValue="https://example.com/project" readonly />
     </Field>
     <div data-slot="row">
       <DialogClose data-variant="solid">Done</DialogClose>

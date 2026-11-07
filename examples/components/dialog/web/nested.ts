@@ -1,5 +1,6 @@
 import "@ui-sdk/web/dialog"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -30,7 +31,9 @@ function mount(root: HTMLElement) {
               </div>
               <ui-field>
                 <ui-field-label>New password</ui-field-label>
-                <input type="password" />
+                <ui-input>
+                  <input type="password" />
+                </ui-input>
               </ui-field>
               <div data-slot="row">
                 <ui-dialog-close>

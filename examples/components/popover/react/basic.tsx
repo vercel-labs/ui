@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import {
   Popover,
   PopoverClose,
@@ -17,7 +18,7 @@ function Example() {
         <PopoverDescription>Anyone with the link can view it.</PopoverDescription>
         <Field>
           <FieldLabel>Link</FieldLabel>
-          <FieldControl readOnly defaultValue="acme.app/d/q3-roadmap" />
+          <Input readOnly defaultValue="acme.app/d/q3-roadmap" />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

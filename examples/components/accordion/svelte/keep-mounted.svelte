@@ -7,7 +7,8 @@
     AccordionPanel,
     AccordionTrigger,
   } from "@ui-sdk/svelte/accordion"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Textarea } from "@ui-sdk/svelte/textarea"
 </script>
 
 <Accordion defaultValue={["reply"]}>
@@ -21,11 +22,7 @@
     <AccordionPanel keepMounted>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl rows="3" placeholder="Write a reply…">
-          {#snippet render({ props })}
-            <textarea {...props}></textarea>
-          {/snippet}
-        </FieldControl>
+        <Textarea rows={3} placeholder="Write a reply…" />
       </Field>
     </AccordionPanel>
   </AccordionItem>

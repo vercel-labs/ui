@@ -8,7 +8,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/vue/drawer"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 </script>
 
 <template>
@@ -47,7 +48,7 @@ import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
             </div>
             <Field>
               <FieldLabel>New password</FieldLabel>
-              <FieldControl type="password" />
+              <Input type="password" />
             </Field>
             <div data-slot="stack">
               <DrawerClose data-variant="solid">Update</DrawerClose>

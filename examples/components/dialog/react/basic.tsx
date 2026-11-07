@@ -7,7 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { XIcon } from "lucide-react"
 
 function Example() {
@@ -22,7 +23,7 @@ function Example() {
         </div>
         <Field>
           <FieldLabel>Link</FieldLabel>
-          <FieldControl defaultValue="https://example.com/project" readOnly />
+          <Input defaultValue="https://example.com/project" readOnly />
         </Field>
         <div data-slot="row">
           <DialogClose data-variant="solid">Done</DialogClose>

@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 </script>
 
 <template>
@@ -35,7 +36,7 @@ import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
             </div>
             <Field>
               <FieldLabel>New password</FieldLabel>
-              <FieldControl type="password" />
+              <Input type="password" />
             </Field>
             <div data-slot="row">
               <DialogClose>Cancel</DialogClose>

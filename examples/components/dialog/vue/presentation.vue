@@ -7,7 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 </script>
 
 <template>
@@ -20,11 +21,11 @@ import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
       </div>
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <FieldControl defaultValue="Hollis Grant" />
+        <Input defaultValue="Hollis Grant" />
       </Field>
       <Field>
         <FieldLabel>Username</FieldLabel>
-        <FieldControl defaultValue="@hollis" />
+        <Input defaultValue="@hollis" />
       </Field>
       <div data-slot="row">
         <DialogClose>Cancel</DialogClose>

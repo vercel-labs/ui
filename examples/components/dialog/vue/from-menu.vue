@@ -8,7 +8,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@ui-sdk/vue/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue/menu"
 import { CopyIcon, EllipsisIcon, PencilIcon } from "@lucide/vue"
 
@@ -40,7 +41,7 @@ const rename = createDialogController()
       </div>
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <FieldControl defaultValue="report.pdf" />
+        <Input defaultValue="report.pdf" />
       </Field>
       <div data-slot="row">
         <DialogClose>Cancel</DialogClose>

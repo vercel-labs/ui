@@ -276,6 +276,12 @@ function ownButton(parts: Bound[]) {
   if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
 }
 
+// Any key on it is an adapter's, like a web component's generated id.
+function soleTrigger(parts: Bound[]) {
+  const triggers = parts.filter((part) => part.slot === "trigger")
+  return triggers.length === 1 ? triggers[0].el : undefined
+}
+
 // The root part's state counts a group around the component, like a toggle's
 // in a disabled toggle group.
 function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
@@ -664,7 +670,9 @@ function createAgent(
     const match = () => {
       const parts = bound(instance)
       const buttons = buttonsOf(parts)
-      if (text === undefined) return { buttons, button: ownButton(parts) }
+      // A popup's own button is its trigger, which opens it like a person's click.
+      if (text === undefined)
+        return { buttons, button: ownButton(parts) ?? (api.setOpen ? soleTrigger(parts) : undefined) }
       // Exact text first, then whole words, like "Delete" for "Delete project". Two that match the same
       // way are refused, not guessed.
       const needle = fold(text)

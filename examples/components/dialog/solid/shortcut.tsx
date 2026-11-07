@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
 function Example() {
   return (
@@ -38,11 +39,11 @@ function Example() {
         <form data-slot="stack" method="dialog">
           <Field>
             <FieldLabel>Name</FieldLabel>
-            <FieldControl name="name" required placeholder="Kofi Mensah" />
+            <Input name="name" required placeholder="Kofi Mensah" />
           </Field>
           <Field>
             <FieldLabel>Email</FieldLabel>
-            <FieldControl name="email" type="email" required placeholder="kofi@example.com" />
+            <Input name="email" type="email" required placeholder="kofi@example.com" />
           </Field>
           <div data-slot="row">
             <DialogClose>Cancel</DialogClose>

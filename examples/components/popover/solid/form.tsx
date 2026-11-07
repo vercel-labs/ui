@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import {
   Popover,
   PopoverClose,
@@ -30,7 +31,7 @@ function Example() {
         >
           <Field>
             <FieldLabel>Name</FieldLabel>
-            <FieldControl name="name" required defaultValue="Hollis Grant" />
+            <Input name="name" required defaultValue="Hollis Grant" />
           </Field>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>

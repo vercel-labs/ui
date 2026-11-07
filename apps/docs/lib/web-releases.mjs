@@ -31,16 +31,21 @@ function newestByMajor(versions) {
   const newest = new Map()
   for (const version of versions) {
     const major = version.split(".")[0]
-    const current = newest.get(major)
-    const isNewer =
-      !current ||
-      (isPrerelease(current) === isPrerelease(version)
-        ? compareVersions(version, current) > 0
-        : isPrerelease(current))
-    if (isNewer) newest.set(major, version)
+    if (isNewer(version, newest.get(major))) newest.set(major, version)
   }
   return newest
 }
+
+/** The newest version of all, by the same rule, for `/web.js`. */
+function newestRelease(versions) {
+  return versions.reduce((newest, version) => (isNewer(version, newest) ? version : newest), undefined)
+}
+
+const isNewer = (version, current) =>
+  !current ||
+  (isPrerelease(current) === isPrerelease(version)
+    ? compareVersions(version, current) > 0
+    : isPrerelease(current))
 
 const isPrerelease = (version) => splitVersion(version)[1].length > 0
 
@@ -70,4 +75,4 @@ function compareIdentifiers(a, b) {
   return 0
 }
 
-export { compareVersions, newestByMajor, releasesIn, webReleaseHeaders }
+export { compareVersions, newestByMajor, newestRelease, releasesIn, webReleaseHeaders }
