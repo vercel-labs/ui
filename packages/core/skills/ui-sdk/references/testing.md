@@ -4,15 +4,15 @@
 
 Test what you built, not what ui-sdk already tests: for an interface, check that the right components are wired with names, values and callbacks; for a new component, check every key and state.
 
-Wiring includes what a person does with the keyboard: press Space on each switch or checkbox you placed, and check that closing a dialog or menu returns focus where it should. Assert every button's name in the page's own markup, not in a fixture, and assert that state attributes you don't set, like `aria-disabled`, are absent. The same goes when you're asked to add tests to existing code: tests that pass on a broken page don't count.
+Wiring includes what a person does with the keyboard: press Space on every switch or checkbox you placed, not just one, and check that closing a dialog or menu returns focus where it should. Press each button in every dialog, Cancel as well as the confirming one, and check what happened. Submit each required field empty. Assert every button's name in the page's own markup, not in a fixture, and assert that state attributes you don't set, like `aria-disabled`, are absent. The same goes when you're asked to add tests to existing code: tests that pass on a broken page don't count.
 
 ## Which tool for what
 
-| You built                                                   | Test with                                                                                                                                                                                                                                                                      |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| An interface from our components                            | The framework's testing library for what you wired (names, values, callbacks, what submits), and the [agent test](agent-ready.md#prove-it-with-a-test). Our components are tested already: don't run `checkPattern` on them.                                                   |
-| A primitive                                                 | `mount` with `keys`, `type`, `click`, `hover` and `drag`, then `checkPattern`, `checkServer` and `checkDirection`. If a page in the app uses it, also render that page: press its keys there, check where focus goes after each step, and assert its name in the page's markup |
-| Anything with popups, layout or focus moving between fields | Also a real browser                                                                                                                                                                                                                                                            |
+| You built                                                   | Test with                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| An interface from our components                            | The framework's testing library for what you wired (names, values, callbacks, what submits), and the [agent test](agent-ready.md#prove-it-with-a-test). Our components are tested already: don't run `checkPattern` on them.                                                                                                                 |
+| A primitive                                                 | `mount` with `keys`, `type`, `click`, `hover` and `drag`, then `checkPattern`, `checkServer` and `checkDirection`. If a page in the app uses it, also render that page: press its keys there, click each of its buttons that moves between steps (Next, Back), assert where focus lands after each, and assert its name in the page's markup |
+| Anything with popups, layout or focus moving between fields | Also a real browser                                                                                                                                                                                                                                                                                                                          |
 
 ## Check a pattern
 
@@ -54,11 +54,11 @@ test("renders on the server and works in both directions", async () => {
 - Focus an input before `type`. `keys` takes `Tab`, `Shift+Tab`, `Space` and combinations.
 - `view.announced` holds what screen readers heard. Call `await view.settle()` before reading delayed work.
 - Always `unmount`.
-- Set `globalThis.__UI_SDK_STRICT__ = true` in the test setup so development warnings fail the test. Declare it first, `declare global { var __UI_SDK_STRICT__: boolean | undefined }`, and leave it off in a file where an action rejects on purpose, like a close action that keeps a dialog open: strict mode turns that rejection into an unhandled error.
+- Set `globalThis.__UI_SDK_STRICT__ = true` in the test setup so development warnings fail the test. Declare it first: `declare global { var __UI_SDK_STRICT__: boolean | undefined }`.
 
 ## Break it on purpose
 
-For each key behavior of a new component, break it (return early, skip a call), run the tests, confirm one fails, then restore the file. A test that still passes is testing nothing. Report how many breaks your tests caught.
+For each key behavior of a new component, break it (return early, skip a call), run the tests, confirm one fails, then restore the file. A test that still passes is testing nothing. Report how many breaks your tests caught. When a page uses the component, break the page too, like a Back button that no longer moves focus, or the component's name.
 
 For a composite widget, test both arrow directions, that exactly one item is tabbable, Space and Enter, and every state attribute you set, like `aria-current` or `aria-disabled`.
 

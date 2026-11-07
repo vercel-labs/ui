@@ -168,3 +168,7 @@ export { ProjectSettings }
 ```
 
 Check each part name against the component pages; they're the source of truth.
+
+## 8. Test it
+
+Every interface gets tests, and at least the agent test from [agent-ready.md](agent-ready.md#prove-it-with-a-test). Follow [testing.md](testing.md) for the rest.

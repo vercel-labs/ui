@@ -6,7 +6,7 @@ The full docs are the Agents pages: `docs/agents.md` in each package, or https:/
 
 ## The checklist
 
-1. **Every control has a name.** The bridge's `label` is the accessible name: `FieldLabel`, the component's label part, or `aria-label`. Labels should be unique where they sit, because a step finds its component by label (`{ ref: "Project name", … }`). Two "Name" fields in two sections are fine only if a step can still tell them apart by ref or row text. Components that only support another still show up: give a shared Tooltip or an Avatar its own `aria-label`, and put `data-agent-hidden` on a toast region (it drops its label while it's empty). A Menu shared by several triggers can't be named today: leave it, and note it in GAPS.md. Labels inside a dialog should differ from the page's too: the bridge still sees the page behind an open modal.
+1. **Every control has a name.** The bridge's `label` is the accessible name: `FieldLabel`, the component's label part, or `aria-label`. Labels should be unique where they sit, because a step finds its component by label (`{ ref: "Project name", … }`). Two "Name" fields in two sections are fine only if a step can still tell them apart by ref or row text. Components that only support another still show up: give a shared Tooltip or an Avatar its own `aria-label`, and put `data-agent-hidden` on a toast region (it drops its label while it's empty). A Menu can't take a name of its own, so don't share one Menu between rows: give each row its own Menu, with a trigger named for its row, like `aria-label="Actions for Jane Doe"`. Labels inside a dialog should differ from the page's too: the bridge still sees the page behind an open modal.
 2. **Every control an agent should use is one of our parts.** `snapshot()` lists only ui-sdk components. These are invisible, so an agent can't fill or press them:
    - a plain `<button>`: use `Button` (`<ui-button><button>…</button></ui-button>` in web components), including submit buttons and a wizard's Back and Continue;
    - a bare `<input>`, `<textarea>` or `<select>`, and `FieldControl`: use `Input`, `Textarea`, `NumberInput` or `Select` inside a `Field`. In web components that's `<ui-field>` with `<ui-input><input /></ui-input>` inside, never a bare `<input>`;
@@ -104,14 +104,13 @@ test("an agent can find and change every setting", async () => {
   const remove = { steps: [{ ref: "Delete project", action: "press", args: ["Delete forever"] }] }
 
   expect((await agent.act(remove)).ok).toBe(false)
-  await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull())
   approve = true
   expect((await agent.act(remove)).ok).toBe(true)
   ```
 
-- A refused press closes the dialog it opened, but the close can still be running when `act` returns. Wait for it, as above with the testing library's `waitFor`, before the next step, or the trigger's label isn't there yet.
-- `press` with a button's text opens a closed dialog or menu to find it. `press` with no text on a closed dialog fails today, so always name the button. Once a dialog is open, its label is its title, not the trigger's text.
+- A refused press closes the dialog it opened before `act` returns.
+- `press` with a button's text opens a closed dialog or menu to find it, and `press` with no text opens it through its trigger. Once a dialog is open, its label is its title, not the trigger's text.
 - `act` can return `ok: true` while a change callback cancelled a value. Check `result.values` or the DOM, not only `ok`.
-- **An action that takes a value needs its choices in the snapshot.** If an agent can't see the values, it can't call the action. List them through the state's `items` or `agent.items`, and in the agent test take the value from `snapshot()`, not from your own data.
+- **An agent needs to find the choices an action takes.** The snapshot lists `items` only for a component with `setValue`: one that doesn't open lists its `item` and `tab` parts, named by their text, and one that opens lists its data when it has 10 items or fewer. For any other action that takes a value, like `goTo` or `pick`, return the choices from `agent.items`; an agent reads them with `query({ within: "<label>" })`. In the agent test, take the value from `snapshot()` or `query` the same way, not from your own data. `query` resolves to a list of components or `{ error }`, so check which before you destructure it.
 
 Also look at the snapshot once by hand (`console.log(JSON.stringify(agent.snapshot(), null, 2))`): every entry should have a label a person would recognize, the actions you expect, and no `"actions": []` on a custom primitive that should do something.

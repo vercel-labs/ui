@@ -4,7 +4,7 @@ Each snippet comes from a component that passes its tests. Adapt the names. When
 
 ## Grid arrows with `createRovingFocus` and `move`
 
-A set of choices in two dimensions, like emoji, colors or dates, is a `grid` of `row`s and `gridcell`s with `createGridFocus`, and the root has a name. A set in one dimension is a `listbox` of `option`s. Don't use plain buttons for the cells.
+A set of choices in two dimensions, like emoji, colors or dates, is a `grid` of `row`s and `gridcell`s, and the root has a name. Use `createGridFocus` only when every row has the same columns, like a calendar. Emoji, swatches and other lists that wrap into rows are a flowing grid: `createRovingFocus` with the `move` below. A set in one dimension is a `listbox` of `option`s. Don't use plain buttons for the cells.
 
 For a grid whose rows and columns are in state. Keys find cells by id, not by index. Past an edge, return `from.key` so the arrow is handled and the page doesn't scroll.
 
