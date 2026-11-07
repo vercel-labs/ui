@@ -1422,6 +1422,14 @@ describe("agent act", () => {
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
+  test("press with no text clicks a closed popup's trigger, which opens it", async () => {
+    const agent = createAgent()
+    const { instance } = await mountActions()
+    const outcome = await agent.act({ steps: [{ ref: "Tom Becker", action: "press" }] })
+    expect(outcome).toMatchObject({ ok: true })
+    expect(instance.get().open).toBe(true)
+  })
+
   test("a press on a disabled button fails, and closes the popup it opened", async () => {
     const agent = createAgent()
     const { instance, onClick } = await mountActions({ disabled: true })

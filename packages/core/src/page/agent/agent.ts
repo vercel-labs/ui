@@ -271,6 +271,11 @@ function buttonsOf(parts: Bound[]) {
 const rootOf = (parts: Bound[]) => parts.find((part) => part.slot === "root" && !part.key)?.el
 
 // The button a component is, like a Button's root, which `press` presses with no text.
+function keylessTrigger(parts: Bound[]) {
+  const triggers = parts.filter((part) => part.slot === "trigger")
+  return triggers.length === 1 && !triggers[0].key ? triggers[0].el : undefined
+}
+
 function ownButton(parts: Bound[]) {
   const root = rootOf(parts)
   if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
@@ -664,7 +669,8 @@ function createAgent(
     const match = () => {
       const parts = bound(instance)
       const buttons = buttonsOf(parts)
-      if (text === undefined) return { buttons, button: ownButton(parts) }
+      // A popup's own button is its trigger, which opens it like a person's click.
+      if (text === undefined) return { buttons, button: ownButton(parts) ?? keylessTrigger(parts) }
       // Exact text first, then whole words, like "Delete" for "Delete project". Two that match the same
       // way are refused, not guessed.
       const needle = fold(text)
