@@ -240,21 +240,31 @@
     }
   }
 
-  /* The trigger sits inside the end of the input it follows. */
-  [data-slot="combobox-root"]:has([data-slot="combobox-trigger"]) [data-slot="combobox-input"] {
-    padding-inline-end: calc(var(--ui-spacing) * 8);
-  }
+  /* A trigger right after its input sits inside the input's end. Web components wrap each part, and :has() can't nest. */
+  :has(> [data-slot="combobox-input"] + [data-slot="combobox-trigger"]),
+  :has(> ui-combobox-input + ui-combobox-trigger) {
+    display: flex;
 
-  [data-slot="combobox-trigger"] {
-    position: relative;
-    width: calc(var(--ui-spacing) * 8);
-    margin-inline-start: calc(var(--ui-spacing) * -8);
-    padding: 0;
-    border-color: transparent;
-    background: transparent;
+    & > :is([data-slot="combobox-input"], ui-combobox-input) {
+      flex: 1;
+      min-width: 0;
+    }
 
-    &:hover:not([data-disabled]) {
+    & [data-slot="combobox-input"] {
+      padding-inline-end: calc(var(--ui-spacing) * 8);
+    }
+
+    & [data-slot="combobox-trigger"] {
+      position: relative;
+      width: calc(var(--ui-spacing) * 8);
+      margin-inline-start: calc(var(--ui-spacing) * -8);
+      padding: 0;
+      border-color: transparent;
       background: transparent;
+
+      &:hover:not([data-disabled]) {
+        background: transparent;
+      }
     }
   }
 
@@ -663,6 +673,15 @@
     position: absolute;
     inset-block: 0;
     background: var(--ui-primary);
+  }
+
+  [data-slot="progress-indicator"][data-indeterminate] {
+    inset-inline: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      color-mix(in oklab, var(--ui-primary) 35%, transparent) 0 0.25rem,
+      transparent 0.25rem 0.5rem
+    );
   }
 
   [data-slot="accordion-root"] {
