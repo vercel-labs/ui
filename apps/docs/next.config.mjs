@@ -1,8 +1,10 @@
 import { createMDX } from "fumadocs-mdx/next"
 import path from "node:path"
-import { newestByMajor, releasesIn, webReleaseHeaders } from "./lib/web-releases.mjs"
+import { newestByMajor, newestRelease, releasesIn, webReleaseHeaders } from "./lib/web-releases.mjs"
 
 const withMDX = createMDX()
+
+const webReleases = releasesIn(path.join(import.meta.dirname, "public"))
 
 /** @type {import('next').NextConfig} */
 const config = {
@@ -14,11 +16,13 @@ const config = {
   // examples/vite.config.ts compiles them into public/examples.
   transpilePackages: ["@ui-sdk/core", "@ui-sdk/react"],
   turbopack: { root: path.resolve(import.meta.dirname, "../..") },
-  // The newest `@ui-sdk/web` release of each major, like `{"1":"1.3.0"}`, for `proxy.ts`.
+  // The newest `@ui-sdk/web` release of each major, and of all, like
+  // `{"1":"1.3.0","2":"2.0.0","latest":"2.0.0"}`, for `proxy.ts`.
   env: {
-    WEB_RELEASES: JSON.stringify(
-      Object.fromEntries(newestByMajor(releasesIn(path.join(import.meta.dirname, "public")))),
-    ),
+    WEB_RELEASES: JSON.stringify({
+      ...Object.fromEntries(newestByMajor(webReleases)),
+      latest: newestRelease(webReleases),
+    }),
   },
   async headers() {
     return [
