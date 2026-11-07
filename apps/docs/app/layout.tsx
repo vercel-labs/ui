@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     url: "https://ui-sdk.dev",
     siteName: "UI SDK",
   },
+  twitter: { card: "summary_large_image" },
 }
 
 export default function Layout({ children }: LayoutProps<"/">) {
