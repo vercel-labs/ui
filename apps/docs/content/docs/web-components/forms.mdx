@@ -59,18 +59,21 @@ The element owns its live state. If your application mirrors `checked` elsewhere
 
 ```ts
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 ```
 
 ```html
 <ui-field name="email">
   <ui-field-label>Email</ui-field-label>
-  <input type="email" required />
+  <ui-input>
+    <input type="email" required />
+  </ui-input>
   <ui-field-description>We'll only use it for receipts.</ui-field-description>
   <ui-field-error></ui-field-error>
 </ui-field>
 ```
 
-The control can be a native input or one of ours, such as `ui-checkbox` or `ui-select`. [Field](./components/field) shows the supported controls.
+The control is one of ours, such as `ui-input`, `ui-textarea`, `ui-checkbox` or `ui-select`. [Field](./components/field) shows the supported controls.
 
 ## Handle a Submission
 
@@ -82,7 +85,9 @@ Your server may still reject a valid-looking value. Set the field’s `invalid` 
 <form>
   <ui-field name="email">
     <ui-field-label>Email</ui-field-label>
-    <input type="email" required />
+    <ui-input>
+      <input type="email" required />
+    </ui-input>
     <ui-field-error></ui-field-error>
   </ui-field>
   <button type="submit">Save</button>
@@ -91,6 +96,7 @@ Your server may still reject a valid-looking value. Set the field’s `invalid` 
 
 ```ts
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 
 const form = document.querySelector("form")!
 const field = form.querySelector("ui-field")!

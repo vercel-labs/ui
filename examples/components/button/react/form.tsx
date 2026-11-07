@@ -1,6 +1,7 @@
 "use client"
 
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { Button } from "@ui-sdk/react/button"
 import { useLog } from "../../../shared/react/log"
 
@@ -18,7 +19,7 @@ function Example() {
     >
       <Field>
         <FieldLabel>Email</FieldLabel>
-        <FieldControl name="email" type="email" defaultValue="ada@example.com" />
+        <Input name="email" type="email" defaultValue="ada@example.com" />
       </Field>
       <div data-slot="row">
         <Button type="submit">Subscribe</Button>

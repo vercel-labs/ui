@@ -1,7 +1,8 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
   import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import {
     Popover,
     PopoverClose,
@@ -43,7 +44,7 @@
       <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
       <Field>
         <FieldLabel>Status</FieldLabel>
-        <FieldControl defaultValue="In a meeting" />
+        <Input defaultValue="In a meeting" />
       </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>

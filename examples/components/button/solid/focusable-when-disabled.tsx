@@ -1,6 +1,7 @@
 import { createSignal, createUniqueId } from "solid-js"
 import { Button } from "@ui-sdk/solid/button"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -13,7 +14,7 @@ function Example() {
     <div data-slot="stack">
       <Field>
         <FieldLabel>Title</FieldLabel>
-        <FieldControl value={title()} onInput={(event) => setTitle(event.currentTarget.value)} />
+        <Input value={title()} onValueChange={(value) => setTitle(value)} />
       </Field>
       <div data-slot="row">
         <Button

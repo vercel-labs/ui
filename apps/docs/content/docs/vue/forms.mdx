@@ -61,20 +61,21 @@ Uncheck the box, then press Reset. `default-checked` supplies the reset value. T
 
 ```vue
 <script setup lang="ts">
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 </script>
 
 <template>
   <Field name="email">
     <FieldLabel>Email</FieldLabel>
-    <FieldControl type="email" required />
+    <Input type="email" required />
     <FieldDescription>We'll only use it for receipts.</FieldDescription>
     <FieldError />
   </Field>
 </template>
 ```
 
-You can use Checkbox, Switch, Radio Group, or Select in place of `FieldControl`. [Field](./components/field) shows how they connect.
+You can use a Textarea, Checkbox, Switch, Radio Group, or Select in place of the Input. [Field](./components/field) shows how they connect.
 
 On controls that support them, `required`, `disabled`, `read-only`, and `form` follow native conventions. Disabled fields are left out of submission; read-only fields remain focusable and submitted.
 
@@ -86,7 +87,8 @@ Your server may still reject a valid-looking value. Pass `invalid` to the field 
 
 ```vue
 <script setup lang="ts">
-import { Field, FieldControl, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { ref } from "vue"
 
 const error = ref("")
@@ -102,7 +104,7 @@ async function save(event: SubmitEvent) {
   <form @submit.prevent="save">
     <Field name="email" :invalid="error ? true : undefined">
       <FieldLabel>Email</FieldLabel>
-      <FieldControl type="email" required @input="error = ''" />
+      <Input type="email" required @value-change="error = ''" />
       <FieldError v-slot="{ state }">{{ error || state.message }}</FieldError>
     </Field>
     <button type="submit">Save</button>

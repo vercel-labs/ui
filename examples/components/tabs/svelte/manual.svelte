@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/svelte/tabs"
 </script>
 
@@ -12,7 +13,7 @@
   <TabsPanel value="code">
     <Field>
       <FieldLabel>Source</FieldLabel>
-      <FieldControl value={'<Welcome name="Hollis" unread={3} />'} />
+      <Input defaultValue={'<Welcome name="Hollis" unread={3} />'} />
     </Field>
   </TabsPanel>
 </Tabs>

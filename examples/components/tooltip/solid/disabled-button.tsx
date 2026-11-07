@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { createSignal } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
@@ -12,7 +13,7 @@ function Example() {
     <div data-slot="stack">
       <Field>
         <FieldLabel>Post title</FieldLabel>
-        <FieldControl value={title()} onInput={(event) => setTitle(event.currentTarget.value)} />
+        <Input value={title()} onValueChange={(value) => setTitle(value)} />
       </Field>
       <Tooltip disabled={!blocked()}>
         <TooltipTrigger

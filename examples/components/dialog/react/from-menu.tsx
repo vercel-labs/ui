@@ -10,7 +10,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@ui-sdk/react/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
 import { CopyIcon, EllipsisIcon, PencilIcon } from "lucide-react"
 
@@ -42,7 +43,7 @@ function Example() {
           </div>
           <Field>
             <FieldLabel>Name</FieldLabel>
-            <FieldControl defaultValue="report.pdf" />
+            <Input defaultValue="report.pdf" />
           </Field>
           <div data-slot="row">
             <DialogClose>Cancel</DialogClose>

@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { XIcon } from "@lucide/vue"
 </script>
 
@@ -23,7 +24,7 @@ import { XIcon } from "@lucide/vue"
       </div>
       <Field>
         <FieldLabel>Link</FieldLabel>
-        <FieldControl defaultValue="https://example.com/project" readonly />
+        <Input defaultValue="https://example.com/project" readonly />
       </Field>
       <div data-slot="row">
         <DialogClose data-variant="solid">Done</DialogClose>

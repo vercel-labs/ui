@@ -7,7 +7,8 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from "@ui-sdk/react/accordion"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Textarea } from "@ui-sdk/react/textarea"
 import { ChevronDownIcon } from "lucide-react"
 
 function Example() {
@@ -23,7 +24,7 @@ function Example() {
         <AccordionPanel keepMounted>
           <Field>
             <FieldLabel>Message</FieldLabel>
-            <FieldControl render={<textarea rows={3} />} placeholder="Write a reply…" />
+            <Textarea rows={3} placeholder="Write a reply…" />
           </Field>
         </AccordionPanel>
       </AccordionItem>

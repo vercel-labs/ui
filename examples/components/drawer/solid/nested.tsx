@@ -7,7 +7,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/solid/drawer"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
 function Example() {
   return (
@@ -46,7 +47,7 @@ function Example() {
               </div>
               <Field>
                 <FieldLabel>New password</FieldLabel>
-                <FieldControl type="password" />
+                <Input type="password" />
               </Field>
               <div data-slot="stack">
                 <DrawerClose data-variant="solid">Update</DrawerClose>

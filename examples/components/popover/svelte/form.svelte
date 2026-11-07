@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import {
     Popover,
     PopoverClose,
@@ -29,7 +30,7 @@
     >
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <FieldControl name="name" required defaultValue="Hollis Grant" />
+        <Input name="name" required defaultValue="Hollis Grant" />
       </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Textarea } from "@ui-sdk/svelte/textarea"
   import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/svelte/tabs"
 </script>
 
@@ -12,11 +13,7 @@
   <TabsPanel value="reply" keepMounted>
     <Field>
       <FieldLabel>Message</FieldLabel>
-      <FieldControl rows="3" placeholder="Write a reply…">
-        {#snippet render({ props })}
-          <textarea {...props}></textarea>
-        {/snippet}
-      </FieldControl>
+      <Textarea rows={3} placeholder="Write a reply…" />
     </Field>
   </TabsPanel>
   <TabsPanel value="formatting">

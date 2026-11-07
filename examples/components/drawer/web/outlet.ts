@@ -1,5 +1,7 @@
 import "@ui-sdk/web/drawer"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
+import "@ui-sdk/web/textarea"
 
 const messages = [
   { from: "Inès", text: "The proofs are back from the printer." },
@@ -38,11 +40,15 @@ function mount(root: HTMLElement) {
         </div>
         <ui-field>
           <ui-field-label>To</ui-field-label>
-          <input value="Design team" />
+          <ui-input>
+            <input value="Design team" />
+          </ui-input>
         </ui-field>
         <ui-field>
           <ui-field-label>Message</ui-field-label>
-          <textarea placeholder="What's new?"></textarea>
+          <ui-textarea>
+            <textarea placeholder="What's new?"></textarea>
+          </ui-textarea>
         </ui-field>
         <div data-slot="stack">
           <ui-drawer-close value="send"><button data-variant="solid">Send</button></ui-drawer-close>

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
   import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Textarea } from "@ui-sdk/svelte/textarea"
 </script>
 
 <Collapsible data-variant="card">
@@ -15,11 +16,7 @@
   <CollapsiblePanel keepMounted>
     <Field>
       <FieldLabel>Delivery note</FieldLabel>
-      <FieldControl placeholder="Leave it with the front desk…">
-        {#snippet render({ props })}
-          <textarea {...props}></textarea>
-        {/snippet}
-      </FieldControl>
+      <Textarea placeholder="Leave it with the front desk…" />
     </Field>
   </CollapsiblePanel>
 </Collapsible>

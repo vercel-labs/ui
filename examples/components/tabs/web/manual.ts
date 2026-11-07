@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/tabs"
 
 function mount(root: HTMLElement) {
@@ -16,7 +17,9 @@ function mount(root: HTMLElement) {
       <ui-tabs-panel value="code">
         <ui-field>
           <ui-field-label>Source</ui-field-label>
-          <input value='&lt;Welcome name="Hollis" unread={3} /&gt;' />
+          <ui-input>
+            <input value='&lt;Welcome name="Hollis" unread={3} /&gt;' />
+          </ui-input>
         </ui-field>
       </ui-tabs-panel>
     </ui-tabs>

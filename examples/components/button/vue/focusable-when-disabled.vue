@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Button } from "@ui-sdk/vue/button"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { computed, ref, useId } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
@@ -8,17 +9,13 @@ const log = useLog()
 const title = ref("")
 const hint = useId()
 const ready = computed(() => title.value.trim() !== "")
-
-function onTitle(event: Event) {
-  title.value = (event.target as HTMLInputElement).value
-}
 </script>
 
 <template>
   <div data-slot="stack">
     <Field>
       <FieldLabel>Title</FieldLabel>
-      <FieldControl :value="title" @input="onTitle" />
+      <Input v-model:value="title" />
     </Field>
     <div data-slot="row">
       <Button

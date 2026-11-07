@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/textarea"
 import "@ui-sdk/web/popover"
 import "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
@@ -54,7 +55,9 @@ function mount(root: HTMLElement) {
           <ui-popover-description>${notes.false}</ui-popover-description>
           <ui-field>
             <ui-field-label>Comment</ui-field-label>
-            <textarea>Looks good to me.</textarea>
+            <ui-textarea>
+              <textarea>Looks good to me.</textarea>
+            </ui-textarea>
           </ui-field>
           <div data-slot="row">
             <ui-popover-close>

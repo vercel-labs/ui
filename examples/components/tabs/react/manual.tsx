@@ -1,6 +1,7 @@
 "use client"
 
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 
 function Example() {
@@ -14,7 +15,7 @@ function Example() {
       <TabsPanel value="code">
         <Field>
           <FieldLabel>Source</FieldLabel>
-          <FieldControl defaultValue='<Welcome name="Hollis" unread={3} />' />
+          <Input defaultValue='<Welcome name="Hollis" unread={3} />' />
         </Field>
       </TabsPanel>
     </Tabs>

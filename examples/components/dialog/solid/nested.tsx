@@ -7,7 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
 function Example() {
   return (
@@ -34,7 +35,7 @@ function Example() {
               </div>
               <Field>
                 <FieldLabel>New password</FieldLabel>
-                <FieldControl type="password" />
+                <Input type="password" />
               </Field>
               <div data-slot="row">
                 <DialogClose>Cancel</DialogClose>

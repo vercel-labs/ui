@@ -1,5 +1,6 @@
 import "@ui-sdk/web/accordion"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/textarea"
 import { ChevronDown, createElement } from "lucide"
 
 function mount(root: HTMLElement) {
@@ -19,7 +20,9 @@ function mount(root: HTMLElement) {
         <ui-accordion-panel keep-mounted>
           <ui-field>
             <ui-field-label>Message</ui-field-label>
-            <textarea rows="3" placeholder="Write a reply…"></textarea>
+            <ui-textarea>
+              <textarea rows="3" placeholder="Write a reply…"></textarea>
+            </ui-textarea>
           </ui-field>
         </ui-accordion-panel>
       </ui-accordion-item>

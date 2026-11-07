@@ -7,7 +7,8 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from "@ui-sdk/vue/accordion"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Textarea } from "@ui-sdk/vue/textarea"
 </script>
 
 <template>
@@ -22,11 +23,7 @@ import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
       <AccordionPanel keep-mounted>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl rows="3" placeholder="Write a reply…">
-            <template #render="{ props }">
-              <textarea v-bind="props" />
-            </template>
-          </FieldControl>
+          <Textarea rows="3" placeholder="Write a reply…" />
         </Field>
       </AccordionPanel>
     </AccordionItem>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Textarea } from "@ui-sdk/vue/textarea"
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
 </script>
 
@@ -13,11 +14,7 @@ import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/t
     <TabsPanel value="reply" keep-mounted>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl rows="3" placeholder="Write a reply…">
-          <template #render="{ props }">
-            <textarea v-bind="props" />
-          </template>
-        </FieldControl>
+        <Textarea rows="3" placeholder="Write a reply…" />
       </Field>
     </TabsPanel>
     <TabsPanel value="formatting">

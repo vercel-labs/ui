@@ -9,7 +9,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/vue/drawer"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Textarea } from "@ui-sdk/vue/textarea"
+import { Input } from "@ui-sdk/vue/input"
 
 const messages = [
   { from: "Inès", text: "The proofs are back from the printer." },
@@ -44,15 +46,11 @@ const messages = [
       </div>
       <Field>
         <FieldLabel>To</FieldLabel>
-        <FieldControl defaultValue="Design team" />
+        <Input defaultValue="Design team" />
       </Field>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl>
-          <template #render="{ props }">
-            <textarea v-bind="props" placeholder="What's new?" />
-          </template>
-        </FieldControl>
+        <Textarea placeholder="What's new?" />
       </Field>
       <div data-slot="stack">
         <DrawerClose data-variant="solid" value="send">Send</DrawerClose>

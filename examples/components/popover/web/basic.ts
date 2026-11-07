@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/popover"
 
 function mount(root: HTMLElement) {
@@ -12,7 +13,9 @@ function mount(root: HTMLElement) {
         <ui-popover-description>Anyone with the link can view it.</ui-popover-description>
         <ui-field>
           <ui-field-label>Link</ui-field-label>
-          <input value="acme.app/d/q3-roadmap" readonly />
+          <ui-input>
+            <input value="acme.app/d/q3-roadmap" readonly />
+          </ui-input>
         </ui-field>
         <div data-slot="row">
           <ui-popover-close>

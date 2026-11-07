@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import {
   Popover,
   PopoverClose,
@@ -19,7 +20,7 @@ import {
         <PopoverDescription>Focus starts in the first field.</PopoverDescription>
         <Field>
           <FieldLabel>Name</FieldLabel>
-          <FieldControl default-value="Q3 roadmap.pdf" />
+          <Input default-value="Q3 roadmap.pdf" />
         </Field>
         <div data-slot="row">
           <PopoverClose>Cancel</PopoverClose>

@@ -1,5 +1,6 @@
 import "@ui-sdk/web/checkbox"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/popover"
 import { Check, createElement } from "lucide"
 import { log } from "../../../shared/web/log"
@@ -24,7 +25,9 @@ function mount(root: HTMLElement) {
           <ui-popover-description>Your team sees it next to your name.</ui-popover-description>
           <ui-field>
             <ui-field-label>Status</ui-field-label>
-            <input value="In a meeting" />
+            <ui-input>
+              <input value="In a meeting" />
+            </ui-input>
           </ui-field>
           <div data-slot="row">
             <ui-popover-close>

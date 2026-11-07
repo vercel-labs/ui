@@ -1,6 +1,7 @@
 "use client"
 
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Textarea } from "@ui-sdk/react/textarea"
 import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 
 function Example() {
@@ -14,7 +15,7 @@ function Example() {
       <TabsPanel value="reply" keepMounted>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl render={<textarea rows={3} />} placeholder="Write a reply…" />
+          <Textarea rows={3} placeholder="Write a reply…" />
         </Field>
       </TabsPanel>
       <TabsPanel value="formatting">

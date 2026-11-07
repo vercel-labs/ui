@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ChevronDownIcon } from "@lucide/vue"
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Textarea } from "@ui-sdk/vue/textarea"
 </script>
 
 <template>
@@ -16,11 +17,7 @@ import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
     <CollapsiblePanel keep-mounted>
       <Field>
         <FieldLabel>Delivery note</FieldLabel>
-        <FieldControl placeholder="Leave it with the front desk…">
-          <template #render="{ props }">
-            <textarea v-bind="props" />
-          </template>
-        </FieldControl>
+        <Textarea placeholder="Leave it with the front desk…" />
       </Field>
     </CollapsiblePanel>
   </Collapsible>

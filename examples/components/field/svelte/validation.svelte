@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -13,7 +14,7 @@
 <form data-slot="stack" onsubmit={submit}>
   <Field name="email">
     <FieldLabel>Email</FieldLabel>
-    <FieldControl type="email" required placeholder="hollis@example.com" />
+    <Input type="email" required placeholder="hollis@example.com" />
     <FieldDescription>
       {#snippet children(state)}
         {state.valid ? "Looks good." : "We'll send you a confirmation link."}
@@ -24,7 +25,7 @@
   </Field>
   <Field name="website">
     <FieldLabel>Website</FieldLabel>
-    <FieldControl type="url" required placeholder="https://example.com" />
+    <Input type="url" required placeholder="https://example.com" />
     <FieldError />
   </Field>
   <button type="submit" data-variant="solid">Subscribe</button>

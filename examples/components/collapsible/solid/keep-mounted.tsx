@@ -1,5 +1,6 @@
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Textarea } from "@ui-sdk/solid/textarea"
 
 function Example() {
   return (
@@ -24,10 +25,7 @@ function Example() {
       <CollapsiblePanel keepMounted>
         <Field>
           <FieldLabel>Delivery note</FieldLabel>
-          <FieldControl
-            render={(props) => <textarea {...props} />}
-            placeholder="Leave it with the front desk…"
-          />
+          <Textarea placeholder="Leave it with the front desk…" />
         </Field>
       </CollapsiblePanel>
     </Collapsible>

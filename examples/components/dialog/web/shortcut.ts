@@ -1,5 +1,6 @@
 import "@ui-sdk/web/dialog"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { createElement, Plus } from "lucide"
 
 function mount(root: HTMLElement) {
@@ -21,11 +22,15 @@ function mount(root: HTMLElement) {
         <form data-slot="stack" method="dialog">
           <ui-field>
             <ui-field-label>Name</ui-field-label>
-            <input name="name" required placeholder="Kofi Mensah" />
+            <ui-input>
+              <input name="name" required placeholder="Kofi Mensah" />
+            </ui-input>
           </ui-field>
           <ui-field>
             <ui-field-label>Email</ui-field-label>
-            <input name="email" type="email" required placeholder="kofi@example.com" />
+            <ui-input>
+              <input name="email" type="email" required placeholder="kofi@example.com" />
+            </ui-input>
           </ui-field>
           <div data-slot="row">
             <ui-dialog-close>

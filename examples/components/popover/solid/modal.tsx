@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Textarea } from "@ui-sdk/solid/textarea"
 import {
   Popover,
   PopoverClose,
@@ -86,7 +87,7 @@ function Example() {
           <PopoverDescription>{notes[mode()]}</PopoverDescription>
           <Field>
             <FieldLabel>Comment</FieldLabel>
-            <FieldControl render={(props) => <textarea {...props} />} defaultValue="Looks good to me." />
+            <Textarea defaultValue="Looks good to me." />
           </Field>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>

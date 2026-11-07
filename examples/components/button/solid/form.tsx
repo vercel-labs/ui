@@ -1,5 +1,6 @@
 import { Button } from "@ui-sdk/solid/button"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -16,7 +17,7 @@ function Example() {
     >
       <Field>
         <FieldLabel>Email</FieldLabel>
-        <FieldControl name="email" type="email" defaultValue="ada@example.com" />
+        <Input name="email" type="email" defaultValue="ada@example.com" />
       </Field>
       <div data-slot="row">
         <Button type="submit">Subscribe</Button>

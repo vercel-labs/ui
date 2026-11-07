@@ -20,7 +20,7 @@ Use the following composition to build a `Field`:
 ```text
 Field
 ├── FieldLabel
-├── FieldControl
+├── Input
 ├── FieldDescription
 └── FieldError
 ```
@@ -29,20 +29,21 @@ Field
 
 ```vue
 <script setup lang="ts">
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 </script>
 
 <template>
   <Field name="username">
     <FieldLabel>Username</FieldLabel>
-    <FieldControl autocomplete="username" required />
+    <Input autocomplete="username" required />
     <FieldDescription>This is your public name.</FieldDescription>
     <FieldError />
   </Field>
 </template>
 ```
 
-`FieldControl` is a native `<input>`, or a `<textarea>` or `<select>` through custom rendering. A `Checkbox`, `Switch`, `RadioGroup` or `CheckboxGroup` inside a field wires itself to it, in place of `FieldControl`.
+The control is one of ours, like an [Input](./input), a [Textarea](./textarea), a [Select](./select) or a [Checkbox](./checkbox), and it wires itself to the field.
 
 The label names the control, and the description and any error that shows describe it.
 
@@ -61,18 +62,18 @@ Group related fields in a [field set](#field-sets):
 
 ## Controls
 
-`FieldControl` renders an `<input>`. Render it as a `<textarea>` or a native `<select>` with the `render` slot, and put the options inside:
+Use an [Input](./input) for a line of text and a [Textarea](./textarea) for more:
 
 ```vue
 <Field>
   <FieldLabel>Feedback</FieldLabel>
-  <FieldControl name="feedback">
-    <template #render="{ props }">
-      <textarea v-bind="props" />
-    </template>
-  </FieldControl>
+  <Textarea name="feedback" />
 </Field>
+```
 
+For a control we don't ship, like a native `<select>`, use `FieldControl`. It renders an `<input>`, or another element with the `render` slot, and connects it to the field the same way. An [agent](/docs/agents) sees only our components, so it can't fill a `FieldControl`: use ours where there is one.
+
+```vue
 <Field>
   <FieldLabel>Department</FieldLabel>
   <FieldControl name="department">
@@ -86,7 +87,7 @@ Group related fields in a [field set](#field-sets):
 </Field>
 ```
 
-A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field takes the place of `FieldControl` and uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
+A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
 
 ```vue
 <Field>
@@ -130,7 +131,7 @@ Give this error its own text and set `match` to `true`. Named matches such as `v
 ```vue
 <Field name="email" :invalid="serverError ? true : undefined">
   <FieldLabel>Email</FieldLabel>
-  <FieldControl type="email" required @input="serverError = null" />
+  <Input type="email" required @value-change="serverError = null" />
   <FieldError match="valueMissing">Enter your email address.</FieldError>
   <FieldError v-if="serverError" match>{{ serverError }}</FieldError>
 </Field>
@@ -149,15 +150,7 @@ Keep the text in state and show its length in the description. Set `maxlength` o
 ```vue
 <Field>
   <FieldLabel>Bio</FieldLabel>
-  <FieldControl
-    :maxlength="280"
-    :value="bio"
-    @input="bio = ($event.target as HTMLTextAreaElement).value"
-  >
-    <template #render="{ props }">
-      <textarea v-bind="props" />
-    </template>
-  </FieldControl>
+  <Textarea v-model:value="bio" :maxlength="280" />
   <FieldDescription>{{ bio.length }} / 280</FieldDescription>
 </Field>
 ```
@@ -188,7 +181,7 @@ Disabling the set disables its controls and nested field sets. The form leaves t
   <FieldLegend>Billing address</FieldLegend>
   <Field name="billing-street">
     <FieldLabel>Street address</FieldLabel>
-    <FieldControl autocomplete="billing street-address" />
+    <Input autocomplete="billing street-address" />
   </Field>
 </FieldSet>
 ```
@@ -215,7 +208,7 @@ The legend names a [checkbox group](./checkbox#group) or a [radio group](./radio
 
 ## Custom Rendering
 
-Every part takes a `render` slot, to render a different element or component in its place, like a `<textarea>` for `FieldControl`. It receives the props to bind and the field's state:
+Every part takes a `render` slot, to render a different element or component in its place, like a `<select>` for `FieldControl`. It receives the props to bind and the field's state:
 
 ```vue
 <FieldDescription>

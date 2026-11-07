@@ -7,7 +7,8 @@
     DialogTitle,
     DialogTrigger,
   } from "@ui-sdk/svelte/dialog"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
 </script>
 
 <Dialog presentation="sheet">
@@ -19,11 +20,11 @@
     </div>
     <Field>
       <FieldLabel>Name</FieldLabel>
-      <FieldControl defaultValue="Hollis Grant" />
+      <Input defaultValue="Hollis Grant" />
     </Field>
     <Field>
       <FieldLabel>Username</FieldLabel>
-      <FieldControl defaultValue="@hollis" />
+      <Input defaultValue="@hollis" />
     </Field>
     <div data-slot="row">
       <DialogClose>Cancel</DialogClose>

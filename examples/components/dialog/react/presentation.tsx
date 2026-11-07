@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 
 function Example() {
   return (
@@ -21,11 +22,11 @@ function Example() {
         </div>
         <Field>
           <FieldLabel>Name</FieldLabel>
-          <FieldControl defaultValue="Hollis Grant" />
+          <Input defaultValue="Hollis Grant" />
         </Field>
         <Field>
           <FieldLabel>Username</FieldLabel>
-          <FieldControl defaultValue="@hollis" />
+          <Input defaultValue="@hollis" />
         </Field>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>

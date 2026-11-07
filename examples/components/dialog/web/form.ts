@@ -1,5 +1,6 @@
 import "@ui-sdk/web/dialog"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
@@ -17,7 +18,9 @@ function mount(root: HTMLElement) {
         <form data-slot="stack" method="dialog">
           <ui-field>
             <ui-field-label>Title</ui-field-label>
-            <input required value="Shipping updates for spring" />
+            <ui-input>
+              <input required value="Shipping updates for spring" />
+            </ui-input>
           </ui-field>
           <div data-slot="row">
             <button type="submit" value="draft">Save Draft</button>

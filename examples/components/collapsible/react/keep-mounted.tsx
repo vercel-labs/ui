@@ -1,5 +1,6 @@
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Textarea } from "@ui-sdk/react/textarea"
 import { ChevronDownIcon } from "lucide-react"
 
 function Example() {
@@ -15,7 +16,7 @@ function Example() {
       <CollapsiblePanel keepMounted>
         <Field>
           <FieldLabel>Delivery note</FieldLabel>
-          <FieldControl render={<textarea placeholder="Leave it with the front desk…" />} />
+          <Textarea placeholder="Leave it with the front desk…" />
         </Field>
       </CollapsiblePanel>
     </Collapsible>

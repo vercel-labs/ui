@@ -8,7 +8,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/solid/drawer"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Textarea } from "@ui-sdk/solid/textarea"
+import { Input } from "@ui-sdk/solid/input"
 import { For } from "solid-js"
 
 const messages = [
@@ -48,11 +50,11 @@ function Example() {
         </div>
         <Field>
           <FieldLabel>To</FieldLabel>
-          <FieldControl defaultValue="Design team" />
+          <Input defaultValue="Design team" />
         </Field>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl render={(props) => <textarea {...props} placeholder="What's new?" />} />
+          <Textarea placeholder="What's new?" />
         </Field>
         <div data-slot="stack">
           <DrawerClose data-variant="solid" value="send">

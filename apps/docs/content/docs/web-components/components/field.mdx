@@ -26,7 +26,7 @@ Use the following composition to build a `ui-field`:
 ```text
 ui-field
 ├── ui-field-label
-├── input
+├── ui-input
 ├── ui-field-description
 └── ui-field-error
 ```
@@ -36,17 +36,20 @@ ui-field
 ```html
 <script type="module">
   import "@ui-sdk/web/field"
+  import "@ui-sdk/web/input"
 </script>
 
 <ui-field name="username">
   <ui-field-label>Username</ui-field-label>
-  <input autocomplete="username" required />
+  <ui-input>
+    <input autocomplete="username" required />
+  </ui-input>
   <ui-field-description>This is your public name.</ui-field-description>
   <ui-field-error></ui-field-error>
 </ui-field>
 ```
 
-The control is your own element: a native `<input>`, `<textarea>` or `<select>`, or one of ours, like `<ui-checkbox>`. The field finds the first one inside it and writes its `id`, `aria-labelledby`, `aria-describedby` and `aria-invalid`.
+The control is one of ours, like `<ui-input>`, `<ui-textarea>` or `<ui-checkbox>`. The field finds the first one inside it and writes its `id`, `aria-labelledby`, `aria-describedby` and `aria-invalid`.
 
 The label names the control, and the description and any error that shows describe it.
 
@@ -67,14 +70,20 @@ Group related fields in a [field set](#field-sets):
 
 ## Controls
 
-The control is your own element, so put a `<textarea>` or a native `<select>` in the field, with the options inside:
+Use `<ui-input>` for a line of text and `<ui-textarea>` for more, each around its native element:
 
 ```html
 <ui-field>
   <ui-field-label>Feedback</ui-field-label>
-  <textarea name="feedback"></textarea>
+  <ui-textarea>
+    <textarea name="feedback"></textarea>
+  </ui-textarea>
 </ui-field>
+```
 
+For a control we don't ship, like a native `<select>`, put the element straight in the field, and it connects the same way. An [agent](/docs/agents) sees only our components, so it can't fill a bare element: use ours where there is one.
+
+```html
 <ui-field>
   <ui-field-label>Department</ui-field-label>
   <select name="department">
@@ -84,7 +93,7 @@ The control is your own element, so put a `<textarea>` or a native `<select>` in
 </ui-field>
 ```
 
-A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field takes the place of the input and uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
+A [Checkbox](./checkbox), [Switch](./switch) or [Radio Group](./radio) inside a field uses the field's label and description. Pressing the label toggles a checkbox or switch. A radio group takes the field's label as its name, and each radio keeps a label of its own:
 
 ```html
 <ui-field>
@@ -128,7 +137,9 @@ Give this error its own text and set `match` to `true`. Named matches such as `v
 ```html
 <ui-field name="email">
   <ui-field-label>Email</ui-field-label>
-  <input type="email" required />
+  <ui-input>
+    <input type="email" required />
+  </ui-input>
   <ui-field-error match="valueMissing">Enter your email address.</ui-field-error>
 </ui-field>
 
@@ -163,7 +174,9 @@ Listen for `input` on the control and show its length in the description. Set `m
 ```html
 <ui-field>
   <ui-field-label>Bio</ui-field-label>
-  <textarea maxlength="280"></textarea>
+  <ui-textarea>
+    <textarea maxlength="280"></textarea>
+  </ui-textarea>
   <ui-field-description>0 / 280</ui-field-description>
 </ui-field>
 
@@ -203,7 +216,9 @@ Disabling the set disables its controls and nested field sets. The form leaves t
     <legend>Billing address</legend>
     <ui-field name="billing-street">
       <ui-field-label>Street address</ui-field-label>
-      <input autocomplete="billing street-address" />
+      <ui-input>
+        <input autocomplete="billing street-address" />
+      </ui-input>
     </ui-field>
   </fieldset>
 </ui-field-set>

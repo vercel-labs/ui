@@ -1,6 +1,7 @@
 "use client"
 
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
@@ -14,7 +15,7 @@ function Example() {
     <div data-slot="stack">
       <Field>
         <FieldLabel>Post title</FieldLabel>
-        <FieldControl value={title} onChange={(event) => setTitle(event.target.value)} />
+        <Input value={title} onValueChange={(value) => setTitle(value)} />
       </Field>
       <Tooltip disabled={!blocked}>
         <TooltipTrigger

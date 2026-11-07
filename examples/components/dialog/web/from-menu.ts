@@ -1,5 +1,6 @@
 import "@ui-sdk/web/dialog"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/menu"
 import { Copy, createElement, Ellipsis, Pencil } from "lucide"
 
@@ -29,7 +30,9 @@ function mount(root: HTMLElement) {
         </div>
         <ui-field>
           <ui-field-label>Name</ui-field-label>
-          <input value="report.pdf" />
+          <ui-input>
+            <input value="report.pdf" />
+          </ui-input>
         </ui-field>
         <div data-slot="row">
           <ui-dialog-close>

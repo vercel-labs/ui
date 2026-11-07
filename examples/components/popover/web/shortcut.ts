@@ -1,4 +1,5 @@
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import "@ui-sdk/web/popover"
 
 function mount(root: HTMLElement) {
@@ -15,7 +16,9 @@ function mount(root: HTMLElement) {
         <ui-popover-description>They'll get an email with a link to join.</ui-popover-description>
         <ui-field>
           <ui-field-label>Email</ui-field-label>
-          <input type="email" placeholder="wren@example.com" />
+          <ui-input>
+            <input type="email" placeholder="wren@example.com" />
+          </ui-input>
         </ui-field>
         <div data-slot="row">
           <ui-popover-close>

@@ -1,5 +1,6 @@
 import "@ui-sdk/web/tooltip"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
@@ -7,7 +8,9 @@ function mount(root: HTMLElement) {
     <div data-slot="stack">
       <ui-field>
         <ui-field-label>Post title</ui-field-label>
-        <input />
+        <ui-input>
+          <input />
+        </ui-input>
       </ui-field>
       <ui-tooltip>
         <ui-tooltip-trigger><button data-variant="solid" aria-disabled="true">Publish</button></ui-tooltip-trigger>

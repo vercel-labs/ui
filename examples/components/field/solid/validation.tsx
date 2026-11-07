@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -14,7 +15,7 @@ function Example() {
     >
       <Field name="email">
         <FieldLabel>Email</FieldLabel>
-        <FieldControl type="email" required placeholder="hollis@example.com" />
+        <Input type="email" required placeholder="hollis@example.com" />
         <FieldDescription
           render={(props, state) => (
             <p {...props}>{state.valid ? "Looks good." : "We'll send you a confirmation link."}</p>
@@ -25,7 +26,7 @@ function Example() {
       </Field>
       <Field name="website">
         <FieldLabel>Website</FieldLabel>
-        <FieldControl type="url" required placeholder="https://example.com" />
+        <Input type="url" required placeholder="https://example.com" />
         <FieldError />
       </Field>
       <button type="submit" data-variant="solid">

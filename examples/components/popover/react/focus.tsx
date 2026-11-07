@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
+import { Field, FieldLabel } from "@ui-sdk/react/field"
+import { Input } from "@ui-sdk/react/input"
 import {
   Popover,
   PopoverClose,
@@ -18,7 +19,7 @@ function Example() {
           <PopoverDescription>Focus starts in the first field.</PopoverDescription>
           <Field>
             <FieldLabel>Name</FieldLabel>
-            <FieldControl defaultValue="Q3 roadmap.pdf" />
+            <Input defaultValue="Q3 roadmap.pdf" />
           </Field>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>

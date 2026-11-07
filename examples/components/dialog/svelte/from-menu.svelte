@@ -9,7 +9,8 @@
     DialogDescription,
     DialogTitle,
   } from "@ui-sdk/svelte/dialog"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/svelte/menu"
 
   const rename = createDialogController()
@@ -39,7 +40,7 @@
     </div>
     <Field>
       <FieldLabel>Name</FieldLabel>
-      <FieldControl defaultValue="report.pdf" />
+      <Input defaultValue="report.pdf" />
     </Field>
     <div data-slot="row">
       <DialogClose>Cancel</DialogClose>

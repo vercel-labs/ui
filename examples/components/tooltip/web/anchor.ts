@@ -1,5 +1,6 @@
 import "@ui-sdk/web/tooltip"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 import { createElement, Info } from "lucide"
 
 function mount(root: HTMLElement) {
@@ -8,7 +9,9 @@ function mount(root: HTMLElement) {
     <ui-field>
       <ui-field-label>Webhook URL</ui-field-label>
       <div data-slot="row" id="${id}">
-        <input placeholder="https://" />
+        <ui-input>
+          <input placeholder="https://" />
+        </ui-input>
         <ui-tooltip>
           <ui-tooltip-trigger>
             <button aria-label="About webhooks">${createElement(Info, { "aria-hidden": "true" }).outerHTML}</button>

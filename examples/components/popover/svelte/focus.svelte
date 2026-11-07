@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Input } from "@ui-sdk/svelte/input"
   import {
     Popover,
     PopoverClose,
@@ -18,7 +19,7 @@
       <PopoverDescription>Focus starts in the first field.</PopoverDescription>
       <Field>
         <FieldLabel>Name</FieldLabel>
-        <FieldControl defaultValue="Q3 roadmap.pdf" />
+        <Input defaultValue="Q3 roadmap.pdf" />
       </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>

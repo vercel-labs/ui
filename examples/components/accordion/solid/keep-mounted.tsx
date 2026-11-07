@@ -5,7 +5,8 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from "@ui-sdk/solid/accordion"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Textarea } from "@ui-sdk/solid/textarea"
 
 function Example() {
   return (
@@ -30,7 +31,7 @@ function Example() {
         <AccordionPanel keepMounted>
           <Field>
             <FieldLabel>Message</FieldLabel>
-            <FieldControl render={(props) => <textarea {...props} rows={3} />} placeholder="Write a reply…" />
+            <Textarea rows={3} placeholder="Write a reply…" />
           </Field>
         </AccordionPanel>
       </AccordionItem>

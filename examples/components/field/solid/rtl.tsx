@@ -1,16 +1,17 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
-import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 
 function Example() {
   return (
     <div data-slot="stack" dir="rtl">
       <Field>
         <FieldLabel>الاسم على البطاقة</FieldLabel>
-        <FieldControl name="card-name" autocomplete="cc-name" placeholder="ليلى حسن" />
+        <Input name="card-name" autocomplete="cc-name" placeholder="ليلى حسن" />
       </Field>
       <Field>
         <FieldLabel>رقم البطاقة</FieldLabel>
-        <FieldControl
+        <Input
           name="card-number"
           inputmode="numeric"
           autocomplete="cc-number"

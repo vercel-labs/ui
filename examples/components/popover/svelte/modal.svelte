@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
-  import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Field, FieldLabel } from "@ui-sdk/svelte/field"
+  import { Textarea } from "@ui-sdk/svelte/textarea"
   import {
     Popover,
     PopoverClose,
@@ -64,11 +65,7 @@
       <PopoverDescription>{notes[mode]}</PopoverDescription>
       <Field>
         <FieldLabel>Comment</FieldLabel>
-        <FieldControl defaultValue="Looks good to me.">
-          {#snippet render({ props })}
-            <textarea {...props}></textarea>
-          {/snippet}
-        </FieldControl>
+        <Textarea defaultValue="Looks good to me." />
       </Field>
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>

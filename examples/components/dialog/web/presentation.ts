@@ -1,5 +1,6 @@
 import "@ui-sdk/web/dialog"
 import "@ui-sdk/web/field"
+import "@ui-sdk/web/input"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -14,11 +15,15 @@ function mount(root: HTMLElement) {
         </div>
         <ui-field>
           <ui-field-label>Name</ui-field-label>
-          <input value="Hollis Grant" />
+          <ui-input>
+            <input value="Hollis Grant" />
+          </ui-input>
         </ui-field>
         <ui-field>
           <ui-field-label>Username</ui-field-label>
-          <input value="@hollis" />
+          <ui-input>
+            <input value="@hollis" />
+          </ui-input>
         </ui-field>
         <div data-slot="row">
           <ui-dialog-close>

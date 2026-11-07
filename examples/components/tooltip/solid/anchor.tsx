@@ -1,4 +1,5 @@
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/solid/field"
+import { Field, FieldLabel } from "@ui-sdk/solid/field"
+import { Input } from "@ui-sdk/solid/input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { createSignal } from "solid-js"
 
@@ -9,7 +10,7 @@ function Example() {
     <Field>
       <FieldLabel>Webhook URL</FieldLabel>
       <div data-slot="row" ref={setField}>
-        <FieldControl placeholder="https://" />
+        <Input placeholder="https://" />
         <Tooltip>
           <TooltipTrigger aria-label="About webhooks">
             <svg

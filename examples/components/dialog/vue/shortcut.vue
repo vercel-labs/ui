@@ -9,7 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@ui-sdk/vue/dialog"
-import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
+import { Field, FieldLabel } from "@ui-sdk/vue/field"
+import { Input } from "@ui-sdk/vue/input"
 import { PlusIcon } from "@lucide/vue"
 </script>
 
@@ -29,11 +30,11 @@ import { PlusIcon } from "@lucide/vue"
       <form data-slot="stack" method="dialog">
         <Field>
           <FieldLabel>Name</FieldLabel>
-          <FieldControl name="name" required placeholder="Kofi Mensah" />
+          <Input name="name" required placeholder="Kofi Mensah" />
         </Field>
         <Field>
           <FieldLabel>Email</FieldLabel>
-          <FieldControl name="email" type="email" required placeholder="kofi@example.com" />
+          <Input name="email" type="email" required placeholder="kofi@example.com" />
         </Field>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>
