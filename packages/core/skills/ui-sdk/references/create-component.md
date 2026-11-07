@@ -5,7 +5,7 @@ ui-sdk ships its behavior layer as public API. A component it doesn't have is on
 ## Read first
 
 1. **The Core docs.** Every package ships them in `docs/`: `docs/core.md` is the whole Core section in one file, the same in every package, since no framework changes it. Each framework's package adds `docs/rendering.md`, how its adapter renders a primitive, and `docs/components/<name>.md` and `docs/utilities/<name>.md` (React's are `docs/hooks/<name>.md`) for the rest. Read `docs/core.md` and `docs/rendering.md` from the package of the framework you render in, like `node_modules/@ui-sdk/react/docs/`. A `core.md` in the project, if there is one, wins. In `core.md`, read the overview, "Build a component" (a star rating, the template to copy), "Popups and layers" under Behaviors if anything opens, and the Behaviors page for each one you use. Search it by heading rather than reading it top to bottom. For another framework, see [Other frameworks](#other-frameworks).
-2. **The types.** Every export has JSDoc in `node_modules/@ui-sdk/core/dist/**/*.d.ts` and in each framework's `.d.ts`. A component entry's types point into its folder, like `dist/components/input/input.d.ts`. Read them there.
+2. **The types.** Every export has JSDoc in `node_modules/@ui-sdk/core/dist/**/*.d.ts` and in each framework's `.d.ts`. A component entry's types point into its folder, like `dist/components/input/input.d.ts`. Read them there. Those JSDoc blocks document the library; your primitive gets none.
 3. **What ui-sdk already has.** List the entries in `node_modules/@ui-sdk/<framework>/package.json`. If one covers part of what you're building, compose it (see [Compose ours](#compose-ours)) rather than rewriting its behavior. If the user named the blocks to use, like "this tests `createSelection`", build from those blocks and record in GAPS.md that composing was possible.
 
 Don't read compiled JavaScript in `dist/*.js`. When the docs and types don't say how something of ours behaves, probe it instead (below), and note the missing docs as a gap.
@@ -27,6 +27,7 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 - **Selection and focus.** Does selection follow focus (radio group, single-select listbox), or do arrows only move focus and Space selects (multi-select listbox, data grid)?
 - **Escape.** Who owns it? Inside a popup, the popup closes on it. A field that clears on Escape should only claim it when there's something to clear.
 - **Parts that leave.** When the focused part is removed or moves out, where does focus go? Use `createFocusRecovery`.
+- **Pick the pattern.** [patterns.md](patterns.md) has the roles for common shapes: a set of choices in two dimensions is a `grid`, a stepper is buttons with `aria-current="step"`.
 - **Declare it on the slots.** Each part's role goes on its slot (`role: "option"`), never in `attrs`. TypeScript then requires what the role needs: `focus` for roles that take it, `press` for roles that activate, `keys` with an `on.keydown` for roles that move with keys, or `{ none: "why" }` when another element does it. Its `attrs` returns the role's required states, like `aria-checked`, and only the ARIA the role takes. Don't cast past these errors; set `globalThis.__UI_SDK_STRICT__ = true` in tests so development warnings fail them (declare it first: `declare global { var __UI_SDK_STRICT__: boolean | undefined }`).
 - **Controls that stop applying.** A button that can't act right now should be `aria-disabled`, not `disabled`, if it may hold focus at the time. `disabled` drops focus to the page.
 - **Keys with no APG rule.** Like Enter to move items between lists. Pick one, and say which in your report.
@@ -42,7 +43,7 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 - **Slots:** `attrs` for ARIA and `data-*` (pure, server safe), `press` for activation, `on` for other events, `bind` for anything that touches the DOM (return a cleanup).
 - **`press` hears only clicks on parts that aren't buttons.** For a `div` or `td` part, handle Space and Enter in `on.keydown`.
 - **Every element gets its `data-slot` from a slot.** Don't write one by hand in the adapter. Wrappers, like a row of buttons, get a slot of their own.
-- **Agents:** end the definition with `agent: { actions: [...] }`, the api methods an agent may call. Keep it after `slots`. [agent-ready.md](agent-ready.md) covers `closed`, `items`, `reveals`, `shown` and `secret`.
+- **Agents:** end the definition with `agent: { actions: [...] }`, the api methods an agent may call. Keep it after `slots`. Give the root a name, with `aria-label` or a label part: the bridge names the component after it. [agent-ready.md](agent-ready.md) covers `closed`, `items`, `reveals`, `shown` and `secret`.
 
 ### 3. Use the blocks, don't rewrite them
 

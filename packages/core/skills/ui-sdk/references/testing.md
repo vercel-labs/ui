@@ -8,11 +8,11 @@ Wiring includes what a person does with the keyboard: press Space on each switch
 
 ## Which tool for what
 
-| You built                                                   | Test with                                                                                                                                                                                                                    |
-| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| An interface from our components                            | The framework's testing library for what you wired (names, values, callbacks, what submits), and the [agent test](agent-ready.md#prove-it-with-a-test). Our components are tested already: don't run `checkPattern` on them. |
-| A primitive                                                 | `mount` with `keys`, `type`, `click`, `hover` and `drag`, then `checkPattern`, `checkServer` and `checkDirection`                                                                                                            |
-| Anything with popups, layout or focus moving between fields | Also a real browser                                                                                                                                                                                                          |
+| You built                                                   | Test with                                                                                                                                                                                                                                                                      |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| An interface from our components                            | The framework's testing library for what you wired (names, values, callbacks, what submits), and the [agent test](agent-ready.md#prove-it-with-a-test). Our components are tested already: don't run `checkPattern` on them.                                                   |
+| A primitive                                                 | `mount` with `keys`, `type`, `click`, `hover` and `drag`, then `checkPattern`, `checkServer` and `checkDirection`. If a page in the app uses it, also render that page: press its keys there, check where focus goes after each step, and assert its name in the page's markup |
+| Anything with popups, layout or focus moving between fields | Also a real browser                                                                                                                                                                                                                                                            |
 
 ## Check a pattern
 
@@ -54,7 +54,7 @@ test("renders on the server and works in both directions", async () => {
 - Focus an input before `type`. `keys` takes `Tab`, `Shift+Tab`, `Space` and combinations.
 - `view.announced` holds what screen readers heard. Call `await view.settle()` before reading delayed work.
 - Always `unmount`.
-- Set `globalThis.__UI_SDK_STRICT__ = true` in the test setup so development warnings fail the test.
+- Set `globalThis.__UI_SDK_STRICT__ = true` in the test setup so development warnings fail the test. Declare it first, `declare global { var __UI_SDK_STRICT__: boolean | undefined }`, and leave it off in a file where an action rejects on purpose, like a close action that keeps a dialog open: strict mode turns that rejection into an unhandled error.
 
 ## Break it on purpose
 
@@ -84,7 +84,7 @@ document.head.append(
 )
 ```
 
-Assign these rather than using `??=`: jsdom has some of them without the parts that matter. Web components in jsdom also need `ElementInternals`: jsdom's `attachInternals` lacks `setFormValue` and `setValidity`, so wrap `HTMLElement.prototype.attachInternals` and add them as no-ops. Stub `URL.createObjectURL` for file previews. `mount` already does the popover and animation stubs, and it keeps a part that isn't present as a detached node, so `view.part()` still returns it: check `isConnected` to tell whether it's on the page. Some state arrives a tick after mounting; wait with `await new Promise((r) => setTimeout(r, 0))` (inside `act` in React).
+Assign these rather than using `??=`: jsdom has some of them without the parts that matter. Web components in jsdom also need `ElementInternals`: jsdom's `attachInternals` lacks `setFormValue`, `setValidity`, `checkValidity`, `reportValidity` and `states`, so wrap `HTMLElement.prototype.attachInternals` and add them (no-ops, `() => true` for the checks, a `Set` for `states`). jsdom also never calls `formResetCallback`, and its `FormData` leaves custom elements out, so check form reset and submitted values in a real browser. Stub `URL.createObjectURL` for file previews. `mount` already does the popover and animation stubs, and it keeps a part that isn't present as a detached node, so `view.part()` still returns it: check `isConnected` to tell whether it's on the page. Some state arrives a tick after mounting; wait with `await new Promise((r) => setTimeout(r, 0))` (inside `act` in React).
 
 ## A real browser
 

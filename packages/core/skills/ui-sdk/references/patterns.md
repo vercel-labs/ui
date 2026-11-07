@@ -152,9 +152,9 @@ Two lists side by side need two `createRovingFocus` groups, and a group is one s
 slots: (slot) => {
   const option = (side: Side) =>
     slot<OptionProps>({
+      role: "option",
       props: { value: "string" },
       attrs: (state, part) => ({
-        role: "option",
         tabindex: part.api.blocks[side].roving.tabIndex(state, part),
       }),
       // …
