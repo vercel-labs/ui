@@ -34,7 +34,7 @@ An older `.npmrc` with an `_authToken` line for the registry keeps working. The 
 
 ## Docs paths
 
-While the docs site is behind Deployment Protection, the registry serves a few of its paths publicly, like `/web.js`, `/web@0.js` and `/web@0/tabs.js`, so a plain HTML page anywhere can load the web components. To serve another path, add it to `paths` in `app/[[...path]]/route.ts`. A path ending in `*` covers everything under it.
+While the docs site is behind Deployment Protection, the registry serves a few of its paths publicly, like `/web.js`, `/web.css`, `/web@0.js` and `/web@0/tabs.js`, so a plain HTML page anywhere can load and style the web components. To serve another path, add it to `paths` in `app/[[...path]]/route.ts`. A path ending in `*` covers everything under it.
 
 The registry fetches each one from the docs site with the docs project's Protection Bypass for Automation secret, in `DOCS_PROTECTION_BYPASS` on the registry project. Without it, those paths answer 404. `DOCS_URL` overrides the docs site, `https://ui.labs.vercel.dev` by default.
 

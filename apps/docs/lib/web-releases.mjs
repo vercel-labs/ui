@@ -7,9 +7,16 @@ import { readdirSync } from "node:fs"
 // its newest release.
 const exact = "web@\\d+\\.\\d+\\.\\d+[^/]*"
 
-/** The released versions in `publicDir`, like `["1.2.0", "1.3.0"]`. */
-function releasesIn(publicDir) {
-  return readdirSync(publicDir).flatMap((file) => file.match(/^web@(\d+\.\d+\.\d+.*)\.js$/)?.[1] ?? [])
+/**
+ * The released versions in `publicDir` with a file of `extension`, like
+ * `["1.2.0", "1.3.0"]`. Releases from before the stylesheet have no `.css`.
+ */
+function releasesIn(publicDir, extension = ".js") {
+  return readdirSync(publicDir).flatMap((file) => {
+    const version =
+      file.startsWith("web@") && file.endsWith(extension) ? file.slice(4, -extension.length) : ""
+    return /^\d+\.\d+\.\d+/.test(version) ? [version] : []
+  })
 }
 
 function webReleaseHeaders() {
@@ -19,6 +26,7 @@ function webReleaseHeaders() {
   ]
   return [
     { source: `/:file(${exact}\\.js)`, headers },
+    { source: `/:file(${exact}\\.css)`, headers },
     { source: `/:folder(${exact})/:path*`, headers },
   ]
 }

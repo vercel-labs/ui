@@ -75,7 +75,10 @@ function publicEntries(root, name) {
   return Object.entries(exports)
     .filter(
       ([subpath, target]) =>
-        typeof target === "string" && !notPublic.includes(subpath) && !subpath.includes("*"),
+        typeof target === "string" &&
+        /\.tsx?$/.test(target) &&
+        !notPublic.includes(subpath) &&
+        !subpath.includes("*"),
     )
     .map(([subpath, target]) => ({ subpath, file: path.join(root, "packages", name, target) }))
 }

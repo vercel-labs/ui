@@ -210,6 +210,7 @@ function adapterEntries(adapter) {
       key !== "." &&
       key !== "./renderer" &&
       key !== "./testing" &&
+      !key.endsWith(".css") &&
       !key.includes("*") &&
       !adapterExports[key],
   )

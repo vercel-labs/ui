@@ -10,7 +10,8 @@
 // so the folder works under any name that keeps the pair.
 //
 //   node ../../scripts/build/browser.mjs   From packages/web, after its build.
-import { readdirSync, rmSync } from "node:fs"
+import { cpSync, readdirSync, rmSync } from "node:fs"
+import { createRequire } from "node:module"
 import path from "node:path"
 import { rolldown } from "rolldown"
 
@@ -55,6 +56,11 @@ await write(
     ],
   },
   { file: path.join(outDir, "web.js") },
+)
+
+cpSync(
+  createRequire(path.join(packageDir, "package.json")).resolve("@ui-sdk/core/web.css"),
+  path.join(outDir, "web.css"),
 )
 
 async function write(input, output) {

@@ -51,6 +51,9 @@ try {
     if (!browser) continue
     cpSync(path.join(browser, "web.js"), path.join(publicDir, `web@${version}.js`))
     cpSync(path.join(browser, "web"), path.join(publicDir, `web@${version}`), { recursive: true })
+    if (existsSync(path.join(browser, "web.css"))) {
+      cpSync(path.join(browser, "web.css"), path.join(publicDir, `web@${version}.css`))
+    }
     copied++
   }
 } finally {
@@ -65,13 +68,14 @@ const { version } = JSON.parse(readFileSync(path.join(packageDir, "package.json"
 const source = `${version}-g${commit}`
 // An earlier commit's build, from a local run, would compete for `/web@0.js`.
 for (const file of readdirSync(publicDir)) {
-  if (/^web@\d+\.\d+\.\d+-g[0-9a-f]{7}(\.js)?$/.test(file)) {
+  if (/^web@\d+\.\d+\.\d+-g[0-9a-f]{7}(\.js|\.css)?$/.test(file)) {
     rmSync(path.join(publicDir, file), { recursive: true })
   }
 }
 execFileSync("node", ["../../scripts/build/browser.mjs"], { cwd: packageDir, stdio: "inherit" })
 cpSync(path.join(packageDir, "browser/web.js"), path.join(publicDir, `web@${source}.js`))
 cpSync(path.join(packageDir, "browser/web"), path.join(publicDir, `web@${source}`), { recursive: true })
+cpSync(path.join(packageDir, "browser/web.css"), path.join(publicDir, `web@${source}.css`))
 console.log(`Built @ui-sdk/web ${source} from source into public/.`)
 
 // Unpacks a release's `browser/` folder, or returns nothing when it has none.

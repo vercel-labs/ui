@@ -16,7 +16,7 @@ const handle = createRegistry({
 const proxy = createDocsProxy({
   origin: process.env.DOCS_URL ?? "https://ui.labs.vercel.dev",
   bypass: process.env.DOCS_PROTECTION_BYPASS,
-  paths: ["/web.js", "/web/*", "/web@*"],
+  paths: ["/web.js", "/web.css", "/web/*", "/web@*"],
 })
 
 async function GET(request: Request) {

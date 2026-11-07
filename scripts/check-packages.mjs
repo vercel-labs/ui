@@ -217,7 +217,7 @@ function listEntries(manifest) {
   const subpaths = []
   const missing = []
   for (const [subpath, target] of Object.entries(manifest.exports)) {
-    if (subpath === "./package.json" || subpath.includes("*")) continue
+    if (subpath === "./package.json" || subpath.endsWith(".css") || subpath.includes("*")) continue
     // An entry with no `types` at all is imported anyway, so TypeScript says what's wrong.
     const types = typeof target === "string" ? target : target.types
     if (!types || existsSync(path.join(app, "node_modules", manifest.name, types))) subpaths.push(subpath)

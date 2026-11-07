@@ -6,7 +6,7 @@
 // --use-client  Starts every module with "use client", for React packages.
 // --server      A module, like `render-element.ts`, that ships without it, for Server Components.
 // --solid       Compiles JSX with Solid's compiler, and keeps it as written under `dist/solid`.
-import { rmSync } from "node:fs"
+import { cpSync, readdirSync, rmSync } from "node:fs"
 import path from "node:path"
 import { parseArgs } from "node:util"
 import { emitDeclarations } from "./declarations.mjs"
@@ -33,6 +33,9 @@ rmSync(outDir, { recursive: true, force: true })
 if (flags.solid) await transpileSolid({ packageDir, sourceDir, outDir })
 else await transpile({ sourceDir, outDir, useClient: flags["use-client"], serverModules: flags.server })
 emitDeclarations({ packageDir, sourceDir, outDir })
+for (const file of readdirSync(sourceDir, { recursive: true })) {
+  if (file.endsWith(".css")) cpSync(path.join(sourceDir, file), path.join(outDir, file))
+}
 // --nuxt builds the Nuxt module in `nuxt/` into `dist/nuxt`, for Vue.
 if (flags.nuxt) await buildNuxtModule({ packageDir, outDir })
 

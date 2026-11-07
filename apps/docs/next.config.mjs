@@ -4,7 +4,9 @@ import { newestByMajor, newestRelease, releasesIn, webReleaseHeaders } from "./l
 
 const withMDX = createMDX()
 
-const webReleases = releasesIn(path.join(import.meta.dirname, "public"))
+const publicDir = path.join(import.meta.dirname, "public")
+const newest = (versions) =>
+  JSON.stringify({ ...Object.fromEntries(newestByMajor(versions)), latest: newestRelease(versions) })
 
 /** @type {import('next').NextConfig} */
 const config = {
@@ -17,12 +19,11 @@ const config = {
   transpilePackages: ["@ui-sdk/core", "@ui-sdk/react"],
   turbopack: { root: path.resolve(import.meta.dirname, "../..") },
   // The newest `@ui-sdk/web` release of each major, and of all, like
-  // `{"1":"1.3.0","2":"2.0.0","latest":"2.0.0"}`, for `proxy.ts`.
+  // `{"1":"1.3.0","2":"2.0.0","latest":"2.0.0"}`, for `proxy.ts`: one map
+  // for the loader and one for the stylesheet, which older releases lack.
   env: {
-    WEB_RELEASES: JSON.stringify({
-      ...Object.fromEntries(newestByMajor(webReleases)),
-      latest: newestRelease(webReleases),
-    }),
+    WEB_RELEASES: newest(releasesIn(publicDir)),
+    WEB_STYLE_RELEASES: newest(releasesIn(publicDir, ".css")),
   },
   async headers() {
     return [

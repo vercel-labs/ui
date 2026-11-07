@@ -103,9 +103,12 @@
     "./gesture": "./src/foundation/motion/gesture.ts",
     "./renderer": "./src/renderer.ts",
     "./testing": "./src/testing.ts",
-    "./internal/*": "./src/*.ts"
+    "./internal/*": "./src/*.ts",
+    "./web.css": "./src/web.css"
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "files": [
     "dist",
     "docs",
@@ -401,7 +404,8 @@
         "types": "./dist/testing.d.ts",
         "default": "./dist/testing.js"
       },
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./web.css": "./dist/web.css"
     }
   },
   "scripts": {
