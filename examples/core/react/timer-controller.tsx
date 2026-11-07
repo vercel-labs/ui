@@ -58,17 +58,17 @@ function Example() {
   const [controller] = React.useState(createCountdownController)
   return (
     <div data-slot="stack">
-      <Countdown controller={controller} aria-label="Tea">
-        {({ left }) => `0:${String(left).padStart(2, "0")}`}
-      </Countdown>
-      <div data-slot="row">
+      <div data-slot="controls">
         <button type="button" onClick={() => controller.start(30)}>
-          Start 30 seconds
+          Start 30 Seconds
         </button>
         <button type="button" onClick={() => controller.stop()}>
           Stop
         </button>
       </div>
+      <Countdown controller={controller} aria-label="Tea">
+        {({ left }) => `0:${String(left).padStart(2, "0")}`}
+      </Countdown>
     </div>
   )
 }

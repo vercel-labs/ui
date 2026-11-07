@@ -36,4 +36,7 @@ const source = loader({
   plugins: [lucideIconsPlugin()],
 })
 
-export { source }
+// Get Started is written with Core's pages, so it shares their sidebar, but it's served at /docs.
+const getStarted = { slugs: ["core", "start"], url: "/docs" }
+
+export { getStarted, source }

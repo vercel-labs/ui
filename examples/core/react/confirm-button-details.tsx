@@ -1,31 +1,29 @@
 import * as React from "react"
+import { useLog } from "../../shared/react/log"
 import { ConfirmButton } from "./confirm-button"
 
 function Example() {
+  const log = useLog()
   const [locked, setLocked] = React.useState(false)
-  const [last, setLast] = React.useState("Press the button, or wait for it to disarm.")
   return (
     <div data-slot="stack">
-      <div data-slot="row">
-        <ConfirmButton
-          timeout={2000}
-          onArmedChange={(armed, details) => {
-            if (locked) details.cancel()
-            setLast(
-              `${armed ? "Arm" : "Disarm"}: ${details.reason}, from ${details.source}${details.canceled ? ", canceled" : ""}`,
-            )
-          }}
-        >
-          {({ armed }) => (armed ? "Press again to delete" : "Delete")}
-        </ConfirmButton>
+      <div data-slot="controls">
         <label data-slot="label">
           <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
           Lock
         </label>
       </div>
-      <p data-last data-slot="hint">
-        {last}
-      </p>
+      <ConfirmButton
+        timeout={2000}
+        onArmedChange={(armed, details) => {
+          if (locked) details.cancel()
+          log(
+            `${armed ? "Arm" : "Disarm"}: ${details.reason}, from ${details.source}${details.canceled ? ", canceled" : ""}`,
+          )
+        }}
+      >
+        {({ armed }) => (armed ? "Press Again to Delete" : "Delete")}
+      </ConfirmButton>
     </div>
   )
 }

@@ -76,14 +76,22 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
     const { store } = context
     const change = createChange(context)
     const history = createHistory(store.get().events)
+    let recorded = store.get().events
     const eventElements = new Map<string, HTMLElement>()
     const syncHistory = () => store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
+    // Events set from outside start the history over, so undo never brings back older ones.
+    const catchUp = () => {
+      const current = store.get().events
+      if (current !== recorded && JSON.stringify(current) !== JSON.stringify(recorded))
+        history.reset((recorded = current))
+    }
     const commit = (
       events: CalendarEvent[],
       details: { reason: WeekCalendarEventsChangeReason; event?: Event },
     ) => {
+      catchUp()
       if (!change("events", events, details)) return false
-      history.record(events)
+      history.record((recorded = events))
       syncHistory()
       return true
     }
@@ -91,6 +99,12 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
     const label = (event: CalendarEvent) =>
       `${event.title}, ${dayLabel(event.track)} ${formatTime(event.start)} to ${formatTime(event.end)}`
 
+    const newId = () => {
+      const taken = new Set(store.get().events.map((event) => event.id))
+      let id = `event-${++made}`
+      while (taken.has(id)) id = `event-${++made}`
+      return id
+    }
     const spans = createSpans<WeekCalendarState, CalendarEvent>(context, {
       key: "events",
       draft: "draft",
@@ -107,8 +121,7 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
       max: () => context.options().max ?? 1080,
       step: () => context.options().step ?? 15,
       size: () => context.options().size ?? 60,
-      create: (span) =>
-        context.options().createEvent?.(span) ?? { ...span, id: `event-${++made}`, title: "New event" },
+      create: (span) => context.options().createEvent?.(span) ?? { ...span, id: newId(), title: "New event" },
       label,
     })
     const edit = createInlineEdit<WeekCalendarState>(context, {
@@ -121,8 +134,12 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
           { reason: "rename", event: details.event },
         ),
     })
-    const travel = (events: CalendarEvent[] | undefined, reason: "undo" | "redo", event?: Event) => {
-      if (events) change("events", events, { reason, event })
+    const travel = (reason: "undo" | "redo", event?: Event) => {
+      catchUp()
+      const events = reason === "undo" ? history.undo() : history.redo()
+      if (events && change("events", events, { reason, event })) recorded = events
+      else if (events && reason === "undo") history.redo()
+      else if (events) history.undo()
       syncHistory()
     }
 
@@ -130,8 +147,8 @@ const weekCalendar = /* @__PURE__ */ definePrimitive({
       spans,
       edit,
       label,
-      undo: (event?: Event) => travel(history.undo(), "undo", event),
-      redo: (event?: Event) => travel(history.redo(), "redo", event),
+      undo: (event?: Event) => travel("undo", event),
+      redo: (event?: Event) => travel("redo", event),
       bindDay: (el: HTMLElement, day: string) => spans.bindTrack(el, day),
       bindEvent(el: HTMLElement, id: string) {
         eventElements.set(id, el)

@@ -1,5 +1,6 @@
 import * as React from "react"
 import { definePrimitive, toLocale } from "@ui-sdk/core"
+import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type LanguageTagState = { tag: string }
@@ -32,7 +33,10 @@ function Example() {
     <LanguageTag>
       {({ locale }) => (
         <>
-          <LanguageTagInput aria-label="Language tag" />
+          <Field>
+            <FieldLabel>Language tag</FieldLabel>
+            <FieldControl render={<LanguageTagInput />} />
+          </Field>
           <p data-locale>{locale ? `Intl reads ${locale}` : "Not a language tag"}</p>
           <p data-date data-slot="hint">
             {new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(date)}

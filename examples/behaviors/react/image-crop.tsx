@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cropImage, type ImageRotation } from "@ui-sdk/core/image"
+import { useLog } from "../../shared/react/log"
 
 const quarters = [
   ["#ef4444", 0, 0],
@@ -17,6 +18,7 @@ function paint(canvas: HTMLCanvasElement) {
 }
 
 function Example() {
+  const log = useLog()
   const source = React.useRef<HTMLCanvasElement>(null)
   const [rotation, setRotation] = React.useState<ImageRotation>(0)
   const [flipX, setFlipX] = React.useState(false)
@@ -33,10 +35,32 @@ function Example() {
       { width: 96, shape: circle ? "circle" : "rectangle" },
     )
     setResult({ url: URL.createObjectURL(file), file })
+    log(`${file.name}, ${file.type}, ${file.size} bytes`)
   }
 
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <select
+          aria-label="Rotation"
+          value={rotation}
+          onChange={(event) => setRotation(Number(event.target.value) as ImageRotation)}
+        >
+          {[0, 90, 180, 270].map((degrees) => (
+            <option key={degrees} value={degrees}>
+              Turn {degrees}°
+            </option>
+          ))}
+        </select>
+        <label data-slot="label">
+          <input type="checkbox" checked={flipX} onChange={(event) => setFlipX(event.target.checked)} />
+          Flip
+        </label>
+        <label data-slot="label">
+          <input type="checkbox" checked={circle} onChange={(event) => setCircle(event.target.checked)} />
+          Circle
+        </label>
+      </div>
       <div data-slot="image-crop-stage">
         <canvas
           ref={source}
@@ -47,40 +71,12 @@ function Example() {
           style={{ transform: `scale(${flipX ? -1 : 1}, 1) rotate(${rotation}deg)` }}
         />
       </div>
-      <div data-slot="row">
-        <label data-slot="label">
-          Rotation
-          <select
-            value={rotation}
-            onChange={(event) => setRotation(Number(event.target.value) as ImageRotation)}
-          >
-            {[0, 90, 180, 270].map((degrees) => (
-              <option key={degrees} value={degrees}>
-                {degrees}°
-              </option>
-            ))}
-          </select>
-        </label>
-        <label data-slot="label">
-          <input type="checkbox" checked={flipX} onChange={(event) => setFlipX(event.target.checked)} />
-          Flip
-        </label>
-        <label data-slot="label">
-          <input type="checkbox" checked={circle} onChange={(event) => setCircle(event.target.checked)} />
-          Circle
-        </label>
-        <button type="button" onClick={crop}>
+      <div data-slot="image-crop-output">
+        <button type="button" data-variant="solid" onClick={crop}>
           Crop
         </button>
+        {result && <img data-slot="image-crop-result" src={result.url} alt="The cropped image" />}
       </div>
-      {result && (
-        <div data-slot="row">
-          <img data-slot="image-crop-result" src={result.url} alt="The cropped image" />
-          <p>
-            {result.file.name}, {result.file.type}, {result.file.size} bytes
-          </p>
-        </div>
-      )}
     </div>
   )
 }

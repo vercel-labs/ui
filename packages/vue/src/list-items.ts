@@ -37,7 +37,7 @@ const ListItems = defineComponent({
             ...render(entry.items),
           ])
         }
-        const { value, keywords, ...rest } = entry as {
+        const { value, label, disabled, keywords } = entry as {
           value: unknown
           label: string
           disabled?: boolean
@@ -45,8 +45,8 @@ const ListItems = defineComponent({
         }
         return h(
           Item,
-          { key: props.keyOf(value), value, ...rest, ...(keywords && { keywords }) },
-          () => rest.label,
+          { key: props.keyOf(value), value, label, disabled, ...(keywords && { keywords }) },
+          () => label,
         )
       })
     }

@@ -61,8 +61,8 @@ const BoardReset = parts.Reset
 
 const notes = [
   { value: "plan", text: "Plan the launch", x: 24, y: 24 },
-  { value: "copy", text: "Write the copy", x: 200, y: 72 },
-  { value: "ship", text: "Ship it", x: 96, y: 160 },
+  { value: "copy", text: "Write the copy", x: 144, y: 80 },
+  { value: "ship", text: "Ship it", x: 40, y: 136 },
   { value: "far", text: "Found me", x: 520, y: 320 },
 ]
 
@@ -76,7 +76,7 @@ function Example() {
           </BoardNote>
         ))}
       </BoardWorld>
-      <BoardReset data-size="sm">Reset view</BoardReset>
+      <BoardReset data-size="sm">Reset View</BoardReset>
     </Board>
   )
 }

@@ -10,6 +10,7 @@ import {
   type TransferLists,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { CheckIcon } from "lucide-react"
 
 type BoardState = { lists: TransferLists; focused: string | null; moving: TransferDraft | null }
 
@@ -110,16 +111,20 @@ function Example() {
           <div key={list} data-slot="transfer-lane">
             <span data-slot="transfer-label">
               {columns[list]}
-              {list === "doing" && " (2 at most)"}
+              {list === "doing" && <span>Max 2</span>}
             </span>
             <BoardColumn value={list} aria-label={columns[list]}>
               {lists[list].map((card) => (
                 <BoardCard key={card} value={card}>
                   {card}
-                  <span data-slot="transfer-meta">
+                  <div data-slot="transfer-meta">
                     {tags[card]}
-                    {list !== "done" && card !== blocked && <BoardFinish value={card}>Done</BoardFinish>}
-                  </span>
+                    {list !== "done" && card !== blocked && (
+                      <BoardFinish value={card}>
+                        <CheckIcon aria-hidden="true" />
+                      </BoardFinish>
+                    )}
+                  </div>
                 </BoardCard>
               ))}
             </BoardColumn>
@@ -130,4 +135,4 @@ function Example() {
   )
 }
 
-export { Board, board, BoardCard, BoardColumn, BoardFinish, type BoardState, Example }
+export { Example }

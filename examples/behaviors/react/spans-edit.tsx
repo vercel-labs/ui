@@ -9,10 +9,16 @@ import {
   type SpansDraft,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type Booking = Span & { title: string }
 
-type RoomState = { bookings: Booking[]; draft: SpansDraft<Booking> | null; note: string }
+type RoomState = { bookings: Booking[]; draft: SpansDraft<Booking> | null }
+
+type RoomOptions = {
+  onBookingsChange?: (bookings: Booking[]) => void
+  onNote?: (note: string) => void
+}
 
 const hour = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
 
@@ -20,13 +26,13 @@ let lunches = 0
 
 const room = definePrimitive({
   name: "room",
-  state: (): RoomState => ({
+  options: { onBookingsChange: "callback", onNote: "callback" },
+  state: (_options: RoomOptions): RoomState => ({
     bookings: [
-      { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 10 * 60 + 30, title: "Standup" },
+      { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 11 * 60, title: "Standup" },
       { id: "board", track: "Atlas", start: 14 * 60, end: 16 * 60, title: "Board meeting" },
     ],
     draft: null,
-    note: "",
   }),
   api: (context) => {
     const { store } = context
@@ -64,15 +70,15 @@ const room = definePrimitive({
             title: "Lunch",
           }
           const free = isSpanFree(store.get().bookings, noon)
-          store.set({ note: free ? "Booked noon." : "Noon is taken." })
+          context.options().onNote?.(free ? "Booked noon" : "Noon is taken")
           if (free) change("bookings", [...store.get().bookings, noon], { reason: "imperative" })
         }
       },
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { bookings: Booking[]; note: string }>({
-      state: (state, { api }) => ({ bookings: api.spans.spans(state), note: state.note }),
+    root: slot<{}, { bookings: Booking[] }>({
+      state: (state, { api }) => ({ bookings: api.spans.spans(state) }),
     }),
     track: slot<{ value: string }>({
       props: { value: "string" },
@@ -93,6 +99,9 @@ const room = definePrimitive({
         const booking = api.spans.spans(state).find((other) => other.id === key)
         return {
           tabindex: "0",
+          "aria-label": booking
+            ? `${booking.title}, ${hour(booking.start)} to ${hour(booking.end)}`
+            : undefined,
           "aria-disabled": key === "board" ? "true" : undefined,
           ...api.spans.spanAttrs(state, key),
           style: booking ? api.spans.spanStyle(booking) : undefined,
@@ -123,39 +132,48 @@ const RoomBooking = parts.Booking
 const RoomAction = parts.Action
 
 function Example() {
+  const log = useLog()
   return (
-    <Room>
-      {({ bookings, note }) => (
+    <Room
+      onBookingsChange={(bookings) =>
+        log(
+          bookings
+            .map((booking) => `${booking.title} ${hour(booking.start)}–${hour(booking.end)}`)
+            .join(" · "),
+        )
+      }
+      onNote={log}
+    >
+      {({ bookings }) => (
         <>
-          <RoomTrack value="Atlas" aria-label="Atlas">
-            {bookings.map((booking) => (
-              <RoomBooking key={booking.id} value={booking.id}>
-                {booking.title} {hour(booking.start)}
-              </RoomBooking>
-            ))}
-          </RoomTrack>
-          <div data-slot="row">
+          <div data-slot="controls">
             {[
               ["later", "Later"],
               ["longer", "Longer"],
               ["delete", "Delete"],
-              ["noon", "Book noon"],
+              ["noon", "Book Noon"],
             ].map(([value, text]) => (
               <RoomAction data-size="sm" key={value} value={value}>
                 {text}
               </RoomAction>
             ))}
-            <p data-slot="hint">{note}</p>
           </div>
-          <p data-slot="output">
-            {bookings
-              .map((booking) => `${booking.title} ${hour(booking.start)}–${hour(booking.end)}`)
-              .join(" · ")}
-          </p>
+          <div data-slot="spans-axis" aria-hidden="true">
+            <span>9:00</span>
+            <span>13:00</span>
+            <span>17:00</span>
+          </div>
+          <RoomTrack value="Atlas" aria-label="Atlas">
+            {bookings.map((booking) => (
+              <RoomBooking key={booking.id} value={booking.id}>
+                {booking.title}
+              </RoomBooking>
+            ))}
+          </RoomTrack>
         </>
       )}
     </Room>
   )
 }
 
-export { type Booking, Example, room, Room, RoomAction, RoomBooking, type RoomState, RoomTrack }
+export { Example }

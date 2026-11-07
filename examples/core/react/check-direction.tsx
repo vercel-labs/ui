@@ -35,7 +35,7 @@ function Example() {
     <div data-slot="check">
       <div data-slot="row">
         <button type="button" data-variant="solid" onClick={check}>
-          Check both directions
+          Check Both Directions
         </button>
         <label data-slot="label">
           <input

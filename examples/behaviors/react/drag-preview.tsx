@@ -103,7 +103,17 @@ function Example() {
           {({ tags }) => (
             <>
               <span data-slot="label">Launch plan</span>
-              <span data-slot="hint">{tags.length ? `Tags: ${tags.join(", ")}` : "Drag a tag here."}</span>
+              <div data-slot="row">
+                {tags.length ? (
+                  tags.map((tag) => (
+                    <span key={tag} data-slot="badge">
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span data-slot="hint">Drag a tag here.</span>
+                )}
+              </div>
             </>
           )}
         </TaggerNote>
@@ -112,4 +122,4 @@ function Example() {
   )
 }
 
-export { Example, tagger, Tagger, TaggerNote, TaggerTag, type TaggerOptions, type TaggerState }
+export { Example }

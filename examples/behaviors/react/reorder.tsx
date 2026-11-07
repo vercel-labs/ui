@@ -86,4 +86,4 @@ function Example() {
   )
 }
 
-export { Example, ranking, Ranking, RankingItem, type RankingOptions, type RankingState }
+export { Example }

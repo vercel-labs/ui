@@ -30,7 +30,7 @@ function Example() {
     <div data-slot="check">
       <div data-slot="row">
         <button type="button" data-variant="solid" onClick={() => setResult(run(broken))}>
-          Check the server HTML
+          Check the Server HTML
         </button>
         <label data-slot="label">
           <input

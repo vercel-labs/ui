@@ -25,13 +25,15 @@ function Example() {
   const first = firstDayOfWeek(locale)
   return (
     <div data-slot="stack">
-      <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
-        {locales.map(([value, text]) => (
-          <option key={value} value={value}>
-            {text}
-          </option>
-        ))}
-      </select>
+      <div data-slot="controls">
+        <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
+          {locales.map(([value, text]) => (
+            <option key={value} value={value}>
+              {text}
+            </option>
+          ))}
+        </select>
+      </div>
       <p data-label data-slot="date-label">
         {formatDateToParts(date, locale, { month: "long", day: "numeric" }).map((part, index) => (
           <span key={index} data-type={part.type}>

@@ -7,22 +7,10 @@ description: Give your agents the behaviors to build headless and accessible com
 
 This section covers building your own components with `@ui-sdk/core`.
 
-- To use ready-made components in your framework, see [Get Started](/docs/frameworks).
+- To set up ui-sdk in your project, see [Get Started](/docs).
 - To browse the components library, see [Components](/docs/components).
 
 </Callout>
-
-## Quick Start
-
-Pick your framework, then copy this prompt into your agent.
-
-<include>../../shared/setup-prompt.mdx</include>
-
-Then ask your agent to build a component:
-
-```text prompt
-Build a search field with ui-sdk: a text input and a Clear button that only shows when there's text. Clear empties the input and puts focus back in it. Use our existing styles.
-```
 
 ## What it is
 
@@ -38,7 +26,7 @@ It has everything you expect: a popover that opens beside its button, arrow key 
 
 <ComponentExample
   name="core/icon-picker"
-  caption="Click Pick an icon to open the picker, then click an icon or type to search. The best match is highlighted, so Enter picks it. Press Down to enter the results and use the arrow keys to move."
+  caption="Click Pick an Icon to open the picker, then click an icon or type to search. The best match is highlighted, so Enter picks it. Press Down to enter the results and use the arrow keys to move."
 />
 
 The icon picker is built from five pieces of `@ui-sdk/core`, which work together to provide the behavior:
@@ -73,10 +61,9 @@ You still choose how the pieces fit and give the component its names, roles and 
 
 Start with [Build a Component](./build-a-component). You'll build a toggle with one piece of state and one button, render it in your framework, and add styles.
 
-Then [Compose Behaviors](./compose-behaviors) brings several parts together in a star rating. Connect their focus and keyboard behavior, then test how they work together.
+Then the Core guides take each step further: [Define a Primitive](./kernel/define-a-primitive), [Render a Primitive](./kernel/render-a-primitive) and [Style a Component](./kernel/style-a-component). [Compose Behaviors](./compose-behaviors) brings several behaviors together in a star rating, and [Handle Changes](./kernel/handle-changes) lets the app control and respond to state.
 
 From there:
 
-- [Define a Primitive](./kernel/define-a-primitive) covers options, slot state and working with elements.
 - [Behaviors](./behaviors) helps you find the pieces for what you're building.
 - [Reference](./reference) lists the functions and types when you need the details.

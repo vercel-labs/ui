@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createArea, createChange, definePrimitive, type AreaReason, type ChangeDetails } from "@ui-sdk/core"
 import { createParts, usePart, usePrimitive, type PartProps } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type Mix = { warmth: number; energy: number }
 
@@ -48,17 +49,21 @@ function Mixer({ defaultMix, onMixChange, ...props }: MixerOptions & PartProps<"
 const MixerThumb = parts.Thumb
 
 function Example() {
-  const [mix, setMix] = React.useState({ warmth: 30, energy: 70 })
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <Mixer defaultMix={mix} onMixChange={setMix}>
-        <MixerThumb aria-label="Mix" />
-      </Mixer>
-      <p data-slot="output">
-        Warmth {mix.warmth}, energy {mix.energy}
-      </p>
-    </div>
+    <Mixer
+      defaultMix={{ warmth: 30, energy: 70 }}
+      onMixChange={(mix, details) => log(`Warmth ${mix.warmth}, energy ${mix.energy} (${details.reason})`)}
+    >
+      <span data-slot="mixer-axis" data-axis="y" aria-hidden="true">
+        Energy
+      </span>
+      <span data-slot="mixer-axis" data-axis="x" aria-hidden="true">
+        Warmth
+      </span>
+      <MixerThumb aria-label="Mix" />
+    </Mixer>
   )
 }
 
-export { Example, mixer, Mixer, MixerThumb, type Mix, type MixerOptions, type MixerState }
+export { Example }

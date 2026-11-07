@@ -10,9 +10,12 @@ function Example() {
 
   return (
     <div data-slot="stack">
-      <output data-slot="rating-value" data-value aria-label="Rating">
-        {value}
-      </output>
+      <div data-slot="rating-readout">
+        <output data-slot="rating-value" data-value aria-label="Rating">
+          {value}
+        </output>
+        <span data-slot="hint">Rating</span>
+      </div>
       <Rating onValueChange={setValue} aria-label="Rating">
         <RatingStar value="1" aria-label="1 star">
           <StarIcon aria-hidden="true" />

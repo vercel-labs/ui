@@ -1,4 +1,5 @@
 import * as React from "react"
+import { XIcon } from "lucide-react"
 import { animateIn, animateOut, definePrimitive } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
@@ -71,7 +72,9 @@ function Example() {
             {toasts.map((key) => (
               <Toast key={key} value={key}>
                 Saved
-                <ToastDismiss value={key}>✕</ToastDismiss>
+                <ToastDismiss value={key}>
+                  <XIcon aria-hidden="true" />
+                </ToastDismiss>
               </Toast>
             ))}
           </div>

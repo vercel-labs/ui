@@ -33,12 +33,22 @@ const config = {
   // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
   // Agents' own `.md` files are the whole section, and they win.
   async rewrites() {
-    return [{ source: "/docs/:path*.md", destination: "/md/:path*" }]
+    return [
+      { source: "/docs.md", destination: "/md/core/start" },
+      { source: "/docs/:path*.md", destination: "/md/:path*" },
+    ]
   },
   async redirects() {
     const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
-    const pages = "components|utilities|rendering|server-rendering"
+    const pages = "components|utilities|rendering|server-rendering|custom-parts|styling-and-animation"
     return [
+      // Get Started is Core's page by its file, and lives at /docs.
+      {
+        source: "/docs/core/kernel/style-a-primitive",
+        destination: "/docs/core/kernel/style-a-component",
+        permanent: true,
+      },
+      { source: "/docs/core/start", destination: "/docs", permanent: true },
       {
         source: `/docs/:framework(${frameworks.join("|")})/:folder(hooks|utilities)/observe`,
         destination: "/docs/core/observe",
@@ -108,15 +118,15 @@ const config = {
         permanent: true,
       },
       { source: "/docs/core/building-blocks", destination: "/docs/core/behaviors", permanent: true },
-      // Older Core pages now live in Foundations or Behaviors.
+      // Older Core pages now live in Core's own pages or in Behaviors.
       {
         source: "/docs/core/primitives",
         destination: "/docs/core/kernel/define-a-primitive",
         permanent: true,
       },
       {
-        source: "/docs/:path(core/behaviors|behaviors|core/kernel)/state-and-events",
-        destination: "/docs/core/kernel/state-and-changes",
+        source: "/docs/:path(core/behaviors|behaviors|core/kernel)/:page(state-and-events|state-and-changes)",
+        destination: "/docs/core/kernel/handle-changes",
         permanent: true,
       },
       { source: "/docs/behaviors/llms.txt", destination: "/docs/core/llms.txt", permanent: true },

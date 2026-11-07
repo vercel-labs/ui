@@ -11,6 +11,8 @@ import {
   type SwipeSide,
 } from "@ui-sdk/core"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
+import { PinIcon } from "lucide-react"
+import { useLog } from "../../shared/react/log"
 
 type MailboxState = { open: SwipeOpen | null; swiping: SwipeDraft | null; focused: string | null }
 
@@ -122,29 +124,43 @@ function MailboxActions({ row, side, ...props }: { row: string; side: SwipeSide 
 }
 
 function Example() {
-  const [messages, setMessages] = React.useState(["Pinned: welcome", "Flight to Lisbon", "Weekly digest"])
+  const log = useLog()
+  const [messages, setMessages] = React.useState(["Welcome to Acme", "Flight to Lisbon", "Weekly digest"])
   const [read, setRead] = React.useState<string[]>([])
-  const [archived, setArchived] = React.useState<string | null>(null)
-  const toggleRead = (message: string) =>
+  const toggleRead = (message: string) => {
+    log(`${read.includes(message) ? "Marked unread" : "Marked read"}: ${message}`)
     setRead((current) =>
       current.includes(message) ? current.filter((other) => other !== message) : [...current, message],
     )
+  }
   const archive = (message: string) => {
+    log(`Archived: ${message}`)
     setMessages((current) => current.filter((other) => other !== message))
-    setArchived(message)
   }
   return (
     <Mailbox
-      pinned="Pinned: welcome"
+      pinned="Welcome to Acme"
       first={messages[1]}
       onAction={(key: string, side: SwipeSide) => (side === "start" ? toggleRead(key) : archive(key))}
     >
+      <div data-slot="controls">
+        <MailboxAction data-size="sm" value="peek">
+          Peek
+        </MailboxAction>
+        <MailboxAction data-size="sm" value="close">
+          Close
+        </MailboxAction>
+      </div>
       <MailboxList aria-label="Mailbox">
         {messages.map((message) => (
           <MailboxRow key={message} value={message}>
             <MailboxContent value={message}>
               {message}
-              {read.includes(message) && <span data-slot="hint">Read</span>}
+              {message === "Welcome to Acme" ? (
+                <PinIcon aria-hidden="true" />
+              ) : (
+                read.includes(message) && <span data-slot="hint">Read</span>
+              )}
             </MailboxContent>
             <MailboxActions row={message} side="start">
               <button type="button" tabIndex={-1} data-variant="solid" onClick={() => toggleRead(message)}>
@@ -159,28 +175,8 @@ function Example() {
           </MailboxRow>
         ))}
       </MailboxList>
-      <div data-slot="row">
-        <MailboxAction data-size="sm" value="peek">
-          Peek
-        </MailboxAction>
-        <MailboxAction data-size="sm" value="close">
-          Close
-        </MailboxAction>
-        <p data-slot="hint">{archived ? `Archived ${archived}` : "Nothing archived"}</p>
-      </div>
     </Mailbox>
   )
 }
 
-export {
-  Example,
-  mailbox,
-  Mailbox,
-  MailboxAction,
-  MailboxActions,
-  MailboxContent,
-  MailboxList,
-  type MailboxOptions,
-  MailboxRow,
-  type MailboxState,
-}
+export { Example }

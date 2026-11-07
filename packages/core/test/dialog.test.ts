@@ -231,6 +231,30 @@ describe("actions", () => {
     press(instance.part("close", { ...props, action: () => undefined }))?.()
     expect(instance.get()).toMatchObject({ open: false })
   })
+
+  test("an action that settles after its dialog closed and reopened leaves the new one alone", async () => {
+    const controller = createDialogController<unknown, string>()
+    const instance = dialog({ id: "d", controller })
+    attachController(controller, instance.api)
+    let finish!: () => void
+    let fail!: (error: Error) => void
+    const action = () => new Promise<void>((resolve) => (finish = resolve))
+    const rejected = () => new Promise<void>((_, reject) => (fail = reject))
+    controller.open()
+    press(instance.part("close", { id: "delete", value: "confirm", action }))?.()
+    controller.close()
+    const second = controller.open()
+    expect(instance.get()).toMatchObject({ open: true, pending: null })
+    press(instance.part("close", { id: "retry", action: rejected }))?.()
+    controller.close()
+    controller.open()
+    finish()
+    fail(new Error("Offline"))
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(instance.get()).toMatchObject({ open: true, pending: null, errors: {} })
+    controller.close({ returnValue: "cancel" })
+    expect((await second).reason).toBe("imperative")
+  })
 })
 
 describe("typed results", () => {

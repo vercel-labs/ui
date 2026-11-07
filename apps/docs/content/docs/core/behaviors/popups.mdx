@@ -88,7 +88,7 @@ For example, `dismissible: false` keeps Escape and outside presses from closing 
 
 <ComponentExample
   name="behaviors/popup-options"
-  caption="Open Cart and watch the reason when it closes. Try Modal, Open on hover, and clearing Dismissible. Check out still closes the cart."
+  caption="Open Cart and watch the reason when it closes. Try Modal, Open on hover, and clearing Dismissible. Check Out still closes the cart."
 />
 
 | Option                                | What It Changes                                                                                             |
@@ -99,7 +99,7 @@ For example, `dismissible: false` keeps Escape and outside presses from closing 
 | `dismissible`, `onDismissAttempt`     | Refuse dismissals and hear the attempted reason. Triggers, Close parts, and controllers can still close it. |
 | `disabled`                            | Prevent opening.                                                                                            |
 
-Controlled `open` uses the same [change and sync pattern](../kernel/state-and-changes#state-a-user-controls) as other state. The cart's source shows those fields together.
+Controlled `open` uses the same [change and sync pattern](../kernel/handle-changes#state-a-user-controls) as other state. The cart's source shows those fields together.
 
 ### One Popup, Many Triggers
 
@@ -246,7 +246,7 @@ note.close({ returnValue: "kept" })
 
 Pass `signal: AbortSignal.timeout(2000)` to `open` for a timed close. An abort closes with reason `imperative`; removing the popup's component resolves with `unmount`. The promise resolves once and doesn't reject.
 
-To expose your own component's API this way, see [Controllers](../kernel/state-and-changes#controllers).
+To expose your own component's API this way, see [Controllers](../kernel/handle-changes#controllers).
 
 ## Placing a Popup
 

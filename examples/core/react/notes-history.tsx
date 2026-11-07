@@ -72,17 +72,17 @@ function Example() {
   return (
     <parts.Root>
       <div data-slot="stack">
-        <parts.Input
-          aria-label="Notes"
-          rows={3}
-          placeholder="Type a few words, pause, and type more. Try “teh”."
-        />
-        <div data-slot="row">
+        <div data-slot="controls">
           <parts.Undo>Undo</parts.Undo>
           <parts.Redo>Redo</parts.Redo>
           <parts.Fix>Fix “teh”</parts.Fix>
           <parts.Clear>Clear</parts.Clear>
         </div>
+        <parts.Input
+          aria-label="Notes"
+          rows={3}
+          placeholder="Type a few words, pause, and type more. Try “teh”."
+        />
       </div>
     </parts.Root>
   )

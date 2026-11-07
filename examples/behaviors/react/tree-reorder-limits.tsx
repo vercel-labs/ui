@@ -11,6 +11,7 @@ import {
   type TreeReorderRow,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { ArrowLeftIcon, ArrowRightIcon, FolderIcon, InboxIcon } from "lucide-react"
 
 type FoldersState = { rows: TreeReorderRow[]; focused: string | null; moving: TreeReorderDraft | null }
 
@@ -117,13 +118,17 @@ function Example() {
       {({ rows }) =>
         rows.map((row) => (
           <FoldersRow key={row.key} value={row.key}>
-            <span aria-hidden="true">{row.key === "Inbox" ? "📥" : "📁"}</span>
+            {row.key === "Inbox" ? <InboxIcon aria-hidden="true" /> : <FolderIcon aria-hidden="true" />}
             <span>{row.key}</span>
             <span data-slot="hint">{counts[row.key]}</span>
             {row.key !== "Inbox" && (
               <>
-                <FoldersOutdent value={row.key}>←</FoldersOutdent>
-                <FoldersIndent value={row.key}>→</FoldersIndent>
+                <FoldersOutdent value={row.key}>
+                  <ArrowLeftIcon aria-hidden="true" />
+                </FoldersOutdent>
+                <FoldersIndent value={row.key}>
+                  <ArrowRightIcon aria-hidden="true" />
+                </FoldersIndent>
               </>
             )}
           </FoldersRow>
@@ -133,4 +138,4 @@ function Example() {
   )
 }
 
-export { Example, folders, Folders, FoldersIndent, FoldersOutdent, FoldersRow, type FoldersState }
+export { Example }

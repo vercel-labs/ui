@@ -126,12 +126,15 @@ function createArea<State extends object>(
       thumb?.focus({ preventScroll: true })
       // The commit names what changed the value last, as a slider's does.
       let reason: "track-press" | "drag" = "track-press"
+      // Disabling it mid-drag ends the drag, like a slider's.
+      const unsubscribe = store.subscribe(() => options.disabled?.() && drags.cancel())
       drags.start(el, event, {
         onMove: (sample) => {
           if (set(at(el, sample.x, sample.y), { reason: "drag", event: sample.event })) reason = "drag"
         },
         // A teardown cut the drag short, so nobody ended it to commit.
         onEnd: (end) => {
+          unsubscribe()
           if (!isDestroying()) options.onCommit?.(value(), { reason, event: end })
         },
       })

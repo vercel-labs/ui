@@ -13,7 +13,6 @@ import { bindDragPreview, type DragPreview } from "./drag-preview"
 import { createDraftMove } from "./draft-move"
 import { isRTL } from "../platform/env"
 import { createOrder } from "../kernel/order"
-import { deriveState } from "../kernel/derive"
 import { createDragSession, dragThreshold } from "./pointer"
 import { labelOf } from "../text/typeahead"
 import { isSameKeys } from "../selection/listbox-range"
@@ -165,6 +164,12 @@ function movedTo(order: readonly string[], key: string | readonly string[], inde
   return rest
 }
 
+// The order with `keys` gathered into one block where `key` is.
+function gathered(order: readonly string[], key: string, keys: readonly string[]) {
+  const before = order.slice(0, order.indexOf(key)).filter((k) => !keys.includes(k)).length
+  return keys.length > 1 ? movedTo(order, keys, before) : [...order]
+}
+
 /**
  * Lets users reorder a slot's parts by dragging them and with the keyboard.
  * The moving item and its order live in state under `draft`, so the list
@@ -203,26 +208,18 @@ function createReorder<State extends object, Props = any>(
     value: options.key,
     shown: (current: ReorderDraft) => current.order,
     same: isSameKeys,
+    rebase(current, now, moved) {
+      if (!now.includes(current.key)) return null
+      const keys = now.filter((key) => current.keys.includes(key))
+      const order = gathered(now, current.key, keys)
+      if (!moved) return { ...current, keys, order }
+      const at = current.order.indexOf(current.keys[0])
+      const index = current.order.slice(0, at).filter((key) => now.includes(key)).length
+      return { ...current, keys, order: movedTo(order, keys, index) }
+    },
     commit: (current, details) => options.set(current.order, details),
     say: (type, current, order) => say(type, current.key, order, current.keys.length),
     element,
-  })
-
-  // The owner can change the value mid-drag, like deleting an item elsewhere.
-  // The draft keeps its moves over the items the value has now.
-  deriveState(context, [options.draft], (state) => {
-    const current = state[options.draft] as ReorderDraft | null
-    const now = state[options.key] as string[]
-    if (!current) return
-    const present = new Set(now)
-    const kept = current.order.filter((key) => present.has(key))
-    if (kept.length === current.order.length && kept.length === now.length) return
-    if (!present.has(current.key)) return { [options.draft]: null } as Partial<State>
-    const known = new Set(current.order)
-    const order = [...kept]
-    now.forEach((key, index) => known.has(key) || order.splice(Math.min(index, order.length), 0, key))
-    const keys = current.keys.filter((key) => present.has(key))
-    return { [options.draft]: { ...current, keys, order } } as Partial<State>
   })
 
   function say(type: ReorderMessage["type"], key: string, order: readonly string[], count = 1) {
@@ -243,8 +240,7 @@ function createReorder<State extends object, Props = any>(
     if (draft() || !current.includes(key) || isDisabled(key)) return false
     const group = new Set(options.group?.(key) ?? [])
     const keys = current.filter((k) => k === key || (group.has(k) && !isDisabled(k)))
-    const before = current.slice(0, current.indexOf(key)).filter((k) => !keys.includes(k)).length
-    const order = keys.length > 1 ? movedTo(current, keys, before) : [...current]
+    const order = gathered(current, key, keys)
     setDraft({ key, keys, order, pointer })
     say("grab", key, order, keys.length)
     if (!pointer && keys.length > 1) focusLater(key)

@@ -63,7 +63,9 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await billing.click()
     await expect(billing).toHaveAttribute("data-pending", "")
     await expect(billing).toHaveAttribute("aria-busy", "true")
+    await expect(billing).toHaveAttribute("aria-disabled", "true")
     await expect(billing).not.toHaveAttribute("data-pending", "")
+    await expect(billing).not.toHaveAttribute("aria-disabled", "true")
   })
 
   test("a command opens its page, and Backspace in the empty field goes back with the text", async ({

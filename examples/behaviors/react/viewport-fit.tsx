@@ -1,4 +1,5 @@
 import * as React from "react"
+import { ArrowLeftIcon, ArrowRightIcon, MapPinIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
 import { createViewport, css, definePrimitive, live, type Viewport } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
@@ -126,29 +127,31 @@ function Example() {
         <SightsMapWorld>
           {sights.map((sight) => (
             <SightsMapSight key={sight.value} value={sight.value}>
-              📍 {sight.label}
+              <MapPinIcon aria-hidden="true" />
+              {sight.label}
             </SightsMapSight>
           ))}
         </SightsMapWorld>
       </SightsMapFrame>
       <div data-slot="row">
-        {[
-          ["fit", "Fit"],
-          ["out", "−"],
-          ["in", "+"],
-          ["reset", "100%"],
-          ["left", "←"],
-          ["right", "→"],
-        ].map(([value, text]) => (
-          <SightsMapAction
-            data-size="sm"
-            key={value}
-            value={value}
-            aria-label={{ left: "Pan left", right: "Pan right", out: "Zoom out", in: "Zoom in" }[value]}
-          >
-            {text}
-          </SightsMapAction>
-        ))}
+        <SightsMapAction data-size="sm" value="fit">
+          Fit
+        </SightsMapAction>
+        <SightsMapAction data-size="sm" value="out" aria-label="Zoom out">
+          <ZoomOutIcon aria-hidden="true" />
+        </SightsMapAction>
+        <SightsMapAction data-size="sm" value="in" aria-label="Zoom in">
+          <ZoomInIcon aria-hidden="true" />
+        </SightsMapAction>
+        <SightsMapAction data-size="sm" value="reset">
+          100%
+        </SightsMapAction>
+        <SightsMapAction data-size="sm" value="left" aria-label="Pan left">
+          <ArrowLeftIcon aria-hidden="true" />
+        </SightsMapAction>
+        <SightsMapAction data-size="sm" value="right" aria-label="Pan right">
+          <ArrowRightIcon aria-hidden="true" />
+        </SightsMapAction>
         <SightsMapZoom />
       </div>
     </SightsMap>

@@ -166,7 +166,11 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
     // A command from the data, whether the list renders it or you do.
     const data = findCommand(store.get().items, key) ?? findCommand(options().emptyItems, key)
     if (!props && !data) return
-    if (props?.disabled || data?.disabled || store.get().pending.includes(key)) return
+    if (props?.disabled || data?.disabled || store.get().pending.includes(key)) {
+      // A command rendered as a link would still follow its href.
+      if (event?.type === "click") event.preventDefault()
+      return
+    }
     if (store.get().error?.key === key) store.set({ error: null })
     // A shortcut's key press is already handled, so `onSelect` gets a fresh event to cancel.
     const selection = event && !event.defaultPrevented ? event : selectEvent()

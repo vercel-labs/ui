@@ -384,20 +384,18 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       props: { disabled: "boolean" },
       ...button(1),
       on: {
-        pointerdown: (event, { api, el, props }) =>
-          el && !props.disabled && api.internal.pressButton(event, el, 1),
         click: (event, { api, props }) => !props.disabled && api.internal.clickButton(event, 1),
       },
+      bind: (el, part) => part.api.internal.bindButton(el, 1, () => !!part.props.disabled),
     }),
 
     decrement: slot<NumberInputButtonProps, NumberInputButtonState>({
       props: { disabled: "boolean" },
       ...button(-1),
       on: {
-        pointerdown: (event, { api, el, props }) =>
-          el && !props.disabled && api.internal.pressButton(event, el, -1),
         click: (event, { api, props }) => !props.disabled && api.internal.clickButton(event, -1),
       },
+      bind: (el, part) => part.api.internal.bindButton(el, -1, () => !!part.props.disabled),
     }),
 
     // Drag across it to change the value, like a label in a design tool. The

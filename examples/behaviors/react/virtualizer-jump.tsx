@@ -97,24 +97,14 @@ const ContactsRow = parts.Row
 
 const ContactsAction = parts.Action
 
-const names = ["Ada", "Ben", "Cleo", "Dev", "Eli", "Fay", "Gus", "Hana", "Ivo", "June"]
+const names = ["Hollis", "Inès", "Kofi", "Wren", "Tomasz"]
 
 function Example() {
   return (
     <Contacts>
       {({ items, count }) => (
-        <>
-          <ContactsScroller>
-            <div data-slot="virtualizer-header">{count} contacts</div>
-            <ContactsBody aria-label="Contacts">
-              {items.map((item) => (
-                <ContactsRow key={item.key} value={item.key} index={item.index} start={item.start}>
-                  {names[item.index % names.length]} {item.index + 1}
-                </ContactsRow>
-              ))}
-            </ContactsBody>
-          </ContactsScroller>
-          <div data-slot="row">
+        <div data-slot="stack">
+          <div data-slot="controls">
             {[
               ["first", "First"],
               ["middle", "Center 50"],
@@ -126,7 +116,17 @@ function Example() {
               </ContactsAction>
             ))}
           </div>
-        </>
+          <ContactsScroller>
+            <div data-slot="virtualizer-header">{count} contacts</div>
+            <ContactsBody aria-label="Contacts">
+              {items.map((item) => (
+                <ContactsRow key={item.key} value={item.key} index={item.index} start={item.start}>
+                  {names[item.index % names.length]} {item.index + 1}
+                </ContactsRow>
+              ))}
+            </ContactsBody>
+          </ContactsScroller>
+        </div>
       )}
     </Contacts>
   )

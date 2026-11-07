@@ -227,6 +227,13 @@ export {
   type SwipeSide,
 } from "./foundation/direct-manipulation/swipe-actions"
 export {
+  bindHold,
+  type BindHoldOptions,
+  type HoldDetails,
+  type HoldEndDetails,
+  type HoldInput,
+} from "./foundation/direct-manipulation/hold"
+export {
   createStickToBottom,
   type StickToBottom,
   type StickToBottomOptions,

@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "motion")
@@ -63,15 +70,14 @@ test("findable panels: the first opens with the page, find in page opens one, an
   await trigger("3.0").scrollIntoViewIfNeeded()
   await expect(trigger("3.0")).toHaveAttribute("aria-expanded", "true")
   await expect(panel("Dark mode")).toBeVisible()
-  await expect(page.locator("[data-settled]")).toHaveText("")
   // Closed sections stay in the page, findable.
   await expect(panel("offline")).toHaveAttribute("hidden", "until-found")
   await panel("offline").evaluate((el) => el.dispatchEvent(new Event("beforematch")))
   await expect(trigger("2.4")).toHaveAttribute("aria-expanded", "true")
-  await expect(page.locator("[data-settled]")).toHaveText("2.4 opened")
+  await expect(lastLog(trigger("2.4"))).toHaveText("Version 2.4 opened")
   await trigger("2.4").click()
   await expect(panel("offline")).toHaveAttribute("data-ending-style", "")
-  await expect(page.locator("[data-settled]")).toHaveText("2.4 closed")
+  await expect(lastLog(trigger("2.4"))).toHaveText("Version 2.4 closed")
   await expect(panel("offline")).toHaveAttribute("hidden", "until-found")
   await page.locator('[data-slot="notes-expand"]').click()
   await expect(trigger("2.3")).toHaveAttribute("aria-expanded", "true")
@@ -87,7 +93,7 @@ test("findable: hidden text stays findable, and a match shows it", async ({ page
   await expect(page.locator("[data-findable]")).toHaveText("Find in page can show the method.")
   await expect(method).toHaveAttribute("hidden", "until-found")
   await method.evaluate((el) => el.dispatchEvent(new Event("beforematch")))
-  await expect(toggle).toHaveText("Hide method")
+  await expect(toggle).toHaveText("Hide Method")
   await expect(method).toBeVisible()
   await toggle.click()
   await expect(method).toHaveAttribute("hidden", "until-found")
@@ -125,9 +131,9 @@ test("rubber band: a pull stretches less past the top, refreshes past the line a
   expect(shown).toBeLessThan(150)
   await page.waitForTimeout(100)
   await page.mouse.up()
-  await expect(page.locator("[data-pull-state]")).toContainText("Let go at 0.00 px/ms")
+  await expect(lastLog(list)).toHaveText("Let go at 0.00 px/ms")
   await expect(list).toHaveAttribute("aria-busy", "true")
-  await expect(page.locator("[data-pull-state]")).toContainText("refreshed 1 time")
+  await expect(lastLog(list)).toHaveText("Refreshed 1 time")
   await expect.poll(pulled).toBe(0)
   // A short pull held still springs back without refreshing.
   await page.mouse.move(x, box.y + 20)
@@ -136,9 +142,9 @@ test("rubber band: a pull stretches less past the top, refreshes past the line a
   await page.waitForTimeout(100)
   await page.mouse.up()
   await expect.poll(pulled).toBe(0)
-  await expect(page.locator("[data-pull-state]")).toContainText("refreshed 1 time")
+  await expect(lastLog(list)).toHaveText("Let go at 0.00 px/ms")
   await page.locator('[data-slot="inbox-refresh"]').click()
-  await expect(page.locator("[data-pull-state]")).toContainText("refreshed 2 times")
+  await expect(lastLog(list)).toHaveText("Refreshed 2 times")
 })
 
 test("sector: a stroke picks the reaction it points at, and a short one picks nothing", async ({ page }) => {
@@ -152,18 +158,17 @@ test("sector: a stroke picks the reaction it points at, and a short one picks no
   await page.mouse.move(cx, cy)
   await page.mouse.down()
   await page.mouse.move(cx + 40, cy, { steps: 5 })
-  await expect(page.getByRole("button", { name: "React with 🎉" })).toHaveAttribute("data-pointing", "")
+  await expect(page.getByRole("button", { name: "Celebrate" })).toHaveAttribute("data-pointing", "")
   await page.mouse.up()
-  await expect(handle).toHaveText("🎉")
-  await expect(page.getByRole("button", { name: "React with 🎉" })).toHaveAttribute("aria-pressed", "true")
+  await expect(page.getByRole("button", { name: "Celebrate" })).toHaveAttribute("aria-pressed", "true")
   // Within the dead zone, nothing.
   await page.mouse.move(cx, cy)
   await page.mouse.down()
   await page.mouse.move(cx - 10, cy - 10, { steps: 3 })
   await page.mouse.up()
-  await expect(handle).toHaveText("🎉")
-  await page.getByRole("button", { name: "React with ❤️" }).click()
-  await expect(handle).toHaveText("❤️")
+  await expect(page.getByRole("button", { name: "Celebrate" })).toHaveAttribute("aria-pressed", "true")
+  await page.getByRole("button", { name: "Love" }).click()
+  await expect(page.getByRole("button", { name: "Love" })).toHaveAttribute("aria-pressed", "true")
 })
 
 test("each option links to the example that shows it", async ({ page }) => {

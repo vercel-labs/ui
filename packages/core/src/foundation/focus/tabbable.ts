@@ -69,17 +69,26 @@ const focusables =
 
 const ownTabStops = new WeakSet<Element>()
 
-const takesFocus = (node: Element) => (node as HTMLElement).tabIndex >= 0 && !node.matches(":disabled")
+// Only inert content inside `root` counts: the observer never sees `root` or
+// its ancestors become inert or stop being.
+function takesFocus(node: Element, root: Element) {
+  const inert = node.closest("[inert]")
+  return (
+    (node as HTMLElement).tabIndex >= 0 &&
+    !node.matches(":disabled") &&
+    !(inert !== root && root.contains(inert))
+  )
+}
 
-function holdsFocusableNode(node: Node) {
+function holdsFocusableNode(node: Node, root: Element) {
   if (!(node instanceof Element)) return false
-  return (node.matches(focusables) && takesFocus(node)) || holdsFocusable(node)
+  return (node.matches(focusables) && takesFocus(node, root)) || holdsFocusable(node, root)
 }
 
 // Whether Tab could stop inside `el` once it shows. Visibility is ignored,
 // since a hidden panel checks before it shows.
-function holdsFocusable(el: Element) {
-  return Array.from(el.querySelectorAll(focusables)).some(takesFocus)
+function holdsFocusable(el: Element, root = el) {
+  return Array.from(el.querySelectorAll(focusables)).some((node) => takesFocus(node, root))
 }
 
 /**
@@ -126,7 +135,7 @@ function bindTabStop(
         holds = holdsFocusable(el)
         break
       }
-      if (!holds) holds = Array.from(record.addedNodes).some(holdsFocusableNode)
+      if (!holds) holds = Array.from(record.addedNodes).some((node) => holdsFocusableNode(node, el))
     }
     check()
   })
@@ -134,7 +143,7 @@ function bindTabStop(
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ["tabindex", "disabled", "href", "contenteditable"],
+    attributeFilter: ["tabindex", "disabled", "href", "contenteditable", "inert"],
   })
   return { check, stop: () => observer.disconnect() }
 }

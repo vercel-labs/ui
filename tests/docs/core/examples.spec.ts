@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../docs-test"
 import { openExamples } from "./behaviors/helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example on the Core pages, and on Trees and Dates, renders without errors", async ({ page }) => {
   test.setTimeout(90_000)
@@ -54,14 +61,14 @@ test("tree checkboxes: a folder checks its files, shows mixed, and the strategy 
   await src.scrollIntoViewIfNeeded()
   await example.getByRole("checkbox", { name: "index.ts" }).click()
   await expect(src).toHaveAttribute("aria-checked", "mixed")
-  await expect(example.locator("[data-value]")).toHaveText("Value: src/index.ts")
+  await expect(lastLog(example)).toHaveText("Value: src/index.ts")
   await example.getByRole("checkbox", { name: "util.ts" }).click()
   await expect(src).toHaveAttribute("aria-checked", "true")
-  await expect(example.locator("[data-value]")).toHaveText("Value: src/index.ts, src/util.ts")
+  await expect(lastLog(example)).toHaveText("Value: src/index.ts, src/util.ts")
   await example.getByRole("radio", { name: "trunk" }).click()
   await src.click()
   await src.click()
-  await expect(example.locator("[data-value]")).toHaveText("Value: src")
+  await expect(lastLog(example)).toHaveText("Value: src")
 })
 
 test("month grid: arrows move by days and weeks, turn the month, and the locale moves the week start", async ({

@@ -1,11 +1,11 @@
 ---
 title: Dragging and Resizing
-description: Move and resize objects, reveal swipe actions, pick points, draw ranges, and preview choices.
+description: Move and resize objects, reveal swipe actions, press and hold, pick points, draw ranges, and preview choices.
 ---
 
-`createMove` moves objects, `createResize` changes their bounds, and `createSwipeActions` reveals actions behind a row. `createArea` picks two-dimensional values, `createSpans` edits ranges on tracks, and `createPreview` lets people try a value before choosing it.
+`createMove` moves objects, `createResize` changes their bounds, `createSwipeActions` reveals actions behind a row, and `bindHold` responds to a press that's held. `createArea` picks two-dimensional values, `createSpans` edits ranges on tracks, and `createPreview` lets people try a value before choosing it.
 
-Import these helpers from `@ui-sdk/core`. When a helper asks for a `set` callback, connect it to your [change](../kernel/state-and-changes#changes). For sorting items into an order, see [Drag and Drop](./drag-and-drop).
+Import these helpers from `@ui-sdk/core`. When a helper asks for a `set` callback, connect it to your [change](../kernel/handle-changes#changes). For sorting items into an order, see [Drag and Drop](./drag-and-drop).
 
 ## Moving in Two Dimensions
 
@@ -264,6 +264,58 @@ Style `data-dismissing` so the change is clear before release, like iOS: here th
   caption="Drag a toast sideways: past a third of its width, the layer behind turns red, and letting go dismisses it. Drag back, or press Escape, to keep it."
 />
 
+## Pressing and Holding
+
+### Hold to Confirm
+
+`bindHold` runs `onHold` once a press lasts past `delay`, 500 milliseconds by default. Give it a button and keep its cleanup:
+
+```ts
+import { bindHold } from "@ui-sdk/core"
+
+const unbind = bindHold(button, {
+  delay: 1500,
+  onHold: () => deleteProject(),
+})
+```
+
+It works with a mouse, a finger, a pen, and Space or Enter while the button has focus. While pressed, the button has `data-holding`, and `data-held` once it's held. `--hold-delay` holds the delay, so CSS can fill the button over exactly that time:
+
+```css
+[data-holding] .fill {
+  transform: scaleX(1);
+  transition: transform var(--hold-delay) linear;
+}
+```
+
+<ComponentExample
+  name="behaviors/hold-confirm"
+  caption="Press and hold Delete Project until it fills. Let go early and nothing is deleted. From the keyboard, focus it and hold Space."
+/>
+
+`onEnd` runs once the press ends, with `held` and `canceled`. A press is canceled when the pointer moves more than `tolerance` pixels before it's held, 10 by default, when a finger starts to scroll, when Escape is pressed, or when focus leaves the button or the window. A canceled press doesn't click, and Escape doesn't reach a dialog or popup around the button. Say that the button needs holding in its label or description, as the hint does here.
+
+### Repeat While Held
+
+Set `repeat` to run `onHold` again at that interval, like a stepper's buttons or a scroll arrow. Return `false` from `onHold` to stop repeating, like at a bound. `count` says which run it is, starting at 1:
+
+```ts
+bindHold(button, {
+  delay: 400,
+  repeat: 80,
+  onHold: () => zoomBy(5),
+})
+```
+
+A short press still clicks, so keep a click handler for one step. A press that's held or canceled doesn't click, so its release doesn't add another step. A short press of Space or Enter clicks once, however long the keyboard repeats the key.
+
+<ComponentExample
+  name="behaviors/hold-repeat"
+  caption="Press Zoom In once to add 5%. Hold it and the zoom keeps climbing until you let go or it reaches 400%."
+/>
+
+`onPress` runs as a press starts, with `input` set to `mouse`, `touch`, `pen` or `keyboard`. Return `false` to ignore it, like a context menu area that opens on a long press only for touch, since a mouse has right-click. Pass `keys: []` to leave keys alone, and `disabled` to refuse presses and stop a hold from repeating. While a finger or pen presses, the browser's own long-press menu and iOS's callout stay closed. The cleanup stops a press under way without calling `onEnd`.
+
 ## Two-Dimensional Values
 
 ### A Point on a Pad
@@ -314,7 +366,7 @@ disabled: () => context.store.get().locked,
 
 <ComponentExample
   name="behaviors/area-color"
-  caption="Drag to adjust saturation and brightness. The swatch follows immediately; Saved updates on release or a keyboard change. Lock disables the picker, and Reset sets its value from code."
+  caption="Drag to adjust saturation and brightness. The swatch follows immediately; the saved value is logged on release or after a keyboard change. Lock disables the picker, and Reset sets its value from code."
 />
 
 `onCommit` runs at the end of pointer tracking or after a successful keyboard change. `disabled` prevents user input and removes the thumb from the tab order.
@@ -560,6 +612,22 @@ The option tables link back to the examples that introduce them.
     onFullSwipe: "Full Swipes",
     fullSwipe: "Full Swipes",
     disabled: "Full Swipes",
+  }}
+/>
+
+<TypeTable
+  path="../../packages/core/src/foundation/direct-manipulation/hold.ts"
+  name="BindHoldOptions"
+  events={false}
+  examples={{
+    delay: "Hold to Confirm",
+    tolerance: "Hold to Confirm",
+    onEnd: "Hold to Confirm",
+    repeat: "Repeat While Held",
+    onHold: "Repeat While Held",
+    onPress: "Repeat While Held",
+    keys: "Repeat While Held",
+    disabled: "Repeat While Held",
   }}
 />
 

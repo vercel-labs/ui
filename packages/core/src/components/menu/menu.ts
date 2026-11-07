@@ -202,9 +202,10 @@ type MenuOptions = PortalProps & {
   onPayloadChange?: (payload: unknown, details: ChangeDetails<MenuPayloadChangeReason>) => void
   /**
    * Runs for every plain item, including items in submenus, with the item's value. Return a Promise
-   * to mark the item pending until it settles: it gets `data-pending` and `aria-busy`, the menu stays
-   * open, and choosing it again waits. It closes once the Promise resolves, and a rejection keeps it
-   * open with the reason in the item's `error` state until the next try.
+   * to mark the item pending until it settles: it gets `data-pending`, `aria-busy` and
+   * `aria-disabled`, the menu stays open, and choosing it again waits. It closes once the Promise
+   * resolves, and a rejection keeps it open with the reason in the item's `error` state until the
+   * next try.
    */
   onAction?: (value: string, details: MenuActionDetails) => unknown
   /**

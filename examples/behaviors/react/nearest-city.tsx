@@ -5,7 +5,7 @@ import { createParts } from "@ui-sdk/react/primitive"
 type CityMapState = { city: string }
 
 const cities: Record<string, { x: number; y: number }> = {
-  Lisbon: { x: 8, y: 78 },
+  Lisbon: { x: 14, y: 78 },
   Paris: { x: 36, y: 40 },
   London: { x: 30, y: 18 },
   Berlin: { x: 64, y: 22 },
@@ -78,6 +78,13 @@ function Example() {
   return (
     <CityMap>
       <div data-slot="stack">
+        <div data-slot="controls">
+          {Object.entries(labels).map(([key, label]) => (
+            <CityMapArrow key={key} value={key} data-size="sm">
+              {label}
+            </CityMapArrow>
+          ))}
+        </div>
         <CityMapMap>
           {Object.entries(cities).map(([city, { x, y }]) => (
             <CityMapCity key={city} value={city} aria-hidden="true" style={{ left: `${x}%`, top: `${y}%` }}>
@@ -85,13 +92,6 @@ function Example() {
             </CityMapCity>
           ))}
         </CityMapMap>
-        <div data-slot="row">
-          {Object.entries(labels).map(([key, label]) => (
-            <CityMapArrow key={key} value={key} data-size="sm">
-              {label}
-            </CityMapArrow>
-          ))}
-        </div>
       </div>
     </CityMap>
   )

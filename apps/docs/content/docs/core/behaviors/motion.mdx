@@ -83,7 +83,7 @@ opening: () => store.get().opening,
 
 <ComponentExample
   name="behaviors/panel-findable"
-  caption="Use your browser's find command to search for offline. In a supporting browser, its closed section opens. Open all reveals the remaining sections immediately."
+  caption="Use your browser's find command to search for offline. In a supporting browser, its closed section opens. Open All reveals the remaining sections immediately."
 />
 
 `opening()` returns `"mount"` for an initially open panel, `"instant"` to skip its opening animation, or `"animate"`. `settled(open)` reports completed opens and closes, including instant changes, but does not run for the initial `"mount"`.
@@ -107,7 +107,7 @@ Inside a slot's `bind`, return a cleanup that calls both `unsubscribe()` and `fi
 
 <ComponentExample
   name="behaviors/findable"
-  caption="Search the page for simmer to reveal the hidden method in a supporting browser. Show method and Hide method work without browser search."
+  caption="Search the page for simmer to reveal the hidden method in a supporting browser. Show Method and Hide Method work without browser search."
 />
 
 `supportsHiddenUntilFound()` tells you whether the browser supports this feature. Provide a visible control for revealing the content either way.

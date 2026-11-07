@@ -1,10 +1,11 @@
 import * as React from "react"
 import { bindDrag, dragThreshold } from "@ui-sdk/core"
 import { scrubTo } from "@ui-sdk/core/number"
+import { XIcon } from "lucide-react"
 
 const initial = [
   { id: 1, title: "Event created", body: "Design review, Friday at 10:00" },
-  { id: 2, title: "Invite sent", body: "Ada and Grace can now edit" },
+  { id: 2, title: "Invite sent", body: "Inès Moreau can now edit" },
   { id: 3, title: "Upload finished", body: "launch-video.mp4 is ready" },
 ]
 
@@ -49,33 +50,34 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
   }
 
   return (
-    <li>
+    <li data-slot="dismiss-item">
       <div
         aria-hidden
+        data-slot="dismiss-layer"
+        data-side={offset < 0 ? "end" : "start"}
         data-dismissing={dismissing || undefined}
-        style={{
-          [offset < 0 ? "right" : "left"]: 0,
-          width: Math.abs(offset),
-          visibility: dragging ? "visible" : "hidden",
-        }}
+        hidden={!dragging}
       >
         {dismissing ? "Release to dismiss" : "Dismiss"}
       </div>
       <div
+        data-slot="dismiss-toast"
         data-dragging={dragging || undefined}
         onPointerDown={pointerdown}
-        style={{ translate: `${offset}px 0` }}
+        style={{ "--dismiss-x": `${offset}px` } as React.CSSProperties}
       >
-        <div>
+        <div data-slot="stack">
           <span>{toast.title}</span>
-          <span>{toast.body}</span>
+          <span data-slot="hint">{toast.body}</span>
         </div>
         <button
           type="button"
+          data-variant="ghost"
+          data-size="sm"
           aria-label={`Dismiss ${toast.title}`}
           onClick={(event) => dismiss(1, event.currentTarget.parentElement!.offsetWidth)}
         >
-          ×
+          <XIcon aria-hidden="true" />
         </button>
       </div>
     </li>
@@ -85,8 +87,13 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
 function Example() {
   const [toasts, setToasts] = React.useState(initial)
   return (
-    <div>
-      <ul aria-label="Notifications">
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <button type="button" onClick={() => setToasts(initial)} disabled={toasts.length === initial.length}>
+          Show All
+        </button>
+      </div>
+      <ul data-slot="dismiss-list" aria-label="Notifications">
         {toasts.map((toast) => (
           <SwipeToast
             key={toast.id}
@@ -95,9 +102,6 @@ function Example() {
           />
         ))}
       </ul>
-      <button type="button" onClick={() => setToasts(initial)} disabled={toasts.length === initial.length}>
-        Show all again
-      </button>
     </div>
   )
 }

@@ -97,9 +97,14 @@ const ids = (el: Element, attribute: string) =>
 
 const textOf = (el: Element) => (el.textContent ?? "").replace(/\s+/g, " ").trim()
 
+/** The element an id reference names, in the document or shadow root `el` is in, as ARIA resolves it. */
+function byId(el: Element, id: string) {
+  const root = el.getRootNode()
+  return root instanceof Document || root instanceof ShadowRoot ? root.getElementById(id) : null
+}
+
 /** The id references in `scope` that point at nothing, with the attribute that holds each. */
 function danglingReferences(scope: Element) {
-  const doc = scope.ownerDocument
   const dangling: { el: Element; attribute: string; id: string }[] = []
   // What isn't rendered says nothing to anyone, like a popup that closed.
   for (const el of [scope, ...scope.querySelectorAll("*")].filter((el) => !isGone(el))) {
@@ -107,7 +112,7 @@ function danglingReferences(scope: Element) {
       // A closed popup's trigger may point at a popup that isn't rendered,
       // as axe allows: aria-controls with aria-expanded=false.
       if (attribute === "aria-controls" && el.getAttribute("aria-expanded") === "false") continue
-      for (const id of ids(el, attribute)) if (!doc.getElementById(id)) dangling.push({ el, attribute, id })
+      for (const id of ids(el, attribute)) if (!byId(el, id)) dangling.push({ el, attribute, id })
     }
   }
   return dangling
@@ -135,6 +140,7 @@ function describe(el: Element | null | undefined) {
 
 export {
   accessibleName,
+  byId,
   checkedOf,
   danglingReferences,
   describe,

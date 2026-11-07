@@ -25,7 +25,7 @@ function ChangelogPosts() {
           >
             {post.data.title}
           </Link>
-          <p className="text-base leading-relaxed text-pretty text-subtle sm:text-[15px]">
+          <p className="text-[17px] leading-relaxed text-pretty text-subtle sm:text-[15px]">
             {post.data.description}
           </p>
         </li>

@@ -94,4 +94,4 @@ function Example() {
   )
 }
 
-export { Example, pages, Pages, PagesRow, type PagesOptions, type PagesState }
+export { Example }

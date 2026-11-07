@@ -147,8 +147,8 @@ const FlowDraft = parts.Draft
 
 const nodes: FlowNode[] = [
   { value: "prompt", label: "Prompt", x: 8, y: 70 },
-  { value: "answer", label: "Answer", x: 200, y: 16 },
-  { value: "summary", label: "Summary", x: 200, y: 124 },
+  { value: "answer", label: "Answer", x: 176, y: 16 },
+  { value: "summary", label: "Summary", x: 176, y: 124 },
 ]
 
 function Example() {

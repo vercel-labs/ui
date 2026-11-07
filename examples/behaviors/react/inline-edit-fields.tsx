@@ -99,19 +99,23 @@ const labels: Record<string, string> = { name: "Name", price: "Price", sku: "SKU
 function Example() {
   return (
     <ProductDetails>
-      <ProductList aria-label="Product">
-        {order.map((id) => (
-          <ProductField key={id} value={id} aria-label={labels[id]}>
-            {({ text, editing }) => (
-              <>
-                <span data-slot="inline-edit-label">{labels[id]}</span>
-                {editing ? <ProductInput /> : <span data-value>{id === "price" ? `$${text}` : text}</span>}
-              </>
-            )}
-          </ProductField>
-        ))}
-      </ProductList>
-      <ProductRename data-size="sm">Rename</ProductRename>
+      <div data-slot="stack">
+        <div data-slot="controls">
+          <ProductRename data-size="sm">Rename</ProductRename>
+        </div>
+        <ProductList aria-label="Product">
+          {order.map((id) => (
+            <ProductField key={id} value={id} aria-label={labels[id]}>
+              {({ text, editing }) => (
+                <>
+                  <span data-slot="inline-edit-label">{labels[id]}</span>
+                  {editing ? <ProductInput /> : <span data-value>{id === "price" ? `$${text}` : text}</span>}
+                </>
+              )}
+            </ProductField>
+          ))}
+        </ProductList>
+      </div>
     </ProductDetails>
   )
 }

@@ -33,7 +33,7 @@ const Pinboard = parts.Root
 const PinboardNote = parts.Note
 
 const notes = [
-  { text: "Call Ana", x: 8, y: 12 },
+  { text: "Call Hollis", x: 8, y: 12 },
   { text: "Ship docs", x: 62, y: 6 },
   { text: "Lunch", x: 36, y: 44 },
   { text: "Review", x: 4, y: 70 },

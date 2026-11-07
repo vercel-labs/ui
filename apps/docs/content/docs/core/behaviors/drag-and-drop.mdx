@@ -3,7 +3,7 @@ title: Drag and Drop
 description: Sort a list, nest a tree, or move items between lists with a pointer or keyboard.
 ---
 
-`createReorder` sorts lists and grids, `createTreeReorder` moves rows and subtrees, and `createTransfer` moves items between lists. They keep a draft during a move and commit it through your [change](../kernel/state-and-changes#changes) on drop. Use `bindDrag` to track a pointer for a custom drag.
+`createReorder` sorts lists and grids, `createTreeReorder` moves rows and subtrees, and `createTransfer` moves items between lists. They keep a draft during a move and commit it through your [change](../kernel/handle-changes#changes) on drop. Use `bindDrag` to track a pointer for a custom drag.
 
 Import these helpers from `@ui-sdk/core`. [Compose Behaviors](../compose-behaviors) shows how to connect a behavior to a primitive. For freely positioned items, see [Dragging and Resizing](./direct-manipulation).
 
@@ -320,7 +320,7 @@ listLabel: (list) => columns[list],
 
 <ComponentExample
   name="behaviors/transfer-board"
-  caption="Move cards between columns. Doing holds at most two cards, Billing can't be picked up, and Done on a card moves it straight to that column."
+  caption="Move cards between columns. Doing holds at most two cards, Billing can't be picked up, and the check on a card moves it straight to Done."
 />
 
 `transfer.move("Search", "done", 0)` makes an immediate move. For a staged move, use `grab`, `moveTo(list, index)`, then `drop` or `cancel`.
@@ -366,7 +366,7 @@ const scroll = createAutoScroll({
 
 ## Keeping Focus and the Draft
 
-The sorting behaviors already preserve focus and keep a committed draft visible while a controlled value catches up. If you're building your own drag, use [`keepFocus`](./focus#focus-that-follows-a-move) after moving a focused element and [`settleDraft`](../kernel/state-and-changes#changes-from-elsewhere) when handing a draft to its owner.
+The sorting behaviors already preserve focus and keep a committed draft visible while a controlled value catches up. If you're building your own drag, use [`keepFocus`](./focus#focus-that-follows-a-move) after moving a focused element and [`settleDraft`](../kernel/handle-changes#changes-from-elsewhere) when handing a draft to its owner.
 
 ## API Reference
 

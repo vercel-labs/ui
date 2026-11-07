@@ -12,6 +12,7 @@ import {
 } from "@ui-sdk/core"
 import { popoverPreset } from "@ui-sdk/core/popover"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type Person = { name: string; role: string; initials: string }
 
@@ -58,44 +59,39 @@ const TeamCardDescription = parts.Description
 const TeamCardArrow = parts.Arrow
 
 const team: Person[] = [
-  { name: "Ada Lovelace", role: "Engineering", initials: "AL" },
-  { name: "Grace Hopper", role: "Compilers", initials: "GH" },
-  { name: "Alan Turing", role: "Research", initials: "AT" },
+  { name: "Hollis Grant", role: "Engineering", initials: "HG" },
+  { name: "Inès Moreau", role: "Design", initials: "IM" },
+  { name: "Kofi Mensah", role: "Research", initials: "KM" },
 ]
 
 function Example() {
-  const [shown, setShown] = React.useState("")
+  const log = useLog()
   return (
-    <div data-slot="stack">
-      <TeamCard
-        onPayloadChange={(person: unknown, details: ChangeDetails<string>) =>
-          setShown(`${(person as Person).name}, by ${details.reason}`)
-        }
-      >
-        <div data-slot="row">
-          {team.map((person) => (
-            <TeamCardTrigger key={person.initials} payload={person} aria-label={person.name}>
-              {person.initials}
-            </TeamCardTrigger>
-          ))}
-        </div>
-        <TeamCardContent sideOffset={8}>
-          {(state) => {
-            const person = state.payload as Person | undefined
-            return (
-              <>
-                <TeamCardArrow />
-                <TeamCardTitle>{person?.name}</TeamCardTitle>
-                <TeamCardDescription>{person?.role}</TeamCardDescription>
-              </>
-            )
-          }}
-        </TeamCardContent>
-      </TeamCard>
-      <p data-team-shown data-slot="output">
-        {shown}
-      </p>
-    </div>
+    <TeamCard
+      onPayloadChange={(person: unknown, details: ChangeDetails<string>) =>
+        log(`${(person as Person).name}, by ${details.reason}`)
+      }
+    >
+      <div data-slot="row">
+        {team.map((person) => (
+          <TeamCardTrigger key={person.initials} payload={person} aria-label={person.name}>
+            {person.initials}
+          </TeamCardTrigger>
+        ))}
+      </div>
+      <TeamCardContent sideOffset={8}>
+        {(state) => {
+          const person = state.payload as Person | undefined
+          return (
+            <>
+              <TeamCardArrow />
+              <TeamCardTitle>{person?.name}</TeamCardTitle>
+              <TeamCardDescription>{person?.role}</TeamCardDescription>
+            </>
+          )
+        }}
+      </TeamCardContent>
+    </TeamCard>
   )
 }
 

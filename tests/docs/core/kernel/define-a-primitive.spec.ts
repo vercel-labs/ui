@@ -6,42 +6,20 @@ const url = "/docs/core/kernel/define-a-primitive"
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
-  await expect(page.locator("[data-example]")).toHaveCount(5)
+  await expect(page.locator("[data-example]")).toHaveCount(4)
   expect(errors).toEqual([])
 })
 
-test("options: the copy button copies its text, reports it, and starts over for new text", async ({
-  page,
-  context,
-}) => {
+test("options: the copy button copies its text, shows it's copied, and resets", async ({ page, context }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"])
   await openExamples(page, url)
   const copy = page.getByRole("button", { name: "Copy", exact: true })
+  await expect(copy).not.toHaveAttribute("data-copied")
   await copy.click()
-  await expect(page.getByRole("button", { name: "Copied" })).toHaveAttribute("data-copied", "")
-  await expect(page.getByText("Copied 1 time")).toBeVisible()
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("pnpm add @ui-sdk/core")
-  await page.getByRole("combobox", { name: "Package manager" }).selectOption("npm")
-  await expect(page.getByRole("button", { name: "Copy", exact: true })).not.toHaveAttribute("data-copied")
-  await page.getByRole("button", { name: "Copy", exact: true }).click()
+  await expect(page.getByRole("button", { name: "Copied", exact: true })).toHaveAttribute("data-copied", "")
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("npm install @ui-sdk/core")
-  await expect(page.getByText("Copied 2 times")).toBeVisible()
-  await expect(page.getByRole("button", { name: "Copy", exact: true })).toBeVisible({ timeout: 3000 })
-})
-
-test("parts that come and go: the panel is in the page only while open", async ({ page }) => {
-  await openExamples(page, url)
-  const trigger = page.getByRole("button", { name: "Read more" })
-  await expect(trigger).toHaveAttribute("data-closed", "")
-  await expect(page.locator('[data-slot="read-more-panel"]')).toHaveCount(0)
-  await trigger.click()
-  const panel = page.locator('[data-slot="read-more-panel"]')
-  await expect(panel).toBeVisible()
-  const less = page.getByRole("button", { name: "Show less" })
-  await expect(less).toHaveAttribute("aria-expanded", "true")
-  await expect(less).toHaveAttribute("aria-controls", (await panel.getAttribute("id"))!)
-  await less.click()
-  await expect(panel).toHaveCount(0)
+  await expect(copy).toBeVisible({ timeout: 3000 })
+  await expect(copy).not.toHaveAttribute("data-copied")
 })
 
 test("events: typing filters, Escape and the clear button empty the field", async ({ page }) => {
@@ -70,16 +48,16 @@ test("working with the element: the textarea grows as you type", async ({ page }
 
 test("reading parts in the api: the button finds the first empty field in page order", async ({ page }) => {
   await openExamples(page, url)
-  const next = page.getByRole("button", { name: "Find the first empty field" })
+  const next = page.getByRole("button", { name: "Find Empty Field" })
   await next.click()
   await expect(page.getByRole("textbox", { name: "Email" })).toBeFocused()
-  await expect(page.getByRole("button", { name: "Fill in email" })).toBeVisible()
-  await page.getByRole("textbox", { name: "Email" }).fill("ada@example.com")
-  await page.getByRole("button", { name: "Fill in email" }).click()
+  await expect(page.getByRole("button", { name: "Fill In Email" })).toBeVisible()
+  await page.getByRole("textbox", { name: "Email" }).fill("hollis@example.com")
+  await page.getByRole("button", { name: "Fill In Email" }).click()
   await expect(page.getByRole("textbox", { name: "Address" })).toBeFocused()
   await page.getByRole("textbox", { name: "Address" }).fill("1 Main Street")
-  await page.getByRole("button", { name: "Fill in address" }).click()
-  await expect(page.getByRole("button", { name: "Find the first empty field" })).toBeVisible()
+  await page.getByRole("button", { name: "Fill In Address" }).click()
+  await expect(page.getByRole("button", { name: "Find Empty Field" })).toBeVisible()
 })
 
 test("every field in the API reference links to the example that shows it", async ({ page }) => {

@@ -37,3 +37,6 @@ apps/docs/public/web@*
 apps/docs/public/examples/
 # Git worktrees agents work in, inside the workspace.
 .claude/worktrees/
+
+# DeepSec scan workspace and results.
+.deepsec/

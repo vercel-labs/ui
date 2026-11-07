@@ -11,15 +11,15 @@ const relativeImport = /(\bfrom\s*|\bimport\s*\(\s*)(["'])(\.{1,2}(?:\/[^"']*)?)
 /**
  * Emits `.d.ts` files with the package's own TypeScript and `tsconfig.json`,
  * then adds `.js` to relative imports so the types also resolve under
- * `moduleResolution: "node16"`.
+ * `moduleResolution: "node16"`. `project` names another tsconfig in the package.
  */
-function emitDeclarations({ packageDir, sourceDir, outDir }) {
+function emitDeclarations({ packageDir, sourceDir, outDir, project = "tsconfig.json" }) {
   const tsc = createRequire(path.join(packageDir, "package.json")).resolve("typescript/bin/tsc")
   // Emit settings live here, not in a `tsconfig.build.json` per package, so
   // each package keeps one `tsconfig.json` that typechecks with `noEmit`.
   const emitFlags = ["--noEmit", "false", "--declaration", "--emitDeclarationOnly"]
   const paths = ["--rootDir", sourceDir, "--outDir", outDir]
-  execFileSync(process.execPath, [tsc, "-p", "tsconfig.json", ...emitFlags, ...paths], {
+  execFileSync(process.execPath, [tsc, "-p", project, ...emitFlags, ...paths], {
     cwd: packageDir,
     stdio: "inherit",
   })

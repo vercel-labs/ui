@@ -1,6 +1,8 @@
 import * as React from "react"
 import { bindDrag, createChange, definePrimitive, dragThreshold, type ChangeDetails } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { CheckIcon } from "lucide-react"
 
 type ScrubState = { value: number }
 
@@ -67,10 +69,16 @@ function Example() {
   const [locked, setLocked] = React.useState(false)
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
-        Locked
-      </label>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <Checkbox checked={locked} onCheckedChange={(next) => setLocked(next === true)}>
+            <CheckboxIndicator>
+              <CheckIcon aria-hidden="true" />
+            </CheckboxIndicator>
+          </Checkbox>
+          Locked
+        </label>
+      </div>
       <Scrub aria-label="Opacity" locked={locked}>
         {({ value }) => (
           <>
@@ -83,4 +91,4 @@ function Example() {
   )
 }
 
-export { Example, scrub, Scrub, type ScrubOptions, type ScrubState }
+export { Example }

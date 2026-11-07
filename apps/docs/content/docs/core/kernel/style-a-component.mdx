@@ -1,0 +1,122 @@
+---
+title: Style a Component
+description: Style each part from its data-slot and the attributes its state sets, with CSS or Tailwind.
+---
+
+[Render a Primitive](./render-a-primitive) put the copy button on the page. Parts render without styles, so let's give it some. Everything on this page works the same in every framework.
+
+## Find the Part
+
+Every part has a `data-slot` attribute: the primitive's `name`, then the slot's. The copy button's root is `copy-button-root`:
+
+```css
+[data-slot="copy-button-root"] {
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+}
+```
+
+Use `data-slot` rather than generated ids, which can change.
+
+## Style Its State
+
+Give a part an attribute for each state you want to style. Here, the root's `attrs` adds `data-copied` while the text is copied:
+
+```ts
+root: slot<{}, { copied: boolean }>({
+  state: (state) => ({ copied: state.copied }),
+  attrs: (state) => ({ type: "button", "data-copied": state.copied ? "" : undefined }),
+  press: ({ api }) => api.copy(),
+}),
+```
+
+An empty string adds the attribute, and `undefined` leaves it off. Your CSS can now follow it:
+
+```css
+[data-slot="copy-button-root"][data-copied] {
+  background: #171717;
+  color: white;
+}
+```
+
+With Tailwind, use the attribute as a variant:
+
+<FrameworkContent value="react">
+
+```tsx
+<CopyButton className="data-copied:bg-neutral-900 data-copied:text-white">Copy</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<CopyButton class="data-copied:bg-neutral-900 data-copied:text-white">Copy</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<CopyButton class="data-copied:bg-neutral-900 data-copied:text-white">Copy</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+<CopyButton class="data-copied:bg-neutral-900 data-copied:text-white">Copy</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```html
+<copy-button text="npm add @ui-sdk/core">
+  <button class="data-copied:bg-neutral-900 data-copied:text-white">Copy</button>
+</copy-button>
+```
+
+</FrameworkContent>
+
+ARIA attributes work as style hooks too, like the mute button's `aria-pressed` in [Build a Component](../build-a-component#style-the-component). For open and checked states, `openAttrs` and `checkedAttrs` return the usual attribute names, as [Naming](./define-a-primitive#naming) shows.
+
+## Pass Values as CSS Variables
+
+For a value rather than an on and off state, such as a percentage, set a CSS variable. `css` from `@ui-sdk/core` turns declarations into a `style` attribute and skips any that are `undefined`:
+
+```ts
+indicator: slot({
+  attrs: (state) => ({ style: css({ "--volume": `${state.value}%` }) }),
+}),
+```
+
+```css
+[data-slot="volume-indicator"] {
+  width: var(--volume);
+}
+```
+
+The style is part of the server's HTML too, so the indicator has its width before the page hydrates.
+
+## Parts That Come and Go
+
+A part with `present` leaves the page as soon as its state hides it. To animate it in and out, keep it present until its transition finishes, with the helpers in [Transitions and Gestures](../behaviors/motion#entering-and-leaving). They add `data-starting-style` for the first frame and `data-ending-style` while the part leaves:
+
+```css
+[data-slot="disclosure-panel"] {
+  transition: opacity 0.15s;
+
+  &:is([data-starting-style], [data-ending-style]) {
+    opacity: 0;
+  }
+}
+```
+
+## In Your Framework
+
+[Styling and Animation](/docs/styling-and-animation) covers class names, CSS Modules and the small cascade layer ui-sdk adds, in your framework.
+
+## Next
+
+You've defined, rendered and styled a primitive with one behavior of its own. Next, [Compose Behaviors](../compose-behaviors) builds a star rating from several behaviors, with one tab stop and arrow keys.

@@ -1,4 +1,3 @@
-import * as React from "react"
 import { definePrimitive } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
@@ -13,7 +12,7 @@ type CopyButtonState = { copied: boolean }
 const copyButton = definePrimitive({
   name: "copy-button",
   options: { text: "string", timeout: "number", onCopy: "callback" },
-  state: (_options: CopyButtonOptions): CopyButtonState => ({ copied: false }),
+  state: (options: CopyButtonOptions): CopyButtonState => ({ copied: false }),
   api: (context) => {
     let timer: ReturnType<typeof setTimeout> | undefined
     let text = context.options().text
@@ -48,28 +47,11 @@ const parts = createParts(copyButton, { root: "button" })
 
 const CopyButton = parts.Root
 
-const commands = { pnpm: "pnpm add @ui-sdk/core", npm: "npm install @ui-sdk/core" }
-
 function Example() {
-  const [manager, setManager] = React.useState<keyof typeof commands>("pnpm")
-  const [copies, setCopies] = React.useState(0)
   return (
     <div data-slot="row">
-      <select
-        aria-label="Package manager"
-        value={manager}
-        onChange={(event) => setManager(event.target.value as keyof typeof commands)}
-      >
-        <option value="pnpm">pnpm</option>
-        <option value="npm">npm</option>
-      </select>
-      <code data-slot="copy-command">{commands[manager]}</code>
-      <CopyButton text={commands[manager]} onCopy={() => setCopies((count) => count + 1)}>
-        {({ copied }) => (copied ? "Copied" : "Copy")}
-      </CopyButton>
-      <span data-slot="hint">
-        Copied {copies} {copies === 1 ? "time" : "times"}
-      </span>
+      <code data-slot="copy-command">npm install @ui-sdk/core</code>
+      <CopyButton text="npm install @ui-sdk/core">{({ copied }) => (copied ? "Copied" : "Copy")}</CopyButton>
     </div>
   )
 }

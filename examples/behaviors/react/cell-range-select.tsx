@@ -110,7 +110,7 @@ function Example() {
   return (
     <LedgerGrid>
       <div data-slot="stack">
-        <div data-slot="row">
+        <div data-slot="controls">
           {Object.entries(shortcuts).map(([value, label]) => (
             <LedgerGridShortcut data-size="sm" key={value} value={value}>
               {label}

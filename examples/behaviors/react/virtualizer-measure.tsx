@@ -6,10 +6,18 @@ type Note = { id: string; text: string }
 
 type NotesState = { notes: Note[]; newest: boolean; large: boolean; items: VirtualItem[]; size: number }
 
-const words = "the quick brown fox jumps over a lazy dog while the band plays on".split(" ")
+const sentences = [
+  "Moved the launch review to Thursday.",
+  "Hollis wants the pricing page copy by Friday.",
+  "Inès shared the onboarding survey; week-two retention is up.",
+  "Kofi is pairing on the billing migration.",
+  "Wren flagged two broken links in the help center.",
+  "Tomasz will draft the release notes.",
+  "Ship the dark mode fixes before the freeze.",
+]
 const notes: Note[] = Array.from({ length: 500 }, (_, index) => ({
   id: `note-${index + 1}`,
-  text: `Note ${index + 1}: ${Array.from({ length: 4 + ((index * 7) % 23) }, (_, word) => words[(index + word) % words.length]).join(" ")}.`,
+  text: `${index + 1}. ${Array.from({ length: 1 + ((index * 5) % 4) }, (_, k) => sentences[(index + k) % sentences.length]).join(" ")}`,
 }))
 
 const notebook = definePrimitive({
@@ -103,7 +111,15 @@ function Example() {
   return (
     <Notebook>
       {({ items, newest, large }) => (
-        <>
+        <div data-slot="stack">
+          <div data-slot="controls">
+            <NotebookAction data-size="sm" value="flip">
+              {newest ? "Oldest First" : "Newest First"}
+            </NotebookAction>
+            <NotebookAction data-size="sm" value="enlarge">
+              {large ? "Smaller Text" : "Larger Text"}
+            </NotebookAction>
+          </div>
           <NotebookScroller>
             <NotebookBody aria-label="Notes" data-large={large ? "" : undefined}>
               {items.map((item) => (
@@ -113,16 +129,7 @@ function Example() {
               ))}
             </NotebookBody>
           </NotebookScroller>
-          <div data-slot="row">
-            <NotebookAction data-size="sm" value="flip">
-              {newest ? "Oldest first" : "Newest first"}
-            </NotebookAction>
-            <NotebookAction data-size="sm" value="enlarge">
-              {large ? "Smaller text" : "Larger text"}
-            </NotebookAction>
-            <span data-slot="hint">{items.length} rows in the page</span>
-          </div>
-        </>
+        </div>
       )}
     </Notebook>
   )

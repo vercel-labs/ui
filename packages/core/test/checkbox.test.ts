@@ -1,5 +1,7 @@
+// @vitest-environment jsdom
 import { describe, expect, test, vi } from "vitest"
 import { checkbox, checkboxGroup } from "../src/components/checkbox/checkbox"
+import { bind } from "../src/foundation/kernel/part"
 
 // Stands in for a checkbox element at a place in the document.
 function fakeElement(position: number) {
@@ -7,7 +9,7 @@ function fakeElement(position: number) {
     id: "",
     isConnected: true,
     focus: vi.fn(),
-    // Node.DOCUMENT_POSITION_FOLLOWING and PRECEDING, since tests run without a DOM.
+    // Node.DOCUMENT_POSITION_FOLLOWING and PRECEDING, for elements that aren't in the document.
     compareDocumentPosition: (other: { position: number }) => (other.position > position ? 4 : 2),
     position,
   }
@@ -45,6 +47,46 @@ describe("checkbox group", () => {
     })
     child.api.toggle({ reason: "press" })
     expect(calls).toEqual(["group:a", "child:true:press"])
+  })
+
+  test("a required group counts only the checked checkboxes that submit, not disabled or missing ones", async () => {
+    const group = checkboxGroup({ id: "g", required: true, defaultValue: ["cheese", "ghost"] })
+    const input = document.body.appendChild(document.createElement("input"))
+    const unbind = bind(group.part("group-input"), input)
+    const options = { id: "c", value: "cheese", group: () => group.api }
+    const cheese = checkbox(options)
+    const unbindCheese = bind(
+      cheese.part("root"),
+      document.body.appendChild(document.createElement("button")),
+    )
+    await flush()
+    expect(input.checked).toBe(true)
+    cheese.setOptions({ ...options, disabled: true })
+    await flush()
+    expect(input.checked).toBe(false)
+    cheese.setOptions(options)
+    await flush()
+    expect(input.checked).toBe(true)
+    unbindCheese?.()
+    unbind?.()
+    document.body.replaceChildren()
+  })
+
+  test("a checkbox whose value changes counts under its new value", async () => {
+    const group = checkboxGroup({ id: "g", required: true, defaultValue: ["olives"] })
+    const input = document.body.appendChild(document.createElement("input"))
+    const unbind = bind(group.part("group-input"), input)
+    const options = { id: "c", value: "cheese", group: () => group.api }
+    const child = checkbox(options)
+    const unbindChild = bind(child.part("root"), document.body.appendChild(document.createElement("button")))
+    await flush()
+    expect(input.checked).toBe(false)
+    child.setOptions({ ...options, value: "olives" })
+    await flush()
+    expect(input.checked).toBe(true)
+    unbindChild?.()
+    unbind?.()
+    document.body.replaceChildren()
   })
 })
 

@@ -1,0 +1,221 @@
+---
+title: Render a Primitive
+description: Turn a primitive's slots into parts in your framework, pass options, and read state.
+---
+
+[Define a Primitive](./define-a-primitive) gave the copy button its options, state and slots. Now let's put it on the page. Choose your framework in the page header, and the code below follows it.
+
+## Install the Adapter
+
+An **adapter** connects a primitive to your framework. Install the one for yours:
+
+<FrameworkContent value="react">
+
+```bash
+npm add @ui-sdk/react
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```bash
+npm add @ui-sdk/vue
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```bash
+npm add @ui-sdk/svelte
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```bash
+npm add @ui-sdk/solid
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```bash
+npm add @ui-sdk/web
+```
+
+</FrameworkContent>
+
+## Create the Parts
+
+`createParts` turns each slot into a **part**. Pass it the primitive and the element each part renders:
+
+<FrameworkContent value="react">
+
+```ts title="copy-button-parts.ts"
+"use client"
+
+import { createParts } from "@ui-sdk/react/primitive"
+import { copyButton } from "./copy-button"
+
+const { Root: CopyButton } = createParts(copyButton, { root: "button" })
+
+export { CopyButton }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```ts title="copy-button-parts.ts"
+import { createParts } from "@ui-sdk/vue/primitive"
+import { copyButton } from "./copy-button"
+
+const { Root: CopyButton } = createParts(copyButton, { root: "button" })
+
+export { CopyButton }
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```ts title="copy-button-parts.ts"
+import { createParts } from "@ui-sdk/svelte/primitive"
+import { copyButton } from "./copy-button"
+
+const { Root: CopyButton } = createParts(copyButton, { root: "button" })
+
+export { CopyButton }
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```ts title="copy-button-parts.ts"
+import { createParts } from "@ui-sdk/solid/primitive"
+import { copyButton } from "./copy-button"
+
+const { Root: CopyButton } = createParts(copyButton, { root: "button" })
+
+export { CopyButton }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```ts title="copy-button-parts.ts"
+import { createParts, wrappedButton } from "@ui-sdk/web"
+import { copyButton } from "./copy-button"
+
+createParts(copyButton, {
+  root: { tag: "copy-button", target: wrappedButton },
+})
+```
+
+`createParts` registers a custom element for each slot you map. `wrappedButton` puts the root's behavior and attributes on a native button inside the element. Import this file from your app's browser entry point.
+
+</FrameworkContent>
+
+`Root` creates the primitive's instance and shares it with the parts inside. Every other slot becomes a part named in Pascal case, so a `star` slot becomes `Star`.
+
+## Pass Options
+
+The primitive's options become the part's props, next to the element's own:
+
+<FrameworkContent value="react">
+
+```tsx
+<CopyButton text="npm add @ui-sdk/core" onCopy={(text) => console.log(text)}>
+  Copy
+</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<CopyButton text="npm add @ui-sdk/core" @copy="(text) => console.log(text)">Copy</CopyButton>
+```
+
+A callback option becomes an event, so `onCopy` is `@copy`.
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<CopyButton text="npm add @ui-sdk/core" onCopy={(text) => console.log(text)}>Copy</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+<CopyButton text="npm add @ui-sdk/core" onCopy={(text) => console.log(text)}>
+  Copy
+</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+```html
+<copy-button text="npm add @ui-sdk/core">
+  <button>Copy</button>
+</copy-button>
+```
+
+A `"string"` option reads from its attribute, and a callback option fires as an event on the element.
+
+</FrameworkContent>
+
+## Read the State
+
+The root's slot returns `copied` from its `state`, so the button's content can follow it:
+
+<FrameworkContent value="react">
+
+```tsx
+<CopyButton text="npm add @ui-sdk/core">{({ copied }) => (copied ? "Copied" : "Copy")}</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue
+<CopyButton v-slot="{ state }" text="npm add @ui-sdk/core">
+  {{ state.copied ? "Copied" : "Copy" }}
+</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte
+<CopyButton text="npm add @ui-sdk/core">
+  {#snippet children(state)}{state.copied ? "Copied" : "Copy"}{/snippet}
+</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx
+<CopyButton text="npm add @ui-sdk/core">{(state) => (state.copied ? "Copied" : "Copy")}</CopyButton>
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+On web components, the content is your own HTML. Show state through the attributes the part sets, as [Style a Component](./style-a-component) shows.
+
+</FrameworkContent>
+
+## Write Your Own Part
+
+`createParts` is enough when each slot maps to one element. When a part needs logic of its own, such as rendering a list from data, write it yourself and connect it to the same primitive. [Custom Parts](/docs/custom-parts) shows how in your framework.
+
+## Render on the Server
+
+Parts render their attributes into the server's HTML, so the page shows the right state before your framework hydrates it. On web components, you send the markup and the element connects its behavior once its module loads. [Server Rendering](/docs/server-rendering) covers the setup for your framework.
+
+## Next
+
+The button works, but it has no styles yet. Next, [Style a Component](./style-a-component) styles it from the attributes it renders.

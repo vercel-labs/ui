@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest"
 import { toolbar } from "../src/components/toolbar/toolbar"
-import { attrs as partAttrs } from "../src/foundation/kernel/part"
+import { attrs as partAttrs, partState } from "../src/foundation/kernel/part"
 
 describe("toolbar", () => {
   test("the root is a horizontal toolbar by default", () => {
@@ -75,6 +75,26 @@ describe("toolbar", () => {
     })
     expect(partAttrs(toolbar({ id: "t" }).part("button", { id: "a", groupDisabled: true }))).toMatchObject({
       "aria-disabled": "true",
+    })
+    const disabledLink = { "aria-disabled": "true", "data-disabled": "" }
+    expect(partAttrs(toolbar({ id: "t" }).part("link", { id: "l", groupDisabled: true }))).toMatchObject(
+      disabledLink,
+    )
+    expect(partAttrs(toolbar({ id: "t", disabled: true }).part("link", { id: "l" }))).toMatchObject(
+      disabledLink,
+    )
+  })
+
+  test("a link's state says whether its group or the toolbar disables it", () => {
+    expect(partState(toolbar({ id: "t" }).part("link", { id: "l" }))).toEqual({
+      disabled: false,
+      orientation: "horizontal",
+    })
+    expect(partState(toolbar({ id: "t" }).part("link", { id: "l", groupDisabled: true }))).toMatchObject({
+      disabled: true,
+    })
+    expect(partState(toolbar({ id: "t", disabled: true }).part("link", { id: "l" }))).toMatchObject({
+      disabled: true,
     })
   })
 })

@@ -1,8 +1,15 @@
-import { expect } from "@playwright/test"
+import { expect, type Page } from "@playwright/test"
 import { test } from "../docs-test"
 import { openExamples } from "./behaviors/helpers"
 
 const url = "/docs/core/text"
+
+// Every line in an example's console.
+const logs = (page: Page, name: string) =>
+  page
+    .locator(`[data-example="${name}"]`)
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openExamples(page, url)
@@ -51,18 +58,18 @@ test("names with spaces: space joins a search, picks without one, and the delay 
   await openExamples(page, url)
   const list = page.getByRole("listbox", { name: "City" })
   const selected = list.getByRole("option", { selected: true })
-  const picked = page.locator("[data-picked-city]")
+  const picked = logs(page, "core/city-picker")
   await list.focus()
   await page.keyboard.type("new y")
   await expect(selected).toHaveAccessibleName("New York")
-  await expect(picked).toHaveText("Nothing picked yet")
+  await expect(picked).toHaveCount(0)
   await page.clock.runFor(600)
   await page.keyboard.press(" ")
-  await expect(picked).toHaveText("Picked New York")
+  await expect(picked.last()).toHaveText("Picked New York")
   await page.keyboard.type("nap")
   await page.keyboard.press("Escape")
   await page.keyboard.press("Enter")
-  await expect(picked).toHaveText("Picked Naples")
+  await expect(picked.last()).toHaveText("Picked Naples")
   await page.getByRole("checkbox", { name: "Wait 1.5 seconds between keys" }).check()
   await list.focus()
   await page.keyboard.press("n")
@@ -135,8 +142,8 @@ test("search as you type: results wait for the input method to commit, unless th
   page,
 }) => {
   await openExamples(page, "/docs/core/text")
-  const field = page.getByRole("searchbox", { name: "Filter" })
-  const results = page.getByRole("status").filter({ hasText: /Results for|Type to see results/ })
+  const field = page.getByRole("searchbox", { name: "Search", exact: true })
+  const searches = logs(page, "core/search-as-you-type")
   await field.scrollIntoViewIfNeeded()
   // A step of a composition: the field's value changes, with an input event marked composing.
   const compose = (value: string, type = "input") =>
@@ -153,12 +160,12 @@ test("search as you type: results wait for the input method to commit, unless th
     )
   await compose("にh")
   await compose("にほn")
-  await expect(results).toHaveText("Type to see results")
+  await expect(searches).toHaveCount(0)
   await compose("日本", "compositionend")
-  await expect(results).toHaveText("Results for “日本”")
+  await expect(searches).toHaveText(["Search “日本”"])
   await page.getByRole("checkbox", { name: "Wait for the input method" }).uncheck()
   await compose("日本ご")
-  await expect(results).toHaveText("Results for “日本ご”")
+  await expect(searches.last()).toHaveText("Search “日本ご”")
   await field.fill("tokyo")
-  await expect(results).toHaveText("Results for “tokyo”")
+  await expect(searches.last()).toHaveText("Search “tokyo”")
 })

@@ -194,18 +194,21 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
 
   const thumbInput = (index: number) => element("thumb-input", String(index)) as HTMLInputElement | undefined
 
+  function setValue(value: number | number[], reason: SliderValueChangeReason, event?: Event) {
+    // Sorted first, then each thumb snapped and kept from its neighbours.
+    const sorted = valuesOf(normalized(value, options()))
+    const next = sorted.reduce<readonly number[]>(
+      (result, item, index) => moveThumb(result, index, item, range()),
+      sorted,
+    )
+    if (sameValue(next, values())) return false
+    return change("value", shaped(next.slice(), store.get().value), { reason, event, thumb: null })
+  }
+
   const api = {
     getValue: () => store.get().value,
-    setValue(value: number | number[], { reason = "imperative", event }: SliderChangeOptions = {}) {
-      // Sorted first, then each thumb snapped and kept from its neighbours.
-      const sorted = valuesOf(normalized(value, options()))
-      const next = sorted.reduce<readonly number[]>(
-        (result, item, index) => moveThumb(result, index, item, range()),
-        sorted,
-      )
-      if (sameValue(next, values())) return false
-      return change("value", shaped(next.slice(), store.get().value), { reason, event, thumb: null })
-    },
+    setValue: (value: number | number[], { reason = "imperative", event }: SliderChangeOptions = {}) =>
+      !isLocked(store.get()) && setValue(value, reason, event),
     focus: (thumb = 0) => thumbInput(thumb)?.focus(),
     internal: {
       // A press on the web: the track's box is read once, so moves never read layout.
@@ -313,9 +316,10 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
       reset() {
         change("value", store.get().initial, { reason: "reset", thumb: null })
       },
+      // The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
         const parsed = parseRange(saved)
-        if (parsed) api.setValue(shaped(parsed, store.get().value), { reason: "restore" })
+        if (parsed) setValue(shaped(parsed, store.get().value), "restore")
       },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
@@ -353,9 +357,9 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     if (!sameValue(value, made.value)) made = { value, thumbValues: thumbValuesOf(value) }
     return { thumbValues: made.thumbValues }
   })
-  // Disabling mid-drag ends the drag.
+  // Disabling it or making it read-only mid-drag ends the drag.
   store.subscribe(() => {
-    if (!gesture || !isDisabled(store.get())) return
+    if (!gesture || !isLocked(store.get())) return
     drags.cancel()
     api.internal.end()
   })

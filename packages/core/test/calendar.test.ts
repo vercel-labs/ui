@@ -726,6 +726,23 @@ describe("calendar", () => {
     expect(instance.api.getValue()).toBe("2027-01-07")
   })
 
+  test("a controller can't select a date people can't pick", () => {
+    const { instance } = mount({ min: "2026-10-05", unavailable: ["2026-10-24"] })
+    expect(instance.api.setValue("2026-10-01")).toBe(false)
+    expect(instance.api.setValue("2026-10-24")).toBe(false)
+    expect(instance.api.getValue()).toBeNull()
+    expect(instance.api.setValue("2026-10-23")).toBe(true)
+  })
+
+  test("a controller can't select on a disabled or read-only calendar", () => {
+    for (const locked of [{ disabled: true }, { readOnly: true }]) {
+      const { instance } = mount(locked)
+      expect(instance.api.setValue("2026-10-20")).toBe(false)
+      expect(instance.api.getValue()).toBeNull()
+      document.body.replaceChildren()
+    }
+  })
+
   test("disabled leaves no tab stop and picks nothing; read only focuses but picks nothing", async () => {
     const disabled = mount({ disabled: true })
     expect(disabled.stops()).toEqual([])
@@ -820,4 +837,9 @@ describe("calendar", () => {
     // August 2027 is past max, so it stops at March.
     expect(heading()).toBe("March 2027")
   })
+})
+
+test("months that aren't a finite number show one month", () => {
+  for (const months of [Infinity, Number.NaN, -2])
+    expect((calendar({ id: "c", months }) as unknown as PrimitiveInstance).get()).toMatchObject({ months: 1 })
 })

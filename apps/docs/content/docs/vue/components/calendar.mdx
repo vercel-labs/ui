@@ -275,7 +275,7 @@ The grid’s slot receives its state, with its month, label, weekdays, and weeks
 
 <ComponentExample
   name="calendar/custom-grid"
-  caption="The table is written out by hand from the grid's state. Navigate and select as usual."
+  caption="The table is your own markup, built from the grid's state. Navigate and select as usual."
 />
 
 ## Styling
@@ -426,7 +426,7 @@ And why a range's start changed:
 
 ### Controller
 
-Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled or there's nowhere to go.
+Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled, there's nowhere to go, or the calendar is disabled or read-only.
 
 <ControllerTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarController" />
 

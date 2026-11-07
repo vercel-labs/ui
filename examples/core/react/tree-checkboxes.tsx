@@ -9,10 +9,12 @@ import {
   type TreeItemData,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type CheckTreeOptions = {
   items: TreeItemData[]
   strategy: TreeCheckStrategy
+  onCheckedChange?: (checked: string[]) => void
 }
 
 type CheckTreeState = { checked: string[]; strategy: TreeCheckStrategy }
@@ -21,7 +23,7 @@ type CheckTreeItemState = { checked: boolean | "indeterminate"; level: number }
 
 const checkTree = definePrimitive({
   name: "check-tree",
-  options: { items: "value", strategy: "string" },
+  options: { items: "value", strategy: "string", onCheckedChange: "callback" },
   state: (options: CheckTreeOptions): CheckTreeState => ({ checked: [], strategy: options.strategy }),
   sync: (options) => ({ strategy: options.strategy }),
   api: (context) => {
@@ -47,15 +49,14 @@ const checkTree = definePrimitive({
       stateOf,
       toggle(key: string) {
         const { checked, strategy } = store.get()
-        store.set({ checked: toggleTreeChecked(tree(), checked, key, { strategy }) })
+        const next = toggleTreeChecked(tree(), checked, key, { strategy })
+        store.set({ checked: next })
+        context.options().onCheckedChange?.(next)
       },
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { checked: string[] }>({
-      state: (state) => ({ checked: state.checked }),
-      attrs: () => ({ role: "group" }),
-    }),
+    root: slot({ attrs: () => ({ role: "group" }) }),
     item: slot<{ value: string }, CheckTreeItemState>({
       props: { value: "string" },
       state: (state, { api, key }) => ({ checked: api.stateOf(state, key), level: api.tree().level(key) }),
@@ -97,40 +98,41 @@ const flat = (list: TreeItemData[]): TreeItemData[] =>
   list.flatMap((item) => [item, ...flat(item.children ?? [])])
 
 function Example() {
+  const log = useLog()
   const [strategy, setStrategy] = React.useState<TreeCheckStrategy>("leaf")
   return (
     <div data-slot="stack">
-      <div role="radiogroup" aria-label="Strategy" data-slot="check-tree-strategy">
-        {(["leaf", "trunk"] as const).map((option) => (
-          <button
-            key={option}
-            type="button"
-            role="radio"
-            aria-checked={strategy === option}
-            data-size="sm"
-            onClick={() => setStrategy(option)}
-          >
-            {option}
-          </button>
-        ))}
+      <div data-slot="controls">
+        <div role="radiogroup" aria-label="Strategy" data-slot="check-tree-strategy">
+          {(["leaf", "trunk"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              role="radio"
+              aria-checked={strategy === option}
+              data-size="sm"
+              onClick={() => setStrategy(option)}
+            >
+              {option[0].toUpperCase() + option.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
-      <CheckTree items={items} strategy={strategy} aria-label="Files">
-        {({ checked }) => (
-          <>
-            {flat(items).map((item) => (
-              <CheckTreeItem key={item.value} value={item.value} aria-label={item.label}>
-                <span data-slot="check-tree-box">
-                  <span data-show="checked">✓</span>
-                  <span data-show="indeterminate">–</span>
-                </span>
-                {item.label}
-              </CheckTreeItem>
-            ))}
-            <p data-slot="output" data-value>
-              Value: {checked.length ? checked.join(", ") : "none"}
-            </p>
-          </>
-        )}
+      <CheckTree
+        items={items}
+        strategy={strategy}
+        aria-label="Files"
+        onCheckedChange={(checked: string[]) => log(`Value: ${checked.join(", ") || "none"}`)}
+      >
+        {flat(items).map((item) => (
+          <CheckTreeItem key={item.value} value={item.value} aria-label={item.label}>
+            <span data-slot="check-tree-box">
+              <span data-show="checked">✓</span>
+              <span data-show="indeterminate">–</span>
+            </span>
+            {item.label}
+          </CheckTreeItem>
+        ))}
       </CheckTree>
     </div>
   )

@@ -35,9 +35,44 @@ function CodeBlockTabsList({
   children: React.ReactNode
   label?: string
 }) {
+  if (label === "Package manager") return <PackageManagerSelect>{children}</PackageManagerSelect>
   return (
     <TabBar>
       <TabsList aria-label={label}>{children}</TabsList>
+      <CopyButton className="ms-auto" />
+    </TabBar>
+  )
+}
+
+function PackageManagerSelect({ children }: { children: React.ReactNode }) {
+  const { value } = usePreference(packageManager)
+  const items = React.Children.toArray(children)
+    .filter(React.isValidElement<{ value: string; children: React.ReactNode }>)
+    .map(({ props }) => ({ value: props.value, label: String(props.children) }))
+  return (
+    <TabBar>
+      <Select
+        items={items}
+        value={value}
+        onValueChange={(next, details) => {
+          if (next) packageManager.set(next as typeof value, details)
+        }}
+      >
+        <SelectTrigger
+          variant="ghost"
+          aria-label="Package manager"
+          className="mx-0 h-8 rounded-frame-control bg-muted px-3 font-mono text-xs hover:bg-muted data-open:bg-muted"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent align="start" sideOffset={6} className="min-w-32">
+          {items.map((item) => (
+            <SelectItem key={item.value} value={item.value} className="font-mono text-xs">
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <CopyButton className="ms-auto" />
     </TabBar>
   )
@@ -75,9 +110,10 @@ function CodeBlockTab({ value, children }: { value: string; children: React.Reac
 }
 
 // Two code blocks for the same styles: plain CSS first, then Tailwind classes.
+// The Tailwind tab can hold one block per framework, each in a FrameworkContent.
 function StyleTabs({ children }: { children: React.ReactNode }) {
   const { value } = usePreference(styling)
-  const [css, tailwind] = React.Children.toArray(children)
+  const [css, ...tailwind] = React.Children.toArray(children)
   return (
     <Frame className="my-5 overflow-hidden">
       <Tabs
@@ -118,13 +154,6 @@ function FrameworkTabs({
         className="flex flex-col [&_[data-prompt-bar]]:hidden"
       >
         <TabBar>
-          <TabsList aria-label="Framework" className="max-sm:hidden">
-            {frameworkIds.map((id) => (
-              <TabsTab key={id} value={id}>
-                {frameworks[id].label}
-              </TabsTab>
-            ))}
-          </TabsList>
           <Select
             items={frameworkItems}
             value={framework}
@@ -133,7 +162,7 @@ function FrameworkTabs({
             <SelectTrigger
               variant="ghost"
               aria-label="Framework"
-              className="mx-0 h-8 rounded-frame-control bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted sm:hidden"
+              className="mx-0 h-8 rounded-frame-control bg-muted px-3 text-[13px] font-medium hover:bg-muted data-open:bg-muted"
             >
               <SelectValue />
             </SelectTrigger>

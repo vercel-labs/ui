@@ -3,6 +3,7 @@ import { command, type CommandData } from "../src/components/command/command"
 import { commandShortcuts, findCommand, pageItems } from "../src/components/command/command-data"
 import { fuzzyFilter, fuzzyScore } from "../src/foundation/text/fuzzy"
 import { createListbox, filterData, itemKey, type ListData } from "../src/foundation/lists/listbox"
+import { attrs } from "../src/foundation/kernel/part"
 import { createStore } from "../src/foundation/kernel/store"
 import { fakeElement } from "./selects"
 
@@ -214,12 +215,30 @@ describe("command headless", () => {
     instance.api.internal.onInputKeyDown(key("Enter"))
     expect(onAction).toHaveBeenCalledWith("calendar", expect.anything())
     expect(instance.get()).toMatchObject({ pending: ["calendar"] })
+    expect(attrs(instance.part("item", { value: "calendar" }))).toMatchObject({
+      "aria-busy": "true",
+      "aria-disabled": "true",
+    })
     instance.api.run("calendar")
     expect(onAction).toHaveBeenCalledTimes(1)
     finish()
     await Promise.resolve()
     await Promise.resolve()
     expect(instance.get()).toMatchObject({ pending: [] })
+  })
+
+  test("a click on a disabled or pending command is canceled, so one rendered as a link stays put", () => {
+    const instance = command({ id: "c", items: commands, onAction: () => new Promise(() => {}) })
+    const click = () => new Event("click", { cancelable: true })
+    const disabled = click()
+    instance.api.internal.press("calculator", disabled)
+    expect(disabled.defaultPrevented).toBe(true)
+    const first = click()
+    instance.api.internal.press("calendar", first)
+    expect(first.defaultPrevented).toBe(false)
+    const pending = click()
+    instance.api.internal.press("calendar", pending)
+    expect(pending.defaultPrevented).toBe(true)
   })
 
   test("a controller's run() hands onSelect a real select Event, whose preventDefault() skips onAction", () => {

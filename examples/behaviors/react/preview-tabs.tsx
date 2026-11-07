@@ -5,9 +5,15 @@ import { scrubTo, stepBy, stepFromKey } from "@ui-sdk/core/number"
 const tabs = {
   inbox: "Inbox",
   drafts: "Drafts",
-  sent: "Sent mail",
-  scheduled: "Scheduled sends",
+  sent: "Sent",
   spam: "Spam",
+}
+
+const counts: Record<string, string> = {
+  inbox: "12 conversations, 3 unread",
+  drafts: "2 drafts",
+  sent: "48 conversations",
+  spam: "No spam",
 }
 
 type Key = keyof typeof tabs
@@ -90,13 +96,18 @@ function Example() {
   const shown = drag ? insert(drag.others, drag.key, drag.target) : order
   const placed = drag ? lefts(shown, drag.widths) : []
   return (
-    <div>
+    <div data-slot="stack">
       <div
         role="tablist"
         aria-label="Mailboxes"
+        data-slot="drag-tabs-list"
         data-dragging={drag ? "" : undefined}
         style={
-          drag ? { width: placed[placed.length - 1] + drag.widths[shown[shown.length - 1]] + 4 } : undefined
+          drag
+            ? ({
+                "--drag-tabs-width": `${placed[placed.length - 1] + drag.widths[shown[shown.length - 1]] + 4}px`,
+              } as React.CSSProperties)
+            : undefined
         }
       >
         {shown.map((key, index) => (
@@ -109,6 +120,7 @@ function Example() {
             type="button"
             role="tab"
             id={`mailbox-${key}`}
+            data-slot="drag-tabs-tab"
             aria-selected={key === selected}
             aria-controls="mailbox-panel"
             tabIndex={key === selected ? 0 : -1}
@@ -116,16 +128,27 @@ function Example() {
             onPointerDown={(event) => pointerdown(event, key)}
             onKeyDown={(event) => keydown(event, key)}
             onClick={() => setSelected(key)}
-            style={drag ? { left: (drag.key === key ? drag.left : placed[index]) + 2 } : undefined}
+            style={
+              drag
+                ? ({
+                    "--drag-tabs-left": `${(drag.key === key ? drag.left : placed[index]) + 2}px`,
+                  } as React.CSSProperties)
+                : undefined
+            }
           >
             {tabs[key]}
           </button>
         ))}
       </div>
-      <div role="tabpanel" id="mailbox-panel" aria-labelledby={`mailbox-${selected}`}>
-        {tabs[selected]} is tab {order.indexOf(selected) + 1} of {order.length}.
+      <div
+        role="tabpanel"
+        id="mailbox-panel"
+        data-slot="drag-tabs-panel"
+        aria-labelledby={`mailbox-${selected}`}
+      >
+        <h3>{tabs[selected]}</h3>
+        <span data-slot="hint">{counts[selected]}</span>
       </div>
-      <p>Hold ⌘ or Ctrl while dragging to place a tab freely.</p>
     </div>
   )
 }

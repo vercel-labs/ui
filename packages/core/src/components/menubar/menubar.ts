@@ -160,13 +160,12 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
   // A disabled menu takes focus on its trigger instead, and the open menu closes.
   function moveTo(next: { key: string; el: HTMLElement } | undefined, event: Event, open: boolean) {
     if (!next) return
-    roving.remember(next.key)
     const member = members.get(next.key)
     if (open && member && !member.disabled()) member.open({ focus: "first", reason: "trigger-press", event })
-    else {
-      openMember()?.close({ reason: "submenu-switch", event, focus: false })
-      next.el.focus()
-    }
+    else if (openMember()?.close({ reason: "submenu-switch", event, focus: false }) !== false) next.el.focus()
+    // A menu that refused to close keeps the menubar where it was.
+    const current = store.get().open
+    if (current === null || current === next.key) roving.remember(next.key)
   }
 
   const api = {
@@ -194,12 +193,14 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       // Whether a press lands on one of the menubar's triggers, which never
       // counts as outside its open menu: it switches menus instead.
       onTrigger: (target: Node) => roving.items().some((item) => item.el.contains(target)),
-      // One menu is open at a time. Another opening closes it.
-      opening(key: string, event?: Event) {
-        for (const [other, member] of members)
-          if (other !== key && member.isOpen())
-            member.close({ reason: "submenu-switch", event, focus: false })
-      },
+      // One menu is open at a time. Another opening closes it, unless it refuses.
+      opening: (key: string, event?: Event) =>
+        [...members].every(
+          ([other, member]) =>
+            other === key ||
+            !member.isOpen() ||
+            member.close({ reason: "submenu-switch", event, focus: false }),
+        ),
       openChanged(key: string, open: boolean) {
         aim.stop()
         if (open) {
@@ -276,6 +277,7 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
           const next = roving.items().find((item) => item.key === key)
           if (!next) return
           moveTo(next, event, false)
+          if (store.get().open !== null) return
           held = next.el
           next.el.addEventListener("blur", release, { once: true })
           return

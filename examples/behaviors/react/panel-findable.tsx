@@ -1,22 +1,26 @@
 import * as React from "react"
 import { bindPanel, definePrimitive, hiddenAttrs } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type NotesState = {
   expanded: string[]
   exiting: string[]
   opening: "mount" | "instant" | "animate"
-  settled: string
 }
+
+type NotesOptions = { onSettled?: (value: string, open: boolean) => void }
 
 const without = (list: string[], value: string) => list.filter((other) => other !== value)
 
 const notes = definePrimitive({
   name: "notes",
-  state: (): NotesState => ({ expanded: ["3.0"], exiting: [], opening: "mount", settled: "" }),
+  options: { onSettled: "callback" },
+  state: (_options: NotesOptions): NotesState => ({ expanded: ["3.0"], exiting: [], opening: "mount" }),
   api: (context) => {
     const { store } = context
     return {
+      settle: (value: string, open: boolean) => context.options().onSettled?.(value, open),
       toggle(value: string) {
         const { expanded, exiting } = store.get()
         if (expanded.includes(value))
@@ -34,7 +38,7 @@ const notes = definePrimitive({
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { settled: string }>({ state: (state) => ({ settled: state.settled }) }),
+    root: slot({}),
     trigger: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, { id, key }) => ({
@@ -61,7 +65,7 @@ const notes = definePrimitive({
           reveal: () => api.show([key]),
           trigger: () => el.previousElementSibling as HTMLElement | undefined,
           subscribe: store.subscribe,
-          settled: (open) => store.set({ settled: `${key} ${open ? "opened" : "closed"}` }),
+          settled: (open) => api.settle(key, open),
           exited: () => store.set({ exiting: without(store.get().exiting, key) }),
         }),
     }),
@@ -90,32 +94,26 @@ const releases = [
 ]
 
 function Example() {
+  const log = useLog()
   return (
-    <Notes>
-      {({ settled }) => (
-        <>
-          <div data-slot="panel-list">
-            {releases.map((release) => (
-              <div key={release.value}>
-                <NotesTrigger value={release.value}>Version {release.value}</NotesTrigger>
-                <NotesPanel value={release.value}>
-                  <p>{release.notes}</p>
-                </NotesPanel>
-              </div>
-            ))}
+    <Notes onSettled={(value, open) => log(`Version ${value} ${open ? "opened" : "closed"}`)}>
+      <div data-slot="controls">
+        <NotesExpand value={releases.map((release) => release.value).join(" ")} data-size="sm">
+          Open All
+        </NotesExpand>
+      </div>
+      <div data-slot="panel-list">
+        {releases.map((release) => (
+          <div key={release.value}>
+            <NotesTrigger value={release.value}>Version {release.value}</NotesTrigger>
+            <NotesPanel value={release.value}>
+              <p>{release.notes}</p>
+            </NotesPanel>
           </div>
-          <div data-slot="row">
-            <NotesExpand value={releases.map((release) => release.value).join(" ")} data-size="sm">
-              Open all
-            </NotesExpand>
-            <span data-settled data-slot="hint">
-              {settled}
-            </span>
-          </div>
-        </>
-      )}
+        ))}
+      </div>
     </Notes>
   )
 }
 
-export { Example, notes, Notes, NotesExpand, NotesPanel, NotesTrigger, type NotesState }
+export { Example, notes, Notes, NotesExpand, type NotesOptions, NotesPanel, NotesTrigger, type NotesState }

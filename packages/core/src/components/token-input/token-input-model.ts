@@ -28,18 +28,27 @@ const TOKEN_CHAR = "\uFFFC"
 
 let lastId = 0
 const nextId = () => `t${++lastId}`
+// A supplied id shaped like a generated one moves the count past it, so no generated id repeats it.
+// Past 15 digits the count would lose precision and stall, and it never gets that far itself.
+const reserveId = (id: string) => {
+  if (/^t\d{1,15}$/.test(id)) lastId = Math.max(lastId, Number(id.slice(1)))
+}
 
 const isToken = (segment: string | Token | undefined): segment is Token =>
   typeof segment === "object" && segment !== null
 
 /**
- * Merges adjacent strings, drops empty ones and gives tokens without one an id. Tokens that have an id keep their identity.
+ * Merges adjacent strings, drops empty ones and gives tokens without one an id. Tokens that have an id keep their identity, except one repeating an earlier token's id, which gets a new one.
  */
 function normalizeValue(value: readonly (string | Token)[]) {
+  for (const segment of value) if (isToken(segment) && segment.id) reserveId(segment.id)
+  const ids = new Set<string>()
   const result: TokenInputValue = []
   for (const segment of value) {
     if (isToken(segment)) {
-      result.push(segment.id ? segment : { ...segment, id: nextId() })
+      const token = segment.id && !ids.has(segment.id) ? segment : { ...segment, id: nextId() }
+      ids.add(token.id!)
+      result.push(token)
       continue
     }
     if (!segment) continue

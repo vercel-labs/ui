@@ -175,8 +175,9 @@ type CommandOptions = {
   onPagesChange?: (pages: string[], details: ChangeDetails<CommandPagesChangeReason>) => void
   /**
    * Runs when a command runs, with its value: Enter, a click, or its shortcut. Return a Promise to
-   * mark the command pending until it settles: it gets `data-pending` and `aria-busy`, and running
-   * it again waits. A rejection puts the reason in its `error` state until the next run.
+   * mark the command pending until it settles: it gets `data-pending`, `aria-busy` and
+   * `aria-disabled`, and running it again waits. A rejection puts the reason in its `error` state
+   * until the next run.
    */
   onAction?: (value: string, details: CommandActionDetails) => unknown
   /**

@@ -16,7 +16,7 @@ function Example() {
   const mixes = steps.map((step) => mixColor(parseColor(from)!, parseColor(to)!, step, { space }))
   return (
     <div data-slot="stack">
-      <div data-slot="color-field">
+      <div data-slot="controls">
         <label data-slot="label">
           <input type="color" value={from} onChange={(event) => setFrom(event.target.value)} />
           From
@@ -39,10 +39,9 @@ function Example() {
       </div>
       <ol data-slot="color-steps">
         {mixes.map((mix, index) => (
-          <li key={index} style={{ background: formatColor(mix) }} />
+          <li key={index} title={formatColor(mix, "hex")} style={{ background: formatColor(mix) }} />
         ))}
       </ol>
-      <p data-middle>{formatColor(mixes[3], "hex")} halfway</p>
     </div>
   )
 }

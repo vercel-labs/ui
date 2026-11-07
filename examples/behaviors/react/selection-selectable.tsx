@@ -64,8 +64,8 @@ const Members = parts.Root
 
 const MembersMember = parts.Member
 
-const names = ["Ana", "Ben", "Chloé", "Dev", "Eli"]
-const owners = ["Ana"]
+const names = ["Hollis Grant", "Inès Moreau", "Kofi Mensah", "Wren Takahashi", "Tomasz Wójcik"]
+const owners = ["Hollis Grant"]
 
 function Example() {
   return (

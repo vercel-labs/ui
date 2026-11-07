@@ -1,11 +1,236 @@
 ---
-title: State and Changes
+title: Handle Changes
 description: Report changes, let the app accept or cancel them, and choose how state updates reach the page.
 ---
 
-`createChange` reports state changes through callbacks and lets the caller accept or cancel them. The other helpers handle commits, frequent updates, and undo.
+[Compose Behaviors](../compose-behaviors) used `createChange` to report each new rating. This page goes further: callbacks that accept or cancel a change, state a parent controls, commits, frequent updates and undo. These helpers are exported from `@ui-sdk/core`.
 
-These helpers are exported from `@ui-sdk/core`. For a first example of `createChange` and controlled state, see [Build a Component](../build-a-component#control-the-state).
+## Control the State
+
+The mute button from [Build a Component](../build-a-component) manages its own state. Let's control it from a parent component and use that state to change its icon and label.
+
+We'll use `createChange`. Update `lib/mute-button.ts` with the highlighted changes:
+
+```ts title="lib/mute-button.ts" {1,5-19,22-23}
+import { createChange, definePrimitive } from "@ui-sdk/core"
+
+const muteButton = definePrimitive({
+  name: "mute-button",
+  options: { muted: "boolean", onMutedChange: "callback" },
+  controlled: ["muted"],
+  state: (options: { muted?: boolean; onMutedChange?: (muted: boolean) => void }) => ({
+    muted: options.muted ?? false,
+  }),
+  sync: (options) => (options.muted === undefined ? {} : { muted: options.muted }),
+  api: (context) => {
+    const change = createChange(context)
+
+    return {
+      toggle: (event?: Event) => {
+        change("muted", !context.store.get().muted, { reason: "press", event })
+      },
+    }
+  },
+  slots: (slot) => ({
+    root: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }, event) => api.toggle(event),
+    }),
+  }),
+})
+
+export { muteButton }
+```
+
+- `options` adds the value and callback. `controlled` marks `muted` as a state value that can be controlled.
+- `state` sets the initial value. `sync` keeps it up to date when a new `muted` value comes in.
+- `createChange` calls `onMutedChange` with the next value and waits for it to come back through `muted`. If you leave out `muted`, it updates the button's own state.
+
+The label now describes the next action, so this version doesn't need `aria-pressed`.
+
+### Connect the State
+
+Now use `muted` for the button, its icon and its label:
+
+<FrameworkContent value="react">
+
+```tsx title="pages/index.tsx"
+"use client"
+
+import * as React from "react"
+import { Volume2Icon, VolumeXIcon } from "lucide-react"
+import { MuteButton } from "@/components/ui/mute-button"
+
+function Example() {
+  const [muted, setMuted] = React.useState(false)
+
+  return (
+    <MuteButton muted={muted} onMutedChange={setMuted}>
+      {muted ? <VolumeXIcon aria-hidden="true" /> : <Volume2Icon aria-hidden="true" />}
+      {muted ? "Unmute" : "Mute"}
+    </MuteButton>
+  )
+}
+
+export { Example }
+```
+
+</FrameworkContent>
+<FrameworkContent value="vue">
+
+```vue title="pages/index.vue"
+<script setup lang="ts">
+import { ref } from "vue"
+import { MuteButton } from "@/components/ui/mute-button"
+
+const muted = ref(false)
+</script>
+
+<template>
+  <MuteButton v-model:muted="muted">
+    <svg
+      aria-hidden="true"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m11 5-6 4H2v6h3l6 4z" />
+      <path :d="muted ? 'm16 9 6 6m0-6-6 6' : 'M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12'" />
+    </svg>
+    {{ muted ? "Unmute" : "Mute" }}
+  </MuteButton>
+</template>
+```
+
+`v-model:muted` passes the value and listens for updates.
+
+</FrameworkContent>
+<FrameworkContent value="svelte">
+
+```svelte title="pages/index.svelte"
+<script lang="ts">
+  import { MuteButton } from "@/components/ui/mute-button"
+
+  let muted = $state(false)
+</script>
+
+<MuteButton bind:muted>
+  <svg
+    aria-hidden="true"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="m11 5-6 4H2v6h3l6 4z" />
+    <path d={muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"} />
+  </svg>
+  {muted ? "Unmute" : "Mute"}
+</MuteButton>
+```
+
+`bind:muted` keeps the button and the parent component's state in sync.
+
+</FrameworkContent>
+<FrameworkContent value="solid">
+
+```tsx title="pages/index.tsx"
+import { createSignal } from "solid-js"
+import { MuteButton } from "@/components/ui/mute-button"
+
+function Example() {
+  const [muted, setMuted] = createSignal(false)
+
+  return (
+    <MuteButton muted={muted()} onMutedChange={setMuted}>
+      <svg
+        aria-hidden="true"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="m11 5-6 4H2v6h3l6 4z" />
+        <path d={muted() ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"} />
+      </svg>
+      {muted() ? "Unmute" : "Mute"}
+    </MuteButton>
+  )
+}
+
+export { Example }
+```
+
+</FrameworkContent>
+<FrameworkContent value="web-components">
+
+Pass the initial value through the `muted` attribute:
+
+```html title="pages/index.html"
+<mute-button muted="false">
+  <button>
+    <svg
+      aria-hidden="true"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m11 5-6 4H2v6h3l6 4z" />
+      <path data-volume d="M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
+    </svg>
+    <span data-label>Mute</span>
+  </button>
+</mute-button>
+```
+
+Then listen for `mutedchange` from your browser entry point, after the button's markup is on the page:
+
+```ts title="main.ts"
+import "@/components/ui/mute-button"
+
+let muted = false
+const button = document.querySelector("mute-button")
+const icon = button?.querySelector("[data-volume]")
+const label = button?.querySelector("[data-label]")
+
+if (button && icon && label) {
+  button.addEventListener("mutedchange", (event) => {
+    muted = (event as CustomEvent<{ value: boolean }>).detail.value
+    button.setAttribute("muted", String(muted))
+    icon.setAttribute("d", muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12")
+    label.textContent = muted ? "Unmute" : "Mute"
+  })
+}
+```
+
+The adapter reads `muted="false"` as the boolean `false`. Each event updates the value, icon and label together.
+
+</FrameworkContent>
+
+<ComponentExample
+  name="core/mute-button-controlled"
+  caption="Click to switch between Mute and Unmute. The parent component controls the value, icon and label."
+/>
+
+Pressing **Mute** updates `muted` in the parent component. The button receives the new value, and the icon and label update with it.
 
 ## Changes
 
@@ -93,7 +318,7 @@ The checkbox and the panel's trigger below share one value held by the app.
 
 <ComponentExample name="core/disclosure" />
 
-[Build a Component](../build-a-component#control-the-state) shows how to connect the value, callback and `sync`. A few details matter when you make this reusable:
+[Control the State](#control-the-state) shows how to connect the value, callback and `sync`. A few details matter when you make this reusable:
 
 - Read `defaultOpen` when creating the state. Changing that option later doesn't reset the panel.
 - Return only controlled values from `sync`. `{}` leaves state alone; `{ open: undefined }` overwrites it.
@@ -352,3 +577,7 @@ A controlled drag has one more timing concern: its draft may need to stay visibl
     reset: "Undo for Typing",
   }}
 />
+
+## Next
+
+That covers the Core guides. [Reference](../reference) lists every export by the job it does, and [Behaviors](../behaviors) has the building blocks for focus, selection, popups and more.

@@ -10,6 +10,7 @@ import {
   type SpansDraft,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type Plan = Span & { title: string }
 
@@ -21,7 +22,8 @@ let made = 0
 
 const week = definePrimitive({
   name: "week",
-  state: (): WeekState => ({
+  options: { onHover: "callback" },
+  state: (_options: { onHover?: (day: string, minutes: number) => void }): WeekState => ({
     plans: [
       { id: "gym", track: "Mon", start: 9 * 60, end: 10 * 60, title: "Gym" },
       { id: "call", track: "Mon", start: 9 * 60 + 30, end: 11 * 60, title: "Call" },
@@ -49,14 +51,16 @@ const week = definePrimitive({
     })
     return {
       spans,
-      hover: (track: string | null, event?: PointerEvent) =>
-        context.store.set({
-          hover: track && event ? spans.valueAt(track, event.clientX, event.clientY) : null,
-        }),
+      hover: (track: string | null, event?: PointerEvent) => {
+        const hover = track && event ? spans.valueAt(track, event.clientX, event.clientY) : null
+        if (hover === context.store.get().hover) return
+        context.store.set({ hover })
+        if (track && hover !== null) context.options().onHover?.(track, hover)
+      },
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { hover: number | null }>({ state: (state) => ({ hover: state.hover }) }),
+    root: slot({}),
     day: slot<{ value: string }, { plans: Plan[] }>({
       props: { value: "string" },
       state: (state, { api, key }) => ({ plans: api.spans.spansOn(state, key) }),
@@ -113,45 +117,41 @@ const WeekPlan = parts.Plan
 const WeekEdge = parts.Edge
 
 function Example() {
+  const log = useLog()
   return (
-    <Week>
-      {({ hover }) => (
-        <>
-          <div data-slot="spans-week-head">
-            {["Mon", "Tue", "Wed"].map((day) => (
-              <span key={day}>{day}</span>
-            ))}
-          </div>
-          <div data-slot="spans-week-frame">
-            <div data-slot="spans-week-hours">
-              {[8, 9, 10, 11, 12, 13].map((hour) => (
-                <div key={hour}>{hour}:00</div>
-              ))}
-            </div>
-            {["Mon", "Tue", "Wed"].map((day) => (
-              <WeekDay key={day} value={day} aria-label={day}>
-                {({ plans }) =>
-                  plans.map((plan) => (
-                    <WeekPlan key={plan.id} value={plan.id}>
-                      {({ plan, action }) => (
-                        <>
-                          <WeekEdge edge="start" />
-                          {plan.title}
-                          {action && ` ${time(plan.start)}–${time(plan.end)}`}
-                          <WeekEdge edge="end" />
-                        </>
-                      )}
-                    </WeekPlan>
-                  ))
-                }
-              </WeekDay>
-            ))}
-          </div>
-          <p data-slot="output">{hover === null ? "Point at a day" : `Pointer at ${time(hover)}`}</p>
-        </>
-      )}
+    <Week onHover={(day, minutes) => log(`Pointer at ${day} ${time(minutes)}`)}>
+      <div data-slot="spans-week-head">
+        {["Mon", "Tue", "Wed"].map((day) => (
+          <span key={day}>{day}</span>
+        ))}
+      </div>
+      <div data-slot="spans-week-frame">
+        <div data-slot="spans-week-hours">
+          {[8, 9, 10, 11, 12, 13].map((hour) => (
+            <div key={hour}>{hour}:00</div>
+          ))}
+        </div>
+        {["Mon", "Tue", "Wed"].map((day) => (
+          <WeekDay key={day} value={day} aria-label={day}>
+            {({ plans }) =>
+              plans.map((plan) => (
+                <WeekPlan key={plan.id} value={plan.id}>
+                  {({ plan, action }) => (
+                    <>
+                      <WeekEdge edge="start" />
+                      {plan.title}
+                      {action && ` ${time(plan.start)}–${time(plan.end)}`}
+                      <WeekEdge edge="end" />
+                    </>
+                  )}
+                </WeekPlan>
+              ))
+            }
+          </WeekDay>
+        ))}
+      </div>
     </Week>
   )
 }
 
-export { type Plan, week, Week, WeekDay, WeekEdge, WeekPlan, type WeekState, Example }
+export { Example }

@@ -13,7 +13,7 @@ The viewport is `{ x, y, zoom }`. `x` and `y` place the canvas origin inside its
 
 ### Pan and Zoom
 
-Start with a viewport in state and mark it as [live](../kernel/state-and-changes#live-state):
+Start with a viewport in state and mark it as [live](../kernel/handle-changes#live-state):
 
 ```ts
 state: () => ({ viewport: { x: 0, y: 0, zoom: 1 } }),
@@ -55,7 +55,7 @@ Give the frame a visible size and an accessible name in your component. One tran
 
 <ComponentExample
   name="behaviors/viewport"
-  caption="Drag the empty board or scroll to pan. Pinch, or hold Control or Command while scrolling, to zoom. Focus the board and try +, −, and 0; Reset view restores its starting position."
+  caption="Drag the empty board or scroll to pan. Pinch, or hold Control or Command while scrolling, to zoom. Focus the board and try +, −, and 0; Reset View restores its starting position."
 />
 
 `0` resets the scale to 100%. To reset the position too, call `viewport.setViewport({ x: 0, y: 0, zoom: 1 })`.
@@ -140,7 +140,7 @@ const point = viewport.toCanvas(event.clientX, event.clientY)
 
 `toScreen(point)` converts back to client coordinates, useful for a label outside the scaled world. `visible()` gives the rectangle currently in view, and `get()` returns the viewport.
 
-By default, the behavior writes its state key directly. To let a component control the viewport, use the [change pattern](../kernel/state-and-changes#state-a-user-controls) with `set`:
+By default, the behavior writes its state key directly. To let a component control the viewport, use the [change pattern](../kernel/handle-changes#state-a-user-controls) with `set`:
 
 ```ts
 set: (value, details) => change("viewport", value, details),

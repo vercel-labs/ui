@@ -9,8 +9,11 @@ import {
   type GridCell,
 } from "@ui-sdk/core"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
-type PricesState = { active: GridCell | null; range: CellRange | null; cells: string[][]; copied: string }
+type PricesOptions = { onCopy?: (text: string) => void }
+
+type PricesState = { active: GridCell | null; range: CellRange | null; cells: string[][] }
 
 const start = [
   ["Tea", "3", "12"],
@@ -23,7 +26,8 @@ const cols = start[0].length
 
 const prices = definePrimitive({
   name: "prices",
-  state: (): PricesState => ({ active: null, range: null, cells: start, copied: "" }),
+  options: { onCopy: "callback" },
+  state: (_options: PricesOptions): PricesState => ({ active: null, range: null, cells: start }),
   api: (context) => {
     const { store } = context
     const grid = createGridFocus<PricesState>(context, { key: "active", rows: () => rows, cols: () => cols })
@@ -41,7 +45,7 @@ const prices = definePrimitive({
         const text = range.text(state, ({ row, col }) => state.cells[row][col])
         event.preventDefault()
         event.clipboardData?.setData("text/plain", text)
-        store.set({ copied: text })
+        context.options().onCopy?.(text)
       },
       paste(event: ClipboardEvent) {
         const state = store.get()
@@ -61,13 +65,13 @@ const prices = definePrimitive({
       },
       copyAll() {
         const text = cellsToText(store.get().cells)
-        store.set({ copied: text })
+        context.options().onCopy?.(text)
         navigator.clipboard?.writeText(text).catch(() => {})
       },
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { copied: string }>({ state: (state) => ({ copied: state.copied }) }),
+    root: slot({}),
     grid: slot({
       attrs: () => ({ role: "grid", style: "user-select:none;touch-action:none" }),
       on: {
@@ -113,29 +117,37 @@ function PricesCell({
 const PricesCopyAll = parts.CopyAll
 
 function Example() {
+  const log = useLog()
   return (
-    <Prices>
-      {({ copied }) => (
-        <>
-          <PricesGrid aria-label="Prices">
-            {start.map((cells, r) => (
-              <PricesRow key={r} id={String(r)}>
-                {cells.map((_, c) => (
-                  <PricesCell key={c} row={r} col={c}>
-                    {({ text }) => text}
-                  </PricesCell>
-                ))}
-              </PricesRow>
-            ))}
-          </PricesGrid>
-          <PricesCopyAll data-size="sm">Copy the whole sheet</PricesCopyAll>
-          <pre data-copied data-slot="log">
-            {copied ? copied.replaceAll("\t", " → ") : "Copied cells show here, with → for each tab."}
-          </pre>
-        </>
-      )}
+    <Prices onCopy={(text: string) => log(`Copied ${JSON.stringify(text)}`)}>
+      <div data-slot="stack">
+        <div data-slot="controls">
+          <PricesCopyAll data-size="sm">Copy Whole Sheet</PricesCopyAll>
+        </div>
+        <PricesGrid aria-label="Prices">
+          {start.map((cells, r) => (
+            <PricesRow key={r} id={String(r)}>
+              {cells.map((_, c) => (
+                <PricesCell key={c} row={r} col={c}>
+                  {({ text }) => text}
+                </PricesCell>
+              ))}
+            </PricesRow>
+          ))}
+        </PricesGrid>
+      </div>
     </Prices>
   )
 }
 
-export { Example, prices, Prices, PricesCell, PricesCopyAll, PricesGrid, PricesRow, type PricesState }
+export {
+  Example,
+  prices,
+  Prices,
+  PricesCell,
+  PricesCopyAll,
+  PricesGrid,
+  PricesRow,
+  type PricesOptions,
+  type PricesState,
+}

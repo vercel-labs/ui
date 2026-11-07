@@ -8,7 +8,9 @@ const pages = [
   ["/core/build-a-component", "Build a Component"],
   ["/core/compose-behaviors", "Compose Behaviors"],
   ["/core/kernel/define-a-primitive", "Define a Primitive"],
-  ["/core/kernel/state-and-changes", "State and Changes"],
+  ["/core/kernel/render-a-primitive", "Render a Primitive"],
+  ["/core/kernel/style-a-component", "Style a Component"],
+  ["/core/kernel/handle-changes", "Handle Changes"],
   ["/core/platform", "Platform"],
   ["/core/storage", "Storage"],
   ["/core/reference", "Reference"],
@@ -58,7 +60,7 @@ for (const [slug, title] of pages) {
 
 test("each framework's rendering guide explains its helpers", async ({ page }) => {
   await page.goto("/docs/react/custom-parts")
-  await expect(page.getByRole("heading", { name: "Write a Part by Hand" })).toBeVisible()
+  await expect(page.getByRole("heading", { name: "Write a Root Part" })).toBeVisible()
   await expect(page.getByText("usePrimitive", { exact: true }).first()).toBeVisible()
   await page.goto("/docs/web-components/rendering")
   await expect(page.getByRole("heading", { name: "Define the Elements" })).toBeVisible()
@@ -108,8 +110,6 @@ test("old framework copies of Core and Agents redirect", async ({ page }) => {
 })
 
 test("pages that moved in the foundation docs redirect", async ({ page }) => {
-  await page.goto("/docs")
-  await expect(page).toHaveURL(/\/docs\/core$/)
   await page.goto("/docs/core/get-started")
   await expect(page).toHaveURL(/\/docs\/core\/build-a-component$/)
   await page.goto("/docs/behaviors/focus")
@@ -123,9 +123,9 @@ test("pages that moved in the foundation docs redirect", async ({ page }) => {
   await page.goto("/docs/core/primitives")
   await expect(page).toHaveURL(/\/docs\/core\/kernel\/define-a-primitive$/)
   await page.goto("/docs/core/behaviors/state-and-events")
-  await expect(page).toHaveURL(/\/docs\/core\/kernel\/state-and-changes$/)
-  await page.goto("/docs/core/kernel/state-and-events")
-  await expect(page).toHaveURL(/\/docs\/core\/kernel\/state-and-changes$/)
+  await expect(page).toHaveURL(/\/docs\/core\/kernel\/handle-changes$/)
+  await page.goto("/docs/core/kernel/state-and-changes")
+  await expect(page).toHaveURL(/\/docs\/core\/kernel\/handle-changes$/)
   await page.goto("/docs/vue/primitives")
   await expect(page).toHaveURL(/\/docs\/vue\/rendering$/)
 })
@@ -144,7 +144,7 @@ test("links from Core go to the framework read last", async ({ page }) => {
   await expect(page).toHaveURL(/\/docs\/vue\/utilities\/shortcuts$/)
 })
 
-test("Components opens the framework read last, and the picker keeps the page", async ({ page }) => {
+test("Components opens the framework read last, and the Frameworks menu keeps the page", async ({ page }) => {
   await page.goto("/docs/vue")
   await expect
     .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value)
@@ -158,9 +158,10 @@ test("Components opens the framework read last, and the picker keeps the page", 
     "page",
   )
 
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto("/docs/react/hooks/shortcuts")
-  await page.getByRole("combobox", { name: "Framework", exact: true }).click()
-  await page.getByRole("option", { name: "Vue", exact: true }).click()
+  await page.getByRole("button", { name: "Frameworks", exact: true }).click()
+  await page.getByRole("link", { name: "Vue", exact: true }).click()
   await expect(page).toHaveURL(/\/docs\/vue\/utilities\/shortcuts$/)
 })
 
@@ -184,7 +185,7 @@ test("the reference points to focused guides", async ({ page }) => {
   await page.goto("/docs/core/reference")
   for (const [name, href] of [
     ["Define a Primitive", "/docs/core/kernel/define-a-primitive"],
-    ["State and Changes", "/docs/core/kernel/state-and-changes"],
+    ["Handle Changes", "/docs/core/kernel/handle-changes"],
     ["Focus and Keys", "/docs/core/behaviors/focus#roving-focus"],
     ["Selection", "/docs/core/behaviors/selection"],
     ["Popups and Layers", "/docs/core/behaviors/popups"],

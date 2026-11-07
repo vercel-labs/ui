@@ -24,7 +24,11 @@ test("crop: the top-left square of the turned image becomes a 96 pixel PNG", asy
   await openExamples(page, "/docs/core/image")
   const example = page.locator("[data-example]")
   await example.getByRole("button", { name: "Crop" }).click()
-  await expect(example.getByText(/^image\.png, image\/png, \d+ bytes$/)).toBeVisible()
+  const log = example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
+  await expect(log).toHaveText(/^image\.png, image\/png, \d+ bytes$/)
   expect(await pixels(example)).toMatchObject({ width: 96, height: 96, center: "239,68,68,255" })
 
   await example.getByLabel("Rotation").selectOption("90")

@@ -6,7 +6,7 @@ import {
   calendarApi,
   calendarState,
   calendarSync,
-  isDisabled,
+  isPickable,
   localeOf,
   preferredDate,
   rangeRules,
@@ -235,8 +235,8 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
 
   function pickValue(value: DatePickerValue, reason: DatePickerValueChangeReason, event?: Event) {
     const state = store.get()
-    if (isDisabled(state) || state.readOnly) return false
     const normalized = normalizeValue(state.mode, value) as DatePickerValue
+    if (!isPickable(state, normalized)) return false
     store.set({ anchor: null, hover: null })
     clearDrafts()
     const changed = setValue(normalized, reason, event)
@@ -269,6 +269,7 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
       value: DatePickerValue,
       { reason = "imperative", event }: DatePickerChangeOptions<DatePickerValueChangeReason> = {},
     ) => {
+      if (!isPickable(store.get(), normalizeValue(store.get().mode, value))) return false
       store.set({ anchor: null, hover: null })
       const result = setValue(value, reason, event)
       // The calendar turns to a date set from code, as it does to a typed one.

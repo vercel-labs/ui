@@ -10,6 +10,7 @@ import {
   type ViewportReason,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type Point = { x: number; y: number }
 
@@ -114,35 +115,31 @@ const DotsView = parts.View
 
 function Example() {
   const [viewport, setViewport] = React.useState<Viewport>({ x: 0, y: 0, zoom: 1 })
-  const [reason, setReason] = React.useState<ViewportReason | null>(null)
+  const log = useLog()
+  const last = React.useRef("")
   return (
-    <div data-slot="stack">
-      <Dots
-        aria-label="Dots"
-        viewport={viewport}
-        onViewportChange={(next, details) => {
-          setViewport(next)
-          setReason(details.reason)
-        }}
-      >
-        {({ dots }) => (
-          <>
-            <DotsWorld>
-              {dots.map((dot, index) => (
-                <span key={index} data-slot="viewport-dot" style={{ left: dot.x, top: dot.y }} />
-              ))}
-            </DotsWorld>
-            <DotsView />
-            <DotsLabel />
-          </>
-        )}
-      </Dots>
-      <p data-reason data-slot="output">
-        {reason
-          ? `Moved by ${reason}, zoom ${Math.round(viewport.zoom * 100)}%`
-          : "Double-click to drop a dot"}
-      </p>
-    </div>
+    <Dots
+      aria-label="Dots"
+      viewport={viewport}
+      onViewportChange={(next, details) => {
+        setViewport(next)
+        const message = `Moved by ${details.reason}, zoom ${Math.round(next.zoom * 100)}%`
+        if (message !== last.current) log(message)
+        last.current = message
+      }}
+    >
+      {({ dots }) => (
+        <>
+          <DotsWorld>
+            {dots.map((dot, index) => (
+              <span key={index} data-slot="viewport-dot" style={{ left: dot.x, top: dot.y }} />
+            ))}
+          </DotsWorld>
+          <DotsView />
+          <DotsLabel />
+        </>
+      )}
+    </Dots>
   )
 }
 

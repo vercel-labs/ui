@@ -5,10 +5,7 @@ description: Use unstyled custom elements with keyboard, focus, and screen reade
 
 <Callout>
 
-This section covers using ui-sdk in Web Components.
-
-- To browse the components library, see [Components](./components).
-- To build your own with `@ui-sdk/core`, see [Core](/docs/core).
+These docs cover ui-sdk in Web Components. Using another framework? See [React](/docs/react), [Vue](/docs/vue), [Svelte](/docs/svelte) or [Solid](/docs/solid). To build your own components from behaviors, see [Core](/docs/core).
 
 </Callout>
 
@@ -20,13 +17,7 @@ Import the components you need to register their tags, add them to your page, an
 
 Copy this prompt into your agent:
 
-```text prompt
-Set up ui-sdk in this Web Components project. Each component registers its tags when you import its entry, like @ui-sdk/web/dialog.
-
-1. Install @ui-sdk/web and @ui-sdk/core with the project's package manager.
-2. Add a note to AGENTS.md, creating it if needed: before using ui-sdk, follow the ui-sdk skill if it's installed, and read node_modules/@ui-sdk/web/docs/llms.txt. To build a new component, also search node_modules/@ui-sdk/web/docs/core.md by heading, and read rendering.md next to it.
-3. If you support skills, run: npx skills add vercel-labs/ui --skill ui-sdk
-```
+<include>../../shared/setup-prompt/web-components.mdx</include>
 
 It installs ui-sdk and points your `AGENTS.md` at the docs that ship with the packages.
 

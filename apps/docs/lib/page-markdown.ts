@@ -4,7 +4,7 @@ import { cssVariableTable } from "./css-variables"
 import { dataAttributeTables } from "./data-attributes"
 import { readExampleSources } from "./example-sources"
 import { frameworks, type Framework } from "./frameworks"
-import { contentDir, docPages, readPage } from "./pages"
+import { contentDir, docPage, docPages, readPage } from "./pages"
 import { controllerRows, reasonRows, stateRows, typeRows, type Row } from "./reference-rows"
 import { frameworkPages, utilitiesFolder } from "./sections"
 import { listOf, sentence, specGroups } from "./spec-groups"
@@ -164,7 +164,7 @@ async function pageMarkdown(
   const styledExample = lean ? attributes(firstExample).name : undefined
 
   // Markdown carries the CSS block of a style snippet; the Tailwind one is a site toggle.
-  let text = body.replace(/<StyleTabs>\s*(```[\s\S]*?\n```)\s*```[\s\S]*?\n```\s*<\/StyleTabs>/g, "$1")
+  let text = body.replace(/<StyleTabs>\s*(```[\s\S]*?\n```)[\s\S]*?<\/StyleTabs>/g, "$1")
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
@@ -185,6 +185,16 @@ async function pageMarkdown(
         const { title, description, href } = attributes(attrs)
         return `- [${title}](${href})${description ? `: ${description}` : ""}`
       })
+      .replace(tag("ComponentCards"), (_, attrs: string) =>
+        attributes(attrs)
+          .names.split(" ")
+          .flatMap((name) => docPage([shown, "components", name]) ?? [])
+          .map(
+            (page) =>
+              `- [${page.title}](/docs/components/${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
+          )
+          .join("\n"),
+      )
       .replace(tag("ComponentGrid"), () =>
         docPages(`${shown}/components`)
           .filter((page) => page.slugs.length === 3)

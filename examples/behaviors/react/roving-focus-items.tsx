@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createRovingFocus, definePrimitive, selects } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type TagListOptions = {
   onAdd?: (tag: string) => void
@@ -64,12 +65,12 @@ const TagListList = parts.List
 const TagListTag = parts.Tag
 
 function Example() {
+  const log = useLog()
   const [tags, setTags] = React.useState(["design", "docs"])
-  const [count, setCount] = React.useState(tags.length)
   return (
     <TagList
       onAdd={(tag: string) => setTags((tags) => (tags.includes(tag) ? tags : [...tags, tag]))}
-      onCountChange={setCount}
+      onCountChange={(count: number) => log(`${count} ${count === 1 ? "tag" : "tags"}`)}
     >
       <TagListInput aria-label="New tag" placeholder="Type a tag and press Enter" />
       <TagListList role="group" aria-label="Tags">
@@ -79,9 +80,6 @@ function Example() {
           </TagListTag>
         ))}
       </TagListList>
-      <p data-slot="hint">
-        {count} {count === 1 ? "tag" : "tags"}
-      </p>
     </TagList>
   )
 }

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createRovingFocus, definePrimitive, selects } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { ChevronRight } from "lucide-react"
 
 type FoldersState = { focused: string | null; open: boolean }
 
@@ -58,7 +59,10 @@ function Example() {
     <Folders role="group" aria-label="Folders">
       <FoldersItem value="Inbox">Inbox</FoldersItem>
       <FoldersItem value="Drafts">Drafts</FoldersItem>
-      <FoldersToggle value="Labels">Labels</FoldersToggle>
+      <FoldersToggle value="Labels">
+        Labels
+        <ChevronRight aria-hidden="true" />
+      </FoldersToggle>
       {["Work", "Family", "Travel"].map((label) => (
         <FoldersItem key={label} value={label} nested>
           {label}

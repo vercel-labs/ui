@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "canvas")
@@ -23,7 +30,7 @@ test("viewport: a drag on the empty board pans, + zooms, and reset goes back", a
   await page.keyboard.press("0")
   await page.keyboard.press("+")
   await expect(world).toHaveAttribute("style", /scale\(1\.25\)/)
-  await board.getByRole("button", { name: "Reset view" }).click()
+  await board.getByRole("button", { name: "Reset View" }).click()
   await expect(world).toHaveAttribute("style", /translate\(0px, ?0px\) scale\(1\)/)
 })
 
@@ -87,8 +94,8 @@ test("viewport fit: Fit shows every sight, zoom stays in bounds, the arrows pan,
   await page.getByRole("button", { name: "Pan right" }).click()
   await expect(world).not.toHaveAttribute("style", before!)
   // Harbor sits far off to the bottom right; focusing it brings it in.
-  await page.getByRole("button", { name: "📍 Museum" }).focus()
-  const harbor = page.getByRole("button", { name: "📍 Harbor" })
+  await page.getByRole("button", { name: "Museum" }).focus()
+  const harbor = page.getByRole("button", { name: "Harbor" })
   await harbor.focus()
   const frameBox = (await frame.boundingBox())!
   const harborBox = (await harbor.boundingBox())!
@@ -113,7 +120,7 @@ test("viewport points: a double-click drops a dot under the pointer at any zoom,
   await expect(label).toHaveAttribute("data-at", "40, 50")
   await frame.focus()
   await page.keyboard.press("+")
-  await expect(page.locator("[data-reason]")).toHaveText("Moved by zoom-key, zoom 125%")
+  await expect(lastLog(frame)).toHaveText("Moved by zoom-key, zoom 125%")
   // Zoomed at the center, the canvas point under (40, 50) moved; the dot dropped there is where the pointer is.
   await page.mouse.dblclick(box.x + 200, box.y + 100)
   const at = await label.getAttribute("data-at")
@@ -131,7 +138,7 @@ test("viewport points: a double-click drops a dot under the pointer at any zoom,
   await page.mouse.down()
   await page.mouse.move(from.x - 30, from.y, { steps: 5 })
   await page.mouse.up()
-  await expect(page.locator("[data-reason]")).toHaveText("Moved by drag, zoom 125%")
+  await expect(lastLog(frame)).toHaveText("Moved by drag, zoom 125%")
 })
 
 test("connect patch: a cable snaps from afar, a second patch unplugs, and code patches and cancels", async ({

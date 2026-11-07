@@ -302,12 +302,16 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
         let reason: "track-press" | "drag" = "track-press"
         setChannel(name, at(event.clientX, event.clientY), { reason, event })
         el.querySelector<HTMLElement>('[role="slider"]')?.focus({ preventScroll: true })
+        const unsubscribe = store.subscribe(() => isLocked(store.get()) && drags.cancel())
         drags.start(el, event, {
           onMove: (sample) => {
             if (setChannel(name, at(sample.x, sample.y), { reason: "drag", event: sample.event }))
               reason = "drag"
           },
-          onEnd: (end) => commit({ reason, event: end }),
+          onEnd: (end) => {
+            unsubscribe()
+            commit({ reason, event: end })
+          },
         })
       },
       // Arrows step, Shift ten steps, Page Up and Page Down a tenth of the

@@ -27,7 +27,7 @@ import {
   fieldState,
   type FieldStore,
 } from "./field-attrs"
-import type { FieldSetState } from "./field-set"
+import { registerById, type FieldSetState } from "./field-set"
 import { held } from "../../foundation/kernel/part"
 import { on } from "../../foundation/kernel/events"
 import { definePrimitive } from "../../foundation/kernel/primitive"
@@ -114,25 +114,6 @@ type FieldDescriptionState = FieldSetState & Partial<FieldState>
 type FieldErrorState = FieldState & {
   /** The browser's message for the current problem. Children you pass show instead. */
   message: string
-}
-
-// A part takes its element's id as it changes, like one its author sets later,
-// so the control points at the id in the page.
-function registerById(el: HTMLElement, register: (id: string) => () => void) {
-  let id = el.id
-  let unregister = register(id)
-  if (typeof MutationObserver === "undefined") return () => unregister()
-  const observer = new MutationObserver(() => {
-    if (el.id === id) return
-    id = el.id
-    unregister()
-    unregister = register(id)
-  })
-  observer.observe(el, { attributeFilter: ["id"] })
-  return () => {
-    observer.disconnect()
-    unregister()
-  }
 }
 
 // A control inside a nested field belongs to that field.

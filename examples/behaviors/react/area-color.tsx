@@ -1,6 +1,9 @@
 import * as React from "react"
 import { createArea, createChange, definePrimitive, type AreaValue } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import { CheckIcon } from "lucide-react"
+import { useLog } from "../../shared/react/log"
 
 type ColorState = { color: AreaValue; locked: boolean }
 
@@ -64,41 +67,34 @@ const ColorThumb = parts.Thumb
 const ColorReset = parts.Reset
 
 function Example() {
+  const log = useLog()
   const [locked, setLocked] = React.useState(false)
-  const [saved, setSaved] = React.useState({ x: 60, y: 80 })
   return (
-    <ColorPicker locked={locked} onColorCommit={setSaved}>
+    <ColorPicker
+      locked={locked}
+      onColorCommit={({ x, y }) => log(`Saved ${x}% saturation, ${y}% brightness`)}
+    >
       {({ swatch }) => (
         <>
-          <ColorSquare>
-            <ColorThumb aria-label="Color" />
-          </ColorSquare>
-          <div data-slot="row">
-            <span data-slot="swatch" style={{ background: swatch }} />
-            <span data-slot="output">
-              Saved {saved.x}% saturation, {saved.y}% brightness
-            </span>
-          </div>
-          <div data-slot="row">
+          <div data-slot="controls">
             <ColorReset data-size="sm">Reset</ColorReset>
             <label data-slot="label">
-              <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
+              <Checkbox checked={locked} onCheckedChange={(next) => setLocked(next === true)}>
+                <CheckboxIndicator>
+                  <CheckIcon aria-hidden="true" />
+                </CheckboxIndicator>
+              </Checkbox>
               Lock
             </label>
           </div>
+          <ColorSquare>
+            <ColorThumb aria-label="Color" />
+          </ColorSquare>
+          <span data-slot="swatch" style={{ background: swatch }} />
         </>
       )}
     </ColorPicker>
   )
 }
 
-export {
-  ColorPicker,
-  ColorReset,
-  ColorSquare,
-  color,
-  type ColorOptions,
-  type ColorState,
-  ColorThumb,
-  Example,
-}
+export { Example }

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createTypeahead, definePrimitive, elements, idPart, isTypeaheadKey } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type CityPickerOptions = {
   delay?: number
@@ -70,14 +71,16 @@ const cities = ["Nairobi", "Naples", "New Delhi", "New Orleans", "New York", "Ne
 
 function Example() {
   const [slow, setSlow] = React.useState(false)
-  const [picked, setPicked] = React.useState<string | null>(null)
+  const log = useLog()
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={slow} onChange={(event) => setSlow(event.target.checked)} />
-        Wait 1.5 seconds between keys
-      </label>
-      <CityPicker aria-label="City" delay={slow ? 1500 : 500} onPick={setPicked}>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={slow} onChange={(event) => setSlow(event.target.checked)} />
+          Wait 1.5 seconds between keys
+        </label>
+      </div>
+      <CityPicker aria-label="City" delay={slow ? 1500 : 500} onPick={(city) => log(`Picked ${city}`)}>
         {cities.map((city) => (
           <CityPickerCity key={city} value={city}>
             {city}
@@ -87,9 +90,6 @@ function Example() {
           </CityPickerCity>
         ))}
       </CityPicker>
-      <p data-picked-city data-slot="hint">
-        {picked ? `Picked ${picked}` : "Nothing picked yet"}
-      </p>
     </div>
   )
 }

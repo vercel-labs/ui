@@ -90,13 +90,13 @@ function Example() {
               } as React.CSSProperties
             }
           >
-            Showing {names[shown]}
+            The quick brown fox jumps over the lazy dog.
           </p>
           <ThemesList aria-label="Theme">
             {Object.keys(names).map((theme) => (
               <ThemesOption key={theme} value={theme}>
                 {names[theme]}
-                {theme === "contrast" && " (soon)"}
+                {theme === "contrast" && <span data-slot="hint">Soon</span>}
               </ThemesOption>
             ))}
           </ThemesList>
@@ -106,4 +106,4 @@ function Example() {
   )
 }
 
-export { Example, themes, Themes, ThemesList, ThemesOption, type ThemesState }
+export { Example }

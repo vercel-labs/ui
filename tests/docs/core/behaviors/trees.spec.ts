@@ -1,6 +1,13 @@
-import { expect } from "@playwright/test"
+import { expect, type Locator } from "@playwright/test"
 import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
+
+// The newest line in an example's console.
+const lastLog = (example: Locator) =>
+  example
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
+    .last()
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "trees")
@@ -24,10 +31,10 @@ test("expand: folders open and close, count their files, and the path follows th
   await expect(row("src")).toContainText("3 files")
   await row("lib").click()
   await row("date.ts").click()
-  await expect(page.locator("[data-path]")).toHaveText("src / lib / date.ts")
+  await expect(lastLog(row("date.ts"))).toHaveText("src / lib / date.ts")
   await row("src").click()
   await expect(row("date.ts")).toHaveCount(0)
-  await page.locator('[data-slot="file-list-expand"]').click()
+  await page.getByRole("button", { name: "Expand All" }).click()
   await expect(row("intro.md")).toBeVisible()
   await expect(row("date.ts")).toBeVisible()
 })
@@ -35,16 +42,11 @@ test("expand: folders open and close, count their files, and the path follows th
 test("paths: lines become folders first, and a trailing slash is an empty folder", async ({ page }) => {
   await openBehaviors(page, "trees")
   const tree = page.locator("[data-tree]")
-  await expect(tree.locator("span")).toHaveText([
-    "📁 src",
-    "📁 lib",
-    "util.ts",
-    "index.ts",
-    "📁 assets",
-    "README.md",
-  ])
+  const rows = tree.locator('[data-slot="tree-behavior-row"]')
+  await expect(rows).toHaveText(["src", "lib", "util.ts", "index.ts", "assets", "README.md"])
+  await expect(rows.filter({ has: page.locator("svg.lucide-folder") })).toHaveText(["src", "lib", "assets"])
   await page.getByLabel("Paths").fill("b.txt\na/c.txt")
-  await expect(tree.locator("span")).toHaveText(["📁 a", "c.txt", "b.txt"])
+  await expect(rows).toHaveText(["a", "c.txt", "b.txt"])
 })
 
 test("flat rows: open sections show their rows, links have addresses, and the retired page is disabled", async ({
@@ -64,7 +66,7 @@ test("strategies: each lists its own nodes, a value reads across them, and a loc
   await openBehaviors(page, "trees")
   const group = page.getByRole("group", { name: "Backup" })
   const box = (name: string) => group.getByRole("checkbox", { name, exact: true })
-  const value = group.locator("[data-value]")
+  const value = lastLog(group)
   const strategy = (name: string) =>
     page.getByRole("radiogroup", { name: "Strategy" }).last().getByRole("radio", { name })
   await box("Photos").click()

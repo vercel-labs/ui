@@ -42,7 +42,7 @@ function Rows({ rows, label }: { rows: Row[]; label: string }) {
               {row.detail && <span className="ms-auto text-xs text-subtle">{row.detail}</span>}
             </dt>
             {row.text && (
-              <dd className="text-base leading-relaxed text-foreground/75 sm:text-[14px]">
+              <dd className="text-[17px] leading-relaxed text-foreground/75 sm:text-[14px]">
                 <Text>{row.text}</Text>
               </dd>
             )}

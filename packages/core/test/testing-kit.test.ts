@@ -4,9 +4,12 @@
 import { afterEach, expect, test } from "vitest"
 import { dialog } from "../src/components/dialog/dialog"
 import { menu } from "../src/components/menu/menu"
+import { radioGroup } from "../src/components/radio/radio"
 import { slider } from "../src/components/slider/slider"
 import { tabs } from "../src/components/tabs/tabs"
+import { toolbar } from "../src/components/toolbar/toolbar"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
+import { announce } from "../src/foundation/platform/announce"
 import { checkDirection, checkServer, mount } from "../src/testing"
 import { sortable } from "../../../examples/experiments/sortable"
 
@@ -248,4 +251,136 @@ test("a dialog with no title is named by its trigger once mounted, and points at
   const content = view.part("content")!
   expect(content.getAttribute("aria-labelledby")).toBeNull()
   expect(content.getAttribute("aria-label")).toBe("Edit profile")
+})
+
+const failing = (where: "state" | "attrs" | "bind") =>
+  definePrimitive({
+    name: "failing",
+    state: () => {
+      if (where === "state") throw new Error("broken state")
+      return {}
+    },
+    api: () => ({}),
+    slots: (slot) => ({
+      root: slot({
+        attrs: () => {
+          if (where === "attrs") throw new Error("broken attrs")
+          return {}
+        },
+        bind: () => {
+          if (where === "bind") throw new Error("broken bind")
+        },
+      }),
+    }),
+  })
+
+test("a mount that throws leaves no markup and gives announcements back to the page", () => {
+  for (const where of ["state", "attrs", "bind"] as const) {
+    expect(() => mount(failing(where), {}, `<root>A</root>`)).toThrow(`broken ${where}`)
+    expect(document.body.querySelector("[data-slot]")).toBeNull()
+  }
+  announce("Saved")
+  expect(document.querySelector("[data-ui-sdk-announcer]")).not.toBeNull()
+})
+
+test("unmount runs every step when a cleanup throws, once", () => {
+  let destroyed = 0
+  const leaky = definePrimitive({
+    name: "leaky",
+    state: () => ({}),
+    api: (context) => {
+      context.onDestroy(() => destroyed++)
+      return {}
+    },
+    slots: (slot) => ({
+      root: slot({
+        bind: () => () => {
+          throw new Error("broken cleanup")
+        },
+      }),
+    }),
+  })
+  const view = mount(leaky, {}, `<root>A</root>`)
+  expect(() => view.unmount()).toThrow("broken cleanup")
+  expect(destroyed).toBe(1)
+  expect(view.root.isConnected).toBe(false)
+  expect(() => view.unmount()).not.toThrow()
+  announce("Saved")
+  expect(document.querySelector("[data-ui-sdk-announcer]")).not.toBeNull()
+})
+
+test("checkDirection puts the page's direction back when mounting throws", async () => {
+  await expect(checkDirection(failing("bind"), {}, `<root></root>`)).rejects.toThrow("broken bind")
+  expect(document.documentElement.getAttribute("dir")).toBeNull()
+})
+
+test("checks of the reading direction at once each get the page to themselves", async () => {
+  document.documentElement.setAttribute("dir", "ltr")
+  try {
+    await Promise.all([
+      checkDirection(tabs, { defaultValue: "a" }, tabsMarkup),
+      checkDirection(tabs, { defaultValue: "b" }, tabsMarkup),
+    ])
+    expect(document.documentElement.getAttribute("dir")).toBe("ltr")
+  } finally {
+    document.documentElement.removeAttribute("dir")
+  }
+})
+
+test("a toolbar follows the reading direction, though its tab stop is a generated id", async () => {
+  await checkDirection(
+    toolbar,
+    {},
+    `<root aria-label="Format"><button>Bold</button><button>Italic</button><button>Underline</button></root>`,
+  )
+})
+
+test("checkDirection compares values named left and right as they are", async () => {
+  await checkDirection(
+    radioGroup,
+    { defaultValue: "center" },
+    `<group aria-label="Align"><root value="left">Left</root><root value="center">Center</root><root value="right">Right</root></group>`,
+  )
+  const aligned = definePrimitive({
+    name: "aligned",
+    state: () => ({ align: "center" }),
+    api: () => ({}),
+    slots: (slot) => ({
+      root: slot({
+        attrs: () => ({ tabindex: "0" }),
+        on: {
+          keydown: (event, { store }) => {
+            if (event.key === "ArrowRight") store.set({ align: "right" })
+            if (event.key === "ArrowLeft") store.set({ align: "left" })
+          },
+        },
+      }),
+    }),
+  })
+  await expect(checkDirection(aligned, {}, `<root></root>`)).rejects.toThrow(
+    /ArrowLeft right to left leaves state/,
+  )
+})
+
+test("checkServer fails a primitive whose state reads the clock with new Date, randomness from crypto or the location", () => {
+  const starting = (initial: () => string) =>
+    definePrimitive({
+      name: "starting",
+      state: () => ({ value: initial() }),
+      api: () => ({}),
+      slots: (slot) => ({ root: slot({ attrs: (state) => ({ "data-value": state.value }) }) }),
+    })
+  const reads = (initial: () => string) => () => checkServer(starting(initial), {}, `<root></root>`)
+  expect(reads(() => new Date().toISOString())).toThrow(
+    /creating it reads the clock or randomness \(`new Date\(\)`\)/,
+  )
+  expect(reads(() => Date())).toThrow(/\(`Date\(\)`\)/)
+  expect(reads(() => crypto.randomUUID())).toThrow(/\(`crypto.randomUUID`\)/)
+  expect(reads(() => String(crypto.getRandomValues(new Uint8Array(1))[0]))).toThrow(
+    /\(`crypto.getRandomValues`\)/,
+  )
+  expect(reads(() => typeof location)).toThrow(/creating it reads `location`/)
+  expect(reads(() => new Date(0).toISOString())()).toContain('data-value="1970-01-01T00:00:00.000Z"')
+  expect(new Date().getTime()).toBeGreaterThan(0)
+  expect(crypto.randomUUID()).toHaveLength(36)
 })

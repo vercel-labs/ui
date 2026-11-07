@@ -57,7 +57,7 @@ function createCalendarController() {
   return createController<{
     /** The selected value: an ISO date, a list of them, or a `[start, end]` range. */
     getValue: () => CalendarValue
-    /** Selects a value. Returns false when canceled or unchanged. */
+    /** Selects a value. Returns false when canceled, unchanged, disabled, read-only, or holding a date people can't pick, like one past `max`. */
     setValue: (value: CalendarValue, options?: CalendarChangeOptions<CalendarValueChangeReason>) => boolean
     /** The first month shown, like `"2026-10"`. */
     getMonth: () => ISOMonth

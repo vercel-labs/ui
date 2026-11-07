@@ -28,29 +28,33 @@ function matches(text: string, query: string, mode: Mode) {
 function Example() {
   const [mode, setMode] = React.useState<Mode>("fuzzy")
   return (
-    <CommandSearch>
-      {({ query }) => (
-        <>
-          <div data-slot="row">
-            <CommandSearchInput aria-label="Search commands" placeholder="Search" />
-            <select aria-label="Match" value={mode} onChange={(event) => setMode(event.target.value as Mode)}>
-              <option value="fuzzy">Fuzzy</option>
-              <option value="contains">Contains</option>
-              <option value="startsWith">Starts with</option>
-            </select>
-          </div>
-          <CommandSearchList>
-            {commands
-              .filter((command) => matches(command, query, mode))
-              .map((command) => (
-                <CommandSearchCommand key={command}>
-                  <Highlight text={command} query={query} mode={mode} />
-                </CommandSearchCommand>
-              ))}
-          </CommandSearchList>
-        </>
-      )}
-    </CommandSearch>
+    <div data-slot="stack">
+      <div data-slot="controls">
+        <select aria-label="Match" value={mode} onChange={(event) => setMode(event.target.value as Mode)}>
+          <option value="fuzzy">Fuzzy</option>
+          <option value="contains">Contains</option>
+          <option value="startsWith">Starts with</option>
+        </select>
+      </div>
+      <CommandSearch>
+        {({ query }) => (
+          <>
+            <CommandSearchInput aria-label="Search commands" placeholder="Search commands" />
+            <CommandSearchList>
+              {commands
+                .filter((command) => matches(command, query, mode))
+                .map((command) => (
+                  <CommandSearchCommand key={command}>
+                    <span>
+                      <Highlight text={command} query={query} mode={mode} />
+                    </span>
+                  </CommandSearchCommand>
+                ))}
+            </CommandSearchList>
+          </>
+        )}
+      </CommandSearch>
+    </div>
   )
 }
 

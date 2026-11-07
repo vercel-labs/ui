@@ -1,5 +1,6 @@
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
+import { frameworkPages } from "@/lib/sections"
 import type { MDXComponents } from "mdx/types"
 import Link from "next/link"
 import type { ComponentProps, ReactNode } from "react"
@@ -9,7 +10,7 @@ import { CssVariables, DataAttributes } from "./data-attributes"
 import { Pre } from "./code"
 import { Collapsible } from "./collapsible"
 import { ChangelogPosts } from "./changelog-posts"
-import { Card, ComponentGrid } from "./component-grid"
+import { Card, ComponentCards, ComponentGrid } from "./component-grid"
 import { Frame } from "./frame"
 import { FrameworkContent, FrameworkLink } from "./site-preferences"
 import {
@@ -27,7 +28,7 @@ import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tabl
 function heading(Tag: "h2" | "h3" | "h4", className: string) {
   return function Heading({ id, children, className: _, ...props }: ComponentProps<"h2">) {
     return (
-      <Tag id={id} className={cn("group scroll-mt-29 text-foreground", className)} {...props}>
+      <Tag id={id} className={cn("group scroll-mt-20 text-foreground", className)} {...props}>
         {id ? (
           <a
             href={`#${id}`}
@@ -57,6 +58,9 @@ function InlineCode(props: ComponentProps<"code">) {
   )
 }
 
+// Links that name no framework, like /docs/rendering, go to the reader's.
+const frameworkHref = new RegExp(`^/docs/(${frameworkPages.join("|")})\\b`)
+
 // Every element MDX renders, styled here instead of with a prose plugin.
 // `framework` is the section's, for tables and examples that differ by
 // framework. Core and Agents pages have none.
@@ -69,17 +73,16 @@ function getMDXComponents(
       "h2",
       "mt-14 mb-4 flex items-center gap-4 text-lg leading-snug font-medium tracking-[-0.01em] after:h-px after:flex-1 after:bg-border/70",
     ),
-    h3: heading("h3", "mt-10 mb-3 text-base leading-snug font-medium sm:text-[15px]"),
+    h3: heading("h3", "mt-10 mb-3 text-[17px] leading-snug font-medium sm:text-[15px]"),
     h4: heading("h4", "mt-8 mb-2 text-sm font-medium"),
     p: (props) => (
-      <p className="my-4 text-base leading-[1.65] text-foreground/75 sm:text-[15px]" {...props} />
+      <p className="my-4 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px]" {...props} />
     ),
     a: ({ href = "", ...props }) => {
       const url = resolve(href)
       const className =
         "font-normal text-foreground underline decoration-foreground/25 underline-offset-[3px] transition-colors hover:decoration-foreground"
-      if (/^\/docs\/(components|utilities|rendering|server-rendering)\b/.test(url))
-        return <FrameworkLink href={url} className={className} {...props} />
+      if (frameworkHref.test(url)) return <FrameworkLink href={url} className={className} {...props} />
       return url.startsWith("/") || url.startsWith("#") ? (
         <Link href={url} className={className} {...props} />
       ) : (
@@ -89,13 +92,13 @@ function getMDXComponents(
     strong: (props) => <strong className="font-medium text-foreground" {...props} />,
     ul: (props) => (
       <ul
-        className="my-4 flex list-disc flex-col gap-1.5 ps-5 text-base leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/25"
+        className="my-4 flex list-disc flex-col gap-1.5 ps-5 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/25"
         {...props}
       />
     ),
     ol: (props) => (
       <ol
-        className="my-4 flex list-decimal flex-col gap-1.5 ps-5 text-base leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/40"
+        className="my-4 flex list-decimal flex-col gap-1.5 ps-5 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/40"
         {...props}
       />
     ),
@@ -161,6 +164,7 @@ function getMDXComponents(
       <Card {...props} href={resolve(props.href)} />
     ),
     ComponentGrid: () => <ComponentGrid framework={framework} />,
+    ComponentCards: (props: { names: string }) => <ComponentCards {...props} framework={framework} />,
     ChangelogPosts,
     ComponentExample: (props: {
       name: string

@@ -39,10 +39,12 @@ function bindTriggerElement(el: HTMLElement) {
   if (!el.matches("a[href]") && !el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0")
 }
 
-// Buttons and links activate themselves. Anything else needs a click on Enter and Space.
+// Buttons and links activate themselves. Anything else needs a click on Enter
+// and Space, and so does Space on a link that says it's a button.
 function triggerKeydown(event: KeyboardEvent, el: HTMLElement | undefined) {
-  if (!el || el.tagName === "BUTTON" || el.matches("a[href]")) return
-  if (event.target !== el || (event.key !== "Enter" && event.key !== " ")) return
+  if (!el || el.tagName === "BUTTON" || event.target !== el) return
+  if (el.matches("a[href]") && (event.key !== " " || el.getAttribute("role") !== "button")) return
+  if (event.key !== "Enter" && event.key !== " ") return
   event.preventDefault()
   el.click()
 }

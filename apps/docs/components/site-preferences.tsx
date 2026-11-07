@@ -1,20 +1,19 @@
 "use client"
 
 import { cn } from "cn"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { type Framework, frameworkIds, frameworks, isFramework } from "@/lib/frameworks"
+import { type Framework, isFramework } from "@/lib/frameworks"
 import {
   colorScheme,
   framework as frameworkPreference,
   packageManager,
   setFramework,
   useFramework,
-  useSavedFramework,
 } from "@/lib/preferences"
-import { frameworkHref, isSection, utilitiesFolder } from "@/lib/sections"
+import { isSection, utilitiesFolder } from "@/lib/sections"
 import { Preferences } from "@ui-sdk/react/preferences"
+import { CheckIcon } from "lucide-react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import * as React from "react"
 
 const preferences = [colorScheme, frameworkPreference, packageManager]
@@ -35,79 +34,22 @@ function SitePreferences({ children }: { children: React.ReactNode }) {
   return <Preferences preferences={preferences}>{children}</Preferences>
 }
 
-const items = frameworkIds.map((value) => ({ value, label: frameworks[value].label }))
-
-const shownFor = {
-  react: "[html[data-framework=react]_&]:inline",
-  vue: "[html[data-framework=vue]_&]:inline",
-  svelte: "[html[data-framework=svelte]_&]:inline",
-  "web-components": "[html[data-framework=web-components]_&]:inline",
-  solid: "[html[data-framework=solid]_&]:inline",
+// The remembered framework, from the attribute the preference sets before the page
+// paints, so the check doesn't move after hydration. React until one is saved.
+const savedCheck = {
+  react: "[html[data-framework]:not([data-framework='']):not([data-framework=react])_&]:invisible",
+  vue: "invisible [html[data-framework=vue]_&]:visible",
+  svelte: "invisible [html[data-framework=svelte]_&]:visible",
+  "web-components": "invisible [html[data-framework=web-components]_&]:visible",
+  solid: "invisible [html[data-framework=solid]_&]:visible",
 }
 
-function SavedLabel() {
-  return (
-    <>
-      <span className="text-muted-foreground [html[data-framework]:not([data-framework=''])_&]:hidden">
-        Framework
-      </span>
-      {frameworkIds.map((value) => (
-        <span key={value} className={cn("hidden", shownFor[value])}>
-          <FrameworkName framework={value} />
-        </span>
-      ))}
-    </>
-  )
-}
-
-// The header has no room for "Web Components" on a phone.
-function FrameworkName({ framework }: { framework: Framework }) {
-  const { label, short } = frameworks[framework]
-  if (label === short) return label
-  return (
-    <>
-      <span className="sm:hidden">{short}</span>
-      <span className="max-sm:hidden">{label}</span>
-    </>
-  )
-}
-
-function FrameworkPicker({ urls }: { urls: string[] }) {
+/** A check on the current framework: the page's, else the remembered one, else React. */
+function FrameworkCheck({ framework, className }: { framework: Framework; className?: string }) {
   const section = useSection()
-  const pathname = usePathname()
-  const router = useRouter()
-  const saved = useSavedFramework()
-  const inFramework = section !== undefined && isFramework(section)
-  const framework = inFramework ? section : (saved ?? null)
-
-  return (
-    <Select
-      items={items}
-      value={framework}
-      onValueChange={(next) => {
-        if (!next || !isFramework(next) || next === framework) return
-        if (!inFramework) return setFramework(next)
-        router.push(frameworkHref(pathname + location.search + location.hash, next, urls))
-      }}
-    >
-      <SelectTrigger
-        variant="ghost"
-        aria-label="Framework"
-        className="h-8 min-w-0 rounded-2xl px-2.5 data-placeholder:text-foreground bg-foreground/5 hover:bg-foreground/10"
-      >
-        <SelectValue className="truncate">
-          {inFramework ? <FrameworkName framework={section} /> : <SavedLabel />}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="start" sideOffset={6} className="min-w-44 transition-none">
-        {items.map(({ value, label }) => (
-          <SelectItem key={value} value={value}>
-            {label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
+  const shown =
+    section && isFramework(section) ? (section === framework ? "" : "invisible") : savedCheck[framework]
+  return <CheckIcon aria-hidden className={cn("size-4 shrink-0", shown, className)} />
 }
 
 function FrameworkLink({ href, ...props }: React.ComponentProps<typeof Link> & { href: string }) {
@@ -126,4 +68,4 @@ function FrameworkContent({ value, children }: { value: Framework; children: Rea
   return framework === value ? children : null
 }
 
-export { FrameworkContent, FrameworkLink, FrameworkPicker, SitePreferences, useSection }
+export { FrameworkCheck, FrameworkContent, FrameworkLink, SitePreferences, useSection }

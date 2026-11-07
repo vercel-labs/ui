@@ -1,6 +1,6 @@
 // Date Picker's parts and the attributes they carry: the inputs, the trigger,
 // the popup, the hint, clear and presets, and Calendar's parts inside it.
-import { calendarSlots, isDisabled, localeOf } from "../calendar/calendar-api"
+import { calendarSlots, isDisabled, isPickable, localeOf } from "../calendar/calendar-api"
 import { normalizeValue } from "../calendar/calendar-model"
 import { formatDate } from "../../foundation/date/format"
 import { datePattern } from "../../foundation/date/parse"
@@ -53,6 +53,9 @@ function triggerLabel(state: State) {
   }
   return `${label}, ${formatDate(state.value as ISODate, locale)}`
 }
+
+const presetDisabled = (state: State, value: DatePickerValue) =>
+  !isPickable(state, normalizeValue(state.mode, value))
 
 const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
   root: slot<{}, DatePickerState>({
@@ -278,18 +281,19 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
     props: { value: "list" },
     state: (state, { props }) => ({
       selected: valueKey(state.value) === valueKey(normalizeValue(state.mode, props.value)),
-      disabled: isDisabled(state) || state.readOnly,
+      disabled: presetDisabled(state, props.value),
     }),
     attrs: (state, { props }) => {
       const selected = valueKey(state.value) === valueKey(normalizeValue(state.mode, props.value))
       return {
         type: "button",
-        disabled: isDisabled(state) || state.readOnly ? "" : undefined,
+        disabled: presetDisabled(state, props.value) ? "" : undefined,
         "aria-pressed": String(selected),
         "data-selected": selected ? "" : undefined,
       }
     },
     press({ api, props, store }, event) {
+      if (presetDisabled(store.get(), props.value)) return
       api.internal.pickValue(props.value, "preset-press", event)
       if (store.get().closeOnSelect) api.internal.hide({ reason: "preset-press", event })
     },

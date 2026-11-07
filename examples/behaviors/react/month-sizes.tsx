@@ -7,6 +7,16 @@ function Example() {
   const [fixedWeeks, setFixedWeeks] = React.useState(true)
   return (
     <div data-slot="stack">
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input
+            type="checkbox"
+            checked={fixedWeeks}
+            onChange={(event) => setFixedWeeks(event.target.checked)}
+          />
+          Six weeks each
+        </label>
+      </div>
       <div data-slot="month-sizes-row">
         {months.map((month) => (
           <div key={month} data-month={month} data-slot="month-sizes-month">
@@ -23,14 +33,6 @@ function Example() {
           </div>
         ))}
       </div>
-      <label data-slot="label">
-        <input
-          type="checkbox"
-          checked={fixedWeeks}
-          onChange={(event) => setFixedWeeks(event.target.checked)}
-        />
-        Six weeks each
-      </label>
     </div>
   )
 }

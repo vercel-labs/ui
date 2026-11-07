@@ -158,6 +158,22 @@ test("a popover in a shadow root stays open when focus moves into it from outsid
   await expect(page.getByRole("button", { name: "Open" })).toHaveAttribute("aria-expanded", "true")
 })
 
+test("an open sheet taken off the page takes its viewport with it", async ({ page }) => {
+  await page.evaluate(() => {
+    const stage = document.querySelector("#stage")!
+    stage.innerHTML = `
+      <div id="sheets"></div>
+      <ui-popover presentation="sheet" container="#sheets">
+        <ui-popover-trigger><button>Open</button></ui-popover-trigger>
+        <ui-popover-content>Popup</ui-popover-content>
+      </ui-popover>`
+  })
+  await page.getByRole("button", { name: "Open" }).click()
+  await expect(page.locator("#sheets > ui-popover-viewport")).toHaveCount(1)
+  await page.evaluate(() => document.querySelector("ui-popover")!.remove())
+  await expect(page.locator("ui-popover-viewport")).toHaveCount(0)
+})
+
 // Like Lit, which replaces a root's sheets when its styles change, or a page
 // that changes them in place.
 for (const change of ["replaces its shadow root's sheets", "changes its shadow root's sheets in place"]) {
@@ -574,6 +590,35 @@ test('disabled="false" disables and required="false" requires, like on native co
     }
   })
   expect(result).toEqual({ ariaDisabled: "true", matches: true, value: null, valid: false })
+})
+
+test("a checkbox group submits only its checked checkboxes that aren't disabled, like native ones", async ({
+  page,
+}) => {
+  const result = await page.evaluate(async () => {
+    const form = document.createElement("form")
+    form.innerHTML = `
+      <ui-checkbox-group name="toppings" aria-label="Toppings" default-value="cheese,olives,ghost" required>
+        <ui-checkbox value="cheese" aria-label="Cheese"></ui-checkbox>
+        <ui-checkbox value="olives" aria-label="Olives" disabled></ui-checkbox>
+      </ui-checkbox-group>`
+    document.querySelector("#stage")!.append(form)
+    const tick = () => new Promise((done) => setTimeout(done))
+    const read = () => ({ submitted: new FormData(form).getAll("toppings"), valid: form.checkValidity() })
+    await tick()
+    const start = read()
+    form.querySelector<HTMLElement & { value: string[] }>("ui-checkbox-group")!.value = ["olives"]
+    await tick()
+    const disabledOnly = read()
+    form.querySelector("ui-checkbox[value=olives]")!.removeAttribute("disabled")
+    await tick()
+    return { start, disabledOnly, enabled: read() }
+  })
+  expect(result).toEqual({
+    start: { submitted: ["cheese"], valid: true },
+    disabledOnly: { submitted: [], valid: false },
+    enabled: { submitted: ["olives"], valid: true },
+  })
 })
 
 test("a checkbox group disabled at the start and enabled later enables its checkboxes", async ({ page }) => {

@@ -851,3 +851,33 @@ test("an item the owner removes mid-drag stays removed when the value renders be
   expect(onValueChange).toHaveBeenCalledTimes(1)
   expect(onValueChange.mock.calls[0][0]).toEqual(["b", "a", "c"])
 })
+
+test("an order the owner changes mid-move stays when the item drops where it was", () => {
+  const onValueChange = vi.fn()
+  const { instance } = render({ value: ["a", "b", "c"], onValueChange })
+  instance.api.reorder.grab("a")
+  instance.setOptions({ value: ["b", "a", "c"], onValueChange })
+  expect(instance.api.reorder.order(instance.get())).toEqual(["b", "a", "c"])
+  instance.api.reorder.drop()
+  expect(onValueChange).not.toHaveBeenCalled()
+})
+
+test("an order the owner changes mid-move keeps the moved item where the user put it", () => {
+  const onValueChange = vi.fn()
+  const { instance } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  instance.api.reorder.grab("a")
+  instance.api.reorder.moveTo(1)
+  instance.setOptions({ value: ["d", "c", "b", "a", "e"], onValueChange })
+  instance.api.reorder.drop()
+  expect(onValueChange.mock.calls[0][0]).toEqual(["d", "a", "c", "b", "e"])
+})
+
+test("a group the owner reverses mid-move stays where the user put it", () => {
+  const onValueChange = vi.fn()
+  const { instance } = render({ value: ["a", "b", "c", "d"], group: ["a", "b"], onValueChange })
+  instance.api.reorder.grab("a")
+  instance.api.reorder.moveTo(1)
+  instance.setOptions({ value: ["b", "a", "c", "d"], group: ["a", "b"], onValueChange })
+  instance.api.reorder.drop()
+  expect(onValueChange.mock.calls[0][0]).toEqual(["c", "b", "a", "d"])
+})

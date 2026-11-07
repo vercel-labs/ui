@@ -9,6 +9,7 @@ import {
   type PreviewReason,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
+import { useLog } from "../../shared/react/log"
 
 type FontsState = { value: string; preview: string | null; focused: string | null }
 
@@ -92,6 +93,7 @@ const families: Record<string, string> = {
 }
 
 function Example() {
+  const log = useLog()
   const [shown, setShown] = React.useState("Sans")
   const [preview, setPreview] = React.useState<string | null>(null)
   return (
@@ -102,16 +104,23 @@ function Example() {
       >
         The quick brown fox
       </p>
-      <Fonts aria-label="Font" defaultValue="Sans" onValueChange={setShown} onPreviewChange={setPreview}>
+      <Fonts
+        aria-label="Font"
+        defaultValue="Sans"
+        onValueChange={(value) => {
+          setShown(value)
+          log(`Chose ${value}`)
+        }}
+        onPreviewChange={setPreview}
+      >
         {Object.keys(families).map((font) => (
           <FontsOption key={font} value={font}>
             {font}
           </FontsOption>
         ))}
       </Fonts>
-      <p data-slot="hint">{preview ? `Previewing ${preview}` : `Chosen: ${shown}`}</p>
     </div>
   )
 }
 
-export { Example, fonts, Fonts, FontsOption, type FontsOptions, type FontsState }
+export { Example }

@@ -46,10 +46,12 @@ function Example() {
   const [keep, setKeep] = React.useState(true)
   return (
     <div data-slot="stack">
-      <label data-slot="label">
-        <input type="checkbox" checked={keep} onChange={(event) => setKeep(event.target.checked)} />
-        Keep focus on the task
-      </label>
+      <div data-slot="controls">
+        <label data-slot="label">
+          <input type="checkbox" checked={keep} onChange={(event) => setKeep(event.target.checked)} />
+          Keep focus on the task
+        </label>
+      </div>
       <Checklist keep={keep}>
         {({ done }) =>
           [false, true].map((finished) => (

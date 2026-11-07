@@ -44,7 +44,7 @@ ui-pagination
 
 Name the navigation with `aria-label`, then put the page links and steps in a list.
 
-A list with a `<template>` renders the range from it: one copy for each page, with the page number in an empty button, and the `<template data-ellipsis>` for each gap. Without the ellipsis template, gaps get a plain `<ui-pagination-ellipsis>`. Links and steps wrap your own `<button>`, or an `<a>` with [`getHref`](#links), so style those. Links written out by hand, like a server's, take a `page` attribute.
+A list with a `<template>` renders the range from it: one copy for each page, with the page number in an empty button, and the `<template data-ellipsis>` for each gap. Without the ellipsis template, gaps get a plain `<ui-pagination-ellipsis>`. Links and steps wrap your own `<button>`, or an `<a>` with [`getHref`](#links), so style those. Links you write yourself, like a server's, take a `page` attribute.
 
 The template keeps page entries keyed as the range moves. The current page's wrapped button gets `aria-current="page"` and `data-current`; an ellipsis shows “…” and is hidden from screen readers.
 
@@ -89,7 +89,7 @@ A page past the end, like after the count shrinks, reads as the last page.
 
 ## Simple
 
-With only a few pages, the range has no gaps, so you can write the links out and leave the steps off. Links written by hand take a `page` attribute and need their own number.
+With only a few pages, the range has no gaps, so you can write the links out and leave the steps off. Links you write yourself take a `page` attribute and need their own number.
 
 ```html
 <ui-pagination aria-label="Pagination" page-count="5">

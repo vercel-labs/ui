@@ -21,7 +21,7 @@ await checkPattern(root, "tabs")
 
 <ComponentExample
   name="core/check-tabs"
-  caption="Press Check the tabs pattern. Then select Leave the tab list unnamed and run the check again to see the missing-name error."
+  caption="Press Check the Tabs Pattern. Then select Leave the tab list unnamed and run the check again to see the missing-name error."
 />
 
 The supported patterns are `listbox`, `menu`, `menubar`, `tabs`, `radio-group`, `toolbar`, `tree`, `grid`, `dialog`, `alertdialog`, `disclosure`, `accordion`, `combobox`, `slider`, `switch`, and `checkbox`.
@@ -34,7 +34,7 @@ It requires Home and End for listboxes, tabs, and toolbars, a name for every tab
 
 Use `mount` when you want to test the primitive itself. Pass its definition, options, and a little markup. Tags that match slots become parts; their attributes supply the part props.
 
-This test uses the [confirm button](./kernel/state-and-changes#changes). The first press arms it. The next confirms and disarms it:
+This test uses the [confirm button](./kernel/handle-changes#changes). The first press arms it. The next confirms and disarms it:
 
 ```ts
 import { expect, test } from "vitest"
@@ -62,7 +62,7 @@ test("confirm with a click and Enter", async () => {
 
 <ComponentExample
   name="core/test-confirm-button"
-  caption="Press Run the test to click the confirm button, press Enter, and inspect the resulting state, change reasons, and input sources."
+  caption="Press Run the Test to click the confirm button, press Enter, and inspect the resulting state, change reasons, and input sources."
 />
 
 `root` is the first element in the markup. Use `part(slot, key)` to find another part, such as `view.part("item", "pear")`. `state` reads the current state, `api` exposes the primitive's methods, and `changes` records each accepted change.
@@ -91,7 +91,7 @@ For pointer interactions, `hover(element)` moves the pointer onto a part. `drag(
 
 <ComponentExample
   name="core/test-inputs"
-  caption="Press Run the tests to type and clear a search, hover a seat, and check the announcement from an empty sign-up form."
+  caption="Press Run the Tests to type and clear a search, hover a seat, and check the announcement from an empty sign-up form."
 />
 
 `announced` captures the text the primitive sends to its screen reader announcer. Wait for scheduled work with `settle` before checking a delayed announcement:
@@ -118,7 +118,7 @@ This uses the [read-more primitive](./kernel/define-a-primitive#parts-that-come-
 
 <ComponentExample
   name="core/check-server"
-  caption="Press Check the server HTML to read the rendered parts. Then select Read the clock in attrs and run it again to see the dependency reported."
+  caption="Press Check the Server HTML to read the rendered parts. Then select Read the clock in attrs and run it again to see the dependency reported."
 />
 
 The markup follows the same rules as `mount`. Ordinary HTML tags stay as they are. Use `as="form"`, for example, when a slot needs to render a specific tag.
@@ -137,7 +137,7 @@ Left in right-to-left text should match Right in left-to-right text, and vice ve
 
 <ComponentExample
   name="core/check-direction"
-  caption="Press Check both directions. Then select Ignore the direction to try a pager whose horizontal arrows never swap."
+  caption="Press Check Both Directions. Then select Ignore the direction to try a pager whose horizontal arrows never swap."
 />
 
 The [pager example](./platform#direction) shows how it reads direction from the page.

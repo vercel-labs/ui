@@ -3,13 +3,11 @@ title: Compose Behaviors
 description: Build a star rating with shared state and keyboard navigation.
 ---
 
-Combine `createChange` and `createRovingFocus` to build a five-star rating. `createChange` reports rating changes, and `createRovingFocus` manages the group's Tab stop and arrow keys.
-
-We'll build on the toggle from [Build a Component](./build-a-component), adding one behavior at a time.
+So far, each primitive has had one behavior of its own. Now let's combine behaviors from `@ui-sdk/core` to build a five-star rating: `createChange` reports each new rating, and `createRovingFocus` manages the group's Tab stop and arrow keys. We'll add one at a time.
 
 ## Start with Shared State
 
-The rating uses the same state and change pattern as the toggle. This time, `value` is a number: `0` means no rating yet. `defaultValue` sets the starting rating.
+The rating's `value` is a number: `0` means no rating yet. `defaultValue` sets the starting rating.
 
 Create `rating.ts`. For now, it has a root to hold the stars and a `rate` function to choose a value:
 
@@ -45,14 +43,14 @@ const rating = definePrimitive({
 export { rating, type RatingOptions }
 ```
 
+- `createChange(context)` returns `change`. `rate` calls it with the new value and a reason. It calls `onValueChange` first, then updates `value` unless the callback cancels or the app controls it.
+- `controlled` and `sync` let a parent own `value`. `sync` copies a new `value` option into state.
+
+[Handle Changes](./kernel/handle-changes) covers the change pattern in depth.
+
 Before we add stars, let's try changing the value. These buttons call `rate(3)` and `rate(0)`:
 
-<ComponentExample
-  name="core/rating-state"
-  hideCode={true}
-  compact={true}
-  caption="Press Set to 3, then Reset to return to 0."
-/>
+<ComponentExample name="core/rating-state" caption="Press Set to 3, then Reset to return to 0." />
 
 ## Add a Star
 
@@ -73,14 +71,12 @@ star: slot<{ value: string }>({
 }),
 ```
 
-- `props` gives each star a `value`, such as `"3"`. That becomes its key. We use `Number(key)` to pass it to `rate` as a number.
+- `props` gives each star a `value`, such as `"3"`. That becomes its key. We use `Number(key)` to pass it to `rate` as a number. [Option Kinds](./kernel/define-a-primitive#option-kinds) lists the kinds a prop can take.
 - `aria-checked` marks the selected star. The root and stars form a radio group: one choice from several.
 - `data-filled` marks every star up to the selection, so choosing three can fill the first three stars.
 
 <ComponentExample
   name="core/rating-star"
-  hideCode={true}
-  compact={true}
   caption="Press the star. The rating becomes 1 and the star fills in."
 />
 
@@ -215,7 +211,7 @@ Then add the stars to your HTML. Each star's behavior connects to the native but
 
 </FrameworkContent>
 
-Use `data-filled` to color the stars, just as we used `aria-pressed` to style the toggle:
+Use `data-filled` to color the stars, the way [Style a Component](./kernel/style-a-component#style-its-state) styled the copy button from `data-copied`:
 
 ```css
 [data-slot="rating-root"] {
@@ -231,8 +227,6 @@ Use `data-filled` to color the stars, just as we used `aria-pressed` to style th
 
 <ComponentExample
   name="core/rating-stars"
-  hideCode={true}
-  compact={true}
   caption="Hover to preview a rating, then click to choose it. Try Tab: each star still has its own Tab stop."
 />
 
@@ -296,8 +290,6 @@ star: slot<{ value: string }>({
 
 <ComponentExample
   name="core/rating-focus"
-  hideCode={true}
-  compact={true}
   caption="Choose a star. Tab leaves the group; Shift+Tab returns to your selection."
 />
 
@@ -359,8 +351,6 @@ on: {
 
 <ComponentExample
   name="core/rating"
-  hideCode={true}
-  compact={true}
   caption="Use the arrows to change the rating. Home and End jump to the first and last star."
 />
 
@@ -369,23 +359,7 @@ on: {
 We can test the shared primitive directly. Here's a small Vitest test that chooses three stars and checks the value:
 
 ```ts
-import { expect, test } from "vitest"
-import { rating } from "./rating"
-
-test("choosing a star changes the rating", () => {
-  const instance = rating({ id: "rating" })
-  instance.api.rate(3)
-  expect(instance.get().value).toBe(3)
-})
-```
-
-We can also check which star has the tab stop, whether a callback can cancel a change, and whether a controlled value waits for its update:
-
-<Collapsible title="Show the complete test file">
-
-```ts
 // rating.test.ts
-import { partAttrs } from "@ui-sdk/core/testing"
 import { expect, test } from "vitest"
 import { rating } from "./rating"
 
@@ -394,36 +368,7 @@ test("choosing a star changes the rating", () => {
   instance.api.rate(3)
   expect(instance.get().value).toBe(3)
 })
-
-test("the selected star has the only tab stop on the server", () => {
-  const instance = rating({ id: "rating", defaultValue: 3 })
-  const stars = ["1", "2", "3", "4", "5"].map((value) => partAttrs(instance.part("star", { value })))
-  expect(stars.map((star) => star.tabindex)).toEqual(["-1", "-1", "0", "-1", "-1"])
-  expect(stars.map((star) => star["aria-checked"])).toEqual(["false", "false", "true", "false", "false"])
-})
-
-test("a callback can cancel a change", () => {
-  const instance = rating({
-    id: "rating",
-    defaultValue: 3,
-    onValueChange: (_value, details) => details.cancel(),
-  })
-  instance.api.rate(1)
-  expect(instance.get().value).toBe(3)
-})
-
-test("a controlled rating waits for its new option", () => {
-  const instance = rating({ id: "rating", value: 2 })
-  instance.api.rate(4)
-  expect(instance.get().value).toBe(2)
-  instance.setOptions({ id: "rating", value: 4 })
-  expect(instance.get().value).toBe(4)
-})
 ```
-
-</Collapsible>
-
-`partAttrs` reads the attributes an adapter would put on a part, so these tests don't need a framework or a DOM.
 
 For focus and keyboard checks, render the component and run `checkPattern(root, "radio-group")` from `@ui-sdk/core/testing`. [Testing](./testing) shows how.
 
@@ -526,6 +471,7 @@ export { rating, type RatingOptions }
 
 ## Keep Building
 
+Next, [Handle Changes](./kernel/handle-changes) goes further into the change pattern the rating uses: callbacks, controlled state, commits and undo.
+
 - [Focus](./behaviors/focus) covers grids and other ways to move through a group.
-- [State and Changes](./kernel/state-and-changes) goes further into callbacks and controlled state.
 - [Testing](./testing) checks the component's keyboard behavior and accessibility.

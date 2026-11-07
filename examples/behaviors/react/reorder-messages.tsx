@@ -92,4 +92,4 @@ function Example() {
   )
 }
 
-export { Example, tracks, Tracks, type TracksOptions, type TracksState, TracksTrack }
+export { Example }

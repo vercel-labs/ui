@@ -153,8 +153,10 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
     attrs: (state, context) => {
       const { key, props } = context
       const pending = state.pending.includes(key)
+      const attrs = option.attrs(state, context)
       return {
-        ...option.attrs(state, context),
+        ...attrs,
+        "aria-disabled": pending ? "true" : attrs["aria-disabled"],
         "aria-busy": pending ? "true" : undefined,
         "aria-keyshortcuts": props.shortcut ? ariaKeyshortcuts(props.shortcut, state.apple) : undefined,
         "data-pending": pending ? "" : undefined,

@@ -39,7 +39,14 @@ function frameworkHref(href: string, framework: Framework, urls: string[]) {
 
 // Links from the shared sections into a framework's pages say no framework, like
 // /docs/components/field, and go to the one the reader last read.
-const frameworkPages = ["components", "utilities", "rendering"]
+const frameworkPages = [
+  "components",
+  "utilities",
+  "rendering",
+  "server-rendering",
+  "custom-parts",
+  "styling-and-animation",
+]
 
 export {
   frameworkHref,

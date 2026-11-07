@@ -37,6 +37,25 @@ type State = {
   descriptions: string[]
 }
 
+// A part takes its element's id as it changes, like one its author sets later,
+// so the parts pointing at it point at the id in the page.
+function registerById(el: HTMLElement, register: (id: string) => () => void) {
+  let id = el.id
+  let unregister = register(id)
+  if (typeof MutationObserver === "undefined") return () => unregister()
+  const observer = new MutationObserver(() => {
+    if (el.id === id) return
+    id = el.id
+    unregister()
+    unregister = register(id)
+  })
+  observer.observe(el, { attributeFilter: ["id"] })
+  return () => {
+    observer.disconnect()
+    unregister()
+  }
+}
+
 const fieldSetState = (state: State) => ({ disabled: state.disabled || state.inherited })
 
 const disabledAttrs = (state: State) => ({
@@ -83,14 +102,14 @@ const fieldSetPrimitive = /* @__PURE__ */ definePrimitive({
       props: { id: "string" },
       state: fieldSetState,
       attrs: (state, { id, props }) => ({ id: props.id ?? `${id}-legend`, ...disabledAttrs(state) }),
-      bind: (el, { api }) => api.register("legends", el.id),
+      bind: (el, { api }) => registerById(el, (id) => api.register("legends", id)),
     }),
     // A FieldDescription right inside a FieldSet, outside any Field, describes the group.
     description: slot<{}, FieldSetState>({
       props: { id: "string" },
       state: fieldSetState,
       attrs: (state, { id, props }) => ({ id: props.id ?? `${id}-description`, ...disabledAttrs(state) }),
-      bind: (el, { api }) => api.register("descriptions", el.id),
+      bind: (el, { api }) => registerById(el, (id) => api.register("descriptions", id)),
     }),
   }),
   agent: { shown: () => false },
@@ -142,4 +161,5 @@ export {
   type FieldSetOptions,
   type FieldSetPrimitive,
   type FieldSetState,
+  registerById,
 }

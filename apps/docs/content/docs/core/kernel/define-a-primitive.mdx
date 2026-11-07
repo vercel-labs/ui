@@ -5,20 +5,53 @@ description: Give your primitive options, expose state to its parts, and work wi
 
 `definePrimitive` brings a component's options, state, methods, and parts together. Use its slots to expose attributes and state, handle events, and work with mounted elements.
 
-[Build a Component](../build-a-component) and [Compose Behaviors](../compose-behaviors) show complete components. The snippets here focus on individual fields; each demo's Code tab has the full example.
+In [Build a Component](../build-a-component), you defined a mute button. This page goes through each field of a definition, using a copy button. Each demo's Code tab has the full example.
+
+Here's the copy button this page builds, as one definition. Each section below covers one of its fields in more detail.
+
+```ts title="copy-button.ts"
+import { definePrimitive } from "@ui-sdk/core"
+
+type CopyButtonOptions = { text?: string; onCopy?: (text: string) => void }
+
+const copyButton = definePrimitive({
+  name: "copy-button",
+  options: { text: "string", onCopy: "callback" },
+  state: (options: CopyButtonOptions) => ({ copied: false }),
+  api: (context) => ({
+    async copy() {
+      const { text = "", onCopy } = context.options()
+      await navigator.clipboard.writeText(text)
+      context.store.set({ copied: true })
+      onCopy?.(text)
+    },
+  }),
+  slots: (slot) => ({
+    root: slot<{}, { copied: boolean }>({
+      state: (state) => ({ copied: state.copied }),
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.copy(),
+    }),
+  }),
+})
+
+export { copyButton }
+```
 
 ## Options
 
-Let's give a copy button some text to copy. Add `options` to describe what it accepts, and type those options in `state`:
+Let's give a copy button some text to copy. Describe the options as a type, list each one's kind in `options`, and type `state`'s parameter with it:
+
+```ts
+type CopyButtonOptions = { text?: string; onCopy?: (text: string) => void }
+```
 
 ```ts
 options: { text: "string", onCopy: "callback" },
-state: (_options: { text?: string; onCopy?: (text: string) => void }) => ({
-  copied: false,
-}),
+state: (options: CopyButtonOptions) => ({ copied: false }),
 ```
 
-The kinds tell adapters how to handle each value. For example, web components read `text` from an attribute and turn `onCopy` into an event. TypeScript checks that every option has a kind. If your primitive has no options, leave `options` out.
+Typing `state`'s options is what types `context.options()` in `api`, so the type is written once. The kinds tell adapters how to handle each value. For example, web components read `text` from an attribute and turn `onCopy` into an event. TypeScript checks that every option has a kind. If your primitive has no options, leave `options` out.
 
 Read the current values with `context.options()`. Here, `copy` reads the text when the button is pressed:
 
@@ -51,11 +84,11 @@ context.onOptions((options) => {
 })
 ```
 
-To keep a controlled value in sync instead, use `sync`, as shown in [Build a Component](../build-a-component#control-the-state).
+To keep a controlled value in sync instead, use `sync`, as shown in [Handle Changes](./handle-changes#control-the-state).
 
 ### Option Kinds
 
-The same kinds work in a slot's `props` schema, like the star's `value` in the rating guide.
+The same kinds work in a slot's `props` schema, which gives each part values of its own, like a star's `value` in [Compose Behaviors](../compose-behaviors#add-a-star).
 
 | Kind                                | Use it for                                                                                       |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -87,9 +120,12 @@ The first type argument describes the part's props; the second describes what it
 <CopyButton text="npm add @ui-sdk/core">{({ copied }) => (copied ? "Copied" : "Copy")}</CopyButton>
 ```
 
-Try copying, then change the text. This version also resets after a short timeout.
+Try it. This version also resets after a short timeout.
 
-<ComponentExample name="core/copy-button" />
+<ComponentExample
+  name="core/copy-button"
+  caption="Press Copy. The button reads Copied while the command is copied, then goes back to Copy."
+/>
 
 ## Parts That Come and Go
 
@@ -118,8 +154,6 @@ trigger: slot({
 `part.id` is the instance's unique id. Both parts use it to build the same panel id. If an id includes an item value, use `idPart(value)` from `@ui-sdk/core` to escape spaces and percent signs.
 
 An id the author writes on a part's element wins over the one its slot makes, in every framework and on web components. The parts that render after it point at the author's id from their first render, on a server too, and once the element binds, every part does: `aria-controls`, `aria-labelledby`, `aria-describedby`, `aria-activedescendant`, `for` and the other references to the made id point at it, so build references from `part.id` and the core keeps them right.
-
-<ComponentExample name="core/read-more" />
 
 Leave `present` out for parts that are always there. Framework adapters remove absent parts; web components keep the markup and bind or unbind its behavior as presence changes.
 
@@ -294,14 +328,14 @@ For state attributes, `openAttrs(open)` returns `data-open` or `data-closed`. `c
   }}
   examples={{
     name: "Naming",
-    state: "../build-a-component#Define the Button",
+    state: "../build-a-component#Define a Primitive",
     options: "Options",
-    live: "./state-and-changes#Live State",
-    sync: "./state-and-changes#State a User Controls",
-    controlled: "./state-and-changes#State a User Controls",
-    commits: "./state-and-changes#Commits",
-    api: "../build-a-component#Define the Button",
-    slots: "../build-a-component#Define the Button",
+    live: "./handle-changes#Live State",
+    sync: "./handle-changes#State a User Controls",
+    controlled: "./handle-changes#State a User Controls",
+    commits: "./handle-changes#Commits",
+    api: "../build-a-component#Define a Primitive",
+    slots: "../build-a-component#Define a Primitive",
     label: "Naming",
     agent: "What Agents Can Do",
   }}
@@ -319,12 +353,12 @@ For state attributes, `openAttrs(open)` returns `data-open` or `data-closed`. `c
   }}
   examples={{
     present: "Parts That Come and Go",
-    attrs: "../build-a-component#Define the Button",
+    attrs: "../build-a-component#Define a Primitive",
     state: "What a Part Shows",
-    live: "./state-and-changes#Live State",
-    direct: "./state-and-changes#Live State",
-    selects: "./state-and-changes#Live State",
-    press: "../build-a-component#Define the Button",
+    live: "./handle-changes#Live State",
+    direct: "./handle-changes#Live State",
+    selects: "./handle-changes#Live State",
+    press: "../build-a-component#Define a Primitive",
     on: "Events",
     bind: "Working with the Element",
     connect: "Working with the Element",
@@ -350,3 +384,7 @@ For state attributes, `openAttrs(open)` returns `data-open` or `data-closed`. `c
     keys: "Roles, Focus and Keys",
   }}
 />
+
+## Next
+
+The copy button has everything it needs. Next, [Render a Primitive](./render-a-primitive) puts it on the page in your framework.

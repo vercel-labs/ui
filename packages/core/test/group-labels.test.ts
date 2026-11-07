@@ -68,6 +68,16 @@ describe("group labels", () => {
     expect(attrs(instance.part("radio-group", { name: "sort" }))["aria-labelledby"]).toBe("m-label-sort")
   })
 
+  test("a menu radio group whose name has a space is named by one id", async () => {
+    const instance = menu({ id: "m" })
+    const label = { id: "sort", group: "sort order" }
+    bind(instance.part("group-label", label), fakeElement(0, "DIV"))
+    await flush()
+    const labelId = attrs(instance.part("group-label", label)).id
+    expect(labelId).not.toMatch(/\s/)
+    expect(attrs(instance.part("radio-group", { name: "sort order" }))["aria-labelledby"]).toBe(labelId)
+  })
+
   test("labels that bind together change the state once", async () => {
     const instance = listbox({ id: "l" })
     let changes = 0

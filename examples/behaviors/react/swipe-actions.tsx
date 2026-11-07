@@ -108,4 +108,4 @@ function Example() {
   )
 }
 
-export { Example, rows, Rows, RowsActions, RowsContent, RowsItem, type RowsState }
+export { Example }

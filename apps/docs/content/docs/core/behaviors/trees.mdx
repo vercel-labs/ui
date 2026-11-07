@@ -50,7 +50,7 @@ It reuses the result for the same expanded array. Replace that array when the op
 
 <ComponentExample
   name="behaviors/tree-expand"
-  caption="Open lib, then choose date.ts to see its path. Close src to hide its descendants, or use Expand all to reveal every folder."
+  caption="Open lib, then choose date.ts; the console logs its path. Close src to hide its descendants, or use Expand All to reveal every folder."
 />
 
 Use `children(key)` for immediate children, or `children(null)` for the top level. `descendants(key)` includes everything below a node; `ancestors(key)` returns its path from the outermost parent inward. `keys()` lists the whole collection in tree order.
@@ -139,7 +139,7 @@ Calculate the states once for a checked value, then read each node with `checked
 
 <ComponentExample
   name="core/tree-checkboxes"
-  caption="Check a folder to check its contents. Uncheck one file to make its folder mixed, then change the strategy and compare the value below."
+  caption="Check a folder to check its contents. Uncheck one file to make its folder mixed, then change the strategy and compare the values in the console."
 />
 
 ### Strategies and Locked Items

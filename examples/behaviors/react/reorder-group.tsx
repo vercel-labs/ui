@@ -110,4 +110,4 @@ function Example() {
   )
 }
 
-export { Backlog, backlog, type BacklogState, BacklogTask, BacklogTick, Example }
+export { Example }

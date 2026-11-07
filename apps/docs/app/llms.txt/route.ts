@@ -12,7 +12,7 @@ To build something ui-sdk doesn't ship, read Core: build a component, compose be
 
 ## Core and Agents
 
-- [Core](/docs/core/llms.txt): the guides and reference, Foundations (primitives, state, platform, text, and dates), Behaviors (focus, selection, dragging, lists, trees, transitions, popups, and canvases), and Testing
+- [Core](/docs/core/llms.txt): the guides (define and render a primitive, style a component, compose behaviors, handle changes), the reference, Utilities (platform, text, and dates), Behaviors (focus, selection, dragging, lists, trees, transitions, popups, and canvases), and Testing
 - [Agents](/docs/agents/llms.txt): the agent bridge, WebMCP and our skills, in one file
 
 ## Frameworks

@@ -1,4 +1,5 @@
 import * as React from "react"
+import { CircleHelpIcon } from "lucide-react"
 import {
   createPopup,
   definePrimitive,
@@ -66,7 +67,9 @@ function Example() {
         </rename.Content>
       </rename.Root>
       <help.Root>
-        <help.Trigger aria-label="Help">?</help.Trigger>
+        <help.Trigger aria-label="Help">
+          <CircleHelpIcon aria-hidden="true" />
+        </help.Trigger>
         <help.Content sideOffset={6}>
           Filters narrow the list, and Rename changes the file's name.
         </help.Content>

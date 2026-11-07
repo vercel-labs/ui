@@ -1,7 +1,7 @@
 // The patterns built from single controls: disclosure, accordion, switch,
 // checkbox and slider. Each checks every control in the root, then presses
 // its keys and presses them again to put the state back.
-import { accessibleName, checkedOf, hasBoolean, ids, isGone, isRtl, roleOf, withRole } from "./aria"
+import { accessibleName, byId, checkedOf, hasBoolean, ids, isGone, isRtl, roleOf, withRole } from "./aria"
 import { orientationOf, requireName, type PatternContext } from "./pattern-context"
 import { isDisabledElement } from "../foundation/forms/form"
 
@@ -26,7 +26,8 @@ async function checkToggles(
     return
   }
   for (let press = 1; press < cycle && state() !== before; press++) await context.press(key)
-  if (state() !== before)
+  // The APG leaves it to the page whether Space gives a checkbox its mixed state back.
+  if (state() !== before && before !== "mixed")
     context.problem(el, `${key} again should change ${name} back to "${before}" (APG ${source}).`)
 }
 
@@ -70,6 +71,7 @@ async function accordion(context: PatternContext) {
     return
   }
   for (const button of buttons) {
+    requireName(context, button, "accordion")
     const heading = button.closest("h1, h2, h3, h4, h5, h6, [role=heading]")
     if (!heading || !context.root.contains(heading))
       context.problem(
@@ -84,7 +86,7 @@ async function accordion(context: PatternContext) {
         `has aria-expanded "${button.getAttribute("aria-expanded")}"; it's "true" or "false" (APG accordion).`,
       )
     if (button.getAttribute("aria-expanded") !== "true") continue
-    const panel = ids(button, "aria-controls").map((id) => context.doc.getElementById(id))[0]
+    const panel = ids(button, "aria-controls").map((id) => byId(button, id))[0]
     if (!panel) context.problem(button, "is expanded but names no panel with aria-controls (APG accordion).")
     else if (roleOf(panel) === "region" && !ids(panel, "aria-labelledby").length)
       context.problem(
@@ -146,7 +148,7 @@ async function checkbox(context: PatternContext) {
     if (!["true", "false", "mixed"].includes(checkedOf(box)))
       context.problem(box, `has no aria-checked; a checkbox is "true", "false" or "mixed" (APG checkbox).`)
   }
-  // A mixed checkbox comes back to mixed in up to three presses.
+  // A mixed checkbox may come back to mixed in three presses, as in the APG's example.
   for (const box of boxes.filter((el) => !isDisabledElement(el)))
     await checkToggles(context, box, "Space", () => checkedOf(box), {
       name: "aria-checked",
@@ -154,9 +156,6 @@ async function checkbox(context: PatternContext) {
       cycle: 3,
     })
 }
-
-// How far the slider restores its value with arrows, after Home and End.
-const restoreLimit = 100
 
 /** Slider: a name and aria-valuenow, arrows that raise and lower it, and Home and End to its bounds. */
 async function slider(context: PatternContext) {
@@ -225,14 +224,25 @@ async function checkSliderKeys(context: PatternContext, thumb: Element) {
       thumb,
       `Home should set the value to its minimum, ${min()}, but it's ${value()} (APG slider).`,
     )
-  // Back to where it started, from the nearer end, a step at a time.
+  // Back to where it started, from the nearer end, a page at a time, then a step at a time.
   if (max() - start < start - min()) await context.press("End")
-  const below = value() < start
-  const unrestored = () => (below ? value() < start : value() > start)
-  for (let press = 0; press < restoreLimit && unrestored(); press++) {
+  await pressToward(context, value, start, value() < start ? "PageUp" : "PageDown")
+  await pressToward(context, value, start, value() < start ? increase : decrease)
+}
+
+// Presses `key` while it moves the value toward `target`, as many times as
+// the first press's move fits in the distance.
+async function pressToward(context: PatternContext, value: () => number, target: number, key: string) {
+  const below = value() < target
+  const distance = Math.abs(target - value())
+  let presses = 1
+  for (let press = 0; press < presses && value() !== target; press++) {
     const before = value()
-    await context.press(below ? increase : decrease)
-    if (value() === before) return
+    await context.press(key)
+    const moved = below ? value() - before : before - value()
+    if (moved <= 0) return
+    // Fractional steps can divide to just under a whole number, like 0.3 / 0.1.
+    if (!press) presses = Math.floor(distance / moved + 1e-9)
   }
 }
 

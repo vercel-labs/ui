@@ -42,7 +42,7 @@ const markup = () => `
           .join("")}
       </ui-toolbar-group>
       ${lock("Locked proofing", `<ui-toggle id="spellcheck"><button class="toggle">${f.spellcheck.label}</button></ui-toggle>`)}
-      <ui-toolbar-link><a href="${f.help.href}">${f.help.label}</a></ui-toolbar-link>
+      ${lock("Locked help", `<ui-toolbar-link><a href="${f.help.href}">${f.help.label}</a></ui-toolbar-link>`)}
     </ui-toolbar>
     <button>After</button>
     <output role="status" aria-label="Last action"></output>

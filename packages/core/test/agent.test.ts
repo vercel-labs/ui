@@ -1512,6 +1512,45 @@ describe("agent act", () => {
     expect(instance.get().open).toBe(false)
   })
 
+  test("a refused press returns once the dialog it opened has left the page", async () => {
+    let unbindOpen: (() => void)[] = []
+    const content = Object.assign(document.createElement("div"), { getAnimations: () => [] })
+    const instance = dialog({
+      id: "delete",
+      onOpenChange: (open) => {
+        if (!open) {
+          requestAnimationFrame(() => {
+            unbindOpen.forEach((unbind) => unbind())
+            unbindOpen = []
+            content.replaceChildren()
+          })
+          return
+        }
+        const title = document.createElement("h2")
+        title.textContent = "Delete Apollo?"
+        const remove = document.createElement("button")
+        remove.textContent = "Delete forever"
+        remove.setAttribute("data-agent-confirm", "Deletes the project")
+        content.append(title, remove)
+        unbindOpen = [bind(instance.part("content"), content), bind(instance.part("title"), title)]
+      },
+    })
+    const trigger = document.createElement("button")
+    trigger.textContent = "Delete project"
+    document.body.append(trigger, content)
+    cleanups.push(bind(instance.part("trigger"), trigger), () => {
+      unbindOpen.forEach((unbind) => unbind())
+      instance.destroy()
+    })
+    let approve = false
+    const agent = createAgent({ allow: (step) => !step.confirm || approve })
+    const remove = { steps: [{ ref: "Delete project", action: "press", args: ["Delete forever"] }] }
+
+    expect((await agent.act(remove)).error?.message).toBe('The person said no to "Deletes the project".')
+    approve = true
+    expect(await agent.act(remove)).toMatchObject({ ok: true })
+  })
+
   test("query and a refused step's message read a closed popup without opening it", async () => {
     const agent = createAgent()
     const { changes } = await mountActions()

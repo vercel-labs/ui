@@ -42,7 +42,7 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 - **Reasons:** use the shared vocabulary (`ReasonVocabulary` in `@ui-sdk/core`) when one fits. When none does, like "select all" or "move to the other list", declare your own in the `on<Key>Change` type and note it in GAPS.md.
 - **Slots:** `attrs` for ARIA and `data-*` (pure, server safe), `press` for activation, `on` for other events, `bind` for anything that touches the DOM (return a cleanup).
 - **`press` hears only clicks on parts that aren't buttons.** For a `div` or `td` part, handle Space and Enter in `on.keydown`.
-- **Every element gets its `data-slot` from a slot.** Don't write one by hand in the adapter. Wrappers, like a row of buttons, get a slot of their own.
+- **Every element gets its `data-slot` from a slot.** The adapter never sets one directly. Wrappers, like a row of buttons, get a slot of their own.
 - **Agents:** end the definition with `agent: { actions: [...] }`, the api methods an agent may call. Keep it after `slots`. Give the root a name, with `aria-label` or a label part: the bridge names the component after it. [agent-ready.md](agent-ready.md) covers `closed`, `items`, `reveals`, `shown` and `secret`.
 
 ### 3. Use the blocks, don't rewrite them
@@ -55,7 +55,7 @@ When the same interaction repeats across several components, like a "press and h
 
 ### 4. Render it
 
-`createParts(primitive, { root: "div", item: "div" })` from `@ui-sdk/<framework>/primitive` returns `Root` and one part per tagged slot, typed from the primitive (`@ui-sdk/web` has `createParts`). Write a part by hand with `usePart` only when it renders something of its own, like a list from data, and a root with `usePrimitive`. The adapter only renders: no key handlers, focus moves, ARIA or `data-slot` in it. In React, the file that calls `createParts` starts with `"use client"`.
+`createParts(primitive, { root: "div", item: "div" })` from `@ui-sdk/<framework>/primitive` returns `Root` and one part per tagged slot, typed from the primitive (`@ui-sdk/web` has `createParts`). Write your own part with `usePart` only when it renders something of its own, like a list from data, and a root with `usePrimitive`. The adapter only renders: no key handlers, focus moves, ARIA or `data-slot` in it. In React, the file that calls `createParts` starts with `"use client"`.
 
 ### 5. Make it agent-ready and test it
 

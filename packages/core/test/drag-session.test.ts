@@ -5,7 +5,7 @@ import { slider } from "../src/components/slider/slider"
 import { createScrollbarInput, type ScrollbarHost } from "../src/components/scroll-area/scroll-area-pointer"
 import { createArea, definePrimitive } from "../src/index"
 import { createDragSession } from "../src/foundation/drag-and-drop/pointer"
-import { mount } from "../src/testing/mount"
+import { mount, rerenderOf } from "../src/testing/mount"
 
 let destroy: (() => void)[] = []
 afterEach(() => {
@@ -207,6 +207,56 @@ test("an area that leaves the page mid-drag commits nothing", async () => {
   expect(instance.get().value.x).toBeCloseTo(0.6)
   instance.destroy()
   expect(onCommit).not.toHaveBeenCalled()
+})
+
+test("a slider made read-only mid-drag stops following the pointer, and commits where it was", async () => {
+  const onValueCommit = vi.fn()
+  const mounted = mountSlider({ onValueCommit })
+  destroy.push(mounted.unmount)
+  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  document.dispatchEvent(press("pointermove", { clientX: 40, clientY: 5 }))
+  await frame()
+  rerenderOf(mounted).setOptions({ readOnly: true })
+  expect(onValueCommit).toHaveBeenCalledTimes(1)
+  expect(onValueCommit.mock.calls[0][0]).toBe(40)
+  document.dispatchEvent(press("pointermove", { clientX: 80, clientY: 5 }))
+  await frame()
+  document.dispatchEvent(press("pointerup", { clientX: 80, clientY: 5 }))
+  expect(mounted.state.value).toBe(40)
+  expect(onValueCommit).toHaveBeenCalledTimes(1)
+})
+
+test("an area disabled mid-drag stops following the pointer, and commits where it was", async () => {
+  const onCommit = vi.fn()
+  const board = definePrimitive({
+    name: "board",
+    options: { disabled: "boolean" },
+    state: (options: { disabled?: boolean }) => ({ value: { x: 0, y: 0 }, disabled: !!options.disabled }),
+    sync: (options) => ({ disabled: !!options.disabled }),
+    api: (context) => ({
+      area: createArea(context, {
+        value: (state) => state.value,
+        set: (value) => (context.store.set({ value }), true),
+        onCommit,
+        disabled: () => context.store.get().disabled,
+      }),
+    }),
+    slots: (slot) => ({ root: slot({}) }),
+  })
+  const instance = board({ id: "b" })
+  destroy.push(instance.destroy)
+  const el = document.body.appendChild(document.createElement("div"))
+  el.getBoundingClientRect = () => new DOMRect(0, 0, 100, 100)
+  instance.api.area.pointerdown(press("pointerdown", { clientX: 10, clientY: 10, cancelable: true }), el)
+  document.dispatchEvent(press("pointermove", { clientX: 60, clientY: 60 }))
+  await frame()
+  instance.setOptions({ id: "b", disabled: true })
+  expect(onCommit).toHaveBeenCalledTimes(1)
+  document.dispatchEvent(press("pointermove", { clientX: 90, clientY: 90 }))
+  await frame()
+  document.dispatchEvent(press("pointerup", { clientX: 90, clientY: 90 }))
+  expect(instance.get().value.x).toBeCloseTo(0.6)
+  expect(onCommit).toHaveBeenCalledTimes(1)
 })
 
 test("a second finger on a slider mid-drag leaves the value to the first", async () => {
