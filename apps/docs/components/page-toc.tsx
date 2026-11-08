@@ -11,11 +11,11 @@ function PageToc({ toc, url }: { toc: TableOfContents; url: string }) {
   return (
     <nav
       aria-label="On this page"
-      className="sticky p-1 -m-1 top-14 ms-auto hidden max-h-[calc(100dvh-4rem)] w-64 shrink-0 overflow-y-auto overscroll-contain pt-10 pb-8 scrollbar-none xl:block"
+      className="sticky p-1 ps-6 -m-1 top-[5.375rem] ms-auto hidden max-h-[calc(100dvh-5.375rem)] w-64 shrink-0 overflow-y-auto overscroll-contain pt-10 pb-8 scrollbar-none xl:block"
     >
       {items.length > 1 && (
         <AnchorProvider toc={items} single>
-          <div className="mb-2 text-xs font-medium text-foreground">On this page</div>
+          <div className="mb-2.5 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">On this page</div>
           <Items items={items} />
           <div className="my-4 h-px bg-foreground/10" />
         </AnchorProvider>
@@ -48,7 +48,7 @@ function Items({ items }: { items: TableOfContents }) {
   const active = useActiveAnchor()
 
   return (
-    <ul className="flex flex-col border-s border-foreground/10">
+    <ul className="-ms-6 flex flex-col">
       {items.map((item) => {
         const current = active === item.url.slice(1)
         return (
@@ -58,7 +58,7 @@ function Items({ items }: { items: TableOfContents }) {
               aria-current={current ? "location" : undefined}
               className={cn(
                 "relative -ms-px block border-s py-[3px] text-[13px] leading-5 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-                item.depth > 2 ? "ps-6" : "ps-3",
+                item.depth > 2 ? "ps-9" : "ps-6",
                 current
                   ? "border-foreground text-foreground"
                   : "border-transparent text-subtle hover:text-foreground",

@@ -45,7 +45,7 @@ function HeaderMenu({ urls }: { urls: string[] }) {
                   align="start"
                   alignOffset={-12}
                   sideOffset={6}
-                  className="min-w-44 rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10"
+                  className="min-w-44 rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground outline-none dark:ring-foreground/10"
                 >
                   <ul className="flex flex-col">
                     {frameworkIds.map((framework) => (

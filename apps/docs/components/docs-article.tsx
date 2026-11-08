@@ -28,7 +28,7 @@ function DocsArticle({
   return (
     <>
       <div className="min-w-0 flex-1">
-        <article className="w-full xl:max-w-2xl px-6 pt-8 pb-24 sm:px-8 lg:px-10">
+        <article className="w-full xl:mx-auto xl:max-w-2xl min-[100rem]:max-w-3xl px-6 pt-8 pb-24 sm:px-8 lg:px-10">
           <header className="mb-10">
             {date && (
               <time dateTime={date} className="mb-3 block text-[13px] text-subtle">
@@ -71,7 +71,9 @@ function DocsArticle({
           )}
         </article>
       </div>
-      <PageToc toc={toc} url={url} />
+      <div className="relative hidden shrink-0 border-s border-foreground/20 xl:block">
+        <PageToc toc={toc} url={url} />
+      </div>
     </>
   )
 }

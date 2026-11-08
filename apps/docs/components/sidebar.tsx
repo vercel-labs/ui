@@ -47,7 +47,7 @@ function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, Tab
   )
 }
 
-const groupLabel = "mb-2 text-xs font-medium text-foreground"
+const groupLabel = "mb-2.5 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase"
 
 function Nodes({
   nodes,

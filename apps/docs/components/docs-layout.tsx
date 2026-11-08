@@ -49,16 +49,18 @@ function DocsLayout({ section, children }: { section: Section; children: ReactNo
   const urls = source.getPages().map((page) => page.url)
 
   return (
-    <div className="container flex flex-1 max-lg:px-0">
-      {/* Size containment keeps the sidebar from making a short page taller than the window. */}
-      <aside className="hidden w-64 shrink-0 contain-size lg:block">
-        <div className="sticky top-16 h-full max-h-[calc(100dvh-4rem)]">
-          <Sidebar tree={tree} tocs={tocs} />
+    <div className="container flex flex-1 flex-col max-lg:px-0">
+      <div className="flex flex-1">
+        {/* Size containment keeps the sidebar from making a short page taller than the window. */}
+        <aside className="relative hidden w-64 shrink-0 border-e border-foreground/20 contain-size lg:block">
+          <div className="sticky top-[5.375rem] h-full max-h-[calc(100dvh-5.375rem)] pt-2">
+            <Sidebar tree={tree} tocs={tocs} />
+          </div>
+        </aside>
+        <div className="min-w-0 flex-1">
+          <MobileNav section={section} tree={tree} urls={urls} />
+          <main className="flex">{children}</main>
         </div>
-      </aside>
-      <div className="min-w-0 flex-1">
-        <MobileNav section={section} tree={tree} urls={urls} />
-        <main className="flex">{children}</main>
       </div>
       <Search section={section} pages={pages} />
     </div>

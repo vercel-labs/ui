@@ -30,7 +30,7 @@
 @utility container {
   margin-inline: auto;
   width: 100%;
-  max-width: 1448px;
+  max-width: 1920px;
   padding-inline: --spacing(6);
   @variant sm {
     padding-inline: --spacing(8);
@@ -82,7 +82,7 @@
 [data-color-scheme] {
   --canvas: light-dark(oklch(0.98 0 0), oklch(0.175 0 0));
   --subtle: light-dark(oklch(0.48 0 0), oklch(0.72 0 0));
-  --radius: 0.625rem;
+  --radius: 0px;
   --background: light-dark(oklch(1 0 0), oklch(0.145 0 0));
   --foreground: light-dark(oklch(0.145 0 0), oklch(0.985 0 0));
   --card: light-dark(oklch(1 0 0), oklch(0.205 0 0));
@@ -105,6 +105,9 @@
 }
 
 @theme inline {
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
   --animate-caret-blink: caret-blink 1.25s ease-out infinite;
   --color-canvas: var(--canvas);
   --color-subtle: var(--subtle);
@@ -138,15 +141,22 @@
   --radius-4xl: calc(var(--radius) * 2.6);
   /* Corners nest: a control inside a frame's corner is inset the same on every side, and its
      radius is the frame's minus that inset. Segments do the same inside their track. */
-  --radius-frame: var(--radius-2xl);
+  --radius-frame: 0px;
   --spacing-frame: 0.5rem;
-  --radius-frame-control: calc(var(--radius-frame) - var(--spacing-frame));
+  --radius-frame-control: 0px;
   --spacing-frame-track: 3px;
-  --radius-frame-segment: calc(var(--radius-frame-control) - var(--spacing-frame-track));
+  --radius-frame-segment: 0px;
 }
 
 html {
   scrollbar-gutter: stable;
+}
+
+/* The site is square: only marked shapes, like a pill or a drawn circle, keep their curve. */
+:where(body) :not([data-round]),
+:where(body) :not([data-round])::before,
+:where(body) :not([data-round])::after {
+  border-radius: 0 !important;
 }
 
 html > body[data-scroll-locked] {
@@ -264,5 +274,25 @@ html {
 
   & .line:is(.highlighted, .diff)::before {
     background: linear-gradient(var(--line-tint), var(--line-tint)), var(--gutter-bg);
+  }
+}
+
+/* On touch screens, small controls on the homepage get an invisible 44px hit area. */
+@layer components {
+  @media (pointer: coarse) {
+    main[data-width="wide"]
+      :is(button, a[href], [role="slider"], [role="switch"], [data-slot$="-thumb"], [data-slot$="-handle"]):not(
+        [data-slot="switch-thumb"]
+      ) {
+      position: relative;
+    }
+    main[data-width="wide"]
+      :is(button, a[href], [role="slider"], [role="switch"], [data-slot$="-thumb"], [data-slot$="-handle"]):not(
+        [data-slot="switch-thumb"]
+      )::after {
+      content: "";
+      position: absolute;
+      inset: min(0px, calc((100% - 44px) / 2));
+    }
   }
 }
