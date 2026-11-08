@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "cn"
+import { bindPersistentLayer } from "@ui-sdk/core"
 import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/react/popover"
 import { frameworkIds, frameworks } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
@@ -30,12 +31,17 @@ function MobileNav({
 }) {
   const [open, setOpen] = React.useState(false)
   const pathname = usePathname()
+  const header = React.useRef<HTMLElement>(null)
 
   // Search can navigate while the menu is open, so the menu closes on any navigation.
   React.useEffect(() => setOpen(false), [pathname])
 
+  // The modal menu makes the page inert, but the header stays usable above it.
+  React.useEffect(() => (open && header.current ? bindPersistentLayer(header.current) : undefined), [open])
+
   return (
     <header
+      ref={header}
       data-mobile-header
       className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas/85 backdrop-blur-md lg:hidden"
     >
@@ -62,7 +68,7 @@ function MobileNav({
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger className="flex size-8 items-center justify-center rounded-2xl bg-foreground/[0.045] text-sm text-subtle outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
         <GitHubLink />
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal>
           <PopoverTrigger
             aria-label="Menu"
             className="group -me-3 inline-flex size-10 touch-manipulation items-center justify-center rounded-2xl outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
