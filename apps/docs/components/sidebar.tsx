@@ -19,9 +19,18 @@ function revealCurrent(list: Element) {
   list.scrollTop += item.top - box.top - (box.height - item.height) / 2
 }
 
+const noSubscribe = () => () => {}
+
 function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, TableOfContents> }) {
   const current = useCurrentUrl(tree)
   const scroller = React.useRef<HTMLDivElement>(null)
+  // The script below only belongs in the server's HTML. A script React adds in the browser
+  // never runs, so those renders leave it out and rely on the layout effect.
+  const hydrated = React.useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  )
 
   React.useLayoutEffect(() => {
     if (scroller.current) revealCurrent(scroller.current)
@@ -37,9 +46,11 @@ function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, Tab
           <Nodes nodes={tree.children} tocs={tocs} current={current} />
         </nav>
         {/* Runs as the HTML arrives, so the list is already in place when the page first paints. */}
-        <script
-          dangerouslySetInnerHTML={{ __html: `(${revealCurrent})(document.currentScript.parentElement)` }}
-        />
+        {!hydrated && (
+          <script
+            dangerouslySetInnerHTML={{ __html: `(${revealCurrent})(document.currentScript.parentElement)` }}
+          />
+        )}
         {/* The page's own column shows it from xl, beside the contents. */}
         <BetaCard className="mt-8 xl:hidden" />
       </div>
