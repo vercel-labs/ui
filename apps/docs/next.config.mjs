@@ -4,6 +4,8 @@ import { newestByMajor, newestRelease, releasesIn, webReleaseHeaders } from "./l
 
 const withMDX = createMDX()
 
+const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
+
 const publicDir = path.join(import.meta.dirname, "public")
 const newest = (versions) =>
   JSON.stringify({ ...Object.fromEntries(newestByMajor(versions)), latest: newestRelease(versions) })
@@ -35,16 +37,35 @@ const config = {
       },
     ]
   },
-  // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
-  // Agents' own `.md` files are the whole section, and they win.
   async rewrites() {
-    return [
-      { source: "/docs.md", destination: "/md/core/start" },
-      { source: "/docs/:path*.md", destination: "/md/:path*" },
-    ]
+    // Get Started, Core and Agents are built once per framework under /for, and
+    // served by the reader's cookie, else React's. The pattern takes the router's
+    // `.rsc` and `.segments/` requests too, and leaves `.md` and `llms.txt` alone.
+    const source =
+      "/:path((?!.*(?:\\.md|/llms\\.txt)$)docs(?:/(?:core|agents)(?:[./].*)?|\\.(?:rsc|segments/.*))?)"
+    const cookie = { type: "cookie", key: "framework" }
+    return {
+      beforeFiles: [
+        {
+          source,
+          has: [{ ...cookie, value: `(?<framework>${frameworks.join("|")})` }],
+          destination: "/for/:framework/:path",
+        },
+        {
+          source,
+          missing: [{ ...cookie, value: `(?:${frameworks.join("|")})` }],
+          destination: "/for/react/:path",
+        },
+      ],
+      // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
+      // Agents' own `.md` files are the whole section, and they win.
+      afterFiles: [
+        { source: "/docs.md", destination: "/md/core/start" },
+        { source: "/docs/:path*.md", destination: "/md/:path*" },
+      ],
+    }
   },
   async redirects() {
-    const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
     const pages = "components|utilities|rendering|server-rendering|custom-parts|styling-and-animation"
     return [
       // Get Started is Core's page by its file, and lives at /docs.
@@ -54,6 +75,8 @@ const config = {
         permanent: true,
       },
       { source: "/docs/core/start", destination: "/docs", permanent: true },
+      // Core's pages for each framework are only served through /docs.
+      { source: "/for/:framework/:path*", destination: "/:path*", permanent: false },
       {
         source: `/docs/:framework(${frameworks.join("|")})/:folder(hooks|utilities)/observe`,
         destination: "/docs/core/observe",

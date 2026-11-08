@@ -118,7 +118,12 @@ test("a highlighted gutter matches its band, and the block keeps its end padding
 test("installation, rendering and the next guide follow the framework docs visited last", async ({
   page,
 }) => {
+  // The framework's pages save it in a cookie once they hydrate, and the server
+  // serves Core's pages by it.
+  const saved = async () =>
+    (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value
   await page.goto("/docs/vue")
+  await expect.poll(saved).toBe("vue")
   await page.goto("/docs/core/build-a-component")
   await expect(page.getByRole("tablist", { name: "Framework", exact: true })).toHaveCount(0)
   const content = page.getByRole("main")
@@ -130,6 +135,7 @@ test("installation, rendering and the next guide follow the framework docs visit
   await page.goto("/docs/core/compose-behaviors")
   await expect(content).toContainText('import { createParts } from "@ui-sdk/vue/primitive"')
   await page.goto("/docs/web-components")
+  await expect.poll(saved).toBe("web-components")
   await page.goto("/docs/core/compose-behaviors")
   await expect(content).toContainText("createParts(rating,")
   await expect(content).toContainText('import { rating } from "./rating"')

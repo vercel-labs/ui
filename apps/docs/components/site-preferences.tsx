@@ -6,6 +6,7 @@ import {
   colorScheme,
   framework as frameworkPreference,
   packageManager,
+  RenderedFramework,
   setFramework,
   useFramework,
 } from "@/lib/preferences"
@@ -13,14 +14,14 @@ import { isSection, utilitiesFolder } from "@/lib/sections"
 import { Preferences } from "@ui-sdk/react/preferences"
 import { CheckIcon } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useDocsPathname } from "@/lib/pathname"
 import * as React from "react"
 
 const preferences = [colorScheme, frameworkPreference, packageManager]
 
 /** The section of the page being read, from its path. */
 function useSection() {
-  const segment = usePathname().split("/")[2] ?? ""
+  const segment = useDocsPathname().split("/")[2] ?? ""
   return isSection(segment) ? segment : undefined
 }
 
@@ -52,15 +53,16 @@ function FrameworkCheck({ framework, className }: { framework: Framework; classN
   return <CheckIcon aria-hidden className={cn("size-4 shrink-0", shown, className)} />
 }
 
+/** The framework a page was built for, which its framework's tabs, snippets and links hydrate as. */
+function PageFramework({ framework, children }: { framework: Framework; children: React.ReactNode }) {
+  return <RenderedFramework value={framework}>{children}</RenderedFramework>
+}
+
 function FrameworkLink({ href, ...props }: React.ComponentProps<typeof Link> & { href: string }) {
   const [framework] = useFramework()
-  const [resolved, setResolved] = React.useState(href)
-  React.useEffect(() => {
-    const [, , folder, ...rest] = href.split("/")
-    const target = folder === "utilities" ? utilitiesFolder(framework) : folder
-    setResolved(["", "docs", framework, target, ...rest].join("/"))
-  }, [framework, href])
-  return <Link href={resolved} {...props} />
+  const [, , folder, ...rest] = href.split("/")
+  const target = folder === "utilities" ? utilitiesFolder(framework) : folder
+  return <Link href={["", "docs", framework, target, ...rest].join("/")} {...props} />
 }
 
 function FrameworkContent({ value, children }: { value: Framework; children: React.ReactNode }) {
@@ -68,4 +70,4 @@ function FrameworkContent({ value, children }: { value: Framework; children: Rea
   return framework === value ? children : null
 }
 
-export { FrameworkCheck, FrameworkContent, FrameworkLink, SitePreferences, useSection }
+export { FrameworkCheck, FrameworkContent, FrameworkLink, PageFramework, SitePreferences, useSection }

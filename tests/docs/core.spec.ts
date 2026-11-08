@@ -181,6 +181,20 @@ test("Core's snippets follow the framework docs visited last", async ({ page }) 
   await expect(page.getByRole("main")).toContainText("npm install @ui-sdk/solid")
 })
 
+test("Core's pages arrive in the framework read last, before any script runs", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false })
+  await context.addCookies([{ name: "framework", value: "svelte", url: baseURL }])
+  const page = await context.newPage()
+  await page.goto("/docs/core/build-a-component")
+  const content = page.getByRole("main")
+  await expect(content).toContainText("npm install @ui-sdk/svelte")
+  await expect(content).not.toContainText("npm install @ui-sdk/react")
+  await context.close()
+})
+
 test("the reference points to focused guides", async ({ page }) => {
   await page.goto("/docs/core/reference")
   for (const [name, href] of [
