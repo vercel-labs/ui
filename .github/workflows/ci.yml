@@ -46,8 +46,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      # Full history, so `pnpm format` finds where the branch left origin/main.
-      # On main that's HEAD itself, so it checks nothing.
+      # Full history, so `pnpm lint` finds where the branch left origin/main.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
@@ -57,7 +56,7 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      # Prettier on the files the branch changed.
+      # Prettier on every file.
       - name: Format
         run: pnpm format
 

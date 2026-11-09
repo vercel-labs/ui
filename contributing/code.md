@@ -4,12 +4,13 @@ Write code a highly skilled team would be glad to read, review and extend. Reada
 
 ## Style
 
-- No semicolons. Double quotes. Prettier formats everything: `pnpm format` checks, `pnpm format:write` fixes.
+- No semicolons. Double quotes. Lines up to 80 characters. Prettier formats every file: `pnpm format` checks, `pnpm format:write` fixes.
+- Every `if`, `else`, `for` and `while` body goes in braces, even a one-line one. `pnpm lint` checks it (`scripts/check-braces.mjs`), and `pnpm format:write` adds them.
 - Comments are rare, at most three lines, and full sentences ending in a period. `pnpm lint` checks the length (`comment-length`).
 - Never annotate function return types; let them infer.
 - Prefer inline types.
 - Named exports, listed once at the end of the file.
-- `pnpm lint` (`scripts/check-code.mjs` and `scripts/check-comments.mjs`) checks the rules a script can. Every new convention lands with its lint rule.
+- `pnpm lint` (`scripts/check-code.mjs`, `scripts/check-comments.mjs` and `scripts/check-braces.mjs`) checks the rules a script can. Every new convention lands with its lint rule.
 
 ## Structure
 
