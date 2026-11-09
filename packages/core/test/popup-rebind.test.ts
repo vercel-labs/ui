@@ -107,3 +107,32 @@ test("a non-modal popover that binds again leaves focus where it is", async () =
   await settle()
   expect(document.activeElement).toBe(document.body)
 })
+
+test("an open modal whose content moves to a new element before the old one unbinds keeps the new one usable", async () => {
+  const outside = document.body.appendChild(document.createElement("button"))
+  const trigger = document.body.appendChild(document.createElement("button"))
+  const first = document.body.appendChild(document.createElement("div"))
+  const store = createStore({ open: false, mounted: false }, [])
+  const popup = createPopupLayer({
+    preset: "dialog",
+    store,
+    trigger: () => trigger,
+    close: () => store.set({ open: false }),
+    modal: () => modalTriple(true),
+  })
+  const unbindFirst = popup.bind(first)
+  popup.opening("keyboard")
+  store.set({ open: true })
+  await settle()
+  const second = document.body.appendChild(document.createElement("div"))
+  const field = second.appendChild(document.createElement("input"))
+  popup.bind(second)
+  unbindFirst()
+  first.remove()
+  await frame()
+  expect(popup.element()).toBe(second)
+  expect(second.inert).toBe(false)
+  expect(outside.inert).toBe(true)
+  field.focus()
+  expect(document.activeElement).toBe(field)
+})
