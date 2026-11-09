@@ -1,0 +1,1553 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>web.css · UI SDK</title>
+    <meta
+      name="description"
+      content="The default design system for UI SDK components: tokens, foundations and every styled component."
+    />
+    <script type="module" src="/web.js"></script>
+    <link rel="stylesheet" href="/web.css" />
+    <link rel="stylesheet" href="/design/design.css" />
+  </head>
+  <body>
+    <header class="ds-bar">
+      <div class="ds-brand">web.css <span>UI SDK design system</span></div>
+      <div class="ds-controls">
+        <ui-toggle id="ds-scheme"><button>Dark</button></ui-toggle>
+        <ui-toggle id="ds-dir"><button>RTL</button></ui-toggle>
+      </div>
+      <div class="ds-tokens">
+        <ui-field>
+          <ui-slider data-token="--ui-radius" default-value="0" min="0" max="16" step="1">
+            <div class="ds-spread">
+              <ui-field-label>Radius</ui-field-label><ui-slider-value></ui-slider-value>
+            </div>
+            <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
+          </ui-slider>
+        </ui-field>
+        <ui-field>
+          <ui-slider data-token="--ui-font-size" default-value="13" min="11" max="18" step="1">
+            <div class="ds-spread">
+              <ui-field-label>Font size</ui-field-label><ui-slider-value></ui-slider-value>
+            </div>
+            <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
+          </ui-slider>
+        </ui-field>
+        <ui-field>
+          <ui-slider data-token="--ui-spacing" default-value="4" min="3" max="6" step="0.25">
+            <div class="ds-spread">
+              <ui-field-label>Spacing</ui-field-label><ui-slider-value></ui-slider-value>
+            </div>
+            <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
+          </ui-slider>
+        </ui-field>
+      </div>
+    </header>
+
+    <div class="ds-layout">
+      <nav class="ds-nav" aria-label="Design system">
+        <h2>Start</h2>
+        <ul>
+          <li><a href="#install">Install</a></li>
+          <li><a href="#principles">Principles</a></li>
+          <li><a href="#themes">Themes</a></li>
+        </ul>
+        <h2>Foundations</h2>
+        <ul>
+          <li><a href="#color">Color</a></li>
+          <li><a href="#typography">Typography</a></li>
+          <li><a href="#spacing">Spacing</a></li>
+          <li><a href="#size">Size</a></li>
+          <li><a href="#radius">Radius</a></li>
+          <li><a href="#elevation">Elevation</a></li>
+          <li><a href="#focus">Focus</a></li>
+          <li><a href="#icons">Icons</a></li>
+          <li><a href="#motion">Motion</a></li>
+        </ul>
+        <h2>Components</h2>
+        <ul>
+          <li><a href="#accordion">Accordion</a></li>
+          <li><a href="#alert-dialog">Alert dialog</a></li>
+          <li><a href="#autocomplete">Autocomplete</a></li>
+          <li><a href="#avatar">Avatar</a></li>
+          <li><a href="#button">Button</a></li>
+          <li><a href="#checkbox">Checkbox</a></li>
+          <li><a href="#collapsible">Collapsible</a></li>
+          <li><a href="#combobox">Combobox</a></li>
+          <li><a href="#command">Command</a></li>
+          <li><a href="#dialog">Dialog</a></li>
+          <li><a href="#drawer">Drawer</a></li>
+          <li><a href="#field">Field</a></li>
+          <li><a href="#form">Form</a></li>
+          <li><a href="#hover-card">Hover card</a></li>
+          <li><a href="#input">Input</a></li>
+          <li><a href="#listbox">Listbox</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#menubar">Menubar</a></li>
+          <li><a href="#meter">Meter</a></li>
+          <li><a href="#navigation-menu">Navigation menu</a></li>
+          <li><a href="#number-input">Number input</a></li>
+          <li><a href="#popover">Popover</a></li>
+          <li><a href="#progress">Progress</a></li>
+          <li><a href="#radio">Radio</a></li>
+          <li><a href="#select">Select</a></li>
+          <li><a href="#separator">Separator</a></li>
+          <li><a href="#slider">Slider</a></li>
+          <li><a href="#switch">Switch</a></li>
+          <li><a href="#tabs">Tabs</a></li>
+          <li><a href="#text">Text elements</a></li>
+          <li><a href="#textarea">Textarea</a></li>
+          <li><a href="#toggle">Toggle</a></li>
+          <li><a href="#toggle-group">Toggle group</a></li>
+          <li><a href="#tooltip">Tooltip</a></li>
+          <li><a href="#trigger-menu">Trigger menu</a></li>
+        </ul>
+        <h2>More</h2>
+        <ul>
+          <li><a href="#patterns">Patterns</a></li>
+          <li><a href="#coverage">Coverage</a></li>
+        </ul>
+      </nav>
+
+      <main class="ds-main">
+        <div class="ds-intro">
+          <h1>web.css</h1>
+          <p>
+            A small, flat design system for UI SDK components. Square by default, built from a handful of
+            tokens, with no animation and shadows only on things that float. It styles parts through their
+            <code>data-slot</code> and state attributes, so the same stylesheet works in React, Vue, Svelte,
+            Solid and web components.
+          </p>
+          <p>
+            Use the bar above to switch color scheme and direction, or drag a token. Every example on
+            this page updates.
+          </p>
+        </div>
+
+        <section class="ds-section" id="install">
+          <h2>Install</h2>
+          <p>Without a bundler, add two tags. The stylesheet follows the same release as the loader.</p>
+          <pre
+            class="ds-code"><code>&lt;script type="module" src="https://ui-sdk.dev/web.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="https://ui-sdk.dev/web.css" /&gt;</code></pre>
+          <p>With a bundler, import it once from core, next to your own CSS.</p>
+          <pre class="ds-code"><code>import "@ui-sdk/core/web.css"</code></pre>
+          <p>
+            Everything sits in <code>@layer ui-sdk</code>, so any style you write without a layer wins.
+            Components inherit your page's font. To use the system font, set
+            <code>font-family: var(--ui-font-sans)</code> on <code>body</code>.
+          </p>
+        </section>
+
+        <section class="ds-section" id="principles">
+          <h2>Principles</h2>
+          <table class="ds-table">
+            <tbody>
+              <tr>
+                <td>Flat</td>
+                <td class="ds-muted">
+                  Borders separate things. Shadows only appear on menus, lists, popovers and dialogs, which
+                  sit above the page.
+                </td>
+              </tr>
+              <tr>
+                <td>Square</td>
+                <td class="ds-muted">
+                  Corners start at zero. One token rounds everything, and small parts scale from it.
+                </td>
+              </tr>
+              <tr>
+                <td>Still</td>
+                <td class="ds-muted">Nothing animates. A state change is visible the moment it happens.</td>
+              </tr>
+              <tr>
+                <td>One height</td>
+                <td class="ds-muted">
+                  Every control is <code>--ui-spacing × 8</code> tall, so inputs, selects and buttons line up
+                  on one row.
+                </td>
+              </tr>
+              <tr>
+                <td>Yours to override</td>
+                <td class="ds-muted">
+                  A low cascade layer and plain custom properties. No classes to learn and nothing to unset.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="ds-section" id="themes">
+          <h2>Themes</h2>
+          <p>
+            A theme is a set of tokens. Set them on <code>:root</code>, or on any element to theme only what's
+            inside it.
+          </p>
+          <pre class="ds-code"><code>:root {
+  --ui-radius: 0.5rem;
+  --ui-spacing: 0.28125rem;
+  --ui-primary: light-dark(#0062e0, #4c9aff);
+}</code></pre>
+          <p>
+            Colors follow the page's <code>color-scheme</code>. Set <code>color-scheme: light dark</code> to
+            follow the system, or <code>dark</code> to force it.
+          </p>
+        </section>
+
+        <p class="ds-part">Foundations</p>
+
+        <section class="ds-section" id="color">
+          <h2>Color</h2>
+          <p>
+            Eleven roles, each with a light and a dark value. Components only use roles, never raw colors, so
+            a theme changes them all at once.
+          </p>
+          <h3>Surfaces and text</h3>
+          <div class="ds-grid">
+            <div class="ds-swatch">
+              <i style="background: var(--ui-background)"></i><b>--ui-background</b><span data-color="--ui-background"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-foreground)"></i><b>--ui-foreground</b><span data-color="--ui-foreground"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-muted)"></i><b>--ui-muted</b><span data-color="--ui-muted"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-muted-foreground)"></i><b>--ui-muted-foreground</b><span data-color="--ui-muted-foreground"></span>
+            </div>
+          </div>
+          <h3>Lines</h3>
+          <div class="ds-grid">
+            <div class="ds-swatch">
+              <i style="background: var(--ui-border)"></i><b>--ui-border</b><span data-color="--ui-border"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-input)"></i><b>--ui-input</b><span data-color="--ui-input"></span>
+            </div>
+          </div>
+          <h3>Accent and status</h3>
+          <div class="ds-grid">
+            <div class="ds-swatch">
+              <i style="background: var(--ui-primary)"></i><b>--ui-primary</b><span data-color="--ui-primary"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-primary-foreground)"></i><b>--ui-primary-foreground</b><span data-color="--ui-primary-foreground"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-destructive)"></i><b>--ui-destructive</b><span data-color="--ui-destructive"></span>
+            </div>
+          </div>
+          <h3>Focus and overlay</h3>
+          <div class="ds-grid">
+            <div class="ds-swatch">
+              <i style="background: var(--ui-ring)"></i><b>--ui-ring</b><span data-color="--ui-ring"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-ring-border)"></i><b>--ui-ring-border</b><span data-color="--ui-ring-border"></span>
+            </div>
+            <div class="ds-swatch">
+              <i style="background: var(--ui-overlay)"></i><b>--ui-overlay</b><span data-color="--ui-overlay"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="ds-section" id="typography">
+          <h2>Typography</h2>
+          <p>
+            One base size sets the scale. Titles sit 2px above it, labels and descriptions 1px below, and
+            small text 2px below.
+          </p>
+          <table class="ds-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Sample</th>
+                <th>Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Title</td>
+                <td>
+                  <span
+                    id="ds-t-title"
+                    style="font-size: calc(var(--ui-font-size) + 0.125rem); font-weight: 600">Delete this project?</span>
+                </td>
+                <td class="ds-mono" data-measure="#ds-t-title|fontSize"></td>
+              </tr>
+              <tr>
+                <td>Base</td>
+                <td>
+                  <span id="ds-t-base" style="font-size: var(--ui-font-size)">Buttons, inputs, menus and body text.</span>
+                </td>
+                <td class="ds-mono" data-measure="#ds-t-base|fontSize"></td>
+              </tr>
+              <tr>
+                <td>Label</td>
+                <td>
+                  <span
+                    id="ds-t-label"
+                    style="font-size: calc(var(--ui-font-size) - 0.0625rem); font-weight: 500">Email address</span>
+                </td>
+                <td class="ds-mono" data-measure="#ds-t-label|fontSize"></td>
+              </tr>
+              <tr>
+                <td>Description</td>
+                <td>
+                  <span
+                    id="ds-t-desc"
+                    class="ds-muted"
+                    style="font-size: calc(var(--ui-font-size) - 0.0625rem)">We'll send a confirmation link.</span>
+                </td>
+                <td class="ds-mono" data-measure="#ds-t-desc|fontSize"></td>
+              </tr>
+              <tr>
+                <td>Small</td>
+                <td>
+                  <span
+                    id="ds-t-small"
+                    class="ds-muted"
+                    style="font-size: calc(var(--ui-font-size) - 0.125rem)">Group labels and shortcuts</span>
+                </td>
+                <td class="ds-mono" data-measure="#ds-t-small|fontSize"></td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>Families</h3>
+          <table class="ds-table">
+            <tbody>
+              <tr>
+                <td class="ds-mono">--ui-font-sans</td>
+                <td style="font-family: var(--ui-font-sans)">The quick brown fox jumps over the lazy dog</td>
+              </tr>
+              <tr>
+                <td class="ds-mono">--ui-font-mono</td>
+                <td style="font-family: var(--ui-font-mono)">npm install @ui-sdk/web</td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>Weight and leading</h3>
+          <p>
+            Three weights: 400 for text, 500 for controls and labels, 600 for titles. Running text uses
+            <code>--ui-line-height</code>.
+          </p>
+        </section>
+
+        <section class="ds-section" id="spacing">
+          <h2>Spacing</h2>
+          <p>
+            A single unit, <code>--ui-spacing</code>. Every padding, gap and height is a multiple of it, so
+            changing it changes the density of everything.
+          </p>
+          <table class="ds-table">
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>Used for</th>
+                <th></th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>× 1</td>
+                <td class="ds-muted">Popup inset</td>
+                <td style="width: 40%">
+                  <div id="ds-s1" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 1)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s1|width"></td>
+              </tr>
+              <tr>
+                <td>× 1.5</td>
+                <td class="ds-muted">Label to control</td>
+                <td>
+                  <div id="ds-s15" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 1.5)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s15|width"></td>
+              </tr>
+              <tr>
+                <td>× 2</td>
+                <td class="ds-muted">Item padding, icon gap</td>
+                <td>
+                  <div id="ds-s2" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 2)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s2|width"></td>
+              </tr>
+              <tr>
+                <td>× 3</td>
+                <td class="ds-muted">Button padding</td>
+                <td>
+                  <div id="ds-s3" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 3)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s3|width"></td>
+              </tr>
+              <tr>
+                <td>× 4</td>
+                <td class="ds-muted">Between fields, popover padding</td>
+                <td>
+                  <div id="ds-s4" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 4)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s4|width"></td>
+              </tr>
+              <tr>
+                <td>× 6</td>
+                <td class="ds-muted">Dialog padding</td>
+                <td>
+                  <div id="ds-s6" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 6)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s6|width"></td>
+              </tr>
+              <tr>
+                <td>× 8</td>
+                <td class="ds-muted">Control height</td>
+                <td>
+                  <div id="ds-s8" class="ds-bar-sample" style="width: calc(var(--ui-spacing) * 8)"></div>
+                </td>
+                <td class="ds-mono" data-measure="#ds-s8|width"></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="ds-section" id="size">
+          <h2>Size</h2>
+          <p>
+            Controls share one height. Put any of them on a row and they line up, at every spacing and font
+            size.
+          </p>
+          <div class="ds-example" data-caption="Input, number input, select, toggle and button on one row.">
+            <template>
+              <div class="ds-row">
+                <ui-input><input placeholder="Search" aria-label="Search" style="width: 10rem" /></ui-input>
+                <ui-number-input default-value="2" min="1" aria-label="Count">
+                  <ui-number-input-group>
+                    <ui-number-input-decrement><button aria-label="Decrease"></button></ui-number-input-decrement>
+                    <ui-number-input-control><input /></ui-number-input-control>
+                    <ui-number-input-increment><button aria-label="Increase"></button></ui-number-input-increment>
+                  </ui-number-input-group>
+                </ui-number-input>
+                <ui-select default-value="week" aria-label="Range">
+                  <ui-select-trigger><button style="min-width: 7rem"><ui-select-value></ui-select-value></button></ui-select-trigger>
+                  <ui-select-content>
+                    <ui-select-item value="day">Day<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                    <ui-select-item value="week">Week<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                  </ui-select-content>
+                </ui-select>
+                <ui-toggle><button>Live</button></ui-toggle>
+                <ui-button><button data-variant="solid">Apply</button></ui-button>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <section class="ds-section" id="radius">
+          <h2>Radius</h2>
+          <p>
+            One token, <code>--ui-radius</code>, starting at zero. Small parts take half of it and floating
+            surfaces take one and a half, so nested corners stay concentric. Switches and slider thumbs go
+            fully round once the radius is above zero.
+          </p>
+          <div class="ds-row" style="gap: 24px">
+            <div class="ds-stack" style="gap: 6px">
+              <div id="ds-r-small" class="ds-box" style="border-radius: calc(var(--ui-radius) / 2)">½</div>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-small|borderRadius"></span><span class="ds-muted">Checkbox, tracks</span>
+            </div>
+            <div class="ds-stack" style="gap: 6px">
+              <div id="ds-r-base" class="ds-box" style="border-radius: var(--ui-radius)">1</div>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-base|borderRadius"></span><span class="ds-muted">Controls</span>
+            </div>
+            <div class="ds-stack" style="gap: 6px">
+              <div id="ds-r-large" class="ds-box" style="border-radius: calc(var(--ui-radius) * 1.5)">1½</div>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-large|borderRadius"></span><span class="ds-muted">Popups, dialogs</span>
+            </div>
+            <div class="ds-stack" style="gap: 6px">
+              <div id="ds-r-full" class="ds-box" style="border-radius: calc(var(--ui-radius) * 999)">∞</div>
+              <span class="ds-mono ds-muted" data-measure="#ds-r-full|borderRadius"></span><span class="ds-muted">Switch, thumb</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="ds-section" id="elevation">
+          <h2>Elevation</h2>
+          <p>
+            Two levels. The page is flat and separated by borders. Popups add <code>--ui-shadow</code>, and
+            modals add <code>--ui-overlay</code> behind them.
+          </p>
+          <div class="ds-row" style="gap: 24px">
+            <div class="ds-surface">Flat, 1px border</div>
+            <div class="ds-surface" style="box-shadow: var(--ui-shadow)">Popup, --ui-shadow</div>
+          </div>
+        </section>
+
+        <section class="ds-section" id="focus">
+          <h2>Focus</h2>
+          <p>
+            Keyboard focus draws a 4px <code>--ui-ring</code> right against the control, with no gap. Fields
+            also turn their border to <code>--ui-ring-border</code>. Invalid fields use a red ring. Tab
+            through any example to see it.
+          </p>
+          <div class="ds-row" style="gap: 24px">
+            <div
+              class="ds-surface ds-ring"
+              style="width: 8rem; height: 2rem; border-color: var(--ui-ring-border)">
+              Focused field
+            </div>
+            <div
+              class="ds-surface"
+              style="
+                width: 8rem;
+                height: 2rem;
+                border-color: var(--ui-destructive);
+                outline: 4px solid color-mix(in oklab, var(--ui-destructive) 20%, transparent);
+              ">
+              Invalid field
+            </div>
+          </div>
+        </section>
+
+        <section class="ds-section" id="icons">
+          <h2>Icons</h2>
+          <p>
+            The stylesheet draws the four icons components need, as CSS masks in <code>currentColor</code>, so
+            there's no icon library to load. Put your own <code>&lt;svg&gt;</code> in a part and the CSS icon
+            steps aside.
+          </p>
+          <table class="ds-table">
+            <tbody>
+              <tr>
+                <td>
+                  <span class="ds-icon" style="display: block; mask-image: var(--ui-icon-chevron)"></span>
+                </td>
+                <td class="ds-mono">--ui-icon-chevron</td>
+                <td class="ds-muted">Select, combobox, accordion, collapsible, navigation menu, submenus</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="ds-icon" style="display: block; mask-image: var(--ui-icon-check)"></span>
+                </td>
+                <td class="ds-mono">--ui-icon-check</td>
+                <td class="ds-muted">Checkbox, selected items, checked menu items</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="ds-icon" style="display: block; mask-image: var(--ui-icon-minus)"></span>
+                </td>
+                <td class="ds-mono">--ui-icon-minus</td>
+                <td class="ds-muted">Indeterminate checkbox, number input decrement</td>
+              </tr>
+              <tr>
+                <td><span class="ds-icon" style="display: block; mask-image: var(--ui-icon-plus)"></span></td>
+                <td class="ds-mono">--ui-icon-plus</td>
+                <td class="ds-muted">Number input increment</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="ds-section" id="motion">
+          <h2>Motion</h2>
+          <p>
+            None. Popups appear and disappear at once, switches jump, and nothing fades. Components still set
+            <code>data-starting-style</code> and <code>data-ending-style</code>, so you can add transitions in
+            your own CSS.
+          </p>
+        </section>
+
+        <p class="ds-part">Components</p>
+
+        <section class="ds-section" id="accordion">
+          <h2>Accordion</h2>
+          <p>Stacked sections that open one at a time, divided by lines. The chevron flips when open.</p>
+          <div class="ds-example">
+            <template>
+              <ui-accordion default-value="shipping" style="width: 28rem; max-width: 100%">
+                <ui-accordion-item value="shipping">
+                  <ui-accordion-header><h3>
+                      <ui-accordion-trigger><button type="button">Shipping</button></ui-accordion-trigger>
+                    </h3></ui-accordion-header>
+                  <ui-accordion-panel>Orders ship within two business days. You get a tracking link by email.</ui-accordion-panel>
+                </ui-accordion-item>
+                <ui-accordion-item value="returns">
+                  <ui-accordion-header><h3>
+                      <ui-accordion-trigger><button type="button">Returns</button></ui-accordion-trigger>
+                    </h3></ui-accordion-header>
+                  <ui-accordion-panel hidden>Return anything within 30 days for a full refund.</ui-accordion-panel>
+                </ui-accordion-item>
+                <ui-accordion-item value="warranty">
+                  <ui-accordion-header><h3>
+                      <ui-accordion-trigger><button type="button">Warranty</button></ui-accordion-trigger>
+                    </h3></ui-accordion-header>
+                  <ui-accordion-panel hidden>Every product has a two year warranty.</ui-accordion-panel>
+                </ui-accordion-item>
+              </ui-accordion>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>accordion-item</code></li>
+            <li><code>accordion-header</code></li>
+            <li><code>accordion-trigger</code></li>
+            <li><code>accordion-panel</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="alert-dialog">
+          <h2>Alert dialog</h2>
+          <p>
+            Asks for a decision before anything else can happen. Use the destructive button for the risky
+            choice.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-alert-dialog>
+                <ui-alert-dialog-trigger><button data-variant="destructive">Delete project</button></ui-alert-dialog-trigger>
+                <ui-alert-dialog-backdrop hidden></ui-alert-dialog-backdrop>
+                <ui-alert-dialog-content hidden>
+                  <ui-alert-dialog-title>Delete this project?</ui-alert-dialog-title>
+                  <ui-alert-dialog-description>This permanently deletes the project and its deployment history.</ui-alert-dialog-description>
+                  <div class="ds-row" style="justify-content: flex-end">
+                    <ui-alert-dialog-close><button>Cancel</button></ui-alert-dialog-close>
+                    <ui-alert-dialog-close value="confirm"><button data-variant="destructive">Delete</button></ui-alert-dialog-close>
+                  </div>
+                </ui-alert-dialog-content>
+              </ui-alert-dialog>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>alert-dialog-backdrop</code></li>
+            <li><code>alert-dialog-content</code></li>
+            <li><code>alert-dialog-title</code></li>
+            <li><code>alert-dialog-description</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="autocomplete">
+          <h2>Autocomplete</h2>
+          <p>An input that suggests values but accepts anything.</p>
+          <div class="ds-example">
+            <template>
+              <ui-autocomplete>
+                <div class="ds-stack ds-w" style="gap: 6px">
+                  <ui-autocomplete-label>Favorite fruit</ui-autocomplete-label>
+                  <ui-autocomplete-input><input placeholder="e.g. Mango" /></ui-autocomplete-input>
+                </div>
+                <ui-autocomplete-content hidden>
+                  <ui-autocomplete-empty>No fruits found.</ui-autocomplete-empty>
+                  <ui-autocomplete-list>
+                    <ui-autocomplete-item value="Apple">Apple</ui-autocomplete-item>
+                    <ui-autocomplete-item value="Banana">Banana</ui-autocomplete-item>
+                    <ui-autocomplete-item value="Mango">Mango</ui-autocomplete-item>
+                    <ui-autocomplete-item value="Peach">Peach</ui-autocomplete-item>
+                  </ui-autocomplete-list>
+                </ui-autocomplete-content>
+              </ui-autocomplete>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>autocomplete-input</code></li>
+            <li><code>autocomplete-content</code></li>
+            <li><code>autocomplete-item</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="avatar">
+          <h2>Avatar</h2>
+          <p>A picture with initials to fall back on while it loads or when it fails.</p>
+          <div class="ds-example">
+            <template>
+              <ui-avatar><img src="/apple-touch-icon.png" alt="UI SDK" /><ui-avatar-fallback>UI</ui-avatar-fallback></ui-avatar>
+              <ui-avatar><img src="/design/missing.png" alt="Hollis Grant" /><ui-avatar-fallback>HG</ui-avatar-fallback></ui-avatar>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>avatar-root</code></li>
+            <li><code>avatar-image</code></li>
+            <li><code>avatar-fallback</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="button">
+          <h2>Button</h2>
+          <p>
+            Outlined by default. <code>data-variant="solid"</code> marks the main action and
+            <code>data-variant="destructive"</code> one that deletes. A button with only an icon and an
+            <code>aria-label</code> turns square.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-button><button data-variant="solid">Save changes</button></ui-button>
+              <ui-button><button>Cancel</button></ui-button>
+              <ui-button><button data-variant="destructive">Delete</button></ui-button>
+              <ui-button disabled><button>Disabled</button></ui-button>
+              <ui-button><button aria-label="Add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14" /></svg></button></ui-button>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>button-root</code></li>
+            <li><code>[data-variant]</code></li>
+            <li><code>[data-disabled]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="checkbox">
+          <h2>Checkbox</h2>
+          <p>
+            Filled with the primary color when checked. A label around it lines the box up with the first line
+            of text, even when the text wraps.
+          </p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <label><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Accept terms</label>
+              <label><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Send me product updates</label>
+              <label><ui-checkbox default-checked="indeterminate"><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Some selected</label>
+              <label><ui-checkbox disabled><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Disabled</label>
+              <label class="ds-w"><ui-checkbox><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox>
+                <span>A longer label that wraps onto a second line, with a <a href="#checkbox">link</a> inside it.</span></label>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>checkbox-root</code></li>
+            <li><code>checkbox-indicator</code></li>
+            <li><code>[data-checked]</code></li>
+            <li><code>[data-indeterminate]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="collapsible">
+          <h2>Collapsible</h2>
+          <p>
+            One section that shows and hides. The "Markup" toggle under every example on this page is one.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-collapsible>
+                <ui-collapsible-trigger><button type="button">Order #4189</button></ui-collapsible-trigger>
+                <ui-collapsible-panel hidden>3 items, $84.00. Shipped yesterday.</ui-collapsible-panel>
+              </ui-collapsible>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>collapsible-trigger</code></li>
+            <li><code>collapsible-panel</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="combobox">
+          <h2>Combobox</h2>
+          <p>
+            An input that filters a list. A trigger placed right after the input tucks into its end. A trigger
+            on its own is a normal button.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-combobox>
+                <div class="ds-stack ds-w" style="gap: 6px">
+                  <ui-combobox-label>Framework</ui-combobox-label>
+                  <div>
+                    <ui-combobox-input><input placeholder="Select a framework" /></ui-combobox-input>
+                    <ui-combobox-trigger><button aria-label="Show frameworks"></button></ui-combobox-trigger>
+                  </div>
+                </div>
+                <ui-combobox-content hidden>
+                  <ui-combobox-empty>No frameworks found.</ui-combobox-empty>
+                  <ui-combobox-list>
+                    <ui-combobox-item value="next" label="Next.js">Next.js<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
+                    <ui-combobox-item value="nuxt" label="Nuxt">Nuxt<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
+                    <ui-combobox-item value="sveltekit" label="SvelteKit">SvelteKit<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
+                    <ui-combobox-item value="astro" label="Astro">Astro<ui-combobox-item-indicator></ui-combobox-item-indicator></ui-combobox-item>
+                  </ui-combobox-list>
+                </ui-combobox-content>
+              </ui-combobox>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>combobox-label</code></li>
+            <li><code>combobox-input</code></li>
+            <li><code>combobox-trigger</code></li>
+            <li><code>combobox-content</code></li>
+            <li><code>combobox-item</code></li>
+            <li><code>combobox-empty</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="command">
+          <h2>Command</h2>
+          <p>A searchable list of actions in a bordered panel, with groups and shortcuts.</p>
+          <div class="ds-example">
+            <template>
+              <ui-command>
+                <ui-command-input><input aria-label="Search commands" placeholder="Type a command or search..." /></ui-command-input>
+                <ui-command-empty>No results found.</ui-command-empty>
+                <ui-command-list>
+                  <ui-command-group>
+                    <ui-command-group-label>Suggestions</ui-command-group-label>
+                    <ui-command-item value="calendar"><span>Calendar</span></ui-command-item>
+                    <ui-command-item value="emoji"><span>Search emoji</span></ui-command-item>
+                    <ui-command-item value="calculator" disabled><span>Calculator</span></ui-command-item>
+                  </ui-command-group>
+                  <ui-command-separator></ui-command-separator>
+                  <ui-command-group>
+                    <ui-command-group-label>Settings</ui-command-group-label>
+                    <ui-command-item value="profile" shortcut="mod+p"><span>Profile</span><ui-command-shortcut></ui-command-shortcut></ui-command-item>
+                    <ui-command-item value="settings" shortcut="mod+s"><span>Settings</span><ui-command-shortcut></ui-command-shortcut></ui-command-item>
+                  </ui-command-group>
+                </ui-command-list>
+              </ui-command>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>command-root</code></li>
+            <li><code>command-input</code></li>
+            <li><code>command-list</code></li>
+            <li><code>command-item</code></li>
+            <li><code>command-group-label</code></li>
+            <li><code>command-shortcut</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="dialog">
+          <h2>Dialog</h2>
+          <p>A focused task over a dimmed page. Title, description, content and actions.</p>
+          <div class="ds-example">
+            <template>
+              <ui-dialog>
+                <ui-dialog-trigger><button>Edit profile</button></ui-dialog-trigger>
+                <ui-dialog-backdrop hidden></ui-dialog-backdrop>
+                <ui-dialog-content hidden>
+                  <ui-dialog-title>Edit profile</ui-dialog-title>
+                  <ui-dialog-description>Changes show on your public page.</ui-dialog-description>
+                  <ui-field><ui-field-label>Name</ui-field-label><ui-input><input value="Hollis Grant" /></ui-input></ui-field>
+                  <div class="ds-row" style="justify-content: flex-end">
+                    <ui-dialog-close><button>Cancel</button></ui-dialog-close>
+                    <ui-dialog-close><button data-variant="solid">Save</button></ui-dialog-close>
+                  </div>
+                </ui-dialog-content>
+              </ui-dialog>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>dialog-backdrop</code></li>
+            <li><code>dialog-content</code></li>
+            <li><code>dialog-title</code></li>
+            <li><code>dialog-description</code></li>
+            <li><code>dialog-close</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="drawer">
+          <h2>Drawer</h2>
+          <p>
+            A panel that slides in from an edge and can be dragged closed. Its outer corners follow the
+            radius.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-drawer>
+                <ui-drawer-trigger><button>Open drawer</button></ui-drawer-trigger>
+                <ui-drawer-backdrop hidden></ui-drawer-backdrop>
+                <ui-drawer-content hidden>
+                  <ui-drawer-title>Move goal</ui-drawer-title>
+                  <ui-drawer-description>Set your daily activity goal.</ui-drawer-description>
+                  <div class="ds-row">
+                    <ui-drawer-close value="submit"><button data-variant="solid">Submit</button></ui-drawer-close>
+                    <ui-drawer-close><button>Cancel</button></ui-drawer-close>
+                  </div>
+                </ui-drawer-content>
+              </ui-drawer>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>drawer-backdrop</code></li>
+            <li><code>drawer-viewport</code></li>
+            <li><code>drawer-content</code></li>
+            <li><code>drawer-title</code></li>
+            <li><code>drawer-description</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="field">
+          <h2>Field</h2>
+          <p>
+            Wraps any control with a label, a description and an error. A fieldset groups fields under a
+            legend.
+          </p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <ui-field class="ds-w">
+                <ui-field-label>Email</ui-field-label>
+                <ui-input><input placeholder="you@example.com" /></ui-input>
+                <ui-field-description>We'll send a confirmation link.</ui-field-description>
+              </ui-field>
+              <ui-field-set class="ds-w">
+                <fieldset>
+                  <legend>Address</legend>
+                  <ui-field-description>Where we send your order.</ui-field-description>
+                  <ui-field-group>
+                    <ui-field><ui-field-label>Street</ui-field-label><ui-input><input /></ui-input></ui-field>
+                    <ui-field><ui-field-label>City</ui-field-label><ui-input><input /></ui-input></ui-field>
+                  </ui-field-group>
+                </fieldset>
+              </ui-field-set>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>field-root</code></li>
+            <li><code>field-label</code></li>
+            <li><code>field-description</code></li>
+            <li><code>field-error</code></li>
+            <li><code>field-set</code></li>
+            <li><code>field-legend</code></li>
+            <li><code>field-group</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="form">
+          <h2>Form</h2>
+          <p>Fields validate on submit. Press "Create account" with the form empty to see errors.</p>
+          <div class="ds-example">
+            <template>
+              <form class="ds-stack" style="gap: 20px; width: 24rem; max-width: 100%">
+                <ui-field name="name">
+                  <ui-field-label>Name</ui-field-label>
+                  <ui-input><input required autocomplete="name" /></ui-input>
+                  <ui-field-error match="valueMissing">Enter your name.</ui-field-error>
+                </ui-field>
+                <ui-field name="email">
+                  <ui-field-label>Email</ui-field-label>
+                  <ui-input><input type="email" required autocomplete="email" /></ui-input>
+                  <ui-field-description>We'll send a confirmation link.</ui-field-description>
+                  <ui-field-error match="valueMissing">Enter your email address.</ui-field-error>
+                  <ui-field-error match="typeMismatch">Enter an email address like hollis@example.com.</ui-field-error>
+                </ui-field>
+                <ui-field name="team">
+                  <ui-field-label>Team size</ui-field-label>
+                  <ui-select placeholder="Select a size" required>
+                    <ui-select-trigger><button><ui-select-value></ui-select-value></button></ui-select-trigger>
+                    <ui-select-content>
+                      <ui-select-item value="1">Just me<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                      <ui-select-item value="10">2 to 10<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                      <ui-select-item value="50">11 to 50<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                    </ui-select-content>
+                  </ui-select>
+                  <ui-field-error match="valueMissing">Choose a team size.</ui-field-error>
+                </ui-field>
+                <label><ui-switch name="updates" default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Email me product updates</label>
+                <div class="ds-row">
+                  <ui-button><button type="submit" data-variant="solid">Create account</button></ui-button>
+                  <ui-button><button type="reset">Reset</button></ui-button>
+                </div>
+              </form>
+            </template>
+          </div>
+        </section>
+
+        <section class="ds-section" id="hover-card">
+          <h2>Hover card</h2>
+          <p>A preview of what a link points to, for people who pause on it.</p>
+          <div class="ds-example">
+            <template>
+              <ui-hover-card>
+                <ui-hover-card-trigger><a href="#hover-card">@hollis</a></ui-hover-card-trigger>
+                <ui-hover-card-content hidden>
+                  <strong>Hollis Grant</strong>
+                  <span class="ds-muted">Design engineer on the payments team.</span>
+                </ui-hover-card-content>
+              </ui-hover-card>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>hover-card-trigger</code></li>
+            <li><code>hover-card-content</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="input">
+          <h2>Input</h2>
+          <p>Fills its field. Focus turns the border darker, and an invalid value turns it red.</p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <ui-field class="ds-w"><ui-field-label>Name</ui-field-label><ui-input><input placeholder="Hollis Grant" /></ui-input></ui-field>
+              <ui-field class="ds-w"><ui-field-label>Disabled</ui-field-label><ui-input><input value="Can't change this" disabled /></ui-input></ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>input-root</code></li>
+            <li><code>[data-invalid]</code></li>
+            <li><code>[data-disabled]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="listbox">
+          <h2>Listbox</h2>
+          <p>A list you pick from in place, with checks on what's selected.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-field-label>Email me about</ui-field-label>
+                <ui-listbox multiple activation="automatic" default-value="mentions">
+                  <ui-listbox-item value="comments">Comments<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
+                  <ui-listbox-item value="mentions">Mentions<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
+                  <ui-listbox-item value="reactions">Reactions<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
+                  <ui-listbox-item value="billing" disabled>Billing<ui-listbox-item-indicator></ui-listbox-item-indicator></ui-listbox-item>
+                </ui-listbox>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>listbox-root</code></li>
+            <li><code>listbox-item</code></li>
+            <li><code>listbox-item-indicator</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="menu">
+          <h2>Menu</h2>
+          <p>
+            A list of actions on a raised surface. Group labels, separators, shortcuts, destructive items and
+            submenus.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-menu>
+                <ui-menu-trigger><button>Open menu</button></ui-menu-trigger>
+                <ui-menu-content>
+                  <ui-menu-group>
+                    <ui-menu-group-label>Project</ui-menu-group-label>
+                    <ui-menu-item value="overview" shortcut="mod+1">Overview</ui-menu-item>
+                    <ui-menu-item value="members" shortcut="mod+2">Members</ui-menu-item>
+                    <ui-menu-item value="archived" disabled>Archived</ui-menu-item>
+                  </ui-menu-group>
+                  <ui-menu-sub>
+                    <ui-menu-sub-trigger>Share</ui-menu-sub-trigger>
+                    <ui-menu-sub-content>
+                      <ui-menu-item value="link">Copy link</ui-menu-item>
+                      <ui-menu-item value="email">Email</ui-menu-item>
+                    </ui-menu-sub-content>
+                  </ui-menu-sub>
+                  <ui-menu-separator></ui-menu-separator>
+                  <ui-menu-item value="delete" destructive>Delete project</ui-menu-item>
+                </ui-menu-content>
+              </ui-menu>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>menu-content</code></li>
+            <li><code>menu-item</code></li>
+            <li><code>menu-group-label</code></li>
+            <li><code>menu-separator</code></li>
+            <li><code>menu-shortcut</code></li>
+            <li><code>menu-checkbox-item</code></li>
+            <li><code>menu-radio-item</code></li>
+            <li><code>menu-item-indicator</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="menubar">
+          <h2>Menubar</h2>
+          <p>A row of menus in one outlined bar. The buttons inside it drop their borders.</p>
+          <div class="ds-example">
+            <template>
+              <ui-menubar>
+                <ui-menu>
+                  <ui-menu-trigger><button>File</button></ui-menu-trigger>
+                  <ui-menu-content>
+                    <ui-menu-item value="new" shortcut="mod+n">New file</ui-menu-item>
+                    <ui-menu-item value="open" shortcut="mod+o">Open…</ui-menu-item>
+                    <ui-menu-separator></ui-menu-separator>
+                    <ui-menu-item value="close">Close window</ui-menu-item>
+                  </ui-menu-content>
+                </ui-menu>
+                <ui-menu>
+                  <ui-menu-trigger><button>View</button></ui-menu-trigger>
+                  <ui-menu-content>
+                    <ui-menu-checkbox-item value="status-bar" default-checked><ui-menu-item-indicator></ui-menu-item-indicator>Status bar</ui-menu-checkbox-item>
+                    <ui-menu-checkbox-item value="minimap"><ui-menu-item-indicator keep-mounted></ui-menu-item-indicator>Minimap</ui-menu-checkbox-item>
+                    <ui-menu-separator></ui-menu-separator>
+                    <ui-menu-radio-group default-value="comfortable">
+                      <ui-menu-group-label>Density</ui-menu-group-label>
+                      <ui-menu-radio-item value="compact"><ui-menu-item-indicator></ui-menu-item-indicator>Compact</ui-menu-radio-item>
+                      <ui-menu-radio-item value="comfortable"><ui-menu-item-indicator></ui-menu-item-indicator>Comfortable</ui-menu-radio-item>
+                    </ui-menu-radio-group>
+                  </ui-menu-content>
+                </ui-menu>
+                <ui-menu>
+                  <ui-menu-trigger><button>Help</button></ui-menu-trigger>
+                  <ui-menu-content>
+                    <ui-menu-item value="docs">Documentation</ui-menu-item>
+                    <ui-menu-item value="about">About</ui-menu-item>
+                  </ui-menu-content>
+                </ui-menu>
+              </ui-menubar>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>menubar-root</code></li>
+            <li><code>menu-trigger</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="meter">
+          <h2>Meter</h2>
+          <p>A measurement within a known range, like storage used.</p>
+          <div class="ds-example">
+            <template>
+              <ui-meter value="68" class="ds-w">
+                <ui-meter-label>Storage used</ui-meter-label>
+                <ui-meter-value></ui-meter-value>
+                <ui-meter-track><ui-meter-indicator></ui-meter-indicator></ui-meter-track>
+              </ui-meter>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>meter-label</code></li>
+            <li><code>meter-value</code></li>
+            <li><code>meter-track</code></li>
+            <li><code>meter-indicator</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="navigation-menu">
+          <h2>Navigation menu</h2>
+          <p>
+            Site links with dropdowns. Triggers and links are flat until hovered or open, and the dropdown
+            sizes to its content.
+          </p>
+          <div class="ds-example" style="min-height: 15rem">
+            <template>
+              <ui-navigation-menu aria-label="Main">
+                <ui-navigation-menu-list>
+                  <ui-navigation-menu-item value="start">
+                    <ui-navigation-menu-trigger><button>Getting started</button></ui-navigation-menu-trigger>
+                    <ui-navigation-menu-content>
+                      <ul>
+                        <li>
+                          <ui-navigation-menu-link><a href="#navigation-menu"><span>Introduction</span><span>One core for every framework.</span></a></ui-navigation-menu-link>
+                        </li>
+                        <li>
+                          <ui-navigation-menu-link><a href="#navigation-menu"><span>Installation</span><span>Add the package and render a part.</span></a></ui-navigation-menu-link>
+                        </li>
+                        <li>
+                          <ui-navigation-menu-link><a href="#navigation-menu"><span>Styling</span><span>Data attributes and CSS variables.</span></a></ui-navigation-menu-link>
+                        </li>
+                      </ul>
+                    </ui-navigation-menu-content>
+                  </ui-navigation-menu-item>
+                  <ui-navigation-menu-item value="components">
+                    <ui-navigation-menu-trigger><button>Components</button></ui-navigation-menu-trigger>
+                    <ui-navigation-menu-content>
+                      <ul>
+                        <li>
+                          <ui-navigation-menu-link><a href="#dialog">Dialog</a></ui-navigation-menu-link>
+                        </li>
+                        <li>
+                          <ui-navigation-menu-link><a href="#menu">Menu</a></ui-navigation-menu-link>
+                        </li>
+                        <li>
+                          <ui-navigation-menu-link><a href="#tabs">Tabs</a></ui-navigation-menu-link>
+                        </li>
+                      </ul>
+                    </ui-navigation-menu-content>
+                  </ui-navigation-menu-item>
+                  <ui-navigation-menu-item>
+                    <ui-navigation-menu-link><a href="#install">Docs</a></ui-navigation-menu-link>
+                  </ui-navigation-menu-item>
+                </ui-navigation-menu-list>
+                <ui-navigation-menu-viewport side-offset="8"></ui-navigation-menu-viewport>
+              </ui-navigation-menu>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>navigation-menu-list</code></li>
+            <li><code>navigation-menu-trigger</code></li>
+            <li><code>navigation-menu-link</code></li>
+            <li><code>navigation-menu-viewport</code></li>
+            <li><code>navigation-menu-content</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="number-input">
+          <h2>Number input</h2>
+          <p>A number between minus and plus buttons, joined into one control. The CSS draws both icons.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-number-input default-value="1" min="1">
+                  <ui-field-label>Quantity</ui-field-label>
+                  <ui-number-input-group>
+                    <ui-number-input-decrement><button aria-label="Decrease"></button></ui-number-input-decrement>
+                    <ui-number-input-control><input /></ui-number-input-control>
+                    <ui-number-input-increment><button aria-label="Increase"></button></ui-number-input-increment>
+                  </ui-number-input-group>
+                </ui-number-input>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>number-input-group</code></li>
+            <li><code>number-input-control</code></li>
+            <li><code>number-input-decrement</code></li>
+            <li><code>number-input-increment</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="popover">
+          <h2>Popover</h2>
+          <p>Floating content with a title, a description and actions.</p>
+          <div class="ds-example">
+            <template>
+              <ui-popover>
+                <ui-popover-trigger><button>Share</button></ui-popover-trigger>
+                <ui-popover-content>
+                  <ui-popover-title>Share this document</ui-popover-title>
+                  <ui-popover-description>Anyone with the link can view it.</ui-popover-description>
+                  <div class="ds-row">
+                    <ui-popover-close><button>Cancel</button></ui-popover-close>
+                    <ui-popover-close><button data-variant="solid">Copy link</button></ui-popover-close>
+                  </div>
+                </ui-popover-content>
+              </ui-popover>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>popover-trigger</code></li>
+            <li><code>popover-content</code></li>
+            <li><code>popover-title</code></li>
+            <li><code>popover-description</code></li>
+            <li><code>popover-close</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="progress">
+          <h2>Progress</h2>
+          <p>How far a task has come. Without a value it's indeterminate and shows a still stripe.</p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <ui-progress value="60" class="ds-w">
+                <ui-progress-label>Exporting video</ui-progress-label>
+                <ui-progress-value></ui-progress-value>
+                <ui-progress-track><ui-progress-indicator></ui-progress-indicator></ui-progress-track>
+              </ui-progress>
+              <ui-progress class="ds-w">
+                <ui-progress-label>Preparing upload</ui-progress-label>
+                <ui-progress-track><ui-progress-indicator></ui-progress-indicator></ui-progress-track>
+              </ui-progress>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>progress-label</code></li>
+            <li><code>progress-value</code></li>
+            <li><code>progress-track</code></li>
+            <li><code>progress-indicator</code></li>
+            <li><code>[data-indeterminate]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="radio">
+          <h2>Radio</h2>
+          <p>Radios stay round in every theme: the circle is how people tell one choice from many.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field>
+                <ui-field-label>Shipping</ui-field-label>
+                <ui-radio-group default-value="standard">
+                  <label><ui-radio value="standard"><ui-radio-indicator></ui-radio-indicator></ui-radio> Standard</label>
+                  <label><ui-radio value="express"><ui-radio-indicator></ui-radio-indicator></ui-radio> Express</label>
+                  <label><ui-radio value="overnight" disabled><ui-radio-indicator></ui-radio-indicator></ui-radio> Overnight</label>
+                </ui-radio-group>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>radio-group</code></li>
+            <li><code>radio-root</code></li>
+            <li><code>radio-indicator</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="select">
+          <h2>Select</h2>
+          <p>
+            Looks like an input with a chevron. Its list is at least as wide as the trigger, and the selected
+            item shows a check.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-field class="ds-w">
+                <ui-field-label>Role</ui-field-label>
+                <ui-select placeholder="Select a role">
+                  <ui-select-trigger><button><ui-select-value></ui-select-value></button></ui-select-trigger>
+                  <ui-select-content>
+                    <ui-select-item value="viewer">Viewer<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                    <ui-select-item value="editor">Editor<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                    <ui-select-item value="admin">Admin<ui-select-item-indicator></ui-select-item-indicator></ui-select-item>
+                  </ui-select-content>
+                </ui-select>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>select-trigger</code></li>
+            <li><code>select-value</code></li>
+            <li><code>select-content</code></li>
+            <li><code>select-item</code></li>
+            <li><code>select-item-indicator</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="separator">
+          <h2>Separator</h2>
+          <p>A 1px line in either direction. Next to text in a row it sits in the middle.</p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <div class="ds-row ds-w" style="flex-wrap: nowrap">
+                <ui-separator></ui-separator><span class="ds-muted">or</span><ui-separator></ui-separator>
+              </div>
+              <div class="ds-row">
+                <span>Docs</span><ui-separator orientation="vertical"></ui-separator><span>Blog</span><ui-separator orientation="vertical"></ui-separator><span>Changelog</span>
+              </div>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>separator-root</code></li>
+            <li><code>[data-orientation]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="slider">
+          <h2>Slider</h2>
+          <p>
+            A thin track with a square thumb that goes round in rounded themes. It fills its container, never
+            narrower than 12rem.
+          </p>
+          <div class="ds-example">
+            <template>
+              <ui-field class="ds-w">
+                <ui-slider default-value="60">
+                  <div class="ds-spread">
+                    <ui-field-label>Volume</ui-field-label><ui-slider-value></ui-slider-value>
+                  </div>
+                  <ui-slider-control><ui-slider-track><ui-slider-indicator></ui-slider-indicator><ui-slider-thumb></ui-slider-thumb></ui-slider-track></ui-slider-control>
+                </ui-slider>
+              </ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>slider-root</code></li>
+            <li><code>slider-control</code></li>
+            <li><code>slider-track</code></li>
+            <li><code>slider-indicator</code></li>
+            <li><code>slider-thumb</code></li>
+            <li><code>slider-value</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="switch">
+          <h2>Switch</h2>
+          <p>For settings that apply at once. Square at zero radius, a pill above it.</p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <label><ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch> Airplane mode</label>
+              <label><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Wi-Fi</label>
+              <label><ui-switch disabled><ui-switch-thumb></ui-switch-thumb></ui-switch> Disabled</label>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>switch-root</code></li>
+            <li><code>switch-thumb</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="tabs">
+          <h2>Tabs</h2>
+          <p>A line under the list, and a 2px underline on the selected tab.</p>
+          <div class="ds-example">
+            <template>
+              <ui-tabs default-value="account" class="ds-w" style="width: 24rem">
+                <ui-tabs-list aria-label="Settings">
+                  <ui-tabs-tab value="account"><button type="button">Account</button></ui-tabs-tab>
+                  <ui-tabs-tab value="password"><button type="button">Password</button></ui-tabs-tab>
+                  <ui-tabs-tab value="billing" disabled><button type="button">Billing</button></ui-tabs-tab>
+                </ui-tabs-list>
+                <ui-tabs-panel value="account">Update your name, email address and profile photo.</ui-tabs-panel>
+                <ui-tabs-panel value="password">Choose a new password. You stay signed in on this device.</ui-tabs-panel>
+                <ui-tabs-panel value="billing">Billing.</ui-tabs-panel>
+              </ui-tabs>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>tabs-list</code></li>
+            <li><code>tabs-tab</code></li>
+            <li><code>tabs-panel</code></li>
+            <li><code>[data-selected]</code></li>
+            <li><code>[data-orientation]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="text">
+          <h2>Text elements</h2>
+          <p>A few plain elements get a matching look: links, code, keys and rules.</p>
+          <div class="ds-example" data-layout="column">
+            <template>
+              <p style="margin: 0"> Read the <a href="#install">installation guide</a>, then run
+                <code>npm install @ui-sdk/web</code>. Press <kbd>Esc</kbd> to close a dialog.
+              </p>
+              <hr />
+              <p style="margin: 0">A paragraph after a rule.</p>
+            </template>
+          </div>
+        </section>
+
+        <section class="ds-section" id="textarea">
+          <h2>Textarea</h2>
+          <p>An input for longer text. It starts five lines tall and resizes vertically.</p>
+          <div class="ds-example">
+            <template>
+              <ui-field class="ds-w"><ui-field-label>Message</ui-field-label><ui-textarea><textarea placeholder="Type your message here."></textarea></ui-textarea></ui-field>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>textarea-root</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="toggle">
+          <h2>Toggle</h2>
+          <p>A button that stays pressed. Pressed shows a muted fill and a darker border.</p>
+          <div class="ds-example">
+            <template>
+              <ui-toggle><button>Bold</button></ui-toggle>
+              <ui-toggle default-pressed><button>Italic</button></ui-toggle>
+              <ui-toggle disabled><button>Underline</button></ui-toggle>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>toggle-root</code></li>
+            <li><code>[data-pressed]</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="toggle-group">
+          <h2>Toggle group</h2>
+          <p>Toggles joined into one control. Only the outer corners round.</p>
+          <div class="ds-example">
+            <template>
+              <ui-toggle-group default-value="center" aria-label="Alignment">
+                <ui-toggle value="left"><button>Left</button></ui-toggle>
+                <ui-toggle value="center"><button>Center</button></ui-toggle>
+                <ui-toggle value="right"><button>Right</button></ui-toggle>
+              </ui-toggle-group>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>toggle-group</code></li>
+            <li><code>toggle-root</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="tooltip">
+          <h2>Tooltip</h2>
+          <p>A short, inverted label on hover or keyboard focus. Flat, with no shadow.</p>
+          <div class="ds-example">
+            <template>
+              <ui-tooltip>
+                <ui-tooltip-trigger><button aria-label="Add to library">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+                    </svg></button></ui-tooltip-trigger>
+                <ui-tooltip-content>Add to library</ui-tooltip-content>
+              </ui-tooltip>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>tooltip-trigger</code></li>
+            <li><code>tooltip-content</code></li>
+          </ul>
+        </section>
+
+        <section class="ds-section" id="trigger-menu">
+          <h2>Trigger menu</h2>
+          <p>Suggestions that open as you type a character. Type <kbd>@</kbd> to mention someone.</p>
+          <div class="ds-example">
+            <template>
+              <ui-trigger-menu data-mentions>
+                <ui-field class="ds-w">
+                  <ui-field-label>Message</ui-field-label>
+                  <ui-trigger-menu-input>
+                    <textarea placeholder="Type @ to mention someone"></textarea>
+                  </ui-trigger-menu-input>
+                </ui-field>
+                <ui-trigger-menu-content>
+                  <ui-trigger-menu-empty>No one found</ui-trigger-menu-empty>
+                  <ui-trigger-menu-list></ui-trigger-menu-list>
+                </ui-trigger-menu-content>
+              </ui-trigger-menu>
+            </template>
+          </div>
+          <ul class="ds-parts">
+            <li><code>trigger-menu-input</code></li>
+            <li><code>trigger-menu-content</code></li>
+            <li><code>trigger-menu-item</code></li>
+          </ul>
+        </section>
+
+        <p class="ds-part">More</p>
+
+        <section class="ds-section" id="patterns">
+          <h2>Patterns</h2>
+          <p>Components put together the way a product would use them.</p>
+          <div class="ds-example">
+            <template>
+              <div class="ds-card" style="width: 22rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h3>Sign in to Acme</h3>
+                  <p>Welcome back. Enter your details to continue.</p>
+                </div>
+                <ui-button><button style="width: 100%">Continue with GitHub</button></ui-button>
+                <div class="ds-row" style="flex-wrap: nowrap">
+                  <ui-separator></ui-separator><span class="ds-muted">or</span><ui-separator></ui-separator>
+                </div>
+                <ui-field><ui-field-label>Email</ui-field-label><ui-input><input type="email" placeholder="you@example.com" /></ui-input></ui-field>
+                <ui-field><ui-field-label>Password</ui-field-label><ui-input><input type="password" /></ui-input></ui-field>
+                <label><ui-checkbox default-checked><ui-checkbox-indicator></ui-checkbox-indicator></ui-checkbox> Keep me signed in</label>
+                <ui-button><button data-variant="solid" style="width: 100%">Sign in</button></ui-button>
+              </div>
+              <div class="ds-card" style="width: 26rem; max-width: 100%">
+                <div class="ds-stack" style="gap: 4px">
+                  <h3>Notifications</h3>
+                  <p>Choose what we email you about.</p>
+                </div>
+                <label><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Comments on your work</label>
+                <label><ui-switch default-checked><ui-switch-thumb></ui-switch-thumb></ui-switch> Mentions</label>
+                <label><ui-switch><ui-switch-thumb></ui-switch-thumb></ui-switch> Weekly digest</label>
+                <ui-meter value="68">
+                  <ui-meter-label>Monthly emails used</ui-meter-label>
+                  <ui-meter-value></ui-meter-value>
+                  <ui-meter-track><ui-meter-indicator></ui-meter-indicator></ui-meter-track>
+                </ui-meter>
+                <div class="ds-row" style="justify-content: flex-end">
+                  <ui-button><button>Cancel</button></ui-button>
+                  <ui-button><button data-variant="solid">Save</button></ui-button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </section>
+
+        <section class="ds-section" id="coverage">
+          <h2>Coverage</h2>
+          <p>
+            web.css styles the components on this page. These still render with the browser's defaults:
+            calendar, carousel, color picker, date input, date picker, file input, image cropper, OTP input,
+            pagination, password input, preferences, rating, resizable, scroll area, segmented control, time
+            input, toast, token input, toolbar and tree.
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/design/design.js"></script>
+  </body>
+</html>
