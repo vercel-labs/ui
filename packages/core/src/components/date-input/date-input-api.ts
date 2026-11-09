@@ -376,6 +376,15 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
     } else if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(key)) {
       event.preventDefault()
       if (editable()) step(type, key, event)
+    } else if (key === "Backspace" || key === "Delete") {
+      // WebKit sends no beforeinput when a segment has nothing left to delete,
+      // so a key from a keyboard is handled here, the same in every browser.
+      event.preventDefault()
+      if (editable()) remove(type, el, key === "Backspace", event)
+    } else if (key === "Enter") {
+      // WebKit sends no beforeinput for Enter either, and the form submits
+      // right after this key, so the digits typed so far are kept first.
+      finish(event)
     }
   }
 

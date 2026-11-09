@@ -1,3 +1,4 @@
 node_modules
 pnpm-lock.yaml
 apps/registry/next-env.d.ts
+apps/docs/public/design/index.html

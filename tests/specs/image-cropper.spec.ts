@@ -44,7 +44,8 @@ test.describe("box", () => {
     await open("image-cropper", { default: "100,50,100,100" })
     await expect(selection(page)).toHaveAttribute("aria-valuenow", "100")
     await drag(page, await centerOf(selection(page)), { x: 50, y: 30 })
-    expect(await lastAction(page)).toBe("150,80,100,100 r0:drag")
+    // Moves land once a frame, so the last one can still be on its way.
+    await expect.poll(() => lastAction(page)).toBe("150,80,100,100 r0:drag")
     expect(await committed(page)).toBe("")
     await page.mouse.up()
     expect(await committed(page)).toBe("150,80,100,100 r0:drag")
@@ -55,7 +56,8 @@ test.describe("box", () => {
     await drag(page, await centerOf(handle(page, "Bottom right corner")), { x: 40, y: 20 })
     await page.mouse.up()
     await expect(selection(page)).toHaveAttribute("aria-valuetext", "140 by 120 pixels, at 100, 50")
-    await drag(page, await centerOf(handle(page, "Top left corner")), { x: -400, y: -400 })
+    // Past the image but not the window, which Playwright's Firefox can't move outside.
+    await drag(page, await centerOf(handle(page, "Top left corner")), { x: -150, y: -60 })
     await page.mouse.up()
     await expect(selection(page)).toHaveAttribute("aria-valuetext", "240 by 170 pixels, at 0, 0")
   })
@@ -141,13 +143,13 @@ test.describe("controls", () => {
     await expect(selection(page)).toHaveAttribute("aria-valuetext", "100 by 100 pixels, at 100, 50")
   })
 
-  test("disabled, nothing takes focus or changes", async ({ page, open }) => {
+  test("disabled, nothing takes focus or changes", async ({ page, open, tab }) => {
     await open("image-cropper", { disabled: "" })
     await expect(cropper(page)).toHaveAttribute("data-disabled", "")
     await expect(page.getByRole("button", { name: "Rotate" })).toBeDisabled()
     await expect(zoom(page)).toBeDisabled()
     await page.getByRole("button", { name: "Before" }).focus()
-    await page.keyboard.press("Tab")
+    await tab()
     await expect(page.getByRole("button", { name: "After" })).toBeFocused()
   })
 })

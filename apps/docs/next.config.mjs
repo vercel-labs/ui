@@ -21,11 +21,11 @@ const config = {
   transpilePackages: ["@ui-sdk/core", "@ui-sdk/react"],
   turbopack: { root: path.resolve(import.meta.dirname, "../..") },
   // The newest `@ui-sdk/web` release of each major, and of all, like
-  // `{"1":"1.3.0","2":"2.0.0","latest":"2.0.0"}`, for `proxy.ts`: one map
-  // for the loader and one for the stylesheet, which older releases lack.
+  // `{"1":"1.3.0","2":"2.0.0","latest":"2.0.0"}`, and the releases with a
+  // stylesheet, which older ones lack, for `proxy.ts`.
   env: {
     WEB_RELEASES: newest(releasesIn(publicDir)),
-    WEB_STYLE_RELEASES: newest(releasesIn(publicDir, ".css")),
+    WEB_STYLE_RELEASES: JSON.stringify(releasesIn(publicDir, ".css")),
   },
   async headers() {
     return [
@@ -60,6 +60,7 @@ const config = {
       // Every page as Markdown, like `/docs/react/components/menu.md`. Core's and
       // Agents' own `.md` files are the whole section, and they win.
       afterFiles: [
+        { source: "/design", destination: "/design/index.html" },
         { source: "/docs.md", destination: "/md/core/start" },
         { source: "/docs/:path*.md", destination: "/md/:path*" },
       ],

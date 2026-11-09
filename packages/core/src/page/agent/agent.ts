@@ -236,6 +236,11 @@ function valueFor(entry: Entry, action: string, value: unknown) {
   return parsed == null || Number.isNaN(parsed) ? refuse() : parsed
 }
 
+// A button's text, else its accessible name, like "Close" for an icon-only ×, but
+// not one read from inside `data-agent-hidden`, which never reaches the agent.
+const textOrName = (el: Element) =>
+  textOf(el) || (el.querySelector("[data-agent-hidden]") ? "" : accessibleName(el))
+
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
 function renderedItems(parts: Bound[]) {
@@ -392,7 +397,7 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   if (text.length) out.text = text as string[]
   const confirm = confirmOf(parts.filter((part) => !part.key).map((part) => part.el))
   if (confirm) out.confirm = confirm
-  const buttons = state.open === true ? buttonsOf(parts).map((el) => textOf(el)) : []
+  const buttons = state.open === true ? buttonsOf(parts).map(textOrName) : []
   if (buttons.length) out.buttons = buttons
   if (isComponentDisabled(state, parts)) out.disabled = true
   else {
@@ -678,8 +683,8 @@ function createAgent(
       // way are refused, not guessed.
       const needle = fold(text)
       const words = wordsOf(text)
-      const exact = buttons.filter((el) => fold(textOf(el)) === needle)
-      const near = buttons.filter((el) => words.trim() && wordsOf(textOf(el)).includes(words))
+      const exact = buttons.filter((el) => fold(textOrName(el)) === needle)
+      const near = buttons.filter((el) => words.trim() && wordsOf(textOrName(el)).includes(words))
       const matches = exact.length ? exact : near
       if (matches.length > 1)
         throw new Error(
@@ -710,16 +715,16 @@ function createAgent(
     const { buttons, button } = found
     if (!button)
       throw new Error(
-        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map((el) => textOf(el)).join(", ") || "none"}.`,
+        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map(textOrName).join(", ") || "none"}.`,
       )
     const refuseDisabled = async () => {
       if (!button.matches(":disabled") && button.getAttribute("aria-disabled") !== "true") return
       if (opened) await close()
-      throw new Error(`"${textOf(button) || accessibleName(button)}" in ${entry.ref} is disabled now.`)
+      throw new Error(`"${textOrName(button)}" in ${entry.ref} is disabled now.`)
     }
     await refuseDisabled()
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
-    const pressed = `Pressed "${textOf(button) || accessibleName(button)}"`
+    const pressed = `Pressed "${textOrName(button)}"`
     return { click: () => button.click(), button, pressed, opened, close, refuseDisabled }
   }
 
@@ -727,9 +732,7 @@ function createAgent(
   // when they're on the page. A closed menu's aren't, and reading them would
   // open it without a step `allow` decided on, so it says press opens it.
   function pressable(instance: PrimitiveInstance) {
-    const texts = buttonsOf(bound(instance))
-      .map((el) => textOf(el))
-      .filter(Boolean)
+    const texts = buttonsOf(bound(instance)).map(textOrName).filter(Boolean)
     if (texts.length) return ` press takes a button's text: ${texts.join(", ")}.`
     const opens = typeof (instance.api as { setOpen?: unknown }).setOpen === "function"
     return opens ? " press takes the text of a button inside it, and opens it first to find the button." : ""
@@ -1002,7 +1005,7 @@ function createAgent(
     const targets = () => (press ? [press.button, ...targetsOf()] : targetsOf(args[0]))
     const askToRun = () =>
       press
-        ? ask(args, [press.button], `press "${textOf(press.button) || accessibleName(press.button)}"`)
+        ? ask(args, [press.button], `press "${textOrName(press.button)}"`)
         : ask(args, targets(), "make this change")
     try {
       // What `allow` saw can change while it decides, like a mark the page adds, which asks again.
