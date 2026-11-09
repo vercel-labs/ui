@@ -153,12 +153,12 @@ const code = [
 ]
 
 const people = [
-  { value: "ada", label: "Ada Lovelace", role: "Design" },
-  { value: "alan", label: "Alan Turing", role: "Engineering" },
-  { value: "grace", label: "Grace Hopper", role: "Engineering" },
-  { value: "hedy", label: "Hedy Lamarr", role: "Research" },
-  { value: "katherine", label: "Katherine Johnson", role: "Data" },
-  { value: "margaret", label: "Margaret Hamilton", role: "Engineering" },
+  { value: "ada", label: "Ada Lovelace" },
+  { value: "alan", label: "Alan Turing" },
+  { value: "grace", label: "Grace Hopper" },
+  { value: "hedy", label: "Hedy Lamarr" },
+  { value: "katherine", label: "Katherine Johnson" },
+  { value: "margaret", label: "Margaret Hamilton" },
 ]
 
 function Step({
@@ -232,7 +232,6 @@ function Picker() {
               className="group/option flex h-11 cursor-default items-center gap-3 px-2 text-[15px] outline-none select-none hover:bg-foreground/[0.06] focus:bg-foreground focus:text-background"
             >
               <span className="flex-1">{person.label}</span>
-              <span className="font-mono text-[10px] tracking-[0.06em] uppercase opacity-60">{person.role}</span>
               <CheckIcon aria-hidden="true" className="invisible size-4 group-aria-selected/option:visible" />
             </PeoplePickerOption>
           ))}

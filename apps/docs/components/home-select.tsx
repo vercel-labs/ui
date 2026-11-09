@@ -85,7 +85,7 @@ function Drawing({ active, onHover }: { active: number | null; onHover: (index: 
         8
       </text>
 
-      <rect x={60} y={108} width={300} height={148} className={cn(edge(1), "fill-background")} />
+      <rect x={60} y={108} width={300} height={144} className={cn(edge(1), "fill-background")} />
       <text x={76} y={142} className="fill-foreground text-[14px]">
         Development
       </text>
@@ -126,7 +126,7 @@ function Drawing({ active, onHover }: { active: number | null; onHover: (index: 
           </text>
         </g>
       ))}
-      <path d="M339,274 V254 M335,258 L339,252 L343,258" className={cn(edge(3), "fill-none")} />
+      <path d="M339,274 V258 M335,262 L339,256 L343,262" className={cn(edge(3), "fill-none")} />
 
       <Tag index={1} y={116} from={[360, 132]} name="popup" lit={active === 1} onHover={onHover} />
       <Tag index={2} y={182} from={[356, 182]} name="listbox" lit={active === 2} onHover={onHover} />

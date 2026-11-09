@@ -25,10 +25,12 @@ function MobileNav({
   section,
   tree,
   urls = [],
+  docs = !!section,
 }: {
   section?: Section
   tree?: PageTree.Root
   urls?: string[]
+  docs?: boolean
 }) {
   const [open, setOpen] = React.useState(false)
   const searching = useSearchOpen()
@@ -69,7 +71,7 @@ function MobileNav({
       data-mobile-header
       data-hidden={hidden && !open && !searching ? "" : undefined}
       data-open={open || searching ? "" : undefined}
-      data-docs={section ? "" : undefined}
+      data-docs={docs ? "" : undefined}
       className="group/header container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas transition-transform duration-200 data-hidden:-translate-y-[calc(100%+12px)] motion-reduce:transition-none lg:hidden"
     >
       <a
@@ -131,7 +133,7 @@ function MobileNav({
         </Popover>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-6 -bottom-px h-px sm:inset-x-8">
-        <span className={cn("absolute inset-x-3.5 top-0 h-px", section ? "bg-foreground/[0.06]" : "bg-foreground")} />
+        <span className={cn("absolute inset-x-3.5 top-0 h-px", docs ? "bg-foreground/[0.06]" : "bg-foreground")} />
         <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px] group-data-open/header:hidden" />
         <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px] group-data-open/header:hidden" />
       </div>
