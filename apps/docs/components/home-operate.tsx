@@ -516,7 +516,7 @@ function OperatePoster({ fig }: { fig?: string }) {
               <span className="truncate">{status}</span>
             </p>
           </div>
-          <div className="order-1 flex min-w-0 items-center justify-center @[36rem]:border @[36rem]:border-foreground @[36rem]:bg-background @[36rem]:bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_18%,transparent)_1px,transparent_1.5px)] @[36rem]:bg-size-[16px_16px] @[36rem]:p-10 @[56rem]:order-2 @[56rem]:border-0">
+          <div className="order-1 flex min-w-0 items-center justify-center @[36rem]:border @[36rem]:border-foreground @[36rem]:bg-background @[36rem]:bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_calc(18%*var(--pattern-opacity,1)),transparent)_1px,transparent_1.5px)] @[36rem]:bg-size-[16px_16px] @[36rem]:p-10 @[56rem]:order-2 @[56rem]:border-0">
             <Settings key={form} changed={changed} active={active} />
           </div>
         </div>

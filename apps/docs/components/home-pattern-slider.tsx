@@ -16,7 +16,9 @@ const storageKey = "ui-sdk:pattern-intensity"
 
 const stops = [
   { label: "Off", value: 0 },
+  { label: "25", value: 25 },
   { label: "Half", value: 50 },
+  { label: "75", value: 75 },
   { label: "Full", value: 100 },
 ]
 
@@ -24,7 +26,7 @@ function snap(value: number) {
   if (!Number.isFinite(value)) {
     return 100
   }
-  return Math.min(100, Math.max(0, Math.round(value / 50) * 50))
+  return Math.min(100, Math.max(0, Math.round(value / 25) * 25))
 }
 
 function labelOf(value: number) {
@@ -67,7 +69,7 @@ function PatternSlider() {
       onValueChange={change}
       min={0}
       max={100}
-      step={50}
+      step={25}
       format={labelOf}
       className="fixed end-4 bottom-4 z-50 flex w-64 flex-col gap-3 border border-foreground bg-background p-4 font-mono text-[11px] leading-4 tracking-[0.06em] uppercase"
     >
