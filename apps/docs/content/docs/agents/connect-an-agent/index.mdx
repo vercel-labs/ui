@@ -118,6 +118,8 @@ import { agentTools } from "@ui-sdk/react/agent"
 
 Use these definitions when setting up your agent's tools. Route each tool call to the matching method on `agent` and return its result to the model. Your model SDK determines how you register and handle those calls.
 
+What the tools return comes from the page, so it can include text your users wrote, like a name in a table row. Their descriptions tell the model to treat it as data. Before an agent changes something that matters, have a person confirm it with [Permissions](./permissions).
+
 For a browser that supports WebMCP, [register the tools with the browser](./webmcp).
 
 ## Your Own Components
