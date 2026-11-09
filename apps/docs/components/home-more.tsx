@@ -1,8 +1,8 @@
 "use client"
 
 import { cn } from "cn"
-import { PauseIcon, PlayIcon } from "lucide-react"
 import * as React from "react"
+import { Haptic, vibrate } from "./haptic"
 
 function PhoneMore({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
@@ -42,8 +42,8 @@ function PhoneStrip({ names, className, children }: { names: string[]; className
   const ref = React.useRef<HTMLDivElement>(null)
   const [index, setIndex] = React.useState(0)
   const [playing, setPlaying] = React.useState(false)
-  const tick = React.useRef<HTMLLabelElement>(null)
   const current = React.useRef(0)
+  const start = React.useRef(0)
 
   const onScroll = () => {
     const element = ref.current
@@ -55,8 +55,17 @@ function PhoneStrip({ names, className, children }: { names: string[]; className
     if (next === current.current) return
     current.current = next
     setIndex(next)
-    if (navigator.vibrate) navigator.vibrate(8)
-    else tick.current?.click()
+  }
+
+  // Android ticks when the finger lifts from a swipe to the next slide. iOS can't: it
+  // only plays a haptic for a tap on a switch.
+  const onTouchEnd = () => {
+    const element = ref.current
+    if (!element) return
+    const moved = element.scrollLeft - start.current
+    if (Math.abs(moved) < 48) return
+    const next = current.current + Math.sign(moved) * (document.dir === "rtl" ? -1 : 1)
+    if (next >= 0 && next < names.length) vibrate()
   }
 
   const go = (next: number) => {
@@ -73,13 +82,18 @@ function PhoneStrip({ names, className, children }: { names: string[]; className
 
   return (
     <>
-      <div ref={ref} onScroll={onScroll} onPointerDown={() => setPlaying(false)} className={className}>
+      <div
+        ref={ref}
+        onScroll={onScroll}
+        onPointerDown={() => setPlaying(false)}
+        onTouchStart={() => {
+          start.current = ref.current?.scrollLeft ?? 0
+        }}
+        onTouchEnd={onTouchEnd}
+        className={className}
+      >
         {children}
       </div>
-      {/* iOS has no vibrate API; toggling a switch input is the only way to play its haptic tick. */}
-      <label ref={tick} aria-hidden="true" className="hidden">
-        <input type="checkbox" tabIndex={-1} {...{ switch: "" }} />
-      </label>
       <div className="mt-6 flex items-center justify-center gap-2 sm:hidden">
         <div className="flex h-10 items-center gap-2 bg-foreground/[0.06] px-4">
           {names.map((name, position) => (
@@ -90,10 +104,12 @@ function PhoneStrip({ names, className, children }: { names: string[]; className
               aria-current={position === index ? "true" : undefined}
               onClick={() => {
                 setPlaying(false)
+                if (position !== index) vibrate()
                 go(position)
               }}
               className="relative h-1.5 w-1.5 overflow-hidden bg-foreground/25 transition-[width] duration-300 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] aria-[current=true]:w-6"
             >
+              <Haptic />
               {position === index && (
                 <span
                   key={`${index}-${playing}`}
@@ -107,14 +123,16 @@ function PhoneStrip({ names, className, children }: { names: string[]; className
         </div>
         <button
           type="button"
-          aria-label={playing ? "Pause" : "Play"}
           onClick={() => {
+            vibrate()
             if (!playing && index === names.length - 1) go(0)
             setPlaying(!playing)
           }}
-          className="flex size-10 items-center justify-center bg-foreground/[0.06] transition-colors outline-none hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] [&_svg]:size-4"
+          className="relative grid h-10 place-items-center bg-foreground/[0.06] px-4 text-[13px] font-medium transition-colors outline-none hover:bg-foreground/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006bff] *:[grid-area:1/1]"
         >
-          {playing ? <PauseIcon aria-hidden="true" /> : <PlayIcon aria-hidden="true" />}
+          <Haptic />
+          <span className={playing ? "invisible" : undefined}>Play</span>
+          <span className={playing ? undefined : "invisible"}>Pause</span>
         </button>
       </div>
     </>

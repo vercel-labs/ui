@@ -57,7 +57,7 @@ async function ComponentExample({
       <TabBar>
         <TabsList aria-label="Files">
           {sources.files.map((file) => (
-            <TabsTab key={file.name} value={file.name} className="font-mono text-xs">
+            <TabsTab key={file.name} value={file.name} className="text-xs tracking-normal normal-case">
               {file.name}
             </TabsTab>
           ))}

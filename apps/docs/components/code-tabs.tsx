@@ -82,7 +82,7 @@ function CodeBlockTabsTrigger({ value, children }: { value: string; children: Re
   return (
     <TabsTab
       value={value}
-      className={value === "css" || value === "tailwind" ? undefined : "font-mono text-xs"}
+      className={value === "css" || value === "tailwind" ? undefined : "text-xs tracking-normal normal-case"}
     >
       {children}
     </TabsTab>

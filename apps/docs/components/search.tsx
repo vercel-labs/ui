@@ -1,5 +1,6 @@
 "use client"
 
+import { cn } from "cn"
 import {
   Command,
   CommandEmpty,
@@ -15,9 +16,11 @@ import { useFramework } from "@/lib/preferences"
 import { createSearchIndex, type SearchPage, searchIndex } from "@/lib/search"
 import type { Section } from "@/lib/sections"
 import { createDialogController, DialogShortcut } from "@ui-sdk/react/dialog"
-import { FileTextIcon, HashIcon, SearchIcon, TextIcon } from "lucide-react"
+import { SearchIcon } from "lucide-react"
+import { bindPersistentLayer } from "@ui-sdk/core"
 import { useRouter } from "next/navigation"
 import * as React from "react"
+import { Haptic, vibrate } from "./haptic"
 
 function Highlighted({ text }: { text: string }) {
   return text.split(/(<mark>.*?<\/mark>|`[^`]+`)/).map((part, index) => {
@@ -37,9 +40,26 @@ function Highlighted({ text }: { text: string }) {
   })
 }
 
-const icons = { page: FileTextIcon, heading: HashIcon, text: TextIcon }
-
 const searchDialog = createDialogController()
+
+// The phone header reads this to show its close button and stay usable over the search.
+let searchOpen = false
+const searchListeners = new Set<() => void>()
+
+function setSearchOpen(next: boolean) {
+  if (next === searchOpen) return
+  searchOpen = next
+  searchListeners.forEach((listener) => listener())
+}
+
+function subscribeSearch(listener: () => void) {
+  searchListeners.add(listener)
+  return () => searchListeners.delete(listener)
+}
+
+function useSearchOpen() {
+  return React.useSyncExternalStore(subscribeSearch, () => searchOpen, () => false)
+}
 
 const indexes = new Map<Framework, Promise<ReturnType<typeof createSearchIndex>>>()
 
@@ -91,11 +111,13 @@ function SearchTrigger({
     <DialogTrigger
       controller={searchDialog}
       shortcut={shortcut ? "mod+k" : undefined}
-      className={
+      className={cn(
+        "relative",
         className ??
-        "flex h-8 w-full items-center gap-2 rounded-2xl px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
-      }
+          "flex h-8 w-full items-center gap-2 rounded-2xl px-3 text-sm text-subtle outline-none transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
+      )}
     >
+      <Haptic />
       {icon && <SearchIcon className="size-4 shrink-0" />}
       <span>{label}</span>
     </DialogTrigger>
@@ -103,11 +125,20 @@ function SearchTrigger({
 }
 
 function Search({ section, pages }: { section?: Section; pages: { name: string; url: string }[] }) {
-  const [open, setOpen] = React.useState(false)
+  const open = useSearchOpen()
   const [preferredFramework] = useFramework()
   const router = useRouter()
 
   const [search, setSearch] = React.useState("")
+  React.useEffect(() => {
+    if (!open) setSearch("")
+  }, [open])
+
+  React.useEffect(() => {
+    const header = document.querySelector<HTMLElement>("[data-mobile-header]")
+    return open && header?.checkVisibility() ? bindPersistentLayer(header) : undefined
+  }, [open])
+
   const framework = section && isFramework(section) ? section : preferredFramework
   const loaded = useSearchIndex(framework, open)
   const searching = search !== "" && !loaded
@@ -121,24 +152,29 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
       controller={searchDialog}
       open={open}
       onOpenChange={(next) => {
-        setOpen(next)
-        if (!next) setSearch("")
+        vibrate()
+        setSearchOpen(next)
       }}
     >
-      <DialogContent instant initialFocus="input" className="max-w-[37rem]">
+      {/* No backdrop. Phones get a full panel under the header, like the menu. */}
+      <DialogContent
+        instant
+        initialFocus="input"
+        backdropClassName="hidden"
+        className="max-w-[37rem] max-lg:top-14 max-lg:bottom-0 max-lg:left-0 max-lg:max-h-none max-lg:w-full max-lg:max-w-none max-lg:translate-x-0 max-lg:bg-canvas max-lg:text-lg max-lg:shadow-none max-lg:ring-0"
+      >
         <DialogTitle className="sr-only">Search the docs</DialogTitle>
         <Command
           filter={false}
           onQueryChange={setSearch}
           onAction={(value) => {
             const url = results.find((result) => result.id === value)?.url ?? value
-            setOpen(false)
-            setSearch("")
+            setSearchOpen(false)
             router.push(url)
           }}
-          className="flex min-h-0 flex-1 flex-col"
+          className="flex min-h-0 flex-1 flex-col max-lg:px-3"
         >
-          <CommandInput aria-label="Search the docs" placeholder="Search the docs" loading={searching} />
+          <CommandInput aria-label="Search the docs" placeholder="Search the docs" className="max-lg:text-xl!" />
           <CommandEmpty>
             {searching
               ? "Searching…"
@@ -148,28 +184,23 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
           </CommandEmpty>
           <CommandList aria-busy={searching || undefined}>
             {search ? (
-              results.map((result) => {
-                const Icon = icons[result.type]
-                return (
-                  <CommandItem
-                    key={result.id}
-                    value={result.id}
-                    label={result.content.replace(/<\/?mark>|`/g, "")}
-                    className={result.type === "page" ? "" : "ps-8 text-subtle"}
-                  >
-                    <Icon className="size-3.5 shrink-0 text-subtle" />
-                    <span className="line-clamp-1">
-                      <Highlighted text={result.content} />
-                    </span>
-                  </CommandItem>
-                )
-              })
+              results.map((result) => (
+                <CommandItem
+                  key={result.id}
+                  value={result.id}
+                  label={result.content.replace(/<\/?mark>|`/g, "")}
+                  className={result.type === "page" ? "" : "ps-6 text-subtle"}
+                >
+                  <span className="line-clamp-1">
+                    <Highlighted text={result.content} />
+                  </span>
+                </CommandItem>
+              ))
             ) : (
               <CommandGroup>
                 <CommandGroupLabel>Pages</CommandGroupLabel>
                 {pages.map((page) => (
                   <CommandItem key={page.url} value={page.url} label={page.name}>
-                    <FileTextIcon className="size-3.5 shrink-0 text-subtle" />
                     {page.name}
                   </CommandItem>
                 ))}
@@ -182,4 +213,4 @@ function Search({ section, pages }: { section?: Section; pages: { name: string; 
   )
 }
 
-export { Search, SearchTrigger }
+export { Search, SearchTrigger, setSearchOpen, useSearchOpen }

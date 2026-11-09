@@ -46,9 +46,9 @@ function SiteHeader({ urls }: { urls: string[] }) {
       </div>
       <div aria-hidden="true" className="container">
         <div className="relative h-[6px]">
-          <span className="absolute inset-x-3.5 top-[5px] h-px bg-foreground" />
-          <span className="pointer-events-none absolute size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] top-0" />
-          <span className="pointer-events-none absolute size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] top-0" />
+          <span className="absolute inset-x-3.5 top-[5px] h-px bg-foreground [body:has([data-docs])_&]:bg-foreground/[0.06]" />
+          <span className="pointer-events-none absolute size-[11px] text-foreground [body:has([data-docs])_&]:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] top-0" />
+          <span className="pointer-events-none absolute size-[11px] text-foreground [body:has([data-docs])_&]:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] top-0" />
         </div>
       </div>
     </header>

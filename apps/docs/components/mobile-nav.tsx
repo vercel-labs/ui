@@ -13,9 +13,10 @@ import { usePathname } from "next/navigation"
 import * as React from "react"
 import { BetaCard } from "./beta-card"
 import { GitHubLink } from "./github-link"
+import { Haptic, vibrate } from "./haptic"
 import { FrameworkCheck } from "./site-preferences"
 import { Logo, VercelLogo } from "./logo"
-import { SearchTrigger } from "./search"
+import { SearchTrigger, setSearchOpen, useSearchOpen } from "./search"
 import { useCurrentUrl, useFrameworkLink, useMenuLink } from "./section-nav"
 
 // The header on small screens. The menu fills the screen below it. Pages outside
@@ -30,11 +31,15 @@ function MobileNav({
   urls?: string[]
 }) {
   const [open, setOpen] = React.useState(false)
+  const searching = useSearchOpen()
   const pathname = usePathname()
   const header = React.useRef<HTMLElement>(null)
 
   // Search can navigate while the menu is open, so the menu closes on any navigation.
   React.useEffect(() => setOpen(false), [pathname])
+  React.useEffect(() => {
+    if (searching) setOpen(false)
+  }, [searching])
 
   // The modal menu makes the page inert, but the header stays usable above it.
   React.useEffect(() => (open && header.current ? bindPersistentLayer(header.current) : undefined), [open])
@@ -62,8 +67,10 @@ function MobileNav({
     <header
       ref={header}
       data-mobile-header
-      data-hidden={hidden && !open ? "" : undefined}
-      className="container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas transition-transform duration-200 data-hidden:-translate-y-[calc(100%+12px)] motion-reduce:transition-none lg:hidden"
+      data-hidden={hidden && !open && !searching ? "" : undefined}
+      data-open={open || searching ? "" : undefined}
+      data-docs={section ? "" : undefined}
+      className="group/header container sticky top-0 z-10 flex h-14 items-center gap-3 bg-canvas transition-transform duration-200 data-hidden:-translate-y-[calc(100%+12px)] motion-reduce:transition-none lg:hidden"
     >
       <a
         href="https://vercel.com"
@@ -86,18 +93,30 @@ function MobileNav({
       </Link>
       <div className="ms-auto flex items-center gap-1">
         {/* Phones show the icon alone, so the breadcrumb fits. */}
-        <SearchTrigger className="flex size-8 items-center justify-center rounded-2xl border border-foreground text-sm text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
-        <GitHubLink className="border border-foreground text-foreground hover:bg-foreground/[0.06]" />
-        <Popover open={open} onOpenChange={setOpen} modal>
-          <PopoverTrigger
-            aria-label="Menu"
-            className="group relative inline-flex size-8 touch-manipulation items-center justify-center rounded-2xl border border-foreground outline-none transition-colors after:absolute after:-inset-1.5 hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30"
-          >
-            <span className="relative size-4">
-              <span className="absolute start-0 top-1 h-0.5 w-4 bg-foreground transition-all duration-100 group-aria-expanded:top-[0.4375rem] group-aria-expanded:-rotate-45 motion-reduce:transition-none" />
-              <span className="absolute start-0 top-2.5 h-0.5 w-4 bg-foreground transition-all duration-100 group-aria-expanded:top-[0.4375rem] group-aria-expanded:rotate-45 motion-reduce:transition-none" />
-            </span>
-          </PopoverTrigger>
+        <SearchTrigger className="hit-area flex size-8 items-center justify-center rounded-2xl text-sm text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only max-sm:[&_svg]:size-5 sm:h-8 sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
+        <GitHubLink className="text-foreground hover:bg-foreground/[0.06] [&_svg]:size-5" />
+        <Popover
+          open={open}
+          onOpenChange={(next) => {
+            vibrate()
+            setOpen(next)
+          }}
+          modal
+        >
+          {searching ? (
+            <button type="button" aria-label="Close search" onClick={() => {
+                vibrate()
+                setSearchOpen(false)
+              }} className={menuButton}>
+              <Haptic />
+              <MenuIcon open />
+            </button>
+          ) : (
+            <PopoverTrigger aria-label="Menu" className={menuButton}>
+              <Haptic />
+              <MenuIcon open={open} />
+            </PopoverTrigger>
+          )}
           <PopoverContent
             anchor="[data-mobile-header]"
             side="bottom"
@@ -112,11 +131,23 @@ function MobileNav({
         </Popover>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-6 -bottom-px h-px sm:inset-x-8">
-        <span className="absolute inset-x-3.5 top-0 h-px bg-foreground" />
-        <span className="pointer-events-none absolute size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px]" />
-        <span className="pointer-events-none absolute size-[11px] text-foreground before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px]" />
+        <span className={cn("absolute inset-x-3.5 top-0 h-px", section ? "bg-foreground/[0.06]" : "bg-foreground")} />
+        <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px] group-data-open/header:hidden" />
+        <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px] group-data-open/header:hidden" />
       </div>
     </header>
+  )
+}
+
+const menuButton =
+  "relative -me-1.5 inline-flex size-8 touch-manipulation after:absolute after:-inset-1.5 items-center justify-center rounded-2xl outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30"
+
+function MenuIcon({ open }: { open: boolean }) {
+  return (
+    <span data-open={open ? "" : undefined} className="group/icon relative size-5">
+      <span className="absolute start-0 top-[0.375rem] h-[1.5px] w-5 bg-foreground transition-all duration-100 group-data-open/icon:top-[0.5625rem] group-data-open/icon:-rotate-45 motion-reduce:transition-none" />
+      <span className="absolute start-0 top-[0.75rem] h-[1.5px] w-5 bg-foreground transition-all duration-100 group-data-open/icon:top-[0.5625rem] group-data-open/icon:rotate-45 motion-reduce:transition-none" />
+    </span>
   )
 }
 
@@ -167,7 +198,7 @@ function MobileMenu({
                     href={item.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex w-fit items-center gap-1 rounded-md text-2xl font-medium tracking-tight text-foreground/70 outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30"
+                    className="flex w-fit items-center gap-1 rounded-md text-2xl font-medium tracking-tight text-foreground outline-none hover:underline hover:decoration-1 hover:underline-offset-[0.2em] focus-visible:ring-3 focus-visible:ring-ring/30"
                   >
                     {item.title}
                     <ArrowUpRightIcon className="size-5" />
@@ -250,7 +281,8 @@ function MenuLink({
         onClick={onNavigate}
         className={cn(
           "block w-fit rounded-md text-2xl font-medium tracking-tight outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-          current ? "text-foreground underline decoration-1 underline-offset-[0.2em]" : "text-foreground/60 hover:text-foreground",
+          "text-foreground decoration-1 underline-offset-[0.2em] hover:underline",
+          current && "underline",
         )}
       >
         {children}

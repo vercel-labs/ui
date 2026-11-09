@@ -8,21 +8,14 @@ import {
   CommandItem as CommandItemPrimitive,
   CommandList as CommandListPrimitive,
 } from "@ui-sdk/react/command"
-import { LoaderCircleIcon, SearchIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 
 function CommandInput({
-  loading,
   className,
   ...props
-}: Omit<ComponentProps<typeof CommandInputPrimitive>, "className"> & {
-  loading?: boolean
-  className?: string
-}) {
-  const Icon = loading ? LoaderCircleIcon : SearchIcon
+}: Omit<ComponentProps<typeof CommandInputPrimitive>, "className"> & { className?: string }) {
   return (
-    <div className="flex items-center gap-2.5 border-b border-border/60 px-3.5">
-      <Icon aria-hidden className={cn("size-4 shrink-0 text-subtle", loading && "animate-spin")} />
+    <div className="flex items-center border-b border-border/60 px-4">
       <CommandInputPrimitive
         className={cn(
           "h-12 w-full min-w-0 bg-transparent text-sm outline-none pointer-coarse:text-base placeholder:text-subtle",

@@ -363,7 +363,7 @@ function Behaviors({
 
 function Result() {
   return (
-    <div className={cn("flex min-h-72 flex-col justify-center bg-background p-5 @[36rem]:p-10", ink)}>
+    <div className={cn("flex min-h-72 flex-col bg-background p-5 @[36rem]:p-10", ink)}>
       <Picker />
     </div>
   )

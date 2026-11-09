@@ -49,10 +49,10 @@ function DocsLayout({ section, children }: { section: Section; children: ReactNo
   const urls = source.getPages().map((page) => page.url)
 
   return (
-    <div className="container flex flex-1 flex-col max-lg:px-0">
+    <div data-docs="" className="container flex flex-1 flex-col max-lg:px-0">
       <div className="flex flex-1">
         {/* Size containment keeps the sidebar from making a short page taller than the window. */}
-        <aside className="relative hidden w-64 shrink-0 border-e border-foreground/20 contain-size lg:block">
+        <aside className="relative hidden w-64 shrink-0 border-e border-foreground/[0.06] pb-10 contain-size lg:block">
           <div className="sticky top-[5.375rem] h-full max-h-[calc(100dvh-5.375rem)] pt-2">
             <Sidebar tree={tree} tocs={tocs} />
           </div>

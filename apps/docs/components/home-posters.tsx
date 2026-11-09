@@ -106,7 +106,6 @@ import {
   FolderIcon,
   MinusIcon,
   PlusIcon,
-  StarIcon,
   XIcon,
   MoveHorizontalIcon,
 } from "lucide-react"
@@ -665,6 +664,14 @@ function OTPTile({ className, fig }: { className?: string; fig?: string }) {
 const step =
   "flex size-20 shrink-0 items-center justify-center @[24rem]:size-24 hover:bg-foreground/[0.06] disabled:text-muted-foreground/50 [&_svg]:size-6"
 
+function Star() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-[15cqi] fill-current">
+      <polygon points="12 1.4 14.58 9.35 22.94 9.35 16.18 14.26 18.76 22.2 12 17.29 5.24 22.2 7.82 14.26 1.06 9.35 9.42 9.35" />
+    </svg>
+  )
+}
+
 function RatingTile({ className, fig }: { className?: string; fig?: string }) {
   const [value, setValue] = React.useState<number | null>(4)
   return (
@@ -687,9 +694,9 @@ function RatingTile({ className, fig }: { className?: string; fig?: string }) {
           className="flex justify-between"
         >
           <RatingItem className="group/star relative inline-flex cursor-default text-foreground/15 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]">
-            <StarIcon aria-hidden="true" className="size-[15cqi] fill-current stroke-0" />
+            <Star />
             <span className="absolute inset-y-0 start-0 w-[calc(var(--rating-fill)*100%)] overflow-hidden text-foreground group-data-highlighted/star:text-foreground/50">
-              <StarIcon aria-hidden="true" className="size-[15cqi] fill-current stroke-0" />
+              <Star />
             </span>
           </RatingItem>
         </Rating>
