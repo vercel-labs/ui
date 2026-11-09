@@ -113,7 +113,7 @@ const FontsOption = parts.Font
 const families: Record<string, string> = {
   Sans: "ui-sans-serif, system-ui",
   Serif: "ui-serif, Georgia, serif",
-  Mono: "ui-monospace, monospace",
+  Mono: "var(--mono)",
 }
 
 function Example() {

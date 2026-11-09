@@ -67,7 +67,7 @@
     scroll-padding-block: 5px;
 
     &[data-trigger="/"] [data-slot="trigger-menu-item"] {
-      font-family: ui-monospace, monospace;
+      font-family: var(--mono);
       font-size: var(--text-sm);
     }
   }
