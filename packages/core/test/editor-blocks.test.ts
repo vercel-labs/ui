@@ -925,6 +925,32 @@ describe("createCellRange", () => {
     expect(instance.api.grid.active()).toEqual({ row: 0, col: 0 })
   })
 
+  test("a drag paints from a press inside a cell, when the event's currentTarget is the document", () => {
+    const instance = mount()
+    const { range } = instance.api
+    const cells = new Map<string, HTMLElement>()
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 4; col++) {
+        const el = box(col * 50, row * 20, 50, 20)
+        cells.set(`${row}:${col}`, el)
+        cleanups.push(range.bind(el, { row, col }))
+      }
+    }
+    document.elementsFromPoint = (x: number, y: number) => {
+      const el = cells.get(`${Math.floor(y / 20)}:${Math.floor(x / 50)}`)
+      return el ? [el] : []
+    }
+    const label = document.createElement("span")
+    cells.get("0:0")!.append(label)
+    const down = pointer("pointerdown", 10, 10)
+    label.dispatchEvent(down)
+    Object.defineProperty(down, "currentTarget", { value: document })
+    range.pointerdown(down, { row: 0, col: 0 })
+    document.dispatchEvent(pointer("pointermove", 120, 50))
+    document.dispatchEvent(pointer("pointerup", 120, 50))
+    expect(bounds(instance)).toEqual({ top: 0, left: 0, bottom: 2, right: 2 })
+  })
+
   test("a range reads as tab-separated text, which reads back as cells", () => {
     const instance = mount()
     const { range } = instance.api

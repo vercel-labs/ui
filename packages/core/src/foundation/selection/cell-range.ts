@@ -416,9 +416,19 @@ function createCellRange<State extends object>(
       }
       grid.focus(cell, { reason: "item-press", event })
       api.select(null, { reason: "item-press", event })
-      const el =
-        event.currentTarget instanceof HTMLElement ? event.currentTarget : null
-      if (!el) {
+      // An adapter may pass a native event whose currentTarget is a delegating
+      // root, like React's, which is the document in a Next app.
+      const pressed = event.currentTarget
+      let el =
+        pressed instanceof Element && cellOf.has(pressed)
+          ? pressed
+          : event.target instanceof Element
+            ? event.target
+            : null
+      while (el && !cellOf.has(el)) {
+        el = el.parentElement
+      }
+      if (!(el instanceof HTMLElement)) {
         return
       }
       let last = { x: event.clientX, y: event.clientY }
