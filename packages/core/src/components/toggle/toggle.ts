@@ -176,7 +176,7 @@ function toggleState(options: ToggleInternalOptions & { id: string }): State {
     disabled,
     formDisabled: false,
     focusableWhenDisabled: !!options.focusableWhenDisabled,
-    element: "button" as const,
+    element: "unknown" as const,
     roving: false,
     groupDisabled: false,
     tabStop: false,

@@ -26,6 +26,25 @@ test("the server renders one tab stop per group, on the pressed toggle", async (
   expect(await hydrationErrors(page)).toEqual([])
 })
 
+test("the server disables a button as a button and a link, and hydration keeps what fits", async ({
+  page,
+  open,
+}) => {
+  await open("toggle")
+  const server = await page.evaluate(() => {
+    const template = document.createElement("template")
+    template.innerHTML = (window as unknown as { __serverHtml: string }).__serverHtml
+    const button = [...template.content.querySelectorAll("button")].find(
+      (el) => el.textContent?.trim() === "Delete",
+    )
+    return [button?.hasAttribute("disabled"), button?.getAttribute("aria-disabled")]
+  })
+  expect(server).toEqual([true, "true"])
+  await expect(buttonNamed(page, "Delete")).toBeDisabled()
+  await expect(buttonNamed(page, "Delete")).not.toHaveAttribute("aria-disabled", /.*/)
+  expect(await hydrationErrors(page)).toEqual([])
+})
+
 test("a button rendered as a link hydrates and stays a link", async ({ page, open }) => {
   await open("toggle")
   await expect(page.getByRole("link", { name: "Docs" })).toBeVisible()

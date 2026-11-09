@@ -45,6 +45,29 @@ describe("button attributes", () => {
     })
   })
 
+  test("before it binds, a disabled part is disabled as a button and as a link", () => {
+    expect(buttonRole(() => "unknown").role({}, { key: "" })).toBeUndefined()
+    expect(buttonElementAttrs("unknown", { type: "button", disabled: false, focusable: false })).toEqual({
+      type: "button",
+    })
+    expect(buttonElementAttrs("unknown", { type: "button", disabled: true, focusable: false })).toEqual({
+      type: "button",
+      disabled: "",
+      "aria-disabled": "true",
+      tabindex: "-1",
+    })
+    expect(buttonElementAttrs("unknown", { type: "button", disabled: true, focusable: true })).toMatchObject({
+      disabled: undefined,
+      "aria-disabled": "true",
+      tabindex: undefined,
+    })
+  })
+
+  test("a disabled button renders its pre-bind attributes until it binds", () => {
+    const instance = button({ id: "b", disabled: true })
+    expect(partAttrs(instance.part("root"))).toMatchObject({ disabled: "", "aria-disabled": "true" })
+  })
+
   test("a roving tab stop overrides the default", () => {
     expect(buttonElementAttrs("button", { disabled: true, focusable: true, tabindex: "-1" })).toMatchObject({
       tabindex: "-1",

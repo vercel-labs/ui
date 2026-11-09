@@ -304,7 +304,7 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
       setElement(key: string, el: HTMLElement) {
         const element = buttonElement(el)
         const { elements } = store.get()
-        if ((elements[key] ?? "button") !== element) store.set({ elements: { ...elements, [key]: element } })
+        if ((elements[key] ?? "unknown") !== element) store.set({ elements: { ...elements, [key]: element } })
       },
     },
   }
@@ -376,7 +376,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     button: slot<ItemProps, ToolbarButtonState>({
-      ...buttonRole<State>((state, { key }) => state.elements[key] ?? "button"),
+      ...buttonRole<State>((state, { key }) => state.elements[key] ?? "unknown"),
       focus: "roving",
       press: { none: "The author's click does the work, and Enter and Space on other elements send one." },
       props: {
@@ -393,7 +393,7 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
         return {
-          ...buttonElementAttrs(state.elements[key] ?? "button", {
+          ...buttonElementAttrs(state.elements[key] ?? "unknown", {
             type: "button",
             disabled: item.disabled,
             focusable: item.focusable,
