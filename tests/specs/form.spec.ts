@@ -26,7 +26,7 @@ test("invalid controls stop the submit and the first one takes focus", async ({ 
 test("an error from the server shows on the field with its name", async ({ page }) => {
   await fillRequired(page, "taken")
   await save(page)
-  await expect(page.getByText("That username is taken.")).toBeVisible()
+  await expect(errors(page).filter({ hasText: "That username is taken." })).toBeVisible()
   await expect(textbox(page, "Username")).toHaveAttribute("aria-invalid", "true")
   await expect(textbox(page, "Username")).toHaveAccessibleDescription(
     "Letters and numbers, at least 3. That username is taken.",
@@ -39,9 +39,9 @@ test(
   async ({ page }) => {
     await fillRequired(page, "taken")
     await save(page)
-    await expect(page.getByText("That username is taken.")).toBeVisible()
+    await expect(errors(page).filter({ hasText: "That username is taken." })).toBeVisible()
     await textbox(page, "Username").fill("taken2")
-    await expect(page.getByText("That username is taken.")).toBeHidden()
+    await expect(errors(page).filter({ hasText: "That username is taken." })).toBeHidden()
     await expect(textbox(page, "Username")).not.toHaveAttribute("aria-invalid", "true")
     await save(page)
     await expect(status(page, "Submitted")).toContainText("username=taken2")
@@ -67,7 +67,7 @@ test("a reset hides the browser's errors and the server's", { tag: "@enhancement
 
   await fillRequired(page, "taken")
   await save(page)
-  await expect(page.getByText("That username is taken.")).toBeVisible()
+  await expect(errors(page).filter({ hasText: "That username is taken." })).toBeVisible()
   await page.getByRole("button", { name: "Reset" }).click()
   await expect(errors(page)).toHaveCount(0)
   await expect(textbox(page, "Username")).toHaveValue("")
