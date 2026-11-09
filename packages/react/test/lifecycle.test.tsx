@@ -55,6 +55,9 @@ afterEach(async () => {
 })
 
 const wait = (ms: number) => new Promise((done) => setTimeout(done, ms))
+// A modal locks the page a frame after it shows, so a check waits for that frame.
+const settle = () =>
+  new Promise((done) => requestAnimationFrame(() => setTimeout(done, 5)))
 
 test("StrictMode's thrown-away instance is never observed, so scope and secrets hold", async () => {
   const changes: ObservedChange[] = []
@@ -148,7 +151,7 @@ test("<Activity> hid and showed again keeps state that has no default option", a
   await React.act(async () =>
     root!.render(<Hideable mode="hidden">{<Counter />}</Hideable>)
   )
-  await wait(5)
+  await settle()
   await React.act(async () =>
     root!.render(<Hideable mode="visible">{<Counter />}</Hideable>)
   )
@@ -180,7 +183,7 @@ test("<Activity> hid and showed again keeps the state of a primitive that binds 
   await React.act(async () =>
     root!.render(<Hideable mode="hidden">{<TextCounter />}</Hideable>)
   )
-  await wait(5)
+  await settle()
   await React.act(async () =>
     root!.render(<Hideable mode="visible">{<TextCounter />}</Hideable>)
   )
@@ -219,7 +222,7 @@ test("a primitive that binds no element lets its controller go while hidden, and
       <Hideable mode="hidden">{<Lamp controller={controller} />}</Hideable>
     )
   )
-  await wait(5)
+  await settle()
   expect("switchOn" in controller).toBe(false)
   await React.act(async () =>
     root!.render(
@@ -241,12 +244,12 @@ test("<Activity> hid and showed again keeps a field's shown errors", async () =>
     </Hideable>
   )
   const view = await render(form("visible"))
-  await wait(5)
+  await settle()
   await React.act(async () => view.querySelector("input")!.checkValidity())
   const field = () => view.querySelector("[data-slot=field-root]")!
   expect(field().hasAttribute("data-invalid")).toBe(true)
   await React.act(async () => root!.render(form("hidden")))
-  await wait(5)
+  await settle()
   await React.act(async () => root!.render(form("visible")))
   expect(field().hasAttribute("data-invalid")).toBe(true)
 })
@@ -266,7 +269,7 @@ test("an instance hidden and then removed with its elements is destroyed", async
   await React.act(async () =>
     root!.render(<Hideable mode="hidden">{<Watched />}</Hideable>)
   )
-  await wait(5)
+  await settle()
   expect(destroy).not.toHaveBeenCalled()
   await React.act(async () => root!.render(null))
   await wait(1100)
@@ -329,7 +332,7 @@ async function showPage(
   } else {
     await render(page)
   }
-  await wait(5)
+  await settle()
 }
 
 test.each(placements)(
@@ -396,7 +399,7 @@ test("a hidden dialog whose content renders nothing yet leaves an open popover i
       </Hideable>
     </>
   )
-  await wait(5)
+  await settle()
   const popover = portals.querySelector<HTMLElement>(
     "[data-slot=popover-content]"
   )
@@ -414,7 +417,7 @@ test("a hidden dialog in the body whose content renders nothing yet leaves the p
       </Dialog>
     </Hideable>
   )
-  await wait(5)
+  await settle()
   expect(rendered(view)).toBe(true)
 })
 
@@ -440,7 +443,7 @@ test("an open dialog in the body whose content renders an element after it hides
       </main>
     </Hideable>
   )
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(gone)
   expect(rendered(document.querySelector("[data-note]"))).toBe(false)
 })
@@ -457,13 +460,13 @@ test("an open dialog in a container whose content changes element while its <Act
   )
   await render(page("visible"))
   await React.act(async () => root!.render(page("hidden")))
-  await wait(5)
+  await settle()
   await React.act(async () => root!.render(page("hidden", <section />)))
-  await wait(5)
+  await settle()
   expect(dialog()!.localName).toBe("section")
   expect(effects()).toEqual(gone)
   await React.act(async () => root!.render(page("visible", <section />)))
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(shown)
 })
 
@@ -479,12 +482,12 @@ test("an open dialog in a container keeps the display React gives it while its <
   )
   await render(page("visible"))
   await React.act(async () => root!.render(page("hidden")))
-  await wait(5)
+  await settle()
   await React.act(async () => root!.render(page("hidden", "grid")))
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(gone)
   await React.act(async () => root!.render(page("visible", "grid")))
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(shown)
   expect(dialog()!.style.display).toBe("grid")
 })
@@ -508,15 +511,15 @@ test("an open dialog rendered into a container hides while a Suspense boundary s
   )
   const loaded = Promise.resolve("Loaded")
   await render(page(loaded))
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(shown)
   let resolve = (_value: string) => {}
   const reloading = new Promise<string>((done) => (resolve = done))
   await React.act(async () => root!.render(page(reloading)))
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(gone)
   await React.act(async () => resolve("Loaded again"))
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(shown)
 })
 
@@ -526,7 +529,7 @@ test("an open dialog rendered into a container stays shown through StrictMode's 
       <SettingsPage mode="visible" defaultOpen container={document.body} />
     </React.StrictMode>
   )
-  await wait(5)
+  await settle()
   expect(effects()).toEqual(shown)
 })
 
@@ -631,13 +634,13 @@ test("a dialog whose content takes an inline ref leaves Escape to the popover op
   await React.act(async () =>
     view.querySelector<HTMLElement>('[aria-haspopup="dialog"]')!.click()
   )
-  await React.act(() => wait(5))
+  await React.act(() => settle())
   await React.act(async () => {
     document.activeElement!.dispatchEvent(
       new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
     )
   })
-  await React.act(() => wait(5))
+  await React.act(() => settle())
   expect(view.textContent).not.toContain("Filter list")
   expect(view.querySelector('[role="dialog"]')?.hasAttribute("data-open")).toBe(
     true
@@ -666,7 +669,7 @@ test("unmounting an open dialog lets the page go in the same commit", async () =
   const inert = (el: HTMLElement | null): boolean =>
     !!el && (el.inert || inert(el.parentElement))
   const outside = view.querySelector("input")!
-  await React.act(() => wait(5))
+  await React.act(() => settle())
   expect(inert(outside)).toBe(true)
   React.act(() => flushSync(hide))
   expect(inert(outside)).toBe(false)

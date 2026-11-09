@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./examples.css";
 
 @custom-variant dark {
   &:where(
@@ -173,9 +172,9 @@ svg.lucide {
 }
 
 /* The site is square: only marked shapes, like a pill or a drawn circle, keep their curve. */
-:where(body) :not([data-round]),
-:where(body) :not([data-round])::before,
-:where(body) :not([data-round])::after {
+:not([data-round]),
+:not([data-round])::before,
+:not([data-round])::after {
   border-radius: 0 !important;
 }
 
@@ -210,9 +209,16 @@ body {
   --line-tint: transparent;
 }
 
+/* Offscreen code blocks skip restyles, most of the work when a dialog opens on
+   a long page. Lines don't wrap, so the height they hold is exact. */
 [data-code-frame] pre {
   --pad-start: var(--code-pad);
   padding-inline: 0;
+
+  &:not([data-text]) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto min(var(--lines) * 1lh, 20lh - 0.875rem);
+  }
 }
 
 [data-code-frame] pre code {

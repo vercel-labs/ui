@@ -67,7 +67,9 @@ function createPresentation<Default extends string>(
     !loading &&
     (value === "sheet" || (value === "auto" && matches("(pointer: coarse)")))
   ) {
-    ;(window.requestIdleCallback ?? setTimeout)(load)
+    ;(window.requestIdleCallback ?? setTimeout)(() =>
+      load().then((sheet) => sheet.prepareVariables())
+    )
   }
   return {
     open,

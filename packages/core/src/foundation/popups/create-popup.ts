@@ -368,6 +368,7 @@ function createPopup<
   const focus = preset.focus?.(core)
   const triggerName = preset.triggerName?.(core)
   preset.resetStyles?.prepare(context.label, contentSlot)
+  preset.placement?.prepare()
 
   // The app's `modal`, else modal while it presents as a sheet, like iOS's
   // sheets, else the preset's. A preset without one leaves `modal` to the

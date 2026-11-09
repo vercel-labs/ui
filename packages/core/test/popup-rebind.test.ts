@@ -36,6 +36,8 @@ afterEach(() => {
 })
 
 const settle = () => new Promise((done) => setTimeout(done))
+const frame = () =>
+  new Promise((done) => requestAnimationFrame(() => setTimeout(done)))
 
 // A popup opened from the keyboard, with a field it focuses first and a
 // button after it, and a button on the page outside it.
@@ -76,7 +78,7 @@ test("an open modal that binds again takes focus from what its return made inert
   unbind()
   outside.focus()
   bind()
-  await settle()
+  await frame()
   expect(document.activeElement).toBe(field)
 })
 

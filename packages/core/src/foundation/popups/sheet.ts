@@ -649,5 +649,6 @@ export {
   type SheetOptions,
 }
 export type { SheetDriverName } from "./sheet-driver"
+export { prepareVariables as prepareSheet } from "./sheet-effects"
 export type { SheetKeyframes, SheetOutlet } from "./sheet-effects"
 export type { SheetSide } from "./sheet-axis"

@@ -1,7 +1,13 @@
 import { cn } from "cn"
 import { getHighlighter } from "fumadocs-core/highlight"
 import { CheckIcon, XIcon } from "lucide-react"
-import type { ComponentProps } from "react"
+import {
+  Children,
+  type ComponentProps,
+  type CSSProperties,
+  isValidElement,
+  type ReactNode,
+} from "react"
 import type { BundledLanguage } from "shiki"
 import { CopyButton } from "./copy-button"
 import { Frame } from "./frame"
@@ -57,7 +63,13 @@ function Pre({
       )}
       <pre
         {...props}
-        style={{ ...style, backgroundColor: undefined }}
+        style={
+          {
+            ...style,
+            backgroundColor: undefined,
+            "--lines": lineCount(props),
+          } as CSSProperties
+        }
         className={cn(
           className,
           "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[14px] leading-[1.7] sm:text-[13px] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]"
@@ -73,6 +85,24 @@ function Pre({
       )}
     </Frame>
   )
+}
+
+function lineCount({
+  children,
+  dangerouslySetInnerHTML,
+}: ComponentProps<"pre">) {
+  const html = dangerouslySetInnerHTML?.__html
+  if (typeof html === "string") {
+    return html.split('class="line').length - 1
+  }
+  const code = isValidElement<{ children?: ReactNode }>(children)
+    ? children.props.children
+    : undefined
+  return Children.toArray(code).filter(
+    (node) =>
+      isValidElement<{ className?: string }>(node) &&
+      !!node.props.className?.split(" ").includes("line")
+  ).length
 }
 
 const highlighted = new Map<

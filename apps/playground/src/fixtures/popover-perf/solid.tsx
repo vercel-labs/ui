@@ -6,11 +6,12 @@ import {
 } from "@ui-sdk/solid/popover"
 import { render } from "@solidjs/web"
 import { For } from "solid-js"
-import { perfItems, perfSize } from "tests/fixtures/perf.ts"
+import { perfItems, perfModal, perfSize } from "tests/fixtures/perf.ts"
 
 // Many popovers on one page, like a row action in every row of a table, for
-// the counts specs. Only the first one is opened.
+// the counts specs. Only the first one is opened. ?modal opens them modal.
 const items = perfItems(perfSize())
+const modal = perfModal()
 
 function Fixture() {
   return (
@@ -18,7 +19,7 @@ function Fixture() {
       <button>Before</button>
       <For each={items}>
         {(item) => (
-          <Popover>
+          <Popover modal={modal}>
             <PopoverTrigger>{item.label}</PopoverTrigger>
             <PopoverContent class="popup" aria-label={item.label}>
               {item.label} details.

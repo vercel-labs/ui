@@ -596,31 +596,9 @@
 
   /* ─── Fields ─── */
 
-  :is(
-    [data-slot="input-root"],
-    :where(
-      [data-slot="field-control"]:not(
-        [type="checkbox"],
-        [type="radio"],
-        [type="range"]
-      )
-    ),
-    [data-slot="textarea-root"],
-    [data-slot="combobox-input"],
-    [data-slot="autocomplete-input"],
-    [data-slot="toolbar-input"],
-    [data-slot="color-picker-input"],
-    [data-slot="color-picker-channel-input"],
-    :where(input):not(
-      [data-slot],
-      [type="checkbox"],
-      [type="radio"],
-      [type="range"],
-      [type="hidden"],
-      [type="color"]
-    ),
-    :where(textarea, select):not([data-slot])
-  ):where(
+  /* Each field is its own selector, not one :is() list, so the browser only
+     tries it on matching elements. The list was tried on every element. */
+  [data-slot="input-root"]:where(
     :not(
       [data-slot="input-group"] *,
       [data-slot="password-input-root"] *,
@@ -628,6 +606,87 @@
       [data-slot="combobox-chips"] *
     )
   ),
+  [data-slot="field-control"]:where(
+      :not([type="checkbox"], [type="radio"], [type="range"])
+    ):where(
+      :not(
+        [data-slot="input-group"] *,
+        [data-slot="password-input-root"] *,
+        [data-slot="number-input-group"] *,
+        [data-slot="combobox-chips"] *
+      )
+    ),
+  [data-slot="textarea-root"]:where(
+    :not(
+      [data-slot="input-group"] *,
+      [data-slot="password-input-root"] *,
+      [data-slot="number-input-group"] *,
+      [data-slot="combobox-chips"] *
+    )
+  ),
+  [data-slot="combobox-input"]:where(
+    :not(
+      [data-slot="input-group"] *,
+      [data-slot="password-input-root"] *,
+      [data-slot="number-input-group"] *,
+      [data-slot="combobox-chips"] *
+    )
+  ),
+  [data-slot="autocomplete-input"]:where(
+    :not(
+      [data-slot="input-group"] *,
+      [data-slot="password-input-root"] *,
+      [data-slot="number-input-group"] *,
+      [data-slot="combobox-chips"] *
+    )
+  ),
+  [data-slot="toolbar-input"]:where(
+    :not(
+      [data-slot="input-group"] *,
+      [data-slot="password-input-root"] *,
+      [data-slot="number-input-group"] *,
+      [data-slot="combobox-chips"] *
+    )
+  ),
+  [data-slot="color-picker-input"]:where(
+    :not(
+      [data-slot="input-group"] *,
+      [data-slot="password-input-root"] *,
+      [data-slot="number-input-group"] *,
+      [data-slot="combobox-chips"] *
+    )
+  ),
+  [data-slot="color-picker-channel-input"]:where(
+    :not(
+      [data-slot="input-group"] *,
+      [data-slot="password-input-root"] *,
+      [data-slot="number-input-group"] *,
+      [data-slot="combobox-chips"] *
+    )
+  ),
+  :where(input):not(
+      [data-slot],
+      [type="checkbox"],
+      [type="radio"],
+      [type="range"],
+      [type="hidden"],
+      [type="color"]
+    ):where(
+      :not(
+        [data-slot="input-group"] *,
+        [data-slot="password-input-root"] *,
+        [data-slot="number-input-group"] *,
+        [data-slot="combobox-chips"] *
+      )
+    ),
+  :where(textarea, select):not([data-slot]):where(
+      :not(
+        [data-slot="input-group"] *,
+        [data-slot="password-input-root"] *,
+        [data-slot="number-input-group"] *,
+        [data-slot="combobox-chips"] *
+      )
+    ),
   :is(
     [data-slot="input-group"],
     [data-slot="password-input-root"],

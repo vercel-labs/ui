@@ -191,7 +191,7 @@ cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test spe
 
 ### Count gates
 
-`<name>.counts.spec.ts`. Exact counts of renders, subscriptions, DOM calls, attribute writes and frames per interaction, at several item counts, against `tests/perf/budgets.ts`. Today: `menu`, `tabs`, `toolbar`, `rows` (a page of closed popups), `select`, `combobox`, `reopen` (frames until a popup settles), `slider`, `resizable` and `scroll-area`. They run in `react`, `vue`, `web` and the engine projects. The portal projects leave them out, since a portal doesn't change the work. Restyle counts read a Chromium trace and are skipped elsewhere. Every budget, what it measures, why, and its command are in the [perf catalog](perf/README.md).
+`<name>.counts.spec.ts`. Exact counts of renders, subscriptions, DOM calls, attribute writes and frames per interaction, at several item counts, against `tests/perf/budgets.ts`. Today: `menu`, `tabs`, `toolbar`, `rows` (a page of closed popups), `select`, `combobox`, `reopen` (frames until a popup settles), `popup-open` (whole-page restyles as a modal popup opens), `slider`, `resizable` and `scroll-area`. They run in `react`, `vue`, `web` and the engine projects. The portal projects leave them out, since a portal doesn't change the work. Restyle counts read a Chromium trace and are skipped elsewhere. Every budget, what it measures, why, and its command are in the [perf catalog](perf/README.md).
 
 ```bash
 cd tests && PLAYGROUND_PORT=5310 ../scripts/test-slot.sh npx playwright test counts.spec --project react --project vue --project web --workers 1
