@@ -1059,8 +1059,19 @@ function createPopupLayer<
       // the popup. So they wait until the popup has painted.
       pendingFreeze = afterPaint(() => {
         pendingFreeze = undefined
-        if (store.get().open) {
-          freezePage()
+        if (!store.get().open) {
+          return
+        }
+        const focused = activeElement()
+        freezePage()
+        // Focus that rested on the page, inert now, moves in.
+        if (
+          tabMode() === "trap" &&
+          focused &&
+          !usable(focused as HTMLElement)
+        ) {
+          focusPending = true
+          initialFocus(config.initialFocus)
         }
       })
     }
