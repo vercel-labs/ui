@@ -12,6 +12,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
 import { BetaCard } from "./beta-card"
+import { HeaderCopyPrompt } from "./copy-prompt"
 import { GitHubLink } from "./github-link"
 import { Haptic, vibrate } from "./haptic"
 import { FrameworkCheck } from "./site-preferences"
@@ -26,11 +27,13 @@ function MobileNav({
   tree,
   urls = [],
   docs = !!section,
+  registry,
 }: {
   section?: Section
   tree?: PageTree.Root
   urls?: string[]
   docs?: boolean
+  registry?: string
 }) {
   const [open, setOpen] = React.useState(false)
   const searching = useSearchOpen()
@@ -94,6 +97,7 @@ function MobileNav({
         <Logo className="h-[18px] w-auto" />
       </Link>
       <div className="ms-auto flex items-center gap-1">
+        <HeaderCopyPrompt registry={registry} className="me-1.5 h-7 px-2.5 text-[13px]" />
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger className="hit-area flex size-8 items-center justify-center rounded-2xl text-sm text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only max-sm:[&_svg]:size-5 sm:h-8 sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
         <GitHubLink className="text-foreground hover:bg-foreground/[0.06] [&_svg]:size-5" />

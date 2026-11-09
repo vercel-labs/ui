@@ -139,7 +139,7 @@ const frameworkItems = frameworkIds.map((value) => ({ value, label: frameworks[v
 
 function FrameworkTabs({
   children,
-  copyLabel = "Copy prompt",
+  copyLabel = "Copy Prompt",
 }: {
   children: React.ReactNode
   copyLabel?: string

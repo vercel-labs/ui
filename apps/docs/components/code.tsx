@@ -42,7 +42,7 @@ function Pre({
           className="flex items-center border-b border-border/60 p-frame ps-4 text-[14px] text-subtle sm:text-[13px]"
         >
           Prompt
-          <CopyButton label="Copy prompt" className="ms-auto" />
+          <CopyButton label="Copy Prompt" className="ms-auto" />
         </div>
       )}
       <pre

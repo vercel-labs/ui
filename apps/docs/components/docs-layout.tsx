@@ -58,7 +58,7 @@ function DocsLayout({ section, children }: { section: Section; children: ReactNo
           </div>
         </aside>
         <div className="min-w-0 flex-1">
-          <MobileNav section={section} tree={tree} urls={urls} />
+          <MobileNav section={section} tree={tree} urls={urls} registry={process.env.NPM_REGISTRY} />
           <main className="flex">{children}</main>
         </div>
       </div>

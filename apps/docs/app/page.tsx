@@ -128,7 +128,7 @@ export default function HomePage() {
 
   return (
     <div className="relative flex flex-1 flex-col">
-      <MobileNav />
+      <MobileNav registry={process.env.NPM_REGISTRY} />
       <Search pages={pages} />
       <main data-width="wide" className="container flex-1 pt-6 pb-24 sm:pt-10">
         <h1 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
@@ -139,8 +139,8 @@ export default function HomePage() {
             <Poster
               fig="FIG. 01"
               head={"WHAT IS UI SDK?\nTHE SHORT VERSION"}
-              tone="ink"
-              pattern="rules"
+              tone="gray"
+              pattern="rings"
               body="gap-10"
               className="flex-1"
             >
@@ -186,7 +186,10 @@ export default function HomePage() {
               >
                 Read the Docs
               </Link>
-              <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl">
+              <CopyPromptButton
+                registry={process.env.NPM_REGISTRY}
+                className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
+              >
                 Copy Prompt
               </CopyPromptButton>
             </div>
@@ -198,7 +201,6 @@ export default function HomePage() {
             tone="white"
             pattern="blueprint"
             body="justify-between gap-8"
-            className="border-foreground [--poster-border:2px]"
           >
             <SelectBlueprint />
             <Title id="inside-a-select" max={20} className="-me-[0.05em] self-end text-end">
@@ -288,7 +290,10 @@ export default function HomePage() {
           >
             Browse Components
           </Link>
-          <CopyPromptButton className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl">
+          <CopyPromptButton
+            registry={process.env.NPM_REGISTRY}
+            className="flex h-16 items-center justify-between gap-4 bg-[#006bff] px-6 text-start text-xl font-[450] tracking-[-0.03em] whitespace-nowrap text-white transition-colors outline-none hover:bg-[#0059d6] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] sm:h-20 sm:px-8 sm:text-2xl"
+          >
             Copy Prompt
           </CopyPromptButton>
         </div>
