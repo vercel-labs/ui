@@ -199,4 +199,26 @@ function ahead(work: () => void) {
   }
 }
 
-export { ahead, enforceHidden, registerUninherited, setStyle, writeStyle }
+/**
+ * Runs work that restyles the whole page once the current frame has painted,
+ * so what the interaction shows comes first. Returns a cancel.
+ */
+function afterPaint(work: () => void) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const frame = requestAnimationFrame(() => {
+    timer = setTimeout(work)
+  })
+  return () => {
+    cancelAnimationFrame(frame)
+    clearTimeout(timer)
+  }
+}
+
+export {
+  afterPaint,
+  ahead,
+  enforceHidden,
+  registerUninherited,
+  setStyle,
+  writeStyle,
+}

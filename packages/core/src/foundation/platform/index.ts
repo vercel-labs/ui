@@ -53,6 +53,7 @@ export {
 export { pressedScrollbar } from "./scrollbar"
 export { physicalSide, type PhysicalSide, type Side } from "./sides"
 export {
+  afterPaint,
   ahead,
   enforceHidden,
   registerUninherited,

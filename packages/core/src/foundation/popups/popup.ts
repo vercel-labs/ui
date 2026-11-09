@@ -33,7 +33,7 @@ import {
 } from "../kernel/modality"
 import { isAfter } from "../kernel/order"
 import { isBrowser } from "../platform/env"
-import { ahead, enforceHidden, writeStyle } from "../platform/style"
+import { afterPaint, ahead, enforceHidden, writeStyle } from "../platform/style"
 import {
   activeElement,
   composedContains,
@@ -1020,6 +1020,7 @@ function createPopupLayer<
     }
     let releaseLock: (() => void) | undefined
     let releaseOwnInert: (() => void) | undefined
+    let pendingFreeze: (() => void) | undefined
     const freezePage = () => {
       const keep = [
         el,
@@ -1045,6 +1046,7 @@ function createPopupLayer<
       releaseInert = releaseOwnInert = inert
     }
     const thawPage = () => {
+      pendingFreeze?.()
       releaseOwnInert?.()
       releaseLock?.()
       if (releaseInert === releaseOwnInert) {
@@ -1053,7 +1055,14 @@ function createPopupLayer<
       releaseOwnInert = releaseLock = own.keep = undefined
     }
     if (modal.inertAndLock) {
-      freezePage()
+      // Both restyle the whole page, which on a phone takes longer than drawing
+      // the popup. So they wait until the popup has painted.
+      pendingFreeze = afterPaint(() => {
+        pendingFreeze = undefined
+        if (store.get().open) {
+          freezePage()
+        }
+      })
     }
     remodal = () => {
       const next = options.modal()
