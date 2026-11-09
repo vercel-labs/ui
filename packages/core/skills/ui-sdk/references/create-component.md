@@ -4,11 +4,11 @@ ui-sdk ships its behavior layer as public API. A component it doesn't have is on
 
 ## Read first
 
-1. **The Core docs.** Every package ships them in `docs/`: `docs/core.md` is the whole Core section in one file, the same in every package, since no framework changes it. Each framework's package adds `docs/rendering.md`, how its adapter renders a primitive, and `docs/components/<name>.md` and `docs/utilities/<name>.md` (React's are `docs/hooks/<name>.md`) for the rest. Read `docs/core.md` and `docs/rendering.md` from the package of the framework you render in, like `node_modules/@ui-sdk/react/docs/`. A `core.md` in the project, if there is one, wins. In `core.md`, read the overview, "Build a component" (a star rating, the template to copy), "Popups and layers" under Behaviors if anything opens, and the Behaviors page for each one you use. Search it by heading rather than reading it top to bottom. For another framework, see [Other frameworks](#other-frameworks).
+1. **The Core docs.** Every package ships them in `docs/`: `docs/core.md` is the whole Core section in one file, the same in every package, since no framework changes it. Each framework's package adds `docs/rendering.md`, how its adapter renders a primitive, and `docs/components/<name>.md` and `docs/utilities/<name>.md` (React's are `docs/hooks/<name>.md`) for the rest. Read `docs/core.md` and `docs/rendering.md` from the package of the framework you render in, like `node_modules/@ui-sdk/react/docs/`. In `core.md`, read the overview, "Build a component" (a star rating, the template to copy), "Popups and layers" under Behaviors if anything opens, and the Behaviors page for each one you use. Search it by heading rather than reading it top to bottom. For another framework, see [Other frameworks](#other-frameworks).
 2. **The types.** Every export has JSDoc in `node_modules/@ui-sdk/core/dist/**/*.d.ts` and in each framework's `.d.ts`. A component entry's types point into its folder, like `dist/components/input/input.d.ts`. Read them there. Those JSDoc blocks document the library; your primitive gets none.
-3. **What ui-sdk already has.** List the entries in `node_modules/@ui-sdk/<framework>/package.json`. If one covers part of what you're building, compose it (see [Compose ours](#compose-ours)) rather than rewriting its behavior. If the user named the blocks to use, like "this tests `createSelection`", build from those blocks and record in GAPS.md that composing was possible.
+3. **What ui-sdk already has.** List the entries in `node_modules/@ui-sdk/<framework>/package.json`. If one covers part of what you're building, compose it (see [Compose ours](#compose-ours)) rather than rewriting its behavior. If the user named the blocks to use, build from those blocks.
 
-Don't read compiled JavaScript in `dist/*.js`. When the docs and types don't say how something of ours behaves, probe it instead (below), and note the missing docs as a gap.
+Don't read compiled JavaScript in `dist/*.js`. When the docs and types don't say how something of ours behaves, probe it instead (below), and mention the missing docs in your report.
 
 ### Probe what the docs don't say
 
@@ -39,7 +39,7 @@ Pick the WAI-ARIA pattern from the Authoring Practices (https://www.w3.org/WAI/A
 - **Schema:** `options` names every option with its kind, and each slot's `props` every prop: `"string"`, `"number"`, `"boolean"`, `"list"`, `"value"` (any other value), `"callback"`, `"action"` (a callback whose return value counts, like a Promise), `"id"` (made when left out), `"key"` (a list item's value of any type, which keys the part and reaches nested parts as that key), or `{ kind, from: "item" }` for a prop a nested part takes from its parent, with `required: true` when it must sit inside it. Renderers read it to tell the primitive's props from the element's. TypeScript checks it names every key.
 - **State:** `state` reads the default. `sync` maps controlled options onto state, or they're silently ignored. Copy any option a part renders into state.
 - **Changes:** `api` builds `change` with `createChange(context)` and returns the api. Every change a user sees goes through `change` with a reason. Internal state, like a selection that starts over, can use `store.set`.
-- **Reasons:** use the shared vocabulary (`ReasonVocabulary` in `@ui-sdk/core`) when one fits. When none does, like "select all" or "move to the other list", declare your own in the `on<Key>Change` type and note it in GAPS.md.
+- **Reasons:** use the shared vocabulary (`ReasonVocabulary` in `@ui-sdk/core`) when one fits. When none does, like "select all" or "move to the other list", declare your own in the `on<Key>Change` type.
 - **Slots:** `attrs` for ARIA and `data-*` (pure, server safe), `press` for activation, `on` for other events, `bind` for anything that touches the DOM (return a cleanup).
 - **`press` hears only clicks on parts that aren't buttons.** For a `div` or `td` part, handle Space and Enter in `on.keydown`.
 - **Every element gets its `data-slot` from a slot.** The adapter never sets one directly. Wrappers, like a row of buttons, get a slot of their own.
@@ -85,9 +85,4 @@ Each needs its own adapter package at the same version as `@ui-sdk/core`. Instal
 
 ## When you're done
 
-Besides SKILL.md's checklist, add to `GAPS.md`, in a section for this component:
-
-- anything you needed that only `@ui-sdk/core/internal/*` or `dist/*.js` had;
-- behavior you rewrote that a block should have covered, with its measured line count.
-
-End the section with a one-line verdict on each block you used.
+Besides SKILL.md's checklist, say in your report what you needed that only `@ui-sdk/core/internal/*` or `dist/*.js` had, and any behavior you wrote yourself that a block should have covered.
