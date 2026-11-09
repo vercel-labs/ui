@@ -67,7 +67,7 @@ const sameCell = (
  *   focus: "roving",
  *   keys: [
  *     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
- *     "Home", "End", "ctrl+Home", "ctrl+End", "PageUp", "PageDown",
+ *     "Home", "End", "mod+Home", "mod+End", "PageUp", "PageDown",
  *   ],
  *   attrs: (state, { props, api }) => ({ tabindex: api.grid.tabIndex(state, props) }),
  *   on: {
@@ -226,11 +226,11 @@ function createGridFocus<State extends object>(
     /**
      * Handles a key pressed in the grid and returns whether it moved. Arrows
      * move a cell, flipped left to right in right-to-left text; Home and End
-     * go to the row's ends, or with Control the grid's; Page Up and Page Down
-     * move `pageSize` rows.
+     * go to the row's ends, or with Control (Command on a Mac) the grid's;
+     * Page Up and Page Down move `pageSize` rows.
      */
     keydown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.altKey || event.metaKey) {
+      if (event.defaultPrevented || event.altKey) {
         return false
       }
       const from = active() ?? firstAllowed(store.get())
@@ -241,7 +241,7 @@ function createGridFocus<State extends object>(
       const page = options.pageSize?.() ?? 10
       const last = { row: options.rows() - 1, col: options.cols() - 1 }
       let to: GridCell | undefined
-      const ctrl = event.ctrlKey
+      const ctrl = event.ctrlKey || event.metaKey
       if (event.key === "ArrowUp" && !ctrl) {
         to = step(from, -1, 0)
       } else if (event.key === "ArrowDown" && !ctrl) {

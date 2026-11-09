@@ -142,7 +142,7 @@ function textToCells(text: string) {
  *   role: "gridcell",
  *   focus: "roving",
  *   keys: [
- *     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End", "ctrl+Home", "ctrl+End",
+ *     "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End", "mod+Home", "mod+End",
  *     "PageUp", "PageDown", "shift+ArrowUp", "shift+ArrowDown", "shift+ArrowLeft", "shift+ArrowRight",
  *     "shift+Home", "shift+End", "shift+ ", "mod+ ", "mod+a", "Escape",
  *   ],

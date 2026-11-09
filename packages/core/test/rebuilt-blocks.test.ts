@@ -263,6 +263,17 @@ describe("createGridFocus", () => {
     expect(instance.get().active).toEqual({ row: 0, col: 0 })
   })
 
+  test("Command on a Mac is Control, for Home and End", () => {
+    const instance = grid({ id: "g" })
+    cleanups.push(() => instance.destroy())
+    const { focus } = instance.api
+    focus.focus({ row: 5, col: 2 })
+    expect(focus.keydown(key("End", { metaKey: true }))).toBe(true)
+    expect(instance.get().active).toEqual({ row: 99, col: 3 })
+    expect(focus.keydown(key("Home", { metaKey: true }))).toBe(true)
+    expect(instance.get().active).toEqual({ row: 0, col: 0 })
+  })
+
   test("before the grid is entered, the first cell that isn't disabled has the tab stop and keys start there", () => {
     const instance = grid({
       id: "g",
