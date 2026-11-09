@@ -212,7 +212,12 @@ function packageImporters() {
   ).exports
   const importers = new Map()
   for (const file of files) {
-    const text = readFileSync(path.join(root, file), "utf8")
+    // Type-only imports are gone at runtime, so they reach no spec. Web's
+    // `events.ts` imports every component's types.
+    const text = readFileSync(path.join(root, file), "utf8").replace(
+      /^\s*(?:import|export) type [^;]*?from\s*"[^"]+"/gm,
+      ""
+    )
     for (const [, specifier] of text.matchAll(
       /(?:from|import)\s*\(?\s*"([^"]+)"/g
     )) {
@@ -282,6 +287,45 @@ function importingComponents(file, importers) {
   return new Set([...seen].flatMap(packageComponents))
 }
 
+/**
+ * Spec prefixes that aren't components, like `forms`, by the components their
+ * fixtures render, like Checkbox: a component's change runs them too.
+ */
+function sharedSpecsByComponent() {
+  const own = new Set(
+    readdirSync(path.join(root, "packages/core/src/components"))
+  )
+  const byComponent = new Map()
+  const folders = readdirSync(fixtureRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+  for (const folder of folders) {
+    const users = fixtureComponents(folder).filter(
+      (user) => !own.has(user) && user !== "leaks"
+    )
+    if (users.length === 0) {
+      continue
+    }
+    const files = readdirSync(path.join(fixtureRoot, folder), {
+      recursive: true,
+    }).filter((file) => /\.(ts|tsx|vue|svelte)$/.test(file))
+    for (const file of files) {
+      const text = readFileSync(path.join(fixtureRoot, folder, file), "utf8")
+      for (const [, entry] of text.matchAll(/"@ui-sdk\/\w+\/([\w-]+)"/g)) {
+        const component = componentOf(entry)
+        if (!component) {
+          continue
+        }
+        if (!byComponent.has(component)) {
+          byComponent.set(component, new Set())
+        }
+        users.forEach((user) => byComponent.get(component).add(user))
+      }
+    }
+  }
+  return byComponent
+}
+
 /** Components whose specs open a fixture folder, like `menu-cases` for menu.cases.spec.ts. */
 function fixtureComponents(folder) {
   const opens = new RegExp(`open\\(\\s*"${folder}"|fixture=${folder}\\b`)
@@ -307,6 +351,7 @@ function plan(files) {
   }
   const share = (file, reach) => shared.set(file, reach)
   let importers
+  let sharedSpecs
   for (const file of files) {
     const parts = file.split("/")
     const reach = frameworksOf(file)
@@ -340,8 +385,12 @@ function plan(files) {
       const own = packageComponents(file)
       const reached = importingComponents(file, importers)
       if (own.length > 0 && reached.size <= sharedThreshold) {
+        sharedSpecs ??= sharedSpecsByComponent()
         for (const component of reached) {
           touch(component, reach)
+          for (const spec of sharedSpecs.get(component) ?? []) {
+            touch(spec, reach)
+          }
         }
       } else {
         share(file, reach)
