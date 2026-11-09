@@ -380,9 +380,10 @@ function otpInputApi(
         insertMany(el, text, "input-change", event)
       }),
       on(el, "paste", (event) => {
-        if (!editable()) return
+        const text = event.clipboardData?.getData("text/plain")
+        if (!editable() || !text) return
         event.preventDefault()
-        insertMany(el, event.clipboardData?.getData("text/plain") ?? "", "paste", event)
+        insertMany(el, text, "paste", event)
       }),
       on(el, "input", (event) => typed(el, event)),
       // Browsers differ on whether an `input` follows the end of a composition.
