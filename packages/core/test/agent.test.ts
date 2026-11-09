@@ -11,11 +11,12 @@ import { checkbox } from "../src/components/checkbox/checkbox"
 import { datePicker } from "../src/components/date-picker/date-picker"
 import { dialog } from "../src/components/dialog/dialog"
 import { input, textarea } from "../src/components/input/input"
+import { listbox } from "../src/components/listbox/listbox-root"
 import { numberInput } from "../src/components/number-input/number-input"
 import { pagination } from "../src/components/pagination/pagination"
 import { passwordInput } from "../src/components/password-input/password-input"
 import { progress } from "../src/components/progress/progress"
-import { bind } from "../src/foundation/kernel/part"
+import { attrs, bind } from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { select } from "../src/components/select/select"
 import { separator } from "../src/components/separator/separator"
@@ -819,6 +820,54 @@ describe("agent", () => {
       { value: "src", label: "src" },
       { value: "src/index.ts", label: "index.ts" },
     ])
+  })
+
+  test("an item's label leaves out text a screen reader skips, like its check mark", async () => {
+    const agent = createAgent()
+    const people = listbox({ id: "people", selectionMode: "multiple" })
+    const list = document.body.appendChild(document.createElement("div"))
+    list.setAttribute("aria-label", "People")
+    cleanups.push(bind(people.part("root"), list), () => people.destroy())
+    for (const name of ["Ada Lovelace", "Alan Turing"]) {
+      const item = list.appendChild(document.createElement("div"))
+      // The indicator's attributes, as an adapter renders them.
+      const mark = item.appendChild(document.createElement("span"))
+      for (const [key, value] of Object.entries(attrs(people.part("item-indicator", { item: name }))))
+        if (typeof value === "string") mark.setAttribute(key, value)
+      mark.textContent = "✓"
+      item.append(name)
+      cleanups.push(
+        bind(people.part("item", { value: name }), item),
+        bind(people.part("item-indicator", { item: name, keepMounted: true }), mark),
+      )
+    }
+    expect(agent.snapshot().find((component) => component.label === "People")?.items).toEqual([
+      { value: "Ada Lovelace", label: "Ada Lovelace" },
+      { value: "Alan Turing", label: "Alan Turing" },
+    ])
+    const outcome = await agent.act({
+      steps: [{ ref: "People", action: "setValue", args: [["Ada Lovelace"]] }],
+    })
+    expect(outcome.ok).toBe(true)
+  })
+
+  test("a button whose text a screen reader skips is pressed by its name", async () => {
+    const agent = createAgent()
+    const instance = dialog({ id: "invite", defaultOpen: true })
+    const popup = document.body.appendChild(
+      Object.assign(document.createElement("div"), { getAnimations: () => [] }),
+    )
+    popup.setAttribute("aria-label", "Invite")
+    const close = popup.appendChild(document.createElement("button"))
+    close.setAttribute("aria-label", "Close")
+    close.innerHTML = `<span aria-hidden="true">×</span>`
+    cleanups.push(bind(instance.part("content"), popup), bind(instance.part("close"), close), () =>
+      instance.destroy(),
+    )
+    expect(agent.snapshot().find((component) => component.component === "dialog")?.buttons).toEqual(["Close"])
+    const outcome = await agent.act({ steps: [{ ref: "Invite", action: "press", args: ["Close"] }] })
+    expect(outcome.ok).toBe(true)
+    expect(instance.get().open).toBe(false)
   })
 
   test("a press waits for the button's action, and a failed action fails the step", async () => {
