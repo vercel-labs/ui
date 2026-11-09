@@ -665,7 +665,7 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                         <FlowNode
                           key={step.value}
                           value={step.value}
-                          aria-label={`${step.label}, ${step.kind}`}
+                          aria-label={`${step.kind}, ${step.label}`}
                           className={cn(
                             "flex cursor-grab flex-col justify-center gap-1 bg-background px-3 transition-colors select-none data-dragging:cursor-grabbing",
                             ink,

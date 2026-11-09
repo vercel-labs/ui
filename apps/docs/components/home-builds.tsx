@@ -125,6 +125,8 @@ const board = definePrimitive({
     box: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, { api, key }) => ({
+        role: "button",
+        "aria-roledescription": "box",
         tabindex: "0",
         style: `${api.resize.boxStyle(state, key)};touch-action:none`,
       }),
@@ -468,7 +470,7 @@ const Shape = React.memo(function Shape({
   return (
     <BoardBox
       value={layer.value}
-      aria-label={`${layer.label}. Arrow keys move it.`}
+      aria-label={`${layer.value === "text" ? "Behaviors, text" : layer.label}. Arrow keys move it.`}
       onFocus={() => onSelect(layer.value)}
       className={cn(
         "group/box cursor-move outline-none",

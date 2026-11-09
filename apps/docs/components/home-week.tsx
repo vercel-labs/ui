@@ -94,7 +94,7 @@ const Event = React.memo(function Event({
     <BoardBox
       value={id}
       data-day={Math.round(box.x / day)}
-      aria-label={`${name}, ${days[Math.round(box.x / day)]} ${range(box, twelve)}. Arrow keys move it.`}
+      aria-label={`${name}, ${range(box, twelve)}, ${days[Math.round(box.x / day)]}. Arrow keys move it.`}
       className={cn(
         "group/box cursor-move p-[3px] outline-none focus-visible:z-20 data-dragging:z-20 focus-visible:[&>div]:outline-2 focus-visible:[&>div]:outline-solid focus-visible:[&>div]:outline-offset-1 focus-visible:[&>div]:outline-[#006bff]",
         active && "z-20",
