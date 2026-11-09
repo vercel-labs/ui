@@ -44,7 +44,7 @@ const frameworkLabel = (value: string) =>
               </ComboboxChipRemove>
             </ComboboxChip>
           </ComboboxValue>
-          <ComboboxInput placeholder="Add a framework" />
+          <ComboboxInput placeholder="Add a framework…" />
         </ComboboxChips>
         <ComboboxTrigger aria-label="Show frameworks">
           <ChevronDownIcon aria-hidden="true" />

@@ -18,7 +18,7 @@ export function mount(root: HTMLElement) {
           <ui-combobox-label>المدينة</ui-combobox-label>
           <div data-slot="row">
             <ui-combobox-input>
-              <input placeholder="ابحث عن مدينة" />
+              <input placeholder="ابحث عن مدينة…" />
             </ui-combobox-input>
             <ui-combobox-trigger>
               <button aria-label="عرض المدن">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>

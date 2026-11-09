@@ -6,7 +6,7 @@ function mount(root: HTMLElement) {
     <ui-field name="message">
       <ui-field-label>Message</ui-field-label>
       <ui-textarea>
-        <textarea placeholder="Type your message here."></textarea>
+        <textarea placeholder="Type your message here…"></textarea>
       </ui-textarea>
     </ui-field>
   `

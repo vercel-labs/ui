@@ -39,7 +39,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-label>Timezones</ui-combobox-label>
         <ui-combobox-chips>
           <ui-combobox-input>
-            <input placeholder="Add timezones" />
+            <input placeholder="Add timezones…" />
           </ui-combobox-input>
         </ui-combobox-chips>
       </div>

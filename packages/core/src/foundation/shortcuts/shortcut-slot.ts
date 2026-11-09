@@ -80,7 +80,7 @@ function shortcutSlot<State extends { apple: boolean }, Api>(
     state: (state, { props, api }) => ({
       text: shortcutText(props.shortcut ?? inherited(state, api), state.apple),
     }),
-    attrs: () => ({ "aria-hidden": "true" }),
+    attrs: () => ({ "aria-hidden": "true", translate: "no" }),
     bind(el, { store, api, props }) {
       // A popup opened only through a controller has no trigger to learn the platform from.
       adoptPlatform(store)

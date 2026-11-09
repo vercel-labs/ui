@@ -44,7 +44,9 @@ function Example() {
     <TriggerMenu triggers={[{ char: "/", boundary: "start", type: "command" }]}>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={(props) => <TriggerMenuInput {...props} placeholder="Type / for commands" />} />
+        <FieldControl
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type / for commands…" />}
+        />
       </Field>
       <TriggerMenuContent>
         <TriggerMenuList>

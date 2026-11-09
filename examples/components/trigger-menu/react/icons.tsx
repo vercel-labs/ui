@@ -24,7 +24,7 @@ function Example() {
     <TriggerMenu triggers={[{ char: "/", boundary: "start", type: "command" }]}>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type / for commands" />} />
+        <FieldControl render={<TriggerMenuInput placeholder="Type / for commands…" />} />
       </Field>
       <TriggerMenuContent>
         <TriggerMenuList>

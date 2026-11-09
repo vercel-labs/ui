@@ -46,7 +46,7 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type # to link a channel" />
+          <TriggerMenuInput v-bind="props" placeholder="Type # to link a channel…" />
         </template>
       </FieldControl>
     </Field>

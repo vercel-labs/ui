@@ -8,7 +8,7 @@ const pages = ["Composition", "Installation", "Styling"]
 function Example() {
   return (
     <Command>
-      <CommandInput aria-label="Search docs" placeholder="Search docs..." />
+      <CommandInput aria-label="Search docs" placeholder="Search docs…" />
       <CommandList>
         {pages.map((page) => (
           <CommandItem key={page} value={page} render={<a href={`#${page.toLowerCase()}`} />}>

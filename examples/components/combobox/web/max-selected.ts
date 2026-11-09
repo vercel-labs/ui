@@ -10,7 +10,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-label>Labels (up to 3)</ui-combobox-label>
         <ui-combobox-chips>
           <ui-combobox-input>
-            <input placeholder="Add labels" />
+            <input placeholder="Add labels…" />
           </ui-combobox-input>
         </ui-combobox-chips>
       </div>

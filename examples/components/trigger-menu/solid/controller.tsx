@@ -49,7 +49,7 @@ function Example() {
       <TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl render={(props) => <TriggerMenuInput {...props} placeholder="Write a message" />} />
+          <FieldControl render={(props) => <TriggerMenuInput {...props} placeholder="Write a message…" />} />
         </Field>
         <TriggerMenuContent>
           <TriggerMenuList>

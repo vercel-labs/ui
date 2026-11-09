@@ -36,7 +36,7 @@ function mount(root: HTMLElement) {
     <div data-slot="stack">
       <ui-command>
         <ui-command-input>
-          <input aria-label="Search commands" placeholder="Type a command..." />
+          <input aria-label="Search commands" placeholder="Type a command…" />
         </ui-command-input>
         <ui-command-empty>No results found.</ui-command-empty>
         <template>

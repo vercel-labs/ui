@@ -24,7 +24,7 @@
   <div data-slot="stack">
     <ComboboxLabel>Assignee</ComboboxLabel>
     <div data-slot="row">
-      <ComboboxInput placeholder="Search people">
+      <ComboboxInput placeholder="Search people…">
         {#snippet render({ props })}
           <div data-slot="row">
             <SearchIcon aria-hidden="true" />

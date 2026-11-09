@@ -68,7 +68,7 @@ function Example() {
               ))
             }
           </ComboboxValue>
-          <ComboboxInput placeholder="Add timezones" />
+          <ComboboxInput placeholder="Add timezones…" />
         </ComboboxChips>
       </div>
       <ComboboxContent>

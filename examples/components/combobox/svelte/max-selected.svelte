@@ -33,7 +33,7 @@
           {/each}
         {/snippet}
       </ComboboxValue>
-      <ComboboxInput placeholder="Add labels" />
+      <ComboboxInput placeholder="Add labels…" />
     </ComboboxChips>
   </div>
   <ComboboxContent>

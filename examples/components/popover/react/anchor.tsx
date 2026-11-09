@@ -23,7 +23,7 @@ function Example() {
 
   return (
     <div data-slot="row">
-      <input ref={setAnchor} type="search" placeholder="Search files" aria-label="Search files" />
+      <input ref={setAnchor} type="search" placeholder="Search files…" aria-label="Search files" />
       <Popover>
         <PopoverTrigger aria-label="Search filters">
           <SlidersHorizontalIcon aria-hidden="true" />

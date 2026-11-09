@@ -42,7 +42,7 @@ const open = ref(false)
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type @ or /" />
+          <TriggerMenuInput v-bind="props" placeholder="Type @ or /…" />
         </template>
       </FieldControl>
     </Field>

@@ -39,7 +39,7 @@ function Example() {
       <CommandSearch>
         {({ query }) => (
           <>
-            <CommandSearchInput aria-label="Search commands" placeholder="Search commands" />
+            <CommandSearchInput aria-label="Search commands" placeholder="Search commands…" />
             <CommandSearchList>
               {commands
                 .filter((command) => matches(command, query, mode))

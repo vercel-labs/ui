@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
   const id = `popover-anchor-${++count}`
   root.innerHTML = `
     <div data-slot="row">
-      <input id="${id}" type="search" placeholder="Search files" aria-label="Search files" />
+      <input id="${id}" type="search" placeholder="Search files…" aria-label="Search files" />
       <ui-popover>
         <ui-popover-trigger>
           <button aria-label="Search filters">${createElement(SlidersHorizontal, { "aria-hidden": "true" }).outerHTML}</button>

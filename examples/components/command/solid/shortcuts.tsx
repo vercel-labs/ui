@@ -42,7 +42,7 @@ function Example() {
   return (
     <div data-slot="stack">
       <Command onAction={(value) => log(`Ran ${value}`)}>
-        <CommandInput aria-label="Search settings" placeholder="Search settings..." />
+        <CommandInput aria-label="Search settings" placeholder="Search settings…" />
         <CommandList>
           <CommandGroup>
             <CommandGroupLabel>Settings</CommandGroupLabel>

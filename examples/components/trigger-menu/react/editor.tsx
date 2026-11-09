@@ -32,7 +32,7 @@ function Example() {
               ref={(field) => {
                 if (field && editor?.element !== field) setEditor(textFieldAdapter(field))
               }}
-              placeholder="Type @ to mention someone"
+              placeholder="Type @ to mention someone…"
             />
           }
         />

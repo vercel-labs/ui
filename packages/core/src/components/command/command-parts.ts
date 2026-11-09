@@ -205,7 +205,7 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
     state: (state, { props }) => ({
       text: props.shortcut ? formatShortcut(props.shortcut, state.apple) : "",
     }),
-    attrs: () => ({ "aria-hidden": "true" }),
+    attrs: () => ({ "aria-hidden": "true", translate: "no" }),
     bind(el, { store, api, props }) {
       // An empty element shows the keys itself, like a web component without children.
       if (el.childNodes.length) return

@@ -23,7 +23,7 @@
     <FieldLabel>Task</FieldLabel>
     <FieldControl>
       {#snippet render({ props })}
-        <TriggerMenuInput {...props} placeholder="Type @ to assign someone">
+        <TriggerMenuInput {...props} placeholder="Type @ to assign someone…">
           {#snippet render({ props })}
             <input {...props} />
           {/snippet}

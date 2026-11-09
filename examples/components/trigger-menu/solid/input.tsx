@@ -27,7 +27,7 @@ function Example() {
             <TriggerMenuInput
               {...props}
               render={(inputProps) => <input {...inputProps} />}
-              placeholder="Type @ to assign someone"
+              placeholder="Type @ to assign someone…"
             />
           )}
         />

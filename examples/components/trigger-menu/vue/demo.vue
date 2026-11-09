@@ -26,7 +26,7 @@ const people = [
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type @ to mention someone" />
+          <TriggerMenuInput v-bind="props" placeholder="Type @ to mention someone…" />
         </template>
       </FieldControl>
     </Field>

@@ -8,7 +8,7 @@ function mount(root: HTMLElement) {
       <ui-field>
         <ui-field-label>Message</ui-field-label>
         <ui-token-input submit-shortcut="mod+enter">
-          <ui-token-input-editor placeholder="Write a message"></ui-token-input-editor>
+          <ui-token-input-editor placeholder="Write a message…"></ui-token-input-editor>
         </ui-token-input>
       </ui-field>
     </form>

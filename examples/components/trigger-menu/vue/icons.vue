@@ -25,7 +25,7 @@ const commands = [
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type / for commands" />
+          <TriggerMenuInput v-bind="props" placeholder="Type / for commands…" />
         </template>
       </FieldControl>
     </Field>

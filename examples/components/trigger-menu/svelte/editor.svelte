@@ -26,7 +26,7 @@
     <FieldLabel>Notes</FieldLabel>
     <FieldControl>
       {#snippet render({ props })}
-        <textarea bind:this={field} {...props} placeholder="Type @ to mention someone"></textarea>
+        <textarea bind:this={field} {...props} placeholder="Type @ to mention someone…"></textarea>
       {/snippet}
     </FieldControl>
   </Field>

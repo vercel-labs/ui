@@ -39,7 +39,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-label>Timezone</ui-combobox-label>
         <div data-slot="row">
           <ui-combobox-input>
-            <input placeholder="Search cities" />
+            <input placeholder="Search cities…" />
           </ui-combobox-input>
           <ui-combobox-trigger>
             <button aria-label="Show timezones">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>

@@ -19,7 +19,7 @@ function mount(root: HTMLElement) {
       <div data-slot="row">
           ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
           <ui-command-input>
-            <input aria-label="Search commands" placeholder="Type a command or search..." />
+            <input aria-label="Search commands" placeholder="Type a command or search…" />
           </ui-command-input>
       </div>
       <ui-command-empty>No results found.</ui-command-empty>

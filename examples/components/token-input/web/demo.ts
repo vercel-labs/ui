@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
     <ui-field>
       <ui-field-label>Message</ui-field-label>
       <ui-token-input>
-        <ui-token-input-editor placeholder="Type @ to mention someone"></ui-token-input-editor>
+        <ui-token-input-editor placeholder="Type @ to mention someone…"></ui-token-input-editor>
         <template>
           <ui-token-input-token>
             <span data-token-label></span>

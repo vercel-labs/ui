@@ -47,7 +47,7 @@ function Example() {
     <TriggerMenu triggers={triggers}>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type @, / or #" />} />
+        <FieldControl render={<TriggerMenuInput placeholder="Type @, / or #…" />} />
       </Field>
     </TriggerMenu>
   )

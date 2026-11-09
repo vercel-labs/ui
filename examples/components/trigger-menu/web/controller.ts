@@ -21,7 +21,7 @@ function mount(root: HTMLElement) {
         <ui-field>
           <ui-field-label>Message</ui-field-label>
           <ui-trigger-menu-input>
-            <textarea placeholder="Write a message"></textarea>
+            <textarea placeholder="Write a message…"></textarea>
           </ui-trigger-menu-input>
         </ui-field>
         <ui-trigger-menu-content>

@@ -25,7 +25,7 @@ function Example() {
     <TriggerMenu triggers={[{ char: "@", items: people }]}>
       <Field ref={setField}>
         <FieldLabel>Comment</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type @ to mention someone" />} />
+        <FieldControl render={<TriggerMenuInput placeholder="Type @ to mention someone…" />} />
       </Field>
       <TriggerMenuContent
         side="top"

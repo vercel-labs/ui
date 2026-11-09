@@ -24,7 +24,7 @@ const log = useLog()
 <template>
   <div data-slot="stack">
     <Command @action="(value: string) => log(`Ran ${value}`)">
-      <CommandInput aria-label="Search settings" placeholder="Search settings..." />
+      <CommandInput aria-label="Search settings" placeholder="Search settings…" />
       <CommandList>
         <CommandGroup>
           <CommandGroupLabel>Settings</CommandGroupLabel>

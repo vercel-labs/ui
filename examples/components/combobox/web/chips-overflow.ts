@@ -31,7 +31,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-chips>
           <ui-combobox-chips-overflow></ui-combobox-chips-overflow>
           <ui-combobox-input>
-            <input placeholder="Add" />
+            <input placeholder="Add…" />
           </ui-combobox-input>
         </ui-combobox-chips>
         <p data-slot="hint"></p>

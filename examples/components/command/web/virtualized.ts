@@ -21,7 +21,7 @@ function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-command>
       <ui-command-input>
-        <input aria-label="Search 10,000 commands" placeholder="Search 10,000 commands..." />
+        <input aria-label="Search 10,000 commands" placeholder="Search 10,000 commands…" />
       </ui-command-input>
       <ui-command-list>
         <div aria-hidden="true"></div>

@@ -18,7 +18,7 @@ function Example() {
         <FieldLabel>Search</FieldLabel>
         <FieldControl
           type="search"
-          placeholder="Type a city"
+          placeholder="Type a city…"
           onChange={(event) => {
             if (!handled || !isComposing(event)) log(`Search “${event.target.value}”`)
           }}

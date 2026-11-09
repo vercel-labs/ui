@@ -6,7 +6,7 @@ function mount(root: HTMLElement) {
     <ui-field name="notes">
       <ui-field-label>Notes</ui-field-label>
       <ui-textarea auto-resize>
-        <textarea placeholder="Add notes for the delivery driver."></textarea>
+        <textarea placeholder="Add notes for the delivery driver…"></textarea>
       </ui-textarea>
       <ui-field-description>Your driver sees these notes.</ui-field-description>
     </ui-field>

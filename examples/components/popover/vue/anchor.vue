@@ -22,7 +22,7 @@ const anchor = ref<HTMLInputElement | null>(null)
 
 <template>
   <div data-slot="row">
-    <input ref="anchor" type="search" placeholder="Search files" aria-label="Search files" />
+    <input ref="anchor" type="search" placeholder="Search files…" aria-label="Search files" />
     <Popover>
       <PopoverTrigger aria-label="Search filters">
         <SlidersHorizontalIcon aria-hidden="true" />

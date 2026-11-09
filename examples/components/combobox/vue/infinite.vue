@@ -69,7 +69,7 @@ const { state: movies, setQuery, loadMore } = useAsyncOptions(searchMoviePages, 
     <div data-slot="stack">
       <ComboboxLabel>Movie</ComboboxLabel>
       <div data-slot="row">
-        <ComboboxInput placeholder="Search movies" />
+        <ComboboxInput placeholder="Search movies…" />
         <ComboboxTrigger aria-label="Show movies">
           <ChevronDownIcon aria-hidden="true" />
         </ComboboxTrigger>

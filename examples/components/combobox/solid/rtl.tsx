@@ -27,7 +27,7 @@ export function Example() {
         <div data-slot="stack">
           <ComboboxLabel>المدينة</ComboboxLabel>
           <div data-slot="row">
-            <ComboboxInput placeholder="ابحث عن مدينة" />
+            <ComboboxInput placeholder="ابحث عن مدينة…" />
             <ComboboxTrigger aria-label="عرض المدن">
               <svg
                 viewBox="0 0 24 24"

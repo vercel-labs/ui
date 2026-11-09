@@ -45,7 +45,7 @@
   onQueryChange={(query: string) => issues.setQuery(query)}
   onLoadMore={issues.loadMore}
 >
-  <CommandInput aria-label="Search issues" placeholder="Search issues..." />
+  <CommandInput aria-label="Search issues" placeholder="Search issues…" />
   <CommandStatus>
     {#snippet children(state)}
       {state.loading ? "Searching…" : `${state.count} ${state.count === 1 ? "issue" : "issues"}`}

@@ -45,7 +45,7 @@ function Example() {
     <TriggerMenu triggers={[{ char: "#", type: "channel", items: searchChannels }]}>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type # to link a channel" />} />
+        <FieldControl render={<TriggerMenuInput placeholder="Type # to link a channel…" />} />
       </Field>
       <TriggerMenuContent>
         <TriggerMenuStatus>

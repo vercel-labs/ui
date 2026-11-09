@@ -38,7 +38,7 @@
     <FieldLabel>Message</FieldLabel>
     <FieldControl>
       {#snippet render({ props })}
-        <TriggerMenuInput {...props} placeholder="Type @ and a first name" />
+        <TriggerMenuInput {...props} placeholder="Type @ and a first name…" />
       {/snippet}
     </FieldControl>
   </Field>

@@ -54,7 +54,7 @@ function Example() {
     <CommandSearch>
       {({ query }) => (
         <>
-          <CommandSearchInput aria-label="Search commands" placeholder="Search commands" />
+          <CommandSearchInput aria-label="Search commands" placeholder="Search commands…" />
           <CommandSearchList>
             {rank(query).map(({ command, score }) => (
               <CommandSearchCommand key={command}>

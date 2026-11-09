@@ -40,7 +40,7 @@ function mount(root: HTMLElement) {
                 <ui-combobox-label>${variant.label}</ui-combobox-label>
                 <div data-slot="row">
                   <ui-combobox-input>
-                    <input placeholder="Search countries" />
+                    <input placeholder="Search countries…" />
                   </ui-combobox-input>
                   <ui-combobox-trigger>
                     <button aria-label="Show countries">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>

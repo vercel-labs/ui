@@ -56,7 +56,7 @@ function Example() {
         <FieldLabel>Country</FieldLabel>
         <Combobox required itemToLabel={countryLabel}>
           <div data-slot="row">
-            <ComboboxInput placeholder="Search countries" />
+            <ComboboxInput placeholder="Search countries…" />
             <ComboboxTrigger aria-label="Show countries">
               <svg
                 viewBox="0 0 24 24"
@@ -131,7 +131,7 @@ function Example() {
                 </For>
               )}
             </ComboboxValue>
-            <ComboboxInput placeholder="Add interests" />
+            <ComboboxInput placeholder="Add interests…" />
           </ComboboxChips>
           <ComboboxContent>
             <ComboboxList>

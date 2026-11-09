@@ -30,7 +30,7 @@ const log = useLog()
     "
     @action="(next: string) => log(`Ran ${next}`)"
   >
-    <CommandInput aria-label="Search themes" placeholder="Search themes..." />
+    <CommandInput aria-label="Search themes" placeholder="Search themes…" />
     <CommandList>
       <CommandPage>
         <CommandItem value="theme" page="theme">Change theme…</CommandItem>

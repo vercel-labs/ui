@@ -50,7 +50,7 @@ const {
     @query-change="(query: string) => setQuery(query)"
     @load-more="loadMore"
   >
-    <CommandInput aria-label="Search issues" placeholder="Search issues..." />
+    <CommandInput aria-label="Search issues" placeholder="Search issues…" />
     <CommandStatus v-slot="{ state }">
       {{ state.loading ? "Searching…" : `${state.count} ${state.count === 1 ? "issue" : "issues"}` }}
     </CommandStatus>

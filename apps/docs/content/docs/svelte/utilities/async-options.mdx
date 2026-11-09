@@ -27,7 +27,7 @@ const movies = useAsyncOptions<string>(async (query, { signal }) => {
 </script>
 
 <Combobox items={movies.state.items} filter={false} status={movies.state.status} onQueryChange={movies.setQuery}>
-<ComboboxInput aria-label="Movie" placeholder="Search movies" />
+<ComboboxInput aria-label="Movie" placeholder="Search movies…" />
 <ComboboxContent />
 </Combobox>
 ```

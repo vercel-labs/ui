@@ -12,7 +12,7 @@
 
 <div dir="rtl" data-slot="stack">
   <Command>
-    <CommandInput aria-label="ابحث عن أمر" placeholder="ابحث..." />
+    <CommandInput aria-label="ابحث عن أمر" placeholder="ابحث…" />
     <CommandEmpty>لا توجد نتائج.</CommandEmpty>
     <CommandList>
       {#each commands as item (item.value)}

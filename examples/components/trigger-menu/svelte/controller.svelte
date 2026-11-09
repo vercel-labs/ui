@@ -44,7 +44,7 @@
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         {#snippet render({ props })}
-          <TriggerMenuInput {...props} placeholder="Write a message" />
+          <TriggerMenuInput {...props} placeholder="Write a message…" />
         {/snippet}
       </FieldControl>
     </Field>

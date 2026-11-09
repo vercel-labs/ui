@@ -45,7 +45,7 @@ function Example() {
       <Field>
         <FieldLabel>Message</FieldLabel>
         <FieldControl
-          render={(props) => <TriggerMenuInput {...props} placeholder="Type # to link a channel" />}
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type # to link a channel…" />}
         />
       </Field>
       <TriggerMenuContent>

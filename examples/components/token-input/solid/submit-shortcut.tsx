@@ -9,7 +9,7 @@ function Example() {
     <Field>
       <FieldLabel>Message</FieldLabel>
       <TokenInput submitShortcut="mod+enter" onSubmit={(value) => log(`Sent ${toLabel(value)}`)}>
-        <TokenInputEditor placeholder="Write a message" />
+        <TokenInputEditor placeholder="Write a message…" />
       </TokenInput>
     </Field>
   )

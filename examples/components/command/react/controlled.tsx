@@ -32,7 +32,7 @@ function Example() {
       }}
       onAction={(next) => log(`Ran ${next}`)}
     >
-      <CommandInput aria-label="Search themes" placeholder="Search themes..." />
+      <CommandInput aria-label="Search themes" placeholder="Search themes…" />
       <CommandList>
         <CommandPage>
           <CommandItem value="theme" page="theme">

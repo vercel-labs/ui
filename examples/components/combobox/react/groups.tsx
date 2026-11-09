@@ -54,7 +54,7 @@ function Example() {
       <div data-slot="stack">
         <ComboboxLabel>Timezone</ComboboxLabel>
         <div data-slot="row">
-          <ComboboxInput placeholder="Search cities" />
+          <ComboboxInput placeholder="Search cities…" />
           <ComboboxTrigger aria-label="Show timezones">
             <ChevronDownIcon aria-hidden="true" />
           </ComboboxTrigger>

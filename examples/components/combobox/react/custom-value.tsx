@@ -31,7 +31,7 @@ function Example() {
     >
       <div data-slot="stack">
         <ComboboxLabel>Job title</ComboboxLabel>
-        <ComboboxInput placeholder="Type any title" />
+        <ComboboxInput placeholder="Type any title…" />
       </div>
       <ComboboxContent>
         <ComboboxEmpty>

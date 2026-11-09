@@ -56,7 +56,7 @@ function Example() {
   return (
     <div data-slot="stack">
       <SearchField onQueryChange={setQuery}>
-        <SearchFieldInput aria-label="Search fruit" placeholder="Search fruit" />
+        <SearchFieldInput aria-label="Search fruit" placeholder="Search fruit…" />
         <SearchFieldClear>
           <XIcon aria-hidden="true" />
         </SearchFieldClear>

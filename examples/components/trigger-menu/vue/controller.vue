@@ -43,7 +43,7 @@ function insertDate() {
         <FieldLabel>Message</FieldLabel>
         <FieldControl>
           <template #render="{ props }">
-            <TriggerMenuInput v-bind="props" placeholder="Write a message" />
+            <TriggerMenuInput v-bind="props" placeholder="Write a message…" />
           </template>
         </FieldControl>
       </Field>

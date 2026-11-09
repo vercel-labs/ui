@@ -25,7 +25,7 @@ function Example() {
       <Field ref={setField}>
         <FieldLabel>Comment</FieldLabel>
         <FieldControl
-          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ to mention someone" />}
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ to mention someone…" />}
         />
       </Field>
       <TriggerMenuContent

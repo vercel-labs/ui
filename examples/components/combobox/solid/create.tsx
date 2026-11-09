@@ -59,7 +59,7 @@ function Example() {
               </For>
             )}
           </ComboboxValue>
-          <ComboboxInput placeholder="Add or create a label" />
+          <ComboboxInput placeholder="Add or create a label…" />
         </ComboboxChips>
       </div>
       <ComboboxContent>

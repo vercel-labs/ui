@@ -28,7 +28,7 @@ function mount(root: HTMLElement) {
           <div data-slot="row">
             ${createElement(Search, { "aria-hidden": "true" }).outerHTML}
             <ui-combobox-input>
-              <input placeholder="Search people" />
+              <input placeholder="Search people…" />
             </ui-combobox-input>
           </div>
           <ui-combobox-trigger>

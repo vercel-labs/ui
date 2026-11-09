@@ -35,7 +35,7 @@ function mount(root: HTMLElement) {
         <ui-combobox required>
           <div data-slot="row">
             <ui-combobox-input>
-              <input placeholder="Search countries" />
+              <input placeholder="Search countries…" />
             </ui-combobox-input>
             <ui-combobox-trigger>
               <button aria-label="Show countries">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>
@@ -67,7 +67,7 @@ function mount(root: HTMLElement) {
         <ui-combobox multiple default-value="Design">
           <ui-combobox-chips>
             <ui-combobox-input>
-              <input placeholder="Add interests" />
+              <input placeholder="Add interests…" />
             </ui-combobox-input>
           </ui-combobox-chips>
           <ui-combobox-content hidden>

@@ -145,6 +145,16 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
   // The controls the field last read, so one leaving the page reads them again.
   let wired: HTMLElement[] = []
 
+  // Errors in the first render, or revealed by a submit, aren't announced:
+  // the page loading or focus moving to the invalid control reads them.
+  let quiet = true
+  let quietTimer: ReturnType<typeof setTimeout> | undefined
+  function hush() {
+    quiet = true
+    clearTimeout(quietTimer)
+    quietTimer = setTimeout(() => (quiet = false))
+  }
+
   function readValidity(controls: HTMLElement[]) {
     wired = controls
     let next = valid
@@ -199,6 +209,31 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       message: () => store.get().validity.message,
       // Controls rendered by a framework bind before their field's root.
       hasControlPart: () => !!element("control"),
+      // Screen readers don't read an error that appears or changes while the
+      // person stays where they are, so its text goes to the shared announcer.
+      announce(el: HTMLElement) {
+        if (typeof MutationObserver === "undefined") return () => {}
+        const textOf = () => el.textContent?.replace(/\s+/g, " ").trim() ?? ""
+        const silent = quiet
+        let said = ""
+        const say = () => {
+          const text = textOf()
+          if (!text || text === said) return
+          said = text
+          import("../../foundation/platform/announce").then(
+            ({ announce }) => el.isConnected && announce(text, { doc: el.ownerDocument }),
+            () => {},
+          )
+        }
+        // A framework may fill the text after the part binds.
+        const timer = setTimeout(() => (silent ? (said = textOf()) : say()))
+        const observer = new MutationObserver(say)
+        observer.observe(el, { childList: true, characterData: true, subtree: true })
+        return () => {
+          clearTimeout(timer)
+          observer.disconnect()
+        }
+      },
       adopt(el: HTMLElement) {
         // A plain button, like a FileInputTrigger's, is named by the label and its
         // own text through aria-labelledby. Some name computations stop at a
@@ -227,6 +262,7 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
 
   function bindRoot(el: HTMLElement) {
     check()
+    hush()
     // The control points at the parts that registered from now on, a
     // microtask later like their registering.
     queueMicrotask(() => store.set({ bound: true }))
@@ -260,6 +296,7 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     // A submit, or reportValidity(), found the field invalid. It doesn't bubble.
     const onInvalid = (event: Event) => {
       const target = event.target as HTMLElement
+      hush()
       store.set({ revealed: true })
       readValidity(controlsIn(el))
       // An error shown in the page replaces the browser's own message, and the
@@ -326,7 +363,10 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       cleanups.push(() => observer.disconnect())
     }
 
-    return () => cleanups.forEach((cleanup) => cleanup())
+    return () => {
+      clearTimeout(quietTimer)
+      cleanups.forEach((cleanup) => cleanup())
+    }
   }
 
   return api
@@ -415,7 +455,14 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         id: props.id ?? (key ? `${id}-error-${key}` : `${id}-error`),
         ...dataAttrs(state, api),
       }),
-      bind: (el, { api }) => registerById(el, (id) => api.internal.register("errors", id)),
+      bind: (el, { api }) => {
+        const unregister = registerById(el, (id) => api.internal.register("errors", id))
+        const unannounce = api.internal.announce(el)
+        return () => {
+          unregister()
+          unannounce()
+        }
+      },
     }),
 
     // The control, when a framework renders it: a control of this package, or

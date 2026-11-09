@@ -53,7 +53,7 @@ function Example() {
                     : "Shipping to"}
               </ComboboxLabel>
               <div data-slot="row">
-                <ComboboxInput placeholder="Search countries" />
+                <ComboboxInput placeholder="Search countries…" />
                 <ComboboxTrigger aria-label="Show countries">
                   <svg
                     viewBox="0 0 24 24"

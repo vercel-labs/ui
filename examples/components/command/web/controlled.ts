@@ -11,7 +11,7 @@ function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-command default-value="dark" default-pages="theme">
       <ui-command-input>
-        <input aria-label="Search themes" placeholder="Search themes..." />
+        <input aria-label="Search themes" placeholder="Search themes…" />
       </ui-command-input>
       <ui-command-list>
         <ui-command-page>

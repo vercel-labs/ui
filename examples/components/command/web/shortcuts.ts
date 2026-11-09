@@ -13,7 +13,7 @@ function mount(root: HTMLElement) {
     <div data-slot="stack">
       <ui-command>
         <ui-command-input>
-          <input aria-label="Search settings" placeholder="Search settings..." />
+          <input aria-label="Search settings" placeholder="Search settings…" />
         </ui-command-input>
         <ui-command-list>
           <ui-command-group>

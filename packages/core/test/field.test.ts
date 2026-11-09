@@ -1,5 +1,6 @@
 import { afterEach, expect, test, vi } from "vitest"
 import { field } from "../src/components/field/field"
+import { setAnnouncer } from "../src/foundation/platform/announce"
 import { attrs, partState, present, subscribe } from "../src/foundation/kernel/part"
 
 // The field reads its controls from the DOM, which this environment doesn't
@@ -214,4 +215,63 @@ test("the control's own description comes before the field's", async () => {
     "hint f-description f-error",
   )
   expect(attrs(instance.part("control", {}))["aria-describedby"]).toBe("f-description f-error")
+})
+
+// Watches an error element the way the error part does, with a stand-in for
+// MutationObserver, which this environment doesn't have.
+function watchError(instance: Awaited<ReturnType<typeof bound>>["instance"], text: string) {
+  let changed = () => {}
+  vi.stubGlobal(
+    "MutationObserver",
+    class {
+      constructor(callback: () => void) {
+        changed = callback
+      }
+      observe() {}
+      disconnect() {}
+    },
+  )
+  const el = { textContent: text, isConnected: true, ownerDocument: undefined }
+  const unwatch = instance.api.internal.announce(el as unknown as HTMLElement)
+  return {
+    unwatch,
+    write(next: string) {
+      el.textContent = next
+      changed()
+    },
+  }
+}
+
+const settle = () => new Promise((resolve) => setTimeout(resolve, 10))
+
+test("an error that appears or changes later is announced, one from the first render or a submit isn't", async () => {
+  const heard: string[] = []
+  setAnnouncer((text) => heard.push(text))
+  try {
+    const { instance, control } = await bound()
+    const first = watchError(instance, "Enter your email.")
+    await settle()
+    expect(heard).toEqual([])
+
+    first.write("Enter a valid email.")
+    await settle()
+    expect(heard).toEqual(["Enter a valid email."])
+    first.unwatch()
+
+    submit(control)
+    const revealed = watchError(instance, "Fill out this field.")
+    await settle()
+    expect(heard).toEqual(["Enter a valid email."])
+    revealed.unwatch()
+
+    const later = watchError(instance, "That email is taken.")
+    await settle()
+    expect(heard).toEqual(["Enter a valid email.", "That email is taken."])
+    later.write("That email is taken.")
+    await settle()
+    expect(heard).toEqual(["Enter a valid email.", "That email is taken."])
+    later.unwatch()
+  } finally {
+    setAnnouncer(undefined)
+  }
 })

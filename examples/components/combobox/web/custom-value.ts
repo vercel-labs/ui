@@ -10,7 +10,7 @@ function mount(root: HTMLElement) {
       <div data-slot="stack">
         <ui-combobox-label>Job title</ui-combobox-label>
         <ui-combobox-input>
-          <input placeholder="Type any title" />
+          <input placeholder="Type any title…" />
         </ui-combobox-input>
       </div>
       <ui-combobox-content hidden>

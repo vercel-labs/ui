@@ -12,7 +12,7 @@ export function mount(root: HTMLElement) {
     <div dir="rtl" data-slot="stack">
       <ui-command>
         <ui-command-input>
-          <input aria-label="ابحث عن أمر" placeholder="ابحث..." />
+          <input aria-label="ابحث عن أمر" placeholder="ابحث…" />
         </ui-command-input>
         <ui-command-empty>لا توجد نتائج.</ui-command-empty>
         <ui-command-list>

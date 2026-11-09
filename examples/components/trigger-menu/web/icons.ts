@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
       <ui-field>
         <ui-field-label>Message</ui-field-label>
         <ui-trigger-menu-input>
-          <textarea placeholder="Type / for commands"></textarea>
+          <textarea placeholder="Type / for commands…"></textarea>
         </ui-trigger-menu-input>
       </ui-field>
       <ui-trigger-menu-content>

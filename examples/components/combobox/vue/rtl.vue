@@ -28,7 +28,7 @@ const cities = [
       <div data-slot="stack">
         <ComboboxLabel>المدينة</ComboboxLabel>
         <div data-slot="row">
-          <ComboboxInput placeholder="ابحث عن مدينة" />
+          <ComboboxInput placeholder="ابحث عن مدينة…" />
           <ComboboxTrigger aria-label="عرض المدن">
             <ChevronDownIcon />
           </ComboboxTrigger>

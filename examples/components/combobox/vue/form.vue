@@ -57,7 +57,7 @@ function submit(event: Event) {
       <FieldLabel>Country</FieldLabel>
       <Combobox required :item-to-label="countryLabel">
         <div data-slot="row">
-          <ComboboxInput placeholder="Search countries" />
+          <ComboboxInput placeholder="Search countries…" />
           <ComboboxTrigger aria-label="Show countries">
             <ChevronDownIcon aria-hidden="true" />
           </ComboboxTrigger>
@@ -96,7 +96,7 @@ function submit(event: Event) {
               </ComboboxChipRemove>
             </ComboboxChip>
           </ComboboxValue>
-          <ComboboxInput placeholder="Add interests" />
+          <ComboboxInput placeholder="Add interests…" />
         </ComboboxChips>
         <ComboboxContent>
           <ComboboxList>

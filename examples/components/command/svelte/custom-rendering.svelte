@@ -6,7 +6,7 @@
 </script>
 
 <Command>
-  <CommandInput aria-label="Search docs" placeholder="Search docs..." />
+  <CommandInput aria-label="Search docs" placeholder="Search docs…" />
   <CommandList>
     {#each pages as page (page)}
       <CommandItem value={page}>

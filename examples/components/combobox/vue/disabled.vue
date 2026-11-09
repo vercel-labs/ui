@@ -58,7 +58,7 @@ const variants = ["disabled", "readOnly", "item"] as const
           }}
         </ComboboxLabel>
         <div data-slot="row">
-          <ComboboxInput placeholder="Search countries" />
+          <ComboboxInput placeholder="Search countries…" />
           <ComboboxTrigger aria-label="Show countries">
             <ChevronDownIcon aria-hidden="true" />
           </ComboboxTrigger>

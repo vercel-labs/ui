@@ -22,7 +22,7 @@ function mount(root: HTMLElement) {
         <div data-slot="row">
           <ui-combobox-chips>
             <ui-combobox-input>
-              <input placeholder="Add a framework" />
+              <input placeholder="Add a framework…" />
             </ui-combobox-input>
           </ui-combobox-chips>
           <ui-combobox-trigger>

@@ -28,7 +28,7 @@
 </script>
 
 <Command items={commands} {onValueChange}>
-  <CommandInput aria-label="Search 10,000 commands" placeholder="Search 10,000 commands..." />
+  <CommandInput aria-label="Search 10,000 commands" placeholder="Search 10,000 commands…" />
   <div bind:this={scroller} onscroll={(event) => (scrollTop = event.currentTarget.scrollTop)}>
     <CommandList>
       {#snippet children(state)}

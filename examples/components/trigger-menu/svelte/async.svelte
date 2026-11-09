@@ -45,7 +45,7 @@
     <FieldLabel>Message</FieldLabel>
     <FieldControl>
       {#snippet render({ props })}
-        <TriggerMenuInput {...props} placeholder="Type # to link a channel" />
+        <TriggerMenuInput {...props} placeholder="Type # to link a channel…" />
       {/snippet}
     </FieldControl>
   </Field>

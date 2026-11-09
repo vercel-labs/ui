@@ -35,7 +35,7 @@
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         {#snippet render({ props })}
-          <TriggerMenuInput {...props} placeholder="Type / for commands" />
+          <TriggerMenuInput {...props} placeholder="Type / for commands…" />
         {/snippet}
       </FieldControl>
     </Field>

@@ -51,7 +51,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-label>Movie</ui-combobox-label>
         <div data-slot="row">
           <ui-combobox-input>
-            <input placeholder="Search movies" />
+            <input placeholder="Search movies…" />
           </ui-combobox-input>
           <ui-combobox-trigger>
             <button aria-label="Show movies">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>

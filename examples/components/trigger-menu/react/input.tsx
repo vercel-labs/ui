@@ -24,7 +24,7 @@ function Example() {
       <Field>
         <FieldLabel>Task</FieldLabel>
         <FieldControl
-          render={<TriggerMenuInput render={<input />} placeholder="Type @ to assign someone" />}
+          render={<TriggerMenuInput render={<input />} placeholder="Type @ to assign someone…" />}
         />
       </Field>
       <TriggerMenuContent>

@@ -29,7 +29,7 @@
 <Command>
   <div data-slot="row">
     <SearchIcon aria-hidden="true" />
-    <CommandInput aria-label="Search commands" placeholder="Type a command or search..." />
+    <CommandInput aria-label="Search commands" placeholder="Type a command or search…" />
   </div>
   <CommandEmpty>No results found.</CommandEmpty>
   <CommandList>

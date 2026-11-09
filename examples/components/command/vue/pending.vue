@@ -22,7 +22,7 @@ async function sync() {
 <template>
   <div data-slot="stack">
     <Command>
-      <CommandInput aria-label="Search actions" placeholder="Search actions..." />
+      <CommandInput aria-label="Search actions" placeholder="Search actions…" />
       <CommandList>
         <CommandItem v-slot="{ state }" value="deploy" @select="deploy">
           Deploy to production

@@ -26,7 +26,7 @@ const users = [
     <div data-slot="stack">
       <ComboboxLabel>Owner</ComboboxLabel>
       <div data-slot="row">
-        <ComboboxInput placeholder="Search people" />
+        <ComboboxInput placeholder="Search people…" />
         <ComboboxTrigger aria-label="Show people">
           <ChevronDownIcon aria-hidden="true" />
         </ComboboxTrigger>

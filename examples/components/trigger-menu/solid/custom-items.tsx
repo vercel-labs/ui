@@ -37,7 +37,7 @@ function Example() {
       <Field>
         <FieldLabel>Message</FieldLabel>
         <FieldControl
-          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ and a first name" />}
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ and a first name…" />}
         />
       </Field>
       <TriggerMenuContent>

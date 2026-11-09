@@ -310,7 +310,7 @@ function Example() {
         )}
       </IconPickerTrigger>
       <IconPickerContent sideOffset={6} aria-label="Choose an icon">
-        <IconPickerSearch aria-label="Search icons" placeholder="Search icons" />
+        <IconPickerSearch aria-label="Search icons" placeholder="Search icons…" />
         <IconPickerGrid aria-label="Icons">
           {({ query }) => {
             const results = search(query)

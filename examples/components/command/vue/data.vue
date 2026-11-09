@@ -73,7 +73,7 @@ const log = useLog()
 <template>
   <div data-slot="stack">
     <Command :items="commands" @action="(value: string) => log(`Ran ${value}`)">
-      <CommandInput aria-label="Search commands" placeholder="Type a command..." />
+      <CommandInput aria-label="Search commands" placeholder="Type a command…" />
       <CommandEmpty>No results found.</CommandEmpty>
       <CommandList v-slot="{ state }">
         <Commands :items="state.items" />

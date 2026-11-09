@@ -25,7 +25,7 @@ const users = [
     <div data-slot="stack">
       <ComboboxLabel>Assignee</ComboboxLabel>
       <div data-slot="row">
-        <ComboboxInput placeholder="Search people">
+        <ComboboxInput placeholder="Search people…">
           <template #render="{ props }">
             <div data-slot="row">
               <SearchIcon aria-hidden="true" />

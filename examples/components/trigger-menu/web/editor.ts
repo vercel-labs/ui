@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
     <ui-trigger-menu>
       <ui-field>
         <ui-field-label>Notes</ui-field-label>
-        <textarea placeholder="Type @ to mention someone"></textarea>
+        <textarea placeholder="Type @ to mention someone…"></textarea>
       </ui-field>
       <ui-trigger-menu-content>
         <ui-trigger-menu-list></ui-trigger-menu-list>

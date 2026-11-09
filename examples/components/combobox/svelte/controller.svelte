@@ -70,7 +70,7 @@
     <div data-slot="stack">
       <ComboboxLabel>Country</ComboboxLabel>
       <div data-slot="row">
-        <ComboboxInput placeholder="Search countries" />
+        <ComboboxInput placeholder="Search countries…" />
         <ComboboxTrigger aria-label="Show countries">
           <ChevronDownIcon />
         </ComboboxTrigger>

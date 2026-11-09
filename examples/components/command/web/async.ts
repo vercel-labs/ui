@@ -32,7 +32,7 @@ function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-command filter="false">
       <ui-command-input>
-        <input aria-label="Search issues" placeholder="Search issues..." />
+        <input aria-label="Search issues" placeholder="Search issues…" />
       </ui-command-input>
       <ui-command-status></ui-command-status>
       <ui-command-empty>No issues match “<span></span>”.</ui-command-empty>

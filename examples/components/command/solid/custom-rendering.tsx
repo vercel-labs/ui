@@ -6,7 +6,7 @@ const pages = ["Composition", "Installation", "Styling"]
 function Example() {
   return (
     <Command>
-      <CommandInput aria-label="Search docs" placeholder="Search docs..." />
+      <CommandInput aria-label="Search docs" placeholder="Search docs…" />
       <CommandList>
         <For each={pages}>
           {(page) => (

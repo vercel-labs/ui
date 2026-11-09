@@ -57,7 +57,7 @@
     <FieldLabel>Country</FieldLabel>
     <Combobox required itemToLabel={countryLabel}>
       <div data-slot="row">
-        <ComboboxInput placeholder="Search countries" />
+        <ComboboxInput placeholder="Search countries…" />
         <ComboboxTrigger aria-label="Show countries">
           <ChevronDownIcon aria-hidden="true" />
         </ComboboxTrigger>
@@ -97,7 +97,7 @@
             {/each}
           {/snippet}
         </ComboboxValue>
-        <ComboboxInput placeholder="Add interests" />
+        <ComboboxInput placeholder="Add interests…" />
       </ComboboxChips>
       <ComboboxContent>
         <ComboboxList>

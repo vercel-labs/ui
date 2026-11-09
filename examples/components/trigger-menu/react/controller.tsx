@@ -50,7 +50,7 @@ function Example() {
       <TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl render={<TriggerMenuInput placeholder="Write a message" />} />
+          <FieldControl render={<TriggerMenuInput placeholder="Write a message…" />} />
         </Field>
         <TriggerMenuContent>
           <TriggerMenuList>

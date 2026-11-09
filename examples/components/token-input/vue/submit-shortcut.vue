@@ -10,7 +10,7 @@ const log = useLog()
   <Field>
     <FieldLabel>Message</FieldLabel>
     <TokenInput submit-shortcut="mod+enter" @submit="(value) => log(`Sent ${toLabel(value)}`)">
-      <TokenInputEditor placeholder="Write a message" />
+      <TokenInputEditor placeholder="Write a message…" />
     </TokenInput>
   </Field>
 </template>

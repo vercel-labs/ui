@@ -24,7 +24,7 @@ function Example() {
   return (
     <div data-slot="stack">
       <Command>
-        <CommandInput aria-label="Search actions" placeholder="Search actions..." />
+        <CommandInput aria-label="Search actions" placeholder="Search actions…" />
         <CommandList>
           <CommandItem
             value="deploy"

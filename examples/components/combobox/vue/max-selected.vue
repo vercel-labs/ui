@@ -30,7 +30,7 @@ const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Sec
             </ComboboxChipRemove>
           </ComboboxChip>
         </ComboboxValue>
-        <ComboboxInput placeholder="Add labels" />
+        <ComboboxInput placeholder="Add labels…" />
       </ComboboxChips>
     </div>
     <ComboboxContent>

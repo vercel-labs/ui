@@ -60,7 +60,7 @@ function Example() {
                 </For>
               )}
             </ComboboxValue>
-            <ComboboxInput placeholder="Add a framework" />
+            <ComboboxInput placeholder="Add a framework…" />
           </ComboboxChips>
           <ComboboxTrigger aria-label="Show frameworks">
             <svg

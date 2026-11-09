@@ -26,7 +26,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-label>Labels</ui-combobox-label>
         <ui-combobox-chips>
           <ui-combobox-input>
-            <input placeholder="Add or create a label" />
+            <input placeholder="Add or create a label…" />
           </ui-combobox-input>
         </ui-combobox-chips>
       </div>

@@ -17,7 +17,7 @@ function Example() {
     >
       <Field name="message">
         <FieldLabel>Message</FieldLabel>
-        <Textarea controller={message} required placeholder="Write a reply to Hollis Grant." />
+        <Textarea controller={message} required placeholder="Write a reply to Hollis Grant…" />
       </Field>
       <div data-slot="row">
         <button type="submit" data-variant="solid">

@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
       <ui-field>
         <ui-field-label>Task</ui-field-label>
         <ui-trigger-menu-input>
-          <input placeholder="Type @ to assign someone" />
+          <input placeholder="Type @ to assign someone…" />
         </ui-trigger-menu-input>
       </ui-field>
       <ui-trigger-menu-content>

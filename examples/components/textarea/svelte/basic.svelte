@@ -5,5 +5,5 @@
 
 <Field name="message">
   <FieldLabel>Message</FieldLabel>
-  <Textarea placeholder="Type your message here." />
+  <Textarea placeholder="Type your message here…" />
 </Field>

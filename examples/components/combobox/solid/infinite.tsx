@@ -68,7 +68,7 @@ function Example() {
       <div data-slot="stack">
         <ComboboxLabel>Movie</ComboboxLabel>
         <div data-slot="row">
-          <ComboboxInput placeholder="Search movies" />
+          <ComboboxInput placeholder="Search movies…" />
           <ComboboxTrigger aria-label="Show movies">
             <svg
               viewBox="0 0 24 24"

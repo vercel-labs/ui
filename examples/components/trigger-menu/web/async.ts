@@ -35,7 +35,7 @@ function mount(root: HTMLElement) {
       <ui-field>
         <ui-field-label>Message</ui-field-label>
         <ui-trigger-menu-input>
-          <textarea placeholder="Type # to link a channel"></textarea>
+          <textarea placeholder="Type # to link a channel…"></textarea>
         </ui-trigger-menu-input>
       </ui-field>
       <ui-trigger-menu-content>

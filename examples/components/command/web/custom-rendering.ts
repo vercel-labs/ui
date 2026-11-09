@@ -7,7 +7,7 @@ function mount(root: HTMLElement) {
   root.innerHTML = `
     <ui-command>
       <ui-command-input>
-        <input aria-label="Search docs" placeholder="Search docs..." />
+        <input aria-label="Search docs" placeholder="Search docs…" />
       </ui-command-input>
       <ui-command-list>
         ${pages

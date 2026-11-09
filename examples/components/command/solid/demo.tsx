@@ -59,7 +59,7 @@ function Example() {
     <Command>
       <div data-slot="row">
         <Search aria-hidden="true" />
-        <CommandInput aria-label="Search commands" placeholder="Type a command or search..." />
+        <CommandInput aria-label="Search commands" placeholder="Type a command or search…" />
       </div>
       <CommandEmpty>No results found.</CommandEmpty>
       <CommandList>

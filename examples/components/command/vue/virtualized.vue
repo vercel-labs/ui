@@ -30,7 +30,7 @@ function visible(items: typeof commands) {
 
 <template>
   <Command :items="commands" @value-change="onValueChange">
-    <CommandInput aria-label="Search 10,000 commands" placeholder="Search 10,000 commands..." />
+    <CommandInput aria-label="Search 10,000 commands" placeholder="Search 10,000 commands…" />
     <div ref="scroller" @scroll="scrollTop = ($event.currentTarget as HTMLDivElement).scrollTop">
       <CommandList v-slot="{ state }">
         <div :style="{ height: `${state.items.length * row}px` }">

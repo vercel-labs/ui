@@ -40,7 +40,7 @@ const triggers: TriggerDefinition[] = [
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type @ and a first name" />
+          <TriggerMenuInput v-bind="props" placeholder="Type @ and a first name…" />
         </template>
       </FieldControl>
     </Field>

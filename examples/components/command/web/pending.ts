@@ -10,7 +10,7 @@ function mount(root: HTMLElement) {
     <div data-slot="stack">
       <ui-command>
         <ui-command-input>
-          <input aria-label="Search actions" placeholder="Search actions..." />
+          <input aria-label="Search actions" placeholder="Search actions…" />
         </ui-command-input>
         <ui-command-list>
           <ui-command-item value="deploy" label="Deploy to production">

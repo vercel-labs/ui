@@ -23,7 +23,7 @@
   onPagesChange={(next, details) => log(`Pages [${next.join(", ")}] (${details.reason})`)}
   onAction={(next) => log(`Ran ${next}`)}
 >
-  <CommandInput aria-label="Search themes" placeholder="Search themes..." />
+  <CommandInput aria-label="Search themes" placeholder="Search themes…" />
   <CommandList>
     <CommandPage>
       <CommandItem value="theme" page="theme">Change theme…</CommandItem>

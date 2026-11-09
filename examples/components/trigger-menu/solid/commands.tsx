@@ -36,7 +36,7 @@ function Example() {
         <Field name="message">
           <FieldLabel>Message</FieldLabel>
           <FieldControl
-            render={(props) => <TriggerMenuInput {...props} placeholder="Type / for commands" />}
+            render={(props) => <TriggerMenuInput {...props} placeholder="Type / for commands…" />}
           />
         </Field>
         <TriggerMenuHint />

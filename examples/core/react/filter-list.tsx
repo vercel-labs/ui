@@ -43,7 +43,7 @@ function Example() {
   return (
     <FilterList>
       <div data-slot="stack">
-        <FilterListInput aria-label="Filter countries" placeholder="Filter countries" />
+        <FilterListInput aria-label="Filter countries" placeholder="Filter countries…" />
         <FilterListList>
           {countries.map((country) => (
             <FilterListItem key={country} value={country}>

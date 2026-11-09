@@ -47,7 +47,7 @@ function mount(root: HTMLElement) {
       <ui-field>
         <ui-field-label>Message</ui-field-label>
         <ui-trigger-menu-input>
-          <textarea placeholder="Type @, / or #"></textarea>
+          <textarea placeholder="Type @, / or #…"></textarea>
         </ui-trigger-menu-input>
       </ui-field>
     </ui-trigger-menu>

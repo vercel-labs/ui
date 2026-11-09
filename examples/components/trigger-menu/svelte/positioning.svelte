@@ -29,7 +29,7 @@
     <FieldLabel>Comment</FieldLabel>
     <FieldControl>
       {#snippet render({ props })}
-        <TriggerMenuInput {...props} placeholder="Type @ to mention someone" />
+        <TriggerMenuInput {...props} placeholder="Type @ to mention someone…" />
       {/snippet}
     </FieldControl>
   </Field>

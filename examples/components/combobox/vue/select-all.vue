@@ -63,7 +63,7 @@ const timezones = [
             </ComboboxChipRemove>
           </ComboboxChip>
         </ComboboxValue>
-        <ComboboxInput placeholder="Add timezones" />
+        <ComboboxInput placeholder="Add timezones…" />
       </ComboboxChips>
     </div>
     <ComboboxContent>

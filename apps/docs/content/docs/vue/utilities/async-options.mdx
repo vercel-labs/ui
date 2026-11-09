@@ -29,7 +29,7 @@ const { state } = movies
 
 <template>
   <Combobox :items="state.items" :filter="false" :status="state.status" @query-change="movies.setQuery">
-    <ComboboxInput aria-label="Movie" placeholder="Search movies" />
+    <ComboboxInput aria-label="Movie" placeholder="Search movies…" />
     <ComboboxContent />
   </Combobox>
 </template>

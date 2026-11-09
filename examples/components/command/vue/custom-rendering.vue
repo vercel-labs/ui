@@ -7,7 +7,7 @@ const pages = ["Composition", "Installation", "Styling"]
 
 <template>
   <Command>
-    <CommandInput aria-label="Search docs" placeholder="Search docs..." />
+    <CommandInput aria-label="Search docs" placeholder="Search docs…" />
     <CommandList>
       <CommandItem v-for="page in pages" :key="page" :value="page">
         <template #render="{ props, children }">

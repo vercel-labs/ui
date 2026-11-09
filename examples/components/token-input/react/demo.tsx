@@ -36,7 +36,7 @@ function Example() {
           </TokenInputToken>
         )}
       >
-        <TokenInputEditor placeholder="Type @ to mention someone" />
+        <TokenInputEditor placeholder="Type @ to mention someone…" />
         <TriggerMenu triggers={[{ char: "@", type: "mention", items: people }]}>
           <TriggerMenuContent>
             <TriggerMenuList>

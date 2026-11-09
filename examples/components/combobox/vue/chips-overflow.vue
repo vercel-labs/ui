@@ -57,7 +57,7 @@ const countryLabel = (value: string) => countries.find((country) => country.valu
             <span v-bind="props" :title="state.labels.join(', ')" data-slot="hint"> +{{ state.count }} </span>
           </template>
         </ComboboxChipsOverflow>
-        <ComboboxInput placeholder="Add" />
+        <ComboboxInput placeholder="Add…" />
       </ComboboxChips>
       <p data-slot="hint">
         <ComboboxValue :max-labels="2" :get-more-label="(count: number) => `${count} more`" />

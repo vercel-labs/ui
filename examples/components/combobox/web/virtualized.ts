@@ -29,7 +29,7 @@ function mount(root: HTMLElement) {
         <ui-combobox-label>Item</ui-combobox-label>
         <div data-slot="row">
           <ui-combobox-input>
-            <input placeholder="Search 10,000 items" />
+            <input placeholder="Search 10,000 items…" />
           </ui-combobox-input>
           <ui-combobox-trigger>
             <button aria-label="Show items">${createElement(ChevronDown, { "aria-hidden": "true" }).outerHTML}</button>

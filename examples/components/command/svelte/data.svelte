@@ -77,7 +77,7 @@
 
 <div data-slot="stack">
   <Command items={commands} onAction={(value) => log(`Ran ${value}`)}>
-    <CommandInput aria-label="Search commands" placeholder="Type a command..." />
+    <CommandInput aria-label="Search commands" placeholder="Type a command…" />
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandList>
       {#snippet children(state)}

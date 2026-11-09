@@ -62,7 +62,7 @@
           </span>
         {/snippet}
       </ComboboxChipsOverflow>
-      <ComboboxInput placeholder="Add" />
+      <ComboboxInput placeholder="Add…" />
     </ComboboxChips>
     <p data-slot="hint">
       <ComboboxValue maxLabels={2} getMoreLabel={(count: number) => `${count} more`} />

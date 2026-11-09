@@ -27,7 +27,7 @@ function Example() {
         <FieldLabel>Notes</FieldLabel>
         <FieldControl
           ref={(field) => setEditor(textFieldAdapter(field))}
-          render={(props) => <textarea {...props} placeholder="Type @ to mention someone" />}
+          render={(props) => <textarea {...props} placeholder="Type @ to mention someone…" />}
         />
       </Field>
       <TriggerMenuContent>

@@ -435,7 +435,7 @@ const menuSlots = (slot: SlotFactory<MenuState, MenuApi>) => ({
 
   shortcut: slot({
     selects: selects({ values: [] }),
-    attrs: () => ({ "aria-hidden": "true" }),
+    attrs: () => ({ "aria-hidden": "true", translate: "no" }),
   }),
 })
 

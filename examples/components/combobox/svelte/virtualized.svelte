@@ -50,7 +50,7 @@
   <div data-slot="stack">
     <ComboboxLabel>Item</ComboboxLabel>
     <div data-slot="row">
-      <ComboboxInput placeholder="Search 10,000 items" />
+      <ComboboxInput placeholder="Search 10,000 items…" />
       <ComboboxTrigger aria-label="Show items">
         <ChevronDownIcon aria-hidden="true" />
       </ComboboxTrigger>

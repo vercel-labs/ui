@@ -25,7 +25,7 @@ function Example() {
       <Field>
         <FieldLabel>Message</FieldLabel>
         <FieldControl
-          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ to mention someone" />}
+          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ to mention someone…" />}
         />
       </Field>
       <div data-slot="visually-hidden">

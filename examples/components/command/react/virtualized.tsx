@@ -25,7 +25,7 @@ function Example() {
         else if (top + row > el.scrollTop + el.clientHeight) el.scrollTop = top + row - el.clientHeight
       }}
     >
-      <CommandInput aria-label="Search 10,000 commands" placeholder="Search 10,000 commands..." />
+      <CommandInput aria-label="Search 10,000 commands" placeholder="Search 10,000 commands…" />
       <div ref={scroller} onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
         <CommandList>
           {(state) => {
